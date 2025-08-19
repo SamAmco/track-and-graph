@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
 import com.samco.trackandgraph.TimeHistogramWindowData
-import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 
 interface ITimeHistogramViewData : IGraphStatViewData {
     data class BarValue(val label: String, val values: List<Double>)

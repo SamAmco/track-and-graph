@@ -1,11 +1,11 @@
 package com.samco.trackandgraph.group
 
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.base.database.dto.GroupChildType
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 
 sealed class GroupChild {
-    fun toDto() = com.samco.trackandgraph.base.database.dto.GroupChild(
+    fun toDto() = com.samco.trackandgraph.data.database.dto.GroupChild(
         type = when (this) {
             is ChildGroup -> GroupChildType.GROUP
             is ChildTracker -> GroupChildType.TRACKER

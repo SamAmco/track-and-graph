@@ -3,7 +3,7 @@ package com.samco.trackandgraph.lua
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.lua.apiimpl.oneArgFunction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi

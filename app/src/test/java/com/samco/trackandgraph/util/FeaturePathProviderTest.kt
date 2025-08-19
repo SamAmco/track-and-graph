@@ -1,6 +1,6 @@
 package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.data.database.dto.Feature
 import junit.framework.Assert
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

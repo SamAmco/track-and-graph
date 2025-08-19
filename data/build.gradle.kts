@@ -77,7 +77,7 @@ android {
         }
     }
     
-    namespace = "com.samco.trackandgraph.base"
+    namespace = "com.samco.trackandgraph.data"
 }
 
 dependencies {

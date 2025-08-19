@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.Group
 
 open class GroupPathProvider(
     val groups: Collection<Group>,

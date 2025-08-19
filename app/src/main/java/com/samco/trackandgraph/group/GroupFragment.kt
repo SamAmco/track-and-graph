@@ -33,9 +33,9 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase

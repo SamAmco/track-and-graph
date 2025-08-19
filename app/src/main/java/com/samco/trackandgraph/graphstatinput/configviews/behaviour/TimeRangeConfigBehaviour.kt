@@ -19,7 +19,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.behaviour
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.samco.trackandgraph.base.database.dto.GraphEndDate
+import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatSampleSize
 import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
 import org.threeten.bp.temporal.TemporalAmount

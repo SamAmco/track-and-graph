@@ -25,7 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.backupandrestore.dto.BackupResult
 import com.samco.trackandgraph.backupandrestore.dto.RestoreResult
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi

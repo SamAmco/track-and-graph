@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functions.functions
 
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.functions.aggregation.FixedBinAggregator
 import com.samco.trackandgraph.functions.aggregation.dataPointsLabel

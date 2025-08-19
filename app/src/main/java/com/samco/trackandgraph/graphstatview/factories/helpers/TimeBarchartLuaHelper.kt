@@ -19,8 +19,8 @@ package com.samco.trackandgraph.graphstatview.factories.helpers
 import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.SimpleXYSeries
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData

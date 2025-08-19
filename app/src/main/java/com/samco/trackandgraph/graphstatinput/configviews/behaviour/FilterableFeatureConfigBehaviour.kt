@@ -21,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import kotlinx.coroutines.CoroutineDispatcher

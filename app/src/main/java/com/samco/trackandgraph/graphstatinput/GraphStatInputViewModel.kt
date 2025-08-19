@@ -25,11 +25,11 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.*
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.DefaultDispatcher
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.data.database.dto.*
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.model.di.DefaultDispatcher
+import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.remoteconfig.UrlNavigator

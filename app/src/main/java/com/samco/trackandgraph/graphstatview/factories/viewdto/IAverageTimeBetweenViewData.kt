@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
 
 interface IAverageTimeBetweenViewData : IGraphStatViewData{
     //The total millis between the first and last data point

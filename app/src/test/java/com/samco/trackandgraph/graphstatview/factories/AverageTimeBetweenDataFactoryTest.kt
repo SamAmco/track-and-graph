@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.data.database.dto.IDataPoint
 import org.junit.Assert
 import org.junit.Test
 import org.threeten.bp.Duration

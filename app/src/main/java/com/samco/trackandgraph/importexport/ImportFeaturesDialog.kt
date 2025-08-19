@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.model.ImportFeaturesException
+import com.samco.trackandgraph.data.model.ImportFeaturesException
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing

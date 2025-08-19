@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.lua.dto
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.DataPoint
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 

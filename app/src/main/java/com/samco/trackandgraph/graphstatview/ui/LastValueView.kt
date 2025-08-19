@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.helpers.formatTimeToDaysHoursMinutesSeconds
 import com.samco.trackandgraph.helpers.getWeekDayNames

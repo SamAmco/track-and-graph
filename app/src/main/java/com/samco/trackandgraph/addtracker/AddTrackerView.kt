@@ -31,7 +31,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusManager
@@ -43,9 +42,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.TrackerSuggestionOrder
-import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.base.model.TrackerHelper
+import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
+import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
+import com.samco.trackandgraph.data.model.TrackerHelper
 import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable

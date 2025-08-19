@@ -18,7 +18,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.util.FeatureDataProvider

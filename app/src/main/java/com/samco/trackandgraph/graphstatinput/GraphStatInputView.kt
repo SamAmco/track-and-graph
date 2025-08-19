@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.data.database.dto.*
 import com.samco.trackandgraph.graphstatinput.configviews.ui.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView

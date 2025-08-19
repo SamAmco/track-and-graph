@@ -18,9 +18,9 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.TimeHistogramWindowData
-import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.data.database.dto.IDataPoint
+import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime

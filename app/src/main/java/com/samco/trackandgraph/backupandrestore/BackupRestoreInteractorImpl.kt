@@ -12,11 +12,11 @@ import com.samco.trackandgraph.backupandrestore.dto.AutoBackupInfo
 import com.samco.trackandgraph.backupandrestore.dto.BackupConfig
 import com.samco.trackandgraph.backupandrestore.dto.BackupResult
 import com.samco.trackandgraph.backupandrestore.dto.RestoreResult
-import com.samco.trackandgraph.base.database.TNG_DATABASE_VERSION
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.data.database.TNG_DATABASE_VERSION
+import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.reminders.AlarmInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

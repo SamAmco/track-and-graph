@@ -17,18 +17,18 @@
 
 package com.samco.trackandgraph
 
-import com.samco.trackandgraph.base.database.dto.DurationPlottingMode
-import com.samco.trackandgraph.base.database.dto.GraphEndDate
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.GraphStatType
-import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
-import com.samco.trackandgraph.base.database.dto.LineGraphFeature
-import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
-import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
-import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.base.database.dto.TrackerSuggestionOrder
-import com.samco.trackandgraph.base.database.dto.YRangeType
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
+import com.samco.trackandgraph.data.database.dto.GraphEndDate
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphFeature
+import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
+import com.samco.trackandgraph.data.database.dto.YRangeType
+import com.samco.trackandgraph.data.model.DataInteractor
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period

@@ -22,7 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 
 class TrackerViewHolder private constructor(

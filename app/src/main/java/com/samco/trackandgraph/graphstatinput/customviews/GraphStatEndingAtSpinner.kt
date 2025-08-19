@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.GraphEndDate
+import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.helpers.formatDayMonthYear
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.Spinner

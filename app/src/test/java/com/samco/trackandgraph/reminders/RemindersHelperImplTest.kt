@@ -2,9 +2,9 @@ package com.samco.trackandgraph.reminders
 
 import android.app.AlarmManager
 import com.nhaarman.mockitokotlin2.*
-import com.samco.trackandgraph.base.database.dto.CheckedDays
-import com.samco.trackandgraph.base.database.dto.Reminder
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.system.AlarmManagerWrapper
 import com.samco.trackandgraph.system.ReminderPrefWrapper
 import com.samco.trackandgraph.system.StoredAlarmInfo

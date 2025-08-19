@@ -1,6 +1,6 @@
 package com.samco.trackandgraph.lua.apiimpl
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.DataPoint
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.tableOf
 import org.luaj.vm2.LuaValue.Companion.valueOf
