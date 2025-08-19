@@ -37,8 +37,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -62,7 +65,8 @@ import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.showTimePickerDialog
+import com.samco.trackandgraph.ui.compose.ui.TimePickerDialogContent
+import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -157,20 +161,11 @@ private fun ReminderTimeDisplay(
     reminderViewData: ReminderViewData,
     timeFormatter: DateTimeFormatter,
 ) {
-    val context = LocalContext.current
+    var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
     Text(
         modifier = modifier
-            .clickable {
-                showTimePickerDialog(
-                    context = context,
-                    hour = reminderViewData.time.value.hour,
-                    minute = reminderViewData.time.value.minute,
-                    onTimeSelected = {
-                        reminderViewData.time.value = LocalTime.of(it.hour, it.minute)
-                    }
-                )
-            }
+            .clickable { showTimePicker = true }
             .padding(
                 start = dialogInputSpacing,
                 end = dialogInputSpacing,
@@ -180,6 +175,18 @@ private fun ReminderTimeDisplay(
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold
     )
+
+    if (showTimePicker) {
+        TimePickerDialogContent(
+            initialHour = reminderViewData.time.value.hour,
+            initialMinute = reminderViewData.time.value.minute,
+            onCancel = { showTimePicker = false },
+            onConfirm = { selectedTime ->
+                reminderViewData.time.value = LocalTime.of(selectedTime.hour, selectedTime.minute)
+                showTimePicker = false
+            }
+        )
+    }
 }
 
 @Composable

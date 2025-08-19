@@ -36,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
@@ -53,6 +54,7 @@ fun CustomDialog(
         inputSpacingLarge
     ),
     dismissOnClickOutside: Boolean = true,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     content: @Composable ColumnScope.() -> Unit,
 ) = DialogTheme {
     Dialog(
@@ -67,7 +69,7 @@ fun CustomDialog(
                 .systemBarsPadding()
                 .imePadding(),
             shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surface,
+            color = backgroundColor,
         ) {
             Column(
                 modifier = Modifier
@@ -92,11 +94,13 @@ fun CustomContinueCancelDialog(
     cancelVisible: Boolean = true,
     scrollContent: Boolean = true,
     dismissOnClickOutside: Boolean = true,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     content: @Composable ColumnScope.() -> Unit
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
     scrollContent = false,
     dismissOnClickOutside = dismissOnClickOutside,
+    backgroundColor = backgroundColor,
     paddingValues = PaddingValues(
         start = inputSpacingLarge,
         end = inputSpacingLarge,

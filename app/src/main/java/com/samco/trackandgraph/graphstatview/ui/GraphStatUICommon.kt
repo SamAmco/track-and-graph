@@ -22,7 +22,6 @@ import android.graphics.Color as GColor
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
