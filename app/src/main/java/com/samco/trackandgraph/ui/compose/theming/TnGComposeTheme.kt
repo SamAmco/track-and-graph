@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.ui.CustomTypography
 import com.samco.trackandgraph.ui.compose.ui.shapes
 
 // Color definitions from colors.xml
@@ -111,34 +112,6 @@ data class TngTypography(
         fontSize = materialTypography.bodyLarge.fontSize,
         lineHeight = 22.sp,
     )
-)
-
-// Custom Typography matching original Material 2 text sizes from dimens.xml
-val CustomTypography = Typography(
-    // Display styles (largest text)
-    displayLarge = Typography().displayLarge.copy(fontSize = 70.sp),
-    displayMedium = Typography().displayMedium.copy(fontSize = 45.sp),
-    displaySmall = Typography().displaySmall.copy(fontSize = 36.sp),
-
-    // Headline styles
-    headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),
-    headlineMedium = Typography().headlineMedium.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp),
-    headlineSmall = Typography().headlineSmall.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-
-    // Title styles
-    titleLarge = Typography().titleLarge.copy(fontSize = 28.sp),
-    titleMedium = Typography().titleMedium.copy(fontSize = 18.sp),
-    titleSmall = Typography().titleSmall.copy(fontSize = 16.sp),
-
-    // Body styles
-    bodyLarge = Typography().bodyLarge.copy(fontSize = 15.sp),
-    bodyMedium = Typography().bodyMedium.copy(fontSize = 15.sp),
-    bodySmall = Typography().bodySmall.copy(fontSize = 13.sp),
-
-    // Label styles (smallest text)
-    labelLarge = Typography().labelLarge.copy(fontSize = 14.sp),
-    labelMedium = Typography().labelMedium.copy(fontSize = 11.sp),
-    labelSmall = Typography().labelSmall.copy(fontSize = 10.sp),
 )
 
 // All hard-coded colors here were generated using the Material 3 color tool based on the core theme colours:
