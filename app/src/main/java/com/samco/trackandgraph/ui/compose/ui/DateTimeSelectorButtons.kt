@@ -24,6 +24,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -44,6 +45,8 @@ import com.samco.trackandgraph.helpers.formatDayMonthYear
 import com.samco.trackandgraph.helpers.formatHourMinute
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
@@ -104,6 +107,7 @@ fun DateButton(
         DatePickerDialogContent(
             initialDateTime = dateTime,
             onDismissRequest = { showDatePicker = false },
+            allowPastDates = allowPastDates,
             onDateSelected = { selectedDate ->
                 onDateSelected(selectedDate)
                 showDatePicker = false
@@ -180,11 +184,29 @@ fun TimePickerDialogContent(
 @Composable
 fun DatePickerDialogContent(
     initialDateTime: OffsetDateTime,
+    allowPastDates: Boolean = true,
     onDismissRequest: () -> Unit = {},
     onDateSelected: (OffsetDateTime) -> Unit = {}
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDateTime.toInstant().toEpochMilli()
+        initialSelectedDateMillis = initialDateTime.toInstant().toEpochMilli(),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                if (allowPastDates) return true
+                return utcTimeMillis >= LocalDateTime.now()
+                    .withHour(0)
+                    .withMinute(0)
+                    .withSecond(0)
+                    .withNano(0)
+                    .toInstant(ZoneOffset.UTC)
+                    .toEpochMilli()
+            }
+
+            override fun isSelectableYear(year: Int): Boolean {
+                if (allowPastDates) return true
+                return year >= LocalDate.now().year
+            }
+        }
     )
 
     DatePickerDialog(
