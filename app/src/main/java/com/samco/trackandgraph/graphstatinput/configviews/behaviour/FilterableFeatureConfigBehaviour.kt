@@ -50,7 +50,7 @@ interface FilterableFeatureConfigBehaviour {
 class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
     FilterableFeatureConfigBehaviour {
 
-    private var featureId: Long? = null
+    var featureId: Long? = null
     override var availableLabels: List<String> by mutableStateOf(listOf())
     override var selectedLabels: List<String> by mutableStateOf(listOf())
     override var fromValue: TextFieldValue by mutableStateOf(TextFieldValue("0", TextRange(1)))

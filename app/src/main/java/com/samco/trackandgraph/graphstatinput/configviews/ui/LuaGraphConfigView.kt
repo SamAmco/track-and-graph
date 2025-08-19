@@ -30,11 +30,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,10 +47,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -65,12 +69,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel.NetworkError
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphFeatureUiData
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.ui.AddBarButton
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
@@ -78,8 +84,9 @@ import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.IconTextButton
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
+import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
@@ -114,12 +121,10 @@ fun LuaGraphConfigView(
 
     LuaGraphConfigView(
         scrollState = scrollState,
-        featureMap = viewModel.featureMap,
         script = viewModel.script,
         scriptPreview = viewModel.scriptPreview
             .collectAsStateWithLifecycle().value,
-        selectedFeatures = viewModel.selectedFeatures,
-        getTextFieldFor = viewModel::getTextFieldFor,
+        featureUiDataList = viewModel.featureUiDataList,
         onUpdateFeatureName = viewModel::onUpdateFeatureName,
         onRemoveFeatureClicked = viewModel::onRemoveFeatureClicked,
         onSelectFeatureClicked = viewModel::onSelectFeatureClicked,
@@ -148,11 +153,9 @@ private fun showErrorToast(context: Context, networkError: NetworkError) {
 @Composable
 private fun LuaGraphConfigView(
     scrollState: ScrollState,
-    featureMap: Map<Long, String>?,
     script: TextFieldValue,
     scriptPreview: TextFieldValue,
-    selectedFeatures: List<LuaGraphFeature>,
-    getTextFieldFor: (Int) -> TextFieldValue,
+    featureUiDataList: List<LuaGraphFeatureUiData>,
     onUpdateFeatureName: (Int, TextFieldValue) -> Unit,
     onRemoveFeatureClicked: (Int) -> Unit,
     onSelectFeatureClicked: (Int, Long) -> Unit,
@@ -197,15 +200,13 @@ private fun LuaGraphConfigView(
 
     InputSpacingLarge()
 
-    Divider()
+    HorizontalDivider()
 
     InputSpacingLarge()
 
     LuaGraphFeaturesInputView(
         scrollState = scrollState,
-        selectedFeatures = selectedFeatures,
-        featureMap = featureMap,
-        getTextFieldFor = getTextFieldFor,
+        featureUiDataList = featureUiDataList,
         onUpdateFeatureName = onUpdateFeatureName,
         onRemoveFeatureClicked = onRemoveFeatureClicked,
         onSelectFeatureClicked = onSelectFeatureClicked,
@@ -253,9 +254,7 @@ private fun LuaUserConfirmDeepLinkDialog(
 @Composable
 private fun LuaGraphFeaturesInputView(
     scrollState: ScrollState,
-    selectedFeatures: List<LuaGraphFeature>,
-    featureMap: Map<Long, String>?,
-    getTextFieldFor: (Int) -> TextFieldValue,
+    featureUiDataList: List<LuaGraphFeatureUiData>,
     onUpdateFeatureName: (Int, TextFieldValue) -> Unit,
     onRemoveFeatureClicked: (Int) -> Unit,
     onSelectFeatureClicked: (Int, Long) -> Unit,
@@ -268,12 +267,10 @@ private fun LuaGraphFeaturesInputView(
 
     DialogInputSpacing()
 
-    for (index in selectedFeatures.indices) {
-        val lgf = selectedFeatures[index]
+    featureUiDataList.forEachIndexed { index, featureUiData ->
         LuaGraphFeatureInputView(
-            lgf = lgf,
-            features = featureMap ?: emptyMap(),
-            nameTextField = getTextFieldFor(index),
+            selectedFeatureText = featureUiData.selectedFeatureText,
+            nameTextField = featureUiData.nameTextField.value,
             onUpdateName = { onUpdateFeatureName(index, it) },
             onRemove = { onRemoveFeatureClicked(index) },
             onChangeSelectedFeatureId = { onSelectFeatureClicked(index, it) }
@@ -298,8 +295,7 @@ private fun LuaGraphFeaturesInputView(
 
 @Composable
 private fun LuaGraphFeatureInputView(
-    lgf: LuaGraphFeature,
-    features: Map<Long, String>,
+    selectedFeatureText: String,
     nameTextField: TextFieldValue,
     onUpdateName: (TextFieldValue) -> Unit,
     onRemove: () -> Unit,
@@ -321,11 +317,13 @@ private fun LuaGraphFeatureInputView(
                 textFieldValue = nameTextField,
                 onValueChange = onUpdateName,
             )
-            IconButton(onClick = { onRemove() }) {
+            IconButton(
+                modifier = Modifier.size(buttonSize),
+                onClick = { onRemove() }) {
                 Icon(
-                    painter = painterResource(id = com.samco.trackandgraph.R.drawable.delete_icon),
+                    painter = painterResource(id = R.drawable.delete_icon),
                     contentDescription = stringResource(
-                        id = com.samco.trackandgraph.R.string.delete_input_button_content_description
+                        id = R.string.delete_input_button_content_description
                     )
                 )
             }
@@ -333,12 +331,27 @@ private fun LuaGraphFeatureInputView(
 
         DialogInputSpacing()
 
-        TextMapSpinner(
-            modifier = Modifier.padding(start = 4.dp),
-            strings = features,
-            selectedItem = lgf.featureId,
-            onItemSelected = onChangeSelectedFeatureId
+        var showSelectDialog by rememberSaveable { mutableStateOf(false) }
+
+        SelectorButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = cardPadding),
+            text = selectedFeatureText,
+            onClick = { showSelectDialog = true }
         )
+
+        if (showSelectDialog) {
+            SelectItemDialog(
+                title = stringResource(R.string.select_a_feature),
+                selectableTypes = setOf(SelectableItemType.FEATURE),
+                onFeatureSelected = { selectedFeatureId ->
+                    onChangeSelectedFeatureId(selectedFeatureId)
+                    showSelectDialog = false
+                },
+                onDismissRequest = { showSelectDialog = false }
+            )
+        }
     }
 }
 
@@ -457,7 +470,6 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
     Column {
         LuaGraphConfigView(
             scrollState = rememberScrollState(),
-            featureMap = mapOf(1L to "Feature 1", 2L to "Feature 2"),
             script = TextFieldValue(),
             scriptPreview = TextFieldValue(
                 """
@@ -466,11 +478,16 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
                 end
             """.trimIndent()
             ),
-            selectedFeatures = listOf(
-                LuaGraphFeature(id = 1, luaGraphId = 1, featureId = 1, name = "Feature 1"),
-                LuaGraphFeature(id = 2, luaGraphId = 1, featureId = 2, name = "Feature 2")
+            featureUiDataList = listOf(
+                LuaGraphFeatureUiData(
+                    nameTextField = remember { mutableStateOf(TextFieldValue("Feature 1")) },
+                    selectedFeatureText = "Track > Steps > Daily Count"
+                ),
+                LuaGraphFeatureUiData(
+                    nameTextField = remember { mutableStateOf(TextFieldValue("Feature 2")) },
+                    selectedFeatureText = "Track > Weight > Average"
+                )
             ),
-            getTextFieldFor = { TextFieldValue("Feature Name $it") },
             onUpdateFeatureName = { _, _ -> },
             onRemoveFeatureClicked = {},
             onSelectFeatureClicked = { _, _ -> },

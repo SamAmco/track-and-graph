@@ -75,7 +75,7 @@ class BarChartConfigViewModel @Inject constructor(
         yRangeConfigBehaviour.initYRangeConfigBehaviour(onUpdate = { onUpdate() })
     }
 
-    private val isTimeBasedRange = snapshotFlow { featureId }
+    private val isTimeBasedRange = snapshotFlow { singleFeatureConfigBehaviour.featureId }
         .filterNotNull()
         .map { featurePathProvider.getDataSampleProperties(it)?.isDuration == true }
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
@@ -119,7 +119,7 @@ class BarChartConfigViewModel @Inject constructor(
 
     override fun updateConfig() {
         barChart = barChart.copy(
-            featureId = this.featureId ?: -1,
+            featureId = singleFeatureConfigBehaviour.featureId ?: -1,
             endDate = sampleEndingAt.asGraphEndDate(),
             sampleSize = selectedDuration.temporalAmount,
             yRangeType = yRangeType,
@@ -139,7 +139,7 @@ class BarChartConfigViewModel @Inject constructor(
     }
 
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
-        return if (singleFeatureConfigBehaviour.featureId == -1L) {
+        return if (singleFeatureConfigBehaviour.featureId == null || singleFeatureConfigBehaviour.featureId == -1L) {
             GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         } else null
     }

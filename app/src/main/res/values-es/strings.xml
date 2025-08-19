@@ -202,6 +202,7 @@
     <string name="duplicate">Duplicar</string>
     <string name="no_notes_hint_text">Las notas añadidas durante la traza aparecerán aquí. También puedes añadir notas globales usando el botón +.</string>
     <string name="add_a_global_note">Añadir una nota global:</string>
+    <string name="duration">Duración</string>
     <string name="weeks">Semanas</string>
     <string name="months">Meses</string>
     <string name="days">Días</string>

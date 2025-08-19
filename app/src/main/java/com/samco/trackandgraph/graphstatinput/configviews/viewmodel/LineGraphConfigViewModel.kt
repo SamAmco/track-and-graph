@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -106,27 +107,46 @@ class LineGraphConfigViewModel @Inject constructor(
         }
     }
 
-    data class FeatureSelectionIdentifier(
-        val featureId: Long,
-        val durationPlottingMode: DurationPlottingMode
+    data class LineGraphFeatureUiData(
+        val nameTextField: TextFieldValue,
+        val offsetTextField: TextFieldValue,
+        val scaleTextField: TextFieldValue,
+        val selectedFeatureText: String,
+        val colorIndex: Int,
+        val averagingMode: LineGraphAveraginModes,
+        val plottingMode: LineGraphPlottingModes,
+        val pointStyle: LineGraphPointStyle,
+        val isDurationFeature: Boolean,
+        val durationPlottingMode: DurationPlottingMode,
+        val featureId: Long
     )
 
-    data class FeaturePathViewData(
-        val id: FeatureSelectionIdentifier,
-        val path: String,
-    )
+    private var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
+    private val featureTextFields = mutableListOf<FeatureTextFields>()
 
-    var featurePaths: List<FeaturePathViewData> by mutableStateOf(emptyList())
-        private set
-
-    var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
-        private set
+    val lineGraphFeatureUiDataList by derivedStateOf {
+        lineGraphFeatures.mapIndexed { index, feature ->
+            val isDuration = featurePathProvider.getDataSampleProperties(feature.featureId)?.isDuration == true
+            val textFields = featureTextFields.getOrNull(index)
+            LineGraphFeatureUiData(
+                nameTextField = textFields?.name ?: TextFieldValue(),
+                offsetTextField = textFields?.offset ?: TextFieldValue(),
+                scaleTextField = textFields?.scale ?: TextFieldValue(),
+                selectedFeatureText = featurePathProvider.getPathForFeature(feature.featureId),
+                colorIndex = feature.colorIndex,
+                averagingMode = feature.averagingMode,
+                plottingMode = feature.plottingMode,
+                pointStyle = feature.pointStyle,
+                isDurationFeature = isDuration,
+                durationPlottingMode = feature.durationPlottingMode,
+                featureId = feature.featureId
+            )
+        }
+    }
 
     private val isTimeBasedRange = snapshotFlow { lineGraphFeatures }
         .map { lgfs -> lgfs.any { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE } }
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
-
-    private val featureTextFields = mutableListOf<FeatureTextFields>()
 
     private var lineGraph = LineGraphWithFeatures(
         id = 0L,
@@ -217,58 +237,9 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
-    private fun initFeaturePaths() {
-        featurePaths = featurePathProvider.dataSourceDataAlphabetically()
-            .flatMap {
-                val id = it.feature.featureId
-                val path = it.path
-                if (it.dataProperties?.isDuration == true) sequenceOf(
-                    FeaturePathViewData(
-                        id = FeatureSelectionIdentifier(
-                            featureId = id,
-                            durationPlottingMode = DurationPlottingMode.DURATION_IF_POSSIBLE
-                        ),
-                        path = path,
-                    ),
-                    FeaturePathViewData(
-                        id = FeatureSelectionIdentifier(
-                            featureId = id,
-                            durationPlottingMode = DurationPlottingMode.HOURS
-                        ),
-                        path = path
-                    ),
-                    FeaturePathViewData(
-                        id = FeatureSelectionIdentifier(
-                            featureId = id,
-                            durationPlottingMode = DurationPlottingMode.MINUTES
-                        ),
-                        path = path
-                    ),
-                    FeaturePathViewData(
-                        id = FeatureSelectionIdentifier(
-                            featureId = id,
-                            durationPlottingMode = DurationPlottingMode.SECONDS
-                        ),
-                        path = path
-                    ),
-                )
-                else sequenceOf(
-                    FeaturePathViewData(
-                        id = FeatureSelectionIdentifier(
-                            featureId = id,
-                            durationPlottingMode = DurationPlottingMode.NONE
-                        ),
-                        path = path
-                    )
-                )
-            }
-    }
-
     override fun onDataLoaded(config: Any?) {
 
         val lgConfig = config as? LineGraphWithFeatures
-
-        initFeaturePaths()
 
         timeRangeConfigBehaviour.onConfigLoaded(
             sampleSize = lgConfig?.sampleSize,
@@ -309,35 +280,78 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
-    fun updateLineGraphFeature(index: Int, newLgf: LineGraphFeature) = viewModelScope.launch {
-        val newFeatureName = featurePathProvider.features
-            .firstOrNull { it.featureId == newLgf.featureId }?.name ?: ""
-        val oldFeatureName = featurePathProvider.features
-            .firstOrNull { it.featureId == lineGraphFeatures[index].featureId }?.name ?: ""
+    fun onUpdateFeatureName(index: Int, text: TextFieldValue) {
+        featureTextFields.getOrNull(index)?.updateName(text)
+    }
 
+    fun onUpdateFeatureOffset(index: Int, text: TextFieldValue) {
+        featureTextFields.getOrNull(index)?.updateOffset(text)
+    }
+
+    fun onUpdateFeatureScale(index: Int, text: TextFieldValue) {
+        featureTextFields.getOrNull(index)?.updateScale(text)
+    }
+
+    fun onUpdateFeatureColor(index: Int, colorIndex: Int) {
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
-            val textFields = featureTextFields[index]
-            if (textFields.name.text == oldFeatureName) {
-                textFields.updateName(
-                    TextFieldValue(
-                        newFeatureName,
-                        TextRange(newFeatureName.length)
-                    ),
-                    triggerUpdate = false
-                )
-            }
-            set(
-                index, newLgf.copy(
-                    name = textFields.name.text,
-                    offset = textFields.offset.text.toDoubleOrNull() ?: 0.toDouble(),
-                    scale = textFields.scale.text.toDoubleOrNull() ?: 1.toDouble()
-                )
-            )
+            set(index, get(index).copy(colorIndex = colorIndex))
         }
         onUpdate()
     }
 
-    fun getTextFieldsFor(index: Int): FeatureTextFields {
-        return featureTextFields[index]
+    fun onUpdateFeaturePointStyle(index: Int, pointStyle: LineGraphPointStyle) {
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
+            set(index, get(index).copy(pointStyle = pointStyle))
+        }
+        onUpdate()
+    }
+
+    fun onUpdateFeatureAveragingMode(index: Int, averagingMode: LineGraphAveraginModes) {
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
+            set(index, get(index).copy(averagingMode = averagingMode))
+        }
+        onUpdate()
+    }
+
+    fun onUpdateFeaturePlottingMode(index: Int, plottingMode: LineGraphPlottingModes) {
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
+            set(index, get(index).copy(plottingMode = plottingMode))
+        }
+        onUpdate()
+    }
+
+    fun onUpdateFeatureDurationPlottingMode(index: Int, durationPlottingMode: DurationPlottingMode) {
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
+            set(index, get(index).copy(durationPlottingMode = durationPlottingMode))
+        }
+        onUpdate()
+    }
+
+    fun onSelectFeature(index: Int, featureId: Long) {
+        val isDuration = featurePathProvider.getDataSampleProperties(featureId)?.isDuration == true
+        val defaultDurationMode = if (isDuration) DurationPlottingMode.DURATION_IF_POSSIBLE else DurationPlottingMode.NONE
+        val newFeatureName = featurePathProvider.featureName(featureId) ?: ""
+        val oldFeatureName = featurePathProvider.featureName(lineGraphFeatures[index].featureId) ?: ""
+
+        // Update the feature
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
+            set(
+                index, get(index).copy(
+                    featureId = featureId,
+                    durationPlottingMode = defaultDurationMode
+                )
+            )
+        }
+
+        // Update the name field if it matches the old feature name
+        val textFields = featureTextFields[index]
+        if (textFields.name.text == oldFeatureName) {
+            textFields.updateName(
+                TextFieldValue(newFeatureName, TextRange(newFeatureName.length)),
+                triggerUpdate = false
+            )
+        }
+
+        onUpdate()
     }
 }

@@ -73,7 +73,7 @@ class PieChartConfigViewModel @Inject constructor(
 
     override fun updateConfig() {
         pieChart = pieChart.copy(
-            featureId = this.featureId ?: -1L,
+            featureId = singleFeatureConfigBehaviour.featureId ?: -1L,
             sampleSize = selectedDuration.temporalAmount,
             endDate = sampleEndingAt.asGraphEndDate(),
             sumByCount = sumByCount

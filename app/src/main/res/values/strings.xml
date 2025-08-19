@@ -223,6 +223,7 @@
     <string name="duplicate">Duplicate</string>
     <string name="no_notes_hint_text">Notes added when tracking will show up here. You can also add global notes using the + button.</string>
     <string name="add_a_global_note">Add a global note:</string>
+    <string name="duration">Duration</string>
     <string name="weeks">Weeks</string>
     <string name="months">Months</string>
     <string name="days">Days</string>

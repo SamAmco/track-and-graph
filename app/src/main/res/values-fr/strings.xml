@@ -204,6 +204,7 @@
     <string name="duplicate">Dupliquer</string>
     <string name="no_notes_hint_text">Les notes ajoutées lors du suivi s\'afficheront ici. Vous pouvez également ajouter des notes globales en utilisant le bouton +.</string>
     <string name="add_a_global_note">Ajouter une note globale : </string>
+    <string name="duration">Durée</string>
     <string name="months">Mois</string>
     <string name="days">Jours</string>
     <string name="minutes">Minutes</string>

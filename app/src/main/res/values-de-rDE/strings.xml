@@ -203,6 +203,7 @@
     <string name="duplicate">Kopie</string>
     <string name="no_notes_hint_text">Beim Tracking hinzugefügte Notizen werden hier angezeigt. Sie können auch globale Notizen mit der + Taste hinzufügen.</string>
     <string name="add_a_global_note">Globale Notiz hinzufügen:</string>
+    <string name="duration">Dauer</string>
     <string name="weeks">Wochen</string>
     <string name="months">Monate</string>
     <string name="days">Tage</string>

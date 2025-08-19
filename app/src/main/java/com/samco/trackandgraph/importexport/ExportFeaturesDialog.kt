@@ -138,8 +138,6 @@ private fun ExportFeaturesDialogContent(
             } else {
                 MaterialTheme.colorScheme.onSurface
             },
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
             onClick = onCreateFile
         )
 

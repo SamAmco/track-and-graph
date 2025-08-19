@@ -89,8 +89,8 @@ fun SelectorButton(
     text: String,
     enabled: Boolean = true,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    overflow: TextOverflow = TextOverflow.Clip,
-    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.StartEllipsis,
+    maxLines: Int = 1,
     onClick: () -> Unit
 ) = Button(
     modifier = modifier,

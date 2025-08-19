@@ -17,12 +17,18 @@
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,10 +38,12 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.PieChartConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
@@ -66,7 +74,7 @@ fun PieChartConfigView(
 
     DialogInputSpacing()
 
-    Divider()
+    HorizontalDivider()
 
     InputSpacingLarge()
 
@@ -76,14 +84,25 @@ fun PieChartConfigView(
         style = MaterialTheme.typography.titleSmall
     )
 
-    val featureId = viewModel.featureId
-    val featureMap = viewModel.featureMap
+    DialogInputSpacing()
 
-    if (featureId != null && featureMap != null) {
-        TextMapSpinner(
-            strings = featureMap,
-            selectedItem = featureId,
-            onItemSelected = { viewModel.updateFeatureId(it) }
+    var showSelectDialog by rememberSaveable { mutableStateOf(false) }
+
+    SelectorButton(
+        modifier = Modifier.fillMaxWidth(),
+        text = viewModel.selectedFeatureText,
+        onClick = { showSelectDialog = true }
+    )
+
+    if (showSelectDialog) {
+        SelectItemDialog(
+            title = stringResource(R.string.select_a_discrete_feature),
+            selectableTypes = setOf(SelectableItemType.FEATURE),
+            onFeatureSelected = { selectedFeatureId ->
+                viewModel.updateFeatureId(selectedFeatureId)
+                showSelectDialog = false
+            },
+            onDismissRequest = { showSelectDialog = false }
         )
     }
 
