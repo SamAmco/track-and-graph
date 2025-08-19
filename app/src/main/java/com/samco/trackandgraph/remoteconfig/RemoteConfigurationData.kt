@@ -16,10 +16,12 @@
 */
 package com.samco.trackandgraph.remoteconfig
 
-interface RemoteConfigProvider {
-    suspend fun getRemoteConfiguration(): RemoteConfiguration?
-    
-    suspend fun getEndpoints(): Map<String, String>?
-    
-    suspend fun getTrustedLuaScriptSources(): List<String>?
-}
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class RemoteConfiguration(
+    val endpoints: Map<String, String>,
+    @Json(name = "trusted-lua-script-sources")
+    val trustedLuaScriptSources: List<String>
+)

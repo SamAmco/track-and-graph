@@ -115,7 +115,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     private var selectedFeatures: List<LuaGraphFeature> by mutableStateOf(emptyList())
     private val featureTextFields = mutableListOf<MutableState<TextFieldValue>>()
-    
+
     val featureUiDataList by derivedStateOf {
         selectedFeatures.mapIndexed { index, feature ->
             LuaGraphFeatureUiData(
@@ -168,23 +168,12 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     private suspend fun onReceivedDeepLink(uri: URI) {
-        val trustedSources = mutableListOf<String>()
-
-        try {
-            val trustedSourcesObj = remoteConfigProvider.getRemoteConfigArray(
-                RemoteConfigProvider.RemoteConfig.TRUSTED_LUA_GRAPH_SOURCES
-            )
-            // Convert JSONObject to JSONArray if needed
-            val jsonArray = trustedSourcesObj
-
-            if (jsonArray != null) {
-                for (i in 0 until jsonArray.length()) {
-                    trustedSources.add(jsonArray.getString(i))
-                }
-            }
+        val trustedSources = try {
+            remoteConfigProvider.getTrustedLuaScriptSources() ?: emptyList()
         } catch (e: Exception) {
             // Handle parsing errors gracefully
             Timber.e(e, "Failed to parse trusted sources")
+            emptyList()
         }
 
         if (trustedSources.isEmpty()) {
@@ -276,7 +265,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         featureTextFields.removeAt(index)
         onUpdate()
     }
-    
+
     fun onUpdateFeatureName(index: Int, text: TextFieldValue) {
         featureTextFields[index].value = text
         onUpdate()

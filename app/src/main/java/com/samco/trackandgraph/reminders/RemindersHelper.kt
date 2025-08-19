@@ -64,7 +64,8 @@ internal class RemindersHelperImpl @Inject constructor(
     private val alarmManager: AlarmManagerWrapper,
     private val systemInfoProvider: SystemInfoProvider,
     private val dataInteractor: DataInteractor,
-    @IODispatcher private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher,
+    private val moshi: Moshi,
 ) : RemindersHelper, CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + io
@@ -74,7 +75,6 @@ internal class RemindersHelperImpl @Inject constructor(
     private val syncMutex = Mutex()
     private val clearMutex = Mutex()
 
-    private val moshi = Moshi.Builder().build()
     private val moshiStoredAlarmInfoListType = Types
         .newParameterizedType(List::class.java, StoredAlarmInfo::class.java)
 
