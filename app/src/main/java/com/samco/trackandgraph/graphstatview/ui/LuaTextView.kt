@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge

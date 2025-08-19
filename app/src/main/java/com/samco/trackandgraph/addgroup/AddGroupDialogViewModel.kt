@@ -24,8 +24,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.ui.dataVisColorList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

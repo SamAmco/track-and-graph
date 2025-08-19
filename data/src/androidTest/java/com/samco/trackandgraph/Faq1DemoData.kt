@@ -1,8 +1,8 @@
 package com.samco.trackandgraph
 
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.TrackerSuggestionOrder
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
+import com.samco.trackandgraph.data.model.DataInteractor
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 

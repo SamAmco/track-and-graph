@@ -26,9 +26,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.CATEGORY_STOPWATCH
 import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.DataUpdateType
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.model.DataUpdateType
 import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import dagger.hilt.android.AndroidEntryPoint

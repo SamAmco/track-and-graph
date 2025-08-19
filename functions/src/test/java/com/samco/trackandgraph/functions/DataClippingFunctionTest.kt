@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functions
 
-import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals

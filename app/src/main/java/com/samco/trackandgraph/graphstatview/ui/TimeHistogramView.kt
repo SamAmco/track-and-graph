@@ -35,7 +35,7 @@ import com.androidplot.xy.StepMode
 import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.TimeHistogramWindowData
-import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing

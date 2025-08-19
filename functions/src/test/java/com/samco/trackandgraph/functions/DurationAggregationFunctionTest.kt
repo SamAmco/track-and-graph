@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.functions
 
-import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.functions.functions.DurationAggregationFunction
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import kotlinx.coroutines.runBlocking

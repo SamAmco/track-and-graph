@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.samco.trackandgraph.base.database.dto.GroupChildType
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 
 class GroupAdapter(
     private val trackerClickListener: TrackerClickListener,

@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph
 
-import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
-import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
-import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAmount

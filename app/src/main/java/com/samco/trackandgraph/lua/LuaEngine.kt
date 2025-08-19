@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.lua
 
-import com.samco.trackandgraph.base.database.sampling.RawDataSample
+import com.samco.trackandgraph.data.database.sampling.RawDataSample
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 
 interface LuaEngine {

@@ -1,6 +1,6 @@
 package com.samco.trackandgraph.group
 
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
 
 class GraphWithViewData(
     val graph: GraphOrStat,

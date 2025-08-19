@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functions.functions
 
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.data.database.sampling.DataSample
 
 /**
  * A function that will filter all data points in the given input sample and return only those that

@@ -16,9 +16,9 @@
  */
 package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
+import com.samco.trackandgraph.data.database.dto.Feature
+import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.sampling.DataSampleProperties
 
 class FeatureDataProvider(
     dataSourceData: List<DataSourceData>,

@@ -19,8 +19,8 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
-import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.data.database.dto.YRangeType
 import org.threeten.bp.OffsetDateTime
 
 data class Line(

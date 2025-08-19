@@ -20,8 +20,8 @@ package com.samco.trackandgraph.helpers
 import android.content.Context
 import android.text.format.DateUtils
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.IDataPoint
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter

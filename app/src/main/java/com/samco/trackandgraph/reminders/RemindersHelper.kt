@@ -19,9 +19,9 @@ package com.samco.trackandgraph.reminders
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
-import com.samco.trackandgraph.base.database.dto.Reminder
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.system.AlarmManagerWrapper
 import com.samco.trackandgraph.system.ReminderPrefWrapper
 import com.samco.trackandgraph.system.StoredAlarmInfo

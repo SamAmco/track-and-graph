@@ -19,11 +19,11 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.TimeHistogramWindowData
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.TimeHistogram
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.TimeHistogram
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.helpers.TimeHelper

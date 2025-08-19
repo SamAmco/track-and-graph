@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functions.functions
 
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.data.database.sampling.DataSample
 
 /**
  * Represents a function that can modify a given [DataSample]

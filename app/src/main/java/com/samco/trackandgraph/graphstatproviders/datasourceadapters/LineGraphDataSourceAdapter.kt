@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.data.model.DataInteractor
 import javax.inject.Inject
 
 class LineGraphDataSourceAdapter @Inject constructor(

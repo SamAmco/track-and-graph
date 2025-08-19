@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatproviders
 
-import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatproviders.datasourceadapters.*
 import com.samco.trackandgraph.graphstatview.factories.*
 import javax.inject.Inject

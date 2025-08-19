@@ -17,10 +17,10 @@
 package com.samco.trackandgraph.graphstatview.factories.helpers
 
 import com.androidplot.xy.RectRegion
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.GraphStatType
-import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData

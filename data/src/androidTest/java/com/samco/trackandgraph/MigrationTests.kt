@@ -22,8 +22,8 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
-import com.samco.trackandgraph.base.database.*
-import com.samco.trackandgraph.base.database.migrations.allMigrations
+import com.samco.trackandgraph.data.database.*
+import com.samco.trackandgraph.data.database.migrations.allMigrations
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import org.junit.Rule

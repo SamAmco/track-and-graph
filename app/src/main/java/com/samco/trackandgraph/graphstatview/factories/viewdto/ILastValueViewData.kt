@@ -1,7 +1,7 @@
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
 
 interface ILastValueViewData : IGraphStatViewData {
     val isDuration: Boolean

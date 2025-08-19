@@ -1,6 +1,6 @@
 package com.samco.trackandgraph.graphstatview.factories.helpers
 
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData

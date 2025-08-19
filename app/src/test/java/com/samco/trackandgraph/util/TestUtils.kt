@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.base.database.sampling.RawDataSample
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.sampling.RawDataSample
 
 fun rawDataSampleFromSequence(
     data: Sequence<DataPoint>,

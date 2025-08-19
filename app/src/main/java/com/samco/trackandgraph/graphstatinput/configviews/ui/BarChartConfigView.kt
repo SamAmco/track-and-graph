@@ -31,8 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
+import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.BarChartConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner

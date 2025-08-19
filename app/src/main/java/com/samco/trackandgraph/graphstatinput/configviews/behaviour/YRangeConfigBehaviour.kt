@@ -22,7 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi

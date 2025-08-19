@@ -1,8 +1,8 @@
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.DefaultDispatcher
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.model.di.DefaultDispatcher
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import dagger.BindsInstance
 import dagger.Component

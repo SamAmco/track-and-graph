@@ -17,8 +17,8 @@
 package com.samco.trackandgraph.group
 
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

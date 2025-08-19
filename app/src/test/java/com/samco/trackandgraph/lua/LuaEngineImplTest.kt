@@ -19,8 +19,8 @@ package com.samco.trackandgraph.lua
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.util.rawDataSampleFromSequence
 import kotlinx.coroutines.CoroutineDispatcher

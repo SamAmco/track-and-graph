@@ -59,8 +59,8 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.addgroup.AddGroupDialog
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog

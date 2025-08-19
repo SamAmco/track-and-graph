@@ -38,8 +38,8 @@ import com.androidplot.xy.StepMode
 import com.androidplot.xy.XValueMarker
 import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.helpers.formatDayMonth
 import com.samco.trackandgraph.helpers.formatMonthYear
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding

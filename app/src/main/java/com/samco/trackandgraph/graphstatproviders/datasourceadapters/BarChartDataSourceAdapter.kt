@@ -1,8 +1,8 @@
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.base.database.dto.BarChart
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.BarChart
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.model.DataInteractor
 import javax.inject.Inject
 
 class BarChartDataSourceAdapter @Inject constructor(

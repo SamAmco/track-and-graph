@@ -16,7 +16,7 @@
 */
 package com.samco.trackandgraph.remoteconfig
 
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.downloader.FileDownloader
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

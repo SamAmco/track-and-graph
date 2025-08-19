@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functions.functions
 
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.data.database.sampling.DataSample
 
 /** A calculator that just returns the data passed to it **/
 class IdentityFunction : DataSampleFunction {

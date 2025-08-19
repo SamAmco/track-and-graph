@@ -18,16 +18,16 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import com.samco.trackandgraph.base.database.dto.BarChart
-import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.GraphEndDate
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.GraphStatType
-import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.dto.YRangeType
-import com.samco.trackandgraph.base.database.sampling.DataSample
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.BarChart
+import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.GraphEndDate
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.IDataPoint
+import com.samco.trackandgraph.data.database.dto.YRangeType
+import com.samco.trackandgraph.data.database.sampling.DataSample
+import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper

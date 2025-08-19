@@ -17,8 +17,8 @@
 
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.model.DataInteractor
 
 /**
  * An abstract adapter for retrieving and writing graph or stat configs to a database

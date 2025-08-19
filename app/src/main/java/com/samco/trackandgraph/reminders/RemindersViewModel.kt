@@ -19,11 +19,11 @@ package com.samco.trackandgraph.reminders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.base.database.dto.CheckedDays
-import com.samco.trackandgraph.base.database.dto.Reminder
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview

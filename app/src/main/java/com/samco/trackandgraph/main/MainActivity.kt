@@ -38,7 +38,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
 import com.samco.trackandgraph.reminders.AlarmInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper

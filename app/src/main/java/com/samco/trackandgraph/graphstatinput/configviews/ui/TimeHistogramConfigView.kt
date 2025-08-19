@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.TimeHistogramConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner

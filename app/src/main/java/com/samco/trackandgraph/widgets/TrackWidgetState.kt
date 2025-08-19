@@ -22,8 +22,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
 
 /**
  * Centralized widget state management for Track & Graph widgets

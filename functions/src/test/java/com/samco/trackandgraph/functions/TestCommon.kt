@@ -1,8 +1,8 @@
 package com.samco.trackandgraph.functions
 
-import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.sampling.DataSample
-import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
+import com.samco.trackandgraph.data.database.dto.IDataPoint
+import com.samco.trackandgraph.data.database.sampling.DataSample
+import com.samco.trackandgraph.data.database.sampling.DataSampleProperties
 
 fun fromSequence(
     sequence: Sequence<IDataPoint>,

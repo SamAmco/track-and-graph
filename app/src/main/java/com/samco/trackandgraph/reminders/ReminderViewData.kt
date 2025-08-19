@@ -21,8 +21,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.input.TextFieldValue
-import com.samco.trackandgraph.base.database.dto.CheckedDays
-import com.samco.trackandgraph.base.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Reminder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge

@@ -18,7 +18,7 @@ package com.samco.trackandgraph.remoteconfig
 
 import android.content.Context
 import android.content.Intent
-import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

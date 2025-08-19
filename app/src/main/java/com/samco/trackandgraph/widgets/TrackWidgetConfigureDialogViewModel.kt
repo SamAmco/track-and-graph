@@ -19,9 +19,9 @@ package com.samco.trackandgraph.widgets
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.MainDispatcher
 import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

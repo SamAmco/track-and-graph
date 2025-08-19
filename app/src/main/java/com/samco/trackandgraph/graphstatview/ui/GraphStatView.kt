@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
