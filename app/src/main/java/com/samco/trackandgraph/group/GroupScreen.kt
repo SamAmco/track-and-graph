@@ -400,75 +400,74 @@ private fun GroupGrid(
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
     onFabVisibilityChange: (Boolean) -> Unit
-) {
-    BoxWithConstraints(modifier = modifier) {
-        // Calculate column count based on maxWidth with minimum 100.dp per cell
-        val columnCount = (maxWidth / 180.dp).toInt().coerceAtLeast(2)
+) = BoxWithConstraints(modifier = modifier) {
+    // Calculate column count based on maxWidth with minimum 100.dp per cell
+    val columnCount = (maxWidth / 180.dp).toInt().coerceAtLeast(2)
 
-        val reorderableLazyGridState = rememberReorderableLazyGridState(lazyGridState) { from, to ->
-            onDragSwap(from.index, to.index)
+    val reorderableLazyGridState = rememberReorderableLazyGridState(lazyGridState) { from, to ->
+        onDragSwap(from.index, to.index)
+    }
+
+    LaunchedEffect(reorderableLazyGridState.isAnyItemDragging) {
+        if (reorderableLazyGridState.isAnyItemDragging) onDragStart() else onDragEnd()
+    }
+
+    var lastSize by remember { mutableIntStateOf(allChildren.size) }
+    LaunchedEffect(allChildren.size) {
+        if (allChildren.size > lastSize) {
+            lazyGridState.animateScrollToItem(0)
         }
+        lastSize = allChildren.size
+    }
 
-        LaunchedEffect(reorderableLazyGridState.isAnyItemDragging) {
-            if (reorderableLazyGridState.isAnyItemDragging) onDragStart() else onDragEnd()
-        }
+    DetectScrollDirection(
+        gridState = lazyGridState,
+        userScrolledUp = onFabVisibilityChange
+    )
 
-        var lastSize by remember { mutableIntStateOf(allChildren.size) }
-        LaunchedEffect(allChildren.size) {
-            if (allChildren.size > lastSize) {
-                lazyGridState.animateScrollToItem(0)
-            }
-            lastSize = allChildren.size
-        }
-
-        DetectScrollDirection(
-            gridState = lazyGridState,
-            userScrolledUp = onFabVisibilityChange
-        )
-
-        LazyVerticalGrid(
-            state = lazyGridState,
-            columns = GridCells.Fixed(columnCount),
-        ) {
-            items(
-                items = allChildren,
-                key = { it.toGroupChildKey() },
-                span = { item ->
-                    when (item) {
-                        is GroupChild.ChildTracker -> GridItemSpan(1)
-                        is GroupChild.ChildGroup -> GridItemSpan(2)
-                        is GroupChild.ChildGraph -> GridItemSpan(columnCount)
-                    }
+    LazyVerticalGrid(
+        modifier = Modifier.fillMaxSize(),
+        state = lazyGridState,
+        columns = GridCells.Fixed(columnCount),
+    ) {
+        items(
+            items = allChildren,
+            key = { it.toGroupChildKey() },
+            span = { item ->
+                when (item) {
+                    is GroupChild.ChildTracker -> GridItemSpan(1)
+                    is GroupChild.ChildGroup -> GridItemSpan(2)
+                    is GroupChild.ChildGraph -> GridItemSpan(columnCount)
                 }
-            ) { item ->
-                ReorderableItem(
-                    reorderableLazyGridState,
-                    key = item.toGroupChildKey()
-                ) { isDragging ->
-                    when (item) {
-                        is GroupChild.ChildTracker -> {
-                            TrackerItem(
-                                tracker = item.displayTracker,
-                                clickListeners = trackerClickListeners,
-                                isElevated = isDragging,
-                            )
-                        }
+            }
+        ) { item ->
+            ReorderableItem(
+                reorderableLazyGridState,
+                key = item.toGroupChildKey()
+            ) { isDragging ->
+                when (item) {
+                    is GroupChild.ChildTracker -> {
+                        TrackerItem(
+                            tracker = item.displayTracker,
+                            clickListeners = trackerClickListeners,
+                            isElevated = isDragging,
+                        )
+                    }
 
-                        is GroupChild.ChildGroup -> {
-                            GroupItem(
-                                group = item.group,
-                                clickListeners = groupClickListeners,
-                                isElevated = isDragging,
-                            )
-                        }
+                    is GroupChild.ChildGroup -> {
+                        GroupItem(
+                            group = item.group,
+                            clickListeners = groupClickListeners,
+                            isElevated = isDragging,
+                        )
+                    }
 
-                        is GroupChild.ChildGraph -> {
-                            GraphStatItem(
-                                graphStat = item.graph.viewData,
-                                clickListeners = graphStatClickListeners,
-                                isElevated = isDragging,
-                            )
-                        }
+                    is GroupChild.ChildGraph -> {
+                        GraphStatItem(
+                            graphStat = item.graph.viewData,
+                            clickListeners = graphStatClickListeners,
+                            isElevated = isDragging,
+                        )
                     }
                 }
             }
