@@ -195,7 +195,7 @@ class StartTimerAction : ActionCallback {
 
             val featureId = parameters[FeatureIdKey] ?: return
 
-            val tracker = dataInteractor.getTrackerById(featureId) ?: return
+            val tracker = dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId) ?: return
             dataInteractor.playTimerForTracker(tracker.id)
             timerServiceInteractor.startTimerNotificationService()
 
