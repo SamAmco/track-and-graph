@@ -264,9 +264,7 @@ internal class TrackerHelperImpl @Inject constructor(
         dao.getTrackerByFeatureId(featureId)?.let { Tracker.fromTrackerWithFeature(it) }
     }
 
-    override fun hasAtLeastOneTracker(): Flow<Boolean> {
-        return dao.numTrackers().map { it > 0 }.flowOn(io)
-    }
+    override suspend fun hasAtLeastOneTracker(): Boolean = withContext(io) { dao.numTrackers() > 0 }
 
     override suspend fun hasAtLeastOneDataPoint() = withContext(io) {
         return@withContext dao.hasAtLeastOneDataPoint()
