@@ -19,9 +19,7 @@ package com.samco.trackandgraph.notes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -144,7 +142,6 @@ private fun NotesView(
                 onEditClick = { onEditClick(note) },
                 onDeleteClick = { onDeleteClick(note) }
             )
-            Spacer(modifier = Modifier.height(cardMarginSmall))
         }
     }
 }
