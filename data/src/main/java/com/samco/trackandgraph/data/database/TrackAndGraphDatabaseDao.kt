@@ -381,7 +381,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun getTrackerByFeatureId(featureId: Long): TrackerWithFeature?
 
     @Query("SELECT COUNT(*) FROM trackers_table")
-    fun numTrackers(): Flow<Int>
+    fun numTrackers(): Int
 
     @Query(
         """

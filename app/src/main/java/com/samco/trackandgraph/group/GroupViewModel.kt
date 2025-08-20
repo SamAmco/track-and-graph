@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.DataUpdateType
 import com.samco.trackandgraph.data.model.di.DefaultDispatcher
@@ -80,15 +81,16 @@ interface GroupViewModel {
     )
 
     val showDurationInputDialog: StateFlow<DurationInputDialogData?>
-    val hasTrackers: StateFlow<Boolean>
+    val groupHasAnyTrackers: StateFlow<Boolean>
     val currentChildren: StateFlow<List<GroupChild>>
     val showEmptyGroupText: StateFlow<Boolean>
     val hasAnyReminders: StateFlow<Boolean>
     val loading: StateFlow<Boolean>
-    val trackers: List<DisplayTracker>
     val lazyGridState: LazyGridState
 
     fun setGroup(groupId: Long)
+    suspend fun userHasAnyTrackers(): Boolean
+    fun getTrackersInGroup(): List<DisplayTracker>
     fun addDefaultTrackerValue(tracker: DisplayTracker)
     fun onDeleteFeature(id: Long)
     fun onDeleteGraphStat(id: Long)
@@ -118,10 +120,7 @@ class GroupViewModelImpl @Inject constructor(
     private val _showDurationInputDialog = MutableStateFlow<GroupViewModel.DurationInputDialogData?>(null)
     override val showDurationInputDialog: StateFlow<GroupViewModel.DurationInputDialogData?> = _showDurationInputDialog
 
-    private val hasTrackersFlow = dataInteractor.hasAtLeastOneTracker()
-
-    override val hasTrackers: StateFlow<Boolean> = hasTrackersFlow
-        .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
+    override suspend fun userHasAnyTrackers() = dataInteractor.hasAtLeastOneTracker()
 
     private val groupId = MutableStateFlow<Long?>(null)
 
@@ -441,6 +440,12 @@ class GroupViewModelImpl @Inject constructor(
         .flatMapLatest { if (it) temporaryDragDropChildren else allChildren }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+
+    override val groupHasAnyTrackers: StateFlow<Boolean> = allChildren
+        .map { children -> children.any { it.type == GroupChildType.TRACKER } }
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+
     override val showEmptyGroupText: StateFlow<Boolean> = currentChildren
         .map {
             if (!inRootGroup()) return@map false
@@ -468,10 +473,11 @@ class GroupViewModelImpl @Inject constructor(
 
     private suspend fun inRootGroup() = groupId.first() == 0L
 
-    override val trackers
-        get() = currentChildren.value
+    override fun getTrackersInGroup(): List<DisplayTracker> {
+        return currentChildren.value
             .filterIsInstance<GroupChild.ChildTracker>()
             .map { it.displayTracker }
+    }
 
     override fun setGroup(groupId: Long) {
         viewModelScope.launch { this@GroupViewModelImpl.groupId.emit(groupId) }

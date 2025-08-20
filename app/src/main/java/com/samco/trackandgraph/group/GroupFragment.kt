@@ -207,10 +207,12 @@ class GroupFragment : Fragment(),
     }
 
     private fun onAddGraphStatClicked() {
-        if (!viewModel.hasTrackers.value) {
-            groupDialogsViewModel.showNoTrackersDialog()
-        } else {
-            navigate(GroupFragmentDirections.actionGraphStatInput(groupId = args.groupId))
+        lifecycleScope.launch {
+            if (!viewModel.userHasAnyTrackers()) {
+                groupDialogsViewModel.showNoTrackersDialog()
+            } else {
+                navigate(GroupFragmentDirections.actionGraphStatInput(groupId = args.groupId))
+            }
         }
     }
 

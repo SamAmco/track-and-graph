@@ -132,7 +132,7 @@ fun GroupScreen(
 ) {
     val isLoading = groupViewModel.loading.collectAsStateWithLifecycle().value
     val showEmptyText = groupViewModel.showEmptyGroupText.collectAsStateWithLifecycle().value
-    val hasTrackers = groupViewModel.hasTrackers.collectAsStateWithLifecycle().value
+    val groupHasTrackers = groupViewModel.groupHasAnyTrackers.collectAsStateWithLifecycle().value
     val allChildren = groupViewModel.currentChildren.collectAsStateWithLifecycle().value
     val context = LocalContext.current
 
@@ -189,9 +189,9 @@ fun GroupScreen(
         isLoading = isLoading,
         showEmptyText = showEmptyText,
         // Only show FAB if scroll allows it AND we have trackers
-        showFab = showFab && hasTrackers,
+        showFab = showFab && groupHasTrackers,
         onQueueAddAllClicked = {
-            groupViewModel.trackers.let { trackers ->
+            groupViewModel.getTrackersInGroup().let { trackers ->
                 addDataPointsDialogViewModel.showAddDataPointsDialog(trackerIds = trackers.map { it.id })
             }
         },

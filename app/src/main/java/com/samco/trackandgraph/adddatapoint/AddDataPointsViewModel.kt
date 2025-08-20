@@ -36,6 +36,7 @@ import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.model.di.MainDispatcher
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.helpers.doubleFormatter
 import com.samco.trackandgraph.helpers.formatTimeDuration
@@ -64,6 +65,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
@@ -149,6 +151,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val suggestedValueHelper: SuggestedValueHelper,
     @param:IODispatcher private val io: CoroutineDispatcher,
+    @param:MainDispatcher private val ui: CoroutineDispatcher,
     private val prefHelper: PrefHelper,
     private val urlNavigator: UrlNavigator,
 ) : ViewModel(), AddDataPointsNavigationViewModel {
@@ -440,7 +443,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         onCurrentViewModel {
             if (it.note.text.isNotEmpty() && this.showCancelConfirmDialog.value == false)
                 this.showCancelConfirmDialog.value = true
-            else dismiss()
+            else withContext(ui) { dismiss() }
         }
     }
 
@@ -468,7 +471,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         viewModel.oldDataPoint?.let { dataInteractor.deleteDataPoint(it) }
         getDataPoint(viewModel)?.let { newDataPoint ->
             dataInteractor.insertDataPoint(newDataPoint)
-            incrementPageIndex()
+            withContext(ui) { incrementPageIndex() }
         }
         viewModel.tracked = true
     }
@@ -519,7 +522,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 .mapNotNull { dataInteractor.getTrackerById(it) }
                 .map { getConfig(it, dataPointTimestamp, customInitialValue) }
 
-            if (configs.isEmpty()) dismiss()
+            if (configs.isEmpty()) withContext(ui) { dismiss() }
             else configFlow.emit(configs)
         }
     }
