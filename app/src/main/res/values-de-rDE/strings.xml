@@ -49,6 +49,7 @@
     <string name="select_a_discrete_feature">Wählen Sie einen Datensatz mit Labels aus: </string>
     <string name="no_labels">Dieser Datensatz hat keine Labels</string>
     <string name="select_a_feature">Wählen Sie einen Datensatz:</string>
+    <string name="select_a_tracker">Beobachten auswählen</string>
     <string name="offset">Offset:</string>
     <string name="scale">Skalieren:</string>
     <string name="from">Von:</string>

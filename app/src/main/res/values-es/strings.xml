@@ -49,6 +49,7 @@
     <string name="select_a_discrete_feature">Seleccione un conjunto de datos con etiquetas:</string>
     <string name="no_labels">Este conjunto de datos no tiene etiquetas</string>
     <string name="select_a_feature">Seleccione un conjunto de datos:</string>
+    <string name="select_a_tracker">Seleccionar un rastreador</string>
     <string name="offset">Desplazamiento:</string>
     <string name="scale">Escala:</string>
     <string name="from">Desde:</string>
