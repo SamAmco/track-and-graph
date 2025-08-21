@@ -49,6 +49,7 @@
     <string name="select_a_discrete_feature">Sélectionnez un ensemble de données avec des libellés : </string>
     <string name="no_labels">Cet ensemble de données n\'a pas de libellés</string>
     <string name="select_a_feature">Sélectionnez un ensemble de données : </string>
+    <string name="select_a_tracker">Sélectionner un suivi</string>
     <string name="offset">Décalage : </string>
     <string name="scale">Echelle : </string>
     <string name="from">De : </string>

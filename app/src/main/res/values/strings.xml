@@ -58,6 +58,7 @@
     <string name="select_a_discrete_feature">Select a data set with labels: </string>
     <string name="no_labels">This data set has no labels</string>
     <string name="select_a_feature">Select a data set:</string>
+    <string name="select_a_tracker">Select a tracker</string>
     <string name="offset">Offset:</string>
     <string name="scale">Scale:</string>
     <string name="from">From:</string>

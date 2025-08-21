@@ -23,9 +23,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.edit
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.widgets.TrackWidgetState.WIDGET_PREFS_NAME
 import com.samco.trackandgraph.widgets.TrackWidgetState.getFeatureIdPref
@@ -46,10 +49,11 @@ class TrackWidgetConfigureActivity : AppCompatActivity() {
 
         setContent {
             TnGComposeTheme {
-                TrackWidgetConfigureDialog(
-                    onCreateWidget = ::onCreateWidget,
-                    onNoFeatures = ::onNoFeatures,
-                    onDismiss = ::onDismiss
+                SelectItemDialog(
+                    title = stringResource(R.string.select_a_tracker),
+                    selectableTypes = setOf(SelectableItemType.TRACKER),
+                    onTrackerSelected = ::onCreateWidget,
+                    onDismissRequest = ::onDismiss
                 )
             }
         }
@@ -84,12 +88,6 @@ class TrackWidgetConfigureActivity : AppCompatActivity() {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId!!)
         }
         setResult(RESULT_OK, resultValue)
-        finish()
-    }
-
-    private fun onNoFeatures() {
-        val errorString = getString(R.string.track_widget_configure_no_data_error)
-        Toast.makeText(applicationContext, errorString, Toast.LENGTH_LONG).show()
         finish()
     }
 
