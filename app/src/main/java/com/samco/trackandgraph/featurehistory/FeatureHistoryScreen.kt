@@ -1,26 +1,31 @@
 /*
- *  This file is part of Track & Graph
+ * This file is part of Track & Graph
  *
- *  Track & Graph is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Track & Graph is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 package com.samco.trackandgraph.featurehistory
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -39,6 +45,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.map
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
@@ -46,6 +54,8 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.helpers.getWeekDayNames
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
@@ -62,6 +72,73 @@ import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class FeatureHistoryNavKey(
+    val featureId: Long,
+    val featureName: String
+) : NavKey
+
+@Composable
+fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
+    val viewModel: FeatureHistoryViewModel = hiltViewModel<FeatureHistoryViewModelImpl>()
+    
+    // Initialize ViewModel with the featureId from NavKey
+    LaunchedEffect(navArgs.featureId) {
+        viewModel.initViewModel(navArgs.featureId)
+    }
+    
+    TopAppBarContent(
+        featureName = navArgs.featureName,
+        viewModel = viewModel
+    )
+    
+    FeatureHistoryView(viewModel = viewModel)
+}
+
+@Composable
+private fun TopAppBarContent(
+    featureName: String,
+    viewModel: FeatureHistoryViewModel
+) {
+    val topBarController = LocalTopBarController.current
+
+    // Observe data points count for subtitle
+    val dataPointsCount by viewModel.dateScrollData.map { it.items.size }.observeAsState(0)
+
+    val subtitle = if (dataPointsCount > 0) {
+        stringResource(R.string.data_points, dataPointsCount)
+    } else {
+        null
+    }
+
+    LaunchedEffect(featureName, subtitle) {
+        topBarController.set(
+            AppBarConfig(
+                title = featureName,
+                backNavigationAction = true,
+                subtitle = subtitle,
+                actions = {
+                    // Info action
+                    IconButton(onClick = { viewModel.onShowFeatureInfo() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.about_icon),
+                            contentDescription = stringResource(id = R.string.info)
+                        )
+                    }
+                    // Update action
+                    IconButton(onClick = { viewModel.showUpdateAllDialog() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.edit_icon),
+                            contentDescription = stringResource(id = R.string.update)
+                        )
+                    }
+                }
+            )
+        )
+    }
+}
 
 @Composable
 fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
@@ -77,6 +154,9 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     } else {
         DateScrollLazyColumn(
             modifier = Modifier.padding(cardMarginSmall),
+            contentPadding = WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+                .asPaddingValues(),
             data = dateScrollData
         ) {
             DataPoint(

@@ -16,28 +16,42 @@
 */
 package com.samco.trackandgraph.aboutpage
 
+import android.content.Context
 import android.widget.ImageView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
@@ -46,6 +60,60 @@ import com.samco.trackandgraph.ui.compose.ui.TextBody1
 import com.samco.trackandgraph.ui.compose.ui.TextLink
 import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import timber.log.Timber
+
+@Serializable
+data object AboutNavKey : NavKey
+
+@Composable
+fun AboutScreen(
+    navArgs: AboutNavKey,
+    urlNavigator: UrlNavigator
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    TopAppBarContent()
+
+    val versionText = remember(context) { getVersionText(context) }
+
+    AboutPageView(
+        versionText = versionText,
+        onRepoLinkClicked = {
+            scope.launch {
+                urlNavigator.navigateTo(context, UrlNavigator.Location.GITHUB)
+            }
+        }
+    )
+}
+
+@Composable
+private fun TopAppBarContent() {
+    val topBarController = LocalTopBarController.current
+    val title = stringResource(R.string.about)
+
+    LaunchedEffect(title) {
+        topBarController.set(
+            AppBarConfig(
+                title = title,
+                appBarPinned = true,
+            )
+        )
+    }
+}
+
+private fun getVersionText(context: Context): String {
+    return try {
+        val pInfo = context.packageManager
+            .getPackageInfo(context.packageName, 0)
+        "v${pInfo.versionName}"
+    } catch (e: Exception) {
+        Timber.e("Could not get package version name: ${e.message}")
+        ""
+    }
+}
 
 @Composable
 fun AboutPageView(
@@ -53,9 +121,14 @@ fun AboutPageView(
     onRepoLinkClicked: () -> Unit = {}
 ) = Column(
     modifier = Modifier
-        .padding(dialogInputSpacing)
-        .fillMaxSize()
+        .padding(
+            WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
+                .asPaddingValues()
+        )
         .verticalScroll(rememberScrollState())
+        .fillMaxSize()
+        .then(Modifier.padding(dialogInputSpacing)),
 ) {
     VersionText(versionText)
     InputSpacingXLarge()
@@ -78,7 +151,6 @@ fun LibraryTable() = Row {
     LibraryVersions()
     Spacer(modifier = Modifier.weight(1f))
 }
-
 
 @Composable
 fun LibraryNames() = Column {
@@ -168,7 +240,6 @@ private fun VersionText(versionText: String) = Box(
         versionText
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable

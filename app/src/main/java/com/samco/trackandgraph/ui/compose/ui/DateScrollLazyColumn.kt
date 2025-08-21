@@ -26,9 +26,13 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -112,12 +116,16 @@ private val scrollBarAnimationSpec = tween<IntOffset>(durationMillis = 300)
 @Composable
 fun <T : Datable> DateScrollLazyColumn(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     data: DateScrollData<T>,
     content: @Composable LazyItemScope.(item: T) -> Unit
 ) = Box(modifier = modifier) {
     val scrollState = rememberLazyListState()
 
-    LazyColumn(state = scrollState) { items(data.items) { content(it) } }
+    LazyColumn(
+        contentPadding = contentPadding,
+        state = scrollState
+    ) { items(data.items) { content(it) } }
 
     val minItemsMet = remember(data.items) { data.items.size >= 50 }
     val isDragging = remember { mutableStateOf(false) }
@@ -180,7 +188,9 @@ fun <T : Datable> DateScrollLazyColumn(
                 )
         ) {
             Text(
-                modifier = Modifier.align(Alignment.TopCenter),
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .align(Alignment.TopCenter),
                 text = currentDateText.value ?: "",
                 style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.onBackground
@@ -246,6 +256,7 @@ private fun <T : Datable> ScrollBarCanvas(
     Canvas(modifier = Modifier
         .width(fullWidth.dp)
         .fillMaxHeight()
+        .safeDrawingPadding()
         .onGloballyPositioned { canvasHeight = it.size.height }
         .pointerInput(Unit) {
             detectDragGestures(

@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.PieChartConfigViewModel
@@ -47,11 +46,10 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun PieChartConfigView(
-    viewModelStoreOwner: ViewModelStoreOwner,
     graphStatId: Long,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) = Column {
-    val viewModel = hiltViewModel<PieChartConfigViewModel>(viewModelStoreOwner).apply {
+    val viewModel = hiltViewModel<PieChartConfigViewModel>().apply {
         initFromGraphStatId(graphStatId)
     }
 

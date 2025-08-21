@@ -16,28 +16,27 @@
  */
 package com.samco.trackandgraph.main
 
-import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
-import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,45 +47,44 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.fragment.findNavController
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.main.AppBarViewModel.NavBarConfig
-import com.samco.trackandgraph.main.AppBarViewModel.NavButtonStyle
+import com.samco.trackandgraph.group.GroupNavKey
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
+import com.samco.trackandgraph.ui.compose.appbar.TopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun MainScreen(
-    activity: FragmentActivity,
+    urlNavigator: UrlNavigator,
     onNavigateToBrowser: (DrawerMenuBrowserLocation) -> Unit,
     currentTheme: State<ThemeSelection>,
     onThemeSelected: (ThemeSelection) -> Unit,
@@ -94,64 +92,40 @@ fun MainScreen(
     onDateFormatSelected: (Int) -> Unit,
 ) = TnGComposeTheme {
 
+    val backStack = rememberNavBackStack(GroupNavKey())
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    val appBarViewModel = viewModel<AppBarViewModel>(
-        viewModelStoreOwner = activity
-    )
+    val title = stringResource(R.string.app_name)
+    val topBarController = remember(title) { TopBarController(AppBarConfig(title)) }
 
-    var navController by remember { mutableStateOf<NavController?>(null) }
-    val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
-    val isAtNavRoot = remember { mutableStateOf(false) }
-    LaunchedEffect(navController, currentBackStackEntry) {
-        isAtNavRoot.value = navController?.previousBackStackEntry == null
-    }
-    BackHandler(!isAtNavRoot.value) { navController?.popBackStack() }
-
-    MainView(
-        navBarConfig = appBarViewModel.navBarConfigState,
-        drawerState = drawerState,
-        isAtNavRoot = isAtNavRoot,
-        onUpClicked = { navController?.popBackStack() },
-        onAppBarAction = appBarViewModel::onAction,
-        navController = navController,
-        onNavigateToBrowser = onNavigateToBrowser,
-        currentTheme = currentTheme,
-        onThemeSelected = onThemeSelected,
-        currentDateFormat = currentDateFormat,
-        onDateFormatSelected = onDateFormatSelected,
-    ) { contentPadding ->
-        AndroidView(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-            factory = { context ->
-                View.inflate(context, R.layout.nav_host_fragment, null)
-            },
-            update = {
-                if (navController == null) {
-                    navController = activity
-                        .supportFragmentManager
-                        .findFragmentById(R.id.nav_fragment)
-                        ?.findNavController()
-                    if (navController == null) {
-                        Timber.e("Could not find NavController")
-                    }
-                }
-            }
-        )
+    CompositionLocalProvider(LocalTopBarController provides topBarController) {
+        MainView(
+            topBarController = topBarController,
+            drawerState = drawerState,
+            backStack = backStack,
+            onNavigateToBrowser = onNavigateToBrowser,
+            currentTheme = currentTheme,
+            onThemeSelected = onThemeSelected,
+            currentDateFormat = currentDateFormat,
+            onDateFormatSelected = onDateFormatSelected,
+        ) { contentPadding ->
+            NavigationHost(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .fillMaxSize(),
+                backStack = backStack,
+                urlNavigator = urlNavigator,
+            )
+        }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainView(
-    navBarConfig: State<NavBarConfig>,
+    topBarController: TopBarController,
     drawerState: DrawerState,
-    isAtNavRoot: State<Boolean>,
-    onUpClicked: () -> Unit,
-    onAppBarAction: (AppBarViewModel.Action) -> Unit,
-    navController: NavController?,
+    backStack: NavBackStack,
     onNavigateToBrowser: (DrawerMenuBrowserLocation) -> Unit,
     currentTheme: State<ThemeSelection>,
     onThemeSelected: (ThemeSelection) -> Unit,
@@ -167,6 +141,13 @@ private fun MainView(
             .collect { focusManager.clearFocus(force = true) }
     }
 
+    val topBarConfig = topBarController.config
+    val pinnedScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val enterAlwaysScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = remember (topBarConfig.appBarPinned) {
+        if (topBarConfig.appBarPinned) pinnedScrollBehavior
+        else enterAlwaysScrollBehavior
+    }
     val scope = rememberCoroutineScope()
 
     BackHandler(drawerState.isOpen) { scope.launch { drawerState.close() } }
@@ -181,16 +162,10 @@ private fun MainView(
                     .fillMaxHeight()
             ) {
                 MenuDrawerContent(
-                    onNavigateFromMenu = {
+                    onNavigate = {
                         scope.launch { drawerState.close() }
-                        // I don't love this, it assumes we're already at the root
-                        // (which should always be true). But it works for now.
-                        // Another improvement to make when transitioning to compose navigation
-                        val root = navController?.currentDestination?.id
-                        val navOptions = NavOptions.Builder()
-                            .setPopUpTo(root ?: R.id.groupFragment, true)
-                            .build()
-                        navController?.navigate(it, null, navOptions)
+                        backStack.clear()
+                        backStack.add(it)
                     },
                     onNavigateToBrowser = onNavigateToBrowser,
                     currentTheme = currentTheme,
@@ -202,16 +177,24 @@ private fun MainView(
         },
     ) {
         Scaffold(
-            contentWindowInsets = WindowInsets.systemBarsIgnoringVisibility,
+            modifier = Modifier
+                .let {
+                    if (topBarConfig.nestedScrollConnection != null) {
+                        it.nestedScroll(topBarConfig.nestedScrollConnection)
+                    } else {
+                        it
+                    }
+                }
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentWindowInsets = WindowInsets(),
             topBar = {
-                if (navBarConfig.value.visible) {
+                if (topBarConfig.visible) {
                     AppBar(
                         scope = scope,
-                        navBarConfig = navBarConfig,
-                        isAtNavRoot = isAtNavRoot,
-                        onUpClicked = onUpClicked,
+                        config = topBarConfig,
                         drawerState = drawerState,
-                        onAction = onAppBarAction
+                        backStack = backStack,
+                        scrollBehavior = scrollBehavior,
                     )
                 }
             },
@@ -220,111 +203,73 @@ private fun MainView(
     }
 }
 
+private enum class NavButtonStyle { UP, MENU }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 fun AppBar(
     scope: CoroutineScope,
-    navBarConfig: State<NavBarConfig>,
-    isAtNavRoot: State<Boolean>,
-    onUpClicked: () -> Unit,
+    config: AppBarConfig,
     drawerState: DrawerState,
-    onAction: (AppBarViewModel.Action) -> Unit,
-) = TopAppBar(
-    windowInsets = WindowInsets.statusBarsIgnoringVisibility,
-    colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.tngColors.toolbarBackgroundColor
-    ),
-    navigationIcon = {
-        NavigationIcon(
-            navButtonStyle = if (isAtNavRoot.value) NavButtonStyle.MENU else NavButtonStyle.UP,
-            onClick = {
-                if (!isAtNavRoot.value) onUpClicked()
-                else scope.launch { drawerState.open() }
+    backStack: NavBackStack,
+    scrollBehavior: TopAppBarScrollBehavior,
+) {
+    val density = LocalDensity.current
+    val statusBarDp = with(density) { WindowInsets.statusBars.getTop(density).toDp() }
+
+    // Make the app bar container taller by the status bar height so that area scrolls away too
+    val totalHeight = TopAppBarDefaults.TopAppBarExpandedHeight + statusBarDp
+
+    // We'll apply the status-bar inset INSIDE each slot
+    val slotInset = Modifier
+        .fillMaxHeight()
+        .windowInsetsPadding(WindowInsets.statusBars.only(WindowInsetsSides.Top))
+
+    TopAppBar(
+        // No external insets -> nothing "pinned" behind status bar
+        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.tngColors.toolbarBackgroundColor,
+            scrolledContainerColor = MaterialTheme.tngColors.toolbarBackgroundColor
+        ),
+        expandedHeight = totalHeight,
+        scrollBehavior = scrollBehavior,
+
+        navigationIcon = {
+            Box(slotInset, contentAlignment = Alignment.CenterStart) {
+                NavigationIcon(
+                    navButtonStyle = if (config.backNavigationAction) NavButtonStyle.UP else NavButtonStyle.MENU,
+                    onClick = {
+                        if (config.backNavigationAction) backStack.removeLastOrNull()
+                        else scope.launch { drawerState.open() }
+                    }
+                )
             }
-        )
-    },
-    actions = {
-        AppBarActions(
-            actions = navBarConfig.value.actions,
-            onAction = onAction,
-        )
-        AppBarOverflowActions(
-            collapsedActions = navBarConfig.value.collapsedActions,
-            onAction = onAction,
-        )
-    },
-    expandedHeight = TopAppBarDefaults.TopAppBarExpandedHeight * LocalConfiguration.current.fontScale,
-    title = {
-        Column(verticalArrangement = Arrangement.Center) {
-            navBarConfig.value.title?.let {
+        },
+
+        title = {
+            Column(slotInset, verticalArrangement = Arrangement.Center) {
                 Text(
-                    text = it,
+                    text = config.title,
                     style = MaterialTheme.typography.headlineSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                config.subtitle?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
-            navBarConfig.value.subtitle?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+        },
+
+        actions = {
+            Row(slotInset, verticalAlignment = Alignment.CenterVertically, content = config.actions)
         }
-    },
-)
-
-@Composable
-private fun AppBarActions(
-    actions: List<AppBarViewModel.Action>,
-    onAction: (AppBarViewModel.Action) -> Unit,
-) = Row {
-    for (action in actions) {
-        IconButton(onClick = { onAction(action) }) {
-            Icon(
-                painter = painterResource(action.iconId),
-                contentDescription = stringResource(action.titleId),
-                tint = MaterialTheme.tngColors.onSurface,
-            )
-        }
-    }
-}
-
-@Composable
-private fun AppBarOverflowActions(
-    collapsedActions: AppBarViewModel.CollapsedActions?,
-    onAction: (AppBarViewModel.Action) -> Unit,
-) {
-    if (collapsedActions == null) return
-
-    var expanded by remember { mutableStateOf(false) }
-
-    Box {
-        IconButton(onClick = { expanded = true }) {
-            Icon(
-                painter = painterResource(id = collapsedActions.overflowIconId),
-                contentDescription = null,
-                tint = MaterialTheme.tngColors.onSurface,
-            )
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            for (action in collapsedActions.actions) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(action.titleId)) },
-                    onClick = {
-                        onAction(action)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
+    )
 }
 
 @Composable
@@ -352,21 +297,11 @@ private fun NavigationIcon(
 private fun MainViewPreview() {
     TnGComposeTheme {
         MainView(
-            navBarConfig = remember {
-                mutableStateOf(
-                    NavBarConfig(
-                        title = "Track & Graph",
-                        subtitle = null,
-                    )
-                )
-            },
+            topBarController = remember { TopBarController(AppBarConfig("Track & Graph")) },
             drawerState = rememberDrawerState(
                 initialValue = DrawerValue.Closed
             ),
-            onAppBarAction = {},
-            navController = null,
-            isAtNavRoot = remember { mutableStateOf(true) },
-            onUpClicked = {},
+            backStack = remember { mutableStateListOf() },
             onNavigateToBrowser = {},
             currentTheme = remember { mutableStateOf(ThemeSelection.SYSTEM) },
             onThemeSelected = {},

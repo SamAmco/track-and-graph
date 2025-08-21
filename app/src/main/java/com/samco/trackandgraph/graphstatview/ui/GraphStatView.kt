@@ -20,9 +20,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -69,7 +73,9 @@ fun FullScreenGraphStatView(
 ) = BoxWithConstraints(modifier = modifier) {
     val maxHeight = constraints.maxHeight
     FadingScrollColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .padding(WindowInsets.safeDrawing.asPaddingValues())
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         content = {
@@ -242,6 +248,7 @@ private fun GraphStatInnerViewOrLuaGraph(
         )
     } else {
         GraphStatInnerView(
+            modifier = modifier,
             graphStatViewData = graphStatViewData,
             graphViewMode = graphViewMode,
             timeMarker = timeMarker,

@@ -54,7 +54,9 @@ fun FadingScrollColumn(
 
     Box {
         Column(
-            modifier = modifier.verticalScroll(scrollState),
+            modifier = Modifier
+                .verticalScroll(scrollState)
+                .then(modifier),
             verticalArrangement = verticalArrangement,
             horizontalAlignment = horizontalAlignment,
             content = content

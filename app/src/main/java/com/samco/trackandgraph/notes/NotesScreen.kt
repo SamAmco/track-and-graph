@@ -19,8 +19,15 @@ package com.samco.trackandgraph.notes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -30,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -41,12 +49,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation3.runtime.NavKey
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
@@ -64,10 +76,14 @@ import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import kotlinx.serialization.Serializable
 import org.threeten.bp.OffsetDateTime
 
+@Serializable
+data object NotesNavKey : NavKey
+
 @Composable
-fun NotesScreen() {
+fun NotesScreen(navArgs: NotesNavKey) {
     val notesViewModel: NotesViewModel = hiltViewModel()
     val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel = hiltViewModel<AddDataPointsViewModelImpl>()
     val globalNoteDialogViewModel: GlobalNoteInputViewModel = hiltViewModel<GlobalNoteInputViewModelImpl>()
@@ -75,6 +91,8 @@ fun NotesScreen() {
     val dateScrollData = notesViewModel.dateScrollData.observeAsState().value
     val showGlobalNoteDialog = globalNoteDialogViewModel.show.observeAsState(false).value
     val selectedNoteForDialog by notesViewModel.selectedNoteForDialog.collectAsState()
+
+    TopAppBarContent()
 
     NotesView(
         dateScrollData = dateScrollData,
@@ -123,6 +141,29 @@ fun NotesScreen() {
 }
 
 @Composable
+private fun TopAppBarContent() {
+    val globalNoteDialogViewModel: GlobalNoteInputViewModel = hiltViewModel<GlobalNoteInputViewModelImpl>()
+    val topBarController = LocalTopBarController.current
+    val title = stringResource(R.string.notes)
+    LaunchedEffect(title) {
+        topBarController.set(
+            AppBarConfig(
+                title = title,
+                actions = {
+                    IconButton(onClick = { globalNoteDialogViewModel.openDialog(null) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.add_icon),
+                            contentDescription = null,
+                            tint = MaterialTheme.tngColors.onSurface
+                        )
+                    }
+                }
+            )
+        )
+    }
+}
+
+@Composable
 private fun NotesView(
     dateScrollData: DateScrollData<NoteInfo>?,
     onNoteClick: (NoteInfo) -> Unit,
@@ -134,6 +175,9 @@ private fun NotesView(
     } else {
         DateScrollLazyColumn(
             modifier = Modifier.padding(cardMarginSmall),
+            contentPadding = WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+                .asPaddingValues(),
             data = dateScrollData
         ) { note ->
             Note(

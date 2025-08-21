@@ -48,7 +48,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.aboutpage.AboutNavKey
+import com.samco.trackandgraph.backupandrestore.BackupAndRestoreNavKey
+import com.samco.trackandgraph.group.GroupNavKey
+import com.samco.trackandgraph.notes.NotesNavKey
+import com.samco.trackandgraph.reminders.RemindersNavKey
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
@@ -67,12 +73,12 @@ enum class DrawerMenuBrowserLocation {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MenuDrawerContent(
-    onNavigateFromMenu: (Int) -> Unit,
-    onNavigateToBrowser: (DrawerMenuBrowserLocation) -> Unit,
+    onNavigate: (NavKey) -> Unit = {},
+    onNavigateToBrowser: (DrawerMenuBrowserLocation) -> Unit = {},
     currentTheme: State<ThemeSelection>,
-    onThemeSelected: (ThemeSelection) -> Unit,
+    onThemeSelected: (ThemeSelection) -> Unit = {},
     currentDateFormat: State<Int>,
-    onDateFormatSelected: (Int) -> Unit
+    onDateFormatSelected: (Int) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -93,22 +99,22 @@ fun MenuDrawerContent(
         MenuItem(
             title = stringResource(R.string.home),
             icon = painterResource(R.drawable.home_menu_icon)
-        ) { onNavigateFromMenu(R.id.groupFragment) }
+        ) { onNavigate(GroupNavKey()) }
 
         MenuItem(
             title = stringResource(R.string.reminders),
             icon = painterResource(R.drawable.reminders_icon)
-        ) { onNavigateFromMenu(R.id.remindersFragment) }
+        ) { onNavigate(RemindersNavKey) }
 
         MenuItem(
             title = stringResource(R.string.notes),
             icon = painterResource(R.drawable.edit_icon)
-        ) { onNavigateFromMenu(R.id.notesFragment) }
+        ) { onNavigate(NotesNavKey) }
 
         MenuItem(
             title = stringResource(R.string.backup_and_restore),
             icon = painterResource(R.drawable.backup_restore_icon)
-        ) { onNavigateFromMenu(R.id.backupAndRestoreFragment) }
+        ) { onNavigate(BackupAndRestoreNavKey) }
 
         Divider(
             modifier = Modifier.padding(vertical = inputSpacingLarge / 2)
@@ -127,7 +133,7 @@ fun MenuDrawerContent(
         MenuItem(
             title = stringResource(R.string.about),
             icon = painterResource(R.drawable.about_icon)
-        ) { onNavigateFromMenu(R.id.aboutPageFragment) }
+        ) { onNavigate(AboutNavKey) }
 
         Divider(
             modifier = Modifier.padding(top = inputSpacingLarge)
@@ -251,11 +257,7 @@ private fun MenuItem(
 @Composable
 private fun MenuDrawerContentPreview() = TnGComposeTheme {
     MenuDrawerContent(
-        onNavigateFromMenu = {},
-        onNavigateToBrowser = {},
         currentTheme = remember { mutableStateOf(ThemeSelection.SYSTEM) },
-        onThemeSelected = {},
         currentDateFormat = remember { mutableIntStateOf(0) },
-        onDateFormatSelected = {}
     )
 }

@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LastValueConfigViewModel
@@ -46,11 +45,10 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun LastValueConfigView(
-    viewModelStoreOwner: ViewModelStoreOwner,
     graphStatId: Long,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
-    val viewModel = hiltViewModel<LastValueConfigViewModel>(viewModelStoreOwner).apply {
+    val viewModel = hiltViewModel<LastValueConfigViewModel>().apply {
         initFromGraphStatId(graphStatId)
     }
 

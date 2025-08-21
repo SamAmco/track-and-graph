@@ -1,18 +1,18 @@
 /*
- *  This file is part of Track & Graph
+ * This file is part of Track & Graph
  *
- *  Track & Graph is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Track & Graph is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 package com.samco.trackandgraph.addtracker
 
@@ -24,11 +24,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -54,10 +60,14 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.model.TrackerHelper
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.ui.AddCreateBar
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
@@ -70,6 +80,54 @@ import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AddTrackerNavKey(
+    val groupId: Long,
+    val editTrackerId: Long = -1L
+) : NavKey
+
+@Composable
+fun AddTrackerScreen(
+    navArgs: AddTrackerNavKey,
+    onPopBack: () -> Unit
+) {
+    val viewModel: AddTrackerViewModel = hiltViewModel<AddTrackerViewModelImpl>()
+
+    // Initialize ViewModel with the arguments from NavKey
+    LaunchedEffect(navArgs.groupId, navArgs.editTrackerId) {
+        viewModel.init(navArgs.groupId, navArgs.editTrackerId)
+    }
+
+    // Handle navigation back when complete
+    LaunchedEffect(viewModel.complete) {
+        viewModel.complete.receiveAsFlow().collect {
+            onPopBack()
+        }
+    }
+
+    TopAppBarContent()
+
+    AddTrackerView(viewModel = viewModel)
+}
+
+@Composable
+private fun TopAppBarContent() {
+    val topBarController = LocalTopBarController.current
+    val title = stringResource(R.string.add_tracker)
+
+    LaunchedEffect(title) {
+        topBarController.set(
+            AppBarConfig(
+                title = title,
+                backNavigationAction = true,
+                appBarPinned = true,
+            )
+        )
+    }
+}
 
 @Composable
 fun AddTrackerView(viewModel: AddTrackerViewModel) {
@@ -81,7 +139,6 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(
             Modifier
-                .imePadding()
                 .fillMaxSize()
         ) {
             AddTrackerInputForm(
@@ -123,9 +180,14 @@ private fun AddTrackerInputForm(
     focusRequester: FocusRequester
 ) = Column(
     modifier = modifier
-        .padding(cardPadding)
         .fillMaxWidth()
         .verticalScroll(state = rememberScrollState())
+        .padding(
+            WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Horizontal)
+                .asPaddingValues()
+        )
+        .then(Modifier.padding(cardPadding))
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
