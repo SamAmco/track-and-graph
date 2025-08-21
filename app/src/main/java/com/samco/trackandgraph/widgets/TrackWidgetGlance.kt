@@ -30,23 +30,22 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalSize
 import androidx.glance.action.Action
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.layout.width
 import androidx.glance.material3.ColorProviders
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
@@ -60,10 +59,11 @@ import com.samco.trackandgraph.base.service.StartTimerAction.Companion.FeatureId
 import com.samco.trackandgraph.ui.compose.theming.DarkColorScheme
 import com.samco.trackandgraph.ui.compose.theming.LightColorScheme
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
 class TrackWidgetGlance : GlanceAppWidget() {
+
+    override val sizeMode: SizeMode = SizeMode.Exact
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             TrackWidgetTheme {
@@ -132,6 +132,12 @@ private fun DisabledWidgetContent() {
     }
 }
 
+// Widget dimensions and scaling constants
+private val WIDGET_BASE_WIDTH = 120.dp
+private val WIDGET_BASE_HEIGHT = 80.dp
+private const val WIDGET_TITLE_SIZE = 12
+private const val WIDGET_ICON_SIZE = 22
+
 @Composable
 private fun EnabledWidgetContent(
     data: TrackWidgetState.WidgetData.Enabled,
@@ -139,116 +145,91 @@ private fun EnabledWidgetContent(
     onStartTimer: Action,
     onStopTimer: Action
 ) {
-    Column(
+    val size = LocalSize.current
+    val sizeArea = size.width.value * size.height.value
+    val baseArea = WIDGET_BASE_WIDTH.value * WIDGET_BASE_HEIGHT.value
+    val scale = (sizeArea / baseArea).coerceIn(1.0f, 1.8f)
+
+    fun sdp(v: Int) = (v * scale).dp
+    fun ssp(v: Int) = (v * scale).sp
+
+    Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(ImageProvider(R.drawable.track_widget_card))
-            //This accounts for the inset of the background
+            // There is a 4dp inset on the end and bottom of the widget card
             .padding(end = 4.dp, bottom = 4.dp)
             .clickable(onWidgetClick),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = GlanceModifier.defaultWeight())
-        // Title text
-        Text(
-            text = data.title,
-            style = TextStyle(
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = GlanceTheme.colors.onSurface,
-                textAlign = TextAlign.Center
-            ),
-            modifier = GlanceModifier
-                .padding(horizontal = cardPadding)
-        )
-
-        Spacer(modifier = GlanceModifier.size(dialogInputSpacing))
-
-        // Bottom row with timer buttons (if duration) and track icon
-        Row(
-            modifier = GlanceModifier
-                .fillMaxWidth()
-                .defaultWeight(),
-            horizontalAlignment = Alignment.End,
-            verticalAlignment = Alignment.Bottom
+        Box(
+            modifier = GlanceModifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
-            Spacer(modifier = GlanceModifier.defaultWeight())
-            // Timer buttons for duration trackers
-            if (data.isDuration) {
-                TimerButtons(
-                    data = data,
-                    onStartTimer = onStartTimer,
-                    onStopTimer = onStopTimer
-                )
-                Spacer(modifier = GlanceModifier.width(dialogInputSpacing))
-            }
-
-            Row(
+            // Title
+            Text(
+                text = data.title,
+                style = TextStyle(
+                    fontSize = ssp(WIDGET_TITLE_SIZE),
+                    fontWeight = FontWeight.Bold,
+                    color = GlanceTheme.colors.onSurface,
+                    textAlign = TextAlign.Center
+                ),
                 modifier = GlanceModifier
-                    .fillMaxWidth()
-                    .defaultWeight(),
-                horizontalAlignment = Alignment.End,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                // Track icon
-                TrackIcon(
-                    requireInput = data.requireInput,
-                    modifier = GlanceModifier.size(buttonSize),
+                    .padding(
+                        start = sdp(8),
+                        end = sdp(8),
+                        bottom = sdp(WIDGET_ICON_SIZE / 2),
+                    )
+            )
+        }
+
+        Box(
+            modifier = GlanceModifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomEnd,
+        ) {
+
+            Image(
+                provider = ImageProvider(R.drawable.ic_add_record),
+                contentDescription = null,
+                modifier = GlanceModifier.size(sdp(WIDGET_ICON_SIZE)),
+                colorFilter = ColorFilter.tint(
+                    if (data.requireInput) GlanceTheme.colors.onSurface
+                    else GlanceTheme.colors.secondary
                 )
+            )
+        }
+        // Bottom row (right aligned)
+        Box(
+            modifier = GlanceModifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            // Optional timer buttons
+            if (data.isDuration) {
+                if (data.timerRunning) {
+                    Image(
+                        provider = ImageProvider(R.drawable.ic_stop_timer),
+                        contentDescription = null,
+                        modifier = GlanceModifier
+                            .size(sdp(WIDGET_ICON_SIZE))
+                            .clickable(onStopTimer),
+                        colorFilter = ColorFilter.tint(GlanceTheme.colors.error)
+                    )
+                } else {
+                    Image(
+                        provider = ImageProvider(R.drawable.ic_play_timer),
+                        contentDescription = null,
+                        modifier = GlanceModifier
+                            .size(sdp(WIDGET_ICON_SIZE))
+                            .clickable(onStartTimer),
+                        colorFilter = ColorFilter.tint(GlanceTheme.colors.onError)
+                    )
+                }
             }
         }
     }
 }
 
-@Composable
-private fun TimerButtons(
-    data: TrackWidgetState.WidgetData.Enabled,
-    onStartTimer: Action,
-    onStopTimer: Action
-) {
-    if (data.timerRunning) {
-        // Stop button
-        Image(
-            provider = ImageProvider(R.drawable.ic_stop_timer),
-            contentDescription = null,
-            modifier = GlanceModifier
-                .size(buttonSize)
-                .clickable(onStopTimer),
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.error)
-        )
-    } else {
-        // Play button
-        Image(
-            provider = ImageProvider(R.drawable.ic_play_timer),
-            contentDescription = null,
-            modifier = GlanceModifier
-                .size(buttonSize)
-                .clickable(onStartTimer),
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.onError)
-        )
-    }
-}
-
-@Composable
-private fun TrackIcon(
-    requireInput: Boolean,
-    modifier: GlanceModifier = GlanceModifier
-) {
-    val tintColor = if (requireInput) {
-        GlanceTheme.colors.onSurface
-    } else {
-        GlanceTheme.colors.secondary
-    }
-
-    Image(
-        provider = ImageProvider(R.drawable.ic_add_record),
-        contentDescription = "Track data point",
-        modifier = modifier,
-        colorFilter = ColorFilter.tint(tintColor)
-    )
-}
-
-@Preview(widthDp = 200, heightDp = 150)
+@Preview(widthDp = 200, heightDp = 100)
 @Composable
 fun TrackWidgetEnabledPreview() {
     TrackWidgetTheme {
@@ -268,7 +249,7 @@ fun TrackWidgetEnabledPreview() {
     }
 }
 
-@Preview(widthDp = 200, heightDp = 150)
+@Preview(widthDp = 200, heightDp = 100)
 @Composable
 fun TrackWidgetEnabledWithTimerPreview() {
     TrackWidgetTheme {
@@ -288,7 +269,7 @@ fun TrackWidgetEnabledWithTimerPreview() {
     }
 }
 
-@Preview(widthDp = 200, heightDp = 150)
+@Preview(widthDp = 200, heightDp = 100)
 @Composable
 fun TrackWidgetEnabledTimerRunningPreview() {
     TrackWidgetTheme {
@@ -308,7 +289,7 @@ fun TrackWidgetEnabledTimerRunningPreview() {
     }
 }
 
-@Preview(widthDp = 200, heightDp = 150)
+@Preview(widthDp = 200, heightDp = 100)
 @Composable
 fun TrackWidgetDisabledPreview() {
     TrackWidgetTheme {

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="10dp"
-    android:minHeight="10dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:configure="com.samco.trackandgraph.widgets.TrackWidgetConfigureActivity"
+
+    android:minWidth="40dp"
+    android:minHeight="20dp"
     android:minResizeWidth="10dp"
     android:minResizeHeight="10dp"
-    android:updatePeriodMillis="86400000"
+
+    android:previewImage="@drawable/track_widget_preview"
     android:resizeMode="horizontal|vertical"
+
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+
+    android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen"
-    android:configure="com.samco.trackandgraph.widgets.TrackWidgetConfigureActivity"
-    android:previewImage="@drawable/track_widget_preview">
-</appwidget-provider>
+     />
