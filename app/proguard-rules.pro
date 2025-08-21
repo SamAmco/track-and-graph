@@ -21,6 +21,5 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class com.androidplot.** { *; }
--keepnames class androidx.navigation.fragment.NavHostFragment
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
