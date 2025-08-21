@@ -49,13 +49,10 @@ interface ViewGraphStatViewModel {
     fun initFromGraphStatId(graphStatId: Long)
 
     val graphStatViewData: StateFlow<IGraphStatViewData?>
-    val showingNotes: StateFlow<Boolean>
     val timeMarker: StateFlow<OffsetDateTime?>
     val notes: StateFlow<List<GraphNote>>
     val selectedNoteForDialog: StateFlow<GraphNote?>
 
-    fun showHideNotesClicked()
-    fun setNotesVisibility(visible: Boolean)
     fun noteClicked(note: GraphNote)
     fun dismissNoteDialog()
 }
@@ -70,7 +67,6 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
     private val graphStatId = MutableStateFlow<Long?>(null)
 
-    override val showingNotes = MutableStateFlow(false)
     override val timeMarker = MutableStateFlow<OffsetDateTime?>(null)
     override val selectedNoteForDialog = MutableStateFlow<GraphNote?>(null)
 
@@ -181,14 +177,6 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
     override fun initFromGraphStatId(graphStatId: Long) {
         this.graphStatId.value = graphStatId
-    }
-
-    override fun showHideNotesClicked() {
-        showingNotes.value = !showingNotes.value
-    }
-
-    override fun setNotesVisibility(visible: Boolean) {
-        showingNotes.value = visible
     }
 
     override fun noteClicked(note: GraphNote) {

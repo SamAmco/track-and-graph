@@ -21,12 +21,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,8 +43,10 @@ import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
 import com.samco.trackandgraph.reminders.AlarmInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.tutorial.TutorialScreen
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -71,7 +74,7 @@ enum class ThemeSelection(
 }
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     private val themeMap = ThemeSelection.entries.associateBy { it.appCompatMode }
 
     private val uiModeManager by lazy { getSystemService(UI_MODE_SERVICE) as UiModeManager }
@@ -88,6 +91,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var urlNavigator: UrlNavigator
 
+    @Inject
+    lateinit var tngSettings: TngSettings
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     private val currentTheme: MutableState<ThemeSelection> by lazy { mutableStateOf(getThemeValue()) }
@@ -103,22 +109,24 @@ class MainActivity : AppCompatActivity() {
         val content = ComposeView(this).apply {
             consumeWindowInsets = false
             setContent {
-                var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
-                AnimatedContent(showTutorial) { show ->
-                    if (show) {
-                        TutorialScreen {
-                            showTutorial = false
-                            prefHelper.setFirstRun(false)
+                CompositionLocalProvider(LocalSettings provides tngSettings) {
+                    var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
+                    AnimatedContent(showTutorial) { show ->
+                        if (show) {
+                            TutorialScreen {
+                                showTutorial = false
+                                prefHelper.setFirstRun(false)
+                            }
+                        } else {
+                            MainScreen(
+                                urlNavigator = urlNavigator,
+                                onNavigateToBrowser = ::onNavigateToBrowser,
+                                currentTheme = currentTheme,
+                                onThemeSelected = ::onThemeSelected,
+                                currentDateFormat = currentDateFormat,
+                                onDateFormatSelected = ::onDateFormatSelected,
+                            )
                         }
-                    } else {
-                        MainScreen(
-                            activity = this@MainActivity,
-                            onNavigateToBrowser = ::onNavigateToBrowser,
-                            currentTheme = currentTheme,
-                            onThemeSelected = ::onThemeSelected,
-                            currentDateFormat = currentDateFormat,
-                            onDateFormatSelected = ::onDateFormatSelected,
-                        )
                     }
                 }
             }

@@ -17,8 +17,13 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,6 +45,11 @@ fun AddCreateBar(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
+            .padding(
+                WindowInsets.safeDrawing
+                    .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
+                    .asPaddingValues()
+            )
     ) {
 
         Text(

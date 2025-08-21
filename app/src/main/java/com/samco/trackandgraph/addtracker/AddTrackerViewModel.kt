@@ -27,6 +27,7 @@ import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -35,7 +36,6 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface AddTrackerViewModel : DurationInputViewModel {
-    //Outputs
     val trackerName: TextFieldValue
     val trackerDescription: TextFieldValue
     val isDuration: LiveData<Boolean>
@@ -51,8 +51,9 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val showUpdateWarningAlertDialog: LiveData<Boolean>
     val suggestionType: LiveData<TrackerSuggestionType>
     val suggestionOrder: LiveData<TrackerSuggestionOrder>
+    val complete: ReceiveChannel<Unit>
 
-    //Inputs
+    fun init(groupId: Long, existingTrackerId: Long)
     fun onTrackerNameChanged(name: TextFieldValue)
     fun onTrackerDescriptionChanged(description: TextFieldValue)
     fun onIsDurationCheckChanged(isDuration: Boolean)
@@ -67,7 +68,6 @@ interface AddTrackerViewModel : DurationInputViewModel {
     fun onSuggestionOrderChanged(suggestionOrder: TrackerSuggestionOrder)
 }
 
-//TODO so much mutable state :/ ugly
 @HiltViewModel
 class AddTrackerViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
@@ -139,13 +139,13 @@ class AddTrackerViewModelImpl @Inject constructor(
             a && (existingTracker?.dataType == DataType.DURATION) != b
         }.asLiveData(viewModelScope.coroutineContext)
 
-    val complete = Channel<Unit>(1)
+    override val complete = Channel<Unit>(1)
 
     private var groupId: Long = -1
     private var existingTracker: Tracker? = null
     private var initialized = false
 
-    fun init(groupId: Long, existingTrackerId: Long) {
+    override fun init(groupId: Long, existingTrackerId: Long) {
         if (initialized) return
         initialized = true
 

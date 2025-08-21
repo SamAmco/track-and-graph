@@ -51,7 +51,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
@@ -89,11 +88,10 @@ import org.threeten.bp.Duration
 @Composable
 fun LineGraphConfigView(
     scrollState: ScrollState,
-    viewModelStoreOwner: ViewModelStoreOwner,
     graphStatId: Long,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
-    val viewModel = hiltViewModel<LineGraphConfigViewModel>(viewModelStoreOwner).apply {
+    val viewModel = hiltViewModel<LineGraphConfigViewModel>().apply {
         initFromGraphStatId(graphStatId)
     }
 

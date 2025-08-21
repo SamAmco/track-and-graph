@@ -68,14 +68,9 @@ data class DataPointInfo(
     )
 }
 
-interface FeatureHistoryNavigationViewModel {
+interface FeatureHistoryViewModel : UpdateDialogViewModel {
     fun initViewModel(featureId: Long)
 
-    fun showUpdateAllDialog()
-}
-
-//TODO we should probably add a loading state for this when we're first loading the data
-interface FeatureHistoryViewModel : UpdateDialogViewModel {
     val tracker: LiveData<Tracker?>
     val dateScrollData: LiveData<DateScrollData<DataPointInfo>>
     val showFeatureInfo: LiveData<Feature?>
@@ -83,6 +78,7 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     val showDeleteConfirmDialog: LiveData<Boolean>
     val showUpdateDialog: LiveData<Boolean>
 
+    fun showUpdateAllDialog()
     fun onDeleteClicked(dataPoint: DataPointInfo)
     fun onDeleteConfirmed()
     fun onDeleteDismissed()
@@ -98,8 +94,7 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : UpdateDialogViewModelImpl(),
-    FeatureHistoryViewModel,
-    FeatureHistoryNavigationViewModel {
+    FeatureHistoryViewModel {
     private val featureIdFlow = MutableSharedFlow<Long>(replay = 1, extraBufferCapacity = 1)
 
     private data class RawData(

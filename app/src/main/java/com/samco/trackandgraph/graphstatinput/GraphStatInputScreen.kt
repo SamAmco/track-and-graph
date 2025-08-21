@@ -1,20 +1,19 @@
 /*
- *  This file is part of Track & Graph
+ * This file is part of Track & Graph
  *
- *  Track & Graph is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Track & Graph is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.samco.trackandgraph.graphstatinput
 
 import androidx.compose.foundation.ScrollState
@@ -24,19 +23,27 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -51,12 +58,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelStoreOwner
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatinput.configviews.ui.AverageTimeBetweenConfigView
@@ -68,6 +78,9 @@ import com.samco.trackandgraph.graphstatinput.configviews.ui.PieChartConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.ui.TimeHistogramConfigView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.AddCreateBar
@@ -81,18 +94,81 @@ import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.TextLink
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.serialization.Serializable
 import java.lang.Float.max
 import java.lang.Float.min
 
+@Serializable
+data class GraphStatInputNavKey(
+    val groupId: Long,
+    val graphStatId: Long = -1L
+) : NavKey
+
+@Composable
+fun GraphStatInputScreen(
+    navArgs: GraphStatInputNavKey,
+    urlNavigator: UrlNavigator,
+    onPopBack: () -> Unit
+) {
+    val viewModel: GraphStatInputViewModel = hiltViewModel<GraphStatInputViewModelImpl>()
+
+    // Initialize ViewModel with arguments
+    LaunchedEffect(navArgs.groupId, navArgs.graphStatId) {
+        viewModel.initViewModel(navArgs.groupId, navArgs.graphStatId)
+    }
+
+    // Handle navigation back when complete
+    LaunchedEffect(Unit) {
+        viewModel.complete.receiveAsFlow().collect {
+            onPopBack()
+        }
+    }
+
+    // App bar configuration
+    TopAppBarContent(urlNavigator)
+
+    // Screen content
+    GraphStatInputView(
+        viewModel = viewModel,
+        graphStatId = navArgs.graphStatId
+    )
+}
+
+@Composable
+private fun TopAppBarContent(urlNavigator: UrlNavigator) {
+    val topBarController = LocalTopBarController.current
+    val context = LocalContext.current
+    val title = stringResource(R.string.add_a_graph_or_stat)
+
+    LaunchedEffect(title) {
+        topBarController.set(
+            AppBarConfig(
+                title = title,
+                backNavigationAction = true,
+                actions = {
+                    IconButton(
+                        onClick = {
+                            urlNavigator.triggerNavigation(context, UrlNavigator.Location.TUTORIAL_GRAPHS)
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.about_icon),
+                            contentDescription = stringResource(R.string.info)
+                        )
+                    }
+                }
+            )
+        )
+    }
+}
+
 @Composable
 internal fun GraphStatInputView(
-    viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
     graphStatId: Long
 ) = Box(
-    modifier = Modifier
-        .fillMaxSize()
-        .imePadding(),
+    modifier = Modifier.fillMaxSize()
 ) {
     val loading = viewModel.loading.observeAsState(true)
     val demoViewData by viewModel.demoViewData.observeAsState()
@@ -112,7 +188,6 @@ internal fun GraphStatInputView(
                 updateMode = viewModel.updateMode.observeAsState(false),
                 configInputView = { scrollState ->
                     ConfigInputView(
-                        viewModelStoreOwner = viewModelStoreOwner,
                         onConfigEvent = viewModel::onConfigEvent,
                         graphType = selectedGraphType,
                         graphStatId = graphStatId,
@@ -163,12 +238,19 @@ private fun GraphStatInputViewForm(
     configInputView: @Composable (ScrollState) -> Unit = {},
 ) = Column(
     modifier = modifier
-        .padding(
-            top = cardPadding,
-            start = cardPadding,
-            end = cardPadding
-        )
         .verticalScroll(state = scrollState)
+        .padding(
+            WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Horizontal)
+                .asPaddingValues()
+        )
+        .then(
+            Modifier.padding(
+                top = cardPadding,
+                start = cardPadding,
+                end = cardPadding
+            )
+        )
 ) {
 
     FullWidthTextField(
@@ -357,7 +439,6 @@ fun GraphStatTypeSelector(
 
 @Composable
 fun ConfigInputView(
-    viewModelStoreOwner: ViewModelStoreOwner,
     graphType: State<GraphStatType>,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit,
     graphStatId: Long,
@@ -366,44 +447,37 @@ fun ConfigInputView(
     when (graphType.value) {
         GraphStatType.LINE_GRAPH -> LineGraphConfigView(
             scrollState = scrollState,
-            viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.PIE_CHART -> PieChartConfigView(
-            viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenConfigView(
-            viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.TIME_HISTOGRAM -> TimeHistogramConfigView(
-            viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.LAST_VALUE -> LastValueConfigView(
-            viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.BAR_CHART -> BarChartConfigView(
-            viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.LUA_SCRIPT -> LuaGraphConfigView(
             scrollState = scrollState,
-            viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
         )

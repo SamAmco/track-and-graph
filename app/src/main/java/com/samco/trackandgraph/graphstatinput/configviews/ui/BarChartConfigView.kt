@@ -34,7 +34,6 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.YRangeType
@@ -57,11 +56,10 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun BarChartConfigView(
-    viewModelStoreOwner: ViewModelStoreOwner,
     graphStatId: Long,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
-    val viewModel = hiltViewModel<BarChartConfigViewModel>(viewModelStoreOwner).apply {
+    val viewModel = hiltViewModel<BarChartConfigViewModel>().apply {
         initFromGraphStatId(graphStatId)
     }
 

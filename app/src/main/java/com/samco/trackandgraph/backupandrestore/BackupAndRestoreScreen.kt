@@ -35,10 +35,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -75,8 +82,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.mockSettings
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
+import kotlinx.serialization.Serializable
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
@@ -100,8 +111,35 @@ import kotlin.system.exitProcess
 
 private const val SQLITE_MIME_TYPE = "application/vnd.sqlite3"
 
+@Serializable
+data object BackupAndRestoreNavKey : NavKey
+
 @Composable
-fun BackupAndRestoreScreen(viewModel: BackupAndRestoreViewModel) {
+fun BackupAndRestoreScreen(navArgs: BackupAndRestoreNavKey) {
+    val viewModel: BackupAndRestoreViewModel = hiltViewModel<BackupAndRestoreViewModelImpl>()
+
+    TopAppBarContent()
+
+    BackupAndRestoreContent(viewModel = viewModel)
+}
+
+@Composable
+private fun TopAppBarContent() {
+    val topBarController = LocalTopBarController.current
+    val title = stringResource(R.string.backup_and_restore)
+
+    LaunchedEffect(title) {
+        topBarController.set(
+            AppBarConfig(
+                title = title,
+                appBarPinned = true,
+            )
+        )
+    }
+}
+
+@Composable
+private fun BackupAndRestoreContent(viewModel: BackupAndRestoreViewModel) {
     val context = LocalContext.current
     val backupSuccessText = stringResource(id = R.string.backup_successful)
 
@@ -160,7 +198,12 @@ private fun BackupAndRestoreView(
     modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())
-        .padding(inputSpacingLarge),
+        .padding(
+            WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
+                .asPaddingValues()
+        )
+        .then(Modifier.padding(inputSpacingLarge)),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
 ) {

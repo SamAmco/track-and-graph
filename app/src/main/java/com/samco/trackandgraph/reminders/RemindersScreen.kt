@@ -20,28 +20,102 @@ package com.samco.trackandgraph.reminders
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.WideButton
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
+import kotlinx.serialization.Serializable
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+
+@Serializable
+data object RemindersNavKey : NavKey
+
+@Composable
+fun RemindersScreen(navArgs: RemindersNavKey) {
+    val viewModel: RemindersViewModel = hiltViewModel<RemindersViewModelImpl>()
+
+    val reminders by viewModel.currentReminders.collectAsState()
+    val isLoading by viewModel.loading.collectAsState()
+    val hasChanges by viewModel.remindersChanged.collectAsState()
+
+    TopAppBarContent()
+
+    RemindersScreen(
+        reminders = reminders,
+        isLoading = isLoading,
+        hasChanges = hasChanges,
+        onSaveChanges = viewModel::saveChanges,
+        onDeleteReminder = viewModel::deleteReminder,
+        onMoveReminder = { from, to -> viewModel.moveItem(from, to) },
+    )
+}
+
+@Composable
+private fun TopAppBarContent() {
+    val topBarController = LocalTopBarController.current
+    val title = stringResource(R.string.reminders)
+    val defaultReminderName = stringResource(R.string.default_reminder_name)
+    val viewModel: RemindersViewModel = hiltViewModel<RemindersViewModelImpl>()
+    val requestNotificationPermission = rememberNotificationPermissionRequester()
+
+    LaunchedEffect(title) {
+        topBarController.set(
+            AppBarConfig(
+                title = title,
+                actions = {
+                    IconButton(
+                        onClick = {
+                            viewModel.addReminder(defaultReminderName)
+                            requestNotificationPermission()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        )
+    }
+}
 
 @Composable
 fun RemindersScreen(
@@ -75,7 +149,9 @@ fun RemindersScreen(
             // Reminders list with drag-and-drop
             LazyColumn(
                 state = lazyListState,
-                contentPadding = PaddingValues(bottom = 80.dp),
+                contentPadding = WindowInsets.safeDrawing
+                    .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+                    .asPaddingValues(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
@@ -94,6 +170,7 @@ fun RemindersScreen(
                         )
                     }
                 }
+                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
 
@@ -102,7 +179,8 @@ fun RemindersScreen(
             WideButton(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(inputSpacingLarge),
+                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .then(Modifier.padding(inputSpacingLarge)),
                 text = stringResource(id = R.string.save_changes),
                 onClick = onSaveChanges
             )

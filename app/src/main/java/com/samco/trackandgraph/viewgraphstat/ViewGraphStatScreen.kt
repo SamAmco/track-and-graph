@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.viewgraphstat
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -34,9 +35,14 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -49,6 +55,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -70,7 +77,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.FullScreenGraphStatView
@@ -84,26 +93,63 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.shapeLarge
+import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
+import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import kotlinx.serialization.Serializable
 import org.threeten.bp.OffsetDateTime
 
+@Serializable
+data class ViewGraphStatNavKey(
+    val graphStatId: Long
+) : NavKey
+
 @Composable
-fun ViewGraphStatScreen(
+fun ViewGraphStatScreen(navArgs: ViewGraphStatNavKey) {
+    val viewModel: ViewGraphStatViewModel = hiltViewModel<ViewGraphStatViewModelImpl>()
+
+    // Initialize ViewModel with the graphStatId from NavKey
+    LaunchedEffect(navArgs.graphStatId) {
+        viewModel.initFromGraphStatId(navArgs.graphStatId)
+    }
+
+    TopAppBarContent()
+
+    ViewGraphStatContent(viewModel = viewModel)
+}
+
+@Composable
+private fun TopAppBarContent() {
+    val topBarController = LocalTopBarController.current
+
+    LaunchedEffect(Unit) {
+        topBarController.set(
+            AppBarConfig(
+                visible = false,
+                //You still need to pin this otherwise it consumes scroll events
+                appBarPinned = true,
+            )
+        )
+    }
+}
+
+@Composable
+private fun ViewGraphStatContent(
     viewModel: ViewGraphStatViewModel,
 ) {
     val graphStatViewData by viewModel.graphStatViewData.collectAsStateWithLifecycle(null)
-    val showingNotes by viewModel.showingNotes.collectAsStateWithLifecycle(false)
     val timeMarker by viewModel.timeMarker.collectAsStateWithLifecycle(null)
     val notes by viewModel.notes.collectAsStateWithLifecycle(emptyList())
     val selectedNoteForDialog by viewModel.selectedNoteForDialog.collectAsStateWithLifecycle(null)
 
+    val showingNotes = remember { mutableStateOf(false) }
+
     ViewGraphStatView(
         graphStatViewData = graphStatViewData,
-        showingNotes = showingNotes,
         timeMarker = timeMarker,
         notes = notes,
+        showingNotes = showingNotes,
         selectedNoteForDialog = selectedNoteForDialog,
-        showHideNotesClicked = viewModel::showHideNotesClicked,
-        setNotesVisibility = viewModel::setNotesVisibility,
         noteClicked = viewModel::noteClicked,
         dismissNoteDialog = viewModel::dismissNoteDialog
     )
@@ -112,12 +158,10 @@ fun ViewGraphStatScreen(
 @Composable
 private fun ViewGraphStatView(
     graphStatViewData: IGraphStatViewData?,
-    showingNotes: Boolean,
     timeMarker: OffsetDateTime?,
     notes: List<GraphNote>,
+    showingNotes: MutableState<Boolean>,
     selectedNoteForDialog: GraphNote?,
-    showHideNotesClicked: () -> Unit,
-    setNotesVisibility: (Boolean) -> Unit,
     noteClicked: (note: GraphNote) -> Unit,
     dismissNoteDialog: () -> Unit,
 ) = TnGComposeTheme {
@@ -135,24 +179,24 @@ private fun ViewGraphStatView(
         // Store the user's preferred notes position (when notes are visible)
         val defaultNotesPosition = if (isPortrait) 0.35f else 0f
         var savedGraphWeight by rememberSaveable { mutableFloatStateOf(defaultNotesPosition) }
-        var currentGraphWeight by remember { mutableFloatStateOf(if (showingNotes) savedGraphWeight else 1f) }
+        var currentGraphWeight by remember { mutableFloatStateOf(if (showingNotes.value) savedGraphWeight else 1f) }
 
         // Track whether we're currently dragging
         var isDraggingNotesButton by remember { mutableStateOf(false) }
         var justTappedNotesButton by remember { mutableStateOf(false) }
 
-        LaunchedEffect(showingNotes, isDraggingNotesButton, justTappedNotesButton) {
+        LaunchedEffect(showingNotes.value, isDraggingNotesButton, justTappedNotesButton) {
             // If the user is dragging, or the current graph weight and the saved graph weight are very close
             // (meaning the user just finished dragging), don't animate
             if (isDraggingNotesButton || !justTappedNotesButton) return@LaunchedEffect
 
-            val duration = 300
+            val duration = 200
             val animationSpec = tween<Float>(
                 durationMillis = duration,
-                easing = FastOutSlowInEasing
+                easing = FastOutLinearInEasing
             )
-            val initialValue = if (showingNotes) 1f else currentGraphWeight
-            val targetValue = if (showingNotes) savedGraphWeight else 1f
+            val initialValue = if (showingNotes.value) 1f else currentGraphWeight
+            val targetValue = if (showingNotes.value) savedGraphWeight else 1f
 
             animate(
                 initialValue = initialValue,
@@ -171,7 +215,6 @@ private fun ViewGraphStatView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(currentGraphWeight)
-                        .background(MaterialTheme.colorScheme.surface)
                 ) {
                     GraphStatView(
                         modifier = Modifier.fillMaxSize(),
@@ -184,10 +227,10 @@ private fun ViewGraphStatView(
             if (notes.isNotEmpty()) {
                 NotesToggleButton(
                     modifier = Modifier.fillMaxWidth(),
-                    showingNotes = showingNotes,
+                    showingNotes = showingNotes.value,
                     onToggleClicked = {
                         justTappedNotesButton = true
-                        showHideNotesClicked()
+                        showingNotes.value = !showingNotes.value
                     },
                     onDrag = { dragOffset ->
                         justTappedNotesButton = false
@@ -197,7 +240,7 @@ private fun ViewGraphStatView(
                         // Update saved position and current weight
                         savedGraphWeight = newWeight
                         currentGraphWeight = newWeight
-                        setNotesVisibility(true)
+                        showingNotes.value = true
                     },
                     onDraggingChanged = { isDraggingNotesButton = it },
                 )
@@ -305,7 +348,18 @@ private fun PopupTabBackground(
                 bottomStart = if (showingNotes) shapeLarge else 0.dp,
                 bottomEnd = if (showingNotes) shapeLarge else 0.dp
             )
-        ),
+        )
+        .let {
+            if (!showingNotes) {
+                it.padding(
+                    WindowInsets.safeDrawing
+                        .only(WindowInsetsSides.Bottom)
+                        .asPaddingValues()
+                )
+            } else {
+                it
+            }
+        },
     content = content
 )
 
@@ -359,15 +413,22 @@ private fun NotesList(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(cardPadding),
-        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
+        contentPadding = WindowInsets.safeDrawing
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+            .asPaddingValues(),
     ) {
+        item { DialogInputSpacing() }
         items(notes) { note ->
-            NoteCard(
-                note = note,
-                onNoteClicked = onNoteClicked,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(
+                modifier = Modifier.padding(horizontal = cardPadding),
+            ) {
+                NoteCard(
+                    note = note,
+                    onNoteClicked = onNoteClicked,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                DialogInputSpacing()
+            }
         }
     }
 }
@@ -457,8 +518,8 @@ private fun NoteCard(
 @Composable
 private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
     graphStatViewData = null,
-    showingNotes = true,
     timeMarker = null,
+    showingNotes = remember { mutableStateOf(true) },
     notes = listOf(
         GraphNote.DataPointNote(
             timestamp = OffsetDateTime.parse("2025-07-25T10:30:00Z"),
@@ -487,8 +548,6 @@ private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
             noteText = "Switched to morning workouts instead of evening - let's see how this affects my energy levels throughout the week."
         )
     ),
-    showHideNotesClicked = {},
-    setNotesVisibility = {},
     noteClicked = {},
     selectedNoteForDialog = null,
     dismissNoteDialog = {},
