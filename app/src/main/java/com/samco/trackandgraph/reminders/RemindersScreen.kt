@@ -19,7 +19,6 @@ package com.samco.trackandgraph.reminders
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -51,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
+import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -93,7 +92,7 @@ private fun TopAppBarContent() {
     val title = stringResource(R.string.reminders)
     val defaultReminderName = stringResource(R.string.default_reminder_name)
     val viewModel: RemindersViewModel = hiltViewModel<RemindersViewModelImpl>()
-    val requestNotificationPermission = rememberNotificationPermissionRequester()
+    val permissionRequester = rememberAlarmAndNotificationPermissionRequester()
 
     LaunchedEffect(title) {
         topBarController.set(
@@ -103,7 +102,7 @@ private fun TopAppBarContent() {
                     IconButton(
                         onClick = {
                             viewModel.addReminder(defaultReminderName)
-                            requestNotificationPermission()
+                            permissionRequester()
                         }
                     ) {
                         Icon(
