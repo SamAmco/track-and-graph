@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -296,6 +297,7 @@ private fun DemoOverlay(
 ) = Box(
     Modifier
         .background(MaterialTheme.tngColors.surface.copy(alpha = 0.8f))
+        .padding(WindowInsets.safeDrawing.asPaddingValues())
         .fillMaxSize()
 ) {
     var displayHeight by remember { mutableFloatStateOf(0f) }
