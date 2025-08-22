@@ -86,6 +86,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
+import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
@@ -324,11 +325,12 @@ private fun GroupScreenContent(
 
     // Permission handling
     val requestNotificationPermission = rememberNotificationPermissionRequester()
+    val requestAlarmAndNotificationPermission = rememberAlarmAndNotificationPermissionRequester()
     LaunchedEffect(groupViewModel.hasAnyReminders) {
         groupViewModel.hasAnyReminders
             .filter { it }
             .take(1)
-            .collect { requestNotificationPermission() }
+            .collect { requestAlarmAndNotificationPermission() }
     }
 
     GroupScreenView(
