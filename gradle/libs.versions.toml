@@ -25,6 +25,7 @@ moshiKotlin = "1.15.2"
 navigationSafeArgsGradlePlugin = "2.9.3"
 navigationUiKtx = "2.9.3"
 room = "2.6.1"
+shot = "6.1.0"
 test-runner = "1.6.2"
 threetenabp = "1.2.1"
 threetenbp = "1.6.9"
@@ -87,6 +88,7 @@ hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "androidxHilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidxHilt" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
@@ -102,6 +104,7 @@ room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 runner = { module = "androidx.test:runner", version.ref = "test-runner" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
+shot = { module = "com.karumi:shot", version.ref = "shot" }
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 threetenbp = { module = "org.threeten:threetenbp", version.ref = "threetenbp" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -115,3 +118,5 @@ androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runt
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
+shot-android = { module = "com.karumi:shot-android", version.ref = "shot" }
+uiautomator = { module = "androidx.test.uiautomator:uiautomator", version = "2.3.0" }

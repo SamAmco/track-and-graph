@@ -10,11 +10,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!--dataExtractionRules is only used for android 12 and up, otherwise fullBackupContent will be used-->
@@ -129,7 +127,7 @@
 
         <receiver
             android:name=".reminders.RecreateAlarms"
-            android:enabled="true"
+            android:enabled="${recreateAlarmsEnabled}"
             android:exported="true"
             >
             <intent-filter>
