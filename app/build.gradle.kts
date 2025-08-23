@@ -98,18 +98,25 @@ android {
             manifestPlaceholders["recreateAlarmsEnabled"] = "true"
         }
         create("screenshots") {
-            initWith(getByName("debug"))
+            initWith(getByName("release"))
             // Let “screenshots” resolve any debug-only deps
             matchingFallbacks += listOf("debug")
             // Flip the receiver OFF just for screenshots
             // because it runs before hilt has had a chance to inject
             // and crashes the tests
             manifestPlaceholders["recreateAlarmsEnabled"] = "false"
+            // Disable minification to keep symbols/ids stable for tests
+            isMinifyEnabled = false
+            isShrinkResources = false
+            // Use debug signing for testing (allows installation on emulator)
+            signingConfig = signingConfigs.getByName("debug")
         }
         create("promo") {
             initWith(getByName("release"))
             matchingFallbacks += listOf("release")
-            // Keep receivers ON for realistic app behavior in promo shots
+            // Flip the receiver OFF just for screenshots
+            // because it runs before hilt has had a chance to inject
+            // and crashes the tests
             manifestPlaceholders["recreateAlarmsEnabled"] = "false"
             // Disable minification to keep symbols/ids stable for tests
             isMinifyEnabled = false
@@ -221,9 +228,9 @@ dependencies {
     //Screenshot testing
     androidTestImplementation(libs.shot.android)
     androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(libs.uiautomator)
     androidTestImplementation(libs.runner)
     androidTestImplementation(libs.junit.ktx)
-    androidTestImplementation(libs.espresso.core)
+    // Compose testing
+    androidTestImplementation(libs.compose.ui.test.junit4)
     kspAndroidTest(libs.hilt.compiler)
 }
