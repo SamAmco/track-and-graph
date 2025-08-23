@@ -23,6 +23,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
+    id("shot")
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
 }
@@ -53,13 +54,18 @@ android {
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
         versionCode = 700000
         versionName = "7.0.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.samco.trackandgraph.screenshots.HiltTestRunner"
+        // Default manifest placeholder for RecreateAlarms receiver
+        manifestPlaceholders["recreateAlarmsEnabled"] = "true"
 
         vectorDrawables {
             useSupportLibrary = true
         }
     }
-    
+
+    // Dynamic testBuildType switching based on project properties
+    testBuildType = if (project.hasProperty("usePromoTests")) "promo" else "screenshots"
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -68,6 +74,7 @@ android {
             resValue("string", "app_name", "Debug Track & Graph")
             manifestPlaceholders["ALLOW_CLEAR_TEXT"] = "false"
             manifestPlaceholders["NETWORK_SECURITY_CONFIG"] = "@xml/debug_network_security_config"
+            manifestPlaceholders["recreateAlarmsEnabled"] = "true"
         }
         create("debugMinify") {
             isMinifyEnabled = true
@@ -78,6 +85,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             manifestPlaceholders["ALLOW_CLEAR_TEXT"] = "false"
             manifestPlaceholders["NETWORK_SECURITY_CONFIG"] = "@xml/production_network_security_config"
+            manifestPlaceholders["recreateAlarmsEnabled"] = "true"
         }
         release {
             isMinifyEnabled = true
@@ -87,6 +95,27 @@ android {
             ndk.debugSymbolLevel = "SYMBOL_TABLE"
             manifestPlaceholders["ALLOW_CLEAR_TEXT"] = "false"
             manifestPlaceholders["NETWORK_SECURITY_CONFIG"] = "@xml/production_network_security_config"
+            manifestPlaceholders["recreateAlarmsEnabled"] = "true"
+        }
+        create("screenshots") {
+            initWith(getByName("debug"))
+            // Let “screenshots” resolve any debug-only deps
+            matchingFallbacks += listOf("debug")
+            // Flip the receiver OFF just for screenshots
+            // because it runs before hilt has had a chance to inject
+            // and crashes the tests
+            manifestPlaceholders["recreateAlarmsEnabled"] = "false"
+        }
+        create("promo") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            // Keep receivers ON for realistic app behavior in promo shots
+            manifestPlaceholders["recreateAlarmsEnabled"] = "false"
+            // Disable minification to keep symbols/ids stable for tests
+            isMinifyEnabled = false
+            isShrinkResources = false
+            // Use debug signing for testing (allows installation on emulator)
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -188,4 +217,13 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
+    
+    //Screenshot testing
+    androidTestImplementation(libs.shot.android)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.uiautomator)
+    androidTestImplementation(libs.runner)
+    androidTestImplementation(libs.junit.ktx)
+    androidTestImplementation(libs.espresso.core)
+    kspAndroidTest(libs.hilt.compiler)
 }

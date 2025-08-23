@@ -3,7 +3,7 @@
 buildscript {
     dependencies {
         classpath(libs.kotlin.gradle.plugin)
-        classpath(libs.navigation.safe.args.gradle.plugin)
+        classpath(libs.shot)
     }
 }
 
