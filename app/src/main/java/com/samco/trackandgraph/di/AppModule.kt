@@ -31,8 +31,6 @@ import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.downloader.FileDownloaderImpl
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
-import com.samco.trackandgraph.helpers.PrefHelper
-import com.samco.trackandgraph.helpers.PrefHelperImpl
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.LuaEngineImpl
 import com.samco.trackandgraph.navigation.PendingIntentProvider
@@ -74,11 +72,6 @@ class AppModule {
 
     @Provides
     fun getSuggestedValueHelper(impl: SuggestedValueHelperImpl): SuggestedValueHelper = impl
-
-    @Provides
-    @Singleton
-    //Must be singleton because it is a dependency of work manager worker
-    fun getPrefHelper(impl: PrefHelperImpl): PrefHelper = impl
 
     @Provides
     @Singleton

@@ -64,6 +64,6 @@ class TutorialScreenshotTest : ScreenshotTest {
         composeRule.waitForIdle()
         
         // Screenshot 4: Empty home screen after tutorial completion
-        compareScreenshot(composeRule, name = "home_screen_empty")
+        compareScreenshot(composeRule, name = "tutorial_complete_home_screen_empty")
     }
 }

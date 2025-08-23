@@ -20,7 +20,8 @@ lifecycleLivedataKtx = "2.9.2"
 lifecycleCompose = "2.9.2"
 luakJvm = "3.4.0"
 material = "1.12.0"
-mockitoKotlin = "2.2.0"
+mockitoCore = "5.19.0"
+mockitoKotlinVersion = "6.0.0"
 moshiKotlin = "1.15.2"
 room = "2.6.1"
 shot = "6.1.0"
@@ -92,7 +93,9 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 luak-jvm = { module = "com.soywiz.korlibs.luak:luak-android", version.ref = "luakJvm" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
-mockito-kotlin = { module = "com.nhaarman.mockitokotlin2:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoCore" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
 moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlin" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
