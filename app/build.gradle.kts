@@ -63,6 +63,10 @@ android {
         }
     }
 
+    //TODO you won't get syntax highlighting in the promo directory code
+    // in android studio because of line if check will default to screenshots
+    // but you can just comment it to say promo during development for now.
+
     // Dynamic testBuildType switching based on project properties
     testBuildType = if (project.hasProperty("usePromoTests")) "promo" else "screenshots"
 
@@ -235,6 +239,7 @@ dependencies {
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(testFixtures(project(":data")))
     kspAndroidTest(libs.hilt.compiler)
 }

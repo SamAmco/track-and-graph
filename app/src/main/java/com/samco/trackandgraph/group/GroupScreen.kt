@@ -607,7 +607,9 @@ private fun GroupGrid(
     }
 
     LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .testTag("groupGrid")
+            .fillMaxSize(),
         state = lazyGridState,
         columns = GridCells.Fixed(columnCount),
         contentPadding = WindowInsets.safeDrawing

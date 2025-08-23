@@ -48,6 +48,7 @@ androidSdk = "36"
 minSdk = "23"
 targetSdk = "35"
 rules = "1.7.0"
+uiautomator = "2.3.0"
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -120,3 +121,4 @@ androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecy
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 shot-android = { module = "com.karumi:shot-android", version.ref = "shot" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
+androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }

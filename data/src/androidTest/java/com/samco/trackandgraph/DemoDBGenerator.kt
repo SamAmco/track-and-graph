@@ -15,8 +15,6 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph
-
 import android.os.Environment
 import androidx.room.Room
 import androidx.sqlite.db.SimpleSQLiteQuery
