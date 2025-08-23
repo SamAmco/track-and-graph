@@ -64,6 +64,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -280,11 +281,13 @@ private fun NavigationIcon(
     IconButton(onClick = onClick) {
         when (navButtonStyle) {
             NavButtonStyle.UP -> Icon(
+                modifier = Modifier.testTag("backButton"),
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
                 contentDescription = null,
             )
 
             NavButtonStyle.MENU -> Icon(
+                modifier = Modifier.testTag("burgerMenuButton"),
                 imageVector = Icons.Filled.Menu,
                 contentDescription = null,
             )

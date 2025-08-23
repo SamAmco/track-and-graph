@@ -68,6 +68,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -541,6 +542,7 @@ private fun GroupScreenView(
                 onClick = onQueueAddAllClicked,
                 containerColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
+                    .testTag("trackAllFab")
                     .padding(WindowInsets.navigationBars.asPaddingValues())
                     .then(Modifier.padding(inputSpacingLarge))
             ) {

@@ -234,5 +234,7 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(testFixtures(project(":data")))
     kspAndroidTest(libs.hilt.compiler)
 }

@@ -56,9 +56,11 @@ fun TextChip(
 
 @Composable
 fun AddChipButton(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit
 ) = TngChip(
+    modifier = modifier,
     onClick = onClick,
     shape = RoundedCornerShape(100.dp),
     contentPaddingValues = PaddingValues(cardMarginSmall)

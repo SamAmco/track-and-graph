@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -102,6 +103,7 @@ fun MenuDrawerContent(
         ) { onNavigate(GroupNavKey()) }
 
         MenuItem(
+            modifier = Modifier.testTag("remindersMenuItem"),
             title = stringResource(R.string.reminders),
             icon = painterResource(R.drawable.reminders_icon)
         ) { onNavigate(RemindersNavKey) }
@@ -227,11 +229,12 @@ private fun DateFormatSpinner(
 
 @Composable
 private fun MenuItem(
+    modifier: Modifier = Modifier,
     icon: Painter,
     title: String,
     onClick: () -> Unit,
 ) = Row(
-    modifier = Modifier
+    modifier = modifier
         .fillMaxWidth()
         .clickable(onClick = onClick)
         .padding(

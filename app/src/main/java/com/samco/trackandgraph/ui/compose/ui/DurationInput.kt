@@ -29,6 +29,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -96,6 +97,7 @@ fun DurationInputView(
     horizontalArrangement = Arrangement.Center
 ) {
     DurationInputComponent(
+        modifier = Modifier.testTag("hoursInput"),
         textFieldValue = hours,
         onValueChange = onHoursChanged,
         suffix = stringResource(id = R.string.hours_suffix),
@@ -109,6 +111,7 @@ fun DurationInputView(
         modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
+        modifier = Modifier.testTag("minutesInput"),
         textFieldValue = minutes,
         onValueChange = onMinutesChanged,
         suffix = stringResource(id = R.string.minutes_suffix),
@@ -121,6 +124,7 @@ fun DurationInputView(
         modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
+        modifier = Modifier.testTag("secondsInput"),
         textFieldValue = seconds,
         onValueChange = onSecondsChanged,
         suffix = stringResource(id = R.string.seconds_suffix),
@@ -133,6 +137,7 @@ fun DurationInputView(
 
 @Composable
 private fun RowScope.DurationInputComponent(
+    modifier: Modifier = Modifier,
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     suffix: String,
@@ -142,7 +147,7 @@ private fun RowScope.DurationInputComponent(
     focusRequester: FocusRequester? = null
 ) {
     MiniNumericTextField(
-        modifier = Modifier
+        modifier = modifier
             .alignByBaseline()
             .weight(1f, fill = false),
         textFieldValue = textFieldValue,

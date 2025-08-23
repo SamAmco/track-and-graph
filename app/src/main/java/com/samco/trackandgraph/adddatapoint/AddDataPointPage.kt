@@ -45,6 +45,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -383,6 +384,7 @@ private fun LabelAndNoteInputsView(
         if (labelAdded) DialogInputSpacing()
         FullWidthTextField(
             modifier = Modifier
+                .testTag("notesInput")
                 .heightIn(min = inputSpacingLarge, max = 200.dp)
                 .padding(horizontal = inputSpacingLarge),
             textFieldValue = note,
@@ -408,7 +410,9 @@ private fun LabelAndNoteInputsView(
             }
         }
         if (!noteAdded) {
-            AddChipButton(text = stringResource(id = R.string.add_a_note)) {
+            AddChipButton(
+                modifier = Modifier.testTag("addNoteChip"),
+                text = stringResource(id = R.string.add_a_note)) {
                 onNoteAdded()
                 pendingFocus = PendingFocus.Note
             }
