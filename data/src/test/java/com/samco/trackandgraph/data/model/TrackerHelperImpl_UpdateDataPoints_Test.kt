@@ -1,9 +1,8 @@
 package com.samco.trackandgraph.data.model
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.entity.DataPoint
@@ -18,6 +17,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.verifyNoInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerHelperImpl_UpdateDataPoints_Test {
@@ -97,7 +97,7 @@ class TrackerHelperImpl_UpdateDataPoints_Test {
             toLabel = "hello"
         )
 
-        verifyZeroInteractions(dao)
+        verifyNoInteractions(dao)
     }
 
     @Test

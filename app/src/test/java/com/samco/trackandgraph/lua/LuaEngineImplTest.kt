@@ -16,8 +16,8 @@
  */
 package com.samco.trackandgraph.lua
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.model.DataInteractor

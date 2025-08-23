@@ -16,8 +16,8 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphOrStat

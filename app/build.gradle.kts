@@ -221,16 +221,18 @@ dependencies {
     //Testing
     testImplementation(libs.threetenbp)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
-    
-    //Screenshot testing
+
+    // Instrumented tests
     androidTestImplementation(libs.shot.android)
     androidTestImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.runner)
     androidTestImplementation(libs.junit.ktx)
-    // Compose testing
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.compose.ui.test.junit4)
     kspAndroidTest(libs.hilt.compiler)
 }
