@@ -1,0 +1,7 @@
+- Material 3 UI
+- Edge to edge display
+- Allow track widgets to be as small as 1x1
+- New dialog for move and select items
+- New point style in line graphs
+- Notes section in view graph screen is now resizable
+- Improved drag and drop responsiveness

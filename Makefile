@@ -72,6 +72,8 @@ boot-and-prep-%:
 	@adb shell settings put global transition_animation_scale 0
 	@adb shell settings put global animator_duration_scale 0
 	@adb shell settings put system user_rotation 0  # portrait
+	@adb shell settings put secure show_ime_with_hard_keyboard 1
+	@adb shell cmd clipboard set text ''
 
 # Shutdown
 kill-emulator:
@@ -103,16 +105,23 @@ playstore-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-a
 	@echo "==> Setting high-res display for Play Store (1080x2340 @ 420dpi)"
 	adb shell wm size 1080x2340
 	adb shell wm density 420
+	@echo "==> Cleaning up any old screenshots"
+	-adb shell rm -rf /sdcard/Download/TrackAndGraphScreenshots/ || true
 	@echo "==> Running promo captures"
-	./gradlew :app:promoExecuteScreenshotTests -Precord -PdirectorySuffix=playstore -PusePromoTests=true
-	@echo "==> Copying to Fastlane phoneScreenshots"
+	./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true
+	# Wait a moment to ensure all files are written
+	@sleep 0.3
+	@echo "==> Pulling screenshots from device and copying to Fastlane phoneScreenshots"
+	mkdir -p tmp/device_screenshots
 	mkdir -p fastlane/metadata/android/en-GB/images/phoneScreenshots
-	# Copy the freshly recorded PNGs by name pattern; adjust glob if needed
-	rsync -av --include '*/' --include '*.png' --exclude '*' \
-	  app/screenshots/promo/playstore/ \
-	  fastlane/metadata/android/en-GB/images/phoneScreenshots/
+	# Pull screenshots from device
+	adb pull /sdcard/Download/TrackAndGraphScreenshots/ tmp/device_screenshots/
+	# Rename and copy to fastlane directory with language suffix
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/1.png fastlane/metadata/android/en-GB/images/phoneScreenshots/1_en-GB.png
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/2.png fastlane/metadata/android/en-GB/images/phoneScreenshots/2_en-GB.png
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/3.png fastlane/metadata/android/en-GB/images/phoneScreenshots/3_en-GB.png
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/4.png fastlane/metadata/android/en-GB/images/phoneScreenshots/4_en-GB.png
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/5.png fastlane/metadata/android/en-GB/images/phoneScreenshots/5_en-GB.png
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/6.png fastlane/metadata/android/en-GB/images/phoneScreenshots/6_en-GB.png
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/7.png fastlane/metadata/android/en-GB/images/phoneScreenshots/7_en-GB.png
 	@$(MAKE) kill-emulator
-
-# ---------- LEGACY COMMAND (for backward compatibility) ----------
-.PHONY: record-store-screenshots
-record-store-screenshots: playstore-record

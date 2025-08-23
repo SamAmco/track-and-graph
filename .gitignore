@@ -74,7 +74,6 @@ database-extract/ge_database.db
 database-extract/ge_database.db-shm
 database-extract/ge_database.db-wal
 
-
 local-scripts/
 
 todo.txt
@@ -85,3 +84,6 @@ app/src/main/assets/generated/
 app/src/test/resources/generated/
 
 lua/local
+
+# Screenshot test related files
+tmp/
