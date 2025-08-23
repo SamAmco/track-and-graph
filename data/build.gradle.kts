@@ -18,8 +18,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("org.jetbrains.kotlin.android")
     id("com.android.library")
+    id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
 }
@@ -76,6 +76,10 @@ android {
             optIn.add("kotlin.RequiresOptIn")
         }
     }
+
+    testFixtures {
+        enable = true
+    }
     
     namespace = "com.samco.trackandgraph.data"
 }
@@ -112,4 +116,7 @@ dependencies {
     androidTestImplementation(libs.runner)
     androidTestImplementation(libs.junit.ktx)
     androidTestImplementation(libs.espresso.core)
+
+    testFixturesImplementation(libs.junit.ktx)
+    testFixturesImplementation(libs.espresso.core)
 }

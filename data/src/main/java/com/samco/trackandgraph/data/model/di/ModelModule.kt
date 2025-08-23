@@ -59,10 +59,6 @@ class ModelModule {
     internal fun getTrackerUpdater(impl: TrackerHelperImpl): TrackerHelper = impl
 
     @Provides
-    @Singleton
-    internal fun getDataInteractor(impl: DataInteractorImpl): DataInteractor = impl
-
-    @Provides
     internal fun getDataSampler(impl: DataSamplerImpl): DataSampler = impl
 
     @Provides

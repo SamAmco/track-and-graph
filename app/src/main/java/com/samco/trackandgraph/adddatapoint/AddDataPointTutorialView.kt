@@ -321,8 +321,8 @@ private fun TutorialPage0(
                     .padding(horizontal = inputSpacingLarge),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                AddChipButton(stringResource(id = R.string.add_a_label)) { }
-                AddChipButton(stringResource(id = R.string.add_a_note)) {}
+                AddChipButton(text = stringResource(id = R.string.add_a_label)) { }
+                AddChipButton(text = stringResource(id = R.string.add_a_note)) {}
             }
 
             //An overlay that fills the parent with a semi transparent background that consumes all click events
