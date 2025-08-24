@@ -121,12 +121,12 @@ fun AboutPageView(
     onRepoLinkClicked: () -> Unit = {}
 ) = Column(
     modifier = Modifier
+        .verticalScroll(rememberScrollState())
         .padding(
             WindowInsets.safeDrawing
                 .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
                 .asPaddingValues()
         )
-        .verticalScroll(rememberScrollState())
         .fillMaxSize()
         .then(Modifier.padding(dialogInputSpacing)),
 ) {
