@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.reminders
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.CheckedDays
@@ -27,12 +28,15 @@ import com.samco.trackandgraph.data.model.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalTime
@@ -43,6 +47,8 @@ interface RemindersViewModel {
     val currentReminders: StateFlow<List<ReminderViewData>>
     val remindersChanged: StateFlow<Boolean>
     val loading: StateFlow<Boolean>
+    val lazyListState: LazyListState
+    val scrollToNewItem: Flow<Int>
 
     fun saveChanges()
     fun addReminder(defaultName: String)
@@ -69,6 +75,11 @@ class RemindersViewModelImpl @Inject constructor(
 
     private val _loading = MutableStateFlow(true)
     override val loading: StateFlow<Boolean> = _loading.asStateFlow()
+
+    override val lazyListState = LazyListState()
+    
+    private val _scrollToNewItem = Channel<Int>(Channel.UNLIMITED)
+    override val scrollToNewItem = _scrollToNewItem.receiveAsFlow()
 
     init {
         viewModelScope.launch(io) {
@@ -131,6 +142,10 @@ class RemindersViewModelImpl @Inject constructor(
         )
         _currentReminders.value = _currentReminders.value.plus(ReminderViewData.fromReminder(newReminder))
         onRemindersUpdated()
+        
+        // Trigger scroll to the new item (last item in the list)
+        val newItemIndex = _currentReminders.value.size - 1
+        _scrollToNewItem.trySend(newItemIndex)
     }
 
     private fun getNextDisplayIndex(): Int {

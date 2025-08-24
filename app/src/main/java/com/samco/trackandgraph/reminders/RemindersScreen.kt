@@ -26,14 +26,13 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import kotlinx.coroutines.flow.Flow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -80,6 +79,8 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
         reminders = reminders,
         isLoading = isLoading,
         hasChanges = hasChanges,
+        lazyListState = viewModel.lazyListState,
+        scrollToNewItem = viewModel.scrollToNewItem,
         onSaveChanges = viewModel::saveChanges,
         onDeleteReminder = viewModel::deleteReminder,
         onMoveReminder = { from, to -> viewModel.moveItem(from, to) },
@@ -121,14 +122,22 @@ fun RemindersScreen(
     reminders: List<ReminderViewData>,
     isLoading: Boolean,
     hasChanges: Boolean,
+    lazyListState: LazyListState,
+    scrollToNewItem: Flow<Int>,
     onSaveChanges: () -> Unit,
     onDeleteReminder: (ReminderViewData) -> Unit,
     onMoveReminder: (Int, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         onMoveReminder(from.index, to.index)
+    }
+
+    // Handle scroll to new item
+    LaunchedEffect(scrollToNewItem, lazyListState) {
+        scrollToNewItem.collect { itemIndex ->
+            lazyListState.animateScrollToItem(itemIndex)
+        }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -200,6 +209,8 @@ private fun RemindersScreenPreview() {
                 reminders = emptyList(),
                 isLoading = false,
                 hasChanges = true,
+                lazyListState = LazyListState(),
+                scrollToNewItem = kotlinx.coroutines.flow.emptyFlow(),
                 onSaveChanges = {},
                 onDeleteReminder = {},
                 onMoveReminder = { _, _ -> }
