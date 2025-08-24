@@ -106,16 +106,16 @@ playstore-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-a
 	adb shell wm size 1080x2340
 	adb shell wm density 420
 	@echo "==> Cleaning up any old screenshots"
-	-adb shell rm -rf /sdcard/Download/TrackAndGraphScreenshots/ || true
+	adb shell rm -rf /storage/emulated/0/Download/TrackAndGraphScreenshots/ || true
 	@echo "==> Running promo captures"
-	./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true
+	./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.promo.PromoScreenshots
 	# Wait a moment to ensure all files are written
 	@sleep 0.3
 	@echo "==> Pulling screenshots from device and copying to Fastlane phoneScreenshots"
 	mkdir -p tmp/device_screenshots
 	mkdir -p fastlane/metadata/android/en-GB/images/phoneScreenshots
 	# Pull screenshots from device
-	adb pull /sdcard/Download/TrackAndGraphScreenshots/ tmp/device_screenshots/
+	adb pull /storage/emulated/0/Download/TrackAndGraphScreenshots/ tmp/device_screenshots/
 	# Rename and copy to fastlane directory with language suffix
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/1.png fastlane/metadata/android/en-GB/images/phoneScreenshots/1_en-GB.png
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/2.png fastlane/metadata/android/en-GB/images/phoneScreenshots/2_en-GB.png
@@ -124,4 +124,59 @@ playstore-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-a
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/5.png fastlane/metadata/android/en-GB/images/phoneScreenshots/5_en-GB.png
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/6.png fastlane/metadata/android/en-GB/images/phoneScreenshots/6_en-GB.png
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/7.png fastlane/metadata/android/en-GB/images/phoneScreenshots/7_en-GB.png
+	@$(MAKE) kill-emulator
+
+# ---------- 4) RECORD TUTORIAL IMAGES FOR APP ----------
+.PHONY: tutorial-record
+tutorial-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-api35-hi
+	@echo "==> Setting high-res display for tutorial capture (1080x2340 @ 420dpi)"
+	adb shell wm size 1080x2340
+	adb shell wm density 420
+	@echo "==> Cleaning up any old tutorial screenshots"
+	adb shell rm -rf /storage/emulated/0/Download/TutorialScreenshots/ || true
+	@echo "==> Running tutorial captures"
+	./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.tutorial.TutorialScreenshots
+	# Wait a moment to ensure all files are written
+	@sleep 0.3
+	@echo "==> Pulling tutorial screenshots from device and processing with ImageMagick"
+	rm -rf tmp/tutorial_screenshots
+	mkdir -p tmp/tutorial_screenshots
+	mkdir -p app/src/main/res/drawable-mdpi
+	mkdir -p app/src/main/res/drawable-hdpi
+	mkdir -p app/src/main/res/drawable-xhdpi
+	mkdir -p app/src/main/res/drawable-xxhdpi
+	mkdir -p app/src/main/res/drawable-xxxhdpi
+	# Pull screenshots from device
+	adb pull /storage/emulated/0/Download/TutorialScreenshots tmp/tutorial_screenshots/
+
+	@echo "==> Converting screenshots to optimal sizes for each density bucket"
+
+	# Convert tutorial_1.png to tutorial_image_1.png for all densities
+	# Source: 1080x2340 emulator capture - optimized for API 24 memory constraints
+	# mdpi (25% of emulator): ~270x585 pixels, 0.6MB memory - safe for low-end devices
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_1.png -resize 25% app/src/main/res/drawable-mdpi/tutorial_image_1.png
+	# hdpi (35% of emulator): ~378x819 pixels, 1.2MB memory - balanced size/quality
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_1.png -resize 35% app/src/main/res/drawable-hdpi/tutorial_image_1.png
+	# xhdpi (50% of emulator): ~540x1170 pixels, 2.5MB memory - good quality, API 24 safe
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_1.png -resize 50% app/src/main/res/drawable-xhdpi/tutorial_image_1.png
+	# xxhdpi (75% of emulator): ~810x1755 pixels, 5.7MB memory - high-end devices
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_1.png -resize 75% app/src/main/res/drawable-xxhdpi/tutorial_image_1.png
+	# xxxhdpi (100% of emulator): 1080x2340 pixels, 10.1MB memory - flagship devices with lots of RAM
+	cp tmp/tutorial_screenshots/TutorialScreenshots/tutorial_1.png app/src/main/res/drawable-xxxhdpi/tutorial_image_1.png
+
+	# Convert tutorial_2.png to tutorial_image_2.png for all densities
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_2.png -resize 25% app/src/main/res/drawable-mdpi/tutorial_image_2.png
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_2.png -resize 35% app/src/main/res/drawable-hdpi/tutorial_image_2.png
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_2.png -resize 50% app/src/main/res/drawable-xhdpi/tutorial_image_2.png
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_2.png -resize 75% app/src/main/res/drawable-xxhdpi/tutorial_image_2.png
+	cp tmp/tutorial_screenshots/TutorialScreenshots/tutorial_2.png app/src/main/res/drawable-xxxhdpi/tutorial_image_2.png
+
+	# Convert tutorial_3.png to tutorial_image_3.png for all densities
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_3.png -resize 25% app/src/main/res/drawable-mdpi/tutorial_image_3.png
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_3.png -resize 35% app/src/main/res/drawable-hdpi/tutorial_image_3.png
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_3.png -resize 50% app/src/main/res/drawable-xhdpi/tutorial_image_3.png
+	magick tmp/tutorial_screenshots/TutorialScreenshots/tutorial_3.png -resize 75% app/src/main/res/drawable-xxhdpi/tutorial_image_3.png
+	cp tmp/tutorial_screenshots/TutorialScreenshots/tutorial_3.png app/src/main/res/drawable-xxxhdpi/tutorial_image_3.png
+
+	@echo "==> Tutorial images generated successfully"
 	@$(MAKE) kill-emulator
