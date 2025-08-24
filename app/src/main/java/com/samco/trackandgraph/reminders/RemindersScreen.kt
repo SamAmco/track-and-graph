@@ -131,11 +131,7 @@ fun RemindersScreen(
         onMoveReminder(from.index, to.index)
     }
 
-    Box(
-        modifier = modifier
-            .imePadding()
-            .fillMaxSize()
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         if (reminders.isEmpty()) {
             // Empty state
             EmptyPageHintText(
@@ -178,7 +174,11 @@ fun RemindersScreen(
             WideButton(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .padding(
+                        WindowInsets.safeDrawing
+                            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+                            .asPaddingValues()
+                    )
                     .then(Modifier.padding(inputSpacingLarge)),
                 text = stringResource(id = R.string.save_changes),
                 onClick = onSaveChanges
