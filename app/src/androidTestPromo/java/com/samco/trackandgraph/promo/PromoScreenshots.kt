@@ -1,8 +1,6 @@
 package com.samco.trackandgraph.promo
 
-import android.content.ContentValues
-import android.os.Environment
-import android.provider.MediaStore
+import com.samco.trackandgraph.screenshots.ScreenshotUtils
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -18,7 +16,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import java.io.File
 import com.samco.trackandgraph.TestDataInteractor
 import com.samco.trackandgraph.createScreenshotsGroup
 import com.samco.trackandgraph.data.model.DataInteractor
@@ -38,8 +35,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -54,44 +49,7 @@ class PromoScreenshots {
     }
 
     private fun takeDeviceScreenshot(name: String) {
-        composeRule.waitForIdle()
-
-        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
-        val resolver = ctx.contentResolver
-
-        // UiDevice needs a File first
-        val tmp = File(ctx.cacheDir, "$name.png")
-        check(uiDevice.takeScreenshot(tmp) && tmp.length() > 0L) { "takeScreenshot failed: $name" }
-
-        val values = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, "$name.png")
-            put(MediaStore.Downloads.MIME_TYPE, "image/png")
-            put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/TrackAndGraphScreenshots")
-            put(MediaStore.Downloads.IS_PENDING, 1)
-        }
-        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)!!
-
-        // Write + hard flush
-        resolver.openFileDescriptor(uri, "w")!!.use { pfd ->
-            FileInputStream(tmp).use { input ->
-                FileOutputStream(pfd.fileDescriptor).use { output ->
-                    input.copyTo(output)
-                    output.fd.sync() // <-- ensure bytes are on disk
-                }
-            }
-        }
-        tmp.delete()
-
-        // Publish
-        values.clear(); values.put(MediaStore.Downloads.IS_PENDING, 0)
-        resolver.update(uri, values, null, null)
-
-        // Optional: sanity check size > 0
-        resolver.query(uri, arrayOf(MediaStore.MediaColumns.SIZE), null, null, null)?.use { c ->
-            if (c.moveToFirst() && c.getLong(0) <= 0L) {
-                throw AssertionError("Saved screenshot has zero size: $uri")
-            }
-        }
+        ScreenshotUtils.takeDeviceScreenshot(composeRule, uiDevice, name)
     }
 
     @get:Rule(order = 0)
@@ -123,13 +81,6 @@ class PromoScreenshots {
     @Before
     fun setUp() {
         hiltRule.inject()
-        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
-        val resolver = ctx.contentResolver
-        resolver.delete(
-            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-            "${MediaStore.Downloads.RELATIVE_PATH}=?",
-            arrayOf("${Environment.DIRECTORY_DOWNLOADS}/$screenshotDir/")
-        )
         runBlocking { createScreenshotsGroup(dataInteractor) }
     }
 

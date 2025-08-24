@@ -47,7 +47,11 @@ private suspend fun createScreenshot1Group(
     parentGroupId: Long
 ): Long {
     val groupId = dataInteractor.insertGroup(
-        createGroup(name = "Track & Graph", parentGroupId = parentGroupId)
+        createGroup(
+            name = "Track & Graph",
+            parentGroupId = parentGroupId,
+            displayIndex = 0,
+        )
     )
 
     // Create Relaxation tracker
@@ -107,7 +111,11 @@ private suspend fun createScreenshot2Group(
     screenshot1GroupId: Long
 ): Long {
     val groupId = dataInteractor.insertGroup(
-        createGroup(name = "Track & Graph", parentGroupId = parentGroupId)
+        createGroup(
+            name = "Track & Graph",
+            parentGroupId = parentGroupId,
+            displayIndex = 1,
+        )
     )
 
     // Copy the trackers from Screenshot 1
@@ -140,17 +148,17 @@ private suspend fun createScreenshot2Group(
     // Copy data from original trackers to new ones
     val relaxationFeatureId = dataInteractor.getTrackerById(relaxationTrackerId)!!.featureId
     val stressFeatureId = dataInteractor.getTrackerById(stressTrackerId)!!.featureId
-    
+
     val originalRelaxationFeatureId = relaxationTracker.featureId
     val originalStressFeatureId = stressTracker.featureId
-    
+
     val relaxationDataPoints = dataInteractor
         .getDataSampleForFeatureId(originalRelaxationFeatureId)
         .getAllRawDataPoints()
     val stressDataPoints = dataInteractor
         .getDataSampleForFeatureId(originalStressFeatureId)
         .getAllRawDataPoints()
-    
+
     for (dataPoint in relaxationDataPoints) {
         dataInteractor.insertDataPoint(
             createDataPoint(
@@ -162,7 +170,7 @@ private suspend fun createScreenshot2Group(
             )
         )
     }
-    
+
     for (dataPoint in stressDataPoints) {
         dataInteractor.insertDataPoint(
             createDataPoint(
@@ -193,7 +201,11 @@ private suspend fun createScreenshot3Group(
     screenshot2GroupId: Long
 ): Long {
     val groupId = dataInteractor.insertGroup(
-        createGroup(name = "Track & Graph", parentGroupId = parentGroupId)
+        createGroup(
+            name = "Track & Graph",
+            parentGroupId = parentGroupId,
+            displayIndex = 3,
+        )
     )
 
     // Copy the trackers from Screenshot 2
@@ -226,10 +238,10 @@ private suspend fun createScreenshot3Group(
     // Copy data from original trackers to new ones
     val relaxationFeatureId = dataInteractor.getTrackerById(relaxationTrackerId)!!.featureId
     val stressFeatureId = dataInteractor.getTrackerById(stressTrackerId)!!.featureId
-    
+
     val originalRelaxationFeatureId = relaxationTracker.featureId
     val originalStressFeatureId = stressTracker.featureId
-    
+
     val relaxationDataPoints = dataInteractor
         .getDataSampleForFeatureId(originalRelaxationFeatureId)
         .getAllRawDataPoints()
@@ -237,7 +249,7 @@ private suspend fun createScreenshot3Group(
     val stressDataPoints = dataInteractor
         .getDataSampleForFeatureId(originalStressFeatureId)
         .getAllRawDataPoints()
-    
+
     for (dataPoint in relaxationDataPoints) {
         dataInteractor.insertDataPoint(
             createDataPoint(
@@ -249,7 +261,7 @@ private suspend fun createScreenshot3Group(
             )
         )
     }
-    
+
     for (dataPoint in stressDataPoints) {
         dataInteractor.insertDataPoint(
             createDataPoint(
