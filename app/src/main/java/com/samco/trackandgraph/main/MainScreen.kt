@@ -166,6 +166,7 @@ private fun MainView(
                     onNavigate = {
                         scope.launch { drawerState.close() }
                         backStack.clear()
+                        backStack.add(GroupNavKey())
                         backStack.add(it)
                     },
                     onNavigateToBrowser = onNavigateToBrowser,
