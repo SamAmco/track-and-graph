@@ -382,11 +382,28 @@ private fun LabelAndNoteInputsView(
 
     if (noteAdded) {
         if (labelAdded) DialogInputSpacing()
+        
+        // Track focus state for the note field
+        var noteFieldFocused by remember { mutableStateOf(false) }
+        
+        // Track when note text changes to scroll to cursor (only when focused)
+        LaunchedEffect(note.text, noteFieldFocused) {
+            if (noteFieldFocused && note.text.isNotEmpty()) {
+                // Small delay to allow text field to recompose with new height
+                withFrameNanos { }
+                bringIntoViewRequester.bringIntoView()
+            }
+        }
+        
         FullWidthTextField(
             modifier = Modifier
                 .testTag("notesInput")
                 .heightIn(min = inputSpacingLarge, max = 200.dp)
-                .padding(horizontal = inputSpacingLarge),
+                .bringIntoViewRequester(bringIntoViewRequester)
+                .padding(horizontal = inputSpacingLarge)
+                .onFocusEvent { focusState ->
+                    noteFieldFocused = focusState.isFocused
+                },
             textFieldValue = note,
             onValueChange = onNoteChanged,
             focusRequester = noteInputFocusRequester,
