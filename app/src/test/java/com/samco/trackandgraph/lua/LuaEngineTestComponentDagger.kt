@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.lua.apiimpl.DataPointParser
 import com.samco.trackandgraph.lua.apiimpl.LuaDataSourceProviderImpl
+import com.samco.trackandgraph.time.TimeProvider
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -63,6 +64,9 @@ interface LuaEngineTestComponent {
 
         @BindsInstance
         fun ioDispatcher(@IODispatcher ioDispatcher: CoroutineDispatcher): Builder
+
+        @BindsInstance
+        fun timeProvider(timeProvider: TimeProvider): Builder
 
         fun build(): LuaEngineTestComponent
     }

@@ -50,6 +50,8 @@ import com.samco.trackandgraph.system.ReminderPrefWrapper
 import com.samco.trackandgraph.system.ReminderPrefWrapperImpl
 import com.samco.trackandgraph.system.SystemInfoProvider
 import com.samco.trackandgraph.system.SystemInfoProviderImpl
+import com.samco.trackandgraph.time.TimeProvider
+import com.samco.trackandgraph.time.TimeProviderImpl
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
 import com.squareup.moshi.Moshi
@@ -129,4 +131,7 @@ class AppModule {
     @Provides
     @Singleton
     fun provideMoshi(): Moshi = Moshi.Builder().build()
+
+    @Provides
+    fun provideTimeProvider(impl: TimeProviderImpl): TimeProvider = impl
 }
