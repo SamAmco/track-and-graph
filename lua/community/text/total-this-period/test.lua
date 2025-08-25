@@ -11,7 +11,7 @@ local PMONTH = core.PERIOD.MONTH
 M.test_default_period_week = {
   config = {},
   sources = function()
-    local end_of_week_date = core.get_end_of_period(PWEEK, core.time().timestamp)
+    local end_of_week_date = core.get_end_of_period(PWEEK, core.time())
     local end_of_week = core.time(end_of_week_date).timestamp
     return {
       source1 = {
@@ -45,7 +45,7 @@ M.test_period_month = {
     period = "core.PERIOD.MONTH",
   },
   sources = function()
-    local end_of_month_date = core.get_end_of_period(PMONTH, core.time().timestamp)
+    local end_of_month_date = core.get_end_of_period(PMONTH, core.time())
     local end_of_month = core.time(end_of_month_date).timestamp
     return {
       source1 = {
@@ -77,7 +77,7 @@ M.test_period_month = {
 M.test_multi_source_output = {
   config = {},
   sources = function()
-    local end_of_week_date = core.get_end_of_period(PWEEK, core.time().timestamp)
+    local end_of_week_date = core.get_end_of_period(PWEEK, core.time())
     local end_of_week = core.time(end_of_week_date).timestamp
     return {
       source1 = {
@@ -130,7 +130,7 @@ M.test_multiplier_2_weeks = {
     multiplier = "2", -- Test 2 weeks period
   },
   sources = function()
-    local end_of_week_date = core.get_end_of_period(PWEEK, core.time().timestamp)
+    local end_of_week_date = core.get_end_of_period(PWEEK, core.time())
     local end_of_week = core.time(end_of_week_date).timestamp
     return {
       source1 = {
@@ -160,7 +160,7 @@ M.test_text_size_override = {
     text_size = "3", -- Override to large text for single source (normally would be large)
   },
   sources = function()
-    local end_of_week_date = core.get_end_of_period(PWEEK, core.time().timestamp)
+    local end_of_week_date = core.get_end_of_period(PWEEK, core.time())
     local end_of_week = core.time(end_of_week_date).timestamp
     return {
       source1 = {

@@ -39,10 +39,6 @@ M.test_basic_fraction = {
 	end,
 }
 
-local print_date = function(date)
-    print(date.year .. "/" .. date.month .. "/" .. date.day .. " " .. date.hour .. ":" .. date.min .. ":" .. date.sec)
-end
-
 M.test_fraction_with_period = {
 	config = {
 		numerator_labels = "{'A'}",
@@ -50,9 +46,7 @@ M.test_fraction_with_period = {
 	},
 	sources = function()
 		local now = core.time().timestamp
-		local end_of_week_date = core.get_end_of_period(core.PERIOD.WEEK, now)
-		local end_of_week = core.time(end_of_week_date)
-		local cutoff = core.shift(end_of_week, core.PERIOD.WEEK, -1).timestamp
+		local cutoff = core.shift(now, core.PERIOD.WEEK, -1).timestamp
 
 		return {
 			source1 = {
