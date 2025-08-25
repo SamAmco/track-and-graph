@@ -36,7 +36,7 @@ M.time = function(date) end
 
 --- Returns the given timestamp as a date. If no timestamp is provided, the current time will be used.
 --- @since v5.1.0
---- @param timestamp? (Timestamp|integer): The timestamp to use for the date.
+--- @param timestamp? (Timestamp|integer): The timestamp to use for the date. If it is an integer, it will mean the timestamp in milliseconds since the epoch.
 --- If it is an integer, it will mean the timestamp in milliseconds since the epoch.
 --- If not provided, the current time will be used.
 --- @return Date: A table containing the current date.
@@ -53,7 +53,7 @@ M.date = function(timestamp) end
 --- Using periods will respect daylight savings time and other time zone changes. Where as using a duration will just move the timestamp by that amount of milliseconds.
 ---
 --- @since v5.1.0
---- @param datetime (Timestamp|Date|integer): Any table with at least the field timestamp. Offset, and zone are optional.
+--- @param datetime (Timestamp|Date|integer): The date or time to shift. If it is an integer, it will mean the timestamp in milliseconds since the epoch.
 --- @param unit (DURATION|PERIOD): The units to shift by. Can be a duration in milliseconds (e.g. DURATION.DAY) or a period string (e.g. PERIOD.DAY).
 --- @param amount? integer: Multiplier for the units. Defaults to 1. Useful if you are passing a period string.
 --- @return Timestamp: The shifted timestamp.
@@ -167,7 +167,7 @@ end
 ---
 --- @since v5.1.0
 --- @param period string: The period to calculate the end for (e.g., PERIOD.DAY, PERIOD.WEEK).
---- @param timestamp integer: The timestamp to calculate the end of the period for.
+--- @param timestamp Timestamp: The timestamp to calculate the end of the period for.
 --- @param zone_override? string: An optional timezone override. If not provided, the default timezone is used.
 --- @return Date: A date representing the end of the specified period with the time set to midnight.
 M.get_end_of_period = function(period, timestamp, zone_override)
