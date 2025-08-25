@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -130,7 +131,9 @@ private fun GraphStatViewContent(
             Box(
                 modifier = Modifier.heightIn(min = guessHeight(graphStatViewData)),
                 contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
+            ) { CircularProgressIndicator(
+                modifier = Modifier.testTag("loadingIndicator")
+            ) }
         }
 
         IGraphStatViewData.State.ERROR -> GraphError(modifier, graphStatViewData)
