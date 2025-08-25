@@ -3,9 +3,6 @@
 Shows the total of a given input over a **rolling time window** extending backwards from the current moment. For example:
 - "Total in last 24 hours" shows data from exactly 24 hours ago until now
 - "Total in last 7 days" shows data from exactly 7 days ago until now  
-- "Total in last 30 days" shows data from exactly 30 days ago until now
-
-This uses a **rolling window approach** that moves continuously with time, unlike fixed period boundaries. The window always extends backwards from the current moment by the specified duration.
 
 If multiple data sources are given then the total of each data source is shown separately, as well as the overall total.
 
