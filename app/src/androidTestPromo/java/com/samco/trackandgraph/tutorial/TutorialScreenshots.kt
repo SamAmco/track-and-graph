@@ -1,5 +1,6 @@
 package com.samco.trackandgraph.tutorial
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -42,7 +43,7 @@ class TutorialScreenshots {
     }
 
     private fun takeDeviceScreenshot(name: String) {
-        ScreenshotUtils.takeDeviceScreenshot(composeRule, uiDevice, name, "TutorialScreenshots")
+        ScreenshotUtils.takeDeviceScreenshot(uiDevice, "TutorialScreenshots", name)
     }
 
     @get:Rule(order = 0)
@@ -77,6 +78,7 @@ class TutorialScreenshots {
         runBlocking { createFirstOpenTutorialGroup(dataInteractor) }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun capture_tutorial_screenshots() {
         // Wait for app to fully load and tutorial to appear
@@ -87,20 +89,28 @@ class TutorialScreenshots {
 
         composeRule.onAllNodes(hasTestTag("groupCard"))[0].performClick()
         composeRule.waitForIdle()
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("trackerCard"))
+        composeRule.waitForIdle()
         takeDeviceScreenshot("tutorial_1")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
 
         composeRule.onAllNodes(hasTestTag("groupCard"))[1].performClick()
         composeRule.waitForIdle()
-        Thread.sleep(1000)
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("graphStatCard"))
+        composeRule.waitForIdle()
+        composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
+        composeRule.waitForIdle()
         takeDeviceScreenshot("tutorial_2")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
 
         composeRule.onAllNodes(hasTestTag("groupCard"))[2].performClick()
         composeRule.waitForIdle()
-        Thread.sleep(1000)
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("graphStatCard"))
+        composeRule.waitForIdle()
+        composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
+        composeRule.waitForIdle()
         takeDeviceScreenshot("tutorial_3")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()

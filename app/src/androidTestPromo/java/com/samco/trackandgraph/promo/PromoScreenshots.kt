@@ -1,5 +1,7 @@
 package com.samco.trackandgraph.promo
 
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.hasTestTag
 import com.samco.trackandgraph.screenshots.ScreenshotUtils
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -42,14 +44,12 @@ import org.mockito.kotlin.whenever
 @HiltAndroidTest
 class PromoScreenshots {
 
-    private val screenshotDir = "TrackAndGraphScreenshots"
-
     private val uiDevice by lazy {
         UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
     private fun takeDeviceScreenshot(name: String) {
-        ScreenshotUtils.takeDeviceScreenshot(composeRule, uiDevice, name)
+        ScreenshotUtils.takeDeviceScreenshot(uiDevice, "TrackAndGraphScreenshots", name)
     }
 
     @get:Rule(order = 0)
@@ -84,6 +84,7 @@ class PromoScreenshots {
         runBlocking { createScreenshotsGroup(dataInteractor) }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun capture_promo_screenshots() {
         // Wait for app to fully load and settle
@@ -92,14 +93,13 @@ class PromoScreenshots {
         composeRule.waitForIdle()
         composeRule.onNodeWithText("Daily").performClick()
         composeRule.waitForIdle()
+        composeRule.waitUntilAtLeastOneExists(hasText("Sleep"))
         takeDeviceScreenshot("1")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
         composeRule.onAllNodesWithText("Exercise")[0].performClick()
         composeRule.waitForIdle()
-        //Wait a sec for the graphs to load
-        //TODO we could probably do this in a more stable way by searching for loading indicators
-        Thread.sleep(2000)
+        composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
         takeDeviceScreenshot("2")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
@@ -120,7 +120,7 @@ class PromoScreenshots {
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("addNoteChip", true).performClick()
         composeRule.waitForIdle()
-        composeRule.onNodeWithTag("notesInput", true).performTextInput("Get plenty of rest")
+        composeRule.onNodeWithTag("notesInput", true).performTextInput("I started using a new pillow")
         composeRule.waitForIdle()
         takeDeviceScreenshot("4")
         composeRule.onNodeWithText("Cancel").performClick()
@@ -129,10 +129,10 @@ class PromoScreenshots {
         composeRule.waitForIdle()
         composeRule.onNodeWithText("Rest day statistics").performClick()
         composeRule.waitForIdle()
-        //Wait a sec for the graphs to load
-        Thread.sleep(2000)
-        takeDeviceScreenshot("5")
+        composeRule.waitUntilAtLeastOneExists(hasText("Stress pie chart"))
         composeRule.waitForIdle()
+        composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
+        takeDeviceScreenshot("5")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("groupGrid")
@@ -143,7 +143,6 @@ class PromoScreenshots {
         composeRule.onNodeWithTag("groupGrid").performTouchInput { swipeDown() }
         composeRule.waitForIdle()
         takeDeviceScreenshot("6")
-        composeRule.waitForIdle()
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("backButton", true).performClick()
@@ -151,6 +150,7 @@ class PromoScreenshots {
         composeRule.onNodeWithTag("burgerMenuButton", true).performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("remindersMenuItem", true).performClick()
+        composeRule.waitForIdle()
         takeDeviceScreenshot("7")
         //Wait a sec for any files to flush to disk
         Thread.sleep(100)

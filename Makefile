@@ -106,7 +106,11 @@ playstore-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-a
 	adb shell wm size 1080x2340
 	adb shell wm density 420
 	@echo "==> Cleaning up any old screenshots"
-	adb shell rm -rf /storage/emulated/0/Download/TrackAndGraphScreenshots/ || true
+	# On the emulator, restart adbd as root otherwise the rm can fail
+	adb root >/dev/null 2>&1 || true
+	adb wait-for-device
+	# Now raw deletes are reliable
+	adb shell rm -rf /sdcard/Pictures/TrackAndGraphScreenshots/ || true
 	@echo "==> Running promo captures"
 	./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.promo.PromoScreenshots
 	# Wait a moment to ensure all files are written
@@ -115,7 +119,7 @@ playstore-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-a
 	mkdir -p tmp/device_screenshots
 	mkdir -p fastlane/metadata/android/en-GB/images/phoneScreenshots
 	# Pull screenshots from device
-	adb pull /storage/emulated/0/Download/TrackAndGraphScreenshots/ tmp/device_screenshots/
+	adb pull /sdcard/Pictures/TrackAndGraphScreenshots/ tmp/device_screenshots/
 	# Rename and copy to fastlane directory with language suffix
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/1.png fastlane/metadata/android/en-GB/images/phoneScreenshots/1_en-GB.png
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/2.png fastlane/metadata/android/en-GB/images/phoneScreenshots/2_en-GB.png
@@ -133,7 +137,11 @@ tutorial-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-ap
 	adb shell wm size 1080x2340
 	adb shell wm density 420
 	@echo "==> Cleaning up any old tutorial screenshots"
-	adb shell rm -rf /storage/emulated/0/Download/TutorialScreenshots/ || true
+	# On the emulator, restart adbd as root otherwise the rm can fail
+	adb root >/dev/null 2>&1 || true
+	adb wait-for-device
+	# Now raw deletes are reliable
+	adb shell rm -rf /sdcard/Pictures/TutorialScreenshots/ || true
 	@echo "==> Running tutorial captures"
 	./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.tutorial.TutorialScreenshots
 	# Wait a moment to ensure all files are written
@@ -147,7 +155,7 @@ tutorial-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-ap
 	mkdir -p app/src/main/res/drawable-xxhdpi
 	mkdir -p app/src/main/res/drawable-xxxhdpi
 	# Pull screenshots from device
-	adb pull /storage/emulated/0/Download/TutorialScreenshots tmp/tutorial_screenshots/
+	adb pull /sdcard/Pictures/TutorialScreenshots tmp/tutorial_screenshots/
 
 	@echo "==> Converting screenshots to optimal sizes for each density bucket"
 
