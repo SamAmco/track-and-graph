@@ -1,0 +1,6 @@
+- Fix crash OOM on old devices with large tutorial images
+- Fix pop back from menu screen closing the app
+- Fix tutorial images outdated
+- Fix bug note input not scrolling when you type
+- Fix reminders screen bad padding
+- Auto-scroll to latest reminder when adding a new one
