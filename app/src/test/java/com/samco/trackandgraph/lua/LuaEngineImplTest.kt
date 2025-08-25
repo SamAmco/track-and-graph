@@ -22,6 +22,8 @@ import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
+import com.samco.trackandgraph.time.TimeProvider
+import com.samco.trackandgraph.time.TimeProviderImpl
 import com.samco.trackandgraph.util.rawDataSampleFromSequence
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,6 +39,7 @@ abstract class LuaEngineImplTest {
     protected val dataInteractor: DataInteractor = mock()
     protected val assetReader: AssetReader = mock()
     protected val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+    protected open val timeProvider: TimeProvider = TimeProviderImpl()
 
     private fun readAssetToString(path: String): String? {
         return javaClass.getClassLoader()
@@ -53,6 +56,7 @@ abstract class LuaEngineImplTest {
             .dataInteractor(dataInteractor)
             .assetReader(assetReader)
             .ioDispatcher(ioDispatcher)
+            .timeProvider(timeProvider)
             .build()
             .provideLuaEngine()
     }

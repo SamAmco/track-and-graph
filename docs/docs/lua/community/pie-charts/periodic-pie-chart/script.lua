@@ -13,7 +13,7 @@ local count_by_label = false
 --- PREVIEW_END
 
 return function(sources)
-	local end_time = core.get_end_of_period(period, core.time().timestamp)
+	local end_time = core.get_end_of_period(period, core.time())
 	local cutoff = core.shift(end_time, period, -1).timestamp
 
 	local datapoints = graphext.merge_sources(sources, cutoff)

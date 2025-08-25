@@ -7,7 +7,7 @@ local test = require("test.core")
 M.test_periodic_pie_chart_default_is_week = {
 	config = {},
 	sources = function()
-		local end_date = core.get_end_of_period(core.PERIOD.WEEK, core.time().timestamp)
+		local end_date = core.get_end_of_period(core.PERIOD.WEEK, core.time())
 		local end_time = core.time(end_date).timestamp
 		local start_time = core.shift(end_time, core.PERIOD.WEEK, -1).timestamp
 		local diff = end_time - start_time
@@ -56,7 +56,7 @@ M.test_periodic_pie_chart_specific_period = {
 	},
 	sources = function()
 		local now = core.time().timestamp
-		local end_date = core.get_end_of_period(core.PERIOD.DAY, now)
+		local end_date = core.get_end_of_period(core.PERIOD.DAY, { timestamp = now })
 		local end_time = core.time(end_date).timestamp
 		local start_time = core.shift({ timestamp = end_time }, core.PERIOD.DAY, -1).timestamp
 		local diff = end_time - start_time
@@ -111,7 +111,7 @@ M.test_periodic_pie_chart_multiple_sources = {
 	},
 	sources = function()
 		local now = core.time().timestamp
-		local end_date = core.get_end_of_period(core.PERIOD.WEEK, now)
+		local end_date = core.get_end_of_period(core.PERIOD.WEEK, { timestamp = now })
 		local end_time = core.time(end_date).timestamp
 		local start_time = core.shift({ timestamp = end_time }, core.PERIOD.WEEK, -1).timestamp
 		local diff = end_time - start_time
@@ -163,7 +163,7 @@ M.test_periodic_pie_chart_with_colors = {
 	},
 	sources = function()
 		local now = core.time().timestamp
-		local end_date = core.get_end_of_period(core.PERIOD.DAY, now)
+		local end_date = core.get_end_of_period(core.PERIOD.DAY, { timestamp = now })
 		local end_time = core.time(end_date).timestamp
 		local start_time = core.shift({ timestamp = end_time }, core.PERIOD.DAY, -1).timestamp
 		local diff = end_time - start_time

@@ -517,6 +517,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
         assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
     }
 
+
     companion object {
         const val MILLIS_IN_DAY = 24 * 60 * 60 * 1000
         const val SECONDS_IN_HOUR = 60 * 60

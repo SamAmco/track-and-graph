@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.lua.apiimpl
 
+import com.samco.trackandgraph.time.TimeProvider
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -32,7 +33,9 @@ import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 import javax.inject.Inject
 
-class DateTimeParser @Inject constructor() {
+class DateTimeParser @Inject constructor(
+    private val timeProvider: TimeProvider
+) {
 
     companion object {
         const val TIMESTAMP = "timestamp"
@@ -48,10 +51,6 @@ class DateTimeParser @Inject constructor() {
         const val Y_DAY = "yday"
     }
 
-    private val defaultZone by lazy {
-        ZonedDateTime.now().zone
-    }
-
     /**
      * Parses a datetime
      *
@@ -61,7 +60,7 @@ class DateTimeParser @Inject constructor() {
      * in tng.lua
      */
     fun parseDateTimeOrNow(dateTime: LuaValue): ZonedDateTime = parseDateTimeOrNull(dateTime)
-        ?: ZonedDateTime.now()
+        ?: timeProvider.now()
 
     fun parseDateTimeOrNull(dateTime: LuaValue): ZonedDateTime? = when {
         dateTime.isnumber() -> ZonedDateTime.ofInstant(
@@ -88,11 +87,11 @@ class DateTimeParser @Inject constructor() {
 
     fun parseDateOrNow(date: LuaValue): ZonedDateTime = when {
         date.istable() -> parseDateOrThrow(date)
-        else -> ZonedDateTime.now()
+        else -> timeProvider.now()
     }
 
     fun parseTimestampOrNow(arg: LuaValue): ZonedDateTime = parseTimestampOrNull(arg)
-        ?: ZonedDateTime.now()
+        ?: timeProvider.now()
 
     fun parseTimestampOrThrow(arg: LuaValue): ZonedDateTime = parseTimestampOrNull(arg)
         ?: throw IllegalArgumentException("Expected a timestamp or a table, got ${arg.typename()}")
@@ -183,7 +182,7 @@ class DateTimeParser @Inject constructor() {
         val second = dateTime[SECOND].optint(0)
         val dayOfWeek = dateTime[W_DAY].optinteger(null)?.v
         val dayOfYear = dateTime[Y_DAY].optinteger(null)?.v
-        val zone = parseZone(dateTime) ?: defaultZone
+        val zone = parseZone(dateTime) ?: timeProvider.defaultZone()
         return ZonedDateTime.of(year, month, day, hour, minute, second, 0, zone).let {
             if (dayOfWeek != null) it.with(TemporalAdjusters.previousOrSame(dayOfWeek.toDayOfWeek()))
             else if (dayOfYear != null) it.withDayOfYear(dayOfYear)

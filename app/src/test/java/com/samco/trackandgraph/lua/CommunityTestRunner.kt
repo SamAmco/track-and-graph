@@ -4,6 +4,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.time.TimeProviderImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -37,6 +38,7 @@ class CommunityTestRunner {
         }
 
         DaggerLuaEngineTestComponent.builder()
+            .timeProvider(TimeProviderImpl())
             .dataInteractor(dataInteractor)
             .assetReader(assetReader)
             .ioDispatcher(ioDispatcher)
