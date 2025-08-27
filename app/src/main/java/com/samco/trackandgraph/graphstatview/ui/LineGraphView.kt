@@ -94,44 +94,43 @@ fun LineGraphBodyView(
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
 
-        xyPlotSetup(
-            context = context,
-            xyPlot = binding.xyPlot
-        )
-        binding.xyPlot.clear()
-
-
-        drawLineGraphFeatures(
-            context = context,
-            binding = binding,
-            plottableData = viewData.lines,
-            listMode = listMode,
-        )
-        setUpLineGraphXAxis(
-            context = context,
-            binding = binding,
-            endTime = viewData.endTime,
-        )
-        setUpXYPlotYAxis(
-            binding = binding,
-            yAxisSubdivides = viewData.yAxisSubdivides,
-            durationBasedRange = viewData.durationBasedRange,
-        )
-        setLineGraphBounds(
-            context = context,
-            binding = binding,
-            bounds = viewData.bounds,
-            yRangeType = viewData.yRangeType,
-            endTime = viewData.endTime,
-            listMode = listMode,
-        )
-
         if (!listMode) {
             PanZoom.attach(binding.xyPlot, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.STRETCH_HORIZONTAL)
         }
 
         return@AndroidViewBinding binding
     }, update = {
+        xyPlotSetup(
+            context = context,
+            xyPlot = xyPlot
+        )
+        xyPlot.clear()
+
+
+        drawLineGraphFeatures(
+            context = context,
+            binding = this,
+            plottableData = viewData.lines,
+            listMode = listMode,
+        )
+        setUpLineGraphXAxis(
+            context = context,
+            binding = this,
+            endTime = viewData.endTime,
+        )
+        setUpXYPlotYAxis(
+            binding = this,
+            yAxisSubdivides = viewData.yAxisSubdivides,
+            durationBasedRange = viewData.durationBasedRange,
+        )
+        setLineGraphBounds(
+            context = context,
+            binding = this,
+            bounds = viewData.bounds,
+            yRangeType = viewData.yRangeType,
+            endTime = viewData.endTime,
+            listMode = listMode,
+        )
         setTimeMarker(
             context = context,
             binding = this,

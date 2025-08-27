@@ -321,16 +321,17 @@ private fun BarChartBodyView(
 
     AndroidViewBinding(
         factory = { inflater, parent, attachToParent ->
-            val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
-
+            return@AndroidViewBinding GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
+        },
+        update = {
             xyPlotSetup(
                 context = context,
-                xyPlot = binding.xyPlot
+                xyPlot = xyPlot
             )
-            binding.xyPlot.clear()
+            xyPlot.clear()
 
             setBarChartBounds(
-                binding = binding,
+                binding = this,
                 bounds = bounds,
             )
 
@@ -340,34 +341,29 @@ private fun BarChartBodyView(
             )
 
             setXAxisFormatter(
-                binding = binding,
+                binding = this,
                 xDates = xDates,
                 xAxisFormatter = xAxisFormatter
             )
 
             setBarChartPaddingFromBounds(
                 context = context,
-                binding = binding,
+                binding = this,
                 bounds = bounds,
                 endTime = endTime,
                 xAxisFormatter = xAxisFormatter
             )
 
             setUpXYPlotYAxis(
-                binding = binding,
+                binding = this,
                 yAxisSubdivides = yAxisSubdivides,
                 durationBasedRange = durationBasedRange,
             )
             drawBars(
                 context = context,
-                binding = binding,
+                binding = this,
                 bars = bars
             )
-
-
-            return@AndroidViewBinding binding
-        },
-        update = {
 
             setXAxisLabelSpacingAndOrigin(binding = this)
 
