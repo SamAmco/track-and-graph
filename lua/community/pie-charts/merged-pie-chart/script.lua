@@ -3,7 +3,7 @@ local graph = require("tng.graph")
 local graphext = require("tng.graphext")
 
 --- PREVIEW_START
--- Script: Pie Charts - Moving Pie Chart
+-- Script: Pie Charts - Merged Pie Chart
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = nil
 -- Optional integer value used with period e.g. 5
