@@ -6,7 +6,7 @@ local test = require("test.core")
 
 local DDAY = core.DURATION.DAY
 
-M.test_moving_pie_chart_basic = {
+M.test_merged_pie_chart_basic = {
   config = {},
   sources = function()
     local now = core.time().timestamp
@@ -48,7 +48,7 @@ M.test_moving_pie_chart_basic = {
   end,
 }
 
-M.test_moving_pie_chart_with_period = {
+M.test_merged_pie_chart_with_period = {
   config = {
     period = "core.PERIOD.WEEK",
     period_multiplier = "1",
@@ -92,7 +92,7 @@ M.test_moving_pie_chart_with_period = {
   end,
 }
 
-M.test_moving_pie_chart_with_label_colors = {
+M.test_merged_pie_chart_with_label_colors = {
   config = {
     label_colors = '{A="#FF0000", B="#00FF00", C="#0000FF"}',
   },
@@ -137,7 +137,7 @@ M.test_moving_pie_chart_with_label_colors = {
   end,
 }
 
-M.test_moving_pie_chart_count_by_label = {
+M.test_merged_pie_chart_count_by_label = {
   config = {
     count_by_label = "true",
   },
