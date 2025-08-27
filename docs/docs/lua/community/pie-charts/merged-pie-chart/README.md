@@ -1,9 +1,9 @@
-# Moving Pie Chart
+# Merged Pie Chart
 
 A pie chart that merges all given data sources into one pie chart including all data, or all data in the given period prior to now.
 
 <div style="text-align: center;">
-    <img src="image.jpg" alt="Moving Pie Chart" style="width: 400px; height: auto;">
+    <img src="image.jpg" alt="Merged Pie Chart" style="width: 400px; height: auto;">
 </div>
 
 ## Configuration
@@ -20,7 +20,7 @@ local label_colors = nil
 local count_by_label = false
 ```
 
-[Install via deeplink](trackandgraph://lua_inject_url?url=https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/docs/lua/community/pie-charts/moving-pie-chart/script.lua)
+[Install via deeplink](trackandgraph://lua_inject_url?url=https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/docs/lua/community/pie-charts/merged-pie-chart/script.lua)
 
 [Read the full script](./script.lua)
 
