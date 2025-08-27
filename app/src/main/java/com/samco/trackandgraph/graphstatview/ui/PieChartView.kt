@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.androidplot.pie.PieRenderer
@@ -121,18 +123,19 @@ private fun PieChartViewBody(
 
     val context = LocalContext.current
 
-    val smallLabelSize = context.resources.getDimension(R.dimen.small_label_size)
+    val smallLabelSize = with(LocalDensity.current) {
+        dimensionResource(R.dimen.small_label_size).toPx()
+    }
     val labelColor = Color.White.toArgb()
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
-        val binding = GraphPieChartBinding.inflate(inflater, parent, attachToParent)
+        return@AndroidViewBinding GraphPieChartBinding.inflate(inflater, parent, attachToParent)
+    }, update = {
+        pieChart.clear()
+        pieChart.backgroundPaint.color = GColor.TRANSPARENT
 
-        binding.pieChart.clear()
-        binding.pieChart.backgroundPaint.color = GColor.TRANSPARENT
-
-        segments.forEachIndexed { i, s ->
-
-            val segForm = SegmentFormatter(s.color.toArgb())
+        segments.forEach { segmentInfo ->
+            val segForm = SegmentFormatter(segmentInfo.color.toArgb())
             if (segments.size > dataVisColorList.size) {
                 segForm.labelPaint.textSize = smallLabelSize
                 segForm.labelPaint.color = labelColor
@@ -140,11 +143,9 @@ private fun PieChartViewBody(
                 segForm.labelPaint.color = GColor.TRANSPARENT
             }
 
-            binding.pieChart.addSegment(s.segment, segForm)
+            pieChart.addSegment(segmentInfo.segment, segForm)
         }
 
-        return@AndroidViewBinding binding
-    }, update = {
         setGraphHeight(
             graphView = pieChart,
             graphViewMode = graphViewMode,

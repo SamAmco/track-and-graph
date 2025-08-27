@@ -19,7 +19,6 @@ package com.samco.trackandgraph.viewgraphstat
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background

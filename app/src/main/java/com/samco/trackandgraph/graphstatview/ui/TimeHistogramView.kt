@@ -86,42 +86,40 @@ private fun TimeHistogramBodyView(
 
     AndroidViewBinding(
         factory = { inflater, parent, attachToParent ->
-            val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
-
+            return@AndroidViewBinding GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
+        },
+        update = {
             xyPlotSetup(
                 context = context,
-                xyPlot = binding.xyPlot
+                xyPlot = xyPlot
             )
-            binding.xyPlot.clear()
+            xyPlot.clear()
 
             setUpXAxis(
-                binding = binding,
+                binding = this,
                 window = window
             )
             setUpXAxisTitle(
                 context = context,
-                binding = binding,
+                binding = this,
                 window = window
             )
             setUpYAxis(
                 context = context,
-                binding = binding,
+                binding = this,
                 maxDisplayHeight = maxDisplayHeight
             )
             setUpBounds(
-                binding = binding,
+                binding = this,
                 window = window,
                 maxDisplayHeight = maxDisplayHeight
             )
             drawBars(
                 context = context,
-                binding = binding,
+                binding = this,
                 barValues = barValues
             )
 
-            return@AndroidViewBinding binding
-        },
-        update = {
             setGraphHeight(
                 graphView = xyPlot,
                 graphViewMode = graphViewMode,
