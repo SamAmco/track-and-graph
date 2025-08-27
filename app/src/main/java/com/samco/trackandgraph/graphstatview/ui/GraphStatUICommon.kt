@@ -151,7 +151,7 @@ fun setGraphHeight(
     hasLegend: Boolean,
 ) {
     if (graphViewMode is GraphViewMode.FullScreenMode) {
-        val multiplier = if (hasLegend) 0.85 else 0.9
+        val multiplier = if (hasLegend) 0.8 else 0.9
         graphView.layoutParams.height = (graphViewMode.availableHeight * multiplier).toInt()
     } else {
         graphView.layoutParams.height = graphView.context.resources.getDimensionPixelSize(R.dimen.graph_height)
