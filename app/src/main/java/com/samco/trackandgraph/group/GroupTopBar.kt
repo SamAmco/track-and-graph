@@ -54,6 +54,7 @@ internal fun GroupTopBarContent(
     onAddTracker: (Long) -> Unit,
     onAddGraphStat: (Long) -> Unit,
     showFab: MutableState<Boolean>,
+    onAddFunction: (Long) -> Unit,
 ) {
     val topBarController = LocalTopBarController.current
 
@@ -80,6 +81,7 @@ internal fun GroupTopBarContent(
             groupViewModel = groupViewModel,
             onAddTracker = onAddTracker,
             onAddGraphStat = onAddGraphStat,
+            onAddFunction = onAddFunction,
             groupId = navArgs.groupId
         )
     }
@@ -129,6 +131,7 @@ private fun createTopBarActions(
     groupViewModel: GroupViewModel,
     onAddTracker: (Long) -> Unit,
     onAddGraphStat: (Long) -> Unit,
+    onAddFunction: (Long) -> Unit,
     groupId: Long
 ): @Composable RowScope.() -> Unit {
     return {
@@ -147,6 +150,7 @@ private fun createTopBarActions(
             addGroupDialogViewModel = addGroupDialogViewModel,
             onAddTracker = onAddTracker,
             onAddGraphStat = onAddGraphStat,
+            onAddFunction = onAddFunction,
             groupId = groupId
         )
     }
@@ -162,6 +166,7 @@ private fun RowScope.GroupAddDropdownMenu(
     addGroupDialogViewModel: AddGroupDialogViewModelImpl,
     onAddTracker: (Long) -> Unit,
     onAddGraphStat: (Long) -> Unit,
+    onAddFunction: (Long) -> Unit,
     groupId: Long
 ) {
     var showAddMenu by remember { mutableStateOf(false) }
@@ -205,6 +210,14 @@ private fun RowScope.GroupAddDropdownMenu(
                         parentGroupId = groupId,
                         groupId = null
                     )
+                }
+            )
+            // Add Function
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.function)) },
+                onClick = {
+                    showAddMenu = false
+                    onAddFunction(groupId)
                 }
             )
         }

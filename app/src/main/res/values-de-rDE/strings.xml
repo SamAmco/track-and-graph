@@ -227,6 +227,7 @@
     <string name="graph_or_stat">Diagramm oder Statistik</string>
     <string name="ru_sure_del_graph">Möchten Sie dieses Diagramm wirklich löschen? Sie können dies nicht rückgängig machen. Sie werden keine getrackten Daten verlieren.</string>
     <string name="open">Öffnen</string>
+    <string name="function">Funktion</string>
     <string name="close">Schließen</string>
     <string name="filter_by_label">nach Label filtern</string>
     <string name="filter_by_value">nach Wert filtern</string>
@@ -234,9 +235,7 @@
     <string name="timer_notification_channel_name">Timer</string>
     <string name="stop">Halt</string>
 
-    <string name="add_function">Fügen Sie eine Funktion hinzu</string>
     <string name="name_your_function">Benennen Sie Ihre Funktion:</string>
-    <string name="write_your_function_here"># Schreiben Sie hier Ihre Funktion</string>
     <string name="add_some_data_sources">Fügen Sie einige Datenquellen hinzu</string>
     <string name="value">Wert</string>
     <string name="label">Label</string>
