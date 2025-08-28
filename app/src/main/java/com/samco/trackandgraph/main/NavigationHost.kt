@@ -181,7 +181,10 @@ fun NavigationHost(
             }
 
             is FunctionsNavKey -> NavEntry(destination) {
-                FunctionsScreen(destination)
+                FunctionsScreen(
+                    navArgs = destination,
+                    onPopBack = { backStack.removeLastOrNull() }
+                )
             }
 
             else -> error("Unknown destination: $destination")
