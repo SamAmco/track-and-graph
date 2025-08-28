@@ -348,6 +348,7 @@
     <string name="default_auto_backup_file_name">RespaldoTrackYGraph.db</string>
 
     <string name="lua_script_empty">Por favor, añade un script Lua</string>
+    <string name="function_name_empty">El nombre de la función no puede estar vacío</string>
     <string name="lua_script_input_hint">Introduce un script Lua...</string>
     <string name="file">Archivo</string>
     <string name="lua_feature_names_not_unique">Las entradas del script deben tener nombres únicos</string>
