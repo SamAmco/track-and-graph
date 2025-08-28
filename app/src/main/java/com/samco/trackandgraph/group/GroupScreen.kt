@@ -113,6 +113,7 @@ fun GroupScreen(
     onTrackerHistory: (DisplayTracker) -> Unit = {},
     onAddTracker: (Long) -> Unit = {},
     onAddGraphStat: (Long) -> Unit = {},
+    onAddFunction: (Long) -> Unit = {},
 ) {
     val groupViewModel: GroupViewModel = hiltViewModel<GroupViewModelImpl>()
     val groupDialogsViewModel: GroupDialogsViewModel = hiltViewModel()
@@ -132,6 +133,7 @@ fun GroupScreen(
         addGroupDialogViewModel = addGroupDialogViewModel,
         onAddTracker = onAddTracker,
         onAddGraphStat = onAddGraphStat,
+        onAddFunction = onAddFunction,
         showFab = showFab,
     )
 
