@@ -32,6 +32,8 @@ import com.samco.trackandgraph.backupandrestore.BackupAndRestoreNavKey
 import com.samco.trackandgraph.backupandrestore.BackupAndRestoreScreen
 import com.samco.trackandgraph.featurehistory.FeatureHistoryNavKey
 import com.samco.trackandgraph.featurehistory.FeatureHistoryScreen
+import com.samco.trackandgraph.functions.FunctionsNavKey
+import com.samco.trackandgraph.functions.FunctionsScreen
 import com.samco.trackandgraph.graphstatinput.GraphStatInputNavKey
 import com.samco.trackandgraph.graphstatinput.GraphStatInputScreen
 import com.samco.trackandgraph.group.GroupNavKey
@@ -88,6 +90,9 @@ fun NavigationHost(
                     },
                     onAddGraphStat = { groupId ->
                         backStack.add(GraphStatInputNavKey(groupId = groupId))
+                    },
+                    onAddFunction = { groupId ->
+                        backStack.add(FunctionsNavKey(groupId = groupId))
                     }
                 )
             }
@@ -129,6 +134,10 @@ fun NavigationHost(
                     urlNavigator = urlNavigator,
                     onPopBack = { backStack.removeLastOrNull() }
                 )
+            }
+
+            is FunctionsNavKey -> NavEntry(destination) {
+                FunctionsScreen(destination)
             }
 
             else -> error("Unknown destination: $destination")
