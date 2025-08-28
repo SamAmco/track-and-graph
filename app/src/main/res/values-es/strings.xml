@@ -223,6 +223,7 @@
     <string name="edit_group">Editar grupo:</string>
     <string name="group">Grupo</string>
     <string name="tracker">Trazar</string>
+    <string name="function">Función</string>
     <string name="graph_or_stat">Gráfico o estadística</string>
     <string name="ru_sure_del_graph">¿Está seguro de que desea eliminar este gráfico? No puedes revertir esto. No perderá ningún dato rastreado.</string>
     <string name="open">Abierta</string>
@@ -233,9 +234,7 @@
     <string name="timer_notification_channel_name">Temporizadores</string>
     <string name="stop">Deténgase</string>
 
-    <string name="add_function">Agregar una función</string>
     <string name="name_your_function">Nombra tu función:</string>
-    <string name="write_your_function_here"># Escriba su función aquí</string>
     <string name="add_some_data_sources">Agregar algunas fuentes de datos</string>
     <string name="value">Valor</string>
     <string name="label">Etiqueta</string>
