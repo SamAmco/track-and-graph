@@ -349,6 +349,7 @@
     <string name="default_auto_backup_file_name">SicherungTrackUndGraph.db</string>
 
     <string name="lua_script_empty">Bitte fügen Sie ein Lua-Skript hinzu</string>
+    <string name="function_name_empty">Funktionsname darf nicht leer sein</string>
     <string name="lua_script_input_hint">Geben Sie ein Lua-Skript ein...</string>
     <string name="file">Datei</string>
     <string name="lua_feature_names_not_unique">Skripteingaben müssen eindeutige Namen haben</string>
