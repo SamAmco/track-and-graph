@@ -92,7 +92,6 @@ import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequest
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.CardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
@@ -127,6 +126,7 @@ fun GroupScreen(
     onTrackerHistory: (DisplayTracker) -> Unit = {},
     onAddTracker: (Long) -> Unit = {},
     onAddGraphStat: (Long) -> Unit = {},
+    onAddFunction: (Long) -> Unit = {},
 ) {
     val groupViewModel: GroupViewModel = hiltViewModel<GroupViewModelImpl>()
     val groupDialogsViewModel: GroupDialogsViewModel = hiltViewModel()
@@ -147,6 +147,7 @@ fun GroupScreen(
         addGroupDialogViewModel = addGroupDialogViewModel,
         onAddTracker = onAddTracker,
         onAddGraphStat = onAddGraphStat,
+        onAddFunction = onAddFunction,
         showFab = showFab,
     )
 
@@ -174,6 +175,7 @@ private fun TopAppBarContent(
     addGroupDialogViewModel: AddGroupDialogViewModelImpl,
     onAddTracker: (Long) -> Unit,
     onAddGraphStat: (Long) -> Unit,
+    onAddFunction: (Long) -> Unit,
     showFab: MutableState<Boolean>,
 ) {
     val topBarController = LocalTopBarController.current
@@ -259,6 +261,14 @@ private fun TopAppBarContent(
                                         parentGroupId = groupId,
                                         groupId = null
                                     )
+                                }
+                            )
+                            // Add Function
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.function)) },
+                                onClick = {
+                                    showAddMenu = false
+                                    onFunctions(groupId)
                                 }
                             )
                         }
