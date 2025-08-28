@@ -268,7 +268,7 @@ private fun TopAppBarContent(
                                 text = { Text(stringResource(R.string.function)) },
                                 onClick = {
                                     showAddMenu = false
-                                    onFunctions(groupId)
+                                    onAddFunction(groupId)
                                 }
                             )
                         }
