@@ -21,6 +21,10 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.samco.trackandgraph.TestDataInteractor
+import com.samco.trackandgraph.createFaq1Group
+import com.samco.trackandgraph.createFirstOpenTutorialGroup
+import com.samco.trackandgraph.createScreenshotsGroup
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
