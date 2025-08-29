@@ -30,11 +30,14 @@ import javax.inject.Inject
 interface FunctionsViewModel {
     val functionName: TextFieldValue
     val functionDescription: TextFieldValue
+    val scriptText: TextFieldValue
     val errorText: StateFlow<Int?>
     val complete: ReceiveChannel<Unit>
 
     fun onFunctionNameChanged(name: TextFieldValue)
     fun onFunctionDescriptionChanged(description: TextFieldValue)
+    fun onScriptTextChanged(script: TextFieldValue)
+    fun onUpdateScriptFromClipboard(clipboardText: String)
     fun onCreateClicked()
     fun init(groupId: Long)
 }
@@ -50,6 +53,9 @@ class FunctionsViewModelImpl @Inject constructor() : ViewModel(), FunctionsViewM
     private val _functionDescription = mutableStateOf(TextFieldValue(""))
     override val functionDescription: TextFieldValue get() = _functionDescription.value
 
+    private val _scriptText = mutableStateOf(TextFieldValue(""))
+    override val scriptText: TextFieldValue get() = _scriptText.value
+
     private val _errorText = MutableStateFlow<Int?>(null)
     override val errorText: StateFlow<Int?> = _errorText.asStateFlow()
 
@@ -63,6 +69,16 @@ class FunctionsViewModelImpl @Inject constructor() : ViewModel(), FunctionsViewM
 
     override fun onFunctionDescriptionChanged(description: TextFieldValue) {
         _functionDescription.value = description
+        validate()
+    }
+
+    override fun onScriptTextChanged(script: TextFieldValue) {
+        _scriptText.value = script
+        validate()
+    }
+
+    override fun onUpdateScriptFromClipboard(clipboardText: String) {
+        _scriptText.value = TextFieldValue(clipboardText)
         validate()
     }
 
@@ -83,6 +99,7 @@ class FunctionsViewModelImpl @Inject constructor() : ViewModel(), FunctionsViewM
 
         _functionName.value = TextFieldValue("")
         _functionDescription.value = TextFieldValue("")
+        _scriptText.value = TextFieldValue("")
         _errorText.value = null
     }
 }
