@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.data.database.entity
 
-
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
