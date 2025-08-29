@@ -34,12 +34,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,9 +48,11 @@ import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.AddCreateBar
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
+import com.samco.trackandgraph.ui.compose.ui.IconTextButton
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -87,9 +89,12 @@ fun FunctionsScreen(
     FunctionsView(
         functionName = viewModel.functionName,
         functionDescription = viewModel.functionDescription,
+        scriptText = viewModel.scriptText,
         errorText = errorText,
         onFunctionNameChanged = viewModel::onFunctionNameChanged,
         onFunctionDescriptionChanged = viewModel::onFunctionDescriptionChanged,
+        onScriptTextChanged = viewModel::onScriptTextChanged,
+        onUpdateScriptFromClipboard = viewModel::onUpdateScriptFromClipboard,
         onCreateClicked = viewModel::onCreateClicked
     )
 }
@@ -114,11 +119,14 @@ private fun TopAppBarContent() {
 private fun FunctionsView(
     functionName: TextFieldValue,
     functionDescription: TextFieldValue,
+    scriptText: TextFieldValue,
     errorText: Int?,
     onFunctionNameChanged: (TextFieldValue) -> Unit,
     onFunctionDescriptionChanged: (TextFieldValue) -> Unit,
+    onScriptTextChanged: (TextFieldValue) -> Unit,
+    onUpdateScriptFromClipboard: (String) -> Unit,
     onCreateClicked: () -> Unit
-) {
+) = TnGComposeTheme {
     val focusRequester = remember { FocusRequester() }
 
     Surface(color = MaterialTheme.colorScheme.background) {
@@ -129,8 +137,11 @@ private fun FunctionsView(
                 modifier = Modifier.weight(1f),
                 functionName = functionName,
                 functionDescription = functionDescription,
+                scriptText = scriptText,
                 onFunctionNameChanged = onFunctionNameChanged,
                 onFunctionDescriptionChanged = onFunctionDescriptionChanged,
+                onScriptTextChanged = onScriptTextChanged,
+                onUpdateScriptFromClipboard = onUpdateScriptFromClipboard,
                 focusRequester = focusRequester
             )
 
@@ -150,8 +161,11 @@ private fun FunctionsInputForm(
     modifier: Modifier,
     functionName: TextFieldValue,
     functionDescription: TextFieldValue,
+    scriptText: TextFieldValue,
     onFunctionNameChanged: (TextFieldValue) -> Unit,
     onFunctionDescriptionChanged: (TextFieldValue) -> Unit,
+    onScriptTextChanged: (TextFieldValue) -> Unit,
+    onUpdateScriptFromClipboard: (String) -> Unit,
     focusRequester: FocusRequester
 ) = Column(
     modifier = modifier
@@ -162,16 +176,18 @@ private fun FunctionsInputForm(
                 .only(WindowInsetsSides.Horizontal)
                 .asPaddingValues()
         )
-        .then(Modifier.padding(cardPadding))
+        .then(Modifier.padding(cardPadding)),
+    horizontalAlignment = Alignment.CenterHorizontally
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     DialogInputSpacing()
 
-    NameInput(
-        functionName = functionName,
-        onFunctionNameChanged = onFunctionNameChanged,
+    FullWidthTextField(
+        textFieldValue = functionName,
+        onValueChange = onFunctionNameChanged,
+        label = stringResource(id = R.string.name_your_function),
         focusManager = focusManager,
         focusRequester = focusRequester,
         keyboardController = keyboardController
@@ -179,38 +195,35 @@ private fun FunctionsInputForm(
 
     InputSpacingLarge()
 
-    DescriptionInput(
-        functionDescription = functionDescription,
-        onFunctionDescriptionChanged = onFunctionDescriptionChanged
+    FullWidthTextField(
+        textFieldValue = functionDescription,
+        onValueChange = onFunctionDescriptionChanged,
+        label = stringResource(id = R.string.add_a_longer_description_optional),
+        singleLine = false
+    )
+    
+    InputSpacingLarge()
+
+    val clipboardManager = LocalClipboardManager.current
+    IconTextButton(
+        onClick = {
+            val text = clipboardManager.getText()?.text
+                ?: return@IconTextButton
+            onUpdateScriptFromClipboard(text)
+        },
+        icon = R.drawable.content_paste,
+        text = stringResource(R.string.paste)
+    )
+
+    InputSpacingLarge()
+
+    FullWidthTextField(
+        textFieldValue = scriptText,
+        onValueChange = onScriptTextChanged,
+        label = "Script",
+        singleLine = false
     )
 }
-
-@Composable
-private fun NameInput(
-    functionName: TextFieldValue,
-    onFunctionNameChanged: (TextFieldValue) -> Unit,
-    focusManager: FocusManager,
-    focusRequester: FocusRequester,
-    keyboardController: SoftwareKeyboardController?
-) = FullWidthTextField(
-    textFieldValue = functionName,
-    onValueChange = onFunctionNameChanged,
-    label = stringResource(id = R.string.name_your_function),
-    focusManager = focusManager,
-    focusRequester = focusRequester,
-    keyboardController = keyboardController
-)
-
-@Composable
-private fun DescriptionInput(
-    functionDescription: TextFieldValue,
-    onFunctionDescriptionChanged: (TextFieldValue) -> Unit
-) = FullWidthTextField(
-    textFieldValue = functionDescription,
-    onValueChange = onFunctionDescriptionChanged,
-    label = stringResource(id = R.string.add_a_longer_description_optional),
-    singleLine = false
-)
 
 @Preview(showBackground = true)
 @Composable
@@ -218,9 +231,12 @@ fun FunctionsScreenPreview() {
     FunctionsView(
         functionName = TextFieldValue("Sample Function"),
         functionDescription = TextFieldValue("This is a sample function description that shows how the UI will look with some content."),
+        scriptText = TextFieldValue("-- Sample Lua script\nlocal function myFunction()\n    return 'Hello World'\nend"),
         errorText = null,
         onFunctionNameChanged = {},
         onFunctionDescriptionChanged = {},
+        onScriptTextChanged = {},
+        onUpdateScriptFromClipboard = {},
         onCreateClicked = {}
     )
 }
@@ -231,9 +247,12 @@ fun FunctionsScreenEmptyPreview() {
     FunctionsView(
         functionName = TextFieldValue(""),
         functionDescription = TextFieldValue(""),
+        scriptText = TextFieldValue(""),
         errorText = null,
         onFunctionNameChanged = {},
         onFunctionDescriptionChanged = {},
+        onScriptTextChanged = {},
+        onUpdateScriptFromClipboard = {},
         onCreateClicked = {}
     )
 }
@@ -244,9 +263,12 @@ fun FunctionsScreenErrorPreview() {
     FunctionsView(
         functionName = TextFieldValue(""),
         functionDescription = TextFieldValue(""),
+        scriptText = TextFieldValue(""),
         errorText = R.string.function_name_empty,
         onFunctionNameChanged = {},
         onFunctionDescriptionChanged = {},
+        onScriptTextChanged = {},
+        onUpdateScriptFromClipboard = {},
         onCreateClicked = {}
     )
 }

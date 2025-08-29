@@ -91,7 +91,6 @@ import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
 import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.samco.trackandgraph.R as AppR
 
 @Composable
 fun LuaGraphConfigView(
@@ -436,7 +435,7 @@ private fun Buttons(
                 ?: return@IconTextButton
             onUpdateScriptFromClipboard(text)
         },
-        icon = AppR.drawable.content_paste,
+        icon = R.drawable.content_paste,
         text = stringResource(R.string.paste)
     )
 
@@ -448,7 +447,7 @@ private fun Buttons(
 
     IconTextButton(
         onClick = { launcher.launch("*/*") },
-        icon = AppR.drawable.folder_open,
+        icon = R.drawable.folder_open,
         text = stringResource(R.string.file)
     )
 
@@ -456,7 +455,7 @@ private fun Buttons(
 
     IconTextButton(
         onClick = { onOpenCommunityScripts() },
-        icon = AppR.drawable.github_mark,
+        icon = R.drawable.github_mark,
         text = stringResource(R.string.github)
     )
 }
