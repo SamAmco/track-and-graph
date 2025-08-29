@@ -17,20 +17,19 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
+import com.samco.trackandgraph.data.database.entity.FunctionStep
 
-data class DisplayTracker(
+data class FunctionStep(
     val id: Long,
-    val featureId: Long,
-    val name: String,
-    val groupId: Long,
-    val dataType: DataType = DataType.CONTINUOUS,
-    val hasDefaultValue: Boolean,
-    val defaultValue: Double,
-    val defaultLabel: String,
-    val timestamp: OffsetDateTime?,
-    val displayIndex: Int,
-    val description: String,
-    val timerStartInstant: Instant?
-)
+    val functionId: Long,
+    val stepIndex: Int,
+    val script: String,
+    val inputFeatures: List<FunctionInputFeature>
+) {
+    internal fun toEntity() = FunctionStep(
+        id = id,
+        functionId = functionId,
+        stepIndex = stepIndex,
+        script = script
+    )
+}
