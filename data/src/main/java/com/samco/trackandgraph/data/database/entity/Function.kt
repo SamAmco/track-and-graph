@@ -15,36 +15,27 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.database.migrations
+package com.samco.trackandgraph.data.database.entity
 
-val allMigrations = arrayOf(
-    MIGRATION_29_30,
-    MIGRATION_30_31,
-    MIGRATION_31_32,
-    MIGRATION_32_33,
-    MIGRATION_33_34,
-    MIGRATION_34_35,
-    MIGRATION_35_36,
-    MIGRATION_36_37,
-    MIGRATION_37_38,
-    MIGRATION_38_39,
-    MIGRATION_39_40,
-    MIGRATION_40_41,
-    MIGRATION_41_42,
-    MIGRATION_42_43,
-    MIGRATION_43_44,
-    MIGRATION_44_45,
-    MIGRATION_45_46,
-    MIGRATION_46_47,
-    MIGRATION_47_48,
-    MIGRATION_48_49,
-    MIGRATION_49_50,
-    MIGRATION_50_51,
-    MIGRATION_51_52,
-    MIGRATION_52_53,
-    MIGRATION_53_54,
-    MIGRATION_54_55,
-    MIGRATION_55_56,
-    MIGRATION_56_57,
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+
+@Entity(
+    tableName = "functions_table",
+    foreignKeys = [ForeignKey(
+        entity = Feature::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("feature_id"),
+        onDelete = ForeignKey.CASCADE
+    )]
 )
+internal data class Function(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id", index = true)
+    val id: Long,
 
+    @ColumnInfo(name = "feature_id", index = true)
+    val featureId: Long
+)

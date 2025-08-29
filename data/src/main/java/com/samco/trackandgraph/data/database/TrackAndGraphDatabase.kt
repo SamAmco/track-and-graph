@@ -51,6 +51,9 @@ import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.Reminder
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
 import com.samco.trackandgraph.data.database.entity.Tracker
+import com.samco.trackandgraph.data.database.entity.Function
+import com.samco.trackandgraph.data.database.entity.FunctionStep
+import com.samco.trackandgraph.data.database.entity.FunctionStepInputFeature
 import com.samco.trackandgraph.data.database.migrations.allMigrations
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -65,7 +68,7 @@ import org.threeten.bp.temporal.TemporalAmount
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-const val TNG_DATABASE_VERSION = 56
+const val TNG_DATABASE_VERSION = 57
 
 @Database(
     entities = [
@@ -86,6 +89,9 @@ const val TNG_DATABASE_VERSION = 56
         BarChart::class,
         LuaGraph::class,
         LuaGraphFeature::class,
+        Function::class,
+        FunctionStep::class,
+        FunctionStepInputFeature::class,
     ],
     version = TNG_DATABASE_VERSION
 )
