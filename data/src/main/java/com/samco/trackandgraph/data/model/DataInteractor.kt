@@ -41,7 +41,7 @@ import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
 
-interface DataInteractor : TrackerHelper, DataSampler {
+interface DataInteractor : TrackerHelper, FunctionHelper, DataSampler {
     suspend fun insertGroup(group: Group): Long
 
     suspend fun deleteGroup(id: Long): DeletedGroupInfo
