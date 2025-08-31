@@ -44,7 +44,7 @@ val darkOrange = Color(0xFFBB3D18)
 val blueBlack = Color(0xFF2B3B45)
 
 val darkCharcoal = Color(0xFF121212)
-val midCharcoal = Color(0xFF222222)
+val midCharcoal = Color(0xFF282828)
 val fadedLightBlue = Color(0xFF88AABF)
 val fadedDarkBlue = Color(0xFF54788C)
 val fadedOrange = Color(0xFFE17656)
