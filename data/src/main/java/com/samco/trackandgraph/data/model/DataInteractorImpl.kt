@@ -64,9 +64,10 @@ internal class DataInteractorImpl @Inject constructor(
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher,
     private val trackerHelper: TrackerHelper,
+    private val functionHelper: FunctionHelper,
     private val csvReadWriter: CSVReadWriter,
     private val dataSampler: DataSampler
-) : DataInteractor, TrackerHelper by trackerHelper, DataSampler by dataSampler {
+) : DataInteractor, TrackerHelper by trackerHelper, FunctionHelper by functionHelper, DataSampler by dataSampler {
 
     private val dataUpdateEvents = MutableSharedFlow<DataUpdateType>(
         extraBufferCapacity = 100,
