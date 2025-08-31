@@ -27,6 +27,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,8 +49,11 @@ import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun LastValueStatView(
@@ -79,15 +87,16 @@ private fun LastValueStatViewBody(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     val context = LocalContext.current
-
     val weekdayNames = getWeekDayNames(context)
+    var durationText by remember { mutableStateOf("") }
 
-    val now = OffsetDateTime.now()
-
-    val duration = Duration.between(dataPoint.timestamp, now)
-
-    val durationText =
-        formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
+    LaunchedEffect(dataPoint.timestamp, context) {
+        while (isActive) {
+            val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
+            durationText = formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
+            delay(1.seconds)
+        }
+    }
 
     Text(
         text = durationText,
