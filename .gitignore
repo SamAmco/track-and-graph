@@ -87,3 +87,5 @@ lua/local
 
 # Screenshot test related files
 tmp/
+
+configuration/venv
