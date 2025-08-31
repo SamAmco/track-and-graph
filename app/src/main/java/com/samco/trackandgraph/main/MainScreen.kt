@@ -17,6 +17,8 @@
 package com.samco.trackandgraph.main
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -150,6 +152,22 @@ private fun MainView(
         else enterAlwaysScrollBehavior
     }
     val scope = rememberCoroutineScope()
+
+    // Animate app bar back in when navigation occurs
+    LaunchedEffect(backStack.size, topBarConfig, enterAlwaysScrollBehavior) {
+        if (topBarConfig.visible && !topBarConfig.appBarPinned) {
+            // Animate from collapsed (1.0) to expanded (0.0) to show the app bar sliding in
+            val animatable = Animatable(enterAlwaysScrollBehavior.state.collapsedFraction)
+            animatable.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(durationMillis = 300)
+            ) {
+                // Update the scroll behavior's height offset to animate the app bar
+                val heightOffsetLimit = enterAlwaysScrollBehavior.state.heightOffsetLimit
+                enterAlwaysScrollBehavior.state.heightOffset = value * heightOffsetLimit
+            }
+        }
+    }
 
     BackHandler(drawerState.isOpen) { scope.launch { drawerState.close() } }
 
