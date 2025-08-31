@@ -1,0 +1,299 @@
+FUNCTIONS PLANNING
+
+User adds function
+Comes to function screen
+Configures function
+Saves function
+User sees function in group
+
+User edits function
+Comes to function screen
+Edits function
+Saves function
+User sees function in group
+
+User deletes function
+User does not see function in group
+
+User moves function to another group
+
+User selects function as data source for a graph
+User selects function as data source for a lua graph
+
+User adds data point to tracker
+Tracker is used as a data source for a function
+graph using function as data source refreshes with new data point
+
+
+Function screen: 
+
+There's a fixed output node in the canvas. You can't remove it.
+The output node has a configuration for the function: 
+- name
+- description
+- whether it's a duration output
+
+
+There's a done button FAB
+When the function is valid the button is enabled, otherwise disabled
+When clicked, saves the function and goes back to group screen
+
+Nodes in canvas
+Node size defined in canvas space
+When editing function, camera zooms to fit all nodes in view
+
+Long pressing anywhere on the canvas creates a new node at that position by bringing up the node picker
+There are three node types: 
+- Data source
+- Prebuilt Lua functions
+- Custom Lua code
+
+Selecting a node type creates that node in the canvas
+The node is a card with configuration on it
+When the configuration for that node is invalid the node has a red border
+A node card has a delete button, and a help button that shows a dialog explaining what the node does
+
+Any node is a card, and it has handles on the left and right side for connecting to other nodes
+Dragging from any handle creates a connection line that follows the finger using a bezier curve
+Releasing the drag on another node's handle creates a connection between the two nodes
+Releasing the drag anywhere else cancels the connection
+Tapping a connection line highlights the line and shows a delete FAB button to remove the connection
+
+Tapping outside of any node or connection line clears the selection
+Dragging on the canvas pans the canvas
+Pinching anywhere zooms in or out
+
+There's a back button in the top left corner to go back to the group screen
+Dragging or pinching hides all fabs and the back button
+Tapping on anything/anywhere shows all relevant fabs and the back button
+
+Prebuilt Lua function nodes:
+
+- Time between 
+  - Include time from now (boolean)
+- Duration clustered max
+  - Threshold (duration enum)
+  - Duration multiplier (uint)
+- Duration clustered min
+  - Threshold (duration enum)
+  - Duration multiplier (uint)
+- Duration clustered average
+  - Threshold (duration enum)
+  - Duration multiplier (uint)
+- Duration clustered sum
+  - Threshold (duration enum)
+  - Duration multiplier (uint)
+
+- Period clustered max
+  - Threshold (period enum)
+  - Period multiplier (uint)
+- Period clustered min
+  - Threshold (period enum)
+  - Period multiplier (uint)
+- Period clustered average
+  - Threshold (period enum)
+  - Period multiplier (uint)
+- Period clustered sum
+  - Threshold (period enum)
+  - Period multiplier (uint)
+
+- Pair and subctract
+  - Threshold (duration)
+  - Filter items without pairs (boolean)
+- Pair and sum
+  - Threshold (duration)
+  - Filter items without pairs (boolean)
+- Pair and multiply
+  - Threshold (duration)
+  - Filter items without pairs (boolean)
+- Pair and divide
+  - Threshold (duration)
+  - Filter items without pairs (boolean)
+
+- Time cutoff from another data source (no config)
+- Time cutoff from timestamp
+  - Cutoff time (timestamp)
+- Time cutoff from duration ago
+  - Cutoff duration (duration)
+- Time cutoff from period ago
+  - Cutoff period (period enum)
+  - Period multiplier (uint)
+
+- Filter value above
+  - Minimum value (number)
+  - Invert (boolean)
+- Filter value below
+  - Maximum value (number)
+  - Invert (boolean)
+- Filter by label
+  - Case sensitive (boolean)
+  - Trim whitespace (boolean)
+  - Invert (boolean)
+- Filter by note
+  - Case sensitive (boolean)
+  - Trim whitespace (boolean)
+  - Invert (boolean)
+
+- Multiply by constant
+  - Constant (number)
+- Add constant
+  - Constant (number)
+- Subtract constant
+  - Constant (number)
+- Divide by constant
+  - Constant (number)
+
+- Swap note and label (no config)
+- Set value to time of day in seconds (no config)
+- Set value to day of week (no config)
+- Set value to day of month (no config)
+- Set value to month of year (no config)
+- Set value to year (no config)
+- Set value to hour of day (no config)
+- Set value to minute of hour (no config)
+- Set value to second of minute (no config)
+
+- Invert value (no config)
+- Absolute value (no config)
+- Cumulative sum (no config)
+  - reset on 0 value (boolean)
+- Rate of change (no config)
+- Round to nearest integer (no config)
+- Floor (no config)
+- Ceiling (no config)
+
+- duration based Standard deviation
+  - Window size (duration enum)
+  - Duration multiplier (uint)
+  - Moving window (boolean)
+- duration based Variance
+  - Window size (duration enum)
+  - Duration multiplier (uint)
+  - Moving window (boolean)
+- duration based Average
+  - Window size (duration enum)
+  - Duration multiplier (uint)
+  - Moving window (boolean)
+- duration based Sum
+  - Window size (duration enum)
+  - Duration multiplier (uint)
+  - Moving window (boolean)
+- duration based Minimum
+  - Window size (duration enum)
+  - Duration multiplier (uint)
+  - Moving window (boolean)
+- duration based Maximum
+  - Window size (duration enum)
+  - Duration multiplier (uint)
+  - Moving window (boolean)
+
+- period based Standard deviation
+  - Window size (period enum)
+  - period multiplier (uint)
+  - Moving window (boolean)
+- period based Variance
+  - Window size (period enum)
+  - period multiplier (uint)
+  - Moving window (boolean)
+- period based Average
+  - Window size (period enum)
+  - period multiplier (uint)
+  - Moving window (boolean)
+- period based Sum
+  - Window size (period enum)
+  - period multiplier (uint)
+  - Moving window (boolean)
+- period based Minimum
+  - Window size (period enum)
+  - period multiplier (uint)
+  - Moving window (boolean)
+- period based Maximum
+  - Window size (period enum)
+  - period multiplier (uint)
+  - Moving window (boolean)
+
+- Distinct until changed by label
+  - use first (boolean)
+- Distinct until changed by note
+  - use first (boolean)
+- Distinct until changed by value
+  - use first (boolean)
+
+- Override label
+  - New label (string)
+- Override note
+  - New note (string)
+- Override value
+  - New value (number)
+
+- Merge
+
+- Merge/Union (no config)
+
+- Synthetic Random data
+  - seed (string)
+  - frequency (duration)
+  - jitter (duration)
+
+- Snap to nearest time
+  - time (local time)
+- Snap to nearest week day
+  - day of week (enum)
+- Snap to nearest month day
+  - day of month (number)
+- Snap to next time 
+  - time (local time)
+- Snap to next week day
+  - day of week (enum)
+- Snap to next month day
+  - day of month (number)
+- Snap to next end of period
+  - period (enum)
+
+
+
+The Lua function spec: 
+
+A lua function file returns an object that contains:
+- A configuration object which defines 
+  - An ID string that uniquely identifies the function
+  - A display name map of language code to translation
+  - A description map of language code to translation
+  - A matrix of the number of input nodes, and the number of data source inputs each node can accept? Data sources are guaranteed to be provided to the function in node order, but the order of data sources within a node is not guaranteed
+  - A configuration spec that describes each configuration input with its:
+    - code name
+    - display name map of language code to translation
+    - type:
+      - boolean
+      - duration i.e. h:m:s
+      - duration enum
+      - period enum
+      - weekday enum
+      - local time
+      - number
+      - uint
+      - string
+      - timestamp (i.e. local time/date input, and timezone enum)
+- A generator function that generates data points via yield and takes:
+  - a list of data sources 
+  - a configuration object 
+
+We should try to gracefully handle null values for all configuration here. I think the bear minimum is to just return a generator function not even wrapped in an object. 
+
+The standard library spec file:
+
+On GitHub we store a json file that lists all the standard library functions as a map of ID to the full function file contents. 
+We download this file once lazily when you open the function screen for the first time. We also store the etag of the response, and make this request at most once per app run with the etag.
+
+
+Use cases: 
+
+- weight where you have kg and lbs entries in the tracker
+- total alcohol consumption per week by merging multiple trackers/labels
+- the ratio of one tracker to another over time, e.g. gym to personal best ratio
+- the time between events, e.g. time between workouts
+- moving averages of weight over time
+- filter outliers from weight data
+- count of events per week
+- combine multiple trackers into one graph
+- 
