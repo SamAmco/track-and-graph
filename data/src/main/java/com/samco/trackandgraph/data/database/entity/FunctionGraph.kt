@@ -15,21 +15,16 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.database.dto
+package com.samco.trackandgraph.data.database.entity
 
-import com.samco.trackandgraph.data.database.entity.FunctionStep
+import com.squareup.moshi.JsonClass
 
-data class FunctionStep(
-    val id: Long,
-    val functionId: Long,
-    val stepIndex: Int,
-    val script: String,
-    val inputFeatures: List<FunctionInputFeature>
-) {
-    internal fun toEntity() = FunctionStep(
-        id = id,
-        functionId = functionId,
-        stepIndex = stepIndex,
-        script = script
-    )
-}
+/**
+ * Entity representation of a function graph structure for database storage.
+ * 
+ * TODO: Define proper graph structure with nodes and edges
+ */
+@JsonClass(generateAdapter = true)
+data class FunctionGraph(
+    val graphData: String = ""
+)

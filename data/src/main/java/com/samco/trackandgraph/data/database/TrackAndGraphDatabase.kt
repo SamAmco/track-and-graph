@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
+import com.samco.trackandgraph.data.database.entity.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
@@ -52,8 +53,7 @@ import com.samco.trackandgraph.data.database.entity.Reminder
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
 import com.samco.trackandgraph.data.database.entity.Tracker
 import com.samco.trackandgraph.data.database.entity.Function
-import com.samco.trackandgraph.data.database.entity.FunctionStep
-import com.samco.trackandgraph.data.database.entity.FunctionStepInputFeature
+import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.database.migrations.allMigrations
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -90,8 +90,7 @@ const val TNG_DATABASE_VERSION = 57
         LuaGraph::class,
         LuaGraphFeature::class,
         Function::class,
-        FunctionStep::class,
-        FunctionStepInputFeature::class,
+        FunctionInputFeature::class,
     ],
     version = TNG_DATABASE_VERSION
 )
@@ -301,6 +300,17 @@ internal class Converters {
             }
         }
     }
+
+    private val functionGraphAdapter by lazy { moshi.adapter(FunctionGraph::class.java) }
+
+    @TypeConverter
+    fun functionGraphToString(value: FunctionGraph): String =
+        toJson(functionGraphAdapter, value)
+
+    @TypeConverter
+    fun stringToFunctionGraph(value: String): FunctionGraph =
+        functionGraphAdapter.fromJson(value) 
+            ?: error("Got null parsing FunctionGraph from JSON: $value")
 }
 
 fun odtFromString(value: String): OffsetDateTime? =
