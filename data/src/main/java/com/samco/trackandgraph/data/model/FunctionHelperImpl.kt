@@ -17,48 +17,91 @@
 
 package com.samco.trackandgraph.data.model
 
+import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.model.di.IODispatcher
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 internal class FunctionHelperImpl @Inject constructor(
-    // TODO: Add required dependencies (database, dao, etc.)
+    private val transactionHelper: DatabaseTransactionHelper,
+    private val dao: TrackAndGraphDatabaseDao,
+    @IODispatcher private val io: CoroutineDispatcher
 ) : FunctionHelper {
 
-    override suspend fun insertFunction(function: Function): Long {
-        TODO("Not yet implemented")
+    override suspend fun insertFunction(function: Function): Long = withContext(io) {
+        transactionHelper.withTransaction {
+            dao.insertFunction(function.toEntity())
+        }
     }
 
-    override suspend fun updateFunction(function: Function) {
-        TODO("Not yet implemented")
+    override suspend fun updateFunction(function: Function) = withContext(io) {
+        transactionHelper.withTransaction {
+            dao.updateFunction(function.toEntity())
+        }
     }
 
-    override suspend fun deleteFunction(functionId: Long) {
-        TODO("Not yet implemented")
+    override suspend fun deleteFunction(functionId: Long) = withContext(io) {
+        transactionHelper.withTransaction {
+            // Get the function to find its feature ID
+            val function = dao.getFunctionById(functionId)
+            if (function != null) {
+                // Delete the feature, which will cascade delete the function
+                dao.deleteFeature(function.featureId)
+            }
+        }
     }
 
-    override suspend fun getFunctionById(functionId: Long): Function? {
-        TODO("Not yet implemented")
+    override suspend fun getFunctionById(functionId: Long): Function? = withContext(io) {
+        val functionWithFeature = dao.getFunctionById(functionId) ?: return@withContext null
+        val inputFeatures = dao.getFunctionInputFeaturesSync(functionId).map { it.toDto() }
+        functionWithFeature.toDto(inputFeatures)
     }
 
-    override suspend fun getFunctionByFeatureId(featureId: Long): Function? {
-        TODO("Not yet implemented")
+    override suspend fun getFunctionByFeatureId(featureId: Long): Function? = withContext(io) {
+        val functionWithFeature = dao.getFunctionByFeatureId(featureId) ?: return@withContext null
+        val inputFeatures = dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.toDto() }
+        functionWithFeature.toDto(inputFeatures)
     }
 
-    override suspend fun getAllFunctionsSync(): List<Function> {
-        TODO("Not yet implemented")
+    override suspend fun getAllFunctionsSync(): List<Function> = withContext(io) {
+        dao.getAllFunctionsSync().map { functionWithFeature ->
+            val inputFeatures = dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.toDto() }
+            functionWithFeature.toDto(inputFeatures)
+        }
     }
 
-    override suspend fun getFunctionsForGroupSync(groupId: Long): List<Function> {
-        TODO("Not yet implemented")
+    override suspend fun getFunctionsForGroupSync(groupId: Long): List<Function> = withContext(io) {
+        dao.getFunctionsForGroupSync(groupId).map { functionWithFeature ->
+            val inputFeatures = dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.toDto() }
+            functionWithFeature.toDto(inputFeatures)
+        }
     }
 
-    override suspend fun duplicateFunction(function: Function): Long? {
-        TODO("Not yet implemented")
+    override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
+        transactionHelper.withTransaction {
+            // Create a copy of the function with id = 0 to generate new id
+            val duplicatedFunction = function.copy(id = 0L)
+            val newFunctionId = dao.insertFunction(duplicatedFunction.toEntity())
+
+            // Duplicate input features
+            function.inputFeatures.forEach { inputFeature ->
+                dao.insertFunctionInputFeature(
+                    inputFeature.copy(
+                        id = 0L,
+                        functionId = newFunctionId
+                    ).toEntity()
+                )
+            }
+
+            newFunctionId
+        }
     }
 
-    override suspend fun hasAnyFunctions(): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun hasAnyFunctions(): Boolean = withContext(io) {
+        dao.hasAnyFunctions()
     }
 }
