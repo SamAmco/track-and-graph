@@ -37,5 +37,8 @@ internal data class Function(
     val id: Long,
 
     @ColumnInfo(name = "feature_id", index = true)
-    val featureId: Long
+    val featureId: Long,
+
+    @ColumnInfo(name = "function_graph")
+    val functionGraph: FunctionGraph
 )

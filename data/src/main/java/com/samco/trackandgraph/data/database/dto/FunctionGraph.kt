@@ -17,16 +17,15 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
-
-data class FunctionInputFeature(
-    val id: Long,
-    val functionId: Long,
-    val featureId: Long
+/**
+ * DTO representation of a function graph structure.
+ * 
+ * TODO: Define proper graph structure with nodes and edges
+ */
+data class FunctionGraph(
+    val graphData: String = ""
 ) {
-    internal fun toEntity() = FunctionInputFeature(
-        id = id,
-        functionId = functionId,
-        featureId = featureId
+    internal fun toEntity() = com.samco.trackandgraph.data.database.entity.FunctionGraph(
+        graphData = graphData
     )
 }

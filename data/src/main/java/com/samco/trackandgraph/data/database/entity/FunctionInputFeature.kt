@@ -23,15 +23,23 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "function_steps_table",
-    foreignKeys = [ForeignKey(
-        entity = Function::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("function_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
+    tableName = "function_input_features_table",
+    foreignKeys = [
+        ForeignKey(
+            entity = Function::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("function_id"),
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Feature::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("feature_id"),
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
 )
-internal data class FunctionStep(
+internal data class FunctionInputFeature(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
@@ -39,9 +47,6 @@ internal data class FunctionStep(
     @ColumnInfo(name = "function_id", index = true)
     val functionId: Long,
 
-    @ColumnInfo(name = "step_index")
-    val stepIndex: Int,
-
-    @ColumnInfo(name = "script")
-    val script: String
+    @ColumnInfo(name = "feature_id", index = true)
+    val featureId: Long
 )
