@@ -250,6 +250,8 @@ Prebuilt Lua function nodes:
 - Snap to next end of period
   - period (enum)
 
+- Filter greater than other tracker
+- Filter less than other tracker
 
 
 The Lua function spec: 
