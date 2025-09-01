@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 57,
-    "identityHash": "b8deb79d295884e7c49722799a3ad72d",
+    "identityHash": "975f20b0b0edc17d165cf9910d303538",
     "entities": [
       {
         "tableName": "features_table",
@@ -1521,7 +1521,7 @@
       },
       {
         "tableName": "functions_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `function_graph` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1533,6 +1533,12 @@
             "fieldPath": "featureId",
             "columnName": "feature_id",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "functionGraph",
+            "columnName": "function_graph",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -1577,8 +1583,8 @@
         ]
       },
       {
-        "tableName": "function_steps_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `function_id` INTEGER NOT NULL, `step_index` INTEGER NOT NULL, `script` TEXT NOT NULL, FOREIGN KEY(`function_id`) REFERENCES `functions_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "tableName": "function_input_features_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `function_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, FOREIGN KEY(`function_id`) REFERENCES `functions_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1593,15 +1599,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "stepIndex",
-            "columnName": "step_index",
+            "fieldPath": "featureId",
+            "columnName": "feature_id",
             "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "script",
-            "columnName": "script",
-            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -1613,22 +1613,31 @@
         },
         "indices": [
           {
-            "name": "index_function_steps_table_id",
+            "name": "index_function_input_features_table_id",
             "unique": false,
             "columnNames": [
               "id"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_steps_table_id` ON `${TABLE_NAME}` (`id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_input_features_table_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
-            "name": "index_function_steps_table_function_id",
+            "name": "index_function_input_features_table_function_id",
             "unique": false,
             "columnNames": [
               "function_id"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_steps_table_function_id` ON `${TABLE_NAME}` (`function_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_input_features_table_function_id` ON `${TABLE_NAME}` (`function_id`)"
+          },
+          {
+            "name": "index_function_input_features_table_feature_id",
+            "unique": false,
+            "columnNames": [
+              "feature_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_input_features_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
           }
         ],
         "foreignKeys": [
@@ -1638,84 +1647,6 @@
             "onUpdate": "NO ACTION",
             "columns": [
               "function_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          }
-        ]
-      },
-      {
-        "tableName": "function_step_input_features_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `function_step_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `name` TEXT NOT NULL, FOREIGN KEY(`function_step_id`) REFERENCES `function_steps_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "functionStepId",
-            "columnName": "function_step_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "featureId",
-            "columnName": "feature_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_function_step_input_features_table_id",
-            "unique": false,
-            "columnNames": [
-              "id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_step_input_features_table_id` ON `${TABLE_NAME}` (`id`)"
-          },
-          {
-            "name": "index_function_step_input_features_table_function_step_id",
-            "unique": false,
-            "columnNames": [
-              "function_step_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_step_input_features_table_function_step_id` ON `${TABLE_NAME}` (`function_step_id`)"
-          },
-          {
-            "name": "index_function_step_input_features_table_feature_id",
-            "unique": false,
-            "columnNames": [
-              "feature_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_function_step_input_features_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
-          }
-        ],
-        "foreignKeys": [
-          {
-            "table": "function_steps_table",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "function_step_id"
             ],
             "referencedColumns": [
               "id"
@@ -1738,7 +1669,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b8deb79d295884e7c49722799a3ad72d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '975f20b0b0edc17d165cf9910d303538')"
     ]
   }
 }

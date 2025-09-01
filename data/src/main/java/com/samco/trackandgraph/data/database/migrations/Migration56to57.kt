@@ -28,31 +28,19 @@ val MIGRATION_56_57 = object : Migration(56, 57) {
                 CREATE TABLE IF NOT EXISTS `functions_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                 `feature_id` INTEGER NOT NULL, 
+                `function_graph` TEXT NOT NULL, 
                 FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimIndent()
         )
 
-        // Create function_steps_table
+        // Create function_input_features_table
         database.execSQL(
             """
-                CREATE TABLE IF NOT EXISTS `function_steps_table` (
+                CREATE TABLE IF NOT EXISTS `function_input_features_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                 `function_id` INTEGER NOT NULL, 
-                `step_index` INTEGER NOT NULL, 
-                `script` TEXT NOT NULL, 
-                FOREIGN KEY(`function_id`) REFERENCES `functions_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-            """.trimIndent()
-        )
-
-        // Create function_step_input_features_table
-        database.execSQL(
-            """
-                CREATE TABLE IF NOT EXISTS `function_step_input_features_table` (
-                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-                `function_step_id` INTEGER NOT NULL, 
                 `feature_id` INTEGER NOT NULL, 
-                `name` TEXT NOT NULL, 
-                FOREIGN KEY(`function_step_id`) REFERENCES `function_steps_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , 
+                FOREIGN KEY(`function_id`) REFERENCES `functions_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , 
                 FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimIndent()
         )
@@ -69,32 +57,20 @@ val MIGRATION_56_57 = object : Migration(56, 57) {
             """.trimIndent()
         )
 
-        // Create indexes for function_steps_table
+        // Create indexes for function_input_features_table
         database.execSQL(
             """
-            CREATE INDEX IF NOT EXISTS `index_function_steps_table_id` ON function_steps_table (`id`)
+            CREATE INDEX IF NOT EXISTS `index_function_input_features_table_id` ON function_input_features_table (`id`)
             """.trimIndent()
         )
         database.execSQL(
             """
-            CREATE INDEX IF NOT EXISTS `index_function_steps_table_function_id` ON function_steps_table (`function_id`)
-            """.trimIndent()
-        )
-
-        // Create indexes for function_step_input_features_table
-        database.execSQL(
-            """
-            CREATE INDEX IF NOT EXISTS `index_function_step_input_features_table_id` ON function_step_input_features_table (`id`)
+            CREATE INDEX IF NOT EXISTS `index_function_input_features_table_function_id` ON function_input_features_table (`function_id`)
             """.trimIndent()
         )
         database.execSQL(
             """
-            CREATE INDEX IF NOT EXISTS `index_function_step_input_features_table_function_step_id` ON function_step_input_features_table (`function_step_id`)
-            """.trimIndent()
-        )
-        database.execSQL(
-            """
-            CREATE INDEX IF NOT EXISTS `index_function_step_input_features_table_feature_id` ON function_step_input_features_table (`feature_id`)
+            CREATE INDEX IF NOT EXISTS `index_function_input_features_table_feature_id` ON function_input_features_table (`feature_id`)
             """.trimIndent()
         )
     }
