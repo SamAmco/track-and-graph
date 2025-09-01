@@ -9,6 +9,7 @@ import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.DataInteractorImpl
 import com.samco.trackandgraph.data.model.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.model.DatabaseTransactionHelperImpl
+import com.samco.trackandgraph.data.model.FunctionHelperImpl
 import com.samco.trackandgraph.data.model.TrackerHelperImpl
 import kotlinx.coroutines.Dispatchers
 
@@ -39,11 +40,14 @@ object TestDataInteractor {
             io = Dispatchers.IO
         )
 
+        val functionHelper = FunctionHelperImpl( )
+
         return DataInteractorImpl(
             database = database,
             dao = database.trackAndGraphDatabaseDao,
             io = Dispatchers.IO,
             trackerHelper = trackerHelper,
+            functionHelper = functionHelper,
             csvReadWriter = CSVReadWriterImpl(
                 dao = database.trackAndGraphDatabaseDao,
                 trackerHelper = trackerHelper,
