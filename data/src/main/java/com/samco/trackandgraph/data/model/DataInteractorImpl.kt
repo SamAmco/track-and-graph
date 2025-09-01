@@ -716,7 +716,11 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun deleteFunction(functionId: Long) = withContext(io) {
-        functionHelper.deleteFunction(functionId)
-        dataUpdateEvents.emit(DataUpdateType.FunctionDeleted)
+        // Get the function to find its feature ID, then delete the feature
+        // This will cascade delete the function and emit the correct event
+        val function = dao.getFunctionById(functionId)
+        if (function != null) {
+            deleteFeature(function.featureId)
+        }
     }
 }
