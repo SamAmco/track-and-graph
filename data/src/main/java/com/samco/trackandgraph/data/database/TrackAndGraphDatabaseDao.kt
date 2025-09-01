@@ -30,6 +30,8 @@ import com.samco.trackandgraph.data.database.entity.BarChart
 import com.samco.trackandgraph.data.database.entity.DataPoint
 import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.FeatureTimer
+import com.samco.trackandgraph.data.database.entity.Function
+import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.database.entity.GlobalNote
 import com.samco.trackandgraph.data.database.entity.GraphOrStat
 import com.samco.trackandgraph.data.database.entity.Group
@@ -44,6 +46,7 @@ import com.samco.trackandgraph.data.database.entity.TimeHistogram
 import com.samco.trackandgraph.data.database.entity.Tracker
 import com.samco.trackandgraph.data.database.entity.queryresponse.DisplayNote
 import com.samco.trackandgraph.data.database.entity.queryresponse.DisplayTracker
+import com.samco.trackandgraph.data.database.entity.queryresponse.FunctionWithFeature
 import com.samco.trackandgraph.data.database.entity.queryresponse.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.entity.queryresponse.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
@@ -425,4 +428,82 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT EXISTS (SELECT 1 FROM reminders_table LIMIT 1)")
     fun hasAnyReminders(): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertFunction(function: Function): Long
+
+    @Update
+    fun updateFunction(function: Function)
+
+    @Query("""
+        SELECT 
+            f.id as id,
+            f.feature_id as feature_id,
+            f.function_graph as function_graph,
+            ft.name as name,
+            ft.group_id as group_id,
+            ft.display_index as display_index,
+            ft.feature_description as feature_description
+        FROM functions_table f
+        INNER JOIN features_table ft ON f.feature_id = ft.id
+        WHERE f.id = :functionId
+        LIMIT 1
+    """)
+    fun getFunctionById(functionId: Long): FunctionWithFeature?
+
+    @Query("""
+        SELECT 
+            f.id as id,
+            f.feature_id as feature_id,
+            f.function_graph as function_graph,
+            ft.name as name,
+            ft.group_id as group_id,
+            ft.display_index as display_index,
+            ft.feature_description as feature_description
+        FROM functions_table f
+        INNER JOIN features_table ft ON f.feature_id = ft.id
+        WHERE f.feature_id = :featureId
+        LIMIT 1
+    """)
+    fun getFunctionByFeatureId(featureId: Long): FunctionWithFeature?
+
+    @Query("""
+        SELECT 
+            f.id as id,
+            f.feature_id as feature_id,
+            f.function_graph as function_graph,
+            ft.name as name,
+            ft.group_id as group_id,
+            ft.display_index as display_index,
+            ft.feature_description as feature_description
+        FROM functions_table f
+        INNER JOIN features_table ft ON f.feature_id = ft.id
+        ORDER BY ft.display_index ASC, f.id DESC
+    """)
+    fun getAllFunctionsSync(): List<FunctionWithFeature>
+
+    @Query("""
+        SELECT 
+            f.id as id,
+            f.feature_id as feature_id,
+            f.function_graph as function_graph,
+            ft.name as name,
+            ft.group_id as group_id,
+            ft.display_index as display_index,
+            ft.feature_description as feature_description
+        FROM functions_table f
+        INNER JOIN features_table ft ON f.feature_id = ft.id
+        WHERE ft.group_id = :groupId
+        ORDER BY ft.display_index ASC, f.id DESC
+    """)
+    fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
+
+    @Query("SELECT EXISTS (SELECT 1 FROM functions_table LIMIT 1)")
+    fun hasAnyFunctions(): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertFunctionInputFeature(functionInputFeature: FunctionInputFeature): Long
+
+    @Query("SELECT * FROM function_input_features_table WHERE function_id = :functionId ORDER BY id ASC")
+    fun getFunctionInputFeaturesSync(functionId: Long): List<FunctionInputFeature>
 }
