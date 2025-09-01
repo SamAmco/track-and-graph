@@ -24,12 +24,12 @@ import com.samco.trackandgraph.data.database.sampling.DataSampler
 import com.samco.trackandgraph.data.database.sampling.DataSamplerImpl
 import com.samco.trackandgraph.data.model.CSVReadWriter
 import com.samco.trackandgraph.data.model.CSVReadWriterImpl
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.DataInteractorImpl
 import com.samco.trackandgraph.data.model.DataPointUpdateHelper
 import com.samco.trackandgraph.data.model.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.model.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.model.DatabaseTransactionHelperImpl
+import com.samco.trackandgraph.data.model.FunctionHelper
+import com.samco.trackandgraph.data.model.FunctionHelperImpl
 import com.samco.trackandgraph.data.model.TrackerHelper
 import com.samco.trackandgraph.data.model.TrackerHelperImpl
 import dagger.Module
@@ -69,4 +69,7 @@ class ModelModule {
     internal fun getDatabaseTransactionHelper(impl: DatabaseTransactionHelperImpl): DatabaseTransactionHelper =
         impl
 
+    @Provides
+    @Singleton
+    internal fun getFunctionHelper(impl: FunctionHelperImpl): FunctionHelper = impl
 }
