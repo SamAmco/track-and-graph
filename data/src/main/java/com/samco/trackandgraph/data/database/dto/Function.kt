@@ -26,10 +26,12 @@ data class Function(
     val groupId: Long,
     val displayIndex: Int,
     val description: String,
-    val steps: List<FunctionStep>
+    val functionGraph: FunctionGraph,
+    val inputFeatures: List<FunctionInputFeature>
 ) {
     internal fun toEntity() = Function(
         id = id,
-        featureId = featureId
+        featureId = featureId,
+        functionGraph = functionGraph.toEntity()
     )
 }
