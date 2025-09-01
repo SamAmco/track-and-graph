@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.Feature
+import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.Group
@@ -235,7 +236,7 @@ internal class DataInteractorImpl @Inject constructor(
         val isTracker = dao.getTrackerByFeatureId(featureId) != null
         dao.deleteFeature(featureId)
         if (isTracker) dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
-        else dataUpdateEvents.emit(DataUpdateType.Function)
+        else dataUpdateEvents.emit(DataUpdateType.FunctionDeleted)
     }
 
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
@@ -701,4 +702,21 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun hasAnyGroups(): Boolean = withContext(io) { dao.hasAnyGroups() }
 
     override suspend fun hasAnyReminders(): Boolean = withContext(io) { dao.hasAnyReminders() }
+
+    // FunctionHelper method overrides with event emission
+    override suspend fun insertFunction(function: Function): Long = withContext(io) {
+        val id = functionHelper.insertFunction(function)
+        dataUpdateEvents.emit(DataUpdateType.FunctionCreated)
+        return@withContext id
+    }
+
+    override suspend fun updateFunction(function: Function) = withContext(io) {
+        functionHelper.updateFunction(function)
+        dataUpdateEvents.emit(DataUpdateType.FunctionUpdated)
+    }
+
+    override suspend fun deleteFunction(functionId: Long) = withContext(io) {
+        functionHelper.deleteFunction(functionId)
+        dataUpdateEvents.emit(DataUpdateType.FunctionDeleted)
+    }
 }
