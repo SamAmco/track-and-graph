@@ -27,7 +27,7 @@ sealed class DataUpdateType {
     /**Display indices were updated **/
     data object DisplayIndex : DataUpdateType()
 
-    /**A global note was created/updated/deleted **/
-    //TODO split out function into separate CRUD events
-    data object Function : DataUpdateType(), FeatureUpdate
+    data object FunctionCreated : DataUpdateType(), FeatureUpdate
+    data object FunctionUpdated : DataUpdateType(), FeatureUpdate
+    data object FunctionDeleted : DataUpdateType(), FeatureUpdate
 }
