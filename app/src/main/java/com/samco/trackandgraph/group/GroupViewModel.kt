@@ -194,7 +194,10 @@ class GroupViewModelImpl @Inject constructor(
             UpdateType.Trackers
         )
 
-        DataUpdateType.Function, DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
+        //TODO handle function related events
+        DataUpdateType.FunctionUpdated, DataUpdateType.FunctionDeleted, DataUpdateType.FunctionCreated -> null
+
+        DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
     }
 
     private val onUpdateChildrenForGroup =
