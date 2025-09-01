@@ -27,4 +27,8 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class FunctionGraph(
     val graphData: String = ""
-)
+) {
+    fun toDto() = com.samco.trackandgraph.data.database.dto.FunctionGraph(
+        graphData = graphData
+    )
+}
