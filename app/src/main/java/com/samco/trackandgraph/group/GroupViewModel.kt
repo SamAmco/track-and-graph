@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.model.DataInteractor
@@ -127,6 +128,7 @@ class GroupViewModelImpl @Inject constructor(
     private sealed class UpdateType {
         data object Trackers : UpdateType()
         data object Groups : UpdateType()
+        data object Functions : UpdateType()
         data object AllGraphs : UpdateType()
         data object GraphDeleted : UpdateType()
         data class GraphsForFeature(val featureId: Long) : UpdateType()
@@ -194,8 +196,19 @@ class GroupViewModelImpl @Inject constructor(
             UpdateType.Trackers
         )
 
-        //TODO handle function related events
-        DataUpdateType.FunctionUpdated, DataUpdateType.FunctionDeleted, DataUpdateType.FunctionCreated -> null
+        DataUpdateType.FunctionCreated -> listOf(
+            UpdateType.Functions,
+            UpdateType.DisplayIndices
+        )
+
+        DataUpdateType.FunctionDeleted -> listOf(
+            UpdateType.Functions,
+            UpdateType.DisplayIndices
+        )
+
+        DataUpdateType.FunctionUpdated -> listOf(
+            UpdateType.Functions
+        )
 
         DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
     }
@@ -415,17 +428,29 @@ class GroupViewModelImpl @Inject constructor(
         .map { getGroupChildren(it.first) }
         .flowOn(io)
 
+    private val functionChildren = onUpdateChildrenForGroup
+        .filter {
+            it.second in arrayOf(
+                UpdateType.Functions,
+                UpdateType.All,
+                UpdateType.DisplayIndices,
+            )
+        }
+        .debounce(10L)
+        .map { getFunctionChildren(it.first) }
+        .flowOn(io)
+
     private val allChildren: StateFlow<List<GroupChild>> =
         combine(
-            graphChildren, trackersChildren, groupChildren
-        ) { a, b, c -> Triple(a, b, c) }
+            graphChildren, trackersChildren, groupChildren, functionChildren
+        ) { graphs, trackers, groups, functions ->
+            listOf(graphs, trackers, groups, functions)
+        }
             //This debounce should be longer than the children debounce
             .debounce(50L)
-            .map { (graphs, trackers, groups) ->
+            .map { childrenLists ->
                 val children = mutableListOf<GroupChild>().apply {
-                    addAll(graphs)
-                    addAll(trackers)
-                    addAll(groups)
+                    childrenLists.forEach { addAll(it) }
                 }
                 sortChildren(children)
                 children
@@ -456,6 +481,7 @@ class GroupViewModelImpl @Inject constructor(
                 dataInteractor.hasAnyFeatures(),
                 dataInteractor.hasAnyGraphs(),
                 dataInteractor.hasAnyGroups(),
+                dataInteractor.hasAnyFunctions(),
             ).none { it }
         }
         .flowOn(io)
@@ -513,6 +539,18 @@ class GroupViewModelImpl @Inject constructor(
     private suspend fun getGroupChildren(groupId: Long): List<GroupChild> {
         return dataInteractor.getGroupsForGroupSync(groupId).map {
             GroupChild.ChildGroup(it.id, it.displayIndex, it)
+        }
+    }
+
+    private suspend fun getFunctionChildren(groupId: Long): List<GroupChild> {
+        return dataInteractor.getFunctionsForGroupSync(groupId).map { function ->
+            val displayFunction = DisplayFunction(
+                id = function.id,
+                featureId = function.featureId,
+                name = function.name,
+                description = function.description
+            )
+            GroupChild.ChildFunction(function.id, function.displayIndex, displayFunction)
         }
     }
 

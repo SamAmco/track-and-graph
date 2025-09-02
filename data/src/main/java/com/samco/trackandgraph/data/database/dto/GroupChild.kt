@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-enum class GroupChildType { GROUP, TRACKER, GRAPH }
+enum class GroupChildType { GROUP, TRACKER, GRAPH, FUNCTION }
 
 /**
  * Represents all relevant view data that the GroupFragment might present.
