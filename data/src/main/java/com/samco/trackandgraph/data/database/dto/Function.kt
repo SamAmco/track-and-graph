@@ -20,8 +20,8 @@ package com.samco.trackandgraph.data.database.dto
 import com.samco.trackandgraph.data.database.entity.Function
 
 data class Function(
-    val id: Long,
-    val featureId: Long,
+    val id: Long = 0L,
+    val featureId: Long = 0L,
     val name: String,
     val groupId: Long,
     val displayIndex: Int,

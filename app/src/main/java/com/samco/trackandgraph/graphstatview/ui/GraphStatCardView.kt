@@ -24,10 +24,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.group.GraphStatClickListener
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+
+class GraphStatClickListener(
+    val onDelete: (graphStat: IGraphStatViewData) -> Unit,
+    val onEdit: (graphStat: IGraphStatViewData) -> Unit,
+    val onClick: (graphStat: IGraphStatViewData) -> Unit,
+    val onMove: (graphStat: IGraphStatViewData) -> Unit,
+    val onDuplicate: (graphStat: IGraphStatViewData) -> Unit
+)
 
 @Composable
 fun GraphStatCardView(
