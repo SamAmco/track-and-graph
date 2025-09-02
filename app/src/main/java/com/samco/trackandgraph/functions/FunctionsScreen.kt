@@ -89,12 +89,9 @@ fun FunctionsScreen(
     FunctionsView(
         functionName = viewModel.functionName,
         functionDescription = viewModel.functionDescription,
-        scriptText = viewModel.scriptText,
         errorText = errorText,
         onFunctionNameChanged = viewModel::onFunctionNameChanged,
         onFunctionDescriptionChanged = viewModel::onFunctionDescriptionChanged,
-        onScriptTextChanged = viewModel::onScriptTextChanged,
-        onUpdateScriptFromClipboard = viewModel::onUpdateScriptFromClipboard,
         onCreateClicked = viewModel::onCreateClicked
     )
 }
@@ -119,12 +116,9 @@ private fun TopAppBarContent() {
 private fun FunctionsView(
     functionName: TextFieldValue,
     functionDescription: TextFieldValue,
-    scriptText: TextFieldValue,
     errorText: Int?,
     onFunctionNameChanged: (TextFieldValue) -> Unit,
     onFunctionDescriptionChanged: (TextFieldValue) -> Unit,
-    onScriptTextChanged: (TextFieldValue) -> Unit,
-    onUpdateScriptFromClipboard: (String) -> Unit,
     onCreateClicked: () -> Unit
 ) = TnGComposeTheme {
     val focusRequester = remember { FocusRequester() }
@@ -137,11 +131,8 @@ private fun FunctionsView(
                 modifier = Modifier.weight(1f),
                 functionName = functionName,
                 functionDescription = functionDescription,
-                scriptText = scriptText,
                 onFunctionNameChanged = onFunctionNameChanged,
                 onFunctionDescriptionChanged = onFunctionDescriptionChanged,
-                onScriptTextChanged = onScriptTextChanged,
-                onUpdateScriptFromClipboard = onUpdateScriptFromClipboard,
                 focusRequester = focusRequester
             )
 
@@ -161,11 +152,8 @@ private fun FunctionsInputForm(
     modifier: Modifier,
     functionName: TextFieldValue,
     functionDescription: TextFieldValue,
-    scriptText: TextFieldValue,
     onFunctionNameChanged: (TextFieldValue) -> Unit,
     onFunctionDescriptionChanged: (TextFieldValue) -> Unit,
-    onScriptTextChanged: (TextFieldValue) -> Unit,
-    onUpdateScriptFromClipboard: (String) -> Unit,
     focusRequester: FocusRequester
 ) = Column(
     modifier = modifier
@@ -201,28 +189,6 @@ private fun FunctionsInputForm(
         label = stringResource(id = R.string.add_a_longer_description_optional),
         singleLine = false
     )
-    
-    InputSpacingLarge()
-
-    val clipboardManager = LocalClipboardManager.current
-    IconTextButton(
-        onClick = {
-            val text = clipboardManager.getText()?.text
-                ?: return@IconTextButton
-            onUpdateScriptFromClipboard(text)
-        },
-        icon = R.drawable.content_paste,
-        text = stringResource(R.string.paste)
-    )
-
-    InputSpacingLarge()
-
-    FullWidthTextField(
-        textFieldValue = scriptText,
-        onValueChange = onScriptTextChanged,
-        label = "Script",
-        singleLine = false
-    )
 }
 
 @Preview(showBackground = true)
@@ -231,12 +197,9 @@ fun FunctionsScreenPreview() {
     FunctionsView(
         functionName = TextFieldValue("Sample Function"),
         functionDescription = TextFieldValue("This is a sample function description that shows how the UI will look with some content."),
-        scriptText = TextFieldValue("-- Sample Lua script\nlocal function myFunction()\n    return 'Hello World'\nend"),
         errorText = null,
         onFunctionNameChanged = {},
         onFunctionDescriptionChanged = {},
-        onScriptTextChanged = {},
-        onUpdateScriptFromClipboard = {},
         onCreateClicked = {}
     )
 }
@@ -247,12 +210,9 @@ fun FunctionsScreenEmptyPreview() {
     FunctionsView(
         functionName = TextFieldValue(""),
         functionDescription = TextFieldValue(""),
-        scriptText = TextFieldValue(""),
         errorText = null,
         onFunctionNameChanged = {},
         onFunctionDescriptionChanged = {},
-        onScriptTextChanged = {},
-        onUpdateScriptFromClipboard = {},
         onCreateClicked = {}
     )
 }
@@ -263,12 +223,9 @@ fun FunctionsScreenErrorPreview() {
     FunctionsView(
         functionName = TextFieldValue(""),
         functionDescription = TextFieldValue(""),
-        scriptText = TextFieldValue(""),
         errorText = R.string.function_name_empty,
         onFunctionNameChanged = {},
         onFunctionDescriptionChanged = {},
-        onScriptTextChanged = {},
-        onUpdateScriptFromClipboard = {},
         onCreateClicked = {}
     )
 }

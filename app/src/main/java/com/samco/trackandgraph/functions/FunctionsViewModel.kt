@@ -19,31 +19,36 @@ package com.samco.trackandgraph.functions
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionGraph
+import com.samco.trackandgraph.data.model.DataInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface FunctionsViewModel {
     val functionName: TextFieldValue
     val functionDescription: TextFieldValue
-    val scriptText: TextFieldValue
     val errorText: StateFlow<Int?>
     val complete: ReceiveChannel<Unit>
 
     fun onFunctionNameChanged(name: TextFieldValue)
     fun onFunctionDescriptionChanged(description: TextFieldValue)
-    fun onScriptTextChanged(script: TextFieldValue)
-    fun onUpdateScriptFromClipboard(clipboardText: String)
     fun onCreateClicked()
     fun init(groupId: Long)
 }
 
 @HiltViewModel
-class FunctionsViewModelImpl @Inject constructor() : ViewModel(), FunctionsViewModel {
+class FunctionsViewModelImpl @Inject constructor(
+    private val dataInteractor: DataInteractor
+) : ViewModel(), FunctionsViewModel {
 
     private var groupId: Long = -1L
 
@@ -52,9 +57,6 @@ class FunctionsViewModelImpl @Inject constructor() : ViewModel(), FunctionsViewM
 
     private val _functionDescription = mutableStateOf(TextFieldValue(""))
     override val functionDescription: TextFieldValue get() = _functionDescription.value
-
-    private val _scriptText = mutableStateOf(TextFieldValue(""))
-    override val scriptText: TextFieldValue get() = _scriptText.value
 
     private val _errorText = MutableStateFlow<Int?>(null)
     override val errorText: StateFlow<Int?> = _errorText.asStateFlow()
@@ -72,24 +74,32 @@ class FunctionsViewModelImpl @Inject constructor() : ViewModel(), FunctionsViewM
         validate()
     }
 
-    override fun onScriptTextChanged(script: TextFieldValue) {
-        _scriptText.value = script
-        validate()
-    }
-
-    override fun onUpdateScriptFromClipboard(clipboardText: String) {
-        _scriptText.value = TextFieldValue(clipboardText)
-        validate()
-    }
-
     private fun validate() {
-        //TODO implement validation
+        _errorText.value = when {
+            _functionName.value.text.isBlank() -> R.string.function_name_empty
+            else -> null
+        }
     }
 
     override fun onCreateClicked() {
-        // TODO: Implement actual function creation logic
-        // For now, just complete the flow
-        complete.trySend(Unit)
+        if (_functionName.value.text.isBlank()) {
+            _errorText.value = R.string.function_name_empty
+            return
+        }
+
+        viewModelScope.launch {
+            val function = Function(
+                name = _functionName.value.text,
+                groupId = groupId,
+                displayIndex = 0, // Will be set by the database
+                description = _functionDescription.value.text,
+                functionGraph = FunctionGraph(), // Empty for now
+                inputFeatures = emptyList() // Empty for now
+            )
+
+            dataInteractor.insertFunction(function)
+            complete.trySend(Unit)
+        }
     }
 
     override fun init(groupId: Long) {
@@ -99,7 +109,6 @@ class FunctionsViewModelImpl @Inject constructor() : ViewModel(), FunctionsViewM
 
         _functionName.value = TextFieldValue("")
         _functionDescription.value = TextFieldValue("")
-        _scriptText.value = TextFieldValue("")
         _errorText.value = null
     }
 }
