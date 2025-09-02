@@ -85,6 +85,7 @@ import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
+import com.samco.trackandgraph.graphstatview.ui.GraphStatClickListener
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
@@ -124,6 +125,8 @@ fun GroupScreen(
     onGraphStatClick: (IGraphStatViewData) -> Unit = {},
     onGroupClick: (Group) -> Unit = {},
     onTrackerHistory: (DisplayTracker) -> Unit = {},
+    onFunctionEdit: (DisplayFunction) -> Unit = {},
+    onFunctionClick: (DisplayFunction) -> Unit = {},
     onAddTracker: (Long) -> Unit = {},
     onAddGraphStat: (Long) -> Unit = {},
     onAddFunction: (Long) -> Unit = {},
@@ -162,6 +165,8 @@ fun GroupScreen(
         onGraphStatClick = onGraphStatClick,
         onGroupClick = onGroupClick,
         onTrackerHistory = onTrackerHistory,
+        onFunctionEdit = onFunctionEdit,
+        onFunctionClick = onFunctionClick,
         showFab = showFab,
     )
 }
@@ -308,6 +313,14 @@ data class GroupClickListeners(
     val onMove: (Group) -> Unit = {}
 )
 
+data class FunctionClickListeners(
+    val onClick: (DisplayFunction) -> Unit = {},
+    val onEdit: (DisplayFunction) -> Unit = {},
+    val onDelete: (DisplayFunction) -> Unit = {},
+    val onMove: (DisplayFunction) -> Unit = {},
+    val onDuplicate: (DisplayFunction) -> Unit = {}
+)
+
 /**
  * Content component for GroupScreen with navigation callbacks
  */
@@ -323,6 +336,8 @@ private fun GroupScreenContent(
     onGraphStatClick: (IGraphStatViewData) -> Unit = {},
     onGroupClick: (Group) -> Unit = {},
     onTrackerHistory: (DisplayTracker) -> Unit = {},
+    onFunctionEdit: (DisplayFunction) -> Unit = {},
+    onFunctionClick: (DisplayFunction) -> Unit = {},
     showFab: State<Boolean>,
 ) {
     val isLoading = groupViewModel.loading.collectAsStateWithLifecycle().value
@@ -393,6 +408,13 @@ private fun GroupScreenContent(
             },
             onDelete = { groupDialogsViewModel.showDeleteGroupDialog(it) },
             onMove = { moveItemViewModel.showMoveGroupDialog(it) }
+        ),
+        functionClickListeners = FunctionClickListeners(
+            onClick = onFunctionClick,
+            onEdit = onFunctionEdit,
+            onDelete = { /* TODO: Add function delete dialog */ },
+            onMove = { /* TODO: Add function move dialog */ },
+            onDuplicate = { /* TODO: Add function duplicate */ }
         ),
         onDragStart = groupViewModel::onDragStart,
         onDragSwap = groupViewModel::onDragSwap,
@@ -507,6 +529,7 @@ private fun GroupScreenView(
     trackerClickListeners: TrackerClickListeners? = null,
     graphStatClickListeners: GraphStatClickListeners? = null,
     groupClickListeners: GroupClickListeners? = null,
+    functionClickListeners: FunctionClickListeners? = null,
     onDragStart: () -> Unit = {},
     onDragSwap: (Int, Int) -> Unit = { _, _ -> },
     onDragEnd: () -> Unit = {},
@@ -522,6 +545,7 @@ private fun GroupScreenView(
             trackerClickListeners = trackerClickListeners ?: TrackerClickListeners(),
             graphStatClickListeners = graphStatClickListeners ?: GraphStatClickListeners(),
             groupClickListeners = groupClickListeners ?: GroupClickListeners(),
+            functionClickListeners = functionClickListeners ?: FunctionClickListeners(),
             onDragStart = onDragStart,
             onDragSwap = onDragSwap,
             onDragEnd = onDragEnd,
@@ -577,12 +601,16 @@ private sealed class GroupChildKey {
 
     @Parcelize
     data class Tracker(val trackerId: Long) : GroupChildKey(), Parcelable
+
+    @Parcelize
+    data class Function(val functionId: Long) : GroupChildKey(), Parcelable
 }
 
 private fun GroupChild.toGroupChildKey(): GroupChildKey = when (this) {
     is GroupChild.ChildGraph -> GroupChildKey.GraphStat(id)
     is GroupChild.ChildGroup -> GroupChildKey.Group(id)
     is GroupChild.ChildTracker -> GroupChildKey.Tracker(id)
+    is GroupChild.ChildFunction -> GroupChildKey.Function(id)
 }
 
 @Composable
@@ -593,6 +621,7 @@ private fun GroupGrid(
     trackerClickListeners: TrackerClickListeners,
     graphStatClickListeners: GraphStatClickListeners,
     groupClickListeners: GroupClickListeners,
+    functionClickListeners: FunctionClickListeners,
     onDragStart: () -> Unit,
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
@@ -632,6 +661,7 @@ private fun GroupGrid(
             span = { item ->
                 when (item) {
                     is GroupChild.ChildTracker -> GridItemSpan(1)
+                    is GroupChild.ChildFunction -> GridItemSpan(1)
                     is GroupChild.ChildGroup -> GridItemSpan(2)
                     is GroupChild.ChildGraph -> GridItemSpan(columnCount)
                 }
@@ -646,6 +676,14 @@ private fun GroupGrid(
                         TrackerItem(
                             tracker = item.displayTracker,
                             clickListeners = trackerClickListeners,
+                            isElevated = isDragging,
+                        )
+                    }
+
+                    is GroupChild.ChildFunction -> {
+                        FunctionItem(
+                            displayFunction = item.displayFunction,
+                            clickListeners = functionClickListeners,
                             isElevated = isDragging,
                         )
                     }
@@ -723,6 +761,22 @@ private fun ReorderableCollectionItemScope.GraphStatItem(
     )
 )
 
+@Composable
+private fun ReorderableCollectionItemScope.FunctionItem(
+    displayFunction: DisplayFunction,
+    clickListeners: FunctionClickListeners,
+    isElevated: Boolean,
+) = Function(
+    modifier = Modifier.longPressDraggableHandle(),
+    displayFunction = displayFunction,
+    isElevated = isElevated,
+    onClick = { clickListeners.onClick(displayFunction) },
+    onEdit = { clickListeners.onEdit(displayFunction) },
+    onDelete = { clickListeners.onDelete(displayFunction) },
+    onMoveTo = { clickListeners.onMove(displayFunction) },
+    onDuplicate = { clickListeners.onDuplicate(displayFunction) }
+)
+
 @Preview(showBackground = true)
 @Composable
 private fun GroupScreenViewEmptyPreview() {
@@ -736,6 +790,7 @@ private fun GroupScreenViewEmptyPreview() {
             trackerClickListeners = TrackerClickListeners(),
             graphStatClickListeners = GraphStatClickListeners(),
             groupClickListeners = GroupClickListeners(),
+            functionClickListeners = FunctionClickListeners(),
         )
     }
 }

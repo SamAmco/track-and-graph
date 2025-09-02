@@ -10,6 +10,7 @@ sealed class GroupChild {
             is ChildGroup -> GroupChildType.GROUP
             is ChildTracker -> GroupChildType.TRACKER
             is ChildGraph -> GroupChildType.GRAPH
+            is ChildFunction -> GroupChildType.FUNCTION
         },
         id = id,
         displayIndex = displayIndex
@@ -38,5 +39,12 @@ sealed class GroupChild {
         override val displayIndex: Int,
         val graph: CalculatedGraphViewData,
         override val type: GroupChildType = GroupChildType.GRAPH
+    ) : GroupChild()
+
+    class ChildFunction(
+        override val id: Long,
+        override val displayIndex: Int,
+        val displayFunction: DisplayFunction,
+        override val type: GroupChildType = GroupChildType.FUNCTION
     ) : GroupChild()
 }
