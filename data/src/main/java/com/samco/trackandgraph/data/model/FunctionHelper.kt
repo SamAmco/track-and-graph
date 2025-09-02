@@ -28,7 +28,6 @@ import com.samco.trackandgraph.data.database.dto.Function
  * throw an exception if anything goes wrong.
  */
 interface FunctionHelper {
-
     suspend fun insertFunction(function: Function): Long
 
     suspend fun updateFunction(function: Function)
