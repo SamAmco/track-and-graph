@@ -19,6 +19,7 @@ package com.samco.trackandgraph.data.model
 
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -34,7 +35,18 @@ internal class FunctionHelperImpl @Inject constructor(
 
     override suspend fun insertFunction(function: Function): Long = withContext(io) {
         transactionHelper.withTransaction {
-            dao.insertFunction(function.toEntity())
+            // First, create the Feature entity that the Function will reference
+            val feature = Feature(
+                id = 0L, // Let the database generate the ID
+                name = function.name,
+                groupId = function.groupId,
+                displayIndex = function.displayIndex,
+                description = function.description
+            )
+            val featureId = dao.insertFeature(feature)
+            
+            // Now create the Function entity with the correct featureId
+            dao.insertFunction(function.copy(featureId = featureId).toEntity())
         }
     }
 
