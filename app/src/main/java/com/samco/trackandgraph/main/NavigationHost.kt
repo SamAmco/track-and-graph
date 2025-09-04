@@ -137,6 +137,9 @@ fun NavigationHost(
                     },
                     onAddFunction = { groupId ->
                         backStack.add(FunctionsNavKey(groupId = groupId))
+                    },
+                    onFunctionEdit = { displayFunction ->
+                        backStack.add(FunctionsNavKey(groupId = destination.groupId, functionId = displayFunction.id))
                     }
                 )
             }
