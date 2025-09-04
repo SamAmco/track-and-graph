@@ -60,7 +60,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FunctionsNavKey(
-    val groupId: Long = 0L
+    val groupId: Long = 0L,
+    val functionId: Long? = null
 ) : NavKey
 
 @Composable
@@ -71,8 +72,8 @@ fun FunctionsScreen(
     val viewModel: FunctionsViewModel = hiltViewModel<FunctionsViewModelImpl>()
 
     // Initialize ViewModel with the arguments from NavKey
-    LaunchedEffect(navArgs.groupId) {
-        viewModel.init(navArgs.groupId)
+    LaunchedEffect(navArgs.groupId, navArgs.functionId) {
+        viewModel.init(navArgs.groupId, navArgs.functionId)
     }
 
     // Handle navigation back when complete
