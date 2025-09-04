@@ -37,12 +37,13 @@ interface FunctionsViewModel {
     val functionName: TextFieldValue
     val functionDescription: TextFieldValue
     val errorText: StateFlow<Int?>
+    val loading: StateFlow<Boolean>
     val complete: ReceiveChannel<Unit>
 
     fun onFunctionNameChanged(name: TextFieldValue)
     fun onFunctionDescriptionChanged(description: TextFieldValue)
     fun onCreateClicked()
-    fun init(groupId: Long)
+    fun init(groupId: Long, functionId: Long? = null)
 }
 
 @HiltViewModel
@@ -51,6 +52,8 @@ class FunctionsViewModelImpl @Inject constructor(
 ) : ViewModel(), FunctionsViewModel {
 
     private var groupId: Long = -1L
+    private var functionId: Long? = null
+    private var existingFunction: Function? = null
 
     private val _functionName = mutableStateOf(TextFieldValue(""))
     override val functionName: TextFieldValue get() = _functionName.value
@@ -60,6 +63,9 @@ class FunctionsViewModelImpl @Inject constructor(
 
     private val _errorText = MutableStateFlow<Int?>(null)
     override val errorText: StateFlow<Int?> = _errorText.asStateFlow()
+
+    private val _loading = MutableStateFlow(false)
+    override val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
     override val complete = Channel<Unit>()
 
@@ -82,33 +88,57 @@ class FunctionsViewModelImpl @Inject constructor(
     }
 
     override fun onCreateClicked() {
-        if (_functionName.value.text.isBlank()) {
-            _errorText.value = R.string.function_name_empty
-            return
-        }
-
         viewModelScope.launch {
-            val function = Function(
-                name = _functionName.value.text,
-                groupId = groupId,
-                displayIndex = 0, // Will be set by the database
-                description = _functionDescription.value.text,
-                functionGraph = FunctionGraph(), // Empty for now
-                inputFeatures = emptyList() // Empty for now
-            )
-
-            dataInteractor.insertFunction(function)
+            val existing = existingFunction
+            if (existing != null) {
+                // Update existing function
+                val updatedFunction = existing.copy(
+                    name = _functionName.value.text,
+                    description = _functionDescription.value.text
+                )
+                dataInteractor.updateFunction(updatedFunction)
+            } else {
+                // Create new function
+                val function = Function(
+                    name = _functionName.value.text,
+                    groupId = groupId,
+                    description = _functionDescription.value.text,
+                    functionGraph = FunctionGraph(), // Empty for now
+                    inputFeatures = emptyList() // Empty for now
+                )
+                dataInteractor.insertFunction(function)
+            }
             complete.trySend(Unit)
         }
     }
 
-    override fun init(groupId: Long) {
-        if (this.groupId == groupId) return
+    override fun init(groupId: Long, functionId: Long?) {
+        if (this.groupId == groupId && this.functionId == functionId) return
 
         this.groupId = groupId
+        this.functionId = functionId
 
-        _functionName.value = TextFieldValue("")
-        _functionDescription.value = TextFieldValue("")
+        if (functionId != null) {
+            // Edit mode - load existing function
+            _loading.value = true
+            viewModelScope.launch {
+                try {
+                    val function = dataInteractor.getFunctionById(functionId)
+                    if (function != null) {
+                        existingFunction = function
+                        _functionName.value = TextFieldValue(function.name)
+                        _functionDescription.value = TextFieldValue(function.description)
+                    }
+                } finally {
+                    _loading.value = false
+                }
+            }
+        } else {
+            // Create mode - reset fields
+            existingFunction = null
+            _functionName.value = TextFieldValue("")
+            _functionDescription.value = TextFieldValue("")
+        }
         _errorText.value = null
     }
 }
