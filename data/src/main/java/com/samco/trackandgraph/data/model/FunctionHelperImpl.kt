@@ -52,6 +52,14 @@ internal class FunctionHelperImpl @Inject constructor(
 
     override suspend fun updateFunction(function: Function) = withContext(io) {
         transactionHelper.withTransaction {
+            val feature = Feature(
+                id = function.featureId,
+                name = function.name,
+                groupId = function.groupId,
+                displayIndex = function.displayIndex,
+                description = function.description
+            )
+            dao.updateFeature(feature)
             dao.updateFunction(function.toEntity())
         }
     }
