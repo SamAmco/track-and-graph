@@ -96,6 +96,9 @@ fun NavigationHost(
                     },
                     onFunctionEdit = { displayFunction ->
                         backStack.add(FunctionsNavKey(groupId = destination.groupId, functionId = displayFunction.id))
+                    },
+                    onFunctionClick = { displayFunction ->
+                        backStack.add(FeatureHistoryNavKey(featureId = displayFunction.featureId, featureName = displayFunction.name))
                     }
                 )
             }

@@ -28,7 +28,7 @@ interface DataSampler {
 
     suspend fun getLabelsForFeatureId(featureId: Long): List<String>
 
-    suspend fun getDataSamplePropertiesForFeatureId(featureId: Long): DataSampleProperties?
+    fun getDataSamplePropertiesForFeatureId(featureId: Long): DataSampleProperties?
 }
 
 internal class DataSamplerImpl @Inject constructor(
@@ -37,34 +37,47 @@ internal class DataSamplerImpl @Inject constructor(
 
     override fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample? {
         val tracker = dao.getTrackerByFeatureId(featureId)
-        return tracker?.let {
+        if (tracker != null) {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
-            RawDataSample.fromSequence(
+            return RawDataSample.fromSequence(
                 data = cursorSequence.asRawDataPointSequence(),
                 getRawDataPoints = cursorSequence::getRawDataPoints,
                 onDispose = cursorSequence::dispose
             )
         }
+        val function = dao.getFunctionByFeatureId(featureId)
+        if (function != null) {
+            return FunctionTreeDataSample(function, dao)
+        }
+        return null
     }
 
     override fun getDataSampleForFeatureId(featureId: Long): DataSample {
         val tracker = dao.getTrackerByFeatureId(featureId)
-        return tracker?.let {
+        if (tracker != null) {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
-            DataSample.fromSequence(
+            return DataSample.fromSequence(
                 data = cursorSequence.asIDataPointSequence(),
                 dataSampleProperties = DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
                 getRawDataPoints = cursorSequence::getRawDataPoints,
                 onDispose = cursorSequence::dispose
             )
-        } ?: DataSample.fromSequence(emptySequence(), onDispose = {})
+        }
+        val function = dao.getFunctionByFeatureId(featureId)
+        if (function != null) {
+            val properties = getDataSamplePropertiesForFeatureId(featureId)
+            return FunctionTreeDataSample(function, dao).asDataSample(properties)
+        }
+        return DataSample.fromSequence(emptySequence(), onDispose = {})
     }
 
-    override suspend fun getDataSamplePropertiesForFeatureId(featureId: Long) =
+    //TODO implement getDataSamplePropertiesForFeatureId for functions
+    override fun getDataSamplePropertiesForFeatureId(featureId: Long) =
         dao.getTrackerByFeatureId(featureId)?.let {
             DataSampleProperties(isDuration = it.dataType == DataType.DURATION)
         }
 
+    //TODO implement getLabelsForFeatureId for functions
     override suspend fun getLabelsForFeatureId(featureId: Long): List<String> {
         val tracker = dao.getTrackerByFeatureId(featureId)
         return tracker?.let {
