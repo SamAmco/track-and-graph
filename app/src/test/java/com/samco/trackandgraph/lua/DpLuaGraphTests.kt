@@ -8,7 +8,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
-class DataPointLuaGraphTests : LuaEngineImplTest() {
+class DpLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Datapoint type gives data point with sensible defaults`() = testLuaEngine(
