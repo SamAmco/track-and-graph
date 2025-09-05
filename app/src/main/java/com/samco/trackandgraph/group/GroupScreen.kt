@@ -286,8 +286,8 @@ private fun GroupScreenContent(
             onClick = onFunctionClick,
             onEdit = onFunctionEdit,
             onDelete = { groupDialogsViewModel.showDeleteFunctionDialog(it) },
-            onMove = { /* TODO: Add function move dialog */ },
-            onDuplicate = { /* TODO: Add function duplicate */ }
+            onMove = { moveItemViewModel.showMoveFunctionDialog(it) },
+            onDuplicate = { groupViewModel.duplicateFunction(it) }
         ),
         onDragStart = groupViewModel::onDragStart,
         onDragSwap = groupViewModel::onDragSwap,
