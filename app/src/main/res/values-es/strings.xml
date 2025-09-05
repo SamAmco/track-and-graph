@@ -32,6 +32,7 @@
     <string name="no_trackers_graph_stats_hint">Cree un rastreador antes de crear cualquier gráfico.</string>
     <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
+    <string name="ru_sure_del_function">¿Estás seguro de que quieres eliminar esta función? No puedes revertir esto.</string>
     <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>
     <string name="tracker_name_cannot_be_null">Por favor, añade un nombre</string>
     <string name="tracker_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
