@@ -11,4 +11,5 @@ sealed class GroupGraphItem {
     data class GroupNode(val groupGraph: GroupGraph) : GroupGraphItem()
     data class GraphNode(val graph: GraphOrStat) : GroupGraphItem()
     data class TrackerNode(val tracker: Tracker) : GroupGraphItem(), FeatureNode
+    data class FunctionNode(val function: Function) : GroupGraphItem(), FeatureNode
 }
