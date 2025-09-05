@@ -723,6 +723,14 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.FunctionUpdated)
     }
 
+    override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
+        val newFunctionId = functionHelper.duplicateFunction(function)
+        if (newFunctionId != null) {
+            dataUpdateEvents.emit(DataUpdateType.FunctionCreated)
+        }
+        return@withContext newFunctionId
+    }
+
     override suspend fun deleteFunction(functionId: Long) = withContext(io) {
         // Get the function to find its feature ID, then delete the feature
         // This will cascade delete the function and emit the correct event
