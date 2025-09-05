@@ -17,4 +17,4 @@
 
 package com.samco.trackandgraph.functions.exceptions
 
-class InvalidRegularityException : Exception() { }
+class InvalidRegularityException : Exception()
