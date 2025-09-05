@@ -80,6 +80,7 @@ fun SelectItemDialog(
     onTrackerSelected: ((Long) -> Unit)? = null,
     onFeatureSelected: ((Long) -> Unit)? = null,
     onGraphSelected: ((Long) -> Unit)? = null,
+    onFunctionSelected: ((Long) -> Unit)? = null,
     onDismissRequest: () -> Unit,
     resetOnClose: Boolean = false,
 ) {
@@ -116,6 +117,10 @@ fun SelectItemDialog(
                     }
 
                     is GraphNode.Graph -> onGraphSelected?.invoke(item.id)
+                    is GraphNode.Function -> {
+                        onFunctionSelected?.invoke(item.functionId)
+                        onFeatureSelected?.invoke(item.featureId)
+                    }
                 }
                 onDismissRequest()
                 if (resetOnClose) viewModel.reset()
@@ -313,6 +318,16 @@ private fun SelectableItemRow(
             onWidthMeasured = onWidthMeasured,
             onClick = onClick
         )
+
+        is GraphNode.Function -> IconItemRow(
+            modifier = modifier,
+            name = item.name,
+            icon = R.drawable.function,
+            indentLevel = indentLevel,
+            isSelected = selectedItem == item,
+            onWidthMeasured = onWidthMeasured,
+            onClick = onClick
+        )
     }
 }
 
@@ -490,6 +505,16 @@ private fun SelectItemDialogContentPreview() {
                     GraphNode.Graph(
                         id = 22L,
                         name = "Overall Health Dashboard Summary"
+                    ),
+                    GraphNode.Function(
+                        functionId = 30L,
+                        featureId = 30L,
+                        name = "BMI Calculator Function"
+                    ),
+                    GraphNode.Function(
+                        functionId = 31L,
+                        featureId = 31L,
+                        name = "Calorie Burn Rate Estimator"
                     )
                 )
             )
