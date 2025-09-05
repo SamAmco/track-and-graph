@@ -38,7 +38,7 @@ data class DeleteItemDto(
  * Type of item being deleted to determine which delete operation to perform.
  */
 enum class DeleteType {
-    GROUP, GRAPH_STAT, TRACKER
+    GROUP, GRAPH_STAT, TRACKER, FUNCTION
 }
 
 /**
@@ -106,6 +106,13 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
         _itemForDeletion.value = DeleteItemDto(
             id = tracker.featureId,
             type = DeleteType.TRACKER
+        )
+    }
+
+    fun showDeleteFunctionDialog(displayFunction: DisplayFunction) {
+        _itemForDeletion.value = DeleteItemDto(
+            id = displayFunction.id,
+            type = DeleteType.FUNCTION
         )
     }
 
