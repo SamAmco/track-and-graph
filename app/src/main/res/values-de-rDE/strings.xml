@@ -32,6 +32,7 @@
     <string name="no_trackers_graph_stats_hint">Bitte erstellen Sie einen Tracker, bevor Sie Diagramme erstellen.</string>
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
+    <string name="ru_sure_del_function">Sind Sie sicher, dass Sie diese Funktion löschen möchten? Sie können dies nicht rückgängig machen.</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
     <string name="tracker_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
