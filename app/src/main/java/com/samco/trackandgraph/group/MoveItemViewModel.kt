@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class MovableItemType { GROUP, GRAPH, TRACKER, }
+enum class MovableItemType { GROUP, GRAPH, TRACKER, FUNCTION }
 
 data class MoveDialogConfig(
     val itemId: Long,
@@ -76,6 +76,14 @@ class MoveItemViewModel @Inject constructor(
         )
     }
 
+    fun showMoveFunctionDialog(displayFunction: DisplayFunction) {
+        _moveDialogConfig.value = MoveDialogConfig(
+            itemId = displayFunction.id,
+            itemType = MovableItemType.FUNCTION,
+            hiddenItems = emptySet()
+        )
+    }
+
     fun dismissMoveDialog() {
         _moveDialogConfig.value = null
     }
@@ -109,6 +117,13 @@ class MoveItemViewModel @Inject constructor(
                         val group = dataInteractor.getGroupById(config.itemId)
                         group.copy(parentGroupId = targetGroupId).let {
                             dataInteractor.updateGroup(it)
+                        }
+                    }
+
+                    MovableItemType.FUNCTION -> {
+                        val function = dataInteractor.getFunctionById(config.itemId)
+                        function?.copy(groupId = targetGroupId)?.let {
+                            dataInteractor.updateFunction(it)
                         }
                     }
                 }
