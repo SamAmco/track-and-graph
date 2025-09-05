@@ -36,7 +36,7 @@ import com.samco.trackandgraph.data.database.dto.GroupGraphItem as ModelGroupGra
 
 enum class SelectItemDialogState { LOADING, READY }
 
-enum class SelectableItemType { GROUP, TRACKER, FEATURE, GRAPH }
+enum class SelectableItemType { GROUP, TRACKER, FEATURE, GRAPH, FUNCTION }
 
 data class HiddenItem(
     val type: SelectableItemType,
@@ -65,8 +65,13 @@ sealed class GraphNode {
         val id: Long,
         override val name: String,
     ) : GraphNode()
-}
 
+    data class Function(
+        val functionId: Long,
+        val featureId: Long,
+        override val name: String,
+    ) : GraphNode()
+}
 
 interface SelectItemDialogViewModel {
     val state: StateFlow<SelectItemDialogState>
@@ -97,7 +102,6 @@ class SelectItemDialogViewModelImpl @Inject constructor(
 
     override val lazyListState = LazyListState()
     override val horizontalScrollState = ScrollState(0)
-
 
     private var initialized = false
     private var selectableTypes: Set<SelectableItemType> = emptySet()
@@ -150,9 +154,15 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 if (SelectableItemType.GRAPH !in selectableTypes) return
                 _selectedItem.value = item
             }
+
+            is GraphNode.Function -> {
+                if (SelectableItemType.FUNCTION !in selectableTypes
+                    && SelectableItemType.FEATURE !in selectableTypes
+                ) return
+                _selectedItem.value = item
+            }
         }
     }
-
 
     override fun reset() {
         initialized = false
@@ -200,6 +210,13 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                     }
                     child.toGraphNode()
                 }
+
+                is ModelGroupGraphItem.FunctionNode -> {
+                    if (functionHidden(functionId = child.function.id, selectableTypes, hiddenItems)) {
+                        return@mapNotNull null
+                    }
+                    child.toGraphNode()
+                }
             }
         }
 
@@ -229,6 +246,7 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 is GraphNode.Group -> hasSelectableDescendants(child, selectableTypes)
                 is GraphNode.Tracker -> SelectableItemType.TRACKER in selectableTypes || SelectableItemType.FEATURE in selectableTypes
                 is GraphNode.Graph -> SelectableItemType.GRAPH in selectableTypes
+                is GraphNode.Function -> SelectableItemType.FUNCTION in selectableTypes
             }
         }
     }
@@ -270,4 +288,21 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         id = graph.id,
         name = graph.name,
     )
+
+    private fun ModelGroupGraphItem.FunctionNode.toGraphNode() = GraphNode.Function(
+        functionId = function.id,
+        featureId = function.featureId,
+        name = function.name,
+    )
+
+    private fun functionHidden(
+        functionId: Long,
+        selectableTypes: Set<SelectableItemType>,
+        hiddenItems: Set<HiddenItem>
+    ): Boolean {
+        val selectable = (SelectableItemType.FUNCTION in selectableTypes
+            || SelectableItemType.FEATURE in selectableTypes)
+        return !selectable
+            || HiddenItem(SelectableItemType.FUNCTION, functionId) in hiddenItems
+    }
 }
