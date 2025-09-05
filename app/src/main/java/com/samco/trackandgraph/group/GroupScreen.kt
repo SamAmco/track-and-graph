@@ -412,7 +412,7 @@ private fun GroupScreenContent(
         functionClickListeners = FunctionClickListeners(
             onClick = onFunctionClick,
             onEdit = onFunctionEdit,
-            onDelete = { /* TODO: Add function delete dialog */ },
+            onDelete = { groupDialogsViewModel.showDeleteFunctionDialog(it) },
             onMove = { /* TODO: Add function move dialog */ },
             onDuplicate = { /* TODO: Add function duplicate */ }
         ),
@@ -476,6 +476,7 @@ private fun GroupScreenContent(
             DeleteType.GROUP -> R.string.ru_sure_del_group
             DeleteType.GRAPH_STAT -> R.string.ru_sure_del_graph
             DeleteType.TRACKER -> R.string.ru_sure_del_feature
+            DeleteType.FUNCTION -> R.string.ru_sure_del_function
         }
 
         ContinueCancelDialog(
@@ -486,6 +487,7 @@ private fun GroupScreenContent(
                     DeleteType.GROUP -> groupViewModel.onDeleteGroup(itemForDeletion.id)
                     DeleteType.GRAPH_STAT -> groupViewModel.onDeleteGraphStat(itemForDeletion.id)
                     DeleteType.TRACKER -> groupViewModel.onDeleteFeature(itemForDeletion.id)
+                    DeleteType.FUNCTION -> groupViewModel.onDeleteFunction(itemForDeletion.id)
                 }
                 groupDialogsViewModel.hideDeleteDialog()
             },
