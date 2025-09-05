@@ -1,6 +1,8 @@
 package com.samco.trackandgraph.data.database.sampling
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.IDataPoint
+import org.threeten.bp.OffsetDateTime
 
 /**
  * A sequence of data points in order from newest to oldest. When you are done iterating the
@@ -38,4 +40,17 @@ abstract class RawDataSample : Sequence<DataPoint> {
      * sequence.
      */
     abstract fun getRawDataPoints(): List<DataPoint>
+
+    fun asDataSample(dataSampleProperties: DataSampleProperties? = null): DataSample =
+        DataSample.fromSequence(
+            data = this.map {
+                object : IDataPoint() {
+                    override val timestamp: OffsetDateTime = it.timestamp
+                    override val value: Double = it.value
+                    override val label: String = it.label
+                }
+            },
+            dataSampleProperties = dataSampleProperties ?: DataSampleProperties(),
+            onDispose = this::dispose
+        )
 }
