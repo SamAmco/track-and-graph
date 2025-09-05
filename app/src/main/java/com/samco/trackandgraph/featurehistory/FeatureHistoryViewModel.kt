@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.Tracker
-import com.samco.trackandgraph.data.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.data.model.di.MainDispatcher
@@ -97,54 +96,42 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     FeatureHistoryViewModel {
     private val featureIdFlow = MutableSharedFlow<Long>(replay = 1, extraBufferCapacity = 1)
 
-    private data class RawData(
-        val dataSampleProperties: DataSampleProperties,
-        val dataPoints: List<DataPointInfo>
-    )
-
     private val dataUpdates = dataInteractor
         .getDataUpdateEvents()
         .map { }
         .debounce(10)
         .onStart { emit(Unit) }
 
-    private val dataSample =
+    override val isDuration: LiveData<Boolean> = featureIdFlow
+        .map { dataInteractor.getDataSamplePropertiesForFeatureId(it)?.isDuration ?: false }
+        .flowOn(io)
+        .asLiveData(viewModelScope.coroutineContext)
+
+    override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> =
         combine(featureIdFlow, dataUpdates) { id, _ -> id }
-            .map { featureId ->
-                val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
-                val answer = RawData(
-                    dataSample.dataSampleProperties,
-                    dataSample.getAllRawDataPoints()
-                        .sortedByDescending { it.timestamp.toEpochSecond() }
-                        .map { it.toDataPointInfo() }
-                )
-                dataSample.dispose()
-                return@map answer
+            .map {
+                dataInteractor.getRawDataSampleForFeatureId(it)
+                    ?.map(::toDataPointInfo)
+                    ?.toList()
+                    ?: emptyList()
             }
             .flowOn(io)
+            .filter { it.isNotEmpty() }
+            .map { dataPoints ->
+                val range = Duration
+                    .between(dataPoints.last().date, dataPoints.first().date)
+                    .abs()
 
-    override val isDuration: LiveData<Boolean> = dataSample.map {
-        it.dataSampleProperties.isDuration
-    }.asLiveData(viewModelScope.coroutineContext)
+                val dateDisplayResolution = when {
+                    range.toDays() > 365 -> DateDisplayResolution.MONTH_YEAR
+                    else -> DateDisplayResolution.MONTH_DAY
+                }
 
-    override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> = dataSample
-        .filter { it.dataPoints.isNotEmpty() }
-        .map { it.dataPoints }
-        .map { dataPoints ->
-            val range = Duration
-                .between(dataPoints.last().date, dataPoints.first().date)
-                .abs()
-
-            val dateDisplayResolution = when {
-                range.toDays() > 365 -> DateDisplayResolution.MONTH_YEAR
-                else -> DateDisplayResolution.MONTH_DAY
-            }
-
-            DateScrollData(
-                dateDisplayResolution = dateDisplayResolution,
-                items = dataPoints
-            )
-        }.asLiveData(viewModelScope.coroutineContext)
+                DateScrollData(
+                    dateDisplayResolution = dateDisplayResolution,
+                    items = dataPoints
+                )
+            }.asLiveData(viewModelScope.coroutineContext)
 
     private val showFeatureInfoFlow = MutableStateFlow(false)
 
@@ -243,11 +230,11 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         showUpdateWarning.value = false
     }
 
-    private fun DataPoint.toDataPointInfo() = DataPointInfo(
-        date = timestamp,
-        featureId = featureId,
-        value = value,
-        label = label,
-        note = note,
+    private fun toDataPointInfo(dp: DataPoint) = DataPointInfo(
+        date = dp.timestamp,
+        featureId = dp.featureId,
+        value = dp.value,
+        label = dp.label,
+        note = dp.note,
     )
 }

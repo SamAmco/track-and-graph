@@ -35,7 +35,7 @@
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
     <string name="tracker_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
-    <string name="data_points">%1$d Getrackt</string>
+    <string name="data_points">%1$d Datenpunkte</string>
     <string name="no_data">Keine Daten</string>
     <string name="skip">Überspringen</string>
     <string name="exportButton">Exportieren</string>
@@ -182,7 +182,7 @@
     <string name="backup_error_failed_to_copy_database">Beim Kopieren der Datenbankdatei ist etwas schief gelaufen.</string>
     <string name="restore_failed">Wiederherstellung fehlgeschlagen. %1$s</string>
     <string name="add_a_longer_description_optional">Eine längere Beschreibung hinzufügen (optional)</string>
-    <string name="no_data_points_history_fragment_hint">Ihr Tracking-Verlauf wird hier angezeigt, wenn Sie einige Daten eingegeben haben.</string>
+    <string name="no_data_points_history_fragment_hint">Ihr Verlauf wird hier angezeigt, wenn Sie einige Datenpunkte haben.</string>
     <string name="info">Info</string>
     <string name="no_description">Keine Beschreibung</string>
     <string name="description">Beschreibung</string>

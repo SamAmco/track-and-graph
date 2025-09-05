@@ -13,7 +13,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 import java.time.OffsetDateTime
 
-class DataPointCursorSequenceTest {
+class DpCursorSequenceTest {
     @Test
     fun `Test sequence iterates the whole database correctly`() {
         //PREPARE
