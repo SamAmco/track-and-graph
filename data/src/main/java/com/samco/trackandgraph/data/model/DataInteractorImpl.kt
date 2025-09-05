@@ -139,6 +139,9 @@ internal class DataInteractorImpl @Inject constructor(
         val graphs = dao.getGraphsAndStatsByGroupIdSync(group.id)
             .map { it.toDto() }
 
+        // Get functions for this specific group using FunctionHelper
+        val functions = getFunctionsForGroupSync(group.id)
+
         // Add child groups recursively
         for (childGroup in childGroups) {
             children.add(GroupGraphItem.GroupNode(buildGroupGraph(childGroup)))
@@ -152,6 +155,11 @@ internal class DataInteractorImpl @Inject constructor(
         // Add graphs
         for (graph in graphs) {
             children.add(GroupGraphItem.GraphNode(graph))
+        }
+
+        // Add functions
+        for (function in functions) {
+            children.add(GroupGraphItem.FunctionNode(function))
         }
 
         return GroupGraph(group, children)
