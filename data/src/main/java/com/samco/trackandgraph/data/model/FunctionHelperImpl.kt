@@ -103,8 +103,12 @@ internal class FunctionHelperImpl @Inject constructor(
 
     override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
         transactionHelper.withTransaction {
+            //Create a copy of the feature
+            val feature = dao.getFeatureById(function.featureId) ?: return@withTransaction null
+            val newFeatureId = dao.insertFeature(feature.copy(id = 0L))
+
             // Create a copy of the function with id = 0 to generate new id
-            val duplicatedFunction = function.copy(id = 0L)
+            val duplicatedFunction = function.copy(id = 0L, featureId = newFeatureId)
             val newFunctionId = dao.insertFunction(duplicatedFunction.toEntity())
 
             // Duplicate input features

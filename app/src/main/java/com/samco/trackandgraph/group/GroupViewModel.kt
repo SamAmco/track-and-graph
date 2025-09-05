@@ -97,6 +97,8 @@ interface GroupViewModel {
     fun onDeleteGraphStat(id: Long)
     fun onDeleteGroup(id: Long)
     fun onDeleteFunction(id: Long)
+
+    fun duplicateFunction(displayFunction: DisplayFunction)
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData)
     fun onConsumedShowDurationInputDialog()
     fun stopTimer(tracker: DisplayTracker)
@@ -591,6 +593,13 @@ class GroupViewModelImpl @Inject constructor(
     override fun onDeleteFunction(id: Long) {
         viewModelScope.launch(io) {
             dataInteractor.deleteFunction(id)
+        }
+    }
+
+    override fun duplicateFunction(displayFunction: DisplayFunction) {
+        viewModelScope.launch(io) {
+            val function = dataInteractor.getFunctionById(displayFunction.id)
+            function?.let { dataInteractor.duplicateFunction(it) }
         }
     }
 
