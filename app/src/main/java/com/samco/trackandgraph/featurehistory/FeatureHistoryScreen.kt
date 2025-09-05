@@ -83,17 +83,17 @@ data class FeatureHistoryNavKey(
 @Composable
 fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     val viewModel: FeatureHistoryViewModel = hiltViewModel<FeatureHistoryViewModelImpl>()
-    
+
     // Initialize ViewModel with the featureId from NavKey
     LaunchedEffect(navArgs.featureId) {
         viewModel.initViewModel(navArgs.featureId)
     }
-    
+
     TopAppBarContent(
         featureName = navArgs.featureName,
         viewModel = viewModel
     )
-    
+
     FeatureHistoryView(viewModel = viewModel)
 }
 
@@ -106,6 +106,7 @@ private fun TopAppBarContent(
 
     // Observe data points count for subtitle
     val dataPointsCount by viewModel.dateScrollData.map { it.items.size }.observeAsState(0)
+    val tracker by viewModel.tracker.observeAsState(null)
 
     val subtitle = if (dataPointsCount > 0) {
         stringResource(R.string.data_points, dataPointsCount)
@@ -113,7 +114,7 @@ private fun TopAppBarContent(
         null
     }
 
-    LaunchedEffect(featureName, subtitle) {
+    LaunchedEffect(featureName, subtitle, tracker) {
         topBarController.set(
             AppBarConfig(
                 title = featureName,
@@ -127,12 +128,14 @@ private fun TopAppBarContent(
                             contentDescription = stringResource(id = R.string.info)
                         )
                     }
-                    // Update action
-                    IconButton(onClick = { viewModel.showUpdateAllDialog() }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.edit_icon),
-                            contentDescription = stringResource(id = R.string.update)
-                        )
+                    if (tracker != null) {
+                        // Update action
+                        IconButton(onClick = { viewModel.showUpdateAllDialog() }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.edit_icon),
+                                contentDescription = stringResource(id = R.string.update)
+                            )
+                        }
                     }
                 }
             )
@@ -227,7 +230,6 @@ private fun UpdateWarningDialog(
     onDismissRequest = onDismissRequest,
     onConfirm = onConfirm
 )
-
 
 @Composable
 private fun UpdateDialog(
@@ -359,7 +361,6 @@ private fun WhereValueInput(
         }
     }
 }
-
 
 @Composable
 private fun DataPoint(
