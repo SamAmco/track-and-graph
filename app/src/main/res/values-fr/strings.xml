@@ -35,7 +35,7 @@
     <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette entrée ?</string>
     <string name="tracker_name_cannot_be_null">Veuillez préciser un nom</string>
     <string name="tracker_with_that_name_exists">Vous suivez déjà quelque chose avec ce nom</string>
-    <string name="data_points">%1$d entrée(s)</string>
+    <string name="data_points">%1$d Points de Données</string>
     <string name="no_data">Aucune donnée</string>
     <string name="skip">Passez</string>
     <string name="exportButton">Exporter</string>
@@ -183,7 +183,7 @@
     <string name="backup_error_failed_to_copy_database">Quelque chose s\'est mal passé lors de la copie du fichier de base de données.</string>
     <string name="restore_failed">Restauration échouée. %1$s</string>
     <string name="add_a_longer_description_optional">Ajoutez une description plus longue (facultative)</string>.
-    <string name="no_data_points_history_fragment_hint">Votre historique de suivi s\'affichera ici lorsque vous aurez saisi des entrées.</string>
+    <string name="no_data_points_history_fragment_hint">Votre historique s\'affichera ici lorsque vous aurez des points de données.</string>
     <string name="info">Info</string>
     <string name="no_description">Aucune description</string>
     <string name="description">Description</string>
