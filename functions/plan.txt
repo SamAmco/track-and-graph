@@ -1,3 +1,7 @@
+TODO: 
+- Re-order doesn't work in the group screen
+- affected by for graphs needs re-implementing to handle function graphs
+
 FUNCTIONS PLANNING
 
 User adds function
