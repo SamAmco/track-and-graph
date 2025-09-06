@@ -18,6 +18,7 @@ package com.samco.trackandgraph.featurehistory
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -90,6 +91,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     }
     
     TopAppBarContent(
+        navArgs = navArgs,
         featureName = navArgs.featureName,
         viewModel = viewModel
     )
@@ -99,6 +101,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
 
 @Composable
 private fun TopAppBarContent(
+    navArgs: FeatureHistoryNavKey,
     featureName: String,
     viewModel: FeatureHistoryViewModel
 ) {
@@ -113,31 +116,34 @@ private fun TopAppBarContent(
         null
     }
 
-    LaunchedEffect(featureName, subtitle) {
-        topBarController.set(
-            AppBarConfig(
-                title = featureName,
-                backNavigationAction = true,
-                subtitle = subtitle,
-                actions = {
-                    // Info action
-                    IconButton(onClick = { viewModel.onShowFeatureInfo() }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.about_icon),
-                            contentDescription = stringResource(id = R.string.info)
-                        )
-                    }
-                    // Update action
-                    IconButton(onClick = { viewModel.showUpdateAllDialog() }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.edit_icon),
-                            contentDescription = stringResource(id = R.string.update)
-                        )
-                    }
-                }
-            )
-        )
+    val actions: @Composable RowScope.() -> Unit = remember(viewModel) {
+        {
+            // Info action
+            IconButton(onClick = { viewModel.onShowFeatureInfo() }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.about_icon),
+                    contentDescription = stringResource(id = R.string.info)
+                )
+            }
+            // Update action
+            IconButton(onClick = { viewModel.showUpdateAllDialog() }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.edit_icon),
+                    contentDescription = stringResource(id = R.string.update)
+                )
+            }
+        }
     }
+
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            title = featureName,
+            backNavigationAction = true,
+            subtitle = subtitle,
+            actions = actions
+        )
+    )
 }
 
 @Composable

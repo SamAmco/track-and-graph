@@ -18,16 +18,21 @@ package com.samco.trackandgraph.ui.compose.appbar
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 
 /**
  * Configuration for the top app bar
  */
+@Immutable
 data class AppBarConfig(
     val title: String = "",
     val subtitle: String? = null,
@@ -43,13 +48,33 @@ data class AppBarConfig(
  */
 @Stable
 class TopBarController(
+    private val backStack: NavBackStack,
     initial: AppBarConfig = AppBarConfig("")
 ) {
     var config by mutableStateOf(initial)
         private set
-        
-    fun set(newConfig: AppBarConfig) { 
-        config = newConfig 
+
+    /**
+     * Publishes [newConfig] for [destination] when (and only when) that destination is the current
+     * top of the navigation back stack.
+     *
+     * Why this exists:
+     * Navigation 3 keeps entry content alive during transitions. If the user navigates A → B and then
+     * quickly back to A before the transition completes, A may not recompose on return. Relying on
+     * composition alone to update the app bar can leave it showing B’s config.
+     *
+     * Approach:
+     * Observe the back stack (top entry) and gate the write on `backStack.lastOrNull() == destination`.
+     * This ensures only the foreground entry updates the app bar and avoids stale writes from an
+     * exiting screen, even under rapid forward/back navigation.
+     */
+    @Composable
+    fun Set(destination: NavKey, newConfig: AppBarConfig) {
+        LaunchedEffect(backStack.lastOrNull(), destination, newConfig) {
+            if (backStack.lastOrNull() == destination) {
+                config = newConfig 
+            }
+        }
     }
 }
 

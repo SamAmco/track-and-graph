@@ -19,14 +19,13 @@ package com.samco.trackandgraph.notes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,7 +36,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -92,7 +90,7 @@ fun NotesScreen(navArgs: NotesNavKey) {
     val showGlobalNoteDialog = globalNoteDialogViewModel.show.observeAsState(false).value
     val selectedNoteForDialog by notesViewModel.selectedNoteForDialog.collectAsState()
 
-    TopAppBarContent()
+    TopAppBarContent(navArgs)
 
     NotesView(
         dateScrollData = dateScrollData,
@@ -141,26 +139,30 @@ fun NotesScreen(navArgs: NotesNavKey) {
 }
 
 @Composable
-private fun TopAppBarContent() {
+private fun TopAppBarContent(navArgs: NotesNavKey) {
     val globalNoteDialogViewModel: GlobalNoteInputViewModel = hiltViewModel<GlobalNoteInputViewModelImpl>()
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.notes)
-    LaunchedEffect(title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                actions = {
-                    IconButton(onClick = { globalNoteDialogViewModel.openDialog(null) }) {
-                        Icon(
-                            painter = painterResource(R.drawable.add_icon),
-                            contentDescription = null,
-                            tint = MaterialTheme.tngColors.onSurface
-                        )
-                    }
-                }
-            )
-        )
+
+    val actions: @Composable RowScope.() -> Unit = remember(globalNoteDialogViewModel) {
+        {
+            IconButton(onClick = { globalNoteDialogViewModel.openDialog(null) }) {
+                Icon(
+                    painter = painterResource(R.drawable.add_icon),
+                    contentDescription = null,
+                    tint = MaterialTheme.tngColors.onSurface
+                )
+            }
+        }
     }
+
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            title = title,
+            actions = actions
+        )
+    )
 }
 
 @Composable

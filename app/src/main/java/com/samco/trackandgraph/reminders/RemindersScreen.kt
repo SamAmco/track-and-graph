@@ -19,6 +19,7 @@ package com.samco.trackandgraph.reminders
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -41,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -73,7 +75,7 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
     val isLoading by viewModel.loading.collectAsState()
     val hasChanges by viewModel.remindersChanged.collectAsState()
 
-    TopAppBarContent()
+    TopAppBarContent(navArgs)
 
     RemindersScreen(
         reminders = reminders,
@@ -88,33 +90,40 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
 }
 
 @Composable
-private fun TopAppBarContent() {
+private fun TopAppBarContent(navArgs: RemindersNavKey) {
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.reminders)
     val defaultReminderName = stringResource(R.string.default_reminder_name)
     val viewModel: RemindersViewModel = hiltViewModel<RemindersViewModelImpl>()
     val permissionRequester = rememberAlarmAndNotificationPermissionRequester()
 
-    LaunchedEffect(title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                actions = {
-                    IconButton(
-                        onClick = {
-                            viewModel.addReminder(defaultReminderName)
-                            permissionRequester()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                    }
+    val actions: @Composable RowScope.() -> Unit = remember(
+        viewModel,
+        defaultReminderName,
+        permissionRequester
+    ) {
+        {
+            IconButton(
+                onClick = {
+                    viewModel.addReminder(defaultReminderName)
+                    permissionRequester()
                 }
-            )
-        )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null
+                )
+            }
+        }
     }
+
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            title = title,
+            actions = actions
+        )
+    )
 }
 
 @Composable

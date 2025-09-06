@@ -111,24 +111,23 @@ fun ViewGraphStatScreen(navArgs: ViewGraphStatNavKey) {
         viewModel.initFromGraphStatId(navArgs.graphStatId)
     }
 
-    TopAppBarContent()
+    TopAppBarContent(navArgs)
 
     ViewGraphStatContent(viewModel = viewModel)
 }
 
 @Composable
-private fun TopAppBarContent() {
+private fun TopAppBarContent(navArgs: ViewGraphStatNavKey) {
     val topBarController = LocalTopBarController.current
 
-    LaunchedEffect(Unit) {
-        topBarController.set(
-            AppBarConfig(
-                visible = false,
-                //You still need to pin this otherwise it consumes scroll events
-                appBarPinned = true,
-            )
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            visible = false,
+            //You still need to pin this otherwise it consumes scroll events
+            appBarPinned = true,
         )
-    }
+    )
 }
 
 @Composable

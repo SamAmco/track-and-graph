@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -29,12 +30,10 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -127,7 +126,7 @@ fun GraphStatInputScreen(
     }
 
     // App bar configuration
-    TopAppBarContent(urlNavigator)
+    TopAppBarContent(navArgs, urlNavigator)
 
     // Screen content
     GraphStatInputView(
@@ -137,31 +136,34 @@ fun GraphStatInputScreen(
 }
 
 @Composable
-private fun TopAppBarContent(urlNavigator: UrlNavigator) {
+private fun TopAppBarContent(navArgs: GraphStatInputNavKey, urlNavigator: UrlNavigator) {
     val topBarController = LocalTopBarController.current
     val context = LocalContext.current
     val title = stringResource(R.string.add_a_graph_or_stat)
 
-    LaunchedEffect(title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                backNavigationAction = true,
-                actions = {
-                    IconButton(
-                        onClick = {
-                            urlNavigator.triggerNavigation(context, UrlNavigator.Location.TUTORIAL_GRAPHS)
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.about_icon),
-                            contentDescription = stringResource(R.string.info)
-                        )
-                    }
+    val actions: @Composable RowScope.() -> Unit = remember(urlNavigator, context) {
+        {
+            IconButton(
+                onClick = {
+                    urlNavigator.triggerNavigation(context, UrlNavigator.Location.TUTORIAL_GRAPHS)
                 }
-            )
-        )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.about_icon),
+                    contentDescription = stringResource(R.string.info)
+                )
+            }
+        }
     }
+
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            title = title,
+            backNavigationAction = true,
+            actions = actions
+        )
+    )
 }
 
 @Composable
