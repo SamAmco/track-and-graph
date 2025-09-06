@@ -26,10 +26,18 @@ import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import com.samco.trackandgraph.data.database.dto.GroupGraph as ModelGroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem as ModelGroupGraphItem
@@ -67,7 +75,6 @@ sealed class GraphNode {
     ) : GraphNode()
 }
 
-
 interface SelectItemDialogViewModel {
     val state: StateFlow<SelectItemDialogState>
     val groupTree: StateFlow<GraphNode?>
@@ -80,17 +87,12 @@ interface SelectItemDialogViewModel {
     fun reset()
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SelectItemDialogViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), SelectItemDialogViewModel {
-
-    private val _state = MutableStateFlow(SelectItemDialogState.LOADING)
-    override val state: StateFlow<SelectItemDialogState> = _state.asStateFlow()
-
-    private val _groupTree = MutableStateFlow<GraphNode?>(null)
-    override val groupTree: StateFlow<GraphNode?> = _groupTree.asStateFlow()
 
     private val _selectedItem = MutableStateFlow<GraphNode?>(null)
     override val selectedItem: StateFlow<GraphNode?> = _selectedItem.asStateFlow()
@@ -98,36 +100,53 @@ class SelectItemDialogViewModelImpl @Inject constructor(
     override val lazyListState = LazyListState()
     override val horizontalScrollState = ScrollState(0)
 
+    private data class Config(
+        val selectableTypes: Set<SelectableItemType>,
+        val hiddenItems: Set<HiddenItem>
+    )
 
-    private var initialized = false
-    private var selectableTypes: Set<SelectableItemType> = emptySet()
+    private val config = MutableStateFlow<Config?>(null)
+    override val groupTree: StateFlow<GraphNode?> = config
+        .filterNotNull()
+        .flatMapLatest { config ->
+            dataInteractor.getDataUpdateEvents()
+                .map { config }
+                .onStart { emit(config) }
+        }
+        .map {
+            buildGraphNodeTree(
+                groupGraph = dataInteractor.getGroupGraphSync(rootGroupId = null),
+                selectableTypes = it.selectableTypes,
+                hiddenItems = it.hiddenItems
+            )
+        }
+        .flowOn(io)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(
+                stopTimeoutMillis = 1000,
+                replayExpirationMillis = 1000,
+            ),
+            initialValue = null
+        )
+
+    override val state: StateFlow<SelectItemDialogState> =
+        combine(listOf(groupTree, config)) { deps ->
+            when {
+                deps.any { it == null } -> SelectItemDialogState.LOADING
+                else -> SelectItemDialogState.READY
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectItemDialogState.LOADING)
 
     override fun init(
         selectableTypes: Set<SelectableItemType>,
         hiddenItems: Set<HiddenItem>
     ) {
-        if (initialized) return
-        initialized = true
-        this.selectableTypes = selectableTypes
-
-        viewModelScope.launch(io) {
-            _state.value = SelectItemDialogState.LOADING
-
-            // Get the root group graph to build the tree structure
-            val rootGroupGraph = dataInteractor.getGroupGraphSync(rootGroupId = null)
-
-            // Build the GraphNode tree from the GroupGraph
-            _groupTree.value = buildGraphNodeTree(
-                groupGraph = rootGroupGraph,
-                selectableTypes = selectableTypes,
-                hiddenItems = hiddenItems
-            )
-
-            _state.value = SelectItemDialogState.READY
-        }
+        config.value = Config(selectableTypes, hiddenItems)
     }
 
     override fun onItemClicked(item: GraphNode) {
+        val selectableTypes = config.value?.selectableTypes ?: return
         when (item) {
             is GraphNode.Group -> {
                 // Always toggle expansion when a group is clicked unless it is the root
@@ -153,13 +172,9 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         }
     }
 
-
     override fun reset() {
-        initialized = false
-        _state.value = SelectItemDialogState.LOADING
-        _groupTree.value = null
+        config.value = null
         _selectedItem.value = null
-        selectableTypes = emptySet()
     }
 
     private fun buildGraphNodeTree(
