@@ -20,8 +20,6 @@ import android.os.Parcelable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
-import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import kotlinx.serialization.Serializable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -46,33 +44,23 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
@@ -92,7 +80,6 @@ import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequest
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.CardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
@@ -105,7 +92,6 @@ import com.samco.trackandgraph.ui.compose.utils.plus
 import com.samco.trackandgraph.util.performTrackVibrate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
@@ -139,9 +125,8 @@ fun GroupScreen(
     // Local state for FAB visibility based on scroll behavior
     val showFab = remember { mutableStateOf(true) }
 
-    TopAppBarContent(
-        groupId = navArgs.groupId,
-        groupName = navArgs.groupName,
+    GroupTopBarContent(
+        navArgs = navArgs,
         groupViewModel = groupViewModel,
         groupDialogsViewModel = groupDialogsViewModel,
         addGroupDialogViewModel = addGroupDialogViewModel,
@@ -163,110 +148,6 @@ fun GroupScreen(
         onTrackerHistory = onTrackerHistory,
         showFab = showFab,
     )
-}
-
-@Composable
-private fun TopAppBarContent(
-    groupId: Long,
-    groupName: String?,
-    groupViewModel: GroupViewModel,
-    groupDialogsViewModel: GroupDialogsViewModel,
-    addGroupDialogViewModel: AddGroupDialogViewModelImpl,
-    onAddTracker: (Long) -> Unit,
-    onAddGraphStat: (Long) -> Unit,
-    showFab: MutableState<Boolean>,
-) {
-    val topBarController = LocalTopBarController.current
-
-    val isRootGroup = groupId == 0L
-    val title = if (isRootGroup) stringResource(R.string.app_name) else groupName ?: ""
-    val scope = rememberCoroutineScope()
-
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val dy = available.y
-                when {
-                    dy < 0 -> showFab.value = false
-                    dy > 0 -> showFab.value = true
-                }
-                return Offset.Zero
-            }
-
-            override suspend fun onPreFling(available: Velocity): Velocity {
-                val vy = available.y
-                when {
-                    vy < 0 -> showFab.value = true
-                    vy > 0 -> showFab.value = false
-                }
-                return Velocity.Zero
-            }
-        }
-    }
-
-    LaunchedEffect(groupId, title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                backNavigationAction = !isRootGroup,
-                nestedScrollConnection = nestedScrollConnection,
-                actions = {
-                    // Import CSV action
-                    IconButton(onClick = { groupDialogsViewModel.showImportDialog() }) {
-                        Icon(painterResource(R.drawable.import_icon), null)
-                    }
-                    // Export CSV action  
-                    IconButton(onClick = { groupDialogsViewModel.showExportDialog() }) {
-                        Icon(painterResource(R.drawable.export_icon), null)
-                    }
-                    // Add dropdown menu
-                    var showAddMenu by remember { mutableStateOf(false) }
-                    IconButton(onClick = { showAddMenu = true }) {
-                        Icon(painterResource(R.drawable.add_icon), stringResource(R.string.add))
-                        DropdownMenu(
-                            expanded = showAddMenu,
-                            onDismissRequest = { showAddMenu = false }
-                        ) {
-                            // Add Tracker
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.tracker)) },
-                                onClick = {
-                                    showAddMenu = false
-                                    onAddTracker(groupId)
-                                }
-                            )
-                            // Add Graph/Stat
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.graph_or_stat)) },
-                                onClick = {
-                                    showAddMenu = false
-                                    scope.launch {
-                                        // Check if user has trackers before navigating
-                                        if (groupViewModel.userHasAnyTrackers()) {
-                                            onAddGraphStat(groupId)
-                                        } else {
-                                            groupDialogsViewModel.showNoTrackersDialog()
-                                        }
-                                    }
-                                }
-                            )
-                            // Add Group
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.group)) },
-                                onClick = {
-                                    showAddMenu = false
-                                    addGroupDialogViewModel.show(
-                                        parentGroupId = groupId,
-                                        groupId = null
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-            )
-        )
-    }
 }
 
 /**

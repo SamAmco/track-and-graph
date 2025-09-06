@@ -41,11 +41,9 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -118,24 +116,23 @@ data object BackupAndRestoreNavKey : NavKey
 fun BackupAndRestoreScreen(navArgs: BackupAndRestoreNavKey) {
     val viewModel: BackupAndRestoreViewModel = hiltViewModel<BackupAndRestoreViewModelImpl>()
 
-    TopAppBarContent()
+    TopAppBarContent(navArgs)
 
     BackupAndRestoreContent(viewModel = viewModel)
 }
 
 @Composable
-private fun TopAppBarContent() {
+private fun TopAppBarContent(navArgs: BackupAndRestoreNavKey) {
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.backup_and_restore)
 
-    LaunchedEffect(title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                appBarPinned = true,
-            )
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            title = title,
+            appBarPinned = true,
         )
-    }
+    )
 }
 
 @Composable

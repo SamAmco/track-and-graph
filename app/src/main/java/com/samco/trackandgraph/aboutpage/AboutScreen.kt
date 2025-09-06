@@ -36,7 +36,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -75,7 +74,7 @@ fun AboutScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    TopAppBarContent()
+    TopAppBarContent(navArgs)
 
     val versionText = remember(context) { getVersionText(context) }
 
@@ -90,18 +89,17 @@ fun AboutScreen(
 }
 
 @Composable
-private fun TopAppBarContent() {
+private fun TopAppBarContent(navArgs: AboutNavKey) {
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.about)
 
-    LaunchedEffect(title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                appBarPinned = true,
-            )
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            title = title,
+            appBarPinned = true,
         )
-    }
+    )
 }
 
 private fun getVersionText(context: Context): String {

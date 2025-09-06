@@ -30,11 +30,9 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -108,25 +106,24 @@ fun AddTrackerScreen(
         }
     }
 
-    TopAppBarContent()
+    TopAppBarContent(navArgs)
 
     AddTrackerView(viewModel = viewModel)
 }
 
 @Composable
-private fun TopAppBarContent() {
+private fun TopAppBarContent(navArgs: AddTrackerNavKey) {
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.add_tracker)
 
-    LaunchedEffect(title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                backNavigationAction = true,
-                appBarPinned = true,
-            )
+    topBarController.Set(
+        navArgs,
+        AppBarConfig(
+            title = title,
+            backNavigationAction = true,
+            appBarPinned = true,
         )
-    }
+    )
 }
 
 @Composable

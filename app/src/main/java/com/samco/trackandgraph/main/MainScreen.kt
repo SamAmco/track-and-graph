@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -56,7 +57,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -99,7 +99,7 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val title = stringResource(R.string.app_name)
-    val topBarController = remember(title) { TopBarController(AppBarConfig(title)) }
+    val topBarController = remember(backStack, title) { TopBarController(backStack, AppBarConfig(title)) }
 
     CompositionLocalProvider(LocalTopBarController provides topBarController) {
         MainView(
@@ -318,12 +318,13 @@ private fun NavigationIcon(
 @Composable
 private fun MainViewPreview() {
     TnGComposeTheme {
+        val mockBackStack = rememberNavBackStack(GroupNavKey())
         MainView(
-            topBarController = remember { TopBarController(AppBarConfig("Track & Graph")) },
+            topBarController = remember { TopBarController(mockBackStack, AppBarConfig("Track & Graph")) },
             drawerState = rememberDrawerState(
                 initialValue = DrawerValue.Closed
             ),
-            backStack = remember { mutableStateListOf() },
+            backStack = mockBackStack,
             onNavigateToBrowser = {},
             currentTheme = remember { mutableStateOf(ThemeSelection.SYSTEM) },
             onThemeSelected = {},
