@@ -34,9 +34,13 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -67,12 +71,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
@@ -87,20 +93,48 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
     LaunchedEffect(Unit) { viewModel.dismissEvents.collect { onDismissRequest() } }
 
     if (!hidden) {
-        CustomDialog(
-            onDismissRequest = { onDismissRequest() },
-            dismissOnClickOutside = false,
-            scrollContent = false,
-            paddingValues = PaddingValues(
-                vertical = halfDialogInputSpacing,
-                horizontal = inputSpacingLarge,
-            )
-        ) {
-            AddDataPointsScreen(viewModel = viewModel)
-            BackHandler {
-                if (viewModel.showCancelConfirmDialog.value == true) {
-                    viewModel.onConfirmCancelDismissed()
-                } else viewModel.onCancelClicked()
+        // Basically everywhere we should use CustomDialog for consistency,
+        // but here we need custom behaviour for layout height animation
+        // performance. Otherwise the entire window animates in height and
+        // we drop a lot of frames.
+        DialogTheme {
+            Dialog(
+                onDismissRequest = onDismissRequest,
+                properties = DialogProperties(
+                    decorFitsSystemWindows = false,
+                    dismissOnClickOutside = false,
+                    usePlatformDefaultWidth = true,
+                )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Surface(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .systemBarsPadding()
+                            .imePadding(),
+                        shape = MaterialTheme.shapes.large,
+                        color = MaterialTheme.colorScheme.surface,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(
+                                paddingValues = PaddingValues(
+                                    vertical = halfDialogInputSpacing,
+                                    horizontal = inputSpacingLarge,
+                                )
+                            )
+                        ) {
+                            AddDataPointsScreen(viewModel = viewModel)
+                        }
+                    }
+                }
+                BackHandler {
+                    if (viewModel.showCancelConfirmDialog.value == true) {
+                        viewModel.onConfirmCancelDismissed()
+                    } else viewModel.onCancelClicked()
+                }
             }
         }
     }
