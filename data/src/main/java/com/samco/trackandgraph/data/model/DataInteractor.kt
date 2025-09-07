@@ -26,7 +26,7 @@ import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.data.database.dto.GroupChild
+import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
@@ -58,7 +58,7 @@ interface DataInteractor : TrackerHelper, FunctionHelper, DataSampler {
 
     suspend fun getGroupById(id: Long): Group
 
-    suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>)
+    suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>)
 
     suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
