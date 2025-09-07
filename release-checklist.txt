@@ -2,9 +2,7 @@
 
 - Run `make validate-remote-config`
 
-- Run the community tests 
-
-./gradlew :app:testDebugUnitTest --tests "com.samco.trackandgraph.lua.CommunityTestRunner"
+- Run the community tests `make run-community-tests`
 
 - Update the build.gradle version code and name
 

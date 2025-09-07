@@ -35,6 +35,7 @@ validate-remote-config:
 	@cd ./configuration && . venv/bin/activate && python3 ./validate-config.py
 
 
+
 # --- Common config ---
 HOST_ARCH := $(shell uname -m)
 ifeq ($(HOST_ARCH),arm64)
@@ -87,6 +88,10 @@ boot-and-prep-%:
 # Shutdown
 kill-emulator:
 	@adb emu kill || true
+
+.PHONY: run-community-tests
+run-community-tests:
+	./gradlew :app:testDebugUnitTest --tests "com.samco.trackandgraph.lua.CommunityTestRunner"
 
 # ---------- 1) RECORD LOW-RES SNAPSHOT BASELINES ----------
 .PHONY: snapshots-record
