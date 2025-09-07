@@ -31,7 +31,7 @@ import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.data.database.dto.GroupChild
+import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
@@ -555,16 +555,16 @@ internal class DataInteractorImpl @Inject constructor(
         dao.updateTimeHistogram(timeHistogram.toEntity())
     }
 
-    override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>) =
+    override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>) =
         performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            //Update trackers
-            dao.getTrackersForGroupSync(groupId).let { features ->
+            //Update features
+            dao.getFeaturesForGroupSync(groupId).let { features ->
                 val updates = features.map { feature ->
                     val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.TRACKER && it.id == feature.id
+                        it.type == GroupChildType.FEATURE && it.id == feature.id
                     }
                     feature.copy(displayIndex = newDisplayIndex)
-                }.map { it.toFeatureEntity() }
+                }
                 dao.updateFeatures(updates)
             }
 
