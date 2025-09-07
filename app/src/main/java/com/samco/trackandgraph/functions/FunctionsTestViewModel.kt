@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-interface FunctionsViewModel {
+interface FunctionsTestViewModel {
     val functionName: TextFieldValue
     val functionDescription: TextFieldValue
     val errorText: StateFlow<Int?>
@@ -47,9 +47,9 @@ interface FunctionsViewModel {
 }
 
 @HiltViewModel
-class FunctionsViewModelImpl @Inject constructor(
+class FunctionsTestViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor
-) : ViewModel(), FunctionsViewModel {
+) : ViewModel(), FunctionsTestViewModel {
 
     private var groupId: Long = -1L
     private var functionId: Long? = null
