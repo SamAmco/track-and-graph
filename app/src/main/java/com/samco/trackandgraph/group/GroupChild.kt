@@ -5,46 +5,54 @@ import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 
 sealed class GroupChild {
-    fun toDto() = com.samco.trackandgraph.data.database.dto.GroupChild(
+    fun toDto() = com.samco.trackandgraph.data.database.dto.GroupChildOrderData(
         type = when (this) {
             is ChildGroup -> GroupChildType.GROUP
-            is ChildTracker -> GroupChildType.TRACKER
+            is ChildTracker -> GroupChildType.FEATURE
             is ChildGraph -> GroupChildType.GRAPH
-            is ChildFunction -> GroupChildType.FUNCTION
+            is ChildFunction -> GroupChildType.FEATURE
         },
-        id = id,
+        id = idForGroupOrdering,
         displayIndex = displayIndex
     )
 
-    abstract val id: Long
     abstract val displayIndex: Int
     abstract val type: GroupChildType
+    abstract val idForGroupOrdering: Long
 
     class ChildGroup(
-        override val id: Long,
+        val id: Long,
         override val displayIndex: Int,
         val group: Group,
         override val type: GroupChildType = GroupChildType.GROUP
-    ) : GroupChild()
+    ) : GroupChild() {
+        override val idForGroupOrdering: Long = id
+    }
 
     class ChildTracker(
-        override val id: Long,
+        val id: Long,
         override val displayIndex: Int,
         val displayTracker: DisplayTracker,
-        override val type: GroupChildType = GroupChildType.TRACKER
-    ) : GroupChild()
+        override val type: GroupChildType = GroupChildType.FEATURE
+    ) : GroupChild() {
+        override val idForGroupOrdering: Long = displayTracker.featureId
+    }
 
     class ChildGraph(
-        override val id: Long,
+        val id: Long,
         override val displayIndex: Int,
         val graph: CalculatedGraphViewData,
         override val type: GroupChildType = GroupChildType.GRAPH
-    ) : GroupChild()
+    ) : GroupChild() {
+        override val idForGroupOrdering: Long = id
+    }
 
     class ChildFunction(
-        override val id: Long,
+        val id: Long,
         override val displayIndex: Int,
         val displayFunction: DisplayFunction,
-        override val type: GroupChildType = GroupChildType.FUNCTION
-    ) : GroupChild()
+        override val type: GroupChildType = GroupChildType.FEATURE
+    ) : GroupChild() {
+        override val idForGroupOrdering: Long = displayFunction.featureId
+    }
 }
