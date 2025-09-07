@@ -1,0 +1,4 @@
+- Improve add data point dialog height animation performance
+- Fix app bar layout crash
+- Fix bug top app bar going out of sync with the current screen
+- Fix bug move dialog not showing newly added groups
