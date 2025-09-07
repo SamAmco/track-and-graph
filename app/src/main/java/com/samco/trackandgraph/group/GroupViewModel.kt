@@ -473,7 +473,7 @@ class GroupViewModelImpl @Inject constructor(
 
 
     override val groupHasAnyTrackers: StateFlow<Boolean> = allChildren
-        .map { children -> children.any { it.type == GroupChildType.TRACKER } }
+        .map { children -> children.any { it is GroupChild.ChildTracker } }
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 
@@ -522,8 +522,8 @@ class GroupViewModelImpl @Inject constructor(
             aInd < bInd -> -1
             bInd < aInd -> 1
             else -> {
-                val aId = a.id
-                val bId = b.id
+                val aId = a.idForGroupOrdering
+                val bId = b.idForGroupOrdering
                 when {
                     aId > bId -> -1
                     bId > aId -> 1
@@ -660,7 +660,7 @@ class GroupViewModelImpl @Inject constructor(
             )
 
             val expectedOrder = temporaryDragDropChildren.value
-                .map { Pair(it.id, it.type) }
+                .map { Pair(it.idForGroupOrdering, it.type) }
 
             // Wait until all children have been updated in the database
             // before switching back to the real children or the UI could
@@ -668,7 +668,7 @@ class GroupViewModelImpl @Inject constructor(
             try {
                 withTimeout(500) {
                     allChildren.first { allChildren ->
-                        val actualOrder = allChildren.map { Pair(it.id, it.type) }
+                        val actualOrder = allChildren.map { Pair(it.idForGroupOrdering, it.type) }
                         actualOrder == expectedOrder
                     }
                 }
