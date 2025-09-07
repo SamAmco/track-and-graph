@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -52,7 +51,6 @@ import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.AddCreateBar
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
-import com.samco.trackandgraph.ui.compose.ui.IconTextButton
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -83,7 +81,7 @@ fun FunctionsScreen(
         }
     }
 
-    TopAppBarContent()
+    TopAppBarContent(navArgs)
 
     val errorText by viewModel.errorText.collectAsState()
 
@@ -98,19 +96,20 @@ fun FunctionsScreen(
 }
 
 @Composable
-private fun TopAppBarContent() {
+private fun TopAppBarContent(
+    navKey: FunctionsNavKey
+) {
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.function)
-    
-    LaunchedEffect(title) {
-        topBarController.set(
-            AppBarConfig(
-                title = title,
-                backNavigationAction = true,
-                appBarPinned = true
-            )
+
+    topBarController.Set(
+        navKey,
+        AppBarConfig(
+            title = title,
+            backNavigationAction = true,
+            appBarPinned = true
         )
-    }
+    )
 }
 
 @Composable
