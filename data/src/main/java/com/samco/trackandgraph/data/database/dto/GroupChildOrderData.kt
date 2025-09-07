@@ -17,12 +17,12 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-enum class GroupChildType { GROUP, TRACKER, GRAPH, FUNCTION }
+enum class GroupChildType { GROUP, FEATURE, GRAPH }
 
 /**
- * Represents all relevant view data that the GroupFragment might present.
+ * Represents all relevant view data for child ordering
  */
-data class GroupChild(
+data class GroupChildOrderData(
     val type: GroupChildType,
     val id: Long,
     val displayIndex: Int
