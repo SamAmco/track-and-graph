@@ -51,7 +51,7 @@ fun EdgeLayer(
     Box(
         modifier
             .fillMaxSize()
-            .then(edgeTapHandler(edges, state, cubics, onSelect, toleranceWorld))
+            .edgeTapHandler(edges, state, cubics, onSelect, toleranceWorld)
     ) {
         Canvas(Modifier.fillMaxSize()) {
             edges.forEach { edge ->
@@ -80,13 +80,13 @@ fun EdgeLayer(
 }
 
 // Custom tap detector that only consumes when we actually hit an edge.
-private fun edgeTapHandler(
+private fun Modifier.edgeTapHandler(
     edges: List<Edge>,
     state: ViewportState,
     cubics: Map<String, Pair<Cubic, List<Offset>>>,
     onSelect: (String?) -> Unit,
     toleranceWorld: Float,
-) = Modifier.pointerInput(edges, state.scale) {
+) = pointerInput(edges, state.scale) {
     awaitEachGesture {
         val down = awaitFirstDown()
         val downWorld = down.position // already world coords (inside PanZoomHost)
