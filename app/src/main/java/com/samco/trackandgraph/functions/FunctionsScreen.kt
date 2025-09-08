@@ -70,7 +70,6 @@ private fun FunctionsScreenContent() {
     NodeEditorDemo()
 }
 
-
 // ============================================================================
 // NODE EDITOR DEMO - Putting it all together
 // ============================================================================
@@ -110,15 +109,23 @@ fun NodeEditorDemo() {
                 onSelect = { selected = it }
             )
 
-            // Cards at specific WORLD coordinates
-            WorldItem(WorldPos(0f, 0f)) {
-                SampleCard(title = "Input", color = Color(0xFFCCE5FF))
-            }
-            WorldItem(WorldPos(600f, 250f)) {
-                SampleCard(title = "Transform", color = Color(0xFFFFF3CD))
-            }
-            WorldItem(WorldPos(1200f, 100f)) {
-                SampleCard(title = "Output", color = Color(0xFFD4EDDA))
+            WorldLayout {
+                // Cards at specific WORLD coordinates
+                SampleCard(
+                    modifier = Modifier.worldPosition(Offset.Zero),
+                    title = "Input",
+                    color = Color(0xFFCCE5FF)
+                )
+                SampleCard(
+                    modifier = Modifier.worldPosition(Offset(600f, 250f)),
+                    title = "Transform",
+                    color = Color(0xFFFFF3CD)
+                )
+                SampleCard(
+                    modifier = Modifier.worldPosition(Offset(1200f, 100f)),
+                    title = "Output",
+                    color = Color(0xFFD4EDDA)
+                )
             }
         }
 
@@ -145,9 +152,13 @@ fun NodeEditorDemo() {
 }
 
 @Composable
-private fun SampleCard(title: String, color: Color) {
+private fun SampleCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    color: Color
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(220.dp)
             .wrapContentHeight()
             .padding(12.dp),

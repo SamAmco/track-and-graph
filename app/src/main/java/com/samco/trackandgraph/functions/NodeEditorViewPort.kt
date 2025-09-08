@@ -1,10 +1,8 @@
 package com.samco.trackandgraph.functions
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -17,10 +15,12 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
 
 // ============================================================================
@@ -127,9 +127,45 @@ fun PanZoomContainer(
 
 data class WorldPos(val x: Float, val y: Float)
 
+private class WorldParentDataModifier(val pos: Offset) : ParentDataModifier {
+    override fun Density.modifyParentData(parentData: Any?) = pos
+}
+
+fun Modifier.worldPosition(
+    pos: Offset,
+) = this.then(WorldParentDataModifier(pos))
+
 @Composable
-fun WorldItem(at: WorldPos, content: @Composable () -> Unit) {
-    Box(Modifier.offset { IntOffset(at.x.roundToInt(), at.y.roundToInt()) }) {
-        content()
+fun WorldLayout(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        content = content,
+        modifier = modifier
+    ) { measurables, constraints ->
+
+        // Measure every child first
+        data class Entry(val placeable: Placeable, val offset: Offset)
+
+        val entries = measurables.map { m ->
+            val p = m.measure(constraints)
+            val d = (m.parentData as? Offset) ?: Offset.Zero
+            Entry(p, d)
+        }
+
+        // This layout fills the available area; the camera (graphicsLayer) handles transform.
+        val width = constraints.maxWidth
+        val height = constraints.maxHeight
+
+        layout(width, height) {
+            entries.forEach { (placeable, pos) ->
+                val ax = 0.5f * placeable.width
+                val ay = 0.5f * placeable.height
+                val x = (pos.x - ax).roundToInt()
+                val y = (pos.y - ay).roundToInt()
+                placeable.place(x, y)
+            }
+        }
     }
 }
