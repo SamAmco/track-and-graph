@@ -7,9 +7,7 @@ import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
@@ -17,7 +15,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import kotlin.math.absoluteValue
 import kotlin.math.max
 
 // This should be placed outside the world transform container at the back
@@ -31,31 +28,31 @@ fun EditorInputOverlay(
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
-    val edgeTapToleranceWorld by remember(state.scale, density) {
-        mutableFloatStateOf(with(density) { 12.dp.toPx() } / state.scale)
-    }
+    val screenTolPx = with(density) { 12.dp.toPx() }
 
-    // Precompute edge polylines for hit-test (world units)
-    val cubics = remember(edges) {
+    // Values that may change across recompositions:
+    val cubicsState = rememberUpdatedState(
         edges.associateBy({ it.id }) { e ->
-            val cubic = cubicWithHorizontalTangents(e.from, e.to)
-            cubic to sampleCubicAsPolyline(cubic)
+            val c = cubicWithHorizontalTangents(e.from, e.to)
+            c to sampleCubicAsPolyline(c)
         }
-    }
+    )
+    val onSelectEdgeState = rememberUpdatedState(onSelectEdge)
+    val onLongPressEmptyState = rememberUpdatedState(onLongPressEmpty)
 
     val focusManager = LocalFocusManager.current
 
     Box(
         modifier
             .fillMaxSize()
-            .pointerInput(edges, state) {
+            .pointerInput(Unit) {
                 awaitEachGesture {
                     worldPointerInputEventHandler(
                         state = state,
-                        cubics = cubics,
-                        onSelectEdge = onSelectEdge,
-                        onLongPressEmpty = onLongPressEmpty,
-                        edgeTapToleranceWorld = edgeTapToleranceWorld,
+                        cubics = cubicsState.value,
+                        onSelectEdge = onSelectEdgeState.value,
+                        onLongPressEmpty = onLongPressEmptyState.value,
+                        edgeTapToleranceWorld = screenTolPx / state.scale,
                         onClearFocus = { focusManager.clearFocus() }
                     )
                 }
