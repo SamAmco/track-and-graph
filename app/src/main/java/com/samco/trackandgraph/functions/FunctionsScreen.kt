@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -88,44 +89,74 @@ fun NodeEditorDemo() {
         // Background grid
         BackgroundGrid(viewport)
 
+        var selected by remember { mutableStateOf<String?>(null) }
+        val edges = remember {
+            listOf(
+                Edge("e1", from = Offset(240f, 100f), to = Offset(600f, 310f)),   // forward
+                Edge("e2", from = Offset(900f, 560f), to = Offset(450f, 180f)),   // loop-back
+                Edge("e3", from = Offset(300f, 420f), to = Offset(1200f, 420f))   // straight
+            )
+        }
+
+        data class CardData(
+            val title: String,
+            val color: Color,
+            val position: Offset,
+        )
+
+        val cards = remember {
+            mutableStateListOf(
+                CardData(
+                    title = "Input",
+                    color = Color(0xFFCCE5FF),
+                    position = Offset.Zero
+                ),
+                CardData(
+                    title = "Transform",
+                    color = Color(0xFFFFF3CD),
+                    position = Offset(600f, 250f)
+                ),
+                CardData(
+                    title = "Output",
+                    color = Color(0xFFD4EDDA),
+                    position = Offset(1200f, 100f)
+                ),
+            )
+        }
+
+        EditorInputOverlay(
+            state = viewport,
+            edges = edges,
+            onSelectEdge = { selected = it },
+            onLongPressEmpty = {
+                cards.add(
+                    CardData(
+                        title = "New Card",
+                        color = Color(0xFFCC85FF),
+                        position = it
+                    )
+                )
+            },
+        )
+
         // The world: scaled + translated as a single layer
-        PanZoomContainer(
+        WorldTransformContainer(
             state = viewport,
             modifier = Modifier.fillMaxSize()
         ) {
-
-            var selected by remember { mutableStateOf<String?>(null) }
-            val edges = remember {
-                listOf(
-                    Edge("e1", from = Offset(240f, 100f), to = Offset(600f, 310f)),   // forward
-                    Edge("e2", from = Offset(900f, 560f), to = Offset(450f, 180f)),   // loop-back
-                    Edge("e3", from = Offset(300f, 420f), to = Offset(1200f, 420f))   // straight
-                )
-            }
             EdgeLayer(
-                state = viewport,
                 edges = edges,
                 selectedId = selected,
-                onSelect = { selected = it }
             )
 
             WorldLayout {
-                // Cards at specific WORLD coordinates
-                SampleCard(
-                    modifier = Modifier.worldPosition(Offset.Zero),
-                    title = "Input",
-                    color = Color(0xFFCCE5FF)
-                )
-                SampleCard(
-                    modifier = Modifier.worldPosition(Offset(600f, 250f)),
-                    title = "Transform",
-                    color = Color(0xFFFFF3CD)
-                )
-                SampleCard(
-                    modifier = Modifier.worldPosition(Offset(1200f, 100f)),
-                    title = "Output",
-                    color = Color(0xFFD4EDDA)
-                )
+                for (card in cards) {
+                    SampleCard(
+                        modifier = Modifier.worldPosition(card.position),
+                        title = card.title,
+                        color = card.color,
+                    )
+                }
             }
         }
 
