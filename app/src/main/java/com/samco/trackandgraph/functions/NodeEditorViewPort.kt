@@ -1,6 +1,9 @@
 package com.samco.trackandgraph.functions
 
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -16,11 +19,17 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 // ============================================================================
@@ -90,7 +99,7 @@ fun rememberViewportState(
 // ============================================================================
 
 @Composable
-fun PanZoomContainer(
+fun WorldTransformContainer(
     state: ViewportState,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
@@ -99,17 +108,8 @@ fun PanZoomContainer(
         modifier
             .fillMaxSize()
             .clipToBounds()
-            .pointerInput(state) {
-                detectTransformGestures(
-                    panZoomLock = true,
-                    onGesture = { centroid, pan, zoom, _ ->
-                        if (zoom != 1f) state.zoomBy(zoom, centroid)
-                        if (pan != Offset.Zero) state.panBy(pan)
-                    }
-                )
-            }
-            // 1) SCALE around top-left
             .graphicsLayer {
+                // SCALE around top-left
                 transformOrigin = TransformOrigin(0f, 0f)
                 scaleX = state.scale
                 scaleY = state.scale
@@ -124,8 +124,6 @@ fun PanZoomContainer(
 // ============================================================================
 // WORLD LAYOUT - Position composables by world coordinates
 // ============================================================================
-
-data class WorldPos(val x: Float, val y: Float)
 
 private class WorldParentDataModifier(val pos: Offset) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = pos
