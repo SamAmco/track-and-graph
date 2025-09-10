@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
@@ -21,27 +20,21 @@ import kotlin.math.max
 // This should be placed outside the world transform container at the back
 // of the z-order so that it doesn't consume input from cards
 @Composable
-fun EditorInputOverlay(
+internal fun EditorInputOverlay(
     state: ViewportState,
-    edges: List<Edge>,
-    onSelectEdge: (String?) -> Unit,
+    edgeLayerState: EdgeLayerState,
+    connectorState: ConnectorLayerState,
+    onSelectEdge: (Edge?) -> Unit,
     onLongPressEmpty: (Offset) -> Unit,
+    onAddEdge: (ConnectorId, ConnectorId) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val density = LocalDensity.current
-    val screenTolPx = with(density) { 12.dp.toPx() }
-
     // Values that may change across recompositions:
-    val cubicsState = rememberUpdatedState(
-        edges.associateBy({ it.id }) { e ->
-            val c = cubicWithHorizontalTangents(e.from, e.to)
-            c to sampleCubicAsPolyline(c)
-        }
-    )
     val onSelectEdgeState = rememberUpdatedState(onSelectEdge)
     val onLongPressEmptyState = rememberUpdatedState(onLongPressEmpty)
+    val onAddEdgeState = rememberUpdatedState(onAddEdge)
 
-    val focusManager = LocalFocusManager.current
+    val focusManager = rememberUpdatedState(LocalFocusManager.current)
 
     Box(
         modifier
@@ -50,11 +43,13 @@ fun EditorInputOverlay(
                 awaitEachGesture {
                     worldPointerInputEventHandler(
                         state = state,
-                        cubics = cubicsState.value,
+                        edgeLayerState = edgeLayerState,
+                        connectorState = connectorState,
                         onSelectEdge = onSelectEdgeState.value,
                         onLongPressEmpty = onLongPressEmptyState.value,
-                        edgeTapToleranceWorld = screenTolPx / state.scale,
-                        onClearFocus = { focusManager.clearFocus() }
+                        edgeTapToleranceWorld = 12.dp.toPx() / state.scale,
+                        onClearFocus = { focusManager.value.clearFocus() },
+                        onAddEdge = onAddEdgeState.value,
                     )
                 }
             }
@@ -63,16 +58,29 @@ fun EditorInputOverlay(
 
 private suspend fun AwaitPointerEventScope.worldPointerInputEventHandler(
     state: ViewportState,
-    cubics: Map<String, Pair<Cubic, List<Offset>>>,
-    onSelectEdge: (String?) -> Unit,
+    edgeLayerState: EdgeLayerState,
+    connectorState: ConnectorLayerState,
+    onSelectEdge: (Edge?) -> Unit,
     onLongPressEmpty: (Offset) -> Unit,
     edgeTapToleranceWorld: Float,
     onClearFocus: () -> Unit,
+    onAddEdge: (ConnectorId, ConnectorId) -> Unit,
 ) {
     val down = awaitFirstDown(requireUnconsumed = true)
-    val start = down.position // screen coords
+    val startScreen = down.position // screen coords
+    val startWorld = state.screenToWorld(startScreen)
 
-    var last = start
+    val startConnector = nearestConnector(
+        connectorState,
+        startWorld,
+        connectorSize.toPx()
+    )
+
+    if (startConnector != null) {
+        connectorState.onDownOnConnector(startConnector)
+    }
+
+    var last = startScreen
     var maxPointerCount = 1
     var up = false
     var maxDelta = Offset.Zero
@@ -87,7 +95,7 @@ private suspend fun AwaitPointerEventScope.worldPointerInputEventHandler(
         val totalPassedMs = (System.nanoTime() - downTime) / 1_000_000
         if (!checkedLongPress && maxPointerCount == 1 && totalPassedMs > longPressMs) {
             if (maxDelta.getDistance() < slop) {
-                onLongPressEmpty(state.screenToWorld(start))
+                onLongPressEmpty(startWorld)
             }
             checkedLongPress = true
         }
@@ -106,7 +114,7 @@ private suspend fun AwaitPointerEventScope.worldPointerInputEventHandler(
             state.panBy(delta)
             current.consume()
 
-            maxDelta = max(current.position - start, maxDelta)
+            maxDelta = max(current.position - startScreen, maxDelta)
             last = current.position
         }
         up = ev.changes.all { !it.pressed }
@@ -116,13 +124,49 @@ private suspend fun AwaitPointerEventScope.worldPointerInputEventHandler(
     if (totalPassedMs < longPressMs && maxPointerCount == 1 && maxDelta.getDistance() < slop) {
         onClearFocus()
         handleEdgeSelection(
-            offset = state.screenToWorld(start),
-            cubics = cubics,
+            offset = startWorld,
+            edgeLayerState = edgeLayerState,
             onSelectEdge = onSelectEdge,
             toleranceWorld = edgeTapToleranceWorld,
         )
     }
+
+    if (startConnector != null) {
+        val endConnector = nearestConnector(
+            connectorState,
+            state.screenToWorld(last),
+            connectorSize.toPx()
+        )
+        if (endConnector != null) {
+            onAddEdge(startConnector, endConnector)
+        }
+        connectorState.onDropConnector()
+    }
 }
+
+private fun nearestConnector(
+    connectorState: ConnectorLayerState,
+    worldPos: Offset,
+    toleranceWorld: Float
+): ConnectorId? {
+    val sqrTolerance = toleranceWorld * toleranceWorld
+    var smallestDist: Float? = null
+    var smallestId: ConnectorId? = null
+
+    for ((id, connector) in connectorState.connectorStates) {
+        val sqrDist = (worldPos - connector.worldPosition).sqrSize()
+        if (sqrDist < sqrTolerance) {
+            if (smallestDist == null || sqrDist < smallestDist) {
+                smallestDist = sqrDist
+                smallestId = id
+            }
+        }
+    }
+
+    return smallestId
+}
+
+private fun Offset.sqrSize() = x * x + y * y
 
 private fun max(a: Offset, b: Offset): Offset {
     if ((a.x * a.x) + (a.y * a.y) > (b.x * b.x) + (b.y * b.y)) {
@@ -134,12 +178,12 @@ private fun max(a: Offset, b: Offset): Offset {
 
 private fun handleEdgeSelection(
     offset: Offset,
-    cubics: Map<String, Pair<Cubic, List<Offset>>>,
-    onSelectEdge: (String?) -> Unit,
+    edgeLayerState: EdgeLayerState,
+    onSelectEdge: (Edge?) -> Unit,
     toleranceWorld: Float,
 ) {
     // Edge candidate?
-    val hit = findClosestEdgeHit(offset, cubics, toleranceWorld)
+    val hit = findClosestEdgeHit(offset, edgeLayerState, toleranceWorld)
     if (hit != null) {
         onSelectEdge(hit.first)
     } else {
@@ -150,14 +194,14 @@ private fun handleEdgeSelection(
 /** Returns (edgeId, distance) if within tolerance, else null. */
 private fun findClosestEdgeHit(
     tapWorld: Offset,
-    cubics: Map<String, Pair<Cubic, List<Offset>>>,
+    edgeLayerState: EdgeLayerState,
     toleranceWorld: Float
-): Pair<String, Float>? {
-    var bestId: String? = null
+): Pair<Edge, Float>? {
+    var bestEdge: Edge? = null
     var bestDist = Float.MAX_VALUE
 
-    for ((id, pair) in cubics) {
-        val poly = pair.second
+    for ((edge, pair) in edgeLayerState.cubics) {
+        val poly = pair?.second ?: continue
         // quick bbox prune
         val minX = poly.minOf { it.x } - toleranceWorld
         val maxX = poly.maxOf { it.x } + toleranceWorld
@@ -171,12 +215,12 @@ private fun findClosestEdgeHit(
             val d = distancePointToSegment(tapWorld, poly[i], poly[i + 1])
             if (d < bestDist) {
                 bestDist = d
-                bestId = id
+                bestEdge = edge
             }
             i++
         }
     }
-    return if (bestId != null && bestDist <= toleranceWorld) bestId to bestDist else null
+    return if (bestEdge != null && bestDist <= toleranceWorld) bestEdge to bestDist else null
 }
 
 private fun distancePointToSegment(p: Offset, a: Offset, b: Offset): Float {
@@ -193,7 +237,7 @@ private fun distancePointToSegment(p: Offset, a: Offset, b: Offset): Float {
 /**
  * Calls onDrag with a drag delta in world coordinates.
  */
-fun Modifier.worldDraggable(
+internal fun Modifier.worldDraggable(
     onDragBy: (Offset) -> Unit
 ) = this.pointerInput(onDragBy) {
     detectDragGestures(
