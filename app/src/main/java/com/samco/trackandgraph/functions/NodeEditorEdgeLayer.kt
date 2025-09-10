@@ -1,11 +1,11 @@
 package com.samco.trackandgraph.functions
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -18,26 +18,68 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 
-@Composable
-fun EdgeLayer(
-    edges: List<Edge>,
-    selectedId: String?,
-    modifier: Modifier = Modifier
-) {
-    val density = LocalDensity.current
+// ============================================================================
+// EDGE LAYER STATE - Handles edge cubic computation and caching
+// ============================================================================
 
-    // Precompute cubic + polyline for each edge (cheap but keeps code tidy)
-    val cubics = remember(edges) {
-        edges.associateBy({ it.id }) { e ->
-            val cubic = cubicWithHorizontalTangents(e.from, e.to)
+internal data class Edge(
+    val from: ConnectorId,
+    val to: ConnectorId,
+)
+
+internal data class Cubic(val p0: Offset, val c1: Offset, val c2: Offset, val p1: Offset)
+
+@Stable
+internal class EdgeLayerState(
+    val edges: List<Edge>,
+    private val connectorState: ConnectorLayerState,
+) {
+    // Derived state that recomputes cubics only when edges change
+    val cubics: Map<Edge, Pair<Cubic, List<Offset>>?> by derivedStateOf {
+        edges.associateBy({ it }) { e ->
+            val from = connectorState.connectorStates[e.from] ?: return@associateBy null
+            val to = connectorState.connectorStates[e.to] ?: return@associateBy null
+            val cubic = cubicWithHorizontalTangents(from.worldPosition, to.worldPosition)
             val poly = sampleCubicAsPolyline(cubic) // List<Offset> in WORLD units
             cubic to poly
         }
     }
 
-    Canvas(modifier.fillMaxSize().zIndex(1f)) {
-        edges.forEach { edge ->
-            val (cubic, _) = cubics.getValue(edge.id)
+    val draggingEdgeOverlay: Pair<Offset, Offset>? by derivedStateOf {
+        val startConnector = connectorState.draggingConnectorId.value
+        val startPos = connectorState.connectorStates[startConnector]?.worldPosition
+        val endPos = connectorState.draggingConnectorWorldPosition.value
+        if (startPos == null || endPos == null) return@derivedStateOf null
+        return@derivedStateOf startPos to endPos
+    }
+}
+
+@Composable
+internal fun rememberEdgeLayerState(
+    edges: List<Edge>,
+    connectorState: ConnectorLayerState
+): EdgeLayerState = remember {
+    EdgeLayerState(
+        edges = edges,
+        connectorState = connectorState,
+    )
+}
+
+@Composable
+internal fun EdgeLayer(
+    edgeLayerState: EdgeLayerState,
+    selectedEdge: Edge?,
+    modifier: Modifier = Modifier
+) {
+    val density = LocalDensity.current
+
+    Canvas(
+        modifier
+            .fillMaxSize()
+            .zIndex(1f)
+    ) {
+        edgeLayerState.edges.forEach { edge ->
+            val (cubic, _) = edgeLayerState.cubics[edge] ?: return@forEach
 
             // Build a Path for drawing
             val path = Path().apply {
@@ -49,7 +91,7 @@ fun EdgeLayer(
                 )
             }
 
-            val isSelected = edge.id == selectedId
+            val isSelected = edge == selectedEdge
             val strokeWidth = with(density) { (if (isSelected) 6.dp else 3.dp).toPx() }
             drawPath(
                 path = path,
@@ -59,14 +101,6 @@ fun EdgeLayer(
         }
     }
 }
-
-data class Edge(
-    val id: String,
-    val from: Offset, // WORLD coords (exit point on source card)
-    val to: Offset    // WORLD coords (entry point on target card)
-)
-
-internal data class Cubic(val p0: Offset, val c1: Offset, val c2: Offset, val p1: Offset)
 
 /**
  * Horizontal tangents at both ends:

@@ -197,7 +197,7 @@ fun Circle(
     modifier: Modifier = Modifier,
     size: Dp = 54.dp,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit = {}
 ) = Card(
     modifier = modifier.size(size),
     shape = RoundedCornerShape(100),
