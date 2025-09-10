@@ -1,9 +1,5 @@
 package com.samco.trackandgraph.functions
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculateCentroid
-import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -19,17 +15,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.AwaitPointerEventScope
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
-import kotlin.math.absoluteValue
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 // ============================================================================
@@ -72,8 +61,6 @@ class ViewportState(
     // world  = (screen - pan) / scale
     fun worldToScreen(p: Offset): Offset = p * scale + pan
     fun screenToWorld(p: Offset): Offset = (p - pan) / scale
-    fun worldToScreen(size: Float): Float = size * scale
-    fun screenToWorld(size: Float): Float = size / scale
 
     fun worldToScreen(rect: Rect): Rect = Rect(
         worldToScreen(rect.topLeft),
