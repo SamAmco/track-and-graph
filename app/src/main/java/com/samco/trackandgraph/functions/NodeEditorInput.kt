@@ -4,6 +4,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -187,4 +188,18 @@ private fun distancePointToSegment(p: Offset, a: Offset, b: Offset): Float {
     val clamped = t.coerceIn(0f, 1f)
     val proj = Offset(a.x + clamped * ab.x, a.y + clamped * ab.y)
     return (p - proj).getDistance()
+}
+
+/**
+ * Calls onDrag with a drag delta in world coordinates.
+ */
+fun Modifier.worldDraggable(
+    onDragBy: (Offset) -> Unit
+) = this.pointerInput(onDragBy) {
+    detectDragGestures(
+        onDrag = { change, dragAmount ->
+            change.consume()
+            onDragBy(dragAmount)
+        }
+    )
 }
