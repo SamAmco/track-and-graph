@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -101,7 +102,7 @@ fun NodeEditorDemo() {
         data class CardData(
             val title: String,
             val color: Color,
-            val position: Offset,
+            val position: MutableState<Offset>,
         )
 
         val cards = remember {
@@ -109,17 +110,17 @@ fun NodeEditorDemo() {
                 CardData(
                     title = "Input",
                     color = Color(0xFFCCE5FF),
-                    position = Offset.Zero
+                    position = mutableStateOf(Offset.Zero)
                 ),
                 CardData(
                     title = "Transform",
                     color = Color(0xFFFFF3CD),
-                    position = Offset(600f, 250f)
+                    position = mutableStateOf(Offset(600f, 250f))
                 ),
                 CardData(
                     title = "Output",
                     color = Color(0xFFD4EDDA),
-                    position = Offset(1200f, 100f)
+                    position = mutableStateOf(Offset(1200f, 100f))
                 ),
             )
         }
@@ -133,7 +134,7 @@ fun NodeEditorDemo() {
                     CardData(
                         title = "New Card",
                         color = Color(0xFFCC85FF),
-                        position = it
+                        position = mutableStateOf(it)
                     )
                 )
             },
@@ -152,7 +153,8 @@ fun NodeEditorDemo() {
             WorldLayout {
                 for (card in cards) {
                     SampleCard(
-                        modifier = Modifier.worldPosition(card.position),
+                        modifier = Modifier.worldPosition(card.position.value),
+                        onDragBy = { card.position.value += it },
                         title = card.title,
                         color = card.color,
                     )
@@ -185,11 +187,13 @@ fun NodeEditorDemo() {
 @Composable
 private fun SampleCard(
     modifier: Modifier = Modifier,
+    onDragBy: (Offset) -> Unit,
     title: String,
     color: Color
 ) {
     Card(
         modifier = modifier
+            .worldDraggable(onDragBy = onDragBy)
             .width(220.dp)
             .wrapContentHeight()
             .padding(12.dp),
