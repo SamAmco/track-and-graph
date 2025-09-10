@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +17,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
 
@@ -32,10 +35,17 @@ class ViewportState(
     private val minScale: Float,
     private val maxScale: Float,
 ) {
+    private val _viewPortCoordinates = mutableStateOf<LayoutCoordinates?>(null)
+    val viewPortCoordinates: State<LayoutCoordinates?> = _viewPortCoordinates
+
     var scale by mutableFloatStateOf(scale)
         private set
     var pan by mutableStateOf(pan) // screen-space translation, in pixels
         private set
+
+    fun setViewPortCoordinates(coordinates: LayoutCoordinates) {
+        _viewPortCoordinates.value = coordinates
+    }
 
     // Adjust scale around an anchor in SCREEN space (e.g., gesture centroid)
     fun zoomBy(factor: Float, anchorScreen: Offset) {
@@ -95,6 +105,7 @@ fun WorldTransformContainer(
         modifier
             .fillMaxSize()
             .clipToBounds()
+            .onGloballyPositioned { state.setViewPortCoordinates(it) }
             .graphicsLayer {
                 // SCALE around top-left
                 transformOrigin = TransformOrigin(0f, 0f)
