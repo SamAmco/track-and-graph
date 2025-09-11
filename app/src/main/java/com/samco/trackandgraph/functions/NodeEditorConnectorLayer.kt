@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.functions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
@@ -13,12 +14,14 @@ internal enum class ConnectorType {
     OUTPUT,
 }
 
+@Immutable
 internal data class ConnectorId(
     val nodeId: Int,
     val type: ConnectorType,
     val connectorIndex: Int,
 )
 
+@Immutable
 internal data class ConnectorState(
     val worldPosition: Offset,
     val enabled: Boolean,
@@ -46,8 +49,7 @@ internal class ConnectorLayerState {
         _draggingConnectorId.value = id
     }
 
-    fun onDragConnector(id: ConnectorId, worldPos: Offset) {
-        _draggingConnectorId.value = id
+    fun onDragConnector(worldPos: Offset) {
         _draggingConnectorWorldPosition.value = worldPos
     }
 

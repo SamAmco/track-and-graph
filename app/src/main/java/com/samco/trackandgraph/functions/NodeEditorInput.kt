@@ -23,16 +23,13 @@ import kotlin.math.max
 internal fun EditorInputOverlay(
     state: ViewportState,
     edgeLayerState: EdgeLayerState,
-    connectorState: ConnectorLayerState,
     onSelectEdge: (Edge?) -> Unit,
     onLongPressEmpty: (Offset) -> Unit,
-    onAddEdge: (ConnectorId, ConnectorId) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Values that may change across recompositions:
     val onSelectEdgeState = rememberUpdatedState(onSelectEdge)
     val onLongPressEmptyState = rememberUpdatedState(onLongPressEmpty)
-    val onAddEdgeState = rememberUpdatedState(onAddEdge)
 
     val focusManager = rememberUpdatedState(LocalFocusManager.current)
 
@@ -44,12 +41,10 @@ internal fun EditorInputOverlay(
                     worldPointerInputEventHandler(
                         state = state,
                         edgeLayerState = edgeLayerState,
-                        connectorState = connectorState,
                         onSelectEdge = onSelectEdgeState.value,
                         onLongPressEmpty = onLongPressEmptyState.value,
                         edgeTapToleranceWorld = 12.dp.toPx() / state.scale,
                         onClearFocus = { focusManager.value.clearFocus() },
-                        onAddEdge = onAddEdgeState.value,
                     )
                 }
             }
@@ -59,26 +54,14 @@ internal fun EditorInputOverlay(
 private suspend fun AwaitPointerEventScope.worldPointerInputEventHandler(
     state: ViewportState,
     edgeLayerState: EdgeLayerState,
-    connectorState: ConnectorLayerState,
     onSelectEdge: (Edge?) -> Unit,
     onLongPressEmpty: (Offset) -> Unit,
     edgeTapToleranceWorld: Float,
     onClearFocus: () -> Unit,
-    onAddEdge: (ConnectorId, ConnectorId) -> Unit,
 ) {
     val down = awaitFirstDown(requireUnconsumed = true)
     val startScreen = down.position // screen coords
     val startWorld = state.screenToWorld(startScreen)
-
-    val startConnector = nearestConnector(
-        connectorState,
-        startWorld,
-        connectorSize.toPx()
-    )
-
-    if (startConnector != null) {
-        connectorState.onDownOnConnector(startConnector)
-    }
 
     var last = startScreen
     var maxPointerCount = 1
@@ -130,43 +113,7 @@ private suspend fun AwaitPointerEventScope.worldPointerInputEventHandler(
             toleranceWorld = edgeTapToleranceWorld,
         )
     }
-
-    if (startConnector != null) {
-        val endConnector = nearestConnector(
-            connectorState,
-            state.screenToWorld(last),
-            connectorSize.toPx()
-        )
-        if (endConnector != null) {
-            onAddEdge(startConnector, endConnector)
-        }
-        connectorState.onDropConnector()
-    }
 }
-
-private fun nearestConnector(
-    connectorState: ConnectorLayerState,
-    worldPos: Offset,
-    toleranceWorld: Float
-): ConnectorId? {
-    val sqrTolerance = toleranceWorld * toleranceWorld
-    var smallestDist: Float? = null
-    var smallestId: ConnectorId? = null
-
-    for ((id, connector) in connectorState.connectorStates) {
-        val sqrDist = (worldPos - connector.worldPosition).sqrSize()
-        if (sqrDist < sqrTolerance) {
-            if (smallestDist == null || sqrDist < smallestDist) {
-                smallestDist = sqrDist
-                smallestId = id
-            }
-        }
-    }
-
-    return smallestId
-}
-
-private fun Offset.sqrSize() = x * x + y * y
 
 private fun max(a: Offset, b: Offset): Offset {
     if ((a.x * a.x) + (a.y * a.y) > (b.x * b.x) + (b.y * b.y)) {
