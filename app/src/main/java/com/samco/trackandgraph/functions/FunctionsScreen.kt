@@ -18,6 +18,7 @@ import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import kotlinx.serialization.Serializable
+import kotlin.random.Random
 
 @Serializable
 data class FunctionsNavKey(
@@ -85,8 +86,8 @@ fun NodeEditorDemo() {
             val title: String,
             val color: Color,
             val id: Int,
-            val inputConnectorCount: Int = 2,
-            val outputConnectorCount: Int = 2,
+            val inputConnectorCount: Int = Random.nextInt(0, 5),
+            val outputConnectorCount: Int = Random.nextInt(0, 5),
             val position: MutableState<Offset>,
         )
 
@@ -116,7 +117,6 @@ fun NodeEditorDemo() {
         EditorInputOverlay(
             state = viewport,
             edgeLayerState = edgeLayerState,
-            connectorState = connectorState,
             onSelectEdge = { selectedEdge = it },
             onLongPressEmpty = {
                 cards.add(
@@ -128,7 +128,6 @@ fun NodeEditorDemo() {
                     )
                 )
             },
-            onAddEdge = { start, end -> edges.add(Edge(start, end)) }
         )
 
         // The world: scaled + translated as a single layer
@@ -153,6 +152,7 @@ fun NodeEditorDemo() {
                         color = card.color,
                         inputConnectorCount = card.inputConnectorCount,
                         outputConnectorCount = card.outputConnectorCount,
+                        onAddEdge = { start, end -> edges.add(Edge(start, end)) }
                     )
                 }
             }
