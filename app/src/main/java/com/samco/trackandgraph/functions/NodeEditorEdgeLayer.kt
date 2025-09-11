@@ -99,6 +99,24 @@ internal fun EdgeLayer(
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round)
             )
         }
+
+        edgeLayerState.draggingEdgeOverlay?.let { (start, end) ->
+            val cubic = cubicWithHorizontalTangents(start, end)
+            val path = Path().apply {
+                moveTo(start.x, start.y)
+                cubicTo(
+                    cubic.c1.x, cubic.c1.y,
+                    cubic.c2.x, cubic.c2.y,
+                    cubic.p1.x, cubic.p1.y
+                )
+            }
+
+            drawPath(
+                path = path,
+                color = Color(0xFF7A7A7A),
+                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+            )
+        }
     }
 }
 
