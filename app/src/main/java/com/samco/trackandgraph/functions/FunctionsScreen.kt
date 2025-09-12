@@ -1,3 +1,19 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.functions
 
 import androidx.compose.animation.AnimatedVisibility
@@ -73,7 +89,7 @@ private fun FunctionsScreenContent() {
 // ============================================================================
 
 @Composable
-fun NodeEditorDemo() {
+fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
     val viewport = rememberViewportState(
         initialScale = 1.0f,
         initialPan = Offset.Zero,
@@ -85,56 +101,53 @@ fun NodeEditorDemo() {
     var selectedEdge by remember { mutableStateOf<Edge?>(null) }
     val edges = remember { mutableStateListOf<Edge>() }
 
-    Box(Modifier.fillMaxSize()) {
+    data class CardData(
+        val title: String,
+        val id: Int,
+        val inputConnectorCount: Int = Random.nextInt(0, 5),
+        val outputConnectorCount: Int = Random.nextInt(0, 5),
+        val position: MutableState<Offset>,
+    )
 
+    val cards = remember {
+        mutableStateListOf(
+            CardData(
+                title = "Input",
+                id = nextId++,
+                position = mutableStateOf(Offset.Zero)
+            ),
+            CardData(
+                title = "Transform",
+                id = nextId++,
+                position = mutableStateOf(Offset(600f, 250f))
+            ),
+            CardData(
+                title = "Output",
+                id = nextId++,
+                position = mutableStateOf(Offset(1200f, 100f))
+            ),
+        )
+    }
+
+    val connectorState = rememberConnectorLayerState()
+    val edgeLayerState = rememberEdgeLayerState(edges, connectorState)
+
+    NodeEditorInputWrapper(
+        state = viewport,
+        edgeLayerState = edgeLayerState,
+        onSelectEdge = { selectedEdge = it },
+        onLongPressEmpty = {
+            cards.add(
+                CardData(
+                    title = "New Card",
+                    id = nextId++,
+                    position = mutableStateOf(it)
+                )
+            )
+        },
+    ) {
         // Background grid
         BackgroundGrid(viewport)
-
-        val connectorState = rememberConnectorLayerState()
-        val edgeLayerState = rememberEdgeLayerState(edges, connectorState)
-
-        data class CardData(
-            val title: String,
-            val id: Int,
-            val inputConnectorCount: Int = Random.nextInt(0, 5),
-            val outputConnectorCount: Int = Random.nextInt(0, 5),
-            val position: MutableState<Offset>,
-        )
-
-        val cards = remember {
-            mutableStateListOf(
-                CardData(
-                    title = "Input",
-                    id = nextId++,
-                    position = mutableStateOf(Offset.Zero)
-                ),
-                CardData(
-                    title = "Transform",
-                    id = nextId++,
-                    position = mutableStateOf(Offset(600f, 250f))
-                ),
-                CardData(
-                    title = "Output",
-                    id = nextId++,
-                    position = mutableStateOf(Offset(1200f, 100f))
-                ),
-            )
-        }
-
-        EditorInputOverlay(
-            state = viewport,
-            edgeLayerState = edgeLayerState,
-            onSelectEdge = { selectedEdge = it },
-            onLongPressEmpty = {
-                cards.add(
-                    CardData(
-                        title = "New Card",
-                        id = nextId++,
-                        position = mutableStateOf(it)
-                    )
-                )
-            },
-        )
 
         // The world: scaled + translated as a single layer
         WorldTransformContainer(
@@ -162,6 +175,7 @@ fun NodeEditorDemo() {
                 }
             }
         }
+
 
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomEnd),
