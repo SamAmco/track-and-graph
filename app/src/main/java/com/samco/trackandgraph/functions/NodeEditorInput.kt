@@ -44,6 +44,8 @@ internal fun NodeEditorInputWrapper(
     edgeLayerState: EdgeLayerState,
     onSelectEdge: (Edge?) -> Unit,
     onLongPressEmpty: (Offset) -> Unit,
+    onPan: () -> Unit,
+    onTap: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     // Values that may change across recompositions:
@@ -62,7 +64,9 @@ internal fun NodeEditorInputWrapper(
                 onSelectEdge = onSelectEdgeState.value,
                 onLongPressEmpty = onLongPressEmptyState.value,
                 edgeTapToleranceWorld = 12.dp / state.scale,
-                onClearFocus = { focusManager.value.clearFocus() }
+                onClearFocus = { focusManager.value.clearFocus() },
+                onPan = onPan,
+                onTap = onTap,
             ),
     ) { content() }
 }
@@ -106,7 +110,9 @@ private fun Modifier.tapPanLongPressPointerInput(
     onSelectEdge: (Edge?) -> Unit,
     onLongPressEmpty: (Offset) -> Unit,
     edgeTapToleranceWorld: Dp,
-    onClearFocus: () -> Unit
+    onClearFocus: () -> Unit,
+    onPan: () -> Unit,
+    onTap: () -> Unit,
 ) = this.pointerInput(state, edgeLayerState, onSelectEdge, onLongPressEmpty, edgeTapToleranceWorld, onClearFocus) {
     awaitEachGesture {
         tapPanLongPressEventHandler(
@@ -115,7 +121,9 @@ private fun Modifier.tapPanLongPressPointerInput(
             onSelectEdge = onSelectEdge,
             onLongPressEmpty = onLongPressEmpty,
             edgeTapToleranceWorld = edgeTapToleranceWorld.toPx(),
-            onClearFocus = onClearFocus
+            onClearFocus = onClearFocus,
+            onPan = onPan,
+            onTap = onTap,
         )
     }
 }
@@ -127,13 +135,14 @@ private suspend fun AwaitPointerEventScope.tapPanLongPressEventHandler(
     onLongPressEmpty: (Offset) -> Unit,
     edgeTapToleranceWorld: Float,
     onClearFocus: () -> Unit,
+    onPan: () -> Unit,
+    onTap: () -> Unit,
 ) {
     val down = awaitFirstDown(requireUnconsumed = true, pass = PointerEventPass.Final)
     val startScreen = down.position // screen coords
     val startWorld = state.screenToWorld(startScreen)
 
     var last = startScreen
-    var maxPointerCount = 1
     var up = false
     var maxDelta = Offset.Zero
     val downTime = System.nanoTime()
@@ -145,7 +154,7 @@ private suspend fun AwaitPointerEventScope.tapPanLongPressEventHandler(
         val ev = withTimeoutOrNull(32) { awaitPointerEvent(pass = PointerEventPass.Final) }
 
         val totalPassedMs = (System.nanoTime() - downTime) / 1_000_000
-        if (!checkedLongPress && maxPointerCount == 1 && totalPassedMs > longPressMs) {
+        if (!checkedLongPress && totalPassedMs > longPressMs) {
             if (maxDelta.getDistance() < slop) {
                 onLongPressEmpty(startWorld)
             }
@@ -161,23 +170,21 @@ private suspend fun AwaitPointerEventScope.tapPanLongPressEventHandler(
             // Only pan if the event hasn't been consumed by a child element (like worldDraggable)
             if (!current.isConsumed) {
                 val delta = current.position - last
+                onPan()
                 state.panBy(delta)
                 current.consume()
             }
 
             maxDelta = max(current.position - startScreen, maxDelta)
             last = current.position
-            maxPointerCount = max(ev.changes.size, maxPointerCount)
-        } else {
-            // Multi-touch detected, but should already be handled by zoom modifier
-            maxPointerCount = max(ev.changes.size, maxPointerCount)
         }
 
         up = ev.changes.all { !it.pressed }
     }
 
     val totalPassedMs = (System.nanoTime() - downTime) / 1_000_000
-    if (totalPassedMs < longPressMs && maxPointerCount == 1 && maxDelta.getDistance() < slop) {
+    if (totalPassedMs < longPressMs && maxDelta.getDistance() < slop) {
+        onTap()
         onClearFocus()
         handleEdgeSelection(
             offset = startWorld,
