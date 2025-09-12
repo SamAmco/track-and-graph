@@ -2,6 +2,7 @@ package com.samco.trackandgraph.functions
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
@@ -13,8 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalDensity
+import kotlin.math.cos
+import kotlin.math.sin
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 
@@ -71,7 +74,11 @@ internal fun EdgeLayer(
     selectedEdge: Edge?,
     modifier: Modifier = Modifier
 ) {
-    val density = LocalDensity.current
+    val color = MaterialTheme.colorScheme.onSurfaceVariant
+    val selectedColor = MaterialTheme.colorScheme.primary
+    val edgeWidth = 3.dp
+    val selectedEdgeWidth = 6.dp
+    val arrowHeadSize = 14.dp
 
     Canvas(
         modifier
@@ -92,11 +99,21 @@ internal fun EdgeLayer(
             }
 
             val isSelected = edge == selectedEdge
-            val strokeWidth = with(density) { (if (isSelected) 6.dp else 3.dp).toPx() }
+            val strokeWidth = (if (isSelected) selectedEdgeWidth else edgeWidth).toPx()
+            val currentColor = if (isSelected) selectedColor else color
+            
             drawPath(
                 path = path,
-                color = if (isSelected) Color(0xFF3D7DFF) else Color(0xFF7A7A7A),
+                color = currentColor,
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round)
+            )
+            
+            // Draw arrow head at the end of the edge
+            drawArrowHead(
+                cubic = cubic,
+                color = currentColor,
+                size = arrowHeadSize.toPx(),
+                strokeWidth = strokeWidth
             )
         }
 
@@ -113,8 +130,20 @@ internal fun EdgeLayer(
 
             drawPath(
                 path = path,
-                color = Color(0xFF7A7A7A),
-                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+                color = color,
+                style = Stroke(
+                    width = edgeWidth.toPx(),
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round
+                )
+            )
+            
+            // Draw arrow head for dragging edge
+            drawArrowHead(
+                cubic = cubic,
+                color = color,
+                size = arrowHeadSize.toPx(),
+                strokeWidth = edgeWidth.toPx()
             )
         }
     }
@@ -165,5 +194,55 @@ private fun cubicPoint(c: Cubic, t: Float): Offset {
     val x = uuu * c.p0.x + 3f * uu * t * c.c1.x + 3f * u * tt * c.c2.x + ttt * c.p1.x
     val y = uuu * c.p0.y + 3f * uu * t * c.c1.y + 3f * u * tt * c.c2.y + ttt * c.p1.y
     return Offset(x, y)
+}
+
+/**
+ * Draws an arrow head at the end of a cubic Bézier curve using two converging lines.
+ * Simplified for left-to-right horizontal edges - arrows always point right.
+ */
+private fun DrawScope.drawArrowHead(
+    cubic: Cubic,
+    color: Color,
+    size: Float,
+    strokeWidth: Float,
+    arrowAngle: Float = 0.5f // Angle of arrow head in radians (about 30 degrees)
+) {
+    // Arrow tip is at the visual end of the line (accounting for rounded cap)
+    // Since edges always go left-to-right, arrow always points right
+    val arrowTipPoint = Offset(
+        cubic.p1.x + strokeWidth / 2f,
+        cubic.p1.y
+    )
+    
+    // Calculate the two arrow line endpoints for a rightward-pointing arrow
+    val cosAngle = cos(arrowAngle)
+    val sinAngle = sin(arrowAngle)
+    
+    val leftPoint = Offset(
+        arrowTipPoint.x - size * cosAngle,
+        arrowTipPoint.y - size * sinAngle
+    )
+    
+    val rightPoint = Offset(
+        arrowTipPoint.x - size * cosAngle,
+        arrowTipPoint.y + size * sinAngle
+    )
+    
+    // Draw two lines that converge at the arrow tip
+    drawLine(
+        color = color,
+        start = leftPoint,
+        end = arrowTipPoint,
+        strokeWidth = strokeWidth,
+        cap = StrokeCap.Round
+    )
+    
+    drawLine(
+        color = color,
+        start = rightPoint,
+        end = arrowTipPoint,
+        strokeWidth = strokeWidth,
+        cap = StrokeCap.Round
+    )
 }
 
