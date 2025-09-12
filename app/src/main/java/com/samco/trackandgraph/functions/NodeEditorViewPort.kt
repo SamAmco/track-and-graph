@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -38,6 +39,8 @@ import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Density
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 // ============================================================================
@@ -58,6 +61,8 @@ class ViewportState(
         private set
     var pan by mutableStateOf(pan) // screen-space translation, in pixels
         private set
+
+    private var initialCameraPositionSet by mutableStateOf(false)
 
     fun setViewPortCoordinates(coordinates: LayoutCoordinates) {
         _viewPortCoordinates.value = coordinates
@@ -97,6 +102,41 @@ class ViewportState(
         screenToWorld(rect.topLeft),
         screenToWorld(rect.bottomRight)
     )
+
+    internal fun fitViewportToWorldRect(entries: List<Entry>) {
+        if (initialCameraPositionSet) return
+
+        val viewportCoords = _viewPortCoordinates.value ?: return
+        val viewportWidth = viewportCoords.size.width.toFloat()
+        val viewportHeight = viewportCoords.size.height.toFloat()
+        if (viewportWidth <= 0f || viewportHeight <= 0f) return
+        if (entries.isEmpty()) return
+
+        // Compute the union of all entry bounds (in WORLD space)
+        val worldRect = entries
+            .map { it.bounds() }
+            .reduce { acc, rect -> acc.union(rect) }
+
+        // Desired padding in SCREEN pixels
+        val padding = 50f
+
+        val availableW = (viewportWidth - 2 * padding).coerceAtLeast(1f)
+        val availableH = (viewportHeight - 2 * padding).coerceAtLeast(1f)
+
+        val worldW = worldRect.width.coerceAtLeast(1e-6f)
+        val worldH = worldRect.height.coerceAtLeast(1e-6f)
+
+        val newScale = min(availableW / worldW, availableH / worldH)
+            .coerceIn(minScale, maxScale)
+
+        // Center by world center (padding is already “baked in” via the scale)
+        val viewportCenter = Offset(viewportWidth / 2f, viewportHeight / 2f)
+        val newPan = viewportCenter - worldRect.center * newScale
+
+        scale = newScale
+        pan = newPan
+        initialCameraPositionSet = true
+    }
 }
 
 @Composable
@@ -147,9 +187,34 @@ fun Modifier.worldPosition(
     pos: Offset,
 ) = this.then(WorldParentDataModifier(pos))
 
+// Measure every child first
+data class Entry(
+    val placeable: Placeable,
+    val offset: Offset,
+)
+
+private fun Entry.bounds(): Rect {
+    val ax = 0.5f * placeable.width
+    val ay = 0.5f * placeable.height
+    return Rect(
+        offset.x - ax,
+        offset.y - ay,
+        offset.x + ax,
+        offset.y + ay,
+    )
+}
+
+private fun Rect.union(other: Rect): Rect = Rect(
+    min(left, other.left),
+    min(top, other.top),
+    max(right, other.right),
+    max(bottom, other.bottom)
+)
+
 @Composable
 fun WorldLayout(
     modifier: Modifier = Modifier,
+    viewportState: ViewportState? = null,
     content: @Composable () -> Unit
 ) {
     Layout(
@@ -157,13 +222,14 @@ fun WorldLayout(
         modifier = modifier
     ) { measurables, constraints ->
 
-        // Measure every child first
-        data class Entry(val placeable: Placeable, val offset: Offset)
-
         val entries = measurables.map { m ->
             val p = m.measure(constraints)
             val d = (m.parentData as? Offset) ?: Offset.Zero
             Entry(p, d)
+        }
+
+        if (viewportState != null && entries.isNotEmpty()) {
+            viewportState.fitViewportToWorldRect(entries)
         }
 
         // This layout fills the available area; the camera (graphicsLayer) handles transform.
