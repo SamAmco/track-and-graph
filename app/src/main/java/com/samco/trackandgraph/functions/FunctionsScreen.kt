@@ -95,7 +95,6 @@ fun NodeEditorDemo() {
 
         data class CardData(
             val title: String,
-            val color: Color,
             val id: Int,
             val inputConnectorCount: Int = Random.nextInt(0, 5),
             val outputConnectorCount: Int = Random.nextInt(0, 5),
@@ -106,19 +105,16 @@ fun NodeEditorDemo() {
             mutableStateListOf(
                 CardData(
                     title = "Input",
-                    color = Color(0xFFCCE5FF),
                     id = nextId++,
                     position = mutableStateOf(Offset.Zero)
                 ),
                 CardData(
                     title = "Transform",
-                    color = Color(0xFFFFF3CD),
                     id = nextId++,
                     position = mutableStateOf(Offset(600f, 250f))
                 ),
                 CardData(
                     title = "Output",
-                    color = Color(0xFFD4EDDA),
                     id = nextId++,
                     position = mutableStateOf(Offset(1200f, 100f))
                 ),
@@ -133,7 +129,6 @@ fun NodeEditorDemo() {
                 cards.add(
                     CardData(
                         title = "New Card",
-                        color = Color(0xFFCC85FF),
                         id = nextId++,
                         position = mutableStateOf(it)
                     )
@@ -160,7 +155,6 @@ fun NodeEditorDemo() {
                         connectorLayerState = connectorState,
                         id = card.id,
                         title = card.title,
-                        color = card.color,
                         inputConnectorCount = card.inputConnectorCount,
                         outputConnectorCount = card.outputConnectorCount,
                         onAddEdge = { start, end -> edges.add(Edge(start, end)) }
