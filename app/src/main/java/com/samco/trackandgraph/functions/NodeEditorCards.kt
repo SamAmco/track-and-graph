@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -32,9 +33,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import com.samco.trackandgraph.ui.compose.ui.Circle
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.graphics.drawscope.Stroke
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.cardElevation
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
-val connectorSize = 24.dp
+val connectorSize = 32.dp
 
 @Composable
 internal fun SampleCard(
@@ -44,7 +50,6 @@ internal fun SampleCard(
     connectorLayerState: ConnectorLayerState,
     id: Int = 0,
     title: String,
-    color: Color,
     inputConnectorCount: Int,
     outputConnectorCount: Int,
     onAddEdge: (ConnectorId, ConnectorId) -> Unit,
@@ -65,11 +70,15 @@ internal fun SampleCard(
             modifier = Modifier
                 .heightIn(min = requiredMinHeight)
                 .width(IntrinsicSize.Max)
-                .padding(connectorSize / 2)
+                .padding(horizontal = connectorSize / 2, vertical = cardPadding)
                 .worldDraggable(onDragBy = onDragBy),
-            colors = CardDefaults.cardColors(containerColor = color)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
         ) {
-            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                Modifier.padding(horizontal = connectorSize / 2, vertical = cardPadding),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Text(title, style = MaterialTheme.typography.titleMedium)
                 OutlinedTextField(value = "", onValueChange = {}, label = { Text("Name") })
                 DropdownMenuDemo()
@@ -132,28 +141,53 @@ private fun Connector(
     viewState: ViewportState,
     enabled: Boolean,
     onAddEdge: (ConnectorId, ConnectorId) -> Unit,
-) = Circle(
-    modifier = Modifier
-        .onGloballyPositioned { coords ->
-            viewState.viewPortCoordinates.value?.let { viewPortCoords ->
-                val screenPosition = viewPortCoords.localBoundingBoxOf(coords, clipBounds = false).center
-                val worldPosition = viewState.screenToWorld(screenPosition)
-                val connectorState = ConnectorState(worldPosition, enabled)
-                connectorLayerState.upsertConnector(id, connectorState)
+) {
+    val innerColor = MaterialTheme.colorScheme.secondary
+    val outerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
+
+    Canvas(
+        modifier = Modifier
+            .size(connectorSize)
+            .onGloballyPositioned { coords ->
+                viewState.viewPortCoordinates.value?.let { viewPortCoords ->
+                    val screenPosition = viewPortCoords.localBoundingBoxOf(coords, clipBounds = false).center
+                    val worldPosition = viewState.screenToWorld(screenPosition)
+                    val connectorState = ConnectorState(worldPosition, enabled)
+                    connectorLayerState.upsertConnector(id, connectorState)
+                }
             }
-        }
-        .pointerInput(Unit) {
-            awaitEachGesture {
-                connectorInputEventHandler(
-                    id = id,
-                    connectorLayerState = connectorLayerState,
-                    onAddEdge = onAddEdge,
-                )
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    connectorInputEventHandler(
+                        id = id,
+                        connectorLayerState = connectorLayerState,
+                        onAddEdge = onAddEdge,
+                    )
+                }
             }
-        },
-    size = connectorSize,
-    backgroundColor = MaterialTheme.colorScheme.secondary
-)
+    ) {
+        val drawableSize = size.minDimension * 0.8f
+        val outerStrokeWidth = 2.dp.toPx()
+        val center = Offset(size.width / 2f, size.height / 2f)
+        val outerRadius = (drawableSize / 2f) - (outerStrokeWidth / 2f)
+        val innerRadius = outerRadius * 0.6f // Inner circle is 60% of outer radius
+
+        // Draw outer circle (stroke only)
+        drawCircle(
+            color = outerColor,
+            radius = outerRadius,
+            center = center,
+            style = Stroke(width = outerStrokeWidth)
+        )
+
+        // Draw filled inner circle
+        drawCircle(
+            color = innerColor,
+            radius = innerRadius,
+            center = center
+        )
+    }
+}
 
 private suspend fun AwaitPointerEventScope.connectorInputEventHandler(
     id: ConnectorId,
@@ -222,6 +256,31 @@ private fun DropdownMenuDemo() {
                 DropdownMenuItem(text = { Text(it) }, onClick = { selected = it; expanded = false })
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SampleCardPreview() {
+    TnGComposeTheme {
+        val viewportState = rememberViewportState(
+            initialScale = 1.0f,
+            initialPan = Offset.Zero,
+            minScale = 0.15f,
+            maxScale = 5.0f
+        )
+        val connectorLayerState = rememberConnectorLayerState()
+
+        SampleCard(
+            onDragBy = { },
+            viewState = viewportState,
+            connectorLayerState = connectorLayerState,
+            id = 1,
+            title = "Sample Node",
+            inputConnectorCount = 2,
+            outputConnectorCount = 3,
+            onAddEdge = { _, _ -> }
+        )
     }
 }
 
