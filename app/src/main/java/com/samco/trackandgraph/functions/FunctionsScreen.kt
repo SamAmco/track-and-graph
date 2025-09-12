@@ -159,7 +159,9 @@ fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
                 selectedEdge = selectedEdge,
             )
 
-            WorldLayout {
+            WorldLayout(
+                viewportState = viewport
+            ) {
                 for (card in cards) {
                     SampleCard(
                         modifier = Modifier.worldPosition(card.position.value),
@@ -175,7 +177,6 @@ fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
                 }
             }
         }
-
 
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomEnd),
