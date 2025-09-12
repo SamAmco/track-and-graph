@@ -24,6 +24,10 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +49,8 @@ import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
@@ -61,7 +67,7 @@ fun FunctionsScreen(
     onPopBack: () -> Unit
 ) {
     TopAppBarContent(navArgs)
-    FunctionsScreenContent()
+    FunctionsScreenContent(onPopBack)
 }
 
 @Composable
@@ -80,8 +86,10 @@ private fun TopAppBarContent(
 }
 
 @Composable
-private fun FunctionsScreenContent() {
-    NodeEditorDemo()
+private fun FunctionsScreenContent(
+    onPopBack: () -> Unit
+) = TnGComposeTheme {
+    NodeEditorDemo(onPopBack = onPopBack)
 }
 
 // ============================================================================
@@ -89,7 +97,9 @@ private fun FunctionsScreenContent() {
 // ============================================================================
 
 @Composable
-fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
+fun NodeEditorDemo(
+    onPopBack: () -> Unit
+) = Box(modifier = Modifier.fillMaxSize()) {
     val viewport = rememberViewportState(
         initialScale = 1.0f,
         initialPan = Offset.Zero,
@@ -100,6 +110,7 @@ fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
     var nextId by remember { mutableIntStateOf(0) }
     var selectedEdge by remember { mutableStateOf<Edge?>(null) }
     val edges = remember { mutableStateListOf<Edge>() }
+    var clearOverlayUi by remember { mutableStateOf(false) }
 
     data class CardData(
         val title: String,
@@ -145,6 +156,8 @@ fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
                 )
             )
         },
+        onPan = { clearOverlayUi = true },
+        onTap = { clearOverlayUi = false },
     ) {
         // Background grid
         BackgroundGrid(viewport)
@@ -183,6 +196,9 @@ fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
             visible = selectedEdge != null
         ) {
             FloatingActionButton(
+                modifier = Modifier
+                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .then(Modifier.padding(inputSpacingLarge)),
                 onClick = {
                     if (selectedEdge != null) {
                         edges.remove(selectedEdge)
@@ -190,9 +206,6 @@ fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
                     selectedEdge = null
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(WindowInsets.navigationBars.asPaddingValues())
-                    .then(Modifier.padding(inputSpacingLarge))
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.delete_icon),
@@ -201,6 +214,26 @@ fun NodeEditorDemo() = Box(modifier = Modifier.fillMaxSize()) {
             }
         }
 
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.TopStart),
+            visible = !clearOverlayUi
+        ) {
+            FloatingActionButton(
+                modifier = Modifier
+                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .then(Modifier.padding(inputSpacingLarge))
+                    .size(buttonSize),
+                onClick = { onPopBack() },
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                shape = RoundedCornerShape(100),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = null,
+                )
+            }
+        }
     }
 }
 
