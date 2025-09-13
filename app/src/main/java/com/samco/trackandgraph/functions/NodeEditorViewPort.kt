@@ -42,10 +42,10 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-// ============================================================================
-// VIEWPORT STATE - Handles world/screen space transforms
-// ============================================================================
-
+/**
+ * Manages viewport transformations between world and screen coordinates.
+ * Handles pan, zoom, and coordinate space conversions for the node editor.
+ */
 @Stable
 class ViewportState(
     scale: Float,
@@ -146,9 +146,10 @@ fun rememberViewportState(
     maxScale: Float,
 ) = remember { ViewportState(initialScale, initialPan, minScale, maxScale) }
 
-// ============================================================================
-// PAN/ZOOM CONTAINER - Handles gestures and applies transforms
-// ============================================================================
+/**
+ * Container that applies viewport transformations using graphics layer.
+ * Handles pan and zoom gestures for the node editor viewport.
+ */
 
 @Composable
 fun WorldTransformContainer(
@@ -174,9 +175,10 @@ fun WorldTransformContainer(
     }
 }
 
-// ============================================================================
-// WORLD LAYOUT - Position composables by world coordinates
-// ============================================================================
+/**
+ * Layout that positions child composables using world coordinates.
+ * Automatically fits viewport to show all content when first displayed.
+ */
 
 private class WorldParentDataModifier(val pos: Offset) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = pos
