@@ -92,10 +92,6 @@ private fun FunctionsScreenContent(
     NodeEditorDemo(onPopBack = onPopBack)
 }
 
-// ============================================================================
-// NODE EDITOR DEMO - Putting it all together
-// ============================================================================
-
 @Composable
 fun NodeEditorDemo(
     onPopBack: () -> Unit
@@ -237,9 +233,10 @@ fun NodeEditorDemo(
     }
 }
 
-// ============================================================================
-// BACKGROUND GRID - Draw grid in screen space with world positioning
-// ============================================================================
+/**
+ * Renders a background grid that scales with the viewport.
+ * Provides visual reference for positioning nodes in world space.
+ */
 
 @Composable
 fun BackgroundGrid(
