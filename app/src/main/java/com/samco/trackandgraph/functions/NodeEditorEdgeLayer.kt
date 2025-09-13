@@ -37,10 +37,6 @@ import kotlin.math.sin
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 
-// ============================================================================
-// EDGE LAYER STATE - Handles edge cubic computation and caching
-// ============================================================================
-
 internal data class Edge(
     val from: ConnectorId,
     val to: ConnectorId,
@@ -48,6 +44,10 @@ internal data class Edge(
 
 internal data class Cubic(val p0: Offset, val c1: Offset, val c2: Offset, val p1: Offset)
 
+/**
+ * Manages edge rendering state and cubic Bézier curve computation.
+ * Handles edge connections between nodes with caching for performance.
+ */
 @Stable
 internal class EdgeLayerState(
     val edges: List<Edge>,
