@@ -37,6 +37,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.max
 import kotlin.math.min
@@ -223,8 +224,15 @@ fun WorldLayout(
         modifier = modifier
     ) { measurables, constraints ->
 
+        val looseConstraints = constraints.copy(
+            minWidth = 0,
+            minHeight = 0,
+            maxWidth = Constraints.Infinity,
+            maxHeight = Constraints.Infinity
+        )
+
         val entries = measurables.mapNotNull { m ->
-            val p = m.measure(constraints)
+            val p = m.measure(looseConstraints)
             val d = (m.parentData as? Offset) ?: return@mapNotNull null
             Entry(p, d)
         }
