@@ -64,7 +64,7 @@ internal fun Node(
             elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
         ) {
             when (node) {
-                is Node.MockNode -> MockNode()
+                is Node.Output -> OutputNode(node)
             }
         }
 
@@ -99,7 +99,7 @@ private fun SampleCardPreview() {
         val connectorLayerState = rememberConnectorLayerState()
 
         Node(
-            node = Node.MockNode(),
+            node = Node.Output(),
             onDragBy = { },
             viewState = viewportState,
             connectorLayerState = connectorLayerState,

@@ -24,7 +24,7 @@
     <string name="update">Mettre à jour</string>
     <string name="graph_or_stat_name">Nom du graphique : </string>
     <string name="tracker_name">Nom du suivi</string>
-    <string name="tracker_type">Il s\'agit d\'un temps ou d\'une durée</string>
+    <string name="this_is_a_time_or_duration">Il s\'agit d\'un temps ou d\'une durée</string>
     <string name="yes">Oui</string>
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
@@ -359,6 +359,8 @@
 
     <string name="lua_script_empty">Veuillez ajouter un script Lua</string>
     <string name="function_name_empty">Le nom de la fonction ne peut pas être vide</string>
+    <string name="function_name">Nom de fonction</string>
+    <string name="output">Sortie</string>
     <string name="lua_script_input_hint">Entrez un script Lua…</string>
     <string name="file">Fichier</string>
     <string name="lua_feature_names_not_unique">Les entrées des scripts doivent avoir des noms uniques</string>
