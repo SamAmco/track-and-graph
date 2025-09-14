@@ -17,7 +17,9 @@
 package com.samco.trackandgraph.functions
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
@@ -64,14 +66,15 @@ sealed class Node(
     val inputConnectorCount: Int,
     val outputConnectorCount: Int,
 ) {
-    class MockNode(
+    class Output(
         id: Int = -1,
-        inputConnectorCount: Int = 2,
-        outputConnectorCount: Int = 3,
+        val name: MutableState<String> = mutableStateOf(""),
+        val description: MutableState<String> = mutableStateOf(""),
+        val isDuration: MutableState<Boolean> = mutableStateOf(false),
     ) : Node(
         id = id,
-        inputConnectorCount = inputConnectorCount,
-        outputConnectorCount = outputConnectorCount,
+        inputConnectorCount = 1,
+        outputConnectorCount = 0,
     )
 }
 
@@ -128,11 +131,9 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             // TODO: Load function data based on groupId and functionId
             // For now, initialize with mock data
             _nodes.value = _nodes.value.mutate {
-                it.add(Node.MockNode(id = 1, inputConnectorCount = 2, outputConnectorCount = 1))
-                it.add(Node.MockNode(id = 2, inputConnectorCount = 1, outputConnectorCount = 2))
+                it.add(Node.Output(id = 1))
             }
             nodePositions[1] = Offset(100f, 100f)
-            nodePositions[2] = Offset(200f, 200f)
         }
     }
 
@@ -210,7 +211,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
     override fun onAddNode(data: AddNodeData) {
         val newId = (_nodes.value.maxOfOrNull { it.id } ?: 0) + 1
-        val newNode = Node.MockNode(id = newId)
+        val newNode = Node.Output(id = newId)
         _nodes.value = _nodes.value.add(newNode)
     }
 
