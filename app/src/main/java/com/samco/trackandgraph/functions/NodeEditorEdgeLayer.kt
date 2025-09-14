@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -36,11 +37,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-
-internal data class Edge(
-    val from: ConnectorId,
-    val to: ConnectorId,
-)
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.StateFlow
 
 internal data class Cubic(val p0: Offset, val c1: Offset, val c2: Offset, val p1: Offset)
 
@@ -50,23 +48,24 @@ internal data class Cubic(val p0: Offset, val c1: Offset, val c2: Offset, val p1
  */
 @Stable
 internal class EdgeLayerState(
-    val edges: List<Edge>,
+    val edges: State<List<Edge>>,
+    val selectedEdge: State<Edge?>,
     private val connectorState: ConnectorLayerState,
 ) {
     // Derived state that recomputes cubics only when edges change
     val cubics: Map<Edge, Pair<Cubic, List<Offset>>?> by derivedStateOf {
-        edges.associateBy({ it }) { e ->
-            val from = connectorState.connectorStates[e.from] ?: return@associateBy null
-            val to = connectorState.connectorStates[e.to] ?: return@associateBy null
-            val cubic = cubicWithHorizontalTangents(from.worldPosition, to.worldPosition)
+        edges.value.associateBy({ it }) { e ->
+            val from = connectorState.worldPosOf(e.from) ?: return@associateBy null
+            val to = connectorState.worldPosOf(e.to) ?: return@associateBy null
+            val cubic = cubicWithHorizontalTangents(from, to)
             val poly = sampleCubicAsPolyline(cubic) // List<Offset> in WORLD units
             cubic to poly
         }
     }
 
     val draggingEdgeOverlay: Pair<Offset, Offset>? by derivedStateOf {
-        val startConnector = connectorState.draggingConnectorId.value
-        val startPos = connectorState.connectorStates[startConnector]?.worldPosition
+        val startPos = connectorState.draggingConnectorId.value
+            ?.let { connectorState.worldPosOf(it) }
         val endPos = connectorState.draggingConnectorWorldPosition.value
         if (startPos == null || endPos == null) return@derivedStateOf null
         return@derivedStateOf startPos to endPos
@@ -75,19 +74,24 @@ internal class EdgeLayerState(
 
 @Composable
 internal fun rememberEdgeLayerState(
-    edges: List<Edge>,
+    edges: StateFlow<List<Edge>>,
+    selectedEdge: StateFlow<Edge?>,
     connectorState: ConnectorLayerState
-): EdgeLayerState = remember {
-    EdgeLayerState(
-        edges = edges,
-        connectorState = connectorState,
-    )
+): EdgeLayerState {
+    val edgesAsState = edges.collectAsStateWithLifecycle()
+    val selectedEdgeAsState = selectedEdge.collectAsStateWithLifecycle()
+    return remember {
+        EdgeLayerState(
+            edges = edgesAsState,
+            selectedEdge = selectedEdgeAsState,
+            connectorState = connectorState,
+        )
+    }
 }
 
 @Composable
 internal fun EdgeLayer(
     edgeLayerState: EdgeLayerState,
-    selectedEdge: Edge?,
     modifier: Modifier = Modifier
 ) {
     val color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -101,7 +105,7 @@ internal fun EdgeLayer(
             .fillMaxSize()
             .zIndex(1f)
     ) {
-        edgeLayerState.edges.forEach { edge ->
+        edgeLayerState.edges.value.forEach { edge ->
             val (cubic, _) = edgeLayerState.cubics[edge] ?: return@forEach
 
             // Build a Path for drawing
@@ -114,16 +118,16 @@ internal fun EdgeLayer(
                 )
             }
 
-            val isSelected = edge == selectedEdge
+            val isSelected = edge == edgeLayerState.selectedEdge.value
             val strokeWidth = (if (isSelected) selectedEdgeWidth else edgeWidth).toPx()
             val currentColor = if (isSelected) selectedColor else color
-            
+
             drawPath(
                 path = path,
                 color = currentColor,
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round)
             )
-            
+
             // Draw arrow head at the end of the edge
             drawArrowHead(
                 cubic = cubic,
@@ -153,7 +157,7 @@ internal fun EdgeLayer(
                     join = StrokeJoin.Round
                 )
             )
-            
+
             // Draw arrow head for dragging edge
             drawArrowHead(
                 cubic = cubic,
@@ -229,21 +233,21 @@ private fun DrawScope.drawArrowHead(
         cubic.p1.x + strokeWidth / 2f,
         cubic.p1.y
     )
-    
+
     // Calculate the two arrow line endpoints for a rightward-pointing arrow
     val cosAngle = cos(arrowAngle)
     val sinAngle = sin(arrowAngle)
-    
+
     val leftPoint = Offset(
         arrowTipPoint.x - size * cosAngle,
         arrowTipPoint.y - size * sinAngle
     )
-    
+
     val rightPoint = Offset(
         arrowTipPoint.x - size * cosAngle,
         arrowTipPoint.y + size * sinAngle
     )
-    
+
     // Draw two lines that converge at the arrow tip
     drawLine(
         color = color,
@@ -252,7 +256,7 @@ private fun DrawScope.drawArrowHead(
         strokeWidth = strokeWidth,
         cap = StrokeCap.Round
     )
-    
+
     drawLine(
         color = color,
         start = rightPoint,

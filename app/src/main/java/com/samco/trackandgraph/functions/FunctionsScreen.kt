@@ -32,10 +32,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,6 +43,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
@@ -52,8 +52,11 @@ import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
-import kotlin.random.Random
+
+// Import missing node editor functions - these should be defined in the same package
+// but need to be imported explicitly if they're in separate files
 
 @Serializable
 data class FunctionsNavKey(
@@ -66,8 +69,33 @@ fun FunctionsScreen(
     navArgs: FunctionsNavKey,
     onPopBack: () -> Unit
 ) {
+    val viewModel: FunctionsScreenViewModel = hiltViewModel<FunctionsScreenViewModelImpl>()
+
+    // Initialize ViewModel with navigation arguments
+    LaunchedEffect(navArgs.groupId, navArgs.functionId) {
+        viewModel.init(navArgs.groupId, navArgs.functionId)
+    }
+
     TopAppBarContent(navArgs)
-    FunctionsScreenContent(onPopBack)
+    FunctionsScreenContent(
+        onPopBack = onPopBack,
+        nodes = viewModel.nodes,
+        onAddNode = viewModel::onAddNode,
+        onDragNodeBy = viewModel::onDragNodeBy,
+        onDeleteNode = viewModel::onDeleteNode,
+        getWorldPosition = viewModel::getWorldPosition,
+        edges = viewModel.edges,
+        selectedEdge = viewModel.selectedEdge,
+        onSelectEdge = viewModel::onSelectEdge,
+        onDeleteSelectedEdge = viewModel::onDeleteSelectedEdge,
+        connectors = viewModel.connectors,
+        draggingConnectorId = viewModel.draggingConnector,
+        onUpsertConnector = viewModel::onUpsertConnector,
+        onDownOnConnector = viewModel::onDownOnConnector,
+        onDropConnector = viewModel::onDropConnector,
+        getConnectorWorldPosition = viewModel::getConnectorWorldPosition,
+        isConnectorEnabled = viewModel::isEnabled,
+    )
 }
 
 @Composable
@@ -87,147 +115,121 @@ private fun TopAppBarContent(
 
 @Composable
 private fun FunctionsScreenContent(
-    onPopBack: () -> Unit
+    onPopBack: () -> Unit,
+    nodes: StateFlow<List<Node>>,
+    onAddNode: (AddNodeData) -> Unit,
+    onDragNodeBy: (Node, Offset) -> Unit,
+    onDeleteNode: (Node) -> Unit,
+    getWorldPosition: (Node) -> Offset?,
+    edges: StateFlow<List<Edge>>,
+    selectedEdge: StateFlow<Edge?>,
+    onSelectEdge: (Edge?) -> Unit,
+    onDeleteSelectedEdge: () -> Unit,
+    connectors: StateFlow<Set<Connector>>,
+    draggingConnectorId: StateFlow<Connector?>,
+    onUpsertConnector: (Connector, Offset) -> Unit,
+    onDownOnConnector: (Connector) -> Unit,
+    onDropConnector: (Connector?) -> Unit,
+    getConnectorWorldPosition: (Connector) -> Offset?,
+    isConnectorEnabled: (Connector) -> Boolean,
 ) = TnGComposeTheme {
-    NodeEditorDemo(onPopBack = onPopBack)
-}
-
-@Composable
-fun NodeEditorDemo(
-    onPopBack: () -> Unit
-) = Box(modifier = Modifier.fillMaxSize()) {
-    val viewport = rememberViewportState(
-        initialScale = 1.0f,
-        initialPan = Offset.Zero,
-        minScale = 0.15f,
-        maxScale = 3.5f
-    )
-
-    var nextId by remember { mutableIntStateOf(0) }
-    var selectedEdge by remember { mutableStateOf<Edge?>(null) }
-    val edges = remember { mutableStateListOf<Edge>() }
-    var clearOverlayUi by remember { mutableStateOf(false) }
-
-    data class CardData(
-        val title: String,
-        val id: Int,
-        val inputConnectorCount: Int = Random.nextInt(0, 5),
-        val outputConnectorCount: Int = Random.nextInt(0, 5),
-        val position: MutableState<Offset>,
-    )
-
-    val cards = remember {
-        mutableStateListOf(
-            CardData(
-                title = "Input",
-                id = nextId++,
-                position = mutableStateOf(Offset.Zero)
-            ),
-            CardData(
-                title = "Transform",
-                id = nextId++,
-                position = mutableStateOf(Offset(600f, 250f))
-            ),
-            CardData(
-                title = "Output",
-                id = nextId++,
-                position = mutableStateOf(Offset(1200f, 100f))
-            ),
+    Box(modifier = Modifier.fillMaxSize()) {
+        val viewport = rememberViewportState(
+            initialScale = 1.0f,
+            initialPan = Offset.Zero,
+            minScale = 0.15f,
+            maxScale = 3.5f
         )
-    }
 
-    val connectorState = rememberConnectorLayerState()
-    val edgeLayerState = rememberEdgeLayerState(edges, connectorState)
+        var clearOverlayUi by remember { mutableStateOf(false) }
 
-    NodeEditorInputWrapper(
-        state = viewport,
-        edgeLayerState = edgeLayerState,
-        onSelectEdge = { selectedEdge = it },
-        onLongPressEmpty = {
-            cards.add(
-                CardData(
-                    title = "New Card",
-                    id = nextId++,
-                    position = mutableStateOf(it)
-                )
-            )
-        },
-        onPan = { clearOverlayUi = true },
-        onTap = { clearOverlayUi = false },
-    ) {
-        // Background grid
-        BackgroundGrid(viewport)
+        val connectorState = rememberConnectorLayerState(
+            connectors = connectors,
+            draggingConnectorId = draggingConnectorId,
+            onUpsertConnector = onUpsertConnector,
+            onDownOnConnector = onDownOnConnector,
+            onDropConnector = onDropConnector,
+            getConnectorWorldPosition = getConnectorWorldPosition,
+            isEnabled = isConnectorEnabled,
+        )
+        val edgeLayerState = rememberEdgeLayerState(
+            edges = edges,
+            selectedEdge = selectedEdge,
+            connectorState = connectorState
+        )
+        val selectedEdgeState by selectedEdge.collectAsStateWithLifecycle()
+        val nodesState by nodes.collectAsStateWithLifecycle()
 
-        // The world: scaled + translated as a single layer
-        WorldTransformContainer(
+        NodeEditorInputWrapper(
             state = viewport,
-            modifier = Modifier.fillMaxSize()
+            edgeLayerState = edgeLayerState,
+            onSelectEdge = onSelectEdge,
+            onLongPressEmpty = { },
+            onPan = { clearOverlayUi = true },
+            onTap = { clearOverlayUi = false },
         ) {
-            EdgeLayer(
-                edgeLayerState = edgeLayerState,
-                selectedEdge = selectedEdge,
-            )
+            // Background grid
+            BackgroundGrid(viewport)
 
-            WorldLayout(
-                viewportState = viewport
+            // The world: scaled + translated as a single layer
+            WorldTransformContainer(
+                state = viewport,
+                modifier = Modifier.fillMaxSize()
             ) {
-                for (card in cards) {
-                    SampleCard(
-                        modifier = Modifier.worldPosition(card.position.value),
-                        onDragBy = { card.position.value += it },
-                        viewState = viewport,
-                        connectorLayerState = connectorState,
-                        id = card.id,
-                        title = card.title,
-                        inputConnectorCount = card.inputConnectorCount,
-                        outputConnectorCount = card.outputConnectorCount,
-                        onAddEdge = { start, end -> edges.add(Edge(start, end)) }
+                EdgeLayer(edgeLayerState = edgeLayerState)
+
+                WorldLayout(
+                    viewportState = viewport
+                ) {
+                    for (node in nodesState) {
+                        Node(
+                            modifier = Modifier.worldPosition(getWorldPosition(node)),
+                            node = node,
+                            onDragBy = { onDragNodeBy(node, it) },
+                            viewState = viewport,
+                            connectorLayerState = connectorState,
+                        )
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                visible = selectedEdgeState != null
+            ) {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .padding(WindowInsets.navigationBars.asPaddingValues())
+                        .then(Modifier.padding(inputSpacingLarge)),
+                    onClick = onDeleteSelectedEdge,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.delete_icon),
+                        contentDescription = stringResource(id = R.string.delete)
                     )
                 }
             }
-        }
 
-        AnimatedVisibility(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            visible = selectedEdge != null
-        ) {
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(WindowInsets.navigationBars.asPaddingValues())
-                    .then(Modifier.padding(inputSpacingLarge)),
-                onClick = {
-                    if (selectedEdge != null) {
-                        edges.remove(selectedEdge)
-                    }
-                    selectedEdge = null
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.TopStart),
+                visible = !clearOverlayUi
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.delete_icon),
-                    contentDescription = stringResource(id = R.string.delete)
-                )
-            }
-        }
-
-        AnimatedVisibility(
-            modifier = Modifier.align(Alignment.TopStart),
-            visible = !clearOverlayUi
-        ) {
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(WindowInsets.navigationBars.asPaddingValues())
-                    .then(Modifier.padding(inputSpacingLarge))
-                    .size(buttonSize),
-                onClick = { onPopBack() },
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                shape = RoundedCornerShape(100),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = null,
-                )
+                FloatingActionButton(
+                    modifier = Modifier
+                        .padding(WindowInsets.navigationBars.asPaddingValues())
+                        .then(Modifier.padding(inputSpacingLarge))
+                        .size(buttonSize),
+                    onClick = { onPopBack() },
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    shape = RoundedCornerShape(100),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                        contentDescription = null,
+                    )
+                }
             }
         }
     }
@@ -237,12 +239,11 @@ fun NodeEditorDemo(
  * Renders a background grid that scales with the viewport.
  * Provides visual reference for positioning nodes in world space.
  */
-
 @Composable
 fun BackgroundGrid(
     viewport: ViewportState,
     worldGridStep: Float = 100f,
-    color: Color = Color.Gray.copy(alpha = 0.3f),
+    color: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
     strokeWidth: Float = 1f
 ) {
     Canvas(Modifier.fillMaxSize()) {

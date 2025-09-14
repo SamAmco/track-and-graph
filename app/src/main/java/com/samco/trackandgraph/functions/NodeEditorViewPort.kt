@@ -180,12 +180,12 @@ fun WorldTransformContainer(
  * Automatically fits viewport to show all content when first displayed.
  */
 
-private class WorldParentDataModifier(val pos: Offset) : ParentDataModifier {
+private class WorldParentDataModifier(val pos: Offset?) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = pos
 }
 
 fun Modifier.worldPosition(
-    pos: Offset,
+    pos: Offset?,
 ) = this.then(WorldParentDataModifier(pos))
 
 // Measure every child first
@@ -223,9 +223,9 @@ fun WorldLayout(
         modifier = modifier
     ) { measurables, constraints ->
 
-        val entries = measurables.map { m ->
+        val entries = measurables.mapNotNull { m ->
             val p = m.measure(constraints)
-            val d = (m.parentData as? Offset) ?: Offset.Zero
+            val d = (m.parentData as? Offset) ?: return@mapNotNull null
             Entry(p, d)
         }
 
