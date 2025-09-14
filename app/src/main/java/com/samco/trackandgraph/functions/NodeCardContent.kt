@@ -8,20 +8,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 
 private val cardWidth = 350.dp
@@ -65,6 +78,60 @@ fun OutputNode(node: Node.Output) {
             )
             DialogInputSpacing()
             Text(stringResource(R.string.this_is_a_time_or_duration))
+        }
+    }
+}
+
+@Composable
+fun DataSourceNode(
+    node: Node.DataSource,
+    onDeleteNode: () -> Unit = {},
+) {
+    Column(
+        Modifier
+            .width(cardWidth)
+            .padding(horizontal = connectorSize / 2, vertical = cardPadding),
+        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.data_source),
+                style = MaterialTheme.typography.titleMedium
+            )
+            IconButton(onClick = onDeleteNode) {
+                Icon(
+                    painter = painterResource(id = R.drawable.delete_icon),
+                    contentDescription = stringResource(R.string.delete)
+                )
+            }
+        }
+
+        var showSelectDialog by rememberSaveable { mutableStateOf(false) }
+
+        val featurePath = remember(node.selectedFeatureId.value) {
+            node.featurePathMap[node.selectedFeatureId.value] ?: ""
+        }
+
+        SelectorButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = featurePath,
+            onClick = { showSelectDialog = true }
+        )
+
+        if (showSelectDialog) {
+            SelectItemDialog(
+                title = stringResource(R.string.select_a_feature),
+                selectableTypes = setOf(SelectableItemType.FEATURE),
+                onFeatureSelected = { selectedFeatureId ->
+                    node.selectedFeatureId.value = selectedFeatureId
+                    showSelectDialog = false
+                },
+                onDismissRequest = { showSelectDialog = false }
+            )
         }
     }
 }
