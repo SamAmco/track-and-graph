@@ -245,6 +245,8 @@ dependencies {
     implementation(libs.moshi.kotlin)
     ksp(libs.moshi.kotlin.codegen)
 
+    implementation(libs.kotlinx.collections.immutable)
+
     //Testing
     testImplementation(libs.threetenbp)
     testImplementation(libs.junit)
