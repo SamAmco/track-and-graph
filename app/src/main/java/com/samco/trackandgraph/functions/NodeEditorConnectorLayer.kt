@@ -25,12 +25,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -39,59 +39,72 @@ import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-
-internal enum class ConnectorType {
-    INPUT,
-    OUTPUT,
-}
-
-@Immutable
-internal data class ConnectorId(
-    val nodeId: Int,
-    val type: ConnectorType,
-    val connectorIndex: Int,
-)
-
-@Immutable
-internal data class ConnectorState(
-    val worldPosition: Offset,
-    val enabled: Boolean,
-)
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
-internal class ConnectorLayerState {
-    private val _connectorStates = mutableStateMapOf<ConnectorId, ConnectorState>()
-    val connectorStates: Map<ConnectorId, ConnectorState> = _connectorStates
+internal class ConnectorLayerState(
+    val connectors: State<Set<Connector>>,
+    val draggingConnectorId: State<Connector?>,
+    private val onUpsertConnector: (Connector, Offset) -> Unit,
+    private val onDownOnConnector: (Connector) -> Unit,
+    private val onDropConnector: (Connector?) -> Unit,
+    private val getConnectorWorldPosition: (Connector) -> Offset?,
+    private val isEnabled: (Connector) -> Boolean,
+) {
 
-    private val _draggingConnectorId = mutableStateOf<ConnectorId?>(null)
-    val draggingConnectorId: State<ConnectorId?> = _draggingConnectorId
     private val _draggingConnectorWorldPosition = mutableStateOf<Offset?>(null)
     val draggingConnectorWorldPosition: State<Offset?> = _draggingConnectorWorldPosition
 
-    fun upsertConnector(id: ConnectorId, state: ConnectorState) {
-        _connectorStates[id] = state
+    fun upsertConnector(connector: Connector, state: Offset) = onUpsertConnector(connector, state)
+    fun downOnConnector(connector: Connector) {
+        if (isEnabled(connector)) {
+            _draggingConnectorWorldPosition.value = getConnectorWorldPosition(connector)
+            onDownOnConnector(connector)
+        }
     }
-
-    fun removeConnector(id: ConnectorId) {
-        _connectorStates.remove(id)
-    }
-
-    fun onDownOnConnector(id: ConnectorId) {
-        _draggingConnectorId.value = id
-    }
-
-    fun onDragConnector(worldPos: Offset) {
-        _draggingConnectorWorldPosition.value = worldPos
-    }
-
-    fun onDropConnector() {
-        _draggingConnectorId.value = null
+    fun dropConnector(connector: Connector?) {
+        onDropConnector(connector)
         _draggingConnectorWorldPosition.value = null
+    }
+
+    fun worldPosOf(connector: Connector) = getConnectorWorldPosition(connector)
+    fun enabled(connector: Connector) = isEnabled(connector)
+
+    fun dragConnector(worldPos: Offset) {
+        if (_draggingConnectorWorldPosition.value != null) {
+            _draggingConnectorWorldPosition.value = worldPos
+        }
     }
 }
 
 @Composable
-internal fun rememberConnectorLayerState(): ConnectorLayerState = remember { ConnectorLayerState() }
+internal fun rememberConnectorLayerState(
+    connectors: StateFlow<Set<Connector>> = MutableStateFlow(emptySet()),
+    draggingConnectorId: StateFlow<Connector?> = MutableStateFlow(null),
+    onUpsertConnector: (Connector, Offset) -> Unit = { _, _ -> },
+    onDownOnConnector: (Connector) -> Unit = {},
+    onDropConnector: (Connector?) -> Unit = {},
+    getConnectorWorldPosition: (Connector) -> Offset? = { null },
+    isEnabled: (Connector) -> Boolean = { true },
+): ConnectorLayerState {
+    val connectorStatesAsState = connectors.collectAsStateWithLifecycle()
+    val draggingConnectorIdAsState = draggingConnectorId.collectAsStateWithLifecycle()
+    return remember {
+        ConnectorLayerState(
+            connectors = connectorStatesAsState,
+            draggingConnectorId = draggingConnectorIdAsState,
+            onUpsertConnector = onUpsertConnector,
+            onDownOnConnector = onDownOnConnector,
+            onDropConnector = onDropConnector,
+            getConnectorWorldPosition = getConnectorWorldPosition,
+            isEnabled = isEnabled,
+        )
+    }
+}
+
+internal val connectorSize = 32.dp
 
 @Composable
 internal fun BoxScope.ConnectorArray(
@@ -100,7 +113,6 @@ internal fun BoxScope.ConnectorArray(
     connectorType: ConnectorType,
     connectorLayerState: ConnectorLayerState,
     viewState: ViewportState,
-    onAddEdge: (ConnectorId, ConnectorId) -> Unit,
 ) = Column(
     modifier = Modifier.matchParentSize(),
     verticalArrangement = Arrangement.SpaceEvenly,
@@ -108,30 +120,39 @@ internal fun BoxScope.ConnectorArray(
         if (connectorType == ConnectorType.INPUT) Alignment.Start
         else Alignment.End,
 ) {
-    val ids = remember(count) {
-        List(count) { ConnectorId(nodeId, connectorType, it) }
+    val connectors = remember(count) {
+        List(count) {
+            Connector(
+                nodeId = nodeId,
+                type = connectorType,
+                connectorIndex = it,
+            )
+        }
     }
-    for (connector in 0 until count) {
+
+    for (connector in connectors) {
         Connector(
-            id = ids[connector],
+            connector = connector,
             connectorLayerState = connectorLayerState,
             viewState = viewState,
-            enabled = connectorLayerState.connectorStates[ids[connector]]?.enabled == true,
-            onAddEdge = onAddEdge,
         )
     }
 }
 
 @Composable
 internal fun Connector(
-    id: ConnectorId,
+    connector: Connector,
     connectorLayerState: ConnectorLayerState,
     viewState: ViewportState,
-    enabled: Boolean,
-    onAddEdge: (ConnectorId, ConnectorId) -> Unit,
 ) {
-    val innerColor = MaterialTheme.colorScheme.secondary
-    val outerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
+    val enabled = connectorLayerState.enabled(connector)
+    val innerColor =
+        if (enabled) MaterialTheme.colorScheme.secondary
+        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+
+    val outerColor =
+        if (enabled) MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
+        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
 
     Canvas(
         modifier = Modifier
@@ -140,16 +161,14 @@ internal fun Connector(
                 viewState.viewPortCoordinates.value?.let { viewPortCoords ->
                     val screenPosition = viewPortCoords.localBoundingBoxOf(coords, clipBounds = false).center
                     val worldPosition = viewState.screenToWorld(screenPosition)
-                    val connectorState = ConnectorState(worldPosition, enabled)
-                    connectorLayerState.upsertConnector(id, connectorState)
+                    connectorLayerState.upsertConnector(connector, worldPosition)
                 }
             }
             .pointerInput(Unit) {
                 awaitEachGesture {
                     connectorInputEventHandler(
-                        id = id,
+                        connector = connector,
                         connectorLayerState = connectorLayerState,
-                        onAddEdge = onAddEdge,
                     )
                 }
             }
@@ -178,15 +197,14 @@ internal fun Connector(
 }
 
 private suspend fun AwaitPointerEventScope.connectorInputEventHandler(
-    id: ConnectorId,
+    connector: Connector,
     connectorLayerState: ConnectorLayerState,
-    onAddEdge: (ConnectorId, ConnectorId) -> Unit
 ) {
     val down = awaitFirstDown(requireUnconsumed = true)
     down.consume()
-    connectorLayerState.onDownOnConnector(id)
+    connectorLayerState.downOnConnector(connector)
 
-    val connectorPosition = connectorLayerState.connectorStates[id]?.worldPosition ?: return
+    val connectorPosition = connectorLayerState.worldPosOf(connector) ?: return
 
     var up = false
     var last = down.position
@@ -196,7 +214,7 @@ private suspend fun AwaitPointerEventScope.connectorInputEventHandler(
         val current = ev.changes.firstOrNull { it.id == down.id } ?: return
         current.consume()
         last = current.position + connectorPosition
-        connectorLayerState.onDragConnector(last)
+        connectorLayerState.dragConnector(last)
         up = !current.pressed
     }
 
@@ -205,10 +223,7 @@ private suspend fun AwaitPointerEventScope.connectorInputEventHandler(
         last,
         connectorSize.toPx()
     )
-    if (endConnector != null && endConnector != id) {
-        onAddEdge(id, endConnector)
-    }
-    connectorLayerState.onDropConnector()
+    connectorLayerState.dropConnector(endConnector)
 }
 
 private fun Offset.sqrSize() = x * x + y * y
@@ -217,21 +232,22 @@ private fun nearestConnector(
     connectorState: ConnectorLayerState,
     worldPos: Offset,
     toleranceWorld: Float
-): ConnectorId? {
+): Connector? {
     val sqrTolerance = toleranceWorld * toleranceWorld
     var smallestDist: Float? = null
-    var smallestId: ConnectorId? = null
+    var connectorOfSmallest: Connector? = null
 
-    for ((id, connector) in connectorState.connectorStates) {
-        val sqrDist = (worldPos - connector.worldPosition).sqrSize()
+    for (other in connectorState.connectors.value) {
+        val otherWorldPos = connectorState.worldPosOf(other) ?: continue
+        val sqrDist = (worldPos - otherWorldPos).sqrSize()
         if (sqrDist < sqrTolerance) {
             if (smallestDist == null || sqrDist < smallestDist) {
                 smallestDist = sqrDist
-                smallestId = id
+                connectorOfSmallest = other
             }
         }
     }
 
-    return smallestId
+    return connectorOfSmallest
 }
 
