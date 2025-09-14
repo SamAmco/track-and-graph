@@ -24,11 +24,11 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.functions.functions.DataClippingFunction
-import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
+import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import kotlin.math.min

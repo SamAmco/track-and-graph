@@ -31,8 +31,8 @@ import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
-import com.samco.trackandgraph.functions.helpers.TimeHelper
+import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
