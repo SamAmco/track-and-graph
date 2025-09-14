@@ -361,6 +361,7 @@
     <string name="function_name_empty">Le nom de la fonction ne peut pas être vide</string>
     <string name="function_name">Nom de fonction</string>
     <string name="output">Sortie</string>
+    <string name="data_source">Source de Données</string>
     <string name="lua_script_input_hint">Entrez un script Lua…</string>
     <string name="file">Fichier</string>
     <string name="lua_feature_names_not_unique">Les entrées des scripts doivent avoir des noms uniques</string>

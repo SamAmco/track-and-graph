@@ -25,9 +25,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -38,9 +42,10 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 internal fun Node(
     modifier: Modifier = Modifier,
     node: Node,
-    onDragBy: (Offset) -> Unit,
     viewState: ViewportState,
     connectorLayerState: ConnectorLayerState,
+    onDragBy: (Offset) -> Unit = {},
+    onDeleteNode: (Node) -> Unit = {},
 ) {
     val minConnectorSpacing = 24.dp
     val connectors = maxOf(node.inputConnectorCount, node.outputConnectorCount)
@@ -65,6 +70,10 @@ internal fun Node(
         ) {
             when (node) {
                 is Node.Output -> OutputNode(node)
+                is Node.DataSource -> DataSourceNode(
+                    node = node,
+                    onDeleteNode = { onDeleteNode(node) },
+                )
             }
         }
 
@@ -88,7 +97,7 @@ internal fun Node(
 
 @Preview
 @Composable
-private fun SampleCardPreview() {
+private fun OutputNodePreview() {
     TnGComposeTheme {
         val viewportState = rememberViewportState(
             initialScale = 1.0f,
@@ -99,8 +108,33 @@ private fun SampleCardPreview() {
         val connectorLayerState = rememberConnectorLayerState()
 
         Node(
-            node = Node.Output(),
-            onDragBy = { },
+            node = Node.Output(
+                name = remember { mutableStateOf(TextFieldValue("Sample Output")) },
+                description = remember { mutableStateOf(TextFieldValue("This is a sample output description")) }
+            ),
+            viewState = viewportState,
+            connectorLayerState = connectorLayerState,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DataSourceNodePreview() {
+    TnGComposeTheme {
+        val viewportState = rememberViewportState(
+            initialScale = 1.0f,
+            initialPan = Offset.Zero,
+            minScale = 0.15f,
+            maxScale = 5.0f
+        )
+        val connectorLayerState = rememberConnectorLayerState()
+
+        Node(
+            node = Node.DataSource(
+                selectedFeatureId = remember { mutableLongStateOf(0L) },
+                featurePathMap = mapOf(0L to "Samples/Sample Data Source"),
+            ),
             viewState = viewportState,
             connectorLayerState = connectorLayerState,
         )
