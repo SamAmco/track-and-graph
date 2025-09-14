@@ -33,13 +33,6 @@ import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.DefaultDispatcher
 import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.functions.functions.CompositeFunction
-import com.samco.trackandgraph.functions.functions.DataClippingFunction
-import com.samco.trackandgraph.functions.functions.DataPaddingFunction
-import com.samco.trackandgraph.functions.functions.DurationAggregationFunction
-import com.samco.trackandgraph.functions.functions.IdentityFunction
-import com.samco.trackandgraph.functions.functions.MovingAverageFunction
-import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.helpers.AndroidPlotSeriesHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
@@ -47,6 +40,12 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataPaddingFunction
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DurationAggregationFunction
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.IdentityFunction
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.MovingAverageFunction
+import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.movingAverageDurations
 import com.samco.trackandgraph.plottingModePeriods
 import kotlinx.coroutines.CoroutineDispatcher
@@ -195,7 +194,7 @@ class LineGraphDataFactory @Inject constructor(
 
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
-            else -> CompositeFunction(
+            else -> com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction(
                 DurationAggregationFunction(timeHelper, plottingPeriod!!),
                 DataPaddingFunction(
                     timeHelper = timeHelper,
@@ -210,7 +209,7 @@ class LineGraphDataFactory @Inject constructor(
             LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)
         }
-        return CompositeFunction(aggregationCalculator, averageCalculator)
+        return com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction(aggregationCalculator, averageCalculator)
             .mapSample(rawDataSample)
     }
 

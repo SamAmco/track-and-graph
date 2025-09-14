@@ -20,8 +20,8 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.data.database.sampling.DataSample
-import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
-import com.samco.trackandgraph.functions.helpers.TimeHelper
+import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import org.junit.Assert
 import org.junit.Test
 import org.threeten.bp.DayOfWeek

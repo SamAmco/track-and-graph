@@ -28,10 +28,10 @@ import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
-import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
-import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
+import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.graphstatview.functions.aggregation.GlobalAggregationPreferences
+import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
