@@ -22,13 +22,12 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.functions.functions.CompositeFunction
-import com.samco.trackandgraph.functions.functions.DataSampleFunction
-import com.samco.trackandgraph.functions.functions.FilterLabelFunction
-import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.FilterLabelFunction
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.FilterValueFunction
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
@@ -108,7 +107,7 @@ class LastValueDataFactory @Inject constructor(
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
 
-        val sampleFunc = CompositeFunction(filters)
+        val sampleFunc = com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction(filters)
         val sample = sampleFunc.mapSample(dataSample)
         val firstIDataPoint = sample.firstOrNull()
         val rawSample = sample.getRawDataPoints()
