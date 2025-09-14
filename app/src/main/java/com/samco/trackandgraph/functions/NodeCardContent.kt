@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,8 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
@@ -35,12 +33,16 @@ import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
+import com.samco.trackandgraph.ui.compose.ui.WideButton
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 
 private val cardWidth = 350.dp
 
 @Composable
-fun OutputNode(node: Node.Output) {
+fun OutputNode(
+    node: Node.Output,
+    onCreateOrUpdate: () -> Unit = {}
+) {
     Column(
         Modifier
             .width(cardWidth)
@@ -79,6 +81,13 @@ fun OutputNode(node: Node.Output) {
             DialogInputSpacing()
             Text(stringResource(R.string.this_is_a_time_or_duration))
         }
+
+        WideButton(
+            text = stringResource(
+                if (node.isUpdateMode) R.string.update else R.string.create
+            ),
+            onClick = onCreateOrUpdate,
+        )
     }
 }
 

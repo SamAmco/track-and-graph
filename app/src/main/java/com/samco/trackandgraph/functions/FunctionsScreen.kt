@@ -91,6 +91,7 @@ fun FunctionsScreen(
         onDropConnector = viewModel::onDropConnector,
         getConnectorWorldPosition = viewModel::getConnectorWorldPosition,
         isConnectorEnabled = viewModel::isEnabled,
+        onCreateOrUpdateFunction = viewModel::onCreateOrUpdateFunction,
     )
 }
 
@@ -128,6 +129,7 @@ private fun FunctionsScreenContent(
     onDropConnector: (Connector?) -> Unit,
     getConnectorWorldPosition: (Connector) -> Offset?,
     isConnectorEnabled: (Connector) -> Boolean,
+    onCreateOrUpdateFunction: () -> Unit,
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
         val viewport = rememberViewportState(
@@ -187,6 +189,7 @@ private fun FunctionsScreenContent(
                             connectorLayerState = connectorState,
                             onDragBy = { onDragNodeBy(node, it) },
                             onDeleteNode = { onDeleteNode(node) },
+                            onCreateOrUpdateFunction = onCreateOrUpdateFunction,
                         )
                     }
                 }

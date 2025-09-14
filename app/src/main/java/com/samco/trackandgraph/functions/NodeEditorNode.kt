@@ -46,6 +46,7 @@ internal fun Node(
     connectorLayerState: ConnectorLayerState,
     onDragBy: (Offset) -> Unit = {},
     onDeleteNode: (Node) -> Unit = {},
+    onCreateOrUpdateFunction: () -> Unit = {},
 ) {
     val minConnectorSpacing = 24.dp
     val connectors = maxOf(node.inputConnectorCount, node.outputConnectorCount)
@@ -69,7 +70,10 @@ internal fun Node(
             elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
         ) {
             when (node) {
-                is Node.Output -> OutputNode(node)
+                is Node.Output -> OutputNode(
+                    node = node,
+                    onCreateOrUpdate = onCreateOrUpdateFunction
+                )
                 is Node.DataSource -> DataSourceNode(
                     node = node,
                     onDeleteNode = { onDeleteNode(node) },
@@ -110,7 +114,8 @@ private fun OutputNodePreview() {
         Node(
             node = Node.Output(
                 name = remember { mutableStateOf(TextFieldValue("Sample Output")) },
-                description = remember { mutableStateOf(TextFieldValue("This is a sample output description")) }
+                description = remember { mutableStateOf(TextFieldValue("This is a sample output description")) },
+                isUpdateMode = false
             ),
             viewState = viewportState,
             connectorLayerState = connectorLayerState,
