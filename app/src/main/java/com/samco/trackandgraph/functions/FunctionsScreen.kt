@@ -164,7 +164,9 @@ private fun FunctionsScreenContent(
             state = viewport,
             edgeLayerState = edgeLayerState,
             onSelectEdge = onSelectEdge,
-            onLongPressEmpty = { },
+            onLongPressEmpty = {
+                onAddNode(AddNodeData.DataSourceNode(it))
+            },
             onPan = { clearOverlayUi = true },
             onTap = { clearOverlayUi = false },
         ) {
@@ -185,9 +187,10 @@ private fun FunctionsScreenContent(
                         Node(
                             modifier = Modifier.worldPosition(getWorldPosition(node)),
                             node = node,
-                            onDragBy = { onDragNodeBy(node, it) },
                             viewState = viewport,
                             connectorLayerState = connectorState,
+                            onDragBy = { onDragNodeBy(node, it) },
+                            onDeleteNode = { onDeleteNode(node) },
                         )
                     }
                 }

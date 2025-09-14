@@ -371,6 +371,7 @@
     <string name="function_name_empty">Function name cannot be empty</string>
     <string name="function_name">Function name</string>
     <string name="output">Output</string>
+    <string name="data_source">Data Source</string>
     <string name="lua_script_input_hint">Enter a Lua script…</string>
     <string name="file">File</string>
     <string name="lua_feature_names_not_unique">Script inputs must have unique names</string>

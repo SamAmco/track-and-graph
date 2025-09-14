@@ -18,12 +18,16 @@ package com.samco.trackandgraph.functions
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentSet
@@ -54,11 +58,11 @@ internal data class Edge(
     val to: Connector,
 )
 
-@Immutable
-data class AddNodeData(
-    val id: String,
+sealed class AddNodeData(
     val offset: Offset,
-)
+) {
+    class DataSourceNode(offset: Offset) : AddNodeData(offset)
+}
 
 @Immutable
 sealed class Node(
@@ -68,13 +72,23 @@ sealed class Node(
 ) {
     class Output(
         id: Int = -1,
-        val name: MutableState<String> = mutableStateOf(""),
-        val description: MutableState<String> = mutableStateOf(""),
+        val name: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
+        val description: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
         val isDuration: MutableState<Boolean> = mutableStateOf(false),
     ) : Node(
         id = id,
         inputConnectorCount = 1,
         outputConnectorCount = 0,
+    )
+
+    class DataSource(
+        id: Int = -1,
+        val selectedFeatureId: MutableState<Long>,
+        val featurePathMap: Map<Long, String>
+    ) : Node(
+        id = id,
+        inputConnectorCount = 0,
+        outputConnectorCount = 1,
     )
 }
 
@@ -104,7 +118,7 @@ internal interface FunctionsScreenViewModel {
 
 @HiltViewModel
 internal class FunctionsScreenViewModelImpl @Inject constructor(
-
+    private val dataInteractor: DataInteractor,
 ) : ViewModel(), FunctionsScreenViewModel {
 
     private val _nodes = MutableStateFlow<PersistentList<Node>>(persistentListOf())
@@ -126,8 +140,15 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val connectorPositions = mutableStateMapOf<Connector, Offset>()
     private val disabledConnectors = mutableStateSetOf<Connector>()
 
+    private lateinit var featurePathMap: Map<Long, String>
+
     override fun init(groupId: Long, functionId: Long?) {
         viewModelScope.launch {
+            val allFeatures = dataInteractor.getAllFeaturesSync()
+            val allGroups = dataInteractor.getAllGroupsSync()
+            val pathProvider = FeaturePathProvider(allFeatures, allGroups)
+            featurePathMap = pathProvider.sortedFeatureMap()
+
             // TODO: Load function data based on groupId and functionId
             // For now, initialize with mock data
             _nodes.value = _nodes.value.mutate {
@@ -211,8 +232,23 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
     override fun onAddNode(data: AddNodeData) {
         val newId = (_nodes.value.maxOfOrNull { it.id } ?: 0) + 1
-        val newNode = Node.Output(id = newId)
+        val success = when (data) {
+            is AddNodeData.DataSourceNode -> addDataSourceNode(newId)
+        }
+        if (success) nodePositions[newId] = data.offset
+    }
+
+    private fun addDataSourceNode(id: Int): Boolean {
+        val feature = featurePathMap.entries.firstOrNull() ?: return false
+
+        val newNode = Node.DataSource(
+            id = id,
+            selectedFeatureId = mutableLongStateOf(feature.key),
+            featurePathMap = featurePathMap,
+        )
         _nodes.value = _nodes.value.add(newNode)
+
+        return true
     }
 
     override fun onDragNodeBy(node: Node, offset: Offset) {
