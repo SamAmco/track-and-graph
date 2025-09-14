@@ -353,6 +353,7 @@
     <string name="function_name_empty">Funktionsname darf nicht leer sein</string>
     <string name="function_name">Funktionsname</string>
     <string name="output">Ausgabe</string>
+    <string name="data_source">Datenquelle</string>
     <string name="lua_script_input_hint">Geben Sie ein Lua-Skript ein...</string>
     <string name="file">Datei</string>
     <string name="lua_feature_names_not_unique">Skripteingaben müssen eindeutige Namen haben</string>
