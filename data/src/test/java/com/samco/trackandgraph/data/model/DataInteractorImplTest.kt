@@ -55,6 +55,7 @@ class DataInteractorImplTest {
     private val trackerHelper: TrackerHelper = mock()
     private val csvReadWriter: CSVReadWriter = mock()
     private val dataSampler: DataSampler = mock()
+    private val functionHelper: FunctionHelper = mock()
 
     @Before
     fun before() {
@@ -66,7 +67,8 @@ class DataInteractorImplTest {
             io = testDispatcher,
             trackerHelper = trackerHelper,
             csvReadWriter = csvReadWriter,
-            dataSampler = dataSampler
+            dataSampler = dataSampler,
+            functionHelper = functionHelper,
         )
     }
 

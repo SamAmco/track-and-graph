@@ -30,7 +30,9 @@ object TestDataInteractor {
                 VALUES(0, '', 0, NULL, 0)
             """.trimMargin()
         )
-
+        val transactionHelper = DatabaseTransactionHelperImpl(
+            database = database
+        )
         val trackerHelper = TrackerHelperImpl(
             transactionHelper = DatabaseTransactionHelperImpl(
                 database = database
@@ -40,7 +42,11 @@ object TestDataInteractor {
             io = Dispatchers.IO
         )
 
-        val functionHelper = FunctionHelperImpl( )
+        val functionHelper = FunctionHelperImpl(
+            transactionHelper = transactionHelper,
+            dao = database.trackAndGraphDatabaseDao,
+            io = Dispatchers.IO
+        )
 
         return DataInteractorImpl(
             database = database,
