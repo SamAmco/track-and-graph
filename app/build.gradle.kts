@@ -177,7 +177,7 @@ tasks.withType<Test>().configureEach {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation(project(":functions"))
+    implementation(project(":data"))
 
     implementation(libs.androidx.legacy.support.v4)
 
