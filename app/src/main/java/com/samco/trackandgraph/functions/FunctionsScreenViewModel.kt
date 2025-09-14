@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 internal enum class ConnectorType {
@@ -121,6 +122,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
 ) : ViewModel(), FunctionsScreenViewModel {
 
+    private val initialized = AtomicBoolean(false)
+
     private val _nodes = MutableStateFlow<PersistentList<Node>>(persistentListOf())
     override val nodes: StateFlow<List<Node>> = _nodes.asStateFlow()
 
@@ -143,6 +146,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private lateinit var featurePathMap: Map<Long, String>
 
     override fun init(groupId: Long, functionId: Long?) {
+        if (initialized.getAndSet(true)) return
+
         viewModelScope.launch {
             val allFeatures = dataInteractor.getAllFeaturesSync()
             val allGroups = dataInteractor.getAllGroupsSync()
