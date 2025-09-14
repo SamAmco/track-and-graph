@@ -28,13 +28,13 @@ import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
+import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import kotlinx.coroutines.CoroutineDispatcher
