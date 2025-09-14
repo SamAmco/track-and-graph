@@ -70,11 +70,7 @@ fun FunctionsScreen(
     onPopBack: () -> Unit
 ) {
     val viewModel: FunctionsScreenViewModel = hiltViewModel<FunctionsScreenViewModelImpl>()
-
-    // Initialize ViewModel with navigation arguments
-    LaunchedEffect(navArgs.groupId, navArgs.functionId) {
-        viewModel.init(navArgs.groupId, navArgs.functionId)
-    }
+        .also { it.init(navArgs.groupId, navArgs.functionId) }
 
     TopAppBarContent(navArgs)
     FunctionsScreenContent(
