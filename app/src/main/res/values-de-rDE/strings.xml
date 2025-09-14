@@ -24,7 +24,7 @@
     <string name="update">Aktualisieren</string>
     <string name="graph_or_stat_name">Name des Diagramms: </string>
     <string name="tracker_name">Was möchten Sie tracken?</string>
-    <string name="tracker_type">Dies ist eine Zeit oder Dauer</string>
+    <string name="this_is_a_time_or_duration">Dies ist eine Zeit oder Dauer</string>
     <string name="yes">Ja</string>
     <string name="cancel">Abbrechen</string>
     <string name="select_file">Datei wählen</string>
@@ -351,6 +351,8 @@
 
     <string name="lua_script_empty">Bitte fügen Sie ein Lua-Skript hinzu</string>
     <string name="function_name_empty">Funktionsname darf nicht leer sein</string>
+    <string name="function_name">Funktionsname</string>
+    <string name="output">Ausgabe</string>
     <string name="lua_script_input_hint">Geben Sie ein Lua-Skript ein...</string>
     <string name="file">Datei</string>
     <string name="lua_feature_names_not_unique">Skripteingaben müssen eindeutige Namen haben</string>

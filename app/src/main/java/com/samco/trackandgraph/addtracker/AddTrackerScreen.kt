@@ -443,7 +443,7 @@ private fun DurationCheckbox(
     RowCheckbox(
         checked = isDuration,
         onCheckedChange = { viewModel.onIsDurationCheckChanged(it) },
-        text = stringResource(id = R.string.tracker_type)
+        text = stringResource(id = R.string.this_is_a_time_or_duration)
     )
 }
 

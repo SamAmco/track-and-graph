@@ -148,11 +148,11 @@ internal fun Connector(
     val enabled = connectorLayerState.enabled(connector)
     val innerColor =
         if (enabled) MaterialTheme.colorScheme.secondary
-        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
 
     val outerColor =
         if (enabled) MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
-        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
 
     Canvas(
         modifier = Modifier
