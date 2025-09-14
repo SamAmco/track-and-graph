@@ -76,6 +76,7 @@ sealed class Node(
         val name: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
         val description: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
         val isDuration: MutableState<Boolean> = mutableStateOf(false),
+        val isUpdateMode: Boolean = false,
     ) : Node(
         id = id,
         inputConnectorCount = 1,
@@ -115,6 +116,8 @@ internal interface FunctionsScreenViewModel {
     fun onDragNodeBy(node: Node, offset: Offset)
     fun onDeleteNode(node: Node)
     fun getWorldPosition(node: Node): Offset?
+    
+    fun onCreateOrUpdateFunction()
 }
 
 @HiltViewModel
@@ -155,9 +158,10 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             featurePathMap = pathProvider.sortedFeatureMap()
 
             // TODO: Load function data based on groupId and functionId
+            // TODO: Set isUpdateMode boolean based on whether functionId is null (create) or not (update)
             // For now, initialize with mock data
             _nodes.value = _nodes.value.mutate {
-                it.add(Node.Output(id = 1))
+                it.add(Node.Output(id = 1, isUpdateMode = false))
             }
             nodePositions[1] = Offset(100f, 100f)
         }
@@ -280,5 +284,9 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             _edges.value = _edges.value.remove(selected)
             _selectedEdge.value = null
         }
+    }
+
+    override fun onCreateOrUpdateFunction() {
+        // TODO: Implement function creation/update logic
     }
 }
