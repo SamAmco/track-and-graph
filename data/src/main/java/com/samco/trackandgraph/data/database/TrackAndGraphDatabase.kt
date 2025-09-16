@@ -23,6 +23,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.samco.trackandgraph.data.BuildConfig
 import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataType
@@ -55,9 +56,7 @@ import com.samco.trackandgraph.data.database.entity.Tracker
 import com.samco.trackandgraph.data.database.entity.Function
 import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.database.migrations.allMigrations
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
+import kotlinx.serialization.json.Json
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalTime
@@ -141,21 +140,26 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
 
 internal class Converters {
 
-    private val moshi = Moshi.Builder().build()
+    private val json = Json {
+        ignoreUnknownKeys = !BuildConfig.DEBUG
+        isLenient = !BuildConfig.DEBUG
+    }
 
-    private fun <T> toJson(adapter: JsonAdapter<T>, value: T): String {
+    private inline fun <reified T> toJson(value: T): String {
         return try {
-            adapter.toJson(value) ?: ""
+            json.encodeToString(value)
         } catch (e: Exception) {
-            ""
+            if (BuildConfig.DEBUG) throw e
+            else ""
         }
     }
 
-    private fun <T> fromJson(adapter: JsonAdapter<T>, value: String, onError: () -> T): T {
+    private inline fun <reified T> fromJson(value: String, onError: () -> T): T {
         return try {
-            adapter.fromJson(value) ?: onError()
+            json.decodeFromString<T>(value)
         } catch (e: Exception) {
-            onError()
+            if (BuildConfig.DEBUG) throw e
+            else onError()
         }
     }
 
@@ -168,27 +172,23 @@ internal class Converters {
     @TypeConverter
     fun stringToListOfFeature(value: String): List<Feature> {
         if (value.isBlank()) return emptyList()
-        val listType = Types.newParameterizedType(List::class.java, Feature::class.java)
-        return fromJson(moshi.adapter(listType), value) { emptyList() }
+        return fromJson<List<Feature>>(value) { emptyList() }
     }
 
     @TypeConverter
     fun listOfFeatureToString(values: List<Feature>): String {
-        val listType = Types.newParameterizedType(List::class.java, Feature::class.java)
-        return toJson(moshi.adapter(listType), values)
+        return toJson(values)
     }
 
     @TypeConverter
     fun stringToListOfStrings(value: String): List<String> {
         if (value.isBlank()) return emptyList()
-        val listType = Types.newParameterizedType(List::class.java, String::class.java)
-        return fromJson(moshi.adapter(listType), value) { emptyList() }
+        return fromJson<List<String>>(value) { emptyList() }
     }
 
     @TypeConverter
     fun listOfStringsToString(values: List<String>): String {
-        val listType = Types.newParameterizedType(List::class.java, String::class.java)
-        return toJson(moshi.adapter(listType), values)
+        return toJson(values)
     }
 
     @TypeConverter
@@ -229,12 +229,10 @@ internal class Converters {
     fun localTimeFromString(value: String) = LocalTime.parse(value)
 
     @TypeConverter
-    fun checkedDaysToString(value: CheckedDays): String =
-        toJson(moshi.adapter(CheckedDays::class.java), value)
+    fun checkedDaysToString(value: CheckedDays): String = toJson(value)
 
     @TypeConverter
-    fun checkedDaysFromString(value: String): CheckedDays =
-        fromJson(moshi.adapter(CheckedDays::class.java), value) { CheckedDays.none() }
+    fun checkedDaysFromString(value: String): CheckedDays = fromJson(value) { CheckedDays.none() }
 
     @TypeConverter
     fun yRangeTypeToInt(yRangeType: YRangeType) = yRangeType.ordinal
@@ -301,16 +299,13 @@ internal class Converters {
         }
     }
 
-    private val functionGraphAdapter by lazy { moshi.adapter(FunctionGraph::class.java) }
-
     @TypeConverter
     fun functionGraphToString(value: FunctionGraph): String =
-        toJson(functionGraphAdapter, value)
+        toJson(value)
 
     @TypeConverter
     fun stringToFunctionGraph(value: String): FunctionGraph =
-        functionGraphAdapter.fromJson(value) 
-            ?: error("Got null parsing FunctionGraph from JSON: $value")
+        fromJson(value) { error("Got null parsing FunctionGraph from JSON: $value") }
 }
 
 fun odtFromString(value: String): OffsetDateTime? =

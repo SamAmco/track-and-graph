@@ -20,11 +20,10 @@ package com.samco.trackandgraph.data.database.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.squareup.moshi.Types
 
 
 val MIGRATION_44_45 = object : Migration(44, 45) {
-    private val helper = MigrationMoshiHelper.getMigrationMoshiHelper()
+    private val helper = MigrationJsonHelper.getMigrationJsonHelper()
 
     override fun migrate(database: SupportSQLiteDatabase) {
         createTimeSinceLastTable(database)
@@ -36,18 +35,12 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
         database.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table2`")
     }
 
-    private fun getDiscreteValues(value: String): List<MigrationMoshiHelper.DiscreteValue> {
-        if (value.isBlank()) return emptyList()
-        val listType = Types.newParameterizedType(
-            List::class.java,
-            MigrationMoshiHelper.DiscreteValue::class.java
-        )
-        return helper.fromJson(helper.moshi.adapter(listType), value) { emptyList() }
+    private fun getDiscreteValues(value: String): List<MigrationJsonHelper.DiscreteValue> {
+        return helper.stringToListOfDiscreteValues(value)
     }
 
     private fun encodeListOfLabels(labels: List<String>): String {
-        val listType = Types.newParameterizedType(List::class.java, String::class.java)
-        return helper.toJson(helper.moshi.adapter(listType), labels)
+        return helper.toJson(labels)
     }
 
     private fun copyTimeSinceLastData(database: SupportSQLiteDatabase) {

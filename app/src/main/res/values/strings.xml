@@ -241,7 +241,6 @@
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">You can not mix time durations with other types of data. Consider plotting hours, minutes or seconds</string>
     <string name="sum_by_count_checkbox_label">Check here to count the number of data points tracked rather than the total of their values.</string>
     <string name="time_window_size">Time window size:</string>
-    <string name="moshi" translatable="false">Moshi</string>
     <string name="hold_to_preview">Hold to preview</string>
     <string name="open">Open</string>
     <string name="close">Close</string>

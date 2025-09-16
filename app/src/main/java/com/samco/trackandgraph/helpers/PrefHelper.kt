@@ -21,26 +21,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.Moshi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
-
-const val THEME_SETTING_PREF_KEY = "theme_setting"
-const val DATE_FORMAT_SETTING_PREF_KEY = "date_format_setting"
-const val FIRST_RUN_PREF_KEY = "firstrun2"
-const val HIDE_DATA_POINT_TUTORIAL_PREF_KEY = "HIDE_DATA_POINT_TUTORIAL_PREF_KEY"
-const val AUTO_BACKUP_CONFIG_PREF_KEY = "auto_backup_config"
-const val LAST_AUTO_BACKUP_TIME_PREF_KEY = "last_auto_backup_time"
-
-fun getPrefs(context: Context, mode: Int = AppCompatActivity.MODE_PRIVATE): SharedPreferences {
-    return context.getSharedPreferences("com.samco.trackandgraph", mode)
-}
-
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 interface PrefHelper {
     fun getHideDataPointTutorial(): Boolean
@@ -59,16 +52,18 @@ interface PrefHelper {
 
     fun setHideDataPointTutorial(hide: Boolean)
 
-    @JsonClass(generateAdapter = false)
+    @Serializable
     enum class BackupConfigUnit {
         HOURS,
         DAYS,
         WEEKS
     }
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class BackupConfigData(
+        @Serializable(with = UriSerializer::class)
         val uri: Uri,
+        @Serializable(with = OffsetDateTimeSerializer::class)
         val firstDate: OffsetDateTime,
         val interval: Int,
         val units: BackupConfigUnit
@@ -83,30 +78,33 @@ interface PrefHelper {
     fun getLastAutoBackupTime(): OffsetDateTime?
 }
 
+const val THEME_SETTING_PREF_KEY = "theme_setting"
+const val DATE_FORMAT_SETTING_PREF_KEY = "date_format_setting"
+const val FIRST_RUN_PREF_KEY = "firstrun2"
+const val HIDE_DATA_POINT_TUTORIAL_PREF_KEY = "HIDE_DATA_POINT_TUTORIAL_PREF_KEY"
+const val AUTO_BACKUP_CONFIG_PREF_KEY = "auto_backup_config"
+const val LAST_AUTO_BACKUP_TIME_PREF_KEY = "last_auto_backup_time"
+
+fun getPrefs(context: Context, mode: Int = AppCompatActivity.MODE_PRIVATE): SharedPreferences {
+    return context.getSharedPreferences("com.samco.trackandgraph", mode)
+}
+
+private object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("OffsetDateTime", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: OffsetDateTime) = encoder.encodeString(value.toString())
+    override fun deserialize(decoder: Decoder): OffsetDateTime = OffsetDateTime.parse(decoder.decodeString())
+}
+
+private object UriSerializer : KSerializer<Uri> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Uri", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: Uri) = encoder.encodeString(value.toString())
+    override fun deserialize(decoder: Decoder): Uri = decoder.decodeString().toUri()
+}
+
 class PrefHelperImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val json: Json
 ) : PrefHelper {
-
-    private val moshi: Moshi = Moshi.Builder()
-        .add(OffsetDateTime::class.java, object : JsonAdapter<OffsetDateTime>() {
-            override fun fromJson(reader: JsonReader): OffsetDateTime? {
-                return OffsetDateTime.parse(reader.nextString())
-            }
-
-            override fun toJson(writer: JsonWriter, value: OffsetDateTime?) {
-                writer.value(value.toString())
-            }
-        })
-        .add(Uri::class.java, object : JsonAdapter<Uri>() {
-            override fun fromJson(reader: JsonReader): Uri? {
-                return Uri.parse(reader.nextString())
-            }
-
-            override fun toJson(writer: JsonWriter, value: Uri?) {
-                writer.value(value.toString())
-            }
-        })
-        .build()
 
     private val prefs get() = getPrefs(context)
 
@@ -116,11 +114,11 @@ class PrefHelperImpl @Inject constructor(
     override fun isFirstRun(): Boolean = prefs.getBoolean(FIRST_RUN_PREF_KEY, true)
 
     override fun setFirstRun(firstRun: Boolean) {
-        prefs.edit().putBoolean(FIRST_RUN_PREF_KEY, firstRun).apply()
+        prefs.edit { putBoolean(FIRST_RUN_PREF_KEY, firstRun) }
     }
 
     override fun setDateTimeFormatIndex(formatIndex: Int) {
-        prefs.edit().putInt(DATE_FORMAT_SETTING_PREF_KEY, formatIndex).apply()
+        prefs.edit { putInt(DATE_FORMAT_SETTING_PREF_KEY, formatIndex) }
     }
 
     override fun getDateFormatValue(): Int =
@@ -130,32 +128,34 @@ class PrefHelperImpl @Inject constructor(
         prefs.getInt(THEME_SETTING_PREF_KEY, defaultThemeValue)
 
     override fun setThemeValue(themeValue: Int) {
-        prefs.edit().putInt(THEME_SETTING_PREF_KEY, themeValue).apply()
+        prefs.edit { putInt(THEME_SETTING_PREF_KEY, themeValue) }
     }
 
     override fun setHideDataPointTutorial(hide: Boolean) {
-        prefs.edit().putBoolean(HIDE_DATA_POINT_TUTORIAL_PREF_KEY, hide).apply()
+        prefs.edit { putBoolean(HIDE_DATA_POINT_TUTORIAL_PREF_KEY, hide) }
     }
 
     override fun setAutoBackupConfig(backupConfig: PrefHelper.BackupConfigData?) {
         if (backupConfig == null) {
-            prefs.edit().remove(AUTO_BACKUP_CONFIG_PREF_KEY).apply()
+            prefs.edit { remove(AUTO_BACKUP_CONFIG_PREF_KEY) }
         } else {
-            prefs.edit().putString(
-                AUTO_BACKUP_CONFIG_PREF_KEY,
-                moshi.adapter(PrefHelper.BackupConfigData::class.java).toJson(backupConfig)
-            ).apply()
+            prefs.edit {
+                putString(
+                    AUTO_BACKUP_CONFIG_PREF_KEY,
+                    json.encodeToString(backupConfig)
+                )
+            }
         }
     }
 
     override fun getAutoBackupConfig(): PrefHelper.BackupConfigData? {
         return prefs.getString(AUTO_BACKUP_CONFIG_PREF_KEY, null)?.let {
-            moshi.adapter(PrefHelper.BackupConfigData::class.java).fromJson(it)
+            json.decodeFromString<PrefHelper.BackupConfigData>(it)
         }
     }
 
     override fun setLastAutoBackupTime(time: OffsetDateTime) {
-        prefs.edit().putString(LAST_AUTO_BACKUP_TIME_PREF_KEY, time.toString()).apply()
+        prefs.edit { putString(LAST_AUTO_BACKUP_TIME_PREF_KEY, time.toString()) }
     }
 
     override fun getLastAutoBackupTime(): OffsetDateTime? {

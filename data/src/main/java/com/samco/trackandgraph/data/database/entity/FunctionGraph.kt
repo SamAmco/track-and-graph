@@ -17,14 +17,14 @@
 
 package com.samco.trackandgraph.data.database.entity
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
 /**
  * Entity representation of a function graph structure for database storage.
  * 
  * TODO: Define proper graph structure with nodes and edges
  */
-@JsonClass(generateAdapter = true)
+@Serializable
 data class FunctionGraph(
     val graphData: String = ""
 ) {

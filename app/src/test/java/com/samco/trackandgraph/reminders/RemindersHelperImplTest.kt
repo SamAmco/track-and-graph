@@ -15,7 +15,7 @@ import com.samco.trackandgraph.system.AlarmManagerWrapper
 import com.samco.trackandgraph.system.ReminderPrefWrapper
 import com.samco.trackandgraph.system.StoredAlarmInfo
 import com.samco.trackandgraph.system.SystemInfoProvider
-import com.squareup.moshi.Moshi
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -39,7 +39,10 @@ internal class RemindersHelperImplTest {
         reminderPref = reminderPref,
         alarmManager = alarmManager,
         systemInfoProvider = systemInfoProvider,
-        moshi = Moshi.Builder().build(),
+        json = Json {
+            ignoreUnknownKeys = false
+            isLenient = false
+        },
         io = testScheduler
     )
 
