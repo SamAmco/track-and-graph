@@ -157,7 +157,6 @@ fun LibraryNames() = Column {
         R.string.apache_commons_csv,
         R.string.three_ten_android_backport,
         R.string.timber,
-        R.string.moshi,
         R.string.luak,
     )
 

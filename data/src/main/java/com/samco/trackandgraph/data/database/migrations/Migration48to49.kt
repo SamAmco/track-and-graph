@@ -55,11 +55,11 @@ val MIGRATION_48_49 = object : Migration(48, 49) {
             """.trimIndent()
         )
         val cursor = database.query("SELECT * FROM trackers_table_old WHERE has_default_value = 1")
-        val moshi = MigrationMoshiHelper.getMigrationMoshiHelper()
+        val helper = MigrationJsonHelper.getMigrationJsonHelper()
         val updates = mutableListOf<Pair<Long, String>>()
         while (cursor.moveToNext()) {
             val id = cursor.getLong(0)
-            val discreteValues = moshi.stringToListOfDiscreteValues(cursor.getString(3))
+            val discreteValues = helper.stringToListOfDiscreteValues(cursor.getString(3))
             val defaultValue = cursor.getDouble(5)
             val index = floor(defaultValue).toInt()
             if (abs(defaultValue - index) < 0.0001 && index in discreteValues.indices) {

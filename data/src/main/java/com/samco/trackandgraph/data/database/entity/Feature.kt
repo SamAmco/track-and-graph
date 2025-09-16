@@ -22,7 +22,9 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.FeatureDtoImpl
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(
     tableName = "features_table",
     foreignKeys = [ForeignKey(

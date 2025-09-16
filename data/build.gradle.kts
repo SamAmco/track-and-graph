@@ -22,6 +22,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -77,6 +78,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     testFixtures {
         enable = true
     }
@@ -99,8 +104,8 @@ dependencies {
     ksp(libs.room.compiler)
     api(libs.room.runtime)
     api(libs.room.ktx)
-    api(libs.moshi.kotlin)
-    ksp(libs.moshi.kotlin.codegen)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
 
     //CSV
     implementation(libs.commons.csv)

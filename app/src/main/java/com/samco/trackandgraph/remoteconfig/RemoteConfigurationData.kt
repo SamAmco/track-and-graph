@@ -16,12 +16,12 @@
 */
 package com.samco.trackandgraph.remoteconfig
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class RemoteConfiguration(
     val endpoints: Map<String, String>,
-    @Json(name = "trusted-lua-script-sources")
+    @SerialName("trusted-lua-script-sources")
     val trustedLuaScriptSources: List<String>
 )
