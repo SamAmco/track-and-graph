@@ -182,6 +182,11 @@ dependencies {
 
     implementation(libs.androidx.legacy.support.v4)
 
+    implementation(libs.threetenabp)
+
+    //Timber
+    implementation(libs.timber)
+
     //Dependency Injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
@@ -207,6 +212,7 @@ dependencies {
     implementation(libs.compose.runtime.livedata)
     // Material design stuff you might need at some point
     implementation(libs.compose.material3)
+    implementation(libs.material)
 
     // Reorderable drag and drop
     implementation(libs.reorderable)
@@ -243,6 +249,8 @@ dependencies {
     implementation(libs.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
 
+    //Backup and restore
+    implementation(libs.room.runtime)
 
     implementation(libs.kotlinx.collections.immutable)
 
