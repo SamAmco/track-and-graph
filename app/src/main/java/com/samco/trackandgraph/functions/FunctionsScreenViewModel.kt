@@ -26,6 +26,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +36,8 @@ import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -96,6 +100,7 @@ sealed class Node(
 
 internal interface FunctionsScreenViewModel {
     fun init(groupId: Long, functionId: Long?)
+    val complete: ReceiveChannel<Unit>
 
     val nodes: StateFlow<List<Node>>
     val edges: StateFlow<List<Edge>>
@@ -126,6 +131,10 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 ) : ViewModel(), FunctionsScreenViewModel {
 
     private val initialized = AtomicBoolean(false)
+    private var groupId: Long = -1
+    private var existingFunction: Function? = null
+
+    override val complete: Channel<Unit> = Channel()
 
     private val _nodes = MutableStateFlow<PersistentList<Node>>(persistentListOf())
     override val nodes: StateFlow<List<Node>> = _nodes.asStateFlow()
@@ -150,8 +159,11 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
     override fun init(groupId: Long, functionId: Long?) {
         if (initialized.getAndSet(true)) return
+        this.groupId = groupId
 
         viewModelScope.launch {
+            existingFunction = functionId?.let { dataInteractor.getFunctionById(it) }
+
             val allFeatures = dataInteractor.getAllFeaturesSync()
             val allGroups = dataInteractor.getAllGroupsSync()
             val pathProvider = FeaturePathProvider(allFeatures, allGroups)
@@ -287,6 +299,30 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     override fun onCreateOrUpdateFunction() {
-        // TODO: Implement function creation/update logic
+        viewModelScope.launch {
+            val outputNode = outputNode()
+            val existing = existingFunction
+            if (existing != null) {
+                // Update existing function
+                val updatedFunction = existing.copy(
+                    name = outputNode.name.value.text,
+                    description = outputNode.description.value.text,
+                )
+                dataInteractor.updateFunction(updatedFunction)
+            } else {
+                // Create new function
+                val function = Function(
+                    name = outputNode.name.value.text,
+                    groupId = groupId,
+                    description = outputNode.description.value.text,
+                    functionGraph = FunctionGraph(), // Empty for now
+                    inputFeatures = emptyList() // Empty for now
+                )
+                dataInteractor.insertFunction(function)
+            }
+            complete.trySend(Unit)
+        }
     }
+
+    private fun outputNode() = _nodes.value.filterIsInstance<Node.Output>().first()
 }
