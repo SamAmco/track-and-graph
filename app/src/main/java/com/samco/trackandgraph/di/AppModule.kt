@@ -19,6 +19,7 @@ package com.samco.trackandgraph.di
 
 import android.content.ContentResolver
 import android.content.Context
+import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelper
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelperImpl
 import com.samco.trackandgraph.assetreader.AssetReader
@@ -54,7 +55,7 @@ import com.samco.trackandgraph.time.TimeProvider
 import com.samco.trackandgraph.time.TimeProviderImpl
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
-import com.squareup.moshi.Moshi
+import kotlinx.serialization.json.Json
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -130,7 +131,10 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideMoshi(): Moshi = Moshi.Builder().build()
+    fun provideJson(): Json = Json {
+        ignoreUnknownKeys = !BuildConfig.DEBUG
+        isLenient = !BuildConfig.DEBUG
+    }
 
     @Provides
     fun provideTimeProvider(impl: TimeProviderImpl): TimeProvider = impl
