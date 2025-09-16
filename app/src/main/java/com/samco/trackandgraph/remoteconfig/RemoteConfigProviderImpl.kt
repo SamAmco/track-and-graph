@@ -18,7 +18,7 @@ package com.samco.trackandgraph.remoteconfig
 
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.downloader.FileDownloader
-import com.squareup.moshi.Moshi
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -35,12 +35,10 @@ import kotlin.coroutines.CoroutineContext
 class RemoteConfigProviderImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     private val fileDownloader: FileDownloader,
-    private val moshi: Moshi,
+    private val json: Json,
 ) : RemoteConfigProvider, CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + ioDispatcher
-
-    private val adapter = moshi.adapter(RemoteConfiguration::class.java)
 
     private sealed interface RemoteConfigResult {
         data class Success(val configuration: RemoteConfiguration) : RemoteConfigResult
@@ -53,8 +51,7 @@ class RemoteConfigProviderImpl @Inject constructor(
                 URI("https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/configuration/remote-configuration.json")
             ) ?: error("Failed to load remote configuration")
 
-            val configuration = adapter.fromJson(configContent)
-                ?: error("Failed to parse remote configuration")
+            val configuration = json.decodeFromString<RemoteConfiguration>(configContent)
 
             emit(RemoteConfigResult.Success(configuration))
         } catch (e: Exception) {

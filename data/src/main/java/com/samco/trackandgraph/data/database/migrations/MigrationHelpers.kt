@@ -17,10 +17,8 @@
 
 package com.samco.trackandgraph.data.database.migrations
 
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 internal data class NTuple2<T1, T2>(val t1: T1, val t2: T2) {
     fun toList() = listOf(t1, t2)
@@ -80,20 +78,23 @@ internal data class NTuple8<T1, T2, T3, T4, T5, T6, T7, T8>(
     fun toList() = listOf(t1, t2, t3, t4, t5, t6, t7, t8)
 }
 
-internal class MigrationMoshiHelper private constructor() {
-    val moshi: Moshi = Moshi.Builder().build()
+internal class MigrationJsonHelper private constructor() {
+    val json: Json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
 
-    fun <T> toJson(adapter: JsonAdapter<T>, value: T): String {
+    inline fun <reified T> toJson(value: T): String {
         return try {
-            adapter.toJson(value) ?: ""
+            json.encodeToString(value)
         } catch (e: Exception) {
             ""
         }
     }
 
-    fun <T> fromJson(adapter: JsonAdapter<T>, value: String, onError: () -> T): T {
+    inline fun <reified T> fromJson(value: String, onError: () -> T): T {
         return try {
-            adapter.fromJson(value) ?: onError()
+            json.decodeFromString<T>(value)
         } catch (e: Exception) {
             onError()
         }
@@ -101,16 +102,14 @@ internal class MigrationMoshiHelper private constructor() {
 
     fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
         if (value.isBlank()) return emptyList()
-        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
-        return fromJson(moshi.adapter(listType), value) { emptyList() }
+        return fromJson<List<DiscreteValue>>(value) { emptyList() }
     }
 
     fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String {
-        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
-        return toJson(moshi.adapter(listType), values)
+        return toJson(values)
     }
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class DiscreteValue(
         val index: Int,
         val label: String
@@ -130,6 +129,6 @@ internal class MigrationMoshiHelper private constructor() {
     }
 
     companion object {
-        internal fun getMigrationMoshiHelper() = MigrationMoshiHelper()
+        internal fun getMigrationJsonHelper() = MigrationJsonHelper()
     }
 }

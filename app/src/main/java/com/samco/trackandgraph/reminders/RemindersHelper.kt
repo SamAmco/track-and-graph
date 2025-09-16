@@ -26,8 +26,7 @@ import com.samco.trackandgraph.system.AlarmManagerWrapper
 import com.samco.trackandgraph.system.ReminderPrefWrapper
 import com.samco.trackandgraph.system.StoredAlarmInfo
 import com.samco.trackandgraph.system.SystemInfoProvider
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -65,7 +64,7 @@ internal class RemindersHelperImpl @Inject constructor(
     private val systemInfoProvider: SystemInfoProvider,
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
-    private val moshi: Moshi,
+    private val json: Json,
 ) : RemindersHelper, CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + io
@@ -74,9 +73,6 @@ internal class RemindersHelperImpl @Inject constructor(
 
     private val syncMutex = Mutex()
     private val clearMutex = Mutex()
-
-    private val moshiStoredAlarmInfoListType = Types
-        .newParameterizedType(List::class.java, StoredAlarmInfo::class.java)
 
     init {
         launch {
@@ -176,8 +172,7 @@ internal class RemindersHelperImpl @Inject constructor(
         val storedIntents = reminderPref.getStoredIntents()
         return try {
             storedIntents?.let {
-                moshi.adapter<List<StoredAlarmInfo>>(moshiStoredAlarmInfoListType)
-                    .fromJson(it)
+                json.decodeFromString<List<StoredAlarmInfo>>(it)
             } ?: emptyList()
         } catch (t: Throwable) {
             Timber.e("Could not parse stored intents string: $storedIntents")
@@ -187,8 +182,7 @@ internal class RemindersHelperImpl @Inject constructor(
 
     private fun updateStoredIntentsInPrefs(intentsToStore: Collection<StoredAlarmInfo>) {
         reminderPref.putStoredIntents(
-            moshi.adapter<List<StoredAlarmInfo>>(moshiStoredAlarmInfoListType)
-                .toJson(intentsToStore.toList())
+            json.encodeToString(intentsToStore.toList())
         )
     }
 
