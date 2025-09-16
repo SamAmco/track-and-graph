@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.functions
+package com.samco.trackandgraph.functions.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -34,9 +34,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.samco.trackandgraph.functions.ConnectorType
+import com.samco.trackandgraph.functions.Node
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+
+val nodeCardContentWidth = 350.dp
 
 @Composable
 internal fun Node(
