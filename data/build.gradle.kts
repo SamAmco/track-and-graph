@@ -90,11 +90,7 @@ android {
 }
 
 dependencies {
-    api(libs.threetenabp)
-
-    api(libs.core.ktx)
-    //Apparently we need material for the instrumented tests to build. idk why
-    api(libs.material)
+    implementation(libs.threetenabp)
 
     //Dependency Injection
     implementation(libs.hilt.android)
@@ -102,8 +98,8 @@ dependencies {
 
     //Database
     ksp(libs.room.compiler)
-    api(libs.room.runtime)
-    api(libs.room.ktx)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
 
@@ -111,7 +107,7 @@ dependencies {
     implementation(libs.commons.csv)
 
     //Timber
-    api(libs.timber)
+    implementation(libs.timber)
 
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -124,4 +120,6 @@ dependencies {
 
     testFixturesImplementation(libs.junit.ktx)
     testFixturesImplementation(libs.espresso.core)
+    testFixturesImplementation(libs.threetenabp)
+    testFixturesImplementation(libs.room.runtime)
 }
