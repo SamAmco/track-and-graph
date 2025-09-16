@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.functions
+package com.samco.trackandgraph.functions.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +38,7 @@ import kotlin.math.sin
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.samco.trackandgraph.functions.Edge
 import kotlinx.coroutines.flow.StateFlow
 
 internal data class Cubic(val p0: Offset, val c1: Offset, val c2: Offset, val p1: Offset)
