@@ -47,12 +47,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.functions.ui.EdgeLayer
+import com.samco.trackandgraph.functions.ui.Node
+import com.samco.trackandgraph.functions.ui.NodeEditorInputWrapper
+import com.samco.trackandgraph.functions.ui.ViewportState
+import com.samco.trackandgraph.functions.ui.WorldLayout
+import com.samco.trackandgraph.functions.ui.WorldTransformContainer
+import com.samco.trackandgraph.functions.ui.rememberConnectorLayerState
+import com.samco.trackandgraph.functions.ui.rememberEdgeLayerState
+import com.samco.trackandgraph.functions.ui.rememberViewportState
+import com.samco.trackandgraph.functions.ui.worldPosition
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
 
 // Import missing node editor functions - these should be defined in the same package
@@ -71,6 +82,13 @@ fun FunctionsScreen(
 ) {
     val viewModel: FunctionsScreenViewModel = hiltViewModel<FunctionsScreenViewModelImpl>()
         .also { it.init(navArgs.groupId, navArgs.functionId) }
+
+    // Handle navigation back when complete
+    LaunchedEffect(viewModel.complete) {
+        viewModel.complete.receiveAsFlow().collect {
+            onPopBack()
+        }
+    }
 
     TopAppBarContent(navArgs)
     FunctionsScreenContent(
