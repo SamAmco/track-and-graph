@@ -152,6 +152,7 @@ android {
     buildFeatures {
         dataBinding = true
         compose = true
+        buildConfig = true
     }
 
     // Dependency info blocks may present a security vulnerability in some cases and they are not
@@ -226,6 +227,7 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
 
     //Lifecycle extensions
     implementation(libs.androidx.lifecycle.extensions)
@@ -241,9 +243,6 @@ dependencies {
     implementation(libs.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
 
-    // Moshi for JSON serialization
-    implementation(libs.moshi.kotlin)
-    ksp(libs.moshi.kotlin.codegen)
 
     implementation(libs.kotlinx.collections.immutable)
 

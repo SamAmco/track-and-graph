@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CheckedDays (
     val monday: Boolean,
     val tuesday: Boolean,
