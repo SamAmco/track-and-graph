@@ -8,11 +8,11 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.samco.trackandgraph.reminders.AlarmReceiver
 import com.samco.trackandgraph.reminders.AlarmReceiver.Companion.ALARM_MESSAGE_KEY
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-@JsonClass(generateAdapter = true)
+@Serializable
 internal data class StoredAlarmInfo(
     val reminderId: Long,
     val reminderName: String,

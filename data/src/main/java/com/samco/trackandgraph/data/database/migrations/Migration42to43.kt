@@ -21,11 +21,10 @@ package com.samco.trackandgraph.data.database.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.data.database.dto.CheckedDays
-import com.squareup.moshi.Types
 
 
 val MIGRATION_42_43 = object : Migration(42, 43) {
-    private val helper = MigrationMoshiHelper.getMigrationMoshiHelper()
+    private val helper = MigrationJsonHelper.getMigrationJsonHelper()
 
     override fun migrate(database: SupportSQLiteDatabase) {
         updateDiscreteValues(database)
@@ -43,7 +42,7 @@ val MIGRATION_42_43 = object : Migration(42, 43) {
                     .map { it.toBoolean() }
             )
 
-            val jsonString = helper.moshi.adapter(CheckedDays::class.java).toJson(checkedDays) ?: ""
+            val jsonString = helper.toJson(checkedDays)
             updates.add(listOf(jsonString, id))
         }
         if (updates.size > 0) updates.forEach {
@@ -66,18 +65,12 @@ val MIGRATION_42_43 = object : Migration(42, 43) {
             val discreteValues = try {
                 discreteValuesString
                     .split("||")
-                    .map { MigrationMoshiHelper.DiscreteValue.fromString(it) }
+                    .map { MigrationJsonHelper.DiscreteValue.fromString(it) }
             } catch (e: Exception) {
                 deletes.add(id)
                 continue
             }
-            val listType = Types.newParameterizedType(
-                List::class.java,
-                MigrationMoshiHelper.DiscreteValue::class.java
-            )
-            val jsonString =
-                helper.moshi.adapter<List<MigrationMoshiHelper.DiscreteValue>>(listType)
-                    .toJson(discreteValues) ?: ""
+            val jsonString = helper.listOfDiscreteValuesToString(discreteValues)
             updates.add(listOf(jsonString, id))
         }
         if (deletes.size > 0) deletes.forEach {
