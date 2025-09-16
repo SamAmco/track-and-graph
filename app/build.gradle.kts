@@ -75,7 +75,7 @@ android {
     //TODO you won't get syntax highlighting in the promo directory code
     // in android studio because this if check will default to screenshots
     // but you can just comment it to say promo during development for now.
-
+    //
     // Dynamic testBuildType switching based on project properties
     testBuildType = if (project.hasProperty("usePromoTests")) "promo" else "screenshots"
 
@@ -180,8 +180,7 @@ dependencies {
 
     implementation(project(":data"))
 
-    implementation(libs.androidx.legacy.support.v4)
-
+    //Date and time
     implementation(libs.threetenabp)
 
     //Timber
@@ -201,18 +200,15 @@ dependencies {
     //Lua
     implementation(libs.luak.jvm)
 
+    //UI
+    implementation(libs.material)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling)
     implementation(libs.compose.material.icons)
     implementation(libs.compose.foundation)
     implementation(libs.compose.ui.viewbinding)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.lifecycle.viewmodel.compose)
-    implementation(libs.lifecycle.runtime.compose)
     implementation(libs.compose.runtime.livedata)
-    // Material design stuff you might need at some point
     implementation(libs.compose.material3)
-    implementation(libs.material)
 
     // Reorderable drag and drop
     implementation(libs.reorderable)
@@ -223,20 +219,12 @@ dependencies {
     implementation(libs.glance.appwidget.preview)
     implementation(libs.glance.preview)
 
-    // Android KTX
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.fragment.ktx)
-
     //Navigation
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
-
-    //Lifecycle extensions
-    implementation(libs.androidx.lifecycle.extensions)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -252,6 +240,7 @@ dependencies {
     //Backup and restore
     implementation(libs.room.runtime)
 
+    //Fast immutable collection updates (used in functions screen)
     implementation(libs.kotlinx.collections.immutable)
 
     //Testing
