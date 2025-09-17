@@ -162,6 +162,15 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "Scroogey",
+      "name": "Scroogey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/139505575?v=4",
+      "profile": "https://github.com/Scroogey",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
