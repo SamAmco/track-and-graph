@@ -1,0 +1,3 @@
+- Fix bug dark theme not working below API 30
+- Fix bug data point tutorial not scrolling
+
