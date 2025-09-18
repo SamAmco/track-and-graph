@@ -49,10 +49,4 @@ internal data class FunctionInputFeature(
 
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long
-) {
-    fun toDto() = com.samco.trackandgraph.data.database.dto.FunctionInputFeature(
-        id = id,
-        functionId = functionId,
-        featureId = featureId
-    )
-}
+)

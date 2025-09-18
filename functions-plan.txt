@@ -1,5 +1,17 @@
 TODO: 
 - affected by for graphs needs re-implementing to handle function graphs
+- We should catch cycles in functions that depend on other functions
+- Don't allow creating a function until you have a tracker? 
+
+- Testing:
+  - Unit test function graph builder, it shouldn't allow cycles
+  - Unit test function serializer
+
+QA: 
+  - Removing a function should remove it from any graphs that use it as a data source
+  - Removing a data source should remove it from any functions that use it as a data source
+  - Adding a function that creates a cycle should be prevented
+
 
 FUNCTIONS PLANNING
 

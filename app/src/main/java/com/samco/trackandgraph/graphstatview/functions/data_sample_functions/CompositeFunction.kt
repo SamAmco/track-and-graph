@@ -22,10 +22,10 @@ import com.samco.trackandgraph.data.database.sampling.DataSample
 /**
  * A calculator that simply applies the operations of all provided calculators in order
  */
-class CompositeFunction(private vararg val calculators: com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction) :
-    com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction {
+class CompositeFunction(private vararg val calculators: DataSampleFunction) :
+    DataSampleFunction {
 
-    constructor(calculators: List<com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction>) : this(*calculators.toTypedArray())
+    constructor(calculators: List<DataSampleFunction>) : this(*calculators.toTypedArray())
 
     override suspend fun mapSample(dataSample: DataSample): DataSample {
         var runningSample = dataSample

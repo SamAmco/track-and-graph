@@ -20,14 +20,61 @@ package com.samco.trackandgraph.data.database.dto
 import kotlinx.serialization.Serializable
 
 /**
+ * Represents a dependency between nodes in the function graph.
+ * @param inputConnectorIndex The input connector index on the dependent node
+ * @param nodeId The ID of the node that this node depends on
+ * @param outputConnectorIndex The output connector index on the dependency node
+ */
+@Serializable
+data class NodeDependency(
+    val inputConnectorIndex: Int,
+    val nodeId: Int,
+    val outputConnectorIndex: Int
+)
+
+/**
+ * Sealed class hierarchy representing different types of nodes in a function graph.
+ */
+@Serializable
+sealed class FunctionGraphNode {
+    abstract val id: Int
+    abstract val dependencies: List<NodeDependency>
+    
+    /**
+     * Represents a feature data source node in the function graph.
+     * @param id Unique identifier for this node
+     * @param featureId The ID of the feature this node represents
+     */
+    @Serializable
+    data class FeatureNode(
+        override val id: Int,
+        val featureId: Long,
+    ) : FunctionGraphNode() {
+        // dependencies should be empty for feature nodes
+        override val dependencies: List<NodeDependency> = emptyList()
+    }
+    
+    /**
+     * Represents the output node in the function graph.
+     * @param id Unique identifier for this node
+     * @param dependencies List of nodes this node depends on
+     */
+    @Serializable
+    data class OutputNode(
+        override val id: Int,
+        override val dependencies: List<NodeDependency>
+    ) : FunctionGraphNode()
+}
+
+/**
  * DTO representation of a function graph structure.
  * This class contains the serialization annotations and will be serialized/deserialized
  * by FunctionGraphSerializer.
- * 
- * TODO: Define proper graph structure with nodes and edges
  */
 @Serializable
 data class FunctionGraph(
-    val graphData: String = ""
+    val nodes: List<FunctionGraphNode>,
+    val outputNode: FunctionGraphNode.OutputNode,
+    val isDuration: Boolean
 ) {
 }

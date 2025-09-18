@@ -34,8 +34,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import com.samco.trackandgraph.functions.ConnectorType
-import com.samco.trackandgraph.functions.Node
+import com.samco.trackandgraph.functions.viewmodel.ConnectorType
+import com.samco.trackandgraph.functions.viewmodel.Node
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding

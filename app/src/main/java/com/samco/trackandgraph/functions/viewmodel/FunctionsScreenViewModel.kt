@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.functions
+package com.samco.trackandgraph.functions.viewmodel
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
@@ -26,8 +26,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.data.database.dto.Function
-import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -134,6 +134,7 @@ internal interface FunctionsScreenViewModel {
 @HiltViewModel
 internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val functionGraphBuilder: FunctionGraphBuilder,
 ) : ViewModel(), FunctionsScreenViewModel {
 
     private val initialized = AtomicBoolean(false)
@@ -324,12 +325,31 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                 return@launch
             }
 
+            // Build the function graph using FunctionGraphBuilder
+            val functionGraph = functionGraphBuilder.buildFunctionGraph(
+                nodes = _nodes.value,
+                edges = _edges.value,
+                isDuration = outputNode.isDuration.value,
+                shouldThrow = BuildConfig.DEBUG
+            )
+            
+            // If building failed and we're in release mode, complete and return
+            if (functionGraph == null) {
+                complete.trySend(Unit)
+                return@launch
+            }
+
+            // Extract input feature IDs from data source nodes
+            val inputFeatureIds = functionGraphBuilder.extractInputFeatureIds(_nodes.value)
+
             val existing = existingFunction
             if (existing != null) {
                 // Update existing function
                 val updatedFunction = existing.copy(
                     name = outputNode.name.value.text,
                     description = outputNode.description.value.text,
+                    functionGraph = functionGraph,
+                    inputFeatureIds = inputFeatureIds
                 )
                 dataInteractor.updateFunction(updatedFunction)
             } else {
@@ -338,8 +358,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                     name = outputNode.name.value.text,
                     groupId = groupId,
                     description = outputNode.description.value.text,
-                    functionGraph = FunctionGraph(), // Empty for now
-                    inputFeatures = emptyList() // Empty for now
+                    functionGraph = functionGraph,
+                    inputFeatureIds = inputFeatureIds
                 )
                 dataInteractor.insertFunction(function)
             }

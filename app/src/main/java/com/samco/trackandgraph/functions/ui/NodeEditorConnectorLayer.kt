@@ -38,8 +38,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.samco.trackandgraph.functions.Connector
-import com.samco.trackandgraph.functions.ConnectorType
+import com.samco.trackandgraph.functions.viewmodel.Connector
+import com.samco.trackandgraph.functions.viewmodel.ConnectorType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

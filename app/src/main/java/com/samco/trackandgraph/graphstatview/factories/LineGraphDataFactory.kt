@@ -40,6 +40,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataPaddingFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DurationAggregationFunction
@@ -194,7 +195,7 @@ class LineGraphDataFactory @Inject constructor(
 
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
-            else -> com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction(
+            else -> CompositeFunction(
                 DurationAggregationFunction(timeHelper, plottingPeriod!!),
                 DataPaddingFunction(
                     timeHelper = timeHelper,
@@ -209,7 +210,7 @@ class LineGraphDataFactory @Inject constructor(
             LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)
         }
-        return com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction(aggregationCalculator, averageCalculator)
+        return CompositeFunction(aggregationCalculator, averageCalculator)
             .mapSample(rawDataSample)
     }
 

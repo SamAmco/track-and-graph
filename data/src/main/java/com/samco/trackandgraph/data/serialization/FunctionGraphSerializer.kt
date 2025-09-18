@@ -31,13 +31,15 @@ import javax.inject.Singleton
 @Singleton
 class FunctionGraphSerializer @Inject constructor(
     private val json: Json,
-    private val throwOnFailure: Boolean = BuildConfig.DEBUG
 ) {
-    
+
     /**
      * Serializes a FunctionGraph DTO to a JSON string for database storage.
      */
-    fun serialize(functionGraph: FunctionGraph): String? {
+    fun serialize(
+        functionGraph: FunctionGraph,
+        throwOnFailure: Boolean = BuildConfig.DEBUG
+    ): String? {
         return try {
             json.encodeToString(FunctionGraph.serializer(), functionGraph)
         } catch (e: Exception) {
@@ -48,11 +50,14 @@ class FunctionGraphSerializer @Inject constructor(
             else null
         }
     }
-    
+
     /**
      * Deserializes a JSON string from the database back to a FunctionGraph DTO.
      */
-    fun deserialize(jsonString: String): FunctionGraph? {
+    fun deserialize(
+        jsonString: String,
+        throwOnFailure: Boolean = BuildConfig.DEBUG
+    ): FunctionGraph? {
         return try {
             json.decodeFromString(FunctionGraph.serializer(), jsonString)
         } catch (e: Exception) {
