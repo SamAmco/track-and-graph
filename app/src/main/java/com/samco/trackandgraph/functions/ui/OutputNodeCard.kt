@@ -45,8 +45,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.functions.Node
-import com.samco.trackandgraph.functions.ValidationError
+import com.samco.trackandgraph.functions.viewmodel.Node
+import com.samco.trackandgraph.functions.viewmodel.ValidationError
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.WideButton
