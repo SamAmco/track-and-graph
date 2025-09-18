@@ -40,5 +40,5 @@ internal data class Function(
     val featureId: Long,
 
     @ColumnInfo(name = "function_graph")
-    val functionGraph: FunctionGraph
+    val functionGraph: String
 )
