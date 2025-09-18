@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.data.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
-import com.samco.trackandgraph.data.database.entity.FunctionGraph
 
 internal data class FunctionWithFeature(
     @ColumnInfo(name = "id")
@@ -28,7 +27,7 @@ internal data class FunctionWithFeature(
     val featureId: Long,
 
     @ColumnInfo(name = "function_graph")
-    val functionGraph: FunctionGraph,
+    val functionGraph: String,
 
     @ColumnInfo(name = "name")
     val name: String,
@@ -42,15 +41,17 @@ internal data class FunctionWithFeature(
     @ColumnInfo(name = "feature_description")
     val description: String
 ) {
-    fun toDto(inputFeatures: List<com.samco.trackandgraph.data.database.dto.FunctionInputFeature> = emptyList()) = 
-        com.samco.trackandgraph.data.database.dto.Function(
-            id = id,
-            featureId = featureId,
-            name = name,
-            groupId = groupId,
-            displayIndex = displayIndex,
-            description = description,
-            functionGraph = functionGraph.toDto(),
-            inputFeatures = inputFeatures
-        )
+    fun toDto(
+        functionGraphDto: com.samco.trackandgraph.data.database.dto.FunctionGraph,
+        inputFeatures: List<com.samco.trackandgraph.data.database.dto.FunctionInputFeature> = emptyList()
+    ) = com.samco.trackandgraph.data.database.dto.Function(
+        id = id,
+        featureId = featureId,
+        name = name,
+        groupId = groupId,
+        displayIndex = displayIndex,
+        description = description,
+        functionGraph = functionGraphDto,
+        inputFeatures = inputFeatures
+    )
 }

@@ -11,7 +11,10 @@ import com.samco.trackandgraph.data.model.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.model.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.data.model.FunctionHelperImpl
 import com.samco.trackandgraph.data.model.TrackerHelperImpl
+import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
+import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 
 object TestDataInteractor {
 
@@ -42,9 +45,16 @@ object TestDataInteractor {
             io = Dispatchers.IO
         )
 
+        val testJson = Json {
+            ignoreUnknownKeys = false
+            isLenient = false
+        }
+        val functionGraphSerializer = FunctionGraphSerializer(testJson)
+
         val functionHelper = FunctionHelperImpl(
             transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
+            functionGraphSerializer = functionGraphSerializer,
             io = Dispatchers.IO
         )
 

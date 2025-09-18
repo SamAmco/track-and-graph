@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,11 +31,15 @@ import javax.inject.Singleton
 internal class FunctionHelperImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
+    private val functionGraphSerializer: FunctionGraphSerializer,
     @IODispatcher private val io: CoroutineDispatcher
 ) : FunctionHelper {
 
-    override suspend fun insertFunction(function: Function): Long = withContext(io) {
+    override suspend fun insertFunction(function: Function): Long? = withContext(io) {
         transactionHelper.withTransaction {
+            val serializedGraph = functionGraphSerializer.serialize(function.functionGraph)
+                ?: return@withTransaction null
+
             // First, create the Feature entity that the Function will reference
             val feature = Feature(
                 id = 0L, // Let the database generate the ID
@@ -46,12 +51,15 @@ internal class FunctionHelperImpl @Inject constructor(
             val featureId = dao.insertFeature(feature)
             
             // Now create the Function entity with the correct featureId
-            dao.insertFunction(function.copy(featureId = featureId).toEntity())
+            dao.insertFunction(function.copy(featureId = featureId).toEntity(serializedGraph))
         }
     }
 
     override suspend fun updateFunction(function: Function) = withContext(io) {
         transactionHelper.withTransaction {
+            val serializedGraph = functionGraphSerializer.serialize(function.functionGraph)
+                ?: return@withTransaction
+
             val feature = Feature(
                 id = function.featureId,
                 name = function.name,
@@ -60,7 +68,7 @@ internal class FunctionHelperImpl @Inject constructor(
                 description = function.description
             )
             dao.updateFeature(feature)
-            dao.updateFunction(function.toEntity())
+            dao.updateFunction(function.toEntity(serializedGraph))
         }
     }
 
@@ -78,38 +86,49 @@ internal class FunctionHelperImpl @Inject constructor(
     override suspend fun getFunctionById(functionId: Long): Function? = withContext(io) {
         val functionWithFeature = dao.getFunctionById(functionId) ?: return@withContext null
         val inputFeatures = dao.getFunctionInputFeaturesSync(functionId).map { it.toDto() }
-        functionWithFeature.toDto(inputFeatures)
+        val functionGraphDto = functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
+            ?: return@withContext null
+        functionWithFeature.toDto(functionGraphDto, inputFeatures)
     }
 
     override suspend fun getFunctionByFeatureId(featureId: Long): Function? = withContext(io) {
         val functionWithFeature = dao.getFunctionByFeatureId(featureId) ?: return@withContext null
         val inputFeatures = dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.toDto() }
-        functionWithFeature.toDto(inputFeatures)
+        val functionGraphDto = functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
+            ?: return@withContext null
+        functionWithFeature.toDto(functionGraphDto, inputFeatures)
     }
 
     override suspend fun getAllFunctionsSync(): List<Function> = withContext(io) {
-        dao.getAllFunctionsSync().map { functionWithFeature ->
+        dao.getAllFunctionsSync().mapNotNull { functionWithFeature ->
             val inputFeatures = dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.toDto() }
-            functionWithFeature.toDto(inputFeatures)
+            val functionGraphDto = functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
+                ?: return@mapNotNull null
+            functionWithFeature.toDto(functionGraphDto, inputFeatures)
         }
     }
 
     override suspend fun getFunctionsForGroupSync(groupId: Long): List<Function> = withContext(io) {
-        dao.getFunctionsForGroupSync(groupId).map { functionWithFeature ->
+        dao.getFunctionsForGroupSync(groupId).mapNotNull { functionWithFeature ->
             val inputFeatures = dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.toDto() }
-            functionWithFeature.toDto(inputFeatures)
+            val functionGraphDto = functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
+                ?: return@mapNotNull null
+            functionWithFeature.toDto(functionGraphDto, inputFeatures)
         }
     }
 
     override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
         transactionHelper.withTransaction {
+            val serializedGraph = functionGraphSerializer.serialize(function.functionGraph)
+                ?: return@withTransaction null
+
             //Create a copy of the feature
             val feature = dao.getFeatureById(function.featureId) ?: return@withTransaction null
             val newFeatureId = dao.insertFeature(feature.copy(id = 0L))
 
             // Create a copy of the function with id = 0 to generate new id
             val duplicatedFunction = function.copy(id = 0L, featureId = newFeatureId)
-            val newFunctionId = dao.insertFunction(duplicatedFunction.toEntity())
+            val newFunctionId = dao.insertFunction(duplicatedFunction.toEntity(serializedGraph))
 
             // Duplicate input features
             function.inputFeatures.forEach { inputFeature ->
