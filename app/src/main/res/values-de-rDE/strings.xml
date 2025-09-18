@@ -34,7 +34,7 @@
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
     <string name="ru_sure_del_function">Sind Sie sicher, dass Sie diese Funktion löschen möchten? Sie können dies nicht rückgängig machen.</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
-    <string name="tracker_name_cannot_be_null">Bitte einen Namen angeben</string>
+    <string name="feature_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
     <string name="data_points">%1$d Datenpunkte</string>
     <string name="no_data">Keine Daten</string>
@@ -352,6 +352,7 @@
     <string name="lua_script_empty">Bitte fügen Sie ein Lua-Skript hinzu</string>
     <string name="function_name_empty">Funktionsname darf nicht leer sein</string>
     <string name="function_name">Funktionsname</string>
+    <string name="add_at_least_one_input">Bitte fügen Sie mindestens eine Eingabe hinzu</string>
     <string name="output">Ausgabe</string>
     <string name="data_source">Datenquelle</string>
     <string name="lua_script_input_hint">Geben Sie ein Lua-Skript ein...</string>

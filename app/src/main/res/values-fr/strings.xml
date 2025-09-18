@@ -34,7 +34,7 @@
     <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ce suivi ?</string>
     <string name="ru_sure_del_function">Êtes-vous sûr de vouloir supprimer cette fonction ? Vous ne pouvez pas revenir en arrière.</string>
     <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette entrée ?</string>
-    <string name="tracker_name_cannot_be_null">Veuillez préciser un nom</string>
+    <string name="feature_name_cannot_be_null">Veuillez préciser un nom</string>
     <string name="tracker_with_that_name_exists">Vous suivez déjà quelque chose avec ce nom</string>
     <string name="data_points">%1$d Points de Données</string>
     <string name="no_data">Aucune donnée</string>
@@ -360,6 +360,7 @@
     <string name="lua_script_empty">Veuillez ajouter un script Lua</string>
     <string name="function_name_empty">Le nom de la fonction ne peut pas être vide</string>
     <string name="function_name">Nom de fonction</string>
+    <string name="add_at_least_one_input">Veuillez ajouter au moins une entrée</string>
     <string name="output">Sortie</string>
     <string name="data_source">Source de Données</string>
     <string name="lua_script_input_hint">Entrez un script Lua…</string>
