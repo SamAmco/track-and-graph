@@ -17,15 +17,17 @@
 
 package com.samco.trackandgraph.data.database.dto
 
+import kotlinx.serialization.Serializable
+
 /**
  * DTO representation of a function graph structure.
+ * This class contains the serialization annotations and will be serialized/deserialized
+ * by FunctionGraphSerializer.
  * 
  * TODO: Define proper graph structure with nodes and edges
  */
+@Serializable
 data class FunctionGraph(
     val graphData: String = ""
 ) {
-    internal fun toEntity() = com.samco.trackandgraph.data.database.entity.FunctionGraph(
-        graphData = graphData
-    )
 }

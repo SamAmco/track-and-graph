@@ -28,7 +28,6 @@ import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
-import com.samco.trackandgraph.data.database.entity.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
@@ -299,13 +298,6 @@ internal class Converters {
         }
     }
 
-    @TypeConverter
-    fun functionGraphToString(value: FunctionGraph): String =
-        toJson(value)
-
-    @TypeConverter
-    fun stringToFunctionGraph(value: String): FunctionGraph =
-        fromJson(value) { error("Got null parsing FunctionGraph from JSON: $value") }
 }
 
 fun odtFromString(value: String): OffsetDateTime? =

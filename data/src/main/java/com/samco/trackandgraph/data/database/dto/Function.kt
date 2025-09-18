@@ -29,9 +29,9 @@ data class Function(
     val functionGraph: FunctionGraph,
     val inputFeatures: List<FunctionInputFeature>
 ) {
-    internal fun toEntity() = Function(
+    internal fun toEntity(serializedFunctionGraph: String) = Function(
         id = id,
         featureId = featureId,
-        functionGraph = functionGraph.toEntity()
+        functionGraph = serializedFunctionGraph
     )
 }
