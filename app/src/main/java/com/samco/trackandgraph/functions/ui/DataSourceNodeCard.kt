@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +49,7 @@ import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
+import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
@@ -71,7 +73,10 @@ internal fun DataSourceNode(
                 text = stringResource(R.string.data_source),
                 style = MaterialTheme.typography.titleMedium
             )
-            IconButton(onClick = onDeleteNode) {
+            IconButton(
+                modifier = Modifier.size(buttonSize),
+                onClick = onDeleteNode
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.delete_icon),
                     contentDescription = stringResource(R.string.delete)
@@ -121,13 +126,13 @@ private fun DataSourceNodePreview() {
                 3L to "Mood / Daily Rating",
                 4L to "Sleep / Hours Slept"
             )
-            
+
             val sampleNode = Node.DataSource(
                 id = 3,
                 selectedFeatureId = remember { mutableLongStateOf(1L) },
                 featurePathMap = sampleFeaturePathMap
             )
-            
+
             DataSourceNode(
                 node = sampleNode,
                 onDeleteNode = { }
@@ -151,13 +156,13 @@ private fun DataSourceNodeNoSelectionPreview() {
                 2L to "Exercise / Running Distance",
                 3L to "Mood / Daily Rating"
             )
-            
+
             val sampleNode = Node.DataSource(
                 id = 4,
                 selectedFeatureId = remember { mutableStateOf(-1L) }, // No selection
                 featurePathMap = sampleFeaturePathMap
             )
-            
+
             DataSourceNode(
                 node = sampleNode,
                 onDeleteNode = { }
