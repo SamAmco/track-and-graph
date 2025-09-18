@@ -44,7 +44,7 @@
     <string name="export_file_name_suffix" translatable="false">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
     <string name="export_file_name_null_group_suffix" translatable="false">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.csv</string>
     <string name="backup_file_name_suffix" translatable="false">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
-    <string name="tracker_name_cannot_be_null">Please add a name</string>
+    <string name="feature_name_cannot_be_null">Please add a name</string>
     <string name="tracker_with_that_name_exists">You are already tracking something with that name</string>
     <string name="data_points">%1$d Data Points</string>
     <string name="no_data">No Data</string>
@@ -369,6 +369,7 @@
     <string name="lua_script_empty">Please add a Lua script</string>
     <string name="function_name_empty">Function name cannot be empty</string>
     <string name="function_name">Function name</string>
+    <string name="add_at_least_one_input">Please add at least one input</string>
     <string name="output">Output</string>
     <string name="data_source">Data Source</string>
     <string name="lua_script_input_hint">Enter a Lua script…</string>
