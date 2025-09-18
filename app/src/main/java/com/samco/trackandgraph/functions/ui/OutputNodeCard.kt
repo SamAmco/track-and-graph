@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
@@ -61,14 +62,24 @@ internal fun OutputNode(
 ) {
     val hasNameError = remember(node.validationErrors) { ValidationError.MISSING_NAME in node.validationErrors }
     val hasNoInputsError = remember(node.validationErrors) { ValidationError.NO_INPUTS in node.validationErrors }
-    
+
     Column(
         Modifier
             .width(nodeCardContentWidth)
             .padding(horizontal = connectorSize / 2, vertical = cardPadding),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
-        Text(stringResource(R.string.output), style = MaterialTheme.typography.titleMedium)
+        // The extra button size row wrapper here makes sure the
+        // text padding aligns with other cards which have a delete button
+        Row(
+            modifier = Modifier.heightIn(min = buttonSize),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.output),
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
@@ -165,7 +176,7 @@ private fun OutputNodePreview() {
                 isUpdateMode = false,
                 validationErrors = emptyList()
             )
-            
+
             OutputNode(
                 node = sampleNode,
                 onCreateOrUpdate = { }
@@ -192,7 +203,7 @@ private fun OutputNodeUpdateModePreview() {
                 isUpdateMode = true,
                 validationErrors = emptyList()
             )
-            
+
             OutputNode(
                 node = sampleNode,
                 onCreateOrUpdate = { }
@@ -219,7 +230,7 @@ private fun OutputNodeWithNameErrorPreview() {
                 isUpdateMode = false,
                 validationErrors = listOf(ValidationError.MISSING_NAME)
             )
-            
+
             OutputNode(
                 node = sampleNode,
                 onCreateOrUpdate = { }
@@ -246,7 +257,7 @@ private fun OutputNodeWithNoInputsErrorPreview() {
                 isUpdateMode = false,
                 validationErrors = listOf(ValidationError.NO_INPUTS)
             )
-            
+
             OutputNode(
                 node = sampleNode,
                 onCreateOrUpdate = { }
@@ -273,7 +284,7 @@ private fun OutputNodeWithAllErrorsPreview() {
                 isUpdateMode = false,
                 validationErrors = listOf(ValidationError.MISSING_NAME, ValidationError.NO_INPUTS)
             )
-            
+
             OutputNode(
                 node = sampleNode,
                 onCreateOrUpdate = { }
