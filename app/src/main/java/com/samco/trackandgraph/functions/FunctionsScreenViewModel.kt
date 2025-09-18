@@ -50,6 +50,11 @@ internal enum class ConnectorType {
     OUTPUT,
 }
 
+internal enum class ValidationError {
+    MISSING_NAME,
+    NO_INPUTS,
+}
+
 @Immutable
 internal data class Connector(
     val nodeId: Int,
@@ -70,17 +75,18 @@ sealed class AddNodeData(
 }
 
 @Immutable
-sealed class Node(
-    val id: Int,
+internal sealed class Node(
+    open val id: Int,
     val inputConnectorCount: Int,
     val outputConnectorCount: Int,
 ) {
-    class Output(
-        id: Int = -1,
+    data class Output(
+        override val id: Int = -1,
         val name: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
         val description: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
         val isDuration: MutableState<Boolean> = mutableStateOf(false),
         val isUpdateMode: Boolean = false,
+        val validationErrors: List<ValidationError> = emptyList(),
     ) : Node(
         id = id,
         inputConnectorCount = 1,
@@ -121,7 +127,7 @@ internal interface FunctionsScreenViewModel {
     fun onDragNodeBy(node: Node, offset: Offset)
     fun onDeleteNode(node: Node)
     fun getWorldPosition(node: Node): Offset?
-    
+
     fun onCreateOrUpdateFunction()
 }
 
@@ -301,6 +307,23 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     override fun onCreateOrUpdateFunction() {
         viewModelScope.launch {
             val outputNode = outputNode()
+
+            // Validate the output node
+            val validationErrors = validateOutputNode(outputNode)
+
+            // Return early if there are validation errors
+            if (validationErrors.isNotEmpty()) {
+                // Update the node with validation errors
+                val updatedOutputNode = outputNode.copy(validationErrors = validationErrors)
+                _nodes.value = _nodes.value.mutate { nodeList ->
+                    val index = nodeList.indexOfFirst { it == outputNode }
+                    if (index >= 0) {
+                        nodeList[index] = updatedOutputNode
+                    }
+                }
+                return@launch
+            }
+
             val existing = existingFunction
             if (existing != null) {
                 // Update existing function
@@ -325,4 +348,29 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     private fun outputNode() = _nodes.value.filterIsInstance<Node.Output>().first()
+
+    private fun validateOutputNode(outputNode: Node.Output): List<ValidationError> {
+        val errors = mutableListOf<ValidationError>()
+
+        // Check if name is missing
+        if (outputNode.name.value.text.isBlank()) {
+            errors.add(ValidationError.MISSING_NAME)
+        }
+
+        // Check if output node has at least one input connection
+        val outputNodeInputConnector = Connector(
+            nodeId = outputNode.id,
+            type = ConnectorType.INPUT,
+            connectorIndex = 0
+        )
+        val hasInputConnection = _edges.value.any { edge ->
+            edge.to == outputNodeInputConnector
+        }
+
+        if (!hasInputConnection) {
+            errors.add(ValidationError.NO_INPUTS)
+        }
+
+        return errors
+    }
 }

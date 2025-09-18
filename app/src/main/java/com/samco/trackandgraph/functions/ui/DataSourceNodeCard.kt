@@ -52,7 +52,7 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
 @Composable
-fun DataSourceNode(
+internal fun DataSourceNode(
     node: Node.DataSource,
     onDeleteNode: () -> Unit = {},
 ) {
