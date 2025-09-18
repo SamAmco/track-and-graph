@@ -124,7 +124,7 @@ class AddTrackerViewModelImpl @Inject constructor(
     override val errorText = validationErrorFlow
         .map {
             when (it) {
-                ValidationError.NoName -> R.string.tracker_name_cannot_be_null
+                ValidationError.NoName -> R.string.feature_name_cannot_be_null
                 ValidationError.NameAlreadyExists -> R.string.tracker_with_that_name_exists
                 else -> null
             }
