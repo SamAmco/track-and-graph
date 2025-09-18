@@ -169,6 +169,10 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.work)
 
+    //AppCompat (enables dark theme on  API <= 29)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.core.ktx)
+
     //Lua
     implementation(libs.luak.jvm)
 
