@@ -66,6 +66,7 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.AddChipButton
 import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.WideButton
@@ -76,7 +77,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
 @Composable
-fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = Column {
+fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = FadingScrollColumn {
     val currentPage by viewModel.currentPage.observeAsState(0)
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentPage)
 
