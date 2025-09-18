@@ -27,7 +27,7 @@ data class Function(
     val displayIndex: Int = 0,
     val description: String,
     val functionGraph: FunctionGraph,
-    val inputFeatures: List<FunctionInputFeature>
+    val inputFeatureIds: List<Long>
 ) {
     internal fun toEntity(serializedFunctionGraph: String) = Function(
         id = id,

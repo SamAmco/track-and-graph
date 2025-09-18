@@ -57,6 +57,12 @@ import com.samco.trackandgraph.functions.ui.rememberConnectorLayerState
 import com.samco.trackandgraph.functions.ui.rememberEdgeLayerState
 import com.samco.trackandgraph.functions.ui.rememberViewportState
 import com.samco.trackandgraph.functions.ui.worldPosition
+import com.samco.trackandgraph.functions.viewmodel.AddNodeData
+import com.samco.trackandgraph.functions.viewmodel.Connector
+import com.samco.trackandgraph.functions.viewmodel.Edge
+import com.samco.trackandgraph.functions.viewmodel.FunctionsScreenViewModel
+import com.samco.trackandgraph.functions.viewmodel.FunctionsScreenViewModelImpl
+import com.samco.trackandgraph.functions.viewmodel.Node
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
