@@ -34,7 +34,7 @@
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
     <string name="ru_sure_del_function">¿Estás seguro de que quieres eliminar esta función? No puedes revertir esto.</string>
     <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>
-    <string name="tracker_name_cannot_be_null">Por favor, añade un nombre</string>
+    <string name="feature_name_cannot_be_null">Por favor, añade un nombre</string>
     <string name="tracker_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
     <string name="data_points">%1$d Puntos de Datos</string>
     <string name="no_data">Sin datos</string>
@@ -351,6 +351,7 @@
     <string name="lua_script_empty">Por favor, añade un script Lua</string>
     <string name="function_name_empty">El nombre de la función no puede estar vacío</string>
     <string name="function_name">Nombre de función</string>
+    <string name="add_at_least_one_input">Por favor, añade al menos una entrada</string>
     <string name="output">Salida</string>
     <string name="data_source">Fuente de Datos</string>
     <string name="lua_script_input_hint">Introduce un script Lua...</string>
