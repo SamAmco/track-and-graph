@@ -29,6 +29,7 @@
         <item name="colorControlNormal">@color/blue_black</item>
         <item name="colorControlHighlight">@color/light_gray</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
+        <item name="android:statusBarColor">@color/chalky_white</item>
         <item name="android:windowBackground">@color/chalky_white</item>
         <item name="android:colorBackground">@color/chalky_white</item>
     </style>

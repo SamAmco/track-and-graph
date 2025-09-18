@@ -22,6 +22,7 @@
         <item name="colorOnSurface">@color/light_gray</item>
         <item name="colorControlNormal">@color/blue_white_pastel</item>
         <item name="colorControlHighlight">@color/dark_gray</item>
+        <item name="android:statusBarColor">@color/dark_charcoal</item>
         <item name="android:textColorPrimary">@color/blue_white_pastel</item>
         <item name="android:windowBackground">@color/dark_charcoal</item>
         <item name="android:colorBackground">@color/dark_charcoal</item>
