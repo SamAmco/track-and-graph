@@ -2,6 +2,7 @@ TODO:
 - affected by for graphs needs re-implementing to handle function graphs
 - We should catch cycles in functions that depend on other functions
 - Don't allow creating a function until you have a tracker? 
+- Function graph builder should use when pattern so you get compiler errors if you add a new type and forget to map it
 
 - Testing:
   - Unit test function graph builder, it shouldn't allow cycles
