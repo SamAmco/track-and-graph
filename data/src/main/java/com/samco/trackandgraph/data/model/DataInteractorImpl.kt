@@ -712,7 +712,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun hasAnyReminders(): Boolean = withContext(io) { dao.hasAnyReminders() }
 
     // FunctionHelper method overrides with event emission
-    override suspend fun insertFunction(function: Function): Long = withContext(io) {
+    override suspend fun insertFunction(function: Function): Long? = withContext(io) {
         val id = functionHelper.insertFunction(function)
         dataUpdateEvents.emit(DataUpdateType.FunctionCreated)
         return@withContext id
