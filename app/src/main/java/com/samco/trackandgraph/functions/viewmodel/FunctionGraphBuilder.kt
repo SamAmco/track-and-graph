@@ -122,12 +122,7 @@ internal class FunctionGraphBuilder @Inject constructor() {
         node: Node.DataSource,
         nodePositions: Map<Int, Offset>
     ): FunctionGraphNode.FeatureNode {
-        // Validate that feature nodes have valid feature IDs
         val featureId = node.selectedFeatureId.value
-        if (featureId <= 0L) {
-            throw IllegalStateException("Feature node ${node.id} must have a valid feature ID")
-        }
-
         val position = nodePositions[node.id] ?: Offset.Zero
 
         return FunctionGraphNode.FeatureNode(
