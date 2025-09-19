@@ -109,27 +109,27 @@ class FunctionGraphSerializerTest {
         return FunctionGraph(
             nodes = listOf(
                 FunctionGraphNode.FeatureNode(
-                    x = 100.0f,
-                    y = 150.0f,
+                    x = 100.5f,      // 1 decimal place
+                    y = 150.75f,     // 2 decimal places
                     id = 1,
                     featureId = 101L
                 ),
                 FunctionGraphNode.FeatureNode(
-                    x = 100.0f,
-                    y = 250.0f,
+                    x = 200.123f,    // 3 decimal places
+                    y = 250.0f,      // No decimal places
                     id = 2,
                     featureId = 102L
                 ),
                 FunctionGraphNode.FeatureNode(
-                    x = 100.0f,
-                    y = 350.0f,
+                    x = 300.0f,      // No decimal places
+                    y = 350.9876f,   // 4 decimal places
                     id = 3,
                     featureId = 103L
                 )
             ),
             outputNode = FunctionGraphNode.OutputNode(
-                x = 500.0f,
-                y = 200.0f,
+                x = 500.25f,     // 2 decimal places
+                y = 200.1f,      // 1 decimal place
                 id = 4,
                 dependencies = listOf(
                     NodeDependency(
