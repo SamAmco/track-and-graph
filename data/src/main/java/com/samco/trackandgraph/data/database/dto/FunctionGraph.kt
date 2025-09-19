@@ -37,6 +37,8 @@ data class NodeDependency(
  */
 @Serializable
 sealed class FunctionGraphNode {
+    abstract val x: Float
+    abstract val y: Float
     abstract val id: Int
     abstract val dependencies: List<NodeDependency>
     
@@ -47,6 +49,8 @@ sealed class FunctionGraphNode {
      */
     @Serializable
     data class FeatureNode(
+        override val x: Float,
+        override val y: Float,
         override val id: Int,
         val featureId: Long,
     ) : FunctionGraphNode() {
@@ -61,6 +65,8 @@ sealed class FunctionGraphNode {
      */
     @Serializable
     data class OutputNode(
+        override val x: Float,
+        override val y: Float,
         override val id: Int,
         override val dependencies: List<NodeDependency>
     ) : FunctionGraphNode()
@@ -76,5 +82,5 @@ data class FunctionGraph(
     val nodes: List<FunctionGraphNode>,
     val outputNode: FunctionGraphNode.OutputNode,
     val isDuration: Boolean
-) {
-}
+)
+

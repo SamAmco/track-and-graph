@@ -1,0 +1,134 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.samco.trackandgraph.data.serialization
+
+import com.samco.trackandgraph.data.database.dto.FunctionGraph
+import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
+import com.samco.trackandgraph.data.database.dto.NodeDependency
+import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Before
+import org.junit.Test
+
+class FunctionGraphSerializerTest {
+
+    private lateinit var json: Json
+    private lateinit var serializer: FunctionGraphSerializer
+
+    @Before
+    fun setUp() {
+        // Use the same Json configuration as the app with pretty printing for tests
+        json = Json {
+            ignoreUnknownKeys = false // Use strict mode for tests
+            isLenient = false
+            prettyPrint = true
+        }
+        serializer = FunctionGraphSerializer(json)
+    }
+
+    @Test
+    fun `deserialize JSON file produces expected function graph`() {
+        val inputJson = readJsonFile("complex_function_graph.json")
+        val expectedGraph = createTestFunctionGraph()
+
+        val actualGraph = serializer.deserialize(inputJson, throwOnFailure = true)
+        assertEquals("Deserialized graph should match expected", expectedGraph, actualGraph)
+    }
+
+    @Test
+    fun `serialize graph matches expected JSON file`() {
+        val functionGraph = createTestFunctionGraph()
+
+        val actualJson = serializer.serialize(functionGraph, throwOnFailure = true)
+        val expectedJson = readJsonFile("complex_function_graph.json")
+        
+        assertEquals("Serialized JSON should match expected file", expectedJson, actualJson)
+    }
+
+//    @Test  // Uncomment to regenerate the JSON file
+    fun `helper - generate JSON file from structure`() {
+        val functionGraph = createTestFunctionGraph()
+
+        val jsonOutput = serializer.serialize(functionGraph, throwOnFailure = true)
+        
+        // Write the JSON to the test resources file
+        val outputFile = java.io.File("src/test/resources/complex_function_graph.json")
+        outputFile.writeText(jsonOutput!!)
+        
+        // This test will always pass - it's just for generating the JSON file
+        assertNotNull("JSON should be generated and written to ${outputFile.absolutePath}", jsonOutput)
+    }
+
+    private fun createTestFunctionGraph(): FunctionGraph {
+        return FunctionGraph(
+            nodes = listOf(
+                FunctionGraphNode.FeatureNode(
+                    x = 100.0f,
+                    y = 150.0f,
+                    id = 1,
+                    featureId = 101L
+                ),
+                FunctionGraphNode.FeatureNode(
+                    x = 100.0f,
+                    y = 250.0f,
+                    id = 2,
+                    featureId = 102L
+                ),
+                FunctionGraphNode.FeatureNode(
+                    x = 100.0f,
+                    y = 350.0f,
+                    id = 3,
+                    featureId = 103L
+                )
+            ),
+            outputNode = FunctionGraphNode.OutputNode(
+                x = 500.0f,
+                y = 200.0f,
+                id = 4,
+                dependencies = listOf(
+                    NodeDependency(
+                        inputConnectorIndex = 0,
+                        nodeId = 1,
+                        outputConnectorIndex = 0
+                    ),
+                    NodeDependency(
+                        inputConnectorIndex = 1,
+                        nodeId = 2,
+                        outputConnectorIndex = 0
+                    ),
+                    NodeDependency(
+                        inputConnectorIndex = 2,
+                        nodeId = 3,
+                        outputConnectorIndex = 0
+                    )
+                )
+            ),
+            isDuration = true
+        )
+    }
+
+    private fun readJsonFile(filename: String): String {
+        return this::class.java.classLoader
+            ?.getResourceAsStream(filename)
+            ?.bufferedReader()
+            ?.use { it.readText() }
+            ?: throw IllegalArgumentException("Could not find resource file: $filename")
+    }
+}

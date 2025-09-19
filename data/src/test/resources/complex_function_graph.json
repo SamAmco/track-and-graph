@@ -1,0 +1,48 @@
+{
+    "nodes": [
+        {
+            "type": "com.samco.trackandgraph.data.database.dto.FunctionGraphNode.FeatureNode",
+            "x": 100.0,
+            "y": 150.0,
+            "id": 1,
+            "featureId": 101
+        },
+        {
+            "type": "com.samco.trackandgraph.data.database.dto.FunctionGraphNode.FeatureNode",
+            "x": 100.0,
+            "y": 250.0,
+            "id": 2,
+            "featureId": 102
+        },
+        {
+            "type": "com.samco.trackandgraph.data.database.dto.FunctionGraphNode.FeatureNode",
+            "x": 100.0,
+            "y": 350.0,
+            "id": 3,
+            "featureId": 103
+        }
+    ],
+    "outputNode": {
+        "x": 500.0,
+        "y": 200.0,
+        "id": 4,
+        "dependencies": [
+            {
+                "inputConnectorIndex": 0,
+                "nodeId": 1,
+                "outputConnectorIndex": 0
+            },
+            {
+                "inputConnectorIndex": 1,
+                "nodeId": 2,
+                "outputConnectorIndex": 0
+            },
+            {
+                "inputConnectorIndex": 2,
+                "nodeId": 3,
+                "outputConnectorIndex": 0
+            }
+        ]
+    },
+    "isDuration": true
+}
