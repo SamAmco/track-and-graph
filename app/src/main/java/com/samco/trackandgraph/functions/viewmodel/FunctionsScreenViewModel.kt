@@ -329,6 +329,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             val functionGraph = functionGraphBuilder.buildFunctionGraph(
                 nodes = _nodes.value,
                 edges = _edges.value,
+                nodePositions = nodePositions.toMap(),
                 isDuration = outputNode.isDuration.value,
                 shouldThrow = BuildConfig.DEBUG
             )
