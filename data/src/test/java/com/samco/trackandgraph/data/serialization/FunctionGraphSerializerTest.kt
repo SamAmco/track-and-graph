@@ -24,6 +24,7 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -60,6 +61,34 @@ class FunctionGraphSerializerTest {
         val expectedJson = readJsonFile("complex_function_graph.json")
         
         assertEquals("Serialized JSON should match expected file", expectedJson, actualJson)
+    }
+
+    @Test
+    fun `test covers all FunctionGraphNode types`() {
+        val testGraph = createTestFunctionGraph()
+        val allNodes = testGraph.nodes + testGraph.outputNode
+        
+        // Get all node types used in our test
+        val testedNodeTypes = allNodes.map { it::class }.toSet()
+        
+        // Get all sealed subclasses of FunctionGraphNode using reflection
+        val allNodeTypes = FunctionGraphNode::class.sealedSubclasses.toSet()
+        
+        // Ensure our test covers all node types
+        val missingTypes = allNodeTypes - testedNodeTypes
+        
+        if (missingTypes.isNotEmpty()) {
+            val missingTypeNames = missingTypes.map { it.simpleName }.joinToString(", ")
+            fail("Test does not cover all FunctionGraphNode types. Missing: $missingTypeNames. " +
+                 "Please update createTestFunctionGraph() to include instances of all node types.")
+        }
+        
+        // Also verify we're not testing non-existent types (defensive check)
+        val extraTypes = testedNodeTypes - allNodeTypes
+        if (extraTypes.isNotEmpty()) {
+            val extraTypeNames = extraTypes.map { it.simpleName }.joinToString(", ")
+            fail("Test includes unknown node types: $extraTypeNames")
+        }
     }
 
 //    @Test  // Uncomment to regenerate the JSON file
