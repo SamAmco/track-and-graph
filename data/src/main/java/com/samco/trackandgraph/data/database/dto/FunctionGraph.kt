@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.data.database.dto
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -48,6 +49,7 @@ sealed class FunctionGraphNode {
      * @param featureId The ID of the feature this node represents
      */
     @Serializable
+    @SerialName("FeatureNode")
     data class FeatureNode(
         override val x: Float,
         override val y: Float,
@@ -64,6 +66,7 @@ sealed class FunctionGraphNode {
      * @param dependencies List of nodes this node depends on
      */
     @Serializable
+    @SerialName("OutputNode")
     data class OutputNode(
         override val x: Float,
         override val y: Float,
