@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview.functions.aggregation
 
 import com.samco.trackandgraph.data.database.dto.IDataPoint
-import com.samco.trackandgraph.data.database.sampling.DataSample
+import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime

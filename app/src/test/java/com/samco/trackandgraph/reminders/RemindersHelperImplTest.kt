@@ -1,6 +1,22 @@
 package com.samco.trackandgraph.reminders
 
 import android.app.AlarmManager
+import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.system.AlarmManagerWrapper
+import com.samco.trackandgraph.system.ReminderPrefWrapper
+import com.samco.trackandgraph.system.StoredAlarmInfo
+import com.samco.trackandgraph.system.SystemInfoProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -8,22 +24,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import com.samco.trackandgraph.data.database.dto.CheckedDays
-import com.samco.trackandgraph.data.database.dto.Reminder
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.system.AlarmManagerWrapper
-import com.samco.trackandgraph.system.ReminderPrefWrapper
-import com.samco.trackandgraph.system.StoredAlarmInfo
-import com.samco.trackandgraph.system.SystemInfoProvider
-import kotlinx.serialization.json.Json
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
 import org.threeten.bp.LocalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)

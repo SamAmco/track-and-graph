@@ -27,10 +27,10 @@ import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.YRangeType
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.DefaultDispatcher
-import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.data.model.di.MainDispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.DefaultDispatcher
+import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviour
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviourImpl

@@ -20,8 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.selectitemdialog.HiddenItem
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType

@@ -15,9 +15,10 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.model
+package com.samco.trackandgraph.data.interactor
 
 import androidx.room.withTransaction
+import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
@@ -44,8 +45,8 @@ import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.data.database.sampling.DataSampler
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow

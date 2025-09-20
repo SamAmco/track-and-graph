@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.model
+package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.Function
 

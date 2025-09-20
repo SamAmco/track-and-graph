@@ -38,10 +38,10 @@ import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.DefaultDispatcher
-import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.data.model.di.MainDispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.DefaultDispatcher
+import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.remoteconfig.UrlNavigator

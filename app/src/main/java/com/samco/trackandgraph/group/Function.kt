@@ -55,7 +55,6 @@ import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 
 /**
  * Lightweight view layer representation of a function for UI display
