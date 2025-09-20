@@ -34,6 +34,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -63,6 +64,7 @@ class LineGraphConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
     private val yRangeConfigBehaviour: YRangeConfigBehaviourImpl = YRangeConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LineGraphConfigData>(
@@ -70,7 +72,8 @@ class LineGraphConfigViewModel @Inject constructor(
     default = default,
     ui = ui,
     gsiProvider = gsiProvider,
-    dataInteractor = dataInteractor
+    dataInteractor = dataInteractor,
+    dataSampler = dataSampler
 ), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
     YRangeConfigBehaviour by yRangeConfigBehaviour {
 

@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
@@ -50,8 +51,9 @@ class LuaGraphDataFactory @Inject constructor(
     private val timeBarChartLuaHelper: TimeBarchartLuaHelper,
     private val luaEngineSettingsProvider: LuaEngineSettingsProvider,
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher
-) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(dataInteractor, dataSampler, ioDispatcher) {
     override suspend fun createViewData(graphOrStat: GraphOrStat, onDataSampled: (List<DataPoint>) -> Unit): ILuaGraphViewData {
         val luaGraph = dataInteractor.getLuaGraphByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
@@ -77,7 +79,7 @@ class LuaGraphDataFactory @Inject constructor(
         return@coroutineScope try {
             dataSamples = config.features
                 .mapNotNull { lgf ->
-                    dataInteractor
+                    dataSampler
                         .getRawDataSampleForFeatureId(lgf.featureId)
                         ?.let { lgf.name to it }
                 }

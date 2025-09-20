@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -61,6 +62,7 @@ interface ViewGraphStatViewModel {
 @HiltViewModel
 class ViewGraphStatViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val dataSampler: DataSampler,
     private val gsiProvider: GraphStatInteractorProvider,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), ViewGraphStatViewModel {
@@ -126,7 +128,7 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         return allFeatures.map { feature ->
             FeatureDataProvider.DataSourceData(
                 feature,
-                dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
+                dataSampler.getDataSamplePropertiesForFeatureId(feature.featureId)
                     ?: return@map null
             )
         }.filterNotNull()
