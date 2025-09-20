@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.functions.ui
+package com.samco.trackandgraph.functions.node_editor
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -51,6 +51,8 @@ internal fun Node(
     onDragBy: (Offset) -> Unit = {},
     onDeleteNode: (Node) -> Unit = {},
     onCreateOrUpdateFunction: () -> Unit = {},
+    onUpdateScriptForNodeId: (Int, String) -> Unit = { _, _ -> },
+    onUpdateScriptFromFileForNodeId: (Int, android.net.Uri?) -> Unit = { _, _ -> },
 ) {
     val minConnectorSpacing = 24.dp
     val connectors = maxOf(node.inputConnectorCount, node.outputConnectorCount)
@@ -81,6 +83,16 @@ internal fun Node(
                 is Node.DataSource -> DataSourceNode(
                     node = node,
                     onDeleteNode = { onDeleteNode(node) },
+                )
+                is Node.LuaScript -> LuaScriptNode(
+                    node = node,
+                    onDeleteNode = { onDeleteNode(node) },
+                    onUpdateScript = { newScript -> 
+                        onUpdateScriptForNodeId(node.id, newScript)
+                    },
+                    onUpdateScriptFromFile = { uri ->
+                        onUpdateScriptFromFileForNodeId(node.id, uri)
+                    }
                 )
             }
         }
@@ -143,6 +155,30 @@ private fun DataSourceNodePreview() {
             node = Node.DataSource(
                 selectedFeatureId = remember { mutableLongStateOf(0L) },
                 featurePathMap = mapOf(0L to "Samples/Sample Data Source"),
+            ),
+            viewState = viewportState,
+            connectorLayerState = connectorLayerState,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LuaScriptNodePreview() {
+    TnGComposeTheme {
+        val viewportState = rememberViewportState(
+            initialScale = 1.0f,
+            initialPan = Offset.Zero,
+            minScale = 0.15f,
+            maxScale = 5.0f
+        )
+        val connectorLayerState = rememberConnectorLayerState()
+
+        Node(
+            node = Node.LuaScript(
+                id = 1,
+                inputConnectorCount = 2,
+                scriptPreview = "function main(input1, input2)\n    return input1 + input2\nend"
             ),
             viewState = viewportState,
             connectorLayerState = connectorLayerState,

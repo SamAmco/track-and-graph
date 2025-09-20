@@ -355,7 +355,9 @@
     <string name="add_at_least_one_input">Bitte fügen Sie mindestens eine Eingabe hinzu</string>
     <string name="output">Ausgabe</string>
     <string name="data_source">Datenquelle</string>
+    <string name="lua_script">Lua-Skript</string>
     <string name="lua_script_input_hint">Geben Sie ein Lua-Skript ein...</string>
+    <string name="select_node_type">Knotentyp auswählen</string>
     <string name="file">Datei</string>
     <string name="lua_feature_names_not_unique">Skripteingaben müssen eindeutige Namen haben</string>
     <string name="graph_stat_type_lua_graph">Lua-Skript</string>
