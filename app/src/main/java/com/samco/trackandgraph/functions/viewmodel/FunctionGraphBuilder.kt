@@ -110,7 +110,6 @@ internal class FunctionGraphBuilder @Inject constructor() {
             NodeDependency(
                 connectorIndex = edge.to.connectorIndex,
                 nodeId = edge.from.nodeId,
-                outputConnectorIndex = edge.from.connectorIndex
             )
         }
     }

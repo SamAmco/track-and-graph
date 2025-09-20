@@ -259,17 +259,14 @@ class FunctionGraphBuilderTest {
                     NodeDependency(
                         connectorIndex = 0,
                         nodeId = 1,
-                        outputConnectorIndex = 0
                     ),
                     NodeDependency(
                         connectorIndex = 1,
                         nodeId = 2,
-                        outputConnectorIndex = 0
                     ),
                     NodeDependency(
                         connectorIndex = 2,
                         nodeId = 3,
-                        outputConnectorIndex = 0
                     )
                 )
             ),
