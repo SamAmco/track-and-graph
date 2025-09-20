@@ -24,13 +24,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.mutate
@@ -42,6 +47,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineDispatcher
+import com.samco.trackandgraph.data.di.IODispatcher
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -72,12 +80,13 @@ sealed class AddNodeData(
     val offset: Offset,
 ) {
     class DataSourceNode(offset: Offset) : AddNodeData(offset)
+    class LuaScriptNode(offset: Offset) : AddNodeData(offset)
 }
 
 @Immutable
 internal sealed class Node(
     open val id: Int,
-    val inputConnectorCount: Int,
+    open val inputConnectorCount: Int,
     val outputConnectorCount: Int,
 ) {
     data class Output(
@@ -100,6 +109,16 @@ internal sealed class Node(
     ) : Node(
         id = id,
         inputConnectorCount = 0,
+        outputConnectorCount = 1,
+    )
+
+    data class LuaScript(
+        override val id: Int = -1,
+        override val inputConnectorCount: Int,
+        val scriptPreview: String,
+    ) : Node(
+        id = id,
+        inputConnectorCount = inputConnectorCount,
         outputConnectorCount = 1,
     )
 }
@@ -129,10 +148,14 @@ internal interface FunctionsScreenViewModel {
     fun getWorldPosition(node: Node): Offset?
 
     fun onCreateOrUpdateFunction()
+    fun updateScriptForNodeId(nodeId: Int, newScript: String)
+    fun updateScriptFromFileForNodeId(nodeId: Int, uri: Uri?)
 }
 
 @HiltViewModel
 internal class FunctionsScreenViewModelImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     private val dataInteractor: DataInteractor,
     private val functionGraphBuilder: FunctionGraphBuilder,
     private val functionGraphDecoder: FunctionGraphDecoder,
@@ -274,6 +297,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         val newId = (_nodes.value.maxOfOrNull { it.id } ?: 0) + 1
         val success = when (data) {
             is AddNodeData.DataSourceNode -> addDataSourceNode(newId)
+            is AddNodeData.LuaScriptNode -> addLuaScriptNode(newId)
         }
         if (success) nodePositions[newId] = data.offset
     }
@@ -285,6 +309,17 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             id = id,
             selectedFeatureId = mutableLongStateOf(feature.key),
             featurePathMap = featurePathMap,
+        )
+        _nodes.value = _nodes.value.add(newNode)
+
+        return true
+    }
+
+    private fun addLuaScriptNode(id: Int): Boolean {
+        val newNode = Node.LuaScript(
+            id = id,
+            inputConnectorCount = 1,
+            scriptPreview = ""
         )
         _nodes.value = _nodes.value.add(newNode)
 
@@ -314,6 +349,39 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         if (selected != null) {
             _edges.value = _edges.value.remove(selected)
             _selectedEdge.value = null
+        }
+    }
+
+    override fun updateScriptForNodeId(nodeId: Int, newScript: String) {
+        // TODO: Run the new lua script to determine input connector count
+        val newInputConnectorCount = 1 // TODO: This should be determined by analyzing the script
+        
+        _nodes.value = _nodes.value.mutate { nodeList ->
+            val index = nodeList.indexOfFirst { it.id == nodeId && it is Node.LuaScript }
+            if (index >= 0) {
+                val oldNode = nodeList[index] as Node.LuaScript
+                nodeList[index] = oldNode.copy(
+                    scriptPreview = newScript,
+                    inputConnectorCount = newInputConnectorCount
+                )
+            }
+        }
+    }
+
+    override fun updateScriptFromFileForNodeId(nodeId: Int, uri: Uri?) {
+        if (uri == null) return
+        
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val scriptText = BufferedReader(InputStreamReader(inputStream)).readText()
+                    updateScriptForNodeId(nodeId, scriptText)
+                }
+            } catch (e: Exception) {
+                // Handle file reading errors gracefully
+                Timber.e(e, "Failed to read file")
+                if (BuildConfig.DEBUG) throw e
+            }
         }
     }
 

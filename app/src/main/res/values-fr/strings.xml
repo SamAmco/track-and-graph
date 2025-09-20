@@ -363,7 +363,9 @@
     <string name="add_at_least_one_input">Veuillez ajouter au moins une entrée</string>
     <string name="output">Sortie</string>
     <string name="data_source">Source de Données</string>
+    <string name="lua_script">Script Lua</string>
     <string name="lua_script_input_hint">Entrez un script Lua…</string>
+    <string name="select_node_type">Sélectionner le Type de Nœud</string>
     <string name="file">Fichier</string>
     <string name="lua_feature_names_not_unique">Les entrées des scripts doivent avoir des noms uniques</string>
     <string name="graph_stat_type_lua_graph">Script Lua</string>
