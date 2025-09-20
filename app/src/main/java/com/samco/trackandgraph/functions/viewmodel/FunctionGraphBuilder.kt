@@ -108,7 +108,7 @@ internal class FunctionGraphBuilder @Inject constructor() {
     private fun calculateDependencies(nodeId: Int, edges: List<Edge>): List<NodeDependency> {
         return edges.filter { it.to.nodeId == nodeId }.map { edge ->
             NodeDependency(
-                inputConnectorIndex = edge.to.connectorIndex,
+                connectorIndex = edge.to.connectorIndex,
                 nodeId = edge.from.nodeId,
                 outputConnectorIndex = edge.from.connectorIndex
             )

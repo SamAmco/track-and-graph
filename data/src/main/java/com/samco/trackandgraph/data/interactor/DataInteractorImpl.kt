@@ -46,7 +46,6 @@ import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.di.IODispatcher
-import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -67,9 +66,7 @@ internal class DataInteractorImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     private val trackerHelper: TrackerHelper,
     private val functionHelper: FunctionHelper,
-    private val csvReadWriter: CSVReadWriter,
-    private val dataSampler: DataSampler
-) : DataInteractor, TrackerHelper by trackerHelper, FunctionHelper by functionHelper, DataSampler by dataSampler {
+) : DataInteractor, TrackerHelper by trackerHelper, FunctionHelper by functionHelper {
 
     private val dataUpdateEvents = MutableSharedFlow<DataUpdateType>(
         extraBufferCapacity = 100,
@@ -611,28 +608,10 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getGroupsForGroupSync(id).map { it.toDto() }
     }
 
-    override suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>) =
-        withContext(io) {
-            val featureMap = featureIds
-                .mapNotNull { getFeatureById(it) }
-                .associateWith { getDataSampleForFeatureId(it.featureId) }
-            try {
-                csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
-            } catch (t: Throwable) {
-                Timber.e(t)
-            } finally {
-                featureMap.values.forEach { it.dispose() }
-            }
-        }
-
-    override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) =
-        withContext(io) {
-            try {
-                csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
-            } finally {
-                dataUpdateEvents.emit(DataUpdateType.TrackerCreated)
-            }
-        }
+    override fun onImportedExternalData() {
+        // Emit data update event to notify observers that external data was imported
+        dataUpdateEvents.tryEmit(DataUpdateType.Unknown)
+    }
 
     override suspend fun playTimerForTracker(trackerId: Long): Long? {
         return trackerHelper.playTimerForTracker(trackerId)?.also {

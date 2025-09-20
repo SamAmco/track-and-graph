@@ -43,9 +43,9 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
-    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
-    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl = FilterableFeatureConfigBehaviourImpl(),
-    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl(),
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl,
+    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl,
+    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.AverageTimeBetweenConfigData>(
     io,
     default,
