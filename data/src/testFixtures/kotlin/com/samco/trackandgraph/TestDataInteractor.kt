@@ -2,17 +2,16 @@ package com.samco.trackandgraph
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriterImpl
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.data.database.sampling.DataSamplerImpl
-import com.samco.trackandgraph.data.model.CSVReadWriterImpl
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.DataInteractorImpl
-import com.samco.trackandgraph.data.model.DataPointUpdateHelperImpl
-import com.samco.trackandgraph.data.model.DatabaseTransactionHelperImpl
-import com.samco.trackandgraph.data.model.FunctionHelperImpl
-import com.samco.trackandgraph.data.model.TrackerHelperImpl
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractorImpl
+import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
+import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
+import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
+import com.samco.trackandgraph.data.sampling.DataSamplerImpl
 import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
-import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 

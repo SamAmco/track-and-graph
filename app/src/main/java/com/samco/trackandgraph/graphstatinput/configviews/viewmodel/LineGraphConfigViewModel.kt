@@ -33,10 +33,10 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.DefaultDispatcher
-import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.data.model.di.MainDispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.DefaultDispatcher
+import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent.ValidationException
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviour

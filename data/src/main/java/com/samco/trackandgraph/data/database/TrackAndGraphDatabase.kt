@@ -40,6 +40,8 @@ import com.samco.trackandgraph.data.database.entity.BarChart
 import com.samco.trackandgraph.data.database.entity.DataPoint
 import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.FeatureTimer
+import com.samco.trackandgraph.data.database.entity.Function
+import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.database.entity.GlobalNote
 import com.samco.trackandgraph.data.database.entity.GraphOrStat
 import com.samco.trackandgraph.data.database.entity.Group
@@ -52,8 +54,6 @@ import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.Reminder
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
 import com.samco.trackandgraph.data.database.entity.Tracker
-import com.samco.trackandgraph.data.database.entity.Function
-import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.database.migrations.allMigrations
 import kotlinx.serialization.json.Json
 import org.threeten.bp.Duration
