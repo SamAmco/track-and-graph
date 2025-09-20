@@ -18,6 +18,9 @@
 package com.samco.trackandgraph.data.interactor
 
 sealed class DataUpdateType {
+    /** Something changed, but we don't know what, e.g. due to external data import **/
+    data object Unknown : DataUpdateType()
+
     /**Data point(s) were created/updated/deleted for a given feature**/
     data class DataPoint(val featureId: Long) : DataUpdateType()
 

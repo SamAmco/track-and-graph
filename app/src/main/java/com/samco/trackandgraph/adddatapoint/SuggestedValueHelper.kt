@@ -22,6 +22,7 @@ import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -47,7 +48,7 @@ interface SuggestedValueHelper {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SuggestedValueHelperImpl @Inject constructor(
-    private val dataInteractor: DataInteractor,
+    private val dataSampler: DataSampler,
     @IODispatcher private val io: CoroutineDispatcher
 ) : SuggestedValueHelper {
 
@@ -56,7 +57,7 @@ class SuggestedValueHelperImpl @Inject constructor(
     }
 
     private fun getDataPoints(tracker: Tracker): Flow<IDataPoint> = flow {
-        val sample = dataInteractor.getDataSampleForFeatureId(tracker.featureId)
+        val sample = dataSampler.getDataSampleForFeatureId(tracker.featureId)
         emit(
             flow { for (dp in sample) emit(dp) }
                 .onCompletion { sample.dispose() }

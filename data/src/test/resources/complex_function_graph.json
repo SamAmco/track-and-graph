@@ -28,19 +28,16 @@
         "id": 4,
         "dependencies": [
             {
-                "inputConnectorIndex": 0,
-                "nodeId": 1,
-                "outputConnectorIndex": 0
+                "connectorIndex": 0,
+                "nodeId": 1
             },
             {
-                "inputConnectorIndex": 1,
-                "nodeId": 2,
-                "outputConnectorIndex": 0
+                "connectorIndex": 1,
+                "nodeId": 2
             },
             {
-                "inputConnectorIndex": 2,
-                "nodeId": 3,
-                "outputConnectorIndex": 0
+                "connectorIndex": 2,
+                "nodeId": 3
             }
         ]
     },

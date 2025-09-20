@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import kotlinx.coroutines.CoroutineDispatcher
@@ -47,7 +48,9 @@ interface FilterableFeatureConfigBehaviour {
     fun updateFilterByRange(filter: Boolean)
 }
 
-class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
+class FilterableFeatureConfigBehaviourImpl @Inject constructor(
+    private val dataSampler: DataSampler
+) :
     FilterableFeatureConfigBehaviour {
 
     var featureId: Long? = null
@@ -65,20 +68,17 @@ class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
     private lateinit var io: CoroutineDispatcher
     private lateinit var ui: CoroutineDispatcher
     private lateinit var coroutineScope: CoroutineScope
-    private lateinit var dataInteractor: DataInteractor
 
     fun initFilterableFeatureConfigBehaviour(
         onUpdate: () -> Unit,
         io: CoroutineDispatcher,
         ui: CoroutineDispatcher,
         coroutineScope: CoroutineScope,
-        dataInteractor: DataInteractor
     ) {
         this.onUpdate = onUpdate
         this.io = io
         this.ui = ui
         this.coroutineScope = coroutineScope
-        this.dataInteractor = dataInteractor
     }
 
     fun onConfigLoaded(
@@ -104,7 +104,7 @@ class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
             labelUpdateJob = coroutineScope.launch(ui) {
                 loadingLabels = true
                 val labels = withContext(io) {
-                    dataInteractor.getLabelsForFeatureId(fId)
+                    dataSampler.getLabelsForFeatureId(fId)
                         .filter { it.isNotEmpty() }
                         .sorted()
                 }
