@@ -135,6 +135,7 @@ internal interface FunctionsScreenViewModel {
 internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val functionGraphBuilder: FunctionGraphBuilder,
+    private val functionGraphDecoder: FunctionGraphDecoder,
 ) : ViewModel(), FunctionsScreenViewModel {
 
     private val initialized = AtomicBoolean(false)
@@ -176,13 +177,24 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             val pathProvider = FeaturePathProvider(allFeatures, allGroups)
             featurePathMap = pathProvider.sortedFeatureMap()
 
-            // TODO: Load function data based on groupId and functionId
-            // TODO: Set isUpdateMode boolean based on whether functionId is null (create) or not (update)
-            // For now, initialize with mock data
-            _nodes.value = _nodes.value.mutate {
-                it.add(Node.Output(id = 1, isUpdateMode = false))
+            val existing = existingFunction
+            if (existing != null) {
+                // Decode existing function graph
+                val decodedGraph = functionGraphDecoder.decodeFunctionGraph(existing, featurePathMap)
+                
+                // Load decoded nodes and edges using persistent lists
+                _nodes.value = decodedGraph.nodes
+                _edges.value = decodedGraph.edges
+                
+                // Load node positions
+                nodePositions.putAll(decodedGraph.nodePositions)
+            } else {
+                // Initialize with default output node for new function
+                _nodes.value = _nodes.value.mutate {
+                    it.add(Node.Output(id = 1, isUpdateMode = false))
+                }
+                nodePositions[1] = Offset(0f, 0f)
             }
-            nodePositions[1] = Offset(100f, 100f)
         }
     }
 

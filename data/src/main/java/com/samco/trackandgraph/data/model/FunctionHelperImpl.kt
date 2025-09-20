@@ -52,14 +52,14 @@ internal class FunctionHelperImpl @Inject constructor(
             val featureId = dao.insertFeature(feature)
 
             // Now create the Function entity with the correct featureId
-            dao.insertFunction(function.copy(featureId = featureId).toEntity(serializedGraph))
+            val functionId = dao.insertFunction(function.copy(featureId = featureId).toEntity(serializedGraph))
 
             // Now create the FunctionInputFeature entities
             function.inputFeatureIds.forEach { inputFeatureId ->
                 dao.insertFunctionInputFeature(
                     FunctionInputFeature(
                         id = 0L,
-                        functionId = featureId,
+                        functionId = functionId,
                         featureId = inputFeatureId
                     )
                 )
