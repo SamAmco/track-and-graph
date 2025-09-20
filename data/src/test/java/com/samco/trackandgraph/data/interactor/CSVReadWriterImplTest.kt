@@ -7,8 +7,9 @@ import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.entity.DataPoint
-import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.data.sampling.DataSampleProperties
+import com.samco.trackandgraph.data.sampling.DataSampler
+import com.samco.trackandgraph.data.sampling.RawDataSample
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -16,6 +17,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -362,6 +364,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
 
     private val trackerHelper = mock<TrackerHelper>()
     private val dao = mock<TrackAndGraphDatabaseDao>()
+    private val dataSampler = mock<DataSampler>()
     private val dispatcher = UnconfinedTestDispatcher()
 
 
@@ -372,6 +375,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
         csvReadWriterImpl = CSVReadWriterImpl(
             dao = dao,
             trackerHelper = trackerHelper,
+            dataSampler = dataSampler,
             io = dispatcher
         )
     }
@@ -442,21 +446,25 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
             .groupBy { it.featureId }
             .map { tuple ->
                 val feature = testTrackers.first { it.featureId == tuple.key } as Feature
-                val dataSampleProperties =
-                    DataSampleProperties(isDuration = feature.featureId == 3L)
-                feature to DataSample.fromSequence(
-                    data = tuple.value.map { it.asIDataPoint() }.asSequence(),
-                    dataSampleProperties = dataSampleProperties,
+                val rawDataSample = RawDataSample.fromSequence(
+                    data = tuple.value.map { it.toDto() }.asSequence(),
                     getRawDataPoints = { tuple.value.map { it.toDto() } },
                     onDispose = {}
                 )
+                feature to rawDataSample
             }
             .toMap()
+
+        // Mock the DataSampler to return the test data
+        featureMap.forEach { (feature, rawDataSample) ->
+            whenever(dataSampler.getRawDataSampleForFeatureId(feature.featureId)) doReturn rawDataSample
+            whenever(dataSampler.getDataSamplePropertiesForFeatureId(feature.featureId)) doReturn DataSampleProperties(isDuration = feature.featureId == 3L)
+        }
 
         val outputStream = ByteArrayOutputStream()
 
         //EXECUTE
-        csvReadWriterImpl.writeFeaturesToCSV(outputStream, featureMap)
+        csvReadWriterImpl.writeFeaturesToCSV(outputStream, featureMap.keys.toList())
 
         //VERIFY
 

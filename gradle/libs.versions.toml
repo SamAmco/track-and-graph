@@ -39,7 +39,7 @@ kotlinSerialization = "2.2.20"
 # Gradle script versions
 jdk = "17"
 androidSdk = "36"
-minSdk = "23"
+minSdk = "24"
 targetSdk = "35"
 rules = "1.7.0"
 uiautomator = "2.3.0"

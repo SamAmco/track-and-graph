@@ -132,19 +132,16 @@ class FunctionGraphSerializerTest {
                 id = 4,
                 dependencies = listOf(
                     NodeDependency(
-                        inputConnectorIndex = 0,
-                        nodeId = 1,
-                        outputConnectorIndex = 0
+                        connectorIndex = 0,
+                        nodeId = 1
                     ),
                     NodeDependency(
-                        inputConnectorIndex = 1,
-                        nodeId = 2,
-                        outputConnectorIndex = 0
+                        connectorIndex = 1,
+                        nodeId = 2
                     ),
                     NodeDependency(
-                        inputConnectorIndex = 2,
-                        nodeId = 3,
-                        outputConnectorIndex = 0
+                        connectorIndex = 2,
+                        nodeId = 3
                     )
                 )
             ),

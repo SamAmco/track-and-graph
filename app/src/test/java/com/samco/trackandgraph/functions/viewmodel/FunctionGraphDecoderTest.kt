@@ -146,12 +146,12 @@ internal class FunctionGraphDecoderTest {
                     id = 3,
                     dependencies = listOf(
                         NodeDependency(
-                            inputConnectorIndex = 0,
+                            connectorIndex = 0,
                             nodeId = 1,
                             outputConnectorIndex = 0
                         ),
                         NodeDependency(
-                            inputConnectorIndex = 1,
+                            connectorIndex = 1,
                             nodeId = 2,
                             outputConnectorIndex = 0
                         )
