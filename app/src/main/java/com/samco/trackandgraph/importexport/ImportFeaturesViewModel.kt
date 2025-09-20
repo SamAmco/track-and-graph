@@ -20,6 +20,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.csvreadwriter.ImportFeaturesException
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -48,6 +49,7 @@ interface ImportFeaturesModuleViewModel {
 
 @HiltViewModel
 class ImportFeaturesModuleViewModelImpl @Inject constructor(
+    private val csvReadWriter: CSVReadWriter,
     private val dataInteractor: DataInteractor,
     private val contentResolver: ContentResolver,
     @MainDispatcher private val ui: CoroutineDispatcher,
@@ -93,7 +95,8 @@ class ImportFeaturesModuleViewModelImpl @Inject constructor(
     private suspend fun doImport(uri: Uri, trackGroupId: Long) = runCatching {
         withContext(io) {
             contentResolver.openInputStream(uri)?.let { inputStream ->
-                dataInteractor.readFeaturesFromCSV(inputStream, trackGroupId)
+                csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
+                dataInteractor.onImportedExternalData()
             }
         }
     }

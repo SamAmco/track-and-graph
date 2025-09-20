@@ -22,15 +22,13 @@ import kotlinx.serialization.Serializable
 
 /**
  * Represents a dependency between nodes in the function graph.
- * @param inputConnectorIndex The input connector index on the dependent node
+ * @param connectorIndex The input connector index on the dependent node
  * @param nodeId The ID of the node that this node depends on
- * @param outputConnectorIndex The output connector index on the dependency node
  */
 @Serializable
 data class NodeDependency(
-    val inputConnectorIndex: Int,
+    val connectorIndex: Int,
     val nodeId: Int,
-    val outputConnectorIndex: Int
 )
 
 /**

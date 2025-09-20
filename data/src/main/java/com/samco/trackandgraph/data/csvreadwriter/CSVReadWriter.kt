@@ -32,6 +32,6 @@ sealed class ImportFeaturesException : Exception() {
 
 
 interface CSVReadWriter {
-    suspend fun writeFeaturesToCSV(outStream: OutputStream, features: Map<Feature, DataSample>)
+    suspend fun writeFeaturesToCSV(outStream: OutputStream, features: List<Feature>)
     suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
 }

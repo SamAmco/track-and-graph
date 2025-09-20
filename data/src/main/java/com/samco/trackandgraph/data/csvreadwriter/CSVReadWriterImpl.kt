@@ -18,14 +18,16 @@
 package com.samco.trackandgraph.data.csvreadwriter
 
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Feature
-import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.odtFromString
 import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.di.IODispatcher
-import com.samco.trackandgraph.data.sampling.DataSample
+import com.samco.trackandgraph.data.interactor.DataUpdateType
+import com.samco.trackandgraph.data.sampling.DataSampleProperties
+import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -45,6 +47,7 @@ import com.samco.trackandgraph.data.database.entity.DataPoint as DataPointEntity
 internal class CSVReadWriterImpl @Inject constructor(
     private val dao: TrackAndGraphDatabaseDao,
     private val trackerHelper: TrackerHelper,
+    private val dataSampler: DataSampler,
     @IODispatcher private val io: CoroutineDispatcher
 ) : CSVReadWriter {
     private enum class RequiredHeaders {
@@ -61,32 +64,45 @@ internal class CSVReadWriterImpl @Inject constructor(
         Note
     }
 
+    private data class WriteFeatureData(
+        val feature: Feature,
+        val dataPoints: List<DataPoint>,
+        val dataSampleProperties: DataSampleProperties?
+    )
+
     override suspend fun writeFeaturesToCSV(
         outStream: OutputStream,
-        features: Map<Feature, DataSample>
+        features: List<Feature>
     ) {
         withContext(io) {
-            outStream.writer().use { writeFeaturesToCSVImpl(features, it) }
+            outStream.writer().use { outputStreamWriter ->
+                val samples = features.map { getWriteFeatureData(it) }
+                writeFeaturesToCSVImpl(samples, outputStreamWriter)
+            }
         }
     }
 
+    private suspend fun getWriteFeatureData(feature: Feature): WriteFeatureData {
+        val dataPoints = dataSampler
+            .getRawDataSampleForFeatureId(feature.featureId)
+            ?.toList() ?: emptyList()
+        val dataSampleProperties = dataSampler
+            .getDataSamplePropertiesForFeatureId(feature.featureId)
+        return WriteFeatureData(feature, dataPoints, dataSampleProperties)
+    }
+
     private suspend fun writeFeaturesToCSVImpl(
-        features: Map<Feature, DataSample>,
+        writeFeatureData: List<WriteFeatureData>,
         writer: OutputStreamWriter
     ) {
         val csvWriter = CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(Headers::class.java))
         try {
-            for (kvp in features) {
-                val feature = kvp.key
-                val dataPoints = kvp.value.toList()
-                val notes = kvp.value.getRawDataPoints().associate { it.timestamp to it.note }
-
+            for (wfd in writeFeatureData) {
                 writeDataPointsToCSV(
                     csvWriter,
-                    dataPoints,
-                    notes,
-                    feature.name,
-                    kvp.value.dataSampleProperties.isDuration
+                    wfd.dataPoints,
+                    wfd.feature.name,
+                    wfd.dataSampleProperties?.isDuration ?: false,
                 )
             }
         } catch (e: Throwable) {
@@ -100,8 +116,7 @@ internal class CSVReadWriterImpl @Inject constructor(
 
     private suspend fun writeDataPointsToCSV(
         csvPrinter: CSVPrinter,
-        dataPoints: List<IDataPoint>,
-        notes: Map<OffsetDateTime, String>,
+        dataPoints: List<DataPoint>,
         featureName: String,
         isDuration: Boolean
     ) = dataPoints.forEach { dp ->
@@ -116,7 +131,7 @@ internal class CSVReadWriterImpl @Inject constructor(
             dp.timestamp.toString(),
             dataPointString,
             dp.label,
-            notes[dp.timestamp] ?: ""
+            dp.note,
         )
         yield()
     }
@@ -317,10 +332,12 @@ internal class CSVReadWriterImpl @Inject constructor(
             colons == 0 -> {
                 value = valueString.toDouble()
             }
+
             colons == 2 && valueString.matches(durationRegex) -> {
                 value = parseDuration(valueString)
                 isDuration = true
             }
+
             colons > 2 && valueString.contains(durationRegex) -> {
                 value = parseDuration(valueString)
                 val matchResult = durationRegex.find(valueString)
@@ -328,6 +345,7 @@ internal class CSVReadWriterImpl @Inject constructor(
                     label = valueString.substring(matchResult.range.last + 2)
                 isDuration = true
             }
+
             else -> {
                 value = valueString.split(":").first().toDoubleOrNull()
                     ?: throw ImportFeaturesException.InconsistentRecord(lineNumber)
