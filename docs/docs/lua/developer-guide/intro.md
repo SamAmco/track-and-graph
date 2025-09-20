@@ -325,10 +325,10 @@ git clone git@github.com:SamAmco/track-and-graph.git
 cd track-and-graph
 ```
 
-The tests are run using the [ CommunityTestRunner.kt ](https://github.com/SamAmco/track-and-graph/blob/master/app/src/test/java/com/samco/trackandgraph/lua/CommunityTestRunner.kt) in the Android project. You can run them using the gradlew file inside the repo with:
+The tests are run using the [ CommunityTestRunner.kt ](https://github.com/SamAmco/track-and-graph/blob/master/data/src/test/java/com/samco/trackandgraph/data/lua/CommunityTestRunner.kt) in the Android project. You can run them using the gradlew file inside the repo with:
 
 ```bash
-./gradlew :app:testDebugUnitTest --tests "com.samco.trackandgraph.lua.CommunityTestRunner"
+./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.CommunityTestRunner"
 ```
 
 ### Debugging tests
