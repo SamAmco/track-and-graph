@@ -28,6 +28,7 @@ import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -56,6 +57,7 @@ class BarChartConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
     private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl(),
     private val yRangeConfigBehaviour: YRangeConfigBehaviourImpl = YRangeConfigBehaviourImpl(),
@@ -64,7 +66,8 @@ class BarChartConfigViewModel @Inject constructor(
     default,
     ui,
     gsiProvider,
-    dataInteractor
+    dataInteractor,
+    dataSampler
 ), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
     SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour,
     YRangeConfigBehaviour by yRangeConfigBehaviour {

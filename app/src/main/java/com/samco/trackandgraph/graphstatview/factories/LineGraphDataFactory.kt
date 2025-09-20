@@ -30,6 +30,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
@@ -60,12 +61,13 @@ import javax.inject.Inject
 
 class LineGraphDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     private val androidPlotSeriesHelper: AndroidPlotSeriesHelper,
     private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val timeHelper: TimeHelper,
-) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(dataInteractor, dataSampler, ioDispatcher) {
 
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
@@ -190,7 +192,7 @@ class LineGraphDataFactory @Inject constructor(
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = withContext(ioDispatcher) {
-            dataInteractor.getDataSampleForFeatureId(lineGraphFeature.featureId)
+            dataSampler.getDataSampleForFeatureId(lineGraphFeature.featureId)
         }
 
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {

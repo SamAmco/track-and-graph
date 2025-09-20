@@ -29,6 +29,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSample
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import junit.framework.TestCase.assertEquals
@@ -48,6 +49,7 @@ import org.threeten.bp.Period
 class LineGraphDataFactoryTest {
 
     private val dataInteractor: DataInteractor = mock()
+    private val dataSampler: DataSampler = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -62,6 +64,7 @@ class LineGraphDataFactoryTest {
     private val daggerComponent = DaggerLineGraphDataFactoryTestComponent
         .builder()
         .dataInteractor(dataInteractor)
+        .dataSampler(dataSampler)
         .ioDispatcher(ioDispatcher)
         .defaultDispatcher(defaultDispatcher)
         .timeHelper(timeHelper)
@@ -109,7 +112,7 @@ class LineGraphDataFactoryTest {
         whenever(dataInteractor.getLineGraphByGraphStatId(1L))
             .thenReturn(lineGraphWithFeatures)
 
-        whenever(dataInteractor.getDataSampleForFeatureId(1L))
+        whenever(dataSampler.getDataSampleForFeatureId(1L))
             .thenReturn(
                 DataSample.fromSequence(
                 onDispose = {},

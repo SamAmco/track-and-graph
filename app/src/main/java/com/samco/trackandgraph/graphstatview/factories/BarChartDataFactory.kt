@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
@@ -50,10 +51,11 @@ import kotlin.math.abs
 
 class BarChartDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     private val timeHelper: TimeHelper,
-) : ViewDataFactory<BarChart, IBarChartViewData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<BarChart, IBarChartViewData>(dataInteractor, dataSampler, ioDispatcher) {
 
     companion object {
 
@@ -277,7 +279,7 @@ class BarChartDataFactory @Inject constructor(
         config: BarChart,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IBarChartViewData {
-        val dataSample = dataInteractor.getDataSampleForFeatureId(config.featureId)
+        val dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
 
         if (!dataSample.iterator().hasNext()) return object : IBarChartViewData {
             override val state = IGraphStatViewData.State.READY

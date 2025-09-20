@@ -20,6 +20,7 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.util.Stopwatch
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,6 +36,7 @@ import timber.log.Timber
  */
 abstract class ViewDataFactory<in I, out T : IGraphStatViewData>(
     protected val dataInteractor: DataInteractor,
+    protected val dataSampler: DataSampler,
     protected val ioDispatcher: CoroutineDispatcher
 ) {
 

@@ -21,6 +21,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -43,6 +44,7 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl,
     private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl,
     private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl,
@@ -51,7 +53,8 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     default,
     ui,
     gsiProvider,
-    dataInteractor
+    dataInteractor,
+    dataSampler
 ), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
     FilterableFeatureConfigBehaviour by filterableFeatureConfigBehaviour,
     SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour {
@@ -63,7 +66,6 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
             io = io,
             ui = ui,
             coroutineScope = viewModelScope,
-            dataInteractor = dataInteractor
         )
         singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(
             onUpdate = { onUpdate() },

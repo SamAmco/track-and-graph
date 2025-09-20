@@ -148,12 +148,10 @@ internal class FunctionGraphDecoderTest {
                         NodeDependency(
                             connectorIndex = 0,
                             nodeId = 1,
-                            outputConnectorIndex = 0
                         ),
                         NodeDependency(
                             connectorIndex = 1,
                             nodeId = 2,
-                            outputConnectorIndex = 0
                         )
                     )
                 ),

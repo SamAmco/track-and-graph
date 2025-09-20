@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -33,8 +34,9 @@ import javax.inject.Inject
 
 class LastValueDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher
-) : ViewDataFactory<LastValueStat, ILastValueViewData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<LastValueStat, ILastValueViewData>(dataInteractor, dataSampler, ioDispatcher) {
 
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
@@ -56,7 +58,6 @@ class LastValueDataFactory @Inject constructor(
     ): ILastValueViewData {
         return try {
             val lastData = getLastDataPoint(
-                dataInteractor,
                 config,
                 onDataSampled
             ) ?: return notEnoughData(graphOrStat)
@@ -97,11 +98,10 @@ class LastValueDataFactory @Inject constructor(
     )
 
     private suspend fun getLastDataPoint(
-        dataInteractor: DataInteractor,
         config: LastValueStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): LastDataPointData? {
-        val dataSample = dataInteractor.getDataSampleForFeatureId(config.featureId)
+        val dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
 
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))

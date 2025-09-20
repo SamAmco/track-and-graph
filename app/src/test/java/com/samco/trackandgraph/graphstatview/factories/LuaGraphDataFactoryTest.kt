@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -49,6 +50,7 @@ import com.samco.trackandgraph.lua.dto.TimeBarSegment
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -68,12 +70,14 @@ class LuaGraphDataFactoryTest {
 
     private val luaEngine: LuaEngine = mock()
     private val dataInteractor: DataInteractor = mock()
+    private val dataSampler: DataSampler = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     private val onDataSampled: (List<DataPoint>) -> Unit = mock()
 
     private fun uut() = DaggerLuaDataFactoryTestComponent.builder()
         .dataInteractor(dataInteractor)
+        .dataSampler(dataSampler)
         .ioDispatcher(ioDispatcher)
         .luaEngine(luaEngine)
         .build()
@@ -84,9 +88,11 @@ class LuaGraphDataFactoryTest {
     @Before
     fun setup() {
         rawDataSamples.clear()
-        whenever(dataInteractor.getRawDataSampleForFeatureId(any())).thenAnswer {
-            val featureId = it.getArgument<Long>(0)
-            rawDataSamples[featureId]
+        runBlocking {
+            whenever(dataSampler.getRawDataSampleForFeatureId(any())).thenAnswer {
+                val featureId = it.getArgument<Long>(0)
+                rawDataSamples[featureId]
+            }
         }
     }
 
