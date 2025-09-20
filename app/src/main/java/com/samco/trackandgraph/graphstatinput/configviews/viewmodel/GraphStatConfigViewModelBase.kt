@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.util.FeatureDataProvider
@@ -30,7 +31,8 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     private val default: CoroutineDispatcher,
     private val ui: CoroutineDispatcher,
     private val gsiProvider: GraphStatInteractorProvider,
-    protected val dataInteractor: DataInteractor
+    protected val dataInteractor: DataInteractor,
+    protected val dataSampler: DataSampler
 ) : ViewModel() {
 
     private var configFlow = MutableStateFlow<GraphStatConfigEvent>(GraphStatConfigEvent.Loading)
@@ -66,7 +68,7 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
         val allFeatures = dataInteractor.getAllFeaturesSync().map {
             FeatureDataProvider.DataSourceData(
                 it,
-                dataInteractor.getDataSamplePropertiesForFeatureId(it.featureId)
+                dataSampler.getDataSamplePropertiesForFeatureId(it.featureId)
             )
         }
         val allGroups = dataInteractor.getAllGroupsSync()

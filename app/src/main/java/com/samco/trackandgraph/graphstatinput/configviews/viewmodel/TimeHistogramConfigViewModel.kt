@@ -24,6 +24,7 @@ import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -44,14 +45,16 @@ class TimeHistogramConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
-    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
-    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl(),
+    dataSampler: DataSampler,
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl,
+    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.TimeHistogramConfigData>(
     io,
     default,
     ui,
     gsiProvider,
-    dataInteractor
+    dataInteractor,
+    dataSampler
 ), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
     SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour {
 

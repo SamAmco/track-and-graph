@@ -21,6 +21,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -43,15 +44,17 @@ class LastValueConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
-    private val endingAtConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
-    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl(),
-    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl = FilterableFeatureConfigBehaviourImpl()
+    dataSampler: DataSampler,
+    private val endingAtConfigBehaviour: TimeRangeConfigBehaviourImpl,
+    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl,
+    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LastValueConfigData>(
     io,
     default,
     ui,
     gsiProvider,
-    dataInteractor
+    dataInteractor,
+    dataSampler
 ),
     EndingAtConfigBehaviour by endingAtConfigBehaviour,
     FilterableFeatureConfigBehaviour by filterableFeatureConfigBehaviour,
@@ -64,7 +67,6 @@ class LastValueConfigViewModel @Inject constructor(
             io = io,
             ui = ui,
             coroutineScope = viewModelScope,
-            dataInteractor = dataInteractor
         )
         singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(
             onUpdate = { onUpdate() },

@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -35,9 +36,10 @@ import kotlin.math.min
 
 class TimeHistogramDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     private val timeHelper: TimeHelper,
-) : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>(dataInteractor, dataSampler, ioDispatcher) {
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
@@ -93,7 +95,7 @@ class TimeHistogramDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit,
         timeHistogramDataHelper: TimeHistogramDataHelper
     ): List<ITimeHistogramViewData.BarValue>? {
-        val sample = dataInteractor.getDataSampleForFeatureId(config.featureId)
+        val sample = dataSampler.getDataSampleForFeatureId(config.featureId)
         val dataSample = DataClippingFunction(config.endDate.toOffsetDateTime(), config.sampleSize)
             .mapSample(sample)
         val barValues = timeHistogramDataHelper

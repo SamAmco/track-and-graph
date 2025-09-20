@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSample
+import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -42,6 +43,7 @@ class PieChartDataFactoryTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
     private val dataInteractor = mock<DataInteractor>()
+    private val dataSampler = mock<DataSampler>()
 
     private lateinit var uut: PieChartDataFactory
 
@@ -75,7 +77,7 @@ class PieChartDataFactoryTest {
 
     @Before
     fun setUp() = runTest {
-        uut = PieChartDataFactory(dataInteractor, testDispatcher)
+        uut = PieChartDataFactory(dataInteractor, dataSampler, testDispatcher)
 
         whenever(dataInteractor.getFeatureById(eq(featureId))).thenReturn(feature)
     }
@@ -96,7 +98,7 @@ class PieChartDataFactoryTest {
             )
         ) {}
 
-        whenever(dataInteractor.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
+        whenever(dataSampler.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
             pieChart.copy(sumByCount = true)
         )
@@ -132,7 +134,7 @@ class PieChartDataFactoryTest {
             )
         ) {}
 
-        whenever(dataInteractor.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
+        whenever(dataSampler.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
             pieChart.copy(sumByCount = false)
         )
@@ -162,7 +164,7 @@ class PieChartDataFactoryTest {
             )
         ) {}
 
-        whenever(dataInteractor.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
+        whenever(dataSampler.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
             pieChart.copy(sumByCount = false)
         )
