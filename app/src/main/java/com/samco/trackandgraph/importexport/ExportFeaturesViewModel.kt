@@ -20,10 +20,12 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.database.dto.Feature
-import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,6 +64,7 @@ interface ExportFeaturesViewModel {
 @HiltViewModel
 class ExportFeaturesViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val csvReadWriter: CSVReadWriter,
     @MainDispatcher private val ui: CoroutineDispatcher,
     @IODispatcher private val io: CoroutineDispatcher,
     private val contentResolver: ContentResolver
@@ -82,17 +85,17 @@ class ExportFeaturesViewModelImpl @Inject constructor(
     override val selectedFeatures: StateFlow<List<FeatureDto>> = _selectedFeatures.asStateFlow()
 
     override fun loadFeatures(groupId: Long) {
-        if (featuresSet.get() ||_exportState.value != ExportState.WAITING) return
-        
+        if (featuresSet.get() || _exportState.value != ExportState.WAITING) return
+
         viewModelScope.launch {
             _exportState.value = ExportState.LOADING
-            
+
             try {
                 val features = withContext(io) {
                     dataInteractor.getFeaturesForGroupSync(groupId)
                 }
                 val featureDtos = features.map { it.toFeatureDto() }
-                
+
                 _availableFeatures.value = featureDtos
                 _selectedFeatures.value = featureDtos // Select all by default
                 featuresSet.set(true)
@@ -136,14 +139,12 @@ class ExportFeaturesViewModelImpl @Inject constructor(
     private suspend fun doExport(uri: Uri) = runCatching {
         withContext(io) {
             contentResolver.openOutputStream(uri)?.let { outStream ->
-                val featureIds = _selectedFeatures.value.map { it.featureId }
-                dataInteractor.writeFeaturesToCSV(outStream, featureIds)
+                val features = _selectedFeatures.value
+                    .mapNotNull { dataInteractor.getFeatureById(it.featureId) }
+                csvReadWriter.writeFeaturesToCSV(outStream, features)
             }
         }
     }
 
-    private fun Feature.toFeatureDto() = FeatureDto(
-        featureId = featureId,
-        name = name
-    )
+    private fun Feature.toFeatureDto() = FeatureDto(featureId, name)
 }

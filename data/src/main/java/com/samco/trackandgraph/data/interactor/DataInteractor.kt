@@ -34,14 +34,11 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
-import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
-import java.io.InputStream
-import java.io.OutputStream
 
-interface DataInteractor : TrackerHelper, FunctionHelper, DataSampler {
+interface DataInteractor : TrackerHelper, FunctionHelper {
     suspend fun insertGroup(group: Group): Long
 
     suspend fun deleteGroup(id: Long): DeletedGroupInfo
@@ -161,9 +158,7 @@ interface DataInteractor : TrackerHelper, FunctionHelper, DataSampler {
 
     suspend fun getGroupsForGroupSync(id: Long): List<Group>
 
-    suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>)
-
-    suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
+    fun onImportedExternalData()
 
     suspend fun getAllFeaturesSync(): List<Feature>
 

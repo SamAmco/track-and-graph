@@ -29,17 +29,18 @@ import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 
-suspend fun createFirstOpenTutorialGroup(dataInteractor: DataInteractor) {
+suspend fun createFirstOpenTutorialGroup(dataInteractor: DataInteractor, dataSampler: DataSampler) {
     val mainGroupId = dataInteractor.insertGroup(createGroup("First open tutorial"))
 
     // Create the three screenshot groups
     val screenshot1GroupId = createScreenshot1Group(dataInteractor, mainGroupId)
-    val screenshot2GroupId = createScreenshot2Group(dataInteractor, mainGroupId, screenshot1GroupId)
-    createScreenshot3Group(dataInteractor, mainGroupId, screenshot2GroupId)
+    val screenshot2GroupId = createScreenshot2Group(dataInteractor, dataSampler, mainGroupId, screenshot1GroupId)
+    createScreenshot3Group(dataInteractor, dataSampler, mainGroupId, screenshot2GroupId)
 }
 
 private suspend fun createScreenshot1Group(
@@ -107,6 +108,7 @@ private suspend fun createScreenshot1Group(
 
 private suspend fun createScreenshot2Group(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     parentGroupId: Long,
     screenshot1GroupId: Long
 ): Long {
@@ -152,10 +154,10 @@ private suspend fun createScreenshot2Group(
     val originalRelaxationFeatureId = relaxationTracker.featureId
     val originalStressFeatureId = stressTracker.featureId
 
-    val relaxationDataPoints = dataInteractor
+    val relaxationDataPoints = dataSampler
         .getDataSampleForFeatureId(originalRelaxationFeatureId)
         .getAllRawDataPoints()
-    val stressDataPoints = dataInteractor
+    val stressDataPoints = dataSampler
         .getDataSampleForFeatureId(originalStressFeatureId)
         .getAllRawDataPoints()
 
@@ -197,6 +199,7 @@ private suspend fun createScreenshot2Group(
 
 private suspend fun createScreenshot3Group(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     parentGroupId: Long,
     screenshot2GroupId: Long
 ): Long {
@@ -242,11 +245,11 @@ private suspend fun createScreenshot3Group(
     val originalRelaxationFeatureId = relaxationTracker.featureId
     val originalStressFeatureId = stressTracker.featureId
 
-    val relaxationDataPoints = dataInteractor
+    val relaxationDataPoints = dataSampler
         .getDataSampleForFeatureId(originalRelaxationFeatureId)
         .getAllRawDataPoints()
 
-    val stressDataPoints = dataInteractor
+    val stressDataPoints = dataSampler
         .getDataSampleForFeatureId(originalStressFeatureId)
         .getAllRawDataPoints()
 

@@ -26,6 +26,7 @@ import com.samco.trackandgraph.createFaq1Group
 import com.samco.trackandgraph.createFirstOpenTutorialGroup
 import com.samco.trackandgraph.createScreenshotsGroup
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.data.sampling.DataSamplerImpl
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -42,6 +43,10 @@ class DemoDBGenerator {
     ).build()
 
     private val dataInteractor = TestDataInteractor.create(database)
+    private val dataSampler = DataSamplerImpl(
+        dataInteractor = dataInteractor,
+        dao = database.trackAndGraphDatabaseDao
+    )
 
     @Before
     fun setup() {
@@ -55,7 +60,7 @@ class DemoDBGenerator {
         println("creating faq1 data")
         createFaq1Group(dataInteractor)
         println("creating first open tutorial data")
-        createFirstOpenTutorialGroup(dataInteractor)
+        createFirstOpenTutorialGroup(dataInteractor, dataSampler)
         println("writing to a db file")
         writeDBToFile()
     }

@@ -19,23 +19,26 @@ package com.samco.trackandgraph.data.sampling
 
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.functions.FunctionGraphDataSample
 import javax.inject.Inject
 
 interface DataSampler {
-    fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample?
+    suspend fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample?
 
-    fun getDataSampleForFeatureId(featureId: Long): DataSample
+    suspend fun getDataSampleForFeatureId(featureId: Long): DataSample
 
     suspend fun getLabelsForFeatureId(featureId: Long): List<String>
 
-    fun getDataSamplePropertiesForFeatureId(featureId: Long): DataSampleProperties?
+    suspend fun getDataSamplePropertiesForFeatureId(featureId: Long): DataSampleProperties?
 }
 
 internal class DataSamplerImpl @Inject constructor(
+    private val dataInteractor: DataInteractor,
     private val dao: TrackAndGraphDatabaseDao
 ) : DataSampler {
 
-    override fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample? {
+    override suspend fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample? {
         val tracker = dao.getTrackerByFeatureId(featureId)
         if (tracker != null) {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
@@ -45,14 +48,14 @@ internal class DataSamplerImpl @Inject constructor(
                 onDispose = cursorSequence::dispose
             )
         }
-        val function = dao.getFunctionByFeatureId(featureId)
+        val function = dataInteractor.getFunctionByFeatureId(featureId)
         if (function != null) {
-            return FunctionTreeDataSample(function, dao)
+            return FunctionGraphDataSample.create(function, this)
         }
         return null
     }
 
-    override fun getDataSampleForFeatureId(featureId: Long): DataSample {
+    override suspend fun getDataSampleForFeatureId(featureId: Long): DataSample {
         val tracker = dao.getTrackerByFeatureId(featureId)
         if (tracker != null) {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
@@ -63,25 +66,43 @@ internal class DataSamplerImpl @Inject constructor(
                 onDispose = cursorSequence::dispose
             )
         }
-        val function = dao.getFunctionByFeatureId(featureId)
+        val function = dataInteractor.getFunctionByFeatureId(featureId)
         if (function != null) {
             val properties = getDataSamplePropertiesForFeatureId(featureId)
-            return FunctionTreeDataSample(function, dao).asDataSample(properties)
+            return FunctionGraphDataSample.create(function, this)
+                .asDataSample(properties)
         }
         return DataSample.fromSequence(emptySequence(), onDispose = {})
     }
 
-    //TODO implement getDataSamplePropertiesForFeatureId for functions
-    override fun getDataSamplePropertiesForFeatureId(featureId: Long) =
-        dao.getTrackerByFeatureId(featureId)?.let {
-            DataSampleProperties(isDuration = it.dataType == DataType.DURATION)
-        }
-
-    //TODO implement getLabelsForFeatureId for functions
-    override suspend fun getLabelsForFeatureId(featureId: Long): List<String> {
+    override suspend fun getDataSamplePropertiesForFeatureId(featureId: Long): DataSampleProperties? {
         val tracker = dao.getTrackerByFeatureId(featureId)
-        return tracker?.let {
-            dao.getLabelsForTracker(tracker.id)
-        } ?: emptyList()
+        if (tracker != null) {
+            return DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION)
+        }
+        val function = dataInteractor.getFunctionByFeatureId(featureId)
+        if (function != null) {
+            return DataSampleProperties(isDuration = function.functionGraph.isDuration)
+        }
+        return null
+    }
+
+    override suspend fun getLabelsForFeatureId(featureId: Long): List<String> {
+        // Fast case, pull directly using sql if it's a tracker
+        val tracker = dao.getTrackerByFeatureId(featureId)
+        if (tracker != null) {
+            return dao.getLabelsForTracker(tracker.id)
+        }
+        // Slow case, fall back to iterating all data and getting labels
+        // if it's a function
+        val rawDataSample = getRawDataSampleForFeatureId(featureId)
+        if (rawDataSample != null) {
+            return rawDataSample.iterator()
+                .asSequence()
+                .map { it.label }
+                .distinct()
+                .toList()
+        }
+        return emptyList()
     }
 }

@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.data.interactor
 
-import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataPoint
@@ -26,7 +25,6 @@ import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
-import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -54,8 +52,6 @@ class DataInteractorImplTest {
     private val database: TrackAndGraphDatabase = mock()
     private val dao: TrackAndGraphDatabaseDao = mock()
     private val trackerHelper: TrackerHelper = mock()
-    private val csvReadWriter: CSVReadWriter = mock()
-    private val dataSampler: DataSampler = mock()
     private val functionHelper: FunctionHelper = mock()
 
     @Before
@@ -67,8 +63,6 @@ class DataInteractorImplTest {
             dao = dao,
             io = testDispatcher,
             trackerHelper = trackerHelper,
-            csvReadWriter = csvReadWriter,
-            dataSampler = dataSampler,
             functionHelper = functionHelper,
         )
     }
