@@ -17,8 +17,8 @@
 package com.samco.trackandgraph.lua
 
 import com.samco.trackandgraph.assetreader.AssetReader
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.lua.apiimpl.DataPointParser
 import com.samco.trackandgraph.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.time.TimeProvider

@@ -20,13 +20,12 @@ package com.samco.trackandgraph.reminders
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import com.samco.trackandgraph.data.database.dto.Reminder
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.system.AlarmManagerWrapper
 import com.samco.trackandgraph.system.ReminderPrefWrapper
 import com.samco.trackandgraph.system.StoredAlarmInfo
 import com.samco.trackandgraph.system.SystemInfoProvider
-import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -37,6 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import org.threeten.bp.LocalTime
 import timber.log.Timber
 import java.util.Calendar

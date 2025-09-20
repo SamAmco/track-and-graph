@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview.data_sample_functions
 
 import com.samco.trackandgraph.data.database.dto.IDataPoint
-import com.samco.trackandgraph.data.database.sampling.DataSampleProperties
+import com.samco.trackandgraph.data.sampling.DataSampleProperties
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataPaddingFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DurationAggregationFunction

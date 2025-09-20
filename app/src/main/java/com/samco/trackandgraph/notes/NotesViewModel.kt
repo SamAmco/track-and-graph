@@ -22,8 +22,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.GlobalNote
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.ui.compose.ui.Datable
 import com.samco.trackandgraph.ui.compose.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.compose.ui.DateScrollData

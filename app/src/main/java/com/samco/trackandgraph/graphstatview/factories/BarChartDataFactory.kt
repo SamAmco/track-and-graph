@@ -25,9 +25,9 @@ import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.YRangeType
-import com.samco.trackandgraph.data.database.sampling.DataSample
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec

@@ -1,7 +1,7 @@
 package com.samco.trackandgraph.lua.apiimpl
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.database.sampling.RawDataSample
+import com.samco.trackandgraph.data.sampling.RawDataSample
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.NIL
