@@ -72,6 +72,10 @@ internal class FunctionGraphDecoder @Inject constructor() {
                         nodeList.add(decodeFeatureNode(graphNode, featurePathMap))
                         nodePositions[graphNode.id] = Offset(graphNode.x, graphNode.y)
                     }
+                    is FunctionGraphNode.LuaScriptNode -> {
+                        nodeList.add(decodeLuaScriptNode(graphNode))
+                        nodePositions[graphNode.id] = Offset(graphNode.x, graphNode.y)
+                    }
                     is FunctionGraphNode.OutputNode -> {
                         // Do nothing should not be here
                     }
@@ -109,6 +113,19 @@ internal class FunctionGraphDecoder @Inject constructor() {
             id = graphNode.id,
             selectedFeatureId = mutableLongStateOf(graphNode.featureId),
             featurePathMap = featurePathMap
+        )
+    }
+    
+    /**
+     * Decodes a LuaScriptNode DTO to a LuaScript ViewModel node.
+     */
+    private fun decodeLuaScriptNode(
+        graphNode: FunctionGraphNode.LuaScriptNode
+    ): Node.LuaScript {
+        return Node.LuaScript(
+            id = graphNode.id,
+            inputConnectorCount = graphNode.inputConnectorCount,
+            scriptPreview = graphNode.script
         )
     }
     
