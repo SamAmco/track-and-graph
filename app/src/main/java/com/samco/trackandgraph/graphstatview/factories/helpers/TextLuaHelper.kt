@@ -4,9 +4,9 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.lua.dto.TextAlignment
-import com.samco.trackandgraph.lua.dto.TextSize
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.TextAlignment
+import com.samco.trackandgraph.data.lua.dto.TextSize
 import javax.inject.Inject
 
 class TextLuaHelper @Inject constructor() {

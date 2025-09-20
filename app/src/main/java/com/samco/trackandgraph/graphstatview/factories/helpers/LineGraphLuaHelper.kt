@@ -24,9 +24,9 @@ import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.lua.dto.Line
-import com.samco.trackandgraph.lua.dto.LinePointStyle
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.Line
+import com.samco.trackandgraph.data.lua.dto.LinePointStyle
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
@@ -46,7 +46,7 @@ class LineGraphLuaHelper @Inject constructor(
             if (lineGraphData.yMax == null || lineGraphData.yMin == null) YRangeType.DYNAMIC
             else YRangeType.FIXED
 
-        val endTime = lineGraphData.lines
+        val endTime = lines
             .mapNotNull { it.linePoints.firstOrNull() }
             .maxOfOrNull { it.timestamp }
             ?: return null

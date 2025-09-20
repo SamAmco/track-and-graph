@@ -25,9 +25,9 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
-import com.samco.trackandgraph.lua.dto.ColorSpec
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.lua.dto.TimeBar
+import com.samco.trackandgraph.data.lua.dto.ColorSpec
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.TimeBar
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 import javax.inject.Inject

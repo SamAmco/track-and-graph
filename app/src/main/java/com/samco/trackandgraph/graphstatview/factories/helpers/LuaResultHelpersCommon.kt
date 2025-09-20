@@ -1,7 +1,7 @@
 package com.samco.trackandgraph.graphstatview.factories.helpers
 
 import androidx.annotation.ColorInt
-import com.samco.trackandgraph.lua.dto.ColorSpec
+import com.samco.trackandgraph.data.lua.dto.ColorSpec
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec as ViewColorSpec

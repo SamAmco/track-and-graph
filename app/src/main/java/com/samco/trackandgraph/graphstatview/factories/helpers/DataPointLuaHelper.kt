@@ -6,7 +6,7 @@ import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import javax.inject.Inject
 
 class DataPointLuaHelper @Inject constructor() {
