@@ -22,6 +22,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
@@ -39,9 +40,11 @@ import javax.inject.Inject
 
 class AverageTimeBetweenDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>(
     dataInteractor,
+    dataSampler,
     ioDispatcher
 ) {
 
@@ -128,7 +131,7 @@ class AverageTimeBetweenDataFactory @Inject constructor(
         config: AverageTimeBetweenStat,
         featureId: Long
     ): DataSample {
-        val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
+        val dataSample = dataSampler.getDataSampleForFeatureId(featureId)
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))

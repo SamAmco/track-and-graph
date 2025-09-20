@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.ui.compose.ui.Datable
@@ -90,6 +91,7 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
 @HiltViewModel
 class FeatureHistoryViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val dataSampler: DataSampler,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : UpdateDialogViewModelImpl(),
@@ -103,14 +105,14 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         .onStart { emit(Unit) }
 
     override val isDuration: LiveData<Boolean> = featureIdFlow
-        .map { dataInteractor.getDataSamplePropertiesForFeatureId(it)?.isDuration ?: false }
+        .map { dataSampler.getDataSamplePropertiesForFeatureId(it)?.isDuration ?: false }
         .flowOn(io)
         .asLiveData(viewModelScope.coroutineContext)
 
     override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> =
         combine(featureIdFlow, dataUpdates) { id, _ -> id }
             .map {
-                dataInteractor.getRawDataSampleForFeatureId(it)
+                dataSampler.getRawDataSampleForFeatureId(it)
                     ?.map(::toDataPointInfo)
                     ?.toList()
                     ?: emptyList()

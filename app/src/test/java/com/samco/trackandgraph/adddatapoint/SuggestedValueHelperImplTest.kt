@@ -21,8 +21,8 @@ import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSample
+import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -45,7 +45,7 @@ class SuggestedValueHelperImplTest {
 
     private lateinit var uut: SuggestedValueHelperImpl
 
-    private val dataInteractor: DataInteractor = mock()
+    private val dataSampler: DataSampler = mock()
 
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -67,7 +67,7 @@ class SuggestedValueHelperImplTest {
     @Before
     fun setUp() {
 
-        uut = SuggestedValueHelperImpl(dataInteractor, dispatcher)
+        uut = SuggestedValueHelperImpl(dataSampler, dispatcher)
     }
 
     //A function to create a data point from a value and a label
@@ -104,7 +104,7 @@ class SuggestedValueHelperImplTest {
         //Assert that the data points are not sorted
         assert(!isSortedByValueAscending(dataPoints.toList()))
 
-        whenever(dataInteractor.getDataSampleForFeatureId(any()))
+        whenever(dataSampler.getDataSampleForFeatureId(any()))
             .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         //suggested values is a flow of lists of SuggestedValue
@@ -126,8 +126,8 @@ class SuggestedValueHelperImplTest {
         //Assert that each of the lists is sorted
         suggestedValuesList.forEach { list -> assert(list.sortedBy { it.value } == list) }
 
-        //Verify that dataInteractor.getDataSampleForFeatureId was called only once
-        verify(dataInteractor, times(1)).getDataSampleForFeatureId(eq(1))
+        //Verify that dataSampler.getDataSampleForFeatureId was called only once
+        verify(dataSampler, times(1)).getDataSampleForFeatureId(eq(1))
     }
 
     @Test
@@ -139,7 +139,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e")
             )
 
-            whenever(dataInteractor.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             //suggested values is a flow of lists of SuggestedValue
@@ -207,7 +207,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e", "")
             )
 
-            whenever(dataInteractor.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -338,7 +338,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e", "")
             )
 
-            whenever(dataInteractor.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -461,7 +461,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e", "")
             )
 
-            whenever(dataInteractor.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -595,7 +595,7 @@ class SuggestedValueHelperImplTest {
             listOf("e", "b", "e", "c", "e", "")
         )
 
-        whenever(dataInteractor.getDataSampleForFeatureId(any()))
+        whenever(dataSampler.getDataSampleForFeatureId(any()))
             .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -666,7 +666,7 @@ class SuggestedValueHelperImplTest {
         val values = List(SuggestedValueHelperImpl.MAX_VALUES + 100) { it.toDouble() }
         val dataPoints = dpFromValues(values)
 
-        whenever(dataInteractor.getDataSampleForFeatureId(any()))
+        whenever(dataSampler.getDataSampleForFeatureId(any()))
             .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         val sizes = mutableListOf<Int>()
@@ -683,7 +683,7 @@ class SuggestedValueHelperImplTest {
 
         var disposeCalled = false
 
-        whenever(dataInteractor.getDataSampleForFeatureId(any())).thenReturn(
+        whenever(dataSampler.getDataSampleForFeatureId(any())).thenReturn(
             DataSample.fromSequence(
                 data = dataPoints,
                 onDispose = { disposeCalled = true }
@@ -702,7 +702,7 @@ class SuggestedValueHelperImplTest {
 
         var disposeCalled = false
 
-        whenever(dataInteractor.getDataSampleForFeatureId(any())).thenReturn(
+        whenever(dataSampler.getDataSampleForFeatureId(any())).thenReturn(
             DataSample.fromSequence(
                 data = dataPoints,
                 onDispose = { disposeCalled = true }

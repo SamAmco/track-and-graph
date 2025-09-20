@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -35,8 +36,9 @@ import javax.inject.Inject
 
 class PieChartDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher
-) : ViewDataFactory<PieChart, IPieChartViewData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<PieChart, IPieChartViewData>(dataInteractor, dataSampler, ioDispatcher) {
 
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
@@ -99,7 +101,7 @@ class PieChartDataFactory @Inject constructor(
             dataInteractor.getFeatureById(pieChart.featureId)
         } ?: return null
         val dataSample = DataClippingFunction(pieChart.endDate.toOffsetDateTime(), pieChart.sampleSize)
-            .mapSample(dataInteractor.getDataSampleForFeatureId(feature.featureId))
+            .mapSample(dataSampler.getDataSampleForFeatureId(feature.featureId))
         val dataPoints = dataSample.toList()
         onDataSampled(dataSample.getRawDataPoints())
         dataSample.dispose()
