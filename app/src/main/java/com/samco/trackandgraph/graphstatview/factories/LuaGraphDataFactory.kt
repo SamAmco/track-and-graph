@@ -34,9 +34,9 @@ import com.samco.trackandgraph.graphstatview.factories.helpers.TextLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.TimeBarchartLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.lua.LuaEngine
-import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
@@ -53,8 +53,15 @@ class LuaGraphDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher
-) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(dataInteractor, dataSampler, ioDispatcher) {
-    override suspend fun createViewData(graphOrStat: GraphOrStat, onDataSampled: (List<DataPoint>) -> Unit): ILuaGraphViewData {
+) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(
+    dataInteractor,
+    dataSampler,
+    ioDispatcher
+) {
+    override suspend fun createViewData(
+        graphOrStat: GraphOrStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): ILuaGraphViewData {
         val luaGraph = dataInteractor.getLuaGraphByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
         return createViewData(graphOrStat, luaGraph, onDataSampled)
@@ -107,18 +114,19 @@ class LuaGraphDataFactory @Inject constructor(
         val luaEngineParams = LuaEngine.LuaGraphEngineParams(dataSources = dataSamples)
 
         val luaGraphResult = luaEngine.runLuaGraphScript(config.script, luaEngineParams)
+        val error = luaGraphResult.error
 
-        if (luaGraphResult.error != null) return errorLuaHelper(graphOrStat, luaGraphResult.error)
+        if (error != null) return errorLuaHelper(graphOrStat, error)
 
         onDataSampled(dataSamples.flatMap { it.value.getRawDataPoints() })
 
-        return when (luaGraphResult.data) {
-            is LuaGraphResultData.DataPointData -> dataPointLuaHelper(luaGraphResult.data, graphOrStat)
-            is LuaGraphResultData.TextData -> textLuaHelper(luaGraphResult.data, graphOrStat)
-            is LuaGraphResultData.PieChartData -> pieChartLuaHelper(luaGraphResult.data, graphOrStat)
-            is LuaGraphResultData.TimeBarChartData -> timeBarChartLuaHelper(luaGraphResult.data, graphOrStat)
+        return when (val data = luaGraphResult.data) {
+            is LuaGraphResultData.DataPointData -> dataPointLuaHelper(data, graphOrStat)
+            is LuaGraphResultData.TextData -> textLuaHelper(data, graphOrStat)
+            is LuaGraphResultData.PieChartData -> pieChartLuaHelper(data, graphOrStat)
+            is LuaGraphResultData.TimeBarChartData -> timeBarChartLuaHelper(data, graphOrStat)
             is LuaGraphResultData.LineGraphData ->
-                lineGraphLuaHelper(luaGraphResult.data, graphOrStat) ?: noData(graphOrStat)
+                lineGraphLuaHelper(data, graphOrStat) ?: noData(graphOrStat)
 
             null -> noData(graphOrStat)
         }

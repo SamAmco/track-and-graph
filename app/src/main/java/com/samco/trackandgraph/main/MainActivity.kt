@@ -40,7 +40,7 @@ import com.samco.trackandgraph.IntentActions
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper
-import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.data.lua.LuaEngineSettingsProvider
 import com.samco.trackandgraph.reminders.AlarmInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.settings.TngSettings
