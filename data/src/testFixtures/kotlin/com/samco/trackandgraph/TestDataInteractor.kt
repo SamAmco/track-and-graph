@@ -81,11 +81,6 @@ object TestDataInteractor {
             functionHelper = functionHelper,
         )
 
-        val dataSampler = DataSamplerImpl(
-            dataInteractor = dataInteractor,
-            dao = database.trackAndGraphDatabaseDao,
-        )
-
         return dataInteractor
     }
 }

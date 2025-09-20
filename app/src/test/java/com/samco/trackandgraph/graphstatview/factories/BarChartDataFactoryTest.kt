@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSample
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.aggregation.GlobalAggregationPreferences
@@ -55,10 +56,12 @@ class BarChartDataFactoryTest {
     )
 
     private val dataInteractor = mock<DataInteractor>()
+    private val dataSampler = mock<DataSampler>()
     private val testCoroutineDispatcher = UnconfinedTestDispatcher()
 
     private fun uut() = BarChartDataFactory(
         dataInteractor = dataInteractor,
+        dataSampler = dataSampler,
         dataDisplayIntervalHelper = DataDisplayIntervalHelper(),
         ioDispatcher = testCoroutineDispatcher,
         timeHelper = TimeHelper(GlobalAggregationPreferences),
@@ -81,7 +84,7 @@ class BarChartDataFactoryTest {
             dataSampledCalled = true
         }
 
-        whenever(dataInteractor.getDataSampleForFeatureId(1))
+        whenever(dataSampler.getDataSampleForFeatureId(1))
             .thenReturn(dataSample)
 
         //EXECUTE

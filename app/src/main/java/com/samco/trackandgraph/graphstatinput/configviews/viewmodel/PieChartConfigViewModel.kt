@@ -23,6 +23,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -43,6 +44,7 @@ class PieChartConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
     private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
     private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.PieChartConfigData>(
@@ -50,7 +52,8 @@ class PieChartConfigViewModel @Inject constructor(
     default,
     ui,
     gsiProvider,
-    dataInteractor
+    dataInteractor,
+    dataSampler
 ), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
     SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour {
 

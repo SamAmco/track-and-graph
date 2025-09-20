@@ -211,6 +211,8 @@ class GroupViewModelImpl @Inject constructor(
             UpdateType.Functions
         )
 
+        DataUpdateType.Unknown -> listOf(UpdateType.All)
+
         DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
     }
 

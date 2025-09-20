@@ -32,6 +32,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -76,12 +77,14 @@ class LuaGraphConfigViewModel @Inject constructor(
     private val remoteConfigProvider: RemoteConfigProvider,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
+    dataSampler: DataSampler,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LuaConfigData>(
     io = io,
     default = default,
     ui = ui,
     gsiProvider = gsiProvider,
-    dataInteractor = dataInteractor
+    dataInteractor = dataInteractor,
+    dataSampler = dataSampler
 ) {
 
 
