@@ -1,16 +1,17 @@
 package com.samco.trackandgraph.data.database.sampling
 
 import android.database.Cursor
+import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.sampling.DataPointCursorSequence
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Test
 import java.time.OffsetDateTime
 
 class DpCursorSequenceTest {

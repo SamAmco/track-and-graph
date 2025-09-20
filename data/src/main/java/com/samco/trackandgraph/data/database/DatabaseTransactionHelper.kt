@@ -1,7 +1,6 @@
-package com.samco.trackandgraph.data.model
+package com.samco.trackandgraph.data.database
 
 import androidx.room.withTransaction
-import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import javax.inject.Inject
 
 internal interface DatabaseTransactionHelper {

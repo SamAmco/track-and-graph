@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.database.sampling
+package com.samco.trackandgraph.data.sampling
 
 import android.database.Cursor
 import com.samco.trackandgraph.data.database.dto.DataPoint

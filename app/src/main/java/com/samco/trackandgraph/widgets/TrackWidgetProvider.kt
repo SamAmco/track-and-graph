@@ -34,7 +34,7 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.appwidget.updateAll
-import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.widgets.TrackWidgetGlance
 import com.samco.trackandgraph.widgets.TrackWidgetState.DELETE_FEATURE_ID

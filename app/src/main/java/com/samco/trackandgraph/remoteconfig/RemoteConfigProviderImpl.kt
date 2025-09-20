@@ -16,9 +16,8 @@
 */
 package com.samco.trackandgraph.remoteconfig
 
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.downloader.FileDownloader
-import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -27,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.net.URI
 import javax.inject.Inject

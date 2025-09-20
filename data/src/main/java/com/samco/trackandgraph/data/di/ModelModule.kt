@@ -15,23 +15,23 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.model.di
+package com.samco.trackandgraph.data.di
 
 import android.content.Context
+import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
+import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriterImpl
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.data.database.sampling.DataSampler
-import com.samco.trackandgraph.data.database.sampling.DataSamplerImpl
-import com.samco.trackandgraph.data.model.CSVReadWriter
-import com.samco.trackandgraph.data.model.CSVReadWriterImpl
-import com.samco.trackandgraph.data.model.DataPointUpdateHelper
-import com.samco.trackandgraph.data.model.DataPointUpdateHelperImpl
-import com.samco.trackandgraph.data.model.DatabaseTransactionHelper
-import com.samco.trackandgraph.data.model.DatabaseTransactionHelperImpl
-import com.samco.trackandgraph.data.model.FunctionHelper
-import com.samco.trackandgraph.data.model.FunctionHelperImpl
-import com.samco.trackandgraph.data.model.TrackerHelper
-import com.samco.trackandgraph.data.model.TrackerHelperImpl
+import com.samco.trackandgraph.data.interactor.DataPointUpdateHelper
+import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
+import com.samco.trackandgraph.data.interactor.FunctionHelper
+import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
+import com.samco.trackandgraph.data.interactor.TrackerHelper
+import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
+import com.samco.trackandgraph.data.sampling.DataSampler
+import com.samco.trackandgraph.data.sampling.DataSamplerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

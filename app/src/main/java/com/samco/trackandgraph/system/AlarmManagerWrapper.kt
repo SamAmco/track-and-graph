@@ -8,8 +8,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.samco.trackandgraph.reminders.AlarmReceiver
 import com.samco.trackandgraph.reminders.AlarmReceiver.Companion.ALARM_MESSAGE_KEY
-import kotlinx.serialization.Serializable
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 @Serializable
