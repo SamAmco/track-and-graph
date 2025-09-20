@@ -91,7 +91,7 @@ kill-emulator:
 
 .PHONY: run-community-tests
 run-community-tests:
-	./gradlew :app:testDebugUnitTest --tests "com.samco.trackandgraph.lua.CommunityTestRunner"
+	./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.CommunityTestRunner"
 
 # ---------- 1) RECORD LOW-RES SNAPSHOT BASELINES ----------
 .PHONY: snapshots-record

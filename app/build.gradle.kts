@@ -28,8 +28,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-apply(from = "gradle/lua-tasks.gradle.kts")
-
 android {
     compileSdk = libs.versions.androidSdk.get().toInt()
 
@@ -149,13 +147,6 @@ android {
     namespace = "com.samco.trackandgraph"
 }
 
-tasks.withType<Test>().configureEach {
-    testLogging {
-        events("passed", "skipped", "failed", "standardOut", "standardError")
-        showStandardStreams = true
-    }
-}
-
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
@@ -177,9 +168,6 @@ dependencies {
     //AppCompat (enables dark theme on  API <= 29)
     implementation(libs.androidx.appcompat)
     implementation(libs.core.ktx)
-
-    //Lua
-    implementation(libs.luak.jvm)
 
     //UI
     implementation(libs.material)

@@ -22,8 +22,6 @@ import android.content.Context
 import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelper
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelperImpl
-import com.samco.trackandgraph.assetreader.AssetReader
-import com.samco.trackandgraph.assetreader.AssetReaderImpl
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractor
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractorImpl
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
@@ -32,8 +30,6 @@ import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.downloader.FileDownloaderImpl
 import com.samco.trackandgraph.graphstatview.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
-import com.samco.trackandgraph.lua.LuaEngine
-import com.samco.trackandgraph.lua.LuaEngineImpl
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
 import com.samco.trackandgraph.reminders.AlarmInteractor
@@ -51,8 +47,6 @@ import com.samco.trackandgraph.system.ReminderPrefWrapper
 import com.samco.trackandgraph.system.ReminderPrefWrapperImpl
 import com.samco.trackandgraph.system.SystemInfoProvider
 import com.samco.trackandgraph.system.SystemInfoProviderImpl
-import com.samco.trackandgraph.time.TimeProvider
-import com.samco.trackandgraph.time.TimeProviderImpl
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
 import dagger.Module
@@ -87,12 +81,6 @@ class AppModule {
     @Singleton
     //Must be singleton because it is a dependency of work manager worker
     fun getBackupRestoreInteractor(impl: BackupRestoreInteractorImpl): BackupRestoreInteractor = impl
-
-    @Provides
-    fun getLuaEngine(impl: LuaEngineImpl): LuaEngine = impl
-
-    @Provides
-    fun getAssetReader(impl: AssetReaderImpl): AssetReader = impl
 
     @Provides
     @Singleton
@@ -135,7 +123,4 @@ class AppModule {
         ignoreUnknownKeys = !BuildConfig.DEBUG
         isLenient = !BuildConfig.DEBUG
     }
-
-    @Provides
-    fun provideTimeProvider(impl: TimeProviderImpl): TimeProvider = impl
 }

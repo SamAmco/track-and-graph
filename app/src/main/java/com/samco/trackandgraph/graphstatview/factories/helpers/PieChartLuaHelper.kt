@@ -21,8 +21,8 @@ import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.lua.dto.PieChartSegment
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.PieChartSegment
 import javax.inject.Inject
 
 class PieChartLuaHelper @Inject constructor() {
