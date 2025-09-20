@@ -65,6 +65,9 @@ internal class FunctionGraphBuilder @Inject constructor() {
                     is Node.DataSource -> {
                         graphNodes.add(buildFeatureNode(node, nodePositions))
                     }
+                    is Node.LuaScript -> {
+                        graphNodes.add(buildLuaScriptNode(node, edges, nodePositions))
+                    }
                     // Future node types will be handled here, compiler will enforce exhaustiveness
                 }
             }
@@ -129,6 +132,27 @@ internal class FunctionGraphBuilder @Inject constructor() {
             y = position.y,
             id = node.id,
             featureId = featureId,
+        )
+    }
+
+    /**
+     * Builds a single Lua script node from a LuaScript node.
+     */
+    private fun buildLuaScriptNode(
+        node: Node.LuaScript,
+        edges: List<Edge>,
+        nodePositions: Map<Int, Offset>
+    ): FunctionGraphNode.LuaScriptNode {
+        val dependencies = calculateDependencies(node.id, edges)
+        val position = nodePositions[node.id] ?: Offset.Zero
+
+        return FunctionGraphNode.LuaScriptNode(
+            x = position.x,
+            y = position.y,
+            id = node.id,
+            script = node.scriptPreview,
+            inputConnectorCount = node.inputConnectorCount,
+            dependencies = dependencies
         )
     }
 

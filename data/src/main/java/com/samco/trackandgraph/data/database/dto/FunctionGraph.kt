@@ -59,6 +59,24 @@ sealed class FunctionGraphNode {
     }
     
     /**
+     * Represents a Lua script node in the function graph.
+     * @param id Unique identifier for this node
+     * @param script The Lua script code as a string
+     * @param inputConnectorCount Number of input connectors this node has
+     * @param dependencies List of nodes this node depends on
+     */
+    @Serializable
+    @SerialName("LuaScriptNode")
+    data class LuaScriptNode(
+        override val x: Float,
+        override val y: Float,
+        override val id: Int,
+        val script: String,
+        val inputConnectorCount: Int,
+        override val dependencies: List<NodeDependency>
+    ) : FunctionGraphNode()
+    
+    /**
      * Represents the output node in the function graph.
      * @param id Unique identifier for this node
      * @param dependencies List of nodes this node depends on

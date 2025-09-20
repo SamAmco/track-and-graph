@@ -41,6 +41,7 @@ internal class FunctionGraphDataSample constructor(
         val node = nodesById[nodeId] ?: throw IllegalArgumentException("Node $nodeId not found")
         return when (node) {
             is FunctionGraphNode.FeatureNode -> dataSources[node.featureId]?.asNodeRawDataSample()
+            is FunctionGraphNode.LuaScriptNode -> TODO("Not implemented")
             is FunctionGraphNode.OutputNode -> throw IllegalArgumentException("Found an illegal output node in the function graph: $nodeId")
         }
     }

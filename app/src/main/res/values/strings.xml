@@ -372,7 +372,9 @@
     <string name="add_at_least_one_input">Please add at least one input</string>
     <string name="output">Output</string>
     <string name="data_source">Data Source</string>
+    <string name="lua_script">Lua Script</string>
     <string name="lua_script_input_hint">Enter a Lua script…</string>
+    <string name="select_node_type">Select Node Type</string>
     <string name="file">File</string>
     <string name="lua_feature_names_not_unique">Script inputs must have unique names</string>
     <string name="graph_stat_type_lua_graph">Lua Script</string>

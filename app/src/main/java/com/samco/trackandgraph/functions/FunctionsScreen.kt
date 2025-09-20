@@ -47,19 +47,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.functions.ui.EdgeLayer
-import com.samco.trackandgraph.functions.ui.Node
-import com.samco.trackandgraph.functions.ui.NodeEditorInputWrapper
-import com.samco.trackandgraph.functions.ui.ViewportState
-import com.samco.trackandgraph.functions.ui.WorldLayout
-import com.samco.trackandgraph.functions.ui.WorldTransformContainer
-import com.samco.trackandgraph.functions.ui.rememberConnectorLayerState
-import com.samco.trackandgraph.functions.ui.rememberEdgeLayerState
-import com.samco.trackandgraph.functions.ui.rememberViewportState
-import com.samco.trackandgraph.functions.ui.worldPosition
+import com.samco.trackandgraph.functions.node_editor.EdgeLayer
+import com.samco.trackandgraph.functions.node_editor.Node
+import com.samco.trackandgraph.functions.node_editor.NodeEditorInputWrapper
+import com.samco.trackandgraph.functions.node_editor.ViewportState
+import com.samco.trackandgraph.functions.node_editor.WorldLayout
+import com.samco.trackandgraph.functions.node_editor.WorldTransformContainer
+import com.samco.trackandgraph.functions.node_editor.rememberConnectorLayerState
+import com.samco.trackandgraph.functions.node_editor.rememberEdgeLayerState
+import com.samco.trackandgraph.functions.node_editor.rememberViewportState
+import com.samco.trackandgraph.functions.node_editor.worldPosition
 import com.samco.trackandgraph.functions.viewmodel.AddNodeData
 import com.samco.trackandgraph.functions.viewmodel.Connector
 import com.samco.trackandgraph.functions.viewmodel.Edge
+import com.samco.trackandgraph.functions.node_selector.NodeSelectionDialog
 import com.samco.trackandgraph.functions.viewmodel.FunctionsScreenViewModel
 import com.samco.trackandgraph.functions.viewmodel.FunctionsScreenViewModelImpl
 import com.samco.trackandgraph.functions.viewmodel.Node
@@ -67,6 +68,7 @@ import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
+import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -116,6 +118,8 @@ fun FunctionsScreen(
         getConnectorWorldPosition = viewModel::getConnectorWorldPosition,
         isConnectorEnabled = viewModel::isEnabled,
         onCreateOrUpdateFunction = viewModel::onCreateOrUpdateFunction,
+        onUpdateScriptForNodeId = viewModel::updateScriptForNodeId,
+        onUpdateScriptFromFileForNodeId = viewModel::updateScriptFromFileForNodeId,
     )
 }
 
@@ -154,6 +158,8 @@ private fun FunctionsScreenContent(
     getConnectorWorldPosition: (Connector) -> Offset?,
     isConnectorEnabled: (Connector) -> Boolean,
     onCreateOrUpdateFunction: () -> Unit,
+    onUpdateScriptForNodeId: (Int, String) -> Unit,
+    onUpdateScriptFromFileForNodeId: (Int, android.net.Uri?) -> Unit,
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
         val viewport = rememberViewportState(
@@ -164,6 +170,8 @@ private fun FunctionsScreenContent(
         )
 
         var clearOverlayUi by remember { mutableStateOf(false) }
+        var showNodeSelectionDialog by remember { mutableStateOf(false) }
+        var nodeSelectionOffset by remember { mutableStateOf(Offset.Zero) }
 
         val connectorState = rememberConnectorLayerState(
             connectors = connectors,
@@ -186,8 +194,9 @@ private fun FunctionsScreenContent(
             state = viewport,
             edgeLayerState = edgeLayerState,
             onSelectEdge = onSelectEdge,
-            onLongPressEmpty = {
-                onAddNode(AddNodeData.DataSourceNode(it))
+            onLongPressEmpty = { offset ->
+                nodeSelectionOffset = offset
+                showNodeSelectionDialog = true
             },
             onPan = { clearOverlayUi = true },
             onTap = { clearOverlayUi = false },
@@ -214,6 +223,8 @@ private fun FunctionsScreenContent(
                             onDragBy = { onDragNodeBy(node, it) },
                             onDeleteNode = { onDeleteNode(node) },
                             onCreateOrUpdateFunction = onCreateOrUpdateFunction,
+                            onUpdateScriptForNodeId = onUpdateScriptForNodeId,
+                            onUpdateScriptFromFileForNodeId = onUpdateScriptFromFileForNodeId,
                         )
                     }
                 }
@@ -257,6 +268,19 @@ private fun FunctionsScreenContent(
                     )
                 }
             }
+        }
+
+        // Node Selection Dialog
+        if (showNodeSelectionDialog) {
+            NodeSelectionDialog(
+                onDismiss = { showNodeSelectionDialog = false },
+                onDataSourceSelected = { 
+                    onAddNode(AddNodeData.DataSourceNode(nodeSelectionOffset))
+                },
+                onLuaScriptSelected = { 
+                    onAddNode(AddNodeData.LuaScriptNode(nodeSelectionOffset))
+                }
+            )
         }
     }
 }
