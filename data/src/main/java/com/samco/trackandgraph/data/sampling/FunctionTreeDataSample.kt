@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.data.database.sampling
+package com.samco.trackandgraph.data.sampling
 
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataPoint

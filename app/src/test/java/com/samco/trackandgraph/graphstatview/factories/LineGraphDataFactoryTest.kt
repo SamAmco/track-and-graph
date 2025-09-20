@@ -16,8 +16,6 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
@@ -29,8 +27,8 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
-import com.samco.trackandgraph.data.database.sampling.DataSample
-import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import junit.framework.TestCase.assertEquals
@@ -39,6 +37,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -110,7 +110,8 @@ class LineGraphDataFactoryTest {
             .thenReturn(lineGraphWithFeatures)
 
         whenever(dataInteractor.getDataSampleForFeatureId(1L))
-            .thenReturn(DataSample.fromSequence(
+            .thenReturn(
+                DataSample.fromSequence(
                 onDispose = {},
                 data = sequenceOf(
                     100, 101, 102, 103, 104, 105, 106, 107, 108, 109

@@ -1,4 +1,4 @@
-package com.samco.trackandgraph.data.database.sampling
+package com.samco.trackandgraph.data.sampling
 
 import org.threeten.bp.temporal.TemporalAmount
 

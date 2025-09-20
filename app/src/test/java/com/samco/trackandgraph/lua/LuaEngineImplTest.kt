@@ -16,11 +16,9 @@
  */
 package com.samco.trackandgraph.lua
 
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.time.TimeProvider
 import com.samco.trackandgraph.time.TimeProviderImpl
@@ -29,6 +27,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
