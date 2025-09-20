@@ -63,7 +63,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramVie
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.compose.ui.smallIconSize
-import org.luaj.vm2.LuaError
+import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -204,9 +204,9 @@ private fun GraphError(
             )
         }
 
-        is LuaError -> {
+        is LuaScriptException -> {
             val message = remember(error) {
-                error.message + "\n" + (error.luaCause?.stackTraceToString() ?: "")
+                error.getFormattedMessage()
             }
             GraphErrorView(
                 modifier = modifier,

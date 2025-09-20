@@ -80,8 +80,8 @@ todo.txt
 kls_database.db
 
 # Generated files
-app/src/main/assets/generated/
-app/src/test/resources/generated/
+data/src/main/assets/generated/
+data/src/test/resources/generated/
 
 lua/local
 

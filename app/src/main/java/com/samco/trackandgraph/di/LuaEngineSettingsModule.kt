@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.di
 
-import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.data.lua.LuaEngineSettingsProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

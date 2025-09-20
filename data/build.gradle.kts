@@ -25,6 +25,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
+apply(from = "gradle/lua-tasks.gradle.kts")
+
 android {
     compileSdk = libs.versions.androidSdk.get().toInt()
 
@@ -89,6 +91,13 @@ android {
     namespace = "com.samco.trackandgraph.data"
 }
 
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events("passed", "skipped", "failed", "standardOut", "standardError")
+        showStandardStreams = true
+    }
+}
+
 dependencies {
     implementation(libs.threetenabp)
 
@@ -109,9 +118,13 @@ dependencies {
     //Timber
     implementation(libs.timber)
 
+    //Lua
+    implementation(libs.luak.jvm)
+
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
+    testImplementation(libs.threetenbp)
 
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.runner)

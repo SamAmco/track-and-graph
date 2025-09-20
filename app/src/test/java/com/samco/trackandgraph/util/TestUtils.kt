@@ -17,19 +17,7 @@
 
 package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.data.sampling.RawDataSample
-
-fun rawDataSampleFromSequence(
-    data: Sequence<DataPoint>,
-    onDispose: () -> Unit
-) = object : RawDataSample() {
-    private val visited = mutableListOf<DataPoint>()
-    override fun getRawDataPoints() = visited
-    override fun iterator() = data.onEach { visited.add(it) }.iterator()
-    override fun dispose() = onDispose()
-}
 
 fun group(name: String = "", id: Long = 0, parentId: Long? = 0): Group {
     return Group(id, name, 0, parentId, 0)
