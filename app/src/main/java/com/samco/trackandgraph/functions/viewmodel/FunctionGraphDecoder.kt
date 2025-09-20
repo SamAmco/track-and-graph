@@ -163,7 +163,7 @@ internal class FunctionGraphDecoder @Inject constructor() {
         val toConnector = Connector(
             nodeId = targetNode.id,
             type = ConnectorType.INPUT,
-            connectorIndex = dependency.inputConnectorIndex
+            connectorIndex = dependency.connectorIndex
         )
         
         return Edge(from = fromConnector, to = toConnector)

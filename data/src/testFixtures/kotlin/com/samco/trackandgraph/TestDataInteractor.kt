@@ -1,8 +1,24 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.samco.trackandgraph
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriterImpl
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -57,18 +73,19 @@ object TestDataInteractor {
             io = Dispatchers.IO
         )
 
-        return DataInteractorImpl(
+        val dataInteractor = DataInteractorImpl(
             database = database,
             dao = database.trackAndGraphDatabaseDao,
             io = Dispatchers.IO,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,
-            csvReadWriter = CSVReadWriterImpl(
-                dao = database.trackAndGraphDatabaseDao,
-                trackerHelper = trackerHelper,
-                io = Dispatchers.IO
-            ),
-            dataSampler = DataSamplerImpl(dao = database.trackAndGraphDatabaseDao)
         )
+
+        val dataSampler = DataSamplerImpl(
+            dataInteractor = dataInteractor,
+            dao = database.trackAndGraphDatabaseDao,
+        )
+
+        return dataInteractor
     }
 }
