@@ -37,7 +37,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider

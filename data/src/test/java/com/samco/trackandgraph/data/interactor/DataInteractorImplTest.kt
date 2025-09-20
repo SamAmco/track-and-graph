@@ -15,14 +15,9 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.model
+package com.samco.trackandgraph.data.interactor
 
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataPoint
@@ -31,7 +26,7 @@ import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
-import com.samco.trackandgraph.data.database.sampling.DataSampler
+import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -42,6 +37,12 @@ import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.threeten.bp.OffsetDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)

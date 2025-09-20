@@ -1,8 +1,6 @@
-package com.samco.trackandgraph.data.model
+package com.samco.trackandgraph.data.interactor
 
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.entity.DataPoint
@@ -17,7 +15,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerHelperImpl_UpdateDataPoints_Test {

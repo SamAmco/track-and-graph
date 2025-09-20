@@ -63,7 +63,7 @@ import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.data.model.TrackerHelper
+import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.ui.AddCreateBar

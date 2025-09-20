@@ -1,9 +1,7 @@
 package com.samco.trackandgraph.lua
 
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
-import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.time.TimeProviderImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +13,8 @@ import org.junit.runners.Parameterized.Parameter
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.mockito.ArgumentMatchers
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)

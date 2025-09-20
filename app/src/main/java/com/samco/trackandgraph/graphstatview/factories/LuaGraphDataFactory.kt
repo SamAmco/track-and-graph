@@ -20,9 +20,9 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
-import com.samco.trackandgraph.data.database.sampling.RawDataSample
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelper

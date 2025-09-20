@@ -16,8 +16,6 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.DataPoint
@@ -26,8 +24,8 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.YRangeType
-import com.samco.trackandgraph.data.database.sampling.DataSample
-import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.aggregation.GlobalAggregationPreferences
@@ -37,6 +35,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime

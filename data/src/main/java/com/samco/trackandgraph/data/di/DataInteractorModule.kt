@@ -1,7 +1,7 @@
-package com.samco.trackandgraph.data.model.di
+package com.samco.trackandgraph.data.di
 
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.DataInteractorImpl
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractorImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

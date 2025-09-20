@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.model.di
+package com.samco.trackandgraph.data.di
 
 import dagger.Module
 import dagger.Provides

@@ -16,19 +16,13 @@
  */
 package com.samco.trackandgraph.adddatapoint
 
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.data.database.sampling.DataSample
-import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.sampling.DataSample
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -38,6 +32,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.threeten.bp.OffsetDateTime
 
 @ExperimentalCoroutinesApi

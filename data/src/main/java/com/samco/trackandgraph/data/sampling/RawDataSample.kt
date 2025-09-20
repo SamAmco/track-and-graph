@@ -1,4 +1,4 @@
-package com.samco.trackandgraph.data.database.sampling
+package com.samco.trackandgraph.data.sampling
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.IDataPoint

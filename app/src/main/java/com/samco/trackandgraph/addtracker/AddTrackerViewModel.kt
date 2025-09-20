@@ -16,10 +16,10 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.TrackerHelper
-import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.data.model.di.MainDispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.interactor.TrackerHelper
+import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl

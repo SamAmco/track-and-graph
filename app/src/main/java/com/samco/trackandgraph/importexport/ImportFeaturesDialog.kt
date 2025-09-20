@@ -48,7 +48,7 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.data.model.ImportFeaturesException
+import com.samco.trackandgraph.data.csvreadwriter.ImportFeaturesException
 import com.samco.trackandgraph.importexport.ImportExportFeatureUtils.getFileNameFromUri
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog

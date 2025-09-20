@@ -16,8 +16,8 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
 import dagger.BindsInstance

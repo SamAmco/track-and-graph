@@ -19,7 +19,7 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
-import com.samco.trackandgraph.data.model.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
 
 class AverageTimeBetweenDataSourceAdapter @Inject constructor(

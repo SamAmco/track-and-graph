@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.functions.data_sample_functions
 
-import com.samco.trackandgraph.data.database.sampling.DataSample
+import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.functions.aggregation.FixedBinAggregator
 import com.samco.trackandgraph.graphstatview.functions.aggregation.dataPointsLabel
 import com.samco.trackandgraph.graphstatview.functions.aggregation.sumDataPoints
