@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.database.dto.NodeDependency
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -168,13 +169,122 @@ class FunctionGraphBuilderTest {
         }
     }
 
-    // TODO: Add comprehensive cycle validation tests
-    // Note: With current node types (DataSource -> Output), cycles are not possible
-    // since DataSource nodes have no inputs and Output nodes have no outputs.
-    // When new node types are added that can create cycles, add tests for:
-    // - Simple cycles (A -> B -> A)
-    // - Complex cycles (A -> B -> C -> A)
-    // - Self-referencing cycles (A -> A)
+    @Test
+    fun `buildFunctionGraph detects simple cycle between two LuaScript nodes`() {
+        val nodesWithSimpleCycle = listOf(
+            Node.LuaScript(id = 1, scriptPreview = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 2, scriptPreview = "", inputConnectorCount = 1),
+            Node.Output(id = 3)
+        )
+        
+        val edgesWithSimpleCycle = listOf(
+            // Simple cycle: 1 -> 2 -> 1
+            Edge(
+                from = Connector(nodeId = 1, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 2, type = ConnectorType.INPUT, connectorIndex = 0)
+            ),
+            Edge(
+                from = Connector(nodeId = 2, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 1, type = ConnectorType.INPUT, connectorIndex = 0)
+            ),
+            Edge(
+                from = Connector(nodeId = 2, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 3, type = ConnectorType.INPUT, connectorIndex = 0)
+            )
+        )
+
+        try {
+            builder.buildFunctionGraph(
+                nodes = nodesWithSimpleCycle,
+                edges = edgesWithSimpleCycle,
+                nodePositions = emptyMap(),
+                isDuration = false,
+                shouldThrow = true
+            )
+            fail("Should have thrown an exception due to simple cycle")
+        } catch (e: IllegalStateException) {
+            assertTrue("Exception message should mention cyclic dependency", 
+                e.message?.contains("Cyclic dependency detected") == true)
+        }
+    }
+
+    @Test
+    fun `buildFunctionGraph detects complex cycle through multiple LuaScript nodes`() {
+        val nodesWithComplexCycle = listOf(
+            Node.LuaScript(id = 1, scriptPreview = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 2, scriptPreview = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 3, scriptPreview = "", inputConnectorCount = 1),
+            Node.Output(id = 4)
+        )
+        
+        val edgesWithComplexCycle = listOf(
+            // Complex cycle: 1 -> 2 -> 3 -> 1
+            Edge(
+                from = Connector(nodeId = 1, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 2, type = ConnectorType.INPUT, connectorIndex = 0)
+            ),
+            Edge(
+                from = Connector(nodeId = 2, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 3, type = ConnectorType.INPUT, connectorIndex = 0)
+            ),
+            Edge(
+                from = Connector(nodeId = 3, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 1, type = ConnectorType.INPUT, connectorIndex = 0)
+            ),
+            Edge(
+                from = Connector(nodeId = 3, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 4, type = ConnectorType.INPUT, connectorIndex = 0)
+            )
+        )
+
+        try {
+            builder.buildFunctionGraph(
+                nodes = nodesWithComplexCycle,
+                edges = edgesWithComplexCycle,
+                nodePositions = emptyMap(),
+                isDuration = false,
+                shouldThrow = true
+            )
+            fail("Should have thrown an exception due to complex cycle")
+        } catch (e: IllegalStateException) {
+            assertTrue("Exception message should mention cyclic dependency", 
+                e.message?.contains("Cyclic dependency detected") == true)
+        }
+    }
+
+    @Test
+    fun `buildFunctionGraph detects self-referencing cycle`() {
+        val nodesWithSelfCycle = listOf(
+            Node.LuaScript(id = 1, scriptPreview = "", inputConnectorCount = 1),
+            Node.Output(id = 2)
+        )
+        
+        val edgesWithSelfCycle = listOf(
+            // Self-referencing cycle: 1 -> 1
+            Edge(
+                from = Connector(nodeId = 1, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 1, type = ConnectorType.INPUT, connectorIndex = 0)
+            ),
+            Edge(
+                from = Connector(nodeId = 1, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 2, type = ConnectorType.INPUT, connectorIndex = 0)
+            )
+        )
+
+        try {
+            builder.buildFunctionGraph(
+                nodes = nodesWithSelfCycle,
+                edges = edgesWithSelfCycle,
+                nodePositions = emptyMap(),
+                isDuration = false,
+                shouldThrow = true
+            )
+            fail("Should have thrown an exception due to self-referencing cycle")
+        } catch (e: IllegalStateException) {
+            assertTrue("Exception message should mention cyclic dependency", 
+                e.message?.contains("Cyclic dependency detected") == true)
+        }
+    }
 
     // Helper functions for creating test data
     private fun createTestNodeList(): List<Node> {
