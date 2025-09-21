@@ -20,6 +20,7 @@ package com.samco.trackandgraph.data.sampling
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.sampling.functions.FunctionGraphDataSample
 import javax.inject.Inject
 
@@ -35,7 +36,8 @@ interface DataSampler {
 
 internal class DataSamplerImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
-    private val dao: TrackAndGraphDatabaseDao
+    private val dao: TrackAndGraphDatabaseDao,
+    private val luaEngine: LuaEngine
 ) : DataSampler {
 
     override suspend fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample? {
@@ -50,7 +52,7 @@ internal class DataSamplerImpl @Inject constructor(
         }
         val function = dataInteractor.getFunctionByFeatureId(featureId)
         if (function != null) {
-            return FunctionGraphDataSample.create(function, this)
+            return FunctionGraphDataSample.create(function, this, luaEngine)
         }
         return null
     }
@@ -69,7 +71,7 @@ internal class DataSamplerImpl @Inject constructor(
         val function = dataInteractor.getFunctionByFeatureId(featureId)
         if (function != null) {
             val properties = getDataSamplePropertiesForFeatureId(featureId)
-            return FunctionGraphDataSample.create(function, this)
+            return FunctionGraphDataSample.create(function, this, luaEngine)
                 .asDataSample(properties)
         }
         return DataSample.fromSequence(emptySequence(), onDispose = {})

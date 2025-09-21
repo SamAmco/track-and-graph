@@ -21,12 +21,25 @@ import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
 import com.samco.trackandgraph.data.sampling.RawDataSample
+import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import org.threeten.bp.OffsetDateTime
 
 class FunctionGraphDataSampleTest {
+
+    private val luaEngineComponent = DaggerLuaEngineTestComponent.builder()
+        .dataInteractor(mock())
+        .assetReader(mock())
+        .ioDispatcher(Dispatchers.IO)
+        .timeProvider(mock())
+        .build()
+    
+    private val luaEngine: LuaEngine = luaEngineComponent.provideLuaEngine()
 
     @Test
     fun `single data source reflects input data`() {
@@ -96,7 +109,7 @@ class FunctionGraphDataSampleTest {
         val dataSources = mapOf(featureId to rawDataSample)
 
         // Act
-        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources)
+        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
         val result = functionGraphDataSample.toList()
 
         // Assert
@@ -207,7 +220,7 @@ class FunctionGraphDataSampleTest {
         )
 
         // Act
-        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources)
+        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
         val result = functionGraphDataSample.toList()
 
         // Assert - should be merged in descending timestamp order
@@ -298,13 +311,126 @@ class FunctionGraphDataSampleTest {
         val dataSources = mapOf(featureId to rawDataSample)
 
         // Act
-        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources)
+        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
         val result = functionGraphDataSample.toList()
 
         // Assert - should only get each data point once, even though it's referenced by two nodes
         assertEquals("Should have same number of unique data points", inputDataPoints.size * 2, result.size)
         assertEquals("Should have same data points in same order", inputDataPoints.flatMap { listOf(it, it) }, result)
         assertEquals("getRawDataPoints should contain unique data points only", inputDataPoints, functionGraphDataSample.getRawDataPoints())
+        
+        // Cleanup
+        functionGraphDataSample.dispose()
+    }
+
+    @Test
+    fun `lua script function processes data points correctly`() {
+        // Arrange
+        val featureId = 1L
+        val inputDataPoints = listOf(
+            DataPoint(
+                timestamp = OffsetDateTime.parse("2023-01-03T10:00:00Z"),
+                featureId = featureId,
+                value = 10.0,
+                label = "input1",
+                note = ""
+            ),
+            DataPoint(
+                timestamp = OffsetDateTime.parse("2023-01-02T10:00:00Z"),
+                featureId = featureId,
+                value = 20.0,
+                label = "input2",
+                note = ""
+            ),
+            DataPoint(
+                timestamp = OffsetDateTime.parse("2023-01-01T10:00:00Z"),
+                featureId = featureId,
+                value = 30.0,
+                label = "input3",
+                note = ""
+            )
+        )
+
+        val rawDataSample = RawDataSample.fromSequence(
+            data = inputDataPoints.asSequence(),
+            getRawDataPoints = { inputDataPoints },
+            onDispose = {}
+        )
+
+        val featureNode = FunctionGraphNode.FeatureNode(
+            x = 100f,
+            y = 100f,
+            id = 1,
+            featureId = featureId
+        )
+        
+        // Create a Lua script node that doubles each value and modifies the label
+        val luaScriptNode = FunctionGraphNode.LuaScriptNode(
+            x = 200f,
+            y = 100f,
+            id = 2,
+            script = """
+                return function(data_sources)
+                    local source = data_sources[1]
+                    local data_point = source:dp()
+                    while data_point do
+                        -- Double the value and modify the label
+                        data_point.value = data_point.value * 2
+                        data_point.label = data_point.label .. "_doubled"
+                        coroutine.yield(data_point)
+                        data_point = source:dp()
+                    end
+                end
+            """.trimIndent(),
+            inputConnectorCount = 1,
+            dependencies = listOf(NodeDependency(connectorIndex = 0, nodeId = 1))
+        )
+        
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 300f,
+            y = 100f,
+            id = 3,
+            dependencies = listOf(NodeDependency(connectorIndex = 0, nodeId = 2))
+        )
+
+        val functionGraph = FunctionGraph(
+            nodes = listOf(featureNode, luaScriptNode, outputNode),
+            outputNode = outputNode,
+            isDuration = false
+        )
+
+        val function = Function(
+            id = 1L,
+            featureId = 2L,
+            name = "Lua Script Test Function",
+            groupId = 1L,
+            displayIndex = 0,
+            description = "Test Lua script processing",
+            functionGraph = functionGraph,
+            inputFeatureIds = listOf(featureId)
+        )
+
+        val dataSources = mapOf(featureId to rawDataSample)
+
+        // Act
+        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
+        val result = functionGraphDataSample.toList()
+
+        // Assert
+        assertEquals("Should have same number of data points", inputDataPoints.size, result.size)
+        
+        // Verify each data point was processed correctly
+        assertEquals(20.0, result[0].value, 0.001)  // 10.0 * 2
+        assertEquals("input1_doubled", result[0].label)
+        assertEquals(40.0, result[1].value, 0.001)  // 20.0 * 2
+        assertEquals("input2_doubled", result[1].label)
+        assertEquals(60.0, result[2].value, 0.001)  // 30.0 * 2
+        assertEquals("input3_doubled", result[2].label)
+        
+        // Verify timestamps are preserved
+        assertEquals(inputDataPoints[0].timestamp, result[0].timestamp)
+        assertEquals(inputDataPoints[1].timestamp, result[1].timestamp)
+        assertEquals(inputDataPoints[2].timestamp, result[2].timestamp)
         
         // Cleanup
         functionGraphDataSample.dispose()

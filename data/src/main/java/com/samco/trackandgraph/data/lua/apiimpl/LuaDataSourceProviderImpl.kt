@@ -40,6 +40,15 @@ internal class LuaDataSourceProviderImpl @Inject constructor(
         return luaTable
     }
 
+    fun createLuaDataSource(iterator: Iterator<DataPoint>): LuaValue {
+        val luaTable = LuaTable()
+        luaTable[DP] = getDpLuaFunction(iterator)
+        luaTable[DP_BATCH] = getDpBatchLuaFunction(iterator)
+        luaTable[DP_ALL] = getDpAllLuaFunction(iterator)
+        luaTable[DP_AFTER] = getDpAfterLuaFunction(iterator)
+        return luaTable
+    }
+
     private fun getDpAfterLuaFunction(dataSource: Iterator<DataPoint>) =
         oneArgFunction { arg1 ->
             val zonedDateTime = dateTimeParser.parseDateTimeOrNull(arg1)

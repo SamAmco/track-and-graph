@@ -8,10 +8,10 @@ import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
-class DpLuaGraphTests : LuaEngineImplTest() {
+internal class DpLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `Datapoint type gives data point with sensible defaults`() = testLuaEngine(
+    fun `Datapoint type gives data point with sensible defaults`() = testLuaGraph(
         emptyMap(),
         """
             local graph = require("tng.graph")
@@ -39,7 +39,7 @@ class DpLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Datapoint type respects all returned values`() = testLuaEngine(
+    fun `Datapoint type respects all returned values`() = testLuaGraph(
         emptyMap(),
         """
             local graph = require("tng.graph")
@@ -71,7 +71,7 @@ class DpLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Datapoint type respects isDuration`() = testLuaEngine(
+    fun `Datapoint type respects isDuration`() = testLuaGraph(
         emptyMap(),
         """
             local graph = require("tng.graph")
@@ -100,7 +100,7 @@ class DpLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Datapoint type with nil data is an error`() = testLuaEngine(
+    fun `Datapoint type with nil data is an error`() = testLuaGraph(
         emptyMap(),
         """
             local graph = require("tng.graph")
@@ -116,7 +116,7 @@ class DpLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Datapoint timestamp is in milliseconds and offset is in seconds`() = testLuaEngine(
+    fun `Datapoint timestamp is in milliseconds and offset is in seconds`() = testLuaGraph(
         emptyMap(),
         """
             local graph = require("tng.graph")
@@ -147,7 +147,7 @@ class DpLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Datapoint without data is an error`() = testLuaEngine(
+    fun `Datapoint without data is an error`() = testLuaGraph(
         emptyMap(),
         """
             local graph = require("tng.graph")

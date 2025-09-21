@@ -6,9 +6,9 @@ import com.samco.trackandgraph.data.lua.dto.TextSize
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
-class TextLuaGraphTests : LuaEngineImplTest() {
+internal class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
-    fun `Text type can return NIL`() = testLuaEngine(
+    fun `Text type can return NIL`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -29,7 +29,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with just text`() = testLuaEngine(
+    fun `Text type with just text`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -47,7 +47,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with text and size small`() = testLuaEngine(
+    fun `Text type with text and size small`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -66,7 +66,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with text and size medium`() = testLuaEngine(
+    fun `Text type with text and size medium`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -85,7 +85,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with text and size large`() = testLuaEngine(
+    fun `Text type with text and size large`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -104,7 +104,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with nested text and no size`() = testLuaEngine(
+    fun `Text type with nested text and no size`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -122,7 +122,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with alignment start`() = testLuaEngine(
+    fun `Text type with alignment start`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -141,7 +141,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with text and alignment center`() = testLuaEngine(
+    fun `Text type with text and alignment center`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -160,7 +160,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with text and alignment centre`() = testLuaEngine(
+    fun `Text type with text and alignment centre`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -179,7 +179,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with text and alignment end`() = testLuaEngine(
+    fun `Text type with text and alignment end`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -198,7 +198,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Text type with numeric text value`() = testLuaEngine(
+    fun `Text type with numeric text value`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -216,7 +216,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `text function with string parameter`() = testLuaEngine(
+    fun `text function with string parameter`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return graph.text("hello world")
@@ -231,7 +231,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `text function with number parameter`() = testLuaEngine(
+    fun `text function with number parameter`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return graph.text(123.45)
@@ -246,7 +246,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `text function with table parameter`() = testLuaEngine(
+    fun `text function with table parameter`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return graph.text({
@@ -265,7 +265,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     }
     
     @Test
-    fun `text function with nil parameter should handle gracefully`() = testLuaEngine(
+    fun `text function with nil parameter should handle gracefully`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return graph.text(NIL)

@@ -19,12 +19,14 @@ package com.samco.trackandgraph.data.sampling.functions
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
+import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.RawDataSample
 
-internal class FunctionGraphDataSample constructor(
+internal class FunctionGraphDataSample(
     private val function: Function,
-    private val dataSources: Map<Long, RawDataSample?>
+    private val dataSources: Map<Long, RawDataSample?>,
+    private val luaEngine: LuaEngine
 ) : RawDataSample() {
 
     private val functionGraph = function.functionGraph
@@ -41,7 +43,11 @@ internal class FunctionGraphDataSample constructor(
         val node = nodesById[nodeId] ?: throw IllegalArgumentException("Node $nodeId not found")
         return when (node) {
             is FunctionGraphNode.FeatureNode -> dataSources[node.featureId]?.asNodeRawDataSample()
-            is FunctionGraphNode.LuaScriptNode -> TODO("Not implemented")
+            is FunctionGraphNode.LuaScriptNode -> LuaScriptNodeRawDataSample(
+                luaScriptNode = node,
+                luaEngine = luaEngine,
+                getDataSourceForNodeId = ::getDataSourceForNodeId
+            )
             is FunctionGraphNode.OutputNode -> throw IllegalArgumentException("Found an illegal output node in the function graph: $nodeId")
         }
     }
@@ -61,10 +67,11 @@ internal class FunctionGraphDataSample constructor(
         suspend fun create(
             function: Function,
             dataSampler: DataSampler,
+            luaEngine: LuaEngine
         ): FunctionGraphDataSample {
             val dataSources = function.inputFeatureIds
                 .associateWith { dataSampler.getRawDataSampleForFeatureId(it) }
-            return FunctionGraphDataSample(function, dataSources)
+            return FunctionGraphDataSample(function, dataSources, luaEngine)
         }
     }
 }

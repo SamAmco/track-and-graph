@@ -29,10 +29,10 @@ import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
-class LineGraphLuaGraphTests : LuaEngineImplTest() {
+internal class LineGraphLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `line graph without lines is an error`() = testLuaEngine(
+    fun `line graph without lines is an error`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -46,7 +46,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `line graph returns lines without colors`() = testLuaEngine(
+    fun `line graph returns lines without colors`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -83,7 +83,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `line graph returns lines with colors`() = testLuaEngine(
+    fun `line graph returns lines with colors`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -121,7 +121,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `line graph returns invalid line no points`() = testLuaEngine(
+    fun `line graph returns invalid line no points`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -138,7 +138,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `line graph returns invalid line no timestamp`() = testLuaEngine(
+    fun `line graph returns invalid line no timestamp`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -157,7 +157,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `range_bounds are parsed correctly`() = testLuaEngine(
+    fun `range_bounds are parsed correctly`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -183,7 +183,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `range bounds only provides one value`() = testLuaEngine(
+    fun `range bounds only provides one value`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -209,7 +209,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `range bounds invalid`() = testLuaEngine(
+    fun `range bounds invalid`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -232,7 +232,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `duration_based_range is parsed correctly`() = testLuaEngine(
+    fun `duration_based_range is parsed correctly`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -255,7 +255,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `lines with colours and point styles`() = testLuaEngine(
+    fun `lines with colours and point styles`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -345,7 +345,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `line with label parses correctly`() = testLuaEngine(
+    fun `line with label parses correctly`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
