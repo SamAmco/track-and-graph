@@ -194,6 +194,11 @@ class FunctionGraphBuilderTest {
                 selectedFeatureId = mutableLongStateOf(103L),
                 featurePathMap = mapOf(103L to "Feature 103")
             ),
+            Node.LuaScript(
+                id = 5,
+                scriptPreview = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                inputConnectorCount = 2
+            ),
             Node.Output(
                 id = 4,
                 name = mutableStateOf(TextFieldValue("Test Output")),
@@ -225,7 +230,8 @@ class FunctionGraphBuilderTest {
             1 to Offset(100.5f, 150.75f),
             2 to Offset(200.123f, 250.0f),
             3 to Offset(300.0f, 350.9876f),
-            4 to Offset(500.25f, 200.1f)
+            4 to Offset(500.25f, 200.1f),
+            5 to Offset(400.0f, 100.0f)
         )
     }
 
@@ -249,6 +255,14 @@ class FunctionGraphBuilderTest {
                     y = 350.9876f,
                     id = 3,
                     featureId = 103L
+                ),
+                FunctionGraphNode.LuaScriptNode(
+                    x = 400.0f,
+                    y = 100.0f,
+                    id = 5,
+                    script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                    inputConnectorCount = 2,
+                    dependencies = emptyList()
                 )
             ),
             outputNode = FunctionGraphNode.OutputNode(
