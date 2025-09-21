@@ -93,6 +93,7 @@ internal class FunctionGraphDecoderTest {
                 when {
                     exp is Node.DataSource && act is Node.DataSource -> DataSourceNodeComparator.equals(exp, act)
                     exp is Node.Output && act is Node.Output -> OutputNodeComparator.equals(exp, act)
+                    exp is Node.LuaScript && act is Node.LuaScript -> LuaScriptNodeComparator.equals(exp, act)
                     else -> false
                 }
             }
@@ -118,6 +119,14 @@ internal class FunctionGraphDecoderTest {
         }
     }
 
+    object LuaScriptNodeComparator {
+        fun equals(expected: Node.LuaScript, actual: Node.LuaScript): Boolean {
+            return expected.id == actual.id &&
+                    expected.scriptPreview == actual.scriptPreview &&
+                    expected.inputConnectorCount == actual.inputConnectorCount
+        }
+    }
+
     // Helper functions for creating test data
     private fun createInputFunction(): Function {
         return Function(
@@ -138,6 +147,23 @@ internal class FunctionGraphDecoderTest {
                         y = 250.0f,
                         id = 2,
                         featureId = 102L
+                    ),
+                    FunctionGraphNode.LuaScriptNode(
+                        x = 300.0f,
+                        y = 350.0f,
+                        id = 4,
+                        script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                        inputConnectorCount = 2,
+                        dependencies = listOf(
+                            NodeDependency(
+                                connectorIndex = 0,
+                                nodeId = 1
+                            ),
+                            NodeDependency(
+                                connectorIndex = 1,
+                                nodeId = 2
+                            )
+                        )
                     )
                 ),
                 outputNode = FunctionGraphNode.OutputNode(
@@ -147,11 +173,7 @@ internal class FunctionGraphDecoderTest {
                     dependencies = listOf(
                         NodeDependency(
                             connectorIndex = 0,
-                            nodeId = 1,
-                        ),
-                        NodeDependency(
-                            connectorIndex = 1,
-                            nodeId = 2,
+                            nodeId = 4,
                         )
                     )
                 ),
@@ -181,6 +203,11 @@ internal class FunctionGraphDecoderTest {
                     selectedFeatureId = mutableLongStateOf(102L),
                     featurePathMap = createFeaturePathMap()
                 ),
+                Node.LuaScript(
+                    id = 4,
+                    scriptPreview = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                    inputConnectorCount = 2
+                ),
                 Node.Output(
                     id = 3,
                     name = mutableStateOf(TextFieldValue("Test Function")),
@@ -193,17 +220,22 @@ internal class FunctionGraphDecoderTest {
             edges = persistentListOf(
                 Edge(
                     from = Connector(nodeId = 1, type = ConnectorType.OUTPUT, connectorIndex = 0),
-                    to = Connector(nodeId = 3, type = ConnectorType.INPUT, connectorIndex = 0)
+                    to = Connector(nodeId = 4, type = ConnectorType.INPUT, connectorIndex = 0)
                 ),
                 Edge(
                     from = Connector(nodeId = 2, type = ConnectorType.OUTPUT, connectorIndex = 0),
-                    to = Connector(nodeId = 3, type = ConnectorType.INPUT, connectorIndex = 1)
+                    to = Connector(nodeId = 4, type = ConnectorType.INPUT, connectorIndex = 1)
+                ),
+                Edge(
+                    from = Connector(nodeId = 4, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                    to = Connector(nodeId = 3, type = ConnectorType.INPUT, connectorIndex = 0)
                 )
             ),
             nodePositions = mapOf(
                 1 to Offset(100.5f, 150.75f),
                 2 to Offset(200.123f, 250.0f),
-                3 to Offset(500.25f, 200.1f)
+                3 to Offset(500.25f, 200.1f),
+                4 to Offset(300.0f, 350.0f)
             ),
             isDuration = true
         )
