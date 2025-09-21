@@ -1,9 +1,9 @@
 package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
-import org.luaj.vm2.LuaError
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
@@ -28,7 +28,7 @@ internal class GraphApiLuaGraphTests : LuaEngineImplTest() {
         println(result)
         assertEquals(null, result.data)
         assert(result.error != null)
-        assert(result.error is LuaError)
+        assert(result.error is LuaScriptException)
     }
 
     @Test

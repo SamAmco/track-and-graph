@@ -18,10 +18,10 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.ColorSpec
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.dto.PieChartSegment
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.luaj.vm2.LuaError
 
 internal class PieChartLuaGraphTests : LuaEngineImplTest() {
 
@@ -36,7 +36,7 @@ internal class PieChartLuaGraphTests : LuaEngineImplTest() {
     ) {
         println(result)
         assertEquals(null, result.data)
-        assert(result.error is LuaError)
+        assert(result.error is LuaScriptException)
     }
 
     @Test
@@ -105,7 +105,7 @@ internal class PieChartLuaGraphTests : LuaEngineImplTest() {
     ) {
         println(result)
         assertEquals(null, result.data)
-        assert(result.error is LuaError)
+        assert(result.error is LuaScriptException)
     }
 
     @Test
@@ -123,6 +123,6 @@ internal class PieChartLuaGraphTests : LuaEngineImplTest() {
     ) {
         println(result)
         assertEquals(null, result.data)
-        assert(result.error is LuaError)
+        assert(result.error is LuaScriptException)
     }
 }

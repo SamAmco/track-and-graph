@@ -21,10 +21,10 @@ import com.samco.trackandgraph.data.lua.dto.Line
 import com.samco.trackandgraph.data.lua.dto.LinePoint
 import com.samco.trackandgraph.data.lua.dto.LinePointStyle
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
-import org.luaj.vm2.LuaError
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -42,7 +42,7 @@ internal class LineGraphLuaGraphTests : LuaEngineImplTest() {
     ) {
         println(result)
         assertEquals(null, result.data)
-        assert(result.error is LuaError)
+        assert(result.error is LuaScriptException)
     }
 
     @Test
@@ -134,7 +134,7 @@ internal class LineGraphLuaGraphTests : LuaEngineImplTest() {
     ) {
         println(result)
         assertEquals(null, result.data)
-        assert(result.error is LuaError)
+        assert(result.error is LuaScriptException)
     }
 
     @Test
