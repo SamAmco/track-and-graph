@@ -16,10 +16,7 @@
  */
 package com.samco.trackandgraph.graphstatview.ui
 
-import android.content.Context
-import android.util.TypedValue
 import android.view.View
-import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -67,8 +64,8 @@ import kotlin.math.roundToLong
 import android.graphics.Color as GColor
 
 fun xyPlotSetup(
-    context: Context,
-    xyPlot: XYPlot
+    xyPlot: XYPlot,
+    @ColorInt onSurfaceColor: Int
 ) {
     xyPlot.layoutManager.remove(xyPlot.legend)
     xyPlot.layoutManager.remove(xyPlot.rangeTitle)
@@ -92,16 +89,14 @@ fun xyPlotSetup(
     xyPlot.graph.setPadding(0f, 0f, 0f, 10f)
     xyPlot.graph.setMargins(0f, 20f, 0f, 0f)
 
-    val colorOnSurface = context.getColorFromAttr(R.attr.colorOnSurface)
-
-    xyPlot.domainTitle.labelPaint.color = colorOnSurface
-    xyPlot.graph.domainGridLinePaint.color = colorOnSurface
-    xyPlot.graph.rangeGridLinePaint.color = colorOnSurface
-    xyPlot.graph.domainSubGridLinePaint.color = colorOnSurface
-    xyPlot.graph.rangeSubGridLinePaint.color = colorOnSurface
-    xyPlot.graph.domainOriginLinePaint.color = colorOnSurface
+    xyPlot.domainTitle.labelPaint.color = onSurfaceColor
+    xyPlot.graph.domainGridLinePaint.color = onSurfaceColor
+    xyPlot.graph.rangeGridLinePaint.color = onSurfaceColor
+    xyPlot.graph.domainSubGridLinePaint.color = onSurfaceColor
+    xyPlot.graph.rangeSubGridLinePaint.color = onSurfaceColor
+    xyPlot.graph.domainOriginLinePaint.color = onSurfaceColor
     xyPlot.graph.domainOriginLinePaint.strokeWidth = 1f
-    xyPlot.graph.rangeOriginLinePaint.color = colorOnSurface
+    xyPlot.graph.rangeOriginLinePaint.color = onSurfaceColor
     xyPlot.graph.rangeOriginLinePaint.strokeWidth = 1f
 
     //Setting the layer type enables transparent backgrounds, I don't know why
@@ -200,24 +195,6 @@ private val graphLegendCircleSize = 20.dp
 private val graphLegendTextStyle @Composable get() = MaterialTheme.typography.bodyMedium
 
 @Composable
-fun legendItemLineHeight(): Int {
-    val density = LocalDensity.current
-    val typography = graphLegendTextStyle
-
-    return remember(density, typography) {
-        val body2LineHeight = with(density) {
-            typography.lineHeight.toPx()
-        }
-        val circleSize = with(density) {
-            graphLegendCircleSize.toPx()
-        }
-
-        maxOf(body2LineHeight, circleSize).toInt()
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
 fun GraphLegend(
     modifier: Modifier = Modifier,
     items: List<GraphLegendItem>
@@ -252,14 +229,4 @@ fun GraphLegendItemView(
         text = item.label,
         style = graphLegendTextStyle
     )
-}
-
-@ColorInt
-fun Context.getColorFromAttr(
-    @AttrRes attrColor: Int,
-    typedValue: TypedValue = TypedValue(),
-    resolveRefs: Boolean = true
-): Int {
-    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
-    return typedValue.data
 }

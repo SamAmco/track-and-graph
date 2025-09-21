@@ -20,10 +20,13 @@ package com.samco.trackandgraph.graphstatview.ui
 import android.content.Context
 import android.graphics.Paint
 import android.util.TypedValue
+import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.androidplot.ui.VerticalPosition
@@ -90,6 +93,9 @@ fun LineGraphBodyView(
 
     val context = LocalContext.current
     val listMode = graphViewMode is GraphViewMode.ListMode
+    val errorColor = MaterialTheme.colorScheme.error.toArgb()
+    val textColorPrimary = MaterialTheme.colorScheme.onSurface.toArgb()
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
@@ -101,17 +107,17 @@ fun LineGraphBodyView(
         return@AndroidViewBinding binding
     }, update = {
         xyPlotSetup(
-            context = context,
-            xyPlot = xyPlot
+            xyPlot = xyPlot,
+            onSurfaceColor = onSurfaceColor,
         )
         xyPlot.clear()
-
 
         drawLineGraphFeatures(
             context = context,
             binding = this,
             plottableData = viewData.lines,
             listMode = listMode,
+            textColorPrimary = textColorPrimary
         )
         setUpLineGraphXAxis(
             context = context,
@@ -132,10 +138,10 @@ fun LineGraphBodyView(
             listMode = listMode,
         )
         setTimeMarker(
-            context = context,
             binding = this,
             endTime = viewData.endTime,
-            timeMarker = timeMarker
+            timeMarker = timeMarker,
+            errorColor = errorColor
         )
 
         if (graphViewMode is GraphViewMode.FullScreenMode) {
@@ -272,7 +278,8 @@ private fun drawLineGraphFeatures(
     context: Context,
     binding: GraphXyPlotBinding,
     plottableData: List<Line>,
-    listMode: Boolean
+    listMode: Boolean,
+    @ColorInt textColorPrimary: Int
 ) {
     for (line in plottableData) {
         if (line.line == null) continue
@@ -280,7 +287,8 @@ private fun drawLineGraphFeatures(
             context = context,
             binding = binding,
             line = line,
-            listMode = listMode
+            listMode = listMode,
+            textColorPrimary = textColorPrimary
         )
     }
 }
@@ -289,18 +297,20 @@ private fun addSeries(
     context: Context,
     binding: GraphXyPlotBinding,
     line: Line,
-    listMode: Boolean
+    listMode: Boolean,
+    @ColorInt textColorPrimary: Int
 ) {
     val seriesFormat =
         if (listMode && line.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
-            getFastLineAndPointFormatter(context, line)
-        else getLineAndPointFormatter(context, line)
+            getFastLineAndPointFormatter(context, line, textColorPrimary)
+        else getLineAndPointFormatter(context, line, textColorPrimary)
     binding.xyPlot.addSeries(line.line, seriesFormat)
 }
 
 private fun getLineAndPointFormatter(
     context: Context,
     line: Line,
+    @ColorInt textColorPrimary: Int
 ): LineAndPointFormatter {
     val formatter = LineAndPointFormatter()
 
@@ -320,7 +330,7 @@ private fun getLineAndPointFormatter(
         formatter.vertexPaint = null
     }
 
-    getPointLabelFormatter(context, line)?.let {
+    getPointLabelFormatter(context, line, textColorPrimary)?.let {
         formatter.pointLabelFormatter = it
         formatter.setPointLabeler { series, index ->
             DecimalFormat("#.#").format(series.getY(index))
@@ -335,6 +345,7 @@ private fun getLineAndPointFormatter(
 private fun getFastLineAndPointFormatter(
     context: Context,
     line: Line,
+    @ColorInt textColorPrimary: Int
 ): LineAndPointFormatter {
 
     // Setting lineColor to null sets the linePaint to null also
@@ -347,7 +358,7 @@ private fun getFastLineAndPointFormatter(
     val formatter = FastLineAndPointRenderer.Formatter(
         lineColor,
         vertexColor,
-        getPointLabelFormatter(context, line)
+        getPointLabelFormatter(context, line, textColorPrimary)
     )
 
     formatter.linePaint?.apply {
@@ -377,11 +388,11 @@ private fun getVertexPaintColor(line: Line): Int? {
 private fun getPointLabelFormatter(
     context: Context,
     line: Line,
+    @ColorInt textColorPrimary: Int
 ): PointLabelFormatter? {
     if (line.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS) return null
-    val color = context.getColorFromAttr(android.R.attr.textColorPrimary)
     val pointLabelFormatter = PointLabelFormatter(
-        color,
+        textColorPrimary,
         context.resources.getDimension(R.dimen.line_graph_point_label_h_offset),
         context.resources.getDimension(R.dimen.line_graph_point_label_v_offset)
     )
@@ -390,25 +401,24 @@ private fun getPointLabelFormatter(
 }
 
 private fun getMarkerPaint(
-    context: Context
+    @ColorInt errorColor: Int
 ): Paint {
-    val color = context.getColorFromAttr(R.attr.errorTextColor)
     val paint = Paint()
-    paint.color = color
-    paint.strokeWidth = 2f
+    paint.color = errorColor
+    paint.strokeWidth = 3f
     return paint
 }
 
 private fun setTimeMarker(
-    context: Context,
     binding: GraphXyPlotBinding,
     endTime: Temporal,
-    timeMarker: OffsetDateTime?
+    timeMarker: OffsetDateTime?,
+    @ColorInt errorColor: Int
 ) {
     binding.xyPlot.removeMarkers()
     if (timeMarker == null) return
 
-    val markerPaint = getMarkerPaint(context)
+    val markerPaint = getMarkerPaint(errorColor)
     val millis = Duration.between(endTime, timeMarker).toMillis()
     binding.xyPlot.addMarker(
         XValueMarker(

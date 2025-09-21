@@ -19,7 +19,9 @@ package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
 import android.util.TypedValue
+import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -81,6 +83,7 @@ private fun TimeHistogramBodyView(
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
 
     val hasLegend = barValues.size > 1
 
@@ -90,8 +93,8 @@ private fun TimeHistogramBodyView(
         },
         update = {
             xyPlotSetup(
-                context = context,
-                xyPlot = xyPlot
+                xyPlot = xyPlot,
+                onSurfaceColor = onSurfaceColor
             )
             xyPlot.clear()
 
@@ -115,9 +118,9 @@ private fun TimeHistogramBodyView(
                 maxDisplayHeight = maxDisplayHeight
             )
             drawBars(
-                context = context,
                 binding = this,
-                barValues = barValues
+                barValues = barValues,
+                onSurfaceColor = onSurfaceColor
             )
 
             setGraphHeight(
@@ -263,18 +266,17 @@ private fun setUpBounds(
 }
 
 private fun drawBars(
-    context: Context,
     binding: GraphXyPlotBinding,
-    barValues: List<ITimeHistogramViewData.BarValue>
+    barValues: List<ITimeHistogramViewData.BarValue>,
+    @ColorInt onSurfaceColor: Int
 ) {
-    val outlineColor = context.getColorFromAttr(R.attr.colorOnSurface)
 
     barValues.forEachIndexed { i, bv ->
         val series = (barValues[i]).values
         val xySeries = SimpleXYSeries(series, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, bv.label)
         val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
         val color = dataVisColorList[colorIndex].toArgb()
-        val seriesFormatter = BarFormatter(color, outlineColor)
+        val seriesFormatter = BarFormatter(color, onSurfaceColor)
         seriesFormatter.borderPaint.strokeWidth = PixelUtils.dpToPix(1f)
         binding.xyPlot.addSeries(xySeries, seriesFormatter)
     }

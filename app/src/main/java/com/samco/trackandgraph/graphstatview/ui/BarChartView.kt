@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import android.annotation.SuppressLint
+import androidx.annotation.ColorInt
 import android.content.Context
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -47,6 +48,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -316,6 +318,7 @@ private fun BarChartBodyView(
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
 
     val hasLegend = bars.size > 1
 
@@ -325,8 +328,8 @@ private fun BarChartBodyView(
         },
         update = {
             xyPlotSetup(
-                context = context,
-                xyPlot = xyPlot
+                xyPlot = xyPlot,
+                onSurfaceColor = onSurfaceColor
             )
             xyPlot.clear()
 
@@ -360,9 +363,9 @@ private fun BarChartBodyView(
                 durationBasedRange = durationBasedRange,
             )
             drawBars(
-                context = context,
                 binding = this,
-                bars = bars
+                bars = bars,
+                onSurfaceColor = onSurfaceColor
             )
 
             setXAxisLabelSpacingAndOrigin(binding = this)
@@ -371,11 +374,13 @@ private fun BarChartBodyView(
                 attachPanZoomClickListener(
                     binding = this,
                     barMarkerStore = barMarkerStore,
-                    barIndexRange = xDates.indices
+                    barIndexRange = xDates.indices,
+                    onSurfaceColor = onSurfaceColor
                 )
                 redrawMarkers(
                     binding = this,
                     barMarkerStore = barMarkerStore,
+                    onSurfaceColor = onSurfaceColor
                 )
             }
 
@@ -408,7 +413,8 @@ private fun BarChartBodyView(
 private fun attachPanZoomClickListener(
     binding: GraphXyPlotBinding,
     barMarkerStore: BarMarkerStore,
-    barIndexRange: IntRange
+    barIndexRange: IntRange,
+    @ColorInt onSurfaceColor: Int
 ) {
     val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
 
@@ -424,13 +430,13 @@ private fun attachPanZoomClickListener(
 
         override fun zoom(motionEvent: MotionEvent?) {
             super.zoom(motionEvent)
-            redrawMarkers(binding, barMarkerStore)
+            redrawMarkers(binding, barMarkerStore, onSurfaceColor)
             setXAxisLabelSpacingAndOrigin(binding)
         }
 
         override fun pan(motionEvent: MotionEvent?) {
             super.pan(motionEvent)
-            redrawMarkers(binding, barMarkerStore)
+            redrawMarkers(binding, barMarkerStore, onSurfaceColor)
             setXAxisLabelSpacingAndOrigin(binding)
         }
 
@@ -470,7 +476,8 @@ private fun attachPanZoomClickListener(
                 toggleBarMarker(
                     binding = binding,
                     barMarkerStore = barMarkerStore,
-                    index = rounded
+                    index = rounded,
+                    onSurfaceColor = onSurfaceColor
                 )
                 view.performClick()
             }
@@ -572,12 +579,10 @@ private fun getXAxisFormatter(
 }
 
 private fun drawBars(
-    context: Context,
     binding: GraphXyPlotBinding,
-    bars: List<TimeBarSegmentSeries>
+    bars: List<TimeBarSegmentSeries>,
+    @ColorInt onSurfaceColor: Int
 ) {
-    val outlineColor = context.getColorFromAttr(R.attr.colorOnSurface)
-
     // if there are more than 60 bars, we don't want to draw the borders
     // I chose 60 simply because it's the first round number after the number of weeks in a year
     val xfermode =
@@ -586,7 +591,7 @@ private fun drawBars(
 
     bars.forEachIndexed { i, bv ->
         val color = getColorInt(bv.color)
-        val seriesFormatter = BarFormatter(color, outlineColor)
+        val seriesFormatter = BarFormatter(color, onSurfaceColor)
         seriesFormatter.borderPaint.xfermode = xfermode
         binding.xyPlot.addSeries(bv.segmentSeries, seriesFormatter)
     }
@@ -596,7 +601,10 @@ private fun drawBars(
     renderer.barOrientation = BarRenderer.BarOrientation.STACKED
 }
 
-private fun getMarkerPaint(binding: GraphXyPlotBinding): Paint {
+private fun getMarkerPaint(
+    binding: GraphXyPlotBinding,
+    @ColorInt onSurfaceColor: Int
+): Paint {
     //Calculate the marker width
     val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
     //If the gridRect is null it will throw an exception, this can happen if the graph hasn't been
@@ -605,7 +613,7 @@ private fun getMarkerPaint(binding: GraphXyPlotBinding): Paint {
     val width = abs(renderer.plot.seriesToScreenX(1) - renderer.plot.seriesToScreenX(0))
 
     val paint = Paint()
-    paint.color = binding.root.context.getColorFromAttr(R.attr.colorOnSurface)
+    paint.color = onSurfaceColor
     paint.alpha = (0.2f * 255f).toInt()
     paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
     paint.strokeWidth = width
@@ -615,19 +623,21 @@ private fun getMarkerPaint(binding: GraphXyPlotBinding): Paint {
 private fun toggleBarMarker(
     binding: GraphXyPlotBinding,
     barMarkerStore: BarMarkerStore,
-    index: Int
+    index: Int,
+    @ColorInt onSurfaceColor: Int
 ) {
     if (barMarkerStore.highlightedIndex == index) barMarkerStore.clearHighlightedIndex()
     else barMarkerStore.setHighlightedIndex(index)
-    redrawMarkers(binding, barMarkerStore)
+    redrawMarkers(binding, barMarkerStore, onSurfaceColor)
 }
 
 private fun redrawMarkers(
     binding: GraphXyPlotBinding,
-    barMarkerStore: BarMarkerStore
+    barMarkerStore: BarMarkerStore,
+    @ColorInt onSurfaceColor: Int
 ) {
     binding.xyPlot.removeMarkers()
-    val markerPaint = getMarkerPaint(binding)
+    val markerPaint = getMarkerPaint(binding, onSurfaceColor)
     barMarkerStore.highlightedIndex?.let {
         binding.xyPlot.addMarker(
             XValueMarker(
