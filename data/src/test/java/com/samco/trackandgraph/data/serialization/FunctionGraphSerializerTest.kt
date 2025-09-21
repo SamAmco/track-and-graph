@@ -124,6 +124,29 @@ class FunctionGraphSerializerTest {
                     y = 350.9876f,   // 4 decimal places
                     id = 3,
                     featureId = 103L
+                ),
+                FunctionGraphNode.LuaScriptNode(
+                    x = 400.0f,
+                    y = 300.0f,
+                    id = 5,
+                    script = """
+                        return function(data_sources)
+                            local source = data_sources[1]
+                            local data_point = source:dp()
+                            while data_point do
+                                data_point.value = data_point.value * 2
+                                coroutine.yield(data_point)
+                                data_point = source:dp()
+                            end
+                        end
+                    """.trimIndent(),
+                    inputConnectorCount = 1,
+                    dependencies = listOf(
+                        NodeDependency(
+                            connectorIndex = 0,
+                            nodeId = 1
+                        )
+                    )
                 )
             ),
             outputNode = FunctionGraphNode.OutputNode(
