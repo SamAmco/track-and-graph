@@ -10,10 +10,10 @@ import org.junit.Test
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
 
-class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
+internal class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `time bars support 3 variants`() = testLuaEngine(
+    fun `time bars support 3 variants`() = testLuaGraph(
         """
         local graph = require("tng.graph")
         local core = require("tng.core")
@@ -72,7 +72,7 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `bar duration takes priority over bar period`() = testLuaEngine(
+    fun `bar duration takes priority over bar period`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             local core = require("tng.core")
@@ -106,7 +106,7 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `fall back to period if bar duration is not provided`() = testLuaEngine(
+    fun `fall back to period if bar duration is not provided`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             local core = require("tng.core")
@@ -139,7 +139,7 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `end_time supports integers`() = testLuaEngine(
+    fun `end_time supports integers`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -169,7 +169,7 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `end_time supports zone and offset`() = testLuaEngine(
+    fun `end_time supports zone and offset`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -205,7 +205,7 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `y_max is parsed correctly`() = testLuaEngine(
+    fun `y_max is parsed correctly`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -235,7 +235,7 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `duration_based_range is parsed correctly`() = testLuaEngine(
+    fun `duration_based_range is parsed correctly`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {

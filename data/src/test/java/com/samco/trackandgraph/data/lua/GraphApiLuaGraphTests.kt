@@ -10,10 +10,10 @@ import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
-class GraphApiLuaGraphTests : LuaEngineImplTest() {
+internal class GraphApiLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `Data source not found gives error`() = testLuaEngine(
+    fun `Data source not found gives error`() = testLuaGraph(
         mapOf(),
         """
             return function(sources)
@@ -32,7 +32,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Sources returns full list of sources`() = testLuaEngine(
+    fun `Sources returns full list of sources`() = testLuaGraph(
         mapOf(
             "source1" to sequenceOf(
                 TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
@@ -64,7 +64,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `dp returns next data point`() = testLuaEngine(
+    fun `dp returns next data point`() = testLuaGraph(
         mapOf(
             "source1" to sequenceOf(
                 TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
@@ -88,7 +88,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `dpbatch returns n data points`() = testLuaEngine(
+    fun `dpbatch returns n data points`() = testLuaGraph(
         mapOf(
             "source1" to sequenceOf(
                 TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
@@ -120,7 +120,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `dpall returns all data points`() = testLuaEngine(
+    fun `dpall returns all data points`() = testLuaGraph(
         mapOf(
             "source1" to sequenceOf(
                 TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
@@ -152,7 +152,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `dpafter returns all data points after timestamp`() = testLuaEngine(
+    fun `dpafter returns all data points after timestamp`() = testLuaGraph(
         mapOf(
             "source1" to sequenceOf(
                 TestDP(
@@ -202,7 +202,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `dpafter returns all datapoints after a date`() = testLuaEngine(
+    fun `dpafter returns all datapoints after a date`() = testLuaGraph(
         mapOf(
             "source1" to sequenceOf(
                 TestDP(
@@ -251,7 +251,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `apply_moving_averaging works correctly`() = testLuaEngine(
+    fun `apply_moving_averaging works correctly`() = testLuaGraph(
         mapOf(
             "source" to sequenceOf(
                 TestDP(100 - 10, 3.0),
@@ -289,7 +289,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `calculate_period_totals dates work correctly`() = testLuaEngine(
+    fun `calculate_period_totals dates work correctly`() = testLuaGraph(
         mapOf(
             "source" to sequenceOf(
                 "2021-11-01T00:13:13.949Z",
@@ -340,7 +340,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `calculate_period_totals value sums work correctly`() = testLuaEngine(
+    fun `calculate_period_totals value sums work correctly`() = testLuaGraph(
         mapOf(
             "source" to sequenceOf(
                 "2025-03-09T00:13:13.949Z",

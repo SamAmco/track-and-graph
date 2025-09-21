@@ -19,11 +19,14 @@ package com.samco.trackandgraph.data.lua
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaScriptException
+import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionDataSourceAdapter
 import com.samco.trackandgraph.data.lua.graphadapters.DataPointLuaGraphAdapter
 import com.samco.trackandgraph.data.lua.graphadapters.LineGraphLuaGraphAdapter
 import com.samco.trackandgraph.data.lua.graphadapters.PieChartLuaGraphAdapter
 import com.samco.trackandgraph.data.lua.graphadapters.TextLuaGraphAdapter
 import com.samco.trackandgraph.data.lua.graphadapters.TimeBarChartLuaGraphAdapter
+import com.samco.trackandgraph.data.sampling.RawDataSample
+import com.samco.trackandgraph.data.database.dto.DataPoint
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -36,6 +39,7 @@ internal class LuaEngineImpl @Inject constructor(
     private val timeBarChartLuaGraphAdapter: TimeBarChartLuaGraphAdapter,
     private val luaScriptResolver: LuaScriptResolver,
     private val luaDataSourceProviderImpl: LuaDataSourceProviderImpl,
+    private val luaFunctionDataSourceAdapter: LuaFunctionDataSourceAdapter,
 ) : LuaEngine {
 
     override fun runLuaGraphScript(
@@ -51,7 +55,6 @@ internal class LuaEngineImpl @Inject constructor(
                 )
             )
         } catch (luaError: LuaError) {
-            // Wrap LuaError in our custom exception to avoid exposing luak library types to app module
             val luaScriptException = LuaScriptException(
                 message = luaError.message ?: "Lua script error",
                 luaCauseStackTrace = luaError.luaCause?.stackTraceToString()
@@ -59,6 +62,22 @@ internal class LuaEngineImpl @Inject constructor(
             LuaGraphResult(error = luaScriptException)
         } catch (t: Throwable) {
             LuaGraphResult(error = t)
+        }
+    }
+
+    override fun runLuaFunctionScript(
+        script: String,
+        dataSources: List<RawDataSample>
+    ): Sequence<DataPoint> {
+        return try {
+            val resolvedScript = luaScriptResolver.resolveLuaScript(script)
+            luaFunctionDataSourceAdapter.createDataPointSequence(resolvedScript, dataSources)
+        } catch (luaError: LuaError) {
+            val luaScriptException = LuaScriptException(
+                message = luaError.message ?: "Lua script error",
+                luaCauseStackTrace = luaError.luaCause?.stackTraceToString()
+            )
+            throw luaScriptException
         }
     }
 
