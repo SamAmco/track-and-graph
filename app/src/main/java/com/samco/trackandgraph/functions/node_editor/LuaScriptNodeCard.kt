@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.functions.node_editor
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +30,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,9 +50,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,8 +69,6 @@ import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.IconTextButton
 import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
 import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
 
@@ -162,10 +160,12 @@ private fun ScriptPreviewTextField(
         scriptPreview.lines().size > maxVisibleLines
     }
 
-    OutlinedTextField(
+    TextField(
         modifier = Modifier
             .fillMaxWidth()
             .slimOutlinedTextField()
+            .border(1.dp, MaterialTheme.colorScheme.outline, shape = MaterialTheme.shapes.small)
+            .horizontalScroll(rememberScrollState())
             .drawWithContent {
                 drawContent()
                 drawRect(color = surfaceColor.copy(alpha = 0.3f))
@@ -262,7 +262,7 @@ private fun LuaScriptNodePreview() {
                 inputConnectorCount = 2,
                 scriptPreview = """
                     function main(input1, input2)
-                        return input1 + input2
+                        return input1 + input2 + input3 + input4 + input5 + input6 + input7 + input8 + input9 + input10
                     end
                 """.trimIndent()
             )
