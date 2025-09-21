@@ -34,7 +34,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class LuaEngineImplTest {
+internal abstract class LuaEngineImplTest {
 
     protected val dataInteractor: DataInteractor = mock()
     protected val assetReader: AssetReader = mock()
@@ -61,20 +61,28 @@ abstract class LuaEngineImplTest {
             .provideLuaEngine()
     }
 
-    protected data class AssertionScope(
+    protected data class LuaGraphAssertionScope(
         val result: LuaGraphResult,
         val sampledData: Map<String, List<DataPoint>>,
     )
 
-    protected fun testLuaEngine(
-        script: String,
-        assertionBlock: AssertionScope.() -> Unit
-    ) = testLuaEngine(emptyMap(), script, assertionBlock)
+    protected data class LuaFunctionAssertionScope(
+        val result: Sequence<DataPoint>,
+        val inputDataSources: List<List<DataPoint>>,
+    ) {
+        // Convert the result sequence to a list for easier testing
+        val resultList: List<DataPoint> by lazy { result.toList() }
+    }
 
-    protected fun testLuaEngine(
+    protected fun testLuaGraph(
+        script: String,
+        assertionBlock: LuaGraphAssertionScope.() -> Unit
+    ) = testLuaGraph(emptyMap(), script, assertionBlock)
+
+    protected fun testLuaGraph(
         dataSources: Map<String, Sequence<TestDP>>,
         script: String,
-        assertionBlock: AssertionScope.() -> Unit
+        assertionBlock: LuaGraphAssertionScope.() -> Unit
     ) {
         val uut = uut()
 
@@ -88,9 +96,34 @@ abstract class LuaEngineImplTest {
             LuaEngine.LuaGraphEngineParams(sources)
         )
 
-        AssertionScope(
+        LuaGraphAssertionScope(
             result = result,
             sampledData = sources.mapValues { (_, sample) -> sample.getRawDataPoints() }
+        ).assertionBlock()
+    }
+
+    protected fun testLuaFunction(
+        script: String,
+        assertionBlock: LuaFunctionAssertionScope.() -> Unit
+    ) = testLuaFunction(emptyList(), script, assertionBlock)
+
+    protected fun testLuaFunction(
+        dataSources: List<Sequence<TestDP>>,
+        script: String,
+        assertionBlock: LuaFunctionAssertionScope.() -> Unit
+    ) {
+        val uut = uut()
+
+        val rawDataSources = dataSources.map { source ->
+            val asDataPoints = source.map { it.toDataPoint() }
+            rawDataSampleFromSequence(asDataPoints) {}
+        }
+
+        val result = uut.runLuaFunctionScript(script, rawDataSources)
+
+        LuaFunctionAssertionScope(
+            result = result,
+            inputDataSources = rawDataSources.map { it.getRawDataPoints() }
         ).assertionBlock()
     }
 

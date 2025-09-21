@@ -25,6 +25,17 @@ abstract class RawDataSample : Sequence<DataPoint> {
                 override fun dispose() = onDispose()
             }
         }
+
+        /**
+         * Return an empty RawDataSample with no data points.
+         */
+        fun empty(): RawDataSample {
+            return fromSequence(
+                data = emptySequence(),
+                getRawDataPoints = { emptyList() },
+                onDispose = { }
+            )
+        }
     }
 
     /**

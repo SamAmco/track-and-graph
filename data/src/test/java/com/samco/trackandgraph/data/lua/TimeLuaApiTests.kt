@@ -9,14 +9,14 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 
-class TimeLuaApiTests : LuaEngineImplTest() {
+internal class TimeLuaApiTests : LuaEngineImplTest() {
 
     //1743202801000 is the timestamp for 2025-03-29T00:00:01 in the Europe/Berlin timezone. the UTC offset is +1.
     // This is one day before daylight savings time starts. It's a Saturday.
     //1743372001000 is the timestamp if you add 2 days. The UTC offset will now be +2
 
     @Test
-    fun `shift timestamp forward by duration`() = testLuaEngine(
+    fun `shift timestamp forward by duration`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -36,7 +36,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift date forward by duration and amount`() = testLuaEngine(
+    fun `shift date forward by duration and amount`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -56,7 +56,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift timestamp backward by duration and amount`() = testLuaEngine(
+    fun `shift timestamp backward by duration and amount`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -76,7 +76,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift date backward by duration`() = testLuaEngine(
+    fun `shift date backward by duration`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -96,7 +96,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift timestamp forward by period`() = testLuaEngine(
+    fun `shift timestamp forward by period`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             local core = require("tng.core")
@@ -119,7 +119,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift date backward by period and amount`() = testLuaEngine(
+    fun `shift date backward by period and amount`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             local core = require("tng.core")
@@ -139,7 +139,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift timestamp backward by period and amount`() = testLuaEngine(
+    fun `shift timestamp backward by period and amount`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -159,7 +159,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift date forward by period and amount`() = testLuaEngine(
+    fun `shift date forward by period and amount`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             local core = require("tng.core")
@@ -180,7 +180,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift using date, offset, and zone uses zone over offset`() = testLuaEngine(
+    fun `shift using date, offset, and zone uses zone over offset`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -201,7 +201,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `shift using date and offset uses offset`() = testLuaEngine(
+    fun `shift using date and offset uses offset`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -224,7 +224,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
 
     @Test
-    fun `shift doesnt lose any fields from the input table`() = testLuaEngine(
+    fun `shift doesnt lose any fields from the input table`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -245,7 +245,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `time with no args returns current time`() = testLuaEngine(
+    fun `time with no args returns current time`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -265,7 +265,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `time with date returns time at that date`() = testLuaEngine(
+    fun `time with date returns time at that date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -284,7 +284,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `date with no args returns current date`() = testLuaEngine(
+    fun `date with no args returns current date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -304,7 +304,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `date with timestamp returns date at that timestamp`() = testLuaEngine(
+    fun `date with timestamp returns date at that timestamp`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -323,7 +323,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `format given a timestamp number and a format string returns the formatted date`() = testLuaEngine(
+    fun `format given a timestamp number and a format string returns the formatted date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -343,7 +343,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `format given a timestamp and a format string returns the formatted date`() = testLuaEngine(
+    fun `format given a timestamp and a format string returns the formatted date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -362,7 +362,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `format given a date and a format string returns the formatted date`() = testLuaEngine(
+    fun `format given a date and a format string returns the formatted date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -381,7 +381,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `you can override the day of week on a date`() = testLuaEngine(
+    fun `you can override the day of week on a date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -402,7 +402,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `you can override the day of month on a date`() = testLuaEngine(
+    fun `you can override the day of month on a date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -423,7 +423,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `you can override the day of year on a date`() = testLuaEngine(
+    fun `you can override the day of year on a date`() = testLuaGraph(
         """
             local core = require("tng.core")
             local graph = require("tng.graph")
@@ -444,7 +444,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `realistic overriding day of month`() = testLuaEngine(
+    fun `realistic overriding day of month`() = testLuaGraph(
         // Realistically you have to remove yday and wday from the table to override the day of month
         // if you are trying to adjust the current date otherwise they will take precedence.
         """
@@ -470,7 +470,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `realistic overriding day of year`() = testLuaEngine(
+    fun `realistic overriding day of year`() = testLuaGraph(
         // Realistically you have to remove wday from the table to override the day of year
         // if you are trying to adjust the current date otherwise it will take precedence.
         """
@@ -495,7 +495,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `realistic overriding day of week`() = testLuaEngine(
+    fun `realistic overriding day of week`() = testLuaGraph(
         // wday takes highest precedence so you have to remove yday and day from the table to override the day of week
         """
             local core = require("tng.core")

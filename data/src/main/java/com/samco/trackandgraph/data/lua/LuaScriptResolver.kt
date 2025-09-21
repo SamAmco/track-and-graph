@@ -23,6 +23,11 @@ internal class LuaScriptResolver @Inject constructor(
         }
     }
 
+    fun resolveLuaScript(script: String): LuaValue {
+        val cleanedScript = script.cleanLuaScript()
+        return globals.load(cleanedScript).call()
+    }
+
     private fun String.cleanLuaScript(): String {
         return this
             // Replace NBSP with space

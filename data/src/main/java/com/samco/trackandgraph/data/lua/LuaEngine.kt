@@ -18,6 +18,7 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
+import com.samco.trackandgraph.data.database.dto.DataPoint
 
 interface LuaEngine {
     data class LuaGraphEngineParams(
@@ -28,4 +29,9 @@ interface LuaEngine {
         script: String,
         params: LuaGraphEngineParams
     ): LuaGraphResult
+
+    fun runLuaFunctionScript(
+        script: String,
+        dataSources: List<RawDataSample>
+    ): Sequence<DataPoint>
 }

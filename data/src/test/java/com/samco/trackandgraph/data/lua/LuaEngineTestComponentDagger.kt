@@ -32,7 +32,7 @@ import javax.inject.Singleton
 
 @Module
 @DisableInstallInCheck
-interface LuaBindingModule {
+internal interface LuaBindingModule {
     @Binds
     fun bindLuaEngine(impl: LuaEngineImpl): LuaEngine
 }
@@ -41,7 +41,7 @@ interface LuaBindingModule {
 @Component(
     modules = [LuaBindingModule::class]
 )
-interface LuaEngineTestComponent {
+internal interface LuaEngineTestComponent {
 
     fun provideLuaEngine(): LuaEngineImpl
 
