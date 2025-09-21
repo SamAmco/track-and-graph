@@ -23,10 +23,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.luaj.vm2.LuaError
 
-class PieChartLuaGraphTests : LuaEngineImplTest() {
+internal class PieChartLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `pie chart without segments is an error`() = testLuaEngine(
+    fun `pie chart without segments is an error`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -40,7 +40,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `pie chart returns segments without colours`() = testLuaEngine(
+    fun `pie chart returns segments without colours`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -65,7 +65,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `pie chart returns segments with colours`() = testLuaEngine(
+    fun `pie chart returns segments with colours`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             local core = require("tng.core")
@@ -91,7 +91,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `pie chart returns invalid segment no value`() = testLuaEngine(
+    fun `pie chart returns invalid segment no value`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {
@@ -109,7 +109,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `pie chart returns invalid segment no label`() = testLuaEngine(
+    fun `pie chart returns invalid segment no label`() = testLuaGraph(
         """
             local graph = require("tng.graph")
             return {

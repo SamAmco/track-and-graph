@@ -9,7 +9,7 @@ import org.mockito.kotlin.whenever
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 
-class TimezoneTimeLuaApiTests : LuaEngineImplTest() {
+internal class TimezoneTimeLuaApiTests : LuaEngineImplTest() {
 
     override val timeProvider: TimeProvider = mock()
 
@@ -23,7 +23,7 @@ class TimezoneTimeLuaApiTests : LuaEngineImplTest() {
         whenever(timeProvider.now()).thenReturn(nycTime)
         whenever(timeProvider.defaultZone()).thenReturn(nycZone)
         
-        testLuaEngine(
+        testLuaGraph(
             """
                 local core = require("tng.core")
                 local graph = require("tng.graph")
@@ -74,7 +74,7 @@ class TimezoneTimeLuaApiTests : LuaEngineImplTest() {
         whenever(timeProvider.now()).thenReturn(nycTime)
         whenever(timeProvider.defaultZone()).thenReturn(nycZone)
         
-        testLuaEngine(
+        testLuaGraph(
             """
                 local core = require("tng.core")
                 local graph = require("tng.graph")
