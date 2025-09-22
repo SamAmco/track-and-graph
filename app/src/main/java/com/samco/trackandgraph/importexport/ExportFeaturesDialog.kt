@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.importexport
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -84,6 +85,17 @@ fun ExportFeaturesDialog(
     // Load features when dialog opens
     LaunchedEffect(trackGroupId) {
         viewModel.loadFeatures(trackGroupId)
+    }
+
+    // Handle export errors
+    LaunchedEffect(Unit) {
+        for (errorMessage in viewModel.errors) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.export_error_message, errorMessage),
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     // File creation launcher

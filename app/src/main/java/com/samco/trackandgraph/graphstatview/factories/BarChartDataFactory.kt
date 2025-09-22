@@ -189,7 +189,8 @@ class BarChartDataFactory @Inject constructor(
                 // values is on the bottom
                 .sortedBy { series -> barSumsByLabel.indexOfFirst { it.first == series.title } }
                 .mapIndexed { i, series ->
-                    val color = ColorSpec.ColorIndex((i * dataVisColorGenerator) % dataVisColorList.size)
+                    val color =
+                        ColorSpec.ColorIndex((i * dataVisColorGenerator) % dataVisColorList.size)
                     TimeBarSegmentSeries(series, color)
                 }
 
@@ -279,14 +280,16 @@ class BarChartDataFactory @Inject constructor(
         config: BarChart,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IBarChartViewData {
-        val dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
-
-        if (!dataSample.iterator().hasNext()) return object : IBarChartViewData {
-            override val state = IGraphStatViewData.State.READY
-            override val graphOrStat = graphOrStat
-        }
+        var dataSample: DataSample? = null
 
         try {
+            dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
+
+            if (!dataSample.iterator().hasNext()) return object : IBarChartViewData {
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
+            }
+
             //TODO basically everywhere you see zone id i think you might wanna use time helper
             // and inject it.
             val endTime = config.endDate.toOffsetDateTime()?.let { timeHelper.toZonedDateTime(it) }
@@ -317,11 +320,11 @@ class BarChartDataFactory @Inject constructor(
             Timber.d(t, "Error creating bar chart data")
             return object : IBarChartViewData {
                 override val state = IGraphStatViewData.State.ERROR
-                override val error = GraphStatInitException(R.string.graph_stat_validation_unknown)
+                override val error = t
                 override val graphOrStat = graphOrStat
             }
         } finally {
-            dataSample.dispose()
+            dataSample?.dispose()
         }
     }
 }
