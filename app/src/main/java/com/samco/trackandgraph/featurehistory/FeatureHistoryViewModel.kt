@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -50,6 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import javax.inject.Inject
 
 data class DataPointInfo(
@@ -77,6 +79,7 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     val showDataPointInfo: LiveData<DataPointInfo?>
     val showDeleteConfirmDialog: LiveData<Boolean>
     val showUpdateDialog: LiveData<Boolean>
+    val error: StateFlow<Exception?>
 
     fun showUpdateAllDialog()
     fun onDeleteClicked(dataPoint: DataPointInfo)
@@ -109,16 +112,36 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         .flowOn(io)
         .asLiveData(viewModelScope.coroutineContext)
 
-    override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> =
-        combine(featureIdFlow, dataUpdates) { id, _ -> id }
-            .map {
-                dataSampler.getRawDataSampleForFeatureId(it)
+    private sealed class GetDataPointsResult {
+        data class Success(val dataPoints: List<DataPointInfo>) : GetDataPointsResult()
+        data class Error(val exception: Exception) : GetDataPointsResult()
+    }
+
+    private val getDataPointsResult = combine(featureIdFlow, dataUpdates) { id, _ -> id }
+        .map {
+            try {
+                val list = dataSampler.getRawDataSampleForFeatureId(it)
                     ?.map(::toDataPointInfo)
                     ?.toList()
                     ?: emptyList()
+                GetDataPointsResult.Success(list)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to get data points for feature $it")
+                GetDataPointsResult.Error(e)
             }
+        }
+        .flowOn(io)
+
+    override val error: StateFlow<Exception?> = getDataPointsResult
+        .filterIsInstance<GetDataPointsResult.Error>()
+        .map { it.exception }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> = getDataPointsResult
             .flowOn(io)
-            .filter { it.isNotEmpty() }
+            .filterIsInstance<GetDataPointsResult.Success>()
+            .filter { it.dataPoints.isNotEmpty() }
+            .map { it.dataPoints }
             .map { dataPoints ->
                 val range = Duration
                     .between(dataPoints.last().date, dataPoints.first().date)

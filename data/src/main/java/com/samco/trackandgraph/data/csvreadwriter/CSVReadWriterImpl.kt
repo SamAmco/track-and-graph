@@ -25,7 +25,6 @@ import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.odtFromString
 import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.di.IODispatcher
-import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.data.sampling.DataSampleProperties
 import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.CoroutineDispatcher
