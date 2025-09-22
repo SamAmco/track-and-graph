@@ -25,6 +25,7 @@ import org.luaj.vm2.LuaFunction
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -62,7 +63,9 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
         val coroutine = LuaThread(globalsProvider.globals.value, generatorFunction)
 
         // Return a Sequence that lazily processes the coroutine
-        return createLuaGeneratorSequence(coroutine, luaDataSources)
+        return createLuaGeneratorSequence(coroutine, luaDataSources) {
+            dataSources.forEach { it.dispose() }
+        }
     }
 
     private fun createLuaDataSourcesList(dataSources: List<RawDataSample>): LuaValue {
@@ -77,7 +80,8 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
 
     private fun createLuaGeneratorSequence(
         coroutine: LuaThread,
-        luaDataSources: LuaValue
+        luaDataSources: LuaValue,
+        onDispose: () -> Unit
     ): Sequence<DataPoint> {
         return Sequence {
             object : Iterator<DataPoint> {
@@ -85,8 +89,14 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
                 private var isStarted = false
 
                 init {
-                    // Load the first data point
-                    loadNextDataPoint()
+                    try {
+                        // Load the first data point
+                        loadNextDataPoint()
+                    } catch (e: Throwable) {
+                        Timber.e(e)
+                        onDispose()
+                        throw e
+                    }
                 }
 
                 override fun hasNext(): Boolean {
@@ -94,13 +104,18 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
                 }
 
                 override fun next(): DataPoint {
-                    val current = nextDataPoint
-                        ?: throw NoSuchElementException("No more elements in Lua generator")
+                    return try {
+                        val current = nextDataPoint
+                            ?: throw NoSuchElementException("No more elements in Lua generator")
 
-                    // Load the next data point for the next call
-                    loadNextDataPoint()
-
-                    return current
+                        // Load the next data point for the next call
+                        loadNextDataPoint()
+                        current
+                    } catch (e: Throwable) {
+                        Timber.e(e)
+                        onDispose()
+                        throw e
+                    }
                 }
 
                 private fun loadNextDataPoint() {

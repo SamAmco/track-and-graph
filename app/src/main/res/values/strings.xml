@@ -52,6 +52,7 @@
     <string name="exportButton">Export</string>
     <string name="importButton">Import</string>
     <string name="export_to">Export tracked data in this group to CSV:</string>
+    <string name="export_error_message">Export failed: %1$s</string>
     <string name="import_from">Import tracked data to this group from CSV:</string>
     <string name="import_warning">Warning: Importing is irreversible. Track &amp; Graph will try to merge any imported data with existing data in this group by name.</string>
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
@@ -205,6 +206,7 @@
     <string name="restore_failed">Restore failed. %1$s</string>
     <string name="add_a_longer_description_optional">Add a longer description (optional)</string>
     <string name="no_data_points_history_fragment_hint">Your history will show up here when you have some data points.</string>
+    <string name="data_resolution_error">An error occurred while trying to resolve this data:\n\n%1$s</string>
     <string name="info">Info</string>
     <string name="no_description">No description</string>
     <string name="description">Description</string>

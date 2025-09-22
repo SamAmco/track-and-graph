@@ -16,7 +16,6 @@
  */
 package com.samco.trackandgraph.data.sampling.functions
 
-import com.samco.trackandgraph.data.BuildConfig
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.lua.LuaEngine
@@ -30,17 +29,23 @@ internal class LuaScriptNodeRawDataSample(
 ) : NodeRawDataSample() {
 
     private val mergedDataSources: List<RawDataSample> by lazy {
-        createMergedDataSources()
+        try {
+            createMergedDataSources()
+        } catch (e: Throwable) {
+            Timber.e(e, "Failed to create merged data sources for Lua script: ${luaScriptNode.script}")
+            dispose()
+            throw e
+        }
     }
 
     private val luaResult: Sequence<DataPoint> by lazy {
         try {
             luaEngine.runLuaFunctionScript(luaScriptNode.script, mergedDataSources)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             // Return empty sequence if Lua execution fails
             Timber.e(e, "Failed to run Lua script: ${luaScriptNode.script}")
-            if (BuildConfig.DEBUG) throw e
-            emptySequence()
+            dispose()
+            throw e
         }
     }
 

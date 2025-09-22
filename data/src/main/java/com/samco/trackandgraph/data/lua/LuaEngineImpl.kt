@@ -73,6 +73,7 @@ internal class LuaEngineImpl @Inject constructor(
             val resolvedScript = luaScriptResolver.resolveLuaScript(script)
             luaFunctionDataSourceAdapter.createDataPointSequence(resolvedScript, dataSources)
         } catch (luaError: LuaError) {
+            dataSources.forEach { it.dispose() }
             val luaScriptException = LuaScriptException(
                 message = luaError.message ?: "Lua script error",
                 luaCauseStackTrace = luaError.luaCause?.stackTraceToString()

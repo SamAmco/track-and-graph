@@ -17,8 +17,8 @@
 package com.samco.trackandgraph.data.sampling.functions
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import timber.log.Timber
 import java.util.PriorityQueue
-
 
 private data class NodeDataPoint(
     val nodeId: Int,
@@ -45,18 +45,30 @@ internal class MergeNode(
         }
         return object : Iterator<DataPoint> {
             override fun hasNext(): Boolean {
-                return priorityQueue.isNotEmpty()
+                return try {
+                    priorityQueue.isNotEmpty()
+                } catch (e: Throwable) {
+                    Timber.e(e)
+                    dispose()
+                    throw e
+                }
             }
 
             override fun next(): DataPoint {
-                val nodeDataPoint =
-                    priorityQueue.poll() ?: throw NoSuchElementException("No more data points")
-                val iterator = iterators[nodeDataPoint.nodeId]
-                    ?: throw NoSuchElementException("No iterator for node ${nodeDataPoint.nodeId}")
-                if (iterator.hasNext()) {
-                    priorityQueue.add(NodeDataPoint(nodeDataPoint.nodeId, iterator.next()))
+                return try {
+                    val nodeDataPoint =
+                        priorityQueue.poll() ?: throw NoSuchElementException("No more data points")
+                    val iterator = iterators[nodeDataPoint.nodeId]
+                        ?: throw NoSuchElementException("No iterator for node ${nodeDataPoint.nodeId}")
+                    if (iterator.hasNext()) {
+                        priorityQueue.add(NodeDataPoint(nodeDataPoint.nodeId, iterator.next()))
+                    }
+                    nodeDataPoint.dataPoint
+                } catch (e: Throwable) {
+                    Timber.e(e)
+                    dispose()
+                    throw e
                 }
-                return nodeDataPoint.dataPoint
             }
         }
     }

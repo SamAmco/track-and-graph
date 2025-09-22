@@ -46,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.map
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
@@ -63,6 +64,7 @@ import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DataPointInfoDialog
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
+import com.samco.trackandgraph.ui.compose.ui.DateScrollData
 import com.samco.trackandgraph.ui.compose.ui.DateScrollLazyColumn
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.DurationInput
@@ -157,26 +159,29 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     val featureInfo by viewModel.showFeatureInfo.observeAsState()
     val dataPointInfo by viewModel.showDataPointInfo.observeAsState()
     val dataPointDialogViewModel = hiltViewModel<AddDataPointsViewModelImpl>()
+    val error by viewModel.error.collectAsStateWithLifecycle()
 
-    if (dateScrollData == null || dateScrollData.items.isEmpty()) {
-        EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
-    } else {
-        DateScrollLazyColumn(
-            modifier = Modifier.padding(cardMarginSmall),
-            contentPadding = WindowInsets.safeDrawing
-                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
-                .asPaddingValues(),
-            data = dateScrollData
-        ) {
-            DataPoint(
-                dataPoint = it,
-                addDataPointsViewModel = dataPointDialogViewModel,
+    when {
+        dateScrollData != null && dateScrollData.items.isEmpty() -> {
+            EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
+        }
+
+        dateScrollData != null -> {
+            DateScrollData(
+                dateScrollData = dateScrollData,
+                dataPointDialogViewModel = dataPointDialogViewModel,
                 viewModel = viewModel,
-                weekdayNames = getWeekDayNames(LocalContext.current),
                 isDuration = isDuration,
                 tracker = tracker
             )
-            Spacer(modifier = Modifier.height(cardMarginSmall))
+        }
+
+        error != null -> {
+            EmptyScreenText(
+                text = stringResource(R.string.data_resolution_error, error?.message ?: ""),
+                color = MaterialTheme.colorScheme.error,
+                alpha = 1f
+            )
         }
     }
 
@@ -224,6 +229,33 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
             viewModel = dataPointDialogViewModel,
             onDismissRequest = { dataPointDialogViewModel.reset() }
         )
+    }
+}
+
+@Composable
+private fun DateScrollData(
+    dateScrollData: DateScrollData<DataPointInfo>,
+    dataPointDialogViewModel: AddDataPointsViewModelImpl,
+    viewModel: FeatureHistoryViewModel,
+    isDuration: Boolean,
+    tracker: Tracker?
+) {
+    DateScrollLazyColumn(
+        modifier = Modifier.padding(cardMarginSmall),
+        contentPadding = WindowInsets.safeDrawing
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+            .asPaddingValues(),
+        data = dateScrollData
+    ) {
+        DataPoint(
+            dataPoint = it,
+            addDataPointsViewModel = dataPointDialogViewModel,
+            viewModel = viewModel,
+            weekdayNames = getWeekDayNames(LocalContext.current),
+            isDuration = isDuration,
+            tracker = tracker
+        )
+        Spacer(modifier = Modifier.height(cardMarginSmall))
     }
 }
 
