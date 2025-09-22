@@ -28,6 +28,8 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -53,6 +55,7 @@ interface ExportFeaturesViewModel {
     val selectedFileUri: StateFlow<Uri?>
     val availableFeatures: StateFlow<List<FeatureDto>>
     val selectedFeatures: StateFlow<List<FeatureDto>>
+    val errors: ReceiveChannel<String>
 
     fun loadFeatures(groupId: Long)
     fun reset()
@@ -83,6 +86,8 @@ class ExportFeaturesViewModelImpl @Inject constructor(
 
     private val _selectedFeatures = MutableStateFlow<List<FeatureDto>>(emptyList())
     override val selectedFeatures: StateFlow<List<FeatureDto>> = _selectedFeatures.asStateFlow()
+
+    override val errors = Channel<String>()
 
     override fun loadFeatures(groupId: Long) {
         if (featuresSet.get() || _exportState.value != ExportState.WAITING) return
@@ -130,13 +135,18 @@ class ExportFeaturesViewModelImpl @Inject constructor(
         _selectedFileUri.value?.let { uri ->
             viewModelScope.launch(ui) {
                 _exportState.value = ExportState.EXPORTING
-                doExport(uri)
-                _exportState.value = ExportState.DONE
+                try {
+                    doExport(uri)
+                    _exportState.value = ExportState.DONE
+                } catch (e: Exception) {
+                    errors.trySend("${e.message}")
+                    _exportState.value = ExportState.WAITING
+                }
             }
         }
     }
 
-    private suspend fun doExport(uri: Uri) = runCatching {
+    private suspend fun doExport(uri: Uri) {
         withContext(io) {
             contentResolver.openOutputStream(uri)?.let { outStream ->
                 val features = _selectedFeatures.value

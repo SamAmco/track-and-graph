@@ -25,26 +25,33 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun EmptyScreenText(
-    @StringRes textId: Int
+    @StringRes textId: Int,
+    vararg formatArgs: Any
+) = EmptyScreenText(stringResource(textId, *formatArgs))
+
+@Composable
+fun EmptyScreenText(
+    text: String,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    alpha: Float = 0.6f
 ) = Box {
     Text(
         modifier = Modifier
             .width(250.dp)
             .wrapContentHeight()
             .align(Alignment.Center),
-        text = stringResource(id = textId),
+        text = text,
         fontSize = MaterialTheme.typography.titleSmall.fontSize,
         fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurface.copy(
-            alpha = 0.6f
-        )
+        color = color.copy(alpha = alpha)
     )
 }
 

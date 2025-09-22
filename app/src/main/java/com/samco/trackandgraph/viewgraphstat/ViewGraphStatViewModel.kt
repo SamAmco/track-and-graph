@@ -97,7 +97,9 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
         // Listen for data points from the callback
         try {
-            for (dataPoints in dataPointsChannel) {
+            if (viewData.error != null) {
+                emit(GraphStatResult(viewData, emptyList()))
+            } else for (dataPoints in dataPointsChannel) {
                 emit(GraphStatResult(viewData, dataPoints))
             }
         } finally {
@@ -140,21 +142,23 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         .flowOn(io)
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
-    private val dataPointNotes = combine(dataPoints, featureDataProvider) { dataPoints, featureProvider ->
-        dataPoints
-            .distinct()
-            .filter { dp -> dp.note.isNotEmpty() }
-            .map { dp ->
-                val featurePath = featureProvider.getPathForFeature(dp.featureId)
-                val isDuration = featureProvider.getDataSampleProperties(dp.featureId)?.isDuration ?: false
-                GraphNote.DataPointNote(
-                    timestamp = dp.timestamp,
-                    noteText = dp.note,
-                    displayValue = dp.getDisplayValue(isDuration),
-                    featurePath = featurePath
-                )
-            }
-    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+    private val dataPointNotes =
+        combine(dataPoints, featureDataProvider) { dataPoints, featureProvider ->
+            dataPoints
+                .distinct()
+                .filter { dp -> dp.note.isNotEmpty() }
+                .map { dp ->
+                    val featurePath = featureProvider.getPathForFeature(dp.featureId)
+                    val isDuration =
+                        featureProvider.getDataSampleProperties(dp.featureId)?.isDuration ?: false
+                    GraphNote.DataPointNote(
+                        timestamp = dp.timestamp,
+                        noteText = dp.note,
+                        displayValue = dp.getDisplayValue(isDuration),
+                        featurePath = featurePath
+                    )
+                }
+        }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     override val notes: StateFlow<List<GraphNote>> =
         combine(dataPointNotes, globalNotes) { dataPointNotes, globalNotes ->

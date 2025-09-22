@@ -33,7 +33,9 @@ internal class FunctionGraphDataSample(
     private val nodesById = function.functionGraph.nodes.associateBy { it.id }
     private val visited = sortedSetOf(compareByDescending<DataPoint> { it.timestamp })
 
-    override fun dispose() {}
+    override fun dispose() {
+        dataSources.values.forEach { it?.dispose() }
+    }
 
     override fun getRawDataPoints(): List<DataPoint> {
         return visited.toList()
@@ -48,7 +50,10 @@ internal class FunctionGraphDataSample(
                 luaEngine = luaEngine,
                 getDataSourceForNodeId = ::getDataSourceForNodeId
             )
-            is FunctionGraphNode.OutputNode -> throw IllegalArgumentException("Found an illegal output node in the function graph: $nodeId")
+            is FunctionGraphNode.OutputNode -> {
+                dispose()
+                throw IllegalArgumentException("Found an illegal output node in the function graph: $nodeId")
+            }
         }
     }
 
