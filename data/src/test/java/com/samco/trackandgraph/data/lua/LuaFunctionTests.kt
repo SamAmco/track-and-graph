@@ -16,6 +16,8 @@
  */
 package com.samco.trackandgraph.data.lua
 
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.sampling.RawDataSample
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
@@ -122,44 +124,6 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         assertEquals("count_3", resultList[2].label)
     }
 
-    /**
-     * Generic helper to test stateful counter behavior with configurable data point count
-     */
-    private fun testStatefulCounter(dataPointCount: Int) {
-        testLuaFunction(
-            dataSources = listOf(
-                sequence {
-                    repeat(dataPointCount) { i ->
-                        yield(TestDP(timestamp = (i + 1) * 1000L, value = 100.0, label = "base"))
-                    }
-                }
-            ),
-            script = """
-                return function(data_sources)
-                    local source = data_sources[1]
-                    local counter = 0  -- Local variable that persists across yields
-                    
-                    local data_point = source:dp()
-                    while data_point do
-                        counter = counter + 1
-                        -- Mutate the input data point directly
-                        data_point.value = counter  -- Use the incrementing counter
-                        data_point.label = "count_" .. counter
-                        coroutine.yield(data_point)
-                        data_point = source:dp()
-                    end
-                end
-            """.trimIndent()
-        ) {
-            assertEquals(dataPointCount, resultList.size)
-            // Verify each counter value is correct
-            for (i in 0 until dataPointCount) {
-                assertEquals((i + 1).toDouble(), resultList[i].value, 0.001)
-                assertEquals("count_${i + 1}", resultList[i].label)
-            }
-        }
-    }
-
     @Test
     fun `Function only consumes needed upstream data points (lazy evaluation)`() {
         var upstreamConsumed = 0
@@ -248,6 +212,96 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         assertEquals("third_x2", resultList[2].label)
     }
 
+    /**
+     * Generic helper to test stateful counter behavior with configurable data point count
+     */
+    private fun testStatefulCounter(dataPointCount: Int) {
+        testLuaFunction(
+            dataSources = listOf(
+                sequence {
+                    repeat(dataPointCount) { i ->
+                        yield(TestDP(timestamp = (i + 1) * 1000L, value = 100.0, label = "base"))
+                    }
+                }
+            ),
+            script = """
+                return function(data_sources)
+                    local source = data_sources[1]
+                    local counter = 0  -- Local variable that persists across yields
+                    
+                    local data_point = source:dp()
+                    while data_point do
+                        counter = counter + 1
+                        -- Mutate the input data point directly
+                        data_point.value = counter  -- Use the incrementing counter
+                        data_point.label = "count_" .. counter
+                        coroutine.yield(data_point)
+                        data_point = source:dp()
+                    end
+                end
+            """.trimIndent()
+        ) {
+            assertEquals(dataPointCount, resultList.size)
+            // Verify each counter value is correct
+            for (i in 0 until dataPointCount) {
+                assertEquals((i + 1).toDouble(), resultList[i].value, 0.001)
+                assertEquals("count_${i + 1}", resultList[i].label)
+            }
+        }
+    }
+
+    /**
+     * Helper to test stateful counter behavior with a shared Lua engine instance
+     * This version uses a provided engine instead of creating a new one
+     */
+    private fun testStatefulCounterWithSharedEngine(luaEngine: LuaEngineImpl, dataPointCount: Int) {
+        val dataSources = listOf(
+            sequence {
+                repeat(dataPointCount) { i ->
+                    yield(TestDP(timestamp = (i + 1) * 1000L, value = 100.0, label = "base"))
+                }
+            }
+        )
+        
+        val rawDataSources = dataSources.map { source ->
+            val asDataPoints = source.map { it.toDataPoint() }
+            // Use the same rawDataSampleFromSequence method from the base class
+            object : RawDataSample() {
+                private val visited = mutableListOf<DataPoint>()
+                override fun getRawDataPoints() = visited
+                override fun iterator() = asDataPoints.onEach { visited.add(it) }.iterator()
+                override fun dispose() {}
+            }
+        }
+
+        val script = """
+            return function(data_sources)
+                local source = data_sources[1]
+                local counter = 0  -- Local variable that persists across yields
+                
+                local data_point = source:dp()
+                while data_point do
+                    counter = counter + 1
+                    -- Mutate the input data point directly
+                    data_point.value = counter  -- Use the incrementing counter
+                    data_point.label = "count_" .. counter
+                    coroutine.yield(data_point)
+                    data_point = source:dp()
+                end
+            end
+        """.trimIndent()
+
+        val result = luaEngine.runLuaFunctionScript(script, rawDataSources)
+        val resultList = result.toList()
+
+        assertEquals(dataPointCount, resultList.size)
+        // Verify each counter value is correct
+        for (i in 0 until dataPointCount) {
+            assertEquals((i + 1).toDouble(), resultList[i].value, 0.001)
+            assertEquals("count_${i + 1}", resultList[i].label)
+        }
+    }
+
     @Test
     fun `Concurrent execution with shared Lua globals is thread-safe`() {
         val threadCount = 50
@@ -255,12 +309,15 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         val executor = Executors.newFixedThreadPool(threadCount)
         val latch = CountDownLatch(threadCount)
         val exceptions = mutableListOf<Exception>()
+        
+        // Create a single shared Lua engine instance for all threads
+        val sharedLuaEngine = uut()
 
         repeat(threadCount) {
             executor.submit {
                 try {
-                    // Each thread runs the stateful counter test
-                    testStatefulCounter(dataPointsPerThread)
+                    // Each thread runs the stateful counter test with the shared engine
+                    testStatefulCounterWithSharedEngine(sharedLuaEngine, dataPointsPerThread)
                 } catch (e: Exception) {
                     synchronized(exceptions) {
                         exceptions.add(e)

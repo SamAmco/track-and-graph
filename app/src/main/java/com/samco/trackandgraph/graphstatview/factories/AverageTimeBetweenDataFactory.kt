@@ -28,6 +28,7 @@ import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.FilterLabelFunction
@@ -136,6 +137,6 @@ class AverageTimeBetweenDataFactory @Inject constructor(
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
         filters.add(DataClippingFunction(config.endDate.toOffsetDateTime(), config.sampleSize))
-        return com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction(filters).mapSample(dataSample)
+        return CompositeFunction(filters).mapSample(dataSample)
     }
 }
