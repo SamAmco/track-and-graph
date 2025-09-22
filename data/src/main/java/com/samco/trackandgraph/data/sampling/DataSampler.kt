@@ -22,6 +22,7 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.sampling.functions.FunctionGraphDataSample
+import timber.log.Timber
 import javax.inject.Inject
 
 interface DataSampler {
@@ -90,21 +91,29 @@ internal class DataSamplerImpl @Inject constructor(
     }
 
     override suspend fun getLabelsForFeatureId(featureId: Long): List<String> {
-        // Fast case, pull directly using sql if it's a tracker
-        val tracker = dao.getTrackerByFeatureId(featureId)
-        if (tracker != null) {
-            return dao.getLabelsForTracker(tracker.id)
+        var dataSample: RawDataSample? = null
+        try {
+            // Fast case, pull directly using sql if it's a tracker
+            val tracker = dao.getTrackerByFeatureId(featureId)
+            if (tracker != null) {
+                return dao.getLabelsForTracker(tracker.id)
+            }
+            // Slow case, fall back to iterating all data and getting labels
+            // if it's a function
+            dataSample = getRawDataSampleForFeatureId(featureId)
+            if (dataSample != null) {
+                return dataSample.iterator()
+                    .asSequence()
+                    .map { it.label }
+                    .distinct()
+                    .toList()
+            }
+            return emptyList()
+        } catch (e: Throwable) {
+            Timber.e(e)
+            return emptyList()
+        } finally {
+            dataSample?.dispose()
         }
-        // Slow case, fall back to iterating all data and getting labels
-        // if it's a function
-        val rawDataSample = getRawDataSampleForFeatureId(featureId)
-        if (rawDataSample != null) {
-            return rawDataSample.iterator()
-                .asSequence()
-                .map { it.label }
-                .distinct()
-                .toList()
-        }
-        return emptyList()
     }
 }

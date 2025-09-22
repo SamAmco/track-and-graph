@@ -28,6 +28,7 @@ import java.util.Collections
 internal class DataPointCursorSequence(
     private val cursor: Cursor
 ) {
+
     private val visited =
         Collections.synchronizedList(mutableListOf<DataPoint>())
 
