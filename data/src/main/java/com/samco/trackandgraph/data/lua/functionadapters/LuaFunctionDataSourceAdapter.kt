@@ -17,7 +17,7 @@
 package com.samco.trackandgraph.data.lua.functionadapters
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.lua.GlobalsProvider
+import com.samco.trackandgraph.data.lua.VMLease
 import com.samco.trackandgraph.data.lua.apiimpl.DataPointParser
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.sampling.RawDataSample
@@ -37,7 +37,6 @@ import javax.inject.Inject
  * configurable parameters, input connector count, name, description etc.
  */
 internal class LuaFunctionDataSourceAdapter @Inject constructor(
-    private val globalsProvider: GlobalsProvider,
     private val luaDataSourceProvider: LuaDataSourceProviderImpl,
     private val dataPointParser: DataPointParser
 ) {
@@ -47,23 +46,19 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
      *
      * @param resolvedScript The resolved LuaValue from executing the Lua script
      * @param dataSources List of input data sources to pass to the Lua function
+     * @param vmLease The VM lease to use for execution with proper synchronization
      * @return Sequence<DataPoint> wrapping the Lua generator function result
      * @throws Exception if script execution fails
      */
     fun createDataPointSequence(
         resolvedScript: LuaValue,
-        dataSources: List<RawDataSample>
+        dataSources: List<RawDataSample>,
+        vmLease: VMLease
     ): Sequence<DataPoint> {
         val generatorFunction = findGeneratorFunction(resolvedScript)
 
-        // Convert List<RawDataSample> to Lua-compatible format
-        val luaDataSources = createLuaDataSourcesList(dataSources)
-
-        // Create a coroutine from the generator function
-        val coroutine = LuaThread(globalsProvider.globals.value, generatorFunction)
-
         // Return a Sequence that lazily processes the coroutine
-        return createLuaGeneratorSequence(coroutine, luaDataSources) {
+        return createLuaGeneratorSequence(generatorFunction, dataSources, vmLease) {
             dataSources.forEach { it.dispose() }
         }
     }
@@ -79,16 +74,22 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
     }
 
     private fun createLuaGeneratorSequence(
-        coroutine: LuaThread,
-        luaDataSources: LuaValue,
+        generatorFunction: LuaFunction,
+        dataSources: List<RawDataSample>,
+        vmLease: VMLease,
         onDispose: () -> Unit
     ): Sequence<DataPoint> {
         return Sequence {
             object : Iterator<DataPoint> {
                 private var nextDataPoint: DataPoint? = null
                 private var isStarted = false
+                private val coroutine = LuaThread(vmLease.globals, generatorFunction)
+
+                // Convert List<RawDataSample> to Lua-compatible format
+                private val luaDataSources = createLuaDataSourcesList(dataSources)
 
                 init {
+                    // Create a coroutine from the generator function
                     try {
                         // Load the first data point
                         loadNextDataPoint()
@@ -119,11 +120,13 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
                 }
 
                 private fun loadNextDataPoint() {
-                    val result = if (!isStarted) {
-                        isStarted = true
-                        coroutine.resume(luaDataSources)
-                    } else {
-                        coroutine.resume(LuaValue.NONE)
+                    val result = synchronized(vmLease.lock) {
+                        if (!isStarted) {
+                            isStarted = true
+                            coroutine.resume(luaDataSources)
+                        } else {
+                            coroutine.resume(LuaValue.NONE)
+                        }
                     }
 
                     val success = result.arg1().toboolean()
