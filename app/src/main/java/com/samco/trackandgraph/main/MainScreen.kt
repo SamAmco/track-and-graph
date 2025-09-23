@@ -82,6 +82,7 @@ import com.samco.trackandgraph.ui.compose.appbar.TopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
@@ -157,6 +158,7 @@ private fun MainView(
     LaunchedEffect(backStack.size, topBarConfig, enterAlwaysScrollBehavior) {
         if (topBarConfig.visible && !topBarConfig.appBarPinned) {
             // Animate from collapsed (1.0) to expanded (0.0) to show the app bar sliding in
+            delay(NAV_ANIM_DURATION_MILLIS.toLong())
             val animatable = Animatable(enterAlwaysScrollBehavior.state.collapsedFraction)
             animatable.animateTo(
                 targetValue = 0f,
