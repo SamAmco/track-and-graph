@@ -51,7 +51,7 @@ import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.viewgraphstat.ViewGraphStatNavKey
 import com.samco.trackandgraph.viewgraphstat.ViewGraphStatScreen
 
-private const val NAV_ANIM_DURATION = 280
+internal const val NAV_ANIM_DURATION_MILLIS = 280
 
 /**
  * POC Navigation implementation using Navigation 3 - demonstrates pattern with NotesScreen only
@@ -73,33 +73,33 @@ fun NavigationHost(
 
     transitionSpec = {
         slideInHorizontally(
-            animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+            animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
             initialOffsetX = { it } // start just off the right edge
         ) + fadeIn() togetherWith
                 slideOutHorizontally(
-                    animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+                    animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
                     targetOffsetX = { -(it / 3) } // slight parallax
                 ) + fadeOut()
     },
 
     popTransitionSpec = {
         slideInHorizontally(
-            animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+            animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
             initialOffsetX = { -(it / 3) } // parallax in from left
         ) + fadeIn() togetherWith
                 slideOutHorizontally(
-                    animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+                    animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
                     targetOffsetX = { it } // exit to right
                 ) + fadeOut()
     },
 
     predictivePopTransitionSpec = {
         slideInHorizontally(
-            animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+            animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
             initialOffsetX = { -(it / 3) } // parallax in from left
         ) + fadeIn() togetherWith
                 slideOutHorizontally(
-                    animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+                    animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
                     targetOffsetX = { it } // exit to right
                 ) + fadeOut()
     },
