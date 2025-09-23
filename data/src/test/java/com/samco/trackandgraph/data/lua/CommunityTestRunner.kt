@@ -106,8 +106,8 @@ class CommunityTestRunner {
     @Test
     fun `run community lua test`() {
         try {
-            val globals = daggerComponent.provideGlobalsProvider().globals.value
-            val test = globals.load(testLuaText)
+            val vmLease = daggerComponent.provideVMProvider().acquire()
+            val test = synchronized(vmLease.lock) { vmLease.globals.load(testLuaText) }
             val testSet = test.call().checktable()!!
             for (key in testSet.keys()) {
                 try {
@@ -119,6 +119,7 @@ class CommunityTestRunner {
                         .resolveLuaGraphScriptResult(
                             script = overriddenScript,
                             dataSources = testDataSources.addDataSourceFunctions(),
+                            vmLease = vmLease,
                         )
                     testStructure["assertions"].checkfunction()!!.call(scriptResult)
                     println("Test passed: $testName.$key")

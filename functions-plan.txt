@@ -4,6 +4,7 @@ TODO:
 - Don't allow creating a function until you have a tracker? 
 - Function graph builder should use when pattern so you get compiler errors if you add a new type and forget to map it
 - Make sure we try catch everywhere we get a data source now because they can throw 
+- We should throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
 
 - Testing:
   - Unit test function graph builder, it shouldn't allow cycles
