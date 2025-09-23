@@ -45,7 +45,7 @@ internal interface LuaEngineTestComponent {
 
     fun provideLuaEngine(): LuaEngineImpl
 
-    fun provideGlobalsProvider(): GlobalsProvider
+    fun provideVMProvider(): LuaVMProvider
     
     fun provideLuaScriptResolver(): LuaScriptResolver
 
