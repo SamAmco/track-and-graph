@@ -3,29 +3,29 @@ package com.samco.trackandgraph.data.lua
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
-internal class LuaScriptResolver @Inject constructor(
-    private val globalsProvider: GlobalsProvider,
-) {
-
-    private val globals get() = globalsProvider.globals.value
+internal class LuaScriptResolver @Inject constructor() {
 
     fun resolveLuaGraphScriptResult(
         script: String,
         dataSources: LuaValue,
+        vmLease: VMLease
     ): LuaValue {
         val cleanedScript = script.cleanLuaScript()
-        val scriptResult = globals.load(cleanedScript).call()
-        return when {
-            scriptResult.isfunction() -> scriptResult.checkfunction()!!.call(dataSources)
-
-            scriptResult.istable() -> scriptResult
-            else -> throw IllegalArgumentException("Invalid lua graph script result. Must be a function or table")
+        return synchronized(vmLease.lock) {
+            val scriptResult = vmLease.globals.load(cleanedScript).call()
+            when {
+                scriptResult.isfunction() -> scriptResult.checkfunction()!!.call(dataSources)
+                scriptResult.istable() -> scriptResult
+                else -> throw IllegalArgumentException("Invalid lua graph script result. Must be a function or table")
+            }
         }
     }
 
-    fun resolveLuaScript(script: String): LuaValue {
+    fun resolveLuaScript(script: String, vmLease: VMLease): LuaValue {
         val cleanedScript = script.cleanLuaScript()
-        return globals.load(cleanedScript).call()
+        return synchronized(vmLease.lock) {
+            vmLease.globals.load(cleanedScript).call()
+        }
     }
 
     private fun String.cleanLuaScript(): String {

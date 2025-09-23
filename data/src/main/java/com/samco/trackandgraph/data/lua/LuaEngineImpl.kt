@@ -40,6 +40,7 @@ internal class LuaEngineImpl @Inject constructor(
     private val luaScriptResolver: LuaScriptResolver,
     private val luaDataSourceProviderImpl: LuaDataSourceProviderImpl,
     private val luaFunctionDataSourceAdapter: LuaFunctionDataSourceAdapter,
+    private val luaVMProvider: LuaVMProvider,
 ) : LuaEngine {
 
     override fun runLuaGraphScript(
@@ -47,11 +48,13 @@ internal class LuaEngineImpl @Inject constructor(
         params: LuaEngine.LuaGraphEngineParams
     ): LuaGraphResult {
         return try {
+            val vmLease = luaVMProvider.acquire()
             val dataSources = luaDataSourceProviderImpl.createDataSourceTable(params.dataSources)
             processLuaGraphResult(
                 luaScriptResolver.resolveLuaGraphScriptResult(
                     script = script,
                     dataSources = dataSources,
+                    vmLease = vmLease
                 )
             )
         } catch (luaError: LuaError) {
@@ -70,8 +73,9 @@ internal class LuaEngineImpl @Inject constructor(
         dataSources: List<RawDataSample>
     ): Sequence<DataPoint> {
         return try {
-            val resolvedScript = luaScriptResolver.resolveLuaScript(script)
-            luaFunctionDataSourceAdapter.createDataPointSequence(resolvedScript, dataSources)
+            val vmLease = luaVMProvider.acquire()
+            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
+            luaFunctionDataSourceAdapter.createDataPointSequence(resolvedScript, dataSources, vmLease)
         } catch (luaError: LuaError) {
             dataSources.forEach { it.dispose() }
             val luaScriptException = LuaScriptException(
