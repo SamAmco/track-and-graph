@@ -1,0 +1,2 @@
+- Fix bug navigation animation with header animation causes frame drop
+
