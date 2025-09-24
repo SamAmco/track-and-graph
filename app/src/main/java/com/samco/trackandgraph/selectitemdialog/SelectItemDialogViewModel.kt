@@ -213,7 +213,13 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 }
 
                 is ModelGroupGraphItem.TrackerNode -> {
-                    if (trackerHidden(trackerId = child.tracker.id, selectableTypes, hiddenItems)) {
+                    if (trackerHidden(
+                            trackerId = child.tracker.id,
+                            featureId = child.tracker.featureId,
+                            selectableTypes = selectableTypes,
+                            hiddenItems = hiddenItems
+                        )
+                    ) {
                         return@mapNotNull null
                     }
                     child.toGraphNode()
@@ -227,7 +233,13 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 }
 
                 is ModelGroupGraphItem.FunctionNode -> {
-                    if (functionHidden(functionId = child.function.id, selectableTypes, hiddenItems)) {
+                    if (functionHidden(
+                            functionId = child.function.id,
+                            featureId = child.function.featureId,
+                            selectableTypes = selectableTypes,
+                            hiddenItems = hiddenItems
+                        )
+                    ) {
                         return@mapNotNull null
                     }
                     child.toGraphNode()
@@ -245,17 +257,19 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         )
 
         // If groups are not selectable, only include this group if it has selectable descendants
-        return if (SelectableItemType.GROUP in selectableTypes || hasSelectableDescendants(group, selectableTypes)) {
-            group
-        } else {
-            null
-        }
+        return if (
+            SelectableItemType.GROUP in selectableTypes ||
+            hasSelectableDescendants(group, selectableTypes)
+        ) group else null
     }
 
     /**
      * Recursively checks if a group has any selectable descendants in its subtree
      */
-    private fun hasSelectableDescendants(group: GraphNode.Group, selectableTypes: Set<SelectableItemType>): Boolean {
+    private fun hasSelectableDescendants(
+        group: GraphNode.Group,
+        selectableTypes: Set<SelectableItemType>
+    ): Boolean {
         return group.children.any { child ->
             when (child) {
                 is GraphNode.Group -> hasSelectableDescendants(child, selectableTypes)
@@ -275,13 +289,15 @@ class SelectItemDialogViewModelImpl @Inject constructor(
 
     private fun trackerHidden(
         trackerId: Long,
+        featureId: Long,
         selectableTypes: Set<SelectableItemType>,
-        hiddenItems: Set<HiddenItem>
+        hiddenItems: Set<HiddenItem>,
     ): Boolean {
         val selectable = (SelectableItemType.TRACKER in selectableTypes
-            || SelectableItemType.FEATURE in selectableTypes)
-        return !selectable
-            || HiddenItem(SelectableItemType.TRACKER, trackerId) in hiddenItems
+                || SelectableItemType.FEATURE in selectableTypes)
+        val hidden = HiddenItem(SelectableItemType.TRACKER, trackerId) in hiddenItems
+                || HiddenItem(SelectableItemType.FEATURE, featureId) in hiddenItems
+        return !selectable || hidden
     }
 
     private fun graphHidden(
@@ -290,7 +306,7 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         hiddenItems: Set<HiddenItem>
     ): Boolean {
         return SelectableItemType.GRAPH !in selectableTypes
-            || HiddenItem(SelectableItemType.GRAPH, graphId) in hiddenItems
+                || HiddenItem(SelectableItemType.GRAPH, graphId) in hiddenItems
     }
 
     private fun ModelGroupGraphItem.TrackerNode.toGraphNode() = GraphNode.Tracker(
@@ -312,12 +328,14 @@ class SelectItemDialogViewModelImpl @Inject constructor(
 
     private fun functionHidden(
         functionId: Long,
+        featureId: Long,
         selectableTypes: Set<SelectableItemType>,
         hiddenItems: Set<HiddenItem>
     ): Boolean {
         val selectable = (SelectableItemType.FUNCTION in selectableTypes
-            || SelectableItemType.FEATURE in selectableTypes)
-        return !selectable
-            || HiddenItem(SelectableItemType.FUNCTION, functionId) in hiddenItems
+                || SelectableItemType.FEATURE in selectableTypes)
+        val hidden = HiddenItem(SelectableItemType.FUNCTION, functionId) in hiddenItems
+                || HiddenItem(SelectableItemType.FEATURE, featureId) in hiddenItems
+        return !selectable || hidden
     }
 }

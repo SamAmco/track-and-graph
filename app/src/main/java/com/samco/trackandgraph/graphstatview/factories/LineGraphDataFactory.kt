@@ -120,11 +120,6 @@ class LineGraphDataFactory @Inject constructor(
         return createViewData(graphOrStat, lineGraph, onDataSampled)
     }
 
-    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
-        return dataInteractor.getLineGraphByGraphStatId(graphOrStatId)?.features
-            ?.any { it.featureId == featureId } ?: false
-    }
-
     private data class PlottingData(
         val lines: List<Line>,
         val endTime: OffsetDateTime

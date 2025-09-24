@@ -39,15 +39,6 @@ class LineGraphDataSourceAdapter @Inject constructor(
         return Pair(lineGraph.id, lineGraph)
     }
 
-    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
-        //If the feature was deleted then it should have been deleted via a cascade rule in the db
-        // so the any statement should not strictly be necessary.
-        return lineGraph.features.isEmpty() || lineGraph.features.any {
-            dataInteractor.getFeatureById(it.featureId) == null
-        }
-    }
-
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         dataInteractor.duplicateLineGraph(graphOrStat)
     }

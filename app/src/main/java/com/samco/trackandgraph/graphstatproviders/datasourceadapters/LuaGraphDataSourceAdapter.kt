@@ -38,10 +38,6 @@ class LuaGraphDataSourceAdapter @Inject constructor(
         return Pair(luaGraph.id, luaGraph)
     }
 
-    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        return dataInteractor.getLuaGraphByGraphStatId(graphOrStat.id) == null
-    }
-
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         dataInteractor.duplicateLuaGraph(graphOrStat)
     }

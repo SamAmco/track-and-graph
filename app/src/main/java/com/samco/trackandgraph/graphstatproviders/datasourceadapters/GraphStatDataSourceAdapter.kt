@@ -47,11 +47,5 @@ abstract class GraphStatDataSourceAdapter<I>(
         writeConfigToDatabase(graphOrStat, config as I, updateMode)
     }
 
-    protected abstract suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean
-
-    suspend fun preen(graphOrStat: GraphOrStat) {
-        if (shouldPreen(graphOrStat)) dataInteractor.deleteGraphOrStat(graphOrStat)
-    }
-
     abstract suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat)
 }

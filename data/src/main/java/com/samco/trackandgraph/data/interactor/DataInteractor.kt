@@ -179,4 +179,10 @@ interface DataInteractor : TrackerHelper, FunctionHelper {
     suspend fun hasAnyGroups(): Boolean
 
     suspend fun hasAnyReminders(): Boolean
+
+    /**
+     * Gets all feature IDs that depend on a given feature, either directly or transitively.
+     * This includes the feature itself and is used for cycle detection to prevent circular dependencies.
+     */
+    suspend fun getFeatureIdsDependingOn(featureId: Long): Set<Long>
 }
