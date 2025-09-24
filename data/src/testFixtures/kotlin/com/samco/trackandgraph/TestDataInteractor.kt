@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataInteractorImpl
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
@@ -73,12 +74,17 @@ object TestDataInteractor {
             io = Dispatchers.IO
         )
 
+        val dependencyAnalyserProvier = DependencyAnalyserProvider(
+            dao = database.trackAndGraphDatabaseDao,
+        )
+
         val dataInteractor = DataInteractorImpl(
             database = database,
             dao = database.trackAndGraphDatabaseDao,
             io = Dispatchers.IO,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,
+            dependencyAnalyserProvider = dependencyAnalyserProvier,
         )
 
         return dataInteractor

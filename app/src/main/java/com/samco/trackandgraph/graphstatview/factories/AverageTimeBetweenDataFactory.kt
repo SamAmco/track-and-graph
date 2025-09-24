@@ -76,11 +76,6 @@ class AverageTimeBetweenDataFactory @Inject constructor(
         return createViewData(graphOrStat, timeBetweenStat, onDataSampled)
     }
 
-    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
-        return dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStatId)
-            ?.featureId == featureId
-    }
-
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,

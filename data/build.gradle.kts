@@ -125,6 +125,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.threetenbp)
+    testImplementation(libs.luak.jvm)
 
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.runner)

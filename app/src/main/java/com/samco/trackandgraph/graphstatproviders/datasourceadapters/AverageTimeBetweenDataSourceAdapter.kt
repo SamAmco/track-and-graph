@@ -40,10 +40,6 @@ class AverageTimeBetweenDataSourceAdapter @Inject constructor(
         return Pair(ats.id, ats)
     }
 
-    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        return dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id) == null
-    }
-
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         dataInteractor.duplicateAverageTimeBetweenStat(graphOrStat)
     }

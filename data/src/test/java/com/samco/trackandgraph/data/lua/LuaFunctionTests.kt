@@ -63,16 +63,17 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             )
         ),
         script = """
+            
             return function(data_sources)
                 local source = data_sources[1]
                 local all_data = source:dpall()
-                
                 for _, data_point in ipairs(all_data) do
                     -- Add 1 to the value
                     data_point.value = data_point.value + 1
                     coroutine.yield(data_point)
                 end
             end
+
         """.trimIndent()
     ) {
         assertEquals(3, resultList.size)

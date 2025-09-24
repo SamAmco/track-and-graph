@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
+import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -53,6 +54,7 @@ class DataInteractorImplTest {
     private val dao: TrackAndGraphDatabaseDao = mock()
     private val trackerHelper: TrackerHelper = mock()
     private val functionHelper: FunctionHelper = mock()
+    private val dependencyAnalyserProvider: DependencyAnalyserProvider = mock()
 
     @Before
     fun before() {
@@ -64,6 +66,7 @@ class DataInteractorImplTest {
             io = testDispatcher,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,
+            dependencyAnalyserProvider = dependencyAnalyserProvider,
         )
     }
 
