@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
@@ -59,7 +60,7 @@ internal const val NAV_ANIM_DURATION_MILLIS = 280
 @Composable
 fun NavigationHost(
     modifier: Modifier = Modifier,
-    backStack: NavBackStack,
+    backStack: NavBackStack<NavKey>,
     urlNavigator: UrlNavigator,
 ) = NavDisplay(
     modifier = modifier,
