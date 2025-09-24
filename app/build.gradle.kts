@@ -52,8 +52,8 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
-        versionCode = 700007
-        versionName = "7.0.7"
+        versionCode = 700008
+        versionName = "7.0.8"
         testInstrumentationRunner = "com.samco.trackandgraph.screenshots.HiltTestRunner"
         // Default manifest placeholder for RecreateAlarms receiver
         manifestPlaceholders["recreateAlarmsEnabled"] = "true"
