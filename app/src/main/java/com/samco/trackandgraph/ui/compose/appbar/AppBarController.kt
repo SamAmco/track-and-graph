@@ -48,7 +48,7 @@ data class AppBarConfig(
  */
 @Stable
 class TopBarController(
-    private val backStack: NavBackStack,
+    private val backStack: NavBackStack<NavKey>,
     initial: AppBarConfig = AppBarConfig("")
 ) {
     var config by mutableStateOf(initial)

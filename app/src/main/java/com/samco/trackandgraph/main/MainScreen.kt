@@ -72,6 +72,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.group.GroupNavKey
@@ -100,7 +101,8 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val title = stringResource(R.string.app_name)
-    val topBarController = remember(backStack, title) { TopBarController(backStack, AppBarConfig(title)) }
+    val topBarController =
+        remember(backStack, title) { TopBarController(backStack, AppBarConfig(title)) }
 
     CompositionLocalProvider(LocalTopBarController provides topBarController) {
         MainView(
@@ -129,7 +131,7 @@ fun MainScreen(
 private fun MainView(
     topBarController: TopBarController,
     drawerState: DrawerState,
-    backStack: NavBackStack,
+    backStack: NavBackStack<NavKey>,
     onNavigateToBrowser: (DrawerMenuBrowserLocation) -> Unit,
     currentTheme: State<ThemeSelection>,
     onThemeSelected: (ThemeSelection) -> Unit,
@@ -148,7 +150,7 @@ private fun MainView(
     val topBarConfig = topBarController.config
     val pinnedScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val enterAlwaysScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val scrollBehavior = remember (topBarConfig.appBarPinned) {
+    val scrollBehavior = remember(topBarConfig.appBarPinned) {
         if (topBarConfig.appBarPinned) pinnedScrollBehavior
         else enterAlwaysScrollBehavior
     }
@@ -185,8 +187,10 @@ private fun MainView(
                 MenuDrawerContent(
                     onNavigate = {
                         scope.launch { drawerState.close() }
-                        backStack.clear()
-                        backStack.add(GroupNavKey())
+                        backStack[0] = GroupNavKey()
+                        while (backStack.size > 1) {
+                            backStack.removeLastOrNull()
+                        }
                         backStack.add(it)
                     },
                     onNavigateToBrowser = onNavigateToBrowser,
@@ -233,7 +237,7 @@ fun AppBar(
     scope: CoroutineScope,
     config: AppBarConfig,
     drawerState: DrawerState,
-    backStack: NavBackStack,
+    backStack: NavBackStack<NavKey>,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     val density = LocalDensity.current
@@ -262,7 +266,7 @@ fun AppBar(
                 NavigationIcon(
                     navButtonStyle = if (config.backNavigationAction) NavButtonStyle.UP else NavButtonStyle.MENU,
                     onClick = {
-                        if (config.backNavigationAction) backStack.removeLastOrNull()
+                        if (config.backNavigationAction && backStack.size > 1) backStack.removeLastOrNull()
                         else scope.launch { drawerState.open() }
                     }
                 )
@@ -322,7 +326,12 @@ private fun MainViewPreview() {
     TnGComposeTheme {
         val mockBackStack = rememberNavBackStack(GroupNavKey())
         MainView(
-            topBarController = remember { TopBarController(mockBackStack, AppBarConfig("Track & Graph")) },
+            topBarController = remember {
+                TopBarController(
+                    mockBackStack,
+                    AppBarConfig("Track & Graph")
+                )
+            },
             drawerState = rememberDrawerState(
                 initialValue = DrawerValue.Closed
             ),
