@@ -52,11 +52,13 @@ internal class FunctionGraphDecoder @Inject constructor() {
      *
      * @param function The Function entity containing the serialized function graph
      * @param featurePathMap Map of feature IDs to their display paths
+     * @param dependentFeatureIds Set of feature IDs that depend on this function (for cycle detection)
      * @return DecodedFunctionGraph containing nodes, edges, positions, and metadata
      */
     fun decodeFunctionGraph(
         function: Function,
-        featurePathMap: Map<Long, String>
+        featurePathMap: Map<Long, String>,
+        dependentFeatureIds: Set<Long> = emptySet()
     ): DecodedFunctionGraph {
         val functionGraph = function.functionGraph
 
@@ -69,7 +71,7 @@ internal class FunctionGraphDecoder @Inject constructor() {
             functionGraph.nodes.forEach { graphNode ->
                 when (graphNode) {
                     is FunctionGraphNode.FeatureNode -> {
-                        nodeList.add(decodeFeatureNode(graphNode, featurePathMap))
+                        nodeList.add(decodeFeatureNode(graphNode, featurePathMap, dependentFeatureIds))
                         nodePositions[graphNode.id] = Offset(graphNode.x, graphNode.y)
                     }
                     is FunctionGraphNode.LuaScriptNode -> {
@@ -107,12 +109,14 @@ internal class FunctionGraphDecoder @Inject constructor() {
      */
     private fun decodeFeatureNode(
         graphNode: FunctionGraphNode.FeatureNode,
-        featurePathMap: Map<Long, String>
+        featurePathMap: Map<Long, String>,
+        dependentFeatureIds: Set<Long>
     ): Node.DataSource {
         return Node.DataSource(
             id = graphNode.id,
             selectedFeatureId = mutableLongStateOf(graphNode.featureId),
-            featurePathMap = featurePathMap
+            featurePathMap = featurePathMap,
+            dependentFeatureIds = dependentFeatureIds
         )
     }
     

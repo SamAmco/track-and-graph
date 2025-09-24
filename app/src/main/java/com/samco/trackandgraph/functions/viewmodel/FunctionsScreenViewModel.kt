@@ -105,7 +105,8 @@ internal sealed class Node(
     class DataSource(
         id: Int = -1,
         val selectedFeatureId: MutableState<Long>,
-        val featurePathMap: Map<Long, String>
+        val featurePathMap: Map<Long, String>,
+        val dependentFeatureIds: Set<Long> = emptySet()
     ) : Node(
         id = id,
         inputConnectorCount = 0,
@@ -187,6 +188,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val disabledConnectors = mutableStateSetOf<Connector>()
 
     private lateinit var featurePathMap: Map<Long, String>
+    private var dependentFeatureIds: Set<Long> = emptySet()
 
     override fun init(groupId: Long, functionId: Long?) {
         if (initialized.getAndSet(true)) return
@@ -202,8 +204,11 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
             val existing = existingFunction
             if (existing != null) {
+                // Get dependent feature IDs for cycle detection when editing existing function
+                dependentFeatureIds = dataInteractor.getFeatureIdsDependingOn(existing.featureId)
+                
                 // Decode existing function graph
-                val decodedGraph = functionGraphDecoder.decodeFunctionGraph(existing, featurePathMap)
+                val decodedGraph = functionGraphDecoder.decodeFunctionGraph(existing, featurePathMap, dependentFeatureIds)
                 
                 // Load decoded nodes and edges using persistent lists
                 _nodes.value = decodedGraph.nodes
@@ -309,6 +314,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             id = id,
             selectedFeatureId = mutableLongStateOf(feature.key),
             featurePathMap = featurePathMap,
+            dependentFeatureIds = dependentFeatureIds
         )
         _nodes.value = _nodes.value.add(newNode)
 
