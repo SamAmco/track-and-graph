@@ -45,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.functions.viewmodel.Node
+import com.samco.trackandgraph.selectitemdialog.HiddenItem
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -97,9 +98,17 @@ internal fun DataSourceNode(
         )
 
         if (showSelectDialog) {
+            // Create hidden items from dependent feature IDs to prevent circular dependencies
+            val hiddenItems = remember(node.dependentFeatureIds) {
+                node.dependentFeatureIds.map { featureId ->
+                    HiddenItem(SelectableItemType.FEATURE, featureId)
+                }.toSet()
+            }
+            
             SelectItemDialog(
                 title = stringResource(R.string.select_a_feature),
                 selectableTypes = setOf(SelectableItemType.FEATURE),
+                hiddenItems = hiddenItems,
                 onFeatureSelected = { selectedFeatureId ->
                     node.selectedFeatureId.value = selectedFeatureId
                     showSelectDialog = false

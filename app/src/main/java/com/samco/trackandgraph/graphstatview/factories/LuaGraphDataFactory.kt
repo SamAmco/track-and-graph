@@ -67,11 +67,6 @@ class LuaGraphDataFactory @Inject constructor(
         return createViewData(graphOrStat, luaGraph, onDataSampled)
     }
 
-    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
-        return dataInteractor.getLuaGraphByGraphStatId(graphOrStatId)?.features
-            ?.any { it.featureId == featureId } ?: false
-    }
-
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: LuaGraphWithFeatures,

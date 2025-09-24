@@ -38,10 +38,6 @@ class LastValueDataSourceAdapter @Inject constructor(
         return Pair(lvs.id, lvs)
     }
 
-    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        return dataInteractor.getLastValueStatByGraphStatId(graphOrStat.id) == null
-    }
-
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         dataInteractor.duplicateLastValueStat(graphOrStat)
     }

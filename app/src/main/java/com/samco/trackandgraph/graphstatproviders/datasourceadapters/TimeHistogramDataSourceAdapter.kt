@@ -39,10 +39,6 @@ class TimeHistogramDataSourceAdapter @Inject constructor(
         return Pair(th.id, th)
     }
 
-    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        return dataInteractor.getTimeHistogramByGraphStatId(graphOrStat.id) == null
-    }
-
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         dataInteractor.duplicateTimeHistogram(graphOrStat)
     }

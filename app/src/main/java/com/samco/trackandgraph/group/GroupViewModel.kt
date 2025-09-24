@@ -119,8 +119,10 @@ class GroupViewModelImpl @Inject constructor(
 
     override val lazyGridState = LazyGridState()
 
-    private val _showDurationInputDialog = MutableStateFlow<GroupViewModel.DurationInputDialogData?>(null)
-    override val showDurationInputDialog: StateFlow<GroupViewModel.DurationInputDialogData?> = _showDurationInputDialog
+    private val _showDurationInputDialog =
+        MutableStateFlow<GroupViewModel.DurationInputDialogData?>(null)
+    override val showDurationInputDialog: StateFlow<GroupViewModel.DurationInputDialogData?> =
+        _showDurationInputDialog
 
     override suspend fun userHasAnyTrackers() = dataInteractor.hasAtLeastOneTracker()
 
@@ -132,11 +134,9 @@ class GroupViewModelImpl @Inject constructor(
         data object Functions : UpdateType()
         data object AllGraphs : UpdateType()
         data object GraphDeleted : UpdateType()
-        data class GraphsForFeature(val featureId: Long) : UpdateType()
         data class Graph(val graphId: Long) : UpdateType()
         data object All : UpdateType()
         data object DisplayIndices : UpdateType()
-        data object Preen : UpdateType()
     }
 
     /**
@@ -145,7 +145,6 @@ class GroupViewModelImpl @Inject constructor(
     private fun asUpdateType(dataUpdateType: DataUpdateType) = when (dataUpdateType) {
         is DataUpdateType.DataPoint -> listOf(
             UpdateType.Trackers,
-            UpdateType.GraphsForFeature(dataUpdateType.featureId)
         )
 
         DataUpdateType.TrackerCreated -> listOf(
@@ -156,7 +155,6 @@ class GroupViewModelImpl @Inject constructor(
         DataUpdateType.TrackerDeleted -> listOf(
             UpdateType.Trackers,
             UpdateType.DisplayIndices,
-            UpdateType.Preen,
             UpdateType.AllGraphs
         )
 
@@ -167,7 +165,6 @@ class GroupViewModelImpl @Inject constructor(
 
         DataUpdateType.GroupDeleted -> listOf(
             UpdateType.Groups,
-            UpdateType.Preen,
             UpdateType.DisplayIndices
         )
 
@@ -227,20 +224,6 @@ class GroupViewModelImpl @Inject constructor(
         ) { a, b -> Pair(a, b) }
             .shareIn(viewModelScope, SharingStarted.Lazily, 1)
 
-    init {
-        viewModelScope.launch {
-            onUpdateChildrenForGroup
-                .filter { it.second == UpdateType.Preen }
-                .debounce(20)
-                .collect { pair -> preenGraphs(pair.first) }
-        }
-    }
-
-    private suspend fun preenGraphs(groupId: Long) = withContext(io) {
-        getGraphObjects(groupId).forEach {
-            gsiProvider.getDataSourceAdapter(it.type).preen(it)
-        }
-    }
 
     private val graphChildren = onUpdateChildrenForGroup
         .filter {
@@ -249,9 +232,7 @@ class GroupViewModelImpl @Inject constructor(
                 UpdateType.AllGraphs,
                 UpdateType.DisplayIndices,
                 UpdateType.GraphDeleted
-            )
-                || it.second is UpdateType.GraphsForFeature
-                || it.second is UpdateType.Graph
+            ) || it.second is UpdateType.Graph
         }
         .debounceBuffer(10)
         //Get any buffered events and only emit the most significant one
@@ -278,21 +259,15 @@ class GroupViewModelImpl @Inject constructor(
         }
         //Get the graph objects for the group
         .scan<Pair<Long, UpdateType>, Pair<UpdateType, List<GraphOrStat>>>(
-            Pair(
-                UpdateType.All,
-                emptyList()
-            )
-        ) { pair, event ->
-            val lastGraphList = pair.second
+            Pair(UpdateType.All, emptyList())
+        ) { _, event ->
             val eventType = event.second
             val groupId = event.first
 
             //Don't need to get the graphs from the database again if the update type is
             //GraphsForFeature as this simply means a feature was updated and we need to
             //recalculate the inner graph data
-            if (lastGraphList.isEmpty() || eventType !is UpdateType.GraphsForFeature) {
-                Pair(eventType, getGraphObjects(groupId))
-            } else Pair(eventType, lastGraphList)
+            Pair(eventType, getGraphObjects(groupId))
         }
         //Get the graph view data for the graphs
         .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, graphUpdate ->
@@ -306,31 +281,12 @@ class GroupViewModelImpl @Inject constructor(
                 }
 
                 is UpdateType.Graph -> withUpdatedGraph(viewData, graphStats, type.graphId)
-                is UpdateType.GraphsForFeature ->
-                    withUpdatedIfAffected(viewData, graphStats, type.featureId)
                 //Shouldn't ever happen
                 else -> flowOf(viewData)
             }
         }
         .map { graphsToGroupChildren(it) }
         .flowOn(io)
-
-    private fun withUpdatedIfAffected(
-        viewData: List<GraphWithViewData>,
-        graphStats: List<GraphOrStat>,
-        featureId: Long
-    ): Flow<List<GraphWithViewData>> = flow {
-
-        val affected = viewData
-            .map { it.graph }
-            .filter { gsiProvider.getDataFactory(it.type).affectedBy(it.id, featureId) }
-            .map { it.id }
-
-        val dontUpdate = viewData.filter { it.graph.id !in affected }
-
-        getGraphViewData(graphStats.filter { it.id in affected })
-            .collect { emit(dontUpdate + it) }
-    }
 
     private fun withUpdatedGraph(
         viewData: List<GraphWithViewData>,
@@ -618,7 +574,8 @@ class GroupViewModelImpl @Inject constructor(
         viewModelScope.launch(io) {
             dataInteractor.stopTimerForTracker(tracker.id)?.let {
                 withContext(ui) {
-                    _showDurationInputDialog.value = GroupViewModel.DurationInputDialogData(tracker.id, it)
+                    _showDurationInputDialog.value =
+                        GroupViewModel.DurationInputDialogData(tracker.id, it)
                 }
             }
             timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)

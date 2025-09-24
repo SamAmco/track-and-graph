@@ -47,10 +47,6 @@ class LastValueDataFactory @Inject constructor(
         return createViewData(graphOrStat, lastValueStat, onDataSampled)
     }
 
-    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
-        return dataInteractor.getLastValueStatByGraphStatId(graphOrStatId)?.featureId == featureId
-    }
-
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: LastValueStat,

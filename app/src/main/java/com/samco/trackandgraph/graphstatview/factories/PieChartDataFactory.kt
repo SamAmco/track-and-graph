@@ -53,10 +53,6 @@ class PieChartDataFactory @Inject constructor(
         return createViewData(graphOrStat, pieChart, onDataSampled)
     }
 
-    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
-        return dataInteractor.getPieChartByGraphStatId(graphOrStatId)?.featureId == featureId
-    }
-
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: PieChart,

@@ -50,6 +50,7 @@ import com.samco.trackandgraph.data.database.entity.queryresponse.FunctionWithFe
 import com.samco.trackandgraph.data.database.entity.queryresponse.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.entity.queryresponse.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
+import com.samco.trackandgraph.data.dependencyanalyser.queryresponse.GraphDependency
 import kotlinx.coroutines.flow.Flow
 
 private const val getTrackersQuery = """
@@ -506,4 +507,40 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM function_input_features_table WHERE function_id = :functionId ORDER BY id ASC")
     fun getFunctionInputFeaturesSync(functionId: Long): List<FunctionInputFeature>
+
+    @Query("DELETE FROM function_input_features_table WHERE function_id = :functionId")
+    fun deleteFunctionInputFeatures(functionId: Long)
+
+    // Dependency analysis queries - single-dependency graphs unified
+    @Query("""
+        SELECT graph_stat_id, feature_id FROM bar_charts_table
+        UNION ALL
+        SELECT graph_stat_id, feature_id FROM pie_charts_table2
+        UNION ALL
+        SELECT graph_stat_id, feature_id FROM average_time_between_stat_table4
+        UNION ALL
+        SELECT graph_stat_id, feature_id FROM time_histograms_table
+        UNION ALL
+        SELECT graph_stat_id, feature_id FROM last_value_stats_table
+    """)
+    fun getAllSingleDependencyGraphs(): List<GraphDependency>
+
+    // Multi-dependency queries split into separate calls
+    @Query("SELECT feature_id FROM functions_table")
+    fun getFunctionFeatureIds(): List<Long>
+
+    @Query("SELECT feature_id FROM function_input_features_table WHERE function_id = (SELECT id FROM functions_table WHERE feature_id = :functionFeatureId)")
+    fun getFunctionInputFeatureIds(functionFeatureId: Long): List<Long>
+
+    @Query("SELECT graph_stat_id FROM line_graphs_table3")
+    fun getLineGraphGraphStatIds(): List<Long>
+
+    @Query("SELECT feature_id FROM line_graph_features_table2 WHERE line_graph_id = (SELECT id FROM line_graphs_table3 WHERE graph_stat_id = :graphStatId)")
+    fun getLineGraphFeatureIds(graphStatId: Long): List<Long>
+
+    @Query("SELECT graph_stat_id FROM lua_graphs_table")
+    fun getLuaGraphGraphStatIds(): List<Long>
+
+    @Query("SELECT feature_id FROM lua_graph_features_table WHERE lua_graph_id = (SELECT id FROM lua_graphs_table WHERE graph_stat_id = :graphStatId)")
+    fun getLuaGraphFeatureIds(graphStatId: Long): List<Long>
 }

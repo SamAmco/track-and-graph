@@ -84,6 +84,18 @@ internal class FunctionHelperImpl @Inject constructor(
             )
             dao.updateFeature(feature)
             dao.updateFunction(function.toEntity(serializedGraph))
+
+            // Now re-create the FunctionInputFeature entities
+            dao.deleteFunctionInputFeatures(function.id)
+            function.inputFeatureIds.forEach { inputFeatureId ->
+                dao.insertFunctionInputFeature(
+                    FunctionInputFeature(
+                        id = 0L,
+                        functionId = function.id,
+                        featureId = inputFeatureId
+                    )
+                )
+            }
         }
     }
 
