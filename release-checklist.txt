@@ -6,11 +6,13 @@
 
 - Update the build.gradle version code and name
 
-- Build an aab for the release (using Android Studio)
+- Build an apk for the release (using Android Studio) and install it to sense check the release build
 
 - Copy and paste a fastlane changelog file and add the changelog there e.g. 
 
 cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
+
+- Build an aab for the release (using Android Studio)
 
 also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
 
@@ -25,8 +27,6 @@ bundle exec fastlane supply --aab app/release/app-release.aab --track beta
 or for release:
 
 bundle exec fastlane supply --aab app/release/app-release.aab --rollout 0.5
-
-- Wait for the upload to complete and then build an apk for the release (using Android Studio) .. Typically android studio deletes the aab when you start the apk build (hence why you might want to wait)
 
 - Commit everything
 
