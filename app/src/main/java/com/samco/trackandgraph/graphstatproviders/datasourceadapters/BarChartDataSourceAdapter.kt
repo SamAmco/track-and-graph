@@ -22,10 +22,6 @@ class BarChartDataSourceAdapter @Inject constructor(
         return Pair(lvs.id, lvs)
     }
 
-    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        return dataInteractor.getBarChartByGraphStatId(graphOrStat.id) == null
-    }
-
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         dataInteractor.duplicateBarChart(graphOrStat)
     }

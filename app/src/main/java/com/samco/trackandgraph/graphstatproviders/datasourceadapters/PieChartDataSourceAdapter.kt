@@ -41,12 +41,6 @@ class PieChartDataSourceAdapter @Inject constructor(
         return Pair(pieChart.id, pieChart)
     }
 
-    override suspend fun shouldPreen(
-        graphOrStat: GraphOrStat
-    ): Boolean {
-        return dataInteractor.getPieChartByGraphStatId(graphOrStat.id) == null
-    }
-
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         dataInteractor.duplicatePieChart(graphOrStat)
     }

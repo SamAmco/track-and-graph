@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.data.interactor
 
 import androidx.room.withTransaction
-import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
@@ -45,6 +44,7 @@ import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
+import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
 import com.samco.trackandgraph.data.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
@@ -55,9 +55,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import timber.log.Timber
-import java.io.InputStream
-import java.io.OutputStream
 import javax.inject.Inject
 
 internal class DataInteractorImpl @Inject constructor(
@@ -66,6 +63,7 @@ internal class DataInteractorImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     private val trackerHelper: TrackerHelper,
     private val functionHelper: FunctionHelper,
+    private val dependencyAnalyserProvider: DependencyAnalyserProvider,
 ) : DataInteractor, TrackerHelper by trackerHelper, FunctionHelper by functionHelper {
 
     private val dataUpdateEvents = MutableSharedFlow<DataUpdateType>(
@@ -86,6 +84,12 @@ internal class DataInteractorImpl @Inject constructor(
         //Get all feature ids after deleting the group
         val allFeatureIdsAfterDelete = dao.getAllFeaturesSync().map { it.id }.toSet()
         val deletedFeatureIds = allFeatureIdsBeforeDelete.minus(allFeatureIdsAfterDelete)
+        //Delete any orphaned graphs
+        val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
+        for (graphStatId in orphanedGraphs.graphStatIds) {
+            dao.deleteGraphOrStat(graphStatId)
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
+        }
         //Emit a data update event
         dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
         return@withContext DeletedGroupInfo(
@@ -231,18 +235,38 @@ internal class DataInteractorImpl @Inject constructor(
             whereLabel = whereLabel,
             toValue = toValue,
             toLabel = toLabel
-        ).also {
-            dao.getTrackerById(trackerId)?.featureId?.let {
-                dataUpdateEvents.emit(DataUpdateType.DataPoint(it))
-            }
+        )
+        val featureId = dao.getTrackerById(trackerId)?.featureId ?: return@withContext
+        dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+        val graphsNeedingUpdate = dependencyAnalyserProvider.create()
+            .getDependentGraphs(featureId)
+        for (graphStatId in graphsNeedingUpdate.graphStatIds) {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
         }
     }
 
     override suspend fun deleteFeature(featureId: Long) = withContext(io) {
+        val allDependentGraphs = dependencyAnalyserProvider.create()
+            .getDependentGraphs(featureId)
         val isTracker = dao.getTrackerByFeatureId(featureId) != null
-        dao.deleteFeature(featureId)
+
+        // We need to make sure all cascade deletes are complete before we continue
+        // hence the atomic update
+        performAtomicUpdate { dao.deleteFeature(featureId) }
+
         if (isTracker) dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
         else dataUpdateEvents.emit(DataUpdateType.FunctionDeleted)
+
+        val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
+        for (graphStatId in orphanedGraphs.graphStatIds) {
+            dao.deleteGraphOrStat(graphStatId)
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
+        }
+
+        val graphsNeedingUpdate = allDependentGraphs.graphStatIds - orphanedGraphs.graphStatIds
+        for (graphStatId in graphsNeedingUpdate) {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
+        }
     }
 
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
@@ -255,27 +279,46 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {
         dao.deleteDataPoint(dataPoint.toEntity())
-            .also { dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoint.featureId)) }
+        dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoint.featureId))
+        val graphsNeedingUpdate = dependencyAnalyserProvider.create()
+            .getDependentGraphs(dataPoint.featureId)
+        for (graphStatId in graphsNeedingUpdate.graphStatIds) {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
+        }
     }
 
     override suspend fun deleteGraphOrStat(id: Long) = withContext(io) {
-        dao.deleteGraphOrStat(id).also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted) }
+        dao.deleteGraphOrStat(id)
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
     }
 
     override suspend fun deleteGraphOrStat(graphOrStat: GraphOrStat) = withContext(io) {
         dao.deleteGraphOrStat(graphOrStat.toEntity())
-            .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted) }
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
     }
 
     override suspend fun insertDataPoint(dataPoint: DataPoint): Long = withContext(io) {
-        dao.insertDataPoint(dataPoint.toEntity())
-            .also { dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoint.featureId)) }
+        dao.insertDataPoint(dataPoint.toEntity()).also {
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoint.featureId))
+            val graphsNeedingUpdate = dependencyAnalyserProvider.create()
+                .getDependentGraphs(dataPoint.featureId)
+            for (graphStatId in graphsNeedingUpdate.graphStatIds) {
+                dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
+            }
+        }
     }
 
     override suspend fun insertDataPoints(dataPoints: List<DataPoint>) = withContext(io) {
         if (dataPoints.isEmpty()) return@withContext
         dao.insertDataPoints(dataPoints.map { it.toEntity() }).also {
             dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoints.first().featureId))
+            val depProvider = dependencyAnalyserProvider.create()
+            val affectedGraphs = dataPoints.fold(emptySet<Long>()) { acc, dataPoint ->
+                acc + depProvider.getDependentGraphs(dataPoint.featureId).graphStatIds
+            }
+            for (graphStatId in affectedGraphs) {
+                dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
+            }
         }
     }
 
@@ -318,13 +361,14 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeNote(timestamp: OffsetDateTime, trackerId: Long) {
-        withContext(io) {
-            dao.getTrackerById(trackerId)?.featureId?.let { featureId ->
-                dao.removeNote(timestamp.toInstant().toEpochMilli(), featureId).also {
-                    dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
-                }
-            }
+    override suspend fun removeNote(timestamp: OffsetDateTime, trackerId: Long) = withContext(io) {
+        val featureId = dao.getTrackerById(trackerId)?.featureId ?: return@withContext
+        dao.removeNote(timestamp.toInstant().toEpochMilli(), featureId).also {
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+        }
+        val dependentGraphs = dependencyAnalyserProvider.create().getDependentGraphs(featureId)
+        for (graphStatId in dependentGraphs.graphStatIds) {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
         }
     }
 
@@ -594,9 +638,9 @@ internal class DataInteractorImpl @Inject constructor(
             dao.getTimeHistogramByGraphStatId(graphStatId)?.toDto()
         }
 
-    override suspend fun getLastValueStatByGraphStatId(graphStatId: Long): LastValueStat? =
+    override suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat? =
         withContext(io) {
-            dao.getLastValueStatByGraphStatId(graphStatId)?.toDto()
+            dao.getLastValueStatByGraphStatId(graphOrStatId)?.toDto()
         }
 
     override suspend fun getBarChartByGraphStatId(graphStatId: Long): BarChart? =
@@ -701,6 +745,11 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun updateFunction(function: Function) = withContext(io) {
         functionHelper.updateFunction(function)
         dataUpdateEvents.emit(DataUpdateType.FunctionUpdated)
+        val dependentGraphs = dependencyAnalyserProvider.create()
+            .getDependentGraphs(function.featureId)
+        for (graphStatId in dependentGraphs.graphStatIds) {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
+        }
     }
 
     override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
@@ -718,5 +767,9 @@ internal class DataInteractorImpl @Inject constructor(
         if (function != null) {
             deleteFeature(function.featureId)
         }
+    }
+
+    override suspend fun getFeatureIdsDependingOn(featureId: Long): Set<Long> = withContext(io) {
+        dependencyAnalyserProvider.create().getFeaturesDependingOn(featureId).featureIds
     }
 }
