@@ -51,7 +51,6 @@ internal class FunctionGraphDataSample(
                 getDataSourceForNodeId = ::getDataSourceForNodeId
             )
             is FunctionGraphNode.OutputNode -> {
-                dispose()
                 throw IllegalArgumentException("Found an illegal output node in the function graph: $nodeId")
             }
         }

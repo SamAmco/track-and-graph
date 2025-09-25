@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSampleProperties
 import com.samco.trackandgraph.data.sampling.DataSampler
+import com.samco.trackandgraph.data.sampling.RawDataSample
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -82,12 +83,17 @@ internal class CSVReadWriterImpl @Inject constructor(
     }
 
     private suspend fun getWriteFeatureData(feature: Feature): WriteFeatureData {
-        val dataPoints = dataSampler
-            .getRawDataSampleForFeatureId(feature.featureId)
-            ?.toList() ?: emptyList()
-        val dataSampleProperties = dataSampler
-            .getDataSamplePropertiesForFeatureId(feature.featureId)
-        return WriteFeatureData(feature, dataPoints, dataSampleProperties)
+        var rawDataSample: RawDataSample? = null
+        return try {
+            rawDataSample = dataSampler
+                .getRawDataSampleForFeatureId(feature.featureId)
+            val dataPoints = rawDataSample?.toList() ?: emptyList()
+            val dataSampleProperties = dataSampler
+                .getDataSamplePropertiesForFeatureId(feature.featureId)
+            WriteFeatureData(feature, dataPoints, dataSampleProperties)
+        } finally {
+            rawDataSample?.dispose()
+        }
     }
 
     private suspend fun writeFeaturesToCSVImpl(

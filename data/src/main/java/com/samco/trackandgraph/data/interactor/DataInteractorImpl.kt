@@ -17,8 +17,7 @@
 
 package com.samco.trackandgraph.data.interactor
 
-import androidx.room.withTransaction
-import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.dto.BarChart
@@ -58,7 +57,7 @@ import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 internal class DataInteractorImpl @Inject constructor(
-    private val database: TrackAndGraphDatabase,
+    private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher,
     private val trackerHelper: TrackerHelper,
@@ -400,7 +399,7 @@ internal class DataInteractorImpl @Inject constructor(
         updateType: DataUpdateType? = null,
         block: suspend () -> R
     ) = withContext(io) {
-        database
+        transactionHelper
             .withTransaction { block() }
             .also { updateType?.let { dataUpdateEvents.emit(it) } }
     }
