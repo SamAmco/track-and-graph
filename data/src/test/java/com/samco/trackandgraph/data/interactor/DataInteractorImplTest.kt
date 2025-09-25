@@ -17,15 +17,20 @@
 
 package com.samco.trackandgraph.data.interactor
 
-import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
+import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyser
 import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
+import com.samco.trackandgraph.data.dependencyanalyser.DependentFeatures
+import com.samco.trackandgraph.data.dependencyanalyser.DependentGraphs
+import com.samco.trackandgraph.data.dependencyanalyser.OrphanedGraphs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -50,7 +55,10 @@ class DataInteractorImplTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var uut: DataInteractorImpl
 
-    private val database: TrackAndGraphDatabase = mock()
+    private val transactionHelper: DatabaseTransactionHelper =
+        object : DatabaseTransactionHelper {
+            override suspend fun <R> withTransaction(block: suspend () -> R): R = block()
+        }
     private val dao: TrackAndGraphDatabaseDao = mock()
     private val trackerHelper: TrackerHelper = mock()
     private val functionHelper: FunctionHelper = mock()
@@ -61,7 +69,7 @@ class DataInteractorImplTest {
         Dispatchers.setMain(testDispatcher)
 
         uut = DataInteractorImpl(
-            database = database,
+            transactionHelper = transactionHelper,
             dao = dao,
             io = testDispatcher,
             trackerHelper = trackerHelper,
@@ -121,7 +129,17 @@ class DataInteractorImplTest {
                 defaultValue = 1.0,
                 defaultLabel = "",
                 suggestionType = TrackerSuggestionType.NONE,
-                suggestionOrder = com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder.VALUE_ASCENDING,
+                suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
+            )
+        )
+
+        val dependencyAnalyser = mock<DependencyAnalyser>()
+        whenever(dependencyAnalyserProvider.create()).thenReturn(dependencyAnalyser)
+        whenever(dependencyAnalyser.getOrphanedGraphs()).thenReturn(OrphanedGraphs(emptySet()))
+        whenever(dependencyAnalyser.getDependentGraphs(any())).thenReturn(DependentGraphs(emptySet()))
+        whenever(dependencyAnalyser.getFeaturesDependingOn(any())).thenReturn(
+            DependentFeatures(
+                emptySet()
             )
         )
 
@@ -137,7 +155,9 @@ class DataInteractorImplTest {
         uut.deleteDataPoint(testDataPoint)
         uut.insertDataPoint(testDataPoint)
         uut.insertDataPoints(listOf(testDataPoint))
-        uut.removeNote(noteTime, 0L)
+        uut.removeNote(
+            noteTime, 0L
+        )
         uut.deleteGlobalNote(testGlobalNote)
         uut.insertGlobalNote(testGlobalNote)
 

@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
@@ -52,10 +53,13 @@ class LastValueDataFactory @Inject constructor(
         config: LastValueStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILastValueViewData {
+        var dataSample: DataSample? = null
         return try {
+            dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
             val lastData = getLastDataPoint(
-                config,
-                onDataSampled
+                dataSample = dataSample,
+                config = config,
+                onDataSampled = onDataSampled
             ) ?: return notEnoughData(graphOrStat)
             object : ILastValueViewData {
                 override val state = IGraphStatViewData.State.READY
@@ -70,6 +74,8 @@ class LastValueDataFactory @Inject constructor(
                 override val error = throwable
                 override val isDuration = false
             }
+        } finally {
+            dataSample?.dispose()
         }
     }
 
@@ -94,11 +100,10 @@ class LastValueDataFactory @Inject constructor(
     )
 
     private suspend fun getLastDataPoint(
+        dataSample: DataSample,
         config: LastValueStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): LastDataPointData? {
-        val dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
-
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
@@ -114,7 +119,6 @@ class LastValueDataFactory @Inject constructor(
         val isDuration = sample.dataSampleProperties.isDuration
 
         onDataSampled(rawSample)
-        dataSample.dispose()
         return firstIDataPoint?.let {
             LastDataPointData(
                 dataPoint = DataPoint(
