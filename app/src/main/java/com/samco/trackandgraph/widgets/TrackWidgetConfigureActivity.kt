@@ -52,7 +52,7 @@ class TrackWidgetConfigureActivity : AppCompatActivity() {
                 SelectItemDialog(
                     title = stringResource(R.string.select_a_tracker),
                     selectableTypes = setOf(SelectableItemType.TRACKER),
-                    onTrackerSelected = ::onCreateWidget,
+                    onFeatureSelected = ::onCreateWidget,
                     onDismissRequest = ::onDismiss
                 )
             }
