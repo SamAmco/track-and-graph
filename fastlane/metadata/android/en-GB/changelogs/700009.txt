@@ -1,0 +1,2 @@
+- Fix potential track widget creation bug
+
