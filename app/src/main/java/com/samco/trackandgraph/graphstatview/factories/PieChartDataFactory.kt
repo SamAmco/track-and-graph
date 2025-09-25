@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
@@ -58,8 +59,10 @@ class PieChartDataFactory @Inject constructor(
         config: PieChart,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IPieChartViewData {
+        var dataSample: DataSample? = null
         return try {
-            val plottingData = tryGetPlottableDataForPieChart(config, onDataSampled)
+            dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
+            val plottingData = tryGetPlottableDataForPieChart(dataSample, config, onDataSampled)
                 ?: return object : IPieChartViewData {
                     override val state = IGraphStatViewData.State.READY
                     override val graphOrStat = graphOrStat
@@ -86,21 +89,21 @@ class PieChartDataFactory @Inject constructor(
                 override val graphOrStat = graphOrStat
                 override val error = throwable
             }
+        } finally {
+            dataSample?.dispose()
         }
     }
 
     private suspend fun tryGetPlottableDataForPieChart(
+        dataSample: DataSample,
         pieChart: PieChart,
         onDataSampled: (List<DataPoint>) -> Unit
     ): List<IDataPoint>? {
-        val feature = withContext(Dispatchers.IO) {
-            dataInteractor.getFeatureById(pieChart.featureId)
-        } ?: return null
-        val dataSample = DataClippingFunction(pieChart.endDate.toOffsetDateTime(), pieChart.sampleSize)
-            .mapSample(dataSampler.getDataSampleForFeatureId(feature.featureId))
-        val dataPoints = dataSample.toList()
-        onDataSampled(dataSample.getRawDataPoints())
-        dataSample.dispose()
+        val clippedSample = DataClippingFunction(pieChart.endDate.toOffsetDateTime(), pieChart.sampleSize)
+            .mapSample(dataSample)
+        val dataPoints = clippedSample.toList()
+        onDataSampled(clippedSample.getRawDataPoints())
+        clippedSample.dispose()
         return dataPoints.ifEmpty { null }
     }
 
