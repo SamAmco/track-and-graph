@@ -79,7 +79,7 @@ object TestDataInteractor {
         )
 
         val dataInteractor = DataInteractorImpl(
-            database = database,
+            transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
             io = Dispatchers.IO,
             trackerHelper = trackerHelper,

@@ -81,19 +81,17 @@ class AverageTimeBetweenDataFactory @Inject constructor(
         config: AverageTimeBetweenStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
+        var dataSample: DataSample? = null
         return try {
-            val dataSample = withContext(Dispatchers.IO) {
+            dataSample = withContext(Dispatchers.IO) {
                 getRelevantDataPoints(config, config.featureId)
             }
-            val dataPoints = withContext(Dispatchers.IO) {
-                dataSample.toList()
-            }
+            val dataPoints = withContext(Dispatchers.IO) { dataSample.toList() }
             if (dataPoints.size < 2) return notEnoughData(graphOrStat)
             val averageMillis = withContext(Dispatchers.Default) {
                 calculateAverageTimeBetween(dataPoints)
             }
             onDataSampled(dataSample.getRawDataPoints())
-            dataSample.dispose()
             object : IAverageTimeBetweenViewData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
@@ -106,6 +104,8 @@ class AverageTimeBetweenDataFactory @Inject constructor(
                 override val graphOrStat = graphOrStat
                 override val error = throwable
             }
+        } finally {
+            dataSample?.dispose()
         }
     }
 

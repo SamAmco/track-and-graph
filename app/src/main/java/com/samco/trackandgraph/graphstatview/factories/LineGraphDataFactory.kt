@@ -57,6 +57,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import java.util.Collections
 import javax.inject.Inject
 
 class LineGraphDataFactory @Inject constructor(
@@ -67,15 +68,31 @@ class LineGraphDataFactory @Inject constructor(
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val timeHelper: TimeHelper,
-) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(dataInteractor, dataSampler, ioDispatcher) {
+) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(
+    dataInteractor,
+    dataSampler,
+    ioDispatcher
+) {
 
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: LineGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): ILineGraphViewData {
+    ): ILineGraphViewData = withContext(defaultDispatcher) {
+        val disposables = Collections.synchronizedList(mutableListOf<DataSample>())
         try {
-            val plottableData = generatePlottingData(config, onDataSampled)
+            //Create all the data samples in parallel (this shouldn't actually take long but why not)
+            val dataSamples = config.features.map { lgf ->
+                async {
+                    withContext(ioDispatcher) {
+                        val dataSample = dataSampler.getDataSampleForFeatureId(lgf.featureId)
+                        disposables.add(dataSample)
+                        Pair(lgf, tryGetPlottingData(dataSample, config, lgf))
+                    }
+                }
+            }.awaitAll()
+
+            val plottableData = generatePlottingData(dataSamples, config, onDataSampled)
             val hasPlottableData = plottableData.lines.any { it.line != null }
 
             val durationBasedRange = config.features
@@ -86,7 +103,7 @@ class LineGraphDataFactory @Inject constructor(
                 durationBasedRange
             )
 
-            return object : ILineGraphViewData {
+            return@withContext object : ILineGraphViewData {
                 override val durationBasedRange = durationBasedRange
                 override val yRangeType = config.yRangeType
                 override val bounds = bounds
@@ -99,11 +116,13 @@ class LineGraphDataFactory @Inject constructor(
             }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
-            return object : ILineGraphViewData {
+            return@withContext object : ILineGraphViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
                 override val error = throwable
             }
+        } finally {
+            disposables.forEach { it.dispose() }
         }
     }
 
@@ -126,14 +145,11 @@ class LineGraphDataFactory @Inject constructor(
     )
 
     private suspend fun generatePlottingData(
+        dataSamples: List<Pair<LineGraphFeature, DataSample>>,
         lineGraph: LineGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
     ): PlottingData = coroutineScope {
         withContext(defaultDispatcher) {
-            //Create all the data samples in parallel (this shouldn't actually take long but why not)
-            val dataSamples = lineGraph.features.map { lgf ->
-                async { Pair(lgf, tryGetPlottingData(lineGraph, lgf)) }
-            }.awaitAll()
 
             //Get the end time of the graph. If not specified it's the time of the last data
             // point of any of the features
@@ -173,22 +189,17 @@ class LineGraphDataFactory @Inject constructor(
             onDataSampled(rawDataPoints)
             dataSamples.forEach { it.second.dispose() }
 
-            return@withContext PlottingData(
-                features,
-                endTime
-            )
+            return@withContext PlottingData(features, endTime)
         }
     }
 
     private suspend fun tryGetPlottingData(
+        dataSample: DataSample,
         config: LineGraphWithFeatures,
         lineGraphFeature: LineGraphFeature
     ): DataSample {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
-        val rawDataSample = withContext(ioDispatcher) {
-            dataSampler.getDataSampleForFeatureId(lineGraphFeature.featureId)
-        }
 
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
@@ -197,7 +208,7 @@ class LineGraphDataFactory @Inject constructor(
                 DataPaddingFunction(
                     timeHelper = timeHelper,
                     endTime = config.endDate.toOffsetDateTime(
-                        fallback = getLastDataPointTimestamp(rawDataSample)
+                        fallback = getLastDataPointTimestamp(dataSample)
                     ),
                     duration = config.sampleSize
                 )
@@ -207,8 +218,7 @@ class LineGraphDataFactory @Inject constructor(
             LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)
         }
-        return CompositeFunction(aggregationCalculator, averageCalculator)
-            .mapSample(rawDataSample)
+        return CompositeFunction(aggregationCalculator, averageCalculator).mapSample(dataSample)
     }
 
     private fun getLastDataPointTimestamp(rawDataSample: DataSample): OffsetDateTime {

@@ -29,6 +29,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
+import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.ui.compose.ui.Datable
 import com.samco.trackandgraph.ui.compose.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.compose.ui.DateScrollData
@@ -119,8 +120,10 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     private val getDataPointsResult = combine(featureIdFlow, dataUpdates) { id, _ -> id }
         .map {
+            var rawDataSample: RawDataSample? = null
             try {
-                val list = dataSampler.getRawDataSampleForFeatureId(it)
+                rawDataSample = dataSampler.getRawDataSampleForFeatureId(it)
+                val list = rawDataSample
                     ?.map(::toDataPointInfo)
                     ?.toList()
                     ?: emptyList()
@@ -128,6 +131,8 @@ class FeatureHistoryViewModelImpl @Inject constructor(
             } catch (e: Exception) {
                 Timber.e(e, "Failed to get data points for feature $it")
                 GetDataPointsResult.Error(e)
+            } finally {
+                rawDataSample?.dispose()
             }
         }
         .flowOn(io)

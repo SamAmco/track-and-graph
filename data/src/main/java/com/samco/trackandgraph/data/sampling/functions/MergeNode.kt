@@ -49,7 +49,6 @@ internal class MergeNode(
                     priorityQueue.isNotEmpty()
                 } catch (e: Throwable) {
                     Timber.e(e)
-                    dispose()
                     throw e
                 }
             }
@@ -66,7 +65,6 @@ internal class MergeNode(
                     nodeDataPoint.dataPoint
                 } catch (e: Throwable) {
                     Timber.e(e)
-                    dispose()
                     throw e
                 }
             }

@@ -33,7 +33,6 @@ internal class LuaScriptNodeRawDataSample(
             createMergedDataSources()
         } catch (e: Throwable) {
             Timber.e(e, "Failed to create merged data sources for Lua script: ${luaScriptNode.script}")
-            dispose()
             throw e
         }
     }
@@ -44,7 +43,6 @@ internal class LuaScriptNodeRawDataSample(
         } catch (e: Throwable) {
             // Return empty sequence if Lua execution fails
             Timber.e(e, "Failed to run Lua script: ${luaScriptNode.script}")
-            dispose()
             throw e
         }
     }
