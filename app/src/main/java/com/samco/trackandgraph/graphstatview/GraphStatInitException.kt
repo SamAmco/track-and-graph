@@ -17,4 +17,4 @@
 
 package com.samco.trackandgraph.graphstatview
 
-class GraphStatInitException(val errorTextId: Int) : Exception()
+open class GraphStatInitException(val errorTextId: Int) : Exception()

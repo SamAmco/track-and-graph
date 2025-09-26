@@ -25,11 +25,13 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
+import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.FilterLabelFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.FilterValueFunction
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
@@ -71,7 +73,11 @@ class LastValueDataFactory @Inject constructor(
             object : ILastValueViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
-                override val error = throwable
+                override val error = if (throwable is LuaEngineDisabledException) {
+                    LuaEngineDisabledGraphStatInitException()
+                } else {
+                    throwable
+                }
                 override val isDuration = false
             }
         } finally {

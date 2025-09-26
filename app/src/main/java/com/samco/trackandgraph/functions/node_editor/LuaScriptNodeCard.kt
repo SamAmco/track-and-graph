@@ -80,11 +80,11 @@ internal fun LuaScriptNode(
     onUpdateScriptFromFile: (Uri?) -> Unit = {},
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
-    var tempScript by remember { mutableStateOf(TextFieldValue(node.scriptPreview)) }
+    var tempScript by remember { mutableStateOf(TextFieldValue(node.script)) }
     
     // Update temp script when node script changes
-    LaunchedEffect(node.scriptPreview) {
-        tempScript = TextFieldValue(node.scriptPreview)
+    LaunchedEffect(node.script) {
+        tempScript = TextFieldValue(node.script)
     }
     
     Column(
@@ -119,7 +119,7 @@ internal fun LuaScriptNode(
         )
 
         ScriptPreviewTextField(
-            scriptPreview = node.scriptPreview,
+            scriptPreview = node.script,
             onScriptPreviewClicked = { textFieldValue ->
                 showDialog = true
                 // Handle cursor position translation if needed
@@ -260,7 +260,7 @@ private fun LuaScriptNodePreview() {
             val sampleNode = Node.LuaScript(
                 id = 1,
                 inputConnectorCount = 2,
-                scriptPreview = """
+                script = """
                     function main(input1, input2)
                         return input1 + input2 + input3 + input4 + input5 + input6 + input7 + input8 + input9 + input10
                     end
@@ -288,7 +288,7 @@ private fun LuaScriptNodeEmptyPreview() {
             val sampleNode = Node.LuaScript(
                 id = 2,
                 inputConnectorCount = 1,
-                scriptPreview = ""
+                script = ""
             )
 
             LuaScriptNode(

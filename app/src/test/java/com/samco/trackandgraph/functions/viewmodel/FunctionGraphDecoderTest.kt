@@ -122,7 +122,7 @@ internal class FunctionGraphDecoderTest {
     object LuaScriptNodeComparator {
         fun equals(expected: Node.LuaScript, actual: Node.LuaScript): Boolean {
             return expected.id == actual.id &&
-                    expected.scriptPreview == actual.scriptPreview &&
+                    expected.script == actual.script &&
                     expected.inputConnectorCount == actual.inputConnectorCount
         }
     }
@@ -205,7 +205,7 @@ internal class FunctionGraphDecoderTest {
                 ),
                 Node.LuaScript(
                     id = 4,
-                    scriptPreview = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                    script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
                     inputConnectorCount = 2
                 ),
                 Node.Output(
