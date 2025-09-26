@@ -14,9 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.samco.trackandgraph.data.lua
 
-data class LuaEngineSettings(
-    val enabled: Boolean
-)
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class LuaEngineSwitch @Inject constructor() {
+    var enabled: Boolean = true
+}

@@ -116,7 +116,7 @@ internal sealed class Node(
     data class LuaScript(
         override val id: Int = -1,
         override val inputConnectorCount: Int,
-        val scriptPreview: String,
+        val script: String,
     ) : Node(
         id = id,
         inputConnectorCount = inputConnectorCount,
@@ -325,7 +325,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         val newNode = Node.LuaScript(
             id = id,
             inputConnectorCount = 1,
-            scriptPreview = ""
+            script = ""
         )
         _nodes.value = _nodes.value.add(newNode)
 
@@ -367,7 +367,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             if (index >= 0) {
                 val oldNode = nodeList[index] as Node.LuaScript
                 nodeList[index] = oldNode.copy(
-                    scriptPreview = newScript,
+                    script = newScript,
                     inputConnectorCount = newInputConnectorCount
                 )
             }

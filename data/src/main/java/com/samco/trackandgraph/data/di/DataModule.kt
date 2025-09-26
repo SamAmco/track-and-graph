@@ -32,6 +32,7 @@ import com.samco.trackandgraph.data.interactor.FunctionHelper
 import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
 import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
+import com.samco.trackandgraph.data.lua.GuardedLuaEngineWrapper
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaEngineImpl
 import com.samco.trackandgraph.data.sampling.DataSampler
@@ -80,7 +81,7 @@ class DataModule {
     internal fun getFunctionHelper(impl: FunctionHelperImpl): FunctionHelper = impl
 
     @Provides
-    internal fun getLuaEngine(impl: LuaEngineImpl): LuaEngine = impl
+    internal fun getLuaEngine(impl: GuardedLuaEngineWrapper): LuaEngine = impl
 
     @Provides
     fun provideTimeProvider(impl: TimeProviderImpl): TimeProvider = impl
