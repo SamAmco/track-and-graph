@@ -14,8 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.data.lua
 
-class LuaEngineSettingsProvider {
-    var settings: LuaEngineSettings = LuaEngineSettings(enabled = true)
-}
+package com.samco.trackandgraph.graphstatview.exceptions
+
+import com.samco.trackandgraph.R
+import com.samco.trackandgraph.graphstatview.GraphStatInitException
+
+/**
+ * Custom exception that wraps LuaEngineDisabledException with the appropriate
+ * error message for graph stat initialization failures.
+ */
+class LuaEngineDisabledGraphStatInitException : GraphStatInitException(R.string.lua_engine_disabled)

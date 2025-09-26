@@ -27,12 +27,12 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PieChartDataFactory @Inject constructor(
@@ -87,7 +87,11 @@ class PieChartDataFactory @Inject constructor(
             object : IPieChartViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
-                override val error = throwable
+                override val error = if (throwable is LuaEngineDisabledException) {
+                    LuaEngineDisabledGraphStatInitException()
+                } else {
+                    throwable
+                }
             }
         } finally {
             dataSample?.dispose()

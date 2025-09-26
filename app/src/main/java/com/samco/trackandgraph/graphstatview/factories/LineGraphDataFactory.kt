@@ -35,6 +35,7 @@ import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.helpers.AndroidPlotSeriesHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
@@ -50,6 +51,7 @@ import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.Mov
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.movingAverageDurations
 import com.samco.trackandgraph.plottingModePeriods
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -119,7 +121,11 @@ class LineGraphDataFactory @Inject constructor(
             return@withContext object : ILineGraphViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
-                override val error = throwable
+                override val error = if (throwable is LuaEngineDisabledException) {
+                    LuaEngineDisabledGraphStatInitException()
+                } else {
+                    throwable
+                }
             }
         } finally {
             disposables.forEach { it.dispose() }

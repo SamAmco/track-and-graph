@@ -20,7 +20,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.data.lua.LuaEngineSwitch
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -32,7 +32,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 @DisableInstallInCheck
 object LuaEngineModule {
     @Provides
-    fun provideLuaSettingsProvider(): LuaEngineSettingsProvider = LuaEngineSettingsProvider()
+    fun provideLuaSettingsProvider(): LuaEngineSwitch = LuaEngineSwitch()
 }
 
 @Component(modules = [LuaEngineModule::class])

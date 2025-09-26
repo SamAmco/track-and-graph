@@ -19,18 +19,16 @@ package com.samco.trackandgraph.data.lua
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 
 interface LuaEngine {
-    data class LuaGraphEngineParams(
-        val dataSources: Map<String, RawDataSample>
-    )
 
     fun runLuaGraphScript(
         script: String,
         params: LuaGraphEngineParams
     ): LuaGraphResult
 
-    fun runLuaFunctionScript(
+    fun runLuaFunctionGenerator(
         script: String,
         dataSources: List<RawDataSample>
     ): Sequence<DataPoint>

@@ -292,7 +292,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             end
         """.trimIndent()
 
-        val result = luaEngine.runLuaFunctionScript(script, rawDataSources)
+        val result = luaEngine.runLuaFunctionGenerator(script, rawDataSources)
         val resultList = result.toList()
 
         assertEquals(dataPointCount, resultList.size)
