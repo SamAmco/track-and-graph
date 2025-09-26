@@ -35,7 +35,9 @@ import com.samco.trackandgraph.graphstatview.factories.helpers.TimeBarchartLuaHe
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.data.lua.LuaEngineSwitch
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
+import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
@@ -49,7 +51,6 @@ class LuaGraphDataFactory @Inject constructor(
     private val errorLuaHelper: ErrorLuaHelper,
     private val lineGraphLuaHelper: LineGraphLuaHelper,
     private val timeBarChartLuaHelper: TimeBarchartLuaHelper,
-    private val luaEngineSettingsProvider: LuaEngineSettingsProvider,
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher
@@ -72,10 +73,6 @@ class LuaGraphDataFactory @Inject constructor(
         config: LuaGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILuaGraphViewData = coroutineScope {
-        if (!luaEngineSettingsProvider.settings.enabled) {
-            return@coroutineScope luaEngineDisabled(graphOrStat)
-        }
-
         var dataSamples: Map<String, RawDataSample> = emptyMap()
 
         return@coroutineScope try {
@@ -106,7 +103,7 @@ class LuaGraphDataFactory @Inject constructor(
         config: LuaGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILuaGraphViewData {
-        val luaEngineParams = LuaEngine.LuaGraphEngineParams(dataSources = dataSamples)
+        val luaEngineParams = LuaGraphEngineParams(dataSources = dataSamples)
 
         val luaGraphResult = luaEngine.runLuaGraphScript(config.script, luaEngineParams)
         val error = luaGraphResult.error
@@ -126,15 +123,6 @@ class LuaGraphDataFactory @Inject constructor(
             null -> noData(graphOrStat)
         }
     }
-
-    private fun luaEngineDisabled(graphOrStat: GraphOrStat) =
-        object : ILuaGraphViewData {
-            override val wrapped: IGraphStatViewData? = null
-            override val hasData: Boolean = false
-            override val state = IGraphStatViewData.State.ERROR
-            override val graphOrStat = graphOrStat
-            override val error = GraphStatInitException(R.string.lua_engine_disabled)
-        }
 
     private fun noData(graphOrStat: GraphOrStat) =
         object : ILuaGraphViewData {

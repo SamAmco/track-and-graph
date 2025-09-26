@@ -17,6 +17,8 @@
 package com.samco.trackandgraph.graphstatview.factories.helpers
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
+import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import javax.inject.Inject
@@ -25,11 +27,16 @@ class ErrorLuaHelper @Inject constructor() {
     operator fun invoke(
         graphOrStat: GraphOrStat,
         throwable: Throwable,
-    ): ILuaGraphViewData =
-        object : ILuaGraphViewData {
+    ): ILuaGraphViewData {
+        return object : ILuaGraphViewData {
             override val wrapped: IGraphStatViewData? = null
             override val state = IGraphStatViewData.State.ERROR
             override val graphOrStat = graphOrStat
-            override val error = throwable
+            override val error = if (throwable is LuaEngineDisabledException) {
+                LuaEngineDisabledGraphStatInitException()
+            } else {
+                throwable
+            }
         }
+    }
 }

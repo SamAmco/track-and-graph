@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
+import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction
@@ -33,6 +34,7 @@ import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.Dat
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataSampleFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.FilterLabelFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.FilterValueFunction
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -102,7 +104,11 @@ class AverageTimeBetweenDataFactory @Inject constructor(
             object : IAverageTimeBetweenViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
-                override val error = throwable
+                override val error = if (throwable is LuaEngineDisabledException) {
+                    LuaEngineDisabledGraphStatInitException()
+                } else {
+                    throwable
+                }
             }
         } finally {
             dataSample?.dispose()

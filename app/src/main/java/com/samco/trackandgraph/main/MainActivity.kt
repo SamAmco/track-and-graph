@@ -40,7 +40,7 @@ import com.samco.trackandgraph.IntentActions
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper
-import com.samco.trackandgraph.data.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.data.lua.LuaEngineSwitch
 import com.samco.trackandgraph.reminders.AlarmInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.settings.TngSettings
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var deepLinkHandler: DeepLinkHandler
 
     @Inject
-    lateinit var luaEngineSettingsProvider: LuaEngineSettingsProvider
+    lateinit var luaEngineSwitch: LuaEngineSwitch
 
     @Inject
     lateinit var urlNavigator: UrlNavigator
@@ -165,9 +165,7 @@ class MainActivity : AppCompatActivity() {
         // Check if the activity was launched with the custom action
         if (intent != null && intent.action == IntentActions.DISABLE_LUA_ENGINE) {
             // Disable the Lua engine
-            luaEngineSettingsProvider.settings = luaEngineSettingsProvider.settings.copy(
-                enabled = false
-            )
+            luaEngineSwitch.enabled = false
         }
     }
 

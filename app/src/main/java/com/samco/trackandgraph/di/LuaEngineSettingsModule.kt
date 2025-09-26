@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.di
 
-import com.samco.trackandgraph.data.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.data.lua.LuaEngineSwitch
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +28,6 @@ import javax.inject.Singleton
 class LuaEngineSettingsModule {
     @Provides
     @Singleton
-    fun provideLuaEngineSettingsProvider(): LuaEngineSettingsProvider = LuaEngineSettingsProvider()
+    fun provideLuaEngineSettingsProvider(): LuaEngineSwitch = LuaEngineSwitch()
 }
 
