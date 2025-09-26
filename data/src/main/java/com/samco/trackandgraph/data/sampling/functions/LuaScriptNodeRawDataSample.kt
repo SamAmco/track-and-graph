@@ -39,7 +39,7 @@ internal class LuaScriptNodeRawDataSample(
 
     private val luaResult: Sequence<DataPoint> by lazy {
         try {
-            luaEngine.runLuaFunctionScript(luaScriptNode.script, mergedDataSources)
+            luaEngine.runLuaFunctionGenerator(luaScriptNode.script, mergedDataSources)
         } catch (e: Throwable) {
             // Return empty sequence if Lua execution fails
             Timber.e(e, "Failed to run Lua script: ${luaScriptNode.script}")

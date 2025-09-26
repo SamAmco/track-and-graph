@@ -150,7 +150,7 @@ internal class FunctionGraphBuilder @Inject constructor() {
             x = position.x,
             y = position.y,
             id = node.id,
-            script = node.scriptPreview,
+            script = node.script,
             inputConnectorCount = node.inputConnectorCount,
             dependencies = dependencies
         )

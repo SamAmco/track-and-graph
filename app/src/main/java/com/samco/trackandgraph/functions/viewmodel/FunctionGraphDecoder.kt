@@ -129,7 +129,7 @@ internal class FunctionGraphDecoder @Inject constructor() {
         return Node.LuaScript(
             id = graphNode.id,
             inputConnectorCount = graphNode.inputConnectorCount,
-            scriptPreview = graphNode.script
+            script = graphNode.script
         )
     }
     

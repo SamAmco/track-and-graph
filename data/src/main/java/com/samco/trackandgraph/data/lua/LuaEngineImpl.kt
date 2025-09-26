@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.lua.graphadapters.TextLuaGraphAdapter
 import com.samco.trackandgraph.data.lua.graphadapters.TimeBarChartLuaGraphAdapter
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -45,7 +46,7 @@ internal class LuaEngineImpl @Inject constructor(
 
     override fun runLuaGraphScript(
         script: String,
-        params: LuaEngine.LuaGraphEngineParams
+        params: LuaGraphEngineParams
     ): LuaGraphResult {
         return try {
             val vmLease = luaVMProvider.acquire()
@@ -68,7 +69,7 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 
-    override fun runLuaFunctionScript(
+    override fun runLuaFunctionGenerator(
         script: String,
         dataSources: List<RawDataSample>
     ): Sequence<DataPoint> {

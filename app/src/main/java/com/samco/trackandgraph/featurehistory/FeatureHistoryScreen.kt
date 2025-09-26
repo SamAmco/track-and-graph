@@ -54,6 +54,7 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
@@ -177,8 +178,11 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
         }
 
         error != null -> {
+            val message =
+                if (error is LuaEngineDisabledException) stringResource(R.string.lua_engine_disabled)
+                else error?.message ?: ""
             EmptyScreenText(
-                text = stringResource(R.string.data_resolution_error, error?.message ?: ""),
+                text = stringResource(R.string.data_resolution_error, message),
                 color = MaterialTheme.colorScheme.error,
                 alpha = 1f
             )

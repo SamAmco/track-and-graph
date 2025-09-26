@@ -172,8 +172,8 @@ class FunctionGraphBuilderTest {
     @Test
     fun `buildFunctionGraph detects simple cycle between two LuaScript nodes`() {
         val nodesWithSimpleCycle = listOf(
-            Node.LuaScript(id = 1, scriptPreview = "", inputConnectorCount = 1),
-            Node.LuaScript(id = 2, scriptPreview = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 2, script = "", inputConnectorCount = 1),
             Node.Output(id = 3)
         )
         
@@ -211,9 +211,9 @@ class FunctionGraphBuilderTest {
     @Test
     fun `buildFunctionGraph detects complex cycle through multiple LuaScript nodes`() {
         val nodesWithComplexCycle = listOf(
-            Node.LuaScript(id = 1, scriptPreview = "", inputConnectorCount = 1),
-            Node.LuaScript(id = 2, scriptPreview = "", inputConnectorCount = 1),
-            Node.LuaScript(id = 3, scriptPreview = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 2, script = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 3, script = "", inputConnectorCount = 1),
             Node.Output(id = 4)
         )
         
@@ -255,7 +255,7 @@ class FunctionGraphBuilderTest {
     @Test
     fun `buildFunctionGraph detects self-referencing cycle`() {
         val nodesWithSelfCycle = listOf(
-            Node.LuaScript(id = 1, scriptPreview = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1),
             Node.Output(id = 2)
         )
         
@@ -306,7 +306,7 @@ class FunctionGraphBuilderTest {
             ),
             Node.LuaScript(
                 id = 5,
-                scriptPreview = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
                 inputConnectorCount = 2
             ),
             Node.Output(
