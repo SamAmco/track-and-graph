@@ -48,12 +48,13 @@ fun LabelInputTextField(
     onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
-    onNextOverride: (() -> Unit)? = null
+    onNextOverride: (() -> Unit)? = null,
+    label: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.label)) }
 ) {
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
-        label = { Text(stringResource(id = R.string.label)) },
+        label = label,
         keyboardActions = KeyboardActions(
             onNext = {
                 if (onNextOverride != null) onNextOverride()
@@ -79,14 +80,15 @@ fun ValueInputTextField(
     onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
-    onNextOverride: (() -> Unit)? = null
+    onNextOverride: (() -> Unit)? = null,
+    label: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.value)) }
 ) {
     val focusUpdateScope = rememberCoroutineScope()
 
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
-        label = { Text(stringResource(id = R.string.value)) },
+        label = label,
         keyboardActions = KeyboardActions(
             onNext = {
                 if (onNextOverride != null) onNextOverride()
