@@ -117,7 +117,7 @@ internal sealed class Node(
         override val id: Int = -1,
         override val inputConnectorCount: Int,
         val script: String,
-        val configuration: Map<String, LuaScriptConfigurationInput> = emptyMap(),
+        val configuration: Map<String, LuaScriptConfigurationInput>,
     ) : Node(
         id = id,
         inputConnectorCount = inputConnectorCount,
@@ -327,7 +327,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         val newNode = Node.LuaScript(
             id = id,
             inputConnectorCount = 1,
-            script = ""
+            script = "",
+            configuration = emptyMap()
         )
         _nodes.value = _nodes.value.add(newNode)
 

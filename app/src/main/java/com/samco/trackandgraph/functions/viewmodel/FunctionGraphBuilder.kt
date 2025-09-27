@@ -18,8 +18,10 @@
 package com.samco.trackandgraph.functions.viewmodel
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,7 +31,9 @@ import javax.inject.Inject
  * This class handles the conversion from the UI layer's node and edge representation
  * to the DTO layer's function graph structure.
  */
-internal class FunctionGraphBuilder @Inject constructor() {
+internal class FunctionGraphBuilder @Inject constructor(
+    private val configurationEncoder: LuaScriptConfigurationEncoder
+) {
 
     /**
      * Builds a FunctionGraph DTO from ViewModel representations.
@@ -137,6 +141,7 @@ internal class FunctionGraphBuilder @Inject constructor() {
 
     /**
      * Builds a single Lua script node from a LuaScript node.
+     * Encodes the configuration input values from ViewModel format to database format.
      */
     private fun buildLuaScriptNode(
         node: Node.LuaScript,
@@ -145,13 +150,14 @@ internal class FunctionGraphBuilder @Inject constructor() {
     ): FunctionGraphNode.LuaScriptNode {
         val dependencies = calculateDependencies(node.id, edges)
         val position = nodePositions[node.id] ?: Offset.Zero
-
+        
         return FunctionGraphNode.LuaScriptNode(
             x = position.x,
             y = position.y,
             id = node.id,
             script = node.script,
             inputConnectorCount = node.inputConnectorCount,
+            configuration = configurationEncoder.encodeConfiguration(node.configuration),
             dependencies = dependencies
         )
     }
