@@ -52,14 +52,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.functions.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.functions.viewmodel.Node
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
@@ -71,6 +75,7 @@ import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
 import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
+import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 
 @Composable
 internal fun LuaScriptNode(
@@ -81,12 +86,12 @@ internal fun LuaScriptNode(
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var tempScript by remember { mutableStateOf(TextFieldValue(node.script)) }
-    
+
     // Update temp script when node script changes
     LaunchedEffect(node.script) {
         tempScript = TextFieldValue(node.script)
     }
-    
+
     Column(
         Modifier
             .width(nodeCardContentWidth)
@@ -129,6 +134,14 @@ internal fun LuaScriptNode(
             }
         )
 
+        val focusManager = LocalFocusManager.current
+
+        // Configuration inputs
+        ConfigurationInputs(
+            focusManager = focusManager,
+            configuration = node.configuration
+        )
+
         // Dialog
         if (showDialog) {
             LuaScriptEditDialog(
@@ -169,7 +182,7 @@ private fun ScriptPreviewTextField(
             .drawWithContent {
                 drawContent()
                 drawRect(color = surfaceColor.copy(alpha = 0.3f))
-                
+
                 // Draw gradient overlay at bottom if content overflows
                 if (showOverlay) {
                     val gradientHeight = size.height * 0.3f // 30% of field height
@@ -247,6 +260,26 @@ private fun Buttons(
     )
 }
 
+@Composable
+private fun ConfigurationInputs(
+    focusManager: FocusManager,
+    configuration: Map<String, LuaScriptConfigurationInput>
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(inputSpacingLarge)
+    ) {
+        configuration.forEach { (_, input) ->
+            ConfigurationInputField(
+                modifier = Modifier.fillMaxWidth(),
+                focusManager = focusManager,
+                input = input,
+            )
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 private fun LuaScriptNodePreview() {
@@ -265,7 +298,16 @@ private fun LuaScriptNodePreview() {
                         return input1 + input2 + input3 + input4 + input5 + input6 + input7 + input8 + input9 + input10
                     end
                 """.trimIndent(),
-                configuration = emptyMap(),
+                configuration = mapOf(
+                    "threshold" to LuaScriptConfigurationInput.Number(
+                        name = TranslatedString.Simple("Threshold"),
+                        value = remember { mutableStateOf(TextFieldValue("10.5")) }
+                    ),
+                    "label" to LuaScriptConfigurationInput.Text(
+                        name = TranslatedString.Simple("Label"),
+                        value = remember { mutableStateOf(TextFieldValue("Sample Label")) }
+                    )
+                ),
             )
 
             LuaScriptNode(
