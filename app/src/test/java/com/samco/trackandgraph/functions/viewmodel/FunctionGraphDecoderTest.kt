@@ -28,23 +28,33 @@ import com.samco.trackandgraph.data.database.dto.NodeDependency
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
-import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 internal class FunctionGraphDecoderTest {
 
-    private lateinit var decoder: FunctionGraphDecoder
-
-    @Before
-    fun setUp() {
-        decoder = FunctionGraphDecoder()
-    }
+    private val mockLuaScriptConfigurationProvider: LuaScriptConfigurationProvider = mock()
+    private val decoder = FunctionGraphDecoder(mockLuaScriptConfigurationProvider)
 
     @Test
     fun `decodeFunctionGraph produces expected output`() {
         val input = createInputFunction()
         val featurePathMap = createFeaturePathMap()
         val expected = createExpectedOutput()
+
+        whenever(mockLuaScriptConfigurationProvider.createLuaScriptNode(
+            script = any(),
+            nodeId = any(),
+            fallbackInputConnectorCount = any(),
+        )).thenAnswer { invocation ->
+            Node.LuaScript(
+                id = invocation.getArgument(1),
+                script = invocation.getArgument(0),
+                inputConnectorCount = invocation.getArgument(2),
+            )
+        }
 
         val result = decoder.decodeFunctionGraph(input, featurePathMap)
 
