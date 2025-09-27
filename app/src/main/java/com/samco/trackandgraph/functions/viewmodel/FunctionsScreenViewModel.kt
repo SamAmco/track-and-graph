@@ -117,6 +117,7 @@ internal sealed class Node(
         override val id: Int = -1,
         override val inputConnectorCount: Int,
         val script: String,
+        val configuration: Map<String, LuaScriptConfigurationInput> = emptyMap(),
     ) : Node(
         id = id,
         inputConnectorCount = inputConnectorCount,
@@ -160,6 +161,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val functionGraphBuilder: FunctionGraphBuilder,
     private val functionGraphDecoder: FunctionGraphDecoder,
+    private val luaScriptConfigurationProvider: LuaScriptConfigurationProvider,
 ) : ViewModel(), FunctionsScreenViewModel {
 
     private val initialized = AtomicBoolean(false)
@@ -359,17 +361,13 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     override fun updateScriptForNodeId(nodeId: Int, newScript: String) {
-        // TODO: Run the new lua script to determine input connector count
-        val newInputConnectorCount = 1 // TODO: This should be determined by analyzing the script
-        
         _nodes.value = _nodes.value.mutate { nodeList ->
             val index = nodeList.indexOfFirst { it.id == nodeId && it is Node.LuaScript }
             if (index >= 0) {
-                val oldNode = nodeList[index] as Node.LuaScript
-                nodeList[index] = oldNode.copy(
-                    script = newScript,
-                    inputConnectorCount = newInputConnectorCount
-                )
+                val existingNode = nodeList[index] as Node.LuaScript
+                // Use the provider to update the node while preserving existing configuration inputs
+                val updatedNode = luaScriptConfigurationProvider.updateLuaScriptNode(existingNode, newScript)
+                nodeList[index] = updatedNode
             }
         }
     }
