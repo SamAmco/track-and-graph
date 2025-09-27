@@ -19,7 +19,9 @@ package com.samco.trackandgraph.data.serialization
 
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -28,6 +30,10 @@ import org.junit.Before
 import org.junit.Test
 
 class FunctionGraphSerializerTest {
+
+    companion object {
+        private const val TEST_JSON_FILE = "comprehensive_function_graph.json"
+    }
 
     private lateinit var json: Json
     private lateinit var serializer: FunctionGraphSerializer
@@ -45,7 +51,7 @@ class FunctionGraphSerializerTest {
 
     @Test
     fun `deserialize JSON file produces expected function graph`() {
-        val inputJson = readJsonFile("complex_function_graph.json")
+        val inputJson = readJsonFile(TEST_JSON_FILE)
         val expectedGraph = createTestFunctionGraph()
 
         val actualGraph = serializer.deserialize(inputJson, throwOnFailure = true)
@@ -57,7 +63,7 @@ class FunctionGraphSerializerTest {
         val functionGraph = createTestFunctionGraph()
 
         val actualJson = serializer.serialize(functionGraph, throwOnFailure = true)
-        val expectedJson = readJsonFile("complex_function_graph.json")
+        val expectedJson = readJsonFile(TEST_JSON_FILE)
         
         assertEquals("Serialized JSON should match expected file", expectedJson, actualJson)
     }
@@ -90,6 +96,38 @@ class FunctionGraphSerializerTest {
         }
     }
 
+    @Test
+    fun `test covers all LuaScriptConfigurationValue types`() {
+        val testGraph = createTestFunctionGraph()
+        
+        // Collect all configuration types from all LuaScript nodes in the test graph
+        val testedConfigTypes = testGraph.nodes
+            .filterIsInstance<FunctionGraphNode.LuaScriptNode>()
+            .flatMap { it.configuration }
+            .map { it.type }
+            .toSet()
+        
+        // Get all enum values that should be tested
+        val allConfigTypes = LuaFunctionConfigType.entries.toSet()
+        
+        // Ensure our test covers all configuration types
+        val missingTypes = allConfigTypes - testedConfigTypes
+        
+        if (missingTypes.isNotEmpty()) {
+            val missingTypeNames = missingTypes.joinToString(", ")
+            fail("Test does not cover all LuaScriptConfigurationValue types. Missing: $missingTypeNames. " +
+                 "Please update createTestFunctionGraph() to include LuaScriptNode configurations of all types. " +
+                 "This test protects against accidental serialization changes that would break user data.")
+        }
+        
+        // Also verify we're not testing non-existent types (defensive check)
+        val extraTypes = testedConfigTypes - allConfigTypes
+        if (extraTypes.isNotEmpty()) {
+            val extraTypeNames = extraTypes.joinToString(", ")
+            fail("Test includes unknown configuration types: $extraTypeNames")
+        }
+    }
+
 //    @Test  // Uncomment to regenerate the JSON file
     fun `helper - generate JSON file from structure`() {
         val functionGraph = createTestFunctionGraph()
@@ -97,7 +135,7 @@ class FunctionGraphSerializerTest {
         val jsonOutput = serializer.serialize(functionGraph, throwOnFailure = true)
         
         // Write the JSON to the test resources file
-        val outputFile = java.io.File("src/test/resources/complex_function_graph.json")
+        val outputFile = java.io.File("src/test/resources/$TEST_JSON_FILE")
         outputFile.writeText(jsonOutput!!)
         
         // This test will always pass - it's just for generating the JSON file
@@ -132,15 +170,25 @@ class FunctionGraphSerializerTest {
                     script = """
                         return function(data_sources)
                             local source = data_sources[1]
-                            local data_point = source:dp()
+                            local data_point = source.dp()
                             while data_point do
                                 data_point.value = data_point.value * 2
                                 coroutine.yield(data_point)
-                                data_point = source:dp()
+                                data_point = source.dp()
                             end
                         end
                     """.trimIndent(),
                     inputConnectorCount = 1,
+                    configuration = listOf(
+                        LuaScriptConfigurationValue.Text(
+                            id = "textConfig",
+                            value = "Sample text value"
+                        ),
+                        LuaScriptConfigurationValue.Number(
+                            id = "numberConfig", 
+                            value = 42.5
+                        )
+                    ),
                     dependencies = listOf(
                         NodeDependency(
                             connectorIndex = 0,

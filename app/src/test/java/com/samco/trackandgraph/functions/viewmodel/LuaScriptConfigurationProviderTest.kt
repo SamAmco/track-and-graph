@@ -18,6 +18,7 @@ package com.samco.trackandgraph.functions.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
@@ -53,6 +54,18 @@ class LuaScriptConfigurationProviderTest {
         )
     )
 
+    private val allTypesConfig = listOf(
+        LuaScriptConfigurationValue.Text(
+            id = "textConfig",
+            value = "default text"
+        ),
+        LuaScriptConfigurationValue.Number(
+            id = "numberConfig",
+            value = 123.45
+        ),
+    )
+
+
     @Test
     fun `createLuaScriptNode handles all configuration types correctly and covers all enum values`() {
         // Given
@@ -61,7 +74,14 @@ class LuaScriptConfigurationProviderTest {
         whenever(mockLuaEngine.runLuaFunction(script)).thenReturn(allTypesMetadata)
 
         // When
-        val result = provider.createLuaScriptNode(script, nodeId)
+        val result = provider.createLuaScriptNode(
+            script = script,
+            nodeId = nodeId,
+            // This deliberately wrong, to assert we are using the one from the metadata and not
+            // what ever is in the database assuming there are no errors.
+            inputConnectorCount = 2,
+            configuration = allTypesConfig
+        )
 
         // Then - Basic node properties
         assertEquals(nodeId, result.id)
@@ -70,15 +90,13 @@ class LuaScriptConfigurationProviderTest {
         assertEquals(2, result.configuration.size)
 
         // Then - Validate each configuration type is created correctly
-        val textConfig = result.configuration["textConfig"]
-        assertTrue("Text configuration should be created as LuaScriptConfigurationInput.Text",
-            textConfig is LuaScriptConfigurationInput.Text)
-        assertSame(allTypesMetadata.config[0].name, textConfig?.name)
+        val textConfig = result.configuration["textConfig"] as LuaScriptConfigurationInput.Text
+        assertSame(allTypesMetadata.config[0].name, textConfig.name)
+        assertEquals("default text", textConfig.value.value.text)
 
-        val numberConfig = result.configuration["numberConfig"]
-        assertTrue("Number configuration should be created as LuaScriptConfigurationInput.Number",
-            numberConfig is LuaScriptConfigurationInput.Number)
-        assertSame(allTypesMetadata.config[1].name, numberConfig?.name)
+        val numberConfig = result.configuration["numberConfig"] as LuaScriptConfigurationInput.Number
+        assertSame(allTypesMetadata.config[1].name, numberConfig.name)
+        assertEquals(123.45, numberConfig.value.value.text.toDouble(), 0.0001)
 
         // CRITICAL: Ensure all enum values are tested
         // This assertion will fail if a new LuaFunctionConfigType is added but not included in allTypesMetadata
@@ -89,44 +107,6 @@ class LuaScriptConfigurationProviderTest {
                 "If you added a new type, update allTypesMetadata to include it.",
             allEnumValues, testedTypes)
 
-        verify(mockLuaEngine).runLuaFunction(script)
-    }
-
-    @Test
-    fun `createLuaScriptNode with valid script creates node with correct configuration`() {
-        // Given
-        val script = "valid lua script"
-        val nodeId = 123
-        val metadata = LuaFunctionMetadata(
-            script = script,
-            inputCount = 2,
-            config = listOf(
-                LuaFunctionConfig(
-                    id = "config1",
-                    type = LuaFunctionConfigType.TEXT,
-                    name = TranslatedString.Simple("Config 1")
-                ),
-                LuaFunctionConfig(
-                    id = "config2", 
-                    type = LuaFunctionConfigType.TEXT,
-                    name = TranslatedString.Simple("Config 2")
-                )
-            )
-        )
-        whenever(mockLuaEngine.runLuaFunction(script)).thenReturn(metadata)
-
-        // When
-        val result = provider.createLuaScriptNode(script, nodeId)
-
-        // Then
-        assertEquals(nodeId, result.id)
-        assertEquals(2, result.inputConnectorCount)
-        assertEquals(script, result.script)
-        assertEquals(2, result.configuration.size)
-        
-        assertTrue(result.configuration["config1"] is LuaScriptConfigurationInput.Text)
-        assertTrue(result.configuration["config2"] is LuaScriptConfigurationInput.Text)
-        
         verify(mockLuaEngine).runLuaFunction(script)
     }
 
@@ -143,7 +123,7 @@ class LuaScriptConfigurationProviderTest {
         whenever(mockLuaEngine.runLuaFunction(script)).thenReturn(metadata)
 
         // When
-        val result = provider.createLuaScriptNode(script, nodeId)
+        val result = provider.createLuaScriptNode(script, nodeId, 1, emptyList())
 
         // Then
         assertEquals(nodeId, result.id)
@@ -162,7 +142,7 @@ class LuaScriptConfigurationProviderTest {
         whenever(mockLuaEngine.runLuaFunction(script)).thenThrow(RuntimeException("Script error"))
 
         // When
-        val result = provider.createLuaScriptNode(script, nodeId)
+        val result = provider.createLuaScriptNode(script, nodeId, 1, emptyList())
 
         // Then
         assertEquals(nodeId, result.id)

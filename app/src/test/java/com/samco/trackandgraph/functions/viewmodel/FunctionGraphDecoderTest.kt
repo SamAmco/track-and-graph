@@ -47,12 +47,14 @@ internal class FunctionGraphDecoderTest {
         whenever(mockLuaScriptConfigurationProvider.createLuaScriptNode(
             script = any(),
             nodeId = any(),
-            fallbackInputConnectorCount = any(),
+            inputConnectorCount = any(),
+            configuration = any(),
         )).thenAnswer { invocation ->
             Node.LuaScript(
                 id = invocation.getArgument(1),
                 script = invocation.getArgument(0),
                 inputConnectorCount = invocation.getArgument(2),
+                configuration = emptyMap(),
             )
         }
 
@@ -162,7 +164,7 @@ internal class FunctionGraphDecoderTest {
                         x = 300.0f,
                         y = 350.0f,
                         id = 4,
-                        script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                        script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1].dp())\nend",
                         inputConnectorCount = 2,
                         dependencies = listOf(
                             NodeDependency(
@@ -215,8 +217,9 @@ internal class FunctionGraphDecoderTest {
                 ),
                 Node.LuaScript(
                     id = 4,
-                    script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
-                    inputConnectorCount = 2
+                    script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1].dp())\nend",
+                    inputConnectorCount = 2,
+                    configuration = emptyMap(),
                 ),
                 Node.Output(
                     id = 3,

@@ -126,6 +126,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.threetenbp)
     testImplementation(libs.luak.jvm)
+    testImplementation(kotlin("reflect"))
 
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.runner)

@@ -264,7 +264,8 @@ private fun LuaScriptNodePreview() {
                     function main(input1, input2)
                         return input1 + input2 + input3 + input4 + input5 + input6 + input7 + input8 + input9 + input10
                     end
-                """.trimIndent()
+                """.trimIndent(),
+                configuration = emptyMap(),
             )
 
             LuaScriptNode(
@@ -288,7 +289,8 @@ private fun LuaScriptNodeEmptyPreview() {
             val sampleNode = Node.LuaScript(
                 id = 2,
                 inputConnectorCount = 1,
-                script = ""
+                script = "",
+                configuration = emptyMap(),
             )
 
             LuaScriptNode(
