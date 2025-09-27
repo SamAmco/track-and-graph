@@ -115,12 +115,12 @@ class CommunityTestRunner {
                     val testConfig = testStructure["config"].checktable()!!
                     val overriddenScript = overrideScriptConfig(scriptLuaText, testConfig)
                     val testDataSources = testStructure["sources"].checkfunction()!!.call()
-                    val scriptResult = daggerComponent.provideLuaScriptResolver()
-                        .resolveLuaGraphScriptResult(
-                            script = overriddenScript,
-                            dataSources = testDataSources.addDataSourceFunctions(),
-                            vmLease = vmLease,
-                        )
+                    val resolvedScript = daggerComponent.provideLuaScriptResolver()
+                        .resolveLuaScript(overriddenScript, vmLease)
+                    
+                    // Use LuaGraphAdapter to execute the script (reuses the same logic)
+                    val scriptResult = daggerComponent.provideLuaGraphAdapter()
+                        .executeScript(resolvedScript, testDataSources.addDataSourceFunctions())
                     testStructure["assertions"].checkfunction()!!.call(scriptResult)
                     println("Test passed: $testName.$key")
                 } catch (t: Throwable) {

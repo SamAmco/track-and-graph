@@ -39,10 +39,10 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         script = """
             return function(data_sources)
                 local source = data_sources[1]
-                local data_point = source:dp()
+                local data_point = source.dp()
                 while data_point do
                     coroutine.yield(data_point)
-                    data_point = source:dp()
+                    data_point = source.dp()
                 end
             end
         """.trimIndent()
@@ -66,7 +66,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             
             return function(data_sources)
                 local source = data_sources[1]
-                local all_data = source:dpall()
+                local all_data = source.dpall()
                 for _, data_point in ipairs(all_data) do
                     -- Add 1 to the value
                     data_point.value = data_point.value + 1
@@ -99,7 +99,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                 local source = data_sources[1]
                 local counter = 0  -- Local variable that persists across yields
                 
-                local data_point = source:dp()
+                local data_point = source.dp()
                 while data_point do
                     counter = counter + 1
                     -- Create new data point with counter value
@@ -111,7 +111,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                         note = data_point.note
                     }
                     coroutine.yield(new_point)
-                    data_point = source:dp()
+                    data_point = source.dp()
                 end
             end
         """.trimIndent()
@@ -145,12 +145,12 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                     local count = 0
                     local max_items = 3  -- Only process first 3 items
                     
-                    local data_point = source:dp()
+                    local data_point = source.dp()
                     while data_point and count < max_items do
                         count = count + 1
                         data_point.label = "processed_" .. count
                         coroutine.yield(data_point)
-                        data_point = source:dp()
+                        data_point = source.dp()
                     end
                     -- Exit early, don't consume remaining data points
                 end
@@ -187,7 +187,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                     local source = data_sources[1]
                     local multiplier = 2  -- Local state for the generator
                     
-                    local data_point = source:dp()
+                    local data_point = source.dp()
                     while data_point do
                         -- Create new data point with doubled value
                         local new_point = {
@@ -198,7 +198,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                             note = data_point.note
                         }
                         coroutine.yield(new_point)
-                        data_point = source:dp()
+                        data_point = source.dp()
                     end
                 end
             }
@@ -230,14 +230,14 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                     local source = data_sources[1]
                     local counter = 0  -- Local variable that persists across yields
                     
-                    local data_point = source:dp()
+                    local data_point = source.dp()
                     while data_point do
                         counter = counter + 1
                         -- Mutate the input data point directly
                         data_point.value = counter  -- Use the incrementing counter
                         data_point.label = "count_" .. counter
                         coroutine.yield(data_point)
-                        data_point = source:dp()
+                        data_point = source.dp()
                     end
                 end
             """.trimIndent()
@@ -280,14 +280,14 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                 local source = data_sources[1]
                 local counter = 0  -- Local variable that persists across yields
                 
-                local data_point = source:dp()
+                local data_point = source.dp()
                 while data_point do
                     counter = counter + 1
                     -- Mutate the input data point directly
                     data_point.value = counter  -- Use the incrementing counter
                     data_point.label = "count_" .. counter
                     coroutine.yield(data_point)
-                    data_point = source:dp()
+                    data_point = source.dp()
                 end
             end
         """.trimIndent()
