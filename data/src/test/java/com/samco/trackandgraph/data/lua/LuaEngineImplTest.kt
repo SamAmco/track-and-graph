@@ -19,6 +19,7 @@ package com.samco.trackandgraph.data.lua
 import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.sampling.RawDataSample
@@ -75,6 +76,10 @@ internal abstract class LuaEngineImplTest {
         val resultList: List<DataPoint> by lazy { result.toList() }
     }
 
+    protected data class LuaFunctionMetadataAssertionScope(
+        val metadata: LuaFunctionMetadata,
+    )
+
     protected fun testLuaGraph(
         script: String,
         assertionBlock: LuaGraphAssertionScope.() -> Unit
@@ -92,7 +97,7 @@ internal abstract class LuaEngineImplTest {
             rawDataSampleFromSequence(asDataPoints) {}
         }
 
-        val result = uut.runLuaGraphScript(
+        val result = uut.runLuaGraph(
             script,
             LuaGraphEngineParams(sources)
         )
@@ -125,6 +130,18 @@ internal abstract class LuaEngineImplTest {
         LuaFunctionAssertionScope(
             result = result,
             inputDataSources = rawDataSources.map { it.getRawDataPoints() }
+        ).assertionBlock()
+    }
+
+    protected fun testLuaFunctionMetadata(
+        script: String,
+        assertionBlock: LuaFunctionMetadataAssertionScope.() -> Unit
+    ) {
+        val uut = uut()
+        val metadata = uut.runLuaFunction(script)
+        
+        LuaFunctionMetadataAssertionScope(
+            metadata = metadata
         ).assertionBlock()
     }
 

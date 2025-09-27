@@ -16,7 +16,6 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
@@ -24,7 +23,6 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.RawDataSample
-import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.ErrorLuaHelper
@@ -35,8 +33,6 @@ import com.samco.trackandgraph.graphstatview.factories.helpers.TimeBarchartLuaHe
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.LuaEngineSwitch
-import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import kotlinx.coroutines.CoroutineDispatcher
@@ -105,7 +101,7 @@ class LuaGraphDataFactory @Inject constructor(
     ): ILuaGraphViewData {
         val luaEngineParams = LuaGraphEngineParams(dataSources = dataSamples)
 
-        val luaGraphResult = luaEngine.runLuaGraphScript(config.script, luaEngineParams)
+        val luaGraphResult = luaEngine.runLuaGraph(config.script, luaEngineParams)
         val error = luaGraphResult.error
 
         if (error != null) return errorLuaHelper(graphOrStat, error)
