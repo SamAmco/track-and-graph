@@ -1147,7 +1147,7 @@
 <span class="c1">--- Data points are iterated in reverse chronological order.</span>
 <span class="c1">--- @since v5.1.0</span>
 <span class="c1">--- @return DataPoint</span>
-<span class="kr">function</span><span class="w"> </span><span class="nc">DataSource</span><span class="p">:</span><span class="nf">dp</span><span class="p">()</span><span class="w"> </span><span class="kr">end</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">DataSource</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span><span class="w"> </span><span class="kr">end</span>
 </code></pre></div>
 <p>That's because the implementation of this data source is actually written in the kotlin code of the android app. <a href="https://github.com/SamAmco/track-and-graph/blob/master/app/src/main/java/com/samco/trackandgraph/lua/apiimpl/LuaDataSourceProviderImpl.kt"> You can see that here </a> if you are interested but it is not necessary to read the kotlin code.</p>
 <h2 id="scripting-limitations">Scripting limitations<a class="headerlink" href="#scripting-limitations" title="Permanent link">#</a></h2>
@@ -1272,8 +1272,8 @@
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:SamAmco/track-and-graph.git
 <span class="nb">cd</span><span class="w"> </span>track-and-graph
 </code></pre></div>
-<p>The tests are run using the <a href="https://github.com/SamAmco/track-and-graph/blob/master/app/src/test/java/com/samco/trackandgraph/lua/CommunityTestRunner.kt"> CommunityTestRunner.kt </a> in the Android project. You can run them using the gradlew file inside the repo with:</p>
-<div class="highlight"><pre><span></span><code>./gradlew<span class="w"> </span>:app:testDebugUnitTest<span class="w"> </span>--tests<span class="w"> </span><span class="s2">&quot;com.samco.trackandgraph.lua.CommunityTestRunner&quot;</span>
+<p>The tests are run using the <a href="https://github.com/SamAmco/track-and-graph/blob/master/data/src/test/java/com/samco/trackandgraph/data/lua/CommunityTestRunner.kt"> CommunityTestRunner.kt </a> in the Android project. You can run them using the gradlew file inside the repo with:</p>
+<div class="highlight"><pre><span></span><code>./gradlew<span class="w"> </span>:data:testDebugUnitTest<span class="w"> </span>--tests<span class="w"> </span><span class="s2">&quot;com.samco.trackandgraph.data.lua.CommunityTestRunner&quot;</span>
 </code></pre></div>
 <h3 id="debugging-tests">Debugging tests<a class="headerlink" href="#debugging-tests" title="Permanent link">#</a></h3>
 <p>Debugging scripts and tests can be a bit tricky since you will generally have to work without a breakpoint debugger in your Lua code. </p>
