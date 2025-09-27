@@ -246,4 +246,53 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
             assertEquals("Script should be preserved", script, metadata.script)
         }
     }
+
+    @Test
+    fun `Function handles all configuration types and covers all enum values`() {
+        val script = """
+            return {
+                inputCount = 3,
+                config = {
+                    {
+                        id = "textConfig",
+                        type = "text",
+                        name = "Text Configuration"
+                    },
+                    {
+                        id = "numberConfig",
+                        type = "number",
+                        name = "Number Configuration"
+                    }
+                },
+                generator = function(data_sources)
+                    -- Function implementation
+                end
+            }
+        """.trimIndent()
+        testLuaFunctionMetadata(script) {
+            assertEquals(3, metadata.inputCount)
+            assertEquals(2, metadata.config.size)
+            assertEquals("Script should be preserved", script, metadata.script)
+
+            // Validate each configuration type is parsed correctly
+            val textConfig = metadata.config.find { it.id == "textConfig" }
+            assertTrue("Text configuration should be parsed", textConfig != null)
+            assertEquals(LuaFunctionConfigType.TEXT, textConfig!!.type)
+            assertEquals("Text Configuration", (textConfig.name as TranslatedString.Simple).value)
+
+            val numberConfig = metadata.config.find { it.id == "numberConfig" }
+            assertTrue("Number configuration should be parsed", numberConfig != null)
+            assertEquals(LuaFunctionConfigType.NUMBER, numberConfig!!.type)
+            assertEquals("Number Configuration", (numberConfig.name as TranslatedString.Simple).value)
+
+            // CRITICAL: Ensure all enum values are tested
+            // This assertion will fail if a new LuaFunctionConfigType is added but not included in this test
+            val testedTypes = metadata.config.map { it.type }.toSet()
+            val allEnumValues = LuaFunctionConfigType.entries.toSet()
+            assertEquals("All LuaFunctionConfigType enum values must be tested in this comprehensive test. " +
+                        "Missing types: ${allEnumValues - testedTypes}. " +
+                        "If you added a new type, update this test to include it and implement parsing logic in LuaFunctionMetadataAdapter.",
+                        allEnumValues, testedTypes)
+        }
+    }
 }
