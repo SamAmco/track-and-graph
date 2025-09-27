@@ -18,10 +18,8 @@
 package com.samco.trackandgraph.functions.viewmodel
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
-import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
 import timber.log.Timber
 import javax.inject.Inject

@@ -161,7 +161,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val functionGraphBuilder: FunctionGraphBuilder,
     private val functionGraphDecoder: FunctionGraphDecoder,
-    private val luaScriptConfigurationProvider: LuaScriptConfigurationProvider,
+    private val luaScriptNodeProvider: LuaScriptNodeProvider,
 ) : ViewModel(), FunctionsScreenViewModel {
 
     private val initialized = AtomicBoolean(false)
@@ -367,7 +367,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             if (index >= 0) {
                 val existingNode = nodeList[index] as Node.LuaScript
                 // Use the provider to update the node while preserving existing configuration inputs
-                val updatedNode = luaScriptConfigurationProvider.updateLuaScriptNode(existingNode, newScript)
+                val updatedNode = luaScriptNodeProvider.updateLuaScriptNode(existingNode, newScript)
                 nodeList[index] = updatedNode
             }
         }
