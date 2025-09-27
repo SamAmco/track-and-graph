@@ -14,7 +14,7 @@ return function(sources)
 
 	-- Initialize with first datapoint from each source
 	for name, source in pairs(sources) do
-		local dp = source:dp()
+		local dp = source.dp()
 		if dp then
 			current_points[name] = dp
 			active_sources[name] = source
@@ -32,7 +32,7 @@ return function(sources)
 			end
 
 			-- Get next point from this source
-			local next_dp = active_sources[name]:dp()
+			local next_dp = active_sources[name].dp()
 			if next_dp then
 				current_points[name] = next_dp
 			else
