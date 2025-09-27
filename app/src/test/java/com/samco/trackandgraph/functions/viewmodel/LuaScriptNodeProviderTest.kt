@@ -30,10 +30,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class LuaScriptConfigurationProviderTest {
+class LuaScriptNodeProviderTest {
 
     private val mockLuaEngine: LuaEngine = mock()
-    private val provider = LuaScriptConfigurationProvider(mockLuaEngine)
+    private val provider = LuaScriptNodeProvider(mockLuaEngine)
     
     // Comprehensive metadata containing all possible configuration types
     // This ensures we test all enum values and catch missing implementations
