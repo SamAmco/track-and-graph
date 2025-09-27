@@ -116,20 +116,20 @@ local DataSource = {}
 --- Data points are iterated in reverse chronological order.
 --- @since v5.1.0
 --- @return DataPoint
-function DataSource:dp() end
+function DataSource.dp() end
 
 --- Fetches the next group of data points from the data source.
 --- Data points are iterated in reverse chronological order.
 --- @since v5.1.0
 --- @param count integer: The number of data points to retrieve.
 --- @return DataPoint[]: A table containing the requested data points.
-function DataSource:dpbatch(count) end
+function DataSource.dpbatch(count) end
 
 --- Fetches all data points from the data source.
 --- Data points are iterated in reverse chronological order.
 --- @since v5.1.0
 --- @return DataPoint[]: A table containing all data points.
-function DataSource:dpall() end
+function DataSource.dpall() end
 
 --- Fetches all data points from the data source that are newer than the given timestamp.
 --- Data points are iterated in reverse chronological order.
@@ -137,7 +137,7 @@ function DataSource:dpall() end
 --- @since v5.1.0
 --- @param datetime (Timestamp|Date)?: The timestamp to compare against. If nil then the behaviour is the same as dpall
 --- @return DataPoint[]: A table containing all data points that are newer than the given timestamp.
-function DataSource:dpafter(datetime) end
+function DataSource.dpafter(datetime) end
 
 --- @since v5.1.0
 --- @class CutoffParams
