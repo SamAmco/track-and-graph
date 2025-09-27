@@ -17,7 +17,8 @@
 package com.samco.trackandgraph.data.lua.dto
 
 enum class LuaFunctionConfigType {
-    TEXT
+    TEXT,
+    NUMBER
 }
 
 sealed class TranslatedString {

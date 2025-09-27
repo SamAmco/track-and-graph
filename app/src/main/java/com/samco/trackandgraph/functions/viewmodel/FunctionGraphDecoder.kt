@@ -45,7 +45,9 @@ internal data class DecodedFunctionGraph(
  * This class handles the reverse conversion from the DTO layer's function graph structure
  * to the UI layer's node and edge representation.
  */
-internal class FunctionGraphDecoder @Inject constructor() {
+internal class FunctionGraphDecoder @Inject constructor(
+    private val luaScriptConfigurationProvider: LuaScriptConfigurationProvider
+) {
 
     /**
      * Decodes a Function entity back to ViewModel representations.
@@ -122,14 +124,16 @@ internal class FunctionGraphDecoder @Inject constructor() {
     
     /**
      * Decodes a LuaScriptNode DTO to a LuaScript ViewModel node.
+     * Uses the configuration provider to analyze the script and create a complete node.
+     * Passes the database inputConnectorCount as fallback in case script analysis fails.
      */
     private fun decodeLuaScriptNode(
         graphNode: FunctionGraphNode.LuaScriptNode
     ): Node.LuaScript {
-        return Node.LuaScript(
-            id = graphNode.id,
-            inputConnectorCount = graphNode.inputConnectorCount,
-            script = graphNode.script
+        return luaScriptConfigurationProvider.createLuaScriptNode(
+            script = graphNode.script,
+            nodeId = graphNode.id,
+            fallbackInputConnectorCount = graphNode.inputConnectorCount
         )
     }
     

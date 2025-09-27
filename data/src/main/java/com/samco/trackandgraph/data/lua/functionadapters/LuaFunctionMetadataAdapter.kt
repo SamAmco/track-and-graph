@@ -89,6 +89,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
 
         return when (typeString) {
             "text" -> LuaFunctionConfigType.TEXT
+            "number" -> LuaFunctionConfigType.NUMBER
             else -> throw IllegalArgumentException("Unknown config type: $typeString")
         }
     }
