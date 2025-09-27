@@ -19,6 +19,9 @@ package com.samco.trackandgraph.data.database.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
+import kotlinx.serialization.ExperimentalSerializationApi
 
 /**
  * Represents a dependency between nodes in the function graph.
@@ -30,6 +33,46 @@ data class NodeDependency(
     val connectorIndex: Int,
     val nodeId: Int,
 )
+
+/**
+ * Sealed class hierarchy representing different types of configuration values for Lua script nodes.
+ * These are the database representations of user input values for script configurations.
+ */
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+@JsonClassDiscriminator("configType")
+sealed class LuaScriptConfigurationValue {
+    abstract val id: String
+    abstract val type: LuaFunctionConfigType
+    
+    /**
+     * Represents a text configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param value The user-entered text value
+     */
+    @Serializable
+    @SerialName("Text")
+    data class Text(
+        override val id: String,
+        val value: String
+    ) : LuaScriptConfigurationValue() {
+        override val type: LuaFunctionConfigType = LuaFunctionConfigType.TEXT
+    }
+    
+    /**
+     * Represents a number configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param value The user-entered numeric value
+     */
+    @Serializable
+    @SerialName("Number")
+    data class Number(
+        override val id: String,
+        val value: Double
+    ) : LuaScriptConfigurationValue() {
+        override val type: LuaFunctionConfigType = LuaFunctionConfigType.NUMBER
+    }
+}
 
 /**
  * Sealed class hierarchy representing different types of nodes in a function graph.
@@ -63,6 +106,7 @@ sealed class FunctionGraphNode {
      * @param id Unique identifier for this node
      * @param script The Lua script code as a string
      * @param inputConnectorCount Number of input connectors this node has
+     * @param configuration List of user configuration input values for this script
      * @param dependencies List of nodes this node depends on
      */
     @Serializable
@@ -73,6 +117,7 @@ sealed class FunctionGraphNode {
         override val id: Int,
         val script: String,
         val inputConnectorCount: Int,
+        val configuration: List<LuaScriptConfigurationValue> = emptyList(),
         override val dependencies: List<NodeDependency>
     ) : FunctionGraphNode()
     

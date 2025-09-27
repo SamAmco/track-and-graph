@@ -178,7 +178,8 @@ private fun LuaScriptNodePreview() {
             node = Node.LuaScript(
                 id = 1,
                 inputConnectorCount = 2,
-                script = "function main(input1, input2)\n    return input1 + input2\nend"
+                script = "function main(input1, input2)\n    return input1 + input2\nend",
+                configuration = emptyMap(),
             ),
             viewState = viewportState,
             connectorLayerState = connectorLayerState,

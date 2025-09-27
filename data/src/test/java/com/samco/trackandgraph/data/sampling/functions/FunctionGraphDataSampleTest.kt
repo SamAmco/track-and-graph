@@ -372,13 +372,13 @@ class FunctionGraphDataSampleTest {
             script = """
                 return function(data_sources)
                     local source = data_sources[1]
-                    local data_point = source:dp()
+                    local data_point = source.dp()
                     while data_point do
                         -- Double the value and modify the label
                         data_point.value = data_point.value * 2
                         data_point.label = data_point.label .. "_doubled"
                         coroutine.yield(data_point)
-                        data_point = source:dp()
+                        data_point = source.dp()
                     end
                 end
             """.trimIndent(),

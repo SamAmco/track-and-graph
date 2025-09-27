@@ -23,7 +23,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -31,18 +33,25 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class FunctionGraphBuilderTest {
 
-    private lateinit var builder: FunctionGraphBuilder
 
-    @Before
-    fun setUp() {
-        builder = FunctionGraphBuilder()
-    }
+    private val mockConfigurationEncoder: LuaScriptConfigurationEncoder = mock()
+    private val builder: FunctionGraphBuilder = FunctionGraphBuilder(
+        configurationEncoder = mockConfigurationEncoder
+    )
+
 
     @Test
     fun `buildFunctionGraph creates correct graph`() {
+        // Mock the encoder to return empty configuration for this test
+        whenever(mockConfigurationEncoder.encodeConfiguration(any())).thenReturn(emptyList())
+        
         val nodes = createTestNodeList()
         val edges = createTestEdgeList()
         val nodePositions = createTestNodePositions()
@@ -61,6 +70,9 @@ class FunctionGraphBuilderTest {
 
     @Test
     fun `buildFunctionGraph handles missing positions with default Offset Zero`() {
+        // Mock the encoder to return empty configuration for this test
+        whenever(mockConfigurationEncoder.encodeConfiguration(any())).thenReturn(emptyList())
+        
         val nodes = createTestNodeList()
         val edges = createTestEdgeList()
         val emptyPositions = emptyMap<Int, Offset>()
@@ -143,6 +155,58 @@ class FunctionGraphBuilderTest {
     }
 
     @Test
+    fun `buildFunctionGraph uses LuaScriptConfigurationEncoder for configuration encoding`() {
+        // Create a LuaScript node with configuration
+        val configurationInput = mapOf(
+            "param1" to LuaScriptConfigurationInput.Text(
+                name = TranslatedString.Simple("Parameter 1"),
+                value = mutableStateOf(TextFieldValue("test value"))
+            ),
+            "param2" to LuaScriptConfigurationInput.Number(
+                name = TranslatedString.Simple("Parameter 2"),
+                value = mutableStateOf(TextFieldValue("42.5"))
+            )
+        )
+        
+        val luaScriptNode = Node.LuaScript(
+            id = 10,
+            script = "-- Test script with config",
+            inputConnectorCount = 1,
+            configuration = configurationInput
+        )
+        
+        val nodes = listOf(
+            luaScriptNode,
+            Node.Output(id = 11)
+        )
+        
+        // Mock the encoder to return expected configuration values
+        val expectedEncodedConfig = listOf(
+            LuaScriptConfigurationValue.Text(id = "param1", value = "test value"),
+            LuaScriptConfigurationValue.Number(id = "param2", value = 42.5)
+        )
+        whenever(mockConfigurationEncoder.encodeConfiguration(configurationInput))
+            .thenReturn(expectedEncodedConfig)
+        
+        // Build the function graph
+        val result = builder.buildFunctionGraph(
+            nodes = nodes,
+            edges = emptyList(),
+            nodePositions = mapOf(10 to Offset.Zero, 11 to Offset.Zero),
+            isDuration = false,
+            shouldThrow = true
+        )
+        
+        // Verify the encoder was called with the correct configuration
+        verify(mockConfigurationEncoder).encodeConfiguration(configurationInput)
+        
+        // Verify the result contains the encoded configuration
+        assertNotNull("Function graph should be built successfully", result)
+        val luaScriptNodeDto = result!!.nodes.filterIsInstance<FunctionGraphNode.LuaScriptNode>().first()
+        assertEquals("Encoded configuration should match expected", expectedEncodedConfig, luaScriptNodeDto.configuration)
+    }
+
+    @Test
     fun `test covers all Node types`() {
         val testNodes = createTestNodeList()
         
@@ -172,8 +236,8 @@ class FunctionGraphBuilderTest {
     @Test
     fun `buildFunctionGraph detects simple cycle between two LuaScript nodes`() {
         val nodesWithSimpleCycle = listOf(
-            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1),
-            Node.LuaScript(id = 2, script = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1, configuration = emptyMap()),
+            Node.LuaScript(id = 2, script = "", inputConnectorCount = 1, configuration = emptyMap()),
             Node.Output(id = 3)
         )
         
@@ -211,9 +275,9 @@ class FunctionGraphBuilderTest {
     @Test
     fun `buildFunctionGraph detects complex cycle through multiple LuaScript nodes`() {
         val nodesWithComplexCycle = listOf(
-            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1),
-            Node.LuaScript(id = 2, script = "", inputConnectorCount = 1),
-            Node.LuaScript(id = 3, script = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1, configuration = emptyMap()),
+            Node.LuaScript(id = 2, script = "", inputConnectorCount = 1, configuration = emptyMap()),
+            Node.LuaScript(id = 3, script = "", inputConnectorCount = 1, configuration = emptyMap()),
             Node.Output(id = 4)
         )
         
@@ -255,7 +319,7 @@ class FunctionGraphBuilderTest {
     @Test
     fun `buildFunctionGraph detects self-referencing cycle`() {
         val nodesWithSelfCycle = listOf(
-            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1),
+            Node.LuaScript(id = 1, script = "", inputConnectorCount = 1, configuration = emptyMap()),
             Node.Output(id = 2)
         )
         
@@ -306,8 +370,9 @@ class FunctionGraphBuilderTest {
             ),
             Node.LuaScript(
                 id = 5,
-                script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
-                inputConnectorCount = 2
+                script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1].dp())\nend",
+                inputConnectorCount = 2,
+                configuration = emptyMap(),
             ),
             Node.Output(
                 id = 4,
@@ -370,8 +435,9 @@ class FunctionGraphBuilderTest {
                     x = 400.0f,
                     y = 100.0f,
                     id = 5,
-                    script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1]:dp())\nend",
+                    script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1].dp())\nend",
                     inputConnectorCount = 2,
+                    configuration = emptyList(),
                     dependencies = emptyList()
                 )
             ),
