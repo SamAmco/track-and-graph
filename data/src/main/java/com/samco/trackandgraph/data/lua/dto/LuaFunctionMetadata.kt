@@ -14,27 +14,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.data.lua
+package com.samco.trackandgraph.data.lua.dto
 
-import com.samco.trackandgraph.data.sampling.RawDataSample
-import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
-import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
-
-interface LuaEngine {
-
-    fun runLuaGraph(
-        script: String,
-        params: LuaGraphEngineParams
-    ): LuaGraphResult
-
-    fun runLuaFunction(
-        script: String
-    ): LuaFunctionMetadata
-
-    fun runLuaFunctionGenerator(
-        script: String,
-        dataSources: List<RawDataSample>
-    ): Sequence<DataPoint>
+enum class LuaFunctionConfigType {
+    TEXT
 }
+
+sealed class TranslatedString {
+    data class Simple(val value: String) : TranslatedString()
+
+    /**
+     * A map of BCP 47 language codes to translations
+     */
+    data class Translations(val values: Map<String, String>) : TranslatedString()
+}
+
+data class LuaFunctionConfig(
+    val id: String,
+    val type: LuaFunctionConfigType,
+    val name: TranslatedString?,
+)
+
+data class LuaFunctionMetadata(
+    val script: String,
+    val inputCount: Int,
+    val config: List<LuaFunctionConfig>
+)
