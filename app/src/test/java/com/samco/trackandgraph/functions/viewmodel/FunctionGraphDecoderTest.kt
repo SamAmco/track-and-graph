@@ -35,8 +35,8 @@ import org.mockito.kotlin.whenever
 
 internal class FunctionGraphDecoderTest {
 
-    private val mockLuaScriptConfigurationProvider: LuaScriptConfigurationProvider = mock()
-    private val decoder = FunctionGraphDecoder(mockLuaScriptConfigurationProvider)
+    private val mockLuaScriptNodeProvider: LuaScriptNodeProvider = mock()
+    private val decoder = FunctionGraphDecoder(mockLuaScriptNodeProvider)
 
     @Test
     fun `decodeFunctionGraph produces expected output`() {
@@ -44,7 +44,7 @@ internal class FunctionGraphDecoderTest {
         val featurePathMap = createFeaturePathMap()
         val expected = createExpectedOutput()
 
-        whenever(mockLuaScriptConfigurationProvider.createLuaScriptNode(
+        whenever(mockLuaScriptNodeProvider.createLuaScriptNode(
             script = any(),
             nodeId = any(),
             inputConnectorCount = any(),
