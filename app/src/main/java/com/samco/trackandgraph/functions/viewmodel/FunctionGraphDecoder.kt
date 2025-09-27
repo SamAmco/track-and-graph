@@ -125,7 +125,6 @@ internal class FunctionGraphDecoder @Inject constructor(
     /**
      * Decodes a LuaScriptNode DTO to a LuaScript ViewModel node.
      * Uses the configuration provider to analyze the script and create a complete node.
-     * Passes the database inputConnectorCount as fallback in case script analysis fails.
      */
     private fun decodeLuaScriptNode(
         graphNode: FunctionGraphNode.LuaScriptNode
@@ -133,7 +132,8 @@ internal class FunctionGraphDecoder @Inject constructor(
         return luaScriptConfigurationProvider.createLuaScriptNode(
             script = graphNode.script,
             nodeId = graphNode.id,
-            fallbackInputConnectorCount = graphNode.inputConnectorCount
+            inputConnectorCount = graphNode.inputConnectorCount,
+            configuration = graphNode.configuration
         )
     }
     
