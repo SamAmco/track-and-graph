@@ -30,7 +30,7 @@ import javax.inject.Inject
  * Provider class that uses the LuaEngine to extract configuration metadata from Lua scripts
  * and returns complete Node.LuaScript instances with proper configuration and error handling.
  */
-internal class LuaScriptConfigurationProvider @Inject constructor(
+internal class LuaScriptNodeProvider @Inject constructor(
     private val luaEngine: LuaEngine
 ) {
     /**

@@ -46,7 +46,7 @@ internal data class DecodedFunctionGraph(
  * to the UI layer's node and edge representation.
  */
 internal class FunctionGraphDecoder @Inject constructor(
-    private val luaScriptConfigurationProvider: LuaScriptConfigurationProvider
+    private val luaScriptNodeProvider: LuaScriptNodeProvider
 ) {
 
     /**
@@ -129,7 +129,7 @@ internal class FunctionGraphDecoder @Inject constructor(
     private fun decodeLuaScriptNode(
         graphNode: FunctionGraphNode.LuaScriptNode
     ): Node.LuaScript {
-        return luaScriptConfigurationProvider.createLuaScriptNode(
+        return luaScriptNodeProvider.createLuaScriptNode(
             script = graphNode.script,
             nodeId = graphNode.id,
             inputConnectorCount = graphNode.inputConnectorCount,
