@@ -52,7 +52,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
@@ -76,6 +75,7 @@ import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.resolve
 
 @Composable
 internal fun LuaScriptNode(
@@ -104,7 +104,7 @@ internal fun LuaScriptNode(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.lua_script),
+                text = getNodeTitle(node),
                 style = MaterialTheme.typography.titleMedium
             )
             IconButton(
@@ -118,21 +118,19 @@ internal fun LuaScriptNode(
             }
         }
 
-        Buttons(
-            onUpdateScriptFromClipboard = onUpdateScript,
-            onReadFile = onUpdateScriptFromFile
-        )
-
-        ScriptPreviewTextField(
-            scriptPreview = node.script,
-            onScriptPreviewClicked = { textFieldValue ->
-                showDialog = true
-                // Handle cursor position translation if needed
-                tempScript = tempScript.copy(
-                    selection = textFieldValue.selection
-                )
-            }
-        )
+        if (node.showEditTools) {
+            EditorTools(
+                node = node,
+                onUpdateScript = onUpdateScript,
+                onUpdateScriptFromFile = onUpdateScriptFromFile,
+                onShowDialog = { showDialog = true },
+                onUpdateTempScript = { textFieldValue ->
+                    tempScript = tempScript.copy(
+                        selection = textFieldValue.selection
+                    )
+                }
+            )
+        }
 
         val focusManager = LocalFocusManager.current
 
@@ -156,6 +154,36 @@ internal fun LuaScriptNode(
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun getNodeTitle(node: Node.LuaScript) =
+    node.title.resolve() ?: stringResource(R.string.lua_script)
+
+@Composable
+private fun EditorTools(
+    node: Node.LuaScript,
+    onUpdateScript: (String) -> Unit,
+    onUpdateScriptFromFile: (Uri?) -> Unit,
+    onShowDialog: () -> Unit,
+    onUpdateTempScript: (TextFieldValue) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
+    ) {
+        Buttons(
+            onUpdateScriptFromClipboard = onUpdateScript,
+            onReadFile = onUpdateScriptFromFile
+        )
+
+        ScriptPreviewTextField(
+            scriptPreview = node.script,
+            onScriptPreviewClicked = { textFieldValue ->
+                onShowDialog()
+                onUpdateTempScript(textFieldValue)
+            }
+        )
     }
 }
 
@@ -308,6 +336,8 @@ private fun LuaScriptNodePreview() {
                         value = remember { mutableStateOf(TextFieldValue("Sample Label")) }
                     )
                 ),
+                showEditTools = true,
+                title = null
             )
 
             LuaScriptNode(
@@ -333,6 +363,47 @@ private fun LuaScriptNodeEmptyPreview() {
                 inputConnectorCount = 1,
                 script = "",
                 configuration = emptyMap(),
+                showEditTools = true,
+                title = null
+            )
+
+            LuaScriptNode(
+                node = sampleNode,
+                onDeleteNode = { }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LuaScriptNodeWithVersionPreview() {
+    TnGComposeTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
+            val sampleNode = Node.LuaScript(
+                id = 3,
+                inputConnectorCount = 1,
+                script = "function main(input) return input end",
+                configuration = mapOf(
+                    "filter_label" to LuaScriptConfigurationInput.Text(
+                        name = TranslatedString.Simple("Filter Label"),
+                        value = remember { mutableStateOf(TextFieldValue("work")) }
+                    )
+                ),
+                showEditTools = false, // Version provided, so hide edit tools
+                title = TranslatedString.Translations(
+                    mapOf(
+                        "en" to "Filter by Label",
+                        "de" to "Filtern nach Etikett",
+                        "es" to "Filtrar por Etiqueta",
+                        "fr" to "Filtrer par Étiquette"
+                    )
+                )
             )
 
             LuaScriptNode(

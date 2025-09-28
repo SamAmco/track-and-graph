@@ -158,6 +158,7 @@ fun LibraryNames() = Column {
         R.string.three_ten_android_backport,
         R.string.timber,
         R.string.luak,
+        R.string.semver,
     )
 
     for (library in libraries) {

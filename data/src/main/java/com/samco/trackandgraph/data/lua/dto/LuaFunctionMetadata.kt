@@ -16,6 +16,8 @@
  */
 package com.samco.trackandgraph.data.lua.dto
 
+import io.github.z4kn4fein.semver.Version
+
 enum class LuaFunctionConfigType {
     TEXT,
     NUMBER
@@ -38,6 +40,8 @@ data class LuaFunctionConfig(
 
 data class LuaFunctionMetadata(
     val script: String,
+    val version: Version?,
+    val title: TranslatedString?,
     val inputCount: Int,
-    val config: List<LuaFunctionConfig>
+    val config: List<LuaFunctionConfig>,
 )

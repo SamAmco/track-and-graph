@@ -121,6 +121,9 @@ dependencies {
     //Lua
     implementation(libs.luak.jvm)
 
+    //Semantic versioning
+    implementation(libs.semver)
+
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
