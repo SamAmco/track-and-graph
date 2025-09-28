@@ -63,7 +63,9 @@ internal class LuaScriptNodeProvider @Inject constructor(
                 id = nodeId,
                 inputConnectorCount = metadata.inputCount,
                 script = script,
-                configuration = inputs
+                showEditTools = metadata.version == null,
+                configuration = inputs,
+                title = metadata.title,
             )
         } catch (e: Exception) {
             Timber.e(e, "Failed to analyze Lua script for node $nodeId, using fallback")
@@ -72,6 +74,7 @@ internal class LuaScriptNodeProvider @Inject constructor(
                 id = nodeId,
                 inputConnectorCount = inputConnectorCount ?: 1,
                 script = script,
+                showEditTools = true,
                 configuration = emptyMap()
             )
         }
@@ -103,7 +106,9 @@ internal class LuaScriptNodeProvider @Inject constructor(
             existingNode.copy(
                 script = newScript,
                 inputConnectorCount = metadata.inputCount,
-                configuration = newConfiguration
+                showEditTools = metadata.version == null,
+                configuration = newConfiguration,
+                title = metadata.title,
             )
         } catch (e: Exception) {
             Timber.e(e, "Failed to update Lua script for node ${existingNode.id}, using fallback")
@@ -111,7 +116,6 @@ internal class LuaScriptNodeProvider @Inject constructor(
             existingNode.copy(
                 script = newScript,
                 inputConnectorCount = 1,
-                configuration = emptyMap() // Clear config on error since we can't validate it
             )
         }
     }
