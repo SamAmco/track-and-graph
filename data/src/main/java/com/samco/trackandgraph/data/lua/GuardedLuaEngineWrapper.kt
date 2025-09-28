@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
@@ -24,9 +25,10 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
 
     override fun runLuaFunctionGenerator(
         script: String,
-        dataSources: List<RawDataSample>
+        dataSources: List<RawDataSample>,
+        configuration: List<LuaScriptConfigurationValue>
     ): Sequence<DataPoint> {
-        return if (luaEngineSwitch.enabled) luaEngine.runLuaFunctionGenerator(script, dataSources)
+        return if (luaEngineSwitch.enabled) luaEngine.runLuaFunctionGenerator(script, dataSources, configuration)
         else throw LuaEngineDisabledException()
     }
 }
