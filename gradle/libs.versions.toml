@@ -35,6 +35,7 @@ glance = "1.1.1"
 nav3Core = "1.0.0-alpha11"
 kotlinxSerializationCore = "1.9.0"
 kotlinSerialization = "2.2.20"
+semver = "3.0.0"
 
 # Gradle script versions
 jdk = "17"
@@ -107,5 +108,6 @@ androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecy
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }
 shot-android = { module = "com.karumi:shot-android", version.ref = "shot" }
+semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }

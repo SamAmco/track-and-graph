@@ -231,6 +231,9 @@ dependencies {
     //Fast immutable collection updates (used in functions screen)
     implementation(libs.kotlinx.collections.immutable)
 
+    //Semantic versioning
+    implementation(libs.semver)
+
     //Testing
     testImplementation(libs.threetenbp)
     testImplementation(libs.junit)

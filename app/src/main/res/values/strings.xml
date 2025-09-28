@@ -366,6 +366,7 @@
     <string name="next_scheduled_backup">Next Scheduled Backup</string>
     <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
     <string name="luak" translatable="false">LuaK</string>
+    <string name="semver" translatable="false">z4kn4fein/kotlin-semver</string>
     <string name="mit" translatable="false">MIT</string>
 
     <string name="lua_script_empty">Please add a Lua script</string>

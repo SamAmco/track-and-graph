@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -117,7 +118,9 @@ internal sealed class Node(
         override val id: Int = -1,
         override val inputConnectorCount: Int,
         val script: String,
-        val configuration: Map<String, LuaScriptConfigurationInput>,
+        val configuration: Map<String, LuaScriptConfigurationInput> = emptyMap(),
+        val showEditTools: Boolean = true,
+        val title: TranslatedString? = null,
     ) : Node(
         id = id,
         inputConnectorCount = inputConnectorCount,
@@ -229,6 +232,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     override fun onUpsertConnector(connector: Connector, worldPosition: Offset) {
+        if (connector.nodeId !in nodes.value.map { it.id }) return
         connectorPositions[connector] = worldPosition
         _connectors.value = _connectors.value.add(connector)
         val isDraggingOutput = _draggingConnector.value != null && connector.type == ConnectorType.OUTPUT
