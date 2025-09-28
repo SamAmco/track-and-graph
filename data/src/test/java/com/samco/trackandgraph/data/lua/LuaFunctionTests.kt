@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -292,7 +293,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             end
         """.trimIndent()
 
-        val result = luaEngine.runLuaFunctionGenerator(script, rawDataSources)
+        val result = luaEngine.runLuaFunctionGenerator(script, rawDataSources, emptyList())
         val resultList = result.toList()
 
         assertEquals(dataPointCount, resultList.size)
@@ -339,6 +340,53 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         if (exceptions.isNotEmpty()) {
             throw AssertionError("Concurrent execution failed with ${exceptions.size} exceptions. First: ${exceptions.first()}")
         }
+    }
+
+    @Test
+    fun `Generator function uses configuration parameters correctly`() = testLuaFunction(
+        dataSources = listOf(
+            sequenceOf(
+                TestDP(timestamp = 1000, value = 10.0, label = "first"),
+                TestDP(timestamp = 2000, value = 20.0, label = "second"),
+                TestDP(timestamp = 3000, value = 30.0, label = "third")
+            )
+        ),
+        script = """
+            return function(data_sources, config)
+                local source = data_sources[1]
+                local multiplier = config.multiplier
+                local prefix = config.prefix
+                local offset = config.offset
+                
+                local data_point = source.dp()
+                while data_point do
+                    -- Use configuration to transform the data point
+                    data_point.value = (data_point.value * multiplier) + offset
+                    data_point.label = prefix .. data_point.label
+                    coroutine.yield(data_point)
+                    data_point = source.dp()
+                end
+            end
+        """.trimIndent(),
+        config = listOf(
+            LuaScriptConfigurationValue.Number(id = "multiplier", value = 2.5),
+            LuaScriptConfigurationValue.Text(id = "prefix", value = "processed_"),
+            LuaScriptConfigurationValue.Number(id = "offset", value = 100.0)
+        )
+    ) {
+        assertEquals("Should have 3 results", 3, resultList.size)
+        
+        // Verify first data point: (10.0 * 2.5) + 100.0 = 125.0
+        assertEquals("First value should be transformed", 125.0, resultList[0].value, 0.001)
+        assertEquals("First label should be prefixed", "processed_first", resultList[0].label)
+        
+        // Verify second data point: (20.0 * 2.5) + 100.0 = 150.0
+        assertEquals("Second value should be transformed", 150.0, resultList[1].value, 0.001)
+        assertEquals("Second label should be prefixed", "processed_second", resultList[1].label)
+        
+        // Verify third data point: (30.0 * 2.5) + 100.0 = 175.0
+        assertEquals("Third value should be transformed", 175.0, resultList[2].value, 0.001)
+        assertEquals("Third label should be prefixed", "processed_third", resultList[2].label)
     }
 }
 
