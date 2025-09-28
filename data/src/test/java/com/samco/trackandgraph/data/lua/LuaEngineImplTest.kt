@@ -18,6 +18,7 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
@@ -110,12 +111,14 @@ internal abstract class LuaEngineImplTest {
 
     protected fun testLuaFunction(
         script: String,
+        config: List<LuaScriptConfigurationValue> = emptyList(),
         assertionBlock: LuaFunctionAssertionScope.() -> Unit
-    ) = testLuaFunction(emptyList(), script, assertionBlock)
+    ) = testLuaFunction(emptyList(), script, config, assertionBlock)
 
     protected fun testLuaFunction(
         dataSources: List<Sequence<TestDP>>,
         script: String,
+        config: List<LuaScriptConfigurationValue> = emptyList(),
         assertionBlock: LuaFunctionAssertionScope.() -> Unit
     ) {
         val uut = uut()
@@ -125,7 +128,7 @@ internal abstract class LuaEngineImplTest {
             rawDataSampleFromSequence(asDataPoints) {}
         }
 
-        val result = uut.runLuaFunctionGenerator(script, rawDataSources)
+        val result = uut.runLuaFunctionGenerator(script, rawDataSources, config)
 
         LuaFunctionAssertionScope(
             result = result,

@@ -19,6 +19,7 @@ package com.samco.trackandgraph.data.lua
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 
@@ -35,6 +36,7 @@ interface LuaEngine {
 
     fun runLuaFunctionGenerator(
         script: String,
-        dataSources: List<RawDataSample>
+        dataSources: List<RawDataSample>,
+        configuration: List<LuaScriptConfigurationValue>,
     ): Sequence<DataPoint>
 }

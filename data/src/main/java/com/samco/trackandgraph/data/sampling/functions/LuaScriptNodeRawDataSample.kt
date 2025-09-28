@@ -32,14 +32,21 @@ internal class LuaScriptNodeRawDataSample(
         try {
             createMergedDataSources()
         } catch (e: Throwable) {
-            Timber.e(e, "Failed to create merged data sources for Lua script: ${luaScriptNode.script}")
+            Timber.e(
+                e,
+                "Failed to create merged data sources for Lua script: ${luaScriptNode.script}"
+            )
             throw e
         }
     }
 
     private val luaResult: Sequence<DataPoint> by lazy {
         try {
-            luaEngine.runLuaFunctionGenerator(luaScriptNode.script, mergedDataSources)
+            luaEngine.runLuaFunctionGenerator(
+                script = luaScriptNode.script,
+                dataSources = mergedDataSources,
+                configuration = luaScriptNode.configuration
+            )
         } catch (e: Throwable) {
             // Return empty sequence if Lua execution fails
             Timber.e(e, "Failed to run Lua script: ${luaScriptNode.script}")
