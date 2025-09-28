@@ -4,8 +4,6 @@ import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
 internal class LuaScriptResolver @Inject constructor() {
-
-
     fun resolveLuaScript(script: String, vmLease: VMLease): LuaValue {
         val cleanedScript = script.cleanLuaScript()
         return synchronized(vmLease.lock) {

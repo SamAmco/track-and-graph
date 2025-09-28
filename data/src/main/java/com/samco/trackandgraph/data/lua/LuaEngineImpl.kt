@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionMetadataAdap
 import com.samco.trackandgraph.data.lua.graphadapters.LuaGraphAdapter
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import org.luaj.vm2.LuaError
@@ -71,12 +72,18 @@ internal class LuaEngineImpl @Inject constructor(
 
     override fun runLuaFunctionGenerator(
         script: String,
-        dataSources: List<RawDataSample>
+        dataSources: List<RawDataSample>,
+        configuration: List<LuaScriptConfigurationValue>,
     ): Sequence<DataPoint> {
         return try {
             val vmLease = luaVMProvider.acquire()
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
-            luaFunctionDataSourceAdapter.createDataPointSequence(resolvedScript, dataSources, vmLease)
+            luaFunctionDataSourceAdapter.createDataPointSequence(
+                vmLease = vmLease,
+                resolvedScript = resolvedScript,
+                dataSources = dataSources,
+                configuration = configuration,
+            )
         } catch (luaError: LuaError) {
             dataSources.forEach { it.dispose() }
             val luaScriptException = LuaScriptException(
