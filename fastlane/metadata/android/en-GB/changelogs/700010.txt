@@ -1,0 +1,2 @@
+- Fix incomplete navigation animations bug on some devices
+
