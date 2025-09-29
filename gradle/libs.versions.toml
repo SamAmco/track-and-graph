@@ -1,5 +1,5 @@
 [versions]
-activityCompose = "1.12.0-alpha06"
+activityCompose = "1.12.0-alpha09"
 androidplotCore = "1.5.11"
 appcompat = "1.7.1"
 commonsCsv = "1.7"
@@ -10,7 +10,7 @@ coreKtx = "1.17.0"
 coreTesting = "2.2.0"
 espressoCore = "3.7.0"
 fragmentKtx = "1.8.9"
-hilt = "2.57.1"
+hilt = "2.57.2"
 androidxHilt = "1.2.0"
 junitKtx = "1.2.1"
 kotlinGradlePlugin = "1.8.10"
@@ -31,15 +31,14 @@ threetenabp = "1.2.1"
 threetenbp = "1.6.9"
 junit = "4.13.2"
 timber = "5.0.1"
-workRuntimeKtx = "2.10.4"
+workRuntimeKtx = "2.10.5"
 kotlin = "2.2.0"
-android = "8.10.0"
+android = "8.10.1"
 ksp = "2.2.0-2.0.2"
 hiltAndroidGradlePlugin = "2.57.1"
 reorderable = "2.5.1"
 glance = "1.1.1"
-nav3Core = "1.0.0-alpha09"
-lifecycleViewmodelNav3 = "1.0.0-alpha04"
+nav3Core = "1.0.0-alpha10"
 kotlinxSerializationCore = "1.9.0"
 kotlinSerialization = "2.2.20"
 
@@ -119,7 +118,7 @@ glance-appwidget-preview = { module = "androidx.glance:glance-appwidget-preview"
 glance-preview = { module = "androidx.glance:glance-preview", version.ref = "glance" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
-androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "nav3Core" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 shot-android = { module = "com.karumi:shot-android", version.ref = "shot" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }

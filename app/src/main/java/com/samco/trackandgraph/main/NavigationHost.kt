@@ -30,8 +30,8 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.samco.trackandgraph.aboutpage.AboutNavKey
 import com.samco.trackandgraph.aboutpage.AboutScreen
 import com.samco.trackandgraph.addtracker.AddTrackerNavKey
