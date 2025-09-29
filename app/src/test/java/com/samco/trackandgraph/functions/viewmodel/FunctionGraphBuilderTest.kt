@@ -69,6 +69,40 @@ class FunctionGraphBuilderTest {
     }
 
     @Test
+    fun `buildFunctionGraph ignores dependencies from non-existent nodes`() {
+        // Encoder not used for this test
+        whenever(mockConfigurationEncoder.encodeConfiguration(any())).thenReturn(emptyList())
+
+        // Only an output node exists in the nodes list
+        val nodes = listOf(
+            Node.Output(id = 1)
+        )
+
+        // Edge references a non-existent 'from' node (id=999) into the real output node (id=1)
+        val edges = listOf(
+            Edge(
+                from = Connector(nodeId = 999, type = ConnectorType.OUTPUT, connectorIndex = 0),
+                to = Connector(nodeId = 1, type = ConnectorType.INPUT, connectorIndex = 0)
+            )
+        )
+
+        val result = builder.buildFunctionGraph(
+            nodes = nodes,
+            edges = edges,
+            nodePositions = emptyMap(),
+            isDuration = false,
+            shouldThrow = true
+        )
+
+        assertNotNull("Graph should be built successfully", result)
+        // The invalid dependency should be ignored since node 999 does not exist in the nodes list
+        assertTrue(
+            "Output node should have no dependencies from non-existent nodes",
+            result!!.outputNode.dependencies.isEmpty()
+        )
+    }
+
+    @Test
     fun `buildFunctionGraph handles missing positions with default Offset Zero`() {
         // Mock the encoder to return empty configuration for this test
         whenever(mockConfigurationEncoder.encodeConfiguration(any())).thenReturn(emptyList())

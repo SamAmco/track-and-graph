@@ -55,6 +55,8 @@ internal class FunctionGraphBuilder @Inject constructor(
             // Process all nodes in a single iteration using when for type safety
             var outputNodeViewModel: Node.Output? = null
             val graphNodes = mutableListOf<FunctionGraphNode>()
+            // The source of truth for valid node IDs is the nodes list, not positions
+            val validNodeIds: Set<Int> = nodes.map { it.id }.toSet()
             
             nodes.forEach { node ->
                 when (node) {
@@ -68,7 +70,7 @@ internal class FunctionGraphBuilder @Inject constructor(
                         graphNodes.add(buildFeatureNode(node, nodePositions))
                     }
                     is Node.LuaScript -> {
-                        graphNodes.add(buildLuaScriptNode(node, edges, nodePositions))
+                        graphNodes.add(buildLuaScriptNode(node, edges, nodePositions, validNodeIds))
                     }
                     // Future node types will be handled here, compiler will enforce exhaustiveness
                 }
@@ -79,7 +81,7 @@ internal class FunctionGraphBuilder @Inject constructor(
                 ?: throw IllegalStateException("Function graph must have an output node")
 
             // Build the output node DTO
-            val outputNodeDto = buildOutputNode(outputNode, edges, nodePositions)
+            val outputNodeDto = buildOutputNode(outputNode, edges, nodePositions, validNodeIds)
 
             // Validate no cyclic dependencies exist
             val allGraphNodes = graphNodes + outputNodeDto
@@ -110,13 +112,21 @@ internal class FunctionGraphBuilder @Inject constructor(
     /**
      * Calculates dependencies for a given node ID from the edges.
      */
-    private fun calculateDependencies(nodeId: Int, edges: List<Edge>): List<NodeDependency> {
-        return edges.filter { it.to.nodeId == nodeId }.map { edge ->
-            NodeDependency(
-                connectorIndex = edge.to.connectorIndex,
-                nodeId = edge.from.nodeId,
-            )
-        }
+    private fun calculateDependencies(
+        nodeId: Int,
+        edges: List<Edge>,
+        validNodeIds: Set<Int>,
+    ): List<NodeDependency> {
+        return edges
+            .filter { it.to.nodeId == nodeId }
+            .filter { edge -> validNodeIds.contains(edge.from.nodeId) }
+            .filter { edge -> validNodeIds.contains(edge.to.nodeId) }
+            .map { edge ->
+                NodeDependency(
+                    connectorIndex = edge.to.connectorIndex,
+                    nodeId = edge.from.nodeId,
+                )
+            }
     }
 
     /**
@@ -144,9 +154,10 @@ internal class FunctionGraphBuilder @Inject constructor(
     private fun buildLuaScriptNode(
         node: Node.LuaScript,
         edges: List<Edge>,
-        nodePositions: Map<Int, Offset>
+        nodePositions: Map<Int, Offset>,
+        validNodeIds: Set<Int>
     ): FunctionGraphNode.LuaScriptNode {
-        val dependencies = calculateDependencies(node.id, edges)
+        val dependencies = calculateDependencies(node.id, edges, validNodeIds)
         val position = nodePositions[node.id] ?: Offset.Zero
         
         return FunctionGraphNode.LuaScriptNode(
@@ -166,9 +177,10 @@ internal class FunctionGraphBuilder @Inject constructor(
     private fun buildOutputNode(
         outputNodeViewModel: Node.Output,
         edges: List<Edge>,
-        nodePositions: Map<Int, Offset>
+        nodePositions: Map<Int, Offset>,
+        validNodeIds: Set<Int>
     ): FunctionGraphNode.OutputNode {
-        val dependencies = calculateDependencies(outputNodeViewModel.id, edges)
+        val dependencies = calculateDependencies(outputNodeViewModel.id, edges, validNodeIds)
         val position = nodePositions[outputNodeViewModel.id] ?: Offset.Zero
 
         return FunctionGraphNode.OutputNode(

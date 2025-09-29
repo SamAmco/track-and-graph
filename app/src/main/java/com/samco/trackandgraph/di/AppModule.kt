@@ -49,6 +49,8 @@ import com.samco.trackandgraph.system.SystemInfoProvider
 import com.samco.trackandgraph.system.SystemInfoProviderImpl
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
+import com.samco.trackandgraph.functions.repository.FunctionsRepository
+import com.samco.trackandgraph.functions.repository.FunctionsRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -96,6 +98,10 @@ class AppModule {
     @Provides
     @Singleton
     fun provideRemoteConfigProvider(impl: RemoteConfigProviderImpl): RemoteConfigProvider = impl
+
+    @Provides
+    @Singleton
+    fun provideFunctionsRepository(impl: FunctionsRepositoryImpl): FunctionsRepository = impl
 
     @Provides
     internal fun getRemindersHelper(impl: RemindersHelperImpl): RemindersHelper = impl
