@@ -142,7 +142,7 @@ private fun TopAppBarContent(
 private fun FunctionsScreenContent(
     onPopBack: () -> Unit,
     nodes: StateFlow<List<Node>>,
-    onAddNode: (AddNodeData) -> Unit,
+    onAddNode: (AddNodeData, Offset) -> Unit,
     onDragNodeBy: (Node, Offset) -> Unit,
     onDeleteNode: (Node) -> Unit,
     getWorldPosition: (Node) -> Offset?,
@@ -274,11 +274,9 @@ private fun FunctionsScreenContent(
         if (showNodeSelectionDialog) {
             NodeSelectionDialog(
                 onDismiss = { showNodeSelectionDialog = false },
-                onDataSourceSelected = { 
-                    onAddNode(AddNodeData.DataSourceNode(nodeSelectionOffset))
-                },
-                onLuaScriptSelected = { 
-                    onAddNode(AddNodeData.LuaScriptNode(nodeSelectionOffset))
+                onSelect = { selection ->
+                    onAddNode(selection, nodeSelectionOffset)
+                    showNodeSelectionDialog = false
                 }
             )
         }

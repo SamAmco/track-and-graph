@@ -22,6 +22,7 @@ import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,33 +52,42 @@ internal class LuaScriptNodeProvider @Inject constructor(
     ): Node.LuaScript {
         return try {
             val metadata = luaEngine.runLuaFunction(script)
-
-            val configMap = configuration.associateBy { it.id }
-
-            val inputs = metadata.config.associate { config ->
-                config.id to createConfigurationInput(config, configMap[config.id])
-            }
-
-            // Always prefer the script metadata inputCount when script analysis succeeds
-            Node.LuaScript(
-                id = nodeId,
-                inputConnectorCount = metadata.inputCount,
-                script = script,
-                showEditTools = metadata.version == null,
-                configuration = inputs,
-                title = metadata.title,
-            )
+            createLuaScriptNode(metadata, nodeId, configuration)
         } catch (e: Exception) {
             Timber.e(e, "Failed to analyze Lua script for node $nodeId, using fallback")
             // Return fallback node with provided inputConnectorCount or default to 1
             Node.LuaScript(
                 id = nodeId,
-                inputConnectorCount = inputConnectorCount ?: 1,
+                inputConnectorCount = inputConnectorCount,
                 script = script,
                 showEditTools = true,
                 configuration = emptyMap()
             )
         }
+    }
+
+    /**
+     * Creates a LuaScript node directly from already-available metadata (no parsing).
+     * Useful when metadata is fetched from a repository or cache.
+     */
+    fun createLuaScriptNode(
+        metadata: LuaFunctionMetadata,
+        nodeId: Int,
+        configuration: List<LuaScriptConfigurationValue> = emptyList()
+    ): Node.LuaScript {
+        val configMap = configuration.associateBy { it.id }
+        val inputs = metadata.config.associate { config ->
+            config.id to createConfigurationInput(config, configMap[config.id])
+        }
+
+        return Node.LuaScript(
+            id = nodeId,
+            inputConnectorCount = metadata.inputCount,
+            script = metadata.script,
+            showEditTools = metadata.version == null,
+            configuration = inputs,
+            title = metadata.title,
+        )
     }
 
     /**
