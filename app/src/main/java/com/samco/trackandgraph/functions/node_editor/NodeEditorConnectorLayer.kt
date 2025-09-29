@@ -120,7 +120,7 @@ internal fun BoxScope.ConnectorArray(
         if (connectorType == ConnectorType.INPUT) Alignment.Start
         else Alignment.End,
 ) {
-    val connectors = remember(count) {
+    val connectors = remember(nodeId, connectorType, count) {
         List(count) {
             Connector(
                 nodeId = nodeId,
