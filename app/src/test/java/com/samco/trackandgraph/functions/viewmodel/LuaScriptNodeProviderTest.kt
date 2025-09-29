@@ -24,6 +24,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import io.github.z4kn4fein.semver.Version
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -51,7 +52,9 @@ class LuaScriptNodeProviderTest {
                 type = LuaFunctionConfigType.NUMBER,
                 name = TranslatedString.Simple("Number Configuration")
             )
-        )
+        ),
+        version = Version(1, 0, 0),
+        title = TranslatedString.Simple("Comprehensive Test Script"),
     )
 
     private val allTypesConfig = listOf(
@@ -86,8 +89,10 @@ class LuaScriptNodeProviderTest {
         // Then - Basic node properties
         assertEquals(nodeId, result.id)
         assertEquals(3, result.inputConnectorCount)
-        assertEquals(script, result.script)
+        assertEquals(allTypesMetadata.script, result.script)
         assertEquals(2, result.configuration.size)
+        assertEquals(false, result.showEditTools)
+        assertEquals(allTypesMetadata.title, result.title)
 
         // Then - Validate each configuration type is created correctly
         val textConfig = result.configuration["textConfig"] as LuaScriptConfigurationInput.Text
@@ -118,7 +123,9 @@ class LuaScriptNodeProviderTest {
         val metadata = LuaFunctionMetadata(
             script = script,
             inputCount = 1,
-            config = emptyList()
+            config = emptyList(),
+            version = null,
+            title = null,
         )
         whenever(mockLuaEngine.runLuaFunction(script)).thenReturn(metadata)
 
@@ -130,6 +137,8 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.inputConnectorCount)
         assertEquals(script, result.script)
         assertTrue(result.configuration.isEmpty())
+        assertEquals(true, result.showEditTools)
+        assertEquals(null, result.title)
         
         verify(mockLuaEngine).runLuaFunction(script)
     }
@@ -177,7 +186,9 @@ class LuaScriptNodeProviderTest {
                     type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("Config 1")
                 )
-            )
+            ),
+            version = Version(1, 0, 0),
+            title = null,
         )
         whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
 
@@ -189,6 +200,8 @@ class LuaScriptNodeProviderTest {
         assertEquals(2, result.inputConnectorCount)
         assertEquals(newScript, result.script)
         assertEquals(1, result.configuration.size)
+        assertEquals(false, result.showEditTools)
+        assertEquals(null, result.title)
         
         // Should preserve the existing input with its value
         val preservedInput = result.configuration["config1"] as LuaScriptConfigurationInput.Text
@@ -218,7 +231,9 @@ class LuaScriptNodeProviderTest {
                     type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("New Config")
                 )
-            )
+            ),
+            version = null,
+            title = TranslatedString.Simple("New Script"),
         )
         whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
 
@@ -230,6 +245,8 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.inputConnectorCount)
         assertEquals(newScript, result.script)
         assertEquals(1, result.configuration.size)
+        assertEquals(true, result.showEditTools)
+        assertEquals(TranslatedString.Simple("New Script"), result.title)
         
         assertTrue(result.configuration["newConfig"] is LuaScriptConfigurationInput.Text)
         val newInput = result.configuration["newConfig"] as LuaScriptConfigurationInput.Text
@@ -269,7 +286,9 @@ class LuaScriptNodeProviderTest {
                     type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("Config 1")
                 )
-            )
+            ),
+            version = null,
+            title = null,
         )
         whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
 
@@ -281,6 +300,8 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.inputConnectorCount)
         assertEquals(newScript, result.script)
         assertEquals(1, result.configuration.size)
+        assertEquals(true, result.showEditTools)
+        assertEquals(null, result.title)
         
         // Should preserve config1 and remove config2
         assertTrue(result.configuration.containsKey("config1"))
@@ -314,7 +335,9 @@ class LuaScriptNodeProviderTest {
                     type = LuaFunctionConfigType.NUMBER, // Changed type from TEXT to NUMBER
                     name = TranslatedString.Simple("Config 1")
                 )
-            )
+            ),
+            version = null,
+            title = null,
         )
         whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
 
@@ -326,7 +349,9 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.inputConnectorCount)
         assertEquals(newScript, result.script)
         assertEquals(1, result.configuration.size)
-        
+        assertEquals(true, result.showEditTools)
+        assertEquals(null, result.title)
+
         // Should create a new input since type changed from TEXT to NUMBER
         val newInput = result.configuration["config1"]
         assertTrue(newInput is LuaScriptConfigurationInput.Number)
@@ -342,11 +367,14 @@ class LuaScriptNodeProviderTest {
             name = TranslatedString.Simple("Test Input"),
             value = mutableStateOf(TextFieldValue("existing value"))
         )
+        val existingConfiguration = mapOf("config1" to existingInput)
         val existingNode = Node.LuaScript(
             id = 500,
             inputConnectorCount = 2,
             script = "old script",
-            configuration = mapOf("config1" to existingInput)
+            configuration = existingConfiguration,
+            showEditTools = false,
+            title = TranslatedString.Simple("Old Script"),
         )
         
         val newScript = "invalid script"
@@ -359,7 +387,9 @@ class LuaScriptNodeProviderTest {
         assertEquals(500, result.id)
         assertEquals(1, result.inputConnectorCount) // Fallback value
         assertEquals(newScript, result.script)
-        assertTrue(result.configuration.isEmpty()) // Configuration cleared on error
+        assertEquals(existingConfiguration, result.configuration)
+        assertEquals(false, result.showEditTools)
+        assertEquals(TranslatedString.Simple("Old Script"), result.title)
         
         verify(mockLuaEngine).runLuaFunction(newScript)
     }
@@ -410,7 +440,9 @@ class LuaScriptNodeProviderTest {
                     type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("New Config")
                 )
-            )
+            ),
+            version = Version(1, 0, 0),
+            title = TranslatedString.Simple("New Script"),
         )
         whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
 
@@ -422,6 +454,8 @@ class LuaScriptNodeProviderTest {
         assertEquals(3, result.inputConnectorCount)
         assertEquals(newScript, result.script)
         assertEquals(3, result.configuration.size)
+        assertEquals(false, result.showEditTools)
+        assertEquals(TranslatedString.Simple("New Script"), result.title)
         
         // Should preserve existing inputs where possible
         assertSame(existingInput1, result.configuration["keep"])
