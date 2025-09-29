@@ -52,8 +52,8 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
-        versionCode = 700009
-        versionName = "7.0.9"
+        versionCode = 700010
+        versionName = "7.0.10"
         testInstrumentationRunner = "com.samco.trackandgraph.screenshots.HiltTestRunner"
         // Default manifest placeholder for RecreateAlarms receiver
         manifestPlaceholders["recreateAlarmsEnabled"] = "true"
@@ -64,7 +64,7 @@ android {
     }
 
     //TODO you won't get syntax highlighting in the promo directory code
-    // in android studio because of line if check will default to screenshots
+    // in android studio because this if check will default to screenshots
     // but you can just comment it to say promo during development for now.
 
     // Dynamic testBuildType switching based on project properties
