@@ -36,6 +36,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.mutate
@@ -77,11 +78,10 @@ internal data class Edge(
     val to: Connector,
 )
 
-sealed class AddNodeData(
-    val offset: Offset,
-) {
-    class DataSourceNode(offset: Offset) : AddNodeData(offset)
-    class LuaScriptNode(offset: Offset) : AddNodeData(offset)
+sealed class AddNodeData {
+    data object DataSourceNode : AddNodeData()
+    data object LuaScriptNode : AddNodeData()
+    data class LibraryFunction(val metadata: LuaFunctionMetadata) : AddNodeData()
 }
 
 @Immutable
@@ -147,7 +147,7 @@ internal interface FunctionsScreenViewModel {
     fun onSelectEdge(edge: Edge?)
     fun onDeleteSelectedEdge()
 
-    fun onAddNode(data: AddNodeData)
+    fun onAddNode(data: AddNodeData, offset: Offset)
     fun onDragNodeBy(node: Node, offset: Offset)
     fun onDeleteNode(node: Node)
     fun getWorldPosition(node: Node): Offset?
@@ -304,13 +304,24 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         _selectedEdge.value = edge
     }
 
-    override fun onAddNode(data: AddNodeData) {
+    override fun onAddNode(data: AddNodeData, offset: Offset) {
         val newId = (_nodes.value.maxOfOrNull { it.id } ?: 0) + 1
         val success = when (data) {
             is AddNodeData.DataSourceNode -> addDataSourceNode(newId)
             is AddNodeData.LuaScriptNode -> addLuaScriptNode(newId)
+            is AddNodeData.LibraryFunction -> addLibraryFunctionNode(newId, data.metadata)
         }
-        if (success) nodePositions[newId] = data.offset
+        if (success) nodePositions[newId] = offset
+    }
+
+    private fun addLibraryFunctionNode(id: Int, metadata: LuaFunctionMetadata): Boolean {
+        val node = luaScriptNodeProvider.createLuaScriptNode(
+            metadata = metadata,
+            nodeId = id,
+            configuration = emptyList(),
+        )
+        _nodes.value = _nodes.value.add(node)
+        return true
     }
 
     private fun addDataSourceNode(id: Int): Boolean {
