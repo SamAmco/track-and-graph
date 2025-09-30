@@ -13,12 +13,14 @@ import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.jse.JseBaseLib
 import org.luaj.vm2.lib.jse.JseMathLib
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
 data class VMLease(
     val globals: Globals,
-    val lock: Any
+    val lock: ReentrantLock,
+    val name: String,
 )
 
 @Singleton
@@ -48,10 +50,11 @@ internal class LuaVMProvider @Inject constructor(
     private fun createVMPool(): Array<VMLease> {
         // Create array of VM leases with globals and locks
         // Note: Memory measurements showed each VM typically uses 30-40KB of memory
-        return Array(poolSize) {
+        return Array(poolSize) { idx ->
             VMLease(
                 globals = buildGlobals(),
-                lock = Any()
+                lock = ReentrantLock(),
+                name = "VM-$idx",
             )
         }
     }

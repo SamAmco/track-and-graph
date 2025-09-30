@@ -16,6 +16,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
+import kotlin.concurrent.withLock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(Parameterized::class)
@@ -107,7 +108,7 @@ class CommunityTestRunner {
     fun `run community lua test`() {
         try {
             val vmLease = daggerComponent.provideVMProvider().acquire()
-            val test = synchronized(vmLease.lock) { vmLease.globals.load(testLuaText) }
+            val test = vmLease.lock.withLock { vmLease.globals.load(testLuaText) }
             val testSet = test.call().checktable()!!
             for (key in testSet.keys()) {
                 try {
