@@ -33,6 +33,7 @@ import com.samco.trackandgraph.graphstatview.factories.helpers.TimeBarchartLuaHe
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import kotlinx.coroutines.CoroutineDispatcher
@@ -70,17 +71,22 @@ class LuaGraphDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILuaGraphViewData = coroutineScope {
         var dataSamples: Map<String, RawDataSample> = emptyMap()
+        var vmLock: LuaVMLock? = null
 
         return@coroutineScope try {
+            vmLock = luaEngine.acquireVM()
             dataSamples = config.features
                 .mapNotNull { lgf ->
                     dataSampler
-                        .getRawDataSampleForFeatureId(lgf.featureId)
-                        ?.let { lgf.name to it }
+                        .getRawDataSampleForFeatureId(
+                            featureId = lgf.featureId,
+                            vmLock = vmLock
+                        )?.let { lgf.name to it }
                 }
                 .toMap()
 
             createViewData(
+                vmLock = vmLock,
                 dataSamples = dataSamples,
                 graphOrStat = graphOrStat,
                 config = config,
@@ -89,11 +95,13 @@ class LuaGraphDataFactory @Inject constructor(
         } catch (t: Throwable) {
             errorLuaHelper(graphOrStat, t)
         } finally {
+            vmLock?.let { luaEngine.releaseVM(it) }
             dataSamples.values.forEach { it.dispose() }
         }
     }
 
     private fun createViewData(
+        vmLock: LuaVMLock,
         dataSamples: Map<String, RawDataSample>,
         graphOrStat: GraphOrStat,
         config: LuaGraphWithFeatures,
@@ -101,7 +109,11 @@ class LuaGraphDataFactory @Inject constructor(
     ): ILuaGraphViewData {
         val luaEngineParams = LuaGraphEngineParams(dataSources = dataSamples)
 
-        val luaGraphResult = luaEngine.runLuaGraph(config.script, luaEngineParams)
+        val luaGraphResult = luaEngine.runLuaGraph(
+            vmLock = vmLock,
+            script = config.script,
+            params = luaEngineParams
+        )
         val error = luaGraphResult.error
 
         if (error != null) return errorLuaHelper(graphOrStat, error)

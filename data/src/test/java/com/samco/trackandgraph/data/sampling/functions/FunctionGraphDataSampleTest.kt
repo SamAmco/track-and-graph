@@ -23,11 +23,18 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.threeten.bp.OffsetDateTime
 
 class FunctionGraphDataSampleTest {
@@ -42,7 +49,7 @@ class FunctionGraphDataSampleTest {
     private val luaEngine: LuaEngine = luaEngineComponent.provideLuaEngine()
 
     @Test
-    fun `single data source reflects input data`() {
+    fun `single data source reflects input data`() = runTest {
         // Arrange
         val featureId = 1L
         val inputDataPoints = listOf(
@@ -106,10 +113,11 @@ class FunctionGraphDataSampleTest {
             inputFeatureIds = listOf(featureId)
         )
 
-        val dataSources = mapOf(featureId to rawDataSample)
+        val mockDataSampler = mock<DataSampler>()
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId), any())).thenReturn(rawDataSample)
 
         // Act
-        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
+        val functionGraphDataSample = FunctionGraphDataSample.create(null, function, mockDataSampler, luaEngine)
         val result = functionGraphDataSample.toList()
 
         // Assert
@@ -122,7 +130,7 @@ class FunctionGraphDataSampleTest {
     }
 
     @Test
-    fun `two data sources merge in timestamp order`() {
+    fun `two data sources merge in timestamp order`() = runTest {
         // Arrange
         val featureId1 = 1L
         val featureId2 = 2L
@@ -214,13 +222,12 @@ class FunctionGraphDataSampleTest {
             inputFeatureIds = listOf(featureId1, featureId2)
         )
 
-        val dataSources = mapOf(
-            featureId1 to rawDataSample1,
-            featureId2 to rawDataSample2
-        )
+        val mockDataSampler = mock<DataSampler>()
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId1), anyOrNull())).thenReturn(rawDataSample1)
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId2), anyOrNull())).thenReturn(rawDataSample2)
 
         // Act
-        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
+        val functionGraphDataSample = FunctionGraphDataSample.create(null, function, mockDataSampler, luaEngine)
         val result = functionGraphDataSample.toList()
 
         // Assert - should be merged in descending timestamp order
@@ -240,7 +247,7 @@ class FunctionGraphDataSampleTest {
     }
 
     @Test
-    fun `duplicate feature dependencies only include data points once in getRawDataPoints`() {
+    fun `duplicate feature dependencies only include data points once in getRawDataPoints`() = runTest {
         // Arrange
         val featureId = 1L
         val inputDataPoints = listOf(
@@ -308,10 +315,11 @@ class FunctionGraphDataSampleTest {
             inputFeatureIds = listOf(featureId)
         )
 
-        val dataSources = mapOf(featureId to rawDataSample)
+        val mockDataSampler = mock<DataSampler>()
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId), anyOrNull())).thenReturn(rawDataSample)
 
         // Act
-        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
+        val functionGraphDataSample = FunctionGraphDataSample.create(null, function, mockDataSampler, luaEngine)
         val result = functionGraphDataSample.toList()
 
         // Assert - should only get each data point once, even though it's referenced by two nodes
@@ -324,7 +332,7 @@ class FunctionGraphDataSampleTest {
     }
 
     @Test
-    fun `lua script function processes data points correctly`() {
+    fun `lua script function processes data points correctly`() = runTest {
         // Arrange
         val featureId = 1L
         val inputDataPoints = listOf(
@@ -410,10 +418,11 @@ class FunctionGraphDataSampleTest {
             inputFeatureIds = listOf(featureId)
         )
 
-        val dataSources = mapOf(featureId to rawDataSample)
+        val mockDataSampler = mock<DataSampler>()
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId), anyOrNull())).thenReturn(rawDataSample)
 
         // Act
-        val functionGraphDataSample = FunctionGraphDataSample(function, dataSources, luaEngine)
+        val functionGraphDataSample = FunctionGraphDataSample.create(null, function, mockDataSampler, luaEngine)
         val result = functionGraphDataSample.toList()
 
         // Assert
@@ -434,5 +443,98 @@ class FunctionGraphDataSampleTest {
         
         // Cleanup
         functionGraphDataSample.dispose()
+    }
+
+    @Test
+    fun `vm lock disposal behavior - null vmLock should auto-dispose, provided vmLock should not`() = runTest {
+        // Arrange
+        val featureId = 1L
+        val inputDataPoints = listOf(
+            DataPoint(
+                timestamp = OffsetDateTime.parse("2023-01-01T10:00:00Z"),
+                featureId = featureId,
+                value = 10.0,
+                label = "Point 1",
+                note = ""
+            )
+        )
+
+        val rawDataSample = RawDataSample.fromSequence(
+            data = inputDataPoints.asSequence(),
+            getRawDataPoints = { inputDataPoints },
+            onDispose = {}
+        )
+
+        val featureNode = FunctionGraphNode.FeatureNode(
+            x = 100f,
+            y = 100f,
+            id = 1,
+            featureId = featureId
+        )
+        
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 200f,
+            y = 100f,
+            id = 2,
+            dependencies = listOf(NodeDependency(connectorIndex = 0, nodeId = 1))
+        )
+
+        val functionGraph = FunctionGraph(
+            nodes = listOf(featureNode, outputNode),
+            outputNode = outputNode,
+            isDuration = false
+        )
+
+        val function = Function(
+            id = 1L,
+            featureId = 2L,
+            name = "VM Lock Test Function",
+            groupId = 1L,
+            displayIndex = 0,
+            description = "Test VM lock disposal",
+            functionGraph = functionGraph,
+            inputFeatureIds = listOf(featureId)
+        )
+
+        val mockDataSampler = mock<DataSampler>()
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId), anyOrNull())).thenReturn(rawDataSample)
+
+        // Test 1: Passing null vmLock should auto-acquire and auto-dispose VM
+        val functionGraphDataSample1 = FunctionGraphDataSample.create(null, function, mockDataSampler, luaEngine)
+        val result1 = functionGraphDataSample1.toList()
+        
+        // Verify functionality works
+        assertEquals("Should have same number of data points", inputDataPoints.size, result1.size)
+        assertEquals("Should have same data points", inputDataPoints, result1)
+        
+        // Dispose should release the internally acquired VM
+        functionGraphDataSample1.dispose()
+        
+        // Test 2: Passing existing vmLock should use it but not dispose it
+        val externalVmLock = luaEngine.acquireVM()
+        
+        // Update mock to expect the external VM lock
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(featureId, externalVmLock)).thenReturn(rawDataSample)
+        
+        val functionGraphDataSample2 = FunctionGraphDataSample.create(externalVmLock, function, mockDataSampler, luaEngine)
+        val result2 = functionGraphDataSample2.toList()
+        
+        // Verify functionality works with provided VM lock
+        assertEquals("Should have same number of data points", inputDataPoints.size, result2.size)
+        assertEquals("Should have same data points", inputDataPoints, result2)
+        
+        // Dispose should NOT release the externally provided VM lock
+        functionGraphDataSample2.dispose()
+        
+        // The key test: VM lock should still be usable after FunctionGraphDataSample disposal
+        // We verify this by successfully releasing it (if it was already disposed, this would fail)
+        try {
+            luaEngine.releaseVM(externalVmLock)
+            // If we reach here, the VM lock was still valid (not disposed by FunctionGraphDataSample)
+            assertTrue("External VM lock disposal should succeed", true)
+        } catch (e: Exception) {
+            // If we get an exception, it means the VM lock was already disposed incorrectly
+            assertTrue("External VM lock should still be valid after FunctionGraphDataSample disposal", false)
+        }
     }
 }

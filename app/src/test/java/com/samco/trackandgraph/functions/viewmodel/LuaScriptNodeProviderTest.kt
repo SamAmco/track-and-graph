@@ -20,13 +20,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.Version
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -35,7 +41,7 @@ class LuaScriptNodeProviderTest {
 
     private val mockLuaEngine: LuaEngine = mock()
     private val provider = LuaScriptNodeProvider(mockLuaEngine)
-    
+
     // Comprehensive metadata containing all possible configuration types
     // This ensures we test all enum values and catch missing implementations
     private val allTypesMetadata = LuaFunctionMetadata(
@@ -48,7 +54,7 @@ class LuaScriptNodeProviderTest {
                 name = TranslatedString.Simple("Text Configuration")
             ),
             LuaFunctionConfig(
-                id = "numberConfig", 
+                id = "numberConfig",
                 type = LuaFunctionConfigType.NUMBER,
                 name = TranslatedString.Simple("Number Configuration")
             )
@@ -68,55 +74,67 @@ class LuaScriptNodeProviderTest {
         ),
     )
 
-
-    @Test
-    fun `createLuaScriptNode handles all configuration types correctly and covers all enum values`() {
-        // Given
-        val script = "comprehensive script"
-        val nodeId = 999
-        whenever(mockLuaEngine.runLuaFunction(script)).thenReturn(allTypesMetadata)
-
-        // When
-        val result = provider.createLuaScriptNode(
-            script = script,
-            nodeId = nodeId,
-            // This deliberately wrong, to assert we are using the one from the metadata and not
-            // what ever is in the database assuming there are no errors.
-            inputConnectorCount = 2,
-            configuration = allTypesConfig
-        )
-
-        // Then - Basic node properties
-        assertEquals(nodeId, result.id)
-        assertEquals(3, result.inputConnectorCount)
-        assertEquals(allTypesMetadata.script, result.script)
-        assertEquals(2, result.configuration.size)
-        assertEquals(false, result.showEditTools)
-        assertEquals(allTypesMetadata.title, result.title)
-
-        // Then - Validate each configuration type is created correctly
-        val textConfig = result.configuration["textConfig"] as LuaScriptConfigurationInput.Text
-        assertSame(allTypesMetadata.config[0].name, textConfig.name)
-        assertEquals("default text", textConfig.value.value.text)
-
-        val numberConfig = result.configuration["numberConfig"] as LuaScriptConfigurationInput.Number
-        assertSame(allTypesMetadata.config[1].name, numberConfig.name)
-        assertEquals(123.45, numberConfig.value.value.text.toDouble(), 0.0001)
-
-        // CRITICAL: Ensure all enum values are tested
-        // This assertion will fail if a new LuaFunctionConfigType is added but not included in allTypesMetadata
-        val testedTypes = allTypesMetadata.config.map { it.type }.toSet()
-        val allEnumValues = LuaFunctionConfigType.entries.toSet()
-        assertEquals("All LuaFunctionConfigType enum values must be tested in allTypesMetadata. " +
-                "Missing types: ${allEnumValues - testedTypes}. " +
-                "If you added a new type, update allTypesMetadata to include it.",
-            allEnumValues, testedTypes)
-
-        verify(mockLuaEngine).runLuaFunction(script)
+    @Before
+    fun setup() {
+        runBlocking {
+            whenever(mockLuaEngine.acquireVM()).thenAnswer {
+                object : LuaVMLock {}
+            }
+        }
     }
 
     @Test
-    fun `createLuaScriptNode with empty config creates node with empty configuration`() {
+    fun `createLuaScriptNode handles all configuration types correctly and covers all enum values`() =
+        runTest {
+            // Given
+            val script = "comprehensive script"
+            val nodeId = 999
+            whenever(mockLuaEngine.runLuaFunction(any(), eq(script))).thenReturn(allTypesMetadata)
+
+            // When
+            val result = provider.createLuaScriptNode(
+                script = script,
+                nodeId = nodeId,
+                // This deliberately wrong, to assert we are using the one from the metadata and not
+                // what ever is in the database assuming there are no errors.
+                inputConnectorCount = 2,
+                configuration = allTypesConfig
+            )
+
+            // Then - Basic node properties
+            assertEquals(nodeId, result.id)
+            assertEquals(3, result.inputConnectorCount)
+            assertEquals(allTypesMetadata.script, result.script)
+            assertEquals(2, result.configuration.size)
+            assertEquals(false, result.showEditTools)
+            assertEquals(allTypesMetadata.title, result.title)
+
+            // Then - Validate each configuration type is created correctly
+            val textConfig = result.configuration["textConfig"] as LuaScriptConfigurationInput.Text
+            assertSame(allTypesMetadata.config[0].name, textConfig.name)
+            assertEquals("default text", textConfig.value.value.text)
+
+            val numberConfig =
+                result.configuration["numberConfig"] as LuaScriptConfigurationInput.Number
+            assertSame(allTypesMetadata.config[1].name, numberConfig.name)
+            assertEquals(123.45, numberConfig.value.value.text.toDouble(), 0.0001)
+
+            // CRITICAL: Ensure all enum values are tested
+            // This assertion will fail if a new LuaFunctionConfigType is added but not included in allTypesMetadata
+            val testedTypes = allTypesMetadata.config.map { it.type }.toSet()
+            val allEnumValues = LuaFunctionConfigType.entries.toSet()
+            assertEquals(
+                "All LuaFunctionConfigType enum values must be tested in allTypesMetadata. " +
+                        "Missing types: ${allEnumValues - testedTypes}. " +
+                        "If you added a new type, update allTypesMetadata to include it.",
+                allEnumValues, testedTypes
+            )
+
+            verify(mockLuaEngine).runLuaFunction(any(), eq(script))
+        }
+
+    @Test
+    fun `createLuaScriptNode with empty config creates node with empty configuration`() = runTest {
         // Given
         val script = "simple script"
         val nodeId = 456
@@ -127,7 +145,7 @@ class LuaScriptNodeProviderTest {
             version = null,
             title = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(script)).thenReturn(metadata)
+        whenever(mockLuaEngine.runLuaFunction(any(), eq(script))).thenReturn(metadata)
 
         // When
         val result = provider.createLuaScriptNode(script, nodeId, 1, emptyList())
@@ -139,16 +157,21 @@ class LuaScriptNodeProviderTest {
         assertTrue(result.configuration.isEmpty())
         assertEquals(true, result.showEditTools)
         assertEquals(null, result.title)
-        
-        verify(mockLuaEngine).runLuaFunction(script)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(script))
     }
 
     @Test
-    fun `createLuaScriptNode with invalid script returns fallback node`() {
+    fun `createLuaScriptNode with invalid script returns fallback node`() = runTest {
         // Given
         val script = "invalid script"
         val nodeId = 789
-        whenever(mockLuaEngine.runLuaFunction(script)).thenThrow(RuntimeException("Script error"))
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                any(),
+                eq(script)
+            )
+        ).thenThrow(RuntimeException("Script error"))
 
         // When
         val result = provider.createLuaScriptNode(script, nodeId, 1, emptyList())
@@ -158,12 +181,12 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.inputConnectorCount) // Fallback value
         assertEquals(script, result.script)
         assertTrue(result.configuration.isEmpty())
-        
-        verify(mockLuaEngine).runLuaFunction(script)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(script))
     }
 
     @Test
-    fun `updateLuaScriptNode preserves existing configuration with same type`() {
+    fun `updateLuaScriptNode preserves existing configuration with same type`() = runTest {
         // Given
         val existingTextInput = LuaScriptConfigurationInput.Text(
             name = TranslatedString.Simple("Test Config"),
@@ -175,7 +198,7 @@ class LuaScriptNodeProviderTest {
             script = "old script",
             configuration = mapOf("config1" to existingTextInput)
         )
-        
+
         val newScript = "new script"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
@@ -190,7 +213,7 @@ class LuaScriptNodeProviderTest {
             version = Version(1, 0, 0),
             title = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
+        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -202,17 +225,17 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.configuration.size)
         assertEquals(false, result.showEditTools)
         assertEquals(null, result.title)
-        
+
         // Should preserve the existing input with its value
         val preservedInput = result.configuration["config1"] as LuaScriptConfigurationInput.Text
         assertEquals("existing value", preservedInput.value.value.text)
         assertSame(existingTextInput, preservedInput) // Should be the exact same instance
-        
-        verify(mockLuaEngine).runLuaFunction(newScript)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
     }
 
     @Test
-    fun `updateLuaScriptNode adds new configuration inputs`() {
+    fun `updateLuaScriptNode adds new configuration inputs`() = runTest {
         // Given
         val existingNode = Node.LuaScript(
             id = 200,
@@ -220,7 +243,7 @@ class LuaScriptNodeProviderTest {
             script = "old script",
             configuration = emptyMap()
         )
-        
+
         val newScript = "new script with config"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
@@ -235,7 +258,7 @@ class LuaScriptNodeProviderTest {
             version = null,
             title = TranslatedString.Simple("New Script"),
         )
-        whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
+        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -247,16 +270,16 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.configuration.size)
         assertEquals(true, result.showEditTools)
         assertEquals(TranslatedString.Simple("New Script"), result.title)
-        
+
         assertTrue(result.configuration["newConfig"] is LuaScriptConfigurationInput.Text)
         val newInput = result.configuration["newConfig"] as LuaScriptConfigurationInput.Text
         assertEquals("", newInput.value.value.text) // New input should have empty default value
-        
-        verify(mockLuaEngine).runLuaFunction(newScript)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
     }
 
     @Test
-    fun `updateLuaScriptNode removes old configuration inputs`() {
+    fun `updateLuaScriptNode removes old configuration inputs`() = runTest {
         // Given
         val existingInput1 = LuaScriptConfigurationInput.Text(
             name = TranslatedString.Simple("Config 1"),
@@ -275,7 +298,7 @@ class LuaScriptNodeProviderTest {
                 "config2" to existingInput2
             )
         )
-        
+
         val newScript = "new script with only one config"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
@@ -290,7 +313,7 @@ class LuaScriptNodeProviderTest {
             version = null,
             title = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
+        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -302,17 +325,17 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.configuration.size)
         assertEquals(true, result.showEditTools)
         assertEquals(null, result.title)
-        
+
         // Should preserve config1 and remove config2
         assertTrue(result.configuration.containsKey("config1"))
         assertFalse(result.configuration.containsKey("config2"))
         assertSame(existingInput1, result.configuration["config1"])
-        
-        verify(mockLuaEngine).runLuaFunction(newScript)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
     }
 
     @Test
-    fun `updateLuaScriptNode creates new input when type changes`() {
+    fun `updateLuaScriptNode creates new input when type changes`() = runTest {
         // Given
         val existingTextInput = LuaScriptConfigurationInput.Text(
             name = TranslatedString.Simple("Test Config"),
@@ -324,7 +347,7 @@ class LuaScriptNodeProviderTest {
             script = "old script",
             configuration = mapOf("config1" to existingTextInput)
         )
-        
+
         val newScript = "new script"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
@@ -339,7 +362,7 @@ class LuaScriptNodeProviderTest {
             version = null,
             title = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
+        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -356,12 +379,12 @@ class LuaScriptNodeProviderTest {
         val newInput = result.configuration["config1"]
         assertTrue(newInput is LuaScriptConfigurationInput.Number)
         assertNotSame(existingTextInput, newInput) // Should be a different instance
-        
-        verify(mockLuaEngine).runLuaFunction(newScript)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
     }
 
     @Test
-    fun `updateLuaScriptNode with invalid script returns fallback node`() {
+    fun `updateLuaScriptNode with invalid script returns fallback node`() = runTest {
         // Given
         val existingInput = LuaScriptConfigurationInput.Text(
             name = TranslatedString.Simple("Test Input"),
@@ -376,9 +399,14 @@ class LuaScriptNodeProviderTest {
             showEditTools = false,
             title = TranslatedString.Simple("Old Script"),
         )
-        
+
         val newScript = "invalid script"
-        whenever(mockLuaEngine.runLuaFunction(newScript)).thenThrow(RuntimeException("Script error"))
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                any(),
+                eq(newScript)
+            )
+        ).thenThrow(RuntimeException("Script error"))
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -390,12 +418,12 @@ class LuaScriptNodeProviderTest {
         assertEquals(existingConfiguration, result.configuration)
         assertEquals(false, result.showEditTools)
         assertEquals(TranslatedString.Simple("Old Script"), result.title)
-        
-        verify(mockLuaEngine).runLuaFunction(newScript)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
     }
 
     @Test
-    fun `updateLuaScriptNode handles complex configuration changes`() {
+    fun `updateLuaScriptNode handles complex configuration changes`() = runTest {
         // Given - existing node with multiple configurations
         val existingInput1 = LuaScriptConfigurationInput.Text(
             name = TranslatedString.Simple("Keep Config"),
@@ -419,7 +447,7 @@ class LuaScriptNodeProviderTest {
                 "change" to existingInput3     // This should be preserved
             )
         )
-        
+
         val newScript = "complex new script"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
@@ -444,7 +472,7 @@ class LuaScriptNodeProviderTest {
             version = Version(1, 0, 0),
             title = TranslatedString.Simple("New Script"),
         )
-        whenever(mockLuaEngine.runLuaFunction(newScript)).thenReturn(newMetadata)
+        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -456,21 +484,21 @@ class LuaScriptNodeProviderTest {
         assertEquals(3, result.configuration.size)
         assertEquals(false, result.showEditTools)
         assertEquals(TranslatedString.Simple("New Script"), result.title)
-        
+
         // Should preserve existing inputs where possible
         assertSame(existingInput1, result.configuration["keep"])
         assertSame(existingInput3, result.configuration["change"])
-        
+
         // Should not contain removed config
         assertFalse(result.configuration.containsKey("remove"))
-        
+
         // Should have new config
         assertTrue(result.configuration.containsKey("new"))
         assertTrue(result.configuration["new"] is LuaScriptConfigurationInput.Text)
         val newInput = result.configuration["new"] as LuaScriptConfigurationInput.Text
         assertEquals("", newInput.value.value.text)
-        
-        verify(mockLuaEngine).runLuaFunction(newScript)
+
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
     }
 
 }
