@@ -25,16 +25,23 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 
 interface LuaEngine {
 
+    suspend fun acquireVM(): LuaVMLock
+
+    fun releaseVM(vmLock: LuaVMLock)
+
     fun runLuaGraph(
+        vmLock: LuaVMLock,
         script: String,
-        params: LuaGraphEngineParams
+        params: LuaGraphEngineParams,
     ): LuaGraphResult
 
     fun runLuaFunction(
+        vmLock: LuaVMLock,
         script: String
     ): LuaFunctionMetadata
 
     fun runLuaFunctionGenerator(
+        vmLock: LuaVMLock,
         script: String,
         dataSources: List<RawDataSample>,
         configuration: List<LuaScriptConfigurationValue>,

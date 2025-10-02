@@ -44,14 +44,16 @@ internal class LuaScriptNodeProvider @Inject constructor(
      *     We fall back to this if script analysis fails, but prefer the script metadata result.
      * @param configuration The configuration values stored in the database for this node.
      */
-    fun createLuaScriptNode(
+    suspend fun createLuaScriptNode(
         script: String,
         nodeId: Int,
         inputConnectorCount: Int,
         configuration: List<LuaScriptConfigurationValue>
     ): Node.LuaScript {
         return try {
-            val metadata = luaEngine.runLuaFunction(script)
+            val vmLock = luaEngine.acquireVM()
+            val metadata = luaEngine.runLuaFunction(vmLock, script)
+            luaEngine.releaseVM(vmLock)
             createLuaScriptNode(metadata, nodeId, configuration)
         } catch (e: Exception) {
             Timber.e(e, "Failed to analyze Lua script for node $nodeId, using fallback")
@@ -96,9 +98,11 @@ internal class LuaScriptNodeProvider @Inject constructor(
      * value is preserved. New inputs are created for new configurations, and old inputs that no longer
      * exist in the new script are dropped.
      */
-    fun updateLuaScriptNode(existingNode: Node.LuaScript, newScript: String): Node.LuaScript {
+    suspend fun updateLuaScriptNode(existingNode: Node.LuaScript, newScript: String): Node.LuaScript {
         return try {
-            val metadata = luaEngine.runLuaFunction(newScript)
+            val vmLock = luaEngine.acquireVM()
+            val metadata = luaEngine.runLuaFunction(vmLock, newScript)
+            luaEngine.releaseVM(vmLock)
 
             // Create new configuration map by iterating through new metadata
             val newConfiguration = metadata.config.associate { config ->

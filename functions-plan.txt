@@ -1,19 +1,29 @@
 TODO: 
-- affected by for graphs needs re-implementing to handle function graphs
-- We should catch cycles in functions that depend on other functions
 - Don't allow creating a function until you have a tracker? 
-- Function graph builder should use when pattern so you get compiler errors if you add a new type and forget to map it
-- Make sure we try catch everywhere we get a data source now because they can throw 
-- We should throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
+- Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
+- Probably detect global cycles and throw in the data module in case there are non-compliant future clients
+- Show a dialog when you first enter the function screen that explains it's advanced and links to the docs
+- Add a help button on the function screen that links to the docs?
+- Add text to the grid that hints at going landscape
+- Add text to the grid that hints at long pressing to add a node
+- Fix up the function card UI. Min height should be the same as tracker
+- Build etagged library: 
+  - make script to compile the library
+    - recursively read all .lua files in a directory
+    - minify them?
+  - semver each function
+- Docs
 
-- Testing:
-  - Unit test function graph builder, it shouldn't allow cycles
-  - Unit test function serializer
+- Write a test for lua pool allocation
+- Get rid of unlock function and add release to the lock object
+- Fix up app module (at least the lua graph should acquire a single lock, other graphs probably should too, like line graph probably should, anything with multiple data sources should)
+- Merge node is incorrectly implemented, it should call the upstream iterators only when its iterator is called, not all at once when it is created
 
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source
   - Removing a data source should remove it from any functions that use it as a data source
   - Adding a function that creates a cycle should be prevented
+  - Create nested complex dependent functions and use them in lots of graphs in the same screen and scroll
 
 
 FUNCTIONS PLANNING

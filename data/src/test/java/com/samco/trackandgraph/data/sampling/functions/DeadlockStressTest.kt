@@ -22,18 +22,23 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
 import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeoutException
 import org.junit.Test
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
 class DeadlockStressTest {
 
@@ -43,62 +48,64 @@ class DeadlockStressTest {
         .ioDispatcher(Dispatchers.IO)
         .timeProvider(mock())
         .build()
-    
+
     private val luaEngine: LuaEngine = luaEngineComponent.provideLuaEngine()
 
     @Test
-    fun `multi thread stress test should deadlock due to contention`() {
+    fun `multi thread stress test should deadlock due to contention`() = runTest {
         // Setup 3-layer function graph chain
         val (layer1Function, layer2Function, layer3Function) = createThreeLayerFunctionChain()
-        
+
         // Create a custom dispatcher with more threads to increase deadlock probability
         val aggressiveDispatcher = Executors.newFixedThreadPool(16).asCoroutineDispatcher()
-        
+
         // Create a custom DataSampler implementation that handles suspend calls properly
         val recursiveDataSampler = object : DataSampler {
-            override suspend fun getRawDataSampleForFeatureId(featureId: Long) = when (featureId) {
-                1001L -> FunctionGraphDataSample.create(layer1Function, this, luaEngine)
-                2001L -> FunctionGraphDataSample.create(layer2Function, this, luaEngine)
-                3001L -> FunctionGraphDataSample.create(layer3Function, this, luaEngine)
-                else -> null
-            }
-            
-            override suspend fun getDataSampleForFeatureId(featureId: Long) = TODO("Not needed for test")
-            override suspend fun getLabelsForFeatureId(featureId: Long) = TODO("Not needed for test")
-            override suspend fun getDataSamplePropertiesForFeatureId(featureId: Long) = TODO("Not needed for test")
+            override suspend fun getRawDataSampleForFeatureId(featureId: Long, vmLock: LuaVMLock?) =
+                when (featureId) {
+                    1001L -> FunctionGraphDataSample.create(vmLock, layer1Function, this, luaEngine)
+                    2001L -> FunctionGraphDataSample.create(vmLock, layer2Function, this, luaEngine)
+                    3001L -> FunctionGraphDataSample.create(vmLock, layer3Function, this, luaEngine)
+                    else -> null
+                }
+
+            override suspend fun getDataSampleForFeatureId(featureId: Long, vmLock: LuaVMLock?) =
+                error("Should not be called by this test")
+
+            override suspend fun getLabelsForFeatureId(featureId: Long) =
+                error("Should not be called by this test")
+
+            override suspend fun getDataSamplePropertiesForFeatureId(featureId: Long) =
+                error("Should not be called by this test")
         }
 
-        // Use CompletableFuture with timeout to handle deadlock detection
-        val testFuture = CompletableFuture.supplyAsync {
-            runTest {
-                aggressiveDispatcher.use { dispatcher ->
-                    coroutineScope {
-                        repeat(100) { iteration ->
-                            launch(dispatcher) {
-                                try {
-                                    // Create top-level function graph and iterate through results
-                                    val topLevelSample = FunctionGraphDataSample.create(
-                                        layer3Function,
-                                        recursiveDataSampler,
-                                        luaEngine
-                                    )
+        // Run 100 iterations of the function graph in parallel
+        val testFuture = async {
+            repeat(100) { iteration ->
+                launch(aggressiveDispatcher) {
+                    try {
+                        // Create top-level function graph and iterate through results
+                        val topLevelSample = FunctionGraphDataSample.create(
+                            // let the FunctionGraphDataSample create the VM lock
+                            vmLock = null,
+                            function = layer3Function,
+                            dataSampler = recursiveDataSampler,
+                            luaEngine = luaEngine
+                        )
 
-                                    // Force full evaluation by collecting results
-                                    val results = topLevelSample.toList()
+                        // Force full evaluation by collecting results
+                        val results = topLevelSample.toList()
 
-                                    // Verify we got some results (basic sanity check)
-                                    assert(results.isNotEmpty()) { "Iteration $iteration: No results returned" }
+                        // Verify we got some results (basic sanity check)
+                        assert(results.isNotEmpty()) { "Iteration $iteration: No results returned" }
 
-                                    // Cleanup
-                                    topLevelSample.dispose()
+                        // Cleanup
+                        topLevelSample.dispose()
 
-                                    println("Iteration $iteration completed successfully with ${results.size} results")
-                                } catch (e: Exception) {
-                                    println("Iteration $iteration failed: ${e.message}")
-                                    throw e
-                                }
-                            }
-                        }
+                        println("Iteration $iteration completed successfully with ${results.size} results")
+                    } catch (e: Exception) {
+                        println("Iteration $iteration failed: ${e.message}")
+                        throw e
                     }
                 }
             }
@@ -106,19 +113,25 @@ class DeadlockStressTest {
 
         try {
             // Wait for completion with timeout - this will throw TimeoutException if deadlocked
-            testFuture.get(10, TimeUnit.SECONDS)
-            println("Deadlock stress test completed successfully!")
+            withContext(Dispatchers.Default.limitedParallelism(1)) {
+                withTimeout(10.seconds) {
+                    testFuture.await()
+                    println("Deadlock stress test completed successfully!")
+                }
+            }
         } catch (e: TimeoutException) {
             println("DEADLOCK DETECTED: Test timed out after 10 seconds")
             println("This confirms the VM lock deadlock issue exists")
-            
+
             // Cancel the future and clean up
-            testFuture.cancel(true)
+            testFuture.cancel()
             aggressiveDispatcher.close()
-            
+
             // Fail the test with a clear message about the deadlock
-            throw AssertionError("Deadlock detected in recursive function graph evaluation. " +
-                "This test successfully reproduced the VM lock contention issue.")
+            throw AssertionError(
+                "Deadlock detected in recursive function graph evaluation. " +
+                        "This test successfully reproduced the VM lock contention issue."
+            )
         } catch (e: Exception) {
             aggressiveDispatcher.close()
             throw e
@@ -132,7 +145,7 @@ class DeadlockStressTest {
             featureId = 1001L,
             name = "Layer 1 Leaf Function"
         )
-        
+
         // Layer 2: Function that depends on Layer 1
         val layer2Function = createPassThroughFunction(
             functionId = 2L,
@@ -140,7 +153,7 @@ class DeadlockStressTest {
             name = "Layer 2 Pass-through Function",
             inputFeatureId = 1001L // depends on layer 1
         )
-        
+
         // Layer 3: Function that depends on Layer 2
         val layer3Function = createPassThroughFunction(
             functionId = 3L,
@@ -148,7 +161,7 @@ class DeadlockStressTest {
             name = "Layer 3 Top Function",
             inputFeatureId = 2001L // depends on layer 2
         )
-        
+
         return Triple(layer1Function, layer2Function, layer3Function)
     }
 
@@ -176,7 +189,7 @@ class DeadlockStressTest {
             inputConnectorCount = 0,
             dependencies = emptyList()
         )
-        
+
         val outputNode = FunctionGraphNode.OutputNode(
             x = 200f,
             y = 100f,
@@ -203,8 +216,8 @@ class DeadlockStressTest {
     }
 
     private fun createPassThroughFunction(
-        functionId: Long, 
-        featureId: Long, 
+        functionId: Long,
+        featureId: Long,
         name: String,
         inputFeatureId: Long
     ): Function {
@@ -215,7 +228,7 @@ class DeadlockStressTest {
             id = 1,
             featureId = inputFeatureId
         )
-        
+
         // Lua script node that passes through data from the feature node
         val luaScriptNode = FunctionGraphNode.LuaScriptNode(
             x = 200f,
@@ -237,7 +250,7 @@ class DeadlockStressTest {
             inputConnectorCount = 1,
             dependencies = listOf(NodeDependency(connectorIndex = 0, nodeId = 1))
         )
-        
+
         val outputNode = FunctionGraphNode.OutputNode(
             x = 300f,
             y = 100f,

@@ -19,10 +19,12 @@ package com.samco.trackandgraph.data.sampling.functions
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import timber.log.Timber
 
 internal class LuaScriptNodeRawDataSample(
+    private val vmLock: LuaVMLock,
     private val luaScriptNode: FunctionGraphNode.LuaScriptNode,
     private val luaEngine: LuaEngine,
     private val getDataSourceForNodeId: (Int) -> NodeRawDataSample?
@@ -43,6 +45,7 @@ internal class LuaScriptNodeRawDataSample(
     private val luaResult: Sequence<DataPoint> by lazy {
         try {
             luaEngine.runLuaFunctionGenerator(
+                vmLock = vmLock,
                 script = luaScriptNode.script,
                 dataSources = mergedDataSources,
                 configuration = luaScriptNode.configuration

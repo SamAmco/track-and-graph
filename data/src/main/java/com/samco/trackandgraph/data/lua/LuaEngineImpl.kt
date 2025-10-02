@@ -37,13 +37,17 @@ internal class LuaEngineImpl @Inject constructor(
     private val luaVMProvider: LuaVMProvider,
 ) : LuaEngine {
 
+    override suspend fun acquireVM(): LuaVMLock = luaVMProvider.acquire()
+
+    override fun releaseVM(vmLock: LuaVMLock) = luaVMProvider.release(vmLock.asLease())
+
     override fun runLuaGraph(
+        vmLock: LuaVMLock,
         script: String,
         params: LuaGraphEngineParams
     ): LuaGraphResult {
         return try {
-            val vmLease = luaVMProvider.acquire()
-            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
+            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
             luaGraphAdapter.process(resolvedScript, params)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
@@ -56,10 +60,12 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 
-    override fun runLuaFunction(script: String): LuaFunctionMetadata {
+    override fun runLuaFunction(
+        vmLock: LuaVMLock,
+        script: String
+    ): LuaFunctionMetadata {
         return try {
-            val vmLease = luaVMProvider.acquire()
-            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
+            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
             luaFunctionMetadataAdapter.process(resolvedScript, script)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
@@ -71,12 +77,13 @@ internal class LuaEngineImpl @Inject constructor(
     }
 
     override fun runLuaFunctionGenerator(
+        vmLock: LuaVMLock,
         script: String,
         dataSources: List<RawDataSample>,
         configuration: List<LuaScriptConfigurationValue>,
     ): Sequence<DataPoint> {
         return try {
-            val vmLease = luaVMProvider.acquire()
+            val vmLease = vmLock.asLease()
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaFunctionDataSourceAdapter.createDataPointSequence(
                 vmLease = vmLease,
@@ -85,7 +92,6 @@ internal class LuaEngineImpl @Inject constructor(
                 configuration = configuration,
             )
         } catch (luaError: LuaError) {
-            dataSources.forEach { it.dispose() }
             val luaScriptException = LuaScriptException(
                 message = luaError.message ?: "",
                 luaCauseStackTrace = luaError.luaCause?.stackTraceToString()
