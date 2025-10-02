@@ -20,13 +20,16 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.RawDataSample
 
 internal class FunctionGraphDataSample(
+    private val vmLock: LuaVMLock,
     private val function: Function,
     private val dataSources: Map<Long, RawDataSample?>,
-    private val luaEngine: LuaEngine
+    private val luaEngine: LuaEngine,
+    private val disposeVM: (() -> Unit)? = null
 ) : RawDataSample() {
 
     private val functionGraph = function.functionGraph
@@ -35,6 +38,7 @@ internal class FunctionGraphDataSample(
 
     override fun dispose() {
         dataSources.values.forEach { it?.dispose() }
+        disposeVM?.invoke()
     }
 
     override fun getRawDataPoints(): List<DataPoint> {
@@ -46,10 +50,12 @@ internal class FunctionGraphDataSample(
         return when (node) {
             is FunctionGraphNode.FeatureNode -> dataSources[node.featureId]?.asNodeRawDataSample()
             is FunctionGraphNode.LuaScriptNode -> LuaScriptNodeRawDataSample(
+                vmLock = vmLock,
                 luaScriptNode = node,
                 luaEngine = luaEngine,
                 getDataSourceForNodeId = ::getDataSourceForNodeId
             )
+
             is FunctionGraphNode.OutputNode -> {
                 throw IllegalArgumentException("Found an illegal output node in the function graph: $nodeId")
             }
@@ -69,13 +75,32 @@ internal class FunctionGraphDataSample(
 
     companion object {
         suspend fun create(
+            vmLock: LuaVMLock?,
             function: Function,
             dataSampler: DataSampler,
             luaEngine: LuaEngine
         ): FunctionGraphDataSample {
+            val lock = vmLock ?: luaEngine.acquireVM()
+
             val dataSources = function.inputFeatureIds
-                .associateWith { dataSampler.getRawDataSampleForFeatureId(it) }
-            return FunctionGraphDataSample(function, dataSources, luaEngine)
+                .associateWith { dataSampler.getRawDataSampleForFeatureId(it, lock) }
+
+            if (vmLock == null) {
+                return FunctionGraphDataSample(
+                    vmLock = lock,
+                    function = function,
+                    dataSources = dataSources,
+                    luaEngine = luaEngine,
+                    disposeVM = { luaEngine.releaseVM(lock) }
+                )
+            } else {
+                return FunctionGraphDataSample(
+                    vmLock = lock,
+                    function = function,
+                    dataSources = dataSources,
+                    luaEngine = luaEngine,
+                )
+            }
         }
     }
 }

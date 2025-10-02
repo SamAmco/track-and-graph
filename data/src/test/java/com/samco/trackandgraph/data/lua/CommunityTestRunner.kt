@@ -5,6 +5,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.time.TimeProviderImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -94,7 +95,8 @@ class CommunityTestRunner {
                     // Add all test files in the same directory
                     files.filter { it.isFile && it.name.startsWith("test") && it.name.endsWith(".lua") }
                         .forEach { testFile ->
-                            val testName = currentDir.relativeTo(basePath).path + "/" + testFile.name
+                            val testName =
+                                currentDir.relativeTo(basePath).path + "/" + testFile.name
                             testCases.add(arrayOf(testName, scriptLuaText, testFile.readText()))
                         }
                 }
@@ -106,9 +108,10 @@ class CommunityTestRunner {
 
     @Test
     fun `run community lua test`() {
+        val vmProvider = daggerComponent.provideVMProvider()
+        val vmLease = runBlocking { vmProvider.acquire() }
         try {
-            val vmLease = daggerComponent.provideVMProvider().acquire()
-            val test = vmLease.lock.withLock { vmLease.globals.load(testLuaText) }
+            val test = vmLease.globals.load(testLuaText)
             val testSet = test.call().checktable()!!
             for (key in testSet.keys()) {
                 try {
@@ -118,7 +121,7 @@ class CommunityTestRunner {
                     val testDataSources = testStructure["sources"].checkfunction()!!.call()
                     val resolvedScript = daggerComponent.provideLuaScriptResolver()
                         .resolveLuaScript(overriddenScript, vmLease)
-                    
+
                     // Use LuaGraphAdapter to execute the script (reuses the same logic)
                     val scriptResult = daggerComponent.provideLuaGraphAdapter()
                         .executeScript(resolvedScript, testDataSources.addDataSourceFunctions())
@@ -134,6 +137,8 @@ class CommunityTestRunner {
             println("Failed to run $testName : ${t.message}")
             t.printStackTrace()
             throw t
+        } finally {
+            vmProvider.release(vmLease)
         }
     }
 

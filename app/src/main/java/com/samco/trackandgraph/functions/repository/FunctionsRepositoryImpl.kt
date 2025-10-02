@@ -51,7 +51,9 @@ class FunctionsRepositoryImpl @Inject constructor(
             }
 
             try {
-                val metadata = luaEngine.runLuaFunction(script)
+                val vmLock = luaEngine.acquireVM()
+                val metadata = luaEngine.runLuaFunction(vmLock, script)
+                luaEngine.releaseVM(vmLock)
                 results.add(metadata)
             } catch (t: Throwable) {
                 Timber.e(t, "Failed to parse/execute script for metadata; ignoring")

@@ -13,22 +13,40 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
     private val luaEngine: LuaEngineImpl,
     private val luaEngineSwitch: LuaEngineSwitch
 ) : LuaEngine {
-    override fun runLuaGraph(script: String, params: LuaGraphEngineParams): LuaGraphResult {
-        return if (luaEngineSwitch.enabled) luaEngine.runLuaGraph(script, params)
-        else throw LuaEngineDisabledException()
+
+    override suspend fun acquireVM(): LuaVMLock {
+        if (luaEngineSwitch.enabled) return luaEngine.acquireVM()
+        throw LuaEngineDisabledException()
     }
 
-    override fun runLuaFunction(script: String): LuaFunctionMetadata {
-        return if (luaEngineSwitch.enabled) luaEngine.runLuaFunction(script)
+    override fun releaseVM(vmLock: LuaVMLock) {
+        if (luaEngineSwitch.enabled) return luaEngine.releaseVM(vmLock)
+        throw LuaEngineDisabledException()
+    }
+
+    override fun runLuaGraph(
+        vmLock: LuaVMLock,
+        script: String,
+        params: LuaGraphEngineParams
+    ): LuaGraphResult {
+        return if (luaEngineSwitch.enabled) {
+            luaEngine.runLuaGraph(vmLock, script, params)
+        } else throw LuaEngineDisabledException()
+    }
+
+    override fun runLuaFunction(vmLock: LuaVMLock, script: String): LuaFunctionMetadata {
+        return if (luaEngineSwitch.enabled) luaEngine.runLuaFunction(vmLock, script)
         else throw LuaEngineDisabledException()
     }
 
     override fun runLuaFunctionGenerator(
+        vmLock: LuaVMLock,
         script: String,
         dataSources: List<RawDataSample>,
         configuration: List<LuaScriptConfigurationValue>
     ): Sequence<DataPoint> {
-        return if (luaEngineSwitch.enabled) luaEngine.runLuaFunctionGenerator(script, dataSources, configuration)
-        else throw LuaEngineDisabledException()
+        return if (luaEngineSwitch.enabled) {
+            luaEngine.runLuaFunctionGenerator(vmLock, script, dataSources, configuration)
+        } else throw LuaEngineDisabledException()
     }
 }

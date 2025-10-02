@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
@@ -39,7 +40,7 @@ internal class FunctionGraphDecoderTest {
     private val decoder = FunctionGraphDecoder(mockLuaScriptNodeProvider)
 
     @Test
-    fun `decodeFunctionGraph produces expected output`() {
+    fun `decodeFunctionGraph produces expected output`() = runTest {
         val input = createInputFunction()
         val featurePathMap = createFeaturePathMap()
         val expected = createExpectedOutput()

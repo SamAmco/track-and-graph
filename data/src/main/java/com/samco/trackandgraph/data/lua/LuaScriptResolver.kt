@@ -1,15 +1,12 @@
 package com.samco.trackandgraph.data.lua
 
 import org.luaj.vm2.LuaValue
-import kotlin.concurrent.withLock
 import javax.inject.Inject
 
 internal class LuaScriptResolver @Inject constructor() {
     fun resolveLuaScript(script: String, vmLease: VMLease): LuaValue {
         val cleanedScript = script.cleanLuaScript()
-        return vmLease.lock.withLock {
-            vmLease.globals.load(cleanedScript).call()
-        }
+        return vmLease.globals.load(cleanedScript).call()
     }
 
     private fun String.cleanLuaScript(): String {

@@ -21,14 +21,21 @@ import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.sampling.functions.FunctionGraphDataSample
 import timber.log.Timber
 import javax.inject.Inject
 
 interface DataSampler {
-    suspend fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample?
+    suspend fun getRawDataSampleForFeatureId(
+        featureId: Long,
+        vmLock: LuaVMLock? = null
+    ): RawDataSample?
 
-    suspend fun getDataSampleForFeatureId(featureId: Long): DataSample
+    suspend fun getDataSampleForFeatureId(
+        featureId: Long,
+        vmLock: LuaVMLock? = null
+    ): DataSample
 
     suspend fun getLabelsForFeatureId(featureId: Long): List<String>
 
@@ -41,7 +48,10 @@ internal class DataSamplerImpl @Inject constructor(
     private val luaEngine: LuaEngine
 ) : DataSampler {
 
-    override suspend fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample? {
+    override suspend fun getRawDataSampleForFeatureId(
+        featureId: Long,
+        vmLock: LuaVMLock?
+    ): RawDataSample? {
         val tracker = dao.getTrackerByFeatureId(featureId)
         if (tracker != null) {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
@@ -53,12 +63,20 @@ internal class DataSamplerImpl @Inject constructor(
         }
         val function = dataInteractor.getFunctionByFeatureId(featureId)
         if (function != null) {
-            return FunctionGraphDataSample.create(function, this, luaEngine)
+            return FunctionGraphDataSample.create(
+                vmLock = vmLock,
+                function = function,
+                dataSampler = this,
+                luaEngine = luaEngine
+            )
         }
         return null
     }
 
-    override suspend fun getDataSampleForFeatureId(featureId: Long): DataSample {
+    override suspend fun getDataSampleForFeatureId(
+        featureId: Long,
+        vmLock: LuaVMLock?
+    ): DataSample {
         val tracker = dao.getTrackerByFeatureId(featureId)
         if (tracker != null) {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
@@ -72,8 +90,12 @@ internal class DataSamplerImpl @Inject constructor(
         val function = dataInteractor.getFunctionByFeatureId(featureId)
         if (function != null) {
             val properties = getDataSamplePropertiesForFeatureId(featureId)
-            return FunctionGraphDataSample.create(function, this, luaEngine)
-                .asDataSample(properties)
+            return FunctionGraphDataSample.create(
+                vmLock = vmLock,
+                function = function,
+                dataSampler = this,
+                luaEngine = luaEngine
+            ).asDataSample(properties)
         }
         return DataSample.fromSequence(emptySequence(), onDispose = {})
     }
