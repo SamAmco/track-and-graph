@@ -28,7 +28,6 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.varargsOf
-import kotlin.concurrent.withLock
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -128,13 +127,11 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
                 }
 
                 private fun loadNextDataPoint() {
-                    val result = vmLease.lock.withLock {
-                        if (!isStarted) {
-                            isStarted = true
-                            coroutine.resume(varargsOf(luaDataSources, config))
-                        } else {
-                            coroutine.resume(LuaValue.NONE)
-                        }
+                    val result = if (!isStarted) {
+                        isStarted = true
+                        coroutine.resume(varargsOf(luaDataSources, config))
+                    } else {
+                        coroutine.resume(LuaValue.NONE)
                     }
 
                     val success = result.arg1().toboolean()

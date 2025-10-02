@@ -57,7 +57,7 @@ internal class FunctionGraphDecoder @Inject constructor(
      * @param dependentFeatureIds Set of feature IDs that depend on this function (for cycle detection)
      * @return DecodedFunctionGraph containing nodes, edges, positions, and metadata
      */
-    fun decodeFunctionGraph(
+    suspend fun decodeFunctionGraph(
         function: Function,
         featurePathMap: Map<Long, String>,
         dependentFeatureIds: Set<Long> = emptySet()
@@ -126,7 +126,7 @@ internal class FunctionGraphDecoder @Inject constructor(
      * Decodes a LuaScriptNode DTO to a LuaScript ViewModel node.
      * Uses the configuration provider to analyze the script and create a complete node.
      */
-    private fun decodeLuaScriptNode(
+    private suspend fun decodeLuaScriptNode(
         graphNode: FunctionGraphNode.LuaScriptNode
     ): Node.LuaScript {
         return luaScriptNodeProvider.createLuaScriptNode(

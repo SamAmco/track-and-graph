@@ -28,6 +28,7 @@ import com.samco.trackandgraph.data.time.TimeProvider
 import com.samco.trackandgraph.data.time.TimeProviderImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
@@ -98,10 +99,17 @@ internal abstract class LuaEngineImplTest {
             rawDataSampleFromSequence(asDataPoints) {}
         }
 
-        val result = uut.runLuaGraph(
-            script,
-            LuaGraphEngineParams(sources)
-        )
+        val vmLock = runBlocking { uut.acquireVM() }
+
+        val result = try {
+            uut.runLuaGraph(
+                vmLock = vmLock,
+                script = script,
+                params = LuaGraphEngineParams(sources)
+            )
+        } finally {
+            uut.releaseVM(vmLock)
+        }
 
         LuaGraphAssertionScope(
             result = result,
@@ -128,7 +136,18 @@ internal abstract class LuaEngineImplTest {
             rawDataSampleFromSequence(asDataPoints) {}
         }
 
-        val result = uut.runLuaFunctionGenerator(script, rawDataSources, config)
+        val vmLock = runBlocking { uut.acquireVM() }
+
+        val result = try {
+            uut.runLuaFunctionGenerator(
+                vmLock = vmLock,
+                script = script,
+                dataSources = rawDataSources,
+                configuration = config
+            )
+        } finally {
+            uut.releaseVM(vmLock)
+        }
 
         LuaFunctionAssertionScope(
             result = result,
@@ -141,8 +160,15 @@ internal abstract class LuaEngineImplTest {
         assertionBlock: LuaFunctionMetadataAssertionScope.() -> Unit
     ) {
         val uut = uut()
-        val metadata = uut.runLuaFunction(script)
-        
+
+        val vmLock = runBlocking { uut.acquireVM() }
+
+        val metadata = try {
+            uut.runLuaFunction(vmLock, script)
+        } finally {
+            uut.releaseVM(vmLock)
+        }
+
         LuaFunctionMetadataAssertionScope(
             metadata = metadata
         ).assertionBlock()

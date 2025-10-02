@@ -377,12 +377,15 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     override fun updateScriptForNodeId(nodeId: Int, newScript: String) {
-        _nodes.value = _nodes.value.mutate { nodeList ->
-            val index = nodeList.indexOfFirst { it.id == nodeId && it is Node.LuaScript }
-            if (index >= 0) {
-                val existingNode = nodeList[index] as Node.LuaScript
-                // Use the provider to update the node while preserving existing configuration inputs
-                val updatedNode = luaScriptNodeProvider.updateLuaScriptNode(existingNode, newScript)
+        val existingNode = _nodes.value
+            .filterIsInstance<Node.LuaScript>()
+            .firstOrNull { it.id == nodeId }
+        if (existingNode == null) return
+
+        viewModelScope.launch {
+            val updatedNode = luaScriptNodeProvider.updateLuaScriptNode(existingNode, newScript)
+            _nodes.value = _nodes.value.mutate { nodeList ->
+                val index = nodeList.indexOfFirst { it.id == nodeId }
                 nodeList[index] = updatedNode
             }
         }

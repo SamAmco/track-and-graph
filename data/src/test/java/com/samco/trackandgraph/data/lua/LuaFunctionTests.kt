@@ -21,6 +21,8 @@ import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -136,7 +138,13 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                 sequence {
                     repeat(totalAvailable) { i ->
                         upstreamConsumed++
-                        yield(TestDP(timestamp = (i + 1) * 1000L, value = (i + 1).toDouble(), label = "item_${i + 1}"))
+                        yield(
+                            TestDP(
+                                timestamp = (i + 1) * 1000L,
+                                value = (i + 1).toDouble(),
+                                label = "item_${i + 1}"
+                            )
+                        )
                     }
                 }
             ),
@@ -164,7 +172,11 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             assertEquals("processed_3", resultList[2].label)
 
             // Most importantly: verify we only consumed 4 upstream data points (3 processed + 1 look-ahead), not all 1000
-            assertEquals("Should only consume 4 upstream data points (3 processed + 1 look-ahead), not all $totalAvailable", 4, upstreamConsumed)
+            assertEquals(
+                "Should only consume 4 upstream data points (3 processed + 1 look-ahead), not all $totalAvailable",
+                4,
+                upstreamConsumed
+            )
         }
     }
 
@@ -256,7 +268,10 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
      * Helper to test stateful counter behavior with a shared Lua engine instance
      * This version uses a provided engine instead of creating a new one
      */
-    private fun testStatefulCounterWithSharedEngine(luaEngine: LuaEngineImpl, dataPointCount: Int) {
+    private fun testStatefulCounterWithSharedEngine(
+        luaEngine: LuaEngineImpl,
+        dataPointCount: Int
+    ) {
         val dataSources = listOf(
             sequence {
                 repeat(dataPointCount) { i ->
@@ -264,7 +279,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                 }
             }
         )
-        
+
         val rawDataSources = dataSources.map { source ->
             val asDataPoints = source.map { it.toDataPoint() }
             // Use the same rawDataSampleFromSequence method from the base class
@@ -277,9 +292,9 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         }
 
         val script = """
+            local counter = 0  -- Local variable that persists across yields
             return function(data_sources)
                 local source = data_sources[1]
-                local counter = 0  -- Local variable that persists across yields
                 
                 local data_point = source.dp()
                 while data_point do
@@ -293,8 +308,17 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             end
         """.trimIndent()
 
-        val result = luaEngine.runLuaFunctionGenerator(script, rawDataSources, emptyList())
-        val resultList = result.toList()
+        val vmLock = runBlocking { luaEngine.acquireVM() }
+        val resultList = try {
+            luaEngine.runLuaFunctionGenerator(
+                vmLock = vmLock,
+                script = script,
+                dataSources = rawDataSources,
+                configuration = emptyList()
+            ).toList()
+        } finally {
+            luaEngine.releaseVM(vmLock)
+        }
 
         assertEquals(dataPointCount, resultList.size)
         // Verify each counter value is correct
@@ -305,28 +329,20 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Concurrent execution with shared Lua globals is thread-safe`() {
+    fun `Concurrent execution with shared Lua engine is thread-safe`() {
         val threadCount = 50
         val dataPointsPerThread = 500
         val executor = Executors.newFixedThreadPool(threadCount)
         val latch = CountDownLatch(threadCount)
-        val exceptions = mutableListOf<Exception>()
-        
+
         // Create a single shared Lua engine instance for all threads
         val sharedLuaEngine = uut()
 
         repeat(threadCount) {
             executor.submit {
-                try {
-                    // Each thread runs the stateful counter test with the shared engine
-                    testStatefulCounterWithSharedEngine(sharedLuaEngine, dataPointsPerThread)
-                } catch (e: Exception) {
-                    synchronized(exceptions) {
-                        exceptions.add(e)
-                    }
-                } finally {
-                    latch.countDown()
-                }
+                // Each thread runs the stateful counter test with the shared engine
+                testStatefulCounterWithSharedEngine(sharedLuaEngine, dataPointsPerThread)
+                latch.countDown()
             }
         }
 
@@ -335,11 +351,6 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
 
         executor.shutdown()
         assertTrue("Executor failed to shutdown", executor.awaitTermination(1, TimeUnit.SECONDS))
-
-        // Check that no exceptions occurred
-        if (exceptions.isNotEmpty()) {
-            throw AssertionError("Concurrent execution failed with ${exceptions.size} exceptions. First: ${exceptions.first()}")
-        }
     }
 
     @Test
@@ -375,15 +386,15 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         )
     ) {
         assertEquals("Should have 3 results", 3, resultList.size)
-        
+
         // Verify first data point: (10.0 * 2.5) + 100.0 = 125.0
         assertEquals("First value should be transformed", 125.0, resultList[0].value, 0.001)
         assertEquals("First label should be prefixed", "processed_first", resultList[0].label)
-        
+
         // Verify second data point: (20.0 * 2.5) + 100.0 = 150.0
         assertEquals("Second value should be transformed", 150.0, resultList[1].value, 0.001)
         assertEquals("Second label should be prefixed", "processed_second", resultList[1].label)
-        
+
         // Verify third data point: (30.0 * 2.5) + 100.0 = 175.0
         assertEquals("Third value should be transformed", 175.0, resultList[2].value, 0.001)
         assertEquals("Third label should be prefixed", "processed_third", resultList[2].label)
