@@ -28,8 +28,11 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.data.sampling.DataSampler
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import junit.framework.TestCase.assertEquals
@@ -38,6 +41,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.threeten.bp.DayOfWeek
@@ -50,6 +55,7 @@ class LineGraphDataFactoryTest {
 
     private val dataInteractor: DataInteractor = mock()
     private val dataSampler: DataSampler = mock()
+    private val luaEngine: LuaEngine = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -65,6 +71,7 @@ class LineGraphDataFactoryTest {
         .builder()
         .dataInteractor(dataInteractor)
         .dataSampler(dataSampler)
+        .luaEngine(luaEngine)
         .ioDispatcher(ioDispatcher)
         .defaultDispatcher(defaultDispatcher)
         .timeHelper(timeHelper)
@@ -75,6 +82,7 @@ class LineGraphDataFactoryTest {
     @Test
     fun `plot total line ending at last data point ends at last data point`() = runTest {
         val now = OffsetDateTime.now()
+        val testVmLock = TestLuaVMFixtures.createTestLuaVMLock()
 
         val graphOrStat = GraphOrStat(
             id = 1L,
@@ -109,17 +117,19 @@ class LineGraphDataFactoryTest {
             endDate = GraphEndDate.Latest,
         )
 
+        whenever(luaEngine.acquireVM()).thenReturn(testVmLock)
         whenever(dataInteractor.getLineGraphByGraphStatId(1L))
             .thenReturn(lineGraphWithFeatures)
 
-        whenever(dataSampler.getDataSampleForFeatureId(1L))
-            .thenReturn(
+        whenever(dataSampler.getDataSampleForFeatureId(eq(1L), any()))
+            .thenAnswer {
                 DataSample.fromSequence(
-                onDispose = {},
-                data = sequenceOf(
-                    100, 101, 102, 103, 104, 105, 106, 107, 108, 109
-                ).map { dpDaysAgo(it, now) }
-            ))
+                    onDispose = {},
+                    data = sequenceOf(
+                        100, 101, 102, 103, 104, 105, 106, 107, 108, 109
+                    ).map { dpDaysAgo(it, now) }
+                )
+            }
 
         val lineGraphDataFactory = uut()
         val lineGraphViewData = lineGraphDataFactory.getViewData(graphOrStat)

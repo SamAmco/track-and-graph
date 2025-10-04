@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
@@ -88,8 +89,10 @@ class LuaGraphDataFactoryTest {
     @Before
     fun setup() {
         rawDataSamples.clear()
+        val testVmLock = TestLuaVMFixtures.createTestLuaVMLock()
         runBlocking {
-            whenever(dataSampler.getRawDataSampleForFeatureId(any())).thenAnswer {
+            whenever(luaEngine.acquireVM()).thenReturn(testVmLock)
+            whenever(dataSampler.getRawDataSampleForFeatureId(any(), any())).thenAnswer {
                 val featureId = it.getArgument<Long>(0)
                 rawDataSamples[featureId]
             }
