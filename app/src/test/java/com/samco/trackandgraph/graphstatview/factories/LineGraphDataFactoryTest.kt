@@ -44,6 +44,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
@@ -150,6 +151,8 @@ class LineGraphDataFactoryTest {
             .findEndOfTemporal(end, Period.ofDays(1))
         val expectedEnd = a.toOffsetDateTime()
         assertEquals(expectedEnd, lineGraphViewData.endTime)
+        
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     private fun dpDaysAgo(

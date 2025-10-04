@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
@@ -50,10 +51,10 @@ internal class LuaScriptNodeProvider @Inject constructor(
         inputConnectorCount: Int,
         configuration: List<LuaScriptConfigurationValue>
     ): Node.LuaScript {
+        var vmLock: LuaVMLock? = null
         return try {
-            val vmLock = luaEngine.acquireVM()
+            vmLock = luaEngine.acquireVM()
             val metadata = luaEngine.runLuaFunction(vmLock, script)
-            luaEngine.releaseVM(vmLock)
             createLuaScriptNode(metadata, nodeId, configuration)
         } catch (e: Exception) {
             Timber.e(e, "Failed to analyze Lua script for node $nodeId, using fallback")
@@ -65,6 +66,8 @@ internal class LuaScriptNodeProvider @Inject constructor(
                 showEditTools = true,
                 configuration = emptyMap()
             )
+        } finally {
+            vmLock?.let { luaEngine.releaseVM(vmLock) }
         }
     }
 
@@ -98,11 +101,14 @@ internal class LuaScriptNodeProvider @Inject constructor(
      * value is preserved. New inputs are created for new configurations, and old inputs that no longer
      * exist in the new script are dropped.
      */
-    suspend fun updateLuaScriptNode(existingNode: Node.LuaScript, newScript: String): Node.LuaScript {
+    suspend fun updateLuaScriptNode(
+        existingNode: Node.LuaScript,
+        newScript: String
+    ): Node.LuaScript {
+        var vmLock: LuaVMLock? = null
         return try {
-            val vmLock = luaEngine.acquireVM()
+            vmLock = luaEngine.acquireVM()
             val metadata = luaEngine.runLuaFunction(vmLock, newScript)
-            luaEngine.releaseVM(vmLock)
 
             // Create new configuration map by iterating through new metadata
             val newConfiguration = metadata.config.associate { config ->
@@ -131,6 +137,8 @@ internal class LuaScriptNodeProvider @Inject constructor(
                 script = newScript,
                 inputConnectorCount = 1,
             )
+        } finally {
+            vmLock?.let { luaEngine.releaseVM(it) }
         }
     }
 
