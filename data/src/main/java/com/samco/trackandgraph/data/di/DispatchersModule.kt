@@ -43,7 +43,7 @@ annotation class MainDispatcher
 
 @Module
 @InstallIn(SingletonComponent::class)
-class DispatchersModule {
+object DispatchersModule {
     @Provides
     @IODispatcher
     fun getIODispatcher(): CoroutineDispatcher = Dispatchers.IO
