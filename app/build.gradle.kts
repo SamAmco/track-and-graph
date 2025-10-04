@@ -42,6 +42,7 @@ android {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
             optIn.add("kotlin.RequiresOptIn")
+            freeCompilerArgs.add("-Xannotation-default-target=param-property")
         }
     }
 
@@ -71,7 +72,10 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             applicationIdSuffix = ".debug"
             resValue("string", "app_name", "Debug Track & Graph")
             manifestPlaceholders["ALLOW_CLEAR_TEXT"] = "false"
@@ -81,22 +85,30 @@ android {
         create("debugMinify") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             applicationIdSuffix = ".debug.minify"
             resValue("string", "app_name", "Debug Minify Track & Graph")
             signingConfig = signingConfigs.getByName("debug")
             manifestPlaceholders["ALLOW_CLEAR_TEXT"] = "false"
-            manifestPlaceholders["NETWORK_SECURITY_CONFIG"] = "@xml/production_network_security_config"
+            manifestPlaceholders["NETWORK_SECURITY_CONFIG"] =
+                "@xml/production_network_security_config"
             manifestPlaceholders["recreateAlarmsEnabled"] = "true"
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             resValue("string", "app_name", "Track & Graph")
             ndk.debugSymbolLevel = "SYMBOL_TABLE"
             manifestPlaceholders["ALLOW_CLEAR_TEXT"] = "false"
-            manifestPlaceholders["NETWORK_SECURITY_CONFIG"] = "@xml/production_network_security_config"
+            manifestPlaceholders["NETWORK_SECURITY_CONFIG"] =
+                "@xml/production_network_security_config"
             manifestPlaceholders["recreateAlarmsEnabled"] = "true"
         }
         create("screenshots") {
@@ -144,6 +156,8 @@ android {
         includeInBundle = true
     }
 
+
+
     namespace = "com.samco.trackandgraph"
 }
 
@@ -181,7 +195,7 @@ dependencies {
 
     // Reorderable drag and drop
     implementation(libs.reorderable)
-    
+
     // Glance for widgets
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
