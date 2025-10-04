@@ -75,15 +75,7 @@ class LuaGraphDataFactory @Inject constructor(
 
         return@coroutineScope try {
             vmLock = luaEngine.acquireVM()
-            dataSamples = config.features
-                .mapNotNull { lgf ->
-                    dataSampler
-                        .getRawDataSampleForFeatureId(
-                            featureId = lgf.featureId,
-                            vmLock = vmLock
-                        )?.let { lgf.name to it }
-                }
-                .toMap()
+            dataSamples = getDataSamples(config, vmLock)
 
             createViewData(
                 vmLock = vmLock,
@@ -99,6 +91,16 @@ class LuaGraphDataFactory @Inject constructor(
             dataSamples.values.forEach { it.dispose() }
         }
     }
+
+    private suspend fun getDataSamples(
+        config: LuaGraphWithFeatures,
+        vmLock: LuaVMLock?
+    ) = config.features.mapNotNull { lgf ->
+        dataSampler.getRawDataSampleForFeatureId(
+            featureId = lgf.featureId,
+            vmLock = vmLock
+        )?.let { lgf.name to it }
+    }.toMap()
 
     private fun createViewData(
         vmLock: LuaVMLock,

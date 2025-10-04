@@ -33,6 +33,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
@@ -53,9 +54,6 @@ import com.samco.trackandgraph.movingAverageDurations
 import com.samco.trackandgraph.plottingModePeriods
 import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -70,6 +68,7 @@ class LineGraphDataFactory @Inject constructor(
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val timeHelper: TimeHelper,
+    private val luaEngine: LuaEngine,
 ) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(
     dataInteractor,
     dataSampler,
@@ -82,17 +81,16 @@ class LineGraphDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData = withContext(defaultDispatcher) {
         val disposables = Collections.synchronizedList(mutableListOf<DataSample>())
+        val vmLock = luaEngine.acquireVM()
         try {
-            //Create all the data samples in parallel (this shouldn't actually take long but why not)
             val dataSamples = config.features.map { lgf ->
-                async {
-                    withContext(ioDispatcher) {
-                        val dataSample = dataSampler.getDataSampleForFeatureId(lgf.featureId)
-                        disposables.add(dataSample)
-                        Pair(lgf, tryGetPlottingData(dataSample, config, lgf))
-                    }
-                }
-            }.awaitAll()
+                val dataSample = dataSampler.getDataSampleForFeatureId(
+                    featureId = lgf.featureId,
+                    vmLock = vmLock
+                )
+                disposables.add(dataSample)
+                Pair(lgf, tryGetPlottingData(dataSample, config, lgf))
+            }
 
             val plottableData = generatePlottingData(dataSamples, config, onDataSampled)
             val hasPlottableData = plottableData.lines.any { it.line != null }
@@ -129,6 +127,7 @@ class LineGraphDataFactory @Inject constructor(
             }
         } finally {
             disposables.forEach { it.dispose() }
+            luaEngine.releaseVM(vmLock)
         }
     }
 
@@ -154,49 +153,50 @@ class LineGraphDataFactory @Inject constructor(
         dataSamples: List<Pair<LineGraphFeature, DataSample>>,
         lineGraph: LineGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): PlottingData = coroutineScope {
-        withContext(defaultDispatcher) {
+    ): PlottingData = withContext(defaultDispatcher) {
 
-            //Get the end time of the graph. If not specified it's the time of the last data
-            // point of any of the features
-            val endTime = lineGraph.endDate.toOffsetDateTime() ?: dataSamples
-                .mapNotNull { it.second.firstOrNull() }
-                .maxOfOrNull { it.timestamp }
-            ?: OffsetDateTime.now()
+        //Get the end time of the graph. If not specified it's the time of the last data
+        // point of any of the features
+        val endTime = lineGraph.endDate.toOffsetDateTime() ?: dataSamples
+            .mapNotNull { it.second.firstOrNull() }
+            .maxOfOrNull { it.timestamp }
+        ?: OffsetDateTime.now()
 
-            //Generate the actual plotting data for each sample. This is the part that will take longer
-            // hence the parallelization
-            val features = dataSamples.map { pair ->
-                async {
-                    val feature = pair.first
-                    val clippedSample = DataClippingFunction(endTime, lineGraph.sampleSize)
-                        .mapSample(pair.second)
+        //Generate the actual plotting data for each sample.
+        val features = dataSamples.map { pair ->
+            val feature = pair.first
+            val clippedSample = DataClippingFunction(endTime, lineGraph.sampleSize)
+                .mapSample(pair.second)
 
-                    //Calling toList on the data sample evaluates it and causes the whole pipeline
-                    // to be processed
-                    val dataPoints = clippedSample.toList().asReversed()
+            //Calling toList on the data sample evaluates it and causes the whole pipeline
+            // to be processed
+            val dataPoints = clippedSample.toList().asReversed()
 
-                    val series = if (dataPoints.size >= 2) {
-                        getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
-                    } else null
+            test = dataPoints
 
-                    Line(
-                        name = feature.name,
-                        color = ColorSpec.ColorIndex(feature.colorIndex),
-                        pointStyle = feature.pointStyle,
-                        line = series
-                    )
-                }
-            }.awaitAll()
+            val series = if (dataPoints.size >= 2) {
+                getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
+            } else null
 
-            val rawDataPoints = dataSamples
-                .map { it.second.getRawDataPoints() }
-                .flatten()
-            onDataSampled(rawDataPoints)
-            dataSamples.forEach { it.second.dispose() }
-
-            return@withContext PlottingData(features, endTime)
+            Line(
+                name = feature.name,
+                color = ColorSpec.ColorIndex(feature.colorIndex),
+                pointStyle = feature.pointStyle,
+                line = series
+            )
         }
+
+        val rawDataPoints = dataSamples
+            .map { it.second.getRawDataPoints() }
+            .flatten()
+
+        onDataSampled(rawDataPoints)
+
+        return@withContext PlottingData(features, endTime)
+    }
+
+    companion object {
+        var test: Any? = null
     }
 
     private suspend fun tryGetPlottingData(
@@ -209,7 +209,11 @@ class LineGraphDataFactory @Inject constructor(
 
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
-            else -> CompositeFunction(
+            LineGraphPlottingModes.GENERATE_HOURLY_TOTALS,
+            LineGraphPlottingModes.GENERATE_DAILY_TOTALS,
+            LineGraphPlottingModes.GENERATE_WEEKLY_TOTALS,
+            LineGraphPlottingModes.GENERATE_MONTHLY_TOTALS,
+            LineGraphPlottingModes.GENERATE_YEARLY_TOTALS -> CompositeFunction(
                 DurationAggregationFunction(timeHelper, plottingPeriod!!),
                 DataPaddingFunction(
                     timeHelper = timeHelper,
