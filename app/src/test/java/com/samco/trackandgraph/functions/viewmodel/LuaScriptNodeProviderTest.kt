@@ -41,6 +41,7 @@ class LuaScriptNodeProviderTest {
 
     private val mockLuaEngine: LuaEngine = mock()
     private val provider = LuaScriptNodeProvider(mockLuaEngine)
+    private val testVmLock = TestLuaVMFixtures.createTestLuaVMLock()
 
     // Comprehensive metadata containing all possible configuration types
     // This ensures we test all enum values and catch missing implementations
@@ -77,7 +78,7 @@ class LuaScriptNodeProviderTest {
     @Before
     fun setup() {
         runBlocking {
-            whenever(mockLuaEngine.acquireVM()).thenReturn(TestLuaVMFixtures.createTestLuaVMLock())
+            whenever(mockLuaEngine.acquireVM()).thenReturn(testVmLock)
         }
     }
 
@@ -129,6 +130,7 @@ class LuaScriptNodeProviderTest {
             )
 
             verify(mockLuaEngine).runLuaFunction(any(), eq(script))
+            verify(mockLuaEngine).releaseVM(testVmLock)
         }
 
     @Test
@@ -157,6 +159,7 @@ class LuaScriptNodeProviderTest {
         assertEquals(null, result.title)
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(script))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -181,6 +184,7 @@ class LuaScriptNodeProviderTest {
         assertTrue(result.configuration.isEmpty())
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(script))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -230,6 +234,7 @@ class LuaScriptNodeProviderTest {
         assertSame(existingTextInput, preservedInput) // Should be the exact same instance
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -274,6 +279,7 @@ class LuaScriptNodeProviderTest {
         assertEquals("", newInput.value.value.text) // New input should have empty default value
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -330,6 +336,7 @@ class LuaScriptNodeProviderTest {
         assertSame(existingInput1, result.configuration["config1"])
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -379,6 +386,7 @@ class LuaScriptNodeProviderTest {
         assertNotSame(existingTextInput, newInput) // Should be a different instance
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -418,6 +426,7 @@ class LuaScriptNodeProviderTest {
         assertEquals(TranslatedString.Simple("Old Script"), result.title)
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -497,6 +506,7 @@ class LuaScriptNodeProviderTest {
         assertEquals("", newInput.value.value.text)
 
         verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
 }
