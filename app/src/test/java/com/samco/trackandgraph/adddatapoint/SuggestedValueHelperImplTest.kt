@@ -33,6 +33,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -104,7 +105,7 @@ class SuggestedValueHelperImplTest {
         //Assert that the data points are not sorted
         assert(!isSortedByValueAscending(dataPoints.toList()))
 
-        whenever(dataSampler.getDataSampleForFeatureId(any()))
+        whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull()))
             .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         //suggested values is a flow of lists of SuggestedValue
@@ -127,7 +128,7 @@ class SuggestedValueHelperImplTest {
         suggestedValuesList.forEach { list -> assert(list.sortedBy { it.value } == list) }
 
         //Verify that dataSampler.getDataSampleForFeatureId was called only once
-        verify(dataSampler, times(1)).getDataSampleForFeatureId(eq(1))
+        verify(dataSampler, times(1)).getDataSampleForFeatureId(1, null)
     }
 
     @Test
@@ -139,7 +140,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e")
             )
 
-            whenever(dataSampler.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             //suggested values is a flow of lists of SuggestedValue
@@ -207,7 +208,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e", "")
             )
 
-            whenever(dataSampler.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -338,7 +339,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e", "")
             )
 
-            whenever(dataSampler.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -461,7 +462,7 @@ class SuggestedValueHelperImplTest {
                 listOf("e", "b", "e", "c", "e", "")
             )
 
-            whenever(dataSampler.getDataSampleForFeatureId(any()))
+            whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull()))
                 .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -595,7 +596,7 @@ class SuggestedValueHelperImplTest {
             listOf("e", "b", "e", "c", "e", "")
         )
 
-        whenever(dataSampler.getDataSampleForFeatureId(any()))
+        whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull()))
             .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         val suggestedValuesValueAscending = uut.getSuggestedValues(
@@ -666,7 +667,7 @@ class SuggestedValueHelperImplTest {
         val values = List(SuggestedValueHelperImpl.MAX_VALUES + 100) { it.toDouble() }
         val dataPoints = dpFromValues(values)
 
-        whenever(dataSampler.getDataSampleForFeatureId(any()))
+        whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull()))
             .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         val sizes = mutableListOf<Int>()
@@ -683,7 +684,7 @@ class SuggestedValueHelperImplTest {
 
         var disposeCalled = false
 
-        whenever(dataSampler.getDataSampleForFeatureId(any())).thenReturn(
+        whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull())).thenReturn(
             DataSample.fromSequence(
                 data = dataPoints,
                 onDispose = { disposeCalled = true }
@@ -702,7 +703,7 @@ class SuggestedValueHelperImplTest {
 
         var disposeCalled = false
 
-        whenever(dataSampler.getDataSampleForFeatureId(any())).thenReturn(
+        whenever(dataSampler.getDataSampleForFeatureId(any(), anyOrNull())).thenReturn(
             DataSample.fromSequence(
                 data = dataPoints,
                 onDispose = { disposeCalled = true }

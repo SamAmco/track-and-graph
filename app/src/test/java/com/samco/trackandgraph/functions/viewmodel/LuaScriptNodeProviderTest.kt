@@ -20,7 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.LuaVMLock
+import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
@@ -77,9 +77,7 @@ class LuaScriptNodeProviderTest {
     @Before
     fun setup() {
         runBlocking {
-            whenever(mockLuaEngine.acquireVM()).thenAnswer {
-                object : LuaVMLock {}
-            }
+            whenever(mockLuaEngine.acquireVM()).thenReturn(TestLuaVMFixtures.createTestLuaVMLock())
         }
     }
 
