@@ -85,11 +85,11 @@ class LuaGraphDataFactoryTest {
         .provideLuaDataFactory()
 
     private val rawDataSamples = mutableMapOf<Long, RawDataSample>()
+    private val testVmLock = TestLuaVMFixtures.createTestLuaVMLock()
 
     @Before
     fun setup() {
         rawDataSamples.clear()
-        val testVmLock = TestLuaVMFixtures.createTestLuaVMLock()
         runBlocking {
             whenever(luaEngine.acquireVM()).thenReturn(testVmLock)
             whenever(dataSampler.getRawDataSampleForFeatureId(any(), any())).thenAnswer {
@@ -124,6 +124,7 @@ class LuaGraphDataFactoryTest {
 
         assertEquals(null, result.wrapped)
         assertEquals("error", result.error?.message)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -144,6 +145,7 @@ class LuaGraphDataFactoryTest {
         assertEquals(null, lastValue.lastDataPoint)
         assertEquals(false, lastValue.isDuration)
         assertEquals(null, result.error)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -172,6 +174,7 @@ class LuaGraphDataFactoryTest {
         assertEquals(dataPoint, lastValue.lastDataPoint)
         assertEquals(false, lastValue.isDuration)
         assertEquals(null, result.error)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -200,6 +203,7 @@ class LuaGraphDataFactoryTest {
         assertEquals(dataPoint, lastValue.lastDataPoint)
         assertEquals(true, lastValue.isDuration)
         assertEquals(null, result.error)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -222,6 +226,7 @@ class LuaGraphDataFactoryTest {
         assertEquals(ITextViewData.TextSize.MEDIUM, text.textSize)
         assertEquals(ITextViewData.TextAlignment.START, text.textAlignment)
         assertEquals(null, result.error)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -259,6 +264,7 @@ class LuaGraphDataFactoryTest {
             pieChart.segments
         )
         assertEquals(null, result.error)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -321,6 +327,7 @@ class LuaGraphDataFactoryTest {
         assertEquals(1.0, lineGraph.bounds.minY.toDouble())
         assertEquals(10.0, lineGraph.bounds.maxY.toDouble())
         assertEquals(YRangeType.FIXED, lineGraph.yRangeType)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -370,6 +377,7 @@ class LuaGraphDataFactoryTest {
         assertEquals(6, barChart.yAxisSubdivides)
         assertEquals(Period.ofDays(2), barChart.barPeriod)
         assertEquals(false, barChart.durationBasedRange)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -431,6 +439,7 @@ class LuaGraphDataFactoryTest {
             ),
             barChart.bars.map { it.color }
         )
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -474,6 +483,7 @@ class LuaGraphDataFactoryTest {
             listOf("B", "A"),
             listOf(barChart.bars[0].segmentSeries.title, barChart.bars[1].segmentSeries.title),
         )
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -491,6 +501,7 @@ class LuaGraphDataFactoryTest {
         assertEquals(null, result.error)
         assertEquals(false, result.hasData)
         assertEquals(IGraphStatViewData.State.READY, result.state)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -539,6 +550,7 @@ class LuaGraphDataFactoryTest {
         )
 
         verify(onDataSampled).invoke(dataPoints + dataPoints)
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -562,6 +574,7 @@ class LuaGraphDataFactoryTest {
         rawDataSamples.values.forEach {
             verify(it).dispose()
         }
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     @Test
@@ -579,6 +592,7 @@ class LuaGraphDataFactoryTest {
         rawDataSamples.values.forEach {
             verify(it).dispose()
         }
+        verify(luaEngine).releaseVM(testVmLock)
     }
 
     private fun luaGraph(
