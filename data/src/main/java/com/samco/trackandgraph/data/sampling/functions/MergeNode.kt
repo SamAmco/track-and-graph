@@ -28,21 +28,25 @@ private data class NodeDataPoint(
 internal class MergeNode(
     private val downStreamSources: Map<Int, NodeRawDataSample?>
 ) : NodeRawDataSample() {
-    val iterators = downStreamSources.mapNotNull {
-        val iterator = it.value?.iterator() ?: return@mapNotNull null
-        it.key to iterator
-    }.toMap()
 
     override fun dispose() {
         downStreamSources.forEach { it.value?.dispose() }
     }
 
     override fun iterator(): Iterator<DataPoint> {
-        val priorityQueue =
-            PriorityQueue<NodeDataPoint>(compareByDescending { it.dataPoint.timestamp })
+        val priorityQueue = PriorityQueue<NodeDataPoint>(
+            compareByDescending { it.dataPoint.timestamp }
+        )
+
+        val iterators = downStreamSources.mapNotNull {
+            val iterator = it.value?.iterator() ?: return@mapNotNull null
+            it.key to iterator
+        }.toMap()
+
         iterators.forEach {
             if (it.value.hasNext()) priorityQueue.add(NodeDataPoint(it.key, it.value.next()))
         }
+
         return object : Iterator<DataPoint> {
             override fun hasNext(): Boolean {
                 return try {

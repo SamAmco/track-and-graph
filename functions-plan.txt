@@ -14,8 +14,6 @@ TODO:
   - semver each function
 - Docs
 
-- Write a test for lua pool allocation
-- Merge node is incorrectly implemented, it should call the upstream iterators only when its iterator is called, not all at once when it is created
 - Get rid of coroutines and just use a function returning a function
 
 QA: 
