@@ -141,6 +141,7 @@ dependencies {
     testFixturesImplementation(libs.espresso.core)
     testFixturesImplementation(libs.threetenabp)
     testFixturesImplementation(libs.room.runtime)
+    testFixturesImplementation(libs.luak.jvm)
     testFixturesImplementation(libs.kotlinx.serialization.core)
     testFixturesImplementation(libs.kotlinx.serialization.json)
 }

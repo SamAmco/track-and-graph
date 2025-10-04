@@ -33,6 +33,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -98,7 +99,7 @@ class PieChartDataFactoryTest {
             )
         ) {}
 
-        whenever(dataSampler.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
+        whenever(dataSampler.getDataSampleForFeatureId(featureId, null)).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
             pieChart.copy(sumByCount = true)
         )
@@ -134,7 +135,7 @@ class PieChartDataFactoryTest {
             )
         ) {}
 
-        whenever(dataSampler.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
+        whenever(dataSampler.getDataSampleForFeatureId(featureId, null)).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
             pieChart.copy(sumByCount = false)
         )
@@ -164,7 +165,7 @@ class PieChartDataFactoryTest {
             )
         ) {}
 
-        whenever(dataSampler.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
+        whenever(dataSampler.getDataSampleForFeatureId(featureId, null)).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
             pieChart.copy(sumByCount = false)
         )

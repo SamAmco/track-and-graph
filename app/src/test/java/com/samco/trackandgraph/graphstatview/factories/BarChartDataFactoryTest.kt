@@ -36,6 +36,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.threeten.bp.DayOfWeek
@@ -84,7 +86,7 @@ class BarChartDataFactoryTest {
             dataSampledCalled = true
         }
 
-        whenever(dataSampler.getDataSampleForFeatureId(1))
+        whenever(dataSampler.getDataSampleForFeatureId(1L, null))
             .thenReturn(dataSample)
 
         //EXECUTE

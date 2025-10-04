@@ -26,19 +26,62 @@ import com.samco.trackandgraph.data.sampling.functions.FunctionGraphDataSample
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Interface for sampling data from features (trackers or functions).
+ */
 interface DataSampler {
+    /**
+     * Gets a raw data sample for the specified feature ID.
+     *
+     * @param featureId The ID of the feature to sample data from
+     * @param vmLock Optional Lua VM lock. If the data source is derived from a function,
+     *               the Lua engine will need to run to provide this data source. If you are
+     *               getting one data source, iterating it, and then disposing it, you can
+     *               leave this as null and a lock will be acquired for you. However, if you
+     *               will get multiple data sources and iterate them all before disposing any
+     *               of them, you could get a deadlock from reaching the VM limit. In such cases,
+     *               you should acquire one VM lock and pass it to all calls, ensuring you do
+     *               not iterate the data samples in parallel on different threads.
+     * @return The raw data sample, or null if the feature doesn't exist
+     */
     suspend fun getRawDataSampleForFeatureId(
         featureId: Long,
         vmLock: LuaVMLock? = null
     ): RawDataSample?
 
+    /**
+     * Gets a data sample for the specified feature ID.
+     *
+     * @param featureId The ID of the feature to sample data from
+     * @param vmLock Optional Lua VM lock. If the data source is derived from a function,
+     *               the Lua engine will need to run to provide this data source. If you are
+     *               getting one data source, iterating it, and then disposing it, you can
+     *               leave this as null and a lock will be acquired for you. However, if you
+     *               will get multiple data sources and iterate them all before disposing any
+     *               of them, you could get a deadlock from reaching the VM limit. In such cases,
+     *               you should acquire one VM lock and pass it to all calls, ensuring you do
+     *               not iterate the data samples in parallel on different threads.
+     * @return The data sample
+     */
     suspend fun getDataSampleForFeatureId(
         featureId: Long,
         vmLock: LuaVMLock? = null
     ): DataSample
 
+    /**
+     * Gets all distinct labels for the specified feature ID.
+     *
+     * @param featureId The ID of the feature to get labels from
+     * @return List of distinct labels
+     */
     suspend fun getLabelsForFeatureId(featureId: Long): List<String>
 
+    /**
+     * Gets the data sample properties for the specified feature ID.
+     *
+     * @param featureId The ID of the feature to get properties from
+     * @return The data sample properties, or null if the feature doesn't exist
+     */
     suspend fun getDataSamplePropertiesForFeatureId(featureId: Long): DataSampleProperties?
 }
 
