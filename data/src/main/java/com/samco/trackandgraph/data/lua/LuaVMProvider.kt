@@ -59,7 +59,6 @@ internal class LuaVMProvider @Inject constructor(
 ) {
     private val poolWriteMutex = Mutex()
     private val vmPool = CopyOnWriteArrayList<VMLease>()
-    private val maxVMs = 8
     private val nextVMIndex = AtomicInteger(0)
 
     suspend fun acquire(): VMLease {
@@ -67,9 +66,9 @@ internal class LuaVMProvider @Inject constructor(
         vmPool.firstOrNull { it.lock.tryLock() }?.let { return it }
 
         // 2) Grow the pool if we still have capacity
-        if (vmPool.size < maxVMs) {
+        if (vmPool.size < MAX_VMS) {
             return poolWriteMutex.withLock {
-                if (vmPool.size < maxVMs) {
+                if (vmPool.size < MAX_VMS) {
                     val newVM = VMLease(
                         globals = buildGlobals(),
                         lock = Mutex(),
@@ -119,5 +118,9 @@ internal class LuaVMProvider @Inject constructor(
         LuaC.install(globals)
         requireApi.installIn(globals)
         return globals
+    }
+
+    internal companion object {
+        const val MAX_VMS = 8
     }
 }

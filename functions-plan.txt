@@ -15,9 +15,8 @@ TODO:
 - Docs
 
 - Write a test for lua pool allocation
-- Get rid of unlock function and add release to the lock object
-- Fix up app module (at least the lua graph should acquire a single lock, other graphs probably should too, like line graph probably should, anything with multiple data sources should)
 - Merge node is incorrectly implemented, it should call the upstream iterators only when its iterator is called, not all at once when it is created
+- Get rid of coroutines and just use a function returning a function
 
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source
