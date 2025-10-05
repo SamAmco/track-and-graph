@@ -10,16 +10,18 @@
 
 - Run `make assemble-bundle-release` or `make assemble-release` and `make bundle-release` to generate the apk and aab
 
+- Run the app on a device to sanity check the release build `adb install app/build/outputs/apk/release/app-release.apk`
+
 - Use fastlane to upload the new aab to the play store e.g. for alpha:
 
-bundle exec fastlane supply --aab app/release/app-release.aab --track alpha
+bundle exec fastlane supply --aab app/build/outputs/bundle/release/app-release.aab --track alpha
 
 for beta:
 
-bundle exec fastlane supply --aab app/release/app-release.aab --track beta
+bundle exec fastlane supply --aab app/build/outputs/bundle/release/app-release.aab --track beta
 
 or for release:
 
-bundle exec fastlane supply --aab app/release/app-release.aab --rollout 0.5
+bundle exec fastlane supply --aab app/build/outputs/bundle/release/app-release.aab --rollout 0.5
 
 - run `make github-release` to create a new github release with the changelog and apk attached
