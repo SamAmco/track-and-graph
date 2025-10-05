@@ -57,7 +57,8 @@ def check_tag_exists(tag):
 
 def get_changelog_content(version_code):
     """Read the changelog file for this version"""
-    changelog_file = Path(__file__).parent.parent / "fastlane" / "metadata" / "android" / "en-GB" / "changelogs" / f"{version_code}.txt"
+    changelog_file = Path(__file__).parent.parent / "fastlane" / "metadata" / \
+        "android" / "en-GB" / "changelogs" / f"{version_code}.txt"
 
     if not changelog_file.exists():
         print(f"Error: Changelog file not found: {changelog_file}")
@@ -75,7 +76,8 @@ def get_current_branch():
 
 def find_apk():
     """Find the release APK file"""
-    apk_dir = Path(__file__).parent.parent / "app" / "build" / "outputs" / "apk" / "release"
+    apk_dir = Path(__file__).parent.parent / "app" / \
+        "build" / "outputs" / "apk" / "release"
     apk_files = list(apk_dir.glob("*.apk"))
 
     if not apk_files:
@@ -90,6 +92,13 @@ def find_apk():
 def main():
     print("==> GitHub Release Creation Script")
     print()
+
+    # Make sure gh CLI is installed
+    try:
+        run_command(["gh", "--version"])
+    except FileNotFoundError:
+        print("Error: GitHub CLI (gh) is not installed or not in PATH")
+        sys.exit(1)
 
     # Check working tree is clean
     check_working_tree_clean()

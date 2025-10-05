@@ -228,5 +228,5 @@ commit-version:
 	@python3 scripts/commit_version_bump.py
 
 .PHONY: github-release
-release:
+github-release:
 	@python3 scripts/create_release.py
