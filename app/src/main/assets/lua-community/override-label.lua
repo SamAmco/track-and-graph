@@ -25,8 +25,7 @@ return {
     },
 
     -- Generator function
-    generator = function(data_sources, config)
-        local source = data_sources[1]
+    generator = function(source, config)
         local new_label = config and config.new_label
 
         return function()
