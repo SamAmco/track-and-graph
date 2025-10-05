@@ -93,6 +93,21 @@ kill-emulator:
 run-community-tests:
 	./gradlew :app:testDebugUnitTest --tests "com.samco.trackandgraph.lua.CommunityTestRunner"
 
+.PHONY: validate-all
+validate-all: validate-remote-config run-community-tests
+	@echo "All validations passed."
+
+.PHONY: assemble-release
+assemble-release: 
+	./gradlew clean assembleRelease
+
+.PHONY: bundle-release
+bundle-release:
+	./gradlew clean bundleRelease
+
+.PHONY: assemble-bundle-release
+assemble-bundle-release: assemble-release bundle-release
+
 # ---------- 1) RECORD LOW-RES SNAPSHOT BASELINES ----------
 .PHONY: snapshots-record
 snapshots-record: check-no-devices ensure-avd-shot-api35-low boot-and-prep-shot-api35-low
@@ -202,3 +217,15 @@ tutorial-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-ap
 
 	@echo "==> Tutorial images generated successfully"
 	@$(MAKE) kill-emulator
+
+.PHONY: changelog
+changelog:
+	@python3 scripts/new_changelog.py
+
+.PHONY: commit-version
+commit-version:
+	@python3 scripts/commit_version_bump.py
+
+.PHONY: github-release
+release:
+	@python3 scripts/create_release.py

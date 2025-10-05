@@ -1,20 +1,14 @@
-- Verify the configuration links are correct in ./configuration/remote-configuration.json
-
-- Run `make validate-remote-config`
-
-- Run the community tests `make run-community-tests`
+- Run `make validate-all` or `make validate-remote-config` and `make run-community-tests`
 
 - Update the build.gradle version code and name
 
-- Build an apk for the release (using Android Studio) and install it to sense check the release build
+(also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.)
 
-- Copy and paste a fastlane changelog file and add the changelog there e.g. 
+- Run `make changelog` to generate a changelog from merged commits since the last release
 
-cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
+- Run `make commit-version` to commit the version bump and changelog (before release to ensure reproducible builds)
 
-- Build an aab for the release (using Android Studio)
-
-also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
+- Run `make assemble-bundle-release` or `make assemble-release` and `make bundle-release` to generate the apk and aab
 
 - Use fastlane to upload the new aab to the play store e.g. for alpha:
 
@@ -28,8 +22,4 @@ or for release:
 
 bundle exec fastlane supply --aab app/release/app-release.aab --rollout 0.5
 
-- Commit everything
-
-- Tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload) as F-droid uses these tags for its own releases
-
-- On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
+- run `make github-release` to create a new github release with the changelog and apk attached
