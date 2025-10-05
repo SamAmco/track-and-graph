@@ -70,6 +70,9 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
     }
 
     private fun createLuaDataSourcesList(dataSources: List<RawDataSample>): LuaValue {
+        if (dataSources.size == 1) {
+            return luaDataSourceProvider.createLuaDataSource(dataSources[0].iterator())
+        }
         val luaTable = LuaTable()
         dataSources.forEachIndexed { index, rawDataSample ->
             // Create a Lua data source for each RawDataSample
