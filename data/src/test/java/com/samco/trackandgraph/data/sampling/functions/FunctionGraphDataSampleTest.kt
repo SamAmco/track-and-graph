@@ -378,9 +378,7 @@ class FunctionGraphDataSampleTest {
             y = 100f,
             id = 2,
             script = """
-                return function(data_sources)
-                    local source = data_sources[1]
-                    
+                return function(source)
                     return function()
                         local data_point = source.dp()
                         if not data_point then return nil end

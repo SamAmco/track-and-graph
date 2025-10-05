@@ -25,8 +25,7 @@ return {
     },
 
     -- Generator function
-    generator = function(data_sources, config)
-        local source = data_sources[1]
+    generator = function(source, config)
         local multiplier = config and config.multiplier or 1.0
 
         return function()

@@ -38,8 +38,7 @@ return {
     },
 
     -- Generator function
-    generator = function(data_sources, config)
-        local source = data_sources[1]
+    generator = function(source, config)
         local filter_label = config and config.filter_label
 
         return function()

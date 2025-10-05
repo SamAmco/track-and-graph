@@ -40,9 +40,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             )
         ),
         script = """
-            return function(data_sources)
-                local source = data_sources[1]
-                
+            return function(source)
                 return function()
                     return source.dp()
                 end
@@ -65,8 +63,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             )
         ),
         script = """
-            return function(data_sources)
-                local source = data_sources[1]
+            return function(source)
                 local all_data = source.dpall()
                 local index = 1
                 
@@ -104,9 +101,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             -- Don't do this! This tests our nested iterator can access state local to the 
             -- chunk. It's not a good idea to do this in real code.
             local counter = 0
-            return function(data_sources)
-                local source = data_sources[1]
-                
+            return function(source)
                 return function()
                     local data_point = source.dp()
                     if not data_point then return nil end
@@ -154,8 +149,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                 }
             ),
             script = """
-                return function(data_sources)
-                    local source = data_sources[1]
+                return function(source)
                     local count = 0
                     local max_items = 3
                     
@@ -199,8 +193,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         ),
         script = """
             return {
-                generator = function(data_sources)
-                    local source = data_sources[1]
+                generator = function(source)
                     local multiplier = 2
                     
                     return function()
@@ -257,9 +250,8 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         }
 
         val script = """
-            return function(data_sources)
+            return function(source)
                 local counter = 0
-                local source = data_sources[1]
                 
                 return function()
                     local data_point = source.dp()
@@ -329,8 +321,7 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             )
         ),
         script = """
-            return function(data_sources, config)
-                local source = data_sources[1]
+            return function(source, config)
                 local multiplier = config.multiplier
                 local prefix = config.prefix
                 local offset = config.offset
@@ -365,6 +356,62 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         // Verify third data point: (30.0 * 2.5) + 100.0 = 175.0
         assertEquals("Third value should be transformed", 175.0, resultList[2].value, 0.001)
         assertEquals("Third label should be prefixed", "processed_third", resultList[2].label)
+    }
+
+    @Test
+    fun `Generator function with multiple data sources (inputCount = 2)`() = testLuaFunction(
+        dataSources = listOf(
+            sequenceOf(
+                TestDP(timestamp = 1000, value = 10.0, label = "source1_a"),
+                TestDP(timestamp = 3000, value = 30.0, label = "source1_b")
+            ),
+            sequenceOf(
+                TestDP(timestamp = 2000, value = 20.0, label = "source2_a"),
+                TestDP(timestamp = 4000, value = 40.0, label = "source2_b")
+            )
+        ),
+        script = """
+            return function(data_sources, config)
+                local source1 = data_sources[1]
+                local source2 = data_sources[2]
+                
+                -- Get all data from both sources and combine into one table
+                local all_data1 = source1.dpall()
+                local all_data2 = source2.dpall()
+                local combined_data = {}
+                
+                -- Add all data from source1
+                for i = 1, #all_data1 do
+                    table.insert(combined_data, all_data1[i])
+                end
+                
+                -- Add all data from source2
+                for i = 1, #all_data2 do
+                    table.insert(combined_data, all_data2[i])
+                end
+                
+                local index = 1
+                return function()
+                    if index > #combined_data then return nil end
+                    
+                    local data_point = combined_data[index]
+                    index = index + 1
+                    return data_point
+                end
+            end
+        """.trimIndent()
+    ) {
+        assertEquals("Should have 4 data points total", 4, resultList.size)
+        
+        // Verify we got data from both sources (order doesn't matter)
+        val labels = resultList.map { it.label }.toSet()
+        assertTrue("Should contain source1_a", labels.contains("source1_a"))
+        assertTrue("Should contain source1_b", labels.contains("source1_b"))
+        assertTrue("Should contain source2_a", labels.contains("source2_a"))
+        assertTrue("Should contain source2_b", labels.contains("source2_b"))
+        
+        val values = resultList.map { it.value }.toSet()
+        assertTrue("Should contain all values", values.containsAll(setOf(10.0, 20.0, 30.0, 40.0)))
     }
 }
 
