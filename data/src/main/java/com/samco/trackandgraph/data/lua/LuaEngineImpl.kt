@@ -86,7 +86,6 @@ internal class LuaEngineImpl @Inject constructor(
             val vmLease = vmLock.asLease()
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaFunctionDataSourceAdapter.createDataPointSequence(
-                vmLease = vmLease,
                 resolvedScript = resolvedScript,
                 dataSources = dataSources,
                 configuration = configuration,

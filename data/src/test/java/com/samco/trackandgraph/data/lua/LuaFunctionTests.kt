@@ -42,10 +42,9 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         script = """
             return function(data_sources)
                 local source = data_sources[1]
-                local data_point = source.dp()
-                while data_point do
-                    coroutine.yield(data_point)
-                    data_point = source.dp()
+                
+                return function()
+                    return source.dp()
                 end
             end
         """.trimIndent()
@@ -66,17 +65,21 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             )
         ),
         script = """
-            
             return function(data_sources)
                 local source = data_sources[1]
                 local all_data = source.dpall()
-                for _, data_point in ipairs(all_data) do
-                    -- Add 1 to the value
+                local index = 1
+                
+                return function()
+                    if index > #all_data then return nil end
+                    
+                    local data_point = all_data[index]
                     data_point.value = data_point.value + 1
-                    coroutine.yield(data_point)
+                    index = index + 1
+                    
+                    return data_point
                 end
             end
-
         """.trimIndent()
     ) {
         assertEquals(3, resultList.size)
@@ -98,23 +101,25 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             )
         ),
         script = """
+            -- Don't do this! This tests our nested iterator can access state local to the 
+            -- chunk. It's not a good idea to do this in real code.
+            local counter = 0
             return function(data_sources)
                 local source = data_sources[1]
-                local counter = 0  -- Local variable that persists across yields
                 
-                local data_point = source.dp()
-                while data_point do
+                return function()
+                    local data_point = source.dp()
+                    if not data_point then return nil end
+                    
                     counter = counter + 1
-                    -- Create new data point with counter value
                     local new_point = {
                         timestamp = data_point.timestamp,
-                        offset = data_point.offset,
-                        value = counter,  -- Use the incrementing counter
+                        value = counter,
                         label = "count_" .. counter,
                         note = data_point.note
                     }
-                    coroutine.yield(new_point)
-                    data_point = source.dp()
+                    
+                    return new_point
                 end
             end
         """.trimIndent()
@@ -152,16 +157,19 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                 return function(data_sources)
                     local source = data_sources[1]
                     local count = 0
-                    local max_items = 3  -- Only process first 3 items
+                    local max_items = 3
                     
-                    local data_point = source.dp()
-                    while data_point and count < max_items do
+                    return function()
+                        if count >= max_items then return nil end
+                        
+                        local data_point = source.dp()
+                        if not data_point then return nil end
+                        
                         count = count + 1
                         data_point.label = "processed_" .. count
-                        coroutine.yield(data_point)
-                        data_point = source.dp()
+                        
+                        return data_point
                     end
-                    -- Exit early, don't consume remaining data points
                 end
             """.trimIndent()
         ) {
@@ -171,18 +179,13 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             assertEquals("processed_2", resultList[1].label)
             assertEquals("processed_3", resultList[2].label)
 
-            // Most importantly: verify we only consumed 4 upstream data points (3 processed + 1 look-ahead), not all 1000
+            // Most importantly: verify we only consumed e upstream data points
             assertEquals(
-                "Should only consume 4 upstream data points (3 processed + 1 look-ahead), not all $totalAvailable",
-                4,
+                "Should only consume 3 upstream data points",
+                3,
                 upstreamConsumed
             )
         }
-    }
-
-    @Test
-    fun `Generic stateful counter test with 10 data points`() {
-        testStatefulCounter(10)
     }
 
     @Test
@@ -198,20 +201,20 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
             return {
                 generator = function(data_sources)
                     local source = data_sources[1]
-                    local multiplier = 2  -- Local state for the generator
+                    local multiplier = 2
                     
-                    local data_point = source.dp()
-                    while data_point do
-                        -- Create new data point with doubled value
+                    return function()
+                        local data_point = source.dp()
+                        if not data_point then return nil end
+                        
                         local new_point = {
                             timestamp = data_point.timestamp,
-                            offset = data_point.offset,
                             value = data_point.value * multiplier,
                             label = data_point.label .. "_x" .. multiplier,
                             note = data_point.note
                         }
-                        coroutine.yield(new_point)
-                        data_point = source.dp()
+                        
+                        return new_point
                     end
                 end
             }
@@ -224,44 +227,6 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         assertEquals("second_x2", resultList[1].label)
         assertEquals(60.0, resultList[2].value, 0.001)  // 30.0 * 2
         assertEquals("third_x2", resultList[2].label)
-    }
-
-    /**
-     * Generic helper to test stateful counter behavior with configurable data point count
-     */
-    private fun testStatefulCounter(dataPointCount: Int) {
-        testLuaFunction(
-            dataSources = listOf(
-                sequence {
-                    repeat(dataPointCount) { i ->
-                        yield(TestDP(timestamp = (i + 1) * 1000L, value = 100.0, label = "base"))
-                    }
-                }
-            ),
-            script = """
-                return function(data_sources)
-                    local source = data_sources[1]
-                    local counter = 0  -- Local variable that persists across yields
-                    
-                    local data_point = source.dp()
-                    while data_point do
-                        counter = counter + 1
-                        -- Mutate the input data point directly
-                        data_point.value = counter  -- Use the incrementing counter
-                        data_point.label = "count_" .. counter
-                        coroutine.yield(data_point)
-                        data_point = source.dp()
-                    end
-                end
-            """.trimIndent()
-        ) {
-            assertEquals(dataPointCount, resultList.size)
-            // Verify each counter value is correct
-            for (i in 0 until dataPointCount) {
-                assertEquals((i + 1).toDouble(), resultList[i].value, 0.001)
-                assertEquals("count_${i + 1}", resultList[i].label)
-            }
-        }
     }
 
     /**
@@ -292,18 +257,19 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         }
 
         val script = """
-            local counter = 0  -- Local variable that persists across yields
             return function(data_sources)
+                local counter = 0
                 local source = data_sources[1]
                 
-                local data_point = source.dp()
-                while data_point do
+                return function()
+                    local data_point = source.dp()
+                    if not data_point then return nil end
+                    
                     counter = counter + 1
-                    -- Mutate the input data point directly
-                    data_point.value = counter  -- Use the incrementing counter
+                    data_point.value = counter
                     data_point.label = "count_" .. counter
-                    coroutine.yield(data_point)
-                    data_point = source.dp()
+                    
+                    return data_point
                 end
             end
         """.trimIndent()
@@ -369,13 +335,14 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
                 local prefix = config.prefix
                 local offset = config.offset
                 
-                local data_point = source.dp()
-                while data_point do
-                    -- Use configuration to transform the data point
+                return function()
+                    local data_point = source.dp()
+                    if not data_point then return nil end
+                    
                     data_point.value = (data_point.value * multiplier) + offset
                     data_point.label = prefix .. data_point.label
-                    coroutine.yield(data_point)
-                    data_point = source.dp()
+                    
+                    return data_point
                 end
             end
         """.trimIndent(),

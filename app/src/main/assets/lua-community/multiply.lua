@@ -29,18 +29,13 @@ return {
         local source = data_sources[1]
         local multiplier = config and config.multiplier or 1.0
 
-        local data_point = source.dp()
-        while data_point do
-            -- Create a new data point with the multiplied value
-            local new_data_point = {
-                timestamp = data_point.timestamp,
-                value = data_point.value * multiplier,
-                label = data_point.label,
-                note = data_point.note
-            }
+        return function()
+            local data_point = source.dp()
+            if not data_point then return nil end
 
-            coroutine.yield(new_data_point)
-            data_point = source.dp()
+            data_point.value = data_point.value * multiplier
+
+            return data_point
         end
     end
 }
