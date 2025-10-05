@@ -106,7 +106,8 @@ bundle-release:
 	./gradlew clean bundleRelease
 
 .PHONY: assemble-bundle-release
-assemble-bundle-release: assemble-release bundle-release
+assemble-bundle-release:
+	./gradlew clean assembleRelease bundleRelease
 
 # ---------- 1) RECORD LOW-RES SNAPSHOT BASELINES ----------
 .PHONY: snapshots-record
