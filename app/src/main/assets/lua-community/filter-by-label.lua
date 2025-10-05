@@ -1,6 +1,19 @@
 -- Example Lua Function with Input Count and Configuration
 -- This function filters data points by label
 
+local function match(data_point, filter_label)
+    if
+        filter_label == nil
+        or filter_label == ""
+        or data_point.label == filter_label
+    then
+        return true
+    else
+        return false
+    end
+end
+
+
 return {
     -- Configuration metadata
     version = "1.0.0",
@@ -29,14 +42,12 @@ return {
         local source = data_sources[1]
         local filter_label = config and config.filter_label
 
-        local data_point = source.dp()
-        while data_point do
-            -- If no filter is set, return all data points
-            -- Otherwise, only yield data points that match the filter label
-            if filter_label == nil or filter_label == "" or data_point.label == filter_label then
-                coroutine.yield(data_point)
+        return function()
+            local data_point = source.dp()
+            while data_point and not match(data_point, filter_label) do
+                data_point = source.dp()
             end
-            data_point = source.dp()
+            return data_point
         end
     end
 }

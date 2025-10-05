@@ -27,25 +27,16 @@ return {
     -- Generator function
     generator = function(data_sources, config)
         local source = data_sources[1]
-        local new_label = config and config.new_label or ""
-        
-        -- Convert to string if needed
-        if type(new_label) ~= "string" then
-            new_label = tostring(new_label)
-        end
+        local new_label = config and config.new_label
 
-        local data_point = source.dp()
-        while data_point do
-            -- Create a new data point with the overridden label
-            local new_data_point = {
-                timestamp = data_point.timestamp,
-                value = data_point.value,
-                label = new_label,  -- Override the label
-                note = data_point.note
-            }
-            
-            coroutine.yield(new_data_point)
-            data_point = source.dp()
+        return function()
+            local data_point = source.dp()
+            if not data_point then return nil end
+
+            if not new_label then return data_point end
+            data_point.label = new_label
+
+            return data_point
         end
     end
 }

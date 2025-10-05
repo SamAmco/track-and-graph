@@ -14,8 +14,6 @@ TODO:
   - semver each function
 - Docs
 
-- Get rid of coroutines and just use a function returning a function
-
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source
   - Removing a data source should remove it from any functions that use it as a data source

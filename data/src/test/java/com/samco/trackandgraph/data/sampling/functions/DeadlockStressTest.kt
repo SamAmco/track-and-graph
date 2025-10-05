@@ -173,7 +173,10 @@ class DeadlockStressTest {
             script = """
                 return function(data_sources, config)
                     local i = 0
-                    while i < 5 do
+                    
+                    return function()
+                        if i >= 500 then return nil end
+                        
                         i = i + 1
                         local data_point = {
                             timestamp = 1000000000 + i * 1000,
@@ -182,7 +185,8 @@ class DeadlockStressTest {
                             label = "leaf_" .. i,
                             note = ""
                         }
-                        coroutine.yield(data_point)
+                        
+                        return data_point
                     end
                 end
             """.trimIndent(),
@@ -237,13 +241,15 @@ class DeadlockStressTest {
             script = """
                 return function(data_sources, config)
                     local source = data_sources[1]
-                    local data_point = source.dp()
-                    while data_point do
-                        -- Pass through with minor modification to prove processing
+                    
+                    return function()
+                        local data_point = source.dp()
+                        if not data_point then return nil end
+                        
                         data_point.value = data_point.value + 0.1
                         data_point.label = data_point.label .. "_pass"
-                        coroutine.yield(data_point)
-                        data_point = source.dp()
+                        
+                        return data_point
                     end
                 end
             """.trimIndent(),

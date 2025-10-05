@@ -18,23 +18,23 @@ package com.samco.trackandgraph.data.lua.functionadapters
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
-import com.samco.trackandgraph.data.lua.VMLease
 import com.samco.trackandgraph.data.lua.apiimpl.ConfigurationValueParser
 import com.samco.trackandgraph.data.lua.apiimpl.DataPointParser
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import org.luaj.vm2.LuaFunction
 import org.luaj.vm2.LuaTable
-import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.LuaValue.Companion.varargsOf
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Adapter responsible for executing Lua function scripts and returning RawDataSample results.
+ * Adapter responsible for executing Lua function scripts and returning Sequence<DataPoint> results.
  * This adapter handles the data processing aspect of Lua functions, finding the generator function
- * and wrapping it in a RawDataSample.
+ * that returns an iterator function and wrapping it in a Sequence.
+ *
+ * The Lua function should return an iterator function (closure) that can be called repeatedly
+ * to get the next data point, returning nil when no more data is available.
  *
  * Note: This is separate from the future metadata adapter which will handle parsing
  * configurable parameters, input connector count, name, description etc.
@@ -50,12 +50,10 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
      *
      * @param resolvedScript The resolved LuaValue from executing the Lua script
      * @param dataSources List of input data sources to pass to the Lua function
-     * @param vmLease The VM lease to use for execution with proper synchronization
-     * @return Sequence<DataPoint> wrapping the Lua generator function result
+     * @return Sequence<DataPoint> wrapping the Lua iterator function result
      * @throws Exception if script execution fails
      */
     fun createDataPointSequence(
-        vmLease: VMLease,
         resolvedScript: LuaValue,
         dataSources: List<RawDataSample>,
         configuration: List<LuaScriptConfigurationValue>,
@@ -63,9 +61,8 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
         val generatorFunction = findGeneratorFunction(resolvedScript)
         val config = configurationValueParser.parseConfigurationValues(configuration)
 
-        // Return a Sequence that lazily processes the coroutine
+        // Return a Sequence that lazily processes the iterator function
         return createLuaGeneratorSequence(
-            vmLease = vmLease,
             generatorFunction = generatorFunction,
             dataSources = dataSources,
             config = config
@@ -83,7 +80,6 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
     }
 
     private fun createLuaGeneratorSequence(
-        vmLease: VMLease,
         generatorFunction: LuaFunction,
         dataSources: List<RawDataSample>,
         config: LuaTable,
@@ -91,15 +87,19 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
         return Sequence {
             object : Iterator<DataPoint> {
                 private var nextDataPoint: DataPoint? = null
-                private var isStarted = false
-                private val coroutine = LuaThread(vmLease.globals, generatorFunction)
-
-                // Convert List<RawDataSample> to Lua-compatible format
-                private val luaDataSources = createLuaDataSourcesList(dataSources)
+                private val iteratorFunction: LuaFunction
 
                 init {
-                    // Create a coroutine from the generator function
                     try {
+                        // Convert List<RawDataSample> to Lua-compatible format
+                        val luaDataSources = createLuaDataSourcesList(dataSources)
+                        // Call the generator function to get the iterator function
+                        val result = generatorFunction.call(luaDataSources, config)
+                        if (!result.isfunction()) {
+                            throw RuntimeException("Lua generator function must return an iterator function")
+                        }
+                        iteratorFunction = result.checkfunction()!!
+
                         // Load the first data point
                         loadNextDataPoint()
                     } catch (e: Throwable) {
@@ -115,7 +115,7 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
                 override fun next(): DataPoint {
                     return try {
                         val current = nextDataPoint
-                            ?: throw NoSuchElementException("No more elements in Lua generator")
+                            ?: throw NoSuchElementException("No more elements in Lua iterator")
 
                         // Load the next data point for the next call
                         loadNextDataPoint()
@@ -127,22 +127,10 @@ internal class LuaFunctionDataSourceAdapter @Inject constructor(
                 }
 
                 private fun loadNextDataPoint() {
-                    val result = if (!isStarted) {
-                        isStarted = true
-                        coroutine.resume(varargsOf(luaDataSources, config))
-                    } else {
-                        coroutine.resume(LuaValue.NONE)
-                    }
-
-                    val success = result.arg1().toboolean()
-                    if (!success) {
-                        val errorMsg = result.arg(2).tojstring()
-                        throw RuntimeException("Lua coroutine failed: $errorMsg")
-                    }
-
-                    val yielded = result.arg(2)
-                    nextDataPoint = if (yielded.isnil()) null
-                    else dataPointParser.parseDataPoint(yielded)
+                    val result = iteratorFunction.call()
+                    nextDataPoint =
+                        if (result.isnil()) null
+                        else dataPointParser.parseDataPoint(result)
                 }
             }
         }
