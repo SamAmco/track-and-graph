@@ -16,6 +16,7 @@
  */
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -29,6 +30,15 @@ plugins {
 }
 
 apply(from = "gradle/lua-tasks.gradle.kts")
+
+
+// Load local.properties
+val localProps = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
+
+android {
+}
 
 android {
     compileSdk = libs.versions.androidSdk.get().toInt()
@@ -70,6 +80,15 @@ android {
     // Dynamic testBuildType switching based on project properties
     testBuildType = if (project.hasProperty("usePromoTests")) "promo" else "screenshots"
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(localProps["KEYSTORE_FILE"] as String)
+            storePassword = localProps["KEYSTORE_PASSWORD"] as String
+            keyAlias = localProps["KEY_ALIAS"] as String
+            keyPassword = localProps["KEY_PASSWORD"] as String
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -94,6 +113,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             resValue("string", "app_name", "Track & Graph")
             ndk.debugSymbolLevel = "SYMBOL_TABLE"
