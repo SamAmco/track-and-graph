@@ -31,13 +31,12 @@ plugins {
 
 apply(from = "gradle/lua-tasks.gradle.kts")
 
-
-// Load local.properties
+// Load local.properties if it exists
+val localPropsFile = rootProject.file("local.properties")
 val localProps = Properties().apply {
-    load(rootProject.file("local.properties").inputStream())
-}
-
-android {
+    if (localPropsFile.exists()) {
+        load(localPropsFile.inputStream())
+    }
 }
 
 android {
@@ -82,10 +81,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(localProps["KEYSTORE_FILE"] as String)
-            storePassword = localProps["KEYSTORE_PASSWORD"] as String
-            keyAlias = localProps["KEY_ALIAS"] as String
-            keyPassword = localProps["KEY_PASSWORD"] as String
+            storeFile = (localProps["KEYSTORE_FILE"] as? String)?.let { file(it) }
+            storePassword = localProps["KEYSTORE_PASSWORD"] as String?
+            keyAlias = localProps["KEY_ALIAS"] as String?
+            keyPassword = localProps["KEY_PASSWORD"] as String?
         }
     }
 
