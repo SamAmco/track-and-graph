@@ -21,7 +21,6 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -104,17 +103,17 @@ class FunctionGraphSerializerTest {
         val testedConfigTypes = testGraph.nodes
             .filterIsInstance<FunctionGraphNode.LuaScriptNode>()
             .flatMap { it.configuration }
-            .map { it.type }
+            .map { it::class }
             .toSet()
         
-        // Get all enum values that should be tested
-        val allConfigTypes = LuaFunctionConfigType.entries.toSet()
+        // Get all sealed subclasses of LuaScriptConfigurationValue using reflection
+        val allConfigTypes = LuaScriptConfigurationValue::class.sealedSubclasses.toSet()
         
         // Ensure our test covers all configuration types
         val missingTypes = allConfigTypes - testedConfigTypes
         
         if (missingTypes.isNotEmpty()) {
-            val missingTypeNames = missingTypes.joinToString(", ")
+            val missingTypeNames = missingTypes.map { it.simpleName }.joinToString(", ")
             fail("Test does not cover all LuaScriptConfigurationValue types. Missing: $missingTypeNames. " +
                  "Please update createTestFunctionGraph() to include LuaScriptNode configurations of all types. " +
                  "This test protects against accidental serialization changes that would break user data.")
@@ -123,7 +122,7 @@ class FunctionGraphSerializerTest {
         // Also verify we're not testing non-existent types (defensive check)
         val extraTypes = testedConfigTypes - allConfigTypes
         if (extraTypes.isNotEmpty()) {
-            val extraTypeNames = extraTypes.joinToString(", ")
+            val extraTypeNames = extraTypes.map { it.simpleName }.joinToString(", ")
             fail("Test includes unknown configuration types: $extraTypeNames")
         }
     }

@@ -20,7 +20,6 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -83,7 +82,6 @@ class LuaScriptConfigurationEncoderNumberTest {
         val numberValue = encodedValue as LuaScriptConfigurationValue.Number
         assertEquals("ID should match", "numberConfig", numberValue.id)
         assertEquals("Value should match", 42.5, numberValue.value, 0.0001)
-        assertEquals("Type should be NUMBER", LuaFunctionConfigType.NUMBER, numberValue.type)
     }
 
     @Test
@@ -177,7 +175,6 @@ class LuaScriptConfigurationEncoderNumberTest {
         // Verify all are number configurations
         result.forEach { encodedValue ->
             assertTrue("All should be Number configurations", encodedValue is LuaScriptConfigurationValue.Number)
-            assertEquals("All should have NUMBER type", LuaFunctionConfigType.NUMBER, encodedValue.type)
         }
         
         // Verify specific values

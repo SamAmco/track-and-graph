@@ -16,15 +16,11 @@
  */
 package com.samco.trackandgraph.functions.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaVMLock
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,7 +29,8 @@ import javax.inject.Inject
  * and returns complete Node.LuaScript instances with proper configuration and error handling.
  */
 internal class LuaScriptNodeProvider @Inject constructor(
-    private val luaEngine: LuaEngine
+    private val luaEngine: LuaEngine,
+    private val configInputFactory: LuaScriptConfigurationInputFactory
 ) {
     /**
      * Analyzes a Lua script and returns a complete Node.LuaScript instance.
@@ -82,7 +79,7 @@ internal class LuaScriptNodeProvider @Inject constructor(
     ): Node.LuaScript {
         val configMap = configuration.associateBy { it.id }
         val inputs = metadata.config.associate { config ->
-            config.id to createConfigurationInput(config, configMap[config.id])
+            config.id to configInputFactory.createConfigurationInput(config, configMap[config.id])
         }
 
         return Node.LuaScript(
@@ -112,15 +109,7 @@ internal class LuaScriptNodeProvider @Inject constructor(
 
             // Create new configuration map by iterating through new metadata
             val newConfiguration = metadata.config.associate { config ->
-                val existingInput = existingNode.configuration[config.id]
-                val input = if (existingInput?.type == config.type) {
-                    // Use existing input if it exists and has the same type
-                    existingInput
-                } else {
-                    // Create new input if type changed or didn't exist
-                    createConfigurationInput(config, null)
-                }
-                config.id to input
+                config.id to recoverConfigOrNew(config, existingNode)
             }
 
             existingNode.copy(
@@ -143,70 +132,13 @@ internal class LuaScriptNodeProvider @Inject constructor(
     }
 
     /**
-     * Creates a new configuration input for the given type.
+     * Checks if the existing input is compatible with the new config spec type.
      */
-    private fun createConfigurationInput(
-        config: LuaFunctionConfig,
-        value: LuaScriptConfigurationValue?
+    private fun recoverConfigOrNew(
+        config: LuaFunctionConfigSpec,
+        existingNode: Node.LuaScript,
     ): LuaScriptConfigurationInput {
-        return when (config.type) {
-            LuaFunctionConfigType.TEXT -> createTextConfigurationInput(config.name, value)
-            LuaFunctionConfigType.NUMBER -> createNumberConfigurationInput(config.name, value)
-            LuaFunctionConfigType.CHECKBOX -> createCheckboxConfigurationInput(config.name, value)
-        }
-    }
-
-    /**
-     * Creates a Text configuration input, restoring the saved value if available and type-compatible.
-     */
-    private fun createTextConfigurationInput(
-        name: TranslatedString?,
-        value: LuaScriptConfigurationValue?
-    ): LuaScriptConfigurationInput.Text {
-        val textValue = value as? LuaScriptConfigurationValue.Text
-        return if (textValue != null) {
-            LuaScriptConfigurationInput.Text(
-                name = name,
-                value = mutableStateOf(TextFieldValue(textValue.value))
-            )
-        } else {
-            LuaScriptConfigurationInput.Text(name = name)
-        }
-    }
-
-    /**
-     * Creates a Number configuration input, restoring the saved value if available and type-compatible.
-     */
-    private fun createNumberConfigurationInput(
-        name: TranslatedString?,
-        value: LuaScriptConfigurationValue?
-    ): LuaScriptConfigurationInput.Number {
-        val numberValue = value as? LuaScriptConfigurationValue.Number
-        return if (numberValue != null) {
-            LuaScriptConfigurationInput.Number(
-                name = name,
-                value = mutableStateOf(TextFieldValue(numberValue.value.toString()))
-            )
-        } else {
-            LuaScriptConfigurationInput.Number(name = name)
-        }
-    }
-
-    /**
-     * Creates a Checkbox configuration input, restoring the saved value if available and type-compatible.
-     */
-    private fun createCheckboxConfigurationInput(
-        name: TranslatedString?,
-        value: LuaScriptConfigurationValue?
-    ): LuaScriptConfigurationInput.Checkbox {
-        val checkboxValue = value as? LuaScriptConfigurationValue.Checkbox
-        return if (checkboxValue != null) {
-            LuaScriptConfigurationInput.Checkbox(
-                name = name,
-                value = mutableStateOf(checkboxValue.value)
-            )
-        } else {
-            LuaScriptConfigurationInput.Checkbox(name = name)
-        }
+        val existingInput = existingNode.configuration[config.id]
+        return configInputFactory.createOrRecoverInput(config, existingInput)
     }
 }

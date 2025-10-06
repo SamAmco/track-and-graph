@@ -21,8 +21,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.Version
@@ -40,49 +39,11 @@ import org.mockito.kotlin.whenever
 class LuaScriptNodeProviderTest {
 
     private val mockLuaEngine: LuaEngine = mock()
-    private val provider = LuaScriptNodeProvider(mockLuaEngine)
+    private val provider = LuaScriptNodeProvider(
+        mockLuaEngine,
+        LuaScriptConfigurationInputFactory()
+    )
     private val testVmLock = TestLuaVMFixtures.createTestLuaVMLock()
-
-    // Comprehensive metadata containing all possible configuration types
-    // This ensures we test all enum values and catch missing implementations
-    private val allTypesMetadata = LuaFunctionMetadata(
-        script = "comprehensive test script",
-        inputCount = 3,
-        config = listOf(
-            LuaFunctionConfig(
-                id = "textConfig",
-                type = LuaFunctionConfigType.TEXT,
-                name = TranslatedString.Simple("Text Configuration")
-            ),
-            LuaFunctionConfig(
-                id = "numberConfig",
-                type = LuaFunctionConfigType.NUMBER,
-                name = TranslatedString.Simple("Number Configuration")
-            ),
-            LuaFunctionConfig(
-                id = "checkboxConfig",
-                type = LuaFunctionConfigType.CHECKBOX,
-                name = TranslatedString.Simple("Checkbox Configuration")
-            )
-        ),
-        version = Version(1, 0, 0),
-        title = TranslatedString.Simple("Comprehensive Test Script"),
-    )
-
-    private val allTypesConfig = listOf(
-        LuaScriptConfigurationValue.Text(
-            id = "textConfig",
-            value = "default text"
-        ),
-        LuaScriptConfigurationValue.Number(
-            id = "numberConfig",
-            value = 123.45
-        ),
-        LuaScriptConfigurationValue.Checkbox(
-            id = "checkboxConfig",
-            value = true
-        ),
-    )
 
     @Before
     fun setup() {
@@ -90,61 +51,6 @@ class LuaScriptNodeProviderTest {
             whenever(mockLuaEngine.acquireVM()).thenReturn(testVmLock)
         }
     }
-
-    @Test
-    fun `createLuaScriptNode handles all configuration types correctly and covers all enum values`() =
-        runTest {
-            // Given
-            val script = "comprehensive script"
-            val nodeId = 999
-            whenever(mockLuaEngine.runLuaFunction(any(), eq(script))).thenReturn(allTypesMetadata)
-
-            // When
-            val result = provider.createLuaScriptNode(
-                script = script,
-                nodeId = nodeId,
-                // This deliberately wrong, to assert we are using the one from the metadata and not
-                // what ever is in the database assuming there are no errors.
-                inputConnectorCount = 2,
-                configuration = allTypesConfig
-            )
-
-            // Then - Basic node properties
-            assertEquals(nodeId, result.id)
-            assertEquals(3, result.inputConnectorCount)
-            assertEquals(allTypesMetadata.script, result.script)
-            assertEquals(3, result.configuration.size)
-            assertEquals(false, result.showEditTools)
-            assertEquals(allTypesMetadata.title, result.title)
-
-            // Then - Validate each configuration type is created correctly
-            val textConfig = result.configuration["textConfig"] as LuaScriptConfigurationInput.Text
-            assertSame(allTypesMetadata.config[0].name, textConfig.name)
-            assertEquals("default text", textConfig.value.value.text)
-
-            val numberConfig =
-                result.configuration["numberConfig"] as LuaScriptConfigurationInput.Number
-            assertSame(allTypesMetadata.config[1].name, numberConfig.name)
-            assertEquals(123.45, numberConfig.value.value.text.toDouble(), 0.0001)
-
-            val checkboxConfig = result.configuration["checkboxConfig"] as LuaScriptConfigurationInput.Checkbox
-            assertSame(allTypesMetadata.config[2].name, checkboxConfig.name)
-            assertEquals(true, checkboxConfig.value.value)
-
-            // CRITICAL: Ensure all enum values are tested
-            // This assertion will fail if a new LuaFunctionConfigType is added but not included in allTypesMetadata
-            val testedTypes = allTypesMetadata.config.map { it.type }.toSet()
-            val allEnumValues = LuaFunctionConfigType.entries.toSet()
-            assertEquals(
-                "All LuaFunctionConfigType enum values must be tested in allTypesMetadata. " +
-                        "Missing types: ${allEnumValues - testedTypes}. " +
-                        "If you added a new type, update allTypesMetadata to include it.",
-                allEnumValues, testedTypes
-            )
-
-            verify(mockLuaEngine).runLuaFunction(any(), eq(script))
-            verify(mockLuaEngine).releaseVM(testVmLock)
-        }
 
     @Test
     fun `createLuaScriptNode with empty config creates node with empty configuration`() = runTest {
@@ -219,9 +125,8 @@ class LuaScriptNodeProviderTest {
             script = newScript,
             inputCount = 2,
             config = listOf(
-                LuaFunctionConfig(
+                LuaFunctionConfigSpec.Text(
                     id = "config1",
-                    type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("Config 1")
                 )
             ),
@@ -265,9 +170,8 @@ class LuaScriptNodeProviderTest {
             script = newScript,
             inputCount = 1,
             config = listOf(
-                LuaFunctionConfig(
+                LuaFunctionConfigSpec.Text(
                     id = "newConfig",
-                    type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("New Config")
                 )
             ),
@@ -321,9 +225,8 @@ class LuaScriptNodeProviderTest {
             script = newScript,
             inputCount = 1,
             config = listOf(
-                LuaFunctionConfig(
+                LuaFunctionConfigSpec.Text(
                     id = "config1",
-                    type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("Config 1")
                 )
             ),
@@ -371,9 +274,8 @@ class LuaScriptNodeProviderTest {
             script = newScript,
             inputCount = 1,
             config = listOf(
-                LuaFunctionConfig(
+                LuaFunctionConfigSpec.Number( // Changed type from TEXT to NUMBER
                     id = "config1",
-                    type = LuaFunctionConfigType.NUMBER, // Changed type from TEXT to NUMBER
                     name = TranslatedString.Simple("Config 1")
                 )
             ),
@@ -473,19 +375,16 @@ class LuaScriptNodeProviderTest {
             script = newScript,
             inputCount = 3,
             config = listOf(
-                LuaFunctionConfig(
+                LuaFunctionConfigSpec.Text(
                     id = "keep",
-                    type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("Keep Config")
                 ),
-                LuaFunctionConfig(
+                LuaFunctionConfigSpec.Text(
                     id = "change",
-                    type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("Changed Config")
                 ),
-                LuaFunctionConfig(
+                LuaFunctionConfigSpec.Text(
                     id = "new",
-                    type = LuaFunctionConfigType.TEXT,
                     name = TranslatedString.Simple("New Config")
                 )
             ),

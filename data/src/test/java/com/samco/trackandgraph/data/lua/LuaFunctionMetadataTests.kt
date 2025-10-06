@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.data.lua
 
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -91,7 +91,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
 
             val config = metadata.config[0]
             assertEquals("threshold", config.id)
-            assertEquals(LuaFunctionConfigType.TEXT, config.type)
+            assertTrue("Config should be text type", config is LuaFunctionConfigSpec.Text)
             assertTrue("Name should be a simple string", config.name is TranslatedString.Simple)
             assertEquals("Threshold Value", (config.name as TranslatedString.Simple).value)
         }
@@ -124,7 +124,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
 
             val config = metadata.config[0]
             assertEquals("multiplier", config.id)
-            assertEquals(LuaFunctionConfigType.TEXT, config.type)
+            assertTrue("Config should be text type", config is LuaFunctionConfigSpec.Text)
             assertTrue("Name should be translations", config.name is TranslatedString.Translations)
             val translations = (config.name as TranslatedString.Translations).values
             assertEquals(3, translations.size)
@@ -166,14 +166,20 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
 
             val thresholdConfig = metadata.config[0]
             assertEquals("threshold", thresholdConfig.id)
-            assertEquals(LuaFunctionConfigType.TEXT, thresholdConfig.type)
-            assertTrue("Threshold name should be a simple string", thresholdConfig.name is TranslatedString.Simple)
+            assertTrue("Threshold config should be text type", thresholdConfig is LuaFunctionConfigSpec.Text)
+            assertTrue(
+                "Threshold name should be a simple string",
+                thresholdConfig.name is TranslatedString.Simple
+            )
             assertEquals("Threshold", (thresholdConfig.name as TranslatedString.Simple).value)
 
             val labelConfig = metadata.config[1]
             assertEquals("label", labelConfig.id)
-            assertEquals(LuaFunctionConfigType.TEXT, labelConfig.type)
-            assertTrue("Label name should be translations", labelConfig.name is TranslatedString.Translations)
+            assertTrue("Label config should be text type", labelConfig is LuaFunctionConfigSpec.Text)
+            assertTrue(
+                "Label name should be translations",
+                labelConfig.name is TranslatedString.Translations
+            )
             val labelTranslations = (labelConfig.name as TranslatedString.Translations).values
             assertEquals("Label", labelTranslations["en-GB"])
             assertEquals("Bezeichnung", labelTranslations["de"])
@@ -203,7 +209,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
 
             val config = metadata.config[0]
             assertEquals("value", config.id)
-            assertEquals(LuaFunctionConfigType.TEXT, config.type)
+            assertTrue("Config should be text type", config is LuaFunctionConfigSpec.Text)
             assertEquals("Name should be null when not provided", null, config.name)
         }
     }
@@ -256,17 +262,20 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                     {
                         id = "textConfig",
                         type = "text",
-                        name = "Text Configuration"
+                        name = "Text Configuration",
+                        default = "Default text value"
                     },
                     {
                         id = "numberConfig",
                         type = "number",
-                        name = "Number Configuration"
+                        name = "Number Configuration",
+                        default = 123
                     },
                     {
                         id = "checkboxConfig",
                         type = "checkbox",
-                        name = "Checkbox Configuration"
+                        name = "Checkbox Configuration",
+                        default = true
                     }
                 },
                 generator = function(data_sources)
@@ -280,29 +289,37 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
             assertEquals("Script should be preserved", script, metadata.script)
 
             // Validate each configuration type is parsed correctly
-            val textConfig = metadata.config.find { it.id == "textConfig" }
+            val textConfig = metadata.config.find { it.id == "textConfig" } as? LuaFunctionConfigSpec.Text
             assertTrue("Text configuration should be parsed", textConfig != null)
-            assertEquals(LuaFunctionConfigType.TEXT, textConfig!!.type)
-            assertEquals("Text Configuration", (textConfig.name as TranslatedString.Simple).value)
+            assertEquals("Text Configuration", (textConfig!!.name as TranslatedString.Simple).value)
+            assertEquals("Default text value should be parsed", "Default text value", textConfig.defaultValue)
 
-            val numberConfig = metadata.config.find { it.id == "numberConfig" }
+            val numberConfig = metadata.config.find { it.id == "numberConfig" } as? LuaFunctionConfigSpec.Number
             assertTrue("Number configuration should be parsed", numberConfig != null)
-            assertEquals(LuaFunctionConfigType.NUMBER, numberConfig!!.type)
-            assertEquals("Number Configuration", (numberConfig.name as TranslatedString.Simple).value)
+            assertEquals(
+                "Number Configuration",
+                (numberConfig!!.name as TranslatedString.Simple).value
+            )
+            assertEquals("Number default should be parsed", 123.0, numberConfig.defaultValue)
 
-            val checkboxConfig = metadata.config.find { it.id == "checkboxConfig" }
+            val checkboxConfig = metadata.config.find { it.id == "checkboxConfig" } as? LuaFunctionConfigSpec.Checkbox
             assertTrue("Checkbox configuration should be parsed", checkboxConfig != null)
-            assertEquals(LuaFunctionConfigType.CHECKBOX, checkboxConfig!!.type)
-            assertEquals("Checkbox Configuration", (checkboxConfig.name as TranslatedString.Simple).value)
+            assertEquals(
+                "Checkbox Configuration",
+                (checkboxConfig!!.name as TranslatedString.Simple).value
+            )
+            assertEquals("Checkbox default should be parsed", true, checkboxConfig.defaultValue)
 
-            // CRITICAL: Ensure all enum values are tested
-            // This assertion will fail if a new LuaFunctionConfigType is added but not included in this test
-            val testedTypes = metadata.config.map { it.type }.toSet()
-            val allEnumValues = LuaFunctionConfigType.entries.toSet()
-            assertEquals("All LuaFunctionConfigType enum values must be tested in this comprehensive test. " +
-                        "Missing types: ${allEnumValues - testedTypes}. " +
+            // CRITICAL: Ensure all sealed class types are tested
+            // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in this test
+            val testedTypes = metadata.config.map { it::class }.toSet()
+            val allConfigTypes = LuaFunctionConfigSpec::class.sealedSubclasses.toSet()
+            assertEquals(
+                "All LuaFunctionConfigSpec sealed class types must be tested in this comprehensive test. " +
+                        "Missing types: ${allConfigTypes - testedTypes}. " +
                         "If you added a new type, update this test to include it and implement parsing logic in LuaFunctionMetadataAdapter.",
-                        allEnumValues, testedTypes)
+                allConfigTypes, testedTypes
+            )
         }
     }
 }
