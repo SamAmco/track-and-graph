@@ -17,8 +17,7 @@
 package com.samco.trackandgraph.data.lua.functionadapters
 
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfig
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.Version
 import io.github.z4kn4fein.semver.toVersion
@@ -66,9 +65,9 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
         return if (inputCountValue.isnil()) 1 else inputCountValue.checkint()
     }
 
-    private fun extractConfigs(resolvedScript: LuaValue): List<LuaFunctionConfig> {
+    private fun extractConfigs(resolvedScript: LuaValue): List<LuaFunctionConfigSpec> {
         val configArray = resolvedScript["config"]
-        val configs = mutableListOf<LuaFunctionConfig>()
+        val configs = mutableListOf<LuaFunctionConfigSpec>()
 
         if (!configArray.isnil()) {
             var i = 1
@@ -84,30 +83,63 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
         return configs
     }
 
-    private fun parseConfigItem(configItem: LuaValue, index: Int): LuaFunctionConfig {
+    private fun parseConfigItem(configItem: LuaValue, index: Int): LuaFunctionConfigSpec {
         val id = configItem["id"].checkjstring()
             ?: throw IllegalArgumentException("Config item $index must have an id")
 
-        val type = parseConfigType(configItem, index)
-        val nameTranslations = parseTranslatedString(configItem["name"])
-
-        return LuaFunctionConfig(
-            id = id,
-            type = type,
-            name = nameTranslations
-        )
-    }
-
-    private fun parseConfigType(configItem: LuaValue, index: Int): LuaFunctionConfigType {
         val typeString = configItem["type"].checkjstring()
             ?: throw IllegalArgumentException("Config item $index must have a type")
 
+        val nameTranslations = parseTranslatedString(configItem["name"])
+
         return when (typeString) {
-            "text" -> LuaFunctionConfigType.TEXT
-            "number" -> LuaFunctionConfigType.NUMBER
-            "checkbox" -> LuaFunctionConfigType.CHECKBOX
+            "text" -> parseTextConfig(id, nameTranslations, configItem)
+            "number" -> parseNumberConfig(id, nameTranslations, configItem)
+            "checkbox" -> parseCheckboxConfig(id, nameTranslations, configItem)
             else -> throw IllegalArgumentException("Unknown config type: $typeString")
         }
+    }
+
+    private fun parseTextConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.Text {
+        val defaultValue = configItem["default"]
+            .takeUnless { it.isnil() }?.checkjstring()
+        return LuaFunctionConfigSpec.Text(
+            id = id,
+            name = name,
+            defaultValue = defaultValue
+        )
+    }
+
+    private fun parseNumberConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.Number {
+        val defaultValue = configItem["default"]
+            .takeUnless { it.isnil() }?.todouble()
+        return LuaFunctionConfigSpec.Number(
+            id = id,
+            name = name,
+            defaultValue = defaultValue
+        )
+    }
+
+    private fun parseCheckboxConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.Checkbox {
+        val defaultValue = configItem["default"]
+            .takeUnless { it.isnil() }?.toboolean()
+        return LuaFunctionConfigSpec.Checkbox(
+            id = id,
+            name = name,
+            defaultValue = defaultValue
+        )
     }
 
     private fun parseTranslatedString(translatedString: LuaValue): TranslatedString? {

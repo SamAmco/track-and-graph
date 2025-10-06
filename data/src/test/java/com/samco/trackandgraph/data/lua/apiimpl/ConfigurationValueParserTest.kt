@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.data.lua.apiimpl
 
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -102,11 +101,11 @@ class ConfigurationValueParserTest {
         // When
         val result = parser.parseConfigurationValues(configuration)
 
-        // Then - Verify all enum types are covered
-        val configTypes = configuration.map { it.type }.toSet()
-        val allEnumTypes = LuaFunctionConfigType.entries.toSet()
+        // Then - Verify all configuration value types are covered
+        val configTypes = configuration.map { it::class }.toSet()
+        val allConfigValueTypes = LuaScriptConfigurationValue::class.sealedSubclasses.toSet()
         
-        assertEquals("Test should cover all LuaFunctionConfigType enum values", allEnumTypes, configTypes)
+        assertEquals("Test should cover all LuaScriptConfigurationValue types", allConfigValueTypes, configTypes)
         
         // Verify all keys exist in the result
         assertTrue("Should have text key", !result["text"].isnil())

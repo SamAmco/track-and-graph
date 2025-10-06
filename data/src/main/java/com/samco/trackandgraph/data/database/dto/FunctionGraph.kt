@@ -20,7 +20,6 @@ package com.samco.trackandgraph.data.database.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import kotlinx.serialization.ExperimentalSerializationApi
 
 /**
@@ -43,7 +42,6 @@ data class NodeDependency(
 @JsonClassDiscriminator("configType")
 sealed class LuaScriptConfigurationValue {
     abstract val id: String
-    abstract val type: LuaFunctionConfigType
     
     /**
      * Represents a text configuration value.
@@ -55,9 +53,7 @@ sealed class LuaScriptConfigurationValue {
     data class Text(
         override val id: String,
         val value: String
-    ) : LuaScriptConfigurationValue() {
-        override val type: LuaFunctionConfigType = LuaFunctionConfigType.TEXT
-    }
+    ) : LuaScriptConfigurationValue()
     
     /**
      * Represents a number configuration value.
@@ -69,9 +65,7 @@ sealed class LuaScriptConfigurationValue {
     data class Number(
         override val id: String,
         val value: Double
-    ) : LuaScriptConfigurationValue() {
-        override val type: LuaFunctionConfigType = LuaFunctionConfigType.NUMBER
-    }
+    ) : LuaScriptConfigurationValue()
     
     /**
      * Represents a checkbox configuration value.
@@ -83,9 +77,7 @@ sealed class LuaScriptConfigurationValue {
     data class Checkbox(
         override val id: String,
         val value: Boolean
-    ) : LuaScriptConfigurationValue() {
-        override val type: LuaFunctionConfigType = LuaFunctionConfigType.CHECKBOX
-    }
+    ) : LuaScriptConfigurationValue()
 }
 
 /**
@@ -149,6 +141,7 @@ sealed class FunctionGraphNode {
         override val dependencies: List<NodeDependency>
     ) : FunctionGraphNode()
 }
+
 
 /**
  * DTO representation of a function graph structure.
