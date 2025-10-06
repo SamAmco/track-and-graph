@@ -19,15 +19,13 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 
 /**
  * Sealed class representing different types of configuration inputs for Lua scripts.
- * Each type contains mutable state for UI interaction and knows its corresponding LuaFunctionConfigType.
+ * Each type contains mutable state for UI interaction.
  */
 sealed class LuaScriptConfigurationInput {
-    abstract val type: LuaFunctionConfigType
     abstract val name: TranslatedString?
     
     /**
@@ -36,9 +34,7 @@ sealed class LuaScriptConfigurationInput {
     data class Text(
         override val name: TranslatedString?,
         val value: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
-    ) : LuaScriptConfigurationInput() {
-        override val type: LuaFunctionConfigType = LuaFunctionConfigType.TEXT
-    }
+    ) : LuaScriptConfigurationInput()
     
     /**
      * Number input configuration with mutable state for numeric value
@@ -46,9 +42,7 @@ sealed class LuaScriptConfigurationInput {
     data class Number(
         override val name: TranslatedString?,
         val value: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
-    ) : LuaScriptConfigurationInput() {
-        override val type: LuaFunctionConfigType = LuaFunctionConfigType.NUMBER
-    }
+    ) : LuaScriptConfigurationInput()
     
     /**
      * Checkbox input configuration with mutable state for boolean value
@@ -56,7 +50,5 @@ sealed class LuaScriptConfigurationInput {
     data class Checkbox(
         override val name: TranslatedString?,
         val value: MutableState<Boolean> = mutableStateOf(false)
-    ) : LuaScriptConfigurationInput() {
-        override val type: LuaFunctionConfigType = LuaFunctionConfigType.CHECKBOX
-    }
+    ) : LuaScriptConfigurationInput()
 }

@@ -18,12 +18,6 @@ package com.samco.trackandgraph.data.lua.dto
 
 import io.github.z4kn4fein.semver.Version
 
-enum class LuaFunctionConfigType {
-    TEXT,
-    NUMBER,
-    CHECKBOX
-}
-
 sealed class TranslatedString {
     data class Simple(val value: String) : TranslatedString()
 
@@ -33,16 +27,47 @@ sealed class TranslatedString {
     data class Translations(val values: Map<String, String>) : TranslatedString()
 }
 
-data class LuaFunctionConfig(
-    val id: String,
-    val type: LuaFunctionConfigType,
-    val name: TranslatedString?,
-)
+/**
+ * Represents the specification/metadata for a Lua function configuration parameter.
+ * This sealed class defines the structure and constraints for different types of
+ * configuration inputs that can be defined in Lua script metadata.
+ */
+sealed class LuaFunctionConfigSpec {
+    /**
+     * The unique identifier for this configuration parameter.
+     * Must match the ID used in the Lua script metadata.
+     */
+    abstract val id: String
+
+    /**
+     * The display name for this configuration parameter.
+     * Can be a simple string or translations for multiple languages.
+     */
+    abstract val name: TranslatedString?
+    
+    data class Text(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValue: String? = null,
+    ) : LuaFunctionConfigSpec()
+    
+    data class Number(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValue: Double? = null,
+    ) : LuaFunctionConfigSpec()
+    
+    data class Checkbox(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValue: Boolean? = null
+    ) : LuaFunctionConfigSpec()
+}
 
 data class LuaFunctionMetadata(
     val script: String,
     val version: Version?,
     val title: TranslatedString?,
     val inputCount: Int,
-    val config: List<LuaFunctionConfig>,
+    val config: List<LuaFunctionConfigSpec>,
 )

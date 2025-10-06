@@ -20,7 +20,6 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -68,7 +67,6 @@ class LuaScriptConfigurationEncoderTextTest {
         val textValue = encodedValue as LuaScriptConfigurationValue.Text
         assertEquals("ID should match", "textConfig", textValue.id)
         assertEquals("Value should match", "Sample text value", textValue.value)
-        assertEquals("Type should be TEXT", LuaFunctionConfigType.TEXT, textValue.type)
     }
 
     @Test
@@ -84,7 +82,6 @@ class LuaScriptConfigurationEncoderTextTest {
         val encodedValue = result[0] as LuaScriptConfigurationValue.Text
         assertEquals("ID should match", "emptyTextConfig", encodedValue.id)
         assertEquals("Empty text should be preserved", "", encodedValue.value)
-        assertEquals("Type should be TEXT", LuaFunctionConfigType.TEXT, encodedValue.type)
     }
 
     @Test
@@ -100,7 +97,6 @@ class LuaScriptConfigurationEncoderTextTest {
         val encodedValue = result[0] as LuaScriptConfigurationValue.Text
         assertEquals("ID should match", "multilineTextConfig", encodedValue.id)
         assertEquals("Multiline text should be preserved", "Line 1\nLine 2\nLine 3", encodedValue.value)
-        assertEquals("Type should be TEXT", LuaFunctionConfigType.TEXT, encodedValue.type)
     }
 
     @Test
@@ -121,7 +117,6 @@ class LuaScriptConfigurationEncoderTextTest {
         // Verify all are text configurations
         result.forEach { encodedValue ->
             assertTrue("All should be Text configurations", encodedValue is LuaScriptConfigurationValue.Text)
-            assertEquals("All should have TEXT type", LuaFunctionConfigType.TEXT, encodedValue.type)
         }
         
         // Verify specific values

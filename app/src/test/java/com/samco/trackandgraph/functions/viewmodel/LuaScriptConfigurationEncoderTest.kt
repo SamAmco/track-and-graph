@@ -20,7 +20,6 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigType
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -81,17 +80,17 @@ class LuaScriptConfigurationEncoderTest {
         assertEquals("Should produce three configuration values", 3, result.size)
         
         // Collect all encoded types
-        val encodedTypes = result.map { it.type }.toSet()
+        val encodedTypes = result.map { it::class }.toSet()
         
-        // Get all enum values that should be tested
-        val allConfigTypes = LuaFunctionConfigType.entries.toSet()
+        // Get all sealed subclasses that should be tested
+        val allConfigTypes = LuaScriptConfigurationValue::class.sealedSubclasses.toSet()
         
         // Ensure our test covers all configuration types
         val missingTypes = allConfigTypes - encodedTypes
         
         if (missingTypes.isNotEmpty()) {
-            val missingTypeNames = missingTypes.joinToString(", ")
-            fail("Test does not cover all LuaFunctionConfigType enum values. Missing: $missingTypeNames. " +
+            val missingTypeNames = missingTypes.map { it.simpleName }.joinToString(", ")
+            fail("Test does not cover all LuaScriptConfigurationValue types. Missing: $missingTypeNames. " +
                  "Please update this test to include all configuration input types. " +
                  "This test protects against missing encoding logic for new configuration types.")
         }
@@ -99,7 +98,7 @@ class LuaScriptConfigurationEncoderTest {
         // Also verify we're not testing non-existent types (defensive check)
         val extraTypes = encodedTypes - allConfigTypes
         if (extraTypes.isNotEmpty()) {
-            val extraTypeNames = extraTypes.joinToString(", ")
+            val extraTypeNames = extraTypes.map { it.simpleName }.joinToString(", ")
             fail("Test includes unknown configuration types: $extraTypeNames")
         }
 
