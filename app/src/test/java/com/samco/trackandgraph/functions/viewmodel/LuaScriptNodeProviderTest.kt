@@ -58,6 +58,11 @@ class LuaScriptNodeProviderTest {
                 id = "numberConfig",
                 type = LuaFunctionConfigType.NUMBER,
                 name = TranslatedString.Simple("Number Configuration")
+            ),
+            LuaFunctionConfig(
+                id = "checkboxConfig",
+                type = LuaFunctionConfigType.CHECKBOX,
+                name = TranslatedString.Simple("Checkbox Configuration")
             )
         ),
         version = Version(1, 0, 0),
@@ -72,6 +77,10 @@ class LuaScriptNodeProviderTest {
         LuaScriptConfigurationValue.Number(
             id = "numberConfig",
             value = 123.45
+        ),
+        LuaScriptConfigurationValue.Checkbox(
+            id = "checkboxConfig",
+            value = true
         ),
     )
 
@@ -104,7 +113,7 @@ class LuaScriptNodeProviderTest {
             assertEquals(nodeId, result.id)
             assertEquals(3, result.inputConnectorCount)
             assertEquals(allTypesMetadata.script, result.script)
-            assertEquals(2, result.configuration.size)
+            assertEquals(3, result.configuration.size)
             assertEquals(false, result.showEditTools)
             assertEquals(allTypesMetadata.title, result.title)
 
@@ -117,6 +126,10 @@ class LuaScriptNodeProviderTest {
                 result.configuration["numberConfig"] as LuaScriptConfigurationInput.Number
             assertSame(allTypesMetadata.config[1].name, numberConfig.name)
             assertEquals(123.45, numberConfig.value.value.text.toDouble(), 0.0001)
+
+            val checkboxConfig = result.configuration["checkboxConfig"] as LuaScriptConfigurationInput.Checkbox
+            assertSame(allTypesMetadata.config[2].name, checkboxConfig.name)
+            assertEquals(true, checkboxConfig.value.value)
 
             // CRITICAL: Ensure all enum values are tested
             // This assertion will fail if a new LuaFunctionConfigType is added but not included in allTypesMetadata

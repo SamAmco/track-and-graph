@@ -33,6 +33,7 @@ import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
+import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.resolve
 
@@ -49,6 +50,7 @@ fun ConfigurationInputField(
     when (input) {
         is LuaScriptConfigurationInput.Text -> TextTextField(focusManager, input)
         is LuaScriptConfigurationInput.Number -> NumberTextField(focusManager, input)
+        is LuaScriptConfigurationInput.Checkbox -> CheckboxField(input)
     }
 }
 
@@ -77,6 +79,18 @@ private fun NumberTextField(
     label = { input.name.resolve()?.let { Text(it) } },
 )
 
+@Composable
+private fun CheckboxField(
+    input: LuaScriptConfigurationInput.Checkbox
+) {
+    val text = input.name.resolve() ?: ""
+    RowCheckbox(
+        checked = input.value.value,
+        onCheckedChange = { input.value.value = it },
+        text = text
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -101,6 +115,20 @@ private fun ConfigurationInputFieldNumberPreview() {
             input = LuaScriptConfigurationInput.Number(
                 name = TranslatedString.Simple("Sample Number Parameter"),
                 value = remember { mutableStateOf(TextFieldValue("42.5")) }
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ConfigurationInputFieldCheckboxPreview() {
+    TnGComposeTheme {
+        ConfigurationInputField(
+            focusManager = LocalFocusManager.current,
+            input = LuaScriptConfigurationInput.Checkbox(
+                name = TranslatedString.Simple("Sample Checkbox Parameter"),
+                value = remember { mutableStateOf(true) }
             )
         )
     }
