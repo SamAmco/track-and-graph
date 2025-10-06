@@ -18,6 +18,7 @@ class ConfigurationValueParser @Inject constructor() {
         return when (value) {
             is LuaScriptConfigurationValue.Number -> parseNumber(value)
             is LuaScriptConfigurationValue.Text -> parseText(value)
+            is LuaScriptConfigurationValue.Checkbox -> parseCheckbox(value)
         }
     }
 
@@ -26,6 +27,10 @@ class ConfigurationValueParser @Inject constructor() {
     }
 
     private fun parseText(value: LuaScriptConfigurationValue.Text): LuaValue {
+        return LuaValue.valueOf(value.value)
+    }
+
+    private fun parseCheckbox(value: LuaScriptConfigurationValue.Checkbox): LuaValue {
         return LuaValue.valueOf(value.value)
     }
 }

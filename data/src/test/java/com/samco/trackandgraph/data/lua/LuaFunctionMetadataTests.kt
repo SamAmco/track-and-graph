@@ -262,6 +262,11 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                         id = "numberConfig",
                         type = "number",
                         name = "Number Configuration"
+                    },
+                    {
+                        id = "checkboxConfig",
+                        type = "checkbox",
+                        name = "Checkbox Configuration"
                     }
                 },
                 generator = function(data_sources)
@@ -271,7 +276,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
         """.trimIndent()
         testLuaFunctionMetadata(script) {
             assertEquals(3, metadata.inputCount)
-            assertEquals(2, metadata.config.size)
+            assertEquals(3, metadata.config.size)
             assertEquals("Script should be preserved", script, metadata.script)
 
             // Validate each configuration type is parsed correctly
@@ -284,6 +289,11 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
             assertTrue("Number configuration should be parsed", numberConfig != null)
             assertEquals(LuaFunctionConfigType.NUMBER, numberConfig!!.type)
             assertEquals("Number Configuration", (numberConfig.name as TranslatedString.Simple).value)
+
+            val checkboxConfig = metadata.config.find { it.id == "checkboxConfig" }
+            assertTrue("Checkbox configuration should be parsed", checkboxConfig != null)
+            assertEquals(LuaFunctionConfigType.CHECKBOX, checkboxConfig!!.type)
+            assertEquals("Checkbox Configuration", (checkboxConfig.name as TranslatedString.Simple).value)
 
             // CRITICAL: Ensure all enum values are tested
             // This assertion will fail if a new LuaFunctionConfigType is added but not included in this test

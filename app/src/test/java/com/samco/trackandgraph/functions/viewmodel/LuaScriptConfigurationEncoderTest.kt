@@ -42,6 +42,11 @@ class LuaScriptConfigurationEncoderTest {
         name = TranslatedString.Simple("Number Config"),
         value = mutableStateOf(TextFieldValue("123.45"))
     )
+    
+    private val checkboxInput = LuaScriptConfigurationInput.Checkbox(
+        name = TranslatedString.Simple("Checkbox Config"),
+        value = mutableStateOf(true)
+    )
 
     @Before
     fun setUp() {
@@ -65,14 +70,15 @@ class LuaScriptConfigurationEncoderTest {
         // Given - Create configuration with all types using class-level declarations
         val configuration = mapOf(
             "textConfig" to textInput,
-            "numberConfig" to numberInput
+            "numberConfig" to numberInput,
+            "checkboxConfig" to checkboxInput
         )
 
         // When
         val result = encoder.encodeConfiguration(configuration)
 
         // Then - Verify all types are encoded correctly
-        assertEquals("Should produce two configuration values", 2, result.size)
+        assertEquals("Should produce three configuration values", 3, result.size)
         
         // Collect all encoded types
         val encodedTypes = result.map { it.type }.toSet()
@@ -103,5 +109,8 @@ class LuaScriptConfigurationEncoderTest {
         
         val numberResult = result.find { it.id == "numberConfig" } as LuaScriptConfigurationValue.Number
         assertEquals("Number value should be encoded correctly", 123.45, numberResult.value, 0.0001)
+        
+        val checkboxResult = result.find { it.id == "checkboxConfig" } as LuaScriptConfigurationValue.Checkbox
+        assertEquals("Checkbox value should be encoded correctly", true, checkboxResult.value)
     }
 }
