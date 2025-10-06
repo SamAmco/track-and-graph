@@ -20,7 +20,8 @@ import io.github.z4kn4fein.semver.Version
 
 enum class LuaFunctionConfigType {
     TEXT,
-    NUMBER
+    NUMBER,
+    CHECKBOX
 }
 
 sealed class TranslatedString {

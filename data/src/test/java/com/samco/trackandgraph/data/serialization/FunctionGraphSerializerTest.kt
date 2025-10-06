@@ -187,6 +187,10 @@ class FunctionGraphSerializerTest {
                         LuaScriptConfigurationValue.Number(
                             id = "numberConfig", 
                             value = 42.5
+                        ),
+                        LuaScriptConfigurationValue.Checkbox(
+                            id = "checkboxConfig",
+                            value = true
                         )
                     ),
                     dependencies = listOf(

@@ -152,6 +152,7 @@ internal class LuaScriptNodeProvider @Inject constructor(
         return when (config.type) {
             LuaFunctionConfigType.TEXT -> createTextConfigurationInput(config.name, value)
             LuaFunctionConfigType.NUMBER -> createNumberConfigurationInput(config.name, value)
+            LuaFunctionConfigType.CHECKBOX -> createCheckboxConfigurationInput(config.name, value)
         }
     }
 
@@ -188,6 +189,24 @@ internal class LuaScriptNodeProvider @Inject constructor(
             )
         } else {
             LuaScriptConfigurationInput.Number(name = name)
+        }
+    }
+
+    /**
+     * Creates a Checkbox configuration input, restoring the saved value if available and type-compatible.
+     */
+    private fun createCheckboxConfigurationInput(
+        name: TranslatedString?,
+        value: LuaScriptConfigurationValue?
+    ): LuaScriptConfigurationInput.Checkbox {
+        val checkboxValue = value as? LuaScriptConfigurationValue.Checkbox
+        return if (checkboxValue != null) {
+            LuaScriptConfigurationInput.Checkbox(
+                name = name,
+                value = mutableStateOf(checkboxValue.value)
+            )
+        } else {
+            LuaScriptConfigurationInput.Checkbox(name = name)
         }
     }
 }

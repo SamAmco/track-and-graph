@@ -49,4 +49,14 @@ sealed class LuaScriptConfigurationInput {
     ) : LuaScriptConfigurationInput() {
         override val type: LuaFunctionConfigType = LuaFunctionConfigType.NUMBER
     }
+    
+    /**
+     * Checkbox input configuration with mutable state for boolean value
+     */
+    data class Checkbox(
+        override val name: TranslatedString?,
+        val value: MutableState<Boolean> = mutableStateOf(false)
+    ) : LuaScriptConfigurationInput() {
+        override val type: LuaFunctionConfigType = LuaFunctionConfigType.CHECKBOX
+    }
 }

@@ -72,6 +72,20 @@ sealed class LuaScriptConfigurationValue {
     ) : LuaScriptConfigurationValue() {
         override val type: LuaFunctionConfigType = LuaFunctionConfigType.NUMBER
     }
+    
+    /**
+     * Represents a checkbox configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param value The user-selected boolean value
+     */
+    @Serializable
+    @SerialName("Checkbox")
+    data class Checkbox(
+        override val id: String,
+        val value: Boolean
+    ) : LuaScriptConfigurationValue() {
+        override val type: LuaFunctionConfigType = LuaFunctionConfigType.CHECKBOX
+    }
 }
 
 /**

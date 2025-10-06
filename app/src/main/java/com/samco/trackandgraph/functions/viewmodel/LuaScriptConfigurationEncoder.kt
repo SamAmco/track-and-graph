@@ -51,6 +51,12 @@ internal class LuaScriptConfigurationEncoder @Inject constructor() {
                         value = doubleValue
                     )
                 }
+                is LuaScriptConfigurationInput.Checkbox -> {
+                    LuaScriptConfigurationValue.Checkbox(
+                        id = id,
+                        value = input.value.value
+                    )
+                }
             }
         }
     }
