@@ -203,12 +203,39 @@ local period = core.PERIOD.WEEK
 
 ## Contributing to the community scripts
 
-You already have all the tools you need to write and run your own scripts. If you create something you think is very useful and you want to share it with the community, you can create a PR into the Track & Graph repository. However community scripts will require a few more things before they can be committed to the repository. To give you an idea of what's required you can see the [ other community scripts and their accompanying files here](https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community). In general you will need 4 things: 
+You already have all the tools you need to write and run your own scripts. If you create something you think is very useful and you want to share it with the community, you can create a PR into the Track & Graph repository. However community scripts will require a few more things before they can be committed to the repository. In general you will need 4 things:
 
 1. A README.md file that describes the script and how to use it
 2. A screenshot of the graph that the script generates
 3. A test file, or multiple test files, that contain the test cases for the script
 4. The script file that contains the code
+
+### File Structure
+
+Community scripts are organized in two separate locations:
+
+**Lua scripts and tests** go in `lua/src/community/graphs/`:
+```
+lua/src/community/graphs/<category>/<script-name>/
+  ├── <script-name>.lua          # Main script file
+  └── test_<script-name>.lua     # Test file(s) (prefix with test_)
+```
+
+**Documentation and images** go in `docs/docs/lua/community/`:
+```
+docs/docs/lua/community/<category>/<script-name>/
+  ├── script.lua                 # Generated from lua/src via make sync-lua-to-docs
+  ├── README.md                  # Documentation
+  └── image.png                  # Screenshot
+```
+
+For example, the fraction script has:
+- Code: `lua/src/community/graphs/text/fraction/fraction.lua` and `test_fraction.lua`
+- Docs: `docs/docs/lua/community/text/fraction/script.lua`, `README.md`, and `image.png`
+
+You can see examples of [scripts here](https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs) and [docs here](https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community).
+
+**Important:** The `script.lua` file in the docs directory is automatically generated. After making changes to your script in `lua/src/community/graphs/`, run `make sync-lua-to-docs` to copy it to the docs location. You only need to manually create the `README.md` and image files in the docs directory.
 
 
 ## Writing tests
@@ -312,7 +339,7 @@ assertions = function(result)
 end
 ```
 
-For more comprehensive testing examples, see the [community script test files](https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community) which demonstrate common patterns for time-based scenarios, multi-source testing, and edge cases.
+For more comprehensive testing examples, see the [community script test files](https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs) which demonstrate common patterns for time-based scenarios, multi-source testing, and edge cases.
 
 ### Running tests
 
