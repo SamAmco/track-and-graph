@@ -85,15 +85,17 @@ class CommunityTestRunner {
                 val files = currentDir.listFiles() ?: continue
                 files.filter { it.isDirectory }.forEach { directoryStack.add(it) }
 
-                // Find script.lua in the current directory
-                val scriptFile = files.find { it.name == "script.lua" }
+                // Find the main script file (any .lua file that's not a test file)
+                val scriptFile = files.find {
+                    it.isFile && it.name.endsWith(".lua") && !it.name.startsWith("test_")
+                }
 
-                // If script.lua exists, find and process all test files
+                // If a script file exists, find and process all test files
                 if (scriptFile != null) {
                     val scriptLuaText = scriptFile.readText()
 
                     // Add all test files in the same directory
-                    files.filter { it.isFile && it.name.startsWith("test") && it.name.endsWith(".lua") }
+                    files.filter { it.isFile && it.name.startsWith("test_") && it.name.endsWith(".lua") }
                         .forEach { testFile ->
                             val testName =
                                 currentDir.relativeTo(basePath).path + "/" + testFile.name
