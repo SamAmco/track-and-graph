@@ -131,12 +131,12 @@ local function main()
     -- Serialize and write using Serpent
     local output_path = "catalog/community-functions.lua"
     local output_content = "return " .. serpent.block(output, {
-        comment = false,
-        sortkeys = true,
-        compact = false,
-        fatal = true,
-        nocode = true,
-        nohuge = true
+        comment = false,      -- No comments
+        sortkeys = true,      -- Sort keys for reproducibility
+        compact = true,       -- Remove unnecessary spaces for smaller output
+        fatal = true,         -- Raise errors on non-serializable values
+        nocode = true,        -- Disable bytecode serialization for safety
+        nohuge = true         -- Disable undefined/huge number checking
     })
     write_file(output_path, output_content)
 
