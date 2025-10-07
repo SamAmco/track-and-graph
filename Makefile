@@ -93,6 +93,10 @@ kill-emulator:
 run-community-tests:
 	./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.CommunityTestRunner"
 
+.PHONY: sync-lua-to-docs
+sync-lua-to-docs:
+	./scripts/sync-lua-to-docs.sh
+
 .PHONY: validate-all
 validate-all: validate-remote-config run-community-tests
 	@echo "All validations passed."
