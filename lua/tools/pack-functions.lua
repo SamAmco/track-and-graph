@@ -1,151 +1,269 @@
 #!/usr/bin/env lua
 -- pack-functions.lua
--- Packs community Lua functions into a single distributable file
+-- Packs community Lua functions into a single distributable catalog
 
 local serpent = require("serpent")
+local validation = require("tools.lib.validation")
+local semver = require("tools.lib.semver")
+local changes = require("tools.lib.changes")
+local versioning = require("tools.lib.catalog-versioning")
+
+-- Configuration
+local FUNCTIONS_DIR = "src/community/functions"
+local CATALOG_PATH = "catalog/community-functions.lua"
 
 -- Find all non-test lua files in a directory
 local function find_lua_files(dir)
-    local files = {}
-    local handle = io.popen("find " .. dir .. " -type f -name '*.lua' ! -name 'test_*'")
-    if not handle then
-        error("Failed to scan directory: " .. dir)
-    end
+	local files = {}
+	local handle = io.popen("find " .. dir .. " -type f -name '*.lua' ! -name 'test_*'")
+	if not handle then
+		error("Failed to scan directory: " .. dir)
+	end
 
-    for file in handle:lines() do
-        table.insert(files, file)
-    end
-    handle:close()
+	for file in handle:lines() do
+		table.insert(files, file)
+	end
+	handle:close()
 
-    return files
+	return files
 end
 
 -- Read entire file
 local function read_file(path)
-    local file = io.open(path, "r")
-    if not file then
-        error("Could not open file: " .. path)
-    end
-    local content = file:read("a")
-    file:close()
-    return content
+	local file = io.open(path, "r")
+	if not file then
+		error("Could not open file: " .. path)
+	end
+	local content = file:read("*all")
+	file:close()
+	return content
 end
-
--- Validate semver format (basic check)
-local function is_semver(version)
-    if type(version) ~= "string" then
-        return false
-    end
-    -- Basic semver pattern: X.Y.Z with optional pre-release and build metadata
-    return version:match("^%d+%.%d+%.%d+") ~= nil
-end
-
 
 -- Write content to file
 local function write_file(path, content)
-    local file = io.open(path, "w")
-    if not file then
-        error("Could not open output file: " .. path)
-    end
-    file:write(content)
-    file:close()
+	local file = io.open(path, "w")
+	if not file then
+		error("Could not open output file: " .. path)
+	end
+	file:write(content)
+	file:close()
 end
 
--- Main function
+-- Run verify-api-specs.lua as subprocess
+local function verify_api_specs()
+	local handle = io.popen("lua tools/verify-api-specs.lua 2>&1") or error("Failed to run API spec verification")
+	local output = handle:read("*all")
+	local success = handle:close()
+
+	print(output)
+
+	if not success then
+		error("API spec verification failed")
+	end
+end
+
+-- Get max API level
+local function get_max_api_level()
+	local handle = io.popen("lua tools/get-max-api-level.lua") or error("Failed to get max API level")
+	local output = handle:read("*all")
+	handle:close()
+	local level = tonumber(output:match("%d+"))
+	if not level then
+		error("Failed to get max API level")
+	end
+	return level
+end
+
+-- Load and validate a single function
+local function load_and_validate_function(file_path, max_api_level)
+	local content = read_file(file_path)
+
+	-- Load module
+	local chunk, load_err = load(content, file_path, "t")
+	if not chunk then
+		return false, "Failed to load: " .. load_err
+	end
+
+	local success, module = pcall(chunk)
+	if not success then
+		return false, "Failed to execute: " .. module
+	end
+
+	-- Validate structure
+	local ok, errors = validation.validate_function(module, file_path)
+	if not ok then
+		return false, table.concat(errors, "\n")
+	end
+
+	-- Check API level compatibility
+	local version = semver.parse(module.version) or error("Invalid semver in " .. file_path)
+	if version.major < 1 or version.major > max_api_level then
+		return false,
+				string.format(
+					"%s: version major %d must be between 1 and %d (max API level)",
+					file_path,
+					version.major,
+					max_api_level
+				)
+	end
+
+	return true,
+			{
+				id = module.id,
+				version = module.version,
+				script = content,
+				file_path = file_path,
+				title = module.title,
+			}
+end
+
+-- Print change summary
+local function print_change_summary(report)
+	if #report.new > 0 then
+		print(string.format("\nNew functions: %d", #report.new))
+		for _, func in ipairs(report.new) do
+			print(string.format("  + %s v%s", func.id, func.version))
+		end
+	end
+
+	if #report.modified > 0 then
+		print(string.format("\nModified functions: %d", #report.modified))
+		for _, func in ipairs(report.modified) do
+			print(string.format("  ~ %s v%s → v%s", func.id, func.old_version, func.new_version))
+		end
+	end
+
+	if #report.unchanged > 0 then
+		print(string.format("\nUnchanged functions: %d", #report.unchanged))
+	end
+end
+
+-- Main execution
 local function main()
-    local functions = {}
-    local seen = {}
+	print("==> Phase 1: API Spec Verification")
+	verify_api_specs()
+	local max_api_level = get_max_api_level()
+	print("Max API level: " .. max_api_level)
 
-    -- Find all lua files
-    local files = find_lua_files("src/community/functions")
+	print("\n==> Phase 2: Loading Functions")
+	local files = find_lua_files(FUNCTIONS_DIR)
 
-    if #files == 0 then
-        error("No function files found in src/community/functions")
-    end
+	if #files == 0 then
+		error("No function files found in " .. FUNCTIONS_DIR)
+	end
 
-    print("Found " .. #files .. " function file(s)")
+	print("Found " .. #files .. " function file(s)")
 
-    for _, file_path in ipairs(files) do
-        print("Processing: " .. file_path)
+	local functions = {}
+	local all_errors = {}
 
-        -- Read file content
-        local content = read_file(file_path)
+	for _, file_path in ipairs(files) do
+		local ok, func_or_err = load_and_validate_function(file_path, max_api_level)
+		if ok then
+			table.insert(functions, func_or_err)
+			print("  ✓ " .. file_path)
+		else
+			print("  ✗ " .. file_path)
+			print("    " .. func_or_err)
+			table.insert(all_errors, func_or_err)
+		end
+	end
 
-        -- Load and execute the file to get the module
-        local chunk, load_err = load(content, file_path, "t")
-        if not chunk then
-            error("Failed to load " .. file_path .. ": " .. load_err)
-        end
+	if #all_errors > 0 then
+		error(string.format("\nValidation failed with %d error(s)", #all_errors))
+	end
 
-        local success, module = pcall(chunk)
-        if not success then
-            error("Failed to execute " .. file_path .. ": " .. module)
-        end
+	-- Check uniqueness
+	local ok, errors = validation.check_uniqueness(functions)
+	if not ok then
+		print("\nUniqueness errors:")
+		for _, err in ipairs(errors) do
+			print("  " .. err)
+		end
+		error("Uniqueness validation failed")
+	end
 
-        -- Validate structure
-        if type(module) ~= "table" then
-            error(file_path .. " must return a table, got " .. type(module))
-        end
+	print("\n==> Phase 3: Change Detection")
+	local old_catalog = versioning.load_catalog(CATALOG_PATH)
 
-        if type(module.id) ~= "string" then
-            error(file_path .. " must have 'id' field as string, got " .. type(module.id))
-        end
+	if old_catalog then
+		print("Loaded existing catalog (published: " .. (old_catalog.published_at or "unknown") .. ")")
+	else
+		print("No existing catalog found (first run)")
+	end
 
-        if type(module.version) ~= "string" then
-            error(file_path .. " must have 'version' field as string, got " .. type(module.version))
-        end
+	local change_report = changes.compare_functions(old_catalog, functions)
+	print_change_summary(change_report)
 
-        if not is_semver(module.version) then
-            error(file_path .. " has invalid semver 'version': " .. tostring(module.version))
-        end
+	-- Validate version increments for modified functions
+	if #change_report.modified > 0 then
+		print("\nValidating version increments...")
+		local ok, errors = changes.validate_version_increments(change_report)
+		if not ok then
+			print("\nVersion errors:")
+			for _, err in ipairs(errors) do
+				print("  " .. err)
+			end
+			error("Version validation failed")
+		end
+		print("✓ All version increments valid")
+	end
 
-        if type(module.generator) ~= "function" then
-            error(file_path .. " must have 'generator' field as function, got " .. type(module.generator))
-        end
+	print("\n==> Phase 4: Catalog Generation")
+	local should_write, reason = versioning.should_write_catalog(change_report)
 
-        -- Check for duplicates
-        local key = module.id .. "@" .. module.version
-        if seen[key] then
-            error("Duplicate id/version pair: " .. key .. " in " .. file_path .. " (already seen in " .. seen[key] .. ")")
-        end
-        seen[key] = file_path
+	if not should_write then
+		print("✓ " .. reason)
+		print("✓ No catalog changes needed")
+		return
+	end
 
-        print("  ✓ id=" .. module.id .. " version=" .. module.version)
+	print("Building new catalog: " .. reason)
 
-        -- Add to functions list
-        table.insert(functions, {
-            id = module.id,
-            version = module.version,
-            script = content
-        })
-    end
+	-- Build function list for catalog (sorted by id)
+	local catalog_functions = {}
+	for _, func in ipairs(functions) do
+		table.insert(catalog_functions, {
+			id = func.id,
+			version = func.version,
+			script = func.script,
+		})
+	end
+	table.sort(catalog_functions, function(a, b)
+		return a.id < b.id
+	end)
 
-    -- Build output
-    local output = {
-        functions = functions
-    }
+	-- Create catalog
+	local catalog = {
+		published_at = versioning.generate_timestamp(),
+		functions = catalog_functions,
+	}
 
-    -- Create catalog directory if it doesn't exist
-    os.execute("mkdir -p catalog")
+	-- Create catalog directory if it doesn't exist
+	os.execute("mkdir -p catalog")
 
-    -- Serialize and write using Serpent
-    local output_path = "catalog/community-functions.lua"
-    local output_content = "return " .. serpent.block(output, {
-        comment = false,      -- No comments
-        sortkeys = true,      -- Sort keys for reproducibility
-        compact = true,       -- Remove unnecessary spaces for smaller output
-        fatal = true,         -- Raise errors on non-serializable values
-        nocode = true,        -- Disable bytecode serialization for safety
-        nohuge = true         -- Disable undefined/huge number checking
-    })
-    write_file(output_path, output_content)
+	-- Serialize and write
+	local output_content = "return "
+			.. serpent.block(catalog, {
+				comment = false,
+				sortkeys = true,
+				compact = true,
+				fatal = true,
+				nocode = true,
+				nohuge = true,
+			})
 
-    print("\n✓ Successfully packed " .. #functions .. " function(s) to " .. output_path)
+	write_file(CATALOG_PATH, output_content)
+
+	print("\n✓ Successfully published catalog")
+	print("  Published at: " .. catalog.published_at)
+	print("  Total functions: " .. #catalog.functions)
+	print("  Output: " .. CATALOG_PATH)
 end
 
 -- Run with error handling
 local success, err = pcall(main)
 if not success then
-    io.stderr:write("ERROR: " .. tostring(err) .. "\n")
-    os.exit(1)
+	io.stderr:write("\nERROR: " .. tostring(err) .. "\n")
+	os.exit(1)
 end
