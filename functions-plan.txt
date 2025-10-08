@@ -13,6 +13,23 @@ TODO:
     - minify them?
   - semver each function
 - Docs
+- Catalog stuff:
+  - Implement code signing
+    - Let's have a publish flow that uses a key with a given location
+    - Let's have a debug flow that generates a keypair, copies the public key, signature block, and catalog to the debug assets
+  - Improve verifications to include description, name, (names should be unique), make sure they're translated
+  - Add a seq to the catalog
+  - When generating the catalog check the existing catalog for the current seq to incrememnt
+  - Don't create a new catalog if nothing has changed
+  - Throw if a script changes but its version hasn't been incremented
+  - Implement an apispec file per api in the tng package
+    - all api's must have a spec file (throw if not)
+    - all items returned by a module must have a declaration in the spec file (throw if not)
+    - add a script to get current api version by iterating all spec files and getting the max version
+    - In android lazily iterate all embedded specs to get the current api version (via max)
+  - Include a signing data structure (json) with key id, signature
+- Implement test harness for functions
+  - optional: gate api access and assert no api int above the scripts major version is accessed
 
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source
