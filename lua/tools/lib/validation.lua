@@ -1,31 +1,12 @@
 -- validation.lua
 -- Validation functions for community Lua functions
 
+local semver = require("tools.lib.semver")
+
 local M = {}
 
 -- Required language codes
 local REQUIRED_LANGUAGES = {"en", "de", "es", "fr"}
-
---- Parse semantic version string
--- @param version_str string: Version string to parse
--- @return table|nil: { major, minor, patch, raw } or nil if invalid
-function M.parse_semver(version_str)
-	if type(version_str) ~= "string" then
-		return nil
-	end
-
-	local major, minor, patch, _ = version_str:match("^(%d+)%.(%d+)%.(%d+)(.*)$")
-	if not major then
-		return nil
-	end
-
-	return {
-		major = tonumber(major),
-		minor = tonumber(minor),
-		patch = tonumber(patch),
-		raw = version_str
-	}
-end
 
 --- Validate that a field contains all required translations
 -- @param field table: The field to validate
@@ -119,7 +100,7 @@ function M.validate_function(module, file_path)
 		table.insert(errors, file_path .. " - 'version' must be a string, got " .. type(module.version))
 	else
 		-- Validate semver format
-		local parsed = M.parse_semver(module.version)
+		local parsed = semver.parse(module.version)
 		if not parsed then
 			table.insert(errors, file_path .. " - 'version' is not valid semver: " .. module.version)
 		end
