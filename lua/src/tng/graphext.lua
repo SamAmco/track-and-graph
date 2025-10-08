@@ -7,7 +7,7 @@ local core = require("tng.core")
 --- This function takes a table of data points (each must have at a minimum a timestamp and a value) and applies a moving average over a specified duration.
 --- It updates each datapoint's value in the table to be the average of values within the specified duration preceding it.
 ---
---- @since v5.1.0
+--- @since v5.1.0 (API level 1)
 --- @param datapoints DataPoint[]: The data points to apply the moving average to.
 --- @param averaging_duration integer?: The duration over which to average the data points, in milliseconds.
 M.apply_moving_averaging = function(datapoints, averaging_duration)
@@ -65,7 +65,7 @@ end
 --- This function takes a table of data points and calculates the total value for each period defined by the given period and multiplier.
 --- It returns a new table of data points, each representing the total value for a specific period.
 ---
---- @since v5.1.0
+--- @since v5.1.0 (API level 1)
 --- @param datapoints DataPoint[]: The data points to calculate totals for.
 --- @param period string: The period to calculate totals over (e.g., core.PERIOD.DAY).
 --- @param multiplier integer?: The multiplier for the period. Allowing for periods like 2 days, 3 weeks, etc.
@@ -114,7 +114,7 @@ end
 --- This function iterates through a table of data points and returns the one with the highest timestamp
 --- along with its corresponding key in the table.
 ---
---- @since v5.1.0
+--- @since v5.1.0 (API level 1)
 --- @param data_points table: A table of data points, where each data point should have a timestamp field.
 --- @return DataPoint|nil: The data point with the highest timestamp, or nil if no valid data points were found.
 --- @return any|nil: The key of the data point with the highest timestamp, or nil if no valid data points were found.
@@ -138,7 +138,7 @@ end
 --- This function collects data points from multiple sources and organizes them in chronological order
 --- (most recent first) until a specified cutoff time is reached.
 ---
---- @since v5.1.0
+--- @since v5.1.0 (API level 1)
 --- @param sources table: A table of sources, where each source has a dp() method that returns a data point.
 --- @param cutoff_params CutoffParams|number: Parameters for calculating the cutoff time, or the cutoff time itself as a Unix epoch millisecond timestamp.
 --- @param from_now boolean?: If true, uses the current time as the end time; otherwise uses the most recent data point's time. You don't need to provide this if you're using a numeric cutoff.
@@ -191,7 +191,7 @@ end
 ---
 --- The input datapoints should be in reverse chronological order. The resultant bars will also be in reverse chronological order. The segments in each bar will be sorted such that the segment with the greatest total value over the time period is alway first (at the bottom of the graph).
 ---
---- @since v5.1.0
+--- @since v5.1.0 (API level 1)
 --- @param datapoints DataPoint[]: The data points to process (in reverse chronological order).
 --- @param totalling_period string: The period to group by (e.g., core.PERIOD.DAY).
 --- @param totalling_period_multiplier? integer: Optional multiplier for the period.
@@ -260,7 +260,7 @@ M.collect_to_bars = function(
 end
 
 --- Collects all given data points into pie chart segments by their label
---- @since v5.1.0
+--- @since v5.1.0 (API level 1)
 --- @param datapoints DataPoint[]: The data points to process.
 --- @param count_by_label boolean?: If true, counts occurrences of labels instead of summing values. Defaults to false
 --- @param label_colors Color?: A table of colors for each label. The keys are the labels and the values are color values.
