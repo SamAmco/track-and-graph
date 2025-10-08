@@ -35,6 +35,12 @@ return {
         ["es"] = "Filtrar por Etiqueta",
         ["fr"] = "Filtrer par Étiquette"
     },
+    description = {
+        ["en"] = "Filters data points by label with optional case sensitivity and exact matching",
+        ["de"] = "Filtert Datenpunkte nach Label mit optionaler Groß-/Kleinschreibung und exakter Übereinstimmung",
+        ["es"] = "Filtra puntos de datos por etiqueta con sensibilidad opcional a mayúsculas y coincidencia exacta",
+        ["fr"] = "Filtre les points de données par étiquette avec sensibilité à la casse et correspondance exacte facultatives"
+    },
     config = {
         {
             id = "filter_label",

@@ -12,6 +12,12 @@ return {
         ["es"] = "Multiplicar Valores",
         ["fr"] = "Multiplier les Valeurs"
     },
+    description = {
+        ["en"] = "Multiplies all incoming data point values by a specified multiplier",
+        ["de"] = "Multipliziert alle eingehenden Datenpunktwerte mit einem bestimmten Multiplikator",
+        ["es"] = "Multiplica todos los valores de puntos de datos entrantes por un multiplicador especificado",
+        ["fr"] = "Multiplie toutes les valeurs de points de données entrantes par un multiplicateur spécifié"
+    },
     config = {
         {
             id = "multiplier",
