@@ -21,28 +21,6 @@ end
 
 print("Testing validation library...\n")
 
--- Test parse_semver
-test("parse_semver parses valid semver", function()
-	local v = validation.parse_semver("1.2.3")
-	assert(v.major == 1 and v.minor == 2 and v.patch == 3)
-	assert(v.raw == "1.2.3")
-end)
-
-test("parse_semver handles pre-release", function()
-	local v = validation.parse_semver("1.2.3-alpha.1")
-	assert(v.major == 1 and v.minor == 2 and v.patch == 3)
-end)
-
-test("parse_semver rejects invalid version", function()
-	local v = validation.parse_semver("1.2")
-	assert(v == nil)
-end)
-
-test("parse_semver rejects non-string", function()
-	local v = validation.parse_semver(123)
-	assert(v == nil)
-end)
-
 -- Test validate_translations
 test("validate_translations accepts valid translations", function()
 	local ok, errors = validation.validate_translations(

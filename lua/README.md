@@ -44,6 +44,12 @@ Validates all community functions have required fields and translations:
 lua tools/validate-functions.lua
 ```
 
+### Detect Changes
+Compares current functions against the published catalog to detect changes:
+```bash
+lua tools/detect-changes.lua
+```
+
 ## Building the Function Catalog
 
 The function catalog is a single Lua file that bundles all community functions for distribution. The Android app downloads this catalog at runtime to discover available functions.
