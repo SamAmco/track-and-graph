@@ -109,6 +109,10 @@ lua-get-max-api-level:
 lua-validate-functions:
 	cd lua && lua tools/validate-functions.lua
 
+.PHONY: lua-detect-changes
+lua-detect-changes:
+	cd lua && lua tools/detect-changes.lua
+
 .PHONY: validate-all
 validate-all: validate-remote-config run-community-tests
 	@echo "All validations passed."
