@@ -97,6 +97,18 @@ run-community-tests:
 sync-lua-to-docs:
 	./scripts/sync-lua-to-docs.sh
 
+.PHONY: lua-verify-api-specs
+lua-verify-api-specs:
+	cd lua && lua tools/verify-api-specs.lua
+
+.PHONY: lua-get-max-api-level
+lua-get-max-api-level:
+	cd lua && lua tools/get-max-api-level.lua
+
+.PHONY: lua-validate-functions
+lua-validate-functions:
+	cd lua && lua tools/validate-functions.lua
+
 .PHONY: validate-all
 validate-all: validate-remote-config run-community-tests
 	@echo "All validations passed."
