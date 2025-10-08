@@ -13,8 +13,10 @@ TODO:
     - minify them?
   - semver each function
 - Docs
+
 - Catalog stuff:
   - Implement code signing
+    - Include a signing data structure (json) with key id, signature
     - Let's have a publish flow that uses a key with a given location
     - Let's have a debug flow that generates a keypair, copies the public key, signature block, and catalog to the debug assets
   - Improve verifications to include description, name, (names should be unique), make sure they're translated
@@ -27,7 +29,6 @@ TODO:
     - all items returned by a module must have a declaration in the spec file (throw if not)
     - add a script to get current api version by iterating all spec files and getting the max version
     - In android lazily iterate all embedded specs to get the current api version (via max)
-  - Include a signing data structure (json) with key id, signature
 - Implement test harness for functions
   - optional: gate api access and assert no api int above the scripts major version is accessed
 
