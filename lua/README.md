@@ -24,6 +24,26 @@ Each function in this directory tree must export a table with at least the follo
 - `version` (string): Semantic version (e.g., "1.0.0")
 - `generator` (function): The function implementation
 
+## Development Tools
+
+### Validate API Specs
+Ensures all TNG API exports have corresponding API level specifications:
+```bash
+lua tools/verify-api-specs.lua
+```
+
+### Get Max API Level
+Returns the highest API level defined across all specs:
+```bash
+lua tools/get-max-api-level.lua
+```
+
+### Validate Functions
+Validates all community functions have required fields and translations:
+```bash
+lua tools/validate-functions.lua
+```
+
 ## Building the Function Catalog
 
 The function catalog is a single Lua file that bundles all community functions for distribution. The Android app downloads this catalog at runtime to discover available functions.
