@@ -2,7 +2,7 @@
 -- verify-api-specs.lua
 -- Validates that all exported symbols from tng modules have API spec entries
 
--- Add src to package path so we can require tng modules
+-- Required for runtime: tng modules have internal dependencies (e.g. graphext requires tng.core)
 package.path = package.path .. ";src/?.lua;src/?/init.lua"
 
 -- Find all module files in tng directory (excluding .apispec.lua files)
@@ -72,7 +72,7 @@ local function split(str, delimiter)
 end
 
 -- Validate that all exports have spec entries and all spec values are valid
-local function validate_module(module_name, module, spec)
+local function validate_module(module, spec)
 	local errors = {}
 	local export_count = 0
 
@@ -163,7 +163,7 @@ local function main()
 		end
 
 		-- Validate
-		local export_count, errors = validate_module(module_name, module, spec)
+		local export_count, errors = validate_module(module, spec)
 		total_exports = total_exports + export_count
 
 		if #errors > 0 then
