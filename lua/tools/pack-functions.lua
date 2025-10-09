@@ -7,6 +7,7 @@ local validation = require("tools.lib.validation")
 local semver = require("tools.lib.semver")
 local changes = require("tools.lib.changes")
 local versioning = require("tools.lib.catalog-versioning")
+local api_specs = require("tools.lib.api-specs")
 
 -- Configuration
 local FUNCTIONS_DIR = "src/community/functions"
@@ -49,27 +50,43 @@ local function write_file(path, content)
 	file:close()
 end
 
--- Run verify-api-specs.lua as subprocess
-local function verify_api_specs()
-	local handle = io.popen("lua tools/verify-api-specs.lua 2>&1") or error("Failed to run API spec verification")
-	local output = handle:read("*all")
-	local success = handle:close()
+-- Verify API specs and print results
+local function verify_and_print_api_specs()
+	local ok, result = api_specs.verify()
 
-	print(output)
-
-	if not success then
+	if not ok and result.error then
+		print("✗ " .. result.error)
 		error("API spec verification failed")
 	end
+
+	-- Print results for each module
+	for _, module_result in ipairs(result.modules) do
+		if #module_result.errors > 0 then
+			print(string.format("✗ %s.lua - %d errors:", module_result.name, #module_result.errors))
+			for _, error_msg in ipairs(module_result.errors) do
+				print(error_msg)
+			end
+		else
+			print(
+				string.format("✓ %s.lua - all %d exports have specs", module_result.name, module_result.export_count)
+			)
+		end
+	end
+
+	if result.total_errors > 0 then
+		error(string.format("API spec validation failed with %d error(s)", result.total_errors))
+	end
+
+	print(
+		string.format("✓ All API specs valid (%d exports across %d modules)", result.total_exports, #result.modules)
+	)
 end
 
 -- Get max API level
 local function get_max_api_level()
-	local handle = io.popen("lua tools/get-max-api-level.lua") or error("Failed to get max API level")
-	local output = handle:read("*all")
-	handle:close()
-	local level = tonumber(output:match("%d+"))
+	local level, err = api_specs.get_max_level()
 	if not level then
-		error("Failed to get max API level")
+		error("Failed to get max API level: " .. err)
 	end
 	return level
 end
@@ -99,22 +116,22 @@ local function load_and_validate_function(file_path, max_api_level)
 	local version = semver.parse(module.version) or error("Invalid semver in " .. file_path)
 	if version.major < 1 or version.major > max_api_level then
 		return false,
-				string.format(
-					"%s: version major %d must be between 1 and %d (max API level)",
-					file_path,
-					version.major,
-					max_api_level
-				)
+			string.format(
+				"%s: version major %d must be between 1 and %d (max API level)",
+				file_path,
+				version.major,
+				max_api_level
+			)
 	end
 
 	return true,
-			{
-				id = module.id,
-				version = module.version,
-				script = content,
-				file_path = file_path,
-				title = module.title,
-			}
+		{
+			id = module.id,
+			version = module.version,
+			script = content,
+			file_path = file_path,
+			title = module.title,
+		}
 end
 
 -- Print change summary
@@ -141,7 +158,7 @@ end
 -- Main execution
 local function main()
 	print("==> Phase 1: API Spec Verification")
-	verify_api_specs()
+	verify_and_print_api_specs()
 	local max_api_level = get_max_api_level()
 	print("Max API level: " .. max_api_level)
 
@@ -244,14 +261,14 @@ local function main()
 
 	-- Serialize and write
 	local output_content = "return "
-			.. serpent.block(catalog, {
-				comment = false,
-				sortkeys = true,
-				compact = true,
-				fatal = true,
-				nocode = true,
-				nohuge = true,
-			})
+		.. serpent.block(catalog, {
+			comment = false,
+			sortkeys = true,
+			compact = true,
+			fatal = true,
+			nocode = true,
+			nohuge = true,
+		})
 
 	write_file(CATALOG_PATH, output_content)
 
