@@ -82,6 +82,7 @@ kls_database.db
 # Generated files
 data/src/main/assets/generated/
 data/src/test/resources/generated/
+app/src/debug/assets/functions-catalog/
 
 lua/local
 

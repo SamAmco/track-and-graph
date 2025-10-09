@@ -67,3 +67,13 @@ Compares current functions against the published catalog to detect changes:
 ```bash
 lua tools/detect-changes.lua
 ```
+
+### Publish for Debug
+Signs the catalog and publishes to debug assets with a fresh keypair:
+```bash
+lua tools/publish-functions-debug.lua
+```
+Creates three files in `app/src/debug/assets/functions-catalog/`:
+- `community-functions.lua` - The catalog
+- `community-functions.sig.json` - Signature metadata
+- `debug-<timestamp>.pub` - Public key (referenced by keyId in JSON)
