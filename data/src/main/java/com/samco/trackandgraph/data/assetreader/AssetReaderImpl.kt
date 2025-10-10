@@ -17,13 +17,29 @@
 package com.samco.trackandgraph.data.assetreader
 
 import android.content.Context
+import com.samco.trackandgraph.data.di.IODispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AssetReaderImpl @Inject constructor(
-  @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AssetReader {
-    override fun readAssetToString(assetPath: String): String {
-        return context.assets.open(assetPath).bufferedReader().use { it.readText() }
+    override fun readAssetToString(assetPath: String): String =
+        context.assets.open(assetPath).bufferedReader().use { it.readText() }
+
+    override suspend fun findFilesWithSuffix(
+        assetDirectoryPath: String,
+        suffix: String
+    ): List<String> = withContext(ioDispatcher) {
+        try {
+            val files = context.assets.list(assetDirectoryPath) ?: emptyArray()
+            files.filter { it.endsWith(suffix) }
+                .map { "$assetDirectoryPath/$it" }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }

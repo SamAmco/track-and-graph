@@ -49,4 +49,13 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
             luaEngine.runLuaFunctionGenerator(vmLock, script, dataSources, configuration)
         } else throw LuaEngineDisabledException()
     }
+
+    override suspend fun runLuaCatalogue(
+        vmLock: LuaVMLock,
+        script: String
+    ): List<LuaFunctionMetadata> {
+        return if (luaEngineSwitch.enabled) {
+            luaEngine.runLuaCatalogue(vmLock, script)
+        } else throw LuaEngineDisabledException()
+    }
 }
