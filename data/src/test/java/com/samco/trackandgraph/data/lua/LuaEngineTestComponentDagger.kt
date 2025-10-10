@@ -56,6 +56,8 @@ internal interface LuaEngineTestComponent {
 
     fun provideLuaDataSourceProvider(): LuaDataSourceProviderImpl
 
+    fun provideApiLevelCalculator(): ApiLevelCalculator
+
     @Component.Builder
     interface Builder {
 
