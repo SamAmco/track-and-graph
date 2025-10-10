@@ -46,4 +46,9 @@ interface LuaEngine {
         dataSources: List<RawDataSample>,
         configuration: List<LuaScriptConfigurationValue>,
     ): Sequence<DataPoint>
+
+    suspend fun runLuaCatalogue(
+        vmLock: LuaVMLock,
+        script: String,
+    ): List<LuaFunctionMetadata>
 }
