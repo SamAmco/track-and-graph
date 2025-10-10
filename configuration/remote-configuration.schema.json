@@ -15,7 +15,9 @@
         "tutorial-lua",
         "tutorial-graphs",
         "lua-community-scripts-root",
-        "play-store-page"
+        "play-store-page",
+        "function-catalogue-location",
+        "function-catalogue-signature"
       ],
       "properties": {
         "github": {
@@ -45,11 +47,21 @@
         "play-store-page": {
           "type": "string",
           "format": "uri"
+        },
+        "function-catalogue-location": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the function catalogue Lua file"
+        },
+        "function-catalogue-signature": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the function catalogue signature file"
         }
       },
       "additionalProperties": false
     },
-    "trusted-lua-graph-sources": {
+    "trusted-lua-script-sources": {
       "type": "array",
       "description": "List of trusted URLs for Lua script sources",
       "items": {
