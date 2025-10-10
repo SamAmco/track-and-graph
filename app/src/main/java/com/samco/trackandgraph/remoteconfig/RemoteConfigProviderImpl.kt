@@ -19,71 +19,48 @@ package com.samco.trackandgraph.remoteconfig
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.downloader.FileDownloader
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.net.URI
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class RemoteConfigProviderImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     private val fileDownloader: FileDownloader,
     private val json: Json,
-) : RemoteConfigProvider, CoroutineScope {
+) : RemoteConfigProvider {
 
-    override val coroutineContext: CoroutineContext = Job() + ioDispatcher
+    private val fetchMutex = Mutex()
+    private var cachedConfiguration: RemoteConfiguration? = null
 
-    private sealed interface RemoteConfigResult {
-        data class Success(val configuration: RemoteConfiguration) : RemoteConfigResult
-        data class Failure(val error: Throwable) : RemoteConfigResult
+    override suspend fun getRemoteConfiguration(): RemoteConfiguration? {
+        return fetchMutex.withLock {
+            // Double-check: if we already have a successful configuration, return it
+            cachedConfiguration?.let { return@withLock it }
+
+            // Try to fetch new configuration
+            tryFetchConfiguration()?.also { newConfig ->
+                // Only cache on success
+                cachedConfiguration = newConfig
+                Timber.d("Successfully fetched and cached remote configuration")
+            }
+        }
     }
 
-    private val remoteConfig = flow {
+    private suspend fun tryFetchConfiguration(): RemoteConfiguration? = withContext(ioDispatcher) {
         try {
             val configContent = fileDownloader.downloadFileToString(
                 URI("https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/configuration/remote-configuration.json")
-            ) ?: error("Failed to load remote configuration")
+            ) ?: return@withContext null
 
-            val configuration = json.decodeFromString<RemoteConfiguration>(configContent)
-
-            emit(RemoteConfigResult.Success(configuration))
+            json.decodeFromString<RemoteConfiguration>(configContent)
         } catch (e: Exception) {
-            Timber.e(e, "Failed to load remote configuration")
-            emit(RemoteConfigResult.Failure(e))
+            Timber.w(e, "Failed to fetch remote configuration")
+            null
         }
-    }.shareIn(this, SharingStarted.Companion.Lazily, replay = 1)
-
-    override suspend fun getRemoteConfiguration(): RemoteConfiguration? {
-        return remoteConfig.map {
-            when (it) {
-                is RemoteConfigResult.Success -> it.configuration
-                is RemoteConfigResult.Failure -> null
-            }
-        }.first()
     }
 
-    override suspend fun getEndpoints(): Map<String, String>? {
-        return remoteConfig.map {
-            when (it) {
-                is RemoteConfigResult.Success -> it.configuration.endpoints
-                is RemoteConfigResult.Failure -> null
-            }
-        }.first()
-    }
-
-    override suspend fun getTrustedLuaScriptSources(): List<String>? {
-        return remoteConfig.map {
-            when (it) {
-                is RemoteConfigResult.Success -> it.configuration.trustedLuaScriptSources
-                is RemoteConfigResult.Failure -> null
-            }
-        }.first()
-    }
 }

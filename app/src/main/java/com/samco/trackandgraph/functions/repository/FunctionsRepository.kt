@@ -24,10 +24,6 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 class SignatureVerificationException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
 interface FunctionsRepository {
-    /**
-     * Triggers a background/non-blocking refresh of available Lua functions.
-     */
-    fun triggerFetchFunctions()
 
     /**
      * Fetches the list of available Lua functions.
