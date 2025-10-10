@@ -7,22 +7,10 @@ TODO:
 - Add text to the grid that hints at going landscape
 - Add text to the grid that hints at long pressing to add a node
 - Fix up the function card UI. Min height should be the same as tracker
-- Build etagged library: 
-  - make script to compile the library
-    - recursively read all .lua files in a directory
-    - minify them?
-  - semver each function
-- Docs
-
-- Catalog stuff:
-  - Implement code signing
-    - Implement prod signing 
-    - Implememt verification in app
-    - Implement assets based retriever for debug
-    - Implement network based retriever for prod
-  - In android lazily iterate all embedded specs to get the current api version (via max)
+- Implement prod signing 
 - Implement test harness for functions
   - optional: gate api access and assert no api int above the scripts major version is accessed
+- Docs
 
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source
@@ -30,6 +18,8 @@ QA:
   - Adding a function that creates a cycle should be prevented
   - Create nested complex dependent functions and use them in lots of graphs in the same screen and scroll
   - Publish the functions and make sure they work in prod
+  - Disable internet and make sure cache hits anyway for functions
+  - Double check url navigation is still working because i changed some stuff there
 
 
 FUNCTIONS PLANNING

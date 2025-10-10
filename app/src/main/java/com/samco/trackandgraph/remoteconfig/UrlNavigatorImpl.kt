@@ -35,16 +35,14 @@ class UrlNavigatorImpl @Inject constructor(
 
     override val coroutineContext: CoroutineContext = Job() + ioDispatcher
 
-    private var _config: Map<String, String>? = null
+    private var _config: RemoteConfiguration? = null
 
     override suspend fun navigateTo(context: Context, location: UrlNavigator.Location): Boolean {
         try {
-            getOrLoadConfig()[location.urlId]?.let { url ->
-                navigateToUrl(context, url)
-                return true
-            } ?: error("URL not found for location: ${location.urlId}")
+            navigateToUrl(context, getUrlForLocation(location))
+            return true
         } catch (t: Throwable) {
-            Timber.e(t, "Failed to navigate to URL for location: ${location.urlId} falling back to default")
+            Timber.e(t, "Failed to navigate to URL for location: $location falling back to default")
             navigateToUrl(context, "https://github.com/SamAmco/track-and-graph/")
             return false
         }
@@ -61,15 +59,24 @@ class UrlNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
-    private suspend fun getOrLoadConfig(): Map<String, String> {
-        if (_config == null) {
-            _config = loadConfig()
+    private suspend fun getUrlForLocation(location: UrlNavigator.Location): String {
+        val config = getOrLoadConfig()
+        return when (location) {
+            UrlNavigator.Location.GITHUB -> config.endpoints.github
+            UrlNavigator.Location.TUTORIAL_ROOT -> config.endpoints.tutorialRoot
+            UrlNavigator.Location.TUTORIAL_TRACKING -> config.endpoints.tutorialTracking
+            UrlNavigator.Location.TUTORIAL_LUA -> config.endpoints.tutorialLua
+            UrlNavigator.Location.TUTORIAL_GRAPHS -> config.endpoints.tutorialGraphs
+            UrlNavigator.Location.LUA_COMMUNITY_SCRIPTS_ROOT -> config.endpoints.luaCommunityScriptsRoot
+            UrlNavigator.Location.PLAY_STORE_PAGE -> config.endpoints.playStorePage
         }
-        return _config!!
     }
 
-    private suspend fun loadConfig(): Map<String, String> {
-        return remoteConfigProvider.getEndpoints()
-            ?: error("Failed to load endpoints configuration")
+    private suspend fun getOrLoadConfig(): RemoteConfiguration {
+        if (_config == null) {
+            _config = remoteConfigProvider.getRemoteConfiguration()
+                ?: error("Failed to load remote configuration")
+        }
+        return _config!!
     }
 }
