@@ -85,12 +85,10 @@ class ProductionFunctionsService @Inject constructor(
         Timber.d("Attempting to use cached catalogue (offline mode)")
         
         val cachedCatalogue = fileCache.getFile(CATALOGUE_CACHE_KEY)?.data
+            ?: error("No cached function catalogue available and unable to connect to server")
         val cachedSignature = fileCache.getFile(SIGNATURE_CACHE_KEY)?.data
-        
-        if (cachedCatalogue == null || cachedSignature == null) {
-            error("No cached function catalogue available and unable to connect to server")
-        }
-        
+            ?: error("No cached signature available for cached function catalogue")
+
         return createFunctionsCatalogData(cachedCatalogue, cachedSignature)
     }
 
