@@ -19,28 +19,10 @@ package com.samco.trackandgraph.functions.service
 /**
  * Data class containing the Lua functions file and its signature data
  */
-data class FunctionsCatalogData(
+class FunctionsCatalogData(
     val luaScriptBytes: ByteArray,
     val signatureData: SignatureData
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as FunctionsCatalogData
-
-        if (!luaScriptBytes.contentEquals(other.luaScriptBytes)) return false
-        if (signatureData != other.signatureData) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = luaScriptBytes.contentHashCode()
-        result = 31 * result + signatureData.hashCode()
-        return result
-    }
-}
+)
 
 /**
  * Service interface for fetching community functions and their signatures

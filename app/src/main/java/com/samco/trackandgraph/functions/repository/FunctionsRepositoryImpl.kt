@@ -16,14 +16,13 @@
  */
 package com.samco.trackandgraph.functions.repository
 
-import android.content.Context
 import android.util.Base64
+import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.functions.service.FunctionsService
 import com.samco.trackandgraph.functions.service.SignatureData
 import com.samco.trackandgraph.util.Stopwatch
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -35,12 +34,8 @@ import javax.inject.Inject
 class FunctionsRepositoryImpl @Inject constructor(
     private val functionsService: FunctionsService,
     private val luaEngine: LuaEngine,
-    @ApplicationContext private val appContext: Context,
+    private val assetReader: AssetReader,
 ) : FunctionsRepository {
-
-    override fun triggerFetchFunctions() {
-        // No-op for now, as requested. We'll fetch on demand in fetchFunctions().
-    }
 
     override suspend fun fetchFunctions(): List<LuaFunctionMetadata> = withContext(Dispatchers.IO) {
         val stopwatch = Stopwatch()
@@ -86,10 +81,7 @@ class FunctionsRepositoryImpl @Inject constructor(
     private fun verifySignature(luaScriptBytes: ByteArray, signatureData: SignatureData): Boolean {
         // Read the public key file based on keyId
         val keyFileName = "${signatureData.keyId}.pub"
-        val keyFileContent = appContext.assets
-            .open("functions-catalog/$keyFileName")
-            .bufferedReader()
-            .use { it.readText() }
+        val keyFileContent = assetReader.readAssetToString("functions-catalog/$keyFileName")
 
         // Extract the base64 key from PEM format
         val publicKeyBase64 = extractPublicKeyFromPem(keyFileContent)

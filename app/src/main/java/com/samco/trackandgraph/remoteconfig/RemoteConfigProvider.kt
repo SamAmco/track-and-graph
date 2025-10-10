@@ -18,8 +18,4 @@ package com.samco.trackandgraph.remoteconfig
 
 interface RemoteConfigProvider {
     suspend fun getRemoteConfiguration(): RemoteConfiguration?
-    
-    suspend fun getEndpoints(): Map<String, String>?
-    
-    suspend fun getTrustedLuaScriptSources(): List<String>?
 }

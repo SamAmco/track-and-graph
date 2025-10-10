@@ -172,7 +172,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     private suspend fun onReceivedDeepLink(uri: URI) {
         val trustedSources = try {
-            remoteConfigProvider.getTrustedLuaScriptSources() ?: emptyList()
+            remoteConfigProvider.getRemoteConfiguration()?.trustedLuaScriptSources ?: emptyList()
         } catch (e: Exception) {
             // Handle parsing errors gracefully
             Timber.e(e, "Failed to parse trusted sources")

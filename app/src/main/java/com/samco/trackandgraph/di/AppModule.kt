@@ -41,6 +41,8 @@ import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.remoteconfig.UrlNavigatorImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.settings.TngSettingsImpl
+import com.samco.trackandgraph.storage.FileCache
+import com.samco.trackandgraph.storage.FileCacheImpl
 import com.samco.trackandgraph.system.AlarmManagerWrapper
 import com.samco.trackandgraph.system.AlarmManagerWrapperImpl
 import com.samco.trackandgraph.system.ReminderPrefWrapper
@@ -93,6 +95,10 @@ class AppModule {
 
     @Provides
     fun provideFileDownloader(impl: FileDownloaderImpl): FileDownloader = impl
+
+    @Provides
+    @Singleton
+    fun provideFileStore(impl: FileCacheImpl): FileCache = impl
 
     @Provides
     @Singleton

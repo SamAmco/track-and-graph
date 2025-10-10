@@ -21,7 +21,28 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RemoteConfiguration(
-    val endpoints: Map<String, String>,
+    val endpoints: Endpoints,
     @SerialName("trusted-lua-script-sources")
     val trustedLuaScriptSources: List<String>
+)
+
+@Serializable
+data class Endpoints(
+    val github: String,
+    @SerialName("tutorial-root")
+    val tutorialRoot: String,
+    @SerialName("tutorial-tracking")
+    val tutorialTracking: String,
+    @SerialName("tutorial-lua")
+    val tutorialLua: String,
+    @SerialName("tutorial-graphs")
+    val tutorialGraphs: String,
+    @SerialName("lua-community-scripts-root")
+    val luaCommunityScriptsRoot: String,
+    @SerialName("play-store-page")
+    val playStorePage: String,
+    @SerialName("function-catalogue-location")
+    val functionCatalogueLocation: String,
+    @SerialName("function-catalogue-signature")
+    val functionCatalogueSignature: String
 )

@@ -19,14 +19,14 @@ package com.samco.trackandgraph.remoteconfig
 import android.content.Context
 
 interface UrlNavigator {
-    enum class Location(val urlId: String) {
-        GITHUB("github"),
-        TUTORIAL_ROOT("tutorial-root"),
-        TUTORIAL_TRACKING("tutorial-tracking"),
-        TUTORIAL_LUA("tutorial-lua"),
-        TUTORIAL_GRAPHS("tutorial-graphs"),
-        LUA_COMMUNITY_SCRIPTS_ROOT("lua-community-scripts-root"),
-        PLAY_STORE_PAGE("play-store-page");
+    enum class Location {
+        GITHUB,
+        TUTORIAL_ROOT,
+        TUTORIAL_TRACKING,
+        TUTORIAL_LUA,
+        TUTORIAL_GRAPHS,
+        LUA_COMMUNITY_SCRIPTS_ROOT,
+        PLAY_STORE_PAGE
     }
 
     suspend fun navigateTo(context: Context, location: Location): Boolean
