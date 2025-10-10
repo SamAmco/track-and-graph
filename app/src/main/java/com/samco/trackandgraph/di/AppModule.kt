@@ -51,6 +51,9 @@ import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
 import com.samco.trackandgraph.functions.repository.FunctionsRepository
 import com.samco.trackandgraph.functions.repository.FunctionsRepositoryImpl
+import com.samco.trackandgraph.functions.service.FunctionsService
+import com.samco.trackandgraph.functions.service.DebugFunctionsService
+import com.samco.trackandgraph.functions.service.ProductionFunctionsService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -98,6 +101,13 @@ class AppModule {
     @Provides
     @Singleton
     fun provideRemoteConfigProvider(impl: RemoteConfigProviderImpl): RemoteConfigProvider = impl
+
+    @Provides
+    @Singleton
+    fun provideFunctionsService(
+        debugService: DebugFunctionsService,
+        productionService: ProductionFunctionsService
+    ): FunctionsService = if (BuildConfig.DEBUG) debugService else productionService
 
     @Provides
     @Singleton

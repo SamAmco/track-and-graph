@@ -14,24 +14,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.functions.repository
+package com.samco.trackandgraph.functions.service
 
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import kotlinx.serialization.Serializable
 
 /**
- * Exception thrown when signature verification fails for functions catalog
+ * Data class representing the signature JSON file structure
  */
-class SignatureVerificationException(message: String, cause: Throwable? = null) : Exception(message, cause)
-
-interface FunctionsRepository {
-    /**
-     * Triggers a background/non-blocking refresh of available Lua functions.
-     */
-    fun triggerFetchFunctions()
-
-    /**
-     * Fetches the list of available Lua functions.
-     * Suspends indefinitely until the list is available.
-     */
-    suspend fun fetchFunctions(): List<LuaFunctionMetadata>
-}
+@Serializable
+data class SignatureData(
+    val keyId: String,
+    val algorithm: String,
+    val signature: String
+)

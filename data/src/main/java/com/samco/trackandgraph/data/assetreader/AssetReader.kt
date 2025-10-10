@@ -18,4 +18,12 @@ package com.samco.trackandgraph.data.assetreader
 
 interface AssetReader {
     fun readAssetToString(assetPath: String): String
+    
+    /**
+     * Finds all files in the given asset directory path that match the given suffix
+     * @param assetDirectoryPath the directory path in assets to search
+     * @param suffix the file suffix to match (e.g., ".apispec.lua")
+     * @return list of file paths relative to the asset directory
+     */
+    suspend fun findFilesWithSuffix(assetDirectoryPath: String, suffix: String): List<String>
 }
