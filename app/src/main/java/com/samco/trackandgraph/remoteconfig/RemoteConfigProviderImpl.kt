@@ -62,5 +62,4 @@ class RemoteConfigProviderImpl @Inject constructor(
             null
         }
     }
-
 }
