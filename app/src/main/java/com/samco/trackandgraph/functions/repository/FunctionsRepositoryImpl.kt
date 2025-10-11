@@ -16,7 +16,8 @@
  */
 package com.samco.trackandgraph.functions.repository
 
-import android.util.Base64
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
@@ -31,6 +32,7 @@ import java.security.Signature
 import java.security.spec.X509EncodedKeySpec
 import javax.inject.Inject
 
+@OptIn(ExperimentalEncodingApi::class)
 class FunctionsRepositoryImpl @Inject constructor(
     private val functionsService: FunctionsService,
     private val luaEngine: LuaEngine,
@@ -44,16 +46,8 @@ class FunctionsRepositoryImpl @Inject constructor(
             stopwatch.start()
             val scriptBytes = catalogData.luaScriptBytes
 
-            // Verify signature before processing
-            val isSignatureValid = verifySignature(scriptBytes, catalogData.signatureData)
-            if (!isSignatureValid) {
-                throw SignatureVerificationException("Signature verification failed for functions catalog")
-            }
-
-            if (scriptBytes.isEmpty()) {
-                Timber.w("Received empty Lua script from functions service")
-                return@withContext emptyList()
-            }
+            // Verify signature before processing - throws SignatureVerificationException on any failure
+            verifySignature(scriptBytes, catalogData.signatureData)
 
             // Convert to string only after signature verification
             val script = String(scriptBytes, Charsets.UTF_8)
@@ -69,6 +63,9 @@ class FunctionsRepositoryImpl @Inject constructor(
             } finally {
                 luaEngine.releaseVM(vmLock)
             }
+        } catch (e: SignatureVerificationException) {
+            // Re-throw signature verification failures - these are security issues that should not be silently ignored
+            throw e
         } catch (t: Throwable) {
             Timber.e(t, "Failed to fetch functions catalog")
             emptyList()
@@ -78,26 +75,34 @@ class FunctionsRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun verifySignature(luaScriptBytes: ByteArray, signatureData: SignatureData): Boolean {
-        // Read the public key file based on keyId
-        val keyFileName = "${signatureData.keyId}.pub"
-        val keyFileContent = assetReader.readAssetToString("functions-catalog/$keyFileName")
+    private fun verifySignature(luaScriptBytes: ByteArray, signatureData: SignatureData) {
+        try {
+            // Read the public key file based on keyId
+            val keyFileName = "${signatureData.keyId}.pub"
+            val keyFileContent = assetReader.readAssetToString("functions-catalog/$keyFileName")
 
-        // Extract the base64 key from PEM format
-        val publicKeyBase64 = extractPublicKeyFromPem(keyFileContent)
+            // Extract the base64 key from PEM format
+            val publicKeyBase64 = extractPublicKeyFromPem(keyFileContent)
 
-        // Verify the signature
-        val isValid = verifyECDSAP256Sha256(
-            manifestBytes = luaScriptBytes,
-            signatureDer = Base64.decode(signatureData.signature, Base64.DEFAULT),
-            publicKeySpkiBase64 = publicKeyBase64
-        )
+            // Verify the signature
+            val isValid = verifyECDSAP256Sha256(
+                manifestBytes = luaScriptBytes,
+                signatureDer = Base64.decode(signatureData.signature),
+                publicKeySpkiBase64 = publicKeyBase64
+            )
 
-        if (isValid) {
+            if (!isValid) {
+                throw SignatureVerificationException("Signature verification failed for functions catalog")
+            }
+
             Timber.d("Signature verification successful for keyId: ${signatureData.keyId}")
+        } catch (e: SignatureVerificationException) {
+            // Re-throw our own exceptions
+            throw e
+        } catch (e: Throwable) {
+            // Wrap any other exceptions (Base64 decode, crypto operations, file reading, etc.)
+            throw SignatureVerificationException("Signature verification failed due to: ${e.message}", e)
         }
-
-        return isValid
     }
 
     private fun extractPublicKeyFromPem(pemContent: String): String {
@@ -112,7 +117,7 @@ class FunctionsRepositoryImpl @Inject constructor(
         signatureDer: ByteArray,
         publicKeySpkiBase64: String
     ): Boolean {
-        val keyBytes = Base64.decode(publicKeySpkiBase64, Base64.DEFAULT)
+        val keyBytes = Base64.decode(publicKeySpkiBase64)
         val kf = KeyFactory.getInstance("EC")
         val pubKey = kf.generatePublic(X509EncodedKeySpec(keyBytes))
         val sig = Signature.getInstance("SHA256withECDSA")
