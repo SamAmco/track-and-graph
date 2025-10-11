@@ -101,6 +101,10 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 
+    companion object {
+        var a: Any? = null
+    }
+
     override suspend fun runLuaCatalogue(
         vmLock: LuaVMLock,
         script: String
@@ -110,6 +114,7 @@ internal class LuaEngineImpl @Inject constructor(
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaFunctionCatalogueAdapter.parseCatalogue(vmLease, resolvedScript)
         } catch (luaError: LuaError) {
+            a = luaError
             val luaScriptException = LuaScriptException(
                 message = luaError.message ?: "",
                 luaCauseStackTrace = luaError.luaCause?.stackTraceToString()

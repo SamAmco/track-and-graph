@@ -82,6 +82,10 @@ internal abstract class LuaEngineImplTest {
         val metadata: LuaFunctionMetadata,
     )
 
+    protected data class LuaCatalogueAssertionScope(
+        val functions: List<LuaFunctionMetadata>,
+    )
+
     protected fun testLuaGraph(
         script: String,
         assertionBlock: LuaGraphAssertionScope.() -> Unit
@@ -171,6 +175,27 @@ internal abstract class LuaEngineImplTest {
 
         LuaFunctionMetadataAssertionScope(
             metadata = metadata
+        ).assertionBlock()
+    }
+
+    protected fun testLuaCatalogue(
+        script: String,
+        assertionBlock: LuaCatalogueAssertionScope.() -> Unit
+    ) {
+        val uut = uut()
+
+        val vmLock = runBlocking { uut.acquireVM() }
+
+        val functions = try {
+            runBlocking { uut.runLuaCatalogue(vmLock, script) }
+        } catch (t: Throwable) {
+            throw t
+        } finally {
+            uut.releaseVM(vmLock)
+        }
+
+        LuaCatalogueAssertionScope(
+            functions = functions
         ).assertionBlock()
     }
 

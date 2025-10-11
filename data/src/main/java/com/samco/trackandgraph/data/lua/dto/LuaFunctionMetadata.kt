@@ -66,8 +66,10 @@ sealed class LuaFunctionConfigSpec {
 
 data class LuaFunctionMetadata(
     val script: String,
+    val id: String?,
     val version: Version?,
     val title: TranslatedString?,
+    val description: TranslatedString?,
     val inputCount: Int,
     val config: List<LuaFunctionConfigSpec>,
 )

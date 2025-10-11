@@ -59,10 +59,12 @@ class LuaScriptNodeProviderTest {
         val nodeId = 456
         val metadata = LuaFunctionMetadata(
             script = script,
+            id = null,
             inputCount = 1,
             config = emptyList(),
             version = null,
             title = null,
+            description = null,
         )
         whenever(mockLuaEngine.runLuaFunction(any(), eq(script))).thenReturn(metadata)
 
@@ -123,6 +125,7 @@ class LuaScriptNodeProviderTest {
         val newScript = "new script"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
+            id = null,
             inputCount = 2,
             config = listOf(
                 LuaFunctionConfigSpec.Text(
@@ -132,6 +135,7 @@ class LuaScriptNodeProviderTest {
             ),
             version = Version(1, 0, 0),
             title = null,
+            description = null,
         )
         whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
@@ -168,6 +172,7 @@ class LuaScriptNodeProviderTest {
         val newScript = "new script with config"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
+            id = null,
             inputCount = 1,
             config = listOf(
                 LuaFunctionConfigSpec.Text(
@@ -177,6 +182,7 @@ class LuaScriptNodeProviderTest {
             ),
             version = null,
             title = TranslatedString.Simple("New Script"),
+            description = null,
         )
         whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
@@ -223,6 +229,7 @@ class LuaScriptNodeProviderTest {
         val newScript = "new script with only one config"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
+            id = null,
             inputCount = 1,
             config = listOf(
                 LuaFunctionConfigSpec.Text(
@@ -232,6 +239,7 @@ class LuaScriptNodeProviderTest {
             ),
             version = null,
             title = null,
+            description = null,
         )
         whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
@@ -272,6 +280,7 @@ class LuaScriptNodeProviderTest {
         val newScript = "new script"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
+            id = null,
             inputCount = 1,
             config = listOf(
                 LuaFunctionConfigSpec.Number( // Changed type from TEXT to NUMBER
@@ -281,6 +290,7 @@ class LuaScriptNodeProviderTest {
             ),
             version = null,
             title = null,
+            description = null,
         )
         whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 
@@ -373,6 +383,7 @@ class LuaScriptNodeProviderTest {
         val newScript = "complex new script"
         val newMetadata = LuaFunctionMetadata(
             script = newScript,
+            id = null,
             inputCount = 3,
             config = listOf(
                 LuaFunctionConfigSpec.Text(
@@ -390,6 +401,7 @@ class LuaScriptNodeProviderTest {
             ),
             version = Version(1, 0, 0),
             title = TranslatedString.Simple("New Script"),
+            description = null,
         )
         whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
 

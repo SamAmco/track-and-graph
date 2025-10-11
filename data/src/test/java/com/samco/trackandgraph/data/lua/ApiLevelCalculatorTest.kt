@@ -69,11 +69,13 @@ class ApiLevelCalculatorTest {
 
         // Mock the findFilesWithSuffix method to return our test files
         whenever(assetReader.findFilesWithSuffix("generated/lua-api", ".apispec.lua"))
-            .thenReturn(listOf(
-                "generated/lua-api/core.apispec.lua",
-                "generated/lua-api/graph.apispec.lua", 
-                "generated/lua-api/extensions.apispec.lua"
-            ))
+            .thenReturn(
+                listOf(
+                    "generated/lua-api/core.apispec.lua",
+                    "generated/lua-api/graph.apispec.lua",
+                    "generated/lua-api/extensions.apispec.lua"
+                )
+            )
 
         // Mock the readAssetToString method to return our hard-coded content
         whenever(assetReader.readAssetToString("generated/lua-api/core.apispec.lua"))
@@ -92,25 +94,27 @@ class ApiLevelCalculatorTest {
     }
 
     @Test
-    fun `calculates maximum API level across multiple apispec files with varying levels`() = runTest {
-        val component = createTestComponent()
-        val apiLevelCalculator = component.provideApiLevelCalculator()
-        val vmProvider = component.provideVMProvider()
+    fun `calculates maximum API level across multiple apispec files with varying levels`() =
+        runTest {
+            val component = createTestComponent()
+            val apiLevelCalculator = component.provideApiLevelCalculator()
+            val vmProvider = component.provideVMProvider()
 
-        // Acquire a VM lease to use for parsing
-        val vmLease = vmProvider.acquire()
-        
-        try {
-            // Call getMaxApiLevel - should return 8 (highest level from extensions.apispec.lua)
-            val maxApiLevel = apiLevelCalculator.getMaxApiLevel(vmLease)
-            
-            // Verify the maximum API level is correctly calculated
-            // Expected: 8 from advanced_filter in extensions.apispec.lua
-            assertEquals(8, maxApiLevel)
-            
-        } finally {
-            vmProvider.release(vmLease)
-            error("Test threw an exception")
+            // Acquire a VM lease to use for parsing
+            val vmLease = vmProvider.acquire()
+
+            try {
+                // Call getMaxApiLevel - should return 8 (highest level from extensions.apispec.lua)
+                val maxApiLevel = apiLevelCalculator.getMaxApiLevel(vmLease)
+
+                // Verify the maximum API level is correctly calculated
+                // Expected: 8 from advanced_filter in extensions.apispec.lua
+                assertEquals(8, maxApiLevel)
+
+            } catch (t: Throwable) {
+                error("Test threw an exception")
+            } finally {
+                vmProvider.release(vmLease)
+            }
         }
-    }
 }

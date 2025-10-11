@@ -17,10 +17,14 @@
 package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import io.github.z4kn4fein.semver.toVersion
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
+import kotlin.reflect.full.memberProperties
 
 internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
 
@@ -320,6 +324,84 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                         "If you added a new type, update this test to include it and implement parsing logic in LuaFunctionMetadataAdapter.",
                 allConfigTypes, testedTypes
             )
+        }
+    }
+
+    @Test
+    fun `Function handles all metadata fields`() {
+        val script = """
+            return {
+                id = "comprehensive-function",
+                version = "2.1.0",
+                inputCount = 2,
+                title = {
+                    ["en"] = "Comprehensive Function",
+                    ["de"] = "Umfassende Funktion",
+                    ["es"] = "Función Integral",
+                    ["fr"] = "Fonction Complète"
+                },
+                description = {
+                    ["en"] = "A function that demonstrates all metadata fields",
+                    ["de"] = "Eine Funktion, die alle Metadatenfelder demonstriert",
+                    ["es"] = "Una función que demuestra todos los campos de metadatos",
+                    ["fr"] = "Une fonction qui démontre tous les champs de métadonnées"
+                },
+                config = {
+                    {
+                        id = "sampleConfig",
+                        type = "text",
+                        name = {
+                            ["en"] = "Sample Configuration",
+                            ["de"] = "Beispielkonfiguration",
+                            ["fr"] = "Configuration d'Exemple"
+                        }
+                    }
+                },
+                generator = function(data_sources, config)
+                    -- Function implementation
+                end
+            }
+        """.trimIndent()
+        testLuaFunctionMetadata(script) {
+            // Use reflection to ensure all fields are non-null
+            val metadataClass = LuaFunctionMetadata::class
+            val properties = metadataClass.memberProperties
+            properties.forEach { property ->
+                val value = property.get(metadata)
+                assertNotNull("Field '${property.name}' should not be null in comprehensive test", value)
+            }
+            
+            // Test all metadata fields are parsed correctly
+            assertEquals("comprehensive-function", metadata.id)
+            assertEquals("2.1.0".toVersion(), metadata.version)
+            assertEquals(2, metadata.inputCount)
+            assertEquals(script, metadata.script)
+            
+            // Test title with translations
+            val title = metadata.title as? TranslatedString.Translations
+            assertNotNull("Title should be parsed as translations", title)
+            assertEquals("Comprehensive Function", title!!.values["en"])
+            assertEquals("Umfassende Funktion", title.values["de"])
+            assertEquals("Función Integral", title.values["es"])
+            assertEquals("Fonction Complète", title.values["fr"])
+            
+            // Test description with translations
+            val description = metadata.description as? TranslatedString.Translations
+            assertNotNull("Description should be parsed as translations", description)
+            assertEquals("A function that demonstrates all metadata fields", description!!.values["en"])
+            assertEquals("Eine Funktion, die alle Metadatenfelder demonstriert", description.values["de"])
+            assertEquals("Una función que demuestra todos los campos de metadatos", description.values["es"])
+            assertEquals("Une fonction qui démontre tous les champs de métadonnées", description.values["fr"])
+            
+            // Test config is parsed
+            assertEquals(1, metadata.config.size)
+            val config = metadata.config[0]
+            assertEquals("sampleConfig", config.id)
+            val configName = config.name as? TranslatedString.Translations
+            assertNotNull("Config name should be parsed as translations", configName)
+            assertEquals("Sample Configuration", configName!!.values["en"])
+            assertEquals("Beispielkonfiguration", configName.values["de"])
+            assertEquals("Configuration d'Exemple", configName.values["fr"])
         }
     }
 }

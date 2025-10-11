@@ -47,7 +47,7 @@ internal interface LuaEngineTestComponent {
     fun provideLuaEngine(): LuaEngineImpl
 
     fun provideVMProvider(): LuaVMProvider
-    
+
     fun provideLuaScriptResolver(): LuaScriptResolver
 
     fun provideLuaGraphAdapter(): LuaGraphAdapter
