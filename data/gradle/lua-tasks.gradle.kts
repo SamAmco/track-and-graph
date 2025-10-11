@@ -40,7 +40,7 @@ tasks.register("copyLuaScriptsForTests") {
         file("src/test/resources/generated/").deleteRecursively()
 
         copy {
-            from("${rootProject.projectDir}/lua/src/community/graphs")
+            from("${rootProject.projectDir}/lua/src/community")
             into("${projectDir}/src/test/resources/generated/lua-community")
             include("**/*.lua")
         }
