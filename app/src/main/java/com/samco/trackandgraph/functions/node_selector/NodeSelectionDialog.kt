@@ -156,6 +156,8 @@ private fun NodeSelectionDialogPreview() {
                 items = listOf(
                     LuaFunctionMetadata(
                         script = "-- script1",
+                        id = null,
+                        description = null,
                         version = null,
                         title = TranslatedString.Simple("Multiply Values"),
                         inputCount = 1,
@@ -163,6 +165,8 @@ private fun NodeSelectionDialogPreview() {
                     ),
                     LuaFunctionMetadata(
                         script = "-- script2",
+                        id = null,
+                        description = null,
                         version = null,
                         title = TranslatedString.Simple("Filter by Label"),
                         inputCount = 1,

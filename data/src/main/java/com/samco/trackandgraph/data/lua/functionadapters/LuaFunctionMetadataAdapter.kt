@@ -31,9 +31,11 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
         if (resolvedScript.isfunction()) {
             return LuaFunctionMetadata(
                 script = originalScript,
+                id = null,
                 inputCount = 1,
                 version = null,
                 title = null,
+                description = null,
                 config = emptyList()
             )
         }
@@ -41,17 +43,31 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
         // Otherwise, extract metadata from table
         return LuaFunctionMetadata(
             script = originalScript,
+            id = extractId(resolvedScript),
             version = extractVersion(resolvedScript),
             title = extractTitle(resolvedScript),
+            description = extractDescription(resolvedScript),
             inputCount = extractInputCount(resolvedScript),
             config = extractConfigs(resolvedScript)
         )
+    }
+
+    private fun extractId(resolvedScript: LuaValue): String? {
+        val titleValue = resolvedScript["id"]
+        return if (!titleValue.isstring()) null
+        else titleValue.tojstring()
     }
 
     private fun extractTitle(resolvedScript: LuaValue): TranslatedString? {
         val titleValue = resolvedScript["title"]
         return if (titleValue.isnil()) null
         else parseTranslatedString(titleValue)
+    }
+
+    private fun extractDescription(resolvedScript: LuaValue): TranslatedString? {
+        val descriptionValue = resolvedScript["description"]
+        return if (descriptionValue.isnil()) null
+        else parseTranslatedString(descriptionValue)
     }
 
     private fun extractVersion(resolvedScript: LuaValue): Version? {

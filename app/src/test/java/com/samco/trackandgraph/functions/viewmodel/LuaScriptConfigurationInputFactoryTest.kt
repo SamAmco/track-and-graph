@@ -36,6 +36,7 @@ class LuaScriptConfigurationInputFactoryTest {
     // This ensures we test all enum values and catch missing implementations
     private val allTypesMetadata = LuaFunctionMetadata(
         script = "comprehensive test script",
+        id = "comprehensive-test",
         inputCount = 3,
         config = listOf(
             LuaFunctionConfigSpec.Text(
@@ -53,6 +54,7 @@ class LuaScriptConfigurationInputFactoryTest {
         ),
         version = Version(1, 0, 0),
         title = TranslatedString.Simple("Comprehensive Test Script"),
+        description = TranslatedString.Simple("A comprehensive test script that demonstrates all configuration types"),
     )
 
     private val allTypesConfig = listOf(
