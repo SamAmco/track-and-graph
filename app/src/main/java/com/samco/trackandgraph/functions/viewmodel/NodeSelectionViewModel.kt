@@ -45,8 +45,12 @@ class NodeSelectionViewModelImpl @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val functions = repository.fetchFunctions()
-            _state.value = NodeSelectionUiState.Ready(functions)
+            try {
+                val functions = repository.fetchFunctions()
+                _state.value = NodeSelectionUiState.Ready(functions)
+            } catch (t: Throwable) {
+                _state.value = NodeSelectionUiState.Ready(emptyList())
+            }
         }
     }
 }

@@ -11,6 +11,9 @@ TODO:
 - Implement test harness for functions
   - optional: gate api access and assert no api int above the scripts major version is accessed
 - Docs
+- Do we want error toasts when function catalogue download fails or something?
+
+- Test RemoteConfigProviderImpl
 
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source
