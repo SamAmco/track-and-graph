@@ -20,6 +20,7 @@ import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
@@ -61,6 +62,7 @@ internal abstract class LuaEngineImplTest {
             .assetReader(assetReader)
             .ioDispatcher(ioDispatcher)
             .timeProvider(timeProvider)
+            .moduleLoadInterceptor(NoOpModuleLoadInterceptorImpl())
             .build()
             .provideLuaEngine()
     }

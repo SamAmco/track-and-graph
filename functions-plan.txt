@@ -7,13 +7,10 @@ TODO:
 - Add text to the grid that hints at going landscape
 - Add text to the grid that hints at long pressing to add a node
 - Fix up the function card UI. Min height should be the same as tracker
-- Implement prod signing 
-- Implement test harness for functions
-  - optional: gate api access and assert no api int above the scripts major version is accessed
 - Docs
 - Do we want error toasts when function catalogue download fails or something?
 
-- Test RemoteConfigProviderImpl
+- Ensure api gating works for multiple successive tests
 
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source

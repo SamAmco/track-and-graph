@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.lua.apiimpl.DataPointParser
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
+import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
 import com.samco.trackandgraph.data.lua.graphadapters.LuaGraphAdapter
 import com.samco.trackandgraph.data.time.TimeProvider
 import dagger.Binds
@@ -72,6 +73,9 @@ internal interface LuaEngineTestComponent {
 
         @BindsInstance
         fun timeProvider(timeProvider: TimeProvider): Builder
+
+        @BindsInstance
+        fun moduleLoadInterceptor(moduleLoadInterceptor: ModuleLoadInterceptor): Builder
 
         fun build(): LuaEngineTestComponent
     }

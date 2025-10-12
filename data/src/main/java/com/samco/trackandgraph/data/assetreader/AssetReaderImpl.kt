@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class AssetReaderImpl @Inject constructor(
@@ -38,7 +39,8 @@ class AssetReaderImpl @Inject constructor(
             val files = context.assets.list(assetDirectoryPath) ?: emptyArray()
             files.filter { it.endsWith(suffix) }
                 .map { "$assetDirectoryPath/$it" }
-        } catch (e: Exception) {
+        } catch (t: Throwable) {
+            Timber.e(t, "Failed to find files with suffix $suffix in asset directory $assetDirectoryPath")
             emptyList()
         }
     }

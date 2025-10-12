@@ -16,13 +16,16 @@
  */
 package com.samco.trackandgraph.data.lua.community_test_runner
 
-import com.samco.trackandgraph.data.lua.VMLease
+import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
+import io.github.z4kn4fein.semver.toVersion
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import java.io.File
 
 @RunWith(Parameterized::class)
 internal class FunctionTestRunner : CommunityTestRunner() {
@@ -42,6 +45,39 @@ internal class FunctionTestRunner : CommunityTestRunner() {
         fun testData(): List<Array<Any>> {
             return crawlTestDirectory("generated/lua-community/functions")
         }
+
+        private fun loadLuaFile(globals: Globals, path: String): LuaValue {
+            val classLoader = FunctionTestRunner::class.java.classLoader!!
+            val scriptText = File(classLoader.getResource(path).toURI()).readText()
+            return globals.load(scriptText).call()
+        }
+    }
+
+    override fun getModuleLoadInterceptor(): ModuleLoadInterceptor {
+        return object : ModuleLoadInterceptor {
+            override fun onModuleLoad(
+                globals: Globals,
+                moduleName: String,
+                module: LuaTable
+            ): LuaTable {
+                if (!moduleName.startsWith("tng.")) return module
+
+                val gateModule = loadLuaFile(
+                    globals = globals,
+                    path = "generated/lua-community/test_utils/api_gate.lua"
+                )
+
+                val moduleFileName = moduleName.removePrefix("tng.")
+                val apiSpecModule = loadLuaFile(
+                    globals = globals,
+                    path = "generated/lua-api/$moduleFileName.apispec.lua"
+                )
+
+                return gateModule["gate"].checkfunction()!!
+                    .call(module, apiSpecModule)
+                    .checktable()!!
+            }
+        }
     }
 
     @Test
@@ -49,13 +85,21 @@ internal class FunctionTestRunner : CommunityTestRunner() {
         val vmProvider = daggerComponent.provideVMProvider()
         val vmLease = runBlocking { vmProvider.acquire() }
         try {
+            val resolvedScript = daggerComponent.provideLuaScriptResolver()
+                .resolveLuaScript(scriptLuaText, vmLease)
+                .checktable()!!
+
+            val version = resolvedScript["version"].checkjstring()!!.toVersion().major
+            vmLease.globals.load("CURRENT_TEST_API_LEVEL = $version").call()
+
             val test = vmLease.globals.load(testLuaText)
+
             val testSet = test.call().checktable()!!
             for (key in testSet.keys()) {
                 runFunctionTest(
+                    resolvedScript = resolvedScript,
                     key = key,
                     testStructure = testSet[key].checktable()!!,
-                    vmLease = vmLease
                 )
             }
         } catch (t: Throwable) {
@@ -67,13 +111,14 @@ internal class FunctionTestRunner : CommunityTestRunner() {
         }
     }
 
-    private fun runFunctionTest(key: LuaValue, testStructure: LuaTable, vmLease: VMLease) {
+    private fun runFunctionTest(
+        resolvedScript: LuaTable,
+        key: LuaValue,
+        testStructure: LuaTable,
+    ) {
         try {
             val testConfig = testStructure["config"].checktable()!!
             val testDataSources = testStructure["sources"].checkfunction()!!.call().checktable()!!
-            val resolvedScript = daggerComponent.provideLuaScriptResolver()
-                .resolveLuaScript(scriptLuaText, vmLease)
-                .checktable()!!
 
             // For functions, we execute the script directly and call the generator
             val functionResult = executeFunctionScript(

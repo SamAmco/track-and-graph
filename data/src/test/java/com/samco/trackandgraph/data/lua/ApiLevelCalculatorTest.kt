@@ -18,6 +18,7 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.time.TimeProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
@@ -90,6 +91,7 @@ class ApiLevelCalculatorTest {
             .assetReader(assetReader)
             .ioDispatcher(Dispatchers.IO)
             .timeProvider(timeProvider)
+            .moduleLoadInterceptor(NoOpModuleLoadInterceptorImpl())
             .build()
     }
 
