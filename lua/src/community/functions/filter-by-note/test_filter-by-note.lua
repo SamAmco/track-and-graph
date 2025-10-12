@@ -7,7 +7,7 @@ local DDAY = core.DURATION.DAY
 
 M.test_filter_basic_substring = {
   config = {
-    filter_label = "test",
+    filter_note = "important",
     case_sensitive = false,
     match_exactly = false,
   },
@@ -18,40 +18,40 @@ M.test_filter_basic_substring = {
         {
           timestamp = now - (DDAY * 1),
           value = 10.0,
-          label = "test1",
+          note = "important note",
         },
         {
           timestamp = now - (DDAY * 2),
           value = 20.0,
-          label = "other",
+          note = "other",
         },
         {
           timestamp = now - (DDAY * 3),
           value = 30.0,
-          label = "TEST2",
+          note = "IMPORTANT data",
         },
         {
           timestamp = now - (DDAY * 4),
           value = 40.0,
-          label = "another",
+          note = "unrelated",
         },
       },
     }
   end,
   assertions = function(result)
     test.assert("result was nil", result)
-    -- Should match "test1" and "TEST2" (case insensitive substring)
+    -- Should match notes containing "important" (case insensitive)
     test.assertEquals(2, #result)
     test.assertEquals(10.0, result[1].value)
-    test.assertEquals("test1", result[1].label)
+    test.assertEquals("important note", result[1].note)
     test.assertEquals(30.0, result[2].value)
-    test.assertEquals("TEST2", result[2].label)
+    test.assertEquals("IMPORTANT data", result[2].note)
   end,
 }
 
 M.test_filter_exact_match = {
   config = {
-    filter_label = "exact",
+    filter_note = "exact",
     case_sensitive = false,
     match_exactly = true,
   },
@@ -62,33 +62,33 @@ M.test_filter_exact_match = {
         {
           timestamp = now - (DDAY * 1),
           value = 10.0,
-          label = "exact",
+          note = "exact",
         },
         {
           timestamp = now - (DDAY * 2),
           value = 20.0,
-          label = "exact_match",
+          note = "exact_match",
         },
         {
           timestamp = now - (DDAY * 3),
           value = 30.0,
-          label = "other",
+          note = "other",
         },
       },
     }
   end,
   assertions = function(result)
     test.assert("result was nil", result)
-    -- Should match only "exact" (exact match, case insensitive would match "EXACT" too but we don't have one)
+    -- Should match only "exact" (exact match, case insensitive)
     test.assertEquals(1, #result)
     test.assertEquals(10.0, result[1].value)
-    test.assertEquals("exact", result[1].label)
+    test.assertEquals("exact", result[1].note)
   end,
 }
 
 M.test_filter_case_sensitive = {
   config = {
-    filter_label = "Test",
+    filter_note = "Note",
     case_sensitive = true,
     match_exactly = false,
   },
@@ -99,27 +99,27 @@ M.test_filter_case_sensitive = {
         {
           timestamp = now - (DDAY * 1),
           value = 10.0,
-          label = "Test1",
+          note = "Note1",
         },
         {
           timestamp = now - (DDAY * 2),
           value = 20.0,
-          label = "test2",
+          note = "note2",
         },
         {
           timestamp = now - (DDAY * 3),
           value = 30.0,
-          label = "TEST3",
+          note = "NOTE3",
         },
       },
     }
   end,
   assertions = function(result)
     test.assert("result was nil", result)
-    -- Should only match "Test1" (case sensitive substring)
+    -- Should only match "Note1" (case sensitive substring)
     test.assertEquals(1, #result)
     test.assertEquals(10.0, result[1].value)
-    test.assertEquals("Test1", result[1].label)
+    test.assertEquals("Note1", result[1].note)
   end,
 }
 
@@ -132,19 +132,19 @@ M.test_filter_no_config = {
         {
           timestamp = now - (DDAY * 1),
           value = 10.0,
-          label = "label1",
+          note = "note1",
         },
         {
           timestamp = now - (DDAY * 2),
           value = 20.0,
-          label = "label2",
+          note = "note2",
         },
       },
     }
   end,
   assertions = function(result)
     test.assert("result was nil", result)
-    -- Without filter_label, all data points should pass through
+    -- Without filter_note, all data points should pass through
     test.assertEquals(2, #result)
     test.assertEquals(10.0, result[1].value)
     test.assertEquals(20.0, result[2].value)
@@ -153,7 +153,7 @@ M.test_filter_no_config = {
 
 M.test_filter_invert = {
   config = {
-    filter_label = "keep",
+    filter_note = "skip",
     case_sensitive = false,
     match_exactly = false,
     invert = true,
@@ -165,29 +165,29 @@ M.test_filter_invert = {
         {
           timestamp = now - (DDAY * 1),
           value = 10.0,
-          label = "keep_this",
+          note = "skip this",
         },
         {
           timestamp = now - (DDAY * 2),
           value = 20.0,
-          label = "remove",
+          note = "keep",
         },
         {
           timestamp = now - (DDAY * 3),
           value = 30.0,
-          label = "also_remove",
+          note = "also keep",
         },
       },
     }
   end,
   assertions = function(result)
     test.assert("result was nil", result)
-    -- With invert=true, should only get items that DON'T match "keep"
+    -- With invert=true, should only get items that DON'T match "skip"
     test.assertEquals(2, #result)
     test.assertEquals(20.0, result[1].value)
-    test.assertEquals("remove", result[1].label)
+    test.assertEquals("keep", result[1].note)
     test.assertEquals(30.0, result[2].value)
-    test.assertEquals("also_remove", result[2].label)
+    test.assertEquals("also keep", result[2].note)
   end,
 }
 
