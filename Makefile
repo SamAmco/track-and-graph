@@ -90,8 +90,15 @@ kill-emulator:
 	@adb emu kill || true
 
 .PHONY: run-community-tests
-run-community-tests:
-	./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.CommunityTestRunner"
+run-community-tests: run-community-functions-tests run-community-graph-tests
+
+.PHONY: run-community-functions-tests
+run-community-functions-tests:
+	./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.FunctionTestRunner" --rerun-tasks
+
+.PHONY: run-community-graph-tests
+run-community-graph-tests:
+	./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.GraphScriptTestRunner" --rerun-tasks
 
 .PHONY: sync-lua-to-docs
 sync-lua-to-docs:

@@ -10,13 +10,13 @@ return {
         ["en"] = "Override Label",
         ["de"] = "Label überschreiben",
         ["es"] = "Sobrescribir Etiqueta",
-        ["fr"] = "Remplacer l'Étiquette"
+        ["fr"] = "Remplacer l'Étiquette",
     },
     description = {
         ["en"] = "Sets all incoming data point labels to a specified value",
         ["de"] = "Setzt alle eingehenden Datenpunkt-Labels auf einen bestimmten Wert",
         ["es"] = "Establece todas las etiquetas de puntos de datos entrantes en un valor especificado",
-        ["fr"] = "Définit toutes les étiquettes de points de données entrantes sur une valeur spécifiée"
+        ["fr"] = "Définit toutes les étiquettes de points de données entrantes sur une valeur spécifiée",
     },
     config = {
         {
@@ -26,9 +26,9 @@ return {
                 ["en"] = "New Label",
                 ["de"] = "Neues Label",
                 ["es"] = "Nueva Etiqueta",
-                ["fr"] = "Nouvelle Étiquette"
-            }
-        }
+                ["fr"] = "Nouvelle Étiquette",
+            },
+        },
     },
 
     -- Generator function
@@ -37,12 +37,16 @@ return {
 
         return function()
             local data_point = source.dp()
-            if not data_point then return nil end
+            if not data_point then
+                return nil
+            end
 
-            if not new_label then return data_point end
+            if not new_label then
+                return data_point
+            end
             data_point.label = new_label
 
             return data_point
         end
-    end
+    end,
 }
