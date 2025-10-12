@@ -19,6 +19,8 @@ package com.samco.trackandgraph.data.lua.community_test_runner
 import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
+import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
+import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.time.TimeProviderImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +43,8 @@ internal abstract class CommunityTestRunner {
     protected val assetReader: AssetReader = mock()
     protected val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
+    open fun getModuleLoadInterceptor(): ModuleLoadInterceptor = NoOpModuleLoadInterceptorImpl()
+
     protected val daggerComponent by lazy {
         whenever(assetReader.readAssetToString(ArgumentMatchers.anyString())).thenAnswer {
             val path = it.getArgument<String>(0)
@@ -52,6 +56,7 @@ internal abstract class CommunityTestRunner {
             .dataInteractor(dataInteractor)
             .assetReader(assetReader)
             .ioDispatcher(ioDispatcher)
+            .moduleLoadInterceptor(getModuleLoadInterceptor())
             .build()
     }
 

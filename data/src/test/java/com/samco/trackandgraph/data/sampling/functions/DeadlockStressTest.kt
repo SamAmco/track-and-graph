@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.database.dto.NodeDependency
 import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaVMLock
+import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -47,6 +48,7 @@ class DeadlockStressTest {
         .assetReader(mock())
         .ioDispatcher(Dispatchers.IO)
         .timeProvider(mock())
+        .moduleLoadInterceptor(NoOpModuleLoadInterceptorImpl())
         .build()
 
     private val luaEngine: LuaEngine = luaEngineComponent.provideLuaEngine()

@@ -19,11 +19,14 @@ package com.samco.trackandgraph.data.lua.apiimpl
 import com.samco.trackandgraph.data.assetreader.AssetReader
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class RequireApiImpl @Inject constructor(
     private val assetReader: AssetReader,
+    private val moduleLoadInterceptor: ModuleLoadInterceptor,
     private val coreApiImpl: CoreApiImpl,
 ) {
     companion object {
@@ -32,42 +35,58 @@ internal class RequireApiImpl @Inject constructor(
 
     fun installIn(globals: Globals) {
         globals[REQUIRE] = getRequireLuaFunction(
-            mapOf(
+            globals = globals,
+            installedApis = mapOf(
                 "tng.core" to lazyCore(globals),
-                "tng.graph" to lazyGraph(globals),
-                "tng.graphext" to lazyGraphExt(globals),
+                "tng.graph" to lazyPureLuaModule(globals, "graph"),
+                "tng.graphext" to lazyPureLuaModule(globals, "graphext"),
                 "test.core" to lazyTest(globals),
             )
         )
     }
 
     private fun lazyCore(globals: Globals) = lazy {
-        val fileContents = assetReader.readAssetToString("generated/lua-api/core.lua")
-        val core = globals.load(fileContents).call().checktable()!!
-        coreApiImpl.installIn(core)
-        return@lazy core
+        try {
+            val fileContents = assetReader.readAssetToString("generated/lua-api/core.lua")
+            val core = globals.load(fileContents).call().checktable()!!
+            coreApiImpl.installIn(core)
+            return@lazy core
+        } catch (t: Throwable) {
+            Timber.e(t, "Failed to load core module")
+            return@lazy LuaTable()
+        }
     }
 
-    private fun lazyGraph(globals: Globals) = lazy {
-        val fileContents = assetReader.readAssetToString("generated/lua-api/graph.lua")
-        return@lazy globals.load(fileContents).call().checktable()!!
-    }
-
-    private fun lazyGraphExt(globals: Globals) = lazy {
-        val fileContents = assetReader.readAssetToString("generated/lua-api/graphext.lua")
-        return@lazy globals.load(fileContents).call().checktable()!!
+    private fun lazyPureLuaModule(globals: Globals, name: String) = lazy {
+        try {
+            val fileContents = assetReader.readAssetToString("generated/lua-api/$name.lua")
+            return@lazy globals.load(fileContents).call().checktable()!!
+        } catch (t: Throwable) {
+            Timber.e(t, "Failed to load $name API")
+            return@lazy LuaTable()
+        }
     }
 
     private fun lazyTest(globals: Globals) = lazy {
-        val fileContents = assetReader.readAssetToString("generated/lua-test/core.lua")
-        return@lazy globals.load(fileContents).call().checktable()!!
+        try {
+            val fileContents = assetReader.readAssetToString("generated/lua-test/core.lua")
+            return@lazy globals.load(fileContents).call().checktable()!!
+        } catch (t: Throwable) {
+            Timber.e(t, "Failed to load lua-test/core API")
+            return@lazy LuaTable()
+        }
     }
 
-    private fun getRequireLuaFunction(installedApis: Map<String, Lazy<LuaValue>>): LuaValue =
+    private fun getRequireLuaFunction(
+        globals: Globals,
+        installedApis: Map<String, Lazy<LuaTable>>,
+    ): LuaValue =
         oneArgFunction { arg: LuaValue ->
             val moduleName = arg.tojstring()
             if (moduleName in installedApis) {
-                return@oneArgFunction installedApis[moduleName]?.value ?: LuaValue.NIL
+                return@oneArgFunction installedApis[moduleName]?.value
+                    ?.let { moduleLoadInterceptor.onModuleLoad(globals, moduleName, it) }
+                    ?: LuaValue.NIL
             } else {
                 throw LuaError("module '$moduleName' not found")
             }

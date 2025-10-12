@@ -34,7 +34,8 @@ import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
 import com.samco.trackandgraph.data.lua.GuardedLuaEngineWrapper
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.LuaEngineImpl
+import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
+import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.DataSamplerImpl
 import com.samco.trackandgraph.data.time.TimeProvider
@@ -88,4 +89,7 @@ class DataModule {
 
     @Provides
     fun getAssetReader(impl: AssetReaderImpl): AssetReader = impl
+
+    @Provides
+    internal fun getModuleLoadInterceptor(): ModuleLoadInterceptor = NoOpModuleLoadInterceptorImpl()
 }
