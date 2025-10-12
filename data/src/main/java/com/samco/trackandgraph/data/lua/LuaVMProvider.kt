@@ -111,8 +111,6 @@ internal class LuaVMProvider @Inject constructor(
         // Remove potentially dangerous functions from BaseLib
         globals["dofile"] = LuaValue.NIL
         globals["loadfile"] = LuaValue.NIL
-        globals["pcall"] = LuaValue.NIL
-        globals["xpcall"] = LuaValue.NIL
         globals["package"] = LuaValue.NIL
         LoadState.install(globals)
         LuaC.install(globals)
