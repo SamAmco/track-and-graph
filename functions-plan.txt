@@ -91,6 +91,12 @@ There's a back button in the top left corner to go back to the group screen
 Dragging or pinching hides all fabs and the back button
 Tapping on anything/anywhere shows all relevant fabs and the back button
 
+
+
+
+
+
+
 Prebuilt Lua function nodes:
 
 - Time between 
@@ -143,26 +149,7 @@ Prebuilt Lua function nodes:
   - Cutoff period (period enum)
   - Period multiplier (uint)
 
-- Filter value above
-  - Minimum value (number)
-  - Invert (boolean)
-- Filter value below
-  - Maximum value (number)
-  - Invert (boolean)
-- Filter by label
-  - Case sensitive (boolean)
-  - Trim whitespace (boolean)
-  - Invert (boolean)
-- Filter by note
-  - Case sensitive (boolean)
-  - Trim whitespace (boolean)
-  - Invert (boolean)
-
-- Multiply by constant
-  - Constant (number)
-- Add constant
-  - Constant (number)
-- Subtract constant
+- Offset by constant
   - Constant (number)
 - Divide by constant
   - Constant (number)
@@ -236,24 +223,6 @@ Prebuilt Lua function nodes:
   - period multiplier (uint)
   - Moving window (boolean)
 
-- Distinct until changed by label
-  - use first (boolean)
-- Distinct until changed by note
-  - use first (boolean)
-- Distinct until changed by value
-  - use first (boolean)
-
-- Override label
-  - New label (string)
-- Override note
-  - New note (string)
-- Override value
-  - New value (number)
-
-- Merge
-
-- Merge/Union (no config)
-
 - Synthetic Random data
   - seed (string)
   - frequency (duration)
@@ -276,6 +245,11 @@ Prebuilt Lua function nodes:
 
 - Filter greater than other tracker
 - Filter less than other tracker
+
+
+
+
+
 
 
 The Lua function spec: 
