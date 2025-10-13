@@ -123,10 +123,7 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         .flowOn(io)
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(
-                stopTimeoutMillis = 1000,
-                replayExpirationMillis = 1000,
-            ),
+            started = SharingStarted.Lazily,
             initialValue = null
         )
 

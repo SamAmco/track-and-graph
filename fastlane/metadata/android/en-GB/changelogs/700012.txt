@@ -1,0 +1,2 @@
+Bump patch versions of compose and navigation libraries for stability
+Fix bug select item dialog not remembering last selected item
