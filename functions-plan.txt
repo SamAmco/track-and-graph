@@ -149,11 +149,6 @@ Prebuilt Lua function nodes:
   - Cutoff period (period enum)
   - Period multiplier (uint)
 
-- Offset by constant
-  - Constant (number)
-- Divide by constant
-  - Constant (number)
-
 - Swap note and label (no config)
 - Set value to time of day in seconds (no config)
 - Set value to day of week (no config)
