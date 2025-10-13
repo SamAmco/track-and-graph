@@ -29,8 +29,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.samco.trackandgraph.aboutpage.AboutNavKey
 import com.samco.trackandgraph.aboutpage.AboutScreen
@@ -65,9 +64,8 @@ fun NavigationHost(
 ) = NavDisplay(
     modifier = modifier,
     entryDecorators = listOf(
-        // Add the default decorators for managing scenes and saving state
-        rememberSceneSetupNavEntryDecorator(),
-        rememberSavedStateNavEntryDecorator(),
+        // Add the default decorator for managing saved state
+        rememberSaveableStateHolderNavEntryDecorator(),
         // Then add the view model store decorator
         rememberViewModelStoreNavEntryDecorator()
     ),
