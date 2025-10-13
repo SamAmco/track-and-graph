@@ -34,6 +34,7 @@ List configuration options with bullet points for complex functions.]],
         {
             id = "param_name",
             type = "text",  -- or "number", "checkbox"
+            default = "default_value",  -- Optional: specify default value
             name = {
                 ["en"] = "Parameter Name",
             }
@@ -63,6 +64,7 @@ List configuration options with bullet points for complex functions.]],
 
 - **Version major number**: Must match the highest API level used by the function. If you call any API with a higher level, tests will fail. See the .apispec.lua files in the `lua/src/tng/` directory for details on api levels.
 - **Config types**: `text` (string), `number` (double), `checkbox` (boolean)
+- **Config defaults**: Optionally specify `default` field in config spec to provide a default value. These defaults are used in the UI, but your generator should still handle missing values with fallbacks.
 - **Config values**: In tests, pass actual Lua types (e.g., `true`/`false` for checkboxes, not strings as are used in the graph tests)
 - **Generator pattern**: Returns an iterator function that yields data points one at a time. The generator takes source(s) and config as arguments. The sources will be a single data source (see the core.lua api) if `inputCount` is 1, or a list of sources if `inputCount` > 1. The config will be a table of config values with keys matching the config ids and values matching the users inputs (or test inputs).
 - **Data point fields**: `timestamp`, `value`, `label`, `note`, `offset`
@@ -164,18 +166,51 @@ Example: A function with `version = "1.2.3"` can only use API level 1 features.
 
 ### Boolean Checkboxes
 ```lua
-config = { checkbox_param = true }  -- In tests
-local enabled = config and config.checkbox_param or false  -- In function
+-- In function spec:
+{
+    id = "my_checkbox",
+    type = "checkbox",
+    default = false,  -- Optional: specify default
+    name = { ["en"] = "My Checkbox" }
+}
+
+-- In tests:
+config = { my_checkbox = true }
+
+-- In generator:
+local enabled = config and config.my_checkbox or false
 ```
 
 ### Optional Text
 ```lua
-config = { text_param = "value" }  -- In tests
-local text = config and config.text_param  -- In function (nil if not set)
+-- In function spec:
+{
+    id = "my_text",
+    type = "text",
+    default = "",  -- Optional: specify default
+    name = { ["en"] = "My Text" }
+}
+
+-- In tests:
+config = { my_text = "value" }
+
+-- In generator:
+local text = config and config.my_text  -- nil if not set
 ```
 
 ### Numbers with Defaults
 ```lua
-config = { number_param = 42.0 }  -- In tests
-local num = config and config.number_param or 1.0  -- In function with default
+-- In function spec:
+{
+    id = "my_number",
+    type = "number",
+    default = 1.0,  -- Optional: specify default
+    name = { ["en"] = "My Number" }
+}
+
+-- In tests:
+config = { my_number = 42.0 }
+
+-- In generator:
+local num = config and config.my_number or 1.0  -- Fallback if not set
 ```
