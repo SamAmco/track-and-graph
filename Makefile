@@ -124,6 +124,10 @@ lua-detect-changes:
 lua-publish-debug:
 	cd lua && lua tools/publish-functions-debug.lua
 
+.PHONY: lua-print-catalog
+lua-print-catalog:
+	cd lua && lua tools/print-catalog.lua
+
 .PHONY: validate-all
 validate-all: validate-remote-config run-community-tests
 	@echo "All validations passed."
