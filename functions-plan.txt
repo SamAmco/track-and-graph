@@ -1,4 +1,5 @@
 TODO: 
+- Add version and id to function node json encoding (to allow auto-updating in future)
 - Don't allow creating a function until you have a tracker? 
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
 - Probably detect global cycles and throw in the data module in case there are non-compliant future clients
@@ -7,10 +8,8 @@ TODO:
 - Add text to the grid that hints at going landscape
 - Add text to the grid that hints at long pressing to add a node
 - Fix up the function card UI. Min height should be the same as tracker
-- Docs
 - Do we want error toasts when function catalogue download fails or something?
-
-- Ensure api gating works for multiple successive tests
+- Docs
 
 QA: 
   - Removing a function should remove it from any graphs that use it as a data source

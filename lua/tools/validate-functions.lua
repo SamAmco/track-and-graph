@@ -3,47 +3,13 @@
 -- Validates all community Lua functions
 
 local validation = require("tools.lib.validation")
-
--- Find all non-test lua files in a directory
-local function find_lua_files(dir)
-	local files = {}
-	local handle = io.popen("find " .. dir .. " -type f -name '*.lua' ! -name 'test_*'")
-	if not handle then
-		error("Failed to scan directory: " .. dir)
-	end
-
-	for file in handle:lines() do
-		table.insert(files, file)
-	end
-	handle:close()
-
-	return files
-end
-
--- Read entire file
-local function read_file(path)
-	local file = io.open(path, "r")
-	if not file then
-		error("Could not open file: " .. path)
-	end
-	local content = file:read("*all")
-	file:close()
-	return content
-end
+local traversal = require("tools.lib.file-traversal")
 
 -- Validate a single function file
 local function validate_file(file_path)
-	local content = read_file(file_path)
-
-	-- Load and execute the file to get the module
-	local chunk, load_err = load(content, file_path, "t")
-	if not chunk then
-		return false, {"Failed to load: " .. load_err}
-	end
-
-	local success, module = pcall(chunk)
-	if not success then
-		return false, {"Failed to execute: " .. module}
+	local ok, module = traversal.read_and_load(file_path)
+	if not ok then
+		return false, {module}  -- module contains error message
 	end
 
 	-- Validate structure
@@ -54,10 +20,10 @@ end
 local function main()
 	print("Validating community functions...")
 
-	local files = find_lua_files("src/community/functions")
+	local files = traversal.find_scripts(traversal.SCRIPT_TYPE.FUNCTIONS)
 
 	if #files == 0 then
-		print("✗ No function files found in src/community/functions")
+		print("✗ No function files found")
 		os.exit(1)
 	end
 
@@ -74,8 +40,7 @@ local function main()
 			print("✓ " .. file_path)
 
 			-- Load module again for uniqueness check
-			local content = read_file(file_path)
-			local module = load(content, file_path, "t")()
+			local _, module = traversal.read_and_load(file_path)
 			table.insert(functions_for_uniqueness, {
 				id = module.id,
 				title = module.title,

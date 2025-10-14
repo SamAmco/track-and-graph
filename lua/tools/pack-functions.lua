@@ -8,37 +8,11 @@ local semver = require("tools.lib.semver")
 local changes = require("tools.lib.changes")
 local versioning = require("tools.lib.catalog-versioning")
 local api_specs = require("tools.lib.api-specs")
+local traversal = require("tools.lib.file-traversal")
 
 -- Configuration
 local FUNCTIONS_DIR = "src/community/functions"
 local CATALOG_PATH = "catalog/community-functions.lua"
-
--- Find all non-test lua files in a directory
-local function find_lua_files(dir)
-	local files = {}
-	local handle = io.popen("find " .. dir .. " -type f -name '*.lua' ! -name 'test_*'")
-	if not handle then
-		error("Failed to scan directory: " .. dir)
-	end
-
-	for file in handle:lines() do
-		table.insert(files, file)
-	end
-	handle:close()
-
-	return files
-end
-
--- Read entire file
-local function read_file(path)
-	local file = io.open(path, "r")
-	if not file then
-		error("Could not open file: " .. path)
-	end
-	local content = file:read("*all")
-	file:close()
-	return content
-end
 
 -- Write content to file
 local function write_file(path, content)
@@ -93,22 +67,15 @@ end
 
 -- Load and validate a single function
 local function load_and_validate_function(file_path, max_api_level)
-	local content = read_file(file_path)
-
-	-- Load module
-	local chunk, load_err = load(content, file_path, "t")
-	if not chunk then
-		return false, "Failed to load: " .. load_err
-	end
-
-	local success, module = pcall(chunk)
-	if not success then
-		return false, "Failed to execute: " .. module
+	local content = traversal.read_file(file_path)
+	local ok, module = traversal.load_module(content, file_path)
+	if not ok then
+		return false, module  -- module contains error message
 	end
 
 	-- Validate structure
-	local ok, errors = validation.validate_function(module, file_path)
-	if not ok then
+	local valid, errors = validation.validate_function(module, file_path)
+	if not valid then
 		return false, table.concat(errors, "\n")
 	end
 
@@ -163,7 +130,7 @@ local function main()
 	print("Max API level: " .. max_api_level)
 
 	print("\n==> Phase 2: Loading Functions")
-	local files = find_lua_files(FUNCTIONS_DIR)
+	local files = traversal.find_scripts(traversal.SCRIPT_TYPE.FUNCTIONS)
 
 	if #files == 0 then
 		error("No function files found in " .. FUNCTIONS_DIR)
