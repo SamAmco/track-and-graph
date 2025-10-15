@@ -19,12 +19,17 @@ package com.samco.trackandgraph.data.lua.community_test_runner
 import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
+import com.samco.trackandgraph.data.lua.LuaVMProvider
+import com.samco.trackandgraph.data.lua.VMLease
 import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
 import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.time.TimeProviderImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.OneArgFunction
 import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -66,6 +71,30 @@ internal abstract class CommunityTestRunner {
 
     protected val luaDataSourceProvider by lazy {
         daggerComponent.provideLuaDataSourceProvider()
+    }
+
+    protected fun acquireTestVMLease(
+        vmProvider: LuaVMProvider
+    ): VMLease = runBlocking {
+        val vmLease = vmProvider.acquire()
+        
+        // Install print function
+        vmLease.globals["print"] = object : OneArgFunction() {
+            override fun call(arg: LuaValue): LuaValue {
+                print(arg.tojstring())
+                return NIL
+            }
+        }
+        
+        // Install println function
+        vmLease.globals["println"] = object : OneArgFunction() {
+            override fun call(arg: LuaValue): LuaValue {
+                println(arg.tojstring())
+                return NIL
+            }
+        }
+
+        return@runBlocking vmLease
     }
 
     companion object {
