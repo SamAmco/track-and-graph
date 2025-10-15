@@ -6,6 +6,7 @@ return {
 	id = "floor",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"arithmetic"},
 	title = {
 		["en"] = "Floor",
 		["de"] = "Abrunden",

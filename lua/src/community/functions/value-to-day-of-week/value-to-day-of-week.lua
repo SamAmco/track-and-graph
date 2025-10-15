@@ -8,6 +8,7 @@ return {
 	id = "value-to-day-of-week",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"time"},
 	title = {
 		["en"] = "Value to Day of Week",
 		["de"] = "Wert zu Wochentag",

@@ -6,6 +6,7 @@ return {
     id = "override-label",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"transform"},
     title = {
         ["en"] = "Override Label",
         ["de"] = "Label überschreiben",

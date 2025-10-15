@@ -9,7 +9,7 @@ local traversal = require("tools.lib.file-traversal")
 local function validate_file(file_path)
 	local ok, module = traversal.read_and_load(file_path)
 	if not ok then
-		return false, {module}  -- module contains error message
+		return false, { module } -- module contains error message
 	end
 
 	-- Validate structure
@@ -44,7 +44,7 @@ local function main()
 			table.insert(functions_for_uniqueness, {
 				id = module.id,
 				title = module.title,
-				file_path = file_path
+				file_path = file_path,
 			})
 		else
 			print("✗ " .. file_path)

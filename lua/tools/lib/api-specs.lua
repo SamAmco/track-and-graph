@@ -1,6 +1,8 @@
 -- api-specs.lua
 -- API specification validation and querying
 
+local traversal = require("tools.lib.file-traversal")
+
 local M = {}
 
 -- Split a string on delimiter
@@ -34,7 +36,7 @@ end
 
 -- Load a module and return its exports table
 local function load_module(module_name)
-	-- Required for runtime: tng modules have internal dependencies
+	-- Set up package path for tng module dependencies
 	package.path = package.path .. ";src/?.lua;src/?/init.lua"
 
 	local ok, module = pcall(require, "tng." .. module_name)
@@ -47,22 +49,9 @@ end
 -- Load an API spec file
 local function load_api_spec(module_name)
 	local spec_path = "src/tng/" .. module_name .. ".apispec.lua"
-	local file = io.open(spec_path, "r")
-	if not file then
-		return nil, "API spec file not found: " .. spec_path
-	end
-
-	local content = file:read("*all")
-	file:close()
-
-	local chunk, load_err = load(content, spec_path, "t")
-	if not chunk then
-		return nil, "Failed to load API spec: " .. load_err
-	end
-
-	local ok, spec = pcall(chunk)
+	local ok, spec = traversal.read_and_load(spec_path)
 	if not ok then
-		return nil, "Failed to execute API spec: " .. spec
+		return nil, spec -- spec contains error message
 	end
 
 	if type(spec) ~= "table" then
@@ -98,14 +87,24 @@ local function validate_module(module, spec)
 	-- Check all spec values are positive integers
 	for spec_name, api_level in pairs(spec) do
 		if type(api_level) ~= "number" then
-			table.insert(errors, string.format("  Invalid API level for '%s': must be a number, got %s",
-				spec_name, type(api_level)))
+			table.insert(
+				errors,
+				string.format("  Invalid API level for '%s': must be a number, got %s", spec_name, type(api_level))
+			)
 		elseif api_level % 1 ~= 0 then
-			table.insert(errors, string.format("  Invalid API level for '%s': must be an integer, got %s",
-				spec_name, tostring(api_level)))
+			table.insert(
+				errors,
+				string.format(
+					"  Invalid API level for '%s': must be an integer, got %s",
+					spec_name,
+					tostring(api_level)
+				)
+			)
 		elseif api_level < 1 then
-			table.insert(errors, string.format("  Invalid API level for '%s': must be positive, got %d",
-				spec_name, api_level))
+			table.insert(
+				errors,
+				string.format("  Invalid API level for '%s': must be positive, got %d", spec_name, api_level)
+			)
 		end
 
 		-- Validate that spec entry exists in module (including nested paths)
@@ -137,7 +136,7 @@ end
 function M.verify()
 	local modules = find_module_files()
 	if #modules == 0 then
-		return false, {error = "No modules found in src/tng/"}
+		return false, { error = "No modules found in src/tng/" }
 	end
 
 	table.sort(modules)
@@ -145,14 +144,14 @@ function M.verify()
 	local result = {
 		total_exports = 0,
 		total_errors = 0,
-		modules = {}
+		modules = {},
 	}
 
 	for _, module_name in ipairs(modules) do
 		local module_result = {
 			name = module_name,
 			export_count = 0,
-			errors = {}
+			errors = {},
 		}
 
 		-- Load module

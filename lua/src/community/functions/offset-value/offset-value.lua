@@ -6,6 +6,7 @@ return {
     id = "offset-value",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"arithmetic"},
     title = {
         ["en"] = "Offset Value",
         ["de"] = "Wert verschieben",

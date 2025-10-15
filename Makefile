@@ -116,6 +116,10 @@ lua-get-max-api-level:
 lua-validate-functions:
 	cd lua && lua tools/validate-functions.lua
 
+.PHONY: lua-validate-function-categories
+lua-validate-function-categories:
+	cd lua && lua tools/validate-function-categories.lua
+
 .PHONY: lua-detect-changes
 lua-detect-changes:
 	cd lua && lua tools/detect-changes.lua

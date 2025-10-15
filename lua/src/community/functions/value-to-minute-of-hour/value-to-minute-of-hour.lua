@@ -8,6 +8,7 @@ return {
 	id = "value-to-minute-of-hour",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"time"},
 	title = {
 		["en"] = "Value to Minute of Hour",
 		["de"] = "Wert zu Minute der Stunde",

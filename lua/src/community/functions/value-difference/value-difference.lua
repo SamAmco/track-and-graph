@@ -6,6 +6,7 @@ return {
 	id = "value-difference",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"arithmetic", "transform"},
 	title = {
 		["en"] = "Value Difference",
 		["de"] = "Wertdifferenz",

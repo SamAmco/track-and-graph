@@ -29,6 +29,7 @@ return {
     id = "filter-by-label",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"filter"},
     title = {
         ["en"] = "Filter by Label",
         ["de"] = "Filtern nach Etikett",

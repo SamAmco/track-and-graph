@@ -6,6 +6,7 @@ return {
 	id = "swap-label-note",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"transform"},
 	title = {
 		["en"] = "Swap Label and Note",
 		["de"] = "Label und Notiz tauschen",

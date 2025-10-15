@@ -8,6 +8,7 @@ return {
 	id = "value-to-month-of-year",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"time"},
 	title = {
 		["en"] = "Value to Month of Year",
 		["de"] = "Wert zu Monat des Jahres",

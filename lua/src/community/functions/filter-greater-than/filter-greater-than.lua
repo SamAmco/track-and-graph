@@ -6,6 +6,7 @@ return {
     id = "filter-greater-than",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"filter"},
     title = {
         ["en"] = "Filter Greater Than",
         ["de"] = "Filtern größer als",

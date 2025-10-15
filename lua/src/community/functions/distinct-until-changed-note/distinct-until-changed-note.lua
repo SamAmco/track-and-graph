@@ -6,6 +6,7 @@ return {
     id = "distinct-until-changed-note",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"filter"},
     title = {
         ["en"] = "Distinct Until Changed (Note)",
         ["de"] = "Eindeutig bis geändert (Notiz)",

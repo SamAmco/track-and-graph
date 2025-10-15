@@ -8,6 +8,7 @@ return {
 	id = "value-to-second-of-minute",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"time"},
 	title = {
 		["en"] = "Value to Second of Minute",
 		["de"] = "Wert zu Sekunde der Minute",

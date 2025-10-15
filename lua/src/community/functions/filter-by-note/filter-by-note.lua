@@ -29,6 +29,7 @@ return {
     id = "filter-by-note",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"filter"},
     title = {
         ["en"] = "Filter by Note",
         ["de"] = "Filtern nach Notiz",

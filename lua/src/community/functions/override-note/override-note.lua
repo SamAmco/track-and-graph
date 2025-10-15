@@ -6,6 +6,7 @@ return {
     id = "override-note",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"transform"},
     title = {
         ["en"] = "Override Note",
         ["de"] = "Notiz überschreiben",
