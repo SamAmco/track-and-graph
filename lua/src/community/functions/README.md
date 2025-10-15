@@ -68,6 +68,7 @@ List configuration options with bullet points for complex functions.]],
 - **Config values**: In tests, pass actual Lua types (e.g., `true`/`false` for checkboxes, not strings as are used in the graph tests)
 - **Generator pattern**: Returns an iterator function that yields data points one at a time. The generator takes source(s) and config as arguments. The sources will be a single data source (see the core.lua api) if `inputCount` is 1, or a list of sources if `inputCount` > 1. The config will be a table of config values with keys matching the config ids and values matching the users inputs (or test inputs).
 - **Data point fields**: `timestamp`, `value`, `label`, `note`, `offset`
+- **Date/time handling**: Always pass the full data point to `core.date()`, not just the timestamp. The data point contains both `timestamp` and `offset` which are needed for correct timezone and DST handling. Use `local date = core.date(data_point)` not `core.date(data_point.timestamp)`.
 
 ## Writing Tests
 

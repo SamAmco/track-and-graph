@@ -18,7 +18,6 @@ package com.samco.trackandgraph.data.lua.community_test_runner
 
 import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
 import io.github.z4kn4fein.semver.toVersion
-import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -83,7 +82,7 @@ internal class FunctionTestRunner : CommunityTestRunner() {
     @Test
     fun `run community function test`() {
         val vmProvider = daggerComponent.provideVMProvider()
-        val vmLease = runBlocking { vmProvider.acquire() }
+        val vmLease = acquireTestVMLease(vmProvider)
         try {
             val resolvedScript = daggerComponent.provideLuaScriptResolver()
                 .resolveLuaScript(scriptLuaText, vmLease)

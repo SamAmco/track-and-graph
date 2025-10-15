@@ -12,4 +12,12 @@ M.assert = function(message, cond)
   end
 end
 
+M.assertClose = function(expected, actual, tolerance)
+  tolerance = tolerance or 0.01
+  local diff = math.abs(expected - actual)
+  if diff > tolerance then
+    error("Assertion failed, expected: " .. tostring(expected) .. " got: " .. tostring(actual) .. " (diff: " .. tostring(diff) .. ", tolerance: " .. tostring(tolerance) .. ")")
+  end
+end
+
 return M

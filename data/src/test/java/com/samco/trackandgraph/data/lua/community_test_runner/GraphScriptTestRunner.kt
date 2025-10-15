@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.data.lua.community_test_runner
 
 import com.samco.trackandgraph.data.lua.VMLease
-import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -47,7 +46,7 @@ internal class GraphScriptTestRunner : CommunityTestRunner() {
     @Test
     fun `run community lua test`() {
         val vmProvider = daggerComponent.provideVMProvider()
-        val vmLease = runBlocking { vmProvider.acquire() }
+        val vmLease = acquireTestVMLease(vmProvider)
         try {
             val test = vmLease.globals.load(testLuaText)
             val testSet = test.call().checktable()!!
