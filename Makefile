@@ -120,6 +120,10 @@ lua-validate-functions:
 lua-detect-changes:
 	cd lua && lua tools/detect-changes.lua
 
+.PHONY: lua-pack-functions
+lua-pack-functions:
+	cd lua && lua tools/pack-functions.lua
+
 .PHONY: lua-publish-debug
 lua-publish-debug:
 	cd lua && lua tools/publish-functions-debug.lua
