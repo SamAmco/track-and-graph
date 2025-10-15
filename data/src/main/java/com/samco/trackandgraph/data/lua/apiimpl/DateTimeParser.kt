@@ -201,5 +201,9 @@ internal class DateTimeParser @Inject constructor(
         else -> throw LuaError("Invalid day of week: $this")
     }
 
-    private fun parseZone(dateTime: LuaValue): ZoneId? = ZoneId.of(dateTime[ZONE].tojstring())
+    private fun parseZone(dateTime: LuaValue): ZoneId? {
+        val zone = dateTime[ZONE]
+        return if (zone.isnil()) null
+        else ZoneId.of(zone.tojstring())
+    }
 }
