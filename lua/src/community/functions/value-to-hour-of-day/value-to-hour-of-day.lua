@@ -8,11 +8,12 @@ return {
 	id = "value-to-hour-of-day",
 	version = "1.0.0",
 	inputCount = 1,
+	categories = {"time"},
 	title = {
-		["en"] = "Value to Hour of Day",
-		["de"] = "Wert zu Stunde des Tages",
-		["es"] = "Valor a hora del día",
-		["fr"] = "Valeur à l'heure du jour",
+		["en"] = "Value to Hour (0-23)",
+		["de"] = "Wert zu Stunde (0-23)",
+		["es"] = "Valor a hora (0-23)",
+		["fr"] = "Valeur à l'heure (0-23)",
 	},
 	description = {
 		["en"] = "Sets each data point's value to its hour of the day (0-23).",

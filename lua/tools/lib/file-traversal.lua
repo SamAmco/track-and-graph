@@ -17,7 +17,7 @@ local BASE_PATHS = {
 
 --- Find all lua files in a directory using the find command
 --- @param dir string The directory to search
---- @param include_tests boolean Whether to include test_ files (default: false)
+--- @param include_tests boolean? Whether to include test_ files (default: false)
 --- @return table Array of file paths
 function M.find_lua_files(dir, include_tests)
 	include_tests = include_tests or false
@@ -41,7 +41,7 @@ end
 
 --- Find lua files for a specific script type
 --- @param script_type string One of M.SCRIPT_TYPE values
---- @param include_tests boolean Whether to include test_ files (default: false)
+--- @param include_tests boolean? Whether to include test_ files (default: false)
 --- @return table Array of file paths
 function M.find_scripts(script_type, include_tests)
 	local base_path = BASE_PATHS[script_type]
@@ -71,6 +71,9 @@ end
 --- @return boolean success
 --- @return table|string module or error message
 function M.load_module(content, file_path)
+	-- Set up package path for tng module dependencies
+	package.path = package.path .. ";src/?.lua;src/?/init.lua"
+
 	local chunk, load_err = load(content, file_path, "t")
 	if not chunk then
 		return false, "Failed to load: " .. load_err

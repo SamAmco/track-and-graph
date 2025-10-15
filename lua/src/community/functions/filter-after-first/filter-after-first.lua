@@ -6,6 +6,7 @@ return {
 	id = "filter-after-first",
 	version = "1.0.0",
 	inputCount = 2,
+	categories = {"filter"},
 	title = {
 		["en"] = "Filter After First",
 		["de"] = "Filtern nach Erstem",

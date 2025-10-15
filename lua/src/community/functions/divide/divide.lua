@@ -6,6 +6,7 @@ return {
     id = "divide",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"arithmetic"},
     title = {
         ["en"] = "Divide Values",
         ["de"] = "Werte dividieren",

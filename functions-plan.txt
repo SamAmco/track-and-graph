@@ -1,5 +1,9 @@
 TODO: 
 - Add version and id to function node json encoding (to allow auto-updating in future)
+- Do we want functions to be a map of id to function instead of a list?
+- Parse categories from the catalogue definition
+- Show categories in the function picker
+- Implement deprecated int?
 - Don't allow creating a function until you have a tracker? 
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
 - Probably detect global cycles and throw in the data module in case there are non-compliant future clients
@@ -98,8 +102,6 @@ Tapping on anything/anywhere shows all relevant fabs and the back button
 
 Prebuilt Lua function nodes:
 
-- Time between 
-  - Include time from now (boolean)
 - Duration clustered max
   - Threshold (duration enum)
   - Duration multiplier (uint)
@@ -139,7 +141,6 @@ Prebuilt Lua function nodes:
   - Threshold (duration)
   - Filter items without pairs (boolean)
 
-- Time cutoff from another data source (no config)
 - Time cutoff from timestamp
   - Cutoff time (timestamp)
 - Time cutoff from duration ago
@@ -148,24 +149,9 @@ Prebuilt Lua function nodes:
   - Cutoff period (period enum)
   - Period multiplier (uint)
 
-- Swap note and label (no config)
-- Set value to time of day in seconds (no config)
-- Set value to day of week (no config)
-- Set value to day of month (no config)
-- Set value to month of year (no config)
-- Set value to year (no config)
-- Set value to hour of day (no config)
-- Set value to minute of hour (no config)
-- Set value to second of minute (no config)
-
-- Invert value (no config)
-- Absolute value (no config)
 - Cumulative sum (no config)
+  - max data points (uint)
   - reset on 0 value (boolean)
-- Rate of change (no config)
-- Round to nearest integer (no config)
-- Floor (no config)
-- Ceiling (no config)
 
 - duration based Standard deviation
   - Window size (duration enum)

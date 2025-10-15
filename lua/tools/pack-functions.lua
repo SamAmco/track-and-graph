@@ -12,7 +12,18 @@ local traversal = require("tools.lib.file-traversal")
 
 -- Configuration
 local FUNCTIONS_DIR = "src/community/functions"
+local CATEGORIES_PATH = "src/community/function-categories.lua"
 local CATALOG_PATH = "catalog/community-functions.lua"
+
+-- Load categories
+local function load_categories()
+	local content = traversal.read_file(CATEGORIES_PATH)
+	local ok, categories = traversal.load_module(content, CATEGORIES_PATH)
+	if not ok then
+		error("Failed to load categories: " .. categories)
+	end
+	return categories
+end
 
 -- Write content to file
 local function write_file(path, content)
@@ -66,15 +77,15 @@ local function get_max_api_level()
 end
 
 -- Load and validate a single function
-local function load_and_validate_function(file_path, max_api_level)
+local function load_and_validate_function(file_path, max_api_level, valid_categories)
 	local content = traversal.read_file(file_path)
 	local ok, module = traversal.load_module(content, file_path)
 	if not ok then
 		return false, module  -- module contains error message
 	end
 
-	-- Validate structure
-	local valid, errors = validation.validate_function(module, file_path)
+	-- Validate structure (including categories)
+	local valid, errors = validation.validate_function(module, file_path, valid_categories)
 	if not valid then
 		return false, table.concat(errors, "\n")
 	end
@@ -98,6 +109,7 @@ local function load_and_validate_function(file_path, max_api_level)
 			script = content,
 			file_path = file_path,
 			title = module.title,
+			categories = module.categories,
 		}
 end
 
@@ -129,7 +141,15 @@ local function main()
 	local max_api_level = get_max_api_level()
 	print("Max API level: " .. max_api_level)
 
-	print("\n==> Phase 2: Loading Functions")
+	print("\n==> Phase 2: Loading Categories")
+	local categories = load_categories()
+	local category_count = 0
+	for _ in pairs(categories) do
+		category_count = category_count + 1
+	end
+	print("Loaded " .. category_count .. " categor" .. (category_count == 1 and "y" or "ies"))
+
+	print("\n==> Phase 3: Loading Functions")
 	local files = traversal.find_scripts(traversal.SCRIPT_TYPE.FUNCTIONS)
 
 	if #files == 0 then
@@ -142,7 +162,7 @@ local function main()
 	local all_errors = {}
 
 	for _, file_path in ipairs(files) do
-		local ok, func_or_err = load_and_validate_function(file_path, max_api_level)
+		local ok, func_or_err = load_and_validate_function(file_path, max_api_level, categories)
 		if ok then
 			table.insert(functions, func_or_err)
 			print("  ✓ " .. file_path)
@@ -167,7 +187,32 @@ local function main()
 		error("Uniqueness validation failed")
 	end
 
-	print("\n==> Phase 3: Change Detection")
+	-- Validate categories
+	print("\nValidating categories...")
+	local undefined_categories = validation.collect_undefined_categories(functions, categories)
+	local unused_categories = validation.collect_unused_categories(categories, functions)
+
+	if #undefined_categories > 0 then
+		print("\n✗ Undefined categories found:")
+		for _, category in ipairs(undefined_categories) do
+			print("  • " .. category)
+		end
+		error(string.format("Category validation failed: %d undefined categor%s",
+			#undefined_categories, #undefined_categories == 1 and "y" or "ies"))
+	end
+
+	if #unused_categories > 0 then
+		print("\n✗ Unused categories found:")
+		for _, category in ipairs(unused_categories) do
+			print("  • " .. category)
+		end
+		error(string.format("Category validation failed: %d unused categor%s (remove from function-categories.lua)",
+			#unused_categories, #unused_categories == 1 and "y" or "ies"))
+	end
+
+	print("✓ All categories valid")
+
+	print("\n==> Phase 4: Change Detection")
 	local old_catalog = versioning.load_catalog(CATALOG_PATH)
 
 	if old_catalog then
@@ -193,7 +238,7 @@ local function main()
 		print("✓ All version increments valid")
 	end
 
-	print("\n==> Phase 4: Catalog Generation")
+	print("\n==> Phase 5: Catalog Generation")
 	local should_write, reason = versioning.should_write_catalog(change_report)
 
 	if not should_write then
@@ -220,6 +265,7 @@ local function main()
 	-- Create catalog
 	local catalog = {
 		published_at = versioning.generate_timestamp(),
+		categories = categories,
 		functions = catalog_functions,
 	}
 

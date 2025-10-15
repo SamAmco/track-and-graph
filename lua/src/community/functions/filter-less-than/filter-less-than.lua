@@ -6,6 +6,7 @@ return {
     id = "filter-less-than",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"filter"},
     title = {
         ["en"] = "Filter Less Than",
         ["de"] = "Filtern kleiner als",

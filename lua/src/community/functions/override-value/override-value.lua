@@ -6,6 +6,7 @@ return {
     id = "override-value",
     version = "1.0.0",
     inputCount = 1,
+    categories = {"transform"},
     title = {
         ["en"] = "Override Value",
         ["de"] = "Wert überschreiben",
