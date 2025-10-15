@@ -94,11 +94,11 @@ run-community-tests: run-community-functions-tests run-community-graph-tests
 
 .PHONY: run-community-functions-tests
 run-community-functions-tests:
-	./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.FunctionTestRunner" --rerun-tasks
+	./gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.FunctionTestRunner"
 
 .PHONY: run-community-graph-tests
 run-community-graph-tests:
-	./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.GraphScriptTestRunner" --rerun-tasks
+	./gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.GraphScriptTestRunner"
 
 .PHONY: sync-lua-to-docs
 sync-lua-to-docs:
