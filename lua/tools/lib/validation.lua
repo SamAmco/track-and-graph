@@ -9,11 +9,11 @@ local M = {}
 local REQUIRED_LANGUAGES = {"en", "de", "es", "fr"}
 
 --- Validate that a field contains all required translations
--- @param field table: The field to validate
--- @param field_name string: Name of the field for error messages
--- @param file_path string: File path for error messages
--- @return boolean: true if valid
--- @return table: Array of missing language codes or empty
+--- @param field table: The field to validate
+--- @param field_name string: Name of the field for error messages
+--- @param file_path string: File path for error messages
+--- @return boolean: true if valid
+--- @return table: Array of missing language codes or empty
 function M.validate_translations(field, field_name, file_path)
 	if type(field) ~= "table" then
 		return false, {"Field '" .. field_name .. "' must be a table"}
@@ -35,11 +35,12 @@ function M.validate_translations(field, field_name, file_path)
 end
 
 --- Validate config array has proper structure and translations
--- @param config table: The config array to validate
--- @param file_path string: File path for error messages
--- @return boolean: true if valid
--- @return table: Array of error messages
-function M.validate_config(config, file_path)
+--- @param config table: The config array to validate
+--- @param file_path string: File path for error messages
+--- @param valid_enums table?: Optional table of valid enum IDs (if provided, validates enum options exist)
+--- @return boolean: true if valid
+--- @return table: Array of error messages
+function M.validate_config(config, file_path, valid_enums)
 	if config == nil then
 		return true, {}  -- config is optional
 	end
@@ -72,6 +73,24 @@ function M.validate_config(config, file_path)
 			end
 		end
 
+		-- Validate enum options if type is enum
+		if item.type == "enum" then
+			if type(item.options) ~= "table" then
+				table.insert(errors, string.format("%s - config[%d].options must be a table for enum type", file_path, i))
+			elseif #item.options == 0 then
+				table.insert(errors, string.format("%s - config[%d].options must contain at least one option", file_path, i))
+			elseif valid_enums then
+				-- Validate each option exists in valid_enums
+				for j, option in ipairs(item.options) do
+					if type(option) ~= "string" then
+						table.insert(errors, string.format("%s - config[%d].options[%d] must be a string", file_path, i, j))
+					elseif not valid_enums[option] then
+						table.insert(errors, string.format("%s - config[%d] undefined enum option '%s'", file_path, i, option))
+					end
+				end
+			end
+		end
+
 		::continue::
 	end
 
@@ -79,12 +98,13 @@ function M.validate_config(config, file_path)
 end
 
 --- Validate a function module structure
--- @param module table: The function module to validate
--- @param file_path string: File path for error messages
--- @param valid_categories table?: Optional table of valid category IDs (if provided, validates categories exist)
--- @return boolean: true if valid
--- @return table: Array of error messages
-function M.validate_function(module, file_path, valid_categories)
+--- @param module table: The function module to validate
+--- @param file_path string: File path for error messages
+--- @param valid_categories table?: Optional table of valid category IDs (if provided, validates categories exist)
+--- @param valid_enums table?: Optional table of valid enum IDs (if provided, validates enum options exist)
+--- @return boolean: true if valid
+--- @return table: Array of error messages
+function M.validate_function(module, file_path, valid_categories, valid_enums)
 	local errors = {}
 
 	-- Check module is a table
@@ -163,7 +183,7 @@ function M.validate_function(module, file_path, valid_categories)
 	end
 
 	-- Validate config (if present)
-	ok, trans_errors = M.validate_config(module.config, file_path)
+	ok, trans_errors = M.validate_config(module.config, file_path, valid_enums)
 	if not ok then
 		for _, err in ipairs(trans_errors) do
 			table.insert(errors, err)
@@ -174,9 +194,9 @@ function M.validate_function(module, file_path, valid_categories)
 end
 
 --- Check uniqueness of titles for a specific language
--- @param functions table: Array of {id, title, file_path} tables
--- @param lang string: Language code (e.g., "en", "de")
--- @return table: Array of error messages for this language
+--- @param functions table: Array of {id, title, file_path} tables
+--- @param lang string: Language code (e.g., "en", "de")
+--- @return table: Array of error messages for this language
 local function check_title_uniqueness_for_language(functions, lang)
 	local errors = {}
 	local seen = {}
@@ -199,9 +219,9 @@ local function check_title_uniqueness_for_language(functions, lang)
 end
 
 --- Check uniqueness of IDs and titles (all languages)
--- @param functions table: Array of {id, title, file_path} tables
--- @return boolean: true if all unique
--- @return table: Array of error messages
+--- @param functions table: Array of {id, title, file_path} tables
+--- @return boolean: true if all unique
+--- @return table: Array of error messages
 function M.check_uniqueness(functions)
 	local errors = {}
 	local seen_ids = {}
@@ -230,9 +250,9 @@ function M.check_uniqueness(functions)
 end
 
 --- Collect all undefined categories across functions
--- @param functions table: Array of function modules
--- @param valid_categories table: Table of valid category IDs
--- @return table: Array of undefined category IDs (unique, sorted)
+--- @param functions table: Array of function modules
+--- @param valid_categories table: Table of valid category IDs
+--- @return table: Array of undefined category IDs (unique, sorted)
 function M.collect_undefined_categories(functions, valid_categories)
 	local undefined = {}
 	local seen = {}
@@ -253,9 +273,9 @@ function M.collect_undefined_categories(functions, valid_categories)
 end
 
 --- Collect all unused categories
--- @param valid_categories table: Table of valid category IDs
--- @param functions table: Array of function modules
--- @return table: Array of unused category IDs (sorted)
+--- @param valid_categories table: Table of valid category IDs
+--- @param functions table: Array of function modules
+--- @return table: Array of unused category IDs (sorted)
 function M.collect_unused_categories(valid_categories, functions)
 	local used = {}
 
@@ -273,6 +293,65 @@ function M.collect_unused_categories(valid_categories, functions)
 	for category_id in pairs(valid_categories) do
 		if not used[category_id] then
 			table.insert(unused, category_id)
+		end
+	end
+
+	table.sort(unused)
+	return unused
+end
+
+--- Collect all undefined enum options across functions
+--- @param functions table: Array of function modules
+--- @param valid_enums table: Table of valid enum option IDs
+--- @return table: Array of undefined enum option IDs (unique, sorted)
+function M.collect_undefined_enums(functions, valid_enums)
+	local undefined = {}
+	local seen = {}
+
+	for _, func in ipairs(functions) do
+		if func.config then
+			for _, config_item in ipairs(func.config) do
+				if config_item.type == "enum" and config_item.options then
+					for _, option in ipairs(config_item.options) do
+						if not valid_enums[option] and not seen[option] then
+							table.insert(undefined, option)
+							seen[option] = true
+						end
+					end
+				end
+			end
+		end
+	end
+
+	table.sort(undefined)
+	return undefined
+end
+
+--- Collect all unused enum options
+--- @param valid_enums table: Table of valid enum option IDs
+--- @param functions table: Array of function modules
+--- @return table: Array of unused enum option IDs (sorted)
+function M.collect_unused_enums(valid_enums, functions)
+	local used = {}
+
+	-- Collect all used enum options
+	for _, func in ipairs(functions) do
+		if func.config then
+			for _, config_item in ipairs(func.config) do
+				if config_item.type == "enum" and config_item.options then
+					for _, option in ipairs(config_item.options) do
+						used[option] = true
+					end
+				end
+			end
+		end
+	end
+
+	-- Find unused
+	local unused = {}
+	for enum_id in pairs(valid_enums) do
+		if not used[enum_id] then
+			table.insert(unused, enum_id)
 		end
 	end
 

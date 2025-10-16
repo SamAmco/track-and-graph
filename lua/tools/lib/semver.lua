@@ -4,8 +4,8 @@
 local M = {}
 
 --- Parse semantic version string
--- @param version_str string: Version string to parse
--- @return table|nil: { major, minor, patch, raw } or nil if invalid
+--- @param version_str string: Version string to parse
+--- @return table|nil: { major, minor, patch, raw } or nil if invalid
 function M.parse(version_str)
 	if type(version_str) ~= "string" then
 		return nil
@@ -25,9 +25,9 @@ function M.parse(version_str)
 end
 
 --- Compare two semantic versions
--- @param v1 string: First version
--- @param v2 string: Second version
--- @return number: -1 if v1 < v2, 0 if equal, 1 if v1 > v2, nil if invalid
+--- @param v1 string: First version
+--- @param v2 string: Second version
+--- @return number: -1 if v1 < v2, 0 if equal, 1 if v1 > v2, nil if invalid
 function M.compare(v1, v2)
 	local parsed1 = M.parse(v1)
 	local parsed2 = M.parse(v2)

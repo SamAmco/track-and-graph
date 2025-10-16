@@ -6,9 +6,9 @@ local semver = require("tools.lib.semver")
 local M = {}
 
 --- Compare old catalog with new functions to detect changes
--- @param old_catalog table|nil: Previous catalog with {functions = [...]} or nil if first run
--- @param new_functions table: Array of {id, version, script, file_path}
--- @return table: ChangeReport = {new = [], modified = [], unchanged = []}
+--- @param old_catalog table|nil: Previous catalog with {functions = [...]} or nil if first run
+--- @param new_functions table: Array of {id, version, script, file_path}
+--- @return table: ChangeReport = {new = [], modified = [], unchanged = []}
 function M.compare_functions(old_catalog, new_functions)
 	local report = {
 		new = {},
@@ -72,10 +72,9 @@ function M.compare_functions(old_catalog, new_functions)
 end
 
 --- Validate that version increments are correct for modified functions
--- @param change_report table: ChangeReport from compare_functions
--- @return boolean: true if all valid
--- @return table: Array of error messages
--- @return table: Array of warning messages
+--- @param change_report table: ChangeReport from compare_functions
+--- @return boolean: true if all valid
+--- @return table: Array of error messages
 function M.validate_version_increments(change_report)
 	local errors = {}
 
