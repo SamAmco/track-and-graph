@@ -54,7 +54,7 @@ class FunctionsRepositoryImpl @Inject constructor(
 
             val vmLock = luaEngine.acquireVM()
             try {
-                luaEngine.runLuaCatalogue(vmLock, script).also {
+                luaEngine.runLuaCatalogue(vmLock, script).functions.also {
                     Timber.d("Returning ${it.size} functions from the catalogue")
                 }
             } catch (t: Throwable) {

@@ -63,6 +63,7 @@ List configuration options with bullet points for complex functions.]],
 ### Key Points
 
 - **Version major number**: Must match the highest API level used by the function. If you call any API with a higher level, tests will fail. See the .apispec.lua files in the `lua/src/tng/` directory for details on api levels.
+- **Deprecated (optional)**: Optionally specify `deprecated = N` (integer) to mark when a function becomes deprecated. Functions with `deprecated <= current_api_level` will be filtered out. Use this to phase out old functions.
 - **Config types**: `text` (string), `number` (double), `checkbox` (boolean)
 - **Config defaults**: Optionally specify `default` field in config spec to provide a default value. These defaults are used in the UI, but your generator should still handle missing values with fallbacks.
 - **Config values**: In tests, pass actual Lua types (e.g., `true`/`false` for checkboxes, not strings as are used in the graph tests)

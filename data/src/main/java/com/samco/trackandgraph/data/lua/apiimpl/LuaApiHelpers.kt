@@ -9,8 +9,8 @@ import org.luaj.vm2.lib.ZeroArgFunction
 
 /**
  * Fails eagerly if the declaration is not found because that means it was not declared in the
- * tng.lua api file. This makes sure unit tests fail if we rename/remove declarations in tng.lua and
- * forget to update the implementation. It unfortunately does not save us from added declarations that
+ * lua api file. This makes sure unit tests fail if we rename/remove declarations in lua and
+ * forget to update the implementation. It does not save us from added declarations that
  * are not implemented or not implemented correctly. For this we must rely on adding tests.
  */
 internal fun LuaValue?.overrideOrThrow(name: String, value: LuaValue): LuaValue {

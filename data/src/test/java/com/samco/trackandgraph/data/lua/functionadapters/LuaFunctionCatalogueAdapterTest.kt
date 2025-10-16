@@ -16,17 +16,24 @@
  */
 package com.samco.trackandgraph.data.lua.functionadapters
 
+import com.samco.trackandgraph.data.lua.ApiLevelCalculator
 import com.samco.trackandgraph.data.lua.LuaEngineImplTest
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.toVersion
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
+
+    // This test needs to actually call getMaxApiLevel, so stub it to return 1
+    override val apiLevelCalculator: ApiLevelCalculator = mock<ApiLevelCalculator>()
 
     private fun readCommunityFunctionsLua(): String {
         return javaClass.getResourceAsStream("/community-functions.lua")
@@ -96,23 +103,24 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
     }
 
     @Test
-    fun `parses community functions catalogue correctly`() = runBlocking {
+    fun `parses community functions catalogue correctly`() = runTest {
+        whenever(apiLevelCalculator.getMaxApiLevel(any())).thenReturn(1)
         val catalogueScript = readCommunityFunctionsLua()
 
         val uut = uut()
         val vmLock = uut.acquireVM()
 
-        val functions = try {
+        val catalogue = try {
             uut.runLuaCatalogue(vmLock, catalogueScript)
         } finally {
             uut.releaseVM(vmLock)
         }
 
         // Verify we parsed the expected number of functions
-        assertEquals("Should parse 3 functions from community-functions.lua", 3, functions.size)
+        assertEquals("Should parse 3 functions from community-functions.lua", 3, catalogue.functions.size)
 
         // Verify function IDs are correct
-        val functionIds = functions.map { it.id }.toSet()
+        val functionIds = catalogue.functions.map { it.id }.toSet()
         assertTrue(
             "Should contain filter-by-label function",
             functionIds.contains("filter-by-label")
@@ -120,39 +128,101 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
         assertTrue("Should contain multiply function", functionIds.contains("multiply"))
         assertTrue("Should contain override-label function", functionIds.contains("override-label"))
 
-        functions.forEach { function ->
+        catalogue.functions.forEach { function ->
             assertEquals(
-                "All functions should have version 0.0.0",
-                "0.0.0".toVersion(),
+                "All functions should have version 1.0.0",
+                "1.0.0".toVersion(),
                 function.version
             )
         }
 
         // Verify all functions have inputCount = 1
-        functions.forEach { function ->
+        catalogue.functions.forEach { function ->
             assertEquals("All functions should have inputCount = 1", 1, function.inputCount)
         }
 
         // Verify specific function details using helper functions
         assertFunctionDetails(
-            functions.find { it.id == "filter-by-label" },
+            catalogue.functions.find { it.id == "filter-by-label" },
             "filter-by-label",
             "Filter by Label",
             setOf("filter_label", "case_sensitive", "match_exactly")
         )
 
         assertFunctionDetails(
-            functions.find { it.id == "multiply" },
+            catalogue.functions.find { it.id == "multiply" },
             "multiply",
             "Multiply Values",
             setOf("multiplier")
         )
 
         assertFunctionDetails(
-            functions.find { it.id == "override-label" },
+            catalogue.functions.find { it.id == "override-label" },
             "override-label",
             "Override Label",
             setOf("new_label")
         )
+
+        // Verify categories are present
+        assertTrue("Catalogue should have categories", catalogue.categories.isNotEmpty())
+    }
+
+    @Test
+    fun `filters deprecated and version-incompatible functions correctly`() = runTest {
+        // Test with API level 2 - should filter functions based on version and deprecation
+        whenever(apiLevelCalculator.getMaxApiLevel(any())).thenReturn(2)
+
+        // Inline catalog with 4 functions testing all filtering scenarios
+        val catalogueScript = """
+            return {
+                categories = {
+                    test = {
+                        en = "Test Category"
+                    }
+                },
+                functions = {
+                    {
+                        id = "func-deprecated-at-2",
+                        version = "1.0.0",
+                        deprecated = 2,
+                        script = "INVALID SYNTAX - should never be parsed (deprecated at API level 2)"
+                    },
+                    {
+                        id = "func-deprecated-at-1",
+                        version = "1.0.0",
+                        deprecated = 1,
+                        script = "INVALID SYNTAX - should never be parsed (deprecated at API level 1)"
+                    },
+                    {
+                        id = "func-version-2",
+                        version = "2.0.0",
+                        script = "return { id='func-version-2', version='2.0.0', inputCount=1, categories={'test'}, title={en='Test'}, description={en='Test'}, config={}, generator=function(s)return function()return nil end end }"
+                    },
+                    {
+                        id = "func-version-3",
+                        version = "3.0.0",
+                        script = "INVALID SYNTAX - should never be parsed (requires API level 3)"
+                    }
+                },
+                published_at = "2025-01-01T00:00:00Z"
+            }
+        """.trimIndent()
+
+        val uut = uut()
+        val vmLock = uut.acquireVM()
+
+        val catalogue = try {
+            uut.runLuaCatalogue(vmLock, catalogueScript)
+        } finally {
+            uut.releaseVM(vmLock)
+        }
+
+        // At API level 2:
+        // - func-deprecated-at-2: version 1 (ok) but deprecated=2 (EXCLUDED: deprecated <= maxApiLevel)
+        // - func-deprecated-at-1: version 1 (ok) but deprecated=1 (EXCLUDED: deprecated <= maxApiLevel)
+        // - func-version-2: version 2 (ok) and no deprecated (INCLUDED)
+        // - func-version-3: version 3 (EXCLUDED: major > maxApiLevel)
+        assertEquals("Should only return func-version-2", 1, catalogue.functions.size)
+        assertEquals("Should be func-version-2", "func-version-2", catalogue.functions[0].id)
     }
 }

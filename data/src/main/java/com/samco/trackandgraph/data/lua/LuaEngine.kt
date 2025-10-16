@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 
 interface LuaEngine {
@@ -50,5 +51,5 @@ interface LuaEngine {
     suspend fun runLuaCatalogue(
         vmLock: LuaVMLock,
         script: String,
-    ): List<LuaFunctionMetadata>
+    ): LuaFunctionCatalogue
 }

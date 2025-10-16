@@ -77,6 +77,9 @@ internal interface LuaEngineTestComponent {
         @BindsInstance
         fun moduleLoadInterceptor(moduleLoadInterceptor: ModuleLoadInterceptor): Builder
 
+        @BindsInstance
+        fun apiLevelCalculator(apiLevelCalculator: ApiLevelCalculator): Builder
+
         fun build(): LuaEngineTestComponent
     }
 }

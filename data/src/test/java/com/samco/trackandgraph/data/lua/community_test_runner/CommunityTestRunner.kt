@@ -62,6 +62,7 @@ internal abstract class CommunityTestRunner {
             .assetReader(assetReader)
             .ioDispatcher(ioDispatcher)
             .moduleLoadInterceptor(getModuleLoadInterceptor())
+            .apiLevelCalculator(mock())
             .build()
     }
 

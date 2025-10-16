@@ -4,6 +4,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.sampling.RawDataSample
@@ -53,7 +54,7 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
     override suspend fun runLuaCatalogue(
         vmLock: LuaVMLock,
         script: String
-    ): List<LuaFunctionMetadata> {
+    ): LuaFunctionCatalogue {
         return if (luaEngineSwitch.enabled) {
             luaEngine.runLuaCatalogue(vmLock, script)
         } else throw LuaEngineDisabledException()

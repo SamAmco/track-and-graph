@@ -102,15 +102,17 @@ local function load_and_validate_function(file_path, max_api_level, valid_catego
 			)
 	end
 
-	return true,
-		{
-			id = module.id,
-			version = module.version,
-			script = content,
-			file_path = file_path,
-			title = module.title,
-			categories = module.categories,
-		}
+	local result = {
+		id = module.id,
+		version = module.version,
+		script = content,
+		file_path = file_path,
+		title = module.title,
+		categories = module.categories,
+		deprecated = module.deprecated,
+	}
+
+	return true, result
 end
 
 -- Print change summary
@@ -252,11 +254,16 @@ local function main()
 	-- Build function list for catalog (sorted by id)
 	local catalog_functions = {}
 	for _, func in ipairs(functions) do
-		table.insert(catalog_functions, {
+		local catalog_func = {
 			id = func.id,
 			version = func.version,
 			script = func.script,
-		})
+		}
+		-- Include deprecated if present
+		if func.deprecated ~= nil then
+			catalog_func.deprecated = func.deprecated
+		end
+		table.insert(catalog_functions, catalog_func)
 	end
 	table.sort(catalog_functions, function(a, b)
 		return a.id < b.id

@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.data.lua.functionadapters
 
+import com.samco.trackandgraph.data.lua.apiimpl.TranslatedStringParser
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
@@ -24,7 +25,9 @@ import io.github.z4kn4fein.semver.toVersion
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
-internal class LuaFunctionMetadataAdapter @Inject constructor() {
+internal class LuaFunctionMetadataAdapter @Inject constructor(
+    private val translatedStringParser: TranslatedStringParser
+) {
 
     fun process(resolvedScript: LuaValue, originalScript: String): LuaFunctionMetadata {
         // If the script is just a function, use defaults
@@ -41,44 +44,19 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
         }
 
         // Otherwise, extract metadata from table
+        val idValue = resolvedScript["id"]
+        val versionValue = resolvedScript["version"]
+        val inputCountValue = resolvedScript["inputCount"]
+
         return LuaFunctionMetadata(
             script = originalScript,
-            id = extractId(resolvedScript),
-            version = extractVersion(resolvedScript),
-            title = extractTitle(resolvedScript),
-            description = extractDescription(resolvedScript),
-            inputCount = extractInputCount(resolvedScript),
+            id = if (!idValue.isstring()) null else idValue.tojstring(),
+            version = if (versionValue.isnil()) null else versionValue.checkjstring()!!.toVersion(),
+            title = translatedStringParser.parse(resolvedScript["title"]),
+            description = translatedStringParser.parse(resolvedScript["description"]),
+            inputCount = if (inputCountValue.isnil()) 1 else inputCountValue.checkint(),
             config = extractConfigs(resolvedScript)
         )
-    }
-
-    private fun extractId(resolvedScript: LuaValue): String? {
-        val titleValue = resolvedScript["id"]
-        return if (!titleValue.isstring()) null
-        else titleValue.tojstring()
-    }
-
-    private fun extractTitle(resolvedScript: LuaValue): TranslatedString? {
-        val titleValue = resolvedScript["title"]
-        return if (titleValue.isnil()) null
-        else parseTranslatedString(titleValue)
-    }
-
-    private fun extractDescription(resolvedScript: LuaValue): TranslatedString? {
-        val descriptionValue = resolvedScript["description"]
-        return if (descriptionValue.isnil()) null
-        else parseTranslatedString(descriptionValue)
-    }
-
-    private fun extractVersion(resolvedScript: LuaValue): Version? {
-        val versionValue = resolvedScript["version"]
-        return if (versionValue.isnil()) null
-        else versionValue.checkjstring()!!.toVersion()
-    }
-
-    private fun extractInputCount(resolvedScript: LuaValue): Int {
-        val inputCountValue = resolvedScript["inputCount"]
-        return if (inputCountValue.isnil()) 1 else inputCountValue.checkint()
     }
 
     private fun extractConfigs(resolvedScript: LuaValue): List<LuaFunctionConfigSpec> {
@@ -106,7 +84,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
         val typeString = configItem["type"].checkjstring()
             ?: throw IllegalArgumentException("Config item $index must have a type")
 
-        val nameTranslations = parseTranslatedString(configItem["name"])
+        val nameTranslations = translatedStringParser.parse(configItem["name"])
 
         return when (typeString) {
             "text" -> parseTextConfig(id, nameTranslations, configItem)
@@ -158,25 +136,4 @@ internal class LuaFunctionMetadataAdapter @Inject constructor() {
         )
     }
 
-    private fun parseTranslatedString(translatedString: LuaValue): TranslatedString? {
-        if (translatedString.isnil()) {
-            return null
-        }
-
-        return if (translatedString.isstring()) {
-            TranslatedString.Simple(translatedString.checkjstring()!!)
-        } else if (translatedString.istable()) {
-            // Handle translation table
-            val translations = mutableMapOf<String, String>()
-            val keys = translatedString.checktable()!!.keys()
-            for (key in keys) {
-                val langCode = key.checkjstring()!!
-                val translation = translatedString[key].checkjstring()!!
-                translations[langCode] = translation
-            }
-            TranslatedString.Translations(translations)
-        } else {
-            null
-        }
-    }
 }
