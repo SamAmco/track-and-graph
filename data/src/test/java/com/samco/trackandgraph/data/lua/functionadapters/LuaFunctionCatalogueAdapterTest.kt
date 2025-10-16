@@ -18,9 +18,11 @@ package com.samco.trackandgraph.data.lua.functionadapters
 
 import com.samco.trackandgraph.data.lua.ApiLevelCalculator
 import com.samco.trackandgraph.data.lua.LuaEngineImplTest
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.toVersion
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -224,5 +226,117 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
         // - func-version-3: version 3 (EXCLUDED: major > maxApiLevel)
         assertEquals("Should only return func-version-2", 1, catalogue.functions.size)
         assertEquals("Should be func-version-2", "func-version-2", catalogue.functions[0].id)
+    }
+
+    @Test
+    fun `hydrates enum options with translations from catalog`() = runTest {
+        whenever(apiLevelCalculator.getMaxApiLevel(any())).thenReturn(1)
+
+        // Inline catalog with enums and a function that uses them
+        val catalogueScript = """
+            return {
+                enums = {
+                    days = {
+                        en = "Days",
+                        de = "Tage",
+                        es = "Días",
+                        fr = "Jours"
+                    },
+                    weeks = {
+                        en = "Weeks",
+                        de = "Wochen",
+                        es = "Semanas",
+                        fr = "Semaines"
+                    }
+                },
+                categories = {
+                    test = {
+                        en = "Test Category"
+                    }
+                },
+                functions = {
+                    {
+                        id = "test-enum-function",
+                        version = "1.0.0",
+                        script = [[
+return {
+    id = "test-enum-function",
+    version = "1.0.0",
+    inputCount = 1,
+    categories = {"test"},
+    title = {
+        en = "Test Enum Function"
+    },
+    description = {
+        en = "Test function with enum config"
+    },
+    config = {
+        {
+            id = "period",
+            type = "enum",
+            options = {"days", "weeks"},
+            name = {
+                en = "Period"
+            }
+        }
+    },
+    generator = function(s) return function() return nil end end
+}
+]]
+                    }
+                },
+                published_at = "2025-01-01T00:00:00Z"
+            }
+        """.trimIndent()
+
+        val uut = uut()
+        val vmLock = uut.acquireVM()
+
+        val catalogue = try {
+            uut.runLuaCatalogue(vmLock, catalogueScript)
+        } finally {
+            uut.releaseVM(vmLock)
+        }
+
+        // Verify function was parsed
+        assertEquals("Should return one function", 1, catalogue.functions.size)
+        val func = catalogue.functions[0]
+        assertEquals("Should be test-enum-function", "test-enum-function", func.id)
+
+        // Verify enum config was parsed
+        assertEquals("Should have one config", 1, func.config.size)
+        val enumConfig = func.config[0]
+        assertEquals("Config should be enum type", "period", enumConfig.id)
+
+        // Verify enum config is an Enum type with hydrated options
+        assertTrue("Config should be Enum type", enumConfig is LuaFunctionConfigSpec.Enum)
+        val enumConfigSpec = enumConfig as LuaFunctionConfigSpec.Enum
+
+        // Verify options were hydrated with EnumOption objects
+        assertEquals("Should have 2 options", 2, enumConfigSpec.options.size)
+
+        val daysOption = enumConfigSpec.options[0]
+        assertEquals("First option ID should be days", "days", daysOption.id)
+        assertTrue("Days option display name should be Translations", daysOption.displayName is TranslatedString.Translations)
+        assertEquals("Days option should have English translation", "Days",
+            (daysOption.displayName as TranslatedString.Translations).values["en"])
+        assertEquals("Days option should have German translation", "Tage",
+            daysOption.displayName.values["de"])
+        assertEquals("Days option should have Spanish translation", "Días",
+            daysOption.displayName.values["es"])
+        assertEquals("Days option should have French translation", "Jours",
+            daysOption.displayName.values["fr"])
+
+        val weeksOption = enumConfigSpec.options[1]
+        assertEquals("Second option ID should be weeks", "weeks", weeksOption.id)
+        assertTrue("Weeks option display name should be Translations", weeksOption.displayName is TranslatedString.Translations)
+        assertEquals("Weeks option should have English translation", "Weeks",
+            (weeksOption.displayName as TranslatedString.Translations).values["en"])
+        assertEquals("Weeks option should have German translation", "Wochen",
+            weeksOption.displayName.values["de"])
+        assertEquals("Weeks option should have Spanish translation", "Semanas",
+            weeksOption.displayName.values["es"])
+        assertEquals("Weeks option should have French translation", "Semaines",
+            weeksOption.displayName.values["fr"])
     }
 }
