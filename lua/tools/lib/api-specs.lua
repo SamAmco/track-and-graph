@@ -131,8 +131,8 @@ local function validate_module(module, spec)
 end
 
 --- Verify all API specs are valid
--- @return boolean: true if all valid
--- @return table: { total_exports = N, modules = { {name, export_count, errors} } }
+--- @return boolean: true if all valid
+--- @return table: { total_exports = N, modules = { {name, export_count, errors} } }
 function M.verify()
 	local modules = find_module_files()
 	if #modules == 0 then
@@ -189,8 +189,8 @@ function M.verify()
 end
 
 --- Get the maximum API level across all specs
--- @return number|nil: Max API level or nil on error
--- @return string|nil: Error message if failed
+--- @return number|nil: Max API level or nil on error
+--- @return string|nil: Error message if failed
 function M.get_max_level()
 	local handle = io.popen("find src/tng -name '*.apispec.lua' -type f")
 	if not handle then
