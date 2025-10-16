@@ -17,10 +17,10 @@
 package com.samco.trackandgraph.data.lua.functionadapters
 
 import com.samco.trackandgraph.data.lua.apiimpl.TranslatedStringParser
+import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
-import io.github.z4kn4fein.semver.Version
 import io.github.z4kn4fein.semver.toVersion
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -90,6 +90,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             "text" -> parseTextConfig(id, nameTranslations, configItem)
             "number" -> parseNumberConfig(id, nameTranslations, configItem)
             "checkbox" -> parseCheckboxConfig(id, nameTranslations, configItem)
+            "enum" -> parseEnumConfig(id, nameTranslations, configItem)
             else -> throw IllegalArgumentException("Unknown config type: $typeString")
         }
     }
@@ -132,6 +133,44 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         return LuaFunctionConfigSpec.Checkbox(
             id = id,
             name = name,
+            defaultValue = defaultValue
+        )
+    }
+
+    private fun parseEnumConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.Enum {
+        val defaultValue = configItem["default"]
+            .takeUnless { it.isnil() }?.checkjstring()
+
+        val optionsValue = configItem["options"]
+        val options = if (optionsValue.isnil() || !optionsValue.istable()) {
+            emptyList()
+        } else {
+            val optionsTable = optionsValue.checktable()!!
+            val enumOptions = mutableListOf<EnumOption>()
+
+            // Iterate over string keys (hydrated format)
+            val keys = optionsTable.keys()
+            for (key in keys) {
+                if (key.isstring()) {
+                    val enumId = key.checkjstring()!!
+                    val displayName = translatedStringParser.parse(optionsTable[key])
+                    if (displayName != null) {
+                        enumOptions.add(EnumOption(enumId, displayName))
+                    }
+                }
+            }
+
+            enumOptions
+        }
+
+        return LuaFunctionConfigSpec.Enum(
+            id = id,
+            name = name,
+            options = options,
             defaultValue = defaultValue
         )
     }

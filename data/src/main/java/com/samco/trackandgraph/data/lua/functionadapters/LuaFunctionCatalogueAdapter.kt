@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.Version
 import io.github.z4kn4fein.semver.toVersion
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,11 +35,13 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
     private val apiLevelCalculator: ApiLevelCalculator,
     private val luaFunctionMetadataAdapter: LuaFunctionMetadataAdapter,
     private val translatedStringParser: TranslatedStringParser,
+    private val enumHydrator: EnumHydrator,
 ) {
 
     companion object {
         private const val FUNCTIONS = "functions"
         private const val CATEGORIES = "categories"
+        private const val ENUMS = "enums"
         private const val VERSION = "version"
         private const val SCRIPT = "script"
         private const val DEPRECATED = "deprecated"
@@ -52,6 +55,8 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
 
     suspend fun parseCatalogue(vmLease: VMLease, catalogue: LuaValue): LuaFunctionCatalogue {
         val maxApiLevel = apiLevelCalculator.getMaxApiLevel(vmLease)
+        val enumsTable = getCatalogEnumsTable(catalogue)
+
         val functions = getCatalogFunctions(catalogue)
             .filter {
                 // Include if version is compatible AND not deprecated at this API level
@@ -60,6 +65,8 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
             }
             .map {
                 val resolvedScript = luaScriptResolver.resolveLuaScript(it.script, vmLease)
+                // Hydrate enum options before processing
+                enumHydrator.hydrateEnums(resolvedScript, enumsTable)
                 luaFunctionMetadataAdapter.process(resolvedScript, it.script)
             }
 
@@ -69,6 +76,15 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
             functions = functions,
             categories = categories
         )
+    }
+
+    private fun getCatalogEnumsTable(catalogue: LuaValue): LuaTable? {
+        val catalogueEnums = catalogue[ENUMS]
+        return if (catalogueEnums.isnil() || !catalogueEnums.istable()) {
+            null
+        } else {
+            catalogueEnums.checktable()
+        }
     }
 
     private fun getCatalogFunctions(catalogue: LuaValue): List<CatalogueFunction> {

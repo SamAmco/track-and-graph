@@ -28,6 +28,14 @@ sealed class TranslatedString {
 }
 
 /**
+ * Represents an enum option with its ID and display name
+ */
+data class EnumOption(
+    val id: String,
+    val displayName: TranslatedString
+)
+
+/**
  * Represents the specification/metadata for a Lua function configuration parameter.
  * This sealed class defines the structure and constraints for different types of
  * configuration inputs that can be defined in Lua script metadata.
@@ -61,6 +69,13 @@ sealed class LuaFunctionConfigSpec {
         override val id: String,
         override val name: TranslatedString?,
         val defaultValue: Boolean? = null
+    ) : LuaFunctionConfigSpec()
+
+    data class Enum(
+        override val id: String,
+        override val name: TranslatedString?,
+        val options: List<EnumOption>,
+        val defaultValue: String? = null
     ) : LuaFunctionConfigSpec()
 }
 
