@@ -34,7 +34,7 @@ internal class EnumHydrator @Inject constructor() {
     fun hydrateEnums(resolvedScript: LuaValue, enumsTable: LuaTable?) {
         if (enumsTable == null) return
 
-        val configArray = resolvedScript["config"]
+        val configArray = resolvedScript[LuaFunctionMetadataAdapter.CONFIG]
         if (configArray.isnil() || !configArray.istable()) return
 
         var i = 1
@@ -42,7 +42,7 @@ internal class EnumHydrator @Inject constructor() {
             val configItem = configArray[i]
             if (configItem.isnil()) break
 
-            val typeValue = configItem["type"]
+            val typeValue = configItem[LuaFunctionMetadataAdapter.TYPE]
             if (typeValue.isstring() && typeValue.checkjstring() == "enum") {
                 hydrateEnumConfigItem(configItem, enumsTable)
             }
@@ -52,7 +52,7 @@ internal class EnumHydrator @Inject constructor() {
     }
 
     private fun hydrateEnumConfigItem(configItem: LuaValue, enumsTable: LuaTable) {
-        val optionsArray = configItem["options"]
+        val optionsArray = configItem[LuaFunctionMetadataAdapter.OPTIONS]
         if (!optionsArray.istable()) {
             Timber.w("Enum config item missing options array")
             return
@@ -60,34 +60,28 @@ internal class EnumHydrator @Inject constructor() {
 
         val optionsTable = optionsArray.checktable()!!
 
-        // Collect enum IDs from integer keys
-        val enumIds = mutableListOf<String>()
+        // Hydrate each option in place (preserves order)
         var i = 1
         while (true) {
             val optionId = optionsTable[i]
             if (optionId.isnil()) break
 
             if (optionId.isstring()) {
-                enumIds.add(optionId.checkjstring()!!)
+                val enumId = optionId.checkjstring()!!
+                val enumTranslations = enumsTable[enumId]
+
+                if (!enumTranslations.isnil() && enumTranslations.istable()) {
+                    // Replace string ID with structured table: {id="...", name={...}}
+                    val hydratedOption = LuaTable()
+                    hydratedOption[LuaFunctionMetadataAdapter.ID] = optionId
+                    hydratedOption[LuaFunctionMetadataAdapter.NAME] = enumTranslations
+                    optionsTable[i] = hydratedOption
+                } else {
+                    Timber.w("Enum option '$enumId' not found in enums table")
+                }
             }
 
             i++
-        }
-
-        // Remove all integer keys
-        for (index in 1..enumIds.size) {
-            optionsTable[index] = org.luaj.vm2.LuaValue.NIL
-        }
-
-        // Add string keys with translation tables
-        for (enumId in enumIds) {
-            val enumTranslations = enumsTable[enumId]
-
-            if (!enumTranslations.isnil() && enumTranslations.istable()) {
-                optionsTable[enumId] = enumTranslations
-            } else {
-                Timber.w("Enum option '$enumId' not found in enums table")
-            }
         }
     }
 }

@@ -57,6 +57,12 @@ internal class LuaScriptConfigurationEncoder @Inject constructor() {
                         value = input.value.value
                     )
                 }
+                is LuaScriptConfigurationInput.Enum -> {
+                    LuaScriptConfigurationValue.Enum(
+                        id = id,
+                        value = input.value.value
+                    )
+                }
             }
         }
     }

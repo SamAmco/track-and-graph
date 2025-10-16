@@ -1,9 +1,8 @@
 TODO: 
+- Enums aren't deserializing properly from json
 - Add version and id to function node json encoding (to allow auto-updating in future)
 - Do we want functions to be a map of id to function instead of a list?
-- Parse categories from the catalogue definition
 - Show categories in the function picker
-- Implement deprecated int?
 - Don't allow creating a function until you have a tracker? 
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
 - Probably detect global cycles and throw in the data module in case there are non-compliant future clients

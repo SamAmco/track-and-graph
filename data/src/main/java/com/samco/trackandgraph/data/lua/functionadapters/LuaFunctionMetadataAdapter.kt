@@ -29,6 +29,20 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
     private val translatedStringParser: TranslatedStringParser
 ) {
 
+    companion object {
+        private const val DEFAULT_INPUT_COUNT = 1
+        const val ID = "id"
+        const val NAME = "name"
+        const val CONFIG = "config"
+        const val TYPE = "type"
+        const val OPTIONS = "options"
+        private const val VERSION = "version"
+        private const val INPUT_COUNT = "inputCount"
+        private const val TITLE = "title"
+        private const val DESCRIPTION = "description"
+        private const val DEFAULT = "default"
+    }
+
     fun process(resolvedScript: LuaValue, originalScript: String): LuaFunctionMetadata {
         // If the script is just a function, use defaults
         if (resolvedScript.isfunction()) {
@@ -44,23 +58,23 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         }
 
         // Otherwise, extract metadata from table
-        val idValue = resolvedScript["id"]
-        val versionValue = resolvedScript["version"]
-        val inputCountValue = resolvedScript["inputCount"]
+        val idValue = resolvedScript[ID]
+        val versionValue = resolvedScript[VERSION]
+        val inputCountValue = resolvedScript[INPUT_COUNT]
 
         return LuaFunctionMetadata(
             script = originalScript,
             id = if (!idValue.isstring()) null else idValue.tojstring(),
             version = if (versionValue.isnil()) null else versionValue.checkjstring()!!.toVersion(),
-            title = translatedStringParser.parse(resolvedScript["title"]),
-            description = translatedStringParser.parse(resolvedScript["description"]),
+            title = translatedStringParser.parse(resolvedScript[TITLE]),
+            description = translatedStringParser.parse(resolvedScript[DESCRIPTION]),
             inputCount = if (inputCountValue.isnil()) 1 else inputCountValue.checkint(),
             config = extractConfigs(resolvedScript)
         )
     }
 
     private fun extractConfigs(resolvedScript: LuaValue): List<LuaFunctionConfigSpec> {
-        val configArray = resolvedScript["config"]
+        val configArray = resolvedScript[CONFIG]
         val configs = mutableListOf<LuaFunctionConfigSpec>()
 
         if (!configArray.isnil()) {
@@ -78,13 +92,13 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
     }
 
     private fun parseConfigItem(configItem: LuaValue, index: Int): LuaFunctionConfigSpec {
-        val id = configItem["id"].checkjstring()
+        val id = configItem[ID].checkjstring()
             ?: throw IllegalArgumentException("Config item $index must have an id")
 
-        val typeString = configItem["type"].checkjstring()
+        val typeString = configItem[TYPE].checkjstring()
             ?: throw IllegalArgumentException("Config item $index must have a type")
 
-        val nameTranslations = translatedStringParser.parse(configItem["name"])
+        val nameTranslations = translatedStringParser.parse(configItem[NAME])
 
         return when (typeString) {
             "text" -> parseTextConfig(id, nameTranslations, configItem)
@@ -100,7 +114,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         name: TranslatedString?,
         configItem: LuaValue
     ): LuaFunctionConfigSpec.Text {
-        val defaultValue = configItem["default"]
+        val defaultValue = configItem[DEFAULT]
             .takeUnless { it.isnil() }?.checkjstring()
         return LuaFunctionConfigSpec.Text(
             id = id,
@@ -114,7 +128,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         name: TranslatedString?,
         configItem: LuaValue
     ): LuaFunctionConfigSpec.Number {
-        val defaultValue = configItem["default"]
+        val defaultValue = configItem[DEFAULT]
             .takeUnless { it.isnil() }?.todouble()
         return LuaFunctionConfigSpec.Number(
             id = id,
@@ -128,7 +142,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         name: TranslatedString?,
         configItem: LuaValue
     ): LuaFunctionConfigSpec.Checkbox {
-        val defaultValue = configItem["default"]
+        val defaultValue = configItem[DEFAULT]
             .takeUnless { it.isnil() }?.toboolean()
         return LuaFunctionConfigSpec.Checkbox(
             id = id,
@@ -142,26 +156,37 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         name: TranslatedString?,
         configItem: LuaValue
     ): LuaFunctionConfigSpec.Enum {
-        val defaultValue = configItem["default"]
+        val defaultValue = configItem[DEFAULT]
             .takeUnless { it.isnil() }?.checkjstring()
 
-        val optionsValue = configItem["options"]
+        val optionsValue = configItem[OPTIONS]
         val options = if (optionsValue.isnil() || !optionsValue.istable()) {
             emptyList()
         } else {
             val optionsTable = optionsValue.checktable()!!
             val enumOptions = mutableListOf<EnumOption>()
 
-            // Iterate over string keys (hydrated format)
-            val keys = optionsTable.keys()
-            for (key in keys) {
-                if (key.isstring()) {
-                    val enumId = key.checkjstring()!!
-                    val displayName = translatedStringParser.parse(optionsTable[key])
-                    if (displayName != null) {
-                        enumOptions.add(EnumOption(enumId, displayName))
+            // Iterate over integer keys (array format, preserves order)
+            var i = 1
+            while (true) {
+                val option = optionsTable[i]
+                if (option.isnil()) break
+
+                if (option.istable()) {
+                    val optionTable = option.checktable()!!
+                    val enumId = optionTable[ID]
+                    val name = optionTable[NAME]
+
+                    if (enumId.isstring()) {
+                        val optionId = enumId.checkjstring()!!
+                        val displayName = translatedStringParser.parse(name)
+                        if (displayName != null) {
+                            enumOptions.add(EnumOption(optionId, displayName))
+                        }
                     }
                 }
+
+                i++
             }
 
             enumOptions

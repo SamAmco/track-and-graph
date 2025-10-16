@@ -19,6 +19,7 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
+import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 
 /**
@@ -27,7 +28,7 @@ import com.samco.trackandgraph.data.lua.dto.TranslatedString
  */
 sealed class LuaScriptConfigurationInput {
     abstract val name: TranslatedString?
-    
+
     /**
      * Text input configuration with mutable state for text field value
      */
@@ -35,7 +36,7 @@ sealed class LuaScriptConfigurationInput {
         override val name: TranslatedString?,
         val value: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
     ) : LuaScriptConfigurationInput()
-    
+
     /**
      * Number input configuration with mutable state for numeric value
      */
@@ -43,12 +44,21 @@ sealed class LuaScriptConfigurationInput {
         override val name: TranslatedString?,
         val value: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
     ) : LuaScriptConfigurationInput()
-    
+
     /**
      * Checkbox input configuration with mutable state for boolean value
      */
     data class Checkbox(
         override val name: TranslatedString?,
         val value: MutableState<Boolean> = mutableStateOf(false)
+    ) : LuaScriptConfigurationInput()
+
+    /**
+     * Enum input configuration with mutable state for selected option ID
+     */
+    data class Enum(
+        override val name: TranslatedString?,
+        val options: List<EnumOption>,
+        val value: MutableState<String> = mutableStateOf("")
     ) : LuaScriptConfigurationInput()
 }
