@@ -43,6 +43,11 @@
                     "configType": "Checkbox",
                     "id": "checkboxConfig",
                     "value": true
+                },
+                {
+                    "configType": "Enum",
+                    "id": "enumConfig",
+                    "value": "hours"
                 }
             ],
             "dependencies": [

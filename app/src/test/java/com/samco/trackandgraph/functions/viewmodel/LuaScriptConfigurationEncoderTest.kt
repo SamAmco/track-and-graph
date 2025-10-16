@@ -20,6 +20,7 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
+import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -30,21 +31,30 @@ import org.junit.Test
 class LuaScriptConfigurationEncoderTest {
 
     private lateinit var encoder: LuaScriptConfigurationEncoder
-    
+
     // Test data declarations at class level
     private val textInput = LuaScriptConfigurationInput.Text(
         name = TranslatedString.Simple("Text Config"),
         value = mutableStateOf(TextFieldValue("text value"))
     )
-    
+
     private val numberInput = LuaScriptConfigurationInput.Number(
         name = TranslatedString.Simple("Number Config"),
         value = mutableStateOf(TextFieldValue("123.45"))
     )
-    
+
     private val checkboxInput = LuaScriptConfigurationInput.Checkbox(
         name = TranslatedString.Simple("Checkbox Config"),
         value = mutableStateOf(true)
+    )
+
+    private val enumInput = LuaScriptConfigurationInput.Enum(
+        name = TranslatedString.Simple("Enum Config"),
+        options = listOf(
+            EnumOption("hours", TranslatedString.Simple("Hours")),
+            EnumOption("days", TranslatedString.Simple("Days"))
+        ),
+        value = mutableStateOf("hours")
     )
 
     @Before
@@ -70,14 +80,15 @@ class LuaScriptConfigurationEncoderTest {
         val configuration = mapOf(
             "textConfig" to textInput,
             "numberConfig" to numberInput,
-            "checkboxConfig" to checkboxInput
+            "checkboxConfig" to checkboxInput,
+            "enumConfig" to enumInput
         )
 
         // When
         val result = encoder.encodeConfiguration(configuration)
 
         // Then - Verify all types are encoded correctly
-        assertEquals("Should produce three configuration values", 3, result.size)
+        assertEquals("Should produce four configuration values", 4, result.size)
         
         // Collect all encoded types
         val encodedTypes = result.map { it::class }.toSet()
@@ -111,5 +122,8 @@ class LuaScriptConfigurationEncoderTest {
         
         val checkboxResult = result.find { it.id == "checkboxConfig" } as LuaScriptConfigurationValue.Checkbox
         assertEquals("Checkbox value should be encoded correctly", true, checkboxResult.value)
+
+        val enumResult = result.find { it.id == "enumConfig" } as LuaScriptConfigurationValue.Enum
+        assertEquals("Enum value should be encoded correctly", "hours", enumResult.value)
     }
 }

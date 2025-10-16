@@ -95,3 +95,191 @@ Creates three files in `app/src/debug/assets/functions-catalog/`:
 - `community-functions.lua` - The catalog
 - `community-functions.sig.json` - Signature metadata
 - `debug-<timestamp>.pub` - Public key (referenced by keyId in JSON)
+
+---
+
+# Advanced: Adding New Lua Configuration Types
+
+Guide for adding new configuration input types (text, number, checkbox, enum, etc.) to Track & Graph's UI.
+
+## Quick Reference
+
+7 files to update + 5 test files:
+
+**Core Implementation:**
+1. `LuaFunctionConfigSpec` - Data DTO (what Lua defines)
+2. `LuaScriptConfigurationValue` - Database serialization
+3. `LuaScriptConfigurationInput` - ViewModel with mutable state
+4. `LuaScriptConfigurationInputFactory` - Creates inputs from specs
+5. `LuaScriptConfigurationEncoder` - ViewModel → Database
+6. `ConfigurationValueParser` - Database → Lua VM
+7. `ConfigurationInputField` - UI component
+
+**Tests (will fail if you miss steps):**
+8. `LuaFunctionMetadataTests` - Parsing from Lua
+9. `LuaScriptConfigurationInputFactoryTest` - Factory coverage
+10. `LuaScriptConfigurationEncoderTest` - Encoding coverage
+11. `ConfigurationValueParserTest` - Parser coverage
+12. `FunctionGraphSerializerTest` - Serialization coverage
+
+## Implementation Steps
+
+### 1. Add to LuaFunctionConfigSpec
+
+**File**: `data/src/main/java/com/samco/trackandgraph/data/lua/dto/LuaFunctionMetadata.kt`
+
+```kotlin
+sealed class LuaFunctionConfigSpec {
+    abstract val id: String
+    abstract val name: TranslatedString?
+
+    data class YourType(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValue: YourValueType? = null
+    ) : LuaFunctionConfigSpec()
+}
+```
+
+### 2. Add to LuaScriptConfigurationValue
+
+**File**: `data/src/main/java/com/samco/trackandgraph/data/database/dto/FunctionGraph.kt`
+
+```kotlin
+@Serializable
+@SerialName("YourType")  // PascalCase
+data class YourType(
+    override val id: String,
+    val value: YourValueType
+) : LuaScriptConfigurationValue()
+```
+
+### 3. Add to LuaScriptConfigurationInput
+
+**File**: `app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationInput.kt`
+
+```kotlin
+data class YourType(
+    override val name: TranslatedString?,
+    val value: MutableState<YourUIType> = mutableStateOf(defaultValue)
+) : LuaScriptConfigurationInput()
+```
+
+### 4. Update LuaScriptConfigurationInputFactory
+
+**File**: `app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationInputFactory.kt`
+
+Add case to `createConfigurationInput()`:
+```kotlin
+is LuaFunctionConfigSpec.YourType -> createYourTypeInput(config, savedValue)
+```
+
+Add case to `isCompatibleType()`:
+```kotlin
+is LuaFunctionConfigSpec.YourType -> existingInput is LuaScriptConfigurationInput.YourType
+```
+
+Add method:
+```kotlin
+private fun createYourTypeInput(
+    config: LuaFunctionConfigSpec.YourType,
+    savedValue: LuaScriptConfigurationValue?
+): LuaScriptConfigurationInput.YourType {
+    val typedValue = savedValue as? LuaScriptConfigurationValue.YourType
+    val initialValue = typedValue?.value ?: config.defaultValue ?: fallback
+
+    return LuaScriptConfigurationInput.YourType(
+        name = config.name,
+        value = mutableStateOf(initialValue)
+    )
+}
+```
+
+### 5. Update LuaScriptConfigurationEncoder
+
+**File**: `app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationEncoder.kt`
+
+```kotlin
+is LuaScriptConfigurationInput.YourType -> {
+    LuaScriptConfigurationValue.YourType(
+        id = id,
+        value = input.value.value
+    )
+}
+```
+
+### 6. Update ConfigurationValueParser
+
+**File**: `data/src/main/java/com/samco/trackandgraph/data/lua/apiimpl/ConfigurationValueParser.kt`
+
+```kotlin
+is LuaScriptConfigurationValue.YourType -> LuaValue.valueOf(value.value)
+```
+
+### 7. Update LuaFunctionMetadataAdapter
+
+**File**: `data/src/main/java/com/samco/trackandgraph/data/lua/functionadapters/LuaFunctionMetadataAdapter.kt`
+
+Add case to `parseConfigItem()`:
+```kotlin
+"your_type" -> parseYourTypeConfig(id, nameTranslations, configItem)
+```
+
+Add method:
+```kotlin
+private fun parseYourTypeConfig(
+    id: String,
+    name: TranslatedString?,
+    configItem: LuaValue
+): LuaFunctionConfigSpec.YourType {
+    val defaultValue = configItem[DEFAULT]
+        .takeUnless { it.isnil() }?.checkYourType()
+
+    return LuaFunctionConfigSpec.YourType(
+        id = id,
+        name = name,
+        defaultValue = defaultValue
+    )
+}
+```
+
+### 8. Add UI Component
+
+**File**: `app/src/main/java/com/samco/trackandgraph/functions/node_editor/ConfigurationInputField.kt`
+
+Add case:
+```kotlin
+is LuaScriptConfigurationInput.YourType -> YourTypeField(input)
+```
+
+Add component:
+```kotlin
+@Composable
+private fun YourTypeField(input: LuaScriptConfigurationInput.YourType) {
+    // TODO: Implement UI
+}
+```
+
+## Test Updates
+
+### 1. LuaFunctionMetadataTests
+Add to `Function handles all configuration types` test in Lua script and assertions.
+
+### 2. LuaScriptConfigurationInputFactoryTest
+Add to `allTypesMetadata.config` and `allTypesConfig`.
+
+### 3. LuaScriptConfigurationEncoderTest
+Add to class-level inputs and `encodeConfiguration handles all` test.
+
+### 4. ConfigurationValueParserTest
+Add to `parseConfigurationValues covers all` test.
+
+### 5. FunctionGraphSerializerTest
+Add to `createTestFunctionGraph()` configuration list.
+
+## Notes
+
+- **Naming**: PascalCase for `@SerialName`, snake_case in Lua
+- **Tests use reflection**: Will fail if you miss a type
+- **State**: Always use `MutableState<T>` for UI reactivity
+- **Defaults**: Handle null values gracefully (saved value → default → fallback)

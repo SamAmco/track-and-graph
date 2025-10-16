@@ -190,6 +190,10 @@ class FunctionGraphSerializerTest {
                         LuaScriptConfigurationValue.Checkbox(
                             id = "checkboxConfig",
                             value = true
+                        ),
+                        LuaScriptConfigurationValue.Enum(
+                            id = "enumConfig",
+                            value = "hours"
                         )
                     ),
                     dependencies = listOf(

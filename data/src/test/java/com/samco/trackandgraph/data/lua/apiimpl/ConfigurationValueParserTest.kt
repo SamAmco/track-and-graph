@@ -96,7 +96,8 @@ class ConfigurationValueParserTest {
         val textConfig = LuaScriptConfigurationValue.Text(id = "text", value = "test")
         val numberConfig = LuaScriptConfigurationValue.Number(id = "number", value = 1.0)
         val checkboxConfig = LuaScriptConfigurationValue.Checkbox(id = "checkbox", value = true)
-        val configuration = listOf(textConfig, numberConfig, checkboxConfig)
+        val enumConfig = LuaScriptConfigurationValue.Enum(id = "enum", value = "option1")
+        val configuration = listOf(textConfig, numberConfig, checkboxConfig, enumConfig)
 
         // When
         val result = parser.parseConfigurationValues(configuration)
@@ -111,9 +112,12 @@ class ConfigurationValueParserTest {
         assertTrue("Should have text key", !result["text"].isnil())
         assertTrue("Should have number key", !result["number"].isnil())
         assertTrue("Should have checkbox key", !result["checkbox"].isnil())
+        assertTrue("Should have enum key", !result["enum"].isnil())
         assertTrue("Text should be string", result["text"].isstring())
         assertTrue("Number should be number", result["number"].isnumber())
         assertTrue("Checkbox should be boolean", result["checkbox"].isboolean())
+        assertTrue("Enum should be string", result["enum"].isstring())
         assertEquals("Checkbox should have correct value", true, result["checkbox"].toboolean())
+        assertEquals("Enum should have correct value", "option1", result["enum"].tojstring())
     }
 }

@@ -29,11 +29,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.resolve
 
@@ -51,7 +53,22 @@ fun ConfigurationInputField(
         is LuaScriptConfigurationInput.Text -> TextTextField(focusManager, input)
         is LuaScriptConfigurationInput.Number -> NumberTextField(focusManager, input)
         is LuaScriptConfigurationInput.Checkbox -> CheckboxField(input)
+        is LuaScriptConfigurationInput.Enum -> EnumDropdownField(input)
     }
+}
+
+@Composable
+private fun EnumDropdownField(
+    input: LuaScriptConfigurationInput.Enum
+) {
+    TextMapSpinner(
+        modifier = Modifier.fillMaxWidth(),
+        strings = input.options.associate {
+            it.id to (it.displayName.resolve() ?: "")
+        },
+        selectedItem = input.value.value,
+        onItemSelected = { input.value.value = it }
+    )
 }
 
 @Composable
@@ -85,6 +102,7 @@ private fun CheckboxField(
 ) {
     val text = input.name.resolve() ?: ""
     RowCheckbox(
+        modifier = Modifier.fillMaxWidth(),
         checked = input.value.value,
         onCheckedChange = { input.value.value = it },
         text = text
@@ -129,6 +147,24 @@ private fun ConfigurationInputFieldCheckboxPreview() {
             input = LuaScriptConfigurationInput.Checkbox(
                 name = TranslatedString.Simple("Sample Checkbox Parameter"),
                 value = remember { mutableStateOf(true) }
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ConfigurationInputFieldEnumPreview() {
+    TnGComposeTheme {
+        ConfigurationInputField(
+            focusManager = LocalFocusManager.current,
+            input = LuaScriptConfigurationInput.Enum(
+                name = TranslatedString.Simple("Period"),
+                options = listOf(
+                    EnumOption("day", TranslatedString.Simple("Day")),
+                    EnumOption("week", TranslatedString.Simple("Week")),
+                ),
+                value = remember { mutableStateOf("week") }
             )
         )
     }

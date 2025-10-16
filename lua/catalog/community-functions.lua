@@ -25,6 +25,50 @@ return {
       fr="Transformer"
     }
   },
+  enums={
+    days={
+      de="Tage",
+      en="Days",
+      es="Días",
+      fr="Jours"
+    },
+    hours={
+      de="Stunden",
+      en="Hours",
+      es="Horas",
+      fr="Heures"
+    },
+    minutes={
+      de="Minuten",
+      en="Minutes",
+      es="Minutos",
+      fr="Minutes"
+    },
+    months={
+      de="Monate",
+      en="Months",
+      es="Meses",
+      fr="Mois"
+    },
+    seconds={
+      de="Sekunden",
+      en="Seconds",
+      es="Segundos",
+      fr="Secondes"
+    },
+    weeks={
+      de="Wochen",
+      en="Weeks",
+      es="Semanas",
+      fr="Semaines"
+    },
+    years={
+      de="Jahre",
+      en="Years",
+      es="Años",
+      fr="Années"
+    }
+  },
   functions={
     {
       id="absolute-value",
@@ -38,7 +82,7 @@ return {
     },
     {
       id="distinct-until-changed-label",
-      script="-- Lua Function to filter out consecutive duplicate labels\n-- Only passes through data points when the label changes from the previous one\n\nreturn {\n    -- Configuration metadata\n    id = \"distinct-until-changed-label\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = {\"filter\"},\n    title = {\n        [\"en\"] = \"Distinct Until Changed (Label)\",\n        [\"de\"] = \"Eindeutig bis geändert (Label)\",\n        [\"es\"] = \"Distinto hasta cambio (Etiqueta)\",\n        [\"fr\"] = \"Distinct jusqu'au changement (Étiquette)\",\n    },\n    description = {\n        [\"en\"] = \"Filters out consecutive duplicate labels. Only data points where the label differs from the previous one will pass through.\",\n        [\"de\"] = \"Filtert aufeinanderfolgende doppelte Labels heraus. Nur Datenpunkte, bei denen sich das Label vom vorherigen unterscheidet, werden durchgelassen.\",\n        [\"es\"] = \"Filtra etiquetas duplicadas consecutivas. Solo los puntos de datos donde la etiqueta difiere de la anterior pasarán.\",\n        [\"fr\"] = \"Filtre les étiquettes en double consécutives. Seuls les points de données où l'étiquette diffère de la précédente passeront.\",\n    },\n    config = {},\n\n    -- Generator function\n    generator = function(source, config)\n        local last_label = nil\n\n        return function()\n            while true do\n                local data_point = source.dp()\n                if not data_point then\n                    return nil\n                end\n\n                local current_label = data_point.label\n                if current_label ~= last_label then\n                    last_label = current_label\n                    return data_point\n                end\n            end\n        end\n    end,\n}\n",
+      script="-- Lua Function to filter out consecutive duplicate labels\n-- Only passes through data points when the label changes from the previous one\n\nreturn {\n\9-- Configuration metadata\n\9id = \"distinct-until-changed-label\",\n\9version = \"1.0.0\",\n\9inputCount = 1,\n\9categories = { \"filter\" },\n\9title = {\n\9\9[\"en\"] = \"Distinct Until Changed (Label)\",\n\9\9[\"de\"] = \"Eindeutig bis geändert (Label)\",\n\9\9[\"es\"] = \"Distinto hasta cambio (Etiqueta)\",\n\9\9[\"fr\"] = \"Distinct jusqu'au changement (Étiquette)\",\n\9},\n\9description = {\n\9\9[\"en\"] = \"Filters out consecutive duplicate labels. Only data points where the label differs from the previous one will pass through.\",\n\9\9[\"de\"] = \"Filtert aufeinanderfolgende doppelte Labels heraus. Nur Datenpunkte, bei denen sich das Label vom vorherigen unterscheidet, werden durchgelassen.\",\n\9\9[\"es\"] = \"Filtra etiquetas duplicadas consecutivas. Solo los puntos de datos donde la etiqueta difiere de la anterior pasarán.\",\n\9\9[\"fr\"] = \"Filtre les étiquettes en double consécutives. Seuls les points de données où l'étiquette diffère de la précédente passeront.\",\n\9},\n\9config = {\n\9\9{\n\9\9\9id = \"enumConfig\",\n\9\9\9type = \"enum\",\n\9\9\9name = { en = \"Time Unit\", de = \"Zeiteinheit\", es = \"Unidad de tiempo\", fr = \"Unité de temps\" },\n\9\9\9options = { \"seconds\", \"minutes\", \"hours\", \"days\" },\n\9\9\9default = \"hours\",\n\9\9},\n\9},\n\n\9-- Generator function\n\9generator = function(source, config)\n\9\9local last_label = nil\n\n\9\9return function()\n\9\9\9while true do\n\9\9\9\9local data_point = source.dp()\n\9\9\9\9if not data_point then\n\9\9\9\9\9return nil\n\9\9\9\9end\n\n\9\9\9\9local current_label = data_point.label\n\9\9\9\9if current_label ~= last_label then\n\9\9\9\9\9last_label = current_label\n\9\9\9\9\9return data_point\n\9\9\9\9end\n\9\9\9end\n\9\9end\n\9end,\n}\n",
       version="1.0.0"
     },
     {
@@ -172,5 +216,5 @@ return {
       version="1.0.0"
     }
   },
-  published_at="2025-10-15T21:46:04Z"
+  published_at="2025-10-16T22:46:53Z"
 }

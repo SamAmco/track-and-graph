@@ -280,6 +280,16 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                         type = "checkbox",
                         name = "Checkbox Configuration",
                         default = true
+                    },
+                    {
+                        id = "enumConfig",
+                        type = "enum",
+                        name = "Enum Configuration",
+                        options = {
+                            {id = "hours", name = {en = "Hours", de = "Stunden"}},
+                            {id = "days", name = {en = "Days", de = "Tage"}}
+                        },
+                        default = "hours"
                     }
                 },
                 generator = function(data_sources)
@@ -289,7 +299,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
         """.trimIndent()
         testLuaFunctionMetadata(script) {
             assertEquals(3, metadata.inputCount)
-            assertEquals(3, metadata.config.size)
+            assertEquals(4, metadata.config.size)
             assertEquals("Script should be preserved", script, metadata.script)
 
             // Validate each configuration type is parsed correctly
@@ -313,6 +323,21 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                 (checkboxConfig!!.name as TranslatedString.Simple).value
             )
             assertEquals("Checkbox default should be parsed", true, checkboxConfig.defaultValue)
+
+            val enumConfig = metadata.config.find { it.id == "enumConfig" } as? LuaFunctionConfigSpec.Enum
+            assertTrue("Enum configuration should be parsed", enumConfig != null)
+            assertEquals(
+                "Enum Configuration",
+                (enumConfig!!.name as TranslatedString.Simple).value
+            )
+            assertEquals("Enum default should be parsed", "hours", enumConfig.defaultValue)
+            assertEquals("Enum should have 2 options", 2, enumConfig.options.size)
+            assertEquals("First option ID should be hours", "hours", enumConfig.options[0].id)
+            assertEquals("First option name should be Hours", "Hours",
+                (enumConfig.options[0].displayName as TranslatedString.Translations).values["en"])
+            assertEquals("Second option ID should be days", "days", enumConfig.options[1].id)
+            assertEquals("Second option name should be Days", "Days",
+                (enumConfig.options[1].displayName as TranslatedString.Translations).values["en"])
 
             // CRITICAL: Ensure all sealed class types are tested
             // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in this test

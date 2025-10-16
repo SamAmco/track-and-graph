@@ -28,12 +28,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RowCheckbox(
+    modifier: Modifier = Modifier,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     text: String
 ) = Row(
     verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier
+    modifier = modifier
         .clickable { onCheckedChange?.invoke(!checked) }
         .padding(end = 14.dp)
 ) {

@@ -16,21 +16,10 @@ class ConfigurationValueParser @Inject constructor() {
 
     private fun parseConfigurationValue(value: LuaScriptConfigurationValue): LuaValue {
         return when (value) {
-            is LuaScriptConfigurationValue.Number -> parseNumber(value)
-            is LuaScriptConfigurationValue.Text -> parseText(value)
-            is LuaScriptConfigurationValue.Checkbox -> parseCheckbox(value)
+            is LuaScriptConfigurationValue.Number -> LuaValue.valueOf(value.value)
+            is LuaScriptConfigurationValue.Text -> LuaValue.valueOf(value.value)
+            is LuaScriptConfigurationValue.Checkbox -> LuaValue.valueOf(value.value)
+            is LuaScriptConfigurationValue.Enum -> LuaValue.valueOf(value.value)
         }
-    }
-
-    private fun parseNumber(value: LuaScriptConfigurationValue.Number): LuaValue {
-        return LuaValue.valueOf(value.value)
-    }
-
-    private fun parseText(value: LuaScriptConfigurationValue.Text): LuaValue {
-        return LuaValue.valueOf(value.value)
-    }
-
-    private fun parseCheckbox(value: LuaScriptConfigurationValue.Checkbox): LuaValue {
-        return LuaValue.valueOf(value.value)
     }
 }

@@ -78,6 +78,18 @@ sealed class LuaScriptConfigurationValue {
         override val id: String,
         val value: Boolean
     ) : LuaScriptConfigurationValue()
+
+    /**
+     * Represents an enum configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param value The selected enum option ID
+     */
+    @Serializable
+    @SerialName("Enum")
+    data class Enum(
+        override val id: String,
+        val value: String
+    ) : LuaScriptConfigurationValue()
 }
 
 /**

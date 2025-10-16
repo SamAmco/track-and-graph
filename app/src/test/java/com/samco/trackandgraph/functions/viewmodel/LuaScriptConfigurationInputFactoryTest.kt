@@ -20,6 +20,7 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
+import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
@@ -50,6 +51,15 @@ class LuaScriptConfigurationInputFactoryTest {
             LuaFunctionConfigSpec.Checkbox(
                 id = "checkboxConfig",
                 name = TranslatedString.Simple("Checkbox Configuration")
+            ),
+            LuaFunctionConfigSpec.Enum(
+                id = "enumConfig",
+                name = TranslatedString.Simple("Enum Configuration"),
+                options = listOf(
+                    EnumOption("hours", TranslatedString.Simple("Hours")),
+                    EnumOption("days", TranslatedString.Simple("Days"))
+                ),
+                defaultValue = "hours"
             )
         ),
         version = Version(1, 0, 0),
@@ -70,6 +80,10 @@ class LuaScriptConfigurationInputFactoryTest {
             id = "checkboxConfig",
             value = true
         ),
+        LuaScriptConfigurationValue.Enum(
+            id = "enumConfig",
+            value = "days"
+        )
     )
 
     @Test
@@ -94,6 +108,11 @@ class LuaScriptConfigurationInputFactoryTest {
         val checkboxInput = createdInputs["checkboxConfig"] as LuaScriptConfigurationInput.Checkbox
         assertSame(allTypesMetadata.config[2].name, checkboxInput.name)
         assertEquals(true, checkboxInput.value.value)
+
+        val enumInput = createdInputs["enumConfig"] as LuaScriptConfigurationInput.Enum
+        assertSame(allTypesMetadata.config[3].name, enumInput.name)
+        assertEquals("days", enumInput.value.value)  // Should use saved value
+        assertEquals(2, enumInput.options.size)
 
         // CRITICAL: Ensure all sealed class types are tested
         // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in allTypesMetadata
