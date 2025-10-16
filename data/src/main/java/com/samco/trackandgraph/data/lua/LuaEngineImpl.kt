@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionCatalogueAdapter
 import org.luaj.vm2.LuaError
@@ -108,18 +109,16 @@ internal class LuaEngineImpl @Inject constructor(
     override suspend fun runLuaCatalogue(
         vmLock: LuaVMLock,
         script: String
-    ): List<LuaFunctionMetadata> {
+    ): LuaFunctionCatalogue {
         return try {
             val vmLease = vmLock.asLease()
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaFunctionCatalogueAdapter.parseCatalogue(vmLease, resolvedScript)
         } catch (luaError: LuaError) {
-            a = luaError
-            val luaScriptException = LuaScriptException(
+            throw LuaScriptException(
                 message = luaError.message ?: "",
                 luaCauseStackTrace = luaError.luaCause?.stackTraceToString()
             )
-            throw luaScriptException
         }
     }
 }

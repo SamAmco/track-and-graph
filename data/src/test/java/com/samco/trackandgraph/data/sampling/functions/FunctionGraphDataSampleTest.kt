@@ -21,12 +21,14 @@ import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.lua.ApiLevelCalculator
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
 import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -46,6 +48,7 @@ class FunctionGraphDataSampleTest {
         .ioDispatcher(Dispatchers.IO)
         .timeProvider(mock())
         .moduleLoadInterceptor(NoOpModuleLoadInterceptorImpl())
+        .apiLevelCalculator(mock())
         .build()
     
     private val luaEngine: LuaEngine = luaEngineComponent.provideLuaEngine()

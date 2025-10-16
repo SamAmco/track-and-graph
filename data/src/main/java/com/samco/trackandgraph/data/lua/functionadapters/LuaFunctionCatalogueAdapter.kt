@@ -19,7 +19,10 @@ package com.samco.trackandgraph.data.lua.functionadapters
 import com.samco.trackandgraph.data.lua.ApiLevelCalculator
 import com.samco.trackandgraph.data.lua.LuaScriptResolver
 import com.samco.trackandgraph.data.lua.VMLease
+import com.samco.trackandgraph.data.lua.apiimpl.TranslatedStringParser
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
+import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.Version
 import io.github.z4kn4fein.semver.toVersion
 import org.luaj.vm2.LuaValue
@@ -30,24 +33,46 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
     private val luaScriptResolver: LuaScriptResolver,
     private val apiLevelCalculator: ApiLevelCalculator,
     private val luaFunctionMetadataAdapter: LuaFunctionMetadataAdapter,
+    private val translatedStringParser: TranslatedStringParser,
 ) {
+
+    companion object {
+        private const val FUNCTIONS = "functions"
+        private const val CATEGORIES = "categories"
+        private const val VERSION = "version"
+        private const val SCRIPT = "script"
+        private const val DEPRECATED = "deprecated"
+    }
+
     private data class CatalogueFunction(
         val version: Version,
         val script: String,
+        val deprecated: Int?,
     )
 
-    suspend fun parseCatalogue(vmLease: VMLease, catalogue: LuaValue): List<LuaFunctionMetadata> {
+    suspend fun parseCatalogue(vmLease: VMLease, catalogue: LuaValue): LuaFunctionCatalogue {
         val maxApiLevel = apiLevelCalculator.getMaxApiLevel(vmLease)
-        return getCatalogFunctions(catalogue)
-            .filter { it.version.major <= maxApiLevel }
+        val functions = getCatalogFunctions(catalogue)
+            .filter {
+                // Include if version is compatible AND not deprecated at this API level
+                it.version.major <= maxApiLevel &&
+                (it.deprecated == null || it.deprecated > maxApiLevel)
+            }
             .map {
                 val resolvedScript = luaScriptResolver.resolveLuaScript(it.script, vmLease)
                 luaFunctionMetadataAdapter.process(resolvedScript, it.script)
             }
+
+        val categories = getCatalogCategories(catalogue)
+
+        return LuaFunctionCatalogue(
+            functions = functions,
+            categories = categories
+        )
     }
 
     private fun getCatalogFunctions(catalogue: LuaValue): List<CatalogueFunction> {
-        val catalogueFunctions = catalogue["functions"]
+        val catalogueFunctions = catalogue[FUNCTIONS]
         if (!catalogueFunctions.istable()) {
             throw IllegalArgumentException("Catalogue functions must be a table")
         }
@@ -68,8 +93,9 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
                 continue
             }
 
-            val catalogueVersion = catalogueFunction["version"]
-            val catalogueScript = catalogueFunction["script"]
+            val catalogueVersion = catalogueFunction[VERSION]
+            val catalogueScript = catalogueFunction[SCRIPT]
+            val catalogueDeprecated = catalogueFunction[DEPRECATED]
 
             if (!catalogueVersion.isstring()) {
                 Timber.w("Catalogue at ${key.toint()} contained a missing or invalid version")
@@ -81,14 +107,49 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
                 continue
             }
 
+            // Parse deprecated (optional)
+            val deprecated = if (catalogueDeprecated.isnil()) {
+                null
+            } else if (catalogueDeprecated.isnumber()) {
+                catalogueDeprecated.toint()
+            } else {
+                Timber.w("Catalogue at ${key.toint()} contained invalid deprecated field (not a number)")
+                null
+            }
+
             functions.add(
                 CatalogueFunction(
                     version = catalogueVersion.checkjstring()!!.toVersion(),
-                    script = catalogueScript.checkjstring()!!
+                    script = catalogueScript.checkjstring()!!,
+                    deprecated = deprecated
                 )
             )
         }
 
         return functions
+    }
+
+    private fun getCatalogCategories(catalogue: LuaValue): Map<String, TranslatedString> {
+        val catalogueCategories = catalogue[CATEGORIES]
+        if (catalogueCategories.isnil() || !catalogueCategories.istable()) {
+            return emptyMap()
+        }
+
+        val categories = mutableMapOf<String, TranslatedString>()
+        val categoriesTable = catalogueCategories.checktable()!!
+
+        val keys = categoriesTable.keys()
+        for (key in keys) {
+            if (!key.isstring()) continue
+
+            val categoryId = key.checkjstring()!!
+            val translations = translatedStringParser.parse(categoriesTable[key])
+
+            if (translations != null) {
+                categories[categoryId] = translations
+            }
+        }
+
+        return categories
     }
 }

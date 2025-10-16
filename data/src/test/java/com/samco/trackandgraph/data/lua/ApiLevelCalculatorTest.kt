@@ -63,8 +63,10 @@ class ApiLevelCalculatorTest {
         }
     """.trimIndent()
 
+    private val assetReader = mock<AssetReader>()
+    private val apiLevelCalculator = ApiLevelCalculator(assetReader)
+
     private suspend fun createTestComponent(): LuaEngineTestComponent {
-        val assetReader = mock<AssetReader>()
         val dataInteractor = mock<DataInteractor>()
         val timeProvider = mock<TimeProvider>()
 
@@ -92,6 +94,7 @@ class ApiLevelCalculatorTest {
             .ioDispatcher(Dispatchers.IO)
             .timeProvider(timeProvider)
             .moduleLoadInterceptor(NoOpModuleLoadInterceptorImpl())
+            .apiLevelCalculator(apiLevelCalculator)
             .build()
     }
 
@@ -99,7 +102,6 @@ class ApiLevelCalculatorTest {
     fun `calculates maximum API level across multiple apispec files with varying levels`() =
         runTest {
             val component = createTestComponent()
-            val apiLevelCalculator = component.provideApiLevelCalculator()
             val vmProvider = component.provideVMProvider()
 
             // Acquire a VM lease to use for parsing

@@ -22,6 +22,7 @@ import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.sampling.RawDataSample
@@ -32,6 +33,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.threeten.bp.Instant
@@ -45,6 +47,7 @@ internal abstract class LuaEngineImplTest {
     protected val assetReader: AssetReader = mock()
     protected val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     protected open val timeProvider: TimeProvider = TimeProviderImpl()
+    protected open val apiLevelCalculator: ApiLevelCalculator = mock()
 
     private fun readAssetToString(path: String): String? {
         return javaClass.getClassLoader()
@@ -57,12 +60,16 @@ internal abstract class LuaEngineImplTest {
             val path = it.getArgument<String>(0)
             readAssetToString(path)
         }
-        return DaggerLuaEngineTestComponent.builder()
+
+        val builder = DaggerLuaEngineTestComponent.builder()
             .dataInteractor(dataInteractor)
             .assetReader(assetReader)
             .ioDispatcher(ioDispatcher)
             .timeProvider(timeProvider)
             .moduleLoadInterceptor(NoOpModuleLoadInterceptorImpl())
+            .apiLevelCalculator(apiLevelCalculator)
+
+        return builder
             .build()
             .provideLuaEngine()
     }
@@ -85,8 +92,10 @@ internal abstract class LuaEngineImplTest {
     )
 
     protected data class LuaCatalogueAssertionScope(
-        val functions: List<LuaFunctionMetadata>,
-    )
+        val catalogue: LuaFunctionCatalogue,
+    ) {
+        val functions: List<LuaFunctionMetadata> get() = catalogue.functions
+    }
 
     protected fun testLuaGraph(
         script: String,
@@ -188,7 +197,7 @@ internal abstract class LuaEngineImplTest {
 
         val vmLock = runBlocking { uut.acquireVM() }
 
-        val functions = try {
+        val catalogue = try {
             runBlocking { uut.runLuaCatalogue(vmLock, script) }
         } catch (t: Throwable) {
             throw t
@@ -197,7 +206,7 @@ internal abstract class LuaEngineImplTest {
         }
 
         LuaCatalogueAssertionScope(
-            functions = functions
+            catalogue = catalogue
         ).assertionBlock()
     }
 

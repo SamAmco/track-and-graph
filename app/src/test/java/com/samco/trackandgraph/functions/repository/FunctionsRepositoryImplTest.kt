@@ -20,6 +20,7 @@ import com.samco.trackandgraph.data.assetreader.AssetReader
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.service.FunctionsCatalogData
 import com.samco.trackandgraph.functions.service.FunctionsService
@@ -96,12 +97,18 @@ class FunctionsRepositoryImplTest {
             )
         )
 
+        // Mock the catalogue response
+        val expectedCatalogue = LuaFunctionCatalogue(
+            functions = expectedFunctions,
+            categories = emptyMap()
+        )
+
         // Setup mocks
         whenever(mockFunctionsService.fetchFunctionsCatalog()).thenReturn(catalogData)
         whenever(mockAssetReader.readAssetToString("functions-catalog/debug-20251010T194102Z.pub"))
             .thenReturn(publicKey)
         whenever(mockLuaEngine.acquireVM()).thenReturn(testVmLock)
-        whenever(mockLuaEngine.runLuaCatalogue(testVmLock, luaScript)).thenReturn(expectedFunctions)
+        whenever(mockLuaEngine.runLuaCatalogue(testVmLock, luaScript)).thenReturn(expectedCatalogue)
 
         // When
         val result = repository.fetchFunctions()

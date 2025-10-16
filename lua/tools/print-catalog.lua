@@ -33,11 +33,55 @@ local function print_function(func)
 	print()
 end
 
+-- Parse command line arguments
+local function parse_args()
+	local api_level = nil
+
+	if arg[1] then
+		api_level = tonumber(arg[1])
+		if not api_level or api_level < 1 or api_level % 1 ~= 0 then
+			io.stderr:write("Error: API level must be a positive integer\n")
+			io.stderr:write("Usage: lua tools/print-catalog.lua [api_level]\n")
+			os.exit(1)
+		end
+	end
+
+	return api_level
+end
+
+-- Filter functions by API level compatibility
+local function filter_by_api_level(functions, api_level)
+	if not api_level then
+		return functions
+	end
+
+	local filtered = {}
+	for _, func in ipairs(functions) do
+		local semver = require("tools.lib.semver")
+		local version = semver.parse(func.version)
+
+		if version and version.major <= api_level then
+			-- Check if deprecated at this level
+			local is_deprecated = func.deprecated ~= nil and func.deprecated <= api_level
+			if not is_deprecated then
+				table.insert(filtered, func)
+			end
+		end
+	end
+
+	return filtered
+end
+
 -- Main function
 local function main()
+	local api_level = parse_args()
+
 	print("\n")
 	print_separator()
 	print("TRACK & GRAPH - COMMUNITY FUNCTIONS CATALOG")
+	if api_level then
+		print("FILTERED BY API LEVEL: " .. api_level)
+	end
 	print_separator()
 	print()
 
@@ -49,19 +93,31 @@ local function main()
 	end
 
 	-- Load all functions
-	local functions = {}
+	local all_functions = {}
 	for _, file_path in ipairs(files) do
 		local ok, module = traversal.read_and_load(file_path)
 		if ok and module then
-			table.insert(functions, module)
+			table.insert(all_functions, module)
 		else
 			io.stderr:write("Warning: Failed to load " .. file_path .. ": " .. tostring(module) .. "\n")
 		end
 	end
 
+	-- Filter by API level if specified
+	local functions = filter_by_api_level(all_functions, api_level)
+
 	sort_by_title(functions)
 
-	print("Total functions: " .. #functions)
+	print("Total functions loaded: " .. #all_functions)
+	if api_level then
+		print("Functions compatible with API level " .. api_level .. ": " .. #functions)
+		local filtered_out = #all_functions - #functions
+		if filtered_out > 0 then
+			print("  (" .. filtered_out .. " filtered out due to version/deprecation)")
+		end
+	else
+		print("  (no API level filter applied)")
+	end
 	print()
 
 	for _, func in ipairs(functions) do

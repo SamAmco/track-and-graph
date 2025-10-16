@@ -20,6 +20,7 @@ import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.lua.ApiLevelCalculator
 import com.samco.trackandgraph.data.lua.DaggerLuaEngineTestComponent
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaVMLock
@@ -28,6 +29,7 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
@@ -38,7 +40,9 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeoutException
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
 class DeadlockStressTest {
@@ -49,6 +53,7 @@ class DeadlockStressTest {
         .ioDispatcher(Dispatchers.IO)
         .timeProvider(mock())
         .moduleLoadInterceptor(NoOpModuleLoadInterceptorImpl())
+        .apiLevelCalculator(mock())
         .build()
 
     private val luaEngine: LuaEngine = luaEngineComponent.provideLuaEngine()
@@ -104,7 +109,6 @@ class DeadlockStressTest {
                         // Cleanup
                         topLevelSample.dispose()
 
-                        println("Iteration $iteration completed successfully with ${results.size} results")
                     } catch (e: Exception) {
                         println("Iteration $iteration failed: ${e.message}")
                         throw e
@@ -118,7 +122,6 @@ class DeadlockStressTest {
             withContext(Dispatchers.Default.limitedParallelism(1)) {
                 withTimeout(10.seconds) {
                     testFuture.await()
-                    println("Deadlock stress test completed successfully!")
                 }
             }
         } catch (e: TimeoutException) {

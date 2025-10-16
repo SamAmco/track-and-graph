@@ -62,6 +62,24 @@ Validates all community functions have required fields and translations:
 lua tools/validate-functions.lua
 ```
 
+### Validate Function Categories
+Validates that all function categories are defined and used:
+```bash
+lua tools/validate-function-categories.lua
+```
+
+### Print Catalog
+Prints all functions with their English titles and descriptions. Optionally filter by API level:
+```bash
+# From repository root (shows all functions):
+make lua-print-catalog
+
+# From lua/ directory (with optional API level filter):
+cd lua
+lua tools/print-catalog.lua          # All functions
+lua tools/print-catalog.lua 1        # Only functions compatible with API level 1
+```
+
 ### Detect Changes
 Compares current functions against the published catalog to detect changes:
 ```bash

@@ -114,6 +114,17 @@ function M.validate_function(module, file_path, valid_categories)
 		end
 	end
 
+	-- deprecated is optional, must be positive integer if present
+	if module.deprecated ~= nil then
+		if type(module.deprecated) ~= "number" then
+			table.insert(errors, file_path .. " - 'deprecated' must be a number, got " .. type(module.deprecated))
+		elseif module.deprecated % 1 ~= 0 then
+			table.insert(errors, file_path .. " - 'deprecated' must be an integer")
+		elseif module.deprecated < 1 then
+			table.insert(errors, file_path .. " - 'deprecated' must be positive")
+		end
+	end
+
 	if type(module.generator) ~= "function" then
 		table.insert(errors, file_path .. " - 'generator' must be a function, got " .. type(module.generator))
 	end
