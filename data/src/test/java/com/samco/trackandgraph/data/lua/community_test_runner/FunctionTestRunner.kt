@@ -116,7 +116,7 @@ internal class FunctionTestRunner : CommunityTestRunner() {
         testStructure: LuaTable,
     ) {
         try {
-            val testConfig = testStructure["config"].checktable()!!
+            val testConfig = testStructure["config"].takeIf { !it.isnil() }?.checktable()
             val testDataSources = testStructure["sources"].checkfunction()!!.call().checktable()!!
 
             // For functions, we execute the script directly and call the generator
@@ -137,7 +137,7 @@ internal class FunctionTestRunner : CommunityTestRunner() {
     private fun executeFunctionScript(
         resolvedScript: LuaTable,
         dataSources: LuaTable,
-        config: LuaTable,
+        config: LuaTable?,
     ): LuaTable {
         // Get the generator function from the table
         val generator = resolvedScript["generator"].checkfunction()!!
@@ -146,7 +146,11 @@ internal class FunctionTestRunner : CommunityTestRunner() {
         val luaDataSources = createLuaDataSourcesList(resolvedScript, dataSources)
 
         // Call the generator with the data sources and config to get the iterator function
-        val iteratorFunc = generator.call(luaDataSources, config)
+        val iteratorFunc = if (config == null) {
+            generator.call(luaDataSources)
+        } else {
+            generator.call(luaDataSources, config)
+        }
 
         // Collect all results from the iterator
         val resultsTable = LuaTable()

@@ -71,6 +71,72 @@ List configuration options with bullet points for complex functions.]],
 - **Data point fields**: `timestamp`, `value`, `label`, `note`, `offset`
 - **Date/time handling**: Always pass the full data point to `core.date()`, not just the timestamp. The data point contains both `timestamp` and `offset` which are needed for correct timezone and DST handling. Use `local date = core.date(data_point)` not `core.date(data_point.timestamp)`.
 
+## Shared Translations
+
+Reusable translated strings are defined in `src/community/shared-translations.lua`. Functions can reference these translations by key instead of defining translations inline.
+
+### How It Works
+
+When the metadata parser encounters a **string** (not a table) for `title`, `description`, `config[].name`, or `enum options`:
+1. Look up the string in shared-translations.lua
+2. If found: replace with the translation table
+3. If not found: use the string as a literal value
+
+This allows you to write `title = "_duration"` and have it automatically replaced with `{en="Duration", de="Dauer", ...}`.
+
+### Convention
+
+**Only store `_` prefixed keys in shared-translations.lua** to avoid accidentally matching literal strings you didn't intend as lookups.
+
+### Examples
+
+**Using translation key**:
+```lua
+title = "_duration"  -- Looks up in shared-translations.lua, replaced with translation table
+```
+
+**Using literal string**:
+```lua
+title = "My Custom Function"  -- Not in translations table, used as Simple string
+```
+
+**Using inline translations**:
+```lua
+title = {  -- Table, used directly without lookup
+    ["en"] = "My Function",
+    ["de"] = "Meine Funktion"
+}
+```
+
+Note: In the catalog all strings must have translations. Either they should define translations inline, or use a translation key that exists in shared-translations.lua.
+
+**Enum options** (must use translation keys in the catalog):
+```lua
+config = {
+    {
+        id = "time_unit",
+        type = "enum",
+        name = "_time_unit",  -- Translation key
+        options = {"_seconds", "_minutes", "_hours", "_days"},
+        default = "_hours"
+    }
+}
+```
+
+**Config name with translation key**:
+```lua
+{
+    id = "multiplier",
+    type = "number",
+    name = "_multiplier",  -- Looks up translation
+    default = 1.0
+}
+```
+
+### Adding New Translations
+
+Edit `src/community/shared-translations.lua` and add your key (prefixed with `_`) with translations for all 4 languages (en, de, es, fr). The file validates itself to ensure all entries are complete and unique.
+
 ## Writing Tests
 
 Test files export a table of test cases:
