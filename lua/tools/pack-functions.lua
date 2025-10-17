@@ -13,7 +13,7 @@ local traversal = require("tools.lib.file-traversal")
 -- Configuration
 local FUNCTIONS_DIR = "src/community/functions"
 local CATEGORIES_PATH = "src/community/function-categories.lua"
-local ENUMS_PATH = "src/community/function-enums.lua"
+local TRANSLATIONS_PATH = "src/community/shared-translations.lua"
 local CATALOG_PATH = "catalog/community-functions.lua"
 
 -- Load categories
@@ -26,13 +26,13 @@ local function load_categories()
 	return categories
 end
 
--- Load enums
-local function load_enums()
-	local ok, enums = traversal.read_and_load(ENUMS_PATH)
+-- Load translations
+local function load_translations()
+	local ok, translations = traversal.read_and_load(TRANSLATIONS_PATH)
 	if not ok then
-		error("Failed to load enums: " .. enums)
+		error("Failed to load translations: " .. translations)
 	end
-	return enums
+	return translations
 end
 
 -- Write content to file
@@ -87,15 +87,15 @@ local function get_max_api_level()
 end
 
 -- Load and validate a single function
-local function load_and_validate_function(file_path, max_api_level, valid_categories, valid_enums)
+local function load_and_validate_function(file_path, max_api_level, valid_categories, valid_translations)
 	local content = traversal.read_file(file_path)
 	local ok, module = traversal.load_module(content, file_path)
 	if not ok or type(module) ~= "table" then
 		return false, module -- module contains error message
 	end
 
-	-- Validate structure (including categories and enums)
-	local valid, errors = validation.validate_function(module, file_path, valid_categories, valid_enums)
+	-- Validate structure (including categories and translations)
+	local valid, errors = validation.validate_function(module, file_path, valid_categories, valid_translations)
 	if not valid then
 		return false, table.concat(errors, "\n")
 	end
@@ -135,7 +135,7 @@ local function count_table_items(tbl)
 end
 
 -- Load and validate all functions
-local function load_all_functions(max_api_level, categories, enums)
+local function load_all_functions(max_api_level, categories, translations)
 	local files = traversal.find_scripts(traversal.SCRIPT_TYPE.FUNCTIONS)
 
 	if #files == 0 then
@@ -148,7 +148,7 @@ local function load_all_functions(max_api_level, categories, enums)
 	local all_errors = {}
 
 	for _, file_path in ipairs(files) do
-		local ok, func_or_err = load_and_validate_function(file_path, max_api_level, categories, enums)
+		local ok, func_or_err = load_and_validate_function(file_path, max_api_level, categories, translations)
 		if ok then
 			table.insert(functions, func_or_err)
 			print("  ✓ " .. file_path)
@@ -215,34 +215,34 @@ local function validate_categories(functions, categories)
 	print("✓ All categories valid")
 end
 
--- Validate enums
-local function validate_enums(functions, enums)
-	print("\nValidating enums...")
-	local undefined_enums = validation.collect_undefined_enums(functions, enums)
-	local unused_enums = validation.collect_unused_enums(enums, functions)
+-- Validate translations
+local function validate_translations(functions, translations)
+	print("\nValidating translations...")
+	local undefined_translations = validation.collect_undefined_translations(functions, translations)
+	local unused_translations = validation.collect_unused_translations(translations, functions)
 
-	if #undefined_enums > 0 then
-		print("\n✗ Undefined enum options found:")
-		for _, enum_option in ipairs(undefined_enums) do
-			print("  • " .. enum_option)
+	if #undefined_translations > 0 then
+		print("\n✗ Undefined translation keys found:")
+		for _, translation_key in ipairs(undefined_translations) do
+			print("  • " .. translation_key)
 		end
 		error(
 			string.format(
-				"Enum validation failed: %d undefined enum option%s",
-				#undefined_enums,
-				#undefined_enums == 1 and "" or "s"
+				"Translation validation failed: %d undefined translation key%s",
+				#undefined_translations,
+				#undefined_translations == 1 and "" or "s"
 			)
 		)
 	end
 
-	if #unused_enums > 0 then
-		print("\n⚠ Warning: Unused enum options found:")
-		for _, enum_option in ipairs(unused_enums) do
-			print("  • " .. enum_option)
+	if #unused_translations > 0 then
+		print("\n⚠ Warning: Unused translation keys found:")
+		for _, translation_key in ipairs(unused_translations) do
+			print("  • " .. translation_key)
 		end
-		print("(Consider removing from function-enums.lua)")
+		print("(Consider removing from shared-translations.lua)")
 	else
-		print("✓ All enum options valid")
+		print("✓ All translation keys valid")
 	end
 end
 
@@ -298,7 +298,7 @@ local function detect_and_validate_changes(functions)
 end
 
 -- Build catalog structure
-local function build_catalog(functions, categories, enums)
+local function build_catalog(functions, categories, translations)
 	local catalog_functions = {}
 	for _, func in ipairs(functions) do
 		table.insert(catalog_functions, {
@@ -315,7 +315,7 @@ local function build_catalog(functions, categories, enums)
 	return {
 		published_at = versioning.generate_timestamp(),
 		categories = categories,
-		enums = enums,
+		translations = translations,
 		functions = catalog_functions,
 	}
 end
@@ -327,7 +327,7 @@ local function main()
 	local max_api_level = get_max_api_level()
 	print("Max API level: " .. max_api_level)
 
-	print("\n==> Phase 2: Loading Categories and Enums")
+	print("\n==> Phase 2: Loading Categories and Translations")
 	local categories = load_categories()
 	print(
 		"Loaded "
@@ -336,15 +336,15 @@ local function main()
 			.. (count_table_items(categories) == 1 and "y" or "ies")
 	)
 
-	local enums = load_enums()
-	print("Loaded " .. count_table_items(enums) .. " enum option" .. (count_table_items(enums) == 1 and "" or "s"))
+	local translations = load_translations()
+	print("Loaded " .. count_table_items(translations) .. " translation key" .. (count_table_items(translations) == 1 and "" or "s"))
 
 	print("\n==> Phase 3: Loading Functions")
-	local functions = load_all_functions(max_api_level, categories, enums)
+	local functions = load_all_functions(max_api_level, categories, translations)
 
 	validate_uniqueness(functions)
 	validate_categories(functions, categories)
-	validate_enums(functions, enums)
+	validate_translations(functions, translations)
 
 	print("\n==> Phase 4: Change Detection")
 	local change_report = detect_and_validate_changes(functions)
@@ -360,7 +360,7 @@ local function main()
 
 	print("Building new catalog: " .. reason)
 
-	local catalog = build_catalog(functions, categories, enums)
+	local catalog = build_catalog(functions, categories, translations)
 
 	-- Create catalog directory if it doesn't exist
 	os.execute("mkdir -p catalog")

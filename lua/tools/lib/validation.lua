@@ -9,14 +9,26 @@ local M = {}
 local REQUIRED_LANGUAGES = {"en", "de", "es", "fr"}
 
 --- Validate that a field contains all required translations
---- @param field table: The field to validate
+--- @param field string|table: The field to validate (string for translation key lookup, table for inline translations)
 --- @param field_name string: Name of the field for error messages
 --- @param file_path string: File path for error messages
+--- @param valid_translations table?: Optional table of valid translation keys (if provided, validates string keys exist)
 --- @return boolean: true if valid
---- @return table: Array of missing language codes or empty
-function M.validate_translations(field, field_name, file_path)
+--- @return table: Array of error messages or empty
+function M.validate_translations(field, field_name, file_path, valid_translations)
+	-- If it's a string, check if it exists in valid_translations (if provided)
+	if type(field) == "string" then
+		if valid_translations and not valid_translations[field] then
+			return false, {string.format("%s - '%s' references undefined translation key: %s",
+				file_path, field_name, field)}
+		end
+		return true, {}
+	end
+
+	-- If it's a table, validate it has all required languages
 	if type(field) ~= "table" then
-		return false, {"Field '" .. field_name .. "' must be a table"}
+		return false, {string.format("%s - '%s' must be a string or table, got %s",
+			file_path, field_name, type(field))}
 	end
 
 	local missing = {}
@@ -37,10 +49,10 @@ end
 --- Validate config array has proper structure and translations
 --- @param config table: The config array to validate
 --- @param file_path string: File path for error messages
---- @param valid_enums table?: Optional table of valid enum IDs (if provided, validates enum options exist)
+--- @param valid_translations table?: Optional table of valid translation keys (if provided, validates translation keys exist)
 --- @return boolean: true if valid
 --- @return table: Array of error messages
-function M.validate_config(config, file_path, valid_enums)
+function M.validate_config(config, file_path, valid_translations)
 	if config == nil then
 		return true, {}  -- config is optional
 	end
@@ -66,7 +78,7 @@ function M.validate_config(config, file_path, valid_enums)
 		end
 
 		-- Validate name translations
-		local ok, trans_errors = M.validate_translations(item.name, "config[" .. i .. "].name", file_path)
+		local ok, trans_errors = M.validate_translations(item.name, "config[" .. i .. "].name", file_path, valid_translations)
 		if not ok then
 			for _, err in ipairs(trans_errors) do
 				table.insert(errors, err)
@@ -79,13 +91,13 @@ function M.validate_config(config, file_path, valid_enums)
 				table.insert(errors, string.format("%s - config[%d].options must be a table for enum type", file_path, i))
 			elseif #item.options == 0 then
 				table.insert(errors, string.format("%s - config[%d].options must contain at least one option", file_path, i))
-			elseif valid_enums then
-				-- Validate each option exists in valid_enums
+			elseif valid_translations then
+				-- Validate each option exists in valid_translations (enum options are translation keys)
 				for j, option in ipairs(item.options) do
 					if type(option) ~= "string" then
 						table.insert(errors, string.format("%s - config[%d].options[%d] must be a string", file_path, i, j))
-					elseif not valid_enums[option] then
-						table.insert(errors, string.format("%s - config[%d] undefined enum option '%s'", file_path, i, option))
+					elseif not valid_translations[option] then
+						table.insert(errors, string.format("%s - config[%d] undefined translation key for enum option '%s'", file_path, i, option))
 					end
 				end
 			end
@@ -101,10 +113,10 @@ end
 --- @param module table: The function module to validate
 --- @param file_path string: File path for error messages
 --- @param valid_categories table?: Optional table of valid category IDs (if provided, validates categories exist)
---- @param valid_enums table?: Optional table of valid enum IDs (if provided, validates enum options exist)
+--- @param valid_translations table?: Optional table of valid translation keys (if provided, validates translation keys exist)
 --- @return boolean: true if valid
 --- @return table: Array of error messages
-function M.validate_function(module, file_path, valid_categories, valid_enums)
+function M.validate_function(module, file_path, valid_categories, valid_translations)
 	local errors = {}
 
 	-- Check module is a table
@@ -167,7 +179,7 @@ function M.validate_function(module, file_path, valid_categories, valid_enums)
 	end
 
 	-- Validate title translations
-	local ok, trans_errors = M.validate_translations(module.title, "title", file_path)
+	local ok, trans_errors = M.validate_translations(module.title, "title", file_path, valid_translations)
 	if not ok then
 		for _, err in ipairs(trans_errors) do
 			table.insert(errors, err)
@@ -175,7 +187,7 @@ function M.validate_function(module, file_path, valid_categories, valid_enums)
 	end
 
 	-- Validate description translations
-	ok, trans_errors = M.validate_translations(module.description, "description", file_path)
+	ok, trans_errors = M.validate_translations(module.description, "description", file_path, valid_translations)
 	if not ok then
 		for _, err in ipairs(trans_errors) do
 			table.insert(errors, err)
@@ -183,7 +195,7 @@ function M.validate_function(module, file_path, valid_categories, valid_enums)
 	end
 
 	-- Validate config (if present)
-	ok, trans_errors = M.validate_config(module.config, file_path, valid_enums)
+	ok, trans_errors = M.validate_config(module.config, file_path, valid_translations)
 	if not ok then
 		for _, err in ipairs(trans_errors) do
 			table.insert(errors, err)
@@ -300,23 +312,37 @@ function M.collect_unused_categories(valid_categories, functions)
 	return unused
 end
 
---- Collect all undefined enum options across functions
+--- Collect all undefined translation keys across functions
 --- @param functions table: Array of function modules
---- @param valid_enums table: Table of valid enum option IDs
---- @return table: Array of undefined enum option IDs (unique, sorted)
-function M.collect_undefined_enums(functions, valid_enums)
+--- @param valid_translations table: Table of valid translation keys
+--- @return table: Array of undefined translation keys (unique, sorted)
+function M.collect_undefined_translations(functions, valid_translations)
 	local undefined = {}
 	local seen = {}
 
+	-- Helper to check and collect undefined translation key
+	local function check_translation(value)
+		if type(value) == "string" and not valid_translations[value] and not seen[value] then
+			table.insert(undefined, value)
+			seen[value] = true
+		end
+	end
+
 	for _, func in ipairs(functions) do
+		-- Check title
+		check_translation(func.title)
+
+		-- Check description
+		check_translation(func.description)
+
+		-- Check config names and enum options
 		if func.config then
 			for _, config_item in ipairs(func.config) do
+				check_translation(config_item.name)
+
 				if config_item.type == "enum" and config_item.options then
 					for _, option in ipairs(config_item.options) do
-						if not valid_enums[option] and not seen[option] then
-							table.insert(undefined, option)
-							seen[option] = true
-						end
+						check_translation(option)
 					end
 				end
 			end
@@ -327,20 +353,36 @@ function M.collect_undefined_enums(functions, valid_enums)
 	return undefined
 end
 
---- Collect all unused enum options
---- @param valid_enums table: Table of valid enum option IDs
+--- Collect all unused translation keys
+--- @param valid_translations table: Table of valid translation keys
 --- @param functions table: Array of function modules
---- @return table: Array of unused enum option IDs (sorted)
-function M.collect_unused_enums(valid_enums, functions)
+--- @return table: Array of unused translation keys (sorted)
+function M.collect_unused_translations(valid_translations, functions)
 	local used = {}
 
-	-- Collect all used enum options
+	-- Helper to mark translation as used
+	local function mark_used(value)
+		if type(value) == "string" then
+			used[value] = true
+		end
+	end
+
+	-- Collect all used translation keys
 	for _, func in ipairs(functions) do
+		-- Check title
+		mark_used(func.title)
+
+		-- Check description
+		mark_used(func.description)
+
+		-- Check config names and enum options
 		if func.config then
 			for _, config_item in ipairs(func.config) do
+				mark_used(config_item.name)
+
 				if config_item.type == "enum" and config_item.options then
 					for _, option in ipairs(config_item.options) do
-						used[option] = true
+						mark_used(option)
 					end
 				end
 			end
@@ -349,9 +391,9 @@ function M.collect_unused_enums(valid_enums, functions)
 
 	-- Find unused
 	local unused = {}
-	for enum_id in pairs(valid_enums) do
-		if not used[enum_id] then
-			table.insert(unused, enum_id)
+	for translation_key in pairs(valid_translations) do
+		if not used[translation_key] then
+			table.insert(unused, translation_key)
 		end
 	end
 

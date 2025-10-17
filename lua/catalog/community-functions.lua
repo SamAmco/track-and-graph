@@ -25,50 +25,6 @@ return {
       fr="Transformer"
     }
   },
-  enums={
-    days={
-      de="Tage",
-      en="Days",
-      es="Días",
-      fr="Jours"
-    },
-    hours={
-      de="Stunden",
-      en="Hours",
-      es="Horas",
-      fr="Heures"
-    },
-    minutes={
-      de="Minuten",
-      en="Minutes",
-      es="Minutos",
-      fr="Minutes"
-    },
-    months={
-      de="Monate",
-      en="Months",
-      es="Meses",
-      fr="Mois"
-    },
-    seconds={
-      de="Sekunden",
-      en="Seconds",
-      es="Segundos",
-      fr="Secondes"
-    },
-    weeks={
-      de="Wochen",
-      en="Weeks",
-      es="Semanas",
-      fr="Semaines"
-    },
-    years={
-      de="Jahre",
-      en="Years",
-      es="Años",
-      fr="Années"
-    }
-  },
   functions={
     {
       id="absolute-value",
@@ -81,18 +37,8 @@ return {
       version="1.0.0"
     },
     {
-      id="distinct-until-changed-label",
-      script="-- Lua Function to filter out consecutive duplicate labels\n-- Only passes through data points when the label changes from the previous one\n\nreturn {\n\9-- Configuration metadata\n\9id = \"distinct-until-changed-label\",\n\9version = \"1.0.0\",\n\9inputCount = 1,\n\9categories = { \"filter\" },\n\9title = {\n\9\9[\"en\"] = \"Distinct Until Changed (Label)\",\n\9\9[\"de\"] = \"Eindeutig bis geändert (Label)\",\n\9\9[\"es\"] = \"Distinto hasta cambio (Etiqueta)\",\n\9\9[\"fr\"] = \"Distinct jusqu'au changement (Étiquette)\",\n\9},\n\9description = {\n\9\9[\"en\"] = \"Filters out consecutive duplicate labels. Only data points where the label differs from the previous one will pass through.\",\n\9\9[\"de\"] = \"Filtert aufeinanderfolgende doppelte Labels heraus. Nur Datenpunkte, bei denen sich das Label vom vorherigen unterscheidet, werden durchgelassen.\",\n\9\9[\"es\"] = \"Filtra etiquetas duplicadas consecutivas. Solo los puntos de datos donde la etiqueta difiere de la anterior pasarán.\",\n\9\9[\"fr\"] = \"Filtre les étiquettes en double consécutives. Seuls les points de données où l'étiquette diffère de la précédente passeront.\",\n\9},\n\9config = {\n\9\9{\n\9\9\9id = \"enumConfig\",\n\9\9\9type = \"enum\",\n\9\9\9name = { en = \"Time Unit\", de = \"Zeiteinheit\", es = \"Unidad de tiempo\", fr = \"Unité de temps\" },\n\9\9\9options = { \"seconds\", \"minutes\", \"hours\", \"days\" },\n\9\9\9default = \"hours\",\n\9\9},\n\9},\n\n\9-- Generator function\n\9generator = function(source, config)\n\9\9local last_label = nil\n\n\9\9return function()\n\9\9\9while true do\n\9\9\9\9local data_point = source.dp()\n\9\9\9\9if not data_point then\n\9\9\9\9\9return nil\n\9\9\9\9end\n\n\9\9\9\9local current_label = data_point.label\n\9\9\9\9if current_label ~= last_label then\n\9\9\9\9\9last_label = current_label\n\9\9\9\9\9return data_point\n\9\9\9\9end\n\9\9\9end\n\9\9end\n\9end,\n}\n",
-      version="1.0.0"
-    },
-    {
-      id="distinct-until-changed-note",
-      script="-- Lua Function to filter out consecutive duplicate notes\n-- Only passes through data points when the note changes from the previous one\n\nreturn {\n    -- Configuration metadata\n    id = \"distinct-until-changed-note\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = {\"filter\"},\n    title = {\n        [\"en\"] = \"Distinct Until Changed (Note)\",\n        [\"de\"] = \"Eindeutig bis geändert (Notiz)\",\n        [\"es\"] = \"Distinto hasta cambio (Nota)\",\n        [\"fr\"] = \"Distinct jusqu'au changement (Note)\",\n    },\n    description = {\n        [\"en\"] = \"Filters out consecutive duplicate notes. Only data points where the note differs from the previous one will pass through.\",\n        [\"de\"] = \"Filtert aufeinanderfolgende doppelte Notizen heraus. Nur Datenpunkte, bei denen sich die Notiz von der vorherigen unterscheidet, werden durchgelassen.\",\n        [\"es\"] = \"Filtra notas duplicadas consecutivas. Solo los puntos de datos donde la nota difiere de la anterior pasarán.\",\n        [\"fr\"] = \"Filtre les notes en double consécutives. Seuls les points de données où la note diffère de la précédente passeront.\",\n    },\n    config = {},\n\n    -- Generator function\n    generator = function(source, config)\n        local last_note = nil\n\n        return function()\n            while true do\n                local data_point = source.dp()\n                if not data_point then\n                    return nil\n                end\n\n                local current_note = data_point.note\n                if current_note ~= last_note then\n                    last_note = current_note\n                    return data_point\n                end\n            end\n        end\n    end,\n}\n",
-      version="1.0.0"
-    },
-    {
-      id="distinct-until-changed-value",
-      script="-- Lua Function to filter out consecutive duplicate values\n-- Only passes through data points when the value changes from the previous one\n\nreturn {\n    -- Configuration metadata\n    id = \"distinct-until-changed-value\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = {\"filter\"},\n    title = {\n        [\"en\"] = \"Distinct Until Changed (Value)\",\n        [\"de\"] = \"Eindeutig bis geändert (Wert)\",\n        [\"es\"] = \"Distinto hasta cambio (Valor)\",\n        [\"fr\"] = \"Distinct jusqu'au changement (Valeur)\",\n    },\n    description = {\n        [\"en\"] = \"Filters out consecutive duplicate values. Only data points where the value differs from the previous one will pass through.\",\n        [\"de\"] = \"Filtert aufeinanderfolgende doppelte Werte heraus. Nur Datenpunkte, bei denen sich der Wert vom vorherigen unterscheidet, werden durchgelassen.\",\n        [\"es\"] = \"Filtra valores duplicados consecutivos. Solo los puntos de datos donde el valor difiere del anterior pasarán.\",\n        [\"fr\"] = \"Filtre les valeurs en double consécutives. Seuls les points de données où la valeur diffère de la précédente passeront.\",\n    },\n    config = {},\n\n    -- Generator function\n    generator = function(source, config)\n        local last_value = nil\n\n        return function()\n            while true do\n                local data_point = source.dp()\n                if not data_point then\n                    return nil\n                end\n\n                local current_value = data_point.value\n                if current_value ~= last_value then\n                    last_value = current_value\n                    return data_point\n                end\n            end\n        end\n    end,\n}\n",
+      id="distinct-until-changed",
+      script="-- Lua Function to filter out consecutive duplicates based on selected fields\n-- Only passes through data points when the selected fields change from the previous one\n\nreturn {\n\9-- Configuration metadata\n\9id = \"distinct-until-changed\",\n\9version = \"1.0.0\",\n\9inputCount = 1,\n\9categories = { \"filter\" },\n\9title = {\n\9\9[\"en\"] = \"Distinct Until Changed\",\n\9\9[\"de\"] = \"Eindeutig bis geändert\",\n\9\9[\"es\"] = \"Distinto hasta cambio\",\n\9\9[\"fr\"] = \"Distinct jusqu'au changement\",\n\9},\n\9description = {\n\9\9[\"en\"] = \"Filters out consecutive duplicates based on the selected fields. Only data points where the selected fields differ from the previous one will pass through.\\n\\n• All Fields - Compare value, label, and note\\n• Value Only - Compare value only\\n• Label Only - Compare label only\\n• Note Only - Compare note only\\n• Value and Label - Compare value and label\\n• Value and Note - Compare value and note\\n• Label and Note - Compare label and note\",\n\9\9[\"de\"] = \"Filtert aufeinanderfolgende Duplikate basierend auf den ausgewählten Feldern heraus. Nur Datenpunkte, bei denen sich die ausgewählten Felder vom vorherigen unterscheiden, werden durchgelassen.\\n\\n• Alle Felder - Vergleicht Wert, Label und Notiz\\n• Nur Wert - Vergleicht nur Wert\\n• Nur Label - Vergleicht nur Label\\n• Nur Notiz - Vergleicht nur Notiz\\n• Wert und Label - Vergleicht Wert und Label\\n• Wert und Notiz - Vergleicht Wert und Notiz\\n• Label und Notiz - Vergleicht Label und Notiz\",\n\9\9[\"es\"] = \"Filtra duplicados consecutivos basándose en los campos seleccionados. Solo los puntos de datos donde los campos seleccionados difieren del anterior pasarán.\\n\\n• Todos los campos - Compara valor, etiqueta y nota\\n• Solo valor - Compara solo valor\\n• Solo etiqueta - Compara solo etiqueta\\n• Solo nota - Compara solo nota\\n• Valor y etiqueta - Compara valor y etiqueta\\n• Valor y nota - Compara valor y nota\\n• Etiqueta y nota - Compara etiqueta y nota\",\n\9\9[\"fr\"] = \"Filtre les doublons consécutifs en fonction des champs sélectionnés. Seuls les points de données où les champs sélectionnés diffèrent du précédent passeront.\\n\\n• Tous les champs - Compare valeur, étiquette et note\\n• Valeur uniquement - Compare la valeur uniquement\\n• Étiquette uniquement - Compare l'étiquette uniquement\\n• Note uniquement - Compare la note uniquement\\n• Valeur et étiquette - Compare valeur et étiquette\\n• Valeur et note - Compare valeur et note\\n• Étiquette et note - Compare étiquette et note\",\n\9},\n\9config = {\n\9\9{\n\9\9\9id = \"compare_by\",\n\9\9\9type = \"enum\",\n\9\9\9name = \"_compare_by\",\n\9\9\9options = {\n\9\9\9\9\"_all_fields\",\n\9\9\9\9\"_value_only\",\n\9\9\9\9\"_label_only\",\n\9\9\9\9\"_note_only\",\n\9\9\9\9\"_value_and_label\",\n\9\9\9\9\"_value_and_note\",\n\9\9\9\9\"_label_and_note\",\n\9\9\9},\n\9\9\9default = \"_all_fields\",\n\9\9},\n\9},\n\n\9-- Generator function\n\9generator = function(source, config)\n\9\9local compare_by = config and config.compare_by or \"_all_fields\"\n\n\9\9local last_value = nil\n\9\9local last_label = nil\n\9\9local last_note = nil\n\n\9\9return function()\n\9\9\9while true do\n\9\9\9\9local data_point = source.dp()\n\9\9\9\9if not data_point then\n\9\9\9\9\9return nil\n\9\9\9\9end\n\n\9\9\9\9local current_value = data_point.value\n\9\9\9\9local current_label = data_point.label\n\9\9\9\9local current_note = data_point.note\n\n\9\9\9\9local is_different = false\n\n\9\9\9\9if compare_by == \"_all_fields\" then\n\9\9\9\9\9is_different = (current_value ~= last_value)\n\9\9\9\9\9\9or (current_label ~= last_label)\n\9\9\9\9\9\9or (current_note ~= last_note)\n\9\9\9\9elseif compare_by == \"_value_only\" then\n\9\9\9\9\9is_different = (current_value ~= last_value)\n\9\9\9\9elseif compare_by == \"_label_only\" then\n\9\9\9\9\9is_different = (current_label ~= last_label)\n\9\9\9\9elseif compare_by == \"_note_only\" then\n\9\9\9\9\9is_different = (current_note ~= last_note)\n\9\9\9\9elseif compare_by == \"_value_and_label\" then\n\9\9\9\9\9is_different = (current_value ~= last_value) or (current_label ~= last_label)\n\9\9\9\9elseif compare_by == \"_value_and_note\" then\n\9\9\9\9\9is_different = (current_value ~= last_value) or (current_note ~= last_note)\n\9\9\9\9elseif compare_by == \"_label_and_note\" then\n\9\9\9\9\9is_different = (current_label ~= last_label) or (current_note ~= last_note)\n\9\9\9\9end\n\n\9\9\9\9if is_different then\n\9\9\9\9\9last_value = current_value\n\9\9\9\9\9last_label = current_label\n\9\9\9\9\9last_note = current_note\n\9\9\9\9\9return data_point\n\9\9\9\9end\n\9\9\9end\n\9\9end\n\9end,\n}\n",
       version="1.0.0"
     },
     {
@@ -216,5 +162,97 @@ return {
       version="1.0.0"
     }
   },
-  published_at="2025-10-16T22:46:53Z"
+  published_at="2025-10-17T20:40:59Z",
+  translations={
+    _all_fields={
+      de="Alle Felder",
+      en="All Fields",
+      es="Todos los campos",
+      fr="Tous les champs"
+    },
+    _compare_by={
+      de="Vergleichen nach",
+      en="Compare By",
+      es="Comparar por",
+      fr="Comparer par"
+    },
+    _days={
+      de="Tage",
+      en="Days",
+      es="Días",
+      fr="Jours"
+    },
+    _hours={
+      de="Stunden",
+      en="Hours",
+      es="Horas",
+      fr="Heures"
+    },
+    _label_and_note={
+      de="Label und Notiz",
+      en="Label and Note",
+      es="Etiqueta y nota",
+      fr="Étiquette et note"
+    },
+    _label_only={
+      de="Nur Label",
+      en="Label Only",
+      es="Solo etiqueta",
+      fr="Étiquette uniquement"
+    },
+    _minutes={
+      de="Minuten",
+      en="Minutes",
+      es="Minutos",
+      fr="Minutes"
+    },
+    _months={
+      de="Monate",
+      en="Months",
+      es="Meses",
+      fr="Mois"
+    },
+    _note_only={
+      de="Nur Notiz",
+      en="Note Only",
+      es="Solo nota",
+      fr="Note uniquement"
+    },
+    _seconds={
+      de="Sekunden",
+      en="Seconds",
+      es="Segundos",
+      fr="Secondes"
+    },
+    _value_and_label={
+      de="Wert und Label",
+      en="Value and Label",
+      es="Valor y etiqueta",
+      fr="Valeur et étiquette"
+    },
+    _value_and_note={
+      de="Wert und Notiz",
+      en="Value and Note",
+      es="Valor y nota",
+      fr="Valeur et note"
+    },
+    _value_only={
+      de="Nur Wert",
+      en="Value Only",
+      es="Solo valor",
+      fr="Valeur uniquement"
+    },
+    _weeks={
+      de="Wochen",
+      en="Weeks",
+      es="Semanas",
+      fr="Semaines"
+    },
+    _years={
+      de="Jahre",
+      en="Years",
+      es="Años",
+      fr="Années"
+    }
+  }
 }
