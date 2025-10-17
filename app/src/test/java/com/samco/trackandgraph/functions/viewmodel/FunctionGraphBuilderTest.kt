@@ -39,13 +39,10 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class FunctionGraphBuilderTest {
-
-
     private val mockConfigurationEncoder: LuaScriptConfigurationEncoder = mock()
     private val builder: FunctionGraphBuilder = FunctionGraphBuilder(
         configurationEncoder = mockConfigurationEncoder
     )
-
 
     @Test
     fun `buildFunctionGraph creates correct graph`() {

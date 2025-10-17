@@ -50,6 +50,21 @@
                     "value": "hours"
                 }
             ],
+            "translations": {
+                "_hours": {
+                    "type": "Translations",
+                    "translations": {
+                        "en": "Hours",
+                        "de": "Stunden",
+                        "es": "Horas",
+                        "fr": "Heures"
+                    }
+                },
+                "_title": {
+                    "type": "Simple",
+                    "value": "Test Title"
+                }
+            },
             "dependencies": [
                 {
                     "connectorIndex": 0,

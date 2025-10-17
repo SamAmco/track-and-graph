@@ -125,6 +125,7 @@ sealed class FunctionGraphNode {
      * @param script The Lua script code as a string
      * @param inputConnectorCount Number of input connectors this node has
      * @param configuration List of user configuration input values for this script
+     * @param translations Map of translation keys to translated strings (for hydration), null if not from catalog
      * @param dependencies List of nodes this node depends on
      */
     @Serializable
@@ -136,6 +137,7 @@ sealed class FunctionGraphNode {
         val script: String,
         val inputConnectorCount: Int,
         val configuration: List<LuaScriptConfigurationValue> = emptyList(),
+        val translations: Map<String, SerializableTranslatedString>? = null,
         override val dependencies: List<NodeDependency>
     ) : FunctionGraphNode()
     

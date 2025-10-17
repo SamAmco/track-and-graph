@@ -20,6 +20,7 @@ import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
+import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
@@ -38,7 +39,8 @@ interface LuaEngine {
 
     fun runLuaFunction(
         vmLock: LuaVMLock,
-        script: String
+        script: String,
+        translations: LocalizationsTable? = null
     ): LuaFunctionMetadata
 
     fun runLuaFunctionGenerator(

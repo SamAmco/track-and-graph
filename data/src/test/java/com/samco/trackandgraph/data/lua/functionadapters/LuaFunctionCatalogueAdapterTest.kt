@@ -232,17 +232,17 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
     fun `hydrates enum options with translations from catalog`() = runTest {
         whenever(apiLevelCalculator.getMaxApiLevel(any())).thenReturn(1)
 
-        // Inline catalog with enums and a function that uses them
+        // Inline catalog with translations and a function that uses them
         val catalogueScript = """
             return {
-                enums = {
-                    days = {
+                translations = {
+                    ["_days"] = {
                         en = "Days",
                         de = "Tage",
                         es = "Días",
                         fr = "Jours"
                     },
-                    weeks = {
+                    ["_weeks"] = {
                         en = "Weeks",
                         de = "Wochen",
                         es = "Semanas",
@@ -274,7 +274,7 @@ return {
         {
             id = "period",
             type = "enum",
-            options = {"days", "weeks"},
+            options = {"_days", "_weeks"},
             name = {
                 en = "Period"
             }
@@ -316,7 +316,7 @@ return {
         assertEquals("Should have 2 options", 2, enumConfigSpec.options.size)
 
         val daysOption = enumConfigSpec.options[0]
-        assertEquals("First option ID should be days", "days", daysOption.id)
+        assertEquals("First option ID should be days", "_days", daysOption.id)
         assertTrue("Days option display name should be Translations", daysOption.displayName is TranslatedString.Translations)
         assertEquals("Days option should have English translation", "Days",
             (daysOption.displayName as TranslatedString.Translations).values["en"])
@@ -328,7 +328,7 @@ return {
             daysOption.displayName.values["fr"])
 
         val weeksOption = enumConfigSpec.options[1]
-        assertEquals("Second option ID should be weeks", "weeks", weeksOption.id)
+        assertEquals("Second option ID should be weeks", "_weeks", weeksOption.id)
         assertTrue("Weeks option display name should be Translations", weeksOption.displayName is TranslatedString.Translations)
         assertEquals("Weeks option should have English translation", "Weeks",
             (weeksOption.displayName as TranslatedString.Translations).values["en"])

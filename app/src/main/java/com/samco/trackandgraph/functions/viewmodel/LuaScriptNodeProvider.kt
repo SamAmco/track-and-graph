@@ -19,6 +19,7 @@ package com.samco.trackandgraph.functions.viewmodel
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaVMLock
+import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import timber.log.Timber
@@ -46,12 +47,13 @@ internal class LuaScriptNodeProvider @Inject constructor(
         script: String,
         nodeId: Int,
         inputConnectorCount: Int,
-        configuration: List<LuaScriptConfigurationValue>
+        configuration: List<LuaScriptConfigurationValue>,
+        translations: LocalizationsTable? = null
     ): Node.LuaScript {
         var vmLock: LuaVMLock? = null
         return try {
             vmLock = luaEngine.acquireVM()
-            val metadata = luaEngine.runLuaFunction(vmLock, script)
+            val metadata = luaEngine.runLuaFunction(vmLock, script, translations)
             createLuaScriptNode(metadata, nodeId, configuration)
         } catch (e: Exception) {
             Timber.e(e, "Failed to analyze Lua script for node $nodeId, using fallback")
@@ -61,7 +63,8 @@ internal class LuaScriptNodeProvider @Inject constructor(
                 inputConnectorCount = inputConnectorCount,
                 script = script,
                 showEditTools = true,
-                configuration = emptyMap()
+                configuration = emptyMap(),
+                metadata = null
             )
         } finally {
             vmLock?.let { luaEngine.releaseVM(vmLock) }
@@ -89,6 +92,7 @@ internal class LuaScriptNodeProvider @Inject constructor(
             showEditTools = metadata.version == null,
             configuration = inputs,
             title = metadata.title,
+            metadata = metadata,
         )
     }
 
@@ -105,7 +109,9 @@ internal class LuaScriptNodeProvider @Inject constructor(
         var vmLock: LuaVMLock? = null
         return try {
             vmLock = luaEngine.acquireVM()
-            val metadata = luaEngine.runLuaFunction(vmLock, newScript)
+            // Use existing metadata's translations if available
+            val translations = existingNode.metadata?.usedTranslations
+            val metadata = luaEngine.runLuaFunction(vmLock, newScript, translations)
 
             // Create new configuration map by iterating through new metadata
             val newConfiguration = metadata.config.associate { config ->
@@ -118,6 +124,7 @@ internal class LuaScriptNodeProvider @Inject constructor(
                 showEditTools = metadata.version == null,
                 configuration = newConfiguration,
                 title = metadata.title,
+                metadata = metadata,
             )
         } catch (e: Exception) {
             Timber.e(e, "Failed to update Lua script for node ${existingNode.id}, using fallback")
@@ -125,6 +132,7 @@ internal class LuaScriptNodeProvider @Inject constructor(
             existingNode.copy(
                 script = newScript,
                 inputConnectorCount = 1,
+                metadata = null,
             )
         } finally {
             vmLock?.let { luaEngine.releaseVM(it) }

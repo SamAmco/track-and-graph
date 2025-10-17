@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.database.dto.SerializableTranslatedString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -184,7 +185,7 @@ class FunctionGraphSerializerTest {
                             value = "Sample text value"
                         ),
                         LuaScriptConfigurationValue.Number(
-                            id = "numberConfig", 
+                            id = "numberConfig",
                             value = 42.5
                         ),
                         LuaScriptConfigurationValue.Checkbox(
@@ -195,6 +196,15 @@ class FunctionGraphSerializerTest {
                             id = "enumConfig",
                             value = "hours"
                         )
+                    ),
+                    translations = mapOf(
+                        "_hours" to SerializableTranslatedString.Translations(mapOf(
+                            "en" to "Hours",
+                            "de" to "Stunden",
+                            "es" to "Horas",
+                            "fr" to "Heures"
+                        )),
+                        "_title" to SerializableTranslatedString.Simple("Test Title")
                     ),
                     dependencies = listOf(
                         NodeDependency(

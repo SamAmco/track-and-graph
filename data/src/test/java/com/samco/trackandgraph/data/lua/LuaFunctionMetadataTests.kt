@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.data.lua
 
+import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
@@ -354,17 +355,46 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
 
     @Test
     fun `Function handles all metadata fields`() {
+        // Create test translations (some will be used, some won't)
+        val translations: LocalizationsTable = mapOf(
+            "_comprehensive_title" to TranslatedString.Translations(mapOf(
+                "en" to "Comprehensive Function",
+                "de" to "Umfassende Funktion",
+                "es" to "Función Integral",
+                "fr" to "Fonction Complète"
+            )),
+            "_config_name" to TranslatedString.Translations(mapOf(
+                "en" to "Sample Configuration",
+                "de" to "Beispielkonfiguration",
+                "fr" to "Configuration d'Exemple",
+                "es" to "Configuración de Muestra"
+            )),
+            "_hours" to TranslatedString.Translations(mapOf(
+                "en" to "Hours",
+                "de" to "Stunden",
+                "es" to "Horas",
+                "fr" to "Heures"
+            )),
+            "_days" to TranslatedString.Translations(mapOf(
+                "en" to "Days",
+                "de" to "Tage",
+                "es" to "Días",
+                "fr" to "Jours"
+            )),
+            "_unused_key" to TranslatedString.Translations(mapOf(
+                "en" to "Unused",
+                "de" to "Unbenutzt",
+                "es" to "No utilizado",
+                "fr" to "Inutilisé"
+            ))
+        )
+
         val script = """
             return {
                 id = "comprehensive-function",
                 version = "2.1.0",
                 inputCount = 2,
-                title = {
-                    ["en"] = "Comprehensive Function",
-                    ["de"] = "Umfassende Funktion",
-                    ["es"] = "Función Integral",
-                    ["fr"] = "Fonction Complète"
-                },
+                title = "_comprehensive_title",
                 description = {
                     ["en"] = "A function that demonstrates all metadata fields",
                     ["de"] = "Eine Funktion, die alle Metadatenfelder demonstriert",
@@ -375,11 +405,14 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                     {
                         id = "sampleConfig",
                         type = "text",
-                        name = {
-                            ["en"] = "Sample Configuration",
-                            ["de"] = "Beispielkonfiguration",
-                            ["fr"] = "Configuration d'Exemple"
-                        }
+                        name = "_config_name"
+                    },
+                    {
+                        id = "enumConfig",
+                        type = "enum",
+                        name = "Period",
+                        options = {"_hours", "_days"},
+                        default = "_hours"
                     }
                 },
                 generator = function(data_sources, config)
@@ -387,7 +420,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                 end
             }
         """.trimIndent()
-        testLuaFunctionMetadata(script) {
+        testLuaFunctionMetadata(script, translations) {
             // Use reflection to ensure all fields are non-null
             val metadataClass = LuaFunctionMetadata::class
             val properties = metadataClass.memberProperties
@@ -395,38 +428,63 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                 val value = property.get(metadata)
                 assertNotNull("Field '${property.name}' should not be null in comprehensive test", value)
             }
-            
+
             // Test all metadata fields are parsed correctly
             assertEquals("comprehensive-function", metadata.id)
             assertEquals("2.1.0".toVersion(), metadata.version)
             assertEquals(2, metadata.inputCount)
             assertEquals(script, metadata.script)
-            
-            // Test title with translations
+
+            // Test title was looked up from translations
             val title = metadata.title as? TranslatedString.Translations
             assertNotNull("Title should be parsed as translations", title)
             assertEquals("Comprehensive Function", title!!.values["en"])
             assertEquals("Umfassende Funktion", title.values["de"])
             assertEquals("Función Integral", title.values["es"])
             assertEquals("Fonction Complète", title.values["fr"])
-            
-            // Test description with translations
+
+            // Test description with inline translations (not looked up)
             val description = metadata.description as? TranslatedString.Translations
             assertNotNull("Description should be parsed as translations", description)
             assertEquals("A function that demonstrates all metadata fields", description!!.values["en"])
             assertEquals("Eine Funktion, die alle Metadatenfelder demonstriert", description.values["de"])
             assertEquals("Una función que demuestra todos los campos de metadatos", description.values["es"])
             assertEquals("Une fonction qui démontre tous les champs de métadonnées", description.values["fr"])
-            
+
             // Test config is parsed
-            assertEquals(1, metadata.config.size)
-            val config = metadata.config[0]
-            assertEquals("sampleConfig", config.id)
-            val configName = config.name as? TranslatedString.Translations
+            assertEquals(2, metadata.config.size)
+
+            // First config: text with translation lookup
+            val textConfig = metadata.config[0]
+            assertEquals("sampleConfig", textConfig.id)
+            assertTrue("Text config should be Text type", textConfig is LuaFunctionConfigSpec.Text)
+            val configName = textConfig.name as? TranslatedString.Translations
             assertNotNull("Config name should be parsed as translations", configName)
             assertEquals("Sample Configuration", configName!!.values["en"])
             assertEquals("Beispielkonfiguration", configName.values["de"])
             assertEquals("Configuration d'Exemple", configName.values["fr"])
+
+            // Second config: enum with translation lookups for options
+            val enumConfig = metadata.config[1]
+            assertEquals("enumConfig", enumConfig.id)
+            assertTrue("Enum config should be Enum type", enumConfig is LuaFunctionConfigSpec.Enum)
+            val enumSpec = enumConfig as LuaFunctionConfigSpec.Enum
+            assertEquals("Period", (enumSpec.name as TranslatedString.Simple).value)
+            assertEquals("_hours", enumSpec.defaultValue)
+            assertEquals(2, enumSpec.options.size)
+            assertEquals("_hours", enumSpec.options[0].id)
+            assertEquals("Hours", (enumSpec.options[0].displayName as TranslatedString.Translations).values["en"])
+            assertEquals("_days", enumSpec.options[1].id)
+            assertEquals("Days", (enumSpec.options[1].displayName as TranslatedString.Translations).values["en"])
+
+            // Test usedTranslations contains only what was looked up
+            assertNotNull("usedTranslations should not be null", metadata.usedTranslations)
+            assertEquals("Should have tracked 4 translation lookups", 4, metadata.usedTranslations!!.size)
+            assertTrue("Should contain _comprehensive_title", metadata.usedTranslations.containsKey("_comprehensive_title"))
+            assertTrue("Should contain _config_name", metadata.usedTranslations.containsKey("_config_name"))
+            assertTrue("Should contain _hours", metadata.usedTranslations.containsKey("_hours"))
+            assertTrue("Should contain _days", metadata.usedTranslations.containsKey("_days"))
+            assertTrue("Should NOT contain _unused_key", !metadata.usedTranslations.containsKey("_unused_key"))
         }
     }
 }

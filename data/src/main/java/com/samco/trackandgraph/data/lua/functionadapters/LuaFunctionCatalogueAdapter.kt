@@ -20,12 +20,12 @@ import com.samco.trackandgraph.data.lua.ApiLevelCalculator
 import com.samco.trackandgraph.data.lua.LuaScriptResolver
 import com.samco.trackandgraph.data.lua.VMLease
 import com.samco.trackandgraph.data.lua.apiimpl.TranslatedStringParser
+import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import io.github.z4kn4fein.semver.Version
 import io.github.z4kn4fein.semver.toVersion
-import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import timber.log.Timber
 import javax.inject.Inject
@@ -35,13 +35,12 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
     private val apiLevelCalculator: ApiLevelCalculator,
     private val luaFunctionMetadataAdapter: LuaFunctionMetadataAdapter,
     private val translatedStringParser: TranslatedStringParser,
-    private val enumHydrator: EnumHydrator,
 ) {
 
     companion object {
         private const val FUNCTIONS = "functions"
         private const val CATEGORIES = "categories"
-        private const val ENUMS = "enums"
+        private const val TRANSLATIONS = "translations"
         private const val VERSION = "version"
         private const val SCRIPT = "script"
         private const val DEPRECATED = "deprecated"
@@ -55,7 +54,7 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
 
     suspend fun parseCatalogue(vmLease: VMLease, catalogue: LuaValue): LuaFunctionCatalogue {
         val maxApiLevel = apiLevelCalculator.getMaxApiLevel(vmLease)
-        val enumsTable = getCatalogEnumsTable(catalogue)
+        val translations = getCatalogTranslations(catalogue)
 
         val functions = getCatalogFunctions(catalogue)
             .filter {
@@ -65,9 +64,7 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
             }
             .map {
                 val resolvedScript = luaScriptResolver.resolveLuaScript(it.script, vmLease)
-                // Hydrate enum options before processing
-                enumHydrator.hydrateEnums(resolvedScript, enumsTable)
-                luaFunctionMetadataAdapter.process(resolvedScript, it.script)
+                luaFunctionMetadataAdapter.process(resolvedScript, it.script, translations)
             }
 
         val categories = getCatalogCategories(catalogue)
@@ -78,13 +75,28 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
         )
     }
 
-    private fun getCatalogEnumsTable(catalogue: LuaValue): LuaTable? {
-        val catalogueEnums = catalogue[ENUMS]
-        return if (catalogueEnums.isnil() || !catalogueEnums.istable()) {
-            null
-        } else {
-            catalogueEnums.checktable()
+    private fun getCatalogTranslations(catalogue: LuaValue): LocalizationsTable {
+        val catalogueTranslations = catalogue[TRANSLATIONS]
+        if (catalogueTranslations.isnil() || !catalogueTranslations.istable()) {
+            return emptyMap()
         }
+
+        val translations = mutableMapOf<String, TranslatedString>()
+        val translationsTable = catalogueTranslations.checktable()!!
+
+        val keys = translationsTable.keys()
+        for (key in keys) {
+            if (!key.isstring()) continue
+
+            val translationKey = key.checkjstring()!!
+            val translatedString = translatedStringParser.parse(translationsTable[key])
+
+            if (translatedString != null) {
+                translations[translationKey] = translatedString
+            }
+        }
+
+        return translations
     }
 
     private fun getCatalogFunctions(catalogue: LuaValue): List<CatalogueFunction> {
