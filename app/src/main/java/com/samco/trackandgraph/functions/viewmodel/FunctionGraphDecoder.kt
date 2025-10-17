@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.database.dto.toTranslatedStrings
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf
@@ -125,15 +126,20 @@ internal class FunctionGraphDecoder @Inject constructor(
     /**
      * Decodes a LuaScriptNode DTO to a LuaScript ViewModel node.
      * Uses the configuration provider to analyze the script and create a complete node.
+     * Passes stored translations to enable proper hydration.
      */
     private suspend fun decodeLuaScriptNode(
         graphNode: FunctionGraphNode.LuaScriptNode
     ): Node.LuaScript {
+        // Convert serializable translations back to LocalizationsTable
+        val translations = graphNode.translations?.toTranslatedStrings()
+
         return luaScriptNodeProvider.createLuaScriptNode(
             script = graphNode.script,
             nodeId = graphNode.id,
             inputConnectorCount = graphNode.inputConnectorCount,
-            configuration = graphNode.configuration
+            configuration = graphNode.configuration,
+            translations = translations
         )
     }
     

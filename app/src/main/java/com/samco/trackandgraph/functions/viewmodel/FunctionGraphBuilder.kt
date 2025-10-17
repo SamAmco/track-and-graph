@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.database.dto.toSerializable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -159,7 +160,10 @@ internal class FunctionGraphBuilder @Inject constructor(
     ): FunctionGraphNode.LuaScriptNode {
         val dependencies = calculateDependencies(node.id, edges, validNodeIds)
         val position = nodePositions[node.id] ?: Offset.Zero
-        
+
+        // Extract and convert used translations from metadata
+        val translations = node.metadata?.usedTranslations?.toSerializable()
+
         return FunctionGraphNode.LuaScriptNode(
             x = position.x,
             y = position.y,
@@ -167,6 +171,7 @@ internal class FunctionGraphBuilder @Inject constructor(
             script = node.script,
             inputConnectorCount = node.inputConnectorCount,
             configuration = configurationEncoder.encodeConfiguration(node.configuration),
+            translations = translations,
             dependencies = dependencies
         )
     }

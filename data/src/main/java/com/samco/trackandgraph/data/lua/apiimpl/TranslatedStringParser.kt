@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.data.lua.apiimpl
 
+import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -52,6 +53,37 @@ internal class TranslatedStringParser @Inject constructor() {
                 if (translations.isEmpty()) null
                 else TranslatedString.Translations(translations)
             }
+            else -> null
+        }
+    }
+
+    /**
+     * Parse a Lua value into a TranslatedString with translation key lookup support
+     * @param value The Lua value (can be string or table of translations)
+     * @param translations Optional table of translation keys to look up
+     * @param usedTranslations Optional mutable map to track which translations were actually looked up
+     * @return TranslatedString or null if value is nil or invalid
+     */
+    fun parseWithLookup(
+        value: LuaValue,
+        translations: LocalizationsTable?,
+        usedTranslations: MutableMap<String, TranslatedString>? = null
+    ): TranslatedString? {
+        return when {
+            value.isnil() -> null
+            value.isstring() -> {
+                val stringValue = value.checkjstring()!!
+                // If we have a translations table, try to look up the string
+                val lookedUp = translations?.get(stringValue)
+                if (lookedUp != null) {
+                    // Track that this translation was used
+                    usedTranslations?.put(stringValue, lookedUp)
+                    lookedUp
+                } else {
+                    TranslatedString.Simple(stringValue)
+                }
+            }
+            value.istable() -> parse(value) // Use existing table parsing logic
             else -> null
         }
     }

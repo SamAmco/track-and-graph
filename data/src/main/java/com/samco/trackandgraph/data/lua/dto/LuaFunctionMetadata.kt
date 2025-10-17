@@ -87,4 +87,10 @@ data class LuaFunctionMetadata(
     val description: TranslatedString?,
     val inputCount: Int,
     val config: List<LuaFunctionConfigSpec>,
+    /**
+     * Map of translation keys to their translated strings that were actually used during parsing.
+     * Only includes translations that were looked up (not inline translations in the script).
+     * Null if no translations were used.
+     */
+    val usedTranslations: LocalizationsTable? = null,
 )

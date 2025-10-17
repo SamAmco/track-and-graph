@@ -121,6 +121,7 @@ internal sealed class Node(
         val configuration: Map<String, LuaScriptConfigurationInput> = emptyMap(),
         val showEditTools: Boolean = true,
         val title: TranslatedString? = null,
+        val metadata: LuaFunctionMetadata? = null,
     ) : Node(
         id = id,
         inputConnectorCount = inputConnectorCount,

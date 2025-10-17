@@ -31,6 +31,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -50,6 +51,7 @@ internal class FunctionGraphDecoderTest {
             nodeId = any(),
             inputConnectorCount = any(),
             configuration = any(),
+            translations = anyOrNull(),
         )).thenAnswer { invocation ->
             Node.LuaScript(
                 id = invocation.getArgument(1),
@@ -80,7 +82,7 @@ internal class FunctionGraphDecoderTest {
         val missingTypes = allGraphNodeTypes - testedGraphNodeTypes
         
         if (missingTypes.isNotEmpty()) {
-            val missingTypeNames = missingTypes.map { it.simpleName }.joinToString(", ")
+            val missingTypeNames = missingTypes.joinToString(", ") { it.simpleName ?: "" }
             fail("Test does not cover all FunctionGraphNode types. Missing: $missingTypeNames. " +
                  "Please update createInputFunction() to include instances of all FunctionGraphNode types.")
         }

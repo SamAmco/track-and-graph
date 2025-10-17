@@ -18,7 +18,6 @@ package com.samco.trackandgraph.functions.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
-import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
@@ -31,6 +30,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -54,7 +54,10 @@ class LuaScriptNodeProviderTest {
 
     @Test
     fun `createLuaScriptNode with empty config creates node with empty configuration`() = runTest {
-        // Given
+        // Given - test with translations to verify they're passed through
+        val translations = mapOf(
+            "_test_key" to TranslatedString.Translations(mapOf("en" to "Test"))
+        )
         val script = "simple script"
         val nodeId = 456
         val metadata = LuaFunctionMetadata(
@@ -65,11 +68,24 @@ class LuaScriptNodeProviderTest {
             version = null,
             title = null,
             description = null,
+            usedTranslations = null
         )
-        whenever(mockLuaEngine.runLuaFunction(any(), eq(script))).thenReturn(metadata)
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                vmLock = any(),
+                script = eq(script),
+                translations = eq(translations)
+            )
+        ).thenReturn(metadata)
 
-        // When
-        val result = provider.createLuaScriptNode(script, nodeId, 1, emptyList())
+        // When - pass translations
+        val result = provider.createLuaScriptNode(
+            script = script,
+            nodeId = nodeId,
+            inputConnectorCount = 1,
+            configuration = emptyList(),
+            translations = translations
+        )
 
         // Then
         assertEquals(nodeId, result.id)
@@ -78,8 +94,14 @@ class LuaScriptNodeProviderTest {
         assertTrue(result.configuration.isEmpty())
         assertEquals(true, result.showEditTools)
         assertEquals(null, result.title)
+        assertEquals(metadata, result.metadata) // Metadata should be set
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(script))
+        // Verify translations were passed through
+        verify(mockLuaEngine).runLuaFunction(
+            vmLock = any(),
+            script = eq(script),
+            translations = eq(translations)
+        )
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
@@ -91,7 +113,8 @@ class LuaScriptNodeProviderTest {
         whenever(
             mockLuaEngine.runLuaFunction(
                 any(),
-                eq(script)
+                eq(script),
+                any()
             )
         ).thenThrow(RuntimeException("Script error"))
 
@@ -104,13 +127,26 @@ class LuaScriptNodeProviderTest {
         assertEquals(script, result.script)
         assertTrue(result.configuration.isEmpty())
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(script))
+        verify(mockLuaEngine).runLuaFunction(any(), eq(script), anyOrNull())
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
     @Test
     fun `updateLuaScriptNode preserves existing configuration with same type`() = runTest {
-        // Given
+        // Given - node with metadata that has translations
+        val existingTranslations = mapOf(
+            "_old_key" to TranslatedString.Translations(mapOf("en" to "Old Translation"))
+        )
+        val existingMetadata = LuaFunctionMetadata(
+            script = "old script",
+            id = null,
+            inputCount = 1,
+            config = emptyList(),
+            version = null,
+            title = null,
+            description = null,
+            usedTranslations = existingTranslations
+        )
         val existingTextInput = LuaScriptConfigurationInput.Text(
             name = TranslatedString.Simple("Test Config"),
             value = mutableStateOf(TextFieldValue("existing value"))
@@ -119,7 +155,8 @@ class LuaScriptNodeProviderTest {
             id = 100,
             inputConnectorCount = 1,
             script = "old script",
-            configuration = mapOf("config1" to existingTextInput)
+            configuration = mapOf("config1" to existingTextInput),
+            metadata = existingMetadata
         )
 
         val newScript = "new script"
@@ -136,8 +173,15 @@ class LuaScriptNodeProviderTest {
             version = Version(1, 0, 0),
             title = null,
             description = null,
+            usedTranslations = null
         )
-        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                any(),
+                eq(newScript),
+                eq(existingTranslations)
+            )
+        ).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -149,13 +193,19 @@ class LuaScriptNodeProviderTest {
         assertEquals(1, result.configuration.size)
         assertEquals(false, result.showEditTools)
         assertEquals(null, result.title)
+        assertEquals(newMetadata, result.metadata) // Metadata should be set
 
         // Should preserve the existing input with its value
         val preservedInput = result.configuration["config1"] as LuaScriptConfigurationInput.Text
         assertEquals("existing value", preservedInput.value.value.text)
         assertSame(existingTextInput, preservedInput) // Should be the exact same instance
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        // Verify translations were passed through from existing metadata
+        verify(mockLuaEngine).runLuaFunction(
+            vmLock = any(),
+            script = eq(newScript),
+            translations = eq(existingTranslations)
+        )
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
@@ -184,7 +234,13 @@ class LuaScriptNodeProviderTest {
             title = TranslatedString.Simple("New Script"),
             description = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                vmLock = any(),
+                script = eq(newScript),
+                translations = anyOrNull()
+            )
+        ).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -201,7 +257,7 @@ class LuaScriptNodeProviderTest {
         val newInput = result.configuration["newConfig"] as LuaScriptConfigurationInput.Text
         assertEquals("", newInput.value.value.text) // New input should have empty default value
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript), anyOrNull())
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
@@ -241,7 +297,13 @@ class LuaScriptNodeProviderTest {
             title = null,
             description = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                vmLock = any(),
+                script = eq(newScript),
+                translations = anyOrNull()
+            )
+        ).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -259,7 +321,7 @@ class LuaScriptNodeProviderTest {
         assertFalse(result.configuration.containsKey("config2"))
         assertSame(existingInput1, result.configuration["config1"])
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript), anyOrNull())
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
@@ -292,7 +354,13 @@ class LuaScriptNodeProviderTest {
             title = null,
             description = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                vmLock = any(),
+                script = eq(newScript),
+                translations = anyOrNull()
+            )
+        ).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -310,7 +378,7 @@ class LuaScriptNodeProviderTest {
         assertTrue(newInput is LuaScriptConfigurationInput.Number)
         assertNotSame(existingTextInput, newInput) // Should be a different instance
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript), anyOrNull())
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
@@ -335,7 +403,8 @@ class LuaScriptNodeProviderTest {
         whenever(
             mockLuaEngine.runLuaFunction(
                 any(),
-                eq(newScript)
+                eq(newScript),
+                any()
             )
         ).thenThrow(RuntimeException("Script error"))
 
@@ -350,7 +419,7 @@ class LuaScriptNodeProviderTest {
         assertEquals(false, result.showEditTools)
         assertEquals(TranslatedString.Simple("Old Script"), result.title)
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript), anyOrNull())
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 
@@ -403,7 +472,13 @@ class LuaScriptNodeProviderTest {
             title = TranslatedString.Simple("New Script"),
             description = null,
         )
-        whenever(mockLuaEngine.runLuaFunction(any(), eq(newScript))).thenReturn(newMetadata)
+        whenever(
+            mockLuaEngine.runLuaFunction(
+                vmLock = any(),
+                script = eq(newScript),
+                translations = anyOrNull()
+            )
+        ).thenReturn(newMetadata)
 
         // When
         val result = provider.updateLuaScriptNode(existingNode, newScript)
@@ -429,7 +504,7 @@ class LuaScriptNodeProviderTest {
         val newInput = result.configuration["new"] as LuaScriptConfigurationInput.Text
         assertEquals("", newInput.value.value.text)
 
-        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript))
+        verify(mockLuaEngine).runLuaFunction(any(), eq(newScript), anyOrNull())
         verify(mockLuaEngine).releaseVM(testVmLock)
     }
 

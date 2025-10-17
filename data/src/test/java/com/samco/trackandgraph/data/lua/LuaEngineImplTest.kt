@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.apiimpl.NoOpModuleLoadInterceptorImpl
+import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
@@ -33,7 +34,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.threeten.bp.Instant
@@ -172,6 +172,7 @@ internal abstract class LuaEngineImplTest {
 
     protected fun testLuaFunctionMetadata(
         script: String,
+        translations: LocalizationsTable? = null,
         assertionBlock: LuaFunctionMetadataAssertionScope.() -> Unit
     ) {
         val uut = uut()
@@ -179,7 +180,7 @@ internal abstract class LuaEngineImplTest {
         val vmLock = runBlocking { uut.acquireVM() }
 
         val metadata = try {
-            uut.runLuaFunction(vmLock, script)
+            uut.runLuaFunction(vmLock, script, translations)
         } finally {
             uut.releaseVM(vmLock)
         }

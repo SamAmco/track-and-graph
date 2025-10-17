@@ -2,6 +2,7 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
+import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
@@ -35,8 +36,12 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
         } else throw LuaEngineDisabledException()
     }
 
-    override fun runLuaFunction(vmLock: LuaVMLock, script: String): LuaFunctionMetadata {
-        return if (luaEngineSwitch.enabled) luaEngine.runLuaFunction(vmLock, script)
+    override fun runLuaFunction(
+        vmLock: LuaVMLock,
+        script: String,
+        translations: LocalizationsTable?
+    ): LuaFunctionMetadata {
+        return if (luaEngineSwitch.enabled) luaEngine.runLuaFunction(vmLock, script, translations)
         else throw LuaEngineDisabledException()
     }
 
