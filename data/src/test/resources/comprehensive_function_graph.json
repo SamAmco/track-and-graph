@@ -65,6 +65,8 @@
                     "value": "Test Title"
                 }
             },
+            "catalogFunctionId": "test-function",
+            "catalogVersion": "1.0.0",
             "dependencies": [
                 {
                     "connectorIndex": 0,

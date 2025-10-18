@@ -22,6 +22,7 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
 import com.samco.trackandgraph.data.database.dto.SerializableTranslatedString
+import io.github.z4kn4fein.semver.toVersion
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -206,6 +207,8 @@ class FunctionGraphSerializerTest {
                         )),
                         "_title" to SerializableTranslatedString.Simple("Test Title")
                     ),
+                    catalogFunctionId = "test-function",
+                    catalogVersion = "1.0.0".toVersion(),
                     dependencies = listOf(
                         NodeDependency(
                             connectorIndex = 0,

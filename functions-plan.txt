@@ -1,7 +1,4 @@
 TODO: 
-- Enums aren't deserializing properly from json
-- Add version and id to function node json encoding (to allow auto-updating in future)
-- Do we want functions to be a map of id to function instead of a list?
 - Show categories in the function picker
 - Don't allow creating a function until you have a tracker? 
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
@@ -11,6 +8,7 @@ TODO:
 - Add text to the grid that hints at going landscape
 - Add text to the grid that hints at long pressing to add a node
 - Fix up the function card UI. Min height should be the same as tracker
+- Improve function card UI in general
 - Do we want error toasts when function catalogue download fails or something?
 - Docs
 
