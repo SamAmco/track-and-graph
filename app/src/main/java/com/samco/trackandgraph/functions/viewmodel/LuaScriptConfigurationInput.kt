@@ -61,4 +61,12 @@ sealed class LuaScriptConfigurationInput {
         val options: List<EnumOption>,
         val value: MutableState<String> = mutableStateOf("")
     ) : LuaScriptConfigurationInput()
+
+    /**
+     * Unsigned integer input configuration with mutable state for uint value
+     */
+    data class UInt(
+        override val name: TranslatedString?,
+        val value: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
+    ) : LuaScriptConfigurationInput()
 }

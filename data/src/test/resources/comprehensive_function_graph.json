@@ -48,6 +48,11 @@
                     "configType": "Enum",
                     "id": "enumConfig",
                     "value": "hours"
+                },
+                {
+                    "configType": "UInt",
+                    "id": "uintConfig",
+                    "value": 100
                 }
             ],
             "translations": {

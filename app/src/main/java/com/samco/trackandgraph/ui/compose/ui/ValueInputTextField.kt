@@ -81,7 +81,8 @@ fun ValueInputTextField(
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
     onNextOverride: (() -> Unit)? = null,
-    label: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.value)) }
+    label: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.value)) },
+    keyboardType: KeyboardType = KeyboardType.Decimal,
 ) {
     val focusUpdateScope = rememberCoroutineScope()
 
@@ -107,7 +108,7 @@ fun ValueInputTextField(
             )
         },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal,
+            keyboardType = keyboardType,
             imeAction = ImeAction.Next
         ),
         singleLine = true,

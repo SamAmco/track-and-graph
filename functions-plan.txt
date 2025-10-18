@@ -248,7 +248,7 @@ A lua function file returns an object that contains:
       x weekday enum
       - local time
       x number
-      - uint
+      x uint
       x string
       - instant (i.e. local time/date input, and timezone enum)
 - A generator function that generates data points via yield and takes:

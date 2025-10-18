@@ -97,7 +97,8 @@ class ConfigurationValueParserTest {
         val numberConfig = LuaScriptConfigurationValue.Number(id = "number", value = 1.0)
         val checkboxConfig = LuaScriptConfigurationValue.Checkbox(id = "checkbox", value = true)
         val enumConfig = LuaScriptConfigurationValue.Enum(id = "enum", value = "option1")
-        val configuration = listOf(textConfig, numberConfig, checkboxConfig, enumConfig)
+        val uintConfig = LuaScriptConfigurationValue.UInt(id = "uint", value = 42)
+        val configuration = listOf(textConfig, numberConfig, checkboxConfig, enumConfig, uintConfig)
 
         // When
         val result = parser.parseConfigurationValues(configuration)
@@ -105,19 +106,22 @@ class ConfigurationValueParserTest {
         // Then - Verify all configuration value types are covered
         val configTypes = configuration.map { it::class }.toSet()
         val allConfigValueTypes = LuaScriptConfigurationValue::class.sealedSubclasses.toSet()
-        
+
         assertEquals("Test should cover all LuaScriptConfigurationValue types", allConfigValueTypes, configTypes)
-        
+
         // Verify all keys exist in the result
         assertTrue("Should have text key", !result["text"].isnil())
         assertTrue("Should have number key", !result["number"].isnil())
         assertTrue("Should have checkbox key", !result["checkbox"].isnil())
         assertTrue("Should have enum key", !result["enum"].isnil())
+        assertTrue("Should have uint key", !result["uint"].isnil())
         assertTrue("Text should be string", result["text"].isstring())
         assertTrue("Number should be number", result["number"].isnumber())
         assertTrue("Checkbox should be boolean", result["checkbox"].isboolean())
         assertTrue("Enum should be string", result["enum"].isstring())
+        assertTrue("UInt should be number", result["uint"].isnumber())
         assertEquals("Checkbox should have correct value", true, result["checkbox"].toboolean())
         assertEquals("Enum should have correct value", "option1", result["enum"].tojstring())
+        assertEquals("UInt should have correct value", 42, result["uint"].toint())
     }
 }

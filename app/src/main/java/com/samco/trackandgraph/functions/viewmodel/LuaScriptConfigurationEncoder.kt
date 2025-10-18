@@ -63,6 +63,14 @@ internal class LuaScriptConfigurationEncoder @Inject constructor() {
                         value = input.value.value
                     )
                 }
+                is LuaScriptConfigurationInput.UInt -> {
+                    // Parse the text field value to long, defaulting to 1L if invalid or negative
+                    val longValue = input.value.value.text.toIntOrNull()?.coerceAtLeast(0) ?: 1
+                    LuaScriptConfigurationValue.UInt(
+                        id = id,
+                        value = longValue
+                    )
+                }
             }
         }
     }
