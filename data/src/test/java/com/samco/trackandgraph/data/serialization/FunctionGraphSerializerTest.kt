@@ -196,6 +196,10 @@ class FunctionGraphSerializerTest {
                         LuaScriptConfigurationValue.Enum(
                             id = "enumConfig",
                             value = "hours"
+                        ),
+                        LuaScriptConfigurationValue.UInt(
+                            id = "uintConfig",
+                            value = 100
                         )
                     ),
                     translations = mapOf(

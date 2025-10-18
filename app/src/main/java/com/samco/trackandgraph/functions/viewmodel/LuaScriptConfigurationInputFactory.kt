@@ -41,6 +41,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.Number -> createNumberInput(config, savedValue)
             is LuaFunctionConfigSpec.Checkbox -> createCheckboxInput(config, savedValue)
             is LuaFunctionConfigSpec.Enum -> createEnumInput(config, savedValue)
+            is LuaFunctionConfigSpec.UInt -> createUIntInput(config, savedValue)
         }
     }
 
@@ -56,6 +57,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.Number -> existingInput is LuaScriptConfigurationInput.Number
             is LuaFunctionConfigSpec.Checkbox -> existingInput is LuaScriptConfigurationInput.Checkbox
             is LuaFunctionConfigSpec.Enum -> existingInput is LuaScriptConfigurationInput.Enum
+            is LuaFunctionConfigSpec.UInt -> existingInput is LuaScriptConfigurationInput.UInt
         }
     }
 
@@ -124,6 +126,19 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             name = config.name,
             options = config.options,
             value = mutableStateOf(initialValue)
+        )
+    }
+
+    private fun createUIntInput(
+        config: LuaFunctionConfigSpec.UInt,
+        savedValue: LuaScriptConfigurationValue?
+    ): LuaScriptConfigurationInput.UInt {
+        val uintValue = savedValue as? LuaScriptConfigurationValue.UInt
+        val initialValue = uintValue?.value ?: config.defaultValue ?: 1
+
+        return LuaScriptConfigurationInput.UInt(
+            name = config.name,
+            value = mutableStateOf(TextFieldValue(initialValue.toString()))
         )
     }
 }

@@ -164,6 +164,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             "number" -> parseNumberConfig(id, nameTranslations, configItem)
             "checkbox" -> parseCheckboxConfig(id, nameTranslations, configItem)
             "enum" -> parseEnumConfig(id, nameTranslations, configItem, translations, usedTranslations)
+            "uint" -> parseUIntConfig(id, nameTranslations, configItem)
             else -> throw IllegalArgumentException("Unknown config type: $typeString")
         }
     }
@@ -271,6 +272,21 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             id = id,
             name = name,
             options = options,
+            defaultValue = defaultValue
+        )
+    }
+
+    private fun parseUIntConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.UInt {
+        val defaultValue = configItem[DEFAULT]
+            .takeUnless { it.isnil() }?.toint()
+
+        return LuaFunctionConfigSpec.UInt(
+            id = id,
+            name = name,
             defaultValue = defaultValue
         )
     }

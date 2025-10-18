@@ -91,6 +91,18 @@ sealed class LuaScriptConfigurationValue {
         override val id: String,
         val value: String
     ) : LuaScriptConfigurationValue()
+
+    /**
+     * Represents an unsigned integer configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param value The user-entered unsigned integer value
+     */
+    @Serializable
+    @SerialName("UInt")
+    data class UInt(
+        override val id: String,
+        val value: Int
+    ) : LuaScriptConfigurationValue()
 }
 
 /**

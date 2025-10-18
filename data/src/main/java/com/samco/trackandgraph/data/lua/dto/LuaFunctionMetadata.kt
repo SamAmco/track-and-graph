@@ -77,6 +77,12 @@ sealed class LuaFunctionConfigSpec {
         val options: List<EnumOption>,
         val defaultValue: String? = null
     ) : LuaFunctionConfigSpec()
+
+    data class UInt(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValue: Int? = null
+    ) : LuaFunctionConfigSpec()
 }
 
 data class LuaFunctionMetadata(

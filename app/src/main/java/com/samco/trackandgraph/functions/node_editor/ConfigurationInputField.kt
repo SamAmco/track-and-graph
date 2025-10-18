@@ -19,6 +19,8 @@ package com.samco.trackandgraph.functions.node_editor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,7 @@ import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
+import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.resolve
 
 @Composable
@@ -54,13 +58,19 @@ fun ConfigurationInputField(
         is LuaScriptConfigurationInput.Number -> NumberTextField(focusManager, input)
         is LuaScriptConfigurationInput.Checkbox -> CheckboxField(input)
         is LuaScriptConfigurationInput.Enum -> EnumDropdownField(input)
+        is LuaScriptConfigurationInput.UInt -> UIntTextField(focusManager, input)
     }
 }
 
 @Composable
 private fun EnumDropdownField(
     input: LuaScriptConfigurationInput.Enum
-) {
+) = Column {
+    Text(
+        modifier = Modifier.padding(horizontal = halfDialogInputSpacing),
+        text = input.name.resolve() ?: "",
+        style = MaterialTheme.typography.bodySmall
+    )
     TextMapSpinner(
         modifier = Modifier.fillMaxWidth(),
         strings = input.options.associate {
@@ -108,6 +118,25 @@ private fun CheckboxField(
         text = text
     )
 }
+
+@Composable
+private fun UIntTextField(
+    focusManager: FocusManager,
+    input: LuaScriptConfigurationInput.UInt
+) = ValueInputTextField(
+    modifier = Modifier.fillMaxWidth(),
+    textFieldValue = input.value.value,
+    onValueChange = { tfv ->
+        if (tfv.text.all { it.isDigit() }) {
+            input.value.value = tfv
+        } else {
+            input.value.value = tfv.copy(text = tfv.text.filter { it.isDigit() })
+        }
+    },
+    focusManager = focusManager,
+    label = { input.name.resolve()?.let { Text(it) } },
+    keyboardType = KeyboardType.Number,
+)
 
 
 @Preview(showBackground = true)
@@ -165,6 +194,20 @@ private fun ConfigurationInputFieldEnumPreview() {
                     EnumOption("week", TranslatedString.Simple("Week")),
                 ),
                 value = remember { mutableStateOf("week") }
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ConfigurationInputFieldUIntPreview() {
+    TnGComposeTheme {
+        ConfigurationInputField(
+            focusManager = LocalFocusManager.current,
+            input = LuaScriptConfigurationInput.UInt(
+                name = TranslatedString.Simple("Sample UInt Parameter"),
+                value = remember { mutableStateOf(TextFieldValue("42")) }
             )
         )
     }

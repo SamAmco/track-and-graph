@@ -60,6 +60,11 @@ class LuaScriptConfigurationInputFactoryTest {
                     EnumOption("days", TranslatedString.Simple("Days"))
                 ),
                 defaultValue = "hours"
+            ),
+            LuaFunctionConfigSpec.UInt(
+                id = "uintConfig",
+                name = TranslatedString.Simple("UInt Configuration"),
+                defaultValue = 10
             )
         ),
         version = Version(1, 0, 0),
@@ -83,6 +88,10 @@ class LuaScriptConfigurationInputFactoryTest {
         LuaScriptConfigurationValue.Enum(
             id = "enumConfig",
             value = "days"
+        ),
+        LuaScriptConfigurationValue.UInt(
+            id = "uintConfig",
+            value = 25
         )
     )
 
@@ -113,6 +122,10 @@ class LuaScriptConfigurationInputFactoryTest {
         assertSame(allTypesMetadata.config[3].name, enumInput.name)
         assertEquals("days", enumInput.value.value)  // Should use saved value
         assertEquals(2, enumInput.options.size)
+
+        val uintInput = createdInputs["uintConfig"] as LuaScriptConfigurationInput.UInt
+        assertSame(allTypesMetadata.config[4].name, uintInput.name)
+        assertEquals("25", uintInput.value.value.text)  // Should use saved value
 
         // CRITICAL: Ensure all sealed class types are tested
         // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in allTypesMetadata

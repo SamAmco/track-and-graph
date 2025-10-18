@@ -57,6 +57,11 @@ class LuaScriptConfigurationEncoderTest {
         value = mutableStateOf("hours")
     )
 
+    private val uintInput = LuaScriptConfigurationInput.UInt(
+        name = TranslatedString.Simple("UInt Config"),
+        value = mutableStateOf(TextFieldValue("42"))
+    )
+
     @Before
     fun setUp() {
         encoder = LuaScriptConfigurationEncoder()
@@ -81,14 +86,15 @@ class LuaScriptConfigurationEncoderTest {
             "textConfig" to textInput,
             "numberConfig" to numberInput,
             "checkboxConfig" to checkboxInput,
-            "enumConfig" to enumInput
+            "enumConfig" to enumInput,
+            "uintConfig" to uintInput
         )
 
         // When
         val result = encoder.encodeConfiguration(configuration)
 
         // Then - Verify all types are encoded correctly
-        assertEquals("Should produce four configuration values", 4, result.size)
+        assertEquals("Should produce five configuration values", 5, result.size)
         
         // Collect all encoded types
         val encodedTypes = result.map { it::class }.toSet()
@@ -125,5 +131,8 @@ class LuaScriptConfigurationEncoderTest {
 
         val enumResult = result.find { it.id == "enumConfig" } as LuaScriptConfigurationValue.Enum
         assertEquals("Enum value should be encoded correctly", "hours", enumResult.value)
+
+        val uintResult = result.find { it.id == "uintConfig" } as LuaScriptConfigurationValue.UInt
+        assertEquals("UInt value should be encoded correctly", 42, uintResult.value)
     }
 }
