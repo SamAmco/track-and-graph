@@ -171,11 +171,12 @@ end
 ---
 --- @since v5.1.0 (API level 1)
 --- @param period string: The period to calculate the end for (e.g., PERIOD.DAY, PERIOD.WEEK).
---- @param timestamp Timestamp: The timestamp to calculate the end of the period for.
+--- @param timestamp Timestamp|integer: The timestamp to calculate the end of the period for.
 --- @param zone_override? string: An optional timezone override. If not provided, the default timezone is used.
 --- @return Date: A date representing the end of the specified period with the time set to midnight.
 M.get_end_of_period = function(period, timestamp, zone_override)
-	local zone = zone_override or M.date().zone
+	local timestamp_zone = type(timestamp) == "table" and timestamp.zone or nil
+	local zone = zone_override or timestamp_zone or M.date().zone
 	local date = M.date(timestamp)
 	if period == M.PERIOD.DAY then
 		date = M.date(M.shift(date, M.PERIOD.DAY, 1))

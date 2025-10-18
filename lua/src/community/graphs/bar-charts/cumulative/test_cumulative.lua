@@ -12,27 +12,34 @@ M.test_cumulative_bar_chart = {
     from_now = "false",
   },
   sources = function()
-    local now = core.time().timestamp
+    local now_data = core.time()
+    local now = now_data.timestamp
+    local offset = now_data.offset
     return {
       source1 = {
         {
           timestamp = now - (DDAY * 1),
+          offset = offset,
           value = 5.0,
         },
         {
           timestamp = now - (DDAY * 2),
+          offset = offset,
           value = 4.0,
         },
         {
           timestamp = now - (DDAY * 3),
+          offset = offset,
           value = 3.0,
         },
         {
           timestamp = now - (DDAY * 4),
+          offset = offset,
           value = 2.0,
         },
         {
           timestamp = now - (DDAY * 5),
+          offset = offset,
           value = 1.0,
         },
       },
@@ -55,46 +62,56 @@ M.test_cumulative_bar_chart_with_different_labels = {
     from_now = "false",
   },
   sources = function()
-    local now = core.time().timestamp
+    local now_data = core.time()
+    local now = now_data.timestamp
+    local offset = now_data.offset
     return {
       source1 = {
         {
           timestamp = now - (DDAY * 0),
+          offset = offset,
           value = 11.0,
           label = "l2",
         },
         {
           timestamp = now - (DDAY * 1),
+          offset = offset,
           value = 10.0,
           label = "l1",
         },
         {
           timestamp = now - (DDAY * 1),
+          offset = offset,
           value = 8.0,
           label = "l2",
         },
         {
           timestamp = now - (DDAY * 2),
+          offset = offset,
           value = 5.0,
           label = "l1",
         },
         {
           timestamp = now - (DDAY * 2),
+          offset = offset,
           value = 3.0,
           label = "l1",
         },
         {
           timestamp = now - (DDAY * 2),
+          offset = offset,
           value = 1.0,
           label = "l2",
         },
         {
           timestamp = now - (DDAY * 3),
+          offset = offset,
           value = 2.0,
           label = "l2",
         },
         {
           timestamp = now - (DDAY * 3),
+          offset = offset,
           value = 1.0,
           label = "l2",
         },
@@ -153,15 +170,19 @@ M.test_using_from_now = {
     from_now = "true",
   },
   sources = function()
-    local now = core.time().timestamp
+    local now_data = core.time()
+    local now = now_data.timestamp
+    local offset = now_data.offset
     return {
       source1 = {
         {
           timestamp = now - (DDAY * 0.5),
+          offset = offset,
           value = 5.0,
         },
         {
           timestamp = now - (DDAY * 1.3),
+          offset = offset,
           value = 4.0,
         },
       },
