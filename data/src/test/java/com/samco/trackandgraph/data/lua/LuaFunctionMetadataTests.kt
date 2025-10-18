@@ -386,6 +386,12 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                 "de" to "Unbenutzt",
                 "es" to "No utilizado",
                 "fr" to "Inutilisé"
+            )),
+            "_test_category" to TranslatedString.Translations(mapOf(
+                "en" to "Test Category",
+                "de" to "Testkategorie",
+                "es" to "Categoría de prueba",
+                "fr" to "Catégorie de test"
             ))
         )
 
@@ -394,6 +400,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                 id = "comprehensive-function",
                 version = "2.1.0",
                 inputCount = 2,
+                categories = {"_test_category"},
                 title = "_comprehensive_title",
                 description = {
                     ["en"] = "A function that demonstrates all metadata fields",
@@ -477,10 +484,18 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
             assertEquals("_days", enumSpec.options[1].id)
             assertEquals("Days", (enumSpec.options[1].displayName as TranslatedString.Translations).values["en"])
 
-            // Test usedTranslations contains only what was looked up
+            // Test categories were parsed and hydrated
+            assertEquals("Should have 1 category", 1, metadata.categories.size)
+            assertTrue("Should contain _test_category", metadata.categories.containsKey("_test_category"))
+            val categoryTranslation = metadata.categories["_test_category"] as? TranslatedString.Translations
+            assertNotNull("Category should be translations", categoryTranslation)
+            assertEquals("Test Category", categoryTranslation!!.values["en"])
+
+            // Test usedTranslations contains only what was looked up (title, category, config name, 2 enum options)
             assertNotNull("usedTranslations should not be null", metadata.usedTranslations)
-            assertEquals("Should have tracked 4 translation lookups", 4, metadata.usedTranslations!!.size)
+            assertEquals("Should have tracked 5 translation lookups", 5, metadata.usedTranslations!!.size)
             assertTrue("Should contain _comprehensive_title", metadata.usedTranslations.containsKey("_comprehensive_title"))
+            assertTrue("Should contain _test_category", metadata.usedTranslations.containsKey("_test_category"))
             assertTrue("Should contain _config_name", metadata.usedTranslations.containsKey("_config_name"))
             assertTrue("Should contain _hours", metadata.usedTranslations.containsKey("_hours"))
             assertTrue("Should contain _days", metadata.usedTranslations.containsKey("_days"))

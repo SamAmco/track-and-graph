@@ -31,7 +31,6 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
 ) {
 
     companion object {
-        private const val DEFAULT_INPUT_COUNT = 1
         const val ID = "id"
         const val NAME = "name"
         const val CONFIG = "config"
@@ -42,6 +41,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         private const val TITLE = "title"
         private const val DESCRIPTION = "description"
         private const val DEFAULT = "default"
+        private const val CATEGORIES = "categories"
     }
 
     fun process(
@@ -70,6 +70,9 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         val versionValue = resolvedScript[VERSION]
         val inputCountValue = resolvedScript[INPUT_COUNT]
 
+        // Parse and hydrate categories
+        val categories = extractCategories(resolvedScript, translations, usedTranslations)
+
         return LuaFunctionMetadata(
             script = originalScript,
             id = if (!idValue.isstring()) null else idValue.tojstring(),
@@ -78,8 +81,46 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             description = translatedStringParser.parseWithLookup(resolvedScript[DESCRIPTION], translations, usedTranslations),
             inputCount = if (inputCountValue.isnil()) 1 else inputCountValue.checkint(),
             config = extractConfigs(resolvedScript, translations, usedTranslations),
+            categories = categories,
             usedTranslations = usedTranslations?.takeIf { it.isNotEmpty() }
         )
+    }
+
+    private fun extractCategories(
+        resolvedScript: LuaValue,
+        translations: LocalizationsTable?,
+        usedTranslations: MutableMap<String, TranslatedString>?
+    ): Map<String, TranslatedString> {
+        val categoriesArray = resolvedScript[CATEGORIES]
+        if (categoriesArray.isnil() || !categoriesArray.istable()) {
+            return emptyMap()
+        }
+
+        val categories = mutableMapOf<String, TranslatedString>()
+        val categoriesTable = categoriesArray.checktable()!!
+
+        var i = 1
+        while (true) {
+            val category = categoriesTable[i]
+            if (category.isnil()) break
+
+            if (category.isstring()) {
+                val categoryKey = category.checkjstring()!!
+                val categoryTranslation = translations?.get(categoryKey)
+
+                if (categoryTranslation != null) {
+                    // Track that this translation was used
+                    usedTranslations?.put(categoryKey, categoryTranslation)
+                    categories[categoryKey] = categoryTranslation
+                } else {
+                    // No translation found, use simple string
+                    categories[categoryKey] = TranslatedString.Simple(categoryKey)
+                }
+            }
+            i++
+        }
+
+        return categories
     }
 
     private fun extractConfigs(

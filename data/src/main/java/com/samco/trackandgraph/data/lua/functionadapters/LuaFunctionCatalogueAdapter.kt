@@ -39,7 +39,6 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
 
     companion object {
         private const val FUNCTIONS = "functions"
-        private const val CATEGORIES = "categories"
         private const val TRANSLATIONS = "translations"
         private const val VERSION = "version"
         private const val SCRIPT = "script"
@@ -67,11 +66,8 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
                 luaFunctionMetadataAdapter.process(resolvedScript, it.script, translations)
             }
 
-        val categories = getCatalogCategories(catalogue)
-
         return LuaFunctionCatalogue(
-            functions = functions,
-            categories = categories
+            functions = functions
         )
     }
 
@@ -158,27 +154,4 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
         return functions
     }
 
-    private fun getCatalogCategories(catalogue: LuaValue): Map<String, TranslatedString> {
-        val catalogueCategories = catalogue[CATEGORIES]
-        if (catalogueCategories.isnil() || !catalogueCategories.istable()) {
-            return emptyMap()
-        }
-
-        val categories = mutableMapOf<String, TranslatedString>()
-        val categoriesTable = catalogueCategories.checktable()!!
-
-        val keys = categoriesTable.keys()
-        for (key in keys) {
-            if (!key.isstring()) continue
-
-            val categoryId = key.checkjstring()!!
-            val translations = translatedStringParser.parse(categoriesTable[key])
-
-            if (translations != null) {
-                categories[categoryId] = translations
-            }
-        }
-
-        return categories
-    }
 }
