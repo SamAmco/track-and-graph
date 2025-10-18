@@ -8,7 +8,7 @@ return {
 	id = "time-between",
 	version = "1.0.0",
 	inputCount = 1,
-	categories = {"time"},
+	categories = {"_time"},
 	title = {
 		["en"] = "Time Between",
 		["de"] = "Zeit dazwischen",

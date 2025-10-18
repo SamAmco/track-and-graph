@@ -12,19 +12,8 @@ local traversal = require("tools.lib.file-traversal")
 
 -- Configuration
 local FUNCTIONS_DIR = "src/community/functions"
-local CATEGORIES_PATH = "src/community/function-categories.lua"
 local TRANSLATIONS_PATH = "src/community/shared-translations.lua"
 local CATALOG_PATH = "catalog/community-functions.lua"
-
--- Load categories
-local function load_categories()
-	local content = traversal.read_file(CATEGORIES_PATH)
-	local ok, categories = traversal.load_module(content, CATEGORIES_PATH)
-	if not ok then
-		error("Failed to load categories: " .. categories)
-	end
-	return categories
-end
 
 -- Load translations
 local function load_translations()
@@ -87,15 +76,15 @@ local function get_max_api_level()
 end
 
 -- Load and validate a single function
-local function load_and_validate_function(file_path, max_api_level, valid_categories, valid_translations)
+local function load_and_validate_function(file_path, max_api_level, valid_translations)
 	local content = traversal.read_file(file_path)
 	local ok, module = traversal.load_module(content, file_path)
 	if not ok or type(module) ~= "table" then
 		return false, module -- module contains error message
 	end
 
-	-- Validate structure (including categories and translations)
-	local valid, errors = validation.validate_function(module, file_path, valid_categories, valid_translations)
+	-- Validate structure (including translations)
+	local valid, errors = validation.validate_function(module, file_path, valid_translations)
 	if not valid then
 		return false, table.concat(errors, "\n")
 	end
@@ -135,7 +124,7 @@ local function count_table_items(tbl)
 end
 
 -- Load and validate all functions
-local function load_all_functions(max_api_level, categories, translations)
+local function load_all_functions(max_api_level, translations)
 	local files = traversal.find_scripts(traversal.SCRIPT_TYPE.FUNCTIONS)
 
 	if #files == 0 then
@@ -148,7 +137,7 @@ local function load_all_functions(max_api_level, categories, translations)
 	local all_errors = {}
 
 	for _, file_path in ipairs(files) do
-		local ok, func_or_err = load_and_validate_function(file_path, max_api_level, categories, translations)
+		local ok, func_or_err = load_and_validate_function(file_path, max_api_level, translations)
 		if ok then
 			table.insert(functions, func_or_err)
 			print("  ✓ " .. file_path)
@@ -176,43 +165,6 @@ local function validate_uniqueness(functions)
 		end
 		error("Uniqueness validation failed")
 	end
-end
-
--- Validate categories
-local function validate_categories(functions, categories)
-	print("\nValidating categories...")
-	local undefined_categories = validation.collect_undefined_categories(functions, categories)
-	local unused_categories = validation.collect_unused_categories(categories, functions)
-
-	if #undefined_categories > 0 then
-		print("\n✗ Undefined categories found:")
-		for _, category in ipairs(undefined_categories) do
-			print("  • " .. category)
-		end
-		error(
-			string.format(
-				"Category validation failed: %d undefined categor%s",
-				#undefined_categories,
-				#undefined_categories == 1 and "y" or "ies"
-			)
-		)
-	end
-
-	if #unused_categories > 0 then
-		print("\n✗ Unused categories found:")
-		for _, category in ipairs(unused_categories) do
-			print("  • " .. category)
-		end
-		error(
-			string.format(
-				"Category validation failed: %d unused categor%s (remove from function-categories.lua)",
-				#unused_categories,
-				#unused_categories == 1 and "y" or "ies"
-			)
-		)
-	end
-
-	print("✓ All categories valid")
 end
 
 -- Validate translations
@@ -298,7 +250,7 @@ local function detect_and_validate_changes(functions)
 end
 
 -- Build catalog structure
-local function build_catalog(functions, categories, translations)
+local function build_catalog(functions, translations)
 	local catalog_functions = {}
 	for _, func in ipairs(functions) do
 		catalog_functions[func.id] = {
@@ -310,7 +262,6 @@ local function build_catalog(functions, categories, translations)
 
 	return {
 		published_at = versioning.generate_timestamp(),
-		categories = categories,
 		translations = translations,
 		functions = catalog_functions,
 	}
@@ -323,23 +274,14 @@ local function main()
 	local max_api_level = get_max_api_level()
 	print("Max API level: " .. max_api_level)
 
-	print("\n==> Phase 2: Loading Categories and Translations")
-	local categories = load_categories()
-	print(
-		"Loaded "
-			.. count_table_items(categories)
-			.. " categor"
-			.. (count_table_items(categories) == 1 and "y" or "ies")
-	)
-
+	print("\n==> Phase 2: Loading Translations")
 	local translations = load_translations()
 	print("Loaded " .. count_table_items(translations) .. " translation key" .. (count_table_items(translations) == 1 and "" or "s"))
 
 	print("\n==> Phase 3: Loading Functions")
-	local functions = load_all_functions(max_api_level, categories, translations)
+	local functions = load_all_functions(max_api_level, translations)
 
 	validate_uniqueness(functions)
-	validate_categories(functions, categories)
 	validate_translations(functions, translations)
 
 	print("\n==> Phase 4: Change Detection")
@@ -356,7 +298,7 @@ local function main()
 
 	print("Building new catalog: " .. reason)
 
-	local catalog = build_catalog(functions, categories, translations)
+	local catalog = build_catalog(functions, translations)
 
 	-- Create catalog directory if it doesn't exist
 	os.execute("mkdir -p catalog")

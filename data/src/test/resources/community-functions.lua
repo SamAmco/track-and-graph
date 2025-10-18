@@ -1,24 +1,4 @@
 return {
-  categories={
-    arithmetic={
-      de="Arithmetik",
-      en="Arithmetic",
-      es="Aritmética",
-      fr="Arithmétique"
-    },
-    filter={
-      de="Filter",
-      en="Filter",
-      es="Filtro",
-      fr="Filtre"
-    },
-    transform={
-      de="Transformieren",
-      en="Transform",
-      es="Transformar",
-      fr="Transformer"
-    }
-  },
   functions={
     {
       id="filter-by-label",

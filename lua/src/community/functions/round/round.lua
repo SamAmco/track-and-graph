@@ -6,7 +6,7 @@ return {
 	id = "round",
 	version = "1.0.0",
 	inputCount = 1,
-	categories = {"arithmetic"},
+	categories = {"_arithmetic"},
 	title = {
 		["en"] = "Round",
 		["de"] = "Runden",

@@ -88,6 +88,12 @@ data class LuaFunctionMetadata(
     val inputCount: Int,
     val config: List<LuaFunctionConfigSpec>,
     /**
+     * Map of category IDs to their translated names.
+     * Categories are hydrated from the translations table when the function is parsed.
+     * They will also be included in the usedTranslations
+     */
+    val categories: Map<String, TranslatedString> = emptyMap(),
+    /**
      * Map of translation keys to their translated strings that were actually used during parsing.
      * Only includes translations that were looked up (not inline translations in the script).
      * Null if no translations were used.

@@ -17,9 +17,8 @@
 package com.samco.trackandgraph.data.lua.dto
 
 /**
- * Represents a Lua function catalogue containing functions and category definitions
+ * Represents a Lua function catalogue containing functions
  */
 data class LuaFunctionCatalogue(
     val functions: List<LuaFunctionMetadata>,
-    val categories: Map<String, TranslatedString>,
 )

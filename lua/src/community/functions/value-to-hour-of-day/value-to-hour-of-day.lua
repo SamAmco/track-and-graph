@@ -8,7 +8,7 @@ return {
 	id = "value-to-hour-of-day",
 	version = "1.0.0",
 	inputCount = 1,
-	categories = {"time"},
+	categories = {"_time"},
 	title = {
 		["en"] = "Value to Hour (0-23)",
 		["de"] = "Wert zu Stunde (0-23)",

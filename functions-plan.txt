@@ -138,8 +138,8 @@ Prebuilt Lua function nodes:
   - Threshold (duration)
   - Filter items without pairs (boolean)
 
-- Time cutoff from timestamp
-  - Cutoff time (timestamp)
+- Time cutoff from instant
+  - Cutoff time (instant)
 - Time cutoff from duration ago
   - Cutoff duration (duration)
 - Time cutoff from period ago
@@ -241,16 +241,16 @@ A lua function file returns an object that contains:
     - code name
     - display name map of language code to translation
     - type:
-      - boolean
+      x boolean
       - duration i.e. h:m:s
-      - duration enum
-      - period enum
-      - weekday enum
+      x duration enum
+      x period enum
+      x weekday enum
       - local time
-      - number
+      x number
       - uint
-      - string
-      - timestamp (i.e. local time/date input, and timezone enum)
+      x string
+      - instant (i.e. local time/date input, and timezone enum)
 - A generator function that generates data points via yield and takes:
   - a list of data sources 
   - a configuration object 

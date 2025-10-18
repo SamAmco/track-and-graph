@@ -108,6 +108,34 @@ local translations = {
 		["es"] = "Comparar por",
 		["fr"] = "Comparer par",
 	},
+	{
+		_id = "_arithmetic",
+		["en"] = "Arithmetic",
+		["de"] = "Arithmetik",
+		["es"] = "Aritmética",
+		["fr"] = "Arithmétique",
+	},
+	{
+		_id = "_filter",
+		["en"] = "Filter",
+		["de"] = "Filter",
+		["es"] = "Filtro",
+		["fr"] = "Filtre",
+	},
+	{
+		_id = "_transform",
+		["en"] = "Transform",
+		["de"] = "Transformieren",
+		["es"] = "Transformar",
+		["fr"] = "Transformer",
+	},
+	{
+		_id = "_time",
+		["en"] = "Time",
+		["de"] = "Zeit",
+		["es"] = "Tiempo",
+		["fr"] = "Temps",
+	},
 }
 
 -- Validation: ensure all entries have all 4 required languages

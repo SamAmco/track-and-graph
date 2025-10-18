@@ -6,7 +6,7 @@ return {
 	id = "ceil",
 	version = "1.0.0",
 	inputCount = 1,
-	categories = {"arithmetic"},
+	categories = {"_arithmetic"},
 	title = {
 		["en"] = "Ceiling",
 		["de"] = "Aufrunden",

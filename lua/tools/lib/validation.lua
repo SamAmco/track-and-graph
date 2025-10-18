@@ -112,11 +112,10 @@ end
 --- Validate a function module structure
 --- @param module table: The function module to validate
 --- @param file_path string: File path for error messages
---- @param valid_categories table?: Optional table of valid category IDs (if provided, validates categories exist)
 --- @param valid_translations table?: Optional table of valid translation keys (if provided, validates translation keys exist)
 --- @return boolean: true if valid
 --- @return table: Array of error messages
-function M.validate_function(module, file_path, valid_categories, valid_translations)
+function M.validate_function(module, file_path, valid_translations)
 	local errors = {}
 
 	-- Check module is a table
@@ -161,7 +160,7 @@ function M.validate_function(module, file_path, valid_categories, valid_translat
 		table.insert(errors, file_path .. " - 'generator' must be a function, got " .. type(module.generator))
 	end
 
-	-- Validate categories (required, must be non-empty array)
+	-- Validate categories (required, must be non-empty array of strings)
 	if type(module.categories) ~= "table" then
 		table.insert(errors, file_path .. " - 'categories' must be a table, got " .. type(module.categories))
 	elseif #module.categories == 0 then
@@ -172,8 +171,6 @@ function M.validate_function(module, file_path, valid_categories, valid_translat
 			if type(category) ~= "string" then
 				table.insert(errors, string.format("%s - categories[%d] must be a string, got %s",
 					file_path, i, type(category)))
-			elseif valid_categories and not valid_categories[category] then
-				table.insert(errors, string.format("%s - undefined category '%s'", file_path, category))
 			end
 		end
 	end
@@ -261,57 +258,6 @@ function M.check_uniqueness(functions)
 	return #errors == 0, errors
 end
 
---- Collect all undefined categories across functions
---- @param functions table: Array of function modules
---- @param valid_categories table: Table of valid category IDs
---- @return table: Array of undefined category IDs (unique, sorted)
-function M.collect_undefined_categories(functions, valid_categories)
-	local undefined = {}
-	local seen = {}
-
-	for _, func in ipairs(functions) do
-		if func.categories then
-			for _, category in ipairs(func.categories) do
-				if not valid_categories[category] and not seen[category] then
-					table.insert(undefined, category)
-					seen[category] = true
-				end
-			end
-		end
-	end
-
-	table.sort(undefined)
-	return undefined
-end
-
---- Collect all unused categories
---- @param valid_categories table: Table of valid category IDs
---- @param functions table: Array of function modules
---- @return table: Array of unused category IDs (sorted)
-function M.collect_unused_categories(valid_categories, functions)
-	local used = {}
-
-	-- Collect all used categories
-	for _, func in ipairs(functions) do
-		if func.categories then
-			for _, category in ipairs(func.categories) do
-				used[category] = true
-			end
-		end
-	end
-
-	-- Find unused
-	local unused = {}
-	for category_id in pairs(valid_categories) do
-		if not used[category_id] then
-			table.insert(unused, category_id)
-		end
-	end
-
-	table.sort(unused)
-	return unused
-end
-
 --- Collect all undefined translation keys across functions
 --- @param functions table: Array of function modules
 --- @param valid_translations table: Table of valid translation keys
@@ -334,6 +280,13 @@ function M.collect_undefined_translations(functions, valid_translations)
 
 		-- Check description
 		check_translation(func.description)
+
+		-- Check categories
+		if func.categories then
+			for _, category in ipairs(func.categories) do
+				check_translation(category)
+			end
+		end
 
 		-- Check config names and enum options
 		if func.config then
@@ -374,6 +327,13 @@ function M.collect_unused_translations(valid_translations, functions)
 
 		-- Check description
 		mark_used(func.description)
+
+		-- Check categories
+		if func.categories then
+			for _, category in ipairs(func.categories) do
+				mark_used(category)
+			end
+		end
 
 		-- Check config names and enum options
 		if func.config then

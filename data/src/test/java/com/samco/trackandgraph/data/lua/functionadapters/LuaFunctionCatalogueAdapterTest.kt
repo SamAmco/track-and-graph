@@ -164,9 +164,6 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
             "Override Label",
             setOf("new_label")
         )
-
-        // Verify categories are present
-        assertTrue("Catalogue should have categories", catalogue.categories.isNotEmpty())
     }
 
     @Test
@@ -177,11 +174,6 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
         // Inline catalog with 4 functions testing all filtering scenarios
         val catalogueScript = """
             return {
-                categories = {
-                    test = {
-                        en = "Test Category"
-                    }
-                },
                 functions = {
                     ["func-deprecated-at-2"] = {
                         version = "1.0.0",
@@ -243,11 +235,6 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
                         de = "Wochen",
                         es = "Semanas",
                         fr = "Semaines"
-                    }
-                },
-                categories = {
-                    test = {
-                        en = "Test Category"
                     }
                 },
                 functions = {

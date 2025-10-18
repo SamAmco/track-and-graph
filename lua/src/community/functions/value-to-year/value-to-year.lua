@@ -8,7 +8,7 @@ return {
 	id = "value-to-year",
 	version = "1.0.0",
 	inputCount = 1,
-	categories = {"time"},
+	categories = {"_time"},
 	title = {
 		["en"] = "Value to Year",
 		["de"] = "Wert zu Jahr",
