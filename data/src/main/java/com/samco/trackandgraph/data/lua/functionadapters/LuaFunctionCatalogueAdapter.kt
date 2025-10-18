@@ -107,17 +107,18 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
         val functions = mutableListOf<CatalogueFunction>()
 
         val catalogueTable = catalogueFunctions.checktable()!!
-        
-        // Use pairs() to iterate over the table properly
+
+        // Iterate over string keys (map format: functionId -> function data)
         val keys = catalogueTable.keys()
         for (key in keys) {
-            // Skip non-numeric keys for array-like iteration
-            if (!key.isnumber()) continue
-            
+            // Skip non-string keys for map-like iteration
+            if (!key.isstring()) continue
+
+            val functionId = key.checkjstring()!!
             val catalogueFunction = catalogueTable[key]
 
             if (catalogueFunction.isnil()) {
-                Timber.w("Catalogue at ${key.toint()} was nil")
+                Timber.w("Catalogue function '$functionId' was nil")
                 continue
             }
 
@@ -126,12 +127,12 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
             val catalogueDeprecated = catalogueFunction[DEPRECATED]
 
             if (!catalogueVersion.isstring()) {
-                Timber.w("Catalogue at ${key.toint()} contained a missing or invalid version")
+                Timber.w("Catalogue function '$functionId' contained a missing or invalid version")
                 continue
             }
 
             if (!catalogueScript.isstring()) {
-                Timber.w("Catalogue at ${key.toint()} contained a missing or invalid script")
+                Timber.w("Catalogue function '$functionId' contained a missing or invalid script")
                 continue
             }
 
@@ -141,7 +142,7 @@ internal class LuaFunctionCatalogueAdapter @Inject constructor(
             } else if (catalogueDeprecated.isnumber()) {
                 catalogueDeprecated.toint()
             } else {
-                Timber.w("Catalogue at ${key.toint()} contained invalid deprecated field (not a number)")
+                Timber.w("Catalogue function '$functionId' contained invalid deprecated field (not a number)")
                 null
             }
 

@@ -301,16 +301,12 @@ end
 local function build_catalog(functions, categories, translations)
 	local catalog_functions = {}
 	for _, func in ipairs(functions) do
-		table.insert(catalog_functions, {
-			id = func.id,
+		catalog_functions[func.id] = {
 			version = func.version,
 			script = func.script,
 			deprecated = func.deprecated,
-		})
+		}
 	end
-	table.sort(catalog_functions, function(a, b)
-		return a.id < b.id
-	end)
 
 	return {
 		published_at = versioning.generate_timestamp(),
@@ -380,7 +376,7 @@ local function main()
 
 	print("\n✓ Successfully published catalog")
 	print("  Published at: " .. catalog.published_at)
-	print("  Total functions: " .. #catalog.functions)
+	print("  Total functions: " .. count_table_items(catalog.functions))
 	print("  Output: " .. CATALOG_PATH)
 end
 
