@@ -25,7 +25,9 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import io.github.z4kn4fein.semver.toVersion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -403,6 +405,15 @@ class FunctionGraphBuilderTest {
                 id = 5,
                 script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1].dp())\nend",
                 inputConnectorCount = 2,
+                metadata = LuaFunctionMetadata(
+                    script = "",
+                    id = "function-id",
+                    version = "1.0.0".toVersion(),
+                    title = null,
+                    description = null,
+                    inputCount = 2,
+                    config = emptyList(),
+                ),
                 configuration = emptyMap(),
             ),
             Node.Output(
@@ -468,6 +479,8 @@ class FunctionGraphBuilderTest {
                     id = 5,
                     script = "-- Test Lua script\nreturn function(sources)\n  yield(sources[1].dp())\nend",
                     inputConnectorCount = 2,
+                    catalogFunctionId = "function-id",
+                    catalogVersion = "1.0.0".toVersion(),
                     configuration = emptyList(),
                     dependencies = emptyList()
                 )

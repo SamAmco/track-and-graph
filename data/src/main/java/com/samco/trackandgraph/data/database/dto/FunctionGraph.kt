@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.data.database.dto
 
+import io.github.z4kn4fein.semver.Version
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -126,6 +127,8 @@ sealed class FunctionGraphNode {
      * @param inputConnectorCount Number of input connectors this node has
      * @param configuration List of user configuration input values for this script
      * @param translations Map of translation keys to translated strings (for hydration), null if not from catalog
+     * @param catalogFunctionId The ID of the catalog function this node was created from, null if custom script
+     * @param catalogVersion The version of the catalog function, null if custom script
      * @param dependencies List of nodes this node depends on
      */
     @Serializable
@@ -138,6 +141,8 @@ sealed class FunctionGraphNode {
         val inputConnectorCount: Int,
         val configuration: List<LuaScriptConfigurationValue> = emptyList(),
         val translations: Map<String, SerializableTranslatedString>? = null,
+        val catalogFunctionId: String? = null,
+        val catalogVersion: Version? = null,
         override val dependencies: List<NodeDependency>
     ) : FunctionGraphNode()
     

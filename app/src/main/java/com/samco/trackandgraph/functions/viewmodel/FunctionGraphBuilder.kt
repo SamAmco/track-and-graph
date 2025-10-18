@@ -163,6 +163,8 @@ internal class FunctionGraphBuilder @Inject constructor(
 
         // Extract and convert used translations from metadata
         val translations = node.metadata?.usedTranslations?.toSerializable()
+        val catalogFunctionId = node.metadata?.id
+        val catalogVersion = node.metadata?.version
 
         return FunctionGraphNode.LuaScriptNode(
             x = position.x,
@@ -172,6 +174,8 @@ internal class FunctionGraphBuilder @Inject constructor(
             inputConnectorCount = node.inputConnectorCount,
             configuration = configurationEncoder.encodeConfiguration(node.configuration),
             translations = translations,
+            catalogFunctionId = catalogFunctionId,
+            catalogVersion = catalogVersion,
             dependencies = dependencies
         )
     }
