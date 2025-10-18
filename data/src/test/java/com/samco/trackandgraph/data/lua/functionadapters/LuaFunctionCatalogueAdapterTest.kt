@@ -183,25 +183,21 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
                     }
                 },
                 functions = {
-                    {
-                        id = "func-deprecated-at-2",
+                    ["func-deprecated-at-2"] = {
                         version = "1.0.0",
                         deprecated = 2,
                         script = "INVALID SYNTAX - should never be parsed (deprecated at API level 2)"
                     },
-                    {
-                        id = "func-deprecated-at-1",
+                    ["func-deprecated-at-1"] = {
                         version = "1.0.0",
                         deprecated = 1,
                         script = "INVALID SYNTAX - should never be parsed (deprecated at API level 1)"
                     },
-                    {
-                        id = "func-version-2",
+                    ["func-version-2"] = {
                         version = "2.0.0",
                         script = "return { id='func-version-2', version='2.0.0', inputCount=1, categories={'test'}, title={en='Test'}, description={en='Test'}, config={}, generator=function(s)return function()return nil end end }"
                     },
-                    {
-                        id = "func-version-3",
+                    ["func-version-3"] = {
                         version = "3.0.0",
                         script = "INVALID SYNTAX - should never be parsed (requires API level 3)"
                     }
@@ -255,8 +251,7 @@ internal class LuaFunctionCatalogueAdapterTest : LuaEngineImplTest() {
                     }
                 },
                 functions = {
-                    {
-                        id = "test-enum-function",
+                    ["test-enum-function"] = {
                         version = "1.0.0",
                         script = [[
 return {
