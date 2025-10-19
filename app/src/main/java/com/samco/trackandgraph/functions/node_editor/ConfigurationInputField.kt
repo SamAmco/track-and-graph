@@ -20,14 +20,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,14 +39,19 @@ import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.DurationInput
+import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.resolve
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
+import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun ConfigurationInputField(
@@ -62,6 +70,7 @@ fun ConfigurationInputField(
         is LuaScriptConfigurationInput.Enum -> EnumDropdownField(input)
         is LuaScriptConfigurationInput.UInt -> UIntTextField(focusManager, input)
         is LuaScriptConfigurationInput.Duration -> DurationField(focusManager, input)
+        is LuaScriptConfigurationInput.LocalTime -> LocalTimeField(input)
     }
 }
 
@@ -160,6 +169,44 @@ private fun DurationField(
     )
 }
 
+@Composable
+private fun LocalTimeField(
+    input: LuaScriptConfigurationInput.LocalTime
+) = Column {
+
+    val previewMode = LocalInspectionMode.current
+
+    val now = remember(input) {
+        if (previewMode) {
+            OffsetDateTime.parse("2023-06-15T14:30:00+01:00")
+        } else {
+            OffsetDateTime.now()
+        }
+    }
+
+    input.name.resolve()?.let {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = halfDialogInputSpacing),
+            text = it,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+    HalfDialogInputSpacing()
+    TimeButton(
+        modifier = Modifier
+            .widthIn(min = 100.dp)
+            .align(Alignment.CenterHorizontally),
+        dateTime = now
+            .withHour(input.time.value.hour.coerceIn(0, 23))
+            .withMinute(input.time.value.minute.coerceIn(0, 59)),
+        onTimeSelected = { selectedTime ->
+            input.time.value = selectedTime
+        }
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -248,6 +295,20 @@ private fun ConfigurationInputFieldDurationPreview() {
                         setDurationFromDouble(5430.0) // 1h 30m 30s
                     }
                 }
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ConfigurationInputFieldLocalTimePreview() {
+    TnGComposeTheme {
+        ConfigurationInputField(
+            focusManager = LocalFocusManager.current,
+            input = LuaScriptConfigurationInput.LocalTime(
+                name = TranslatedString.Simple("Sample Time Parameter"),
+                time = remember { mutableStateOf(SelectedTime(14, 30)) }
             )
         )
     }

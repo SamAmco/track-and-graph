@@ -69,7 +69,12 @@ class LuaScriptConfigurationInputFactoryTest {
             LuaFunctionConfigSpec.Duration(
                 id = "durationConfig",
                 name = TranslatedString.Simple("Duration Configuration"),
-                defaultValue = 3600.0
+                defaultValueSeconds = 3600.0  // Stored as seconds
+            ),
+            LuaFunctionConfigSpec.LocalTime(
+                id = "localtimeConfig",
+                name = TranslatedString.Simple("LocalTime Configuration"),
+                defaultValueMinutes = 930  // Stored as minutes (15.5 hours)
             )
         ),
         version = Version(1, 0, 0),
@@ -100,7 +105,11 @@ class LuaScriptConfigurationInputFactoryTest {
         ),
         LuaScriptConfigurationValue.Duration(
             id = "durationConfig",
-            value = 7200.0
+            seconds = 7200.0
+        ),
+        LuaScriptConfigurationValue.LocalTime(
+            id = "localtimeConfig",
+            minutes = 930
         )
     )
 
@@ -139,6 +148,11 @@ class LuaScriptConfigurationInputFactoryTest {
         val durationInput = createdInputs["durationConfig"] as LuaScriptConfigurationInput.Duration
         assertSame(allTypesMetadata.config[5].name, durationInput.name)
         assertEquals(7200.0, durationInput.viewModel.getDurationAsDouble(), 0.001)  // Should use saved value
+
+        val localtimeInput = createdInputs["localtimeConfig"] as LuaScriptConfigurationInput.LocalTime
+        assertSame(allTypesMetadata.config[6].name, localtimeInput.name)
+        assertEquals(15, localtimeInput.time.value.hour)  // 930 minutes = 15 hours 30 minutes
+        assertEquals(30, localtimeInput.time.value.minute)
 
         // CRITICAL: Ensure all sealed class types are tested
         // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in allTypesMetadata

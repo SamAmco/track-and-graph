@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -68,6 +69,11 @@ class LuaScriptConfigurationEncoderTest {
         viewModel = DurationInputViewModelImpl().apply { setDurationFromDouble(3600.0) }
     )
 
+    private val localtimeInput = LuaScriptConfigurationInput.LocalTime(
+        name = TranslatedString.Simple("LocalTime Config"),
+        time = mutableStateOf(SelectedTime(14, 30))
+    )
+
     @Before
     fun setUp() {
         encoder = LuaScriptConfigurationEncoder()
@@ -94,14 +100,15 @@ class LuaScriptConfigurationEncoderTest {
             "checkboxConfig" to checkboxInput,
             "enumConfig" to enumInput,
             "uintConfig" to uintInput,
-            "durationConfig" to durationInput
+            "durationConfig" to durationInput,
+            "localtimeConfig" to localtimeInput
         )
 
         // When
         val result = encoder.encodeConfiguration(configuration)
 
         // Then - Verify all types are encoded correctly
-        assertEquals("Should produce six configuration values", 6, result.size)
+        assertEquals("Should produce seven configuration values", 7, result.size)
         
         // Collect all encoded types
         val encodedTypes = result.map { it::class }.toSet()
@@ -143,6 +150,9 @@ class LuaScriptConfigurationEncoderTest {
         assertEquals("UInt value should be encoded correctly", 42, uintResult.value)
 
         val durationResult = result.find { it.id == "durationConfig" } as LuaScriptConfigurationValue.Duration
-        assertEquals("Duration value should be encoded correctly", 3600.0, durationResult.value, 0.001)
+        assertEquals("Duration value should be encoded correctly", 3600.0, durationResult.seconds, 0.001)
+
+        val localtimeResult = result.find { it.id == "localtimeConfig" } as LuaScriptConfigurationValue.LocalTime
+        assertEquals("LocalTime value should be encoded correctly", 870, localtimeResult.minutes)  // 14*60+30
     }
 }

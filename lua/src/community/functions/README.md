@@ -320,15 +320,38 @@ config.enum { id = "my_enum", name = {...}, options = {"_opt1", "_opt2"}, defaul
 config.uint { id = "my_uint", name = {...}, default = 42 }
 ```
 
+**duration**: Time duration in milliseconds (compatible with `core.DURATION` enum)
+```lua
+local core = require("tng.core")
+config.duration { id = "my_duration", name = {...}, default = core.DURATION.HOUR }
+-- User sees hours:minutes:seconds UI, but Lua receives milliseconds
+-- Example: 1 hour = 3600000 milliseconds
+```
+
+**localtime**: Time of day in milliseconds since midnight (0-86399999, compatible with `core.DURATION` enum)
+```lua
+local core = require("tng.core")
+config.localtime { id = "wake_time", name = {...}, default = 8 * core.DURATION.HOUR }
+-- User sees time picker UI, but Lua receives milliseconds since midnight
+-- Example: 14:30 = 14.5 * DURATION.HOUR = 52200000 milliseconds
+```
+
 ### Accessing Config Values in Generator
 
 ```lua
 generator = function(source, config)
+    local core = require("tng.core")
+
     local text_val = config and config.my_text
     local number_val = config and config.my_number or 1.0
     local checkbox_val = config and config.my_checkbox or false
     local enum_val = config and config.my_enum
     local uint_val = config and config.my_uint or 1
+    local duration_val = config and config.my_duration or core.DURATION.HOUR
+    local time_val = config and config.wake_time or (12 * core.DURATION.HOUR)
+
+    -- All time values are in milliseconds, compatible with core.DURATION
+    -- Example: config.my_duration - core.DURATION.MINUTE * 30
 
     -- Use values...
 end
@@ -336,13 +359,17 @@ end
 
 ### Config in Tests
 
-Pass actual Lua types (not strings):
+Pass actual Lua types (not strings). Time-based configs use milliseconds:
 ```lua
+local core = require("tng.core")
+
 config = {
     my_text = "test value",
     my_number = 42.0,
     my_checkbox = true,
     my_enum = "_hours",
     my_uint = 10,
+    my_duration = core.DURATION.HOUR,  -- 3600000 milliseconds
+    wake_time = 8 * core.DURATION.HOUR + 30 * core.DURATION.MINUTE,  -- 8:30 AM
 }
 ```

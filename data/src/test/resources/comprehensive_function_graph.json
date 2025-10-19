@@ -57,7 +57,12 @@
                 {
                     "configType": "Duration",
                     "id": "durationConfig",
-                    "value": 3600.0
+                    "seconds": 3600.0
+                },
+                {
+                    "configType": "LocalTime",
+                    "id": "localtimeConfig",
+                    "minutes": 870
                 }
             ],
             "translations": {

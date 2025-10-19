@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
+import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import javax.inject.Inject
 
@@ -44,6 +45,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.Enum -> createEnumInput(config, savedValue)
             is LuaFunctionConfigSpec.UInt -> createUIntInput(config, savedValue)
             is LuaFunctionConfigSpec.Duration -> createDurationInput(config, savedValue)
+            is LuaFunctionConfigSpec.LocalTime -> createLocalTimeInput(config, savedValue)
         }
     }
 
@@ -61,6 +63,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.Enum -> existingInput is LuaScriptConfigurationInput.Enum
             is LuaFunctionConfigSpec.UInt -> existingInput is LuaScriptConfigurationInput.UInt
             is LuaFunctionConfigSpec.Duration -> existingInput is LuaScriptConfigurationInput.Duration
+            is LuaFunctionConfigSpec.LocalTime -> existingInput is LuaScriptConfigurationInput.LocalTime
         }
     }
 
@@ -150,14 +153,32 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
         savedValue: LuaScriptConfigurationValue?
     ): LuaScriptConfigurationInput.Duration {
         val durationValue = savedValue as? LuaScriptConfigurationValue.Duration
-        val initialValue = durationValue?.value ?: config.defaultValue ?: 0.0
+        // Both savedValue and config.defaultValue are in seconds
+        val seconds = durationValue?.seconds ?: config.defaultValueSeconds ?: 0.0
 
         val viewModel = DurationInputViewModelImpl()
-        viewModel.setDurationFromDouble(initialValue)
+        viewModel.setDurationFromDouble(seconds)  // ViewModel uses seconds
 
         return LuaScriptConfigurationInput.Duration(
             name = config.name,
             viewModel = viewModel
+        )
+    }
+
+    private fun createLocalTimeInput(
+        config: LuaFunctionConfigSpec.LocalTime,
+        savedValue: LuaScriptConfigurationValue?
+    ): LuaScriptConfigurationInput.LocalTime {
+        val localTimeValue = savedValue as? LuaScriptConfigurationValue.LocalTime
+        // Both savedValue and config.defaultValue are in minutes since midnight (0-1439)
+        val minutesSinceMidnight = localTimeValue?.minutes ?: config.defaultValueMinutes ?: 720 // Default 12:00
+
+        val hour = minutesSinceMidnight / 60
+        val minute = minutesSinceMidnight % 60
+
+        return LuaScriptConfigurationInput.LocalTime(
+            name = config.name,
+            time = mutableStateOf(SelectedTime(hour, minute))
         )
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 
 /**
@@ -77,5 +78,13 @@ sealed class LuaScriptConfigurationInput {
     data class Duration(
         override val name: TranslatedString?,
         val viewModel: DurationInputViewModel
+    ) : LuaScriptConfigurationInput()
+
+    /**
+     * Local time input configuration with mutable state for hour and minute
+     */
+    data class LocalTime(
+        override val name: TranslatedString?,
+        val time: MutableState<SelectedTime> = mutableStateOf(SelectedTime(0, 0))
     ) : LuaScriptConfigurationInput()
 }

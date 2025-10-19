@@ -65,12 +65,24 @@ function M.uint(spec)
 end
 
 --- Create a duration configuration item
---- @param spec table Configuration specification with id, name, and optional default (in seconds)
+--- @param spec table Configuration specification with id, name, and optional default (in milliseconds, compatible with DURATION enum)
 --- @return table Configuration item ready for use in config array
 function M.duration(spec)
 	return {
 		id = spec.id,
 		type = "duration",
+		name = spec.name,
+		default = spec.default,
+	}
+end
+
+--- Create a local time configuration item
+--- @param spec table Configuration specification with id, name, and optional default (milliseconds since midnight, 0-86399999, compatible with DURATION enum)
+--- @return table Configuration item ready for use in config array
+function M.localtime(spec)
+	return {
+		id = spec.id,
+		type = "localtime",
 		name = spec.name,
 		default = spec.default,
 	}

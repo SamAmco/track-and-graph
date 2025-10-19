@@ -1,5 +1,5 @@
 -- Example function demonstrating all available configuration types
--- This function showcases text, number, checkbox, enum, uint, and duration inputs
+-- This function showcases text, number, checkbox, enum, uint, duration, and localtime inputs
 
 local tng_config = require("tng.config")
 local text = tng_config.text
@@ -8,6 +8,7 @@ local checkbox = tng_config.checkbox
 local enum = tng_config.enum
 local uint = tng_config.uint
 local duration = tng_config.duration
+local localtime = tng_config.localtime
 
 return {
 	id = "a1-test",
@@ -22,13 +23,13 @@ return {
 	},
 	description = {
 		["en"] =
-		"Demonstrates all available configuration input types: text, number, checkbox, enum, uint, and duration. This function passes through all data points unchanged.",
+		"Demonstrates all available configuration input types: text, number, checkbox, enum, uint, duration, and localtime. This function passes through all data points unchanged.",
 		["de"] =
-		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung, uint und Dauer. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
+		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung, uint, Dauer und Ortszeit. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
 		["es"] =
-		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración, uint y duración. Esta función pasa todos los puntos de datos sin cambios.",
+		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración, uint, duración y hora local. Esta función pasa todos los puntos de datos sin cambios.",
 		["fr"] =
-		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération, uint et durée. Cette fonction transmet tous les points de données inchangés.",
+		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération, uint, durée et heure locale. Cette fonction transmet tous les points de données inchangés.",
 	},
 	config = {
 		text {
@@ -90,7 +91,17 @@ return {
 				["es"] = "Entrada de duración",
 				["fr"] = "Saisie de durée",
 			},
-			default = 3600, -- 1 hour in seconds
+			default = 3600000, -- 1 hour (DURATION.HOUR)
+		},
+		localtime {
+			id = "localtime_example",
+			name = {
+				["en"] = "Time of Day Input",
+				["de"] = "Tageszeiteingabe",
+				["es"] = "Entrada de hora del día",
+				["fr"] = "Saisie de l'heure de la journée",
+			},
+			default = 52200000, -- 14:30 (2:30 PM) = 14.5 hours * DURATION.HOUR
 		},
 	},
 
@@ -102,6 +113,7 @@ return {
 		local enum_val = config and config.enum_example
 		local uint_val = config and config.uint_example
 		local duration_val = config and config.duration_example
+		local localtime_val = config and config.localtime_example
 
 		-- Pass through all data points unchanged
 		return function()

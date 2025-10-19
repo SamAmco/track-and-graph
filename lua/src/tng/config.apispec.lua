@@ -8,4 +8,5 @@ return {
 	enum = 1,
 	uint = 1,
 	duration = 1,
+	localtime = 1,
 }
