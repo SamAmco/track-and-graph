@@ -1,6 +1,10 @@
 -- Example Lua Function with Input Count and Configuration
 -- This function filters data points by label
 
+local tng_config = require("tng.config")
+local text = tng_config.text
+local checkbox = tng_config.checkbox
+
 local function match(data_point, filter_label, case_sensitive, match_exactly)
     if filter_label == nil then
         return true
@@ -67,9 +71,8 @@ Configuration:
 • Inverser: Conserver les points de données qui NE correspondent PAS (par défaut: false)]]
     },
     config = {
-        {
+        text {
             id = "filter_label",
-            type = "text",
             name = {
                 ["en"] = "Filter Label",
                 ["de"] = "Filter-Label",
@@ -77,9 +80,8 @@ Configuration:
                 ["fr"] = "Filtrer l'Étiquette"
             }
         },
-        {
+        checkbox {
             id = "case_sensitive",
-            type = "checkbox",
             name = {
                 ["en"] = "Case Sensitive",
                 ["de"] = "Groß-/Kleinschreibung beachten",
@@ -87,9 +89,8 @@ Configuration:
                 ["fr"] = "Sensible à la Casse"
             }
         },
-        {
+        checkbox {
             id = "match_exactly",
-            type = "checkbox",
             name = {
                 ["en"] = "Match Exactly",
                 ["de"] = "Exakt übereinstimmen",
@@ -97,9 +98,8 @@ Configuration:
                 ["fr"] = "Correspondance Exacte"
             }
         },
-        {
+        checkbox {
             id = "invert",
-            type = "checkbox",
             name = {
                 ["en"] = "Invert",
                 ["de"] = "Invertieren",

@@ -1,6 +1,8 @@
 -- Lua Function to override the value of all data points with a configurable number
 -- This function sets all incoming data point values to a specified value
 
+local number = require("tng.config").number
+
 return {
     -- Configuration metadata
     id = "override-value",
@@ -20,9 +22,8 @@ return {
         ["fr"] = "Définit toutes les valeurs de points de données entrantes sur une valeur spécifiée",
     },
     config = {
-        {
+        number {
             id = "new_value",
-            type = "number",
             name = {
                 ["en"] = "New Value",
                 ["de"] = "Neuer Wert",

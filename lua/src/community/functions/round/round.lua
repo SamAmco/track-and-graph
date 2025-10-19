@@ -1,6 +1,8 @@
 -- Lua Function to round values
 -- Rounds each data point's value to the nearest multiple of a specified number
 
+local number = require("tng.config").number
+
 return {
 	-- Configuration metadata
 	id = "round",
@@ -32,9 +34,8 @@ Configuration:
 • Plus proche: Arrondir au multiple le plus proche de ce nombre (par défaut: 1.0)]],
 	},
 	config = {
-		{
+		number {
 			id = "nearest",
-			type = "number",
 			default = 1.0,
 			name = {
 				["en"] = "Nearest",

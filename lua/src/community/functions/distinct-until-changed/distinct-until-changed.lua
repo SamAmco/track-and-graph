@@ -1,6 +1,8 @@
 -- Lua Function to filter out consecutive duplicates based on selected fields
 -- Only passes through data points when the selected fields change from the previous one
 
+local enum = require("tng.config").enum
+
 return {
 	-- Configuration metadata
 	id = "distinct-until-changed",
@@ -20,9 +22,8 @@ return {
 		["fr"] = "Filtre les doublons consécutifs en fonction des champs sélectionnés. Seuls les points de données où les champs sélectionnés diffèrent du précédent passeront.\n\n• Tous les champs - Compare valeur, étiquette et note\n• Valeur uniquement - Compare la valeur uniquement\n• Étiquette uniquement - Compare l'étiquette uniquement\n• Note uniquement - Compare la note uniquement\n• Valeur et étiquette - Compare valeur et étiquette\n• Valeur et note - Compare valeur et note\n• Étiquette et note - Compare étiquette et note",
 	},
 	config = {
-		{
+		enum {
 			id = "compare_by",
-			type = "enum",
 			name = "_compare_by",
 			options = {
 				"_all_fields",

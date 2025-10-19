@@ -1,6 +1,8 @@
 -- Lua Function to offset data point values by a configurable number
 -- This function adds a constant offset to all incoming data point values
 
+local number = require("tng.config").number
+
 return {
     -- Configuration metadata
     id = "offset-value",
@@ -32,9 +34,8 @@ Configuration:
 • Décalage: Le nombre à ajouter à toutes les valeurs (par défaut: 0.0). Utilisez des valeurs négatives pour soustraire.]]
     },
     config = {
-        {
+        number {
             id = "offset",
-            type = "number",
             default = 0.0,
             name = {
                 ["en"] = "Offset",

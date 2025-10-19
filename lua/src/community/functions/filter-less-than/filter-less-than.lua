@@ -1,6 +1,10 @@
 -- Lua Function to filter data points by value (less than threshold)
 -- Only passes through data points with values less than a threshold
 
+local tng_config = require("tng.config")
+local number = tng_config.number
+local checkbox = tng_config.checkbox
+
 return {
     -- Configuration metadata
     id = "filter-less-than",
@@ -36,9 +40,8 @@ Configuration:
 • Inclure égal: Inclure également les valeurs égales au seuil (par défaut: false)]],
     },
     config = {
-        {
+        number {
             id = "threshold",
-            type = "number",
             name = {
                 ["en"] = "Threshold",
                 ["de"] = "Schwellenwert",
@@ -46,9 +49,8 @@ Configuration:
                 ["fr"] = "Seuil",
             },
         },
-        {
+        checkbox {
             id = "include_equal",
-            type = "checkbox",
             name = {
                 ["en"] = "Include Equal",
                 ["de"] = "Gleich einschließen",
