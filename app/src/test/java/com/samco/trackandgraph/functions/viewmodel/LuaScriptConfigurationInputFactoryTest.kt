@@ -75,6 +75,11 @@ class LuaScriptConfigurationInputFactoryTest {
                 id = "localtimeConfig",
                 name = TranslatedString.Simple("LocalTime Configuration"),
                 defaultValueMinutes = 930  // Stored as minutes (15.5 hours)
+            ),
+            LuaFunctionConfigSpec.Instant(
+                id = "instantConfig",
+                name = TranslatedString.Simple("Instant Configuration"),
+                defaultValueEpochMilli = 1686835800000L  // 2023-06-15T14:30:00Z
             )
         ),
         version = Version(1, 0, 0),
@@ -110,6 +115,10 @@ class LuaScriptConfigurationInputFactoryTest {
         LuaScriptConfigurationValue.LocalTime(
             id = "localtimeConfig",
             minutes = 930
+        ),
+        LuaScriptConfigurationValue.Instant(
+            id = "instantConfig",
+            epochMilli = 1687012200000L  // 2023-06-17T15:30:00Z
         )
     )
 
@@ -153,6 +162,10 @@ class LuaScriptConfigurationInputFactoryTest {
         assertSame(allTypesMetadata.config[6].name, localtimeInput.name)
         assertEquals(15, localtimeInput.time.value.hour)  // 930 minutes = 15 hours 30 minutes
         assertEquals(30, localtimeInput.time.value.minute)
+
+        val instantInput = createdInputs["instantConfig"] as LuaScriptConfigurationInput.Instant
+        assertSame(allTypesMetadata.config[7].name, instantInput.name)
+        assertEquals(1687012200000L, instantInput.dateTime.value.toInstant().toEpochMilli())  // Should use saved value
 
         // CRITICAL: Ensure all sealed class types are tested
         // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in allTypesMetadata

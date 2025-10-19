@@ -88,4 +88,16 @@ function M.localtime(spec)
 	}
 end
 
+--- Create an instant (date/time) configuration item
+--- @param spec table Configuration specification with id, name, and optional default (epoch milliseconds, compatible with core.time().timestamp)
+--- @return table Configuration item ready for use in config array
+function M.instant(spec)
+	return {
+		id = spec.id,
+		type = "instant",
+		name = spec.name,
+		default = spec.default,
+	}
+end
+
 return M

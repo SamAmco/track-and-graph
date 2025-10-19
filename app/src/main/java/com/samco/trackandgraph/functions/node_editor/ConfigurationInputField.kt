@@ -39,6 +39,7 @@ import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.DurationInput
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
@@ -71,6 +72,7 @@ fun ConfigurationInputField(
         is LuaScriptConfigurationInput.UInt -> UIntTextField(focusManager, input)
         is LuaScriptConfigurationInput.Duration -> DurationField(focusManager, input)
         is LuaScriptConfigurationInput.LocalTime -> LocalTimeField(input)
+        is LuaScriptConfigurationInput.Instant -> InstantField(input)
     }
 }
 
@@ -207,6 +209,27 @@ private fun LocalTimeField(
     )
 }
 
+@Composable
+private fun InstantField(
+    input: LuaScriptConfigurationInput.Instant
+) = Column {
+    input.name.resolve()?.let {
+        Text(
+            modifier = Modifier.padding(horizontal = halfDialogInputSpacing),
+            text = it,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+    HalfDialogInputSpacing()
+    DateTimeButtonRow(
+        modifier = Modifier.fillMaxWidth(),
+        selectedDateTime = input.dateTime.value,
+        onDateTimeSelected = { dateTime ->
+            input.dateTime.value = dateTime
+        }
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -309,6 +332,20 @@ private fun ConfigurationInputFieldLocalTimePreview() {
             input = LuaScriptConfigurationInput.LocalTime(
                 name = TranslatedString.Simple("Sample Time Parameter"),
                 time = remember { mutableStateOf(SelectedTime(14, 30)) }
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ConfigurationInputFieldInstantPreview() {
+    TnGComposeTheme {
+        ConfigurationInputField(
+            focusManager = LocalFocusManager.current,
+            input = LuaScriptConfigurationInput.Instant(
+                name = TranslatedString.Simple("Sample DateTime Parameter"),
+                dateTime = remember { mutableStateOf(OffsetDateTime.parse("2023-06-15T14:30:00+01:00")) }
             )
         )
     }

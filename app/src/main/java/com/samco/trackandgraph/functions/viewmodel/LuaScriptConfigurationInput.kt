@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
+import org.threeten.bp.OffsetDateTime
 
 /**
  * Sealed class representing different types of configuration inputs for Lua scripts.
@@ -86,5 +87,13 @@ sealed class LuaScriptConfigurationInput {
     data class LocalTime(
         override val name: TranslatedString?,
         val time: MutableState<SelectedTime> = mutableStateOf(SelectedTime(0, 0))
+    ) : LuaScriptConfigurationInput()
+
+    /**
+     * Instant (date/time) input configuration with mutable state for OffsetDateTime
+     */
+    data class Instant(
+        override val name: TranslatedString?,
+        val dateTime: MutableState<OffsetDateTime> = mutableStateOf(OffsetDateTime.now())
     ) : LuaScriptConfigurationInput()
 }

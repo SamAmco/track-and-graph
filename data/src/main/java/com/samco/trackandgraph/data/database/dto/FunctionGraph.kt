@@ -127,6 +127,18 @@ sealed class LuaScriptConfigurationValue {
         override val id: String,
         val minutes: Int
     ) : LuaScriptConfigurationValue()
+
+    /**
+     * Represents an instant (date/time) configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param epochMilli The timestamp in epoch milliseconds (matches core.time().timestamp in Lua)
+     */
+    @Serializable
+    @SerialName("Instant")
+    data class Instant(
+        override val id: String,
+        val epochMilli: Long
+    ) : LuaScriptConfigurationValue()
 }
 
 /**

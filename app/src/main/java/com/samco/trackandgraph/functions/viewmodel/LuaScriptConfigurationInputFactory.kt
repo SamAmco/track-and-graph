@@ -22,6 +22,9 @@ import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import javax.inject.Inject
 
 /**
@@ -46,6 +49,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.UInt -> createUIntInput(config, savedValue)
             is LuaFunctionConfigSpec.Duration -> createDurationInput(config, savedValue)
             is LuaFunctionConfigSpec.LocalTime -> createLocalTimeInput(config, savedValue)
+            is LuaFunctionConfigSpec.Instant -> createInstantInput(config, savedValue)
         }
     }
 
@@ -64,6 +68,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.UInt -> existingInput is LuaScriptConfigurationInput.UInt
             is LuaFunctionConfigSpec.Duration -> existingInput is LuaScriptConfigurationInput.Duration
             is LuaFunctionConfigSpec.LocalTime -> existingInput is LuaScriptConfigurationInput.LocalTime
+            is LuaFunctionConfigSpec.Instant -> existingInput is LuaScriptConfigurationInput.Instant
         }
     }
 
@@ -179,6 +184,27 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
         return LuaScriptConfigurationInput.LocalTime(
             name = config.name,
             time = mutableStateOf(SelectedTime(hour, minute))
+        )
+    }
+
+    private fun createInstantInput(
+        config: LuaFunctionConfigSpec.Instant,
+        savedValue: LuaScriptConfigurationValue?
+    ): LuaScriptConfigurationInput.Instant {
+        val instantValue = savedValue as? LuaScriptConfigurationValue.Instant
+        // Both savedValue and config.defaultValue are in epoch milliseconds
+        val epochMilli = instantValue?.epochMilli
+            ?: config.defaultValueEpochMilli
+            ?: Instant.now().toEpochMilli()
+
+        val dateTime = OffsetDateTime.ofInstant(
+            Instant.ofEpochMilli(epochMilli),
+            ZoneId.systemDefault()
+        )
+
+        return LuaScriptConfigurationInput.Instant(
+            name = config.name,
+            dateTime = mutableStateOf(dateTime)
         )
     }
 }

@@ -29,6 +29,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.OffsetDateTime
 
 class LuaScriptConfigurationEncoderTest {
 
@@ -74,6 +75,11 @@ class LuaScriptConfigurationEncoderTest {
         time = mutableStateOf(SelectedTime(14, 30))
     )
 
+    private val instantInput = LuaScriptConfigurationInput.Instant(
+        name = TranslatedString.Simple("Instant Config"),
+        dateTime = mutableStateOf(OffsetDateTime.parse("2023-06-15T14:30:00Z"))
+    )
+
     @Before
     fun setUp() {
         encoder = LuaScriptConfigurationEncoder()
@@ -101,14 +107,15 @@ class LuaScriptConfigurationEncoderTest {
             "enumConfig" to enumInput,
             "uintConfig" to uintInput,
             "durationConfig" to durationInput,
-            "localtimeConfig" to localtimeInput
+            "localtimeConfig" to localtimeInput,
+            "instantConfig" to instantInput
         )
 
         // When
         val result = encoder.encodeConfiguration(configuration)
 
         // Then - Verify all types are encoded correctly
-        assertEquals("Should produce seven configuration values", 7, result.size)
+        assertEquals("Should produce eight configuration values", 8, result.size)
         
         // Collect all encoded types
         val encodedTypes = result.map { it::class }.toSet()
@@ -154,5 +161,8 @@ class LuaScriptConfigurationEncoderTest {
 
         val localtimeResult = result.find { it.id == "localtimeConfig" } as LuaScriptConfigurationValue.LocalTime
         assertEquals("LocalTime value should be encoded correctly", 870, localtimeResult.minutes)  // 14*60+30
+
+        val instantResult = result.find { it.id == "instantConfig" } as LuaScriptConfigurationValue.Instant
+        assertEquals("Instant value should be encoded correctly", 1686839400000L, instantResult.epochMilli)
     }
 }

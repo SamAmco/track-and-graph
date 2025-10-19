@@ -103,6 +103,16 @@ sealed class LuaFunctionConfigSpec {
         override val name: TranslatedString?,
         val defaultValueMinutes: Int? = null
     ) : LuaFunctionConfigSpec()
+
+    /**
+     * Instant (date/time) configuration spec.
+     * @param defaultValueEpochMilli Timestamp in epoch milliseconds (matches core.time().timestamp in Lua)
+     */
+    data class Instant(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValueEpochMilli: Long? = null
+    ) : LuaFunctionConfigSpec()
 }
 
 data class LuaFunctionMetadata(

@@ -9,4 +9,5 @@ return {
 	uint = 1,
 	duration = 1,
 	localtime = 1,
+	instant = 1,
 }
