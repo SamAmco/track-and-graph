@@ -1,6 +1,13 @@
 -- Example function demonstrating all available configuration types
 -- This function showcases text, number, checkbox, enum, and uint inputs
 
+local tng_config = require("tng.config")
+local text = tng_config.text
+local number = tng_config.number
+local checkbox = tng_config.checkbox
+local enum = tng_config.enum
+local uint = tng_config.uint
+
 return {
 	id = "a1-test",
 	version = "1.0.0",
@@ -13,15 +20,18 @@ return {
 		["fr"] = "Démonstration des types de configuration",
 	},
 	description = {
-		["en"] = "Demonstrates all available configuration input types: text, number, checkbox, enum, and uint. This function passes through all data points unchanged.",
-		["de"] = "Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung und uint. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
-		["es"] = "Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración y uint. Esta función pasa todos los puntos de datos sin cambios.",
-		["fr"] = "Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération et uint. Cette fonction transmet tous les points de données inchangés.",
+		["en"] =
+		"Demonstrates all available configuration input types: text, number, checkbox, enum, and uint. This function passes through all data points unchanged.",
+		["de"] =
+		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung und uint. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
+		["es"] =
+		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración y uint. Esta función pasa todos los puntos de datos sin cambios.",
+		["fr"] =
+		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération et uint. Cette fonction transmet tous les points de données inchangés.",
 	},
 	config = {
-		{
+		text {
 			id = "text_example",
-			type = "text",
 			name = {
 				["en"] = "Text Input",
 				["de"] = "Texteingabe",
@@ -30,9 +40,8 @@ return {
 			},
 			default = "Example text",
 		},
-		{
+		number {
 			id = "number_example",
-			type = "number",
 			name = {
 				["en"] = "Number Input",
 				["de"] = "Zahleneingabe",
@@ -41,9 +50,8 @@ return {
 			},
 			default = 3.14,
 		},
-		{
+		checkbox {
 			id = "checkbox_example",
-			type = "checkbox",
 			name = {
 				["en"] = "Checkbox Input",
 				["de"] = "Kontrollkästchen",
@@ -52,9 +60,8 @@ return {
 			},
 			default = true,
 		},
-		{
+		enum {
 			id = "enum_example",
-			type = "enum",
 			name = {
 				["en"] = "Enum Input",
 				["de"] = "Aufzählungseingabe",
@@ -64,9 +71,8 @@ return {
 			options = { "_hours", "_days", "_weeks" },
 			default = "_days",
 		},
-		{
+		uint {
 			id = "uint_example",
-			type = "uint",
 			name = {
 				["en"] = "Unsigned Integer Input",
 				["de"] = "Vorzeichenlose Ganzzahleingabe",
@@ -87,7 +93,7 @@ return {
 
 		-- Pass through all data points unchanged
 		return function()
-			return source[1].dp()
+			return source.dp()
 		end
 	end,
 }
