@@ -1,6 +1,8 @@
 -- Lua Function to divide data point values by a configurable number
 -- This function divides all incoming data point values by a specified divisor
 
+local number = require("tng.config").number
+
 return {
     -- Configuration metadata
     id = "divide",
@@ -32,9 +34,8 @@ Configuration:
 • Diviseur: Le nombre par lequel diviser toutes les valeurs (par défaut: 1.0)]]
     },
     config = {
-        {
+        number {
             id = "divisor",
-            type = "number",
             default = 1.0,
             name = {
                 ["en"] = "Divisor",

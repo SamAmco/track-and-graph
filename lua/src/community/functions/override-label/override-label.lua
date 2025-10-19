@@ -1,6 +1,8 @@
 -- Lua Function to override the label of all data points with a configurable string
 -- This function sets all incoming data point labels to a specified value
 
+local text = require("tng.config").text
+
 return {
     -- Configuration metadata
     id = "override-label",
@@ -20,9 +22,8 @@ return {
         ["fr"] = "Définit toutes les étiquettes de points de données entrantes sur une valeur spécifiée",
     },
     config = {
-        {
+        text {
             id = "new_label",
-            type = "text",
             name = {
                 ["en"] = "New Label",
                 ["de"] = "Neues Label",

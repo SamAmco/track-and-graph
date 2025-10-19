@@ -10,17 +10,24 @@ Community functions are Lua scripts that transform data point streams. Each func
 
 ## Function Structure
 
-A function exports a table with metadata and a generator function:
+A function exports a table with metadata and a generator function. Use the `tng.config` DSL to define configuration items:
 
 ```lua
+local tng_config = require("tng.config").number
+local number = tng_config.number
+local checkbox = tng_config.checkbox
+
 return {
     id = "function-name",
     version = "1.0.0",  -- Major version = API compatibility level
     inputCount = 1,      -- Number of input data sources
+    categories = { "_transform" },  -- One or more category keys
 
     title = {
         ["en"] = "Function Title",
-        -- Add translations for de, es, fr
+        ["de"] = "Funktionstitel",
+        ["es"] = "Título de función",
+        ["fr"] = "Titre de la fonction",
     },
 
     description = {
@@ -28,22 +35,38 @@ return {
 
 Use multi-line strings for detailed descriptions.
 List configuration options with bullet points for complex functions.]],
+        ["de"] = [[Funktionsbeschreibung...]],
+        ["es"] = [[Descripción de la función...]],
+        ["fr"] = [[Description de la fonction...]],
     },
 
     config = {
-        {
-            id = "param_name",
-            type = "text",  -- or "number", "checkbox"
-            default = "default_value",  -- Optional: specify default value
+        number {
+            id = "multiplier",
             name = {
-                ["en"] = "Parameter Name",
-            }
-        }
+                ["en"] = "Multiplier",
+                ["de"] = "Multiplikator",
+                ["es"] = "Multiplicador",
+                ["fr"] = "Multiplicateur",
+            },
+            default = 1.0,
+        },
+        checkbox {
+            id = "enabled",
+            name = {
+                ["en"] = "Enabled",
+                ["de"] = "Aktiviert",
+                ["es"] = "Habilitado",
+                ["fr"] = "Activé",
+            },
+            default = true,
+        },
     },
 
     generator = function(source, config)
-        -- Access config values
-        local param = config and config.param_name
+        -- Access config values with fallbacks
+        local multiplier = config and config.multiplier or 1.0
+        local enabled = config and config.enabled or false
 
         -- Return iterator function
         return function()
@@ -53,6 +76,9 @@ List configuration options with bullet points for complex functions.]],
             end
 
             -- Transform data_point...
+            if enabled then
+                data_point.value = data_point.value * multiplier
+            end
 
             return data_point
         end
@@ -62,11 +88,12 @@ List configuration options with bullet points for complex functions.]],
 
 ### Key Points
 
+- **Use the config DSL**: Import helpers from `tng.config` and use them to define configuration items
 - **Version major number**: Must match the highest API level used by the function. If you call any API with a higher level, tests will fail. See the .apispec.lua files in the `lua/src/tng/` directory for details on api levels.
 - **Deprecated (optional)**: Optionally specify `deprecated = N` (integer) to mark when a function becomes deprecated. Functions with `deprecated <= current_api_level` will be filtered out. Use this to phase out old functions.
-- **Config types**: `text` (string), `number` (double), `checkbox` (boolean)
-- **Config defaults**: Optionally specify `default` field in config spec to provide a default value. These defaults are used in the UI, but your generator should still handle missing values with fallbacks.
-- **Config values**: In tests, pass actual Lua types (e.g., `true`/`false` for checkboxes, not strings as are used in the graph tests)
+- **Categories**: Array of category keys (e.g., `{"_arithmetic", "_filter"}`). Use translation keys from shared-translations.lua.
+- **Config defaults**: Optionally specify `default` field to provide a default value. These defaults are used in the UI, but your generator should still handle missing values with fallbacks.
+- **Config values**: In tests, pass actual Lua types (e.g., `true`/`false` for checkboxes, not strings)
 - **Generator pattern**: Returns an iterator function that yields data points one at a time. The generator takes source(s) and config as arguments. The sources will be a single data source (see the core.lua api) if `inputCount` is 1, or a list of sources if `inputCount` > 1. The config will be a table of config values with keys matching the config ids and values matching the users inputs (or test inputs).
 - **Data point fields**: `timestamp`, `value`, `label`, `note`, `offset`
 - **Date/time handling**: Always pass the full data point to `core.date()`, not just the timestamp. The data point contains both `timestamp` and `offset` which are needed for correct timezone and DST handling. Use `local date = core.date(data_point)` not `core.date(data_point.timestamp)`.
@@ -110,26 +137,18 @@ title = {  -- Table, used directly without lookup
 
 Note: In the catalog all strings must have translations. Either they should define translations inline, or use a translation key that exists in shared-translations.lua.
 
-**Enum options** (must use translation keys in the catalog):
+### Using Translation Keys with Config DSL
+
 ```lua
+local enum = require("tng.config").enum
+
 config = {
-    {
+    enum {
         id = "time_unit",
-        type = "enum",
         name = "_time_unit",  -- Translation key
-        options = {"_seconds", "_minutes", "_hours", "_days"},
+        options = { "_seconds", "_minutes", "_hours", "_days" },
         default = "_hours"
     }
-}
-```
-
-**Config name with translation key**:
-```lua
-{
-    id = "multiplier",
-    type = "number",
-    name = "_multiplier",  -- Looks up translation
-    default = 1.0
 }
 ```
 
@@ -230,55 +249,100 @@ Example: A function with `version = "1.2.3"` can only use API level 1 features.
 4. **Run tests**: `make run-community-functions-tests`
 5. **Validate and package**: See [lua/README.md](../../README.md) for packaging and validation tools
 
-## Config Parameter Patterns
+## Configuration DSL
 
-### Boolean Checkboxes
+Use the `tng.config` module for a cleaner, more ergonomic way to define configuration items:
+
 ```lua
--- In function spec:
-{
-    id = "my_checkbox",
-    type = "checkbox",
-    default = false,  -- Optional: specify default
-    name = { ["en"] = "My Checkbox" }
+local tng_config = require("tng.config")
+local text = tng_config.text
+local number = tng_config.number
+local checkbox = tng_config.checkbox
+local enum = tng_config.enum
+local uint = tng_config.uint
+
+return {
+    config = {
+        text {
+            id = "label_filter",
+            name = { ["en"] = "Label Filter" },
+            default = "",
+        },
+        number {
+            id = "multiplier",
+            name = { ["en"] = "Multiplier" },
+            default = 1.0,
+        },
+        checkbox {
+            id = "enabled",
+            name = { ["en"] = "Enabled" },
+            default = true,
+        },
+        enum {
+            id = "period",
+            name = { ["en"] = "Period" },
+            options = { "_hours", "_days", "_weeks" },
+            default = "_days",
+        },
+        uint {
+            id = "count",
+            name = { ["en"] = "Count" },
+            default = 10,
+        },
+    },
 }
-
--- In tests:
-config = { my_checkbox = true }
-
--- In generator:
-local enabled = config and config.my_checkbox or false
 ```
 
-### Optional Text
+### Available Config Types
+
+**text**: String input
 ```lua
--- In function spec:
-{
-    id = "my_text",
-    type = "text",
-    default = "",  -- Optional: specify default
-    name = { ["en"] = "My Text" }
-}
-
--- In tests:
-config = { my_text = "value" }
-
--- In generator:
-local text = config and config.my_text  -- nil if not set
+config.text { id = "my_text", name = {...}, default = "value" }
 ```
 
-### Numbers with Defaults
+**number**: Floating point number
 ```lua
--- In function spec:
-{
-    id = "my_number",
-    type = "number",
-    default = 1.0,  -- Optional: specify default
-    name = { ["en"] = "My Number" }
+config.number { id = "my_number", name = {...}, default = 1.0 }
+```
+
+**checkbox**: Boolean value
+```lua
+config.checkbox { id = "my_checkbox", name = {...}, default = true }
+```
+
+**enum**: Dropdown with predefined options
+```lua
+config.enum { id = "my_enum", name = {...}, options = {"_opt1", "_opt2"}, default = "_opt1" }
+```
+
+**uint**: Unsigned integer (non-negative whole number)
+```lua
+config.uint { id = "my_uint", name = {...}, default = 42 }
+```
+
+### Accessing Config Values in Generator
+
+```lua
+generator = function(source, config)
+    local text_val = config and config.my_text
+    local number_val = config and config.my_number or 1.0
+    local checkbox_val = config and config.my_checkbox or false
+    local enum_val = config and config.my_enum
+    local uint_val = config and config.my_uint or 1
+
+    -- Use values...
+end
+```
+
+### Config in Tests
+
+Pass actual Lua types (not strings):
+```lua
+config = {
+    my_text = "test value",
+    my_number = 42.0,
+    my_checkbox = true,
+    my_enum = "_hours",
+    my_uint = 10,
 }
-
--- In tests:
-config = { my_number = 42.0 }
-
--- In generator:
-local num = config and config.my_number or 1.0  -- Fallback if not set
 ```

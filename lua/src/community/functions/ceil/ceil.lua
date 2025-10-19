@@ -1,6 +1,8 @@
 -- Lua Function to ceiling values
 -- Rounds each data point's value up to the nearest multiple of a specified number
 
+local number = require("tng.config").number
+
 return {
 	-- Configuration metadata
 	id = "ceil",
@@ -32,9 +34,8 @@ Configuration:
 • Plus proche: Arrondir vers le haut au multiple le plus proche de ce nombre (par défaut: 1.0)]],
 	},
 	config = {
-		{
+		number {
 			id = "nearest",
-			type = "number",
 			default = 1.0,
 			name = {
 				["en"] = "Nearest",

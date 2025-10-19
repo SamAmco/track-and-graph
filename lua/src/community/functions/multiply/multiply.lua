@@ -1,6 +1,8 @@
 -- Lua Function to multiply data point values by a configurable number
 -- This function multiplies all incoming data point values by a specified multiplier
 
+local number = require("tng.config").number
+
 return {
     -- Configuration metadata
     id = "multiply",
@@ -32,9 +34,8 @@ Configuration:
 • Multiplicateur: Le nombre par lequel multiplier toutes les valeurs (par défaut: 1.0)]]
     },
     config = {
-        {
+        number {
             id = "multiplier",
-            type = "number",
             name = {
                 ["en"] = "Multiplier",
                 ["de"] = "Multiplikator",

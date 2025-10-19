@@ -1,6 +1,8 @@
 -- Lua Function to override the note of all data points with a configurable string
 -- This function sets all incoming data point notes to a specified value
 
+local text = require("tng.config").text
+
 return {
     -- Configuration metadata
     id = "override-note",
@@ -20,9 +22,8 @@ return {
         ["fr"] = "Définit toutes les notes de points de données entrantes sur une valeur spécifiée",
     },
     config = {
-        {
+        text {
             id = "new_note",
-            type = "text",
             name = {
                 ["en"] = "New Note",
                 ["de"] = "Neue Notiz",

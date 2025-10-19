@@ -2,6 +2,7 @@
 -- Outputs the duration in seconds between each data point and the previous one
 
 local core = require("tng.core")
+local checkbox = require("tng.config").checkbox
 
 return {
 	-- Configuration metadata
@@ -34,9 +35,8 @@ Configuration:
 • Inclure le temps jusqu'au premier: Inclure le temps entre maintenant et le premier point de données (par défaut: false)]],
 	},
 	config = {
-		{
+		checkbox {
 			id = "include_first",
-			type = "checkbox",
 			default = false,
 			name = {
 				["en"] = "Include Time to First",
