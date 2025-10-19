@@ -203,7 +203,11 @@ class FunctionGraphSerializerTest {
                         ),
                         LuaScriptConfigurationValue.Duration(
                             id = "durationConfig",
-                            value = 3600.0
+                            seconds = 3600.0
+                        ),
+                        LuaScriptConfigurationValue.LocalTime(
+                            id = "localtimeConfig",
+                            minutes = 870
                         )
                     ),
                     translations = mapOf(

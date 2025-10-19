@@ -84,10 +84,24 @@ sealed class LuaFunctionConfigSpec {
         val defaultValue: Int? = null
     ) : LuaFunctionConfigSpec()
 
+    /**
+     * Duration configuration spec.
+     * @param defaultValueSeconds Duration in seconds (converted from Lua milliseconds in LuaFunctionMetadataAdapter)
+     */
     data class Duration(
         override val id: String,
         override val name: TranslatedString?,
-        val defaultValue: Double? = null
+        val defaultValueSeconds: Double? = null
+    ) : LuaFunctionConfigSpec()
+
+    /**
+     * Local time configuration spec.
+     * @param defaultValueMinutes Time in minutes since midnight 0-1439 (converted from Lua milliseconds in LuaFunctionMetadataAdapter)
+     */
+    data class LocalTime(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValueMinutes: Int? = null
     ) : LuaFunctionConfigSpec()
 }
 

@@ -166,6 +166,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             "enum" -> parseEnumConfig(id, nameTranslations, configItem, translations, usedTranslations)
             "uint" -> parseUIntConfig(id, nameTranslations, configItem)
             "duration" -> parseDurationConfig(id, nameTranslations, configItem)
+            "localtime" -> parseLocalTimeConfig(id, nameTranslations, configItem)
             else -> throw IllegalArgumentException("Unknown config type: $typeString")
         }
     }
@@ -292,18 +293,53 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
         )
     }
 
+    /**
+     * Parses duration config from Lua metadata.
+     *
+     * Conversion: Lua milliseconds → Kotlin seconds
+     * - Lua scripts define: default = core.DURATION.HOUR (3600000 milliseconds)
+     * - We store internally: 3600.0 seconds (for DurationInputViewModel)
+     * - ConfigurationValueParser converts back to milliseconds when passing to Lua runtime
+     */
     private fun parseDurationConfig(
         id: String,
         name: TranslatedString?,
         configItem: LuaValue
     ): LuaFunctionConfigSpec.Duration {
-        val defaultValue = configItem[DEFAULT]
+        val milliseconds = configItem[DEFAULT]
             .takeUnless { it.isnil() }?.todouble()
+
+        val seconds = milliseconds?.let { it / 1000.0 }
 
         return LuaFunctionConfigSpec.Duration(
             id = id,
             name = name,
-            defaultValue = defaultValue
+            defaultValueSeconds = seconds
+        )
+    }
+
+    /**
+     * Parses localtime config from Lua metadata.
+     *
+     * Conversion: Lua milliseconds since midnight → Kotlin minutes since midnight
+     * - Lua scripts define: default = 14.5 * core.DURATION.HOUR (52200000 milliseconds)
+     * - We store internally: 870 minutes (for SelectedTime UI)
+     * - ConfigurationValueParser converts back to milliseconds when passing to Lua runtime
+     */
+    private fun parseLocalTimeConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.LocalTime {
+        val milliseconds = configItem[DEFAULT]
+            .takeUnless { it.isnil() }?.todouble()
+
+        val minutes = milliseconds?.let { (it / 1000.0 / 60.0).toInt() }
+
+        return LuaFunctionConfigSpec.LocalTime(
+            id = id,
+            name = name,
+            defaultValueMinutes = minutes
         )
     }
 

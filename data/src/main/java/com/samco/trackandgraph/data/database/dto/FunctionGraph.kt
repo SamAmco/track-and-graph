@@ -107,13 +107,25 @@ sealed class LuaScriptConfigurationValue {
     /**
      * Represents a duration configuration value.
      * @param id The configuration ID from the Lua script metadata
-     * @param value The duration in seconds (as double)
+     * @param seconds The duration in seconds (stored as double). Converted to milliseconds when passed to Lua.
      */
     @Serializable
     @SerialName("Duration")
     data class Duration(
         override val id: String,
-        val value: Double
+        val seconds: Double
+    ) : LuaScriptConfigurationValue()
+
+    /**
+     * Represents a local time configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param minutes The time as minutes since midnight (0-1439). Converted to milliseconds when passed to Lua.
+     */
+    @Serializable
+    @SerialName("LocalTime")
+    data class LocalTime(
+        override val id: String,
+        val minutes: Int
     ) : LuaScriptConfigurationValue()
 }
 

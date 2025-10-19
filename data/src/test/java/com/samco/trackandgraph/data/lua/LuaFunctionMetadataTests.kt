@@ -302,7 +302,13 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                         id = "durationConfig",
                         type = "duration",
                         name = "Duration Configuration",
-                        default = 3600
+                        default = 3600000
+                    },
+                    {
+                        id = "localtimeConfig",
+                        type = "localtime",
+                        name = "LocalTime Configuration",
+                        default = 52200000
                     }
                 },
                 generator = function(data_sources)
@@ -312,7 +318,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
         """.trimIndent()
         testLuaFunctionMetadata(script) {
             assertEquals(3, metadata.inputCount)
-            assertEquals(6, metadata.config.size)
+            assertEquals(7, metadata.config.size)
             assertEquals("Script should be preserved", script, metadata.script)
 
             // Validate each configuration type is parsed correctly
@@ -360,7 +366,14 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
             val durationConfig = metadata.config.find { it.id == "durationConfig" } as? LuaFunctionConfigSpec.Duration
             assertTrue("Duration configuration should be parsed", durationConfig != null)
             assertEquals("Duration Configuration", (durationConfig!!.name as TranslatedString.Simple).value)
-            assertEquals("Duration default should be parsed", 3600.0, durationConfig.defaultValue)
+            // Lua provides 3600000 milliseconds, converted to 3600 seconds for internal storage
+            assertEquals("Duration default should be parsed", 3600.0, durationConfig.defaultValueSeconds)
+
+            val localtimeConfig = metadata.config.find { it.id == "localtimeConfig" } as? LuaFunctionConfigSpec.LocalTime
+            assertTrue("LocalTime configuration should be parsed", localtimeConfig != null)
+            assertEquals("LocalTime Configuration", (localtimeConfig!!.name as TranslatedString.Simple).value)
+            // Lua provides 52200000 milliseconds (14.5 hours), converted to 870 minutes for internal storage
+            assertEquals("LocalTime default should be parsed", 870, localtimeConfig.defaultValueMinutes)
 
             // CRITICAL: Ensure all sealed class types are tested
             // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in this test

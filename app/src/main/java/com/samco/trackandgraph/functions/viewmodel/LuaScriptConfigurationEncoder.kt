@@ -72,9 +72,20 @@ internal class LuaScriptConfigurationEncoder @Inject constructor() {
                     )
                 }
                 is LuaScriptConfigurationInput.Duration -> {
+                    // ViewModel returns seconds, store as seconds in database
+                    val seconds = input.viewModel.getDurationAsDouble()
                     LuaScriptConfigurationValue.Duration(
                         id = id,
-                        value = input.viewModel.getDurationAsDouble()
+                        seconds = seconds
+                    )
+                }
+                is LuaScriptConfigurationInput.LocalTime -> {
+                    // Convert hour/minute to minutes since midnight (0-1439) for database storage
+                    val time = input.time.value
+                    val minutesSinceMidnight = time.hour * 60 + time.minute
+                    LuaScriptConfigurationValue.LocalTime(
+                        id = id,
+                        minutes = minutesSinceMidnight
                     )
                 }
             }

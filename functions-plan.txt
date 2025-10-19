@@ -242,11 +242,11 @@ A lua function file returns an object that contains:
     - display name map of language code to translation
     - type:
       x boolean
-      - duration i.e. h:m:s
+      x duration i.e. h:m:s
       x duration enum
       x period enum
       x weekday enum
-      - local time
+      x local time
       x number
       x uint
       x string
