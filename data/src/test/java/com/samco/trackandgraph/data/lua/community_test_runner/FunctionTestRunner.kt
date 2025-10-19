@@ -63,7 +63,7 @@ internal class FunctionTestRunner : CommunityTestRunner() {
 
                 val gateModule = loadLuaFile(
                     globals = globals,
-                    path = "generated/lua-community/test_utils/api_gate.lua"
+                    path = "generated/lua-community/test-utils/api-gate.lua"
                 )
 
                 val moduleFileName = moduleName.removePrefix("tng.")
@@ -84,15 +84,19 @@ internal class FunctionTestRunner : CommunityTestRunner() {
         val vmProvider = daggerComponent.provideVMProvider()
         val vmLease = acquireTestVMLease(vmProvider)
         try {
+            // Reset API usage tracking
+            val gateModule = loadLuaFile(vmLease.globals, "generated/lua-community/test-utils/api-gate.lua")
+            gateModule["reset"].checkfunction()!!.call()
+
+            // Read the script to get the version
             val resolvedScript = daggerComponent.provideLuaScriptResolver()
                 .resolveLuaScript(scriptLuaText, vmLease)
                 .checktable()!!
 
             val version = resolvedScript["version"].checkjstring()!!.toVersion().major
-            vmLease.globals.load("CURRENT_TEST_API_LEVEL = $version").call()
 
+            // Run all tests
             val test = vmLease.globals.load(testLuaText)
-
             val testSet = test.call().checktable()!!
             for (key in testSet.keys()) {
                 runFunctionTest(
@@ -101,6 +105,13 @@ internal class FunctionTestRunner : CommunityTestRunner() {
                     testStructure = testSet[key].checktable()!!,
                 )
             }
+
+            // Validate API usage at the end
+            gateModule["validate"].checkfunction()!!
+                .call(LuaValue.valueOf(version))
+
+            // Clear usage table
+            gateModule["reset"].checkfunction()!!.call()
         } catch (t: Throwable) {
             println("Failed to run $testName : ${t.message}")
             t.printStackTrace()
