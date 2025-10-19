@@ -297,6 +297,12 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                         type = "uint",
                         name = "UInt Configuration",
                         default = 42
+                    },
+                    {
+                        id = "durationConfig",
+                        type = "duration",
+                        name = "Duration Configuration",
+                        default = 3600
                     }
                 },
                 generator = function(data_sources)
@@ -306,7 +312,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
         """.trimIndent()
         testLuaFunctionMetadata(script) {
             assertEquals(3, metadata.inputCount)
-            assertEquals(5, metadata.config.size)
+            assertEquals(6, metadata.config.size)
             assertEquals("Script should be preserved", script, metadata.script)
 
             // Validate each configuration type is parsed correctly
@@ -350,6 +356,11 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
             assertTrue("UInt configuration should be parsed", uintConfig != null)
             assertEquals("UInt Configuration", (uintConfig!!.name as TranslatedString.Simple).value)
             assertEquals("UInt default should be parsed", 42, uintConfig.defaultValue)
+
+            val durationConfig = metadata.config.find { it.id == "durationConfig" } as? LuaFunctionConfigSpec.Duration
+            assertTrue("Duration configuration should be parsed", durationConfig != null)
+            assertEquals("Duration Configuration", (durationConfig!!.name as TranslatedString.Simple).value)
+            assertEquals("Duration default should be parsed", 3600.0, durationConfig.defaultValue)
 
             // CRITICAL: Ensure all sealed class types are tested
             // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in this test

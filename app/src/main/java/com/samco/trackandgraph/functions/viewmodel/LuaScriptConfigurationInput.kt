@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 
 /**
  * Sealed class representing different types of configuration inputs for Lua scripts.
@@ -68,5 +69,13 @@ sealed class LuaScriptConfigurationInput {
     data class UInt(
         override val name: TranslatedString?,
         val value: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
+    ) : LuaScriptConfigurationInput()
+
+    /**
+     * Duration input configuration with DurationInputViewModel for hours/minutes/seconds
+     */
+    data class Duration(
+        override val name: TranslatedString?,
+        val viewModel: DurationInputViewModel
     ) : LuaScriptConfigurationInput()
 }

@@ -53,6 +53,11 @@
                     "configType": "UInt",
                     "id": "uintConfig",
                     "value": 100
+                },
+                {
+                    "configType": "Duration",
+                    "id": "durationConfig",
+                    "value": 3600.0
                 }
             ],
             "translations": {

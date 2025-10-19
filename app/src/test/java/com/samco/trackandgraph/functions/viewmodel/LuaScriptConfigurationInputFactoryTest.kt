@@ -65,6 +65,11 @@ class LuaScriptConfigurationInputFactoryTest {
                 id = "uintConfig",
                 name = TranslatedString.Simple("UInt Configuration"),
                 defaultValue = 10
+            ),
+            LuaFunctionConfigSpec.Duration(
+                id = "durationConfig",
+                name = TranslatedString.Simple("Duration Configuration"),
+                defaultValue = 3600.0
             )
         ),
         version = Version(1, 0, 0),
@@ -92,6 +97,10 @@ class LuaScriptConfigurationInputFactoryTest {
         LuaScriptConfigurationValue.UInt(
             id = "uintConfig",
             value = 25
+        ),
+        LuaScriptConfigurationValue.Duration(
+            id = "durationConfig",
+            value = 7200.0
         )
     )
 
@@ -126,6 +135,10 @@ class LuaScriptConfigurationInputFactoryTest {
         val uintInput = createdInputs["uintConfig"] as LuaScriptConfigurationInput.UInt
         assertSame(allTypesMetadata.config[4].name, uintInput.name)
         assertEquals("25", uintInput.value.value.text)  // Should use saved value
+
+        val durationInput = createdInputs["durationConfig"] as LuaScriptConfigurationInput.Duration
+        assertSame(allTypesMetadata.config[5].name, durationInput.name)
+        assertEquals(7200.0, durationInput.viewModel.getDurationAsDouble(), 0.001)  // Should use saved value
 
         // CRITICAL: Ensure all sealed class types are tested
         // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in allTypesMetadata

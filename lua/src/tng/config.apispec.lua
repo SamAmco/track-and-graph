@@ -7,4 +7,5 @@ return {
 	checkbox = 1,
 	enum = 1,
 	uint = 1,
+	duration = 1,
 }

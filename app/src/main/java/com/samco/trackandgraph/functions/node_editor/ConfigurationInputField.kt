@@ -36,12 +36,14 @@ import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.DurationInput
 import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.resolve
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 
 @Composable
 fun ConfigurationInputField(
@@ -59,6 +61,7 @@ fun ConfigurationInputField(
         is LuaScriptConfigurationInput.Checkbox -> CheckboxField(input)
         is LuaScriptConfigurationInput.Enum -> EnumDropdownField(input)
         is LuaScriptConfigurationInput.UInt -> UIntTextField(focusManager, input)
+        is LuaScriptConfigurationInput.Duration -> DurationField(focusManager, input)
     }
 }
 
@@ -138,6 +141,25 @@ private fun UIntTextField(
     keyboardType = KeyboardType.Number,
 )
 
+@Composable
+private fun DurationField(
+    focusManager: FocusManager,
+    input: LuaScriptConfigurationInput.Duration
+) = Column {
+    input.name.resolve()?.let {
+        Text(
+            modifier = Modifier.padding(horizontal = halfDialogInputSpacing),
+            text = it,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+    DurationInput(
+        modifier = Modifier.fillMaxWidth(),
+        viewModel = input.viewModel,
+        focusManager = focusManager
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -208,6 +230,24 @@ private fun ConfigurationInputFieldUIntPreview() {
             input = LuaScriptConfigurationInput.UInt(
                 name = TranslatedString.Simple("Sample UInt Parameter"),
                 value = remember { mutableStateOf(TextFieldValue("42")) }
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ConfigurationInputFieldDurationPreview() {
+    TnGComposeTheme {
+        ConfigurationInputField(
+            focusManager = LocalFocusManager.current,
+            input = LuaScriptConfigurationInput.Duration(
+                name = TranslatedString.Simple("Sample Duration Parameter"),
+                viewModel = remember {
+                    DurationInputViewModelImpl().apply {
+                        setDurationFromDouble(5430.0) // 1h 30m 30s
+                    }
+                }
             )
         )
     }

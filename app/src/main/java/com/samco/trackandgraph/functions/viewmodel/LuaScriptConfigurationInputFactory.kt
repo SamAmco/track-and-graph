@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import javax.inject.Inject
 
 /**
@@ -42,6 +43,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.Checkbox -> createCheckboxInput(config, savedValue)
             is LuaFunctionConfigSpec.Enum -> createEnumInput(config, savedValue)
             is LuaFunctionConfigSpec.UInt -> createUIntInput(config, savedValue)
+            is LuaFunctionConfigSpec.Duration -> createDurationInput(config, savedValue)
         }
     }
 
@@ -58,6 +60,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
             is LuaFunctionConfigSpec.Checkbox -> existingInput is LuaScriptConfigurationInput.Checkbox
             is LuaFunctionConfigSpec.Enum -> existingInput is LuaScriptConfigurationInput.Enum
             is LuaFunctionConfigSpec.UInt -> existingInput is LuaScriptConfigurationInput.UInt
+            is LuaFunctionConfigSpec.Duration -> existingInput is LuaScriptConfigurationInput.Duration
         }
     }
 
@@ -139,6 +142,22 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
         return LuaScriptConfigurationInput.UInt(
             name = config.name,
             value = mutableStateOf(TextFieldValue(initialValue.toString()))
+        )
+    }
+
+    private fun createDurationInput(
+        config: LuaFunctionConfigSpec.Duration,
+        savedValue: LuaScriptConfigurationValue?
+    ): LuaScriptConfigurationInput.Duration {
+        val durationValue = savedValue as? LuaScriptConfigurationValue.Duration
+        val initialValue = durationValue?.value ?: config.defaultValue ?: 0.0
+
+        val viewModel = DurationInputViewModelImpl()
+        viewModel.setDurationFromDouble(initialValue)
+
+        return LuaScriptConfigurationInput.Duration(
+            name = config.name,
+            viewModel = viewModel
         )
     }
 }
