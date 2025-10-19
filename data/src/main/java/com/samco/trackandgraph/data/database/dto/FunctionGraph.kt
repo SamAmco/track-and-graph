@@ -103,6 +103,18 @@ sealed class LuaScriptConfigurationValue {
         override val id: String,
         val value: Int
     ) : LuaScriptConfigurationValue()
+
+    /**
+     * Represents a duration configuration value.
+     * @param id The configuration ID from the Lua script metadata
+     * @param value The duration in seconds (as double)
+     */
+    @Serializable
+    @SerialName("Duration")
+    data class Duration(
+        override val id: String,
+        val value: Double
+    ) : LuaScriptConfigurationValue()
 }
 
 /**

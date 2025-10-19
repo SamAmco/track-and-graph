@@ -83,6 +83,12 @@ sealed class LuaFunctionConfigSpec {
         override val name: TranslatedString?,
         val defaultValue: Int? = null
     ) : LuaFunctionConfigSpec()
+
+    data class Duration(
+        override val id: String,
+        override val name: TranslatedString?,
+        val defaultValue: Double? = null
+    ) : LuaFunctionConfigSpec()
 }
 
 data class LuaFunctionMetadata(

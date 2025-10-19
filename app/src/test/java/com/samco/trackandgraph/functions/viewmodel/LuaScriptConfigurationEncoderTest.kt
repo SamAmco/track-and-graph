@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -62,6 +63,11 @@ class LuaScriptConfigurationEncoderTest {
         value = mutableStateOf(TextFieldValue("42"))
     )
 
+    private val durationInput = LuaScriptConfigurationInput.Duration(
+        name = TranslatedString.Simple("Duration Config"),
+        viewModel = DurationInputViewModelImpl().apply { setDurationFromDouble(3600.0) }
+    )
+
     @Before
     fun setUp() {
         encoder = LuaScriptConfigurationEncoder()
@@ -87,14 +93,15 @@ class LuaScriptConfigurationEncoderTest {
             "numberConfig" to numberInput,
             "checkboxConfig" to checkboxInput,
             "enumConfig" to enumInput,
-            "uintConfig" to uintInput
+            "uintConfig" to uintInput,
+            "durationConfig" to durationInput
         )
 
         // When
         val result = encoder.encodeConfiguration(configuration)
 
         // Then - Verify all types are encoded correctly
-        assertEquals("Should produce five configuration values", 5, result.size)
+        assertEquals("Should produce six configuration values", 6, result.size)
         
         // Collect all encoded types
         val encodedTypes = result.map { it::class }.toSet()
@@ -134,5 +141,8 @@ class LuaScriptConfigurationEncoderTest {
 
         val uintResult = result.find { it.id == "uintConfig" } as LuaScriptConfigurationValue.UInt
         assertEquals("UInt value should be encoded correctly", 42, uintResult.value)
+
+        val durationResult = result.find { it.id == "durationConfig" } as LuaScriptConfigurationValue.Duration
+        assertEquals("Duration value should be encoded correctly", 3600.0, durationResult.value, 0.001)
     }
 }

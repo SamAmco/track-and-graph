@@ -71,6 +71,12 @@ internal class LuaScriptConfigurationEncoder @Inject constructor() {
                         value = longValue
                     )
                 }
+                is LuaScriptConfigurationInput.Duration -> {
+                    LuaScriptConfigurationValue.Duration(
+                        id = id,
+                        value = input.viewModel.getDurationAsDouble()
+                    )
+                }
             }
         }
     }

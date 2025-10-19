@@ -98,7 +98,8 @@ class ConfigurationValueParserTest {
         val checkboxConfig = LuaScriptConfigurationValue.Checkbox(id = "checkbox", value = true)
         val enumConfig = LuaScriptConfigurationValue.Enum(id = "enum", value = "option1")
         val uintConfig = LuaScriptConfigurationValue.UInt(id = "uint", value = 42)
-        val configuration = listOf(textConfig, numberConfig, checkboxConfig, enumConfig, uintConfig)
+        val durationConfig = LuaScriptConfigurationValue.Duration(id = "duration", value = 3600.0)
+        val configuration = listOf(textConfig, numberConfig, checkboxConfig, enumConfig, uintConfig, durationConfig)
 
         // When
         val result = parser.parseConfigurationValues(configuration)
@@ -115,13 +116,16 @@ class ConfigurationValueParserTest {
         assertTrue("Should have checkbox key", !result["checkbox"].isnil())
         assertTrue("Should have enum key", !result["enum"].isnil())
         assertTrue("Should have uint key", !result["uint"].isnil())
+        assertTrue("Should have duration key", !result["duration"].isnil())
         assertTrue("Text should be string", result["text"].isstring())
         assertTrue("Number should be number", result["number"].isnumber())
         assertTrue("Checkbox should be boolean", result["checkbox"].isboolean())
         assertTrue("Enum should be string", result["enum"].isstring())
         assertTrue("UInt should be number", result["uint"].isnumber())
+        assertTrue("Duration should be number", result["duration"].isnumber())
         assertEquals("Checkbox should have correct value", true, result["checkbox"].toboolean())
         assertEquals("Enum should have correct value", "option1", result["enum"].tojstring())
         assertEquals("UInt should have correct value", 42, result["uint"].toint())
+        assertEquals("Duration should have correct value", 3600.0, result["duration"].todouble(), 0.001)
     }
 }

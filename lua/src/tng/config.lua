@@ -64,4 +64,16 @@ function M.uint(spec)
 	}
 end
 
+--- Create a duration configuration item
+--- @param spec table Configuration specification with id, name, and optional default (in seconds)
+--- @return table Configuration item ready for use in config array
+function M.duration(spec)
+	return {
+		id = spec.id,
+		type = "duration",
+		name = spec.name,
+		default = spec.default,
+	}
+end
+
 return M

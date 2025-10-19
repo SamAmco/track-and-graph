@@ -1,5 +1,5 @@
 -- Example function demonstrating all available configuration types
--- This function showcases text, number, checkbox, enum, and uint inputs
+-- This function showcases text, number, checkbox, enum, uint, and duration inputs
 
 local tng_config = require("tng.config")
 local text = tng_config.text
@@ -7,6 +7,7 @@ local number = tng_config.number
 local checkbox = tng_config.checkbox
 local enum = tng_config.enum
 local uint = tng_config.uint
+local duration = tng_config.duration
 
 return {
 	id = "a1-test",
@@ -21,13 +22,13 @@ return {
 	},
 	description = {
 		["en"] =
-		"Demonstrates all available configuration input types: text, number, checkbox, enum, and uint. This function passes through all data points unchanged.",
+		"Demonstrates all available configuration input types: text, number, checkbox, enum, uint, and duration. This function passes through all data points unchanged.",
 		["de"] =
-		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung und uint. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
+		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung, uint und Dauer. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
 		["es"] =
-		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración y uint. Esta función pasa todos los puntos de datos sin cambios.",
+		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración, uint y duración. Esta función pasa todos los puntos de datos sin cambios.",
 		["fr"] =
-		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération et uint. Cette fonction transmet tous les points de données inchangés.",
+		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération, uint et durée. Cette fonction transmet tous les points de données inchangés.",
 	},
 	config = {
 		text {
@@ -81,6 +82,16 @@ return {
 			},
 			default = 42,
 		},
+		duration {
+			id = "duration_example",
+			name = {
+				["en"] = "Duration Input",
+				["de"] = "Dauereingabe",
+				["es"] = "Entrada de duración",
+				["fr"] = "Saisie de durée",
+			},
+			default = 3600, -- 1 hour in seconds
+		},
 	},
 
 	generator = function(source, config)
@@ -90,6 +101,7 @@ return {
 		local checkbox_val = config and config.checkbox_example
 		local enum_val = config and config.enum_example
 		local uint_val = config and config.uint_example
+		local duration_val = config and config.duration_example
 
 		-- Pass through all data points unchanged
 		return function()

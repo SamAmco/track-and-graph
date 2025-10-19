@@ -21,6 +21,7 @@ class ConfigurationValueParser @Inject constructor() {
             is LuaScriptConfigurationValue.Checkbox -> LuaValue.valueOf(value.value)
             is LuaScriptConfigurationValue.Enum -> LuaValue.valueOf(value.value)
             is LuaScriptConfigurationValue.UInt -> LuaValue.valueOf(value.value)
+            is LuaScriptConfigurationValue.Duration -> LuaValue.valueOf(value.value)
         }
     }
 }

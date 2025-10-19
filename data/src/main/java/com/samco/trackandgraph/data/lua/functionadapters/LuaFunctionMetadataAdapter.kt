@@ -165,6 +165,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             "checkbox" -> parseCheckboxConfig(id, nameTranslations, configItem)
             "enum" -> parseEnumConfig(id, nameTranslations, configItem, translations, usedTranslations)
             "uint" -> parseUIntConfig(id, nameTranslations, configItem)
+            "duration" -> parseDurationConfig(id, nameTranslations, configItem)
             else -> throw IllegalArgumentException("Unknown config type: $typeString")
         }
     }
@@ -285,6 +286,21 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             .takeUnless { it.isnil() }?.toint()
 
         return LuaFunctionConfigSpec.UInt(
+            id = id,
+            name = name,
+            defaultValue = defaultValue
+        )
+    }
+
+    private fun parseDurationConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.Duration {
+        val defaultValue = configItem[DEFAULT]
+            .takeUnless { it.isnil() }?.todouble()
+
+        return LuaFunctionConfigSpec.Duration(
             id = id,
             name = name,
             defaultValue = defaultValue

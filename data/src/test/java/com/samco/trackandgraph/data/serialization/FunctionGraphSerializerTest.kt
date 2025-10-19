@@ -200,6 +200,10 @@ class FunctionGraphSerializerTest {
                         LuaScriptConfigurationValue.UInt(
                             id = "uintConfig",
                             value = 100
+                        ),
+                        LuaScriptConfigurationValue.Duration(
+                            id = "durationConfig",
+                            value = 3600.0
                         )
                     ),
                     translations = mapOf(
