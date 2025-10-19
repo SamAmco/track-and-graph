@@ -309,6 +309,12 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
                         type = "localtime",
                         name = "LocalTime Configuration",
                         default = 52200000
+                    },
+                    {
+                        id = "instantConfig",
+                        type = "instant",
+                        name = "Instant Configuration",
+                        default = 1686835800000
                     }
                 },
                 generator = function(data_sources)
@@ -318,7 +324,7 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
         """.trimIndent()
         testLuaFunctionMetadata(script) {
             assertEquals(3, metadata.inputCount)
-            assertEquals(7, metadata.config.size)
+            assertEquals(8, metadata.config.size)
             assertEquals("Script should be preserved", script, metadata.script)
 
             // Validate each configuration type is parsed correctly
@@ -374,6 +380,12 @@ internal class LuaFunctionMetadataTests : LuaEngineImplTest() {
             assertEquals("LocalTime Configuration", (localtimeConfig!!.name as TranslatedString.Simple).value)
             // Lua provides 52200000 milliseconds (14.5 hours), converted to 870 minutes for internal storage
             assertEquals("LocalTime default should be parsed", 870, localtimeConfig.defaultValueMinutes)
+
+            val instantConfig = metadata.config.find { it.id == "instantConfig" } as? LuaFunctionConfigSpec.Instant
+            assertTrue("Instant configuration should be parsed", instantConfig != null)
+            assertEquals("Instant Configuration", (instantConfig!!.name as TranslatedString.Simple).value)
+            // Instant stays in epoch milliseconds (no conversion needed)
+            assertEquals("Instant default should be parsed", 1686835800000L, instantConfig.defaultValueEpochMilli)
 
             // CRITICAL: Ensure all sealed class types are tested
             // This assertion will fail if a new LuaFunctionConfigSpec type is added but not included in this test

@@ -167,6 +167,7 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             "uint" -> parseUIntConfig(id, nameTranslations, configItem)
             "duration" -> parseDurationConfig(id, nameTranslations, configItem)
             "localtime" -> parseLocalTimeConfig(id, nameTranslations, configItem)
+            "instant" -> parseInstantConfig(id, nameTranslations, configItem)
             else -> throw IllegalArgumentException("Unknown config type: $typeString")
         }
     }
@@ -340,6 +341,29 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
             id = id,
             name = name,
             defaultValueMinutes = minutes
+        )
+    }
+
+    /**
+     * Parses instant config from Lua metadata.
+     *
+     * No conversion needed - epoch milliseconds throughout the stack
+     * - Lua scripts define: default = core.time().timestamp (epoch milliseconds)
+     * - We store internally: epoch milliseconds (matches database and Lua)
+     * - ConfigurationValueParser passes through unchanged to Lua runtime
+     */
+    private fun parseInstantConfig(
+        id: String,
+        name: TranslatedString?,
+        configItem: LuaValue
+    ): LuaFunctionConfigSpec.Instant {
+        val epochMilli = configItem[DEFAULT]
+            .takeUnless { it.isnil() }?.tolong()
+
+        return LuaFunctionConfigSpec.Instant(
+            id = id,
+            name = name,
+            defaultValueEpochMilli = epochMilli
         )
     }
 

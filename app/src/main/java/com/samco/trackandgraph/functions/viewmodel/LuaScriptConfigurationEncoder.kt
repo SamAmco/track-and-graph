@@ -88,6 +88,14 @@ internal class LuaScriptConfigurationEncoder @Inject constructor() {
                         minutes = minutesSinceMidnight
                     )
                 }
+                is LuaScriptConfigurationInput.Instant -> {
+                    // Convert OffsetDateTime to epoch milliseconds for database storage
+                    val epochMilli = input.dateTime.value.toInstant().toEpochMilli()
+                    LuaScriptConfigurationValue.Instant(
+                        id = id,
+                        epochMilli = epochMilli
+                    )
+                }
             }
         }
     }

@@ -1,7 +1,8 @@
 -- Example function demonstrating all available configuration types
--- This function showcases text, number, checkbox, enum, uint, duration, and localtime inputs
+-- This function showcases text, number, checkbox, enum, uint, duration, localtime, and instant inputs
 
 local tng_config = require("tng.config")
+local core = require("tng.core")
 local text = tng_config.text
 local number = tng_config.number
 local checkbox = tng_config.checkbox
@@ -9,6 +10,10 @@ local enum = tng_config.enum
 local uint = tng_config.uint
 local duration = tng_config.duration
 local localtime = tng_config.localtime
+local instant = tng_config.instant
+
+local now = core.time()
+local default_instant = now and now.timestamp -- Current time as epoch milliseconds
 
 return {
 	id = "a1-test",
@@ -23,13 +28,13 @@ return {
 	},
 	description = {
 		["en"] =
-		"Demonstrates all available configuration input types: text, number, checkbox, enum, uint, duration, and localtime. This function passes through all data points unchanged.",
+		"Demonstrates all available configuration input types: text, number, checkbox, enum, uint, duration, localtime, and instant. This function passes through all data points unchanged.",
 		["de"] =
-		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung, uint, Dauer und Ortszeit. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
+		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung, uint, Dauer, Ortszeit und Zeitpunkt. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
 		["es"] =
-		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración, uint, duración y hora local. Esta función pasa todos los puntos de datos sin cambios.",
+		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración, uint, duración, hora local e instante. Esta función pasa todos los puntos de datos sin cambios.",
 		["fr"] =
-		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération, uint, durée et heure locale. Cette fonction transmet tous les points de données inchangés.",
+		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération, uint, durée, heure locale et instant. Cette fonction transmet tous les points de données inchangés.",
 	},
 	config = {
 		text {
@@ -103,6 +108,16 @@ return {
 			},
 			default = 52200000, -- 14:30 (2:30 PM) = 14.5 hours * DURATION.HOUR
 		},
+		instant {
+			id = "instant_example",
+			name = {
+				["en"] = "Date & Time Input",
+				["de"] = "Datum & Uhrzeit-Eingabe",
+				["es"] = "Entrada de fecha y hora",
+				["fr"] = "Saisie de date et heure",
+			},
+			default = default_instant, -- Current time as epoch milliseconds
+		},
 	},
 
 	generator = function(source, config)
@@ -114,10 +129,16 @@ return {
 		local uint_val = config and config.uint_example
 		local duration_val = config and config.duration_example
 		local localtime_val = config and config.localtime_example
+		local instant_val = config and config.instant_example
 
 		-- Pass through all data points unchanged
 		return function()
-			return source.dp()
+			local dp = source.dp()
+			if not dp then
+				return nil
+			end
+			dp.timestamp = instant_val or dp.timestamp
+			return dp
 		end
 	end,
 }

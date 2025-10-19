@@ -336,6 +336,14 @@ config.localtime { id = "wake_time", name = {...}, default = 8 * core.DURATION.H
 -- Example: 14:30 = 14.5 * DURATION.HOUR = 52200000 milliseconds
 ```
 
+**instant**: Date and time in epoch milliseconds (compatible with `core.time().timestamp`)
+```lua
+local core = require("tng.core")
+config.instant { id = "start_date", name = {...}, default = core.time().timestamp }
+-- User sees date and time picker UI, Lua receives epoch milliseconds
+-- Example: 2023-06-15T14:30:00Z = 1686835800000 milliseconds
+```
+
 ### Accessing Config Values in Generator
 
 ```lua
@@ -349,9 +357,12 @@ generator = function(source, config)
     local uint_val = config and config.my_uint or 1
     local duration_val = config and config.my_duration or core.DURATION.HOUR
     local time_val = config and config.wake_time or (12 * core.DURATION.HOUR)
+    local instant_val = config and config.start_date or core.time().timestamp
 
-    -- All time values are in milliseconds, compatible with core.DURATION
-    -- Example: config.my_duration - core.DURATION.MINUTE * 30
+    -- All time values are in milliseconds, compatible with core.DURATION and core.time()
+    -- Examples:
+    --   config.my_duration - core.DURATION.MINUTE * 30
+    --   config.start_date + core.DURATION.DAY * 7
 
     -- Use values...
 end
@@ -370,6 +381,7 @@ config = {
     my_enum = "_hours",
     my_uint = 10,
     my_duration = core.DURATION.HOUR,  -- 3600000 milliseconds
-    wake_time = 8 * core.DURATION.HOUR + 30 * core.DURATION.MINUTE,  -- 8:30 AM
+    wake_time = 8 * core.DURATION.HOUR + 30 * core.DURATION.MINUTE,  -- 8:30 AM in milliseconds
+    start_date = 1686835800000,  -- 2023-06-15T14:30:00Z as epoch milliseconds
 }
 ```

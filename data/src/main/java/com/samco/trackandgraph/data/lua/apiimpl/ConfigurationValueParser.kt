@@ -28,6 +28,8 @@ class ConfigurationValueParser @Inject constructor() {
             is LuaScriptConfigurationValue.Duration -> LuaValue.valueOf(value.seconds * 1000)
             // Convert localtime from minutes to milliseconds for Lua API (to match DURATION enum)
             is LuaScriptConfigurationValue.LocalTime -> LuaValue.valueOf(value.minutes * 60 * 1000)
+            // Instant is already in epoch milliseconds (matches core.time().timestamp)
+            is LuaScriptConfigurationValue.Instant -> LuaValue.valueOf(value.epochMilli.toDouble())
         }
     }
 }
