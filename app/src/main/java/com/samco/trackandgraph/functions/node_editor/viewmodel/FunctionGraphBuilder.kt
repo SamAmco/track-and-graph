@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functions.viewmodel
+package com.samco.trackandgraph.functions.node_editor.viewmodel
 
 import androidx.compose.ui.geometry.Offset
 import com.samco.trackandgraph.data.database.dto.FunctionGraph

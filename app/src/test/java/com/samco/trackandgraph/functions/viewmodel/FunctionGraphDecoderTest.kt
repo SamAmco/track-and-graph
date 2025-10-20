@@ -25,6 +25,13 @@ import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.functions.node_editor.viewmodel.Connector
+import com.samco.trackandgraph.functions.node_editor.viewmodel.ConnectorType
+import com.samco.trackandgraph.functions.node_editor.viewmodel.DecodedFunctionGraph
+import com.samco.trackandgraph.functions.node_editor.viewmodel.Edge
+import com.samco.trackandgraph.functions.node_editor.viewmodel.FunctionGraphDecoder
+import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptNodeProvider
+import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
