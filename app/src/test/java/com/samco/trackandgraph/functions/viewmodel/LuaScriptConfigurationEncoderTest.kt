@@ -22,6 +22,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationEncoder
+import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import org.junit.Assert.assertEquals

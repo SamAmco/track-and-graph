@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.samco.trackandgraph.functions.viewmodel.Edge
+import com.samco.trackandgraph.functions.node_editor.viewmodel.Edge
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.cos
 import kotlin.math.sin

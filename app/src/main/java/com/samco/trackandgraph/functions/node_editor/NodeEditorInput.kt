@@ -33,7 +33,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.samco.trackandgraph.functions.viewmodel.Edge
+import com.samco.trackandgraph.functions.node_editor.viewmodel.Edge
 
 // This should be placed outside the world transform container at the back
 // of the z-order so that it doesn't consume input from cards

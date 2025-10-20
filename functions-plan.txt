@@ -1,8 +1,8 @@
 TODO: 
-- Although you can't select a feature that creates a cycle, the default selected item might create a cycle
 - Show categories in the function picker
 - Don't allow creating a function until you have a tracker? 
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
+- Although you can't select a feature that creates a cycle, the default selected item might create a cycle
 - Probably detect global cycles and throw in the data module in case there are non-compliant future clients
 - Show a dialog when you first enter the function screen that explains it's advanced and links to the docs
 - Add a help button on the function screen that links to the docs?
@@ -225,43 +225,6 @@ Prebuilt Lua function nodes:
 - Filter less than other tracker
 
 
-
-
-
-
-
-The Lua function spec: 
-
-A lua function file returns an object that contains:
-- A configuration object which defines 
-  - An ID string that uniquely identifies the function
-  - A display name map of language code to translation
-  - A description map of language code to translation
-  - A matrix of the number of input nodes, and the number of data source inputs each node can accept? Data sources are guaranteed to be provided to the function in node order, but the order of data sources within a node is not guaranteed
-  - A configuration spec that describes each configuration input with its:
-    - code name
-    - display name map of language code to translation
-    - type:
-      x boolean
-      x duration i.e. h:m:s
-      x duration enum
-      x period enum
-      x weekday enum
-      x local time
-      x number
-      x uint
-      x string
-      - instant (i.e. local time/date input, and timezone enum)
-- A generator function that generates data points via yield and takes:
-  - a list of data sources 
-  - a configuration object 
-
-We should try to gracefully handle null values for all configuration here. I think the bear minimum is to just return a generator function not even wrapped in an object. 
-
-The standard library spec file:
-
-On GitHub we store a json file that lists all the standard library functions as a map of ID to the full function file contents. 
-We download this file once lazily when you open the function screen for the first time. We also store the etag of the response, and make this request at most once per app run with the etag.
 
 
 Use cases: 
