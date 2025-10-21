@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur au jour du mois",
 	},
 	description = {
-		["en"] = "Sets each data point's value to its day of the month (1-31).",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf seinen Tag des Monats (1-31).",
-		["es"] = "Establece el valor de cada punto de datos en su día del mes (1-31).",
-		["fr"] = "Définit la valeur de chaque point de données sur son jour du mois (1-31).",
+		["en"] = [[
+Sets each data point's value to its day of the month (1-31).
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf seinen Tag des Monats (1-31).
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en su día del mes (1-31).
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur son jour du mois (1-31).
+]],
 	},
 	config = {},
 

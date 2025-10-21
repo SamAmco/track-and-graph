@@ -18,6 +18,7 @@ luakJvm = "3.4.0"
 material = "1.13.0"
 mockitoCore = "5.19.0"
 mockitoKotlinVersion = "6.0.0"
+multiplatformMarkdownRenderer = "0.38.0-b01"
 room = "2.6.1"
 shot = "6.1.0"
 test-runner = "1.6.2"
@@ -87,6 +88,8 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoCore" }
+multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
+multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

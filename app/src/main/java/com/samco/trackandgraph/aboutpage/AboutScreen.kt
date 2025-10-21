@@ -159,6 +159,7 @@ fun LibraryNames() = Column {
         R.string.timber,
         R.string.luak,
         R.string.semver,
+        R.string.markdown_renderer,
     )
 
     for (library in libraries) {
@@ -180,6 +181,7 @@ fun LibraryVersions() = Column(
         R.string.apache_2_0,
         R.string.apache_2_0,
         R.string.mit,
+        R.string.apache_2_0,
     )
 
     for (version in versions) {

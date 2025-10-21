@@ -16,10 +16,18 @@ return {
         ["fr"] = "Remplacer l'Étiquette",
     },
     description = {
-        ["en"] = "Sets all incoming data point labels to a specified value",
-        ["de"] = "Setzt alle eingehenden Datenpunkt-Labels auf einen bestimmten Wert",
-        ["es"] = "Establece todas las etiquetas de puntos de datos entrantes en un valor especificado",
-        ["fr"] = "Définit toutes les étiquettes de points de données entrantes sur une valeur spécifiée",
+        ["en"] = [[
+Sets all incoming data point labels to a specified value
+]],
+        ["de"] = [[
+Setzt alle eingehenden Datenpunkt-Labels auf einen bestimmten Wert
+]],
+        ["es"] = [[
+Establece todas las etiquetas de puntos de datos entrantes en un valor especificado
+]],
+        ["fr"] = [[
+Définit toutes les étiquettes de points de données entrantes sur une valeur spécifiée
+]],
     },
     config = {
         text {

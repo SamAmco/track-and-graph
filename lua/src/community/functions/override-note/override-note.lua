@@ -16,10 +16,18 @@ return {
         ["fr"] = "Remplacer la Note",
     },
     description = {
-        ["en"] = "Sets all incoming data point notes to a specified value",
-        ["de"] = "Setzt alle eingehenden Datenpunkt-Notizen auf einen bestimmten Wert",
-        ["es"] = "Establece todas las notas de puntos de datos entrantes en un valor especificado",
-        ["fr"] = "Définit toutes les notes de points de données entrantes sur une valeur spécifiée",
+        ["en"] = [[
+Sets all incoming data point notes to a specified value
+]],
+        ["de"] = [[
+Setzt alle eingehenden Datenpunkt-Notizen auf einen bestimmten Wert
+]],
+        ["es"] = [[
+Establece todas las notas de puntos de datos entrantes en un valor especificado
+]],
+        ["fr"] = [[
+Définit toutes les notes de points de données entrantes sur une valeur spécifiée
+]],
     },
     config = {
         text {

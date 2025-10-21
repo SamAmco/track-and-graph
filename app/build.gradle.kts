@@ -214,6 +214,10 @@ dependencies {
 
     // Reorderable drag and drop
     implementation(libs.reorderable)
+    
+    // Markdown rendering
+    implementation(libs.multiplatform.markdown.renderer)
+    implementation(libs.multiplatform.markdown.renderer.m3)
 
     // Glance for widgets
     implementation(libs.glance.appwidget)

@@ -16,22 +16,30 @@ return {
         ["fr"] = "Décaler la Valeur"
     },
     description = {
-        ["en"] = [[Adds a constant offset to all incoming data point values.
+        ["en"] = [[
+Adds a constant offset to all incoming data point values.
 
 Configuration:
-• Offset: The number to add to all values (default: 0.0). Use negative values to subtract.]],
-        ["de"] = [[Fügt allen eingehenden Datenpunktwerten einen konstanten Offset hinzu.
+- **Offset**: The number to add to all values (default: 0.0). Use negative values to subtract.
+]],
+        ["de"] = [[
+Fügt allen eingehenden Datenpunktwerten einen konstanten Offset hinzu.
 
 Konfiguration:
-• Offset: Die Zahl, die zu allen Werten addiert wird (Standard: 0.0). Verwenden Sie negative Werte zum Subtrahieren.]],
-        ["es"] = [[Añade un desplazamiento constante a todos los valores de puntos de datos entrantes.
+- **Offset**: Die Zahl, die zu allen Werten addiert wird (Standard: 0.0). Verwenden Sie negative Werte zum Subtrahieren.
+]],
+        ["es"] = [[
+Añade un desplazamiento constante a todos los valores de puntos de datos entrantes.
 
 Configuración:
-• Desplazamiento: El número a añadir a todos los valores (predeterminado: 0.0). Use valores negativos para restar.]],
-        ["fr"] = [[Ajoute un décalage constant à toutes les valeurs de points de données entrantes.
+- **Desplazamiento**: El número a añadir a todos los valores (predeterminado: 0.0). Use valores negativos para restar.
+]],
+        ["fr"] = [[
+Ajoute un décalage constant à toutes les valeurs de points de données entrantes.
 
 Configuration:
-• Décalage: Le nombre à ajouter à toutes les valeurs (par défaut: 0.0). Utilisez des valeurs négatives pour soustraire.]]
+- **Décalage**: Le nombre à ajouter à toutes les valeurs (par défaut: 0.0). Utilisez des valeurs négatives pour soustraire.
+]]
     },
     config = {
         number {

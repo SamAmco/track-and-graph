@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur à la seconde de la minute",
 	},
 	description = {
-		["en"] = "Sets each data point's value to its second of the minute (0-59).",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf seine Sekunde der Minute (0-59).",
-		["es"] = "Establece el valor de cada punto de datos en su segundo del minuto (0-59).",
-		["fr"] = "Définit la valeur de chaque point de données sur sa seconde de la minute (0-59).",
+		["en"] = [[
+Sets each data point's value to its second of the minute (0-59).
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf seine Sekunde der Minute (0-59).
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en su segundo del minuto (0-59).
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur sa seconde de la minute (0-59).
+]],
 	},
 	config = {},
 

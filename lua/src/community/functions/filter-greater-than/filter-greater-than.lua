@@ -18,26 +18,34 @@ return {
         ["fr"] = "Filtrer supérieur à",
     },
     description = {
-        ["en"] = [[Filters data points by value. Only data points with values greater than the threshold will pass through.
+        ["en"] = [[
+Filters data points by value. Only data points with values greater than the threshold will pass through.
 
 Configuration:
-• Threshold: The minimum value (exclusive by default)
-• Include Equal: Also include values equal to the threshold (default: false)]],
-        ["de"] = [[Filtert Datenpunkte nach Wert. Nur Datenpunkte mit Werten größer als der Schwellenwert werden durchgelassen.
+- **Threshold**: The minimum value (exclusive by default)
+- **Include Equal**: Also include values equal to the threshold (default: false)
+]],
+        ["de"] = [[
+Filtert Datenpunkte nach Wert. Nur Datenpunkte mit Werten größer als der Schwellenwert werden durchgelassen.
 
 Konfiguration:
-• Schwellenwert: Der Mindestwert (standardmäßig exklusiv)
-• Gleich einschließen: Werte gleich dem Schwellenwert auch einschließen (Standard: false)]],
-        ["es"] = [[Filtra puntos de datos por valor. Solo los puntos de datos con valores mayores que el umbral pasarán.
+- **Schwellenwert**: Der Mindestwert (standardmäßig exklusiv)
+- **Gleich einschließen**: Werte gleich dem Schwellenwert auch einschließen (Standard: false)
+]],
+        ["es"] = [[
+Filtra puntos de datos por valor. Solo los puntos de datos con valores mayores que el umbral pasarán.
 
 Configuración:
-• Umbral: El valor mínimo (exclusivo por defecto)
-• Incluir igual: También incluir valores iguales al umbral (predeterminado: false)]],
-        ["fr"] = [[Filtre les points de données par valeur. Seuls les points de données avec des valeurs supérieures au seuil passeront.
+- **Umbral**: El valor mínimo (exclusivo por defecto)
+- **Incluir igual**: También incluir valores iguales al umbral (predeterminado: false)
+]],
+        ["fr"] = [[
+Filtre les points de données par valeur. Seuls les points de données avec des valeurs supérieures au seuil passeront.
 
 Configuration:
-• Seuil: La valeur minimale (exclusive par défaut)
-• Inclure égal: Inclure également les valeurs égales au seuil (par défaut: false)]],
+- **Seuil**: La valeur minimale (exclusive par défaut)
+- **Inclure égal**: Inclure également les valeurs égales au seuil (par défaut: false)
+]],
     },
     config = {
         number {

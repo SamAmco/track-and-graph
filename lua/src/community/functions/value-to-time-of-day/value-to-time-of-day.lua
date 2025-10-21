@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur à l'heure de la journée",
 	},
 	description = {
-		["en"] = "Sets each data point's value to the time of day in seconds since midnight. The output is a duration value representing elapsed time since the start of the day.",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf die Tageszeit in Sekunden seit Mitternacht. Die Ausgabe ist ein Dauerwert, der die verstrichene Zeit seit Tagesbeginn darstellt.",
-		["es"] = "Establece el valor de cada punto de datos en la hora del día en segundos desde la medianoche. La salida es un valor de duración que representa el tiempo transcurrido desde el comienzo del día.",
-		["fr"] = "Définit la valeur de chaque point de données sur l'heure de la journée en secondes depuis minuit. La sortie est une valeur de durée représentant le temps écoulé depuis le début de la journée.",
+		["en"] = [[
+Sets each data point's value to the time of day in seconds since midnight. The output is a duration value representing elapsed time since the start of the day.
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf die Tageszeit in Sekunden seit Mitternacht. Die Ausgabe ist ein Dauerwert, der die verstrichene Zeit seit Tagesbeginn darstellt.
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en la hora del día en segundos desde la medianoche. La salida es un valor de duración que representa el tiempo transcurrido desde el comienzo del día.
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur l'heure de la journée en secondes depuis minuit. La sortie est une valeur de durée représentant le temps écoulé depuis le début de la journée.
+]],
 	},
 	config = {},
 

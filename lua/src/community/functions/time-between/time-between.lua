@@ -17,22 +17,30 @@ return {
 		["fr"] = "Temps entre",
 	},
 	description = {
-		["en"] = [[Calculates the duration in seconds between each data point and the previous one. The output value is the time difference in seconds and can be treated as a duration.
+		["en"] = [[
+Calculates the duration in seconds between each data point and the previous one. The output value is the time difference in seconds and can be treated as a duration.
 
 Configuration:
-• Include Time to First: Include the time between now and the first data point (default: false)]],
-		["de"] = [[Berechnet die Dauer in Sekunden zwischen jedem Datenpunkt und dem vorherigen. Der Ausgabewert ist die Zeitdifferenz in Sekunden und kann als Dauer behandelt werden.
+- **Include Time to First**: Include the time between now and the first data point (default: false)
+]],
+		["de"] = [[
+Berechnet die Dauer in Sekunden zwischen jedem Datenpunkt und dem vorherigen. Der Ausgabewert ist die Zeitdifferenz in Sekunden und kann als Dauer behandelt werden.
 
 Konfiguration:
-• Zeit zum Ersten einschließen: Die Zeit zwischen jetzt und dem ersten Datenpunkt einschließen (Standard: false)]],
-		["es"] = [[Calcula la duración en segundos entre cada punto de datos y el anterior. El valor de salida es la diferencia de tiempo en segundos y puede tratarse como una duración.
+- **Zeit zum Ersten einschließen**: Die Zeit zwischen jetzt und dem ersten Datenpunkt einschließen (Standard: false)
+]],
+		["es"] = [[
+Calcula la duración en segundos entre cada punto de datos y el anterior. El valor de salida es la diferencia de tiempo en segundos y puede tratarse como una duración.
 
 Configuración:
-• Incluir tiempo al primero: Incluir el tiempo entre ahora y el primer punto de datos (predeterminado: false)]],
-		["fr"] = [[Calcule la durée en secondes entre chaque point de données et le précédent. La valeur de sortie est la différence de temps en secondes et peut être traitée comme une durée.
+- **Incluir tiempo al primero**: Incluir el tiempo entre ahora y el primer punto de datos (predeterminado: false)
+]],
+		["fr"] = [[
+Calcule la durée en secondes entre chaque point de données et le précédent. La valeur de sortie est la différence de temps en secondes et peut être traitée comme une durée.
 
 Configuration:
-• Inclure le temps jusqu'au premier: Inclure le temps entre maintenant et le premier point de données (par défaut: false)]],
+- **Inclure le temps jusqu'au premier**: Inclure le temps entre maintenant et le premier point de données (par défaut: false)
+]],
 	},
 	config = {
 		checkbox {

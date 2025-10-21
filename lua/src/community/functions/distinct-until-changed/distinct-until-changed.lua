@@ -16,10 +16,50 @@ return {
 		["fr"] = "Distinct jusqu'au changement",
 	},
 	description = {
-		["en"] = "Filters out consecutive duplicates based on the selected fields. Only data points where the selected fields differ from the previous one will pass through.\n\n• All Fields - Compare value, label, and note\n• Value Only - Compare value only\n• Label Only - Compare label only\n• Note Only - Compare note only\n• Value and Label - Compare value and label\n• Value and Note - Compare value and note\n• Label and Note - Compare label and note",
-		["de"] = "Filtert aufeinanderfolgende Duplikate basierend auf den ausgewählten Feldern heraus. Nur Datenpunkte, bei denen sich die ausgewählten Felder vom vorherigen unterscheiden, werden durchgelassen.\n\n• Alle Felder - Vergleicht Wert, Label und Notiz\n• Nur Wert - Vergleicht nur Wert\n• Nur Label - Vergleicht nur Label\n• Nur Notiz - Vergleicht nur Notiz\n• Wert und Label - Vergleicht Wert und Label\n• Wert und Notiz - Vergleicht Wert und Notiz\n• Label und Notiz - Vergleicht Label und Notiz",
-		["es"] = "Filtra duplicados consecutivos basándose en los campos seleccionados. Solo los puntos de datos donde los campos seleccionados difieren del anterior pasarán.\n\n• Todos los campos - Compara valor, etiqueta y nota\n• Solo valor - Compara solo valor\n• Solo etiqueta - Compara solo etiqueta\n• Solo nota - Compara solo nota\n• Valor y etiqueta - Compara valor y etiqueta\n• Valor y nota - Compara valor y nota\n• Etiqueta y nota - Compara etiqueta y nota",
-		["fr"] = "Filtre les doublons consécutifs en fonction des champs sélectionnés. Seuls les points de données où les champs sélectionnés diffèrent du précédent passeront.\n\n• Tous les champs - Compare valeur, étiquette et note\n• Valeur uniquement - Compare la valeur uniquement\n• Étiquette uniquement - Compare l'étiquette uniquement\n• Note uniquement - Compare la note uniquement\n• Valeur et étiquette - Compare valeur et étiquette\n• Valeur et note - Compare valeur et note\n• Étiquette et note - Compare étiquette et note",
+		["en"] = [[
+Filters out consecutive duplicates based on the selected fields. Only data points where the selected fields differ from the previous one will pass through.
+
+- **All Fields** - Compare value, label, and note
+- **Value Only** - Compare value only
+- **Label Only** - Compare label only
+- **Note Only** - Compare note only
+- **Value and Label** - Compare value and label
+- **Value and Note** - Compare value and note
+- **Label and Note** - Compare label and note
+]],
+		["de"] = [[
+Filtert aufeinanderfolgende Duplikate basierend auf den ausgewählten Feldern heraus. Nur Datenpunkte, bei denen sich die ausgewählten Felder vom vorherigen unterscheiden, werden durchgelassen.
+
+- **Alle Felder** - Vergleicht Wert, Label und Notiz
+- **Nur Wert** - Vergleicht nur Wert
+- **Nur Label** - Vergleicht nur Label
+- **Nur Notiz** - Vergleicht nur Notiz
+- **Wert und Label** - Vergleicht Wert und Label
+- **Wert und Notiz** - Vergleicht Wert und Notiz
+- **Label und Notiz** - Vergleicht Label und Notiz
+]],
+		["es"] = [[
+Filtra duplicados consecutivos basándose en los campos seleccionados. Solo los puntos de datos donde los campos seleccionados difieren del anterior pasarán.
+
+- **Todos los campos** - Compara valor, etiqueta y nota
+- **Solo valor** - Compara solo valor
+- **Solo etiqueta** - Compara solo etiqueta
+- **Solo nota** - Compara solo nota
+- **Valor y etiqueta** - Compara valor y etiqueta
+- **Valor y nota** - Compara valor y nota
+- **Etiqueta y nota** - Compara etiqueta y nota
+]],
+		["fr"] = [[
+Filtre les doublons consécutifs en fonction des champs sélectionnés. Seuls les points de données où les champs sélectionnés diffèrent du précédent passeront.
+
+- **Tous les champs** - Compare valeur, étiquette et note
+- **Valeur uniquement** - Compare la valeur uniquement
+- **Étiquette uniquement** - Compare l'étiquette uniquement
+- **Note uniquement** - Compare la note uniquement
+- **Valeur et étiquette** - Compare valeur et étiquette
+- **Valeur et note** - Compare valeur et note
+- **Étiquette et note** - Compare étiquette et note
+]],
 	},
 	config = {
 		enum {

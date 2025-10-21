@@ -16,22 +16,30 @@ return {
         ["fr"] = "Multiplier les Valeurs"
     },
     description = {
-        ["en"] = [[Multiplies all incoming data point values by a specified multiplier.
+        ["en"] = [[
+Multiplies all incoming data point values by a specified multiplier.
 
 Configuration:
-• Multiplier: The number to multiply all values by (default: 1.0)]],
-        ["de"] = [[Multipliziert alle eingehenden Datenpunktwerte mit einem bestimmten Multiplikator.
+- **Multiplier**: The number to multiply all values by (default: 1.0)
+]],
+        ["de"] = [[
+Multipliziert alle eingehenden Datenpunktwerte mit einem bestimmten Multiplikator.
 
 Konfiguration:
-• Multiplikator: Die Zahl, mit der alle Werte multipliziert werden (Standard: 1.0)]],
-        ["es"] = [[Multiplica todos los valores de puntos de datos entrantes por un multiplicador especificado.
+- **Multiplikator**: Die Zahl, mit der alle Werte multipliziert werden (Standard: 1.0)
+]],
+        ["es"] = [[
+Multiplica todos los valores de puntos de datos entrantes por un multiplicador especificado.
 
 Configuración:
-• Multiplicador: El número por el cual multiplicar todos los valores (predeterminado: 1.0)]],
-        ["fr"] = [[Multiplie toutes les valeurs de points de données entrantes par un multiplicateur spécifié.
+- **Multiplicador**: El número por el cual multiplicar todos los valores (predeterminado: 1.0)
+]],
+        ["fr"] = [[
+Multiplie toutes les valeurs de points de données entrantes par un multiplicateur spécifié.
 
 Configuration:
-• Multiplicateur: Le nombre par lequel multiplier toutes les valeurs (par défaut: 1.0)]]
+- **Multiplicateur**: Le nombre par lequel multiplier toutes les valeurs (par défaut: 1.0)
+]]
     },
     config = {
         number {

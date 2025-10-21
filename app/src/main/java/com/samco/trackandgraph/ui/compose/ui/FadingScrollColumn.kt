@@ -52,11 +52,9 @@ fun FadingScrollColumn(
 
     val threshold = 20
 
-    Box {
+    Box(modifier = modifier) {
         Column(
-            modifier = Modifier
-                .verticalScroll(scrollState)
-                .then(modifier),
+            modifier = Modifier.verticalScroll(scrollState),
             verticalArrangement = verticalArrangement,
             horizontalAlignment = horizontalAlignment,
             content = content
