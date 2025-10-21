@@ -16,10 +16,18 @@ return {
         ["fr"] = "Remplacer la Valeur",
     },
     description = {
-        ["en"] = "Sets all incoming data point values to a specified value",
-        ["de"] = "Setzt alle eingehenden Datenpunktwerte auf einen bestimmten Wert",
-        ["es"] = "Establece todos los valores de puntos de datos entrantes en un valor especificado",
-        ["fr"] = "Définit toutes les valeurs de points de données entrantes sur une valeur spécifiée",
+        ["en"] = [[
+Sets all incoming data point values to a specified value
+]],
+        ["de"] = [[
+Setzt alle eingehenden Datenpunktwerte auf einen bestimmten Wert
+]],
+        ["es"] = [[
+Establece todos los valores de puntos de datos entrantes en un valor especificado
+]],
+        ["fr"] = [[
+Définit toutes les valeurs de points de données entrantes sur une valeur spécifiée
+]],
     },
     config = {
         number {

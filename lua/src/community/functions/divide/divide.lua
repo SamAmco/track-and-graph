@@ -16,22 +16,30 @@ return {
         ["fr"] = "Diviser les Valeurs"
     },
     description = {
-        ["en"] = [[Divides all incoming data point values by a specified divisor.
+        ["en"] = [[
+Divides all incoming data point values by a specified divisor.
 
 Configuration:
-• Divisor: The number to divide all values by (default: 1.0)]],
-        ["de"] = [[Dividiert alle eingehenden Datenpunktwerte durch einen bestimmten Divisor.
+- **Divisor**: The number to divide all values by (default: 1.0)
+]],
+        ["de"] = [[
+Dividiert alle eingehenden Datenpunktwerte durch einen bestimmten Divisor.
 
 Konfiguration:
-• Divisor: Die Zahl, durch die alle Werte dividiert werden (Standard: 1.0)]],
-        ["es"] = [[Divide todos los valores de puntos de datos entrantes por un divisor especificado.
+- **Divisor**: Die Zahl, durch die alle Werte dividiert werden (Standard: 1.0)
+]],
+        ["es"] = [[
+Divide todos los valores de puntos de datos entrantes por un divisor especificado.
 
 Configuración:
-• Divisor: El número por el cual dividir todos los valores (predeterminado: 1.0)]],
-        ["fr"] = [[Divise toutes les valeurs de points de données entrantes par un diviseur spécifié.
+- **Divisor**: El número por el cual dividir todos los valores (predeterminado: 1.0)
+]],
+        ["fr"] = [[
+Divise toutes les valeurs de points de données entrantes par un diviseur spécifié.
 
 Configuration:
-• Diviseur: Le nombre par lequel diviser toutes les valeurs (par défaut: 1.0)]]
+- **Diviseur**: Le nombre par lequel diviser toutes les valeurs (par défaut: 1.0)
+]]
     },
     config = {
         number {

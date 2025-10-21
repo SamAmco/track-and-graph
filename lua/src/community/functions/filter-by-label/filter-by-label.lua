@@ -41,34 +41,42 @@ return {
         ["fr"] = "Filtrer par Étiquette"
     },
     description = {
-        ["en"] = [[Filters data points by their label field. Only data points matching the filter criteria will pass through.
+        ["en"] = [[
+Filters data points by their label field. Only data points matching the filter criteria will pass through.
 
 Configuration:
-• Filter Label: The text to search for in labels
-• Case Sensitive: Match case exactly (default: false)
-• Match Exactly: Require exact match instead of substring (default: false)
-• Invert: Keep data points that DON'T match instead (default: false)]],
-        ["de"] = [[Filtert Datenpunkte nach ihrem Label-Feld. Nur Datenpunkte, die den Filterkriterien entsprechen, werden durchgelassen.
+- **Filter Label**: The text to search for in labels
+- **Case Sensitive**: Match case exactly (default: false)
+- **Match Exactly**: Require exact match instead of substring (default: false)
+- **Invert**: Keep data points that DON'T match instead (default: false)
+]],
+        ["de"] = [[
+Filtert Datenpunkte nach ihrem Label-Feld. Nur Datenpunkte, die den Filterkriterien entsprechen, werden durchgelassen.
 
 Konfiguration:
-• Filter-Label: Der Text, nach dem in Labels gesucht werden soll
-• Groß-/Kleinschreibung beachten: Groß-/Kleinschreibung exakt beachten (Standard: false)
-• Exakt übereinstimmen: Exakte Übereinstimmung statt Teilstring erforderlich (Standard: false)
-• Invertieren: Datenpunkte behalten, die NICHT übereinstimmen (Standard: false)]],
-        ["es"] = [[Filtra puntos de datos por su campo de etiqueta. Solo los puntos de datos que coincidan con los criterios del filtro pasarán.
+- **Filter-Label**: Der Text, nach dem in Labels gesucht werden soll
+- **Groß-/Kleinschreibung beachten**: Groß-/Kleinschreibung exakt beachten (Standard: false)
+- **Exakt übereinstimmen**: Exakte Übereinstimmung statt Teilstring erforderlich (Standard: false)
+- **Invertieren**: Datenpunkte behalten, die NICHT übereinstimmen (Standard: false)
+]],
+        ["es"] = [[
+Filtra puntos de datos por su campo de etiqueta. Solo los puntos de datos que coincidan con los criterios del filtro pasarán.
 
 Configuración:
-• Filtrar Etiqueta: El texto a buscar en las etiquetas
-• Sensible a Mayúsculas: Coincidir exactamente con mayúsculas y minúsculas (predeterminado: false)
-• Coincidir Exactamente: Requerir coincidencia exacta en lugar de subcadena (predeterminado: false)
-• Invertir: Mantener puntos de datos que NO coincidan (predeterminado: false)]],
-        ["fr"] = [[Filtre les points de données par leur champ d'étiquette. Seuls les points de données correspondant aux critères du filtre passeront.
+- **Filtrar Etiqueta**: El texto a buscar en las etiquetas
+- **Sensible a Mayúsculas**: Coincidir exactamente con mayúsculas y minúsculas (predeterminado: false)
+- **Coincidir Exactamente**: Requerir coincidencia exacta en lugar de subcadena (predeterminado: false)
+- **Invertir**: Mantener puntos de datos que NO coincidan (predeterminado: false)
+]],
+        ["fr"] = [[
+Filtre les points de données par leur champ d'étiquette. Seuls les points de données correspondant aux critères du filtre passeront.
 
 Configuration:
-• Filtrer l'Étiquette: Le texte à rechercher dans les étiquettes
-• Sensible à la Casse: Correspondance exacte de la casse (par défaut: false)
-• Correspondance Exacte: Nécessite une correspondance exacte au lieu d'une sous-chaîne (par défaut: false)
-• Inverser: Conserver les points de données qui NE correspondent PAS (par défaut: false)]]
+- **Filtrer l'Étiquette**: Le texte à rechercher dans les étiquettes
+- **Sensible à la Casse**: Correspondance exacte de la casse (par défaut: false)
+- **Correspondance Exacte**: Nécessite une correspondance exacte au lieu d'une sous-chaîne (par défaut: false)
+- **Inverser**: Conserver les points de données qui NE correspondent PAS (par défaut: false)
+]]
     },
     config = {
         text {

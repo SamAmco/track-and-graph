@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur à la minute de l'heure",
 	},
 	description = {
-		["en"] = "Sets each data point's value to its minute of the hour (0-59).",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf seine Minute der Stunde (0-59).",
-		["es"] = "Establece el valor de cada punto de datos en su minuto de la hora (0-59).",
-		["fr"] = "Définit la valeur de chaque point de données sur sa minute de l'heure (0-59).",
+		["en"] = [[
+Sets each data point's value to its minute of the hour (0-59).
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf seine Minute der Stunde (0-59).
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en su minuto de la hora (0-59).
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur sa minute de l'heure (0-59).
+]],
 	},
 	config = {},
 

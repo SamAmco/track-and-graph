@@ -55,12 +55,13 @@ fun CustomDialog(
     dismissOnClickOutside: Boolean = true,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     usePlatformDefaultWidth: Boolean = true,
+    decorFitsSystemWindows: Boolean? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) = DialogTheme {
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
-            decorFitsSystemWindows = false,
+            decorFitsSystemWindows = decorFitsSystemWindows ?: usePlatformDefaultWidth,
             dismissOnClickOutside = dismissOnClickOutside,
             usePlatformDefaultWidth = usePlatformDefaultWidth,
         )

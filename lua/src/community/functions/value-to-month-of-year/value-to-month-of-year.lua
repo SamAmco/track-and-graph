@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur au mois de l'année",
 	},
 	description = {
-		["en"] = "Sets each data point's value to its month of the year (1-12, where January is 1).",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf seinen Monat des Jahres (1-12, wobei Januar 1 ist).",
-		["es"] = "Establece el valor de cada punto de datos en su mes del año (1-12, donde enero es 1).",
-		["fr"] = "Définit la valeur de chaque point de données sur son mois de l'année (1-12, où janvier est 1).",
+		["en"] = [[
+Sets each data point's value to its month of the year (1-12, where January is 1).
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf seinen Monat des Jahres (1-12, wobei Januar 1 ist).
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en su mes del año (1-12, donde enero es 1).
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur son mois de l'année (1-12, où janvier est 1).
+]],
 	},
 	config = {},
 

@@ -16,22 +16,30 @@ return {
 		["fr"] = "Arrondir",
 	},
 	description = {
-		["en"] = [[Rounds each data point's value to the nearest multiple of a specified number.
+		["en"] = [[
+Rounds each data point's value to the nearest multiple of a specified number.
 
 Configuration:
-• Nearest: Round to the nearest multiple of this number (default: 1.0)]],
-		["de"] = [[Rundet den Wert jedes Datenpunkts auf das nächste Vielfache einer angegebenen Zahl.
+- **Nearest**: Round to the nearest multiple of this number (default: 1.0)
+]],
+		["de"] = [[
+Rundet den Wert jedes Datenpunkts auf das nächste Vielfache einer angegebenen Zahl.
 
 Konfiguration:
-• Nächste: Auf das nächste Vielfache dieser Zahl runden (Standard: 1.0)]],
-		["es"] = [[Redondea el valor de cada punto de datos al múltiplo más cercano de un número especificado.
+- **Nächste**: Auf das nächste Vielfache dieser Zahl runden (Standard: 1.0)
+]],
+		["es"] = [[
+Redondea el valor de cada punto de datos al múltiplo más cercano de un número especificado.
 
 Configuración:
-• Más cercano: Redondear al múltiplo más cercano de este número (predeterminado: 1.0)]],
-		["fr"] = [[Arrondit la valeur de chaque point de données au multiple le plus proche d'un nombre spécifié.
+- **Más cercano**: Redondear al múltiplo más cercano de este número (predeterminado: 1.0)
+]],
+		["fr"] = [[
+Arrondit la valeur de chaque point de données au multiple le plus proche d'un nombre spécifié.
 
 Configuration:
-• Plus proche: Arrondir au multiple le plus proche de ce nombre (par défaut: 1.0)]],
+- **Plus proche**: Arrondir au multiple le plus proche de ce nombre (par défaut: 1.0)
+]],
 	},
 	config = {
 		number {

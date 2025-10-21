@@ -16,22 +16,30 @@ return {
 		["fr"] = "Plancher",
 	},
 	description = {
-		["en"] = [[Rounds each data point's value down to the nearest multiple of a specified number.
+		["en"] = [[
+Rounds each data point's value down to the nearest multiple of a specified number.
 
 Configuration:
-• Nearest: Round down to the nearest multiple of this number (default: 1.0)]],
-		["de"] = [[Rundet den Wert jedes Datenpunkts auf das nächste Vielfache einer angegebenen Zahl ab.
+- **Nearest**: Round down to the nearest multiple of this number (default: 1.0)
+]],
+		["de"] = [[
+Rundet den Wert jedes Datenpunkts auf das nächste Vielfache einer angegebenen Zahl ab.
 
 Konfiguration:
-• Nächste: Auf das nächste Vielfache dieser Zahl abrunden (Standard: 1.0)]],
-		["es"] = [[Redondea hacia abajo el valor de cada punto de datos al múltiplo más cercano de un número especificado.
+- **Nächste**: Auf das nächste Vielfache dieser Zahl abrunden (Standard: 1.0)
+]],
+		["es"] = [[
+Redondea hacia abajo el valor de cada punto de datos al múltiplo más cercano de un número especificado.
 
 Configuración:
-• Más cercano: Redondear hacia abajo al múltiplo más cercano de este número (predeterminado: 1.0)]],
-		["fr"] = [[Arrondit vers le bas la valeur de chaque point de données au multiple le plus proche d'un nombre spécifié.
+- **Más cercano**: Redondear hacia abajo al múltiplo más cercano de este número (predeterminado: 1.0)
+]],
+		["fr"] = [[
+Arrondit vers le bas la valeur de chaque point de données au multiple le plus proche d'un nombre spécifié.
 
 Configuration:
-• Plus proche: Arrondir vers le bas au multiple le plus proche de ce nombre (par défaut: 1.0)]],
+- **Plus proche**: Arrondir vers le bas au multiple le plus proche de ce nombre (par défaut: 1.0)
+]],
 	},
 	config = {
 		number {

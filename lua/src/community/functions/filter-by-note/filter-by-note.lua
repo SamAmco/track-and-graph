@@ -41,34 +41,42 @@ return {
         ["fr"] = "Filtrer par Note"
     },
     description = {
-        ["en"] = [[Filters data points by their note field. Only data points matching the filter criteria will pass through.
+        ["en"] = [[
+Filters data points by their note field. Only data points matching the filter criteria will pass through.
 
 Configuration:
-• Filter Note: The text to search for in notes
-• Case Sensitive: Match case exactly (default: false)
-• Match Exactly: Require exact match instead of substring (default: false)
-• Invert: Keep data points that DON'T match instead (default: false)]],
-        ["de"] = [[Filtert Datenpunkte nach ihrem Notiz-Feld. Nur Datenpunkte, die den Filterkriterien entsprechen, werden durchgelassen.
+- **Filter Note**: The text to search for in notes
+- **Case Sensitive**: Match case exactly (default: false)
+- **Match Exactly**: Require exact match instead of substring (default: false)
+- **Invert**: Keep data points that DON'T match instead (default: false)
+]],
+        ["de"] = [[
+Filtert Datenpunkte nach ihrem Notiz-Feld. Nur Datenpunkte, die den Filterkriterien entsprechen, werden durchgelassen.
 
 Konfiguration:
-• Filter-Notiz: Der Text, nach dem in Notizen gesucht werden soll
-• Groß-/Kleinschreibung beachten: Groß-/Kleinschreibung exakt beachten (Standard: false)
-• Exakt übereinstimmen: Exakte Übereinstimmung statt Teilstring erforderlich (Standard: false)
-• Invertieren: Datenpunkte behalten, die NICHT übereinstimmen (Standard: false)]],
-        ["es"] = [[Filtra puntos de datos por su campo de nota. Solo los puntos de datos que coincidan con los criterios del filtro pasarán.
+- **Filter-Notiz**: Der Text, nach dem in Notizen gesucht werden soll
+- **Groß-/Kleinschreibung beachten**: Groß-/Kleinschreibung exakt beachten (Standard: false)
+- **Exakt übereinstimmen**: Exakte Übereinstimmung statt Teilstring erforderlich (Standard: false)
+- **Invertieren**: Datenpunkte behalten, die NICHT übereinstimmen (Standard: false)
+]],
+        ["es"] = [[
+Filtra puntos de datos por su campo de nota. Solo los puntos de datos que coincidan con los criterios del filtro pasarán.
 
 Configuración:
-• Filtrar Nota: El texto a buscar en las notas
-• Sensible a Mayúsculas: Coincidir exactamente con mayúsculas y minúsculas (predeterminado: false)
-• Coincidir Exactamente: Requerir coincidencia exacta en lugar de subcadena (predeterminado: false)
-• Invertir: Mantener puntos de datos que NO coincidan (predeterminado: false)]],
-        ["fr"] = [[Filtre les points de données par leur champ de note. Seuls les points de données correspondant aux critères du filtre passeront.
+- **Filtrar Nota**: El texto a buscar en las notas
+- **Sensible a Mayúsculas**: Coincidir exactamente con mayúsculas y minúsculas (predeterminado: false)
+- **Coincidir Exactamente**: Requerir coincidencia exacta en lugar de subcadena (predeterminado: false)
+- **Invertir**: Mantener puntos de datos que NO coincidan (predeterminado: false)
+]],
+        ["fr"] = [[
+Filtre les points de données par leur champ de note. Seuls les points de données correspondant aux critères du filtre passeront.
 
 Configuration:
-• Filtrer la Note: Le texte à rechercher dans les notes
-• Sensible à la Casse: Correspondance exacte de la casse (par défaut: false)
-• Correspondance Exacte: Nécessite une correspondance exacte au lieu d'une sous-chaîne (par défaut: false)
-• Inverser: Conserver les points de données qui NE correspondent PAS (par défaut: false)]]
+- **Filtrer la Note**: Le texte à rechercher dans les notes
+- **Sensible à la Casse**: Correspondance exacte de la casse (par défaut: false)
+- **Correspondance Exacte**: Nécessite une correspondance exacte au lieu d'une sous-chaîne (par défaut: false)
+- **Inverser**: Conserver les points de données qui NE correspondent PAS (par défaut: false)
+]]
     },
     config = {
         text {

@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur à l'heure (0-23)",
 	},
 	description = {
-		["en"] = "Sets each data point's value to its hour of the day (0-23).",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf seine Stunde des Tages (0-23).",
-		["es"] = "Establece el valor de cada punto de datos en su hora del día (0-23).",
-		["fr"] = "Définit la valeur de chaque point de données sur son heure du jour (0-23).",
+		["en"] = [[
+Sets each data point's value to its hour of the day (0-23).
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf seine Stunde des Tages (0-23).
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en su hora del día (0-23).
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur son heure du jour (0-23).
+]],
 	},
 	config = {},
 

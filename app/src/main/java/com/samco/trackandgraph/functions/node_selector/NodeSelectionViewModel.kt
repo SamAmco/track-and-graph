@@ -25,10 +25,7 @@ import com.samco.trackandgraph.functions.repository.SignatureVerificationExcepti
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -39,17 +36,20 @@ enum class FetchError {
 
 sealed class NodeSelectionUiState {
     data object Loading : NodeSelectionUiState()
-    data class Ready(val items: List<LuaFunctionMetadata>) : NodeSelectionUiState()
+    data class Ready(
+        val allFunctions: List<LuaFunctionMetadata>,
+        val displayedFunctions: List<LuaFunctionMetadata>,
+        val selectedCategory: String?,
+        val allCategories: Map<String, TranslatedString>
+    ) : NodeSelectionUiState()
     data class Error(val error: FetchError) : NodeSelectionUiState()
 }
 
 interface NodeSelectionViewModel {
     val state: StateFlow<NodeSelectionUiState>
-    val displayedFunctions: StateFlow<List<LuaFunctionMetadata>>
-    val selectedCategory: StateFlow<String?>
-    val allCategories: StateFlow<Map<String, TranslatedString>>
 
     fun selectCategory(categoryId: String?)
+    fun clearSelection()
     fun retry()
 }
 
@@ -61,34 +61,22 @@ class NodeSelectionViewModelImpl @Inject constructor(
     private val _state = MutableStateFlow<NodeSelectionUiState>(NodeSelectionUiState.Loading)
     override val state: StateFlow<NodeSelectionUiState> = _state
 
-    private val _allFunctions = MutableStateFlow<List<LuaFunctionMetadata>>(emptyList())
-    private val _selectedCategory = MutableStateFlow<String?>(null)
-    override val selectedCategory: StateFlow<String?> = _selectedCategory
-
-    private val _allCategories = MutableStateFlow<Map<String, TranslatedString>>(emptyMap())
-    override val allCategories: StateFlow<Map<String, TranslatedString>> = _allCategories
-
-    override val displayedFunctions: StateFlow<List<LuaFunctionMetadata>> =
-        combine(_allFunctions, _selectedCategory) { functions, category ->
-            if (category == null) {
-                functions
-            } else {
-                functions.filter { function ->
-                    function.categories.containsKey(category)
-                }
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    private var allFunctions: List<LuaFunctionMetadata> = emptyList()
+    private var selectedCategory: String? = null
+    private var allCategories: Map<String, TranslatedString> = emptyMap()
 
     init {
         fetchFunctions()
     }
 
     override fun selectCategory(categoryId: String?) {
-        _selectedCategory.value = categoryId
+        selectedCategory = categoryId
+        updateReadyState()
+    }
+
+    override fun clearSelection() {
+        selectedCategory = null
+        updateReadyState()
     }
 
     override fun retry() {
@@ -96,11 +84,30 @@ class NodeSelectionViewModelImpl @Inject constructor(
         fetchFunctions()
     }
 
+    private fun updateReadyState() {
+        if (_state.value !is NodeSelectionUiState.Ready) return
+        
+        val displayedFunctions = if (selectedCategory == null) {
+            allFunctions
+        } else {
+            allFunctions.filter { function ->
+                function.categories.containsKey(selectedCategory)
+            }
+        }
+        
+        _state.value = NodeSelectionUiState.Ready(
+            allFunctions = allFunctions,
+            displayedFunctions = displayedFunctions,
+            selectedCategory = selectedCategory,
+            allCategories = allCategories
+        )
+    }
+
     private fun fetchFunctions() {
         viewModelScope.launch {
             try {
                 val functions = repository.fetchFunctions()
-                _allFunctions.value = functions
+                allFunctions = functions
                 
                 // Build the categories map from all functions
                 val categoriesMap = mutableMapOf<String, TranslatedString>()
@@ -112,9 +119,22 @@ class NodeSelectionViewModelImpl @Inject constructor(
                         }
                     }
                 }
-                _allCategories.value = categoriesMap
+                allCategories = categoriesMap
                 
-                _state.value = NodeSelectionUiState.Ready(functions)
+                val displayedFunctions = if (selectedCategory == null) {
+                    functions
+                } else {
+                    functions.filter { function ->
+                        function.categories.containsKey(selectedCategory)
+                    }
+                }
+                
+                _state.value = NodeSelectionUiState.Ready(
+                    allFunctions = functions,
+                    displayedFunctions = displayedFunctions,
+                    selectedCategory = selectedCategory,
+                    allCategories = categoriesMap
+                )
             } catch (e: SignatureVerificationException) {
                 Timber.e(e)
                 _state.value = NodeSelectionUiState.Error(FetchError.VERIFICATION_FAILURE)

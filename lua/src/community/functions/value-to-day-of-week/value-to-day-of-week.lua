@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur au jour de la semaine",
 	},
 	description = {
-		["en"] = "Sets each data point's value to its day of the week (1-7, where Monday is 1 and Sunday is 7).",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf seinen Wochentag (1-7, wobei Montag 1 und Sonntag 7 ist).",
-		["es"] = "Establece el valor de cada punto de datos en su día de la semana (1-7, donde lunes es 1 y domingo es 7).",
-		["fr"] = "Définit la valeur de chaque point de données sur son jour de la semaine (1-7, où lundi est 1 et dimanche est 7).",
+		["en"] = [[
+Sets each data point's value to its day of the week (1-7, where Monday is 1 and Sunday is 7).
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf seinen Wochentag (1-7, wobei Montag 1 und Sonntag 7 ist).
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en su día de la semana (1-7, donde lunes es 1 y domingo es 7).
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur son jour de la semaine (1-7, où lundi est 1 et dimanche est 7).
+]],
 	},
 	config = {},
 

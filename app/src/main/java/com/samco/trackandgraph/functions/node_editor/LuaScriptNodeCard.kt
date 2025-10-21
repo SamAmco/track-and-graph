@@ -52,6 +52,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
@@ -94,7 +95,7 @@ internal fun LuaScriptNode(
 
     Column(
         Modifier
-            .width(nodeCardContentWidth)
+            .widthIn(max = nodeCardContentWidth)
             .padding(horizontal = connectorSize / 2, vertical = cardPadding),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
@@ -135,10 +136,12 @@ internal fun LuaScriptNode(
         val focusManager = LocalFocusManager.current
 
         // Configuration inputs
-        ConfigurationInputs(
-            focusManager = focusManager,
-            configuration = node.configuration
-        )
+        if (node.configuration.isNotEmpty()) {
+            ConfigurationInputs(
+                focusManager = focusManager,
+                configuration = node.configuration
+            )
+        }
 
         // Dialog
         if (showDialog) {

@@ -14,10 +14,18 @@ return {
 		["fr"] = "Différence de valeur",
 	},
 	description = {
-		["en"] = "Calculates the difference between each data point's value and the next one. Each output point has its original identity with the value set to the difference.",
-		["de"] = "Berechnet die Differenz zwischen dem Wert jedes Datenpunkts und dem nächsten. Jeder Ausgabepunkt hat seine ursprüngliche Identität mit dem Wert auf die Differenz gesetzt.",
-		["es"] = "Calcula la diferencia entre el valor de cada punto de datos y el siguiente. Cada punto de salida tiene su identidad original con el valor establecido en la diferencia.",
-		["fr"] = "Calcule la différence entre la valeur de chaque point de données et la suivante. Chaque point de sortie a son identité d'origine avec la valeur définie sur la différence.",
+		["en"] = [[
+Calculates the difference between each data point's value and the next one. Each output point has its original identity with the value set to the difference.
+]],
+		["de"] = [[
+Berechnet die Differenz zwischen dem Wert jedes Datenpunkts und dem nächsten. Jeder Ausgabepunkt hat seine ursprüngliche Identität mit dem Wert auf die Differenz gesetzt.
+]],
+		["es"] = [[
+Calcula la diferencia entre el valor de cada punto de datos y el siguiente. Cada punto de salida tiene su identidad original con el valor establecido en la diferencia.
+]],
+		["fr"] = [[
+Calcule la différence entre la valeur de chaque point de données et la suivante. Chaque point de sortie a son identité d'origine avec la valeur définie sur la différence.
+]],
 	},
 	config = {},
 

@@ -27,14 +27,18 @@ return {
 		["fr"] = "Démonstration des types de configuration",
 	},
 	description = {
-		["en"] =
-		"Demonstrates all available configuration input types: text, number, checkbox, enum, uint, duration, localtime, and instant. This function passes through all data points unchanged.",
-		["de"] =
-		"Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung, uint, Dauer, Ortszeit und Zeitpunkt. Diese Funktion gibt alle Datenpunkte unverändert weiter.",
-		["es"] =
-		"Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración, uint, duración, hora local e instante. Esta función pasa todos los puntos de datos sin cambios.",
-		["fr"] =
-		"Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération, uint, durée, heure locale et instant. Cette fonction transmet tous les points de données inchangés.",
+		["en"] = [[
+Demonstrates all available configuration input types: text, number, checkbox, enum, uint, duration, localtime, and instant. This function passes through all data points unchanged.
+]],
+		["de"] = [[
+Demonstriert alle verfügbaren Konfigurationseingabetypen: Text, Nummer, Kontrollkästchen, Aufzählung, uint, Dauer, Ortszeit und Zeitpunkt. Diese Funktion gibt alle Datenpunkte unverändert weiter.
+]],
+		["es"] = [[
+Demuestra todos los tipos de entrada de configuración disponibles: texto, número, casilla de verificación, enumeración, uint, duración, hora local e instante. Esta función pasa todos los puntos de datos sin cambios.
+]],
+		["fr"] = [[
+Démontre tous les types d'entrée de configuration disponibles : texte, nombre, case à cocher, énumération, uint, durée, heure locale et instant. Cette fonction transmet tous les points de données inchangés.
+]],
 	},
 	config = {
 		text {

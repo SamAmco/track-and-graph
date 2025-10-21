@@ -163,6 +163,7 @@
     <string name="apache_commons_csv" translatable="false">Apache Commons CSV</string>
     <string name="three_ten_android_backport" translatable="false">Three Ten Android Backport</string>
     <string name="timber" translatable="false">Timber</string>
+    <string name="markdown_renderer" translatable="false">Multiplatform Markdown Renderer</string>
     <string name="about">About</string>
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
@@ -376,6 +377,8 @@
     <string name="output">Output</string>
     <string name="data_source">Data Source</string>
     <string name="lua_script">Lua Script</string>
+    <string name="data_source_description">A Data Source node allows you to select a tracker or function to use as an input.</string>
+    <string name="lua_script_description">A Lua Script node allows you to insert custom Lua code to transform data.</string>
     <string name="lua_script_input_hint">Enter a Lua script…</string>
     <string name="select_node_type">Select Node Type</string>
     <string name="file">File</string>

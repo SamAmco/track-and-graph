@@ -356,7 +356,9 @@
     <string name="add_at_least_one_input">Por favor, añade al menos una entrada</string>
     <string name="output">Salida</string>
     <string name="data_source">Fuente de Datos</string>
+    <string name="data_source_description">Un nodo de Fuente de Datos te permite seleccionar un rastreador o función para usar como entrada.</string>
     <string name="lua_script">Script Lua</string>
+    <string name="lua_script_description">Un nodo de Script Lua te permite insertar código Lua personalizado para transformar datos.</string>
     <string name="lua_script_input_hint">Introduce un script Lua…</string>
     <string name="select_node_type">Seleccionar Tipo de Nodo</string>
     <string name="file">Archivo</string>

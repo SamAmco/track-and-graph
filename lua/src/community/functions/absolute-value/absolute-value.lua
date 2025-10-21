@@ -14,10 +14,18 @@ return {
 		["fr"] = "Valeur absolue",
 	},
 	description = {
-		["en"] = "Converts each data point's value to its absolute value (removes negative sign).",
-		["de"] = "Konvertiert den Wert jedes Datenpunkts zu seinem Absolutwert (entfernt negatives Vorzeichen).",
-		["es"] = "Convierte el valor de cada punto de datos a su valor absoluto (elimina el signo negativo).",
-		["fr"] = "Convertit la valeur de chaque point de données en sa valeur absolue (supprime le signe négatif).",
+		["en"] = [[
+Converts each data point's value to its absolute value (removes negative sign).
+]],
+		["de"] = [[
+Konvertiert den Wert jedes Datenpunkts zu seinem Absolutwert (entfernt negatives Vorzeichen).
+]],
+		["es"] = [[
+Convierte el valor de cada punto de datos a su valor absoluto (elimina el signo negativo).
+]],
+		["fr"] = [[
+Convertit la valeur de chaque point de données en sa valeur absolue (supprime le signe négatif).
+]],
 	},
 	config = {},
 

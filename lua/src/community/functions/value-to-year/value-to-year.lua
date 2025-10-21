@@ -16,10 +16,18 @@ return {
 		["fr"] = "Valeur à l'année",
 	},
 	description = {
-		["en"] = "Sets each data point's value to its year (e.g., 2025).",
-		["de"] = "Setzt den Wert jedes Datenpunkts auf sein Jahr (z.B. 2025).",
-		["es"] = "Establece el valor de cada punto de datos en su año (p. ej., 2025).",
-		["fr"] = "Définit la valeur de chaque point de données sur son année (par exemple, 2025).",
+		["en"] = [[
+Sets each data point's value to its year (e.g., 2025).
+]],
+		["de"] = [[
+Setzt den Wert jedes Datenpunkts auf sein Jahr (z.B. 2025).
+]],
+		["es"] = [[
+Establece el valor de cada punto de datos en su año (p. ej., 2025).
+]],
+		["fr"] = [[
+Définit la valeur de chaque point de données sur son année (par exemple, 2025).
+]],
 	},
 	config = {},
 

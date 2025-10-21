@@ -14,10 +14,18 @@ return {
 		["fr"] = "Échanger étiquette et note",
 	},
 	description = {
-		["en"] = "Swaps the label and note fields of each data point.",
-		["de"] = "Tauscht die Label- und Notizfelder jedes Datenpunkts aus.",
-		["es"] = "Intercambia los campos de etiqueta y nota de cada punto de datos.",
-		["fr"] = "Échange les champs étiquette et note de chaque point de données.",
+		["en"] = [[
+Swaps the label and note fields of each data point.
+]],
+		["de"] = [[
+Tauscht die Label- und Notizfelder jedes Datenpunkts aus.
+]],
+		["es"] = [[
+Intercambia los campos de etiqueta y nota de cada punto de datos.
+]],
+		["fr"] = [[
+Échange les champs étiquette et note de chaque point de données.
+]],
 	},
 	config = {},
 
