@@ -172,19 +172,14 @@ class FunctionsRepositoryImplTest {
         }
 
     @Test
-    fun `fetchFunctions service throws exception - returns empty list`() = runTest {
+    fun `fetchFunctions service throws exception - rethrows and releases VM`() = runTest {
         // Given
         whenever(mockFunctionsService.fetchFunctionsCatalog()).thenThrow(RuntimeException("Service unavailable"))
 
         // When
-        val result = repository.fetchFunctions()
-
-        // Then
-        assertEquals(
-            "Should return empty list on service failure",
-            emptyList<LuaFunctionMetadata>(),
-            result
-        )
+        assertThrows(RuntimeException::class.java) {
+            runBlocking { repository.fetchFunctions() }
+        }
 
         // Verify interactions - should not reach asset reader or Lua engine
         verify(mockFunctionsService).fetchFunctionsCatalog()
@@ -194,7 +189,7 @@ class FunctionsRepositoryImplTest {
     }
 
     @Test
-    fun `fetchFunctions lua engine throws exception - returns empty list and releases VM`() =
+    fun `fetchFunctions lua engine throws exception - rethrows and releases VM`() =
         runTest {
             // Given - Valid signature but Lua parsing fails
             val luaScript =
@@ -229,14 +224,9 @@ class FunctionsRepositoryImplTest {
                 .thenThrow(RuntimeException("Lua parsing failed"))
 
             // When
-            val result = repository.fetchFunctions()
-
-            // Then
-            assertEquals(
-                "Should return empty list on Lua parsing failure",
-                emptyList<LuaFunctionMetadata>(),
-                result
-            )
+            assertThrows(RuntimeException::class.java) {
+                runBlocking { repository.fetchFunctions() }
+            }
 
             // Verify interactions - VM should be acquired and released even on exception
             verify(mockFunctionsService).fetchFunctionsCatalog()

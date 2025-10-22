@@ -57,18 +57,12 @@ class FunctionsRepositoryImpl @Inject constructor(
                 luaEngine.runLuaCatalogue(vmLock, script).functions.also {
                     Timber.d("Returning ${it.size} functions from the catalogue")
                 }
-            } catch (t: Throwable) {
-                Timber.e(t, "Failed to parse/execute community functions script for metadata")
-                emptyList()
             } finally {
                 luaEngine.releaseVM(vmLock)
             }
-        } catch (e: SignatureVerificationException) {
-            // Re-throw signature verification failures - these are security issues that should not be silently ignored
-            throw e
         } catch (t: Throwable) {
             Timber.e(t, "Failed to fetch functions catalog")
-            emptyList()
+            throw t
         } finally {
             stopwatch.stop()
             Timber.d("fetchFunctions took ${stopwatch.elapsedMillis}ms to parse the catalogue")

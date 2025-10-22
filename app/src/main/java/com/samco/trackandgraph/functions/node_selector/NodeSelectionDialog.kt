@@ -18,7 +18,6 @@ package com.samco.trackandgraph.functions.node_selector
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Box
@@ -27,8 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
@@ -41,7 +38,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,7 +55,15 @@ import com.samco.trackandgraph.ui.compose.ui.Divider
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import androidx.compose.ui.unit.dp
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.samco.trackandgraph.functions.node_editor.viewmodel.AddNodeData
 import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
@@ -67,12 +71,15 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.resolve
 import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 import com.mikepenz.markdown.m3.Markdown
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 sealed class InfoDisplay {
     data object DataSource : InfoDisplay()
     data object LuaScript : InfoDisplay()
     data class Function(val metadata: LuaFunctionMetadata) : InfoDisplay()
 }
+
+private val minHeight = 120.dp
 
 @Composable
 fun NodeSelectionDialog(
@@ -104,7 +111,7 @@ fun NodeSelectionDialog(
 }
 
 @Composable
-fun NodeSelectionDialogUi(
+private fun NodeSelectionDialogUi(
     state: NodeSelectionUiState,
     onDismiss: () -> Unit,
     onSelect: (AddNodeData) -> Unit,
@@ -115,22 +122,30 @@ fun NodeSelectionDialogUi(
     onShowInfo: (InfoDisplay) -> Unit = {},
     onCloseInfo: () -> Unit = {},
 ) {
-    val usePlatformDefaultWidth =
-        state !is NodeSelectionUiState.Ready || state.selectedCategory == null
+    val usePlatformDefaultWidth = when {
+        state !is NodeSelectionUiState.Ready -> true
+        !isLandscape -> true
+        state.selectedCategory == null -> true
+        else -> false
+    }
     val widthPercentage = if (usePlatformDefaultWidth) 1f else 0.9f
 
     CustomDialog(
         onDismissRequest = onDismiss,
         scrollContent = false,
         usePlatformDefaultWidth = usePlatformDefaultWidth,
+        decorFitsSystemWindows = false,
         paddingValues = PaddingValues(inputSpacingLarge),
+        supportSmoothHeightAnimation = true,
     ) {
         Column(modifier = Modifier.fillMaxWidth(widthPercentage)) {
             SelectionView(
                 state = state,
                 isLandscape = isLandscape,
-                onSelect = onSelect,
-                onDismiss = onDismiss,
+                onSelect = {
+                    onSelect(it)
+                    onDismiss()
+                },
                 onRetry = onRetry,
                 onSelectCategory = onSelectCategory,
                 onShowInfo = onShowInfo
@@ -152,38 +167,57 @@ private fun SelectionView(
     state: NodeSelectionUiState,
     isLandscape: Boolean,
     onSelect: (AddNodeData) -> Unit,
-    onDismiss: () -> Unit,
     onRetry: () -> Unit,
     onSelectCategory: (String?) -> Unit,
     onShowInfo: (InfoDisplay) -> Unit,
 ) {
-    Text(
-        text = stringResource(R.string.select_node_type),
-        style = MaterialTheme.typography.headlineSmall,
-    )
+    Row(
+        modifier = Modifier.sizeIn(minHeight = buttonSize),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (!isLandscape && state is NodeSelectionUiState.Ready && state.selectedCategory != null) {
+            BackHandler { onSelectCategory(null) }
+            IconButton(
+                onClick = { onSelectCategory(null) },
+                modifier = Modifier.size(buttonSize)
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.AutoMirrored.Default.ArrowBack),
+                    contentDescription = null,
+                    modifier = Modifier.size(smallIconSize)
+                )
+            }
+        }
+
+        val categoryTitle = when {
+            isLandscape -> null
+            state is NodeSelectionUiState.Ready -> state.allCategories[state.selectedCategory].resolve()
+            else -> null
+        }
+
+        Text(
+            text = categoryTitle ?: stringResource(R.string.select_node_type),
+            style = MaterialTheme.typography.headlineSmall,
+        )
+    }
 
     DialogInputSpacing()
 
     when (state) {
-        is NodeSelectionUiState.Loading -> {
-            LoadingState()
-        }
+        is NodeSelectionUiState.Loading -> LoadingState()
 
         is NodeSelectionUiState.Ready -> {
             if (isLandscape) {
                 LandscapeReadyState(
                     state = state,
                     onSelect = onSelect,
-                    onDismiss = onDismiss,
                     onSelectCategory = onSelectCategory,
                     onShowInfo = onShowInfo
                 )
             } else {
-                // TODO: Implement portrait mode with different UI flow
                 PortraitReadyState(
                     state = state,
                     onSelect = onSelect,
-                    onDismiss = onDismiss,
                     onSelectCategory = onSelectCategory,
                     onShowInfo = onShowInfo
                 )
@@ -200,70 +234,93 @@ private fun SelectionView(
 }
 
 @Composable
+private fun PortraitReadyState(
+    state: NodeSelectionUiState.Ready,
+    onSelect: (AddNodeData) -> Unit,
+    onSelectCategory: (String?) -> Unit,
+    onShowInfo: (InfoDisplay) -> Unit,
+) = AnimatedContent(state.selectedCategory) {
+    if (it == null) {
+        // Show category list first
+        CategoryList(
+            state = state.copy(selectedCategory = null),
+            onSelect = onSelect,
+            onSelectCategory = onSelectCategory,
+            onShowInfo = onShowInfo,
+            modifier = Modifier.fillMaxWidth()
+        )
+    } else {
+        // Function list
+        FunctionList(
+            functions = state.displayedFunctions,
+            onSelect = onSelect,
+            onShowInfo = { function ->
+                onShowInfo(InfoDisplay.Function(function))
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
 private fun InfoDisplayDialog(
     infoDisplay: InfoDisplay,
     onDismiss: () -> Unit,
+) = CustomDialog(
+    onDismissRequest = onDismiss,
+    paddingValues = PaddingValues(),
+    scrollContent = false,
 ) {
-    CustomDialog(
-        onDismissRequest = onDismiss,
-        paddingValues = PaddingValues(),
-        scrollContent = false,
-    ) {
-        Box {
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .size(buttonSize)
-                    .align(Alignment.TopEnd)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.close),
-                    contentDescription = stringResource(R.string.close),
-                    modifier = Modifier.size(smallIconSize)
-                )
-            }
+    Box {
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .size(buttonSize)
+                .align(Alignment.TopEnd)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.close),
+                contentDescription = stringResource(R.string.close),
+                modifier = Modifier.size(smallIconSize)
+            )
+        }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(inputSpacingLarge)
-            ) {
-                // Header
-                Text(
-                    text = when (infoDisplay) {
-                        is InfoDisplay.DataSource -> stringResource(R.string.data_source)
-                        is InfoDisplay.LuaScript -> stringResource(R.string.lua_script)
-                        is InfoDisplay.Function -> infoDisplay.metadata.title.resolve() ?: ""
-                    },
-                    style = MaterialTheme.typography.headlineSmall,
-                )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(inputSpacingLarge)
+        ) {
+            // Header
+            Text(
+                text = when (infoDisplay) {
+                    is InfoDisplay.DataSource -> stringResource(R.string.data_source)
+                    is InfoDisplay.LuaScript -> stringResource(R.string.lua_script)
+                    is InfoDisplay.Function -> infoDisplay.metadata.title.resolve() ?: ""
+                },
+                style = MaterialTheme.typography.headlineSmall,
+            )
 
-                Divider()
+            Divider()
 
-                DialogInputSpacing()
+            DialogInputSpacing()
 
-                // Description content
-                FadingScrollColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 100.dp, max = 400.dp)
-                ) {
-                    val descriptionText = when (infoDisplay) {
-                        is InfoDisplay.DataSource -> {
-                            stringResource(R.string.data_source_description)
-                        }
-
-                        is InfoDisplay.LuaScript -> {
-                            stringResource(R.string.lua_script_description)
-                        }
-
-                        is InfoDisplay.Function -> {
-                            infoDisplay.metadata.description.resolve()?.trim() ?: ""
-                        }
+            // Description content
+            FadingScrollColumn(modifier = Modifier.fillMaxWidth()) {
+                val descriptionText = when (infoDisplay) {
+                    is InfoDisplay.DataSource -> {
+                        stringResource(R.string.data_source_description)
                     }
 
-                    Markdown(descriptionText)
+                    is InfoDisplay.LuaScript -> {
+                        stringResource(R.string.lua_script_description)
+                    }
+
+                    is InfoDisplay.Function -> {
+                        infoDisplay.metadata.description.resolve()?.trim() ?: ""
+                    }
                 }
+
+                Markdown(descriptionText)
             }
         }
     }
@@ -274,7 +331,7 @@ private fun LoadingState() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 120.dp),
+            .heightIn(min = minHeight),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
@@ -282,117 +339,14 @@ private fun LoadingState() {
 }
 
 @Composable
-private fun LandscapeReadyState(
+private fun CategoryList(
     state: NodeSelectionUiState.Ready,
     onSelect: (AddNodeData) -> Unit,
-    onDismiss: () -> Unit,
     onSelectCategory: (String?) -> Unit,
     onShowInfo: (InfoDisplay) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 400.dp)
-    ) {
-        // Left side - Categories list
-        FadingScrollColumn(modifier = Modifier.weight(1f)) {
-            Divider()
-
-            // Data Source option at the top
-            SelectionRow(
-                text = stringResource(R.string.data_source),
-                onClick = {
-                    onSelect(AddNodeData.DataSourceNode)
-                    onDismiss()
-                },
-                showInfoIcon = true,
-                onInfoClick = {
-                    onShowInfo(InfoDisplay.DataSource)
-                }
-            )
-
-            Divider()
-
-            // Categories in the middle
-            state.allCategories.forEach { (categoryId, categoryName) ->
-                SelectionRow(
-                    text = categoryName.resolve() ?: categoryId,
-                    onClick = { onSelectCategory(categoryId) },
-                    isSelected = state.selectedCategory == categoryId
-                )
-                Divider()
-            }
-
-            // Lua Script option at the bottom
-            SelectionRow(
-                text = stringResource(R.string.lua_script),
-                onClick = {
-                    onSelect(AddNodeData.LuaScriptNode)
-                    onDismiss()
-                },
-                showInfoIcon = true,
-                onInfoClick = {
-                    onShowInfo(InfoDisplay.LuaScript)
-                }
-            )
-
-            Divider()
-        }
-
-        // Show functions list if a category is selected
-        if (state.selectedCategory != null) {
-            VerticalDivider(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(horizontal = 8.dp)
-            )
-
-            // Right side - Functions list for selected category
-            FadingScrollColumn(modifier = Modifier.weight(1f)) {
-                Divider()
-
-                state.displayedFunctions.forEach { function ->
-                    val title = function.title.resolve() ?: return@forEach
-                    SelectionRow(
-                        text = title,
-                        onClick = {
-                            onSelect(AddNodeData.LibraryFunction(function))
-                            onDismiss()
-                        },
-                        showInfoIcon = true,
-                        onInfoClick = {
-                            onShowInfo(InfoDisplay.Function(function))
-                        }
-                    )
-                    Divider()
-                }
-
-                if (state.displayedFunctions.isEmpty()) {
-                    Text(
-                        text = "No functions in this category",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PortraitReadyState(
-    state: NodeSelectionUiState.Ready,
-    onSelect: (AddNodeData) -> Unit,
-    onDismiss: () -> Unit,
-    onSelectCategory: (String?) -> Unit,
-    onShowInfo: (InfoDisplay) -> Unit,
-) {
-    // TODO: Implement portrait mode
-    // For now, just show all functions as before
-    Column(
-        modifier = Modifier.verticalScroll(rememberScrollState())
-    ) {
+    FadingScrollColumn(modifier = modifier) {
         Divider()
 
         // Data Source option at the top
@@ -400,7 +354,6 @@ private fun PortraitReadyState(
             text = stringResource(R.string.data_source),
             onClick = {
                 onSelect(AddNodeData.DataSourceNode)
-                onDismiss()
             },
             showInfoIcon = true,
             onInfoClick = {
@@ -410,19 +363,12 @@ private fun PortraitReadyState(
 
         Divider()
 
-        // Show all functions for now
-        state.allFunctions.forEach { function ->
-            val title = function.title.resolve() ?: return@forEach
+        // Categories in the middle
+        state.allCategories.forEach { (categoryId, categoryName) ->
             SelectionRow(
-                text = title,
-                onClick = {
-                    onSelect(AddNodeData.LibraryFunction(function))
-                    onDismiss()
-                },
-                showInfoIcon = true,
-                onInfoClick = {
-                    onShowInfo(InfoDisplay.Function(function))
-                }
+                text = categoryName.resolve() ?: categoryId,
+                onClick = { onSelectCategory(categoryId) },
+                isSelected = state.selectedCategory == categoryId
             )
             Divider()
         }
@@ -432,7 +378,6 @@ private fun PortraitReadyState(
             text = stringResource(R.string.lua_script),
             onClick = {
                 onSelect(AddNodeData.LuaScriptNode)
-                onDismiss()
             },
             showInfoIcon = true,
             onInfoClick = {
@@ -445,6 +390,72 @@ private fun PortraitReadyState(
 }
 
 @Composable
+private fun FunctionList(
+    functions: List<LuaFunctionMetadata>,
+    onSelect: (AddNodeData) -> Unit,
+    onShowInfo: (LuaFunctionMetadata) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FadingScrollColumn(modifier = modifier) {
+        Divider()
+
+        functions.forEach { function ->
+            val title = function.title.resolve() ?: return@forEach
+            SelectionRow(
+                text = title,
+                onClick = {
+                    onSelect(AddNodeData.LibraryFunction(function))
+                },
+                showInfoIcon = true,
+                onInfoClick = {
+                    onShowInfo(function)
+                }
+            )
+            Divider()
+        }
+    }
+}
+
+@Composable
+private fun LandscapeReadyState(
+    state: NodeSelectionUiState.Ready,
+    onSelect: (AddNodeData) -> Unit,
+    onSelectCategory: (String?) -> Unit,
+    onShowInfo: (InfoDisplay) -> Unit,
+) = Row(
+    modifier = Modifier.fillMaxWidth()
+) {
+    // Left side - Categories list
+    CategoryList(
+        state = state,
+        onSelect = onSelect,
+        onSelectCategory = onSelectCategory,
+        onShowInfo = onShowInfo,
+        modifier = Modifier.weight(1f)
+    )
+
+    // Show functions list if a category is selected
+    if (state.selectedCategory != null) {
+        VerticalDivider(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = cardPadding)
+        )
+
+        // Right side - Functions list for selected category
+        FunctionList(
+            functions = state.displayedFunctions,
+            onSelect = onSelect,
+            onShowInfo = { function ->
+                onShowInfo(InfoDisplay.Function(function))
+            },
+            // The golden ratio, why not
+            modifier = Modifier.weight(1.61f)
+        )
+    }
+}
+
+@Composable
 private fun ErrorState(
     error: FetchError,
     onRetry: () -> Unit,
@@ -452,25 +463,23 @@ private fun ErrorState(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 120.dp),
+            .heightIn(min = minHeight),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = when (error) {
                 FetchError.VERIFICATION_FAILURE -> {
-                    // TODO: Add string resource for verification failure message
-                    "Failed to verify function signatures"
+                    stringResource(R.string.function_verification_failure)
                 }
 
                 FetchError.NETWORK_FAILURE -> {
-                    // TODO: Add string resource for network failure message
-                    "Failed to load functions. Check your network connection."
+                    stringResource(R.string.function_network_failure)
                 }
             },
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = inputSpacingLarge)
         )
 
         DialogInputSpacing()
@@ -491,44 +500,42 @@ private fun SelectionRow(
     isSelected: Boolean = false,
     showInfoIcon: Boolean = false,
     onInfoClick: (() -> Unit)? = null,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = buttonSize)
-            .clickable { onClick() }
-            .let {
-                if (isSelected) {
-                    it.border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.small
-                    )
-                } else it
-            }
-            .padding(horizontal = dialogInputSpacing),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = dialogInputSpacing)
-        )
-
-        if (showInfoIcon) {
-            IconButton(
-                onClick = { onInfoClick?.invoke() },
-                modifier = Modifier.size(buttonSize)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.about_icon),
-                    contentDescription = stringResource(R.string.info),
-                    modifier = Modifier.size(smallIconSize),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+) = Row(
+    modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(min = buttonSize)
+        .clickable { onClick() }
+        .let {
+            if (isSelected) {
+                it.border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = MaterialTheme.shapes.small
                 )
-            }
+            } else it
+        }
+        .padding(horizontal = dialogInputSpacing),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier
+            .weight(1f)
+            .padding(vertical = dialogInputSpacing)
+    )
+
+    if (showInfoIcon) {
+        IconButton(
+            onClick = { onInfoClick?.invoke() },
+            modifier = Modifier.size(buttonSize)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.about_icon),
+                contentDescription = stringResource(R.string.info),
+                modifier = Modifier.size(smallIconSize),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

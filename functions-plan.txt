@@ -1,5 +1,5 @@
 TODO: 
-- Show categories in the function picker
+- Implement portrait mode for node picker
 - Don't allow creating a function until you have a tracker? 
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
 - Although you can't select a feature that creates a cycle, the default selected item might create a cycle
@@ -10,7 +10,6 @@ TODO:
 - Add text to the grid that hints at long pressing to add a node
 - Fix up the function card UI. Min height should be the same as tracker
 - Improve function card UI in general
-- Do we want error toasts when function catalogue download fails or something?
 - Docs
 
 QA: 
@@ -21,6 +20,7 @@ QA:
   - Publish the functions and make sure they work in prod
   - Disable internet and make sure cache hits anyway for functions
   - Double check url navigation is still working because i changed some stuff there
+  - Check what happens on signature and network failure when downloading functions
 
 
 FUNCTIONS PLANNING

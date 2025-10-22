@@ -113,7 +113,7 @@ return {
       version="1.0.0"
     }
   },
-  published_at="2025-10-21T22:33:01Z",
+  published_at="2025-10-22T21:01:39Z",
   translations={
     _all_fields={
       de="Alle Felder",

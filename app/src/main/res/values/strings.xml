@@ -396,4 +396,6 @@
     <string name="confirm_deep_link">You have received a script link from an unknown source. Only install scripts from sources you trust. Would you like to install this script?</string>
     <string name="graph_stat_info_button_description">Graphs and stats tutorials</string>
     <string name="network_generic_error">An error occurred while trying to access the network. Please check your connection and try again.</string>
+    <string name="function_verification_failure">Failed to verify function signatures. Please make sure you have a secure connection and Track &amp; Graph is up to date</string>
+    <string name="function_network_failure">Failed to load functions. Please check your network connection.</string>
 </resources>
