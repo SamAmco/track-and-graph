@@ -1,16 +1,19 @@
 TODO: 
-- Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
-- Although you can't select a feature that creates a cycle, the default selected item might create a cycle
-- Probably detect global cycles and throw in the data module in case there are non-compliant future clients
-- Show a dialog when you first enter the function screen that explains it's advanced and links to the docs
-- Add a help button on the function screen that links to the docs?
+- Add description buttons to node cards
 - Add text to the grid that hints at going landscape
 - Add text to the grid that hints at long pressing to add a node
 - Fix up the function card UI. Min height should be the same as tracker
 - Improve function card UI in general
+- Although you can't select a feature that creates a cycle, the default selected item might create a cycle
+- Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
+- Probably detect global cycles and throw in the data module in case there are non-compliant future clients
+- Show a dialog when you first enter the function screen that explains it's advanced and links to the docs
+- Add a help button on the function screen that links to the docs?
 - Docs
 
 QA: 
+  - Select function as data source for a graph
+  - Select function as data source for a lua graph
   - Removing a function should remove it from any graphs that use it as a data source
   - Removing a data source should remove it from any functions that use it as a data source
   - Adding a function that creates a cycle should be prevented
@@ -19,81 +22,10 @@ QA:
   - Disable internet and make sure cache hits anyway for functions
   - Double check url navigation is still working because i changed some stuff there
   - Check what happens on signature and network failure when downloading functions
+  - Graph using function as data source refreshes with new data point
 
 
 FUNCTIONS PLANNING
-
-User adds function
-Comes to function screen
-Configures function
-Saves function
-User sees function in group
-
-User edits function
-Comes to function screen
-Edits function
-Saves function
-User sees function in group
-
-User deletes function
-User does not see function in group
-
-User moves function to another group
-
-User selects function as data source for a graph
-User selects function as data source for a lua graph
-
-User adds data point to tracker
-Tracker is used as a data source for a function
-graph using function as data source refreshes with new data point
-
-
-Function screen: 
-
-There's a fixed output node in the canvas. You can't remove it.
-The output node has a configuration for the function: 
-- name
-- description
-- whether it's a duration output
-
-
-There's a done button FAB
-When the function is valid the button is enabled, otherwise disabled
-When clicked, saves the function and goes back to group screen
-
-Nodes in canvas
-Node size defined in canvas space
-When editing function, camera zooms to fit all nodes in view
-
-Long pressing anywhere on the canvas creates a new node at that position by bringing up the node picker
-There are three node types: 
-- Data source
-- Prebuilt Lua functions
-- Custom Lua code
-
-Selecting a node type creates that node in the canvas
-The node is a card with configuration on it
-When the configuration for that node is invalid the node has a red border
-A node card has a delete button, and a help button that shows a dialog explaining what the node does
-
-Any node is a card, and it has handles on the left and right side for connecting to other nodes
-Dragging from any handle creates a connection line that follows the finger using a bezier curve
-Releasing the drag on another node's handle creates a connection between the two nodes
-Releasing the drag anywhere else cancels the connection
-Tapping a connection line highlights the line and shows a delete FAB button to remove the connection
-
-Tapping outside of any node or connection line clears the selection
-Dragging on the canvas pans the canvas
-Pinching anywhere zooms in or out
-
-There's a back button in the top left corner to go back to the group screen
-Dragging or pinching hides all fabs and the back button
-Tapping on anything/anywhere shows all relevant fabs and the back button
-
-
-
-
-
 
 
 Prebuilt Lua function nodes:
@@ -224,7 +156,6 @@ Prebuilt Lua function nodes:
 
 
 
-
 Use cases: 
 
 - weight where you have kg and lbs entries in the tracker
@@ -235,4 +166,3 @@ Use cases:
 - filter outliers from weight data
 - count of events per week
 - combine multiple trackers into one graph
-- 
