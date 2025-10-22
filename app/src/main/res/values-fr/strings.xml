@@ -385,4 +385,6 @@
     <string name="confirm_deep_link">Vous avez reçu un lien vers un script d\'une source inconnue. Installez uniquement des scripts provenant de sources de confiance. Voulez-vous installer ce script ?</string>
     <string name="graph_stat_info_button_description">Tutoriels sur les graphiques et les statistiques</string>
     <string name="network_generic_error">Une erreur s\'est produite lors de la tentative d\'accès au réseau. Veuillez vérifier votre connexion et réessayer.</string>
+    <string name="function_verification_failure">Échec de la vérification des signatures des fonctions. Veuillez vous assurer que vous avez une connexion sécurisée et que Track &amp; Graph est à jour</string>
+    <string name="function_network_failure">Échec du chargement des fonctions. Veuillez vérifier votre connexion réseau.</string>
 </resources>

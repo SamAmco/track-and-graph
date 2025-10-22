@@ -377,4 +377,6 @@
     <string name="confirm_deep_link">Sie haben einen Skriptlink von einer unbekannten Quelle erhalten. Installieren Sie nur Skripte aus vertrauenswürdigen Quellen. Möchten Sie dieses Skript installieren?</string>
     <string name="graph_stat_info_button_description">Tutorials zu Diagrammen und Statistiken</string>
     <string name="network_generic_error">Beim Versuch, auf das Netzwerk zuzugreifen, ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
+    <string name="function_verification_failure">Fehler beim Überprüfen der Funktionssignaturen. Bitte stellen Sie sicher, dass Sie eine sichere Verbindung haben und Track &amp; Graph auf dem neuesten Stand ist</string>
+    <string name="function_network_failure">Fehler beim Laden der Funktionen. Bitte überprüfen Sie Ihre Netzwerkverbindung.</string>
 </resources>

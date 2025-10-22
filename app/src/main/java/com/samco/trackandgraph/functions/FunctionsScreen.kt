@@ -36,6 +36,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -137,6 +139,12 @@ private fun TopAppBarContent(
     )
 }
 
+// Custom Saver for Offset
+private val OffsetSaver = listSaver(
+    save = { listOf(it.x, it.y) },
+    restore = { Offset(it[0], it[1]) }
+)
+
 @Composable
 private fun FunctionsScreenContent(
     onPopBack: () -> Unit,
@@ -168,9 +176,9 @@ private fun FunctionsScreenContent(
             maxScale = 3.5f
         )
 
-        var clearOverlayUi by remember { mutableStateOf(false) }
-        var showNodeSelectionDialog by remember { mutableStateOf(false) }
-        var nodeSelectionOffset by remember { mutableStateOf(Offset.Zero) }
+        var clearOverlayUi by rememberSaveable { mutableStateOf(false) }
+        var showNodeSelectionDialog by rememberSaveable { mutableStateOf(false) }
+        var nodeSelectionOffset by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
 
         val connectorState = rememberConnectorLayerState(
             connectors = connectors,
