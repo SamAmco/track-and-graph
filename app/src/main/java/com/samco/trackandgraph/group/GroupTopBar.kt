@@ -217,7 +217,13 @@ private fun RowScope.GroupAddDropdownMenu(
                 text = { Text(stringResource(R.string.function)) },
                 onClick = {
                     showAddMenu = false
-                    onAddFunction(groupId)
+                    scope.launch {
+                        if (groupViewModel.userHasAnyTrackers()) {
+                            onAddFunction(groupId)
+                        } else {
+                            groupDialogsViewModel.showNoTrackersFunctionsDialog()
+                        }
+                    }
                 }
             )
         }

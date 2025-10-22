@@ -378,6 +378,15 @@ private fun GroupScreenContent(
         )
     }
 
+    if (groupDialogsViewModel.showNoTrackersFunctionsDialog.collectAsStateWithLifecycle().value) {
+        ContinueDialog(
+            body = R.string.no_trackers_functions_hint,
+            onConfirm = { groupDialogsViewModel.hideNoTrackersFunctionsDialog() },
+            onDismissRequest = { groupDialogsViewModel.hideNoTrackersFunctionsDialog() },
+            continueText = R.string.ok
+        )
+    }
+
     val showDurationInputDialog = groupViewModel.showDurationInputDialog.collectAsStateWithLifecycle().value
     LaunchedEffect(showDurationInputDialog) {
         if (showDurationInputDialog == null) return@LaunchedEffect

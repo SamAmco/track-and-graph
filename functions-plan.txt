@@ -1,6 +1,4 @@
 TODO: 
-- Implement portrait mode for node picker
-- Don't allow creating a function until you have a tracker? 
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
 - Although you can't select a feature that creates a cycle, the default selected item might create a cycle
 - Probably detect global cycles and throw in the data module in case there are non-compliant future clients

@@ -131,4 +131,16 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
     fun hideNoTrackersDialog() {
         _showNoTrackersDialog.value = false
     }
+
+    // No Trackers for Functions Warning Dialog
+    private val _showNoTrackersFunctionsDialog = MutableStateFlow(false)
+    val showNoTrackersFunctionsDialog: StateFlow<Boolean> = _showNoTrackersFunctionsDialog.asStateFlow()
+
+    fun showNoTrackersFunctionsDialog() {
+        _showNoTrackersFunctionsDialog.value = true
+    }
+
+    fun hideNoTrackersFunctionsDialog() {
+        _showNoTrackersFunctionsDialog.value = false
+    }
 }

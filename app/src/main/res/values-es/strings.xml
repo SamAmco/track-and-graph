@@ -30,6 +30,7 @@
     <string name="select_file">Seleccionar archivo</string>
     <string name="empty_group_hint">Bienvenido a Track &amp; ¡Grafico!\n\nToque + en la parte superior derecha y seleccione Rastreador para comenzar. </string>
     <string name="no_trackers_graph_stats_hint">Cree un rastreador antes de crear cualquier gráfico.</string>
+    <string name="no_trackers_functions_hint">Cree un rastreador antes de crear cualquier función.</string>
     <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
     <string name="ru_sure_del_function">¿Estás seguro de que quieres eliminar esta función? No puedes revertir esto.</string>
