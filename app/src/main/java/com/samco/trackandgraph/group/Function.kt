@@ -21,12 +21,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -42,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,10 +51,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngTypography
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 
 /**
  * Lightweight view layer representation of a function for UI display
@@ -82,56 +86,76 @@ fun Function(
 ) = Box(modifier = modifier.fillMaxWidth()) {
     var showContextMenu by remember { mutableStateOf(false) }
 
+    val functionFont = MaterialTheme.tngTypography.code.copy(
+        fontSize = MaterialTheme.typography.labelLarge.fontSize,
+        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+    )
+    val fontSizeDp = with(LocalDensity.current) {
+        functionFont.fontSize.toDp()
+    }
+    val peekDistance = fontSizeDp + (dialogInputSpacing * 1.15f)
+
     Card(
         modifier = Modifier
             .testTag("functionCard")
             .fillMaxWidth()
             .padding(cardMarginSmall)
             .clickable { onClick(displayFunction) },
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = minTrackerCardHeight)
         ) {
-            // Top row with lua icon and menu button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+            Card(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(bottom = peekDistance)
+                    .heightIn(min = (minTrackerCardHeight - peekDistance)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                shape = MaterialTheme.shapes.medium,
             ) {
-                // Lua icon in top start
-                Icon(
-                    painter = painterResource(R.drawable.lua_icon),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(buttonSize)
-                        .padding(cardPadding),
-                    tint = MaterialTheme.colorScheme.secondary
-                )
-
-                // Menu button in top end
-                FunctionMenuButton(
-                    showContextMenu = showContextMenu,
-                    onShowContextMenu = { showContextMenu = it },
-                    displayFunction = displayFunction,
-                    onEdit = onEdit,
-                    onDelete = onDelete,
-                    onMoveTo = onMoveTo,
-                    onDuplicate = onDuplicate
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    // Menu button in top end
+                    FunctionMenuButton(
+                        modifier = Modifier.align(Alignment.End),
+                        showContextMenu = showContextMenu,
+                        onShowContextMenu = { showContextMenu = it },
+                        displayFunction = displayFunction,
+                        onEdit = onEdit,
+                        onDelete = onDelete,
+                        onMoveTo = onMoveTo,
+                        onDuplicate = onDuplicate
+                    )
+                    // Function name
+                    FunctionNameText(functionName = displayFunction.name)
+                    InputSpacingLarge()
+                }
             }
-            // Function name
-            FunctionNameText(functionName = displayFunction.name)
-
-            Spacer(modifier = Modifier.height(buttonSize))
+            Text(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(halfDialogInputSpacing),
+                text = stringResource(R.string.function).lowercase(),
+                style = MaterialTheme.tngTypography.code.copy(
+                    fontSize = MaterialTheme.typography.labelLarge.fontSize,
+                    fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+                )
+            )
         }
     }
 }
 
 @Composable
 private fun FunctionMenuButton(
+    modifier: Modifier = Modifier,
     showContextMenu: Boolean,
     onShowContextMenu: (Boolean) -> Unit,
     displayFunction: DisplayFunction,
@@ -140,7 +164,7 @@ private fun FunctionMenuButton(
     onMoveTo: (DisplayFunction) -> Unit,
     onDuplicate: (DisplayFunction) -> Unit
 ) {
-    Box {
+    Box(modifier = modifier) {
         IconButton(
             modifier = Modifier.size(buttonSize),
             onClick = { onShowContextMenu(true) },
@@ -197,9 +221,8 @@ private fun FunctionNameText(
         text = functionName,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = cardPadding)
-            .padding(bottom = cardPadding),
-        style = MaterialTheme.typography.headlineMedium,
+            .padding(horizontal = inputSpacingLarge),
+        style = MaterialTheme.typography.headlineSmall,
         textAlign = TextAlign.Center,
         maxLines = 10,
         overflow = TextOverflow.Ellipsis

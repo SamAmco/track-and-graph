@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -68,13 +69,14 @@ import com.samco.trackandgraph.ui.compose.theming.fadedGreen
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.delay
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.hypot
+
+internal val minTrackerCardHeight = 160.dp
 
 /**
  * Composable that displays a tracker item card with timer functionality,
@@ -126,7 +128,10 @@ fun Tracker(
             if (timestamp == null) {
                 timeSinceLastText = noDataText
             } else {
-                val duration = if (previewMode) Duration.ZERO else Duration.between(timestamp.toInstant(), Instant.now())
+                val duration = if (previewMode) Duration.ZERO else Duration.between(
+                    timestamp.toInstant(),
+                    Instant.now()
+                )
                 timeSinceLastText = formatRelativeTimeSpan(context, timestamp, duration)
             }
             delay(1000) // Update every second
@@ -152,26 +157,33 @@ fun Tracker(
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .requiredHeightIn(min = minTrackerCardHeight)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
-                TrackerMenuButton(
-                    modifier = Modifier.align(Alignment.End),
-                    showContextMenu = showContextMenu,
-                    onShowContextMenu = { showContextMenu = it },
-                    tracker = tracker,
-                    onEdit = onEdit,
-                    onDelete = onDelete,
-                    onMoveTo = onMoveTo,
-                    onDescription = onDescription
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TrackerMenuButton(
+                        modifier = Modifier.align(Alignment.End),
+                        showContextMenu = showContextMenu,
+                        onShowContextMenu = { showContextMenu = it },
+                        tracker = tracker,
+                        onEdit = onEdit,
+                        onDelete = onDelete,
+                        onMoveTo = onMoveTo,
+                        onDescription = onDescription
+                    )
 
-                TrackerNameText(trackerName = tracker.name)
+                    TrackerNameText(trackerName = tracker.name)
 
-                TrackerDateTimeArea(
-                    tracker = tracker,
-                    timerText = timerText,
-                    timeSinceLastText = timeSinceLastText
-                )
+                    TrackerDateTimeArea(
+                        tracker = tracker,
+                        timerText = timerText,
+                        timeSinceLastText = timeSinceLastText
+                    )
+                }
 
                 TrackerButtonsArea(
                     tracker = tracker,
@@ -255,8 +267,8 @@ private fun TrackerNameText(
         text = trackerName,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(cardPadding),
-        style = MaterialTheme.typography.headlineMedium,
+            .padding(horizontal = inputSpacingLarge),
+        style = MaterialTheme.typography.headlineSmall,
         textAlign = TextAlign.Center,
         maxLines = 10,
         overflow = TextOverflow.Ellipsis
