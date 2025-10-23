@@ -207,7 +207,10 @@ private fun FunctionsScreenContent(
             connectors = connectors,
             draggingConnectorId = draggingConnectorId,
             onUpsertConnector = onUpsertConnector,
-            onDownOnConnector = onDownOnConnector,
+            onDownOnConnector = {
+                onDownOnConnector(it)
+                autoFitCameraToContent.value = false
+            },
             onDropConnector = onDropConnector,
             getConnectorWorldPosition = getConnectorWorldPosition,
             isEnabled = isConnectorEnabled,
@@ -255,8 +258,14 @@ private fun FunctionsScreenContent(
                             node = node,
                             viewState = viewport,
                             connectorLayerState = connectorState,
-                            onDragBy = { onDragNodeBy(node, it) },
-                            onDeleteNode = { onDeleteNode(node) },
+                            onDragBy = {
+                                onDragNodeBy(node, it)
+                                autoFitCameraToContent.value = false
+                            },
+                            onDeleteNode = {
+                                onDeleteNode(node)
+                                autoFitCameraToContent.value = false
+                            },
                             onCreateOrUpdateFunction = onCreateOrUpdateFunction,
                             onUpdateScriptForNodeId = onUpdateScriptForNodeId,
                             onUpdateScriptFromFileForNodeId = onUpdateScriptFromFileForNodeId,
