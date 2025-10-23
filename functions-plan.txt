@@ -3,6 +3,7 @@ TODO:
 - Improve function card UI in general
 - Although you can't select a feature that creates a cycle, the default selected item might create a cycle
 - Throw if you try to create a function that does not declare all of its data sources somehow to ensure cycles are impossible
+- Don't allow inserting/updating a function that references a non-existent feature
 - Probably detect global cycles and throw in the data module in case there are non-compliant future clients
 - Show a dialog when you first enter the function screen that explains it's advanced and links to the docs
 - Add a help button on the function screen that links to the docs?
