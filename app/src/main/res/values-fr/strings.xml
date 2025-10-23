@@ -388,4 +388,6 @@
     <string name="network_generic_error">Une erreur s\'est produite lors de la tentative d\'accès au réseau. Veuillez vérifier votre connexion et réessayer.</string>
     <string name="function_verification_failure">Échec de la vérification des signatures des fonctions. Veuillez vous assurer que vous avez une connexion sécurisée et que Track &amp; Graph est à jour</string>
     <string name="function_network_failure">Échec du chargement des fonctions. Veuillez vérifier votre connexion réseau.</string>
+    <string name="functions_landscape_hint">Astuce : Les fonctions fonctionnent mieux en mode paysage</string>
+    <string name="functions_start_hint">Commencez ici : Appui long et sélectionner Source de données</string>
 </resources>

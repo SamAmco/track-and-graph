@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
@@ -43,6 +42,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +51,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.functions.node_editor.EdgeLayer
-import com.samco.trackandgraph.functions.node_editor.Node
 import com.samco.trackandgraph.functions.node_editor.NodeEditorInputWrapper
 import com.samco.trackandgraph.functions.node_editor.ViewportState
 import com.samco.trackandgraph.functions.node_editor.WorldLayout
@@ -74,9 +74,14 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
-
-// Import missing node editor functions - these should be defined in the same package
-// but need to be imported explicitly if they're in separate files
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.style.TextAlign
+import com.samco.trackandgraph.functions.node_editor.NodeCard
+import com.samco.trackandgraph.functions.node_editor.nodeCardContentWidth
+import com.samco.trackandgraph.functions.node_editor.viewmodel.Hint
 
 @Serializable
 data class FunctionsNavKey(
@@ -99,14 +104,23 @@ fun FunctionsScreen(
         }
     }
 
+    // Track orientation changes
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    LaunchedEffect(isPortrait) {
+        viewModel.onOrientationChanged(isPortrait)
+    }
+
     TopAppBarContent(navArgs)
     FunctionsScreenContent(
         onPopBack = onPopBack,
         nodes = viewModel.nodes,
+        hints = viewModel.hints,
         onAddNode = viewModel::onAddNode,
         onDragNodeBy = viewModel::onDragNodeBy,
         onDeleteNode = viewModel::onDeleteNode,
         getWorldPosition = viewModel::getWorldPosition,
+        onRegisterNodeBounds = viewModel::onRegisterNodeBounds,
         edges = viewModel.edges,
         selectedEdge = viewModel.selectedEdge,
         onSelectEdge = viewModel::onSelectEdge,
@@ -149,10 +163,12 @@ private val OffsetSaver = listSaver(
 private fun FunctionsScreenContent(
     onPopBack: () -> Unit,
     nodes: StateFlow<List<Node>>,
+    hints: StateFlow<List<Hint>>,
     onAddNode: (AddNodeData, Offset) -> Unit,
     onDragNodeBy: (Node, Offset) -> Unit,
     onDeleteNode: (Node) -> Unit,
     getWorldPosition: (Node) -> Offset?,
+    onRegisterNodeBounds: (Int, Rect) -> Unit,
     edges: StateFlow<List<Edge>>,
     selectedEdge: StateFlow<Edge?>,
     onSelectEdge: (Edge?) -> Unit,
@@ -169,16 +185,23 @@ private fun FunctionsScreenContent(
     onUpdateScriptFromFileForNodeId: (Int, android.net.Uri?) -> Unit,
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
+
+        var clearOverlayUi by rememberSaveable { mutableStateOf(false) }
+        var showNodeSelectionDialog by rememberSaveable { mutableStateOf(false) }
+        var nodeSelectionOffset by rememberSaveable(stateSaver = OffsetSaver) {
+            mutableStateOf(
+                Offset.Zero
+            )
+        }
+        val autoFitCameraToContent = remember { mutableStateOf(true) }
+
         val viewport = rememberViewportState(
             initialScale = 1.0f,
             initialPan = Offset.Zero,
             minScale = 0.15f,
-            maxScale = 3.5f
+            maxScale = 3.5f,
+            autoFitContent = autoFitCameraToContent,
         )
-
-        var clearOverlayUi by rememberSaveable { mutableStateOf(false) }
-        var showNodeSelectionDialog by rememberSaveable { mutableStateOf(false) }
-        var nodeSelectionOffset by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
 
         val connectorState = rememberConnectorLayerState(
             connectors = connectors,
@@ -196,6 +219,7 @@ private fun FunctionsScreenContent(
         )
         val selectedEdgeState by selectedEdge.collectAsStateWithLifecycle()
         val nodesState by nodes.collectAsStateWithLifecycle()
+        val hintsState by hints.collectAsStateWithLifecycle()
 
         NodeEditorInputWrapper(
             state = viewport,
@@ -205,8 +229,14 @@ private fun FunctionsScreenContent(
                 nodeSelectionOffset = offset
                 showNodeSelectionDialog = true
             },
-            onPan = { clearOverlayUi = true },
-            onTap = { clearOverlayUi = false },
+            onPan = {
+                clearOverlayUi = true
+                autoFitCameraToContent.value = false
+            },
+            onTap = {
+                clearOverlayUi = false
+                autoFitCameraToContent.value = false
+            },
         ) {
             // Background grid
             BackgroundGrid(viewport)
@@ -218,11 +248,9 @@ private fun FunctionsScreenContent(
             ) {
                 EdgeLayer(edgeLayerState = edgeLayerState)
 
-                WorldLayout(
-                    viewportState = viewport
-                ) {
+                WorldLayout(viewportState = viewport) {
                     for (node in nodesState) {
-                        Node(
+                        NodeCard(
                             modifier = Modifier.worldPosition(getWorldPosition(node)),
                             node = node,
                             viewState = viewport,
@@ -232,6 +260,19 @@ private fun FunctionsScreenContent(
                             onCreateOrUpdateFunction = onCreateOrUpdateFunction,
                             onUpdateScriptForNodeId = onUpdateScriptForNodeId,
                             onUpdateScriptFromFileForNodeId = onUpdateScriptFromFileForNodeId,
+                            onRegisterNodeBounds = onRegisterNodeBounds,
+                        )
+                    }
+
+                    for (hint in hintsState) {
+                        Text(
+                            modifier = Modifier
+                                .worldPosition(hint.position)
+                                .widthIn(max = nodeCardContentWidth),
+                            text = stringResource(hint.textId),
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
@@ -308,8 +349,10 @@ fun BackgroundGrid(
         val topLeftWorld = viewport.screenToWorld(Offset.Zero)
 
         // Find the first grid line to the left and above the visible area
-        val firstGridX = (kotlin.math.floor(topLeftWorld.x / worldGridStep) * worldGridStep).toFloat()
-        val firstGridY = (kotlin.math.floor(topLeftWorld.y / worldGridStep) * worldGridStep).toFloat()
+        val firstGridX =
+            (kotlin.math.floor(topLeftWorld.x / worldGridStep) * worldGridStep).toFloat()
+        val firstGridY =
+            (kotlin.math.floor(topLeftWorld.y / worldGridStep) * worldGridStep).toFloat()
 
         // Convert first grid positions to screen coordinates
         val firstScreenX = viewport.worldToScreen(Offset(firstGridX, 0f)).x

@@ -53,6 +53,7 @@ class ViewportState(
     pan: Offset,
     private val minScale: Float,
     private val maxScale: Float,
+    private val autoFitContent: State<Boolean>,
 ) {
     private val _viewPortCoordinates = mutableStateOf<LayoutCoordinates?>(null)
     val viewPortCoordinates: State<LayoutCoordinates?> = _viewPortCoordinates
@@ -61,8 +62,6 @@ class ViewportState(
         private set
     var pan by mutableStateOf(pan) // screen-space translation, in pixels
         private set
-
-    private var initialCameraPositionSet by mutableStateOf(false)
 
     fun setViewPortCoordinates(coordinates: LayoutCoordinates) {
         _viewPortCoordinates.value = coordinates
@@ -103,8 +102,11 @@ class ViewportState(
         screenToWorld(rect.bottomRight)
     )
 
+    fun localBoundingBoxOf(layoutCoordinates: LayoutCoordinates): Rect? =
+        _viewPortCoordinates.value?.localBoundingBoxOf(layoutCoordinates)
+
     internal fun fitViewportToWorldRect(entries: List<Entry>) {
-        if (initialCameraPositionSet) return
+        if (!autoFitContent.value) return
 
         val viewportCoords = _viewPortCoordinates.value ?: return
         val viewportWidth = viewportCoords.size.width.toFloat()
@@ -135,7 +137,6 @@ class ViewportState(
 
         scale = newScale
         pan = newPan
-        initialCameraPositionSet = true
     }
 }
 
@@ -145,13 +146,21 @@ fun rememberViewportState(
     initialPan: Offset,
     minScale: Float,
     maxScale: Float,
-) = remember { ViewportState(initialScale, initialPan, minScale, maxScale) }
+    autoFitContent: State<Boolean>,
+) = remember {
+    ViewportState(
+        scale = initialScale,
+        pan = initialPan,
+        minScale = minScale,
+        maxScale = maxScale,
+        autoFitContent = autoFitContent
+    )
+}
 
 /**
  * Container that applies viewport transformations using graphics layer.
  * Handles pan and zoom gestures for the node editor viewport.
  */
-
 @Composable
 fun WorldTransformContainer(
     state: ViewportState,
@@ -180,7 +189,6 @@ fun WorldTransformContainer(
  * Layout that positions child composables using world coordinates.
  * Automatically fits viewport to show all content when first displayed.
  */
-
 private class WorldParentDataModifier(val pos: Offset?) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = pos
 }
