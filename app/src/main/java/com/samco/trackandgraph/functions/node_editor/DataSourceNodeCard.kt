@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +49,7 @@ import com.samco.trackandgraph.selectitemdialog.HiddenItem
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
@@ -61,7 +62,7 @@ internal fun DataSourceNode(
 ) {
     Column(
         Modifier
-            .width(nodeCardContentWidth)
+            .widthIn(max = nodeCardContentWidth)
             .padding(horizontal = connectorSize / 2, vertical = cardPadding),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
@@ -74,6 +75,7 @@ internal fun DataSourceNode(
                 text = stringResource(R.string.data_source),
                 style = MaterialTheme.typography.titleMedium
             )
+            InputSpacingLarge()
             IconButton(
                 modifier = Modifier.size(buttonSize),
                 onClick = onDeleteNode

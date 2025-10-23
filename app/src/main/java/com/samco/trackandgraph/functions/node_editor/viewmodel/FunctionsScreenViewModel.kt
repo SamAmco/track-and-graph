@@ -26,11 +26,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.geometry.Rect
 import androidx.lifecycle.ViewModel
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.BuildConfig
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
@@ -45,12 +47,17 @@ import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import kotlinx.coroutines.FlowPreview
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -76,6 +83,18 @@ internal data class Connector(
 internal data class Edge(
     val from: Connector,
     val to: Connector,
+)
+
+@Immutable
+internal data class NodeBounds(
+    val nodeId: Int,
+    val bounds: Rect,
+)
+
+@Immutable
+internal data class Hint(
+    val textId: Int,
+    val position: Offset,
 )
 
 sealed class AddNodeData {
@@ -136,6 +155,7 @@ internal interface FunctionsScreenViewModel {
     val nodes: StateFlow<List<Node>>
     val edges: StateFlow<List<Edge>>
     val selectedEdge: StateFlow<Edge?>
+    val hints: StateFlow<List<Hint>>
 
     val connectors: StateFlow<Set<Connector>>
     val draggingConnector: StateFlow<Connector?>
@@ -152,12 +172,15 @@ internal interface FunctionsScreenViewModel {
     fun onDragNodeBy(node: Node, offset: Offset)
     fun onDeleteNode(node: Node)
     fun getWorldPosition(node: Node): Offset?
+    fun onRegisterNodeBounds(nodeId: Int, bounds: Rect)
+    fun onOrientationChanged(isPortrait: Boolean)
 
     fun onCreateOrUpdateFunction()
     fun updateScriptForNodeId(nodeId: Int, newScript: String)
     fun updateScriptFromFileForNodeId(nodeId: Int, uri: Uri?)
 }
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 internal class FunctionsScreenViewModelImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -190,8 +213,23 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     override val draggingConnector: StateFlow<Connector?> = _draggingConnector.asStateFlow()
 
     private val nodePositions = mutableStateMapOf<Int, Offset>()
+    private val _nodeBounds = MutableStateFlow<PersistentList<NodeBounds>>(persistentListOf())
     private val connectorPositions = mutableStateMapOf<Connector, Offset>()
     private val disabledConnectors = mutableStateSetOf<Connector>()
+
+    private val _isPortrait = MutableStateFlow(false)
+
+    override val hints: StateFlow<List<Hint>> = combine(
+        _nodes.debounce(100),
+        _nodeBounds.debounce(100),
+        _isPortrait.debounce(100)
+    ) { nodes, nodeBounds, isPortrait ->
+        calculateHints(nodes, nodeBounds, isPortrait)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     private lateinit var featurePathMap: Map<Long, String>
     private var dependentFeatureIds: Set<Long> = emptySet()
@@ -212,14 +250,18 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             if (existing != null) {
                 // Get dependent feature IDs for cycle detection when editing existing function
                 dependentFeatureIds = dataInteractor.getFeatureIdsDependingOn(existing.featureId)
-                
+
                 // Decode existing function graph
-                val decodedGraph = functionGraphDecoder.decodeFunctionGraph(existing, featurePathMap, dependentFeatureIds)
-                
+                val decodedGraph = functionGraphDecoder.decodeFunctionGraph(
+                    existing,
+                    featurePathMap,
+                    dependentFeatureIds
+                )
+
                 // Load decoded nodes and edges using persistent lists
                 _nodes.value = decodedGraph.nodes
                 _edges.value = decodedGraph.edges
-                
+
                 // Load node positions
                 nodePositions.putAll(decodedGraph.nodePositions)
             } else {
@@ -236,7 +278,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         if (connector.nodeId !in nodes.value.map { it.id }) return
         connectorPositions[connector] = worldPosition
         _connectors.value = _connectors.value.add(connector)
-        val isDraggingOutput = _draggingConnector.value != null && connector.type == ConnectorType.OUTPUT
+        val isDraggingOutput =
+            _draggingConnector.value != null && connector.type == ConnectorType.OUTPUT
         val isInput = connector.type == ConnectorType.INPUT
         if (isDraggingOutput || isInput) disabledConnectors += connector
     }
@@ -264,10 +307,10 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private fun validConnection(from: Connector, to: Connector): Boolean {
         return when {
             from.nodeId == to.nodeId
-                || from.type != ConnectorType.OUTPUT
-                || to.type != ConnectorType.INPUT
-                || edgeExists(from, to)
-                || to.nodeId in traverseDependencies(from.nodeId) -> false
+                    || from.type != ConnectorType.OUTPUT
+                    || to.type != ConnectorType.INPUT
+                    || edgeExists(from, to)
+                    || to.nodeId in traverseDependencies(from.nodeId) -> false
 
             else -> true
         }
@@ -362,11 +405,27 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         _connectors.value = _connectors.value.removeAll { connector ->
             (connector.nodeId == node.id).also { if (it) removedConnectors.add(connector) }
         }
-        _edges.value = _edges.value.removeAll { it.from in removedConnectors || it.to in removedConnectors }
+        _edges.value =
+            _edges.value.removeAll { it.from in removedConnectors || it.to in removedConnectors }
+        // Also remove the node bounds
+        _nodeBounds.value = _nodeBounds.value.removeAll { it.nodeId == node.id }
     }
 
     override fun getWorldPosition(node: Node): Offset? {
         return nodePositions[node.id]
+    }
+
+    override fun onRegisterNodeBounds(nodeId: Int, bounds: Rect) {
+        _nodeBounds.value = _nodeBounds.value.mutate { list ->
+            // Remove any existing bounds for this node
+            list.removeAll { it.nodeId == nodeId }
+            // Add the new bounds
+            list.add(NodeBounds(nodeId, bounds))
+        }
+    }
+
+    override fun onOrientationChanged(isPortrait: Boolean) {
+        _isPortrait.value = isPortrait
     }
 
     override fun onDeleteSelectedEdge() {
@@ -394,7 +453,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
     override fun updateScriptFromFileForNodeId(nodeId: Int, uri: Uri?) {
         if (uri == null) return
-        
+
         viewModelScope.launch(ioDispatcher) {
             try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -437,7 +496,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                 isDuration = outputNode.isDuration.value,
                 shouldThrow = BuildConfig.DEBUG
             )
-            
+
             // If building failed and we're in release mode, complete and return
             if (functionGraph == null) {
                 complete.trySend(Unit)
@@ -497,5 +556,41 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         }
 
         return errors
+    }
+
+    private fun calculateHints(
+        nodes: List<Node>,
+        nodeBounds: List<NodeBounds>,
+        isPortrait: Boolean,
+    ): List<Hint> {
+        // If the user has any more nodes than just the output node, don't show hints
+        val hasOnlyOutputNode = nodes.size == 1 && nodes.firstOrNull() is Node.Output
+        if (!hasOnlyOutputNode) return emptyList()
+
+        val outputNode = (nodes.firstOrNull() as? Node.Output) ?: return emptyList()
+        val outputNodeBounds = nodeBounds
+            .find { it.nodeId == outputNode.id }
+            ?.bounds
+            ?: return emptyList()
+
+        return when {
+            isPortrait -> {
+                // Show hint below the output node
+                val hintPosition = outputNodeBounds.center + Offset(
+                    x = 0f,
+                    y = outputNodeBounds.height * .75f
+                )
+                listOf(Hint(R.string.functions_landscape_hint, hintPosition))
+            }
+
+            else -> {
+                // Show hint to the left of the output node in landscape
+                val hintPosition = outputNodeBounds.center + Offset(
+                    x = -outputNodeBounds.width * 1.25f, // Subtract width * 1.5 from center (which is at width/2)
+                    y = 0f
+                )
+                listOf(Hint(R.string.functions_start_hint, hintPosition))
+            }
+        }
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.functions.node_editor
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.heightIn
@@ -30,6 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,7 +46,7 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 val nodeCardContentWidth = 350.dp
 
 @Composable
-internal fun Node(
+internal fun NodeCard(
     modifier: Modifier = Modifier,
     node: Node,
     viewState: ViewportState,
@@ -52,7 +55,8 @@ internal fun Node(
     onDeleteNode: (Node) -> Unit = {},
     onCreateOrUpdateFunction: () -> Unit = {},
     onUpdateScriptForNodeId: (Int, String) -> Unit = { _, _ -> },
-    onUpdateScriptFromFileForNodeId: (Int, android.net.Uri?) -> Unit = { _, _ -> },
+    onUpdateScriptFromFileForNodeId: (Int, Uri?) -> Unit = { _, _ -> },
+    onRegisterNodeBounds: (Int, Rect) -> Unit = { _, _ -> },
 ) {
     val minConnectorSpacing = 24.dp
     val connectors = maxOf(node.inputConnectorCount, node.outputConnectorCount)
@@ -61,10 +65,15 @@ internal fun Node(
     val requiredMinHeight =
         if (connectors <= 0) 0.dp
         else (connectorSize * connectors) + ((connectors + 1) * minConnectorSpacing)
-
     Box(
         modifier = modifier
             .heightIn(min = requiredMinHeight)
+            .onGloballyPositioned { layoutCoordinates ->
+                // Get the actual size of the node after it's been laid out
+                viewState.localBoundingBoxOf(layoutCoordinates)?.let {
+                    onRegisterNodeBounds(node.id, viewState.screenToWorld(it))
+                }
+            }
     ) {
         Card(
             modifier = Modifier
@@ -80,14 +89,16 @@ internal fun Node(
                     node = node,
                     onCreateOrUpdate = onCreateOrUpdateFunction
                 )
+
                 is Node.DataSource -> DataSourceNode(
                     node = node,
                     onDeleteNode = { onDeleteNode(node) },
                 )
+
                 is Node.LuaScript -> LuaScriptNode(
                     node = node,
                     onDeleteNode = { onDeleteNode(node) },
-                    onUpdateScript = { newScript -> 
+                    onUpdateScript = { newScript ->
                         onUpdateScriptForNodeId(node.id, newScript)
                     },
                     onUpdateScriptFromFile = { uri ->
@@ -115,7 +126,7 @@ internal fun Node(
     }
 }
 
-@Preview
+@Preview()
 @Composable
 private fun OutputNodePreview() {
     TnGComposeTheme {
@@ -123,11 +134,12 @@ private fun OutputNodePreview() {
             initialScale = 1.0f,
             initialPan = Offset.Zero,
             minScale = 0.15f,
-            maxScale = 5.0f
+            maxScale = 5.0f,
+            autoFitContent = remember { mutableStateOf(true) },
         )
         val connectorLayerState = rememberConnectorLayerState()
 
-        Node(
+        NodeCard(
             node = Node.Output(
                 name = remember { mutableStateOf(TextFieldValue("Sample Output")) },
                 description = remember { mutableStateOf(TextFieldValue("This is a sample output description")) },
@@ -147,11 +159,12 @@ private fun DataSourceNodePreview() {
             initialScale = 1.0f,
             initialPan = Offset.Zero,
             minScale = 0.15f,
-            maxScale = 5.0f
+            maxScale = 5.0f,
+            autoFitContent = remember { mutableStateOf(true) },
         )
         val connectorLayerState = rememberConnectorLayerState()
 
-        Node(
+        NodeCard(
             node = Node.DataSource(
                 selectedFeatureId = remember { mutableLongStateOf(0L) },
                 featurePathMap = mapOf(0L to "Samples/Sample Data Source"),
@@ -170,11 +183,12 @@ private fun LuaScriptNodePreview() {
             initialScale = 1.0f,
             initialPan = Offset.Zero,
             minScale = 0.15f,
-            maxScale = 5.0f
+            maxScale = 5.0f,
+            autoFitContent = remember { mutableStateOf(true) },
         )
         val connectorLayerState = rememberConnectorLayerState()
 
-        Node(
+        NodeCard(
             node = Node.LuaScript(
                 id = 1,
                 inputConnectorCount = 2,
