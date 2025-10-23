@@ -49,17 +49,22 @@ import com.samco.trackandgraph.selectitemdialog.HiddenItem
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.functions.InfoDisplay
+import com.samco.trackandgraph.functions.InfoDisplayDialog
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 
 @Composable
 internal fun DataSourceNode(
     node: Node.DataSource,
     onDeleteNode: () -> Unit = {},
 ) {
+    var showInfoDialog by rememberSaveable { mutableStateOf(false) }
+    
     Column(
         Modifier
             .widthIn(max = nodeCardContentWidth)
@@ -73,17 +78,34 @@ internal fun DataSourceNode(
         ) {
             Text(
                 text = stringResource(R.string.data_source),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
             )
+
             InputSpacingLarge()
-            IconButton(
-                modifier = Modifier.size(buttonSize),
-                onClick = onDeleteNode
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.delete_icon),
-                    contentDescription = stringResource(R.string.delete)
-                )
+            
+            Row {
+                IconButton(
+                    modifier = Modifier.size(buttonSize),
+                    onClick = { showInfoDialog = true }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.about_icon),
+                        contentDescription = stringResource(R.string.info),
+                        modifier = Modifier.size(smallIconSize),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                
+                IconButton(
+                    modifier = Modifier.size(buttonSize),
+                    onClick = onDeleteNode
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.delete_icon),
+                        contentDescription = stringResource(R.string.delete)
+                    )
+                }
             }
         }
 
@@ -116,6 +138,14 @@ internal fun DataSourceNode(
                     showSelectDialog = false
                 },
                 onDismissRequest = { showSelectDialog = false }
+            )
+        }
+        
+        // Info dialog
+        if (showInfoDialog) {
+            InfoDisplayDialog(
+                infoDisplay = InfoDisplay.DataSource,
+                onDismiss = { showInfoDialog = false }
             )
         }
     }

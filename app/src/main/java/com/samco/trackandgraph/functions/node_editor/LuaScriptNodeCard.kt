@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,6 +61,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
@@ -77,6 +77,11 @@ import com.samco.trackandgraph.ui.compose.ui.InputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.resolve
+import com.samco.trackandgraph.functions.InfoDisplay
+import com.samco.trackandgraph.functions.InfoDisplayDialog
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.smallIconSize
+import io.github.z4kn4fein.semver.toVersion
 
 @Composable
 internal fun LuaScriptNode(
@@ -86,6 +91,7 @@ internal fun LuaScriptNode(
     onUpdateScriptFromFile: (Uri?) -> Unit = {},
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
+    var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     var tempScript by remember { mutableStateOf(TextFieldValue(node.script)) }
 
     // Update temp script when node script changes
@@ -106,16 +112,39 @@ internal fun LuaScriptNode(
         ) {
             Text(
                 text = getNodeTitle(node),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
             )
-            IconButton(
-                modifier = Modifier.size(buttonSize),
-                onClick = onDeleteNode
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.delete_icon),
-                    contentDescription = stringResource(R.string.delete)
-                )
+
+            InputSpacingLarge()
+            
+            Row {
+                // Show info button if metadata has title and description
+                if (node.metadata != null && 
+                    node.metadata.title != null && 
+                    node.metadata.description != null) {
+                    IconButton(
+                        modifier = Modifier.size(buttonSize),
+                        onClick = { showInfoDialog = true }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.about_icon),
+                            contentDescription = stringResource(R.string.info),
+                            modifier = Modifier.size(smallIconSize),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                
+                IconButton(
+                    modifier = Modifier.size(buttonSize),
+                    onClick = onDeleteNode
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.delete_icon),
+                        contentDescription = stringResource(R.string.delete)
+                    )
+                }
             }
         }
 
@@ -155,6 +184,14 @@ internal fun LuaScriptNode(
                 onValueChanged = { newValue ->
                     tempScript = newValue
                 }
+            )
+        }
+        
+        // Info dialog
+        if (showInfoDialog && node.metadata != null) {
+            InfoDisplayDialog(
+                infoDisplay = InfoDisplay.Function(node.metadata),
+                onDismiss = { showInfoDialog = false }
             )
         }
     }
@@ -388,17 +425,14 @@ private fun LuaScriptNodeWithVersionPreview() {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
-            val sampleNode = Node.LuaScript(
-                id = 3,
-                inputConnectorCount = 1,
+            val metadata = LuaFunctionMetadata(
                 script = "function main(input) return input end",
-                configuration = mapOf(
-                    "filter_label" to LuaScriptConfigurationInput.Text(
-                        name = TranslatedString.Simple("Filter Label"),
-                        value = remember { mutableStateOf(TextFieldValue("work")) }
-                    )
+                id = "filter_by_label",
+                description = TranslatedString.Simple(
+                    "Filters data points based on their label. " +
+                    "Only data points with the specified label will be included in the output."
                 ),
-                showEditTools = false, // Version provided, so hide edit tools
+                version = "1.0.0".toVersion(),
                 title = TranslatedString.Translations(
                     mapOf(
                         "en" to "Filter by Label",
@@ -406,7 +440,25 @@ private fun LuaScriptNodeWithVersionPreview() {
                         "es" to "Filtrar por Etiqueta",
                         "fr" to "Filtrer par Étiquette"
                     )
-                )
+                ),
+                inputCount = 1,
+                config = listOf(),
+                categories = mapOf("filter" to TranslatedString.Simple("Filter"))
+            )
+            
+            val sampleNode = Node.LuaScript(
+                id = 3,
+                inputConnectorCount = 1,
+                script = metadata.script,
+                configuration = mapOf(
+                    "filter_label" to LuaScriptConfigurationInput.Text(
+                        name = TranslatedString.Simple("Filter Label"),
+                        value = remember { mutableStateOf(TextFieldValue("work")) }
+                    )
+                ),
+                showEditTools = false, // Version provided, so hide edit tools
+                title = metadata.title,
+                metadata = metadata
             )
 
             LuaScriptNode(

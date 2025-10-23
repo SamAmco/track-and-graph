@@ -70,14 +70,9 @@ import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.resolve
 import com.samco.trackandgraph.ui.compose.ui.smallIconSize
-import com.mikepenz.markdown.m3.Markdown
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
-
-sealed class InfoDisplay {
-    data object DataSource : InfoDisplay()
-    data object LuaScript : InfoDisplay()
-    data class Function(val metadata: LuaFunctionMetadata) : InfoDisplay()
-}
+import com.samco.trackandgraph.functions.InfoDisplay
+import com.samco.trackandgraph.functions.InfoDisplayDialog
 
 private val minHeight = 120.dp
 
@@ -262,69 +257,6 @@ private fun PortraitReadyState(
     }
 }
 
-@Composable
-private fun InfoDisplayDialog(
-    infoDisplay: InfoDisplay,
-    onDismiss: () -> Unit,
-) = CustomDialog(
-    onDismissRequest = onDismiss,
-    paddingValues = PaddingValues(),
-    scrollContent = false,
-) {
-    Box {
-        IconButton(
-            onClick = onDismiss,
-            modifier = Modifier
-                .size(buttonSize)
-                .align(Alignment.TopEnd)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.close),
-                contentDescription = stringResource(R.string.close),
-                modifier = Modifier.size(smallIconSize)
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(inputSpacingLarge)
-        ) {
-            // Header
-            Text(
-                text = when (infoDisplay) {
-                    is InfoDisplay.DataSource -> stringResource(R.string.data_source)
-                    is InfoDisplay.LuaScript -> stringResource(R.string.lua_script)
-                    is InfoDisplay.Function -> infoDisplay.metadata.title.resolve() ?: ""
-                },
-                style = MaterialTheme.typography.headlineSmall,
-            )
-
-            Divider()
-
-            DialogInputSpacing()
-
-            // Description content
-            FadingScrollColumn(modifier = Modifier.fillMaxWidth()) {
-                val descriptionText = when (infoDisplay) {
-                    is InfoDisplay.DataSource -> {
-                        stringResource(R.string.data_source_description)
-                    }
-
-                    is InfoDisplay.LuaScript -> {
-                        stringResource(R.string.lua_script_description)
-                    }
-
-                    is InfoDisplay.Function -> {
-                        infoDisplay.metadata.description.resolve()?.trim() ?: ""
-                    }
-                }
-
-                Markdown(descriptionText)
-            }
-        }
-    }
-}
 
 @Composable
 private fun LoadingState() {
