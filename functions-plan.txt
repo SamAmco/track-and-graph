@@ -1,7 +1,4 @@
 TODO: 
-- Add description buttons to node cards
-- Add text to the grid that hints at going landscape
-- Add text to the grid that hints at long pressing to add a node
 - Fix up the function card UI. Min height should be the same as tracker
 - Improve function card UI in general
 - Although you can't select a feature that creates a cycle, the default selected item might create a cycle
