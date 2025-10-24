@@ -274,23 +274,31 @@ class DurationAggregationFunctionTest {
 
             //THEN
             assertEquals(answer.map { it.value }, listOf(2.0, 3.0))
-            assertEquals(
-                answer.map { it.timestamp }, listOf(
-                    endTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY))
-                        .withHour(4)
-                        .withSecond(0)
-                        .withMinute(0)
-                        .withNano(0),
-                    endTime.with(TemporalAdjusters.previous(DayOfWeek.WEDNESDAY))
-                        .withHour(4)
-                        .withSecond(0)
-                        .withMinute(0)
-                        .withNano(0)
-                ).map { it.minusNanos(1) }
+            
+            // Convert to ZonedDateTime to properly handle DST changes
+            val zoneId = ZoneId.systemDefault()
+            val expectedTimestamps = listOf(
+                endTime.atZoneSameInstant(zoneId)
+                    .with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY))
+                    .withHour(4)
+                    .withSecond(0)
+                    .withMinute(0)
+                    .withNano(0)
+                    .minusNanos(1)
+                    .toOffsetDateTime(),
+                endTime.atZoneSameInstant(zoneId)
+                    .with(TemporalAdjusters.previous(DayOfWeek.WEDNESDAY))
+                    .withHour(4)
+                    .withSecond(0)
+                    .withMinute(0)
+                    .withNano(0)
+                    .minusNanos(1)
+                    .toOffsetDateTime()
             )
+            
+            assertEquals(expectedTimestamps, answer.map { it.timestamp })
         }
     }
-
 
     private fun generateDataPoints(
         endTime: OffsetDateTime,
