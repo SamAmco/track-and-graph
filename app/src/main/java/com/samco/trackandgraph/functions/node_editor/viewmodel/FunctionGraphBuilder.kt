@@ -84,10 +84,6 @@ internal class FunctionGraphBuilder @Inject constructor(
             // Build the output node DTO
             val outputNodeDto = buildOutputNode(outputNode, edges, nodePositions, validNodeIds)
 
-            // Validate no cyclic dependencies exist
-            val allGraphNodes = graphNodes + outputNodeDto
-            validateNoCycles(allGraphNodes)
-
             FunctionGraph(
                 nodes = graphNodes,
                 outputNode = outputNodeDto,
@@ -198,80 +194,5 @@ internal class FunctionGraphBuilder @Inject constructor(
             id = outputNodeViewModel.id,
             dependencies = dependencies
         )
-    }
-
-    /**
-     * Validates that there are no cyclic dependencies in the function graph.
-     * Uses depth-first search with a three-color algorithm (white-gray-black) to detect cycles.
-     *
-     * @param allNodes All nodes in the graph including the output node
-     * @throws IllegalStateException if a cycle is detected
-     */
-    private fun validateNoCycles(allNodes: List<FunctionGraphNode>) {
-        // Create a map of node ID to node for quick lookup
-        val nodeMap = allNodes.associateBy { it.id }
-
-        // Track node states: 0 = white (unvisited), 1 = gray (visiting), 2 = black (visited)
-        val nodeStates = mutableMapOf<Int, Int>()
-
-        // Initialize all nodes as white (unvisited)
-        allNodes.forEach { node ->
-            nodeStates[node.id] = 0
-        }
-
-        // Perform DFS from each unvisited node
-        allNodes.forEach { node ->
-            if (nodeStates[node.id] == 0) {
-                if (hasCycleDFS(node.id, nodeMap, nodeStates)) {
-                    throw IllegalStateException("Cyclic dependency detected in function graph starting from node ${node.id}")
-                }
-            }
-        }
-    }
-
-    /**
-     * Performs depth-first search to detect cycles starting from the given node.
-     *
-     * @param nodeId The current node ID being visited
-     * @param nodeMap Map of node ID to FunctionGraphNode for quick lookup
-     * @param nodeStates Map tracking the state of each node (0=white, 1=gray, 2=black)
-     * @return true if a cycle is detected, false otherwise
-     */
-    private fun hasCycleDFS(
-        nodeId: Int,
-        nodeMap: Map<Int, FunctionGraphNode>,
-        nodeStates: MutableMap<Int, Int>
-    ): Boolean {
-        // Mark current node as gray (being visited)
-        nodeStates[nodeId] = 1
-
-        val currentNode = nodeMap[nodeId] ?: return false
-
-        // Visit all dependencies (adjacent nodes)
-        for (dependency in currentNode.dependencies) {
-            val dependencyNodeId = dependency.nodeId
-
-            when (nodeStates[dependencyNodeId]) {
-                1 -> {
-                    // Gray node found - cycle detected!
-                    return true
-                }
-
-                0 -> {
-                    // White node - recursively visit
-                    if (hasCycleDFS(dependencyNodeId, nodeMap, nodeStates)) {
-                        return true
-                    }
-                }
-
-                2 -> {
-                    // Black node (2) - already processed, safe to ignore
-                }
-            }
-        }
-
-        // Mark current node as black (fully processed)
-        nodeStates[nodeId] = 2
-        return false
     }
 }
