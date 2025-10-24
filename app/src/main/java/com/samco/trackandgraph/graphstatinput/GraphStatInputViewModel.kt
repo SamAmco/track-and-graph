@@ -268,7 +268,7 @@ class GraphStatInputViewModelImpl @Inject constructor(
     private fun validateConfiguration() {
         val configException = when {
             graphName.text.isEmpty() -> GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_name)
-            graphStatType.value == null -> GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_unknown)
+            graphStatType.value == null -> GraphStatConfigEvent.ValidationException(R.string.unknown_error_occurred)
             else -> null
         }
         validationException.value = configException ?: subConfigException

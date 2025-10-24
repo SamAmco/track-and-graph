@@ -41,7 +41,6 @@ internal class FunctionGraphBuilder @Inject constructor(
      * @param edges List of edges connecting the nodes
      * @param nodePositions Map of node ID to position (Offset)
      * @param isDuration Whether the output represents a duration value
-     * @param shouldThrow Whether to throw exceptions on error (debug mode) or return null (release mode)
      * @return FunctionGraph DTO ready for serialization, or null if building failed and shouldThrow is false
      * @throws IllegalStateException if the function graph cannot be built and shouldThrow is true
      */
@@ -50,8 +49,7 @@ internal class FunctionGraphBuilder @Inject constructor(
         edges: List<Edge>,
         nodePositions: Map<Int, Offset>,
         isDuration: Boolean,
-        shouldThrow: Boolean
-    ): FunctionGraph? {
+    ): FunctionGraph {
         return try {
             // Process all nodes in a single iteration using when for type safety
             var outputNodeViewModel: Node.Output? = null
@@ -91,7 +89,7 @@ internal class FunctionGraphBuilder @Inject constructor(
             )
         } catch (t: Throwable) {
             Timber.e(t, "Failed to build function graph: ${t.message}")
-            if (shouldThrow) throw t else null
+            throw t
         }
     }
 

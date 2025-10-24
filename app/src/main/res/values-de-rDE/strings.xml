@@ -128,7 +128,7 @@
     <string name="import_exception_bad_timestamp">Import fehlgeschlagen: Konnte den Zeitstempel für Eintrag in Zeile %1$s nicht interpretieren</string>
     <string name="import_exception_inconsistent_data_type">Import fehlgeschlagen: Inkonsistenter Datentyp in Zeile %1$s enthalten</string>
 
-    <string name="graph_stat_validation_unknown">Ein unbekannter Fehler ist aufgetreten</string>
+    <string name="unknown_error_occurred">Ein unbekannter Fehler ist aufgetreten</string>
     <string name="graph_stat_validation_no_name">Bitte geben Sie einen Namen an</string>
     <string name="graph_stat_validation_no_line_graph_features">Bitte fügen Sie dem Diagramm etwas hinzu</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Bitte stellen Sie sicher, dass „Von“ kleiner oder gleich „Bis“ ist.</string>

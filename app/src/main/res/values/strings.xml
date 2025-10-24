@@ -145,7 +145,7 @@
     <string name="import_exception_bad_timestamp">Import failed: Could not interpret the timestamp for record on line: %1$s</string>
     <string name="import_exception_inconsistent_data_type">Import failed: Received inconsistent data type on line: %1$s</string>
 
-    <string name="graph_stat_validation_unknown">An unknown error occurred</string>
+    <string name="unknown_error_occurred">An unknown error occurred</string>
     <string name="graph_stat_validation_no_name">Please provide a name</string>
     <string name="graph_stat_validation_no_line_graph_features">Please add something to the graph</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Please make sure that "From" is smaller than or equal to "To"</string>

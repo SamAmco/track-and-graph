@@ -127,7 +127,7 @@
     <string name="import_exception_bad_timestamp">L\'importation a échoué : impossible d\'interpréter l\'horodatage pour l\'enregistrement sur la ligne : %1$s</string>
     <string name="import_exception_inconsistent_data_type">L\'importation a échoué : type de données incohérent sur la ligne : %1$s</string>
 
-    <string name="graph_stat_validation_unknown">Une erreur inconnue s\'est produite</string>
+    <string name="unknown_error_occurred">Une erreur inconnue s\'est produite</string>
     <string name="graph_stat_validation_no_name">Veuillez fournir un nom</string>
     <string name="graph_stat_validation_no_line_graph_features">Veuillez ajouter quelque chose au graphique</string>
     .
