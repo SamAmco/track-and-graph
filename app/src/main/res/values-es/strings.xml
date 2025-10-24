@@ -127,7 +127,7 @@
     <string name="import_exception_bad_timestamp">Error de importación: No se pudo interpretar la marca de tiempo para la traza en la línea: %1$s</string>
     <string name="import_exception_inconsistent_data_type">Error de importación: Se ha recibido un tipo de datos inconsistente en la línea: %1$s</string>
 
-    <string name="graph_stat_validation_unknown">Se ha producido un error desconocido</string>
+    <string name="unknown_error_occurred">Se ha producido un error desconocido</string>
     <string name="graph_stat_validation_no_name">Por favor, proporciona un nombre</string>
     <string name="graph_stat_validation_no_line_graph_features">Por favor, añade este detalle al gráfico</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Asegúrate de que "From" es menor o igual que "To"</string>

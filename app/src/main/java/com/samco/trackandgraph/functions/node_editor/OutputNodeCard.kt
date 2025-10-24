@@ -59,8 +59,12 @@ internal fun OutputNode(
     node: Node.Output,
     onCreateOrUpdate: () -> Unit = {}
 ) {
-    val hasNameError = remember(node.validationErrors) { ValidationError.MISSING_NAME in node.validationErrors }
-    val hasNoInputsError = remember(node.validationErrors) { ValidationError.NO_INPUTS in node.validationErrors }
+    val hasNameError =
+        remember(node.validationErrors) { ValidationError.MISSING_NAME in node.validationErrors }
+    val hasNoInputsError =
+        remember(node.validationErrors) { ValidationError.NO_INPUTS in node.validationErrors }
+    val hasGenericError =
+        remember(node.validationErrors) { ValidationError.GENERIC_ERROR in node.validationErrors }
 
     Column(
         Modifier
@@ -99,18 +103,10 @@ internal fun OutputNode(
             }
         )
 
-        AnimatedVisibility(
+        ErrorMessage(
             visible = hasNameError,
-            enter = expandVertically(),
-            exit = shrinkVertically()
-        ) {
-            Text(
-                text = stringResource(R.string.feature_name_cannot_be_null),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+            message = stringResource(R.string.feature_name_cannot_be_null)
+        )
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
@@ -135,18 +131,15 @@ internal fun OutputNode(
             Text(stringResource(R.string.this_is_a_time_or_duration))
         }
 
-        AnimatedVisibility(
+        ErrorMessage(
             visible = hasNoInputsError,
-            enter = expandVertically(),
-            exit = shrinkVertically()
-        ) {
-            Text(
-                text = stringResource(R.string.add_at_least_one_input),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+            message = stringResource(R.string.add_at_least_one_input)
+        )
+
+        ErrorMessage(
+            visible = hasGenericError,
+            message = stringResource(R.string.unknown_error_occurred)
+        )
 
         WideButton(
             text = stringResource(
@@ -155,6 +148,23 @@ internal fun OutputNode(
             onClick = onCreateOrUpdate,
         )
     }
+}
+
+@Composable
+private fun ErrorMessage(
+    visible: Boolean,
+    message: String
+) = AnimatedVisibility(
+    visible = visible,
+    enter = expandVertically(),
+    exit = shrinkVertically()
+) {
+    Text(
+        text = message,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.error,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Preview(showBackground = true)
@@ -281,7 +291,11 @@ private fun OutputNodeWithAllErrorsPreview() {
                 description = remember { mutableStateOf(TextFieldValue("Function with all validation errors")) },
                 isDuration = remember { mutableStateOf(true) },
                 isUpdateMode = false,
-                validationErrors = listOf(ValidationError.MISSING_NAME, ValidationError.NO_INPUTS)
+                validationErrors = listOf(
+                    ValidationError.MISSING_NAME,
+                    ValidationError.NO_INPUTS,
+                    ValidationError.GENERIC_ERROR
+                )
             )
 
             OutputNode(

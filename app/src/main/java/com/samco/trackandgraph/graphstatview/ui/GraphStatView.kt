@@ -200,7 +200,7 @@ private fun GraphError(
                 modifier = modifier,
                 error = (graphStatViewData.error as? GraphStatInitException)
                     ?.errorTextId
-                    ?: R.string.graph_stat_validation_unknown
+                    ?: R.string.unknown_error_occurred
             )
         }
 
@@ -218,7 +218,7 @@ private fun GraphError(
             GraphErrorView(
                 modifier = modifier,
                 error = graphStatViewData.error?.message
-                    ?: stringResource(R.string.graph_stat_validation_unknown)
+                    ?: stringResource(R.string.unknown_error_occurred)
             )
         }
     }

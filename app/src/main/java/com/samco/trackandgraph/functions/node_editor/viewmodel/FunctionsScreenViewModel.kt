@@ -70,6 +70,7 @@ internal enum class ConnectorType {
 internal enum class ValidationError {
     MISSING_NAME,
     NO_INPUTS,
+    GENERIC_ERROR,
 }
 
 @Immutable
@@ -488,46 +489,54 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                 return@launch
             }
 
-            // Build the function graph using FunctionGraphBuilder
-            val functionGraph = functionGraphBuilder.buildFunctionGraph(
-                nodes = _nodes.value,
-                edges = _edges.value,
-                nodePositions = nodePositions.toMap(),
-                isDuration = outputNode.isDuration.value,
-                shouldThrow = BuildConfig.DEBUG
-            )
+            try {
+                // Build the function graph using FunctionGraphBuilder
+                val functionGraph = functionGraphBuilder.buildFunctionGraph(
+                    nodes = _nodes.value,
+                    edges = _edges.value,
+                    nodePositions = nodePositions.toMap(),
+                    isDuration = outputNode.isDuration.value,
+                )
 
-            // If building failed and we're in release mode, complete and return
-            if (functionGraph == null) {
+                // Extract input feature IDs from data source nodes
+                val inputFeatureIds = functionGraphBuilder.extractInputFeatureIds(_nodes.value)
+
+                val existing = existingFunction
+                if (existing != null) {
+                    // Update existing function
+                    val updatedFunction = existing.copy(
+                        name = outputNode.name.value.text,
+                        description = outputNode.description.value.text,
+                        functionGraph = functionGraph,
+                        inputFeatureIds = inputFeatureIds
+                    )
+                    dataInteractor.updateFunction(updatedFunction)
+                } else {
+                    // Create new function
+                    val function = Function(
+                        name = outputNode.name.value.text,
+                        groupId = groupId,
+                        description = outputNode.description.value.text,
+                        functionGraph = functionGraph,
+                        inputFeatureIds = inputFeatureIds
+                    )
+                    dataInteractor.insertFunction(function)
+                }
                 complete.trySend(Unit)
-                return@launch
-            }
+            } catch (e: IllegalStateException) {
+                Timber.e(e, "Function could not be created or updated")
 
-            // Extract input feature IDs from data source nodes
-            val inputFeatureIds = functionGraphBuilder.extractInputFeatureIds(_nodes.value)
-
-            val existing = existingFunction
-            if (existing != null) {
-                // Update existing function
-                val updatedFunction = existing.copy(
-                    name = outputNode.name.value.text,
-                    description = outputNode.description.value.text,
-                    functionGraph = functionGraph,
-                    inputFeatureIds = inputFeatureIds
+                // Show a generic error on the output node
+                val updatedOutputNode = outputNode.copy(
+                    validationErrors = listOf(ValidationError.GENERIC_ERROR)
                 )
-                dataInteractor.updateFunction(updatedFunction)
-            } else {
-                // Create new function
-                val function = Function(
-                    name = outputNode.name.value.text,
-                    groupId = groupId,
-                    description = outputNode.description.value.text,
-                    functionGraph = functionGraph,
-                    inputFeatureIds = inputFeatureIds
-                )
-                dataInteractor.insertFunction(function)
+                _nodes.value = _nodes.value.mutate { nodeList ->
+                    val index = nodeList.indexOfFirst { it.id == outputNode.id }
+                    if (index >= 0) {
+                        nodeList[index] = updatedOutputNode
+                    }
+                }
             }
-            complete.trySend(Unit)
         }
     }
 

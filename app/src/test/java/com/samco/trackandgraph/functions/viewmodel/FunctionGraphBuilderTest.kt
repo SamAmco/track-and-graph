@@ -37,7 +37,7 @@ import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import io.github.z4kn4fein.semver.toVersion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
@@ -56,7 +56,7 @@ class FunctionGraphBuilderTest {
     fun `buildFunctionGraph creates correct graph`() {
         // Mock the encoder to return empty configuration for this test
         whenever(mockConfigurationEncoder.encodeConfiguration(any())).thenReturn(emptyList())
-        
+
         val nodes = createTestNodeList()
         val edges = createTestEdgeList()
         val nodePositions = createTestNodePositions()
@@ -66,7 +66,6 @@ class FunctionGraphBuilderTest {
             edges = edges,
             nodePositions = nodePositions,
             isDuration = true,
-            shouldThrow = true
         )
 
         val expected = createExpectedGraph()
@@ -96,14 +95,13 @@ class FunctionGraphBuilderTest {
             edges = edges,
             nodePositions = emptyMap(),
             isDuration = false,
-            shouldThrow = true
         )
 
         assertNotNull("Graph should be built successfully", result)
         // The invalid dependency should be ignored since node 999 does not exist in the nodes list
         assertTrue(
             "Output node should have no dependencies from non-existent nodes",
-            result!!.outputNode.dependencies.isEmpty()
+            result.outputNode.dependencies.isEmpty()
         )
     }
 
@@ -111,7 +109,7 @@ class FunctionGraphBuilderTest {
     fun `buildFunctionGraph handles missing positions with default Offset Zero`() {
         // Mock the encoder to return empty configuration for this test
         whenever(mockConfigurationEncoder.encodeConfiguration(any())).thenReturn(emptyList())
-        
+
         val nodes = createTestNodeList()
         val edges = createTestEdgeList()
         val emptyPositions = emptyMap<Int, Offset>()
@@ -121,11 +119,10 @@ class FunctionGraphBuilderTest {
             edges = edges,
             nodePositions = emptyPositions,
             isDuration = false,
-            shouldThrow = true
         )
 
         assertNotNull("Graph should be built even with missing positions", result)
-        assertEquals("Missing positions should default to (0,0)", 0.0f, result!!.nodes[0].x)
+        assertEquals("Missing positions should default to (0,0)", 0.0f, result.nodes[0].x)
         assertEquals("Missing positions should default to (0,0)", 0.0f, result.nodes[0].y)
         assertEquals("Missing positions should default to (0,0)", 0.0f, result.outputNode.x)
         assertEquals("Missing positions should default to (0,0)", 0.0f, result.outputNode.y)
@@ -141,15 +138,14 @@ class FunctionGraphBuilderTest {
             )
         )
 
-        val result = builder.buildFunctionGraph(
-            nodes = nodesWithoutOutput,
-            edges = emptyList(),
-            nodePositions = emptyMap(),
-            isDuration = false,
-            shouldThrow = false
-        )
-
-        assertNull("Graph should fail to build without output node", result)
+        assertThrows(IllegalStateException::class.java) {
+            builder.buildFunctionGraph(
+                nodes = nodesWithoutOutput,
+                edges = emptyList(),
+                nodePositions = emptyMap(),
+                isDuration = false,
+            )
+        }
     }
 
     @Test
@@ -164,15 +160,14 @@ class FunctionGraphBuilderTest {
             Node.Output(id = 3)
         )
 
-        val result = builder.buildFunctionGraph(
-            nodes = nodesWithMultipleOutputs,
-            edges = emptyList(),
-            nodePositions = emptyMap(),
-            isDuration = false,
-            shouldThrow = false
-        )
-
-        assertNull("Graph should fail to build with multiple output nodes", result)
+        assertThrows(IllegalStateException::class.java) {
+            builder.buildFunctionGraph(
+                nodes = nodesWithMultipleOutputs,
+                edges = emptyList(),
+                nodePositions = emptyMap(),
+                isDuration = false,
+            )
+        }
     }
 
 
@@ -180,7 +175,7 @@ class FunctionGraphBuilderTest {
     fun `extractInputFeatureIds returns correct feature IDs`() {
         val nodes = createTestNodeList()
         val result = builder.extractInputFeatureIds(nodes)
-        
+
         val expected = listOf(101L, 102L, 103L)
         assertEquals("Should extract all feature IDs from data source nodes", expected, result)
     }
@@ -189,8 +184,12 @@ class FunctionGraphBuilderTest {
     fun `extractInputFeatureIds returns empty list when no data source nodes`() {
         val nodesWithoutDataSource = listOf(Node.Output(id = 1))
         val result = builder.extractInputFeatureIds(nodesWithoutDataSource)
-        
-        assertEquals("Should return empty list when no data source nodes", emptyList<Long>(), result)
+
+        assertEquals(
+            "Should return empty list when no data source nodes",
+            emptyList<Long>(),
+            result
+        )
     }
 
     @Test
@@ -206,19 +205,19 @@ class FunctionGraphBuilderTest {
                 value = mutableStateOf(TextFieldValue("42.5"))
             )
         )
-        
+
         val luaScriptNode = Node.LuaScript(
             id = 10,
             script = "-- Test script with config",
             inputConnectorCount = 1,
             configuration = configurationInput
         )
-        
+
         val nodes = listOf(
             luaScriptNode,
             Node.Output(id = 11)
         )
-        
+
         // Mock the encoder to return expected configuration values
         val expectedEncodedConfig = listOf(
             LuaScriptConfigurationValue.Text(id = "param1", value = "test value"),
@@ -226,48 +225,54 @@ class FunctionGraphBuilderTest {
         )
         whenever(mockConfigurationEncoder.encodeConfiguration(configurationInput))
             .thenReturn(expectedEncodedConfig)
-        
+
         // Build the function graph
         val result = builder.buildFunctionGraph(
             nodes = nodes,
             edges = emptyList(),
             nodePositions = mapOf(10 to Offset.Zero, 11 to Offset.Zero),
             isDuration = false,
-            shouldThrow = true
         )
-        
+
         // Verify the encoder was called with the correct configuration
         verify(mockConfigurationEncoder).encodeConfiguration(configurationInput)
-        
+
         // Verify the result contains the encoded configuration
         assertNotNull("Function graph should be built successfully", result)
-        val luaScriptNodeDto = result!!.nodes.filterIsInstance<FunctionGraphNode.LuaScriptNode>().first()
-        assertEquals("Encoded configuration should match expected", expectedEncodedConfig, luaScriptNodeDto.configuration)
+        val luaScriptNodeDto =
+            result.nodes.filterIsInstance<FunctionGraphNode.LuaScriptNode>().first()
+        assertEquals(
+            "Encoded configuration should match expected",
+            expectedEncodedConfig,
+            luaScriptNodeDto.configuration
+        )
     }
 
     @Test
     fun `test covers all Node types`() {
         val testNodes = createTestNodeList()
-        
+
         // Get all node types used in our test
         val testedNodeTypes = testNodes.map { it::class }.toSet()
-        
+
         // Get all sealed subclasses of Node using reflection
         val allNodeTypes = Node::class.sealedSubclasses.toSet()
-        
+
         // Ensure our test covers all node types
         val missingTypes = allNodeTypes - testedNodeTypes
-        
+
         if (missingTypes.isNotEmpty()) {
-            val missingTypeNames = missingTypes.map { it.simpleName }.joinToString(", ")
-            fail("Test does not cover all Node types. Missing: $missingTypeNames. " +
-                 "Please update createTestNodeList() to include instances of all node types.")
+            val missingTypeNames = missingTypes.joinToString(", ") { it.simpleName!! }
+            fail(
+                "Test does not cover all Node types. Missing: $missingTypeNames. " +
+                        "Please update createTestNodeList() to include instances of all node types."
+            )
         }
-        
+
         // Also verify we're not testing non-existent types (defensive check)
         val extraTypes = testedNodeTypes - allNodeTypes
         if (extraTypes.isNotEmpty()) {
-            val extraTypeNames = extraTypes.map { it.simpleName }.joinToString(", ")
+            val extraTypeNames = extraTypes.joinToString(", ") { it.simpleName!! }
             fail("Test includes unknown node types: $extraTypeNames")
         }
     }
