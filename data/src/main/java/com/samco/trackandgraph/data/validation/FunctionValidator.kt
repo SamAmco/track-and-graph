@@ -37,11 +37,35 @@ internal class FunctionValidator @Inject constructor(
      * @throws IllegalStateException if validation fails
      */
     suspend fun validateFunction(function: Function) {
-        // Validate inter-function dependencies (cycles between different features)
-        validateInterFunctionDependencies(function)
-
-        // Validate intra-function dependencies (cycles within the function's node graph)
+        validateFunctionGraphStructure(function)
         validateIntraFunctionDependencies(function.functionGraph.nodes)
+        validateInterFunctionDependencies(function)
+    }
+
+    private fun validateFunctionGraphStructure(function: Function) {
+        val nodeIds = mutableListOf<Int>()
+
+        for (node in function.functionGraph.nodes) {
+            when (node) {
+                is FunctionGraphNode.FeatureNode -> {
+                    nodeIds.add(node.id)
+                }
+
+                is FunctionGraphNode.OutputNode -> {
+                    error("Output node should not be in the function graph nodes")
+                }
+
+                is FunctionGraphNode.LuaScriptNode -> {
+                    nodeIds.add(node.id)
+                }
+            }
+        }
+
+        val nodeIdsSet = nodeIds.toSet()
+
+        if (nodeIds.size != nodeIdsSet.size || function.functionGraph.outputNode.id in nodeIdsSet) {
+            error("Node IDs should be unique in a function graph")
+        }
     }
 
     /**
@@ -50,13 +74,19 @@ internal class FunctionValidator @Inject constructor(
      * (either directly or transitively).
      */
     private suspend fun validateInterFunctionDependencies(function: Function) {
-        val featureNodeDependencies = function.functionGraph.nodes.mapNotNull {
-            when (it) {
-                is FunctionGraphNode.FeatureNode -> it.featureId
-                is FunctionGraphNode.OutputNode -> null
-                is FunctionGraphNode.LuaScriptNode -> null
+        val featureNodeDependencies = mutableSetOf<Long>()
+
+        for (node in function.functionGraph.nodes) {
+            when (node) {
+                is FunctionGraphNode.FeatureNode -> {
+                    featureNodeDependencies.add(node.featureId)
+                }
+
+                is FunctionGraphNode.OutputNode,
+                is FunctionGraphNode.LuaScriptNode -> {
+                }
             }
-        }.toSet()
+        }
 
         val declaredDependencies = function.inputFeatureIds.toSet()
 
@@ -68,12 +98,12 @@ internal class FunctionValidator @Inject constructor(
         if (declaredDependencies.isEmpty()) return
 
         val dependencyAnalyser = dependencyAnalyserProvider.create()
-        
+
         // Check that all declared dependencies exist
         if (!dependencyAnalyser.allFeaturesExist(declaredDependencies)) {
             error("Function references non-existent features")
         }
-        
+
         // Check for cycles
         val dependentFeatures = dependencyAnalyser
             .getFeaturesDependingOn(function.featureId)
