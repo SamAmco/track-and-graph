@@ -125,7 +125,7 @@ internal sealed class Node(
 
     class DataSource(
         id: Int = -1,
-        val selectedFeatureId: MutableState<Long>,
+        val selectedFeatureId: MutableState<Long?>,
         val featurePathMap: Map<Long, String>,
         val dependentFeatureIds: Set<Long> = emptySet()
     ) : Node(
@@ -378,11 +378,9 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     private fun addDataSourceNode(id: Int): Boolean {
-        val feature = featurePathMap.entries.firstOrNull() ?: return false
-
         val newNode = Node.DataSource(
             id = id,
-            selectedFeatureId = mutableLongStateOf(feature.key),
+            selectedFeatureId = mutableStateOf(null),
             featurePathMap = featurePathMap,
             dependentFeatureIds = dependentFeatureIds
         )

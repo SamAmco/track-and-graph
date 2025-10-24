@@ -56,7 +56,7 @@ internal class FunctionGraphBuilder @Inject constructor(
             val graphNodes = mutableListOf<FunctionGraphNode>()
             // The source of truth for valid node IDs is the nodes list, not positions
             val validNodeIds: Set<Int> = nodes.map { it.id }.toSet()
-            
+
             nodes.forEach { node ->
                 when (node) {
                     is Node.Output -> {
@@ -65,16 +65,19 @@ internal class FunctionGraphBuilder @Inject constructor(
                         }
                         outputNodeViewModel = node
                     }
+
                     is Node.DataSource -> {
-                        graphNodes.add(buildFeatureNode(node, nodePositions))
+                        buildFeatureNode(node, nodePositions)
+                            ?.let { graphNodes.add(it) }
                     }
+
                     is Node.LuaScript -> {
                         graphNodes.add(buildLuaScriptNode(node, edges, nodePositions, validNodeIds))
                     }
                     // Future node types will be handled here, compiler will enforce exhaustiveness
                 }
             }
-            
+
             // Ensure we found an output node
             val outputNode = outputNodeViewModel
                 ?: throw IllegalStateException("Function graph must have an output node")
@@ -100,8 +103,9 @@ internal class FunctionGraphBuilder @Inject constructor(
      * @return List of feature IDs from all data source nodes
      */
     fun extractInputFeatureIds(nodes: List<Node>): List<Long> {
-        return nodes.filterIsInstance<Node.DataSource>()
-            .map { it.selectedFeatureId.value }
+        return nodes
+            .filterIsInstance<Node.DataSource>()
+            .mapNotNull { it.selectedFeatureId.value }
     }
 
     /**
@@ -130,8 +134,8 @@ internal class FunctionGraphBuilder @Inject constructor(
     private fun buildFeatureNode(
         node: Node.DataSource,
         nodePositions: Map<Int, Offset>
-    ): FunctionGraphNode.FeatureNode {
-        val featureId = node.selectedFeatureId.value
+    ): FunctionGraphNode.FeatureNode? {
+        val featureId = node.selectedFeatureId.value ?: return null
         val position = nodePositions[node.id] ?: Offset.Zero
 
         return FunctionGraphNode.FeatureNode(

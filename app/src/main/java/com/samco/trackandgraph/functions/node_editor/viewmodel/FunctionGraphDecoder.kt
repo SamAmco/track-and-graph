@@ -119,7 +119,7 @@ internal class FunctionGraphDecoder @Inject constructor(
     ): Node.DataSource {
         return Node.DataSource(
             id = graphNode.id,
-            selectedFeatureId = mutableLongStateOf(graphNode.featureId),
+            selectedFeatureId = mutableStateOf(graphNode.featureId),
             featurePathMap = featurePathMap,
             dependentFeatureIds = dependentFeatureIds
         )
