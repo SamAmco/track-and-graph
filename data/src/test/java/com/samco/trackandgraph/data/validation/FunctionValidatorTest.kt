@@ -201,10 +201,12 @@ class FunctionValidatorTest {
     fun `validateFunction passes when no inter-function cycles exist`() = runTest {
         val functionFeatureId = 1L
         val dependencyFeatureId = 2L
-        
+
         // Mock: Only the function itself depends on itself (no other features depend on it)
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId)))
+        whenever(mockDependencyAnalyser.allFeaturesExist(any()))
+            .thenReturn(true)
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -212,7 +214,7 @@ class FunctionValidatorTest {
                 featureId = dependencyFeatureId
             )
         )
-        
+
         val outputNode = FunctionGraphNode.OutputNode(
             x = 0f, y = 0f, id = 2,
             dependencies = listOf(
@@ -230,7 +232,7 @@ class FunctionValidatorTest {
         // Should not throw
         validator.validateFunction(function)
     }
-    
+
     @Test
     fun `validateFunction fails when feature node is not declared in dependencies`() = runTest {
         // Mock to avoid inter-function cycle detection failure
@@ -267,11 +269,13 @@ class FunctionValidatorTest {
             validator.validateFunction(function)
             fail("Should have thrown an exception due to undeclared dependency")
         } catch (e: IllegalStateException) {
-            assertTrue("Exception message should mention mismatched dependencies",
-                e.message?.contains("Feature node dependencies do not match declared dependencies") == true)
+            assertTrue(
+                "Exception message should mention mismatched dependencies",
+                e.message?.contains("Feature node dependencies do not match declared dependencies") == true
+            )
         }
     }
-    
+
     @Test
     fun `validateFunction fails when declared dependency is not used in graph`() = runTest {
         // Mock to avoid inter-function cycle detection failure
@@ -303,20 +307,24 @@ class FunctionValidatorTest {
             validator.validateFunction(function)
             fail("Should have thrown an exception due to unused declared dependency")
         } catch (e: IllegalStateException) {
-            assertTrue("Exception message should mention mismatched dependencies",
-                e.message?.contains("Feature node dependencies do not match declared dependencies") == true)
+            assertTrue(
+                "Exception message should mention mismatched dependencies",
+                e.message?.contains("Feature node dependencies do not match declared dependencies") == true
+            )
         }
     }
 
     // ========== Inter-function dependency cycle tests ==========
-    
+
     @Test
     fun `validateFunction fails when function has self-referential dependency`() = runTest {
         val functionFeatureId = 1L
-        
+
         // Mock: Function depends on itself
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId)))
+        whenever(mockDependencyAnalyser.allFeaturesExist(any()))
+            .thenReturn(true)
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -324,7 +332,7 @@ class FunctionValidatorTest {
                 featureId = functionFeatureId  // Function depends on itself
             )
         )
-        
+
         val outputNode = FunctionGraphNode.OutputNode(
             x = 0f, y = 0f, id = 2,
             dependencies = listOf(
@@ -343,20 +351,24 @@ class FunctionValidatorTest {
             validator.validateFunction(function)
             fail("Should have thrown an exception due to self-referential dependency")
         } catch (e: IllegalStateException) {
-            assertTrue("Exception message should mention function cycle", 
-                e.message?.contains("Function cycle detected") == true)
+            assertTrue(
+                "Exception message should mention function cycle",
+                e.message?.contains("Function cycle detected") == true
+            )
         }
     }
-    
+
     @Test
     fun `validateFunction fails when simple inter-function cycle exists`() = runTest {
         val functionFeatureId = 1L
         val dependencyFeatureId = 2L
-        
+
         // Mock: Feature 2 already depends on Feature 1 (our function)
         // So if Feature 1 depends on Feature 2, we have a cycle: 1 -> 2 -> 1
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId, dependencyFeatureId)))
+        whenever(mockDependencyAnalyser.allFeaturesExist(setOf(dependencyFeatureId)))
+            .thenReturn(true)
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -364,7 +376,7 @@ class FunctionValidatorTest {
                 featureId = dependencyFeatureId
             )
         )
-        
+
         val outputNode = FunctionGraphNode.OutputNode(
             x = 0f, y = 0f, id = 2,
             dependencies = listOf(
@@ -383,8 +395,10 @@ class FunctionValidatorTest {
             validator.validateFunction(function)
             fail("Should have thrown an exception due to simple inter-function cycle")
         } catch (e: IllegalStateException) {
-            assertTrue("Exception message should mention function cycle", 
-                e.message?.contains("Function cycle detected") == true)
+            assertTrue(
+                "Exception message should mention function cycle",
+                e.message?.contains("Function cycle detected") == true
+            )
         }
     }
 
@@ -393,10 +407,14 @@ class FunctionValidatorTest {
         val functionFeatureId = 1L
         val dependency1FeatureId = 2L
         val dependency2FeatureId = 3L
-        
+
         // Mock: No other features depend on this function (no cycles)
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId)))
+        whenever(
+            mockDependencyAnalyser
+                .allFeaturesExist(setOf(dependency1FeatureId, dependency2FeatureId))
+        ).thenReturn(true)
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -418,7 +436,7 @@ class FunctionValidatorTest {
                 )
             )
         )
-        
+
         val outputNode = FunctionGraphNode.OutputNode(
             x = 0f, y = 0f, id = 4,
             dependencies = listOf(
@@ -443,9 +461,16 @@ class FunctionValidatorTest {
         val functionFeatureId = 1L
         val existingFeatureId = 2L
         val nonExistentFeatureId = 999L
-        
+
         // Mock: Feature 999 doesn't exist
-        whenever(mockDependencyAnalyser.allFeaturesExist(setOf(existingFeatureId, nonExistentFeatureId)))
+        whenever(
+            mockDependencyAnalyser.allFeaturesExist(
+                setOf(
+                    existingFeatureId,
+                    nonExistentFeatureId
+                )
+            )
+        )
             .thenReturn(false)
 
         val nodes = listOf(
@@ -458,7 +483,7 @@ class FunctionValidatorTest {
                 featureId = nonExistentFeatureId
             )
         )
-        
+
         val outputNode = FunctionGraphNode.OutputNode(
             x = 0f, y = 0f, id = 3,
             dependencies = listOf(
@@ -478,8 +503,135 @@ class FunctionValidatorTest {
             validator.validateFunction(function)
             fail("Should have thrown an exception due to non-existent feature reference")
         } catch (e: IllegalStateException) {
-            assertTrue("Exception message should mention non-existent features", 
-                e.message?.contains("Function references non-existent features") == true)
+            assertTrue(
+                "Exception message should mention non-existent features",
+                e.message?.contains("Function references non-existent features") == true
+            )
+        }
+    }
+
+    // ========== Function graph structure validation tests ==========
+
+    @Test
+    fun `validateFunction fails when node IDs are not unique`() = runTest {
+        val nodes = listOf(
+            FunctionGraphNode.FeatureNode(
+                x = 0f, y = 0f, id = 1,
+                featureId = 100L
+            ),
+            FunctionGraphNode.LuaScriptNode(
+                x = 0f, y = 0f, id = 1,  // Duplicate ID with the feature node
+                script = "return function(sources) yield(sources[1].dp()) end",
+                inputConnectorCount = 1,
+                configuration = emptyList(),
+                dependencies = listOf(
+                    NodeDependency(connectorIndex = 0, nodeId = 1)
+                )
+            )
+        )
+
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 0f, y = 0f, id = 2,
+            dependencies = listOf(
+                NodeDependency(connectorIndex = 0, nodeId = 1)
+            )
+        )
+
+        val function = createTestFunction(
+            nodes = nodes,
+            outputNode = outputNode,
+            inputFeatureIds = listOf(100L)
+        )
+
+        try {
+            validator.validateFunction(function)
+            fail("Should have thrown an exception due to duplicate node IDs")
+        } catch (e: IllegalStateException) {
+            assertTrue(
+                "Exception message should mention unique node IDs",
+                e.message?.contains("Node IDs should be unique") == true
+            )
+        }
+    }
+
+    @Test
+    fun `validateFunction fails when output node ID conflicts with regular node ID`() = runTest {
+        val nodes = listOf(
+            FunctionGraphNode.FeatureNode(
+                x = 0f, y = 0f, id = 1,
+                featureId = 100L
+            ),
+            FunctionGraphNode.LuaScriptNode(
+                x = 0f, y = 0f, id = 2,
+                script = "return function(sources) yield(sources[1].dp()) end",
+                inputConnectorCount = 1,
+                configuration = emptyList(),
+                dependencies = listOf(
+                    NodeDependency(connectorIndex = 0, nodeId = 1)
+                )
+            )
+        )
+
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 0f, y = 0f, id = 2,  // Same ID as the LuaScriptNode
+            dependencies = listOf(
+                NodeDependency(connectorIndex = 0, nodeId = 2)
+            )
+        )
+
+        val function = createTestFunction(
+            nodes = nodes,
+            outputNode = outputNode,
+            inputFeatureIds = listOf(100L)
+        )
+
+        try {
+            validator.validateFunction(function)
+            fail("Should have thrown an exception due to output node ID conflicting with regular node")
+        } catch (e: IllegalStateException) {
+            assertTrue(
+                "Exception message should mention unique node IDs",
+                e.message?.contains("Node IDs should be unique") == true
+            )
+        }
+    }
+
+    @Test
+    fun `validateFunction fails when output node is declared in nodes list`() = runTest {
+        val nodes = listOf(
+            FunctionGraphNode.FeatureNode(
+                x = 0f, y = 0f, id = 1,
+                featureId = 100L
+            ),
+            FunctionGraphNode.OutputNode(  // Output node incorrectly in the nodes list
+                x = 0f, y = 0f, id = 2,
+                dependencies = listOf(
+                    NodeDependency(connectorIndex = 0, nodeId = 1)
+                )
+            )
+        )
+
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 0f, y = 0f, id = 3,
+            dependencies = listOf(
+                NodeDependency(connectorIndex = 0, nodeId = 1)
+            )
+        )
+
+        val function = createTestFunction(
+            nodes = nodes,
+            outputNode = outputNode,
+            inputFeatureIds = listOf(100L)
+        )
+
+        try {
+            validator.validateFunction(function)
+            fail("Should have thrown an exception due to output node in nodes list")
+        } catch (e: IllegalStateException) {
+            assertTrue(
+                "Exception message should mention output node should not be in nodes",
+                e.message?.contains("Output node should not be in the function graph nodes") == true
+            )
         }
     }
 
