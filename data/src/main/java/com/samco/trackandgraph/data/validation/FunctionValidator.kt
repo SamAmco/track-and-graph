@@ -68,6 +68,13 @@ internal class FunctionValidator @Inject constructor(
         if (declaredDependencies.isEmpty()) return
 
         val dependencyAnalyser = dependencyAnalyserProvider.create()
+        
+        // Check that all declared dependencies exist
+        if (!dependencyAnalyser.allFeaturesExist(declaredDependencies)) {
+            error("Function references non-existent features")
+        }
+        
+        // Check for cycles
         val dependentFeatures = dependencyAnalyser
             .getFeaturesDependingOn(function.featureId)
             .featureIds

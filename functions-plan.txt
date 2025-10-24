@@ -1,5 +1,4 @@
 TODO: 
-- Don't allow inserting/updating a function that references a non-existent feature
 - Although you can't select a feature that creates a cycle, the default selected item might create a cycle
 
 - Show a dialog when you first enter the function screen that explains it's advanced and links to the docs

@@ -156,6 +156,14 @@ internal class DependencyAnalyser private constructor(
         return DependentFeatures(result)
     }
 
+    /**
+     * Checks if all the given feature IDs exist in the dependency graph.
+     * Returns true if all features exist, false otherwise.
+     */
+    fun allFeaturesExist(featureIds: Set<Long>): Boolean {
+        return featureNodes.keys.containsAll(featureIds)
+    }
+
     companion object {
         /**
          * Creates a new DependencyAnalyzer by building the current dependency tree from the database.
