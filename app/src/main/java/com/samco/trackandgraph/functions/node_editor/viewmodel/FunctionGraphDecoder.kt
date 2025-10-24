@@ -64,49 +64,51 @@ internal class FunctionGraphDecoder @Inject constructor(
         dependentFeatureIds: Set<Long> = emptySet()
     ): DecodedFunctionGraph {
         val functionGraph = function.functionGraph
-
-        // Build node positions map
+        
+        // Decode nodes and track which ones to filter
+        val decodedNodes = mutableListOf<Node>()
         val nodePositions = mutableMapOf<Int, Offset>()
-
-        // Decode all nodes from the function graph
-        val nodes = persistentListOf<Node>().mutate { nodeList ->
-            // Process feature nodes
-            functionGraph.nodes.forEach { graphNode ->
-                when (graphNode) {
-                    is FunctionGraphNode.FeatureNode -> {
-                        nodeList.add(decodeFeatureNode(graphNode, featurePathMap, dependentFeatureIds))
+        val filteredNodeIds = mutableSetOf<Int>()
+        
+        // Process each node
+        functionGraph.nodes.forEach { graphNode ->
+            when (graphNode) {
+                is FunctionGraphNode.FeatureNode -> {
+                    if (graphNode.featureId in featurePathMap) {
+                        decodedNodes.add(
+                            decodeFeatureNode(graphNode, featurePathMap, dependentFeatureIds)
+                        )
                         nodePositions[graphNode.id] = Offset(graphNode.x, graphNode.y)
-                    }
-                    is FunctionGraphNode.LuaScriptNode -> {
-                        nodeList.add(decodeLuaScriptNode(graphNode))
-                        nodePositions[graphNode.id] = Offset(graphNode.x, graphNode.y)
-                    }
-                    is FunctionGraphNode.OutputNode -> {
-                        // Do nothing should not be here
+                    } else {
+                        filteredNodeIds.add(graphNode.id)
                     }
                 }
+                is FunctionGraphNode.LuaScriptNode -> {
+                    decodedNodes.add(decodeLuaScriptNode(graphNode))
+                    nodePositions[graphNode.id] = Offset(graphNode.x, graphNode.y)
+                }
+                is FunctionGraphNode.OutputNode -> {
+                    // Output nodes shouldn't be in the nodes list
+                }
             }
-            
-            // Process output node
-            val outputNode = decodeOutputNode(functionGraph.outputNode, function)
-            nodeList.add(outputNode)
-            nodePositions[functionGraph.outputNode.id] = Offset(
-                functionGraph.outputNode.x,
-                functionGraph.outputNode.y
-            )
         }
-
-        // Build edges from dependencies
-        val edges = buildEdgesFromDependencies(functionGraph)
         
+        // Add output node (always valid)
+        val outputNode = functionGraph.outputNode
+        decodedNodes.add(decodeOutputNode(outputNode, function))
+        nodePositions[outputNode.id] = Offset(outputNode.x, outputNode.y)
+        
+        // Build edges, filtering out connections to invalid nodes
+        val edges = buildEdgesFromDependencies(functionGraph, filteredNodeIds)
+
         return DecodedFunctionGraph(
-            nodes = nodes,
+            nodes = persistentListOf<Node>().addAll(decodedNodes),
             edges = edges,
             nodePositions = nodePositions,
             isDuration = functionGraph.isDuration
         )
     }
-    
+
     /**
      * Decodes a FeatureNode DTO to a DataSource ViewModel node.
      */
@@ -122,7 +124,7 @@ internal class FunctionGraphDecoder @Inject constructor(
             dependentFeatureIds = dependentFeatureIds
         )
     }
-    
+
     /**
      * Decodes a LuaScriptNode DTO to a LuaScript ViewModel node.
      * Uses the configuration provider to analyze the script and create a complete node.
@@ -142,7 +144,7 @@ internal class FunctionGraphDecoder @Inject constructor(
             translations = translations
         )
     }
-    
+
     /**
      * Decodes an OutputNode DTO to an Output ViewModel node.
      */
@@ -159,25 +161,37 @@ internal class FunctionGraphDecoder @Inject constructor(
             validationErrors = emptyList()
         )
     }
-    
+
     /**
      * Builds edges from the dependency information in the function graph.
+     * Excludes edges connected to filtered-out nodes.
+     *
+     * @param functionGraph The function graph containing dependency information
+     * @param filteredNodeIds Set of node IDs that were filtered out (invalid feature nodes)
      */
-    private fun buildEdgesFromDependencies(functionGraph: FunctionGraph): PersistentList<Edge> {
+    private fun buildEdgesFromDependencies(
+        functionGraph: FunctionGraph,
+        filteredNodeIds: Set<Int>
+    ): PersistentList<Edge> {
         return persistentListOf<Edge>().mutate { edgeList ->
             // Get all nodes including the output node
             val allNodes = functionGraph.nodes + functionGraph.outputNode
-            
+
             // Process dependencies for each node
             allNodes.forEach { node ->
+                if (node.id in filteredNodeIds) return@forEach
+                // Skip if this node was filtered out
                 node.dependencies.forEach { dependency ->
-                    val edge = createEdgeFromDependency(node, dependency)
-                    edgeList.add(edge)
+                    // Only add edge if the source node wasn't filtered out
+                    if (dependency.nodeId !in filteredNodeIds) {
+                        val edge = createEdgeFromDependency(node, dependency)
+                        edgeList.add(edge)
+                    }
                 }
             }
         }
     }
-    
+
     /**
      * Creates an Edge from a NodeDependency.
      */
@@ -190,13 +204,13 @@ internal class FunctionGraphDecoder @Inject constructor(
             type = ConnectorType.OUTPUT,
             connectorIndex = 0
         )
-        
+
         val toConnector = Connector(
             nodeId = targetNode.id,
             type = ConnectorType.INPUT,
             connectorIndex = dependency.connectorIndex
         )
-        
+
         return Edge(from = fromConnector, to = toConnector)
     }
 }

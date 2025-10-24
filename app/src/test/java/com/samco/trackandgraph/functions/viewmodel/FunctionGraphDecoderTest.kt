@@ -95,6 +95,67 @@ internal class FunctionGraphDecoderTest {
         }
     }
 
+    @Test
+    fun `filters out feature nodes with invalid feature IDs and their edges`() = runTest {
+        // Create a function with a feature node that references a non-existent feature (999L)
+        val functionWithInvalidFeature = Function(
+            id = 1L,
+            name = "Test Function",
+            groupId = 1L,
+            description = "Test Description",
+            functionGraph = FunctionGraph(
+                nodes = listOf(
+                    FunctionGraphNode.FeatureNode(
+                        x = 100f,
+                        y = 100f,
+                        id = 1,
+                        featureId = 101L // Valid feature
+                    ),
+                    FunctionGraphNode.FeatureNode(
+                        x = 200f,
+                        y = 200f,
+                        id = 2,
+                        featureId = 999L // Invalid feature - not in featurePathMap
+                    )
+                ),
+                outputNode = FunctionGraphNode.OutputNode(
+                    x = 300f,
+                    y = 300f,
+                    id = 3,
+                    dependencies = listOf(
+                        NodeDependency(connectorIndex = 0, nodeId = 1), // Edge from valid node
+                        NodeDependency(connectorIndex = 1, nodeId = 2)  // Edge from invalid node - should be filtered
+                    )
+                ),
+                isDuration = false
+            ),
+            inputFeatureIds = listOf(101L, 999L)
+        )
+
+        // Feature path map only contains 101L, not 999L
+        val featurePathMap = mapOf(101L to "Valid Feature")
+
+        val result = decoder.decodeFunctionGraph(functionWithInvalidFeature, featurePathMap)
+
+        // Assert that only the valid feature node (id=1) and output node (id=3) are present
+        assertTrue("Should have exactly 2 nodes (1 valid feature + 1 output)", result.nodes.size == 2)
+        assertTrue("First node should be DataSource with id=1", 
+            result.nodes[0] is Node.DataSource && result.nodes[0].id == 1)
+        assertTrue("Second node should be Output with id=3", 
+            result.nodes[1] is Node.Output && result.nodes[1].id == 3)
+
+        // Assert that only the edge from the valid node is present
+        assertTrue("Should have exactly 1 edge", result.edges.size == 1)
+        assertTrue("Edge should be from node 1 to node 3", 
+            result.edges[0].from.nodeId == 1 && result.edges[0].to.nodeId == 3)
+
+        // Assert that positions only exist for valid nodes
+        assertTrue("Should have positions for 2 nodes", result.nodePositions.size == 2)
+        assertTrue("Should have position for node 1", result.nodePositions.containsKey(1))
+        assertTrue("Should have position for node 3", result.nodePositions.containsKey(3))
+        assertTrue("Should not have position for filtered node 2", !result.nodePositions.containsKey(2))
+    }
+
     // Custom comparators for structural equality
     object DecodedFunctionGraphComparator {
         fun equals(expected: DecodedFunctionGraph, actual: DecodedFunctionGraph): Boolean {

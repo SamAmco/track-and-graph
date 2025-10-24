@@ -249,30 +249,38 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
             val existing = existingFunction
             if (existing != null) {
-                // Get dependent feature IDs for cycle detection when editing existing function
-                dependentFeatureIds = dataInteractor.getFeatureIdsDependingOn(existing.featureId)
-
-                // Decode existing function graph
-                val decodedGraph = functionGraphDecoder.decodeFunctionGraph(
-                    existing,
-                    featurePathMap,
-                    dependentFeatureIds
-                )
-
-                // Load decoded nodes and edges using persistent lists
-                _nodes.value = decodedGraph.nodes
-                _edges.value = decodedGraph.edges
-
-                // Load node positions
-                nodePositions.putAll(decodedGraph.nodePositions)
+                initializeExistingFunction(existing)
             } else {
-                // Initialize with default output node for new function
-                _nodes.value = _nodes.value.mutate {
-                    it.add(Node.Output(id = 1, isUpdateMode = false))
-                }
-                nodePositions[1] = Offset(0f, 0f)
+                initializeNewFunction()
             }
         }
+    }
+
+    private suspend fun initializeExistingFunction(existing: Function) {
+        // Get dependent feature IDs for cycle detection when editing existing function
+        dependentFeatureIds = dataInteractor.getFeatureIdsDependingOn(existing.featureId)
+
+        // Decode existing function graph
+        val decodedGraph = functionGraphDecoder.decodeFunctionGraph(
+            existing,
+            featurePathMap,
+            dependentFeatureIds
+        )
+
+        // Load decoded nodes and edges using persistent lists
+        _nodes.value = decodedGraph.nodes
+        _edges.value = decodedGraph.edges
+
+        // Load node positions
+        nodePositions.putAll(decodedGraph.nodePositions)
+    }
+
+    private fun initializeNewFunction() {
+        // Initialize with default output node for new function
+        _nodes.value = _nodes.value.mutate {
+            it.add(Node.Output(id = 1, isUpdateMode = false))
+        }
+        nodePositions[1] = Offset(0f, 0f)
     }
 
     override fun onUpsertConnector(connector: Connector, worldPosition: Offset) {
