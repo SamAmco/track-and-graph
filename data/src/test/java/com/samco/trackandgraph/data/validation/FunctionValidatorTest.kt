@@ -438,6 +438,51 @@ class FunctionValidatorTest {
         validator.validateFunction(function)
     }
 
+    @Test
+    fun `validateFunction fails when function references non-existent features`() = runTest {
+        val functionFeatureId = 1L
+        val existingFeatureId = 2L
+        val nonExistentFeatureId = 999L
+        
+        // Mock: Feature 999 doesn't exist
+        whenever(mockDependencyAnalyser.allFeaturesExist(setOf(existingFeatureId, nonExistentFeatureId)))
+            .thenReturn(false)
+
+        val nodes = listOf(
+            FunctionGraphNode.FeatureNode(
+                x = 0f, y = 0f, id = 1,
+                featureId = existingFeatureId
+            ),
+            FunctionGraphNode.FeatureNode(
+                x = 0f, y = 0f, id = 2,
+                featureId = nonExistentFeatureId
+            )
+        )
+        
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 0f, y = 0f, id = 3,
+            dependencies = listOf(
+                NodeDependency(connectorIndex = 0, nodeId = 1),
+                NodeDependency(connectorIndex = 1, nodeId = 2)
+            )
+        )
+
+        val function = createTestFunction(
+            featureId = functionFeatureId,
+            nodes = nodes,
+            outputNode = outputNode,
+            inputFeatureIds = listOf(existingFeatureId, nonExistentFeatureId)
+        )
+
+        try {
+            validator.validateFunction(function)
+            fail("Should have thrown an exception due to non-existent feature reference")
+        } catch (e: IllegalStateException) {
+            assertTrue("Exception message should mention non-existent features", 
+                e.message?.contains("Function references non-existent features") == true)
+        }
+    }
+
     // ========== Helper functions ==========
 
     private fun createTestFunction(
