@@ -64,7 +64,7 @@ internal fun DataSourceNode(
     onDeleteNode: () -> Unit = {},
 ) {
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
-    
+
     Column(
         Modifier
             .widthIn(max = nodeCardContentWidth)
@@ -83,7 +83,7 @@ internal fun DataSourceNode(
             )
 
             InputSpacingLarge()
-            
+
             Row {
                 IconButton(
                     modifier = Modifier.size(buttonSize),
@@ -96,7 +96,7 @@ internal fun DataSourceNode(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 IconButton(
                     modifier = Modifier.size(buttonSize),
                     onClick = onDeleteNode
@@ -121,14 +121,14 @@ internal fun DataSourceNode(
             onClick = { showSelectDialog = true }
         )
 
-        if (showSelectDialog) {
+        if (showSelectDialog || node.selectedFeatureId.value == null) {
             // Create hidden items from dependent feature IDs to prevent circular dependencies
             val hiddenItems = remember(node.dependentFeatureIds) {
                 node.dependentFeatureIds.map { featureId ->
                     HiddenItem(SelectableItemType.FEATURE, featureId)
                 }.toSet()
             }
-            
+
             SelectItemDialog(
                 title = stringResource(R.string.select_a_feature),
                 selectableTypes = setOf(SelectableItemType.FEATURE),
@@ -137,10 +137,15 @@ internal fun DataSourceNode(
                     node.selectedFeatureId.value = selectedFeatureId
                     showSelectDialog = false
                 },
-                onDismissRequest = { showSelectDialog = false }
+                onDismissRequest = {
+                    showSelectDialog = false
+                    if (node.selectedFeatureId.value == null) {
+                        onDeleteNode()
+                    }
+                }
             )
         }
-        
+
         // Info dialog
         if (showInfoDialog) {
             InfoDisplayDialog(
@@ -170,7 +175,7 @@ private fun DataSourceNodePreview() {
 
             val sampleNode = Node.DataSource(
                 id = 3,
-                selectedFeatureId = remember { mutableLongStateOf(1L) },
+                selectedFeatureId = remember { mutableStateOf(1L) },
                 featurePathMap = sampleFeaturePathMap
             )
 

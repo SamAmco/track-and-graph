@@ -166,7 +166,7 @@ private fun DataSourceNodePreview() {
 
         NodeCard(
             node = Node.DataSource(
-                selectedFeatureId = remember { mutableLongStateOf(0L) },
+                selectedFeatureId = remember { mutableStateOf(0L) },
                 featurePathMap = mapOf(0L to "Samples/Sample Data Source"),
             ),
             viewState = viewportState,
