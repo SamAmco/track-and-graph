@@ -56,13 +56,37 @@ end
 --- @param path string Path to the file
 --- @return string File content
 function M.read_file(path)
-	local file = io.open(path, "r")
+	local file = io.open(path, "rb")
 	if not file then
 		error("Could not open file: " .. path)
 	end
 	local content = file:read("*all")
 	file:close()
 	return content
+end
+
+--- Write content to file
+--- @param path string Path to the file
+--- @param content string Content to write
+function M.write_file(path, content)
+	local file = io.open(path, "wb")
+	if not file then
+		error("Could not open output file: " .. path)
+	end
+	file:write(content)
+	file:close()
+end
+
+--- Check if file exists
+--- @param path string Path to file
+--- @return boolean true if file exists
+function M.file_exists(path)
+	local file = io.open(path, "r")
+	if file then
+		file:close()
+		return true
+	end
+	return false
 end
 
 --- Load a Lua module from file content

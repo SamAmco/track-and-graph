@@ -132,6 +132,10 @@ lua-pack-functions:
 lua-publish-debug:
 	cd lua && lua tools/publish-functions-debug.lua
 
+.PHONY: lua-publish-prod
+lua-publish-prod:
+	cd lua && lua tools/publish-functions-prod.lua
+
 .PHONY: lua-print-catalog
 lua-print-catalog:
 	cd lua && lua tools/print-catalog.lua
