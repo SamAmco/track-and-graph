@@ -7,9 +7,9 @@
     "tutorial-graphs": "https://samamco.github.io/track-and-graph/tutorial/graphs/",
     "lua-community-scripts-root": "https://samamco.github.io/track-and-graph/lua/community/",
     "play-store-page": "https://play.google.com/store/apps/details?id=com.samco.trackandgraph",
-    "function-catalogue-location": "broken.https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/functions/lua/catalog/community-functions.lua",
-    "function-catalogue-signature": "broken.https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/functions/lua/catalog/community-functions.lua.sig",
-    "functions-docs": "broken.https://samamco.github.io/track-and-graph/tutorial/graphs/lua-graphs/lua-graphs/"
+    "function-catalogue-location": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/lua/catalog/community-functions.lua",
+    "function-catalogue-signature": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/lua/catalog/community-functions.lua.sig",
+    "functions-docs": "https://samamco.github.io/track-and-graph/tutorial/functions/"
   },
   "trusted-lua-script-sources": [
     "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads"
