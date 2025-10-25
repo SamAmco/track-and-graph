@@ -390,7 +390,9 @@
     <string name="lua_engine_disabled">Lua engine disabled</string>
     <string name="lua_graph_first_time_user_title">Lua script graphs and stats</string>
     <string name="lua_graph_first_time_user_message">Lua scripts are an advanced feature that let you create custom graphs and stats with the Lua programming language. \n\nYou can load your own, or pick one from the GitHub collection. Installing a script from GitHub will return you to the app with the script ready to use.</string>
-    <string name="learn_more">Learn more</string>
+    <string name="functions_first_time_user_title">Welcome to Functions</string>
+    <string name="functions_first_time_user_message">Functions are an advanced feature that let you combine, aggregate, and transform your data into new derived data sources.</string>
+    <string name="learn_more">Learn more here</string>
     <string name="github">GitHub</string>
     <string name="paste">Paste</string>
     <string name="failed_to_download_file">Failed to download file: %s</string>

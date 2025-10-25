@@ -44,5 +44,7 @@ data class Endpoints(
     @SerialName("function-catalogue-location")
     val functionCatalogueLocation: String,
     @SerialName("function-catalogue-signature")
-    val functionCatalogueSignature: String
+    val functionCatalogueSignature: String,
+    @SerialName("functions-docs")
+    val functionsDocs: String
 )

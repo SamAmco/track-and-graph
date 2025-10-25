@@ -69,6 +69,7 @@ class UrlNavigatorImpl @Inject constructor(
             UrlNavigator.Location.TUTORIAL_GRAPHS -> config.endpoints.tutorialGraphs
             UrlNavigator.Location.LUA_COMMUNITY_SCRIPTS_ROOT -> config.endpoints.luaCommunityScriptsRoot
             UrlNavigator.Location.PLAY_STORE_PAGE -> config.endpoints.playStorePage
+            UrlNavigator.Location.FUNCTIONS_DOCS -> config.endpoints.functionsDocs
         }
     }
 

@@ -371,7 +371,8 @@
     <string name="lua_engine_disabled">Lua-Engine deaktiviert</string>
     <string name="lua_graph_first_time_user_title">Lua-Skript-Diagramme und -Statistiken</string>
     <string name="lua_graph_first_time_user_message">Lua-Skripte sind eine erweiterte Funktion, mit der Sie benutzerdefinierte Diagramme und Statistiken mit der Programmiersprache Lua erstellen können. \n\nSie können Ihr eigenes laden oder eines aus der GitHub-Sammlung auswählen. Das Installieren eines Skripts von GitHub bringt Sie zurück zur App, mit dem Skript bereit zur Verwendung.</string>
-    <string name="learn_more">Erfahren Sie mehr</string>
+    <string name="functions_first_time_user_title">Willkommen bei Funktionen</string>
+    <string name="functions_first_time_user_message">Funktionen sind eine erweiterte Funktion, mit der Sie Ihre Daten kombinieren, aggregieren und in neue abgeleitete Datenquellen transformieren können.</string>    <string name="learn_more">Erfahren Sie mehr hier</string>
     <string name="github">GitHub</string>
     <string name="paste">Einfügen</string>
     <string name="failed_to_download_file">Fehler beim Herunterladen der Datei: %s</string>

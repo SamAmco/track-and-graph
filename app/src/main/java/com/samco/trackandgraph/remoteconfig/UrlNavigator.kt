@@ -26,7 +26,8 @@ interface UrlNavigator {
         TUTORIAL_LUA,
         TUTORIAL_GRAPHS,
         LUA_COMMUNITY_SCRIPTS_ROOT,
-        PLAY_STORE_PAGE
+        PLAY_STORE_PAGE,
+        FUNCTIONS_DOCS
     }
 
     suspend fun navigateTo(context: Context, location: Location): Boolean
