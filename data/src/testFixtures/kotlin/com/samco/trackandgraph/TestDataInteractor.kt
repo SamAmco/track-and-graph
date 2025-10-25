@@ -74,6 +74,7 @@ object TestDataInteractor {
 
         val functionValidator = FunctionValidator(
             dependencyAnalyserProvider = dependencyAnalyserProvier,
+            dao = database.trackAndGraphDatabaseDao,
         )
 
         val functionHelper = FunctionHelperImpl(

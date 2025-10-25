@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.data.database
 
 import android.database.Cursor
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -104,9 +103,6 @@ private const val getDisplayTrackersQuery = """
         )
     """
 
-
-//TODO it would probably be better if we migrated from LiveData to flow here to remove lifecycle
-// awareness from the model layer
 @Dao
 internal interface TrackAndGraphDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -132,9 +128,6 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroupsSync(): List<Group>
-
-    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
-    fun getAllFeatures(): LiveData<List<Feature>>
 
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>

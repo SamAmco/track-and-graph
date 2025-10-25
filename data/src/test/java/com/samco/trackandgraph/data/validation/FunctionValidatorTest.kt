@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.data.validation
 
+import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
@@ -37,7 +39,8 @@ import org.mockito.kotlin.whenever
 class FunctionValidatorTest {
     private val mockDependencyAnalyserProvider: DependencyAnalyserProvider = mock()
     private val mockDependencyAnalyser: DependencyAnalyser = mock()
-    private val validator: FunctionValidator = FunctionValidator(mockDependencyAnalyserProvider)
+    private val mockDao: TrackAndGraphDatabaseDao = mock()
+    private val validator: FunctionValidator = FunctionValidator(mockDependencyAnalyserProvider, mockDao)
 
     @Before
     fun setup() {
@@ -205,8 +208,13 @@ class FunctionValidatorTest {
         // Mock: Only the function itself depends on itself (no other features depend on it)
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId)))
-        whenever(mockDependencyAnalyser.allFeaturesExist(any()))
-            .thenReturn(true)
+        
+        // Mock: All features exist in the database
+        whenever(mockDao.getAllFeaturesSync())
+            .thenReturn(listOf(
+                createMockFeature(functionFeatureId),
+                createMockFeature(dependencyFeatureId)
+            ))
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -323,8 +331,10 @@ class FunctionValidatorTest {
         // Mock: Function depends on itself
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId)))
-        whenever(mockDependencyAnalyser.allFeaturesExist(any()))
-            .thenReturn(true)
+        
+        // Mock: Feature exists in the database
+        whenever(mockDao.getAllFeaturesSync())
+            .thenReturn(listOf(createMockFeature(functionFeatureId)))
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -367,8 +377,13 @@ class FunctionValidatorTest {
         // So if Feature 1 depends on Feature 2, we have a cycle: 1 -> 2 -> 1
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId, dependencyFeatureId)))
-        whenever(mockDependencyAnalyser.allFeaturesExist(setOf(dependencyFeatureId)))
-            .thenReturn(true)
+        
+        // Mock: Features exist in the database
+        whenever(mockDao.getAllFeaturesSync())
+            .thenReturn(listOf(
+                createMockFeature(functionFeatureId),
+                createMockFeature(dependencyFeatureId)
+            ))
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -403,6 +418,45 @@ class FunctionValidatorTest {
     }
 
     @Test
+    fun `validateFunction skips cycle detection for new functions with featureId 0`() = runTest {
+        val newFunctionFeatureId = 0L  // New function not yet persisted
+        val dependencyFeatureId = 2L
+
+        // Mock: Features exist in the database
+        whenever(mockDao.getAllFeaturesSync())
+            .thenReturn(listOf(
+                createMockFeature(dependencyFeatureId)
+            ))
+
+        // We should NOT call getFeaturesDependingOn for new functions
+        // So we don't set up any mock for it
+
+        val nodes = listOf(
+            FunctionGraphNode.FeatureNode(
+                x = 0f, y = 0f, id = 1,
+                featureId = dependencyFeatureId
+            )
+        )
+
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 0f, y = 0f, id = 2,
+            dependencies = listOf(
+                NodeDependency(connectorIndex = 0, nodeId = 1)
+            )
+        )
+
+        val function = createTestFunction(
+            featureId = newFunctionFeatureId,
+            nodes = nodes,
+            outputNode = outputNode,
+            inputFeatureIds = listOf(dependencyFeatureId)
+        )
+
+        // Should not throw even though we didn't mock getFeaturesDependingOn
+        validator.validateFunction(function)
+    }
+
+    @Test
     fun `validateFunction passes when all validations succeed`() = runTest {
         val functionFeatureId = 1L
         val dependency1FeatureId = 2L
@@ -411,10 +465,14 @@ class FunctionValidatorTest {
         // Mock: No other features depend on this function (no cycles)
         whenever(mockDependencyAnalyser.getFeaturesDependingOn(functionFeatureId))
             .thenReturn(DependentFeatures(setOf(functionFeatureId)))
-        whenever(
-            mockDependencyAnalyser
-                .allFeaturesExist(setOf(dependency1FeatureId, dependency2FeatureId))
-        ).thenReturn(true)
+        
+        // Mock: All features exist in the database
+        whenever(mockDao.getAllFeaturesSync())
+            .thenReturn(listOf(
+                createMockFeature(functionFeatureId),
+                createMockFeature(dependency1FeatureId),
+                createMockFeature(dependency2FeatureId)
+            ))
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -462,16 +520,13 @@ class FunctionValidatorTest {
         val existingFeatureId = 2L
         val nonExistentFeatureId = 999L
 
-        // Mock: Feature 999 doesn't exist
-        whenever(
-            mockDependencyAnalyser.allFeaturesExist(
-                setOf(
-                    existingFeatureId,
-                    nonExistentFeatureId
-                )
-            )
-        )
-            .thenReturn(false)
+        // Mock: Feature 999 doesn't exist in the database
+        whenever(mockDao.getAllFeaturesSync())
+            .thenReturn(listOf(
+                createMockFeature(functionFeatureId),
+                createMockFeature(existingFeatureId)
+                // nonExistentFeatureId is not in the list
+            ))
 
         val nodes = listOf(
             FunctionGraphNode.FeatureNode(
@@ -636,6 +691,16 @@ class FunctionValidatorTest {
     }
 
     // ========== Helper functions ==========
+
+    private fun createMockFeature(id: Long): Feature {
+        return Feature(
+            id = id,
+            name = "Feature $id",
+            groupId = 1L,
+            displayIndex = 0,
+            description = ""
+        )
+    }
 
     private fun createTestFunction(
         id: Long = 1L,

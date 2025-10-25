@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.data.validation
 
+import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
@@ -28,7 +29,8 @@ import javax.inject.Inject
  * and intra-function cycle detection (cycles within a function's own node graph).
  */
 internal class FunctionValidator @Inject constructor(
-    private val dependencyAnalyserProvider: DependencyAnalyserProvider
+    private val dependencyAnalyserProvider: DependencyAnalyserProvider,
+    private val dao: TrackAndGraphDatabaseDao
 ) {
     /**
      * Validates a function before insert or update.
@@ -97,14 +99,18 @@ internal class FunctionValidator @Inject constructor(
         // Skip validation if there are no dependencies
         if (declaredDependencies.isEmpty()) return
 
-        val dependencyAnalyser = dependencyAnalyserProvider.create()
-
         // Check that all declared dependencies exist
-        if (!dependencyAnalyser.allFeaturesExist(declaredDependencies)) {
+        val allFeatureIds = dao.getAllFeaturesSync().map { it.id }.toSet()
+        if (!allFeatureIds.containsAll(declaredDependencies)) {
             error("Function references non-existent features")
         }
 
+        // Skip cycle detection for new functions (featureId = 0)
+        // New functions haven't been persisted yet, so they can't have cycles
+        if (function.featureId == 0L) return
+
         // Check for cycles
+        val dependencyAnalyser = dependencyAnalyserProvider.create()
         val dependentFeatures = dependencyAnalyser
             .getFeaturesDependingOn(function.featureId)
             .featureIds
