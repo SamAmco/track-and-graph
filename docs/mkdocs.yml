@@ -46,6 +46,7 @@ nav:
       - tutorial/graphs/lua-graphs/lua-graphs.md
     - tutorial/notes.md
     - tutorial/timestamps.md
+    - tutorial/functions.md
   - Lua:
     - lua/community/index.md
     - lua/developer-guide/intro.md
