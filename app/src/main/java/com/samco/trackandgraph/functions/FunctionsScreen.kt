@@ -83,6 +83,7 @@ import com.samco.trackandgraph.functions.node_editor.NodeCard
 import com.samco.trackandgraph.functions.node_editor.nodeCardContentWidth
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Hint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.ui.tooling.preview.Preview
 import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
@@ -376,7 +377,7 @@ private fun TopCornerFab(
     ) {
         FloatingActionButton(
             modifier = Modifier
-                .padding(WindowInsets.navigationBars.asPaddingValues())
+                .padding(WindowInsets.safeDrawing.asPaddingValues())
                 .then(Modifier.padding(inputSpacingLarge))
                 .size(buttonSize),
             onClick = onClick,
