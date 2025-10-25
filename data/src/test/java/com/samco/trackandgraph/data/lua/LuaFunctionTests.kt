@@ -21,11 +21,17 @@ import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.fail
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
 internal class LuaFunctionTests : LuaEngineImplTest() {
@@ -312,6 +318,77 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
     }
 
     @Test
+    fun `Concurrent random generation with coroutines`() = runBlocking {
+        val threadCount = 50
+        val sharedLuaEngine = uut()
+
+        // Use Dispatchers.IO to ensure true parallelism (not limited to main thread)
+        val jobs = (0 until threadCount).map { threadIndex ->
+            // Launch in IO dispatcher for true parallelism
+            async(Dispatchers.IO) {
+                val script = """
+                    return function(source)
+                        -- Seed the randomizer with a hardcoded value
+                        math.randomseed(42)
+                        
+                        local count = 0
+                        return function()
+                            if count >= 10 then
+                                return nil
+                            end
+                            
+                            count = count + 1
+                            local value = math.random()
+                            
+                            return {
+                                timestamp = count * 1000,
+                                value = value,
+                                label = "random_" .. count
+                            }
+                        end
+                    end
+                """.trimIndent()
+
+                val vmLock = sharedLuaEngine.acquireVM()
+                val resultList = try {
+                    sharedLuaEngine.runLuaFunctionGenerator(
+                        vmLock = vmLock,
+                        script = script,
+                        dataSources = emptyList(),
+                        configuration = emptyList()
+                    ).toList()
+                } finally {
+                    sharedLuaEngine.releaseVM(vmLock)
+                }
+
+                assertEquals(
+                    listOf(
+                        0.22631526597231777,
+                        0.9049568172356872,
+                        0.27072817312675046,
+                        0.9704900678643866,
+                        0.18360383903895205,
+                        0.5926209788406316,
+                        0.2943534810687458,
+                        0.13814851556395114,
+                        0.5930778252098076,
+                        0.08548125910056925
+                    ),
+                    resultList.map { it.value }
+                )
+
+                resultList
+            }
+        }
+
+        // awaitAll will throw any exception from any coroutine
+        val results = jobs.awaitAll()
+
+        // Additional assertions can go here
+        assertEquals("Should have results from all coroutines", threadCount, results.size)
+    }
+
+    @Test
     fun `Generator function uses configuration parameters correctly`() = testLuaFunction(
         dataSources = listOf(
             sequenceOf(
@@ -402,14 +479,14 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         """.trimIndent()
     ) {
         assertEquals("Should have 4 data points total", 4, resultList.size)
-        
+
         // Verify we got data from both sources (order doesn't matter)
         val labels = resultList.map { it.label }.toSet()
         assertTrue("Should contain source1_a", labels.contains("source1_a"))
         assertTrue("Should contain source1_b", labels.contains("source1_b"))
         assertTrue("Should contain source2_a", labels.contains("source2_a"))
         assertTrue("Should contain source2_b", labels.contains("source2_b"))
-        
+
         val values = resultList.map { it.value }.toSet()
         assertTrue("Should contain all values", values.containsAll(setOf(10.0, 20.0, 30.0, 40.0)))
     }
