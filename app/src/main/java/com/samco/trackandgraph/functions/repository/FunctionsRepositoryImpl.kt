@@ -72,7 +72,7 @@ class FunctionsRepositoryImpl @Inject constructor(
     private fun verifySignature(luaScriptBytes: ByteArray, signatureData: SignatureData) {
         try {
             // Read the public key file based on keyId
-            val keyFileName = "${signatureData.keyId}.pub"
+            val keyFileName = "${signatureData.keyId}"
             val keyFileContent = assetReader.readAssetToString("functions-catalog/$keyFileName")
 
             // Extract the base64 key from PEM format
