@@ -72,7 +72,7 @@ local function main()
 	signing.run("cp " .. json_path .. " " .. json_dest, "Failed to copy signature JSON")
 	print("✓ Copied signature JSON to " .. json_dest)
 
-	local public_key_dest = DEBUG_CATALOG_DIR .. "/" .. key_id .. ".pub"
+	local public_key_dest = DEBUG_CATALOG_DIR .. "/" .. key_id
 	signing.run("cp " .. public_key .. " " .. public_key_dest, "Failed to copy public key")
 	print("✓ Copied public key to " .. public_key_dest)
 
