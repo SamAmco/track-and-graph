@@ -518,6 +518,28 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -723,6 +745,21 @@
       Contributing to the community scripts
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Contributing to the community scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -936,6 +973,21 @@
       Contributing to the community scripts
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Contributing to the community scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1180,13 +1232,31 @@
 <span class="c1">--- PREVIEW_END</span>
 </code></pre></div>
 <h2 id="contributing-to-the-community-scripts">Contributing to the community scripts<a class="headerlink" href="#contributing-to-the-community-scripts" title="Permanent link">#</a></h2>
-<p>You already have all the tools you need to write and run your own scripts. If you create something you think is very useful and you want to share it with the community, you can create a PR into the Track &amp; Graph repository. However community scripts will require a few more things before they can be committed to the repository. To give you an idea of what's required you can see the <a href="https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community"> other community scripts and their accompanying files here</a>. In general you will need 4 things: </p>
+<p>You already have all the tools you need to write and run your own scripts. If you create something you think is very useful and you want to share it with the community, you can create a PR into the Track &amp; Graph repository. However community scripts will require a few more things before they can be committed to the repository. In general you will need 4 things:</p>
 <ol>
 <li>A README.md file that describes the script and how to use it</li>
 <li>A screenshot of the graph that the script generates</li>
 <li>A test file, or multiple test files, that contain the test cases for the script</li>
 <li>The script file that contains the code</li>
 </ol>
+<h3 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">#</a></h3>
+<p>Community scripts are organized in two separate locations:</p>
+<p><strong>Lua scripts and tests</strong> go in <code>lua/src/community/graphs/</code>:
+<div class="highlight"><pre><span></span><code>lua/src/community/graphs/&lt;category&gt;/&lt;script-name&gt;/
+  ├── &lt;script-name&gt;.lua          # Main script file
+  └── test_&lt;script-name&gt;.lua     # Test file(s) (prefix with test_)
+</code></pre></div></p>
+<p><strong>Documentation and images</strong> go in <code>docs/docs/lua/community/</code>:
+<div class="highlight"><pre><span></span><code>docs/docs/lua/community/&lt;category&gt;/&lt;script-name&gt;/
+  ├── script.lua                 # Generated from lua/src via make sync-lua-to-docs
+  ├── README.md                  # Documentation
+  └── image.png                  # Screenshot
+</code></pre></div></p>
+<p>For example, the fraction script has:
+- Code: <code>lua/src/community/graphs/text/fraction/fraction.lua</code> and <code>test_fraction.lua</code>
+- Docs: <code>docs/docs/lua/community/text/fraction/script.lua</code>, <code>README.md</code>, and <code>image.png</code></p>
+<p>You can see examples of <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs">scripts here</a> and <a href="https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community">docs here</a>.</p>
+<p><strong>Important:</strong> The <code>script.lua</code> file in the docs directory is automatically generated. After making changes to your script in <code>lua/src/community/graphs/</code>, run <code>make sync-lua-to-docs</code> to copy it to the docs location. You only need to manually create the <code>README.md</code> and image files in the docs directory.</p>
 <h2 id="writing-tests">Writing tests<a class="headerlink" href="#writing-tests" title="Permanent link">#</a></h2>
 <p>Writing tests is important not only to ensure your code works as expected (particularly around edge cases) but also to make sure that your script continues to work as the Track &amp; Graph API evolves. If your script relies on some implementation detail or method call in the Track &amp; Graph Lua API, and that function changes in a future version, then your script may be left broken without anyone noticing except disgruntled users.</p>
 <h3 id="the-testing-framework">The testing framework<a class="headerlink" href="#the-testing-framework" title="Permanent link">#</a></h3>
@@ -1265,7 +1335,7 @@
 <span class="w">  </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
-<p>For more comprehensive testing examples, see the <a href="https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community">community script test files</a> which demonstrate common patterns for time-based scenarios, multi-source testing, and edge cases.</p>
+<p>For more comprehensive testing examples, see the <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs">community script test files</a> which demonstrate common patterns for time-based scenarios, multi-source testing, and edge cases.</p>
 <h3 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">#</a></h3>
 <p>Since the tests run in the actual Track &amp; Graph Lua engine, you need an Android development environment to run them. You should be ok with just the CLI tools, or you can install Android Studio if you prefer. <a href="https://developer.android.com/studio"> You can download those things here. </a></p>
 <p>You will also need Track &amp; Graph cloned locally:</p>
