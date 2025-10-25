@@ -370,7 +370,8 @@
     <string name="lua_engine_disabled">Motor Lua deshabilitado</string>
     <string name="lua_graph_first_time_user_title">Gráficos y estadísticas de scripts Lua</string>
     <string name="lua_graph_first_time_user_message">Los scripts Lua son una función avanzada que te permite crear gráficos y estadísticas personalizados con el lenguaje de programación Lua. \n\nPuedes cargar el tuyo propio, o elegir uno de la colección de GitHub. Instalar un script desde GitHub te devolverá a la aplicación con el script listo para usar.</string>
-    <string name="learn_more">Aprende más</string>
+    <string name="functions_first_time_user_title">Bienvenido a Funciones</string>
+    <string name="functions_first_time_user_message">Las funciones son una característica avanzada que te permite combinar, agregar y transformar tus datos en nuevas fuentes de datos derivadas.</string>    <string name="learn_more">Aprende más aquí</string>
     <string name="github">GitHub</string>
     <string name="paste">Pegar</string>
     <string name="failed_to_download_file">Error al descargar el archivo: %s</string>

@@ -36,6 +36,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
@@ -152,6 +153,9 @@ internal sealed class Node(
 internal interface FunctionsScreenViewModel {
     fun init(groupId: Long, functionId: Long?)
     val complete: ReceiveChannel<Unit>
+    val showFirstTimeUserDialog: StateFlow<Boolean>
+    fun dismissFirstTimeUserDialog()
+    fun onOpenFunctionsTutorial()
 
     val nodes: StateFlow<List<Node>>
     val edges: StateFlow<List<Edge>>
@@ -190,6 +194,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private val functionGraphBuilder: FunctionGraphBuilder,
     private val functionGraphDecoder: FunctionGraphDecoder,
     private val luaScriptNodeProvider: LuaScriptNodeProvider,
+    private val urlNavigator: UrlNavigator,
 ) : ViewModel(), FunctionsScreenViewModel {
 
     private val initialized = AtomicBoolean(false)
@@ -197,6 +202,9 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     private var existingFunction: Function? = null
 
     override val complete: Channel<Unit> = Channel()
+
+    private val _showFirstTimeUserDialog = MutableStateFlow(false)
+    override val showFirstTimeUserDialog: StateFlow<Boolean> = _showFirstTimeUserDialog.asStateFlow()
 
     private val _nodes = MutableStateFlow<PersistentList<Node>>(persistentListOf())
     override val nodes: StateFlow<List<Node>> = _nodes.asStateFlow()
@@ -242,6 +250,12 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         viewModelScope.launch {
             existingFunction = functionId?.let { dataInteractor.getFunctionById(it) }
 
+            // Check if user has any functions at all (for first-time user dialog)
+            if (functionId == null) {
+                val allFunctions = dataInteractor.getAllFunctionsSync()
+                _showFirstTimeUserDialog.value = allFunctions.isEmpty()
+            }
+
             val allFeatures = dataInteractor.getAllFeaturesSync()
             val allGroups = dataInteractor.getAllGroupsSync()
             val pathProvider = FeaturePathProvider(allFeatures, allGroups)
@@ -253,6 +267,16 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             } else {
                 initializeNewFunction()
             }
+        }
+    }
+
+    override fun dismissFirstTimeUserDialog() {
+        _showFirstTimeUserDialog.value = false
+    }
+
+    override fun onOpenFunctionsTutorial() {
+        viewModelScope.launch {
+            urlNavigator.navigateTo(context, UrlNavigator.Location.FUNCTIONS_DOCS)
         }
     }
 

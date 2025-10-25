@@ -17,7 +17,8 @@
         "lua-community-scripts-root",
         "play-store-page",
         "function-catalogue-location",
-        "function-catalogue-signature"
+        "function-catalogue-signature",
+        "functions-docs"
       ],
       "properties": {
         "github": {
@@ -57,6 +58,11 @@
           "type": "string",
           "format": "uri",
           "description": "URL to the function catalogue signature file"
+        },
+        "functions-docs": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the functions documentation"
         }
       },
       "additionalProperties": false

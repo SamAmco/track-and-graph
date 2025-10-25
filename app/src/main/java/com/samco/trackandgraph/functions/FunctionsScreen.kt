@@ -82,6 +82,11 @@ import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.functions.node_editor.NodeCard
 import com.samco.trackandgraph.functions.node_editor.nodeCardContentWidth
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Hint
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.tooling.preview.Preview
+import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.TextLink
 
 @Serializable
 data class FunctionsNavKey(
@@ -111,6 +116,9 @@ fun FunctionsScreen(
         viewModel.onOrientationChanged(isPortrait)
     }
 
+    // Observe first-time user dialog state
+    val showFirstTimeUserDialog by viewModel.showFirstTimeUserDialog.collectAsStateWithLifecycle()
+
     TopAppBarContent(navArgs)
     FunctionsScreenContent(
         onPopBack = onPopBack,
@@ -135,6 +143,9 @@ fun FunctionsScreen(
         onCreateOrUpdateFunction = viewModel::onCreateOrUpdateFunction,
         onUpdateScriptForNodeId = viewModel::updateScriptForNodeId,
         onUpdateScriptFromFileForNodeId = viewModel::updateScriptFromFileForNodeId,
+        showFirstTimeUserDialog = showFirstTimeUserDialog,
+        onDismissFirstTimeUserDialog = viewModel::dismissFirstTimeUserDialog,
+        onOpenFunctionsTutorial = viewModel::onOpenFunctionsTutorial,
     )
 }
 
@@ -183,6 +194,9 @@ private fun FunctionsScreenContent(
     onCreateOrUpdateFunction: () -> Unit,
     onUpdateScriptForNodeId: (Int, String) -> Unit,
     onUpdateScriptFromFileForNodeId: (Int, android.net.Uri?) -> Unit,
+    showFirstTimeUserDialog: Boolean,
+    onDismissFirstTimeUserDialog: () -> Unit,
+    onOpenFunctionsTutorial: () -> Unit,
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -337,7 +351,54 @@ private fun FunctionsScreenContent(
                 }
             )
         }
+
+        // First Time User Dialog
+        if (showFirstTimeUserDialog) {
+            FunctionsFirstTimeUserDialog(
+                onDismiss = onDismissFirstTimeUserDialog,
+                onOpenFunctionsTutorialPath = onOpenFunctionsTutorial
+            )
+        }
     }
+}
+
+@Composable
+private fun FunctionsFirstTimeUserDialog(
+    onDismiss: () -> Unit,
+    onOpenFunctionsTutorialPath: () -> Unit,
+) {
+    CustomContinueCancelDialog(
+        onDismissRequest = onDismiss,
+        onConfirm = onDismiss,
+        cancelVisible = false,
+        content = {
+            Column {
+                Text(
+                    stringResource(id = R.string.functions_first_time_user_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                InputSpacingLarge()
+                Text(
+                    stringResource(id = R.string.functions_first_time_user_message),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                InputSpacingLarge()
+                TextLink(
+                    stringResource(id = R.string.learn_more),
+                ) {
+                    onOpenFunctionsTutorialPath()
+                    onDismiss()
+                }
+            }
+        },
+        continueText = R.string.ok,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FunctionsFirstTimeUserDialogPreview() {
+    FunctionsFirstTimeUserDialog(onDismiss = {}, onOpenFunctionsTutorialPath = {})
 }
 
 /**
