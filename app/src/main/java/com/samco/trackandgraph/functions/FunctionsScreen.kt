@@ -319,25 +319,26 @@ private fun FunctionsScreenContent(
                 }
             }
 
-            AnimatedVisibility(
+            TopCornerFab(
                 modifier = Modifier.align(Alignment.TopStart),
+                onClick = { onPopBack() },
                 visible = !clearOverlayUi
             ) {
-                FloatingActionButton(
-                    modifier = Modifier
-                        .padding(WindowInsets.navigationBars.asPaddingValues())
-                        .then(Modifier.padding(inputSpacingLarge))
-                        .size(buttonSize),
-                    onClick = { onPopBack() },
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    shape = RoundedCornerShape(100),
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = null,
-                    )
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = null,
+                )
+            }
+
+            TopCornerFab(
+                modifier = Modifier.align(Alignment.TopEnd),
+                onClick = onOpenFunctionsTutorial,
+                visible = !clearOverlayUi
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.faq_icon),
+                    contentDescription = stringResource(id = R.string.help),
+                )
             }
         }
 
@@ -358,6 +359,32 @@ private fun FunctionsScreenContent(
                 onDismiss = onDismissFirstTimeUserDialog,
                 onOpenFunctionsTutorialPath = onOpenFunctionsTutorial
             )
+        }
+    }
+}
+
+@Composable
+private fun TopCornerFab(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    visible: Boolean,
+    content: @Composable () -> Unit,
+) {
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = visible
+    ) {
+        FloatingActionButton(
+            modifier = Modifier
+                .padding(WindowInsets.navigationBars.asPaddingValues())
+                .then(Modifier.padding(inputSpacingLarge))
+                .size(buttonSize),
+            onClick = onClick,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(100),
+        ) {
+            content()
         }
     }
 }
