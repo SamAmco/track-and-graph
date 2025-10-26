@@ -136,6 +136,34 @@ local translations = {
 		["es"] = "Tiempo",
 		["fr"] = "Temps",
 	},
+	{
+		_id = "_randomisers",
+		["en"] = "Randomisers",
+		["de"] = "Zufallsgeneratoren",
+		["es"] = "Aleatorizadores",
+		["fr"] = "Générateurs Aléatoires",
+	},
+	{
+		_id = "_min_value",
+		["en"] = "Min Value",
+		["de"] = "Minimalwert",
+		["es"] = "Valor Mínimo",
+		["fr"] = "Valeur Minimale",
+	},
+	{
+		_id = "_max_value",
+		["en"] = "Max Value",
+		["de"] = "Maximalwert",
+		["es"] = "Valor Máximo",
+		["fr"] = "Valeur Maximale",
+	},
+	{
+		_id = "_seed",
+		["en"] = "Seed",
+		["de"] = "Seed",
+		["es"] = "Semilla",
+		["fr"] = "Graine",
+	},
 }
 
 -- Validation: ensure all entries have all 4 required languages
