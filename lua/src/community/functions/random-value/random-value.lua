@@ -5,6 +5,9 @@ local number = require("tng.config").number
 local uint = require("tng.config").uint
 local core = require("tng.core")
 
+local now_time = core.time()
+local now = now_time and now_time.timestamp or 0
+
 return {
     -- Configuration metadata
     id = "random-value",
@@ -69,7 +72,7 @@ La fonction échange automatiquement min et max si max est inférieur à min.]],
         uint {
             id = "seed",
             name = "_seed",
-            default = core.time().timestamp,
+            default = now,
         },
     },
 
