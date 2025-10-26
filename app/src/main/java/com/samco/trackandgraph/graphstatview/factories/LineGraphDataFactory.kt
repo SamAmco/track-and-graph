@@ -95,8 +95,10 @@ class LineGraphDataFactory @Inject constructor(
             val plottableData = generatePlottingData(dataSamples, config, onDataSampled)
             val hasPlottableData = plottableData.lines.any { it.line != null }
 
-            val durationBasedRange = config.features
-                .any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
+            val durationBasedRange = dataSamples.any { pair ->
+                pair.first.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE
+                        && pair.second.dataSampleProperties.isDuration
+            }
             val (bounds, yAxisParameters) = getYAxisParameters(
                 config,
                 plottableData.lines.map { it.line },
