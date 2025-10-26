@@ -7,6 +7,9 @@ local uint = require("tng.config").uint
 local localtime = require("tng.config").localtime
 local instant = require("tng.config").instant
 
+local now_time = core.time()
+local now = now_time and now_time.timestamp or 0
+
 return {
     -- Configuration metadata
     id = "periodic-data-points",
@@ -105,7 +108,7 @@ La fonction génère des points de données à la demande, en remontant de maint
         instant {
             id = "cutoff",
             name = "_cutoff",
-            default = core.time().timestamp - (365 * core.DURATION.DAY),
+            default = now - (365 * core.DURATION.DAY),
         },
     },
 

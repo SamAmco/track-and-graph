@@ -64,6 +64,14 @@ return {
       script="-- Lua Function to override the value of all data points with a configurable number\n-- This function sets all incoming data point values to a specified value\n\nlocal number = require(\"tng.config\").number\n\nreturn {\n    -- Configuration metadata\n    id = \"override-value\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = {\"_transform\"},\n    title = {\n        [\"en\"] = \"Override Value\",\n        [\"de\"] = \"Wert überschreiben\",\n        [\"es\"] = \"Sobrescribir Valor\",\n        [\"fr\"] = \"Remplacer la Valeur\",\n    },\n    description = {\n        [\"en\"] = [[\nSets all incoming data point values to a specified value\n]],\n        [\"de\"] = [[\nSetzt alle eingehenden Datenpunktwerte auf einen bestimmten Wert\n]],\n        [\"es\"] = [[\nEstablece todos los valores de puntos de datos entrantes en un valor especificado\n]],\n        [\"fr\"] = [[\nDéfinit toutes les valeurs de points de données entrantes sur une valeur spécifiée\n]],\n    },\n    config = {\n        number {\n            id = \"new_value\",\n            name = {\n                [\"en\"] = \"New Value\",\n                [\"de\"] = \"Neuer Wert\",\n                [\"es\"] = \"Nuevo Valor\",\n                [\"fr\"] = \"Nouvelle Valeur\",\n            },\n        },\n    },\n\n    -- Generator function\n    generator = function(source, config)\n        local new_value = config and config.new_value\n\n        return function()\n            local data_point = source.dp()\n            if not data_point then\n                return nil\n            end\n\n            if not new_value then\n                return data_point\n            end\n            data_point.value = new_value\n\n            return data_point\n        end\n    end,\n}\n",
       version="1.0.0"
     },
+    ["periodic-data-points"]={
+      script="-- Lua Function to generate periodic data points at regular intervals\n-- This function creates data points with value=1 at deterministic timestamps\n\nlocal core = require(\"tng.core\")\nlocal enum = require(\"tng.config\").enum\nlocal uint = require(\"tng.config\").uint\nlocal localtime = require(\"tng.config\").localtime\nlocal instant = require(\"tng.config\").instant\n\nlocal now_time = core.time()\nlocal now = now_time and now_time.timestamp or 0\n\nreturn {\n    -- Configuration metadata\n    id = \"periodic-data-points\",\n    version = \"1.0.0\",\n    inputCount = 0, -- This is a generator, not a transformer\n    categories = { \"_generators\" },\n    title = {\n        [\"en\"] = \"Periodic Data Points\",\n        [\"de\"] = \"Periodische Datenpunkte\",\n        [\"es\"] = \"Puntos de Datos Periódicos\",\n        [\"fr\"] = \"Points de Données Périodiques\",\n    },\n    description = {\n        [\"en\"] = [[\nGenerates data points with value=1 at regular intervals going back in time.\n\nConfiguration:\n- **Period**: Time period unit (Day, Week, Month, Year)\n- **Period Multiplier**: Generate data point every N periods (e.g., every 2 days)\n- **Time of Day**: The time of day for each data point\n- **Cutoff**: Stop generating data points at this date/time\n\nGenerated data points will have:\n- value = 1.0\n- label = \"\" (empty)\n- note = \"\" (empty)\n- Deterministic timestamps at the specified time of day, spaced by the period\n\nThe function generates data points on-demand, working backwards from now to the cutoff.]],\n        [\"de\"] = [[\nGeneriert Datenpunkte mit Wert=1 in regelmäßigen Abständen zurück in der Zeit.\n\nKonfiguration:\n- **Periode**: Zeitperiodeneinheit (Tag, Woche, Monat, Jahr)\n- **Periodenmultiplikator**: Datenpunkt alle N Perioden generieren (z.B. alle 2 Tage)\n- **Tageszeit**: Die Tageszeit für jeden Datenpunkt\n- **Grenzwert**: Generierung bei diesem Datum/Zeit stoppen\n\nGenerierte Datenpunkte haben:\n- Wert = 1.0\n- Label = \"\" (leer)\n- Notiz = \"\" (leer)\n- Deterministische Zeitstempel zur angegebenen Tageszeit, im Abstand der Periode\n\nDie Funktion generiert Datenpunkte bei Bedarf, rückwärts von jetzt bis zum Grenzwert.]],\n        [\"es\"] = [[\nGenera puntos de datos con valor=1 a intervalos regulares retrocediendo en el tiempo.\n\nConfiguración:\n- **Período**: Unidad de período de tiempo (Día, Semana, Mes, Año)\n- **Multiplicador de Período**: Generar punto de datos cada N períodos (ej. cada 2 días)\n- **Hora del Día**: La hora del día para cada punto de datos\n- **Límite**: Detener generación de puntos de datos en esta fecha/hora\n\nLos puntos de datos generados tendrán:\n- valor = 1.0\n- etiqueta = \"\" (vacío)\n- nota = \"\" (vacío)\n- Marcas de tiempo determinísticas a la hora especificada, espaciadas por el período\n\nLa función genera puntos de datos bajo demanda, retrocediendo desde ahora hasta el límite.]],\n        [\"fr\"] = [[\nGénère des points de données avec valeur=1 à intervalles réguliers en remontant dans le temps.\n\nConfiguration:\n- **Période**: Unité de période de temps (Jour, Semaine, Mois, Année)\n- **Multiplicateur de Période**: Générer un point de données tous les N périodes (ex. tous les 2 jours)\n- **Heure de la Journée**: L'heure de la journée pour chaque point de données\n- **Limite**: Arrêter la génération de points de données à cette date/heure\n\nLes points de données générés auront:\n- valeur = 1.0\n- étiquette = \"\" (vide)\n- note = \"\" (vide)\n- Horodatages déterministes à l'heure spécifiée, espacés par la période\n\nLa fonction génère des points de données à la demande, en remontant de maintenant jusqu'à la limite.]],\n    },\n    config = {\n        enum {\n            id = \"period\",\n            name = \"_period\",\n            options = { \"_day\", \"_week\", \"_month\", \"_year\" },\n            default = \"_day\",\n        },\n        uint {\n            id = \"period_multiplier\",\n            name = \"_period_multiplier\",\n            default = 1,\n        },\n        localtime {\n            id = \"time_of_day\",\n            name = \"_time_of_day\",\n            default = 12 * core.DURATION.HOUR,\n        },\n        instant {\n            id = \"cutoff\",\n            name = \"_cutoff\",\n            default = now - (365 * core.DURATION.DAY),\n        },\n    },\n\n    -- Generator function\n    generator = function(_, config)\n        -- Parse configuration with defaults\n        local period_str = config and config.period or error(\"Period configuration is required\")\n        local period_multiplier = (config and config.period_multiplier) or 1\n        -- Don't allow 0 multiplier, fallback to 1\n        if period_multiplier == 0 then\n            period_multiplier = 1\n        end\n        local time_of_day_ms = config and config.time_of_day or error(\"Time of Day configuration is required\")\n        local cutoff_timestamp = config and config.cutoff or error(\"Cutoff configuration is required\")\n\n        -- Map enum string to core.PERIOD constant\n        local period_map = {\n            [\"_day\"] = core.PERIOD.DAY,\n            [\"_week\"] = core.PERIOD.WEEK,\n            [\"_month\"] = core.PERIOD.MONTH,\n            [\"_year\"] = core.PERIOD.YEAR,\n        }\n        local period = period_map[period_str]\n\n        -- Helper: apply time_of_day to a timestamp\n        local function apply_time_of_day(timestamp)\n            local hours = math.floor(time_of_day_ms / core.DURATION.HOUR)\n            local remaining = time_of_day_ms % core.DURATION.HOUR\n            local minutes = math.floor(remaining / core.DURATION.MINUTE)\n            remaining = remaining % core.DURATION.MINUTE\n            local seconds = math.floor(remaining / core.DURATION.SECOND)\n\n            local date = core.date(timestamp)\n            date.hour = hours\n            date.min = minutes\n            date.sec = seconds\n\n            return core.time(date)\n        end\n\n        -- Create anchor: cutoff with time_of_day applied (fixed, deterministic)\n        local anchor = apply_time_of_day(cutoff_timestamp)\n\n        -- If applying time_of_day moved us backwards, shift forward by days\n        -- (not the full period) to get past the cutoff without losing data\n        while anchor.timestamp < cutoff_timestamp do\n            anchor = core.shift(anchor, core.PERIOD.DAY, 1)\n        end\n\n        -- Get current time for comparison\n        local now = core.time().timestamp\n\n        -- If cutoff is in the future, no data points to generate\n        if anchor.timestamp > now then\n            return function()\n                return nil\n            end\n        end\n\n        -- Estimate number of periods elapsed since anchor\n        local elapsed_ms = now - anchor.timestamp\n        local estimated_periods\n\n        if period == core.PERIOD.DAY then\n            local period_duration_ms = period_multiplier * core.DURATION.DAY\n            estimated_periods = math.floor(elapsed_ms / period_duration_ms)\n        elseif period == core.PERIOD.WEEK then\n            local period_duration_ms = period_multiplier * core.DURATION.WEEK\n            estimated_periods = math.floor(elapsed_ms / period_duration_ms)\n        elseif period == core.PERIOD.MONTH then\n            -- Average month length: 30.44 days\n            local avg_month_ms = 30.44 * core.DURATION.DAY\n            local period_duration_ms = period_multiplier * avg_month_ms\n            estimated_periods = math.floor(elapsed_ms / period_duration_ms)\n        elseif period == core.PERIOD.YEAR then\n            -- Average year length: 365.25 days\n            local avg_year_ms = 365.25 * core.DURATION.DAY\n            local period_duration_ms = period_multiplier * avg_year_ms\n            estimated_periods = math.floor(elapsed_ms / period_duration_ms)\n        else\n            error(\"Invalid period: \" .. tostring(period_str))\n        end\n\n        -- Jump close to now with one large shift\n        local candidate = core.shift(anchor, period, estimated_periods * period_multiplier)\n\n        -- Fine-tune: shift forward until we pass \"now\"\n        while candidate.timestamp <= now do\n            candidate = core.shift(candidate, period, period_multiplier)\n        end\n\n        -- Back up one step to get the most recent data point <= now\n        local current = core.shift(candidate, period, -period_multiplier)\n\n        -- Return iterator function\n        return function()\n            -- Check if we've gone past the anchor (cutoff with time applied)\n            if current.timestamp < anchor.timestamp then\n                return nil\n            end\n\n            -- Create data point at current timestamp\n            local data_point = {\n                timestamp = current.timestamp,\n                offset = current.offset,\n                value = 1.0,\n                label = \"\",\n                note = \"\",\n            }\n\n            -- Shift backwards by period * period_multiplier for next iteration\n            current = core.shift(current, period, -period_multiplier)\n\n            return data_point\n        end\n    end,\n}\n",
+      version="1.0.0"
+    },
+    ["random-value"]={
+      script="-- Lua Function to override data point values with random values\n-- This function replaces all incoming data point values with random numbers between min and max\n\nlocal number = require(\"tng.config\").number\nlocal uint = require(\"tng.config\").uint\nlocal core = require(\"tng.core\")\n\nlocal now_time = core.time()\nlocal now = now_time and now_time.timestamp or 0\n\nreturn {\n    -- Configuration metadata\n    id = \"random-value\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = {\"_randomisers\"},\n    title = {\n        [\"en\"] = \"Random Value\",\n        [\"de\"] = \"Zufälliger Wert\",\n        [\"es\"] = \"Valor Aleatorio\",\n        [\"fr\"] = \"Valeur Aléatoire\",\n    },\n    description = {\n        [\"en\"] = [[\nReplaces all incoming data point values with random numbers between min and max.\n\nConfiguration:\n- **Min Value**: The minimum value for random generation\n- **Max Value**: The maximum value for random generation\n- **Seed**: Random seed for reproducible results (defaults to current UTC timestamp)\n\nThe function automatically swaps min and max if max is smaller than min.]],\n        [\"de\"] = [[\nErsetzt alle eingehenden Datenpunktwerte durch Zufallszahlen zwischen Min und Max.\n\nKonfiguration:\n- **Minimalwert**: Der Minimalwert für die Zufallsgenerierung\n- **Maximalwert**: Der Maximalwert für die Zufallsgenerierung\n- **Seed**: Zufalls-Seed für reproduzierbare Ergebnisse (Standard: aktueller UTC-Zeitstempel)\n\nDie Funktion tauscht automatisch Min und Max, wenn Max kleiner als Min ist.]],\n        [\"es\"] = [[\nReemplaza todos los valores de puntos de datos entrantes con números aleatorios entre mín y máx.\n\nConfiguración:\n- **Valor Mínimo**: El valor mínimo para la generación aleatoria\n- **Valor Máximo**: El valor máximo para la generación aleatoria\n- **Semilla**: Semilla aleatoria para resultados reproducibles (predeterminado: marca de tiempo UTC actual)\n\nLa función intercambia automáticamente mín y máx si máx es menor que mín.]],\n        [\"fr\"] = [[\nRemplace toutes les valeurs de points de données entrantes par des nombres aléatoires entre min et max.\n\nConfiguration:\n- **Valeur Minimale**: La valeur minimale pour la génération aléatoire\n- **Valeur Maximale**: La valeur maximale pour la génération aléatoire\n- **Graine**: Graine aléatoire pour des résultats reproductibles (par défaut: horodatage UTC actuel)\n\nLa fonction échange automatiquement min et max si max est inférieur à min.]],\n    },\n    config = {\n        number {\n            id = \"min_value\",\n            name = \"_min_value\",\n            default = 0.0,\n        },\n        number {\n            id = \"max_value\",\n            name = \"_max_value\",\n            default = 1.0,\n        },\n        uint {\n            id = \"seed\",\n            name = \"_seed\",\n            default = now,\n        },\n    },\n\n    -- Generator function\n    generator = function(source, config)\n        local min_val = config and config.min_value or 0.0\n        local max_val = config and config.max_value or 1.0\n        local seed = config and config.seed or core.time().timestamp\n\n        -- Ensure min is always the smaller value\n        if min_val > max_val then\n            min_val, max_val = max_val, min_val\n        end\n\n        local range = max_val - min_val\n\n        -- Initialize random seed\n        math.randomseed(seed)\n\n        return function()\n            local data_point = source.dp()\n            if not data_point then\n                return nil\n            end\n\n            -- Generate random value between min and max\n            local random_value = min_val + (math.random() * range)\n            data_point.value = random_value\n\n            return data_point\n        end\n    end,\n}\n",
+      version="1.0.0"
+    },
     round={
       script="-- Lua Function to round values\n-- Rounds each data point's value to the nearest multiple of a specified number\n\nlocal number = require(\"tng.config\").number\n\nreturn {\n\9-- Configuration metadata\n\9id = \"round\",\n\9version = \"1.0.0\",\n\9inputCount = 1,\n\9categories = {\"_arithmetic\"},\n\9title = {\n\9\9[\"en\"] = \"Round\",\n\9\9[\"de\"] = \"Runden\",\n\9\9[\"es\"] = \"Redondear\",\n\9\9[\"fr\"] = \"Arrondir\",\n\9},\n\9description = {\n\9\9[\"en\"] = [[\nRounds each data point's value to the nearest multiple of a specified number.\n\nConfiguration:\n- **Nearest**: Round to the nearest multiple of this number (default: 1.0)\n]],\n\9\9[\"de\"] = [[\nRundet den Wert jedes Datenpunkts auf das nächste Vielfache einer angegebenen Zahl.\n\nKonfiguration:\n- **Nächste**: Auf das nächste Vielfache dieser Zahl runden (Standard: 1.0)\n]],\n\9\9[\"es\"] = [[\nRedondea el valor de cada punto de datos al múltiplo más cercano de un número especificado.\n\nConfiguración:\n- **Más cercano**: Redondear al múltiplo más cercano de este número (predeterminado: 1.0)\n]],\n\9\9[\"fr\"] = [[\nArrondit la valeur de chaque point de données au multiple le plus proche d'un nombre spécifié.\n\nConfiguration:\n- **Plus proche**: Arrondir au multiple le plus proche de ce nombre (par défaut: 1.0)\n]],\n\9},\n\9config = {\n\9\9number {\n\9\9\9id = \"nearest\",\n\9\9\9default = 1.0,\n\9\9\9name = {\n\9\9\9\9[\"en\"] = \"Nearest\",\n\9\9\9\9[\"de\"] = \"Nächste\",\n\9\9\9\9[\"es\"] = \"Más cercano\",\n\9\9\9\9[\"fr\"] = \"Plus proche\",\n\9\9\9},\n\9\9},\n\9},\n\n\9-- Generator function\n\9generator = function(source, config)\n\9\9local nearest = config and config.nearest or 1.0\n\n\9\9return function()\n\9\9\9local data_point = source.dp()\n\9\9\9if not data_point then\n\9\9\9\9return nil\n\9\9\9end\n\n\9\9\9-- Round to nearest multiple\n\9\9\9data_point.value = math.floor((data_point.value / nearest) + 0.5) * nearest\n\n\9\9\9return data_point\n\9\9end\n\9end,\n}\n",
       version="1.0.0"
@@ -113,7 +121,7 @@ return {
       version="1.0.0"
     }
   },
-  published_at="2025-10-22T21:01:39Z",
+  published_at="2025-10-26T23:42:15Z",
   translations={
     _all_fields={
       de="Alle Felder",
@@ -133,6 +141,18 @@ return {
       es="Comparar por",
       fr="Comparer par"
     },
+    _cutoff={
+      de="Grenzwert",
+      en="Cutoff",
+      es="Límite",
+      fr="Limite"
+    },
+    _day={
+      de="Tag",
+      en="Day",
+      es="Día",
+      fr="Jour"
+    },
     _days={
       de="Tage",
       en="Days",
@@ -144,6 +164,18 @@ return {
       en="Filter",
       es="Filtro",
       fr="Filtre"
+    },
+    _frequency={
+      de="Häufigkeit",
+      en="Frequency",
+      es="Frecuencia",
+      fr="Fréquence"
+    },
+    _generators={
+      de="Generatoren",
+      en="Generators",
+      es="Generadores",
+      fr="Générateurs"
     },
     _hours={
       de="Stunden",
@@ -163,11 +195,29 @@ return {
       es="Solo etiqueta",
       fr="Étiquette uniquement"
     },
+    _max_value={
+      de="Maximalwert",
+      en="Max Value",
+      es="Valor Máximo",
+      fr="Valeur Maximale"
+    },
+    _min_value={
+      de="Minimalwert",
+      en="Min Value",
+      es="Valor Mínimo",
+      fr="Valeur Minimale"
+    },
     _minutes={
       de="Minuten",
       en="Minutes",
       es="Minutos",
       fr="Minutes"
+    },
+    _month={
+      de="Monat",
+      en="Month",
+      es="Mes",
+      fr="Mois"
     },
     _months={
       de="Monate",
@@ -181,17 +231,53 @@ return {
       es="Solo nota",
       fr="Note uniquement"
     },
+    _period={
+      de="Periode",
+      en="Period",
+      es="Período",
+      fr="Période"
+    },
+    _period_multiplier={
+      de="Periodenmultiplikator",
+      en="Period Multiplier",
+      es="Multiplicador de Período",
+      fr="Multiplicateur de Période"
+    },
+    _randomisers={
+      de="Zufallsgeneratoren",
+      en="Randomisers",
+      es="Aleatorizadores",
+      fr="Générateurs Aléatoires"
+    },
     _seconds={
       de="Sekunden",
       en="Seconds",
       es="Segundos",
       fr="Secondes"
     },
+    _seed={
+      de="Seed",
+      en="Seed",
+      es="Semilla",
+      fr="Graine"
+    },
     _time={
       de="Zeit",
       en="Time",
       es="Tiempo",
       fr="Temps"
+    },
+    _time_jitter={
+      de="Zeitliche Streuung",
+      en="Time Jitter",
+      es="Variación de Tiempo",
+      fr="Fluctuation Temporelle"
+    },
+    _time_of_day={
+      de="Tageszeit",
+      en="Time of Day",
+      es="Hora del Día",
+      fr="Heure de la Journée"
     },
     _transform={
       de="Transformieren",
@@ -217,11 +303,23 @@ return {
       es="Solo valor",
       fr="Valeur uniquement"
     },
+    _week={
+      de="Woche",
+      en="Week",
+      es="Semana",
+      fr="Semaine"
+    },
     _weeks={
       de="Wochen",
       en="Weeks",
       es="Semanas",
       fr="Semaines"
+    },
+    _year={
+      de="Jahr",
+      en="Year",
+      es="Año",
+      fr="Année"
     },
     _years={
       de="Jahre",
