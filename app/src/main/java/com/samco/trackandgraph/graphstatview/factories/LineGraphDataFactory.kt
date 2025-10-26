@@ -174,8 +174,6 @@ class LineGraphDataFactory @Inject constructor(
             // to be processed
             val dataPoints = clippedSample.toList().asReversed()
 
-            test = dataPoints
-
             val series = if (dataPoints.size >= 2) {
                 getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
             } else null
@@ -195,10 +193,6 @@ class LineGraphDataFactory @Inject constructor(
         onDataSampled(rawDataPoints)
 
         return@withContext PlottingData(features, endTime)
-    }
-
-    companion object {
-        var test: Any? = null
     }
 
     private suspend fun tryGetPlottingData(
