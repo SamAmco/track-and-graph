@@ -95,6 +95,9 @@ class LineGraphDataFactory @Inject constructor(
             val plottableData = generatePlottingData(dataSamples, config, onDataSampled)
             val hasPlottableData = plottableData.lines.any { it.line != null }
 
+            // Only show a duration based range if the user selected duration for a line graph
+            // feature, and that feature actually says it is a duration still (this could have
+            // changed since they created the graph).
             val durationBasedRange = dataSamples.any { pair ->
                 pair.first.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE
                         && pair.second.dataSampleProperties.isDuration
