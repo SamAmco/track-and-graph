@@ -274,8 +274,8 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             when (child) {
                 is GraphNode.Group -> hasSelectableDescendants(child, selectableTypes)
                 is GraphNode.Tracker -> SelectableItemType.TRACKER in selectableTypes || SelectableItemType.FEATURE in selectableTypes
+                is GraphNode.Function -> SelectableItemType.FUNCTION in selectableTypes || SelectableItemType.FEATURE in selectableTypes
                 is GraphNode.Graph -> SelectableItemType.GRAPH in selectableTypes
-                is GraphNode.Function -> SelectableItemType.FUNCTION in selectableTypes
             }
         }
     }
