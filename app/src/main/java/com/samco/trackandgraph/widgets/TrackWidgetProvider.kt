@@ -20,6 +20,7 @@
 // after updating the app if FQCN (Full Qualified Class Name) of TrackWidgetProvider
 // changes.
 @file:Suppress("PackageDirectoryMismatch")
+
 package com.samco.trackandgraph.base.service
 
 import android.appwidget.AppWidgetManager
@@ -71,7 +72,7 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
                 }
 
                 extras.containsKey(DELETE_FEATURE_ID) -> {
-                    onDeleted(context, intArrayOf(extras.getInt(DELETE_FEATURE_ID)))
+                    deleteWidgetsForFeature(context, extras.getLong(DELETE_FEATURE_ID))
                 }
             }
         }
@@ -83,7 +84,6 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
         appWidgetIds: IntArray
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        // Update all widgets with fresh data following ChatGPT pattern
         runBlocking {
             val glanceManager = GlanceAppWidgetManager(context)
             appWidgetIds.forEach { appWidgetId ->
@@ -92,19 +92,6 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
             }
             glanceAppWidget.updateAll(context)
         }
-    }
-
-    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        super.onDeleted(context, appWidgetIds)
-        //Clean up widget preferences
-        appWidgetIds.forEach { id ->
-            context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).edit().apply {
-                remove(getFeatureIdPref(id))
-                apply()
-            }
-        }
-
-        runBlocking { glanceAppWidget.updateAll(context) }
     }
 
     private suspend fun updateWidgetState(
@@ -151,7 +138,8 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
             val glanceManager = GlanceAppWidgetManager(context)
 
             appWidgetIds.forEach { appWidgetId ->
-                val widgetFeatureId = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+                val widgetFeatureId = context
+                    .getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
                     .getLong(getFeatureIdPref(appWidgetId), -1L)
                 if (widgetFeatureId == featureId) {
                     val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
@@ -159,6 +147,25 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
                 }
             }
             glanceAppWidget.updateAll(context)
+        }
+    }
+
+    private fun deleteWidgetsForFeature(context: Context, featureId: Long) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val appWidgetIds = appWidgetManager.getAppWidgetIds(
+            ComponentName(context, TrackWidgetProvider::class.java)
+        )
+
+        val widgetsToUpdate = appWidgetIds.filter { appWidgetId ->
+            val widgetFeatureId =
+                context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+                    .getLong(getFeatureIdPref(appWidgetId), -1L)
+            widgetFeatureId == featureId
+        }
+
+        if (widgetsToUpdate.isNotEmpty()) {
+            // Update widgets to show broken state (can't actually delete from launcher)
+            onUpdate(context, appWidgetManager, widgetsToUpdate.toIntArray())
         }
     }
 }
