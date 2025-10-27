@@ -107,7 +107,9 @@ local function load_and_validate_function(file_path, max_api_level, valid_transl
 		script = content,
 		file_path = file_path,
 		title = module.title,
+		description = module.description,
 		categories = module.categories,
+		config = module.config,
 		deprecated = module.deprecated,
 	}
 

@@ -4,20 +4,6 @@
 
 local translations = {
 	{
-		_id = "_seconds",
-		["en"] = "Seconds",
-		["de"] = "Sekunden",
-		["es"] = "Segundos",
-		["fr"] = "Secondes",
-	},
-	{
-		_id = "_minutes",
-		["en"] = "Minutes",
-		["de"] = "Minuten",
-		["es"] = "Minutos",
-		["fr"] = "Minutes",
-	},
-	{
 		_id = "_hours",
 		["en"] = "Hours",
 		["de"] = "Stunden",
@@ -37,20 +23,6 @@ local translations = {
 		["de"] = "Wochen",
 		["es"] = "Semanas",
 		["fr"] = "Semaines",
-	},
-	{
-		_id = "_months",
-		["en"] = "Months",
-		["de"] = "Monate",
-		["es"] = "Meses",
-		["fr"] = "Mois",
-	},
-	{
-		_id = "_years",
-		["en"] = "Years",
-		["de"] = "Jahre",
-		["es"] = "Años",
-		["fr"] = "Années",
 	},
 	{
 		_id = "_all_fields",
@@ -205,27 +177,6 @@ local translations = {
 		["de"] = "Periode",
 		["es"] = "Período",
 		["fr"] = "Période",
-	},
-	{
-		_id = "_frequency",
-		["en"] = "Frequency",
-		["de"] = "Häufigkeit",
-		["es"] = "Frecuencia",
-		["fr"] = "Fréquence",
-	},
-	{
-		_id = "_time_of_day",
-		["en"] = "Time of Day",
-		["de"] = "Tageszeit",
-		["es"] = "Hora del Día",
-		["fr"] = "Heure de la Journée",
-	},
-	{
-		_id = "_time_jitter",
-		["en"] = "Time Jitter",
-		["de"] = "Zeitliche Streuung",
-		["es"] = "Variación de Tiempo",
-		["fr"] = "Fluctuation Temporelle",
 	},
 	{
 		_id = "_cutoff",
