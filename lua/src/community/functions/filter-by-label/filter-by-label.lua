@@ -31,7 +31,7 @@ end
 return {
     -- Configuration metadata
     id = "filter-by-label",
-    version = "1.0.0",
+    version = "1.0.1",
     inputCount = 1,
     categories = {"_filter"},
     title = {
@@ -90,21 +90,11 @@ Configuration:
         },
         checkbox {
             id = "case_sensitive",
-            name = {
-                ["en"] = "Case Sensitive",
-                ["de"] = "Groß-/Kleinschreibung beachten",
-                ["es"] = "Sensible a Mayúsculas",
-                ["fr"] = "Sensible à la Casse"
-            }
+            name = "_case_sensitive",
         },
         checkbox {
             id = "match_exactly",
-            name = {
-                ["en"] = "Match Exactly",
-                ["de"] = "Exakt übereinstimmen",
-                ["es"] = "Coincidir Exactamente",
-                ["fr"] = "Correspondance Exacte"
-            }
+            name = "_match_exactly",
         },
         checkbox {
             id = "invert",

@@ -241,6 +241,34 @@ local translations = {
 		["es"] = "Multiplicador de Período",
 		["fr"] = "Multiplicateur de Période",
 	},
+	{
+		_id = "_reset_on_label_match",
+		["en"] = "Reset on Label Match",
+		["de"] = "Zurücksetzen bei Label-Übereinstimmung",
+		["es"] = "Restablecer al Coincidir Etiqueta",
+		["fr"] = "Réinitialiser sur Correspondance d'Étiquette",
+	},
+	{
+		_id = "_reset_label",
+		["en"] = "Reset Label",
+		["de"] = "Zurücksetzen-Label",
+		["es"] = "Etiqueta de Restablecimiento",
+		["fr"] = "Étiquette de Réinitialisation",
+	},
+	{
+		_id = "_match_exactly",
+		["en"] = "Match Exactly",
+		["de"] = "Exakt übereinstimmen",
+		["es"] = "Coincidir Exactamente",
+		["fr"] = "Correspondance Exacte",
+	},
+	{
+		_id = "_case_sensitive",
+		["en"] = "Case Sensitive",
+		["de"] = "Groß-/Kleinschreibung beachten",
+		["es"] = "Distinguir Mayúsculas",
+		["fr"] = "Sensible à la Casse",
+	},
 }
 
 -- Validation: ensure all entries have all 4 required languages
