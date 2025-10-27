@@ -52,7 +52,7 @@ test("validate_translations rejects empty string", function()
 end)
 
 test("validate_translations rejects non-table", function()
-	local ok, errors = validation.validate_translations("not a table", "test", "test.lua")
+	local ok, errors = validation.validate_translations(123, "test", "test.lua")
 	assert(ok == false)
 end)
 
@@ -109,6 +109,7 @@ test("validate_function accepts valid module", function()
 		id = "test-function",
 		version = "1.0.0",
 		inputCount = 1,
+		categories = {"_filter"},
 		title = {en="Test", de="Test", es="Test", fr="Test"},
 		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
 		generator = function() end

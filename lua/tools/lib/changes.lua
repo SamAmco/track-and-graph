@@ -31,8 +31,8 @@ function M.compare_functions(old_catalog, new_functions)
 
 	-- Build map of old functions by id
 	local old_by_id = {}
-	for _, old_func in ipairs(old_catalog.functions) do
-		old_by_id[old_func.id] = old_func
+	for func_id, old_func in pairs(old_catalog.functions) do
+		old_by_id[func_id] = old_func
 	end
 
 	-- Compare each new function with old

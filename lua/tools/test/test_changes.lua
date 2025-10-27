@@ -36,7 +36,7 @@ end)
 test("compare_functions detects unchanged functions", function()
 	local old_catalog = {
 		functions = {
-			{id = "func1", version = "1.0.0", script = "script content"}
+			["func1"] = {version = "1.0.0", script = "script content"}
 		}
 	}
 	local new_functions = {
@@ -52,7 +52,7 @@ end)
 test("compare_functions detects modified functions", function()
 	local old_catalog = {
 		functions = {
-			{id = "func1", version = "1.0.0", script = "old script"}
+			["func1"] = {version = "1.0.0", script = "old script"}
 		}
 	}
 	local new_functions = {
@@ -70,7 +70,7 @@ end)
 test("compare_functions detects new functions", function()
 	local old_catalog = {
 		functions = {
-			{id = "func1", version = "1.0.0", script = "script1"}
+			["func1"] = {version = "1.0.0", script = "script1"}
 		}
 	}
 	local new_functions = {
