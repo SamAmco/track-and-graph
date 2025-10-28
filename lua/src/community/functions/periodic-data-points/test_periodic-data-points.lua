@@ -6,11 +6,12 @@ local test = require("test.core")
 local DHOUR = core.DURATION.HOUR
 local DDAY = core.DURATION.DAY
 
+local test_daily_basic_cutoff = core.time().timestamp - (7 * DDAY)
 M.test_daily_basic = {
     config = {
         period = "_day",
         period_multiplier = 1,
-        cutoff = core.time().timestamp - (7 * DDAY), -- 7 days ago
+        cutoff = test_daily_basic_cutoff, -- 7 days ago
     },
     sources = function()
         return {}
@@ -34,9 +35,8 @@ M.test_daily_basic = {
             test.assert("timestamps should decrease", result[i].timestamp < result[i - 1].timestamp)
         end
 
-        -- First data point should be at or after cutoff
-        local cutoff = core.time().timestamp - (7 * DDAY)
-        test.assert("oldest timestamp should be at or after cutoff", result[#result].timestamp >= cutoff)
+        -- First data point should be at the cutoff (within 1 second tolerance)
+        test.assertClose(test_daily_basic_cutoff, result[#result].timestamp, 1000)
     end,
 }
 
@@ -135,11 +135,12 @@ M.test_yearly = {
     end,
 }
 
+local test_cutoff_boundary_cutoff = core.time().timestamp - (2 * DDAY)
 M.test_cutoff_boundary = {
     config = {
         period = "_day",
         period_multiplier = 1,
-        cutoff = core.time().timestamp - (2 * DDAY), -- Very recent cutoff
+        cutoff = test_cutoff_boundary_cutoff, -- 2 days ago
     },
     sources = function()
         return {}
@@ -151,11 +152,32 @@ M.test_cutoff_boundary = {
         test.assert("should have data points", #result >= 2)
         test.assert("should respect cutoff", #result <= 3)
 
-        -- All timestamps should be >= cutoff
-        local cutoff = core.time().timestamp - (2 * DDAY)
+        -- All timestamps should be >= cutoff (within 1 second tolerance)
         for i = 1, #result do
-            test.assert("timestamp should be after cutoff", result[i].timestamp >= cutoff)
+            test.assert("timestamp should be after cutoff (with tolerance)",
+                result[i].timestamp >= test_cutoff_boundary_cutoff - 1000)
         end
+    end,
+}
+
+M.test_cutoff_same_day_weekly = {
+    config = {
+        period = "_week",
+        period_multiplier = 1,
+        cutoff = core.time().timestamp - (3 * DHOUR), -- 3 hours ago
+    },
+    sources = function()
+        return {}
+    end,
+    assertions = function(result)
+        test.assert("result was nil", result)
+
+        -- Should have exactly 1 data point (the cutoff point)
+        test.assertEquals(1, #result)
+
+        -- Data point should be at the cutoff time (within 1 second tolerance)
+        local cutoff = core.time().timestamp - (3 * DHOUR)
+        test.assertClose(cutoff, result[1].timestamp, 1000)
     end,
 }
 
