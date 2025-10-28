@@ -12,7 +12,7 @@ local now = now_time and now_time.timestamp or 0
 return {
     -- Configuration metadata
     id = "periodic-data-points",
-    version = "1.1.0",
+    version = "1.1.1",
     inputCount = 0, -- This is a generator, not a transformer
     categories = { "_generators" },
     title = {
@@ -110,9 +110,6 @@ Les points de données générés auront:
         }
         local period = period_map[period_str]
 
-        -- Anchor is simply the cutoff timestamp
-        local anchor_time = core.date(cutoff_timestamp)
-
         -- Get current time for comparison
         local now = core.time().timestamp
 
@@ -144,8 +141,10 @@ Les points de données générés auront:
 
         estimated_periods = math.floor(elapsed_ms / period_duration_ms)
 
+        local cutoff_date = core.date(cutoff_timestamp)
+
         -- Jump close to now with one large shift
-        local candidate = core.shift(anchor_time, period, estimated_periods * period_multiplier)
+        local candidate = core.shift(cutoff_date, period, estimated_periods * period_multiplier)
 
         -- Fine-tune: shift forward until we pass "now"
         while candidate.timestamp <= now do
@@ -157,8 +156,8 @@ Les points de données générés auront:
 
         -- Return iterator function
         return function()
-            -- Check if we've gone past the cutoff
-            if current.timestamp < cutoff_timestamp then
+            -- Check if we've gone past the cutoff (with 1 second tolerance for millisecond precision loss)
+            if current.timestamp < cutoff_timestamp - 1000 then
                 return nil
             end
 
