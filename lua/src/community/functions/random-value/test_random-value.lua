@@ -139,28 +139,38 @@ M.test_random_value_negative_range = {
     end,
 }
 
-M.test_random_value_reproducible = {
+local reference_date = {
+    year = 2025,
+    month = 1,
+    day = 2,
+    hour = 3,
+    min = 2,
+    sec = 1,
+    zone = "UTC",
+}
+local reference_time = core.time(reference_date).timestamp
+
+M["test random value reproducible 1"] = {
     config = {
         min_value = 0.0,
         max_value = 1.0,
         seed = 42,
     },
     sources = function()
-        local now = core.time().timestamp
         return {
             {
                 {
-                    timestamp = now - (DDAY * 1),
+                    timestamp = reference_time - 1,
                     value = 100.0,
                     label = "test1",
                 },
                 {
-                    timestamp = now - (DDAY * 2),
+                    timestamp = reference_time - 2,
                     value = 200.0,
                     label = "test2",
                 },
                 {
-                    timestamp = now - (DDAY * 3),
+                    timestamp = reference_time - 3,
                     value = 300.0,
                     label = "test3",
                 },
@@ -171,15 +181,13 @@ M.test_random_value_reproducible = {
         test.assert("result was nil", result)
         test.assertEquals(3, #result)
 
-        -- With seed 42, math.random() should produce these exact values
-        -- (verified by the Kotlin test)
         local expected_values = {
-            0.22631526597231777,
-            0.9049568172356872,
-            0.27072817312675046,
+            0.19737142,
+            0.8292714,
+            0.099706925,
         }
 
-        for i = 1, 3 do
+        for i = 1, #expected_values do
             test.assertEquals(expected_values[i], result[i].value)
         end
 
@@ -187,6 +195,64 @@ M.test_random_value_reproducible = {
         test.assertEquals("test1", result[1].label)
         test.assertEquals("test2", result[2].label)
         test.assertEquals("test3", result[3].label)
+    end,
+}
+
+-- In this second test time has moved forwards and we have all the same old data
+-- points plus one new one. The random values should be the same for the old data points.
+-- The new data point should get the next random value in the sequence.
+M["test random value reproducible 2"] = {
+    config = {
+        min_value = 0.0,
+        max_value = 1.0,
+        seed = 42,
+    },
+    sources = function()
+        return {
+            {
+                {
+                    timestamp = reference_time,
+                    value = 50.0,
+                    label = "test1",
+                },
+                {
+                    timestamp = reference_time - 1,
+                    value = 100.0,
+                    label = "test1",
+                },
+                {
+                    timestamp = reference_time - 2,
+                    value = 200.0,
+                    label = "test2",
+                },
+                {
+                    timestamp = reference_time - 3,
+                    value = 300.0,
+                    label = "test3",
+                },
+            },
+        }
+    end,
+    assertions = function(result)
+        test.assert("result was nil", result)
+        test.assertEquals(4, #result)
+
+        local expected_values = {
+            0.4741889,
+            0.19737142,
+            0.8292714,
+            0.099706925,
+        }
+
+        for i = 1, #expected_values do
+            test.assertEquals(expected_values[i], result[i].value)
+        end
+
+        -- Labels should be preserved
+        test.assertEquals("test1", result[1].label)
+        test.assertEquals("test1", result[2].label)
+        test.assertEquals("test2", result[3].label)
+        test.assertEquals("test3", result[4].label)
     end,
 }
 
