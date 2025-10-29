@@ -1,5 +1,5 @@
 {
   "keyId": "prod-key-1-pub.pem",
   "algorithm": "ECDSA-P256-SHA256",
-  "signature": "MEUCIQClgY3QPYpB1KPJS3fR4wtqE3WI1mFYtzhDx2EUM9Jz1QIgY+6KZSNePJGuRuf/M7p5vKkOtlrS3rjBNmotdP+EsGM="
+  "signature": "MEUCIQDsG/3Fx+uGLNycJYVbaiorTnxEKpJap5RkxhcZXuNzHQIgQBSy1e3WT/ywoZMZakr2RvmUCKmWtybFDTVDhtUrW/w="
 }
