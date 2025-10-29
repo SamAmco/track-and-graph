@@ -4,16 +4,17 @@
 local number = require("tng.config").number
 local uint = require("tng.config").uint
 local core = require("tng.core")
+local random = require("tng.random")
 
-local now_time = core.time()
-local now = now_time and now_time.timestamp or 0
+local now = core.time()
+local default_seed = now and now.timestamp or 0
 
 return {
     -- Configuration metadata
     id = "random-value",
-    version = "1.0.0",
+    version = "2.0.0",
     inputCount = 1,
-    categories = {"_randomisers"},
+    categories = { "_randomisers" },
     title = {
         ["en"] = "Random Value",
         ["de"] = "Zufälliger Wert",
@@ -72,7 +73,7 @@ La fonction échange automatiquement min et max si max est inférieur à min.]],
         uint {
             id = "seed",
             name = "_seed",
-            default = now,
+            default = default_seed,
         },
     },
 
@@ -87,11 +88,6 @@ La fonction échange automatiquement min et max si max est inférieur à min.]],
             min_val, max_val = max_val, min_val
         end
 
-        local range = max_val - min_val
-
-        -- Initialize random seed
-        math.randomseed(seed)
-
         return function()
             local data_point = source.dp()
             if not data_point then
@@ -99,8 +95,8 @@ La fonction échange automatiquement min et max si max est inférieur à min.]],
             end
 
             -- Generate random value between min and max
-            local random_value = min_val + (math.random() * range)
-            data_point.value = random_value
+            local rng = random.new_seeded_random(seed, data_point.timestamp)
+            data_point.value = rng:next(min_val, max_val)
 
             return data_point
         end

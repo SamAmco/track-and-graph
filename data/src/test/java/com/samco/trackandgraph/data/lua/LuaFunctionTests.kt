@@ -326,6 +326,9 @@ internal class LuaFunctionTests : LuaEngineImplTest() {
         val jobs = (0 until threadCount).map { threadIndex ->
             // Launch in IO dispatcher for true parallelism
             async(Dispatchers.IO) {
+                // Please note you should prefer the tng.random API for seeded PRNG because it
+                // is intended to be stable across app releases. The backing Lua implementation
+                // may otherwise change resulting in a different set of generated numbers.
                 val script = """
                     return function(source)
                         -- Seed the randomizer with a hardcoded value

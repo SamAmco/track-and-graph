@@ -23,6 +23,7 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.random.Random
 
 internal class RequireApiImpl @Inject constructor(
     private val assetReader: AssetReader,
@@ -41,9 +42,22 @@ internal class RequireApiImpl @Inject constructor(
                 "tng.graph" to lazyPureLuaModule(globals, "graph"),
                 "tng.graphext" to lazyPureLuaModule(globals, "graphext"),
                 "tng.config" to lazyPureLuaModule(globals, "config"),
+                "tng.random" to lazyRandom(globals),
                 "test.core" to lazyTest(globals),
             )
         )
+    }
+
+    private fun lazyRandom(globals: Globals) = lazy {
+        try {
+            val fileContents = assetReader.readAssetToString("generated/lua-api/random.lua")
+            val random = globals.load(fileContents).call().checktable()!!
+            RandomApiImpl().installIn(random)
+            return@lazy random
+        } catch (t: Throwable) {
+            Timber.e(t, "Failed to load random module")
+            return@lazy LuaTable()
+        }
     }
 
     private fun lazyCore(globals: Globals) = lazy {
