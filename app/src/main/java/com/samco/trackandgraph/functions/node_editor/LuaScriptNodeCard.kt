@@ -66,6 +66,8 @@ import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigur
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
@@ -105,10 +107,10 @@ internal fun LuaScriptNode(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Text(
                     text = getNodeTitle(node),
@@ -119,9 +121,11 @@ internal fun LuaScriptNode(
                     Text(
                         text = node.metadata.version.toString(),
                         style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
             }
+
             InputSpacingLarge()
 
             Row {
@@ -153,6 +157,10 @@ internal fun LuaScriptNode(
                     )
                 }
             }
+        }
+
+        if (node.metadata?.version != null) {
+            HalfDialogInputSpacing()
         }
 
         if (node.showEditTools) {
