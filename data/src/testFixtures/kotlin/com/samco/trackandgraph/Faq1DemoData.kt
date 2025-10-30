@@ -6,7 +6,6 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-
 suspend fun createFaq1Group(dataInteractor: DataInteractor) {
     val outerGroupId = dataInteractor.insertGroup(createGroup("FAQ 1"))
 

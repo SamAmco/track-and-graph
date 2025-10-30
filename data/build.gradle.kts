@@ -45,6 +45,10 @@ android {
         sourceSets {
             getByName("androidTest").assets.srcDirs("$projectDir/schemas")
         }
+
+        defaultConfig {
+            testInstrumentationRunner = "com.samco.trackandgraph.HiltTestRunner"
+        }
     }
 
     ksp {
@@ -105,6 +109,7 @@ dependencies {
     //Dependency Injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     //Database
     ksp(libs.room.compiler)
@@ -136,6 +141,8 @@ dependencies {
     androidTestImplementation(libs.runner)
     androidTestImplementation(libs.junit.ktx)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
 
     testFixturesImplementation(libs.junit.ktx)
     testFixturesImplementation(libs.espresso.core)
