@@ -71,8 +71,8 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.resolve
 import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.functions.InfoDisplay
-import com.samco.trackandgraph.functions.InfoDisplayDialog
+import com.samco.trackandgraph.functions.node_editor.InfoDisplay
+import com.samco.trackandgraph.functions.node_editor.NodeDescriptionDialog
 
 private val minHeight = 120.dp
 
@@ -150,7 +150,7 @@ private fun NodeSelectionDialogUi(
 
     // Show info dialog on top when needed
     if (infoDisplay != null) {
-        InfoDisplayDialog(
+        NodeDescriptionDialog(
             infoDisplay = infoDisplay,
             onDismiss = onCloseInfo
         )

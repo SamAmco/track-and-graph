@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,10 +46,12 @@ import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.TngColors
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import org.threeten.bp.OffsetDateTime
 
 // Custom Typography matching original Material 2 text sizes from dimens.xml
+
 val CustomTypography = Typography(
     // Display styles (largest text)
     displayLarge = Typography().displayLarge.copy(fontSize = 60.sp),
@@ -56,9 +59,19 @@ val CustomTypography = Typography(
     displaySmall = Typography().displaySmall.copy(fontSize = 34.sp),
 
     // Headline styles
-    headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),
-    headlineMedium = Typography().headlineMedium.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp),
-    headlineSmall = Typography().headlineSmall.copy(fontSize = 20.sp, fontWeight = FontWeight.W500),
+    headlineLarge = Typography().headlineLarge.copy(
+        fontSize = 30.sp,
+        fontWeight = FontWeight.Bold
+    ),
+    headlineMedium = Typography().headlineMedium.copy(
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Bold,
+        lineHeight = 28.sp
+    ),
+    headlineSmall = Typography().headlineSmall.copy(
+        fontSize = 20.sp,
+        fontWeight = FontWeight.W500
+    ),
 
     // Title styles
     titleLarge = Typography().titleLarge.copy(fontSize = 28.sp),
@@ -72,7 +85,12 @@ val CustomTypography = Typography(
 
     // Label styles (smallest text)
     labelLarge = Typography().labelLarge.copy(fontSize = 14.sp),
-    labelMedium = Typography().labelMedium.copy(fontSize = 11.sp),
+    labelMedium = Typography().labelMedium.let { default ->
+        default.copy(
+            color = default.color.copy(alpha = 0.6f),
+            fontSize = 14.sp
+        )
+    },
     labelSmall = Typography().labelSmall.copy(fontSize = 10.sp),
 )
 
@@ -95,7 +113,7 @@ private fun TextPreview() = TnGComposeTheme {
             style = MaterialTheme.typography.displaySmall,
             text = "Display Small"
         )
-        
+
         // Headline typography
         Text(
             style = MaterialTheme.typography.headlineLarge,
@@ -109,7 +127,7 @@ private fun TextPreview() = TnGComposeTheme {
             style = MaterialTheme.typography.headlineSmall,
             text = "Headline Small"
         )
-        
+
         // Title typography
         Text(
             style = MaterialTheme.typography.titleLarge,
@@ -123,7 +141,7 @@ private fun TextPreview() = TnGComposeTheme {
             style = MaterialTheme.typography.titleSmall,
             text = "Title Small"
         )
-        
+
         // Body typography
         Text(
             style = MaterialTheme.typography.bodyLarge,
@@ -137,7 +155,7 @@ private fun TextPreview() = TnGComposeTheme {
             style = MaterialTheme.typography.bodySmall,
             text = "Body Small"
         )
-        
+
         // Label typography
         Text(
             style = MaterialTheme.typography.labelLarge,
