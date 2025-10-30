@@ -15,24 +15,30 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+package com.samco.trackandgraph
+
 import android.os.Environment
 import androidx.room.Room
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.samco.trackandgraph.TestDataInteractor
-import com.samco.trackandgraph.createFaq1Group
-import com.samco.trackandgraph.createFirstOpenTutorialGroup
-import com.samco.trackandgraph.createScreenshotsGroup
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.data.sampling.DataSamplerImpl
+import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.sampling.DataSampler
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
+import javax.inject.Inject
 
+@LargeTest
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class DemoDBGenerator {
 
@@ -42,14 +48,24 @@ class DemoDBGenerator {
         "trackandgraph_database"
     ).build()
 
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var luaEngine: LuaEngine
+
     private val dataInteractor = TestDataInteractor.create(database)
-    private val dataSampler = DataSamplerImpl(
-        dataInteractor = dataInteractor,
-        dao = database.trackAndGraphDatabaseDao
-    )
+
+    private lateinit var dataSampler: DataSampler
 
     @Before
     fun setup() {
+        hiltRule.inject()
+        dataSampler = TestDataSampler.create(
+            luaEngine = luaEngine,
+            dataInteractor = dataInteractor,
+            database = database,
+        )
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
     }
 

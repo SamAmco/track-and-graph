@@ -264,6 +264,7 @@ dependencies {
     // Instrumented tests
     androidTestImplementation(libs.shot.android)
     androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
     androidTestImplementation(libs.runner)
     androidTestImplementation(libs.junit.ktx)
     androidTestImplementation(libs.mockito.kotlin)
@@ -272,5 +273,4 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(testFixtures(project(":data")))
-    kspAndroidTest(libs.hilt.compiler)
 }
