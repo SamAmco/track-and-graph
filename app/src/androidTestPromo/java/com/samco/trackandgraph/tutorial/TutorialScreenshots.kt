@@ -1,3 +1,20 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.samco.trackandgraph.tutorial
 
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -12,9 +29,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.samco.trackandgraph.TestDataInteractor
+import com.samco.trackandgraph.TestDataSampler
+import com.samco.trackandgraph.TestDatabase
 import com.samco.trackandgraph.createFirstOpenTutorialGroup
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.DataInteractorModule
+import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.DataInteractorModule
+import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.di.PrefHelperModule
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.main.MainActivity
@@ -31,6 +53,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import javax.inject.Inject
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -52,9 +75,16 @@ class TutorialScreenshots {
     @get:Rule(order = 1)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
+    private val database: TrackAndGraphDatabase = TestDatabase.create()
+
     @BindValue
     @JvmField
-    val dataInteractor: DataInteractor = TestDataInteractor.create()
+    val dataInteractor: DataInteractor = TestDataInteractor.create(database)
+
+    @Inject
+    lateinit var luaEngine: LuaEngine
+
+    lateinit var dataSampler: DataSampler
 
     // Mock PrefHelper to enable tutorial by returning that first run is NOT complete
     @BindValue
@@ -75,7 +105,13 @@ class TutorialScreenshots {
     @Before
     fun setUp() {
         hiltRule.inject()
-        runBlocking { createFirstOpenTutorialGroup(dataInteractor) }
+
+        dataSampler = TestDataSampler.create(
+            luaEngine = luaEngine,
+            database = database,
+            dataInteractor = dataInteractor,
+        )
+        runBlocking { createFirstOpenTutorialGroup(dataInteractor, dataSampler) }
     }
 
     @OptIn(ExperimentalTestApi::class)
@@ -87,6 +123,7 @@ class TutorialScreenshots {
         composeRule.onNodeWithText("First open tutorial").performClick()
         composeRule.waitForIdle()
 
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("groupCard"))
         composeRule.onAllNodes(hasTestTag("groupCard"))[0].performClick()
         composeRule.waitForIdle()
         composeRule.waitUntilAtLeastOneExists(hasTestTag("trackerCard"))

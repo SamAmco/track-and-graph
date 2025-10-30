@@ -1,3 +1,20 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.samco.trackandgraph.promo
 
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -20,8 +37,8 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.samco.trackandgraph.TestDataInteractor
 import com.samco.trackandgraph.createScreenshotsGroup
-import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.data.model.di.DataInteractorModule
+import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.di.DataInteractorModule
 import com.samco.trackandgraph.di.PrefHelperModule
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.main.MainActivity
@@ -105,6 +122,7 @@ class PromoScreenshots {
         composeRule.waitForIdle()
         composeRule.onNodeWithText("Daily").performClick()
         composeRule.waitForIdle()
+        composeRule.waitUntilDoesNotExist(hasTestTag("trackAllFab"))
         composeRule.onNodeWithTag("trackAllFab", true).performClick()
         composeRule.waitForIdle()
         repeat(8) {
