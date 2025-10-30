@@ -133,6 +133,7 @@ private fun FunctionHeader(metadata: LuaFunctionMetadata) = Column {
         Text(
             text = str,
             style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
         HalfDialogInputSpacing()
     }

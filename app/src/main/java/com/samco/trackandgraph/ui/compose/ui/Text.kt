@@ -30,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.TngColors
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import org.threeten.bp.OffsetDateTime
 
@@ -85,12 +83,7 @@ val CustomTypography = Typography(
 
     // Label styles (smallest text)
     labelLarge = Typography().labelLarge.copy(fontSize = 14.sp),
-    labelMedium = Typography().labelMedium.let { default ->
-        default.copy(
-            color = default.color.copy(alpha = 0.6f),
-            fontSize = 14.sp
-        )
-    },
+    labelMedium = Typography().labelMedium.copy(fontSize = 14.sp) ,
     labelSmall = Typography().labelSmall.copy(fontSize = 10.sp),
 )
 
