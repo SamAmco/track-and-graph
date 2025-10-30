@@ -32,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,8 +52,6 @@ import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.functions.InfoDisplay
-import com.samco.trackandgraph.functions.InfoDisplayDialog
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 
@@ -148,7 +145,7 @@ internal fun DataSourceNode(
 
         // Info dialog
         if (showInfoDialog) {
-            InfoDisplayDialog(
+            NodeDescriptionDialog(
                 infoDisplay = InfoDisplay.DataSource,
                 onDismiss = { showInfoDialog = false }
             )

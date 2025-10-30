@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -77,8 +76,6 @@ import com.samco.trackandgraph.ui.compose.ui.InputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.resolve
-import com.samco.trackandgraph.functions.InfoDisplay
-import com.samco.trackandgraph.functions.InfoDisplayDialog
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 import io.github.z4kn4fein.semver.toVersion
@@ -110,19 +107,29 @@ internal fun LuaScriptNode(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = getNodeTitle(node),
-                style = MaterialTheme.typography.titleMedium,
+            Column(
                 modifier = Modifier.weight(1f)
-            )
+            ) {
+                Text(
+                    text = getNodeTitle(node),
+                    style = MaterialTheme.typography.titleMedium,
+                )
 
+                if (node.metadata?.version != null) {
+                    Text(
+                        text = node.metadata.version.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            }
             InputSpacingLarge()
-            
+
             Row {
                 // Show info button if metadata has title and description
-                if (node.metadata != null && 
-                    node.metadata.title != null && 
-                    node.metadata.description != null) {
+                if (node.metadata != null &&
+                    node.metadata.title != null &&
+                    node.metadata.description != null
+                ) {
                     IconButton(
                         modifier = Modifier.size(buttonSize),
                         onClick = { showInfoDialog = true }
@@ -135,7 +142,7 @@ internal fun LuaScriptNode(
                         )
                     }
                 }
-                
+
                 IconButton(
                     modifier = Modifier.size(buttonSize),
                     onClick = onDeleteNode
@@ -186,10 +193,10 @@ internal fun LuaScriptNode(
                 }
             )
         }
-        
+
         // Info dialog
         if (showInfoDialog && node.metadata != null) {
-            InfoDisplayDialog(
+            NodeDescriptionDialog(
                 infoDisplay = InfoDisplay.Function(node.metadata),
                 onDismiss = { showInfoDialog = false }
             )
@@ -354,7 +361,6 @@ private fun LuaScriptNodePreview() {
     TnGComposeTheme {
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
@@ -394,7 +400,6 @@ private fun LuaScriptNodeEmptyPreview() {
     TnGComposeTheme {
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
@@ -421,7 +426,6 @@ private fun LuaScriptNodeWithVersionPreview() {
     TnGComposeTheme {
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
@@ -430,7 +434,7 @@ private fun LuaScriptNodeWithVersionPreview() {
                 id = "filter_by_label",
                 description = TranslatedString.Simple(
                     "Filters data points based on their label. " +
-                    "Only data points with the specified label will be included in the output."
+                            "Only data points with the specified label will be included in the output."
                 ),
                 version = "1.0.0".toVersion(),
                 title = TranslatedString.Translations(
@@ -445,7 +449,7 @@ private fun LuaScriptNodeWithVersionPreview() {
                 config = listOf(),
                 categories = mapOf("filter" to TranslatedString.Simple("Filter"))
             )
-            
+
             val sampleNode = Node.LuaScript(
                 id = 3,
                 inputConnectorCount = 1,

@@ -19,6 +19,7 @@ package com.samco.trackandgraph.functions.node_editor
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -29,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -37,11 +39,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
+import com.samco.trackandgraph.data.lua.dto.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.ConnectorType
+import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import io.github.z4kn4fein.semver.toVersion
+import kotlin.Int
 
 val nodeCardContentWidth = 350.dp
 
@@ -84,26 +91,16 @@ internal fun NodeCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
         ) {
-            when (node) {
-                is Node.Output -> OutputNode(
-                    node = node,
-                    onCreateOrUpdate = onCreateOrUpdateFunction
-                )
-
-                is Node.DataSource -> DataSourceNode(
-                    node = node,
-                    onDeleteNode = { onDeleteNode(node) },
-                )
-
-                is Node.LuaScript -> LuaScriptNode(
-                    node = node,
-                    onDeleteNode = { onDeleteNode(node) },
-                    onUpdateScript = { newScript ->
-                        onUpdateScriptForNodeId(node.id, newScript)
-                    },
-                    onUpdateScriptFromFile = { uri ->
-                        onUpdateScriptFromFileForNodeId(node.id, uri)
-                    }
+            Box(
+                modifier = Modifier.heightIn(min = requiredMinHeight),
+                contentAlignment = Alignment.Center
+            ) {
+                NodeCardContent(
+                    node,
+                    onCreateOrUpdateFunction,
+                    onDeleteNode,
+                    onUpdateScriptForNodeId,
+                    onUpdateScriptFromFileForNodeId
                 )
             }
         }
@@ -124,6 +121,36 @@ internal fun NodeCard(
             viewState = viewState,
         )
     }
+}
+
+@Composable
+private fun NodeCardContent(
+    node: Node,
+    onCreateOrUpdateFunction: () -> Unit,
+    onDeleteNode: (Node) -> Unit,
+    onUpdateScriptForNodeId: (Int, String) -> Unit,
+    onUpdateScriptFromFileForNodeId: (Int, Uri?) -> Unit
+) = when (node) {
+    is Node.Output -> OutputNode(
+        node = node,
+        onCreateOrUpdate = onCreateOrUpdateFunction
+    )
+
+    is Node.DataSource -> DataSourceNode(
+        node = node,
+        onDeleteNode = { onDeleteNode(node) },
+    )
+
+    is Node.LuaScript -> LuaScriptNode(
+        node = node,
+        onDeleteNode = { onDeleteNode(node) },
+        onUpdateScript = { newScript ->
+            onUpdateScriptForNodeId(node.id, newScript)
+        },
+        onUpdateScriptFromFile = { uri ->
+            onUpdateScriptFromFileForNodeId(node.id, uri)
+        }
+    )
 }
 
 @Preview()
@@ -168,6 +195,53 @@ private fun DataSourceNodePreview() {
             node = Node.DataSource(
                 selectedFeatureId = remember { mutableStateOf(0L) },
                 featurePathMap = mapOf(0L to "Samples/Sample Data Source"),
+            ),
+            viewState = viewportState,
+            connectorLayerState = connectorLayerState,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun NameOnlyNodePreview() {
+    TnGComposeTheme {
+        val viewportState = rememberViewportState(
+            initialScale = 1.0f,
+            initialPan = Offset.Zero,
+            minScale = 0.15f,
+            maxScale = 5.0f,
+            autoFitContent = remember { mutableStateOf(true) },
+        )
+        val connectorLayerState = rememberConnectorLayerState()
+
+        val metadata = LuaFunctionMetadata(
+            script = "function main(input) return input end",
+            id = "filter_after_last",
+            description = TranslatedString.Simple("Filters data points "),
+            version = "1.0.0".toVersion(),
+            title = TranslatedString.Translations(
+                mapOf(
+                    "en" to "Filter After Last",
+                    "de" to "Filtern nach Letztem",
+                    "es" to "Filtrar después del último",
+                    "fr" to "Filtrer après le dernier"
+                )
+            ),
+            inputCount = 1,
+            config = listOf(),
+            categories = mapOf("filter" to TranslatedString.Simple("Filter"))
+        )
+
+        NodeCard(
+            node = Node.LuaScript(
+                id = 3,
+                inputConnectorCount = 2,
+                script = metadata.script,
+                configuration = emptyMap(),
+                showEditTools = false, // Version provided, so hide edit tools
+                title = metadata.title,
+                metadata = metadata
             ),
             viewState = viewportState,
             connectorLayerState = connectorLayerState,
