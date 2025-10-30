@@ -6,7 +6,7 @@ local test = require("test.core")
 local DDAY = core.DURATION.DAY
 local now = core.time().timestamp
 
-M.test_filter_after_first_basic = {
+M.test_filter_after_last_basic = {
   config = {},
   sources = function()
     return {
@@ -46,7 +46,7 @@ M.test_filter_after_first_basic = {
   end,
 }
 
-M.test_filter_after_first_no_reference = {
+M.test_filter_after_last_no_reference = {
   config = {},
   sources = function()
     return {
@@ -81,7 +81,7 @@ M.test_filter_after_first_no_reference = {
   end,
 }
 
-M.test_filter_after_first_all_before = {
+M.test_filter_after_last_all_before = {
   config = {},
   sources = function()
     return {
@@ -113,7 +113,7 @@ M.test_filter_after_first_all_before = {
   end,
 }
 
-M.test_filter_after_first_all_after = {
+M.test_filter_after_last_all_after = {
   config = {},
   sources = function()
     return {
