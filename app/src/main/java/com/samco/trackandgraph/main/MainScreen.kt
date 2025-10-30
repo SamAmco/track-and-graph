@@ -56,10 +56,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -149,28 +151,30 @@ private fun MainView(
 
     val topBarConfig = topBarController.config
     val pinnedScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val enterAlwaysScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val exitUntilCollapsedScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val scrollBehavior = remember(topBarConfig.appBarPinned) {
         if (topBarConfig.appBarPinned) pinnedScrollBehavior
-        else enterAlwaysScrollBehavior
+        else exitUntilCollapsedScrollBehavior
     }
     val scope = rememberCoroutineScope()
 
-    // Animate app bar back in when navigation occurs
-    LaunchedEffect(backStack.size, topBarConfig, enterAlwaysScrollBehavior) {
-        if (topBarConfig.visible && !topBarConfig.appBarPinned) {
+    // Animate app bar back in when navigating forwards
+    var lastBackStackSize by remember { mutableIntStateOf(backStack.size) }
+    LaunchedEffect(backStack.size, topBarConfig, exitUntilCollapsedScrollBehavior) {
+        if (topBarConfig.visible && !topBarConfig.appBarPinned && backStack.size > lastBackStackSize) {
             // Animate from collapsed (1.0) to expanded (0.0) to show the app bar sliding in
             delay(NAV_ANIM_DURATION_MILLIS.toLong())
-            val animatable = Animatable(enterAlwaysScrollBehavior.state.collapsedFraction)
+            val animatable = Animatable(exitUntilCollapsedScrollBehavior.state.collapsedFraction)
             animatable.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(durationMillis = 300)
             ) {
                 // Update the scroll behavior's height offset to animate the app bar
-                val heightOffsetLimit = enterAlwaysScrollBehavior.state.heightOffsetLimit
-                enterAlwaysScrollBehavior.state.heightOffset = value * heightOffsetLimit
+                val heightOffsetLimit = exitUntilCollapsedScrollBehavior.state.heightOffsetLimit
+                exitUntilCollapsedScrollBehavior.state.heightOffset = value * heightOffsetLimit
             }
         }
+        lastBackStackSize = backStack.size
     }
 
     BackHandler(drawerState.isOpen) { scope.launch { drawerState.close() } }
