@@ -4,6 +4,7 @@ The tutorials will guide you on how to use Track & Graph step by step.
 
 - [Get started with tracking](tracking.md)
 - [Importing and exporting data](import-export.md)
+- [Functions](functions.md)
 - Creating graphs
     - [Line graphs](graphs/line.md)
     - [Pie charts](graphs/pie.md)
