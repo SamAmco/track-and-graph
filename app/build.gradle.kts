@@ -46,7 +46,7 @@ android {
     }
 
     kotlin {
-        jvmToolchain(libs.versions.jdk.get().toInt())
+        jvmToolchain(libs.versions.buildJdk.get().toInt())
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -60,8 +60,8 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
-        versionCode = 700012
-        versionName = "7.0.12"
+        versionCode = 800000
+        versionName = "8.0.0-alpha5"
         testInstrumentationRunner = "com.samco.trackandgraph.screenshots.HiltTestRunner"
         // Default manifest placeholder for RecreateAlarms receiver
         manifestPlaceholders["recreateAlarmsEnabled"] = "true"

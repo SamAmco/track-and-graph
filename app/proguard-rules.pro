@@ -23,3 +23,6 @@
 -keep class com.androidplot.** { *; }
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
+
+# This is for commons CSV
+-dontwarn edu.umd.cs.findbugs.annotations.**
