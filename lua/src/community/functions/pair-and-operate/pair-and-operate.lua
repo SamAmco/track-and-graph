@@ -7,7 +7,7 @@ local core = require("tng.core")
 return {
   -- Configuration metadata
   id = "pair-and-operate",
-  version = "1.0.1",
+  version = "1.0.2",
   inputCount = 2,
   categories = { "_transform" },
   title = {
@@ -26,8 +26,7 @@ Pairs each data point in the first data source with the corresponding data point
   - **Skip:** Do not output anything for that data point.
   - **Pass Through:** Output the original data point from the first source without modification.
 
-
-**Note:** Division by zero is invalid and considered as missing data. The On Missing configuration will determine how such cases are handled.
+> **Note:** Division by zero is invalid and considered as missing data. The On Missing configuration will determine how such cases are handled.
 ]],
     ["de"] = [[
 Paart jeden Datenpunkt in der ersten Datenquelle mit dem entsprechenden Datenpunkt in der zweiten Datenquelle und führt eine bestimmte Operation (Addition, Subtraktion, Multiplikation oder Division) mit ihren Werten durch. Das Paar für jeden Datenpunkt ist der erste Datenpunkt, der innerhalb des gegebenen Zeitschwellwerts liegt. Konfiguration:
@@ -38,8 +37,7 @@ Paart jeden Datenpunkt in der ersten Datenquelle mit dem entsprechenden Datenpun
   - **Überspringen:** Nichts für diesen Datenpunkt ausgeben.
   - **Durchleiten:** Den ursprünglichen Datenpunkt aus der ersten Quelle ohne Änderung ausgeben.
 
-
-**Hinweis:** Division durch Null ist ungültig und wird als fehlende Daten betrachtet. Die Konfiguration "Bei Fehlen" bestimmt, wie solche Fälle behandelt werden.
+> **Hinweis:** Division durch Null ist ungültig und wird als fehlende Daten betrachtet. Die Konfiguration "Bei Fehlen" bestimmt, wie solche Fälle behandelt werden.
 ]],
     ["es"] = [[
 Empareja cada punto de datos en la primera fuente de datos con el punto de datos correspondiente en la segunda fuente de datos y realiza una operación específica (suma, resta, multiplicación o división) en sus valores. La pareja para cada punto de datos es el primer punto de datos que cae dentro del umbral de tiempo dado. Configuración:
@@ -50,8 +48,7 @@ Empareja cada punto de datos en la primera fuente de datos con el punto de datos
   - **Omitir:** No generar nada para ese punto de datos.
   - **Pasar Sin Cambios:** Generar el punto de datos original de la primera fuente sin modificación.
 
-
-**Nota:** La división por cero es inválida y se considera como datos faltantes. La configuración "En Faltante" determinará cómo se manejan tales casos.
+> **Nota:** La división por cero es inválida y se considera como datos faltantes. La configuración "En Faltante" determinará cómo se manejan tales casos.
 ]],
     ["fr"] = [[
 Apparie chaque point de données dans la première source de données avec le point de données correspondant dans la deuxième source de données et effectue une opération spécifiée (addition, soustraction, multiplication ou division) sur leurs valeurs. La paire pour chaque point de données est le premier point de données qui tombe dans le seuil de temps donné. Configuration:
@@ -62,8 +59,7 @@ Apparie chaque point de données dans la première source de données avec le po
   - **Ignorer:** Ne rien générer pour ce point de données.
   - **Laisser Passer:** Générer le point de données original de la première source sans modification.
 
-
-**Note:** La division par zéro est invalide et considérée comme des données manquantes. La configuration "En Cas de Manque" déterminera comment de tels cas sont traités.
+> **Note:** La division par zéro est invalide et considérée comme des données manquantes. La configuration "En Cas de Manque" déterminera comment de tels cas sont traités.
 ]],
   },
   config = {
