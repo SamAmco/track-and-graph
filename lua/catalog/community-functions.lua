@@ -84,6 +84,10 @@ return {
       script="-- Lua Function to round values\n-- Rounds each data point's value to the nearest multiple of a specified number\n\nlocal number = require(\"tng.config\").number\n\nreturn {\n\9-- Configuration metadata\n\9id = \"round\",\n\9version = \"1.0.0\",\n\9inputCount = 1,\n\9categories = {\"_arithmetic\"},\n\9title = {\n\9\9[\"en\"] = \"Round\",\n\9\9[\"de\"] = \"Runden\",\n\9\9[\"es\"] = \"Redondear\",\n\9\9[\"fr\"] = \"Arrondir\",\n\9},\n\9description = {\n\9\9[\"en\"] = [[\nRounds each data point's value to the nearest multiple of a specified number.\n\nConfiguration:\n- **Nearest**: Round to the nearest multiple of this number (default: 1.0)\n]],\n\9\9[\"de\"] = [[\nRundet den Wert jedes Datenpunkts auf das nächste Vielfache einer angegebenen Zahl.\n\nKonfiguration:\n- **Nächste**: Auf das nächste Vielfache dieser Zahl runden (Standard: 1.0)\n]],\n\9\9[\"es\"] = [[\nRedondea el valor de cada punto de datos al múltiplo más cercano de un número especificado.\n\nConfiguración:\n- **Más cercano**: Redondear al múltiplo más cercano de este número (predeterminado: 1.0)\n]],\n\9\9[\"fr\"] = [[\nArrondit la valeur de chaque point de données au multiple le plus proche d'un nombre spécifié.\n\nConfiguration:\n- **Plus proche**: Arrondir au multiple le plus proche de ce nombre (par défaut: 1.0)\n]],\n\9},\n\9config = {\n\9\9number {\n\9\9\9id = \"nearest\",\n\9\9\9default = 1.0,\n\9\9\9name = {\n\9\9\9\9[\"en\"] = \"Nearest\",\n\9\9\9\9[\"de\"] = \"Nächste\",\n\9\9\9\9[\"es\"] = \"Más cercano\",\n\9\9\9\9[\"fr\"] = \"Plus proche\",\n\9\9\9},\n\9\9},\n\9},\n\n\9-- Generator function\n\9generator = function(source, config)\n\9\9local nearest = config and config.nearest or 1.0\n\n\9\9return function()\n\9\9\9local data_point = source.dp()\n\9\9\9if not data_point then\n\9\9\9\9return nil\n\9\9\9end\n\n\9\9\9-- Round to nearest multiple\n\9\9\9data_point.value = math.floor((data_point.value / nearest) + 0.5) * nearest\n\n\9\9\9return data_point\n\9\9end\n\9end,\n}\n",
       version="1.0.0"
     },
+    ["snap-time-to"]={
+      script="-- Lua Function to snap data point timestamps to a specific time of day\n-- This function adjusts timestamps to the specified time of day based on the direction (next, previous, or nearest)\n\nlocal localtime = require(\"tng.config\").localtime\nlocal enum = require(\"tng.config\").enum\nlocal core = require(\"tng.core\")\n\nreturn {\n  -- Configuration metadata\n  id = \"snap-time-to\",\n  version = \"1.0.0\",\n  inputCount = 1,\n  categories = { \"_time\" },\n\n  title = {\n    [\"en\"] = \"Snap Time To\",\n    [\"de\"] = \"Zeit Einrasten Auf\",\n    [\"es\"] = \"Ajustar Tiempo A\",\n    [\"fr\"] = \"Aligner l'Heure Sur\",\n  },\n\n  description = {\n    [\"en\"] = [[\nSnaps data point timestamps to a specific time of day.\n\n- Time of Day: The target time (e.g., 09:30:00)\n- Direction: Next, Previous, or Nearest occurrence of that time\n]],\n    [\"de\"] = [[\nRastet Datenpunkt-Zeitstempel auf eine bestimmte Tageszeit ein.\n\n- Tageszeit: Die Zielzeit (z.B. 09:30:00)\n- Richtung: Nächste, Vorherige oder Nächstgelegene Occurrence dieser Zeit\n]],\n    [\"es\"] = [[\nAjusta las marcas de tiempo de los puntos de datos a una hora específica del día.\n\n- Hora del Día: La hora objetivo (ej. 09:30:00)\n- Dirección: Siguiente, Anterior, o Más Cercana ocurrencia de esa hora\n]],\n    [\"fr\"] = [[\nAligne les horodatages des points de données sur une heure spécifique de la journée.\n\n- Heure du Jour: L'heure cible (ex. 09:30:00)\n- Direction: Prochaine, Précédente, ou Plus Proche occurrence de cette heure\n]],\n  },\n\n  config = {\n    localtime {\n      id = \"target_time\",\n      name = {\n        [\"en\"] = \"Time of Day\",\n        [\"de\"] = \"Tageszeit\",\n        [\"es\"] = \"Hora del Día\",\n        [\"fr\"] = \"Heure du Jour\",\n      },\n      default = 9 * core.DURATION.HOUR, -- 09:00:00\n    },\n    enum {\n      id = \"direction\",\n      name = {\n        [\"en\"] = \"Direction\",\n        [\"de\"] = \"Richtung\",\n        [\"es\"] = \"Dirección\",\n        [\"fr\"] = \"Direction\",\n      },\n      options = { \"_next\", \"_previous\", \"_nearest\" },\n      default = \"_nearest\",\n    },\n  },\n\n  -- Generator function\n  generator = function(source, config)\n    local target_time = config and config.target_time or error(\"Target time is required\")\n    local direction = config and config.direction or error(\"Direction is required\")\n\n    return function()\n      local data_point = source.dp()\n      if not data_point then\n        return nil\n      end\n\n      -- Get the date components of the data point\n      local date = core.date(data_point)\n\n      -- Calculate the target time on the same date\n      local same_day_target = core.time({\n        year = date.year,\n        month = date.month,\n        day = date.day,\n        hour = 0,\n        min = 0,\n        sec = 0,\n        zone = date.zone\n      })\n      same_day_target = core.shift(same_day_target, target_time)\n\n      local new_timestamp\n\n      if direction == \"_next\" then\n        -- Find next occurrence of target time\n        if data_point.timestamp <= same_day_target.timestamp then\n          new_timestamp = same_day_target\n        else\n          -- Next day\n          new_timestamp = core.shift(same_day_target, core.PERIOD.DAY)\n        end\n      elseif direction == \"_previous\" then\n        -- Find previous occurrence of target time\n        if data_point.timestamp >= same_day_target.timestamp then\n          new_timestamp = same_day_target\n        else\n          -- Previous day\n          new_timestamp = core.shift(same_day_target, core.PERIOD.DAY, -1)\n        end\n      else -- \"_nearest\"\n        -- Find nearest occurrence of target time\n        local other_target\n        if data_point.timestamp <= same_day_target.timestamp then\n          other_target = core.shift(same_day_target, core.PERIOD.DAY, -1)\n        else\n          other_target = core.shift(same_day_target, core.PERIOD.DAY)\n        end\n\n        local diff_same = math.abs(data_point.timestamp - same_day_target.timestamp)\n        local diff_other = math.abs(data_point.timestamp - other_target.timestamp)\n\n        if diff_same <= diff_other then\n          new_timestamp = same_day_target\n        else\n          new_timestamp = other_target\n        end\n      end\n\n      -- Return data point with adjusted timestamp\n      return {\n        timestamp = new_timestamp.timestamp,\n        offset = new_timestamp.offset,\n        value = data_point.value,\n        label = data_point.label,\n        note = data_point.note,\n      }\n    end\n  end,\n}\n",
+      version="1.0.0"
+    },
     ["swap-label-note"]={
       script="-- Lua Function to swap label and note fields\n-- Swaps the label and note of each data point\n\nreturn {\n\9-- Configuration metadata\n\9id = \"swap-label-note\",\n\9version = \"1.0.0\",\n\9inputCount = 1,\n\9categories = {\"_transform\"},\n\9title = {\n\9\9[\"en\"] = \"Swap Label and Note\",\n\9\9[\"de\"] = \"Label und Notiz tauschen\",\n\9\9[\"es\"] = \"Intercambiar etiqueta y nota\",\n\9\9[\"fr\"] = \"Échanger étiquette et note\",\n\9},\n\9description = {\n\9\9[\"en\"] = [[\nSwaps the label and note fields of each data point.\n]],\n\9\9[\"de\"] = [[\nTauscht die Label- und Notizfelder jedes Datenpunkts aus.\n]],\n\9\9[\"es\"] = [[\nIntercambia los campos de etiqueta y nota de cada punto de datos.\n]],\n\9\9[\"fr\"] = [[\nÉchange les champs étiquette et note de chaque point de données.\n]],\n\9},\n\9config = {},\n\n\9-- Generator function\n\9generator = function(source)\n\9\9return function()\n\9\9\9local data_point = source.dp()\n\9\9\9if not data_point then\n\9\9\9\9return nil\n\9\9\9end\n\n\9\9\9-- Swap label and note\n\9\9\9local temp = data_point.label\n\9\9\9data_point.label = data_point.note\n\9\9\9data_point.note = temp\n\n\9\9\9return data_point\n\9\9end\n\9end,\n}\n",
       version="1.0.0"
@@ -129,7 +133,7 @@ return {
       version="1.0.0"
     }
   },
-  published_at="2025-11-04T11:29:51Z",
+  published_at="2025-11-04T22:19:00Z",
   translations={
     _addition={
       de="Addition",
@@ -251,6 +255,18 @@ return {
       es="Multiplicación",
       fr="Multiplication"
     },
+    _nearest={
+      de="Nächstgelegene",
+      en="Nearest",
+      es="Más Cercano",
+      fr="Le Plus Proche"
+    },
+    _next={
+      de="Nächste",
+      en="Next",
+      es="Siguiente",
+      fr="Suivant"
+    },
     _note_only={
       de="Nur Notiz",
       en="Note Only",
@@ -286,6 +302,12 @@ return {
       en="Period Multiplier",
       es="Multiplicador de Período",
       fr="Multiplicateur de Période"
+    },
+    _previous={
+      de="Vorherige",
+      en="Previous",
+      es="Anterior",
+      fr="Précédent"
     },
     _randomisers={
       de="Zufallsgeneratoren",
