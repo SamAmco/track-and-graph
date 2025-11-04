@@ -13,6 +13,13 @@ local function sort_by_title(functions)
 	end)
 end
 
+local function string_list(lst)
+	if not lst or #lst == 0 then
+		return "none"
+	end
+	return table.concat(lst, ", ")
+end
+
 -- Print separator line
 local function print_separator()
 	print(string.rep("=", 80))
@@ -27,6 +34,7 @@ local function print_function(func)
 	print("TITLE: " .. title)
 	print("ID: " .. (func.id or "unknown"))
 	print("VERSION: " .. (func.version or "unknown"))
+	print("CATEGORIES: " .. string_list(func.categories))
 	print()
 	print("DESCRIPTION:")
 	print(description)
