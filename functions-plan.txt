@@ -17,9 +17,6 @@ QA:
 
 FUNCTIONS PLANNING
 
-
-Prebuilt Lua function nodes:
-
 - Duration clustered max
   - Threshold (duration enum)
   - Duration multiplier (uint)
@@ -46,30 +43,11 @@ Prebuilt Lua function nodes:
   - Threshold (period enum)
   - Period multiplier (uint)
 
-- Pair and subctract
-  - Threshold (duration)
-  - Filter items without pairs (boolean)
-- Pair and sum
-  - Threshold (duration)
-  - Filter items without pairs (boolean)
-- Pair and multiply
-  - Threshold (duration)
-  - Filter items without pairs (boolean)
-- Pair and divide
-  - Threshold (duration)
-  - Filter items without pairs (boolean)
-
-- Time cutoff from instant
-  - Cutoff time (instant)
 - Time cutoff from duration ago
   - Cutoff duration (duration)
 - Time cutoff from period ago
   - Cutoff period (period enum)
   - Period multiplier (uint)
-
-- Cumulative sum (no config)
-  - max data points (uint)
-  - reset on 0 value (boolean)
 
 - duration based Standard deviation
   - Window size (duration enum)
@@ -120,11 +98,6 @@ Prebuilt Lua function nodes:
   - Window size (period enum)
   - period multiplier (uint)
   - Moving window (boolean)
-
-- Synthetic Random data
-  - seed (string)
-  - frequency (duration)
-  - jitter (duration)
 
 - Snap to nearest time
   - time (local time)

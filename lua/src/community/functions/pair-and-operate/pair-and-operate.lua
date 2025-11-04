@@ -7,9 +7,9 @@ local core = require("tng.core")
 return {
   -- Configuration metadata
   id = "pair-and-operate",
-  version = "1.0.2",
+  version = "1.0.3",
   inputCount = 2,
-  categories = { "_transform" },
+  categories = { "_combine" },
   title = {
     ["en"] = "Pair and Operate",
     ["de"] = "Paaren und Operieren",

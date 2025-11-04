@@ -283,6 +283,13 @@ local translations = {
 		["es"] = "En Faltante",
 		["fr"] = "En Cas de Manque",
 	},
+	{
+		_id = "_combine",
+		["en"] = "Combine",
+		["de"] = "Kombinieren",
+		["es"] = "Combinar",
+		["fr"] = "Combiner",
+	},
 }
 
 -- Validation: ensure all entries have all 4 required languages
