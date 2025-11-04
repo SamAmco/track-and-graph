@@ -4,27 +4,6 @@
 
 local translations = {
 	{
-		_id = "_hours",
-		["en"] = "Hours",
-		["de"] = "Stunden",
-		["es"] = "Horas",
-		["fr"] = "Heures",
-	},
-	{
-		_id = "_days",
-		["en"] = "Days",
-		["de"] = "Tage",
-		["es"] = "Días",
-		["fr"] = "Jours",
-	},
-	{
-		_id = "_weeks",
-		["en"] = "Weeks",
-		["de"] = "Wochen",
-		["es"] = "Semanas",
-		["fr"] = "Semaines",
-	},
-	{
 		_id = "_all_fields",
 		["en"] = "All Fields",
 		["de"] = "Alle Felder",
@@ -289,6 +268,27 @@ local translations = {
 		["de"] = "Kombinieren",
 		["es"] = "Combinar",
 		["fr"] = "Combiner",
+	},
+	{
+		_id = "_next",
+		["en"] = "Next",
+		["de"] = "Nächste",
+		["es"] = "Siguiente",
+		["fr"] = "Suivant",
+	},
+	{
+		_id = "_previous",
+		["en"] = "Previous",
+		["de"] = "Vorherige",
+		["es"] = "Anterior",
+		["fr"] = "Précédent",
+	},
+	{
+		_id = "_nearest",
+		["en"] = "Nearest",
+		["de"] = "Nächstgelegene",
+		["es"] = "Más Cercano",
+		["fr"] = "Le Plus Proche",
 	},
 }
 
