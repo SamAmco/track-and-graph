@@ -127,10 +127,10 @@ M.test_snap_to_9am_next = {
     end,
 }
 
-M.test_snap_to_9am_previous = {
+M.test_snap_to_9am_last = {
     config = {
         target_time = 9 * core.DURATION.HOUR, -- 9:00 AM
-        direction = "_previous",
+        direction = "_last",
     },
     sources = function()
         local base_time = core.time({
@@ -177,7 +177,7 @@ M.test_snap_to_9am_previous = {
         test.assertEquals(expected_this_9am, result[1].timestamp)
         test.assertEquals(100.0, result[1].value)
 
-        local expected_previous_9am = core.time({
+        local expected_last_9am = core.time({
             year = 2023,
             month = 6,
             day = 14, -- Previous day
@@ -186,7 +186,7 @@ M.test_snap_to_9am_previous = {
             sec = 0
         }).timestamp
 
-        test.assertEquals(expected_previous_9am, result[2].timestamp)
+        test.assertEquals(expected_last_9am, result[2].timestamp)
         test.assertEquals(200.0, result[2].value)
     end,
 }
@@ -262,7 +262,7 @@ M.test_data_preservation = {
 -- M["test daylight savings picks correct local time"] = {
 --     config = {
 --         target_time = 9 * core.DURATION.HOUR, -- 9:00 AM
---         direction = "_previous",
+--         direction = "_last",
 --     },
 --     sources = function()
 --         return {

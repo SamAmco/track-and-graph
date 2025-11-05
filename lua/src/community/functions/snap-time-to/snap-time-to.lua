@@ -8,7 +8,7 @@ local core = require("tng.core")
 return {
   -- Configuration metadata
   id = "snap-time-to",
-  version = "1.0.0",
+  version = "1.0.1",
   inputCount = 1,
   categories = { "_time" },
 
@@ -65,7 +65,7 @@ Aligne les horodatages des points de données sur une heure spécifique de la jo
         ["es"] = "Dirección",
         ["fr"] = "Direction",
       },
-      options = { "_next", "_previous", "_nearest" },
+      options = { "_next", "_nearest", "_last" },
       default = "_nearest",
     },
   },
@@ -106,7 +106,7 @@ Aligne les horodatages des points de données sur une heure spécifique de la jo
           -- Next day
           new_timestamp = core.shift(same_day_target, core.PERIOD.DAY)
         end
-      elseif direction == "_previous" then
+      elseif direction == "_last" then
         -- Find previous occurrence of target time
         if data_point.timestamp >= same_day_target.timestamp then
           new_timestamp = same_day_target
