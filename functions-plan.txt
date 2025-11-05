@@ -99,17 +99,13 @@ FUNCTIONS PLANNING
   - period multiplier (uint)
   - Moving window (boolean)
 
-- Snap to nearest time
-  - time (local time)
 - Snap to nearest week day
   - day of week (enum)
-- Snap to nearest month day
-  - day of month (number)
-- Snap to next time 
-  - time (local time)
 - Snap to next week day
   - day of week (enum)
 - Snap to next month day
+  - day of month (number)
+- Snap to nearest month day
   - day of month (number)
 - Snap to next end of period
   - period (enum)
