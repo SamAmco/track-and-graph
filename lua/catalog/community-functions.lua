@@ -28,6 +28,14 @@ return {
       script="-- Lua Function to filter data points after a reference point\n-- Outputs all data points from the first source that come after the last point in the second source\n\nreturn {\n\9-- Configuration metadata\n\9id = \"filter-after-last\",\n\9version = \"1.0.0\",\n\9inputCount = 2,\n\9categories = {\"_filter\"},\n\9title = {\n\9\9[\"en\"] = \"Filter After Last\",\n\9\9[\"de\"] = \"Filtern nach Letztem\",\n\9\9[\"es\"] = \"Filtrar después del último\",\n\9\9[\"fr\"] = \"Filtrer après le dernier\",\n\9},\n\9description = {\n\9\9[\"en\"] = [[\nFilters data points from the first input source to only include those that occur after the last data point in the second input source.\n\nThis is useful for filtering data based on a reference event or timestamp from another tracker.\n]],\n\9\9[\"de\"] = [[\nFiltert Datenpunkte aus der ersten Eingabequelle, um nur diejenigen einzuschließen, die nach dem letzten Datenpunkt in der zweiten Eingabequelle auftreten.\n\nDies ist nützlich zum Filtern von Daten basierend auf einem Referenzereignis oder Zeitstempel von einem anderen Tracker.\n]],\n\9\9[\"es\"] = [[\nFiltra puntos de datos de la primera fuente de entrada para incluir solo aquellos que ocurren después del último punto de datos en la segunda fuente de entrada.\n\nEsto es útil para filtrar datos basados en un evento de referencia o marca de tiempo de otro rastreador.\n]],\n\9\9[\"fr\"] = [[\nFiltre les points de données de la première source d'entrée pour n'inclure que ceux qui se produisent après le dernier point de données de la deuxième source d'entrée.\n\nCeci est utile pour filtrer les données basées sur un événement de référence ou un horodatage d'un autre tracker.\n]],\n\9},\n\9config = {},\n\n\9-- Generator function\n\9generator = function(sources, config)\n\9\9local source1 = sources[1]\n\9\9local source2 = sources[2]\n\9\9local cutoff_timestamp = nil\n\n\9\9return function()\n\9\9\9-- Initialize cutoff on first call\n\9\9\9if cutoff_timestamp == nil then\n\9\9\9\9local reference_point = source2.dp()\n\9\9\9\9cutoff_timestamp = reference_point and reference_point.timestamp\n\9\9\9end\n\n\9\9\9-- Get next point from source1 and check if it's after cutoff\n\9\9\9local data_point = source1.dp()\n\9\9\9if not data_point then\n\9\9\9\9return nil\n\9\9\9end\n\n\9\9\9-- Data points are in reverse chronological order, so \"after\" means greater timestamp\n\9\9\9if not cutoff_timestamp or data_point.timestamp > cutoff_timestamp then\n\9\9\9\9return data_point\n\9\9\9end\n\n\9\9\9-- If the data point is not after the cutoff we're done\n\9\9\9return nil\n\9\9end\n\9end,\n}\n",
       version="1.0.0"
     },
+    ["filter-before-cutoff"]={
+      script="-- Lua Function to filter data points before a cutoff timestamp\n-- This function only passes through data points that occur before the specified cutoff time\nlocal instant = require(\"tng.config\").instant\nlocal core = require(\"tng.core\")\n\nlocal now_time = core.time()\nlocal now = now_time and now_time.timestamp or 0\n\nreturn {\n    -- Configuration metadata\n    id = \"filter-before-cutoff\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = { \"_filter\", \"_time\" },\n\n    title = {\n        [\"en\"] = \"Filter Before Cutoff\",\n        [\"de\"] = \"Filtern vor Grenzwert\",\n        [\"es\"] = \"Filtrar Antes del Límite\",\n        [\"fr\"] = \"Filtrer Avant la Limite\",\n    },\n\n    description = {\n        [\"en\"] = \"Filters data points to only include those before the specified cutoff time.\",\n        [\"de\"] = \"Filtert Datenpunkte, um nur diejenigen vor dem angegebenen Grenzwert einzuschließen.\",\n        [\"es\"] = \"Filtra puntos de datos para incluir solo aquellos antes del límite especificado.\",\n        [\"fr\"] = \"Filtre les points de données pour n'inclure que ceux avant la limite spécifiée.\",\n    },\n\n    config = {\n        instant {\n            id = \"cutoff\",\n            name = \"_cutoff\",\n            default = now, -- Current time as default\n        },\n    },\n\n    -- Generator function\n    generator = function(source, config)\n        local cutoff = config and config.cutoff or error(\"Cutoff configuration is required\")\n\n        return function()\n            while true do\n                local data_point = source.dp()\n                if not data_point then\n                    return nil\n                end\n\n                -- Only return data points before the cutoff\n                if data_point.timestamp < cutoff then\n                    return data_point\n                end\n                -- Otherwise, skip this data point and continue to the next\n            end\n        end\n    end,\n}\n",
+      version="1.0.0"
+    },
+    ["filter-before-last"]={
+      script="-- Lua Function to filter data points before a reference point\n-- Outputs all data points from the first source that come before the last point in the second source\n\nreturn {\n\9-- Configuration metadata\n\9id = \"filter-before-last\",\n\9version = \"1.0.0\",\n\9inputCount = 2,\n\9categories = { \"_filter\" },\n\9title = {\n\9\9[\"en\"] = \"Filter Before Last\",\n\9\9[\"de\"] = \"Filtern vor Letztem\",\n\9\9[\"es\"] = \"Filtrar antes del último\",\n\9\9[\"fr\"] = \"Filtrer avant le dernier\",\n\9},\n\9description = {\n\9\9[\"en\"] = [[\nFilters data points from the first input source to only include those that occur before the last data point in the second input source.\n\nThis is useful for filtering data based on a reference event or timestamp from another tracker.\n]],\n\9\9[\"de\"] = [[\nFiltert Datenpunkte aus der ersten Eingabequelle, um nur diejenigen einzuschließen, die vor dem letzten Datenpunkt in der zweiten Eingabequelle auftreten.\n\nDies ist nützlich zum Filtern von Daten basierend auf einem Referenzereignis oder Zeitstempel von einem anderen Tracker.\n]],\n\9\9[\"es\"] = [[\nFiltra puntos de datos de la primera fuente de entrada para incluir solo aquellos que ocurren antes del último punto de datos en la segunda fuente de entrada.\n\nEsto es útil para filtrar datos basados en un evento de referencia o marca de tiempo de otro rastreador.\n]],\n\9\9[\"fr\"] = [[\nFiltre les points de données de la première source d'entrée pour n'inclure que ceux qui se produisent avant le dernier point de données de la deuxième source d'entrée.\n\nCeci est utile pour filtrer les données basées sur un événement de référence ou un horodatage d'un autre tracker.\n]],\n\9},\n\9config = {},\n\n\9-- Generator function\n\9generator = function(sources)\n\9\9local source1 = sources[1]\n\9\9local source2 = sources[2]\n\n\9\9-- Initialize cutoff on first call\n\9\9local reference_point = source2.dp()\n\9\9local cutoff_timestamp = reference_point and reference_point.timestamp\n\n\9\9return function()\n\9\9\9while true do\n\9\9\9\9-- Get next point from source1 and check if it's after cutoff\n\9\9\9\9local data_point = source1.dp()\n\9\9\9\9if not data_point then\n\9\9\9\9\9return nil\n\9\9\9\9end\n\n\9\9\9\9if not cutoff_timestamp or data_point.timestamp < cutoff_timestamp then\n\9\9\9\9\9return data_point\n\9\9\9\9end\n\9\9\9end\n\9\9end\n\9end\n}\n",
+      version="1.0.0"
+    },
     ["filter-by-label"]={
       script="-- Example Lua Function with Input Count and Configuration\n-- This function filters data points by label\n\nlocal tng_config = require(\"tng.config\")\nlocal text = tng_config.text\nlocal checkbox = tng_config.checkbox\n\nlocal function match(data_point, filter_label, case_sensitive, match_exactly)\n    if filter_label == nil then\n        return true\n    end\n\n    local data_label = data_point.label\n    if not data_label then return false end\n\n    -- Apply case sensitivity\n    if not case_sensitive then\n        data_label = string.lower(data_label)\n        filter_label = string.lower(filter_label)\n    end\n\n    -- Apply matching mode\n    if match_exactly then\n        return data_label == filter_label\n    else\n        return string.find(data_label, filter_label, 1, true) ~= nil\n    end\nend\n\n\nreturn {\n    -- Configuration metadata\n    id = \"filter-by-label\",\n    version = \"1.0.1\",\n    inputCount = 1,\n    categories = {\"_filter\"},\n    title = {\n        [\"en\"] = \"Filter by Label\",\n        [\"de\"] = \"Filtern nach Etikett\",\n        [\"es\"] = \"Filtrar por Etiqueta\",\n        [\"fr\"] = \"Filtrer par Étiquette\"\n    },\n    description = {\n        [\"en\"] = [[\nFilters data points by their label field. Only data points matching the filter criteria will pass through.\n\nConfiguration:\n- **Filter Label**: The text to search for in labels\n- **Case Sensitive**: Match case exactly (default: false)\n- **Match Exactly**: Require exact match instead of substring (default: false)\n- **Invert**: Keep data points that DON'T match instead (default: false)\n]],\n        [\"de\"] = [[\nFiltert Datenpunkte nach ihrem Label-Feld. Nur Datenpunkte, die den Filterkriterien entsprechen, werden durchgelassen.\n\nKonfiguration:\n- **Filter-Label**: Der Text, nach dem in Labels gesucht werden soll\n- **Groß-/Kleinschreibung beachten**: Groß-/Kleinschreibung exakt beachten (Standard: false)\n- **Exakt übereinstimmen**: Exakte Übereinstimmung statt Teilstring erforderlich (Standard: false)\n- **Invertieren**: Datenpunkte behalten, die NICHT übereinstimmen (Standard: false)\n]],\n        [\"es\"] = [[\nFiltra puntos de datos por su campo de etiqueta. Solo los puntos de datos que coincidan con los criterios del filtro pasarán.\n\nConfiguración:\n- **Filtrar Etiqueta**: El texto a buscar en las etiquetas\n- **Sensible a Mayúsculas**: Coincidir exactamente con mayúsculas y minúsculas (predeterminado: false)\n- **Coincidir Exactamente**: Requerir coincidencia exacta en lugar de subcadena (predeterminado: false)\n- **Invertir**: Mantener puntos de datos que NO coincidan (predeterminado: false)\n]],\n        [\"fr\"] = [[\nFiltre les points de données par leur champ d'étiquette. Seuls les points de données correspondant aux critères du filtre passeront.\n\nConfiguration:\n- **Filtrer l'Étiquette**: Le texte à rechercher dans les étiquettes\n- **Sensible à la Casse**: Correspondance exacte de la casse (par défaut: false)\n- **Correspondance Exacte**: Nécessite une correspondance exacte au lieu d'une sous-chaîne (par défaut: false)\n- **Inverser**: Conserver les points de données qui NE correspondent PAS (par défaut: false)\n]]\n    },\n    config = {\n        text {\n            id = \"filter_label\",\n            name = {\n                [\"en\"] = \"Filter Label\",\n                [\"de\"] = \"Filter-Label\",\n                [\"es\"] = \"Filtrar Etiqueta\",\n                [\"fr\"] = \"Filtrer l'Étiquette\"\n            }\n        },\n        checkbox {\n            id = \"case_sensitive\",\n            name = \"_case_sensitive\",\n        },\n        checkbox {\n            id = \"match_exactly\",\n            name = \"_match_exactly\",\n        },\n        checkbox {\n            id = \"invert\",\n            name = {\n                [\"en\"] = \"Invert\",\n                [\"de\"] = \"Invertieren\",\n                [\"es\"] = \"Invertir\",\n                [\"fr\"] = \"Inverser\"\n            }\n        }\n    },\n\n    -- Generator function\n    generator = function(source, config)\n        local filter_label = config and config.filter_label\n        local case_sensitive = config and config.case_sensitive or false\n        local match_exactly = config and config.match_exactly or false\n        local invert = config and config.invert or false\n\n        return function()\n            local data_point = source.dp()\n            local should_match = not invert\n            while data_point and (match(data_point, filter_label, case_sensitive, match_exactly) ~= should_match) do\n                data_point = source.dp()\n            end\n            return data_point\n        end\n    end\n}\n",
       version="1.0.1"
@@ -42,6 +50,10 @@ return {
     },
     ["filter-less-than"]={
       script="-- Lua Function to filter data points by value (less than threshold)\n-- Only passes through data points with values less than a threshold\n\nlocal tng_config = require(\"tng.config\")\nlocal number = tng_config.number\nlocal checkbox = tng_config.checkbox\n\nreturn {\n    -- Configuration metadata\n    id = \"filter-less-than\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = {\"_filter\"},\n    title = {\n        [\"en\"] = \"Filter Less Than\",\n        [\"de\"] = \"Filtern kleiner als\",\n        [\"es\"] = \"Filtrar menor que\",\n        [\"fr\"] = \"Filtrer inférieur à\",\n    },\n    description = {\n        [\"en\"] = [[\nFilters data points by value. Only data points with values less than the threshold will pass through.\n\nConfiguration:\n- **Threshold**: The maximum value (exclusive by default)\n- **Include Equal**: Also include values equal to the threshold (default: false)\n]],\n        [\"de\"] = [[\nFiltert Datenpunkte nach Wert. Nur Datenpunkte mit Werten kleiner als der Schwellenwert werden durchgelassen.\n\nKonfiguration:\n- **Schwellenwert**: Der Maximalwert (standardmäßig exklusiv)\n- **Gleich einschließen**: Werte gleich dem Schwellenwert auch einschließen (Standard: false)\n]],\n        [\"es\"] = [[\nFiltra puntos de datos por valor. Solo los puntos de datos con valores menores que el umbral pasarán.\n\nConfiguración:\n- **Umbral**: El valor máximo (exclusivo por defecto)\n- **Incluir igual**: También incluir valores iguales al umbral (predeterminado: false)\n]],\n        [\"fr\"] = [[\nFiltre les points de données par valeur. Seuls les points de données avec des valeurs inférieures au seuil passeront.\n\nConfiguration:\n- **Seuil**: La valeur maximale (exclusive par défaut)\n- **Inclure égal**: Inclure également les valeurs égales au seuil (par défaut: false)\n]],\n    },\n    config = {\n        number {\n            id = \"threshold\",\n            name = {\n                [\"en\"] = \"Threshold\",\n                [\"de\"] = \"Schwellenwert\",\n                [\"es\"] = \"Umbral\",\n                [\"fr\"] = \"Seuil\",\n            },\n        },\n        checkbox {\n            id = \"include_equal\",\n            name = {\n                [\"en\"] = \"Include Equal\",\n                [\"de\"] = \"Gleich einschließen\",\n                [\"es\"] = \"Incluir igual\",\n                [\"fr\"] = \"Inclure égal\",\n            },\n        },\n    },\n\n    -- Generator function\n    generator = function(source, config)\n        local threshold = config and config.threshold or 0.0\n        local include_equal = config and config.include_equal or false\n\n        return function()\n            while true do\n                local data_point = source.dp()\n                if not data_point then\n                    return nil\n                end\n\n                local passes\n                if include_equal then\n                    passes = data_point.value <= threshold\n                else\n                    passes = data_point.value < threshold\n                end\n\n                if passes then\n                    return data_point\n                end\n            end\n        end\n    end,\n}\n",
+      version="1.0.0"
+    },
+    ["filter-within-period"]={
+      script="-- Lua Function to filter data points within a specified period from now\n-- This function calculates a cutoff timestamp by subtracting a specified period from \"now\" and only passes through data points at or after that cutoff\nlocal enum = require(\"tng.config\").enum\nlocal uint = require(\"tng.config\").uint\nlocal core = require(\"tng.core\")\n\nreturn {\n    -- Configuration metadata\n    id = \"filter-within-period\",\n    version = \"1.0.0\",\n    inputCount = 1,\n    categories = { \"_filter\", \"_time\" },\n\n    title = {\n        [\"en\"] = \"Filter Within Period\",\n        [\"de\"] = \"Filtern innerhalb Periode\",\n        [\"es\"] = \"Filtrar Dentro de Período\",\n        [\"fr\"] = \"Filtrer Dans la Période\",\n    },\n\n    description = {\n        [\"en\"] = [[\nFilters data points to only include those within the specified time period from now.\nThe cutoff is calculated by subtracting the specified period from the current time.\n\nConfiguration:\n- **Period**: Time period unit (Day, Week, Month, Year)\n- **Period Multiplier**: Number of periods to include (e.g., 2 weeks = Week + Multiplier 2)\n\nFor example, with Period=Day and Multiplier=7, only data from within the last 7 days will pass through.\n]],\n        [\"de\"] = [[\nFiltert Datenpunkte, um nur diejenigen innerhalb der angegebenen Zeitperiode von jetzt einzuschließen.\nDer Grenzwert wird berechnet, indem die angegebene Periode von der aktuellen Zeit abgezogen wird.\n\nKonfiguration:\n- **Periode**: Zeitperiodeneinheit (Tag, Woche, Monat, Jahr)\n- **Periodenmultiplikator**: Anzahl der Perioden einzuschließen (z.B. 2 Wochen = Woche + Multiplikator 2)\n\nZum Beispiel, mit Periode=Tag und Multiplikator=7, passieren nur Daten innerhalb der letzten 7 Tage durch.\n]],\n        [\"es\"] = [[\nFiltra puntos de datos para incluir solo aquellos dentro del período de tiempo especificado desde ahora.\nEl límite se calcula restando el período especificado del tiempo actual.\n\nConfiguración:\n- **Período**: Unidad de período de tiempo (Día, Semana, Mes, Año)\n- **Multiplicador de Período**: Número de períodos a incluir (ej. 2 semanas = Semana + Multiplicador 2)\n\nPor ejemplo, con Período=Día y Multiplicador=7, solo pasarán datos dentro de los últimos 7 días.\n]],\n        [\"fr\"] = [[\nFiltre les points de données pour n'inclure que ceux dans la période de temps spécifiée depuis maintenant.\nLa limite est calculée en soustrayant la période spécifiée du temps actuel.\n\nConfiguration:\n- **Période**: Unité de période de temps (Jour, Semaine, Mois, Année)\n- **Multiplicateur de Période**: Nombre de périodes à inclure (ex. 2 semaines = Semaine + Multiplicateur 2)\n\nPar exemple, avec Période=Jour et Multiplicateur=7, seules les données dans les 7 derniers jours passeront.\n]],\n    },\n\n    config = {\n        enum {\n            id = \"period\",\n            name = \"_period\",\n            options = { \"_day\", \"_week\", \"_month\", \"_year\" },\n            default = \"_month\",\n        },\n        uint {\n            id = \"period_multiplier\",\n            name = \"_period_multiplier\",\n            default = 1,\n        },\n    },\n\n    -- Generator function\n    generator = function(source, config)\n        local period_str = config and config.period or error(\"Period configuration is required\")\n        local period_multiplier = (config and config.period_multiplier) or 30\n\n        -- Don't allow 0 multiplier, fallback to 1\n        if period_multiplier == 0 then\n            period_multiplier = 1\n        end\n\n        -- Map enum string to core.PERIOD constant\n        local period_map = {\n            [\"_day\"] = core.PERIOD.DAY,\n            [\"_week\"] = core.PERIOD.WEEK,\n            [\"_month\"] = core.PERIOD.MONTH,\n            [\"_year\"] = core.PERIOD.YEAR,\n        }\n        local period = period_map[period_str]\n        if not period then\n            error(\"Invalid period: \" .. tostring(period_str))\n        end\n\n        -- Calculate cutoff timestamp: now - (period * multiplier)\n        local now = core.time()\n        local cutoff = core.shift(now, period, -period_multiplier)\n        local cutoff_timestamp = cutoff.timestamp\n\n        return function()\n            local data_point = source.dp()\n            if not data_point then\n                return nil\n            end\n\n            -- Only return data points at or after the cutoff\n            if data_point.timestamp >= cutoff_timestamp then\n                return data_point\n            end\n        end\n    end,\n}\n",
       version="1.0.0"
     },
     floor={
@@ -85,7 +97,11 @@ return {
       version="1.0.0"
     },
     ["snap-time-to"]={
-      script="-- Lua Function to snap data point timestamps to a specific time of day\n-- This function adjusts timestamps to the specified time of day based on the direction (next, previous, or nearest)\n\nlocal localtime = require(\"tng.config\").localtime\nlocal enum = require(\"tng.config\").enum\nlocal core = require(\"tng.core\")\n\nreturn {\n  -- Configuration metadata\n  id = \"snap-time-to\",\n  version = \"1.0.0\",\n  inputCount = 1,\n  categories = { \"_time\" },\n\n  title = {\n    [\"en\"] = \"Snap Time To\",\n    [\"de\"] = \"Zeit Einrasten Auf\",\n    [\"es\"] = \"Ajustar Tiempo A\",\n    [\"fr\"] = \"Aligner l'Heure Sur\",\n  },\n\n  description = {\n    [\"en\"] = [[\nSnaps data point timestamps to a specific time of day.\n\n- Time of Day: The target time (e.g., 09:30:00)\n- Direction: Next, Previous, or Nearest occurrence of that time\n]],\n    [\"de\"] = [[\nRastet Datenpunkt-Zeitstempel auf eine bestimmte Tageszeit ein.\n\n- Tageszeit: Die Zielzeit (z.B. 09:30:00)\n- Richtung: Nächste, Vorherige oder Nächstgelegene Occurrence dieser Zeit\n]],\n    [\"es\"] = [[\nAjusta las marcas de tiempo de los puntos de datos a una hora específica del día.\n\n- Hora del Día: La hora objetivo (ej. 09:30:00)\n- Dirección: Siguiente, Anterior, o Más Cercana ocurrencia de esa hora\n]],\n    [\"fr\"] = [[\nAligne les horodatages des points de données sur une heure spécifique de la journée.\n\n- Heure du Jour: L'heure cible (ex. 09:30:00)\n- Direction: Prochaine, Précédente, ou Plus Proche occurrence de cette heure\n]],\n  },\n\n  config = {\n    localtime {\n      id = \"target_time\",\n      name = {\n        [\"en\"] = \"Time of Day\",\n        [\"de\"] = \"Tageszeit\",\n        [\"es\"] = \"Hora del Día\",\n        [\"fr\"] = \"Heure du Jour\",\n      },\n      default = 9 * core.DURATION.HOUR, -- 09:00:00\n    },\n    enum {\n      id = \"direction\",\n      name = {\n        [\"en\"] = \"Direction\",\n        [\"de\"] = \"Richtung\",\n        [\"es\"] = \"Dirección\",\n        [\"fr\"] = \"Direction\",\n      },\n      options = { \"_next\", \"_previous\", \"_nearest\" },\n      default = \"_nearest\",\n    },\n  },\n\n  -- Generator function\n  generator = function(source, config)\n    local target_time = config and config.target_time or error(\"Target time is required\")\n    local direction = config and config.direction or error(\"Direction is required\")\n\n    return function()\n      local data_point = source.dp()\n      if not data_point then\n        return nil\n      end\n\n      -- Get the date components of the data point\n      local date = core.date(data_point)\n\n      -- Calculate the target time on the same date\n      local same_day_target = core.time({\n        year = date.year,\n        month = date.month,\n        day = date.day,\n        hour = 0,\n        min = 0,\n        sec = 0,\n        zone = date.zone\n      })\n      same_day_target = core.shift(same_day_target, target_time)\n\n      local new_timestamp\n\n      if direction == \"_next\" then\n        -- Find next occurrence of target time\n        if data_point.timestamp <= same_day_target.timestamp then\n          new_timestamp = same_day_target\n        else\n          -- Next day\n          new_timestamp = core.shift(same_day_target, core.PERIOD.DAY)\n        end\n      elseif direction == \"_previous\" then\n        -- Find previous occurrence of target time\n        if data_point.timestamp >= same_day_target.timestamp then\n          new_timestamp = same_day_target\n        else\n          -- Previous day\n          new_timestamp = core.shift(same_day_target, core.PERIOD.DAY, -1)\n        end\n      else -- \"_nearest\"\n        -- Find nearest occurrence of target time\n        local other_target\n        if data_point.timestamp <= same_day_target.timestamp then\n          other_target = core.shift(same_day_target, core.PERIOD.DAY, -1)\n        else\n          other_target = core.shift(same_day_target, core.PERIOD.DAY)\n        end\n\n        local diff_same = math.abs(data_point.timestamp - same_day_target.timestamp)\n        local diff_other = math.abs(data_point.timestamp - other_target.timestamp)\n\n        if diff_same <= diff_other then\n          new_timestamp = same_day_target\n        else\n          new_timestamp = other_target\n        end\n      end\n\n      -- Return data point with adjusted timestamp\n      return {\n        timestamp = new_timestamp.timestamp,\n        offset = new_timestamp.offset,\n        value = data_point.value,\n        label = data_point.label,\n        note = data_point.note,\n      }\n    end\n  end,\n}\n",
+      script="-- Lua Function to snap data point timestamps to a specific time of day\n-- This function adjusts timestamps to the specified time of day based on the direction (next, previous, or nearest)\n\nlocal localtime = require(\"tng.config\").localtime\nlocal enum = require(\"tng.config\").enum\nlocal core = require(\"tng.core\")\n\nreturn {\n  -- Configuration metadata\n  id = \"snap-time-to\",\n  version = \"1.0.1\",\n  inputCount = 1,\n  categories = { \"_time\" },\n\n  title = {\n    [\"en\"] = \"Snap Time To\",\n    [\"de\"] = \"Zeit Einrasten Auf\",\n    [\"es\"] = \"Ajustar Tiempo A\",\n    [\"fr\"] = \"Aligner l'Heure Sur\",\n  },\n\n  description = {\n    [\"en\"] = [[\nSnaps data point timestamps to a specific time of day.\n\n- Time of Day: The target time (e.g., 09:30:00)\n- Direction: Next, Previous, or Nearest occurrence of that time\n]],\n    [\"de\"] = [[\nRastet Datenpunkt-Zeitstempel auf eine bestimmte Tageszeit ein.\n\n- Tageszeit: Die Zielzeit (z.B. 09:30:00)\n- Richtung: Nächste, Vorherige oder Nächstgelegene Occurrence dieser Zeit\n]],\n    [\"es\"] = [[\nAjusta las marcas de tiempo de los puntos de datos a una hora específica del día.\n\n- Hora del Día: La hora objetivo (ej. 09:30:00)\n- Dirección: Siguiente, Anterior, o Más Cercana ocurrencia de esa hora\n]],\n    [\"fr\"] = [[\nAligne les horodatages des points de données sur une heure spécifique de la journée.\n\n- Heure du Jour: L'heure cible (ex. 09:30:00)\n- Direction: Prochaine, Précédente, ou Plus Proche occurrence de cette heure\n]],\n  },\n\n  config = {\n    localtime {\n      id = \"target_time\",\n      name = {\n        [\"en\"] = \"Time of Day\",\n        [\"de\"] = \"Tageszeit\",\n        [\"es\"] = \"Hora del Día\",\n        [\"fr\"] = \"Heure du Jour\",\n      },\n      default = 9 * core.DURATION.HOUR, -- 09:00:00\n    },\n    enum {\n      id = \"direction\",\n      name = {\n        [\"en\"] = \"Direction\",\n        [\"de\"] = \"Richtung\",\n        [\"es\"] = \"Dirección\",\n        [\"fr\"] = \"Direction\",\n      },\n      options = { \"_next\", \"_nearest\", \"_last\" },\n      default = \"_nearest\",\n    },\n  },\n\n  -- Generator function\n  generator = function(source, config)\n    local target_time = config and config.target_time or error(\"Target time is required\")\n    local direction = config and config.direction or error(\"Direction is required\")\n\n    return function()\n      local data_point = source.dp()\n      if not data_point then\n        return nil\n      end\n\n      -- Get the date components of the data point\n      local date = core.date(data_point)\n\n      -- Calculate the target time on the same date\n      local same_day_target = core.time({\n        year = date.year,\n        month = date.month,\n        day = date.day,\n        hour = 0,\n        min = 0,\n        sec = 0,\n        zone = date.zone\n      })\n      same_day_target = core.shift(same_day_target, target_time)\n\n      local new_timestamp\n\n      if direction == \"_next\" then\n        -- Find next occurrence of target time\n        if data_point.timestamp <= same_day_target.timestamp then\n          new_timestamp = same_day_target\n        else\n          -- Next day\n          new_timestamp = core.shift(same_day_target, core.PERIOD.DAY)\n        end\n      elseif direction == \"_last\" then\n        -- Find previous occurrence of target time\n        if data_point.timestamp >= same_day_target.timestamp then\n          new_timestamp = same_day_target\n        else\n          -- Previous day\n          new_timestamp = core.shift(same_day_target, core.PERIOD.DAY, -1)\n        end\n      else -- \"_nearest\"\n        -- Find nearest occurrence of target time\n        local other_target\n        if data_point.timestamp <= same_day_target.timestamp then\n          other_target = core.shift(same_day_target, core.PERIOD.DAY, -1)\n        else\n          other_target = core.shift(same_day_target, core.PERIOD.DAY)\n        end\n\n        local diff_same = math.abs(data_point.timestamp - same_day_target.timestamp)\n        local diff_other = math.abs(data_point.timestamp - other_target.timestamp)\n\n        if diff_same <= diff_other then\n          new_timestamp = same_day_target\n        else\n          new_timestamp = other_target\n        end\n      end\n\n      -- Return data point with adjusted timestamp\n      return {\n        timestamp = new_timestamp.timestamp,\n        offset = new_timestamp.offset,\n        value = data_point.value,\n        label = data_point.label,\n        note = data_point.note,\n      }\n    end\n  end,\n}\n",
+      version="1.0.1"
+    },
+    ["snap-to-weekday"]={
+      script="-- Lua Function to snap data point timestamps to the same local time on a specific weekday\n-- This function adjusts timestamps to the same local time but on the specified weekday based on the direction (next, last, or nearest)\n\nlocal enum = require(\"tng.config\").enum\nlocal core = require(\"tng.core\")\n\nreturn {\n  -- Configuration metadata\n  id = \"snap-to-weekday\",\n  version = \"1.0.0\",\n  inputCount = 1,\n  categories = { \"_time\" },\n\n  title = {\n    [\"en\"] = \"Snap To Weekday\",\n    [\"de\"] = \"Auf Wochentag Einrasten\",\n    [\"es\"] = \"Ajustar A Día De La Semana\",\n    [\"fr\"] = \"Aligner Sur Jour De La Semaine\",\n  },\n\n  description = {\n    [\"en\"] = [[\nSnaps data point timestamps to the same local time on a specific weekday.\n\n- Weekday: The target day of the week (Monday through Sunday)\n- Direction: Last, Nearest, or Next occurrence of that local time on that weekday\n\nThe data point keeps its original time of day but moves to the specified weekday.\n]],\n    [\"de\"] = [[\nRastet Datenpunkt-Zeitstempel auf die gleiche Ortszeit an einem bestimmten Wochentag ein.\n\n- Wochentag: Der Ziel-Wochentag (Montag bis Sonntag)\n- Richtung: Letzte, Nächstgelegene oder Nächste Occurrence dieser Ortszeit an diesem Wochentag\n\nDer Datenpunkt behält seine ursprüngliche Tageszeit bei, wird aber auf den angegebenen Wochentag verschoben.\n]],\n    [\"es\"] = [[\nAjusta las marcas de tiempo de los puntos de datos a la misma hora local en un día específico de la semana.\n\n- Día de la Semana: El día objetivo de la semana (Lunes a Domingo)\n- Dirección: Última, Más Cercana, o Siguiente ocurrencia de esa hora local en ese día de la semana\n\nEl punto de datos mantiene su hora original del día pero se mueve al día de la semana especificado.\n]],\n    [\"fr\"] = [[\nAligne les horodatages des points de données sur la même heure locale d'un jour spécifique de la semaine.\n\n- Jour de la Semaine: Le jour cible de la semaine (Lundi à Dimanche)\n- Direction: Dernière, Plus Proche, ou Prochaine occurrence de cette heure locale ce jour de la semaine\n\nLe point de données conserve son heure d'origine mais se déplace vers le jour de la semaine spécifié.\n]],\n  },\n\n  config = {\n    enum {\n      id = \"target_weekday\",\n      name = {\n        [\"en\"] = \"Weekday\",\n        [\"de\"] = \"Wochentag\",\n        [\"es\"] = \"Día de la Semana\",\n        [\"fr\"] = \"Jour de la Semaine\",\n      },\n      options = { \"_monday\", \"_tuesday\", \"_wednesday\", \"_thursday\", \"_friday\", \"_saturday\", \"_sunday\" },\n      default = \"_monday\",\n    },\n    enum {\n      id = \"direction\",\n      name = {\n        [\"en\"] = \"Direction\",\n        [\"de\"] = \"Richtung\",\n        [\"es\"] = \"Dirección\",\n        [\"fr\"] = \"Direction\",\n      },\n      options = { \"_next\", \"_nearest\", \"_last\" },\n      default = \"_nearest\",\n    },\n  },\n\n  -- Generator function\n  generator = function(source, config)\n    local target_weekday = config and config.target_weekday or error(\"target_weekday is required\")\n    local direction = config and config.direction or error(\"direction is required\")\n\n    -- Map weekday strings to numbers (Monday = 1, Sunday = 7)\n    local weekday_map = {\n      [\"_monday\"] = 1,\n      [\"_tuesday\"] = 2,\n      [\"_wednesday\"] = 3,\n      [\"_thursday\"] = 4,\n      [\"_friday\"] = 5,\n      [\"_saturday\"] = 6,\n      [\"_sunday\"] = 7,\n    }\n    local target_wday = weekday_map[target_weekday]\n    if not target_wday then\n      error(\"Invalid weekday: \" .. target_weekday)\n    end\n\n    return function()\n      local data_point = source.dp()\n      if not data_point then\n        return nil\n      end\n\n      -- Get the date components of the data point\n      local date = core.date(data_point)\n      local current_wday = date.wday\n\n      -- Calculate days difference to target weekday\n      local days_to_target = (target_wday - current_wday) % 7\n\n      -- Calculate the target time on the target weekday in the same week\n      -- Use the original time components from the data point\n      local next_target = core.shift(data_point, core.PERIOD.DAY, days_to_target)\n\n      local new_timestamp\n\n      if days_to_target == 0 then\n        -- Already on target weekday, no change needed\n        new_timestamp = data_point\n      elseif direction == \"_next\" then\n        new_timestamp = next_target\n      elseif direction == \"_last\" then\n        new_timestamp = core.shift(next_target, core.PERIOD.WEEK, -1)\n      else -- \"_nearest\"\n        -- Find nearest occurrence of same time on target weekday\n        local last_target = core.shift(next_target, core.PERIOD.WEEK, -1)\n        local next_diff = math.abs(next_target.timestamp - data_point.timestamp)\n        local last_diff = math.abs(data_point.timestamp - last_target.timestamp)\n\n        if next_diff < last_diff then\n          new_timestamp = next_target\n        else\n          new_timestamp = last_target\n        end\n      end\n\n      -- Return data point with adjusted timestamp\n      return {\n        timestamp = new_timestamp.timestamp,\n        offset = new_timestamp.offset,\n        value = data_point.value,\n        label = data_point.label,\n        note = data_point.note,\n      }\n    end\n  end,\n}\n",
       version="1.0.0"
     },
     ["swap-label-note"]={
@@ -133,7 +149,7 @@ return {
       version="1.0.0"
     }
   },
-  published_at="2025-11-04T22:19:00Z",
+  published_at="2025-11-05T13:52:40Z",
   translations={
     _addition={
       de="Addition",
@@ -183,12 +199,6 @@ return {
       es="Día",
       fr="Jour"
     },
-    _days={
-      de="Tage",
-      en="Days",
-      es="Días",
-      fr="Jours"
-    },
     _division={
       de="Division",
       en="Division",
@@ -201,17 +211,17 @@ return {
       es="Filtro",
       fr="Filtre"
     },
+    _friday={
+      de="Freitag",
+      en="Friday",
+      es="Viernes",
+      fr="Vendredi"
+    },
     _generators={
       de="Generatoren",
       en="Generators",
       es="Generadores",
       fr="Générateurs"
-    },
-    _hours={
-      de="Stunden",
-      en="Hours",
-      es="Horas",
-      fr="Heures"
     },
     _label_and_note={
       de="Label und Notiz",
@@ -224,6 +234,12 @@ return {
       en="Label Only",
       es="Solo etiqueta",
       fr="Étiquette uniquement"
+    },
+    _last={
+      de="Letzte",
+      en="Last",
+      es="Último",
+      fr="Dernier"
     },
     _match_exactly={
       de="Exakt übereinstimmen",
@@ -242,6 +258,12 @@ return {
       en="Min Value",
       es="Valor Mínimo",
       fr="Valeur Minimale"
+    },
+    _monday={
+      de="Montag",
+      en="Monday",
+      es="Lunes",
+      fr="Lundi"
     },
     _month={
       de="Monat",
@@ -303,12 +325,6 @@ return {
       es="Multiplicador de Período",
       fr="Multiplicateur de Période"
     },
-    _previous={
-      de="Vorherige",
-      en="Previous",
-      es="Anterior",
-      fr="Précédent"
-    },
     _randomisers={
       de="Zufallsgeneratoren",
       en="Randomisers",
@@ -326,6 +342,12 @@ return {
       en="Reset on Label Match",
       es="Restablecer al Coincidir Etiqueta",
       fr="Réinitialiser sur Correspondance d'Étiquette"
+    },
+    _saturday={
+      de="Samstag",
+      en="Saturday",
+      es="Sábado",
+      fr="Samedi"
     },
     _seed={
       de="Seed",
@@ -345,6 +367,18 @@ return {
       es="Resta",
       fr="Soustraction"
     },
+    _sunday={
+      de="Sonntag",
+      en="Sunday",
+      es="Domingo",
+      fr="Dimanche"
+    },
+    _thursday={
+      de="Donnerstag",
+      en="Thursday",
+      es="Jueves",
+      fr="Jeudi"
+    },
     _time={
       de="Zeit",
       en="Time",
@@ -362,6 +396,12 @@ return {
       en="Transform",
       es="Transformar",
       fr="Transformer"
+    },
+    _tuesday={
+      de="Dienstag",
+      en="Tuesday",
+      es="Martes",
+      fr="Mardi"
     },
     _value_and_label={
       de="Wert und Label",
@@ -381,17 +421,17 @@ return {
       es="Solo valor",
       fr="Valeur uniquement"
     },
+    _wednesday={
+      de="Mittwoch",
+      en="Wednesday",
+      es="Miércoles",
+      fr="Mercredi"
+    },
     _week={
       de="Woche",
       en="Week",
       es="Semana",
       fr="Semaine"
-    },
-    _weeks={
-      de="Wochen",
-      en="Weeks",
-      es="Semanas",
-      fr="Semaines"
     },
     _year={
       de="Jahr",
