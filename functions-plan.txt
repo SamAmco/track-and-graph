@@ -43,12 +43,6 @@ FUNCTIONS PLANNING
   - Threshold (period enum)
   - Period multiplier (uint)
 
-- Time cutoff from duration ago
-  - Cutoff duration (duration)
-- Time cutoff from period ago
-  - Cutoff period (period enum)
-  - Period multiplier (uint)
-
 - duration based Standard deviation
   - Window size (duration enum)
   - Duration multiplier (uint)
@@ -107,8 +101,6 @@ FUNCTIONS PLANNING
   - day of month (number)
 - Snap to nearest month day
   - day of month (number)
-- Snap to next end of period
-  - period (enum)
 
 - Filter greater than other tracker
 - Filter less than other tracker
