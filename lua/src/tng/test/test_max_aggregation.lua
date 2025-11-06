@@ -12,7 +12,7 @@ print("Testing max aggregator...\n")
 
 -- Test max aggregator creation
 test("max_aggregator creates aggregator instance", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 	assert(max_agg ~= nil)
 	assert(type(max_agg.push) == "function")
 	assert(type(max_agg.pop) == "function")
@@ -22,7 +22,7 @@ end)
 
 -- Test max aggregator with single data point
 test("max_aggregator handles single data point", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 	local dp = create_data_point(1000, 5.0)
 
 	max_agg:push(dp)
@@ -34,7 +34,7 @@ end)
 
 -- Test max aggregator with multiple data points
 test("max_aggregator finds maximum value", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	max_agg:push(create_data_point(1000, 10.0))
 	max_agg:push(create_data_point(2000, 5.0))
@@ -47,7 +47,7 @@ end)
 
 -- Test max aggregator with negative values
 test("max_aggregator handles negative values", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	max_agg:push(create_data_point(1000, -5.0))
 	max_agg:push(create_data_point(2000, -10.0))
@@ -60,7 +60,7 @@ end)
 
 -- Test max aggregator with duplicate maximum values
 test("max_aggregator handles duplicate maximum values", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	max_agg:push(create_data_point(1000, 5.0))
 	max_agg:push(create_data_point(2000, 8.0))
@@ -73,7 +73,7 @@ end)
 
 -- Test max aggregator midpoint calculation
 test("max_aggregator calculates correct midpoint timestamp", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	max_agg:push(create_data_point(1000, 10.0))
 	max_agg:push(create_data_point(5000, 15.0))
@@ -86,7 +86,7 @@ end)
 
 -- Test max aggregator pop functionality
 test("max_aggregator pop removes oldest element", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	max_agg:push(create_data_point(1000, 10.0))
 	max_agg:push(create_data_point(2000, 15.0))
@@ -106,7 +106,7 @@ end)
 
 -- Test max aggregator pop when maximum is removed
 test("max_aggregator pop updates maximum when maximum is removed", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	max_agg:push(create_data_point(1000, 15.0)) -- This will be the maximum
 	max_agg:push(create_data_point(2000, 10.0))
@@ -126,7 +126,7 @@ end)
 
 -- Test max aggregator with sliding window behavior
 test("max_aggregator maintains sliding window correctly", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	-- Add initial data points
 	max_agg:push(create_data_point(1000, 8.0))
@@ -156,7 +156,7 @@ end)
 
 -- Test sliding window with fixed size over a data sequence
 test("max_aggregator correctly handles sliding window over data sequence", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 	local window_size = 3
 
 	-- Test data sequence: [8, 3, 5, 4, 7, 6, 2, 1, 9]
@@ -204,7 +204,7 @@ end)
 
 -- Test sliding window performance characteristics (verify deque optimization)
 test("max_aggregator efficiently handles large sliding window", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 	local window_size = 5
 
 	-- Create a larger dataset with known maximum pattern
@@ -246,7 +246,7 @@ end)
 
 -- Test growing then shrinking window
 test("max_aggregator handles growing then shrinking window correctly", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	-- Values to push: [2, 8, 4, 15, 6]
 	local values = { 2, 8, 4, 15, 6 }
@@ -287,7 +287,7 @@ end)
 
 -- Test error cases
 test("max_aggregator throws error on empty window", function()
-	local max_agg = aggregation.max_aggregator()
+	local max_agg = aggregation.running_max_aggregator()
 
 	local ok, err = pcall(function()
 		max_agg:run()

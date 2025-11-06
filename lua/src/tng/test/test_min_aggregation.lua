@@ -12,7 +12,7 @@ print("Testing min aggregator...\n")
 
 -- Test min aggregator creation
 test("min_aggregator creates aggregator instance", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 	assert(min_agg ~= nil)
 	assert(type(min_agg.push) == "function")
 	assert(type(min_agg.pop) == "function")
@@ -22,7 +22,7 @@ end)
 
 -- Test min aggregator with single data point
 test("min_aggregator handles single data point", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 	local dp = create_data_point(1000, 5.0)
 
 	min_agg:push(dp)
@@ -34,7 +34,7 @@ end)
 
 -- Test min aggregator with multiple data points
 test("min_aggregator finds minimum value", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	min_agg:push(create_data_point(1000, 10.0))
 	min_agg:push(create_data_point(2000, 5.0))
@@ -47,7 +47,7 @@ end)
 
 -- Test min aggregator with negative values
 test("min_aggregator handles negative values", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	min_agg:push(create_data_point(1000, -5.0))
 	min_agg:push(create_data_point(2000, 10.0))
@@ -60,7 +60,7 @@ end)
 
 -- Test min aggregator with duplicate minimum values
 test("min_aggregator handles duplicate minimum values", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	min_agg:push(create_data_point(1000, 5.0))
 	min_agg:push(create_data_point(2000, 3.0))
@@ -73,7 +73,7 @@ end)
 
 -- Test min aggregator midpoint calculation
 test("min_aggregator calculates correct midpoint timestamp", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	min_agg:push(create_data_point(1000, 10.0))
 	min_agg:push(create_data_point(5000, 5.0))
@@ -86,7 +86,7 @@ end)
 
 -- Test min aggregator pop functionality
 test("min_aggregator pop removes oldest element", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	min_agg:push(create_data_point(1000, 10.0))
 	min_agg:push(create_data_point(2000, 5.0))
@@ -106,7 +106,7 @@ end)
 
 -- Test min aggregator pop when minimum is removed
 test("min_aggregator pop updates minimum when minimum is removed", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	min_agg:push(create_data_point(1000, 3.0)) -- This will be the minimum
 	min_agg:push(create_data_point(2000, 10.0))
@@ -126,7 +126,7 @@ end)
 
 -- Test min aggregator with sliding window behavior
 test("min_aggregator maintains sliding window correctly", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	-- Add initial data points
 	min_agg:push(create_data_point(1000, 8.0))
@@ -156,7 +156,7 @@ end)
 
 -- Test sliding window with fixed size over a data sequence
 test("min_aggregator handles sliding window size 3", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 	local window_size = 3
 
 	-- Test data sequence: [8, 3, 5, 4, 7, 6, 2, 1, 9]
@@ -203,7 +203,7 @@ test("min_aggregator handles sliding window size 3", function()
 end)
 
 test("min_aggregator handles sliding window size 5", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 	local window_size = 5
 
 	-- Create a larger dataset with known minimum pattern
@@ -245,7 +245,7 @@ end)
 
 -- Test growing then shrinking window
 test("min_aggregator handles growing then shrinking window correctly", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	-- Values to push: [7, 3, 9, 1, 5]
 	local values = { 7, 3, 9, 1, 5 }
@@ -286,7 +286,7 @@ end)
 
 -- Test error cases
 test("min_aggregator throws error on empty window", function()
-	local min_agg = aggregation.min_aggregator()
+	local min_agg = aggregation.running_min_aggregator()
 
 	local ok, err = pcall(function()
 		min_agg:run()
