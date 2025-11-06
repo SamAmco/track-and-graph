@@ -1,6 +1,6 @@
 local M = {}
 
--- Although Lua has built-in math.random and math.randomseed functions, the stability of those 
+-- Although Lua has built-in math.random and math.randomseed functions, the stability of those
 -- generated numbers across different Lua versions and platforms is not guaranteed.
 -- Also the current Lua engine implementation supports only a single 32 bit seed, which
 -- can be tricky to work with if you are trying to seed from an epoch milliseconds timestamp
@@ -21,7 +21,7 @@ M.Random = {}
 --- @param min number?: The minimum value (inclusive) of the random number. Defaults to 0.0.
 --- @param max number?: The maximum value (exclusive) of the random number. Defaults to 1.0.
 --- @return number: A double in the range [min, max).
-M.Random.next = function(self, min, max) end
+function M.Random:next(min, max) end
 
 --- Creates a new Random object seeded with the given values.
 --- @since (API level 2)

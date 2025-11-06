@@ -17,94 +17,22 @@ QA:
 
 FUNCTIONS PLANNING
 
-- Duration clustered max
-  - Threshold (duration enum)
-  - Duration multiplier (uint)
-- Duration clustered min
-  - Threshold (duration enum)
-  - Duration multiplier (uint)
-- Duration clustered average
-  - Threshold (duration enum)
-  - Duration multiplier (uint)
-- Duration clustered sum
-  - Threshold (duration enum)
-  - Duration multiplier (uint)
+- Adaptive time clustering
+  - Max time delta (enum: second, minute, hour, day, week, month, year)
+  - Time delta multiplier (uint)
+  - Aggregation method (enum: max, min, average, sum, standard deviation, variance)
 
-- Period clustered max
-  - Threshold (period enum)
-  - Period multiplier (uint)
-- Period clustered min
-  - Threshold (period enum)
-  - Period multiplier (uint)
-- Period clustered average
-  - Threshold (period enum)
-  - Period multiplier (uint)
-- Period clustered sum
-  - Threshold (period enum)
-  - Period multiplier (uint)
+- Sliding window aggregation
+  - Window size (enum: second, minute, hour, day, week, month, year)
+  - Window size multiplier (uint)
+  - Aggregation method (enum: max, min, average, sum, standard deviation, variance)
 
-- duration based Standard deviation
-  - Window size (duration enum)
-  - Duration multiplier (uint)
-  - Moving window (boolean)
-- duration based Variance
-  - Window size (duration enum)
-  - Duration multiplier (uint)
-  - Moving window (boolean)
-- duration based Average
-  - Window size (duration enum)
-  - Duration multiplier (uint)
-  - Moving window (boolean)
-- duration based Sum
-  - Window size (duration enum)
-  - Duration multiplier (uint)
-  - Moving window (boolean)
-- duration based Minimum
-  - Window size (duration enum)
-  - Duration multiplier (uint)
-  - Moving window (boolean)
-- duration based Maximum
-  - Window size (duration enum)
-  - Duration multiplier (uint)
-  - Moving window (boolean)
-
-- period based Standard deviation
-  - Window size (period enum)
-  - period multiplier (uint)
-  - Moving window (boolean)
-- period based Variance
-  - Window size (period enum)
-  - period multiplier (uint)
-  - Moving window (boolean)
-- period based Average
-  - Window size (period enum)
-  - period multiplier (uint)
-  - Moving window (boolean)
-- period based Sum
-  - Window size (period enum)
-  - period multiplier (uint)
-  - Moving window (boolean)
-- period based Minimum
-  - Window size (period enum)
-  - period multiplier (uint)
-  - Moving window (boolean)
-- period based Maximum
-  - Window size (period enum)
-  - period multiplier (uint)
-  - Moving window (boolean)
-
-- Snap to nearest week day
-  - day of week (enum)
-- Snap to next week day
-  - day of week (enum)
-- Snap to next month day
-  - day of month (number)
-- Snap to nearest month day
-  - day of month (number)
+- Snap to month day
+  - target day of month (uint)
+  - direction (enum: last, nearest, next)
 
 - Filter greater than other tracker
 - Filter less than other tracker
-
 
 
 Use cases: 
