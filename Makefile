@@ -136,8 +136,12 @@ lua-publish-prod:
 lua-print-catalog:
 	cd lua && lua tools/print-catalog.lua
 
+.PHONY: lua-test-api
+lua-test-api:
+	cd lua && lua src/tng/test/test_all.lua
+
 .PHONY: validate-all
-validate-all: validate-remote-config run-community-tests
+validate-all: lua-test-api validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
 	@echo "All validations passed."
 
 .PHONY: assemble-release
