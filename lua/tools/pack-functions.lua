@@ -2,13 +2,13 @@
 -- pack-functions.lua
 -- Packs community Lua functions into a single distributable catalog
 
-local serpent = require("serpent")
 local validation = require("tools.lib.validation")
 local semver = require("tools.lib.semver")
 local changes = require("tools.lib.changes")
 local versioning = require("tools.lib.catalog-versioning")
 local api_specs = require("tools.lib.api-specs")
 local traversal = require("tools.lib.file-traversal")
+local catalog_encoding = require("tools.lib.catalog-encoding")
 
 -- Configuration
 local FUNCTIONS_DIR = "src/community/functions"
@@ -306,15 +306,7 @@ local function main()
 	os.execute("mkdir -p catalog")
 
 	-- Serialize and write
-	local output_content = "return "
-		.. serpent.block(catalog, {
-			comment = false,
-			sortkeys = true,
-			compact = true,
-			fatal = true,
-			nocode = true,
-			nohuge = true,
-		})
+	local output_content = catalog_encoding.encode_catalog(catalog)
 
 	write_file(CATALOG_PATH, output_content)
 
