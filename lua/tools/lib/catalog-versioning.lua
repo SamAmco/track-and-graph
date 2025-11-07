@@ -34,7 +34,7 @@ function M.load_catalog(path)
 end
 
 --- Generate ISO 8601 timestamp in UTC
---- @return string: Timestamp like "2025-10-08T23:45:12Z"
+--- @return string|osdate: Timestamp like "2025-10-08T23:45:12Z"
 function M.generate_timestamp()
 	return os.date("!%Y-%m-%dT%H:%M:%SZ")
 end
