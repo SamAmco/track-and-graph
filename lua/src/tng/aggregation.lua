@@ -281,30 +281,13 @@ M.stdev_aggregator = function()
   return var_agg
 end
 
-
 --- Create a count aggregator that returns the number of data points in the sliding window
 --- @return Aggregator: An aggregator that counts the number of data points in the sliding window
 --- @since API level 3
 M.count_aggregator = function()
-  local count = 0
-
-  local aggregator = new_aggregator(function(self)
-    return self:mid_point(count)
+  return new_aggregator(function(self)
+    return self:mid_point(#self.window)
   end)
-
-  function aggregator:push(data_point)
-    table.insert(self.window, data_point)
-    count = count + 1
-  end
-
-  function aggregator:pop()
-    if #self.window > 0 then
-      table.remove(self.window, 1)
-      count = count - 1
-    end
-  end
-
-  return aggregator
 end
 
 
