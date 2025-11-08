@@ -41,8 +41,8 @@ function Aggregator:mid_point(value)
     timestamp = oldest_dp.timestamp + half_diff,
     offset = oldest_dp.offset,
     value = value,
-    label = oldest_dp.label,
-    note = oldest_dp.note,
+    label = newest_dp.label,
+    note = newest_dp.note,
   }
 end
 
