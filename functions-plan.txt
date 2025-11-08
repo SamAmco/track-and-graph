@@ -17,19 +17,11 @@ QA:
 
 FUNCTIONS PLANNING
 
-- Adaptive time clustering
-  - Max time delta (enum: second, minute, hour, day, week, month, year)
-  - Time delta multiplier (uint)
-  - Aggregation method (enum: max, min, average, sum, standard deviation, variance)
-
-- Sliding window aggregation
-  - Window size (enum: second, minute, hour, day, week, month, year)
-  - Window size multiplier (uint)
-  - Aggregation method (enum: max, min, average, sum, standard deviation, variance)
-
 - Snap to month day
   - target day of month (uint)
   - direction (enum: last, nearest, next)
+
+- Correlation co-efficient
 
 - Filter greater than other tracker
 - Filter less than other tracker
