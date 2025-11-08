@@ -56,7 +56,7 @@ M.date = function(timestamp) end
 --- Using periods will respect daylight savings time and other time zone changes. Where as using a duration will just move the timestamp by that amount of milliseconds.
 ---
 --- @since v5.1.0 (API level 1)
---- @param datetime (Timestamp|Date|integer): The date or time to shift. If it is an integer, it will mean the timestamp in milliseconds since the epoch.
+--- @param datetime (DataPoint|Timestamp|Date|integer): The date or time to shift. If it is an integer, it will mean the timestamp in milliseconds since the epoch.
 --- @param unit (DURATION|PERIOD): The units to shift by. Can be a duration in milliseconds (e.g. DURATION.DAY) or a period string (e.g. PERIOD.DAY).
 --- @param amount? integer: Multiplier for the units. Defaults to 1. Useful if you are passing a period string.
 --- @return Timestamp: The shifted timestamp.
