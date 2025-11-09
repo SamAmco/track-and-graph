@@ -9,11 +9,11 @@ local PDAY = core.PERIOD.DAY
 local now = core.time().timestamp
 local shift = core.shift
 
-M["test window is inclusive and preserves data"] = {
+M["test threshold is inclusive and preserves data"] = {
   config = {
     aggregation_type = "_count",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -43,11 +43,11 @@ M["test window is inclusive and preserves data"] = {
   end
 }
 
-M["test window rolling includes relevant data"] = {
+M["test threshold rolling includes relevant data"] = {
   config = {
     aggregation_type = "_count",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -73,11 +73,11 @@ M["test window rolling includes relevant data"] = {
   end
 }
 
-M["test window rolling includes relevant data no clusters"] = {
+M["test threshold rolling includes relevant data no clusters"] = {
   config = {
     aggregation_type = "_count",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -99,11 +99,11 @@ M["test window rolling includes relevant data no clusters"] = {
   end
 }
 
-M["test window rolling includes relevant data all clusters"] = {
+M["test threshold rolling includes relevant data all clusters"] = {
   config = {
     aggregation_type = "_count",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -127,11 +127,11 @@ M["test window rolling includes relevant data all clusters"] = {
   end
 }
 
-M["test window rolling includes relevant data period and multiplier"] = {
+M["test threshold rolling includes relevant data period and multiplier"] = {
   config = {
     aggregation_type = "_count",
     multiplier = 2,
-    window = "_months"
+    threshold = "_months"
   },
   sources = function()
     return {
@@ -156,11 +156,11 @@ M["test window rolling includes relevant data period and multiplier"] = {
   end
 }
 
-M["test empty window returns empty"] = {
+M["test empty threshold returns empty"] = {
   config = {
     aggregation_type = "_count",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return { {} }
@@ -174,7 +174,7 @@ M["test min works"] = {
   config = {
     aggregation_type = "_min",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -204,7 +204,7 @@ M["test max works"] = {
   config = {
     aggregation_type = "_max",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -234,7 +234,7 @@ M["test average works"] = {
   config = {
     aggregation_type = "_average",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -264,7 +264,7 @@ M["test sum works"] = {
   config = {
     aggregation_type = "_sum",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -294,7 +294,7 @@ M["test variance works"] = {
   config = {
     aggregation_type = "_variance",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {
@@ -332,7 +332,7 @@ M["test standard deviation works"] = {
   config = {
     aggregation_type = "_standard_deviation",
     multiplier = 1,
-    window = "_hours"
+    threshold = "_hours"
   },
   sources = function()
     return {

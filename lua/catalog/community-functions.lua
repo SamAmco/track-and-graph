@@ -51,6 +51,221 @@ Convertit la valeur de chaque point de données en sa valeur absolue (supprime l
 ]=],
 			version="1.0.0",
 		},
+		["adaptve-clustering-aggregation"]={
+			script=[=[
+local core = require("tng.core")
+local enum = require("tng.config").enum
+local uint = require("tng.config").uint
+
+local get_aggregator_factory = function(config)
+  local aggregation = require("tng.aggregation")
+  local type = config.aggregation_type or error("aggregation_type required")
+  local aggregator
+
+  if type == "_min" then
+    aggregator = aggregation.running_min_aggregator
+  elseif type == "_max" then
+    aggregator = aggregation.running_max_aggregator
+  elseif type == "_average" then
+    aggregator = aggregation.avg_aggregator
+  elseif type == "_sum" then
+    aggregator = aggregation.sum_aggregator
+  elseif type == "_variance" then
+    aggregator = aggregation.variance_aggregator
+  elseif type == "_standard_deviation" then
+    aggregator = aggregation.stdev_aggregator
+  elseif type == "_count" then
+    aggregator = aggregation.count_aggregator
+  else
+    error("Unknown aggregation_type " .. tostring(type))
+  end
+
+  return aggregator
+end
+
+local get_threshold = function(config)
+  if type(config.threshold) ~= "string" then
+    error("config.threshold is not a string")
+  end
+
+  if config.threshold == "_seconds" then
+    return core.DURATION.SECOND
+  elseif config.threshold == "_minutes" then
+    return core.DURATION.MINUTE
+  elseif config.threshold == "_hours" then
+    return core.DURATION.HOUR
+  elseif config.threshold == "_days" then
+    return core.PERIOD.DAY
+  elseif config.threshold == "_weeks" then
+    return core.PERIOD.WEEK
+  elseif config.threshold == "_months" then
+    return core.PERIOD.MONTH
+  elseif config.threshold == "_years" then
+    return core.PERIOD.YEAR
+  else
+    error("Unknown threshold: " .. tostring(config.threshold))
+  end
+end
+
+return {
+  id = "adaptve-clustering-aggregation",
+  version = "3.0.0",
+  inputCount = 1,
+  title = {
+    ["en"] = "Adaptive Clustering",
+    ["de"] = "Adaptives Clustering",
+    ["es"] = "Agrupación Adaptativa",
+    ["fr"] = "Regroupement Adaptatif",
+  },
+  categories = { "_aggregation" },
+  description = {
+    ["en"] = [[
+Groups nearby data points into clusters and aggregates each cluster into a single value. The function groups any sequence of data points with less than the given time threshold between each data point.
+
+For example, with a 1-hour threshold, if you have several data points at 9:00am, 9:30am, and 10:15am, they will be grouped into a single cluster. If the next data point was at 11:16am it would start a new cluster.
+
+**Configuration Options:**
+
+- **Aggregation**: The operation to perform on values in each cluster:
+  - Min: Minimum value
+  - Max: Maximum value
+  - Average: Mean of all values
+  - Sum: Total of all values
+  - Count: Number of data points
+  - Variance: Statistical variance
+  - Standard Deviation: Statistical standard deviation
+
+- **Threshold Units**: The time unit for clustering proximity (seconds, minutes, hours, days, weeks, months, or years)
+
+- **Multiplier**: How many threshold size units define the clustering threshold (e.g., multiplier of 2 with threshold units "hours" = 2-hour clustering threshold)
+    ]],
+    ["de"] = [[
+Gruppiert nahe beieinander liegende Datenpunkte in Cluster und aggregiert jeden Cluster zu einem einzelnen Wert. Die Funktion gruppiert jede Sequenz von Datenpunkten mit weniger als dem angegebenen Zeitschwellenwert zwischen jedem Datenpunkt.
+
+Zum Beispiel, mit einem 1-Stunden-Schwellenwert, wenn Sie mehrere Datenpunkte um 9:00 Uhr, 9:30 Uhr und 10:15 Uhr haben, werden sie zu einem einzigen Cluster gruppiert. Wenn der nächste Datenpunkt um 11:16 Uhr wäre, würde ein neuer Cluster beginnen.
+
+**Konfigurationsoptionen:**
+
+- **Aggregation**: Die Operation, die auf Werte in jedem Cluster angewendet wird:
+  - Min: Minimalwert
+  - Max: Maximalwert
+  - Durchschnitt: Mittelwert aller Werte
+  - Summe: Gesamtsumme aller Werte
+  - Anzahl: Anzahl der Datenpunkte
+  - Varianz: Statistische Varianz
+  - Standardabweichung: Statistische Standardabweichung
+
+- **Schwellenwert-Einheiten**: Die Zeiteinheit für Clustering-Nähe (Sekunden, Minuten, Stunden, Tage, Wochen, Monate oder Jahre)
+
+- **Multiplikator**: Wie viele Schwellenwert-Einheiten den Clustering-Schwellenwert definieren (z.B. Multiplikator von 2 mit Schwellenwert-Einheiten "Stunden" = 2-Stunden-Clustering-Schwellenwert)
+    ]],
+    ["es"] = [[
+Agrupa puntos de datos cercanos en clústeres y agrega cada clúster en un único valor. La función agrupa cualquier secuencia de puntos de datos con menos del umbral de tiempo dado entre cada punto de datos.
+
+Por ejemplo, con un umbral de 1 hora, si tiene varios puntos de datos a las 9:00am, 9:30am y 10:15am, se agruparán en un solo clúster. Si el siguiente punto de datos fuera a las 11:16am, comenzaría un nuevo clúster.
+
+**Opciones de Configuración:**
+
+- **Agregación**: La operación a realizar sobre los valores en cada clúster:
+  - Mínimo: Valor mínimo
+  - Máximo: Valor máximo
+  - Promedio: Media de todos los valores
+  - Suma: Total de todos los valores
+  - Recuento: Número de puntos de datos
+  - Varianza: Varianza estadística
+  - Desviación Estándar: Desviación estándar estadística
+
+- **Unidades de Umbral**: La unidad de tiempo para la proximidad de agrupación (segundos, minutos, horas, días, semanas, meses o años)
+
+- **Multiplicador**: Cuántas unidades de tamaño de umbral definen el umbral de agrupación (p.ej., multiplicador de 2 con unidades de umbral "horas" = umbral de agrupación de 2 horas)
+    ]],
+    ["fr"] = [[
+Regroupe les points de données proches en clusters et agrège chaque cluster en une valeur unique. La fonction regroupe toute séquence de points de données avec moins que le seuil de temps donné entre chaque point de données.
+
+Par exemple, avec un seuil de 1 heure, si vous avez plusieurs points de données à 9h00, 9h30 et 10h15, ils seront regroupés en un seul cluster. Si le prochain point de données était à 11h16, il commencerait un nouveau cluster.
+
+**Options de Configuration:**
+
+- **Agrégation**: L'opération à effectuer sur les valeurs dans chaque cluster:
+  - Min: Valeur minimale
+  - Max: Valeur maximale
+  - Moyenne: Moyenne de toutes les valeurs
+  - Somme: Total de toutes les valeurs
+  - Comptage: Nombre de points de données
+  - Variance: Variance statistique
+  - Écart-Type: Écart-type statistique
+
+- **Unités de Seuil**: L'unité de temps pour la proximité de regroupement (secondes, minutes, heures, jours, semaines, mois ou années)
+
+- **Multiplicateur**: Combien d'unités de taille de seuil définissent le seuil de regroupement (par ex., multiplicateur de 2 avec unités de seuil "heures" = seuil de regroupement de 2 heures)
+    ]]
+  },
+  config = {
+    enum {
+      id = "aggregation_type",
+      name = "_aggregation",
+      options = { "_min", "_max", "_average", "_sum", "_count", "_variance", "_standard_deviation" },
+      default = "_average"
+    },
+    uint {
+      id = "multiplier",
+      name = "_multiplier",
+      default = 1
+    },
+    enum {
+      id = "threshold",
+      name = "_threshold_units",
+      options = { "_seconds", "_minutes", "_hours", "_days", "_weeks", "_months", "_years", },
+      default = "_hours"
+    },
+  },
+  generator = function(source, config)
+    local agg_factory = get_aggregator_factory(config)
+    local threshold = get_threshold(config)
+    local multiplier = config.multiplier
+    local carry = nil
+
+    return function()
+      local aggregator = agg_factory()
+
+      local cutoff
+
+      if carry ~= nil then
+        aggregator:push(carry)
+        cutoff = core.shift(carry, threshold, -multiplier)
+        carry = nil
+      else
+        local ref = source.dp()
+
+        if ref == nil then
+          return nil
+        end
+
+        aggregator:push(ref)
+        cutoff = core.shift(ref, threshold, -multiplier)
+      end
+
+      while true do
+        local next_dp = source.dp()
+
+        if next_dp == nil then break end
+
+        if next_dp.timestamp >= cutoff.timestamp then
+          aggregator:push(next_dp)
+          cutoff = core.shift(next_dp, threshold, -multiplier)
+        else
+          carry = next_dp
+          break
+        end
+      end
+
+      return aggregator:run()
+    end
+  end
+}
+]=],
+			version="3.0.0",
+		},
 		ceil={
 			script=[=[
 -- Lua Function to ceiling values
@@ -2183,6 +2398,234 @@ La fonction échange automatiquement min et max si max est inférieur à min.]],
 ]=],
 			version="2.0.0",
 		},
+		["rolling-window-aggregation"]={
+			script=[=[
+local core = require("tng.core")
+local enum = require("tng.config").enum
+local uint = require("tng.config").uint
+
+local get_aggregator = function(config)
+  local aggregation = require("tng.aggregation")
+  local type = config.aggregation_type or error("aggregation_type required")
+  local aggregator
+
+  if type == "_min" then
+    aggregator = aggregation.running_min_aggregator()
+  elseif type == "_max" then
+    aggregator = aggregation.running_max_aggregator()
+  elseif type == "_average" then
+    aggregator = aggregation.avg_aggregator()
+  elseif type == "_sum" then
+    aggregator = aggregation.sum_aggregator()
+  elseif type == "_variance" then
+    aggregator = aggregation.variance_aggregator()
+  elseif type == "_standard_deviation" then
+    aggregator = aggregation.stdev_aggregator()
+  elseif type == "_count" then
+    aggregator = aggregation.count_aggregator()
+  else
+    error("Unknown aggregation_type " .. tostring(type))
+  end
+
+  return aggregator
+end
+
+local get_window = function(config)
+  if type(config.window) ~= "string" then
+    error("config.window is not a string")
+  end
+
+  if config.window == "_seconds" then
+    return core.DURATION.SECOND
+  elseif config.window == "_minutes" then
+    return core.DURATION.MINUTE
+  elseif config.window == "_hours" then
+    return core.DURATION.HOUR
+  elseif config.window == "_days" then
+    return core.PERIOD.DAY
+  elseif config.window == "_weeks" then
+    return core.PERIOD.WEEK
+  elseif config.window == "_months" then
+    return core.PERIOD.MONTH
+  elseif config.window == "_years" then
+    return core.PERIOD.YEAR
+  else
+    error("Unknown window: " .. tostring(config.window))
+  end
+end
+
+return {
+  id = "rolling-window-aggregation",
+  version = "3.0.0",
+  inputCount = 1,
+  title = {
+    ["en"] = "Rolling Window",
+    ["de"] = "Rollierendes Fenster",
+    ["es"] = "Ventana Móvil",
+    ["fr"] = "Fenêtre Glissante",
+  },
+  categories = { "_aggregation" },
+  description = {
+    ["en"] = [[
+Calculates aggregate statistics over a moving time window for each data point. The function looks backward in time from each point and aggregates all values within the specified window period.
+
+For example, with a 7-day window and average aggregation, each output point represents the average of all values in the 7 days leading up to that point.
+
+**Configuration Options:**
+
+- **Aggregation**: The operation to perform on values in each window:
+  - Min: Minimum value
+  - Max: Maximum value
+  - Average: Mean of all values
+  - Sum: Total of all values
+  - Count: Number of data points
+  - Variance: Statistical variance
+  - Standard Deviation: Statistical standard deviation
+
+- **Window Size**: The time unit for the lookback period (seconds, minutes, hours, days, weeks, months, or years)
+
+- **Multiplier**: How many window size units to look back (e.g., multiplier of 3 with window size "days" = 3-day window)
+    ]],
+    ["de"] = [[
+Berechnet Aggregationsstatistiken über ein bewegliches Zeitfenster für jeden Datenpunkt. Die Funktion schaut von jedem Punkt aus rückwärts in der Zeit und aggregiert alle Werte innerhalb des angegebenen Fensterzeitraums.
+
+Zum Beispiel repräsentiert bei einem 7-Tage-Fenster und Durchschnittsaggregation jeder Ausgabepunkt den Durchschnitt aller Werte in den 7 Tagen bis zu diesem Punkt.
+
+**Konfigurationsoptionen:**
+
+- **Aggregation**: Die Operation, die auf Werte in jedem Fenster angewendet wird:
+  - Min: Minimalwert
+  - Max: Maximalwert
+  - Durchschnitt: Mittelwert aller Werte
+  - Summe: Gesamtsumme aller Werte
+  - Anzahl: Anzahl der Datenpunkte
+  - Varianz: Statistische Varianz
+  - Standardabweichung: Statistische Standardabweichung
+
+- **Fenstergröße**: Die Zeiteinheit für den Rückblickzeitraum (Sekunden, Minuten, Stunden, Tage, Wochen, Monate oder Jahre)
+
+- **Multiplikator**: Wie viele Fenstergrößeneinheiten zurückgeschaut werden soll (z.B. Multiplikator von 3 mit Fenstergröße "Tage" = 3-Tage-Fenster)
+    ]],
+    ["es"] = [[
+Calcula estadísticas agregadas sobre una ventana de tiempo móvil para cada punto de datos. La función mira hacia atrás en el tiempo desde cada punto y agrega todos los valores dentro del período de ventana especificado.
+
+Por ejemplo, con una ventana de 7 días y agregación promedio, cada punto de salida representa el promedio de todos los valores en los 7 días previos a ese punto.
+
+**Opciones de Configuración:**
+
+- **Agregación**: La operación a realizar sobre los valores en cada ventana:
+  - Mínimo: Valor mínimo
+  - Máximo: Valor máximo
+  - Promedio: Media de todos los valores
+  - Suma: Total de todos los valores
+  - Recuento: Número de puntos de datos
+  - Varianza: Varianza estadística
+  - Desviación Estándar: Desviación estándar estadística
+
+- **Tamaño de Ventana**: La unidad de tiempo para el período de retrospección (segundos, minutos, horas, días, semanas, meses o años)
+
+- **Multiplicador**: Cuántas unidades de tamaño de ventana mirar hacia atrás (p.ej., multiplicador de 3 con tamaño de ventana "días" = ventana de 3 días)
+    ]],
+    ["fr"] = [[
+Calcule des statistiques agrégées sur une fenêtre de temps mobile pour chaque point de données. La fonction regarde en arrière dans le temps à partir de chaque point et agrège toutes les valeurs dans la période de fenêtre spécifiée.
+
+Par exemple, avec une fenêtre de 7 jours et une agrégation moyenne, chaque point de sortie représente la moyenne de toutes les valeurs des 7 jours précédant ce point.
+
+**Options de Configuration:**
+
+- **Agrégation**: L'opération à effectuer sur les valeurs dans chaque fenêtre:
+  - Min: Valeur minimale
+  - Max: Valeur maximale
+  - Moyenne: Moyenne de toutes les valeurs
+  - Somme: Total de toutes les valeurs
+  - Comptage: Nombre de points de données
+  - Variance: Variance statistique
+  - Écart-Type: Écart-type statistique
+
+- **Taille de Fenêtre**: L'unité de temps pour la période de rétrospection (secondes, minutes, heures, jours, semaines, mois ou années)
+
+- **Multiplicateur**: Combien d'unités de taille de fenêtre regarder en arrière (par ex., multiplicateur de 3 avec taille de fenêtre "jours" = fenêtre de 3 jours)
+    ]]
+  },
+  config = {
+    enum {
+      id = "aggregation_type",
+      name = "_aggregation",
+      options = { "_min", "_max", "_average", "_sum", "_count", "_variance", "_standard_deviation" },
+      default = "_average"
+    },
+    uint {
+      id = "multiplier",
+      name = "_multiplier",
+      default = 1
+    },
+    enum {
+      id = "window",
+      name = "_window_size",
+      options = { "_seconds", "_minutes", "_hours", "_days", "_weeks", "_months", "_years", },
+      default = "_weeks"
+    },
+  },
+  generator = function(source, config)
+    local aggregator = get_aggregator(config)
+    local window = get_window(config)
+    local multiplier = config.multiplier
+    local carry = nil
+
+    return function()
+      if #aggregator.window > 0 then
+        aggregator:pop()
+      end
+
+      if #aggregator.window == 0 then
+        if carry ~= nil then
+          aggregator:push(carry)
+          carry = nil
+        else
+          local next_dp = source.dp()
+          if next_dp == nil then
+            return nil
+          end
+          aggregator:push(next_dp)
+        end
+      end
+
+      local last_dp = aggregator.window[1]
+      if last_dp == nil then
+        return nil
+      end
+
+      local new_window_start = core.shift(last_dp, window, -multiplier)
+
+      while true do
+        if carry ~= nil then
+          if carry.timestamp >= new_window_start.timestamp then
+            aggregator:push(carry)
+            carry = nil
+          else
+            break
+          end
+        end
+
+        local next_dp = source.dp()
+
+        if next_dp == nil then
+          break
+        elseif next_dp.timestamp >= new_window_start.timestamp then
+          aggregator:push(next_dp)
+        else
+          carry = next_dp
+          break
+        end
+      end
+
+      return aggregator:run()
+    end
+  end
+}
+]=],
+			version="3.0.0",
+		},
 		round={
 			script=[=[
 -- Lua Function to round values
@@ -3244,13 +3687,19 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			version="1.0.0",
 		},
 	},
-	published_at="2025-11-07T21:09:35Z",
+	published_at="2025-11-09T12:39:36Z",
 	translations={
 		_addition={
 			de="Addition",
 			en="Addition",
 			es="Suma",
 			fr="Addition",
+		},
+		_aggregation={
+			de="Aggregation",
+			en="Aggregation",
+			es="Agregación",
+			fr="Agrégation",
 		},
 		_all_fields={
 			de="Alle Felder",
@@ -3263,6 +3712,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			en="Arithmetic",
 			es="Aritmética",
 			fr="Arithmétique",
+		},
+		_average={
+			de="Durchschnitt",
+			en="Average",
+			es="Promedio",
+			fr="Moyenne",
 		},
 		_case_sensitive={
 			de="Groß-/Kleinschreibung beachten",
@@ -3282,6 +3737,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Comparar por",
 			fr="Comparer par",
 		},
+		_count={
+			de="Anzahl",
+			en="Count",
+			es="Recuento",
+			fr="Comptage",
+		},
 		_cutoff={
 			de="Grenzwert",
 			en="Cutoff",
@@ -3293,6 +3754,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			en="Day",
 			es="Día",
 			fr="Jour",
+		},
+		_days={
+			de="Tage",
+			en="Days",
+			es="Días",
+			fr="Jours",
 		},
 		_division={
 			de="Division",
@@ -3318,6 +3785,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Generadores",
 			fr="Générateurs",
 		},
+		_hours={
+			de="Stunden",
+			en="Hours",
+			es="Horas",
+			fr="Heures",
+		},
 		_label_and_note={
 			de="Label und Notiz",
 			en="Label and Note",
@@ -3342,17 +3815,35 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Coincidir Exactamente",
 			fr="Correspondance Exacte",
 		},
+		_max={
+			de="Max",
+			en="Max",
+			es="Máximo",
+			fr="Max",
+		},
 		_max_value={
 			de="Maximalwert",
 			en="Max Value",
 			es="Valor Máximo",
 			fr="Valeur Maximale",
 		},
+		_min={
+			de="Min",
+			en="Min",
+			es="Mínimo",
+			fr="Min",
+		},
 		_min_value={
 			de="Minimalwert",
 			en="Min Value",
 			es="Valor Mínimo",
 			fr="Valeur Minimale",
+		},
+		_minutes={
+			de="Minuten",
+			en="Minutes",
+			es="Minutos",
+			fr="Minutes",
 		},
 		_monday={
 			de="Montag",
@@ -3366,11 +3857,23 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Mes",
 			fr="Mois",
 		},
+		_months={
+			de="Monate",
+			en="Months",
+			es="Meses",
+			fr="Mois",
+		},
 		_multiplication={
 			de="Multiplikation",
 			en="Multiplication",
 			es="Multiplicación",
 			fr="Multiplication",
+		},
+		_multiplier={
+			de="Multiplikator",
+			en="Multiplier",
+			es="Multiplicador",
+			fr="Multiplicateur",
 		},
 		_nearest={
 			de="Nächstgelegene",
@@ -3444,6 +3947,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Sábado",
 			fr="Samedi",
 		},
+		_seconds={
+			de="Sekunden",
+			en="Seconds",
+			es="Segundos",
+			fr="Secondes",
+		},
 		_seed={
 			de="Seed",
 			en="Seed",
@@ -3456,17 +3965,35 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Omitir",
 			fr="Ignorer",
 		},
+		_standard_deviation={
+			de="Standardabweichung",
+			en="Standard Deviation",
+			es="Desviación Estándar",
+			fr="Écart-Type",
+		},
 		_subtraction={
 			de="Subtraktion",
 			en="Subtraction",
 			es="Resta",
 			fr="Soustraction",
 		},
+		_sum={
+			de="Summe",
+			en="Sum",
+			es="Suma",
+			fr="Somme",
+		},
 		_sunday={
 			de="Sonntag",
 			en="Sunday",
 			es="Domingo",
 			fr="Dimanche",
+		},
+		_threshold_units={
+			de="Schwellenwert-Einheiten",
+			en="Threshold Units",
+			es="Unidades de Umbral",
+			fr="Unités de Seuil",
 		},
 		_thursday={
 			de="Donnerstag",
@@ -3516,6 +4043,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Solo valor",
 			fr="Valeur uniquement",
 		},
+		_variance={
+			de="Varianz",
+			en="Variance",
+			es="Varianza",
+			fr="Variance",
+		},
 		_wednesday={
 			de="Mittwoch",
 			en="Wednesday",
@@ -3528,11 +4061,29 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Semana",
 			fr="Semaine",
 		},
+		_weeks={
+			de="Wochen",
+			en="Weeks",
+			es="Semanas",
+			fr="Semaines",
+		},
+		_window_size={
+			de="Fenstergröße",
+			en="Window Size",
+			es="Tamaño de Ventana",
+			fr="Taille de Fenêtre",
+		},
 		_year={
 			de="Jahr",
 			en="Year",
 			es="Año",
 			fr="Année",
+		},
+		_years={
+			de="Jahre",
+			en="Years",
+			es="Años",
+			fr="Années",
 		},
 	},
 }
