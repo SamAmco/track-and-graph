@@ -58,18 +58,98 @@ return {
   inputCount = 1,
   title = {
     ["en"] = "Rolling Window",
+    ["de"] = "Rollierendes Fenster",
+    ["es"] = "Ventana Móvil",
+    ["fr"] = "Fenêtre Glissante",
   },
   categories = { "_aggregation" },
   description = {
     ["en"] = [[
+Calculates aggregate statistics over a moving time window for each data point. The function looks backward in time from each point and aggregates all values within the specified window period.
 
+For example, with a 7-day window and average aggregation, each output point represents the average of all values in the 7 days leading up to that point.
+
+**Configuration Options:**
+
+- **Aggregation**: The operation to perform on values in each window:
+  - Min: Minimum value
+  - Max: Maximum value
+  - Average: Mean of all values
+  - Sum: Total of all values
+  - Count: Number of data points
+  - Variance: Statistical variance
+  - Standard Deviation: Statistical standard deviation
+
+- **Window Size**: The time unit for the lookback period (seconds, minutes, hours, days, weeks, months, or years)
+
+- **Multiplier**: How many window size units to look back (e.g., multiplier of 3 with window size "days" = 3-day window)
+    ]],
+    ["de"] = [[
+Berechnet Aggregationsstatistiken über ein bewegliches Zeitfenster für jeden Datenpunkt. Die Funktion schaut von jedem Punkt aus rückwärts in der Zeit und aggregiert alle Werte innerhalb des angegebenen Fensterzeitraums.
+
+Zum Beispiel repräsentiert bei einem 7-Tage-Fenster und Durchschnittsaggregation jeder Ausgabepunkt den Durchschnitt aller Werte in den 7 Tagen bis zu diesem Punkt.
+
+**Konfigurationsoptionen:**
+
+- **Aggregation**: Die Operation, die auf Werte in jedem Fenster angewendet wird:
+  - Min: Minimalwert
+  - Max: Maximalwert
+  - Durchschnitt: Mittelwert aller Werte
+  - Summe: Gesamtsumme aller Werte
+  - Anzahl: Anzahl der Datenpunkte
+  - Varianz: Statistische Varianz
+  - Standardabweichung: Statistische Standardabweichung
+
+- **Fenstergröße**: Die Zeiteinheit für den Rückblickzeitraum (Sekunden, Minuten, Stunden, Tage, Wochen, Monate oder Jahre)
+
+- **Multiplikator**: Wie viele Fenstergrößeneinheiten zurückgeschaut werden soll (z.B. Multiplikator von 3 mit Fenstergröße "Tage" = 3-Tage-Fenster)
+    ]],
+    ["es"] = [[
+Calcula estadísticas agregadas sobre una ventana de tiempo móvil para cada punto de datos. La función mira hacia atrás en el tiempo desde cada punto y agrega todos los valores dentro del período de ventana especificado.
+
+Por ejemplo, con una ventana de 7 días y agregación promedio, cada punto de salida representa el promedio de todos los valores en los 7 días previos a ese punto.
+
+**Opciones de Configuración:**
+
+- **Agregación**: La operación a realizar sobre los valores en cada ventana:
+  - Mínimo: Valor mínimo
+  - Máximo: Valor máximo
+  - Promedio: Media de todos los valores
+  - Suma: Total de todos los valores
+  - Recuento: Número de puntos de datos
+  - Varianza: Varianza estadística
+  - Desviación Estándar: Desviación estándar estadística
+
+- **Tamaño de Ventana**: La unidad de tiempo para el período de retrospección (segundos, minutos, horas, días, semanas, meses o años)
+
+- **Multiplicador**: Cuántas unidades de tamaño de ventana mirar hacia atrás (p.ej., multiplicador de 3 con tamaño de ventana "días" = ventana de 3 días)
+    ]],
+    ["fr"] = [[
+Calcule des statistiques agrégées sur une fenêtre de temps mobile pour chaque point de données. La fonction regarde en arrière dans le temps à partir de chaque point et agrège toutes les valeurs dans la période de fenêtre spécifiée.
+
+Par exemple, avec une fenêtre de 7 jours et une agrégation moyenne, chaque point de sortie représente la moyenne de toutes les valeurs des 7 jours précédant ce point.
+
+**Options de Configuration:**
+
+- **Agrégation**: L'opération à effectuer sur les valeurs dans chaque fenêtre:
+  - Min: Valeur minimale
+  - Max: Valeur maximale
+  - Moyenne: Moyenne de toutes les valeurs
+  - Somme: Total de toutes les valeurs
+  - Comptage: Nombre de points de données
+  - Variance: Variance statistique
+  - Écart-Type: Écart-type statistique
+
+- **Taille de Fenêtre**: L'unité de temps pour la période de rétrospection (secondes, minutes, heures, jours, semaines, mois ou années)
+
+- **Multiplicateur**: Combien d'unités de taille de fenêtre regarder en arrière (par ex., multiplicateur de 3 avec taille de fenêtre "jours" = fenêtre de 3 jours)
     ]]
   },
   config = {
     enum {
       id = "aggregation_type",
       name = "_aggregation",
-      options = { "_min", "_max", "_average", "_sum", "_variance", "_standard_deviation", "_count" },
+      options = { "_min", "_max", "_average", "_sum", "_count", "_variance", "_standard_deviation" },
       default = "_average"
     },
     uint {
