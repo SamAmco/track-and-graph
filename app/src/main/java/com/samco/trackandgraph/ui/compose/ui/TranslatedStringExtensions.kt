@@ -36,34 +36,50 @@ fun TranslatedString?.resolve(): String? {
     }
 }
 
+/**
+ * Non-Compose version that resolves using the provided LocaleList.
+ */
+fun TranslatedString?.resolve(locales: LocaleList): String? {
+    if (this == null) return null
+    return when (this) {
+        is TranslatedString.Simple -> value
+        is TranslatedString.Translations -> resolveTranslated(locales)
+    }
+}
+
 @Composable
 private fun TranslatedString.Translations?.resolveTranslated(): String? {
+    val configuration = LocalConfiguration.current
+    return remember(this, configuration.locales) {
+        this.resolveTranslated(configuration.locales)
+    }
+}
+
+/**
+ * Non-Compose core resolver for TranslatedString.Translations using the provided LocaleList.
+ */
+fun TranslatedString.Translations?.resolveTranslated(locales: LocaleList): String? {
     if (this == null) return null
     if (values.isEmpty()) return ""
 
-    val configuration = LocalConfiguration.current
+    // Normalize keys to BCP-47 tags for matching
+    val supported = values.keys
+        .map { Locale.forLanguageTag(it).toLanguageTag() }
+        .toTypedArray()
 
-    return remember(this) {
-        // Normalize keys to BCP-47 tags
-        val supported = values.keys
-            .map { Locale.forLanguageTag(it).toLanguageTag() }
-            .toTypedArray()
+    // Ask Android for the best match given user's locale prefs
+    val best: Locale? = locales.getFirstMatch(supported)
 
-        // Ask Android for the best match given user's locale prefs
-        val userLocales: LocaleList = configuration.locales
-        val best: Locale? = userLocales.getFirstMatch(supported)
-
-        // Exact match?
-        best?.toLanguageTag()?.let { tag ->
-            values[tag]?.let { return@remember it }
-        }
-
-        // Language-only fallback
-        best?.language?.let { lang ->
-            values[lang]?.let { return@remember it }
-        }
-
-        // Last-ditch fallback
-        values.values.firstOrNull()
+    // Exact match?
+    best?.toLanguageTag()?.let { tag ->
+        values[tag]?.let { return it }
     }
+
+    // Language-only fallback
+    best?.language?.let { lang ->
+        values[lang]?.let { return it }
+    }
+
+    // Last-ditch fallback
+    return values.values.firstOrNull()
 }
