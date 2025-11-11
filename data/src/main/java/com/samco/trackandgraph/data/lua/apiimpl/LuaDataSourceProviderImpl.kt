@@ -21,35 +21,56 @@ internal class LuaDataSourceProviderImpl @Inject constructor(
         const val INDEX = "index"
     }
 
+    private class PeekableIterator<T>(private val iterator: Iterator<T>): Iterator<T> {
+        private var peeked: T? = null
+
+        override fun hasNext(): Boolean {
+            return peeked != null || iterator.hasNext()
+        }
+
+        override fun next(): T {
+            val stored = peeked
+            peeked = null
+            return stored ?: iterator.next()
+        }
+
+        fun peek(): T {
+            return peeked ?: iterator.next().also { peeked = it }
+        }
+    }
+
     fun createDataSourceTable(dataSources: Map<String, RawDataSample>): LuaValue {
         val dataSourceTable = LuaTable()
         dataSources.entries.forEachIndexed { index, entry ->
-            dataSourceTable[entry.key] = createLuaDataSource(index, entry.key, entry.value.iterator())
+            val iterator = PeekableIterator(entry.value.iterator())
+            dataSourceTable[entry.key] = createLuaDataSource(index, entry.key, iterator)
         }
         return dataSourceTable
     }
 
     fun createLuaDataSource(index: Int, name: String, iterator: Iterator<DataPoint>): LuaValue {
+        val wrappedIterator = iterator as? PeekableIterator ?: PeekableIterator(iterator)
         val luaTable = LuaTable()
         luaTable[NAME] = name
-        luaTable[DP] = getDpLuaFunction(iterator)
-        luaTable[DP_BATCH] = getDpBatchLuaFunction(iterator)
-        luaTable[DP_ALL] = getDpAllLuaFunction(iterator)
-        luaTable[DP_AFTER] = getDpAfterLuaFunction(iterator)
+        luaTable[DP] = getDpLuaFunction(wrappedIterator)
+        luaTable[DP_BATCH] = getDpBatchLuaFunction(wrappedIterator)
+        luaTable[DP_ALL] = getDpAllLuaFunction(wrappedIterator)
+        luaTable[DP_AFTER] = getDpAfterLuaFunction(wrappedIterator)
         luaTable[INDEX] = index + 1 // Lua is 1 indexed
         return luaTable
     }
 
     fun createLuaDataSource(iterator: Iterator<DataPoint>): LuaValue {
+        val wrappedIterator = iterator as? PeekableIterator ?: PeekableIterator(iterator)
         val luaTable = LuaTable()
-        luaTable[DP] = getDpLuaFunction(iterator)
-        luaTable[DP_BATCH] = getDpBatchLuaFunction(iterator)
-        luaTable[DP_ALL] = getDpAllLuaFunction(iterator)
-        luaTable[DP_AFTER] = getDpAfterLuaFunction(iterator)
+        luaTable[DP] = getDpLuaFunction(wrappedIterator)
+        luaTable[DP_BATCH] = getDpBatchLuaFunction(wrappedIterator)
+        luaTable[DP_ALL] = getDpAllLuaFunction(wrappedIterator)
+        luaTable[DP_AFTER] = getDpAfterLuaFunction(wrappedIterator)
         return luaTable
     }
 
-    private fun getDpAfterLuaFunction(dataSource: Iterator<DataPoint>) =
+    private fun getDpAfterLuaFunction(dataSource: PeekableIterator<DataPoint>) =
         oneArgFunction { arg1 ->
             val zonedDateTime = dateTimeParser.parseDateTimeOrNull(arg1)
             val batch = mutableListOf<LuaValue>()
@@ -59,8 +80,9 @@ internal class LuaDataSourceProviderImpl @Inject constructor(
                 }
             } else {
                 while (dataSource.hasNext()) {
-                    val dataPoint = dataSource.next()
+                    val dataPoint = dataSource.peek()
                     if (dataPoint.timestamp <= zonedDateTime.toOffsetDateTime()) break
+                    dataSource.next()
                     batch.add(dataPointParser.toLuaValueNullable(dataPoint))
                 }
             }

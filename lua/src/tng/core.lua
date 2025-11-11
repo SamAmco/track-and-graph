@@ -39,7 +39,7 @@ M.time = function(date) end
 
 --- Returns the given timestamp as a date. If no timestamp is provided, the current time will be used.
 --- @since v5.1.0 (API level 1)
---- @param timestamp? (Timestamp|integer): The timestamp to use for the date. If it is an integer, it will mean the timestamp in milliseconds since the epoch.
+--- @param timestamp? (DataPoint|Timestamp|integer): The timestamp to use for the date. If it is an integer, it will mean the timestamp in milliseconds since the epoch.
 --- If it is an integer, it will mean the timestamp in milliseconds since the epoch.
 --- If not provided, the current time will be used.
 --- @return Date: A table containing the current date.
@@ -138,7 +138,7 @@ M.DataSource.dpall = function() end
 --- Data points are iterated in reverse chronological order.
 --- After this operation the data source will contain only datapoints that are before the given timestamp
 --- @since v5.1.0 (API level 1)
---- @param datetime (Timestamp|Date)?: The timestamp to compare against. If nil then the behaviour is the same as dpall
+--- @param datetime (DataPoint|Timestamp|Date)?: The timestamp to compare against. If nil then the behaviour is the same as dpall
 --- @return DataPoint[]: A table containing all data points that are newer than the given timestamp.
 M.DataSource.dpafter = function(datetime) end
 
@@ -171,7 +171,7 @@ end
 ---
 --- @since v5.1.0 (API level 1)
 --- @param period string: The period to calculate the end for (e.g., PERIOD.DAY, PERIOD.WEEK).
---- @param timestamp Timestamp|integer: The timestamp to calculate the end of the period for.
+--- @param timestamp DataPoint|Timestamp|integer: The timestamp to calculate the end of the period for.
 --- @param zone_override? string: An optional timezone override. If not provided, the default timezone is used.
 --- @return Date: A date representing the end of the specified period with the time set to midnight.
 M.get_end_of_period = function(period, timestamp, zone_override)
