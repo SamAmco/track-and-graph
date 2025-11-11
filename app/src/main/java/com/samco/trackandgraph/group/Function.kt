@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -88,7 +89,6 @@ fun Function(
 
     val functionFont = MaterialTheme.tngTypography.code.copy(
         fontSize = MaterialTheme.typography.labelLarge.fontSize,
-        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
     )
     val fontSizeDp = with(LocalDensity.current) {
         functionFont.fontSize.toDp()
@@ -144,10 +144,7 @@ fun Function(
                     .align(Alignment.BottomCenter)
                     .padding(halfDialogInputSpacing),
                 text = stringResource(R.string.function).lowercase(),
-                style = MaterialTheme.tngTypography.code.copy(
-                    fontSize = MaterialTheme.typography.labelLarge.fontSize,
-                    fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
-                )
+                style = functionFont
             )
         }
     }

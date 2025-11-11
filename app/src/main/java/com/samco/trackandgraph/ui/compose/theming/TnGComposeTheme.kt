@@ -109,9 +109,7 @@ data class TngColors(
 data class TngTypography(
     val materialTypography: Typography,
     val code: TextStyle = TextStyle(
-        fontFamily = FontFamily(
-            Font(resId = R.font.roboto_mono, weight = FontWeight(750))
-        ),
+        fontFamily = FontFamily(Font(resId = R.font.roboto_mono)),
         fontSize = materialTypography.bodyLarge.fontSize,
         lineHeight = 22.sp,
     )
