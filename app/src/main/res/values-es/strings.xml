@@ -379,7 +379,7 @@
     <string name="graph_stat_info_button_description">Tutoriales de gráficos y estadísticas</string>
     <string name="network_generic_error">Se produjo un error al intentar acceder a la red. Por favor, compruebe su conexión e inténtelo de nuevo.</string>
     <string name="function_verification_failure">Error al verificar las firmas de las funciones. Por favor, asegúrese de tener una conexión segura y que Track &amp; Graph esté actualizado</string>
-    <string name="function_network_failure">Error al cargar las funciones. Por favor, compruebe su conexión de red.</string>
+    <string name="function_network_failure">Error al cargar las funciones. Por favor, asegúrese de estar conectado a internet. Si el problema persiste, asegúrese de que la aplicación esté actualizada.</string>
     <string name="functions_landscape_hint">Consejo: Las funciones funcionan mejor en modo horizontal</string>
     <string name="functions_start_hint">Empieza aquí: Pulsación larga y seleccionar Fuente de datos</string>
 </resources>

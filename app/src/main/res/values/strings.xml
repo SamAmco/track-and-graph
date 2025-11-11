@@ -400,7 +400,7 @@
     <string name="graph_stat_info_button_description">Graphs and stats tutorials</string>
     <string name="network_generic_error">An error occurred while trying to access the network. Please check your connection and try again.</string>
     <string name="function_verification_failure">Failed to verify function signatures. Please make sure you have a secure connection and Track &amp; Graph is up to date</string>
-    <string name="function_network_failure">Failed to load functions. Please check your network connection.</string>
+    <string name="function_network_failure">Failed to load functions. Please make sure you are connected to the internet. If the issue persists please make sure the app is up to date.</string>
     <string name="functions_landscape_hint">Tip: Functions work best in landscape</string>
     <string name="functions_start_hint">Start here: Long press and select Data Source</string>
 </resources>
