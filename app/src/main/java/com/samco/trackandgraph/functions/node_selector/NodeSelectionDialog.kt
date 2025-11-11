@@ -295,10 +295,18 @@ private fun CategoryList(
 
         Divider()
 
+        val localeList = LocalConfiguration.current.locales
+
+        val sortedCategories = remember(state.allCategories, localeList) {
+            state.allCategories
+                .map { (id, name) -> id to name.resolve(localeList) }
+                .sortedBy { (_, categoryName) -> categoryName?.lowercase() }
+        }
+
         // Categories in the middle
-        state.allCategories.forEach { (categoryId, categoryName) ->
+        sortedCategories.forEach { (categoryId, categoryName) ->
             SelectionRow(
-                text = categoryName.resolve() ?: categoryId,
+                text = categoryName ?: categoryId,
                 onClick = { onSelectCategory(categoryId) },
                 isSelected = state.selectedCategory == categoryId
             )
@@ -331,10 +339,18 @@ private fun FunctionList(
     FadingScrollColumn(modifier = modifier) {
         Divider()
 
-        functions.forEach { function ->
-            val title = function.title.resolve() ?: return@forEach
+        val localeList = LocalConfiguration.current.locales
+
+        val sortedFunctions = remember(functions, localeList) {
+            functions
+                .map { it to it.title.resolve(localeList) }
+                .filter { (_, title) -> title != null }
+                .sortedBy { (_, title) -> title?.lowercase() }
+        }
+
+        sortedFunctions.forEach { (function, title) ->
             SelectionRow(
-                text = title,
+                text = title!!,
                 onClick = {
                     onSelect(AddNodeData.LibraryFunction(function))
                 },

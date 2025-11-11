@@ -42,6 +42,7 @@ sealed class NodeSelectionUiState {
         val selectedCategory: String?,
         val allCategories: Map<String, TranslatedString>
     ) : NodeSelectionUiState()
+
     data class Error(val error: FetchError) : NodeSelectionUiState()
 }
 
@@ -86,15 +87,13 @@ class NodeSelectionViewModelImpl @Inject constructor(
 
     private fun updateReadyState() {
         if (_state.value !is NodeSelectionUiState.Ready) return
-        
+
         val displayedFunctions = if (selectedCategory == null) {
             allFunctions
         } else {
-            allFunctions.filter { function ->
-                function.categories.containsKey(selectedCategory)
-            }
+            allFunctions.filter { it.categories.containsKey(selectedCategory) }
         }
-        
+
         _state.value = NodeSelectionUiState.Ready(
             allFunctions = allFunctions,
             displayedFunctions = displayedFunctions,
@@ -108,7 +107,7 @@ class NodeSelectionViewModelImpl @Inject constructor(
             try {
                 val functions = repository.fetchFunctions()
                 allFunctions = functions
-                
+
                 // Build the categories map from all functions
                 val categoriesMap = mutableMapOf<String, TranslatedString>()
                 functions.forEach { function ->
@@ -120,7 +119,7 @@ class NodeSelectionViewModelImpl @Inject constructor(
                     }
                 }
                 allCategories = categoriesMap
-                
+
                 val displayedFunctions = if (selectedCategory == null) {
                     functions
                 } else {
@@ -128,7 +127,7 @@ class NodeSelectionViewModelImpl @Inject constructor(
                         function.categories.containsKey(selectedCategory)
                     }
                 }
-                
+
                 _state.value = NodeSelectionUiState.Ready(
                     allFunctions = functions,
                     displayedFunctions = displayedFunctions,
