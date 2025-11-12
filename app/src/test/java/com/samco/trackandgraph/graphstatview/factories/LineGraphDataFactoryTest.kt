@@ -32,7 +32,6 @@ import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.data.sampling.DataSampler
-import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import junit.framework.TestCase.assertEquals

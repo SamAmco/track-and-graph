@@ -34,6 +34,7 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
@@ -81,8 +82,9 @@ class LineGraphDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData = withContext(defaultDispatcher) {
         val disposables = Collections.synchronizedList(mutableListOf<DataSample>())
-        val vmLock = luaEngine.acquireVM()
+        var vmLock: LuaVMLock? = null
         try {
+            vmLock = luaEngine.acquireVM()
             val dataSamples = config.features.map { lgf ->
                 val dataSample = dataSampler.getDataSampleForFeatureId(
                     featureId = lgf.featureId,
@@ -132,7 +134,7 @@ class LineGraphDataFactory @Inject constructor(
             }
         } finally {
             disposables.forEach { it.dispose() }
-            luaEngine.releaseVM(vmLock)
+            vmLock?.let { luaEngine.releaseVM(it) }
         }
     }
 
