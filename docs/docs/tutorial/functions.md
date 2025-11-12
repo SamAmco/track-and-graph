@@ -1,6 +1,6 @@
 # Functions
 
-Functions allow you to create custom data sources by transforming and combining existing trackers. Using a visual node editor, you can build graphs that process your data in powerful ways without writing any code.
+Functions allow you to create custom data sources by transforming and combining existing trackers. Using a visual node editor, you can build graphs that process your data in powerful ways.
 
 ## What are Functions?
 
@@ -11,8 +11,6 @@ Think of Functions as pipelines: data flows from your trackers (inputs) through 
 ## Creating Your First Function
 
 To create a Function, tap the + icon in a group and select "Function" from the menu.
-
-<!-- TODO: Screenshot of creating a function -->
 
 ### The Output Node
 
@@ -35,9 +33,9 @@ Each function node typically has:
 
 ### Connecting Nodes
 
-To connect nodes, **drag from an output connector to an input connector**. You can connect multiple output connectors to the same input connector - their data will be merged in chronological order.
+To connect nodes, **drag from an output connector to an input connector**. You can connect multiple output connectors to the same input connector - their data will be merged in reverse chronological order.
 
-**Note:** You cannot create connections that would form a cycle in the graph.
+**Note:** You cannot create connections that would form a cycle in the graph, and you must always start from an output and drag to an input.
 
 ## Example 1: Merging Multiple Trackers
 
@@ -47,7 +45,11 @@ Let's say you track exercise in two separate trackers - one for running and one 
 
 <!-- TODO: Screenshot or GIF showing merging two data sources -->
 
-Now your "All Exercise" Function contains all data points from both trackers, merged in chronological order. You can use this in graphs or statistics to see your total exercise activity.
+Now your "All Exercise" Function contains all data points from both trackers, merged in reverse chronological order. You can use this in graphs or statistics to see your total exercise activity.
+
+Taking this a step further you could create a Function that only outputs the exercise that you've done this week by adding a **Filter After Last** node connected to a **Periodic Data Points** generator set to weekly intervals:
+
+<!-- TODO: Screenshot or GIF showing weekly exercise setup -->
 
 ## Example 2: Converting Units with Transformations
 
@@ -57,14 +59,18 @@ You can create a "Weight (kg)" Function by connecting your "Weight" tracker to a
 
 <!-- TODO: Screenshot showing data source -> multiply -> output -->
 
-Now you have a data source showing your weight in kilograms without changing your original tracker. This same approach works for other conversions - calories to kilojoules, miles to kilometers, or any other mathematical transformation.
+Now you have a data source showing your weight in kilograms without changing your original tracker. 
 
-## Example 3: This Week's Activity
+Furthermore if you track your weight sometimes in kilograms and sometimes in pounds (using labels), you can create a more complex Function that only converts values with the label "lbs":
 
-For a more advanced example, let's create a Function that automatically shows only the current week's data from your exercise tracker.
+<!-- TODO: Screenshot showing data source -> filter -> multiply -> output -->
 
-This Function combines a **Periodic Data Points** generator node with a **Filter After Last** node. The periodic generator creates a data point with value=1 at the start of each week. The filter then outputs only exercise data that comes after the most recent weekly marker.
+## Exploring Further
 
-<!-- TODO: Screenshot or GIF of complete weekly filter setup -->
+For a deeper understanding of what's possible with Functions, I recommend exploring the Function Catalog and experimenting with different nodes. If you click the 'i' icon on any node in the catalog, you'll see detailed documentation about what it does and how to use it.
 
-The result is a data source that automatically resets each week, showing only your current week's activity. This is useful for weekly progress tracking or creating "this week" summary statistics.
+<!-- TODO: Screenshot showing a function description dialog -->
+
+## Disabling Lua
+
+Function nodes are powered by the Lua scripting engine. It should be hard to create a function graph that crashes the app, but if you somehow manage to do this you can start the app without the lua engine enabled by long pressing on the app launcher on your home screen and selecting "Launch Lua disabled". You will still see the cards for the Lua functions you created so you can delete them before restarting the app again.
