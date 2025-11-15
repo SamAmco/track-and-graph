@@ -20,6 +20,7 @@ package com.samco.trackandgraph
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
+import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
@@ -33,13 +34,17 @@ import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import kotlinx.serialization.json.Json
 import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
+import org.threeten.bp.ZoneOffset
 
 suspend fun createScreenshotsGroup(dataInteractor: DataInteractor) {
     val outerGroupId = dataInteractor.insertGroup(createGroup("Screenshots"))
@@ -47,6 +52,7 @@ suspend fun createScreenshotsGroup(dataInteractor: DataInteractor) {
     createDailyGroup(dataInteractor, outerGroupId)
     createExerciseGroup(dataInteractor, outerGroupId)
     createRestDaysGroup(dataInteractor, outerGroupId)
+    createFunctionsGroup(dataInteractor, outerGroupId)
     createReminders(dataInteractor)
 }
 
@@ -206,7 +212,10 @@ private suspend fun createStressPieChart(
 
 private suspend fun createGroupListForScreenshots(dataInteractor: DataInteractor, parent: Long) {
     val groupListGroup = dataInteractor.insertGroup(
-        createGroup(name = "Track & Graph                              Groups list", parentGroupId = parent)
+        createGroup(
+            name = "Track & Graph                              Groups list",
+            parentGroupId = parent
+        )
     )
 
     dataInteractor.insertGroup(
@@ -416,7 +425,7 @@ private suspend fun createExerciseGraph1(
                 lineGraphId = 0L,
                 featureId = exerciseFeatureId,
                 name = "Yearly",
-                colorIndex = 4,
+                colorIndex = 5,
                 averagingMode = LineGraphAveraginModes.YEARLY_MOVING_AVERAGE,
                 plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                 pointStyle = LineGraphPointStyle.NONE,
@@ -673,4 +682,195 @@ private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGrou
         spacingRandomisationHours = 4,
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
+}
+
+// Function graph JSON strings for Playstore Screenshot group
+
+private fun personal_bests_function_graph(featureId: Long) =
+    """{"nodes":[{"type":"FeatureNode","x":-1762.3301,"y":-26.252203,"id":2,"featureId":""" +
+            featureId +
+            """}],"outputNode":{"x":0.0,"y":0.0,"id":1,"dependencies":[{"connectorIndex":0,"nodeId":2}]},"isDuration":false}"""
+
+private fun personal_best_rpm_function_graph(featureId: Long) =
+    """{"nodes":[{"type":"FeatureNode","x":-1364.5275,"y":-67.224884,"id":2,"featureId":""" +
+            featureId +
+            """}],"outputNode":{"x":0.0,"y":0.0,"id":1,"dependencies":[{"connectorIndex":0,"nodeId":2}]},"isDuration":false}"""
+
+private fun personal_best_weight_jumps_function_graph(featureId: Long) =
+    """{"nodes":[{"type":"FeatureNode","x":-1367.9341,"y":56.33628,"id":2,"featureId":""" +
+            featureId +
+            """}],"outputNode":{"x":-41.805542,"y":2.338745,"id":1,"dependencies":[{"connectorIndex":0,"nodeId":2}]},"isDuration":false}"""
+
+private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent: Long) {
+    val groupId = dataInteractor.insertGroup(
+        createGroup(
+            name = "Squats",
+            parentGroupId = parent,
+            displayIndex = 2
+        )
+    )
+
+    // Create tracker: Squats 🏋🏼
+    val squatsTrackerId = dataInteractor.insertTracker(
+        createTracker(
+            name = "Squats 🏋🏼",
+            groupId = groupId,
+            displayIndex = 0,
+            dataType = DataType.CONTINUOUS,
+            hasDefaultValue = false,
+            suggestionType = TrackerSuggestionType.LABEL_ONLY,
+            suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
+        )
+    )
+    val squatsFeatureId = dataInteractor.getTrackerById(squatsTrackerId)!!.featureId
+
+    // Insert data points for Squats
+    val dataPoints = listOf(
+        Triple(1743343444822L, 1.5, ""),
+        Triple(1746021888293L, 1.0, ""),
+        Triple(1748613899924L, 0.7, ""),
+        Triple(1751292323594L, 0.55, ""),
+        Triple(1753884333876L, 0.48, ""),
+        Triple(1756562746678L, 0.46, ""),
+        Triple(1759241155311L, 0.43, ""),
+        Triple(1761833185676L, 0.42, "")
+    )
+
+    dataPoints.forEach { (epochMilli, value, label) ->
+        dataInteractor.insertDataPoint(
+            createDataPoint(
+                timestamp = OffsetDateTime.ofInstant(
+                    Instant.ofEpochMilli(epochMilli),
+                    ZoneOffset.UTC
+                ),
+                featureId = squatsFeatureId,
+                value = value,
+                label = label
+            )
+        )
+    }
+
+    // Create functions
+    val json = Json { ignoreUnknownKeys = true }
+
+    // Function: Personal Bests
+    dataInteractor.insertFunction(
+        Function(
+            name = "Personal Bests",
+            groupId = groupId,
+            displayIndex = 1,
+            description = "",
+            functionGraph = json.decodeFromString(personal_bests_function_graph(squatsFeatureId)),
+            inputFeatureIds = listOf(squatsFeatureId)
+        )
+    )
+
+    // Function: Personal Best Rate per Month
+    dataInteractor.insertFunction(
+        Function(
+            name = "Personal Best Rate per Month",
+            groupId = groupId,
+            displayIndex = 2,
+            description = "",
+            functionGraph = json.decodeFromString(personal_best_rpm_function_graph(squatsFeatureId)),
+            inputFeatureIds = listOf(squatsFeatureId)
+        )
+    )
+
+    // Function: Personal Best Weight Jumps
+    dataInteractor.insertFunction(
+        Function(
+            name = "Personal Best Weight Jumps",
+            groupId = groupId,
+            displayIndex = 3,
+            description = "",
+            functionGraph = json.decodeFromString(
+                personal_best_weight_jumps_function_graph(
+                    squatsFeatureId
+                )
+            ),
+            inputFeatureIds = listOf(squatsFeatureId)
+        )
+    )
+
+    // Create line graphs
+    createFunctionsScreenshotLineGraphs(dataInteractor, groupId, squatsFeatureId)
+}
+
+private suspend fun createFunctionsScreenshotLineGraphs(
+    dataInteractor: DataInteractor,
+    groupId: Long,
+    squatsFeatureId: Long
+) {
+    // Line Graph 1
+    val graphStat1 = GraphOrStat(
+        id = 0L,
+        groupId = groupId,
+        name = "Personal Best Rate Per Month",
+        type = GraphStatType.LINE_GRAPH,
+        displayIndex = 4
+    )
+
+    val lineGraph1 = LineGraphWithFeatures(
+        id = 0L,
+        graphStatId = 0L,
+        features = listOf(
+            LineGraphFeature(
+                id = 0L,
+                lineGraphId = 0L,
+                featureId = squatsFeatureId,
+                name = "Squats 🏋🏼",
+                colorIndex = 0,
+                averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
+                offset = 0.0,
+                scale = 1.0,
+                durationPlottingMode = DurationPlottingMode.NONE
+            )
+        ),
+        sampleSize = null,
+        yRangeType = YRangeType.FIXED,
+        yFrom = 0.0,
+        yTo = 1.5,
+        endDate = GraphEndDate.Latest
+    )
+
+    dataInteractor.insertLineGraph(graphStat1, lineGraph1)
+
+    // Line Graph 2
+    val graphStat2 = GraphOrStat(
+        id = 0L,
+        groupId = groupId,
+        name = "Personal Best Rate Per Month",
+        type = GraphStatType.LINE_GRAPH,
+        displayIndex = 5
+    )
+
+    val lineGraph2 = LineGraphWithFeatures(
+        id = 0L,
+        graphStatId = 0L,
+        features = listOf(
+            LineGraphFeature(
+                id = 0L,
+                lineGraphId = 0L,
+                featureId = squatsFeatureId,
+                name = "PB",
+                colorIndex = 2,
+                averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
+                offset = 0.0,
+                scale = 1.0,
+                durationPlottingMode = DurationPlottingMode.NONE
+            )
+        ),
+        sampleSize = null,
+        yRangeType = YRangeType.FIXED,
+        yFrom = 0.0,
+        yTo = 1.5,
+        endDate = GraphEndDate.Latest
+    )
+
+    dataInteractor.insertLineGraph(graphStat2, lineGraph2)
 }

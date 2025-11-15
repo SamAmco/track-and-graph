@@ -393,7 +393,7 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) =
-        dao.insertGraphOrStat(graphOrStat.copy(id = 0L, displayIndex = 0).toEntity())
+        dao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
 
     private suspend fun <R> performAtomicUpdate(
         updateType: DataUpdateType? = null,
@@ -424,7 +424,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun duplicateLineGraph(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getLineGraphByGraphStatId(graphOrStat.id)?.let {
                 val copy = dao.insertLineGraph(
@@ -439,7 +438,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun duplicatePieChart(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getPieChartByGraphStatId(graphOrStat.id)?.let {
                 dao.insertPieChart(it.copy(id = 0L, graphStatId = newGraphStat))
@@ -448,7 +446,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun duplicateAverageTimeBetweenStat(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)?.let {
                 dao.insertAverageTimeBetweenStat(it.copy(id = 0L, graphStatId = newGraphStat))
@@ -457,7 +454,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getTimeHistogramByGraphStatId(graphOrStat.id)?.let {
                 dao.insertTimeHistogram(it.copy(id = 0L, graphStatId = newGraphStat))
@@ -466,7 +462,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getLastValueStatByGraphStatId(graphOrStat.id)?.let {
                 dao.insertLastValueStat(it.copy(id = 0L, graphStatId = newGraphStat))
@@ -475,7 +470,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun duplicateBarChart(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getBarChartByGraphStatId(graphOrStat.id)?.let {
                 dao.insertBarChart(it.copy(id = 0L, graphStatId = newGraphStat))
@@ -483,13 +477,15 @@ internal class DataInteractorImpl @Inject constructor(
         }
 
     private fun insertGraphStat(graphOrStat: GraphOrStat) =
-        dao.insertGraphOrStat(graphOrStat.copy(id = 0L, displayIndex = 0).toEntity())
+        dao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
 
     override suspend fun insertLineGraph(
         graphOrStat: GraphOrStat,
         lineGraph: LineGraphWithFeatures
     ): Long = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        if (graphOrStat.displayIndex == 0) {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+        }
         val id = insertGraphStat(graphOrStat)
         val lineGraphId =
             dao.insertLineGraph(lineGraph.toLineGraph().copy(graphStatId = id).toEntity())
@@ -500,7 +496,9 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun insertPieChart(graphOrStat: GraphOrStat, pieChart: PieChart): Long =
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            if (graphOrStat.displayIndex == 0) {
+                shiftUpGroupChildIndexes(graphOrStat.groupId)
+            }
             val id = insertGraphStat(graphOrStat)
             dao.insertPieChart(pieChart.copy(graphStatId = id).toEntity())
         }
@@ -509,7 +507,9 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         averageTimeBetweenStat: AverageTimeBetweenStat
     ): Long = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        if (graphOrStat.displayIndex == 0) {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+        }
         val id = insertGraphStat(graphOrStat)
         dao.insertAverageTimeBetweenStat(
             averageTimeBetweenStat.copy(graphStatId = id).toEntity()
@@ -520,7 +520,9 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         timeHistogram: TimeHistogram
     ) = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        if (graphOrStat.displayIndex == 0) {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+        }
         val id = insertGraphStat(graphOrStat)
         dao.insertTimeHistogram(timeHistogram.copy(graphStatId = id).toEntity())
     }
@@ -529,14 +531,18 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         config: LastValueStat
     ): Long = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        if (graphOrStat.displayIndex == 0) {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+        }
         val id = insertGraphStat(graphOrStat)
         dao.insertLastValueStat(config.copy(graphStatId = id).toEntity())
     }
 
     override suspend fun insertBarChart(graphOrStat: GraphOrStat, barChart: BarChart): Long =
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            if (graphOrStat.displayIndex == 0) {
+                shiftUpGroupChildIndexes(graphOrStat.groupId)
+            }
             val id = insertGraphStat(graphOrStat)
             dao.insertBarChart(barChart.copy(graphStatId = id).toEntity())
         }
@@ -678,7 +684,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun duplicateLuaGraph(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getLuaGraphByGraphStatId(graphOrStat.id)?.let {
                 val copy = dao.insertLuaGraph(
@@ -696,7 +701,9 @@ internal class DataInteractorImpl @Inject constructor(
         luaGraph: LuaGraphWithFeatures
     ): Long =
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            if (graphOrStat.displayIndex == 0) {
+                shiftUpGroupChildIndexes(graphOrStat.groupId)
+            }
             val id = insertGraphStat(graphOrStat)
             val luaGraphId = dao.insertLuaGraph(
                 luaGraph.toLuaGraph().copy(
