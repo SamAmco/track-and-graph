@@ -1,0 +1,6 @@
+- Functions are here! [Check out the tutorial here](https://samamco.github.io/track-and-graph/tutorial/functions/)
+- Bump versions for compose and nav3Core to get bug fix for known crash
+- Bug fix for rare font load crash on Android 7 Samsung devices
+- Change enter always scroll behavior to exit until collapsed scroll behavior
+- Tracker and function card UI alignment and improvements
+- Fix timezone issue in the core api, and cumulative bar chart graph
