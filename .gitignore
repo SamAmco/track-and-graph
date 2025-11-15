@@ -90,3 +90,6 @@ lua/local
 tmp/
 
 configuration/venv
+
+# Mac OS X system files
+**/.DS_Store

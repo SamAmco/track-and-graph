@@ -205,6 +205,7 @@ playstore-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-a
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/5.png fastlane/metadata/android/en-GB/images/phoneScreenshots/5_en-GB.png
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/6.png fastlane/metadata/android/en-GB/images/phoneScreenshots/6_en-GB.png
 	mv tmp/device_screenshots/TrackAndGraphScreenshots/7.png fastlane/metadata/android/en-GB/images/phoneScreenshots/7_en-GB.png
+	mv tmp/device_screenshots/TrackAndGraphScreenshots/8.png fastlane/metadata/android/en-GB/images/phoneScreenshots/8_en-GB.png
 	@$(MAKE) kill-emulator
 
 # ---------- 4) RECORD TUTORIAL IMAGES FOR APP ----------

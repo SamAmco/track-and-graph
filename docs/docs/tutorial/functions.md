@@ -41,35 +41,35 @@ To connect nodes, **drag from an output connector to an input connector**. You c
 
 The simplest use of Functions is combining data from multiple trackers into a single data source.
 
-Let's say you track exercise in two separate trackers - one for running and one for cycling. You can merge them into a single "All Exercise" data source:
+Let's say you track exercise in two separate trackers - one for running and one for cycling. You can merge them into a single "Exercise" data source:
 
-<!-- TODO: Screenshot or GIF showing merging two data sources -->
+![Merging Running and Cycling trackers into an Exercise function](images/functions_merge_exercise.jpg)
 
-Now your "All Exercise" Function contains all data points from both trackers, merged in reverse chronological order. You can use this in graphs or statistics to see your total exercise activity.
+Now your "Exercise" Function contains all data points from both trackers, merged in reverse chronological order. You can use this in graphs or statistics to see your total exercise activity.
 
 Taking this a step further you could create a Function that only outputs the exercise that you've done this week by adding a **Filter After Last** node connected to a **Periodic Data Points** generator set to weekly intervals:
 
-<!-- TODO: Screenshot or GIF showing weekly exercise setup -->
+![Weekly exercise filtering using Periodic Data Points and Filter After Last](images/functions_weekly_exercise.jpg)
 
 ## Example 2: Converting Units with Transformations
 
 Functions can transform your data using simple operations. Let's say you track your weight in pounds, but want to see it in kilograms for a specific graph.
 
-You can create a "Weight (kg)" Function by connecting your "Weight" tracker to a **Multiply Values** node (set to 0.453592), then connecting that to the Output Node.
+You can create a "Weight (Kg)" Function by connecting your "Weight" tracker to a **Multiply Values** node (set to 0.453592), then connecting that to the Output Node.
 
-<!-- TODO: Screenshot showing data source -> multiply -> output -->
+![Converting weight from pounds to kilograms using Multiply Values](images/functions_weight_conversion.jpg)
 
 Now you have a data source showing your weight in kilograms without changing your original tracker. 
 
 Furthermore if you track your weight sometimes in kilograms and sometimes in pounds (using labels), you can create a more complex Function that only converts values with the label "lbs":
 
-<!-- TODO: Screenshot showing data source -> filter -> multiply -> output -->
+![Advanced weight conversion using label filtering](images/functions_weight_label_filter.jpg)
 
 ## Exploring Further
 
 For a deeper understanding of what's possible with Functions, I recommend exploring the Function Catalog and experimenting with different nodes. If you click the 'i' icon on any node in the catalog, you'll see detailed documentation about what it does and how to use it.
 
-<!-- TODO: Screenshot showing a function description dialog -->
+![Function info dialog showing detailed documentation](images/functions_info_dialog.jpg)
 
 ## Disabling Lua
 

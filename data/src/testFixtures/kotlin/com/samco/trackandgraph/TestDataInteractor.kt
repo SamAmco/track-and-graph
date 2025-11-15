@@ -27,7 +27,6 @@ import com.samco.trackandgraph.data.interactor.DataInteractorImpl
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
 import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
-import com.samco.trackandgraph.data.sampling.DataSamplerImpl
 import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
 import com.samco.trackandgraph.data.validation.FunctionValidator
 import kotlinx.coroutines.Dispatchers
