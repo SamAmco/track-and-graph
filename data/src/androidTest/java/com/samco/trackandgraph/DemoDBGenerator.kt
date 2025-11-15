@@ -77,6 +77,8 @@ class DemoDBGenerator {
         createFaq1Group(dataInteractor)
         println("creating first open tutorial data")
         createFirstOpenTutorialGroup(dataInteractor, dataSampler)
+        println("creating functions tutorial data")
+        createFunctionsTutorialGroup(dataInteractor)
         println("writing to a db file")
         writeDBToFile()
     }
