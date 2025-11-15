@@ -25,6 +25,7 @@ An android app for tracking personal data and creating custom graphs. Check out 
 	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/5_en-GB.png" width="200px" />
 	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/6_en-GB.png" width="200px" />
 	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/7_en-GB.png" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/8_en-GB.png" width="200px" />
 </p>
 
 # Privacy Policy
