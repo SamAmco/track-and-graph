@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RemoteConfiguration(
+    @SerialName("endpoints")
     val endpoints: Endpoints,
     @SerialName("trusted-lua-script-sources")
     val trustedLuaScriptSources: List<String>
@@ -46,5 +47,7 @@ data class Endpoints(
     @SerialName("function-catalogue-signature")
     val functionCatalogueSignature: String,
     @SerialName("functions-docs")
-    val functionsDocs: String
+    val functionsDocs: String,
+    @SerialName("changelogs-root")
+    val changelogsRoot: String
 )

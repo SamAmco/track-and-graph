@@ -9,7 +9,8 @@
     "play-store-page": "https://play.google.com/store/apps/details?id=com.samco.trackandgraph",
     "function-catalogue-location": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/lua/catalog/community-functions.lua",
     "function-catalogue-signature": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/lua/catalog/community-functions.sig.json",
-    "functions-docs": "https://samamco.github.io/track-and-graph/tutorial/functions/"
+    "functions-docs": "https://samamco.github.io/track-and-graph/tutorial/functions/",
+    "changelogs-root": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/"
   },
   "trusted-lua-script-sources": [
     "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads"
