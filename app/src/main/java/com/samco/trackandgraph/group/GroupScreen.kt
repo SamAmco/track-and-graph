@@ -121,6 +121,7 @@ fun GroupScreen(
     val groupViewModel: GroupViewModel = hiltViewModel<GroupViewModelImpl>()
     val groupDialogsViewModel: GroupDialogsViewModel = hiltViewModel()
     val addGroupDialogViewModel: AddGroupDialogViewModelImpl = hiltViewModel()
+    val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel()
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)

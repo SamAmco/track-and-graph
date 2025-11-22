@@ -269,7 +269,7 @@ tutorial-record: check-no-devices ensure-avd-shot-api35-hi boot-and-prep-shot-ap
 
 .PHONY: changelog
 changelog:
-	@python3 scripts/new_changelog.py
+	@lua scripts/new_changelog.lua
 
 .PHONY: commit-version
 commit-version:
