@@ -129,7 +129,7 @@ private fun GraphStatViewContent(
     when (graphStatViewData.state) {
         IGraphStatViewData.State.LOADING -> {
             Box(
-                modifier = Modifier.heightIn(min = guessHeight(graphStatViewData)),
+                modifier = modifier.heightIn(min = guessHeight(graphStatViewData)),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator(
                 modifier = Modifier.testTag("loadingIndicator")
