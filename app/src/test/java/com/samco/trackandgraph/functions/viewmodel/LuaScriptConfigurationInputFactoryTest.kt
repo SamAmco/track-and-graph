@@ -23,7 +23,7 @@ import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInputFactory
 import io.github.z4kn4fein.semver.Version

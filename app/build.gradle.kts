@@ -218,6 +218,11 @@ dependencies {
     // Markdown rendering
     implementation(libs.multiplatform.markdown.renderer)
     implementation(libs.multiplatform.markdown.renderer.m3)
+    implementation(libs.multiplatform.markdown.renderer.coil3)
+    
+    // Coil for image loading
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // Glance for widgets
     implementation(libs.glance.appwidget)
@@ -251,6 +256,10 @@ dependencies {
 
     //Semantic versioning
     implementation(libs.semver)
+
+    //Data Store
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.preferences)
 
     //Testing
     testImplementation(libs.threetenbp)

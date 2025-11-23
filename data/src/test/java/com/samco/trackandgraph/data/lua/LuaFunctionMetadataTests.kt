@@ -19,7 +19,7 @@ package com.samco.trackandgraph.data.lua
 import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import io.github.z4kn4fein.semver.toVersion
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull

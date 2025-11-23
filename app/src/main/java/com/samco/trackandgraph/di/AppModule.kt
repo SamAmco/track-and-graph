@@ -56,6 +56,12 @@ import com.samco.trackandgraph.functions.repository.FunctionsRepositoryImpl
 import com.samco.trackandgraph.functions.service.FunctionsService
 import com.samco.trackandgraph.functions.service.DebugFunctionsService
 import com.samco.trackandgraph.functions.service.ProductionFunctionsService
+import com.samco.trackandgraph.releasenotes.ReleaseNotesRepository
+import com.samco.trackandgraph.releasenotes.ReleaseNotesRepositoryImpl
+import com.samco.trackandgraph.versionprovider.VersionProvider
+import com.samco.trackandgraph.versionprovider.VersionProviderImpl
+import com.samco.trackandgraph.storage.PrefsPersistenceProvider
+import com.samco.trackandgraph.storage.PrefsPersistenceProviderImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -145,4 +151,14 @@ class AppModule {
         ignoreUnknownKeys = !BuildConfig.DEBUG
         isLenient = !BuildConfig.DEBUG
     }
+
+    @Singleton
+    @Provides
+    internal fun getReleaseNotesRepository(impl: ReleaseNotesRepositoryImpl): ReleaseNotesRepository = impl
+
+    @Provides
+    internal fun getPropertiesPersistenceProvider(impl: PrefsPersistenceProviderImpl): PrefsPersistenceProvider = impl
+
+    @Provides
+    fun provideVersionProvider(impl: VersionProviderImpl): VersionProvider = impl
 }

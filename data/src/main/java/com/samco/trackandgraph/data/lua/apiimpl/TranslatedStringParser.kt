@@ -17,7 +17,7 @@
 package com.samco.trackandgraph.data.lua.apiimpl
 
 import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 

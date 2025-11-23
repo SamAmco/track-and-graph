@@ -20,7 +20,7 @@ package com.samco.trackandgraph.functions.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationEncoder
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
 import org.junit.Assert.assertEquals

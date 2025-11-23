@@ -20,9 +20,8 @@ import com.samco.trackandgraph.data.lua.ApiLevelCalculator
 import com.samco.trackandgraph.data.lua.LuaEngineImplTest
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import io.github.z4kn4fein.semver.toVersion
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

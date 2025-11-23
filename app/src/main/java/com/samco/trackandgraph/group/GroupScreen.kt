@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -43,6 +44,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -77,13 +79,18 @@ import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
+import com.samco.trackandgraph.releasenotes.ReleaseNotesDialog
+import com.samco.trackandgraph.releasenotes.ReleaseNotesViewModel
+import com.samco.trackandgraph.releasenotes.ReleaseNotesViewModelImpl
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
+import com.samco.trackandgraph.ui.compose.ui.FloatingBarButton
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
@@ -121,7 +128,7 @@ fun GroupScreen(
     val groupViewModel: GroupViewModel = hiltViewModel<GroupViewModelImpl>()
     val groupDialogsViewModel: GroupDialogsViewModel = hiltViewModel()
     val addGroupDialogViewModel: AddGroupDialogViewModelImpl = hiltViewModel()
-    val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel()
+    val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel<ReleaseNotesViewModelImpl>()
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)
@@ -145,6 +152,7 @@ fun GroupScreen(
         groupViewModel = groupViewModel,
         groupDialogsViewModel = groupDialogsViewModel,
         addGroupDialogViewModel = addGroupDialogViewModel,
+        releaseNotesViewModel = releaseNotesViewModel,
         groupId = navArgs.groupId,
         groupName = navArgs.groupName,
         onTrackerEdit = onTrackerEdit,
@@ -203,6 +211,7 @@ private fun GroupScreenContent(
     groupViewModel: GroupViewModel,
     groupDialogsViewModel: GroupDialogsViewModel,
     addGroupDialogViewModel: AddGroupDialogViewModelImpl,
+    releaseNotesViewModel: ReleaseNotesViewModel,
     groupId: Long,
     groupName: String?,
     onTrackerEdit: (DisplayTracker) -> Unit = {},
@@ -233,17 +242,23 @@ private fun GroupScreenContent(
             .collect { requestAlarmAndNotificationPermission() }
     }
 
+    val showReleaseNotesButton = releaseNotesViewModel.showReleaseNotesButton.collectAsStateWithLifecycle().value
+    val showReleaseNotesDialog = releaseNotesViewModel.showReleaseNotesDialog.collectAsStateWithLifecycle().value
+    val releaseNotes = releaseNotesViewModel.releaseNotes.collectAsStateWithLifecycle().value
+
     GroupScreenView(
         lazyGridState = groupViewModel.lazyGridState,
         isLoading = isLoading,
         showEmptyText = showEmptyText,
         // Only show FAB if scroll allows it AND we have trackers
         showFab = showFab.value && groupHasTrackers,
+        showReleaseNotesButton = showFab.value && showReleaseNotesButton,
         onQueueAddAllClicked = {
             groupViewModel.getTrackersInGroup().let { trackers ->
                 addDataPointsDialogViewModel.showAddDataPointsDialog(trackerIds = trackers.map { it.id })
             }
         },
+        onReleaseNotesClicked = releaseNotesViewModel::onClickReleaseNotesButton,
         allChildren = allChildren,
         trackerClickListeners = TrackerClickListeners(
             onEdit = onTrackerEdit,
@@ -398,6 +413,19 @@ private fun GroupScreenContent(
         )
         groupViewModel.onConsumedShowDurationInputDialog()
     }
+
+    // Release notes dialog
+    if (showReleaseNotesDialog) {
+        ReleaseNotesDialog(
+            releaseNotes = releaseNotes,
+            onDismissRequest = releaseNotesViewModel::onDismissReleaseNotesButton,
+            onDonateClicked = {
+                // TODO: Handle donation click
+                releaseNotesViewModel.onDismissReleaseNotesButton()
+            },
+            onSkipDonationClicked = releaseNotesViewModel::onDismissReleaseNotesButton
+        )
+    }
 }
 
 /**
@@ -409,8 +437,10 @@ private fun GroupScreenView(
     isLoading: Boolean,
     showEmptyText: Boolean,
     showFab: Boolean,
+    showReleaseNotesButton: Boolean,
     allChildren: List<GroupChild>,
     onQueueAddAllClicked: () -> Unit = {},
+    onReleaseNotesClicked: () -> Unit = {},
     trackerClickListeners: TrackerClickListeners? = null,
     graphStatClickListeners: GraphStatClickListeners? = null,
     groupClickListeners: GroupClickListeners? = null,
@@ -446,16 +476,20 @@ private fun GroupScreenView(
             )
         }
 
+        // Extract animation specs for reuse
+        val fabEnterAnimation = scaleIn(
+            animationSpec = tween(300)
+        ) + fadeIn(animationSpec = tween(300))
+        val fabExitAnimation = scaleOut(
+            animationSpec = tween(300)
+        ) + fadeOut(animationSpec = tween(300))
+
         // FAB positioned manually at bottom end
         AnimatedVisibility(
             visible = showFab,
             modifier = Modifier.align(Alignment.BottomEnd),
-            enter = scaleIn(
-                animationSpec = tween(300)
-            ) + fadeIn(animationSpec = tween(300)),
-            exit = scaleOut(
-                animationSpec = tween(300)
-            ) + fadeOut(animationSpec = tween(300))
+            enter = fabEnterAnimation,
+            exit = fabExitAnimation
         ) {
             FloatingActionButton(
                 onClick = onQueueAddAllClicked,
@@ -470,6 +504,25 @@ private fun GroupScreenView(
                     contentDescription = stringResource(id = R.string.track_all)
                 )
             }
+        }
+
+        // Release notes button positioned at bottom center
+        AnimatedVisibility(
+            visible = showReleaseNotesButton,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = fabEnterAnimation,
+            exit = fabExitAnimation
+        ) {
+            FloatingBarButton(
+                onClick = onReleaseNotesClicked,
+                text = stringResource(id = R.string.see_whats_new),
+                icon = R.drawable.deployed_code_update_24px,
+                modifier = Modifier
+                    .testTag("releaseNotesButton")
+                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .widthIn(max = 300.dp)
+                    .then(Modifier.padding(inputSpacingLarge))
+            )
         }
 
         // Loading overlay
@@ -672,6 +725,7 @@ private fun GroupScreenViewEmptyPreview() {
             isLoading = false,
             showEmptyText = true,
             showFab = true,
+            showReleaseNotesButton = true,
             trackerClickListeners = TrackerClickListeners(),
             graphStatClickListeners = GraphStatClickListeners(),
             groupClickListeners = GroupClickListeners(),

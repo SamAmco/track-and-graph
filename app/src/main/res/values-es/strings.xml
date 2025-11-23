@@ -382,4 +382,8 @@
     <string name="function_network_failure">Error al cargar las funciones. Por favor, asegúrese de estar conectado a internet. Si el problema persiste, asegúrese de que la aplicación esté actualizada.</string>
     <string name="functions_landscape_hint">Consejo: Las funciones funcionan mejor en modo horizontal</string>
     <string name="functions_start_hint">Empieza aquí: Pulsación larga y seleccionar Fuente de datos</string>
+    <string name="see_whats_new">Ver Novedades</string>
+    <string name="release_notes_support_text">Cada apoyo ayuda a que Track &amp; Graph sea mejor para todos ❤️</string>
+    <string name="release_notes_maybe_later">Quizás más tarde</string>
+    <string name="release_notes_support_development">Apoyar el desarrollo</string>
 </resources>

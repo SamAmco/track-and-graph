@@ -383,4 +383,8 @@
     <string name="function_network_failure">Fehler beim Laden der Funktionen. Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind. Falls das Problem weiterhin besteht, stellen Sie bitte sicher, dass die App auf dem neuesten Stand ist.</string>
     <string name="functions_landscape_hint">Tipp: Funktionen funktionieren am besten im Querformat</string>
     <string name="functions_start_hint">Hier starten: Lange drücken und Datenquelle wählen</string>
+    <string name="see_whats_new">Neuigkeiten ansehen</string>
+    <string name="release_notes_support_text">Jede Unterstützung trägt dazu bei, Track &amp; Graph für alle zu verbessern ❤️</string>
+    <string name="release_notes_maybe_later">Vielleicht später</string>
+    <string name="release_notes_support_development">Entwicklung unterstützen</string>
 </resources>

@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

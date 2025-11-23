@@ -391,4 +391,8 @@
     <string name="function_network_failure">Échec du chargement des fonctions. Veuillez vous assurer que vous êtes connecté à internet. Si le problème persiste, veuillez vous assurer que l\'application est à jour.</string>
     <string name="functions_landscape_hint">Astuce : Les fonctions fonctionnent mieux en mode paysage</string>
     <string name="functions_start_hint">Commencez ici : Appui long et sélectionner Source de données</string>
+    <string name="see_whats_new">Voir les Nouveautés</string>
+    <string name="release_notes_support_text">Chaque contribution aide à rendre Track &amp; Graph meilleur pour tout le monde ❤️</string>
+    <string name="release_notes_maybe_later">Peut-être plus tard</string>
+    <string name="release_notes_support_development">Soutenir le développement</string>
 </resources>

@@ -18,7 +18,6 @@ package com.samco.trackandgraph.functions.node_editor.viewmodel
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
@@ -57,7 +56,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import kotlinx.coroutines.FlowPreview
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean

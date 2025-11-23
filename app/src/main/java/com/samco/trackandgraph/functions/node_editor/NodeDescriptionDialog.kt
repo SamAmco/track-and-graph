@@ -33,10 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.mikepenz.markdown.m3.Markdown
+import com.samco.trackandgraph.ui.compose.ui.TnGMarkdown
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
@@ -110,7 +110,7 @@ fun NodeDescriptionDialog(
                     }
                 }
 
-                Markdown(descriptionText)
+                TnGMarkdown(content = descriptionText)
             }
         }
     }

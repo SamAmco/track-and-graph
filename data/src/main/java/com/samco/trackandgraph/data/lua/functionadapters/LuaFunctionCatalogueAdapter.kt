@@ -21,9 +21,8 @@ import com.samco.trackandgraph.data.lua.LuaScriptResolver
 import com.samco.trackandgraph.data.lua.VMLease
 import com.samco.trackandgraph.data.lua.apiimpl.TranslatedStringParser
 import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
-import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import io.github.z4kn4fein.semver.Version
 import io.github.z4kn4fein.semver.toVersion
 import org.luaj.vm2.LuaValue
