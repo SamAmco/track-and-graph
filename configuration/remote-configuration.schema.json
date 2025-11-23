@@ -18,7 +18,9 @@
         "play-store-page",
         "function-catalogue-location",
         "function-catalogue-signature",
-        "functions-docs"
+        "functions-docs",
+        "changelogs-root",
+        "donate-url"
       ],
       "properties": {
         "github": {
@@ -63,6 +65,16 @@
           "type": "string",
           "format": "uri",
           "description": "URL to the functions documentation"
+        },
+        "changelogs-root": {
+          "type": "string",
+          "format": "uri",
+          "description": "Root URL for changelog files"
+        },
+        "donate-url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for donation page"
         }
       },
       "additionalProperties": false

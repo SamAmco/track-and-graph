@@ -49,5 +49,7 @@ data class Endpoints(
     @SerialName("functions-docs")
     val functionsDocs: String,
     @SerialName("changelogs-root")
-    val changelogsRoot: String
+    val changelogsRoot: String,
+    @SerialName("donate-url")
+    val donateUrl: String
 )

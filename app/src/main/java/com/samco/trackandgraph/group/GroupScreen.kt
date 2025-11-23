@@ -420,7 +420,7 @@ private fun GroupScreenContent(
             releaseNotes = releaseNotes,
             onDismissRequest = releaseNotesViewModel::onDismissReleaseNotesButton,
             onDonateClicked = {
-                // TODO: Handle donation click
+                releaseNotesViewModel.onDonateClicked()
                 releaseNotesViewModel.onDismissReleaseNotesButton()
             },
             onSkipDonationClicked = releaseNotesViewModel::onDismissReleaseNotesButton
