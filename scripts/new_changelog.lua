@@ -146,7 +146,7 @@ local function create_version_json_line(version_name, changelogs)
 	local locale_pairs = {}
 	for _, changelog in pairs(changelogs) do
 		local locale = changelog.general
-		local path = string.format("changelogs/%s/%s.md", version_name, locale)
+		local path = string.format("%s/%s.md", version_name, locale)
 		table.insert(locale_pairs, string.format('"%s": "%s"', locale, path))
 	end
 	
