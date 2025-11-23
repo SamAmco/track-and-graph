@@ -21,7 +21,7 @@ import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.service.FunctionsCatalogData
 import com.samco.trackandgraph.functions.service.FunctionsService
 import com.samco.trackandgraph.functions.service.SignatureData
@@ -68,7 +68,7 @@ class FunctionsRepositoryImplTest {
                     ?: throw IllegalStateException("Could not read test public key")
 
             val signatureData = SignatureData(
-                keyId = "debug-20251010T194102Z",
+                keyId = "debug-20251010T194102Z.pub",
                 algorithm = "ECDSA-P256-SHA256",
                 signature = "MEYCIQC7EtQMp/uZ6whP7RHDTununvnAZmdxSO2LFyxxwOR+qwIhAPpljd0MQvsTJo6LP2oG2Xs1mSOQtKHlAs/X6h2e7xsr"
             )
@@ -144,7 +144,7 @@ class FunctionsRepositoryImplTest {
 
             // Invalid signature that won't match the script
             val invalidSignatureData = SignatureData(
-                keyId = "debug-20251010T194102Z",
+                keyId = "debug-20251010T194102Z.pub",
                 algorithm = "ECDSA-P256-SHA256",
                 signature = "INVALID_SIGNATURE_THAT_WONT_VERIFY"
             )
@@ -205,7 +205,7 @@ class FunctionsRepositoryImplTest {
                     ?: throw IllegalStateException("Could not read test public key")
 
             val signatureData = SignatureData(
-                keyId = "debug-20251010T194102Z",
+                keyId = "debug-20251010T194102Z.pub",
                 algorithm = "ECDSA-P256-SHA256",
                 signature = "MEYCIQC7EtQMp/uZ6whP7RHDTununvnAZmdxSO2LFyxxwOR+qwIhAPpljd0MQvsTJo6LP2oG2Xs1mSOQtKHlAs/X6h2e7xsr"
             )
