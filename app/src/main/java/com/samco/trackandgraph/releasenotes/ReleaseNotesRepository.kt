@@ -176,7 +176,7 @@ class ReleaseNotesRepositoryImpl @Inject constructor(
 
     private suspend fun downloadReleaseNotesIndex(): ReleaseNotesIndex? {
         val remoteConfig = remoteConfigProvider.getRemoteConfiguration() ?: return null
-        val indexUrl = "${remoteConfig.endpoints.changelogsRoot}/index.json"
+        val indexUrl = "${remoteConfig.changelogsRoot}/index.json"
 
         // Try to download with ETag support
         val cachedETag = fileCache.getETag(INDEX_CACHE_KEY)
@@ -207,7 +207,7 @@ class ReleaseNotesRepositoryImpl @Inject constructor(
 
         for ((locale, relativePath) in localeMap) {
             val remoteConfig = remoteConfigProvider.getRemoteConfiguration() ?: continue
-            val fileUrl = "${remoteConfig.endpoints.changelogsRoot}/$relativePath"
+            val fileUrl = "${remoteConfig.changelogsRoot}/$relativePath"
             val cacheKey = "$RELEASE_NOTES_DATA_ROOT/$versionString/$locale"
 
             // Try to download with ETag support
