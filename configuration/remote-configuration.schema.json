@@ -3,7 +3,7 @@
   "title": "Remote Configuration Schema",
   "description": "Schema for remote configuration endpoints",
   "type": "object",
-  "required": ["endpoints", "trusted-lua-script-sources"],
+  "required": ["endpoints", "trusted-lua-script-sources", "changelogs-root"],
   "properties": {
     "endpoints": {
       "type": "object",
@@ -19,7 +19,6 @@
         "function-catalogue-location",
         "function-catalogue-signature",
         "functions-docs",
-        "changelogs-root",
         "donate-url"
       ],
       "properties": {
@@ -66,11 +65,6 @@
           "format": "uri",
           "description": "URL to the functions documentation"
         },
-        "changelogs-root": {
-          "type": "string",
-          "format": "uri",
-          "description": "Root URL for changelog files"
-        },
         "donate-url": {
           "type": "string",
           "format": "uri",
@@ -86,6 +80,11 @@
         "type": "string",
         "format": "uri"
       }
+    },
+    "changelogs-root": {
+      "type": "string",
+      "format": "uri",
+      "description": "Root URL for changelog files"
     }
   }
 }

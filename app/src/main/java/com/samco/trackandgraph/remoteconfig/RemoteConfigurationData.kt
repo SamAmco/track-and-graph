@@ -24,7 +24,9 @@ data class RemoteConfiguration(
     @SerialName("endpoints")
     val endpoints: Endpoints,
     @SerialName("trusted-lua-script-sources")
-    val trustedLuaScriptSources: List<String>
+    val trustedLuaScriptSources: List<String>,
+    @SerialName("changelogs-root")
+    val changelogsRoot: String
 )
 
 @Serializable
@@ -48,8 +50,6 @@ data class Endpoints(
     val functionCatalogueSignature: String,
     @SerialName("functions-docs")
     val functionsDocs: String,
-    @SerialName("changelogs-root")
-    val changelogsRoot: String,
     @SerialName("donate-url")
     val donateUrl: String
 )

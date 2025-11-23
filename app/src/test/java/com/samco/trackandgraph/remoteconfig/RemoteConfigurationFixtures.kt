@@ -27,13 +27,13 @@ val testEndpoints = Endpoints(
     functionCatalogueLocation = "https://functions.com/catalog",
     functionCatalogueSignature = "https://functions.com/signature",
     functionsDocs = "https://functions.com/docs",
-    changelogsRoot = "https://changelogs.com",
     donateUrl = "https://buymeacoffee.com/trackandgraph"
 )
 
 val testRemoteConfig = RemoteConfiguration(
     endpoints = testEndpoints,
-    trustedLuaScriptSources = listOf("https://trusted.com")
+    trustedLuaScriptSources = listOf("https://trusted.com"),
+    changelogsRoot = "https://changelogs.com"
 )
 
 class FakeRemoteConfigProvider : RemoteConfigProvider {
