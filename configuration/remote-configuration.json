@@ -10,7 +10,8 @@
     "function-catalogue-location": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/lua/catalog/community-functions.lua",
     "function-catalogue-signature": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/lua/catalog/community-functions.sig.json",
     "functions-docs": "https://samamco.github.io/track-and-graph/tutorial/functions/",
-    "changelogs-root": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/"
+    "changelogs-root": "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/",
+    "donate-url": "https://buymeacoffee.com/trackandgraph"
   },
   "trusted-lua-script-sources": [
     "https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads"

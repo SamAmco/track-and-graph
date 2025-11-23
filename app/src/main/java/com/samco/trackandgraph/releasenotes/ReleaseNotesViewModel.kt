@@ -16,15 +16,21 @@
  */
 package com.samco.trackandgraph.releasenotes
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.localisation.TranslatedString
+import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
@@ -39,6 +45,7 @@ interface ReleaseNotesViewModel {
 
     fun onClickReleaseNotesButton()
     fun onDismissReleaseNotesButton()
+    fun onDonateClicked()
 }
 
 data class ReleaseNoteViewData(
@@ -48,7 +55,10 @@ data class ReleaseNoteViewData(
 
 @HiltViewModel
 class ReleaseNotesViewModelImpl @Inject constructor(
-    private val repository: ReleaseNotesRepository
+    @ApplicationContext private val context: Context,
+    private val repository: ReleaseNotesRepository,
+    private val urlNavigator: UrlNavigator,
+    private val remoteConfigProvider: RemoteConfigProvider,
 ) : ViewModel(), ReleaseNotesViewModel {
     override val showReleaseNotesDialog = MutableStateFlow(false)
 
@@ -56,8 +66,16 @@ class ReleaseNotesViewModelImpl @Inject constructor(
         send(repository.getNewReleaseNotes().map { it.toViewData() })
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
+    private val hasDonateLink = flow {
+        val link = remoteConfigProvider.getRemoteConfiguration()?.endpoints?.donateUrl
+        emit(!link.isNullOrBlank())
+    }
+
     override val showReleaseNotesButton: StateFlow<Boolean> = merge(
-        releaseNotes.map { it.isNotEmpty() },
+        combine(
+            releaseNotes.map { it.isNotEmpty() },
+            hasDonateLink,
+        ) { hasNotes, hasLink -> hasNotes && hasLink },
         showReleaseNotesDialog.filter { it }.map { false }
     ).stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
@@ -67,6 +85,10 @@ class ReleaseNotesViewModelImpl @Inject constructor(
 
     override fun onDismissReleaseNotesButton() {
         showReleaseNotesDialog.update { false }
+    }
+
+    override fun onDonateClicked() {
+        urlNavigator.triggerNavigation(context, UrlNavigator.Location.DONATE)
     }
 
     private fun ReleaseNote.toViewData() = ReleaseNoteViewData(
