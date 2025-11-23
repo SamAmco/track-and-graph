@@ -69,6 +69,7 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 enum class DrawerMenuBrowserLocation {
     FAQ,
     RATE_APP,
+    SUPPORT_PROJECT,
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -131,6 +132,11 @@ fun MenuDrawerContent(
             title = stringResource(R.string.rate_the_app),
             icon = painterResource(R.drawable.rate_icon)
         ) { onNavigateToBrowser(DrawerMenuBrowserLocation.RATE_APP) }
+
+        MenuItem(
+            title = stringResource(R.string.release_notes_support_development),
+            icon = painterResource(R.drawable.bmc_logo)
+        ) { onNavigateToBrowser(DrawerMenuBrowserLocation.SUPPORT_PROJECT) }
 
         MenuItem(
             title = stringResource(R.string.about),

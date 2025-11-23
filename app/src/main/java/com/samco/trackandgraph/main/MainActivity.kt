@@ -141,6 +141,9 @@ class MainActivity : AppCompatActivity() {
 
             DrawerMenuBrowserLocation.RATE_APP -> urlNavigator
                 .triggerNavigation(this, UrlNavigator.Location.PLAY_STORE_PAGE)
+
+            DrawerMenuBrowserLocation.SUPPORT_PROJECT -> urlNavigator
+                .triggerNavigation(this, UrlNavigator.Location.DONATE)
         }
     }
 

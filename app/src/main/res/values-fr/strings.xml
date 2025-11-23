@@ -392,8 +392,8 @@
     <string name="functions_landscape_hint">Astuce : Les fonctions fonctionnent mieux en mode paysage</string>
     <string name="functions_start_hint">Commencez ici : Appui long et sélectionner Source de données</string>
     <string name="see_whats_new">Voir les Nouveautés</string>
-    <string name="release_notes_support_text">Chaque contribution aide à rendre Track &amp; Graph meilleur pour tout le monde ❤️</string>
+    <string name="release_notes_support_text">Votre soutien aide à maintenir Track &amp; Graph vivant et en croissance 🌱</string>
     <string name="release_notes_maybe_later">Peut-être plus tard</string>
-    <string name="release_notes_support_development">Soutenir le développement</string>
-    <string name="release_notes_thank_you"><![CDATA[Merci ! ❤️\n\nVotre soutien aide à maintenir Track & Graph vivant et en croissance 🌱]]></string>
+    <string name="release_notes_support_development">Faire un Don pour Soutenir le Développement</string>
+    <string name="release_notes_thank_you"><![CDATA[Merci ! ❤️\n\nChaque contribution aide à rendre Track & Graph meilleur pour tout le monde 🌱]]></string>
 </resources>

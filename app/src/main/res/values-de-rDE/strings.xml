@@ -384,8 +384,8 @@
     <string name="functions_landscape_hint">Tipp: Funktionen funktionieren am besten im Querformat</string>
     <string name="functions_start_hint">Hier starten: Lange drücken und Datenquelle wählen</string>
     <string name="see_whats_new">Neuigkeiten ansehen</string>
-    <string name="release_notes_support_text">Jede Unterstützung trägt dazu bei, Track &amp; Graph für alle zu verbessern ❤️</string>
+    <string name="release_notes_support_text">Ihre Unterstützung hilft dabei, Track &amp; Graph am Leben zu erhalten und wachsen zu lassen 🌱</string>
     <string name="release_notes_maybe_later">Vielleicht später</string>
-    <string name="release_notes_support_development">Entwicklung unterstützen</string>
-    <string name="release_notes_thank_you"><![CDATA[Vielen Dank! ❤️\n\nIhre Unterstützung hilft dabei, Track & Graph am Leben zu erhalten und wachsen zu lassen 🌱]]></string>
+    <string name="release_notes_support_development">Spenden zur Entwicklungsunterstützung</string>
+    <string name="release_notes_thank_you"><![CDATA[Vielen Dank! ❤️\n\nJede Unterstützung trägt dazu bei, Track & Graph für alle zu verbessern 🌱]]></string>
 </resources>
