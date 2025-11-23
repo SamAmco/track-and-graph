@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.functions.viewmodel
 
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
@@ -278,12 +277,12 @@ internal class FunctionGraphDecoderTest {
             nodes = persistentListOf(
                 Node.DataSource(
                     id = 1,
-                    selectedFeatureId = mutableLongStateOf(101L),
+                    selectedFeatureId = mutableStateOf(101L),
                     featurePathMap = createFeaturePathMap()
                 ),
                 Node.DataSource(
                     id = 2,
-                    selectedFeatureId = mutableLongStateOf(102L),
+                    selectedFeatureId = mutableStateOf(102L),
                     featurePathMap = createFeaturePathMap()
                 ),
                 Node.LuaScript(

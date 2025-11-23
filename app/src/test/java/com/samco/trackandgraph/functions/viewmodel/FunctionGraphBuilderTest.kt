@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.functions.viewmodel
 
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
@@ -26,7 +25,7 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.database.dto.NodeDependency
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Connector
 import com.samco.trackandgraph.functions.node_editor.viewmodel.ConnectorType
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Edge
@@ -133,7 +132,7 @@ class FunctionGraphBuilderTest {
         val nodesWithoutOutput = listOf(
             Node.DataSource(
                 id = 1,
-                selectedFeatureId = mutableLongStateOf(101L),
+                selectedFeatureId = mutableStateOf(101L),
                 featurePathMap = emptyMap()
             )
         )
@@ -153,7 +152,7 @@ class FunctionGraphBuilderTest {
         val nodesWithMultipleOutputs = listOf(
             Node.DataSource(
                 id = 1,
-                selectedFeatureId = mutableLongStateOf(101L),
+                selectedFeatureId = mutableStateOf(101L),
                 featurePathMap = emptyMap()
             ),
             Node.Output(id = 2),
@@ -282,17 +281,17 @@ class FunctionGraphBuilderTest {
         return listOf(
             Node.DataSource(
                 id = 1,
-                selectedFeatureId = mutableLongStateOf(101L),
+                selectedFeatureId = mutableStateOf(101L),
                 featurePathMap = mapOf(101L to "Feature 101")
             ),
             Node.DataSource(
                 id = 2,
-                selectedFeatureId = mutableLongStateOf(102L),
+                selectedFeatureId = mutableStateOf(102L),
                 featurePathMap = mapOf(102L to "Feature 102")
             ),
             Node.DataSource(
                 id = 3,
-                selectedFeatureId = mutableLongStateOf(103L),
+                selectedFeatureId = mutableStateOf(103L),
                 featurePathMap = mapOf(103L to "Feature 103")
             ),
             Node.LuaScript(
