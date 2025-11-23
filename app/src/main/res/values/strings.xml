@@ -404,8 +404,8 @@
     <string name="functions_landscape_hint">Tip: Functions work best in landscape</string>
     <string name="functions_start_hint">Start here: Long press and select Data Source</string>
     <string name="see_whats_new">See What\'s New</string>
-    <string name="release_notes_support_text">Every bit of support goes toward making Track &amp; Graph better for everyone ❤️</string>
+    <string name="release_notes_support_text">Your support helps keep Track &amp; Graph alive and growing 🌱</string>
     <string name="release_notes_maybe_later">Maybe Later</string>
-    <string name="release_notes_support_development">Support Development</string>
-    <string name="release_notes_thank_you"><![CDATA[Thank You! ❤️\n\nYour support helps keep Track & Graph alive and growing 🌱]]></string>
+    <string name="release_notes_support_development">Donate to Support Development</string>
+    <string name="release_notes_thank_you"><![CDATA[Thank You! ❤️\n\nEvery bit of support goes toward making Track & Graph better for everyone 🌱]]></string>
 </resources>
