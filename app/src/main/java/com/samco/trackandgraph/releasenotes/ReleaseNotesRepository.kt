@@ -69,13 +69,6 @@ class ReleaseNotesRepositoryImpl @Inject constructor(
             val registeredVersions = getRegisteredVersions()
             if (registeredVersions == null) return@withContext emptyList()
 
-            return@withContext listOf(
-                ReleaseNote(
-                    version = registeredVersions.current,
-                    text = TranslatedString.Simple("Test")
-                )
-            )
-
             if (registeredVersions.lastSeen == null) {
                 if (dataInteractor.hasAnyFeatures()) {
                     // Special case: Show all release notes if you're on v8.1.x to make sure the

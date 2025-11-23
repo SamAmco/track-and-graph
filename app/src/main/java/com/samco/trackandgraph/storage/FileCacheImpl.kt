@@ -47,6 +47,9 @@ class FileCacheImpl @Inject constructor(
             val dataFile = File(cacheDir, "$key$DATA_SUFFIX")
             val etagFile = File(cacheDir, "$key$ETAG_SUFFIX")
 
+            dataFile.parentFile?.mkdirs()
+            etagFile.parentFile?.mkdirs()
+
             // Write data file
             dataFile.writeBytes(data)
 
