@@ -18,8 +18,9 @@ package com.samco.trackandgraph.functions.service
 
 import com.samco.trackandgraph.downloader.DownloadResult
 import com.samco.trackandgraph.downloader.FileDownloader
-import com.samco.trackandgraph.fakes.FakeRemoteConfiguration
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
+import com.samco.trackandgraph.remoteconfig.testEndpoints
+import com.samco.trackandgraph.remoteconfig.testRemoteConfig
 import com.samco.trackandgraph.storage.FileCache
 import com.samco.trackandgraph.storage.CachedFile
 import kotlinx.coroutines.runBlocking
@@ -32,8 +33,6 @@ import org.junit.Before
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.any
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import java.net.URI
@@ -56,8 +55,8 @@ class ProductionFunctionsServiceTest {
         """{"keyId":"$testKeyId","algorithm":"ECDSA-P256-SHA256","signature":"$testSignature"}"""
     private val testSignatureBytes = testSignatureJson.toByteArray()
 
-    private val testRemoteConfig = FakeRemoteConfiguration.copy(
-        endpoints = FakeRemoteConfiguration.endpoints.copy(
+    private val remoteConfig = testRemoteConfig.copy(
+        endpoints = testEndpoints.copy(
             functionCatalogueLocation = testCatalogueUrl,
             functionCatalogueSignature = testSignatureUrl
         )
@@ -76,7 +75,7 @@ class ProductionFunctionsServiceTest {
     @Test
     fun `fetchFunctionsCatalog - online success downloads new files`() = runTest {
         // Given
-        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(testRemoteConfig)
+        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(remoteConfig)
         whenever(fileCache.getETag("function_catalogue")).thenReturn(null)
         whenever(fileDownloader.downloadFileWithETag(URI(testCatalogueUrl), null))
             .thenReturn(DownloadResult.Downloaded(testLuaScript, "new-etag"))
@@ -99,7 +98,7 @@ class ProductionFunctionsServiceTest {
         verify(fileDownloader).downloadFileToBytes(URI(testSignatureUrl))
         verify(fileCache).storeFile("function_catalogue", testLuaScript, "new-etag")
         verify(fileCache).storeFile("function_signature", testSignatureBytes, null)
-        
+
         // Verify no additional interactions
         verifyNoMoreInteractions(remoteConfigProvider, fileDownloader, fileCache)
     }
@@ -107,7 +106,7 @@ class ProductionFunctionsServiceTest {
     @Test
     fun `fetchFunctionsCatalog - online fails uses cached files`() = runTest {
         // Given
-        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(testRemoteConfig)
+        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(remoteConfig)
         whenever(fileCache.getETag("function_catalogue")).thenReturn("cached-etag")
         whenever(fileDownloader.downloadFileWithETag(URI(testCatalogueUrl), "cached-etag"))
             .thenReturn(null) // Network failure
@@ -124,7 +123,7 @@ class ProductionFunctionsServiceTest {
         assertEquals(testKeyId, result.signatureData.keyId)
         assertEquals("ECDSA-P256-SHA256", result.signatureData.algorithm)
         assertEquals(testSignature, result.signatureData.signature)
-        
+
         // Verify all interactions in correct order
         verify(remoteConfigProvider).getRemoteConfiguration()
         verify(fileCache).getETag("function_catalogue")
@@ -138,7 +137,7 @@ class ProductionFunctionsServiceTest {
     @Test
     fun `fetchFunctionsCatalog - online uses cache when not modified`() = runTest {
         // Given
-        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(testRemoteConfig)
+        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(remoteConfig)
         whenever(fileCache.getETag("function_catalogue")).thenReturn("existing-etag")
         whenever(fileDownloader.downloadFileWithETag(URI(testCatalogueUrl), "existing-etag"))
             .thenReturn(DownloadResult.UseCache) // 304 Not Modified
@@ -162,14 +161,14 @@ class ProductionFunctionsServiceTest {
         verify(fileDownloader).downloadFileWithETag(URI(testCatalogueUrl), "existing-etag")
         verify(fileCache).getFile("function_catalogue")
         verify(fileCache).getFile("function_signature")
-        
+
         verifyNoMoreInteractions(remoteConfigProvider, fileDownloader, fileCache)
     }
 
     @Test
     fun `fetchFunctionsCatalog - online fails and cache fails throws error`() = runTest {
         // Given
-        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(testRemoteConfig)
+        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(remoteConfig)
         whenever(fileCache.getETag("function_catalogue")).thenReturn(null)
         whenever(fileDownloader.downloadFileWithETag(URI(testCatalogueUrl), null))
             .thenReturn(null) // Network failure
@@ -184,7 +183,7 @@ class ProductionFunctionsServiceTest {
             "No cached function catalogue available and unable to connect to server",
             exception.message
         )
-        
+
         // Verify all interactions occurred in correct order
         verify(remoteConfigProvider).getRemoteConfiguration()
         verify(fileCache).getETag("function_catalogue")
@@ -195,31 +194,32 @@ class ProductionFunctionsServiceTest {
     }
 
     @Test
-    fun `fetchFunctionsCatalog - remote config provider throws exception falls back to cache`() = runTest {
-        // Given
-        whenever(remoteConfigProvider.getRemoteConfiguration()).thenThrow(RuntimeException("Network error"))
-        whenever(fileCache.getFile("function_catalogue"))
-            .thenReturn(CachedFile(testLuaScript, "cached-etag"))
-        whenever(fileCache.getFile("function_signature"))
-            .thenReturn(CachedFile(testSignatureBytes, null))
+    fun `fetchFunctionsCatalog - remote config provider throws exception falls back to cache`() =
+        runTest {
+            // Given
+            whenever(remoteConfigProvider.getRemoteConfiguration()).thenThrow(RuntimeException("Network error"))
+            whenever(fileCache.getFile("function_catalogue"))
+                .thenReturn(CachedFile(testLuaScript, "cached-etag"))
+            whenever(fileCache.getFile("function_signature"))
+                .thenReturn(CachedFile(testSignatureBytes, null))
 
-        // When
-        val result = service.fetchFunctionsCatalog()
+            // When
+            val result = service.fetchFunctionsCatalog()
 
-        // Then
-        assertEquals(testLuaScript, result.luaScriptBytes)
-        assertEquals(testKeyId, result.signatureData.keyId)
-        assertEquals("ECDSA-P256-SHA256", result.signatureData.algorithm)
-        assertEquals(testSignature, result.signatureData.signature)
-        
-        // Verify interactions
-        verify(remoteConfigProvider).getRemoteConfiguration()
-        verify(fileCache).getFile("function_catalogue")
-        verify(fileCache).getFile("function_signature")
-        
-        // Verify no download attempts
-        verifyNoInteractions(fileDownloader)
+            // Then
+            assertEquals(testLuaScript, result.luaScriptBytes)
+            assertEquals(testKeyId, result.signatureData.keyId)
+            assertEquals("ECDSA-P256-SHA256", result.signatureData.algorithm)
+            assertEquals(testSignature, result.signatureData.signature)
 
-        verifyNoMoreInteractions(remoteConfigProvider, fileCache)
-    }
+            // Verify interactions
+            verify(remoteConfigProvider).getRemoteConfiguration()
+            verify(fileCache).getFile("function_catalogue")
+            verify(fileCache).getFile("function_signature")
+
+            // Verify no download attempts
+            verifyNoInteractions(fileDownloader)
+
+            verifyNoMoreInteractions(remoteConfigProvider, fileCache)
+        }
 }

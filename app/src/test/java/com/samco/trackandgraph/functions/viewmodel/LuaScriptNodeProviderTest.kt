@@ -22,7 +22,7 @@ import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInputFactory
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptNodeProvider

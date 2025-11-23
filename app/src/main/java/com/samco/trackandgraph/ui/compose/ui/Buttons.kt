@@ -19,6 +19,7 @@ package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -39,11 +41,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.ColorUtils
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -136,6 +142,7 @@ fun TextButton(
     onClick: () -> Unit,
     enabled: Boolean = true,
     text: String,
+    textAlign: TextAlign = TextAlign.Start,
 ) = Button(
     modifier = modifier,
     onClick = onClick,
@@ -145,10 +152,58 @@ fun TextButton(
 ) {
     Text(
         text = text,
+        textAlign = textAlign,
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.onPrimary
     )
 }
+
+enum class ButtonLocation { Start, End }
+
+@Composable
+fun FullWidthIconTextButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    @DrawableRes icon: Int,
+    text: String,
+    buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
+    textAlign: TextAlign = TextAlign.Start,
+    iconSize: Dp = smallIconSize,
+    buttonLocation: ButtonLocation = ButtonLocation.Start,
+) = Button(
+    modifier = modifier,
+    onClick = onClick,
+    colors = buttonColors,
+    shape = MaterialTheme.shapes.medium,
+    contentPadding = PaddingValues(cardPadding)
+) {
+    val iconComposable: @Composable () -> Unit = {
+        Icon(
+            modifier = Modifier.size(iconSize),
+            painter = painterResource(id = icon),
+            contentDescription = text,
+            tint = MaterialTheme.colorScheme.onPrimary,
+        )
+    }
+
+    if (buttonLocation == ButtonLocation.Start) {
+        HalfDialogInputSpacing()
+        iconComposable()
+    }
+    Text(
+        modifier = Modifier.weight(1f),
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onPrimary,
+        textAlign = textAlign,
+    )
+
+    if (buttonLocation == ButtonLocation.End) {
+        HalfDialogInputSpacing()
+        iconComposable()
+    }
+}
+
 
 @Composable
 fun IconTextButton(
@@ -156,14 +211,18 @@ fun IconTextButton(
     onClick: () -> Unit,
     @DrawableRes icon: Int,
     text: String,
+    buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
+    textAlign: TextAlign = TextAlign.Start,
+    iconSize: Dp = smallIconSize,
 ) = Button(
     modifier = modifier,
     onClick = onClick,
+    colors = buttonColors,
     shape = MaterialTheme.shapes.medium,
     contentPadding = PaddingValues(cardPadding)
 ) {
     Icon(
-        modifier = Modifier.size(smallIconSize),
+        modifier = Modifier.size(iconSize),
         painter = painterResource(id = icon),
         contentDescription = text,
         tint = MaterialTheme.colorScheme.onPrimary,
@@ -172,8 +231,50 @@ fun IconTextButton(
     Text(
         text = text,
         style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onPrimary
+        color = MaterialTheme.colorScheme.onPrimary,
+        textAlign = textAlign,
     )
+}
+
+@Composable
+fun FloatingBarButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    @DrawableRes icon: Int? = null,
+    text: String,
+) {
+    val blendedColor = Color(
+        ColorUtils.blendARGB(
+            MaterialTheme.colorScheme.surface.toArgb(),
+            MaterialTheme.tngColors.secondary.toArgb(),
+            0.3f
+        )
+    )
+
+    Button(
+        modifier = modifier,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        onClick = onClick,
+        shape = RoundedCornerShape(100f),
+        colors = ButtonDefaults.buttonColors().copy(containerColor = blendedColor),
+        contentPadding = PaddingValues(horizontal = inputSpacingLarge, vertical = cardPadding)
+    ) {
+        icon?.let {
+            Icon(
+                modifier = Modifier.size(smallIconSize),
+                painter = painterResource(id = icon),
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.onPrimary,
+            )
+        }
+        HalfDialogInputSpacing()
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onPrimary,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -212,6 +313,16 @@ fun ButtonPreview() = TnGComposeTheme(
             icon = R.drawable.add_icon,
             text = "Some Text",
             onClick = {}
+        )
+        FullWidthIconTextButton(
+            icon = R.drawable.add_icon,
+            text = "Some Text",
+            onClick = {}
+        )
+        FloatingBarButton(
+            onClick = {},
+            icon = R.drawable.deployed_code_update_24px,
+            text = "Floating Button"
         )
     }
 }

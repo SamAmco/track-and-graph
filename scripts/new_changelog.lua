@@ -107,6 +107,52 @@ local function ensure_dir(dir)
 	os.execute("mkdir -p " .. dir)
 end
 
+-- Check if jsonschema-cli is installed
+local function check_jsonschema_cli()
+    -- Run `command -v` to check if jsonschema-cli exists
+    local ok, _, code = os.execute("command -v jsonschema-cli >/dev/null 2>&1")
+
+    -- Handle both Lua 5.1 and 5.2+ return styles
+    local success = (ok == true or ok == 0) and (code == nil or code == 0)
+
+    if not success then
+        print("Error: jsonschema-cli is not installed")
+        print("Please install it with: cargo install jsonschema-cli")
+        os.exit(1)
+    end
+
+    print("✓ jsonschema-cli found")
+end
+
+-- Validate JSON file against schema
+local function validate_json_schema(json_file, schema_file)
+	print("\nValidating " .. json_file .. " against schema...")
+	local cmd = string.format("jsonschema-cli -i %s %s", json_file, schema_file)
+	local ok, _, code = os.execute(cmd)
+
+    -- Handle both Lua 5.1 and 5.2+ return styles
+    local success = (ok == true or ok == 0) and (code == nil or code == 0)
+
+	if not success then
+		print("Error: JSON schema validation failed")
+		print("The index file does not conform to the expected schema")
+		os.exit(1)
+	end
+	print("✓ JSON schema validation passed")
+end
+
+-- Create a JSON line for a version with its available locales
+local function create_version_json_line(version_name, changelogs)
+	local locale_pairs = {}
+	for _, changelog in pairs(changelogs) do
+		local locale = changelog.general
+		local path = string.format("changelogs/%s/%s.md", version_name, locale)
+		table.insert(locale_pairs, string.format('"%s": "%s"', locale, path))
+	end
+	
+	return string.format('    "%s": {%s},', version_name, table.concat(locale_pairs, ', '))
+end
+
 local function create_temp_changelog_file(git_log)
 	local temp_file = os.tmpname()
 	local initial_content = [=[
@@ -201,14 +247,44 @@ local function publish_to_public_changelogs(version_name, changelogs)
 	end
 
 	-- Update index file
-	local index_file = "changelogs/index.properties"
-	local file = io.open(index_file, "a") or error("Could not open " .. index_file .. " for appending")
-	file:write(string.format("%s=changelogs/%s/\n", version_name, version_name))
+	local index_file = "changelogs/index.json"
+	
+	-- Read existing index file
+	local existing_file = io.open(index_file, "r")
+	if not existing_file then
+        error("Could not open " .. index_file .. " for reading")
+	end
+	
+	local lines = {}
+	for line in existing_file:lines() do
+		table.insert(lines, line)
+	end
+	existing_file:close()
+	
+	-- Create the new version line
+	local new_version_line = create_version_json_line(version_name, changelogs)
+
+	table.insert(lines, 3, new_version_line)
+	
+	-- Write updated index
+	local file = io.open(index_file, "w") or error("Could not open " .. index_file .. " for writing")
+	for _, line in ipairs(lines) do
+		file:write(line .. '\n')
+	end
 	file:close()
+	print("Updated index file: " .. index_file)
+	
+	-- Validate the updated JSON file against schema
+	local schema_file = "changelogs/index.schema.json"
+	validate_json_schema(index_file, schema_file)
 end
 
 local function main()
-	print("Extracting version code from app/build.gradle.kts...")
+	-- Check dependencies first
+	print("Checking dependencies...")
+	check_jsonschema_cli()
+	
+	print("\nExtracting version code from app/build.gradle.kts...")
 	local version_code, version_name = get_versions_from_gradle()
 	print("Current version code: " .. version_code .. ", version name: " .. version_name)
 

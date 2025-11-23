@@ -19,7 +19,7 @@ package com.samco.trackandgraph.functions.node_selector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.repository.FunctionsRepository
 import com.samco.trackandgraph.functions.repository.SignatureVerificationException
 import dagger.hilt.android.lifecycle.HiltViewModel

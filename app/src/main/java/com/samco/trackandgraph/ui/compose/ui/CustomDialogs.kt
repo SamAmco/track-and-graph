@@ -56,6 +56,7 @@ fun CustomDialog(
         inputSpacingLarge
     ),
     dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     usePlatformDefaultWidth: Boolean = true,
     decorFitsSystemWindows: Boolean? = null,
@@ -67,6 +68,7 @@ fun CustomDialog(
         properties = DialogProperties(
             decorFitsSystemWindows = decorFitsSystemWindows ?: usePlatformDefaultWidth,
             dismissOnClickOutside = dismissOnClickOutside,
+            dismissOnBackPress = dismissOnBackPress,
             usePlatformDefaultWidth = usePlatformDefaultWidth,
         )
     ) {

@@ -20,7 +20,7 @@ import android.os.LocaleList
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import java.util.Locale
 
 /**

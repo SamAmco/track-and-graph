@@ -47,7 +47,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
-import com.samco.trackandgraph.data.lua.dto.TranslatedString
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing

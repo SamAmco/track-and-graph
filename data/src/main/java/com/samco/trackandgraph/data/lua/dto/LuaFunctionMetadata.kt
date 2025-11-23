@@ -16,16 +16,8 @@
  */
 package com.samco.trackandgraph.data.lua.dto
 
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import io.github.z4kn4fein.semver.Version
-
-sealed class TranslatedString {
-    data class Simple(val value: String) : TranslatedString()
-
-    /**
-     * A map of BCP 47 language codes to translations
-     */
-    data class Translations(val values: Map<String, String>) : TranslatedString()
-}
 
 /**
  * Represents an enum option with its ID and display name
