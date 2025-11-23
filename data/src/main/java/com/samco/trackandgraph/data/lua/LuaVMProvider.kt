@@ -95,7 +95,7 @@ internal class LuaVMProvider @Inject constructor(
     }
 
     fun release(vmLease: VMLease) {
-        vmLease.lock.unlock()
+        if (vmLease.lock.isLocked) vmLease.lock.unlock()
     }
 
     private fun buildGlobals(): Globals {
