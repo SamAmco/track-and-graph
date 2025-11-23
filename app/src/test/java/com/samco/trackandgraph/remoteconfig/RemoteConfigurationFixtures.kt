@@ -27,7 +27,8 @@ val testEndpoints = Endpoints(
     functionCatalogueLocation = "https://functions.com/catalog",
     functionCatalogueSignature = "https://functions.com/signature",
     functionsDocs = "https://functions.com/docs",
-    changelogsRoot = "https://changelogs.com"
+    changelogsRoot = "https://changelogs.com",
+    donateUrl = "https://buymeacoffee.com/trackandgraph"
 )
 
 val testRemoteConfig = RemoteConfiguration(

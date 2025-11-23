@@ -75,6 +75,23 @@ fun SmallTextButton(
     enabled: Boolean = true,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) = SmallTextButton(
+    text = stringResource(stringRes),
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    colors = colors,
+    interactionSource = interactionSource,
+)
+
+@Composable
+fun SmallTextButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = TextButton(
     onClick = onClick,
     modifier = modifier,
@@ -83,7 +100,7 @@ fun SmallTextButton(
     interactionSource = interactionSource,
 ) {
     Text(
-        text = stringResource(stringRes),
+        text = text,
         style = MaterialTheme.typography.labelLarge
     )
 }
