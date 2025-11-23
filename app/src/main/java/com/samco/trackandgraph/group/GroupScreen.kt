@@ -417,10 +417,7 @@ private fun GroupScreenContent(
         ReleaseNotesDialog(
             releaseNotes = releaseNotes,
             onDismissRequest = releaseNotesViewModel::onDismissReleaseNotesDialog,
-            onDonateClicked = {
-                releaseNotesViewModel.onDonateClicked()
-                releaseNotesViewModel.onDismissReleaseNotesDialog()
-            },
+            onDonateClicked = releaseNotesViewModel::onDonateClicked,
             onSkipDonationClicked = releaseNotesViewModel::onDismissReleaseNotesDialog
         )
     }

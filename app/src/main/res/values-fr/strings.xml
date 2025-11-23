@@ -395,4 +395,5 @@
     <string name="release_notes_support_text">Chaque contribution aide à rendre Track &amp; Graph meilleur pour tout le monde ❤️</string>
     <string name="release_notes_maybe_later">Peut-être plus tard</string>
     <string name="release_notes_support_development">Soutenir le développement</string>
+    <string name="release_notes_thank_you"><![CDATA[Merci ! ❤️\n\nVotre soutien aide à maintenir Track & Graph vivant et en croissance 🌱]]></string>
 </resources>
