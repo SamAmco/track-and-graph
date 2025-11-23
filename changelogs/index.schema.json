@@ -11,20 +11,16 @@
           "type": "object",
           "properties": {
             "en": {
-              "type": "string",
-              "pattern": "^changelogs/\\d+\\.\\d+\\.\\d+(-.*)?/en\\.md$"
+              "type": "string"
             },
             "de": {
-              "type": "string",
-              "pattern": "^changelogs/\\d+\\.\\d+\\.\\d+(-.*)?/de\\.md$"
+              "type": "string"
             },
             "es": {
-              "type": "string",
-              "pattern": "^changelogs/\\d+\\.\\d+\\.\\d+(-.*)?/es\\.md$"
+              "type": "string"
             },
             "fr": {
-              "type": "string",
-              "pattern": "^changelogs/\\d+\\.\\d+\\.\\d+(-.*)?/fr\\.md$"
+              "type": "string"
             }
           },
           "required": ["en"],
