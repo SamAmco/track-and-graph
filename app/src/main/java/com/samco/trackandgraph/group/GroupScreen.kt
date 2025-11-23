@@ -44,7 +44,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -87,7 +86,6 @@ import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
-import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
 import com.samco.trackandgraph.ui.compose.ui.FloatingBarButton
@@ -418,12 +416,12 @@ private fun GroupScreenContent(
     if (showReleaseNotesDialog) {
         ReleaseNotesDialog(
             releaseNotes = releaseNotes,
-            onDismissRequest = releaseNotesViewModel::onDismissReleaseNotesButton,
+            onDismissRequest = releaseNotesViewModel::onDismissReleaseNotesDialog,
             onDonateClicked = {
                 releaseNotesViewModel.onDonateClicked()
-                releaseNotesViewModel.onDismissReleaseNotesButton()
+                releaseNotesViewModel.onDismissReleaseNotesDialog()
             },
-            onSkipDonationClicked = releaseNotesViewModel::onDismissReleaseNotesButton
+            onSkipDonationClicked = releaseNotesViewModel::onDismissReleaseNotesDialog
         )
     }
 }

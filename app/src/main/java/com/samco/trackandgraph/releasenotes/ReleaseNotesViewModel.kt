@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface ReleaseNotesViewModel {
@@ -44,7 +45,7 @@ interface ReleaseNotesViewModel {
     val releaseNotes: StateFlow<List<ReleaseNoteViewData>>
 
     fun onClickReleaseNotesButton()
-    fun onDismissReleaseNotesButton()
+    fun onDismissReleaseNotesDialog()
     fun onDonateClicked()
 }
 
@@ -83,11 +84,13 @@ class ReleaseNotesViewModelImpl @Inject constructor(
         showReleaseNotesDialog.update { true }
     }
 
-    override fun onDismissReleaseNotesButton() {
+    override fun onDismissReleaseNotesDialog() {
+        viewModelScope.launch { repository.registerSeenReleaseNotes() }
         showReleaseNotesDialog.update { false }
     }
 
     override fun onDonateClicked() {
+        viewModelScope.launch { repository.registerSeenReleaseNotes() }
         urlNavigator.triggerNavigation(context, UrlNavigator.Location.DONATE)
     }
 

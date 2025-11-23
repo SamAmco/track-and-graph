@@ -35,7 +35,7 @@ class PrefsPersistenceProviderImpl @Inject constructor(
     override fun getDataStore(path: String): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createWithPath(
             produceFile = {
-                context.filesDir.resolve(path).absoluteFile.toOkioPath()
+                context.filesDir.resolve("$path.preferences_pb").absoluteFile.toOkioPath()
             }
         )
     }
