@@ -135,6 +135,7 @@ private fun ReleaseNotesDialogContent(
     onDismissRequest = onDismissRequest,
     dismissOnClickOutside = false,
     scrollContent = false,
+    dismissOnBackPress = false,
 ) {
     FadingScrollColumn(
         modifier = Modifier.fillMaxWidth(),
