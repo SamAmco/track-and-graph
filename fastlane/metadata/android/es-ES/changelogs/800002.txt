@@ -1,0 +1,3 @@
+- Cambia compose y nav3Core a las últimas versiones estables
+- Desactiva el cierre al pulsar atrás en el diálogo de notas de la versión, porque puede desplazarse y quiero que la gente reconozca la solicitud de soporte
+			

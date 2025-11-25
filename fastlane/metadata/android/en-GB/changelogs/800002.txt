@@ -1,0 +1,3 @@
+- Switch compose and nav3Core to latest stable versions
+- Disable dismiss on back action for release notes dialog, because it may scroll and I want people to acknowledge the support request
+			
