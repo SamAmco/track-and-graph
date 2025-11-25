@@ -1,0 +1,3 @@
+- Aktualisiere compose und nav3Core auf die neuesten stabilen Versionen
+- Deaktiviere das Schließen per Zurück-Taste im Release-Notes-Dialog, da dieser scrollen kann und ich möchte, dass die Nutzer die Support-Anfrage bestätigen
+			

@@ -1,0 +1,3 @@
+- Passe compose et nav3Core aux dernières versions stables
+- Désactive la fermeture avec la touche retour pour la boîte de dialogue des notes de version, car elle peut défiler et je veux que les utilisateurs reconnaissent la demande de support
+			
