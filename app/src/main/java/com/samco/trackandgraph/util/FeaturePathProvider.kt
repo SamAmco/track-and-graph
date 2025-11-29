@@ -20,8 +20,6 @@ package com.samco.trackandgraph.util
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.Group
 
-
-
 open class FeaturePathProvider(
     features: List<Feature>,
     groups: List<Group>,

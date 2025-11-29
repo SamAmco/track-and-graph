@@ -160,7 +160,7 @@ private fun createTopBarActions(
  * Dropdown menu for adding new items (tracker, graph/stat, group)
  */
 @Composable
-private fun RowScope.GroupAddDropdownMenu(
+private fun GroupAddDropdownMenu(
     groupViewModel: GroupViewModel,
     groupDialogsViewModel: GroupDialogsViewModel,
     addGroupDialogViewModel: AddGroupDialogViewModelImpl,
