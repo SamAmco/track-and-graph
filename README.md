@@ -36,10 +36,10 @@ Small contributions are welcome but I would prefer if you could raise an issue f
 
 Please be aware my time to work on this project is limited so I may not be able to respond to your issue or pull request immediately.
 
-Please be aware I have no intention of supporting other languages at this time. Even if you have translated all the current copy, supporting multiple languages adds significant overhead to developing and maintaining the project going forwards.
+Please also be aware I have no intention of supporting other languages at this time. Even if you have translated all the current copy, supporting multiple languages adds significant overhead to developing and maintaining the project going forwards.
 
 # License
-    Copyright (C) 2019-2020 SamAmco <samuel.amco@gmail.com>
+    Copyright (C) 2019-2020 SamAmco <help.trackandgraph@gmail.com>
     
     Track & Graph is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by the
@@ -98,7 +98,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 
-# Donate crypto to the creator
+# Donate to support development
+
+The easiest way to donate is via [Buy Me a Coffee](https://www.buymeacoffee.com/TrackAndGraph):
+
+<p align="center">
+  <a href="https://www.buymeacoffee.com/TrackAndGraph" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="100px" ></a>
+</p>
+
+However if you prefer, you can also donate crypto to any of the following addresses:
 
 <center>
 
