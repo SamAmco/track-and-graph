@@ -1,0 +1,4 @@
+Fehler behoben, bei dem verwaiste Diagramme nicht richtig erkannt wurden.
+
+(Das Löschen eines Trackers/Funktion sollte alle Diagramme entfernen, die keine gültigen Eingabemerkmale mehr haben)
+			

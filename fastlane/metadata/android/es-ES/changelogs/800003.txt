@@ -1,0 +1,4 @@
+Corrige el error por el que los gráficos huérfanos no se detectaban correctamente.
+
+(Eliminar un rastreador/función debería eliminar cualquier gráfico que ya no tenga características de entrada válidas)
+			

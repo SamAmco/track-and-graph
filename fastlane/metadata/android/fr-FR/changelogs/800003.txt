@@ -1,0 +1,4 @@
+Correction d’un bug où les graphiques orphelins n’étaient pas correctement détectés.
+
+(Supprimer un tracker/fonction devrait supprimer tous les graphiques n’ayant plus d’entrées valides)
+			
