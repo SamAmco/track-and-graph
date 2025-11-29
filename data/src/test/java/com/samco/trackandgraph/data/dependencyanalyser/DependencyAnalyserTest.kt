@@ -18,6 +18,8 @@
 package com.samco.trackandgraph.data.dependencyanalyser
 
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.entity.GraphOrStat
 import com.samco.trackandgraph.data.dependencyanalyser.queryresponse.GraphDependency
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -46,6 +48,9 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0)
+        ))
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
@@ -57,7 +62,7 @@ class DependencyAnalyserTest {
 
     @Test
     fun `test transitive dependency through function - feature affects function affects graph`() = runTest {
-        // Given: 
+        // Given:
         // - Feature 1 (tracker)
         // - Feature 2 (function that depends on feature 1)
         // - Graph 20 (depends on feature 2)
@@ -68,6 +73,9 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L))
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 0)
+        ))
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
@@ -85,10 +93,13 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLineGraphFeatureIds(30L)).thenReturn(listOf(1L, 2L, 3L))
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 30, groupId = 1, name = "Graph 30", type = GraphStatType.LINE_GRAPH, displayIndex = 0)
+        ))
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
-        
+
         // Then: Each feature should affect the line graph
         assertEquals(setOf(30L), dependencyAnalyser.getDependentGraphs(1).graphStatIds)
         assertEquals(setOf(30L), dependencyAnalyser.getDependentGraphs(2).graphStatIds)
@@ -110,6 +121,11 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L))
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
+            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 1),
+            GraphOrStat(id = 30, groupId = 1, name = "Graph 30", type = GraphStatType.LINE_GRAPH, displayIndex = 2)
+        ))
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
@@ -127,6 +143,7 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L))
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(emptyList())
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
@@ -145,6 +162,7 @@ class DependencyAnalyserTest {
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L, 3L))
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
         whenever(mockDao.getFunctionInputFeatureIds(3L)).thenReturn(listOf(2L))
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(emptyList())
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
@@ -165,6 +183,11 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLineGraphFeatureIds(40L)).thenReturn(emptyList()) // No dependencies
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
+            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 1),
+            GraphOrStat(id = 40, groupId = 1, name = "Graph 40", type = GraphStatType.LINE_GRAPH, displayIndex = 2)
+        ))
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
@@ -172,6 +195,81 @@ class DependencyAnalyserTest {
 
         // Then: Graph 40 should be orphaned
         assertTrue(result.graphStatIds.contains(40L))
+    }
+
+    @Test
+    fun `test getOrphanedGraphs - detects graph stats with no associated graph entities`() = runTest {
+        // Given: Graph stat 50 exists in graphs_and_stats_table2 but has no associated pie chart, bar chart, etc.
+        whenever(mockDao.getAllSingleDependencyGraphs()).thenReturn(listOf(
+            GraphDependency(graphStatId = 10, featureId = 1) // Only graph 10 has an associated entity
+        ))
+        whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
+            GraphOrStat(id = 50, groupId = 1, name = "Orphaned Graph", type = GraphStatType.PIE_CHART, displayIndex = 1) // No associated entity
+        ))
+
+        // When
+        dependencyAnalyser = DependencyAnalyser.create(mockDao)
+        val result = dependencyAnalyser.getOrphanedGraphs()
+
+        // Then: Graph 50 should be detected as orphaned (has no associated graph entity)
+        assertTrue(result.graphStatIds.contains(50L))
+        assertEquals(setOf(50L), result.graphStatIds)
+    }
+
+    @Test
+    fun `test getOrphanedGraphs - mixed scenario with multiple orphan types`() = runTest {
+        // Given: Multiple types of orphaned graphs
+        whenever(mockDao.getAllSingleDependencyGraphs()).thenReturn(listOf(
+            GraphDependency(graphStatId = 10, featureId = 1) // Valid graph
+        ))
+        whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(listOf(70L))
+        whenever(mockDao.getLineGraphFeatureIds(70L)).thenReturn(emptyList()) // Empty dependencies
+        whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(1L))
+        whenever(mockDao.getFunctionInputFeatureIds(1L)).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 10, groupId = 1, name = "Valid Graph", type = GraphStatType.PIE_CHART, displayIndex = 0),
+            GraphOrStat(id = 50, groupId = 1, name = "No Entity Graph", type = GraphStatType.PIE_CHART, displayIndex = 1), // No associated entity
+            GraphOrStat(id = 70, groupId = 1, name = "Empty Deps Graph", type = GraphStatType.LINE_GRAPH, displayIndex = 2) // Empty dependencies
+        ))
+
+        // When
+        dependencyAnalyser = DependencyAnalyser.create(mockDao)
+        val result = dependencyAnalyser.getOrphanedGraphs()
+
+        // Then: Both orphaned graphs should be detected
+        assertEquals(setOf(50L, 70L), result.graphStatIds)
+    }
+
+    @Test
+    fun `test getOrphanedGraphs - no orphans when all graphs have valid dependencies`() = runTest {
+        // Given: All graphs have valid dependencies
+        whenever(mockDao.getAllSingleDependencyGraphs()).thenReturn(listOf(
+            GraphDependency(graphStatId = 10, featureId = 1),
+            GraphDependency(graphStatId = 20, featureId = 2)
+        ))
+        whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(listOf(30L))
+        whenever(mockDao.getLineGraphFeatureIds(30L)).thenReturn(listOf(1L, 2L))
+        whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(1L, 2L))
+        whenever(mockDao.getFunctionInputFeatureIds(1L)).thenReturn(emptyList())
+        whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
+            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 1),
+            GraphOrStat(id = 30, groupId = 1, name = "Graph 30", type = GraphStatType.LINE_GRAPH, displayIndex = 2)
+        ))
+
+        // When
+        dependencyAnalyser = DependencyAnalyser.create(mockDao)
+        val result = dependencyAnalyser.getOrphanedGraphs()
+
+        // Then: No graphs should be orphaned
+        assertTrue(result.graphStatIds.isEmpty())
     }
 
     @Test
@@ -183,6 +281,9 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
+            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0)
+        ))
 
         // When
         dependencyAnalyser = DependencyAnalyser.create(mockDao)
@@ -205,6 +306,7 @@ class DependencyAnalyserTest {
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L, 3L, 1L))
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
         whenever(mockDao.getFunctionInputFeatureIds(3L)).thenReturn(listOf(2L))
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(emptyList())
 
         // When: Check what depends on feature 1 (for cycle detection)
         dependencyAnalyser = DependencyAnalyser.create(mockDao)

@@ -115,15 +115,9 @@ internal class DependencyAnalyser private constructor(
      * Call this after features/groups have already been deleted to find orphaned graphs.
      */
     fun getOrphanedGraphs(): OrphanedGraphs {
-        val orphanedGraphs = graphNodes.values.filter { graphNode ->
-            graphNode.dependencies.isEmpty() ||
-                    graphNode.dependencies.all { dep ->
-                        when (dep) {
-                            is DependencyNode.Feature -> !featureNodes.containsKey(dep.featureId)
-                            is DependencyNode.Graph -> false // graphs don't depend on other graphs
-                        }
-                    }
-        }.map { it.graphStatId }
+        val orphanedGraphs = graphNodes.values
+            .filter { it.dependencies.isEmpty() }
+            .map { it.graphStatId }
 
         return OrphanedGraphs(orphanedGraphs.toSet())
     }
@@ -195,6 +189,16 @@ internal class DependencyAnalyser private constructor(
             luaGraphGraphStatIds.forEach { graphStatId ->
                 val featureIds = dao.getLuaGraphFeatureIds(graphStatId).toSet()
                 allGraphDependencies[graphStatId] = featureIds
+            }
+
+            // Ensure all graph stats are represented in the dependency map
+            // This catches orphaned graph stats that have no associated graph entities
+            val allGraphStats = dao.getAllGraphStatsSync()
+            allGraphStats.forEach { graphStat ->
+                if (!allGraphDependencies.containsKey(graphStat.id)) {
+                    // Add orphaned graph stat with empty dependencies
+                    allGraphDependencies[graphStat.id] = emptySet()
+                }
             }
 
             // Fetch function dependencies
