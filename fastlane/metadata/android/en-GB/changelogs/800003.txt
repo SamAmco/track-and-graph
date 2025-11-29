@@ -1,0 +1,4 @@
+Fix bug orphaned graphs not being detected properly. 
+
+(Deleting a tracker/function should delete any graphs that now have no valid input features)
+			
