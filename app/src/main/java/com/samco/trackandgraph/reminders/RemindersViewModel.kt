@@ -108,6 +108,15 @@ class RemindersViewModelImpl @Inject constructor(
         viewModelScope.launch(io) {
             _loading.value = true
             _currentReminders.value.let { reminders ->
+                // Find reminders that were removed (exist in saved but not in current)
+                val currentIds = reminders.map { it.id }.toSet()
+                val removedReminders = savedReminders.filter { it.id !in currentIds }
+                
+                // Delete alarms for removed reminders
+                removedReminders.forEach { removedReminder ->
+                    alarmInteractor.deleteAlarms(removedReminder)
+                }
+                
                 val withDisplayIndices = reminders.mapIndexed { index, reminderViewData ->
                     reminderViewData.toReminder().copy(displayIndex = index)
                 }
@@ -132,13 +141,11 @@ class RemindersViewModelImpl @Inject constructor(
 
     override fun addReminder(defaultName: String) {
         val newReminder = Reminder(
-            //We just want a unique ID for now,
-            // this won't be used when it's added to the db
-            System.nanoTime(),
-            getNextDisplayIndex(),
-            defaultName,
-            LocalTime.now(),
-            CheckedDays.none()
+            id = getNextReminderId(),
+            displayIndex = getNextDisplayIndex(),
+            alarmName = defaultName,
+            time = LocalTime.now(),
+            checkedDays = CheckedDays.none()
         )
         _currentReminders.value = _currentReminders.value.plus(ReminderViewData.fromReminder(newReminder))
         onRemindersUpdated()
@@ -146,6 +153,13 @@ class RemindersViewModelImpl @Inject constructor(
         // Trigger scroll to the new item (last item in the list)
         val newItemIndex = _currentReminders.value.size - 1
         _scrollToNewItem.trySend(newItemIndex)
+    }
+
+    private fun getNextReminderId(): Long {
+        // Find the highest ID from both saved reminders (database snapshot) and current reminders (including unsaved)
+        val savedMaxId = savedReminders.maxOfOrNull { it.id } ?: 0L
+        val currentMaxId = _currentReminders.value.maxOfOrNull { it.id } ?: 0L
+        return maxOf(savedMaxId, currentMaxId) + 1L
     }
 
     private fun getNextDisplayIndex(): Int {

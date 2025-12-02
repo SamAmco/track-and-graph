@@ -29,8 +29,12 @@ import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.algorithms.murmurHash3
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -43,9 +47,13 @@ class AlarmReceiver : BroadcastReceiver() {
     @Inject
     lateinit var alarmInteractor: AlarmInteractor
 
+    @Inject
+    lateinit var dataInteractor: com.samco.trackandgraph.data.interactor.DataInteractor
+
     companion object {
         private const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
         const val ALARM_MESSAGE_KEY = "Message"
+        const val ALARM_REMINDER_ID_KEY = "ReminderId"
     }
 
     private fun createNotificationChannel(context: Context) {
@@ -86,11 +94,30 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        notificationManager.notify(System.currentTimeMillis().toInt() % 10, notification)
+        notificationManager.notify(System.currentTimeMillis().murmurHash3(), notification)
         performVibrate(context)
 
-        //Schedule the next notification
-        runBlocking { alarmInteractor.syncAlarms() }
+
+        //TODO should we use the work manager to do this because it might
+        // take time (especially in the case where we need to read a data
+        // point from a function data source) and we don't want to fail
+        // to schedule the next alarm because we timed out in the broadcast
+        // receiver. The tradeoff is I'm not sure the complexity of
+        // triggering the work manager from a broadcast receiver if we
+        // want immediate work to be done with significant enough quota
+        // remaining.
+
+        //Schedule the next notification for this specific reminder
+        val reminderId = intent.extras?.getLong(ALARM_REMINDER_ID_KEY)
+        if (reminderId != null) {
+            runBlocking {
+                val reminder = dataInteractor.getReminderById(reminderId)
+                if (reminder != null) {
+                    alarmInteractor.scheduleNext(reminder)
+                }
+            }
+        }
+
     }
 
     @Suppress("DEPRECATION")
@@ -117,17 +144,19 @@ class RecreateAlarms : BroadcastReceiver() {
     lateinit var alarmInteractor: AlarmInteractor
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        val validActions = listOf(
-            "android.intent.action.DATE_CHANGED",
-            "android.intent.action.TIME_SET",
-            "android.intent.action.TIMEZONE_CHANGED",
-            "android.intent.action.BOOT_COMPLETED",
-            "android.intent.action.LOCKED_BOOT_COMPLETED",
-            "android.intent.action.QUICKBOOT_POWERON",
-            "android.intent.action.MY_PACKAGE_REPLACED"
+        val valid = setOf(
+            Intent.ACTION_DATE_CHANGED,
+            Intent.ACTION_TIME_CHANGED,
+            Intent.ACTION_TIMEZONE_CHANGED,
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_LOCKED_BOOT_COMPLETED,
+            Intent.ACTION_MY_PACKAGE_REPLACED
         )
-        if (!validActions.contains(intent?.action)) return
-        if (context == null) return
-        runBlocking { alarmInteractor.syncAlarms() }
+        if (intent?.action !in valid) return
+        val pending = goAsync()
+        CoroutineScope(Dispatchers.Default).launch {
+            alarmInteractor.syncAlarms()
+            pending.finish()
+        }
     }
 }

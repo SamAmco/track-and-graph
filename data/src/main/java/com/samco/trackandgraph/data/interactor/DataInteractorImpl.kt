@@ -174,6 +174,10 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllRemindersSync().map { it.toDto() }
     }
 
+    override suspend fun getReminderById(id: Long): Reminder? = withContext(io) {
+        dao.getReminderById(id)?.toDto()
+    }
+
     override suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature> = withContext(io) {
         dao.getFeaturesForGroupSync(groupId).map { it.toDto() }
     }
