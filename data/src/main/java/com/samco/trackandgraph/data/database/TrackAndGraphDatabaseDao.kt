@@ -123,6 +123,9 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
     fun getAllRemindersSync(): List<Reminder>
 
+    @Query("""SELECT * FROM reminders_table WHERE id = :id""")
+    fun getReminderById(id: Long): Reminder?
+
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroups(): Flow<List<Group>>
 

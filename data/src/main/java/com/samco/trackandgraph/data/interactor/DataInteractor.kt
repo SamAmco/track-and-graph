@@ -47,6 +47,8 @@ interface DataInteractor : TrackerHelper, FunctionHelper {
 
     suspend fun getAllRemindersSync(): List<Reminder>
 
+    suspend fun getReminderById(id: Long): Reminder?
+
     suspend fun getAllGroupsSync(): List<Group>
 
     suspend fun getGroupGraphSync(rootGroupId: Long? = null): GroupGraph

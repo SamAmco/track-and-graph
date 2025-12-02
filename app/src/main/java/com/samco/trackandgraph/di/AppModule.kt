@@ -33,8 +33,7 @@ import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
 import com.samco.trackandgraph.reminders.AlarmInteractor
-import com.samco.trackandgraph.reminders.RemindersHelper
-import com.samco.trackandgraph.reminders.RemindersHelperImpl
+import com.samco.trackandgraph.reminders.AlarmInteractorImpl
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProviderImpl
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
@@ -58,6 +57,8 @@ import com.samco.trackandgraph.functions.service.DebugFunctionsService
 import com.samco.trackandgraph.functions.service.ProductionFunctionsService
 import com.samco.trackandgraph.releasenotes.ReleaseNotesRepository
 import com.samco.trackandgraph.releasenotes.ReleaseNotesRepositoryImpl
+import com.samco.trackandgraph.reminders.scheduling.AlarmScheduler
+import com.samco.trackandgraph.reminders.scheduling.AlarmSchedulerImpl
 import com.samco.trackandgraph.versionprovider.VersionProvider
 import com.samco.trackandgraph.versionprovider.VersionProviderImpl
 import com.samco.trackandgraph.storage.PrefsPersistenceProvider
@@ -126,10 +127,7 @@ class AppModule {
     fun provideFunctionsRepository(impl: FunctionsRepositoryImpl): FunctionsRepository = impl
 
     @Provides
-    internal fun getRemindersHelper(impl: RemindersHelperImpl): RemindersHelper = impl
-
-    @Provides
-    internal fun getAlarmInteractor(impl: RemindersHelper): AlarmInteractor = impl
+    internal fun getAlarmInteractor(impl: AlarmInteractorImpl): AlarmInteractor = impl
 
     @Provides
     internal fun getServiceManager(impl: TimerServiceInteractorImpl): TimerServiceInteractor = impl
@@ -161,4 +159,7 @@ class AppModule {
 
     @Provides
     fun provideVersionProvider(impl: VersionProviderImpl): VersionProvider = impl
+
+    @Provides
+    internal fun getAlarmScheduler(impl: AlarmSchedulerImpl): AlarmScheduler = impl
 }
