@@ -17,8 +17,6 @@
 
 package com.samco.trackandgraph.reminders
 
-import com.samco.trackandgraph.system.ReminderPrefWrapper
-
 internal class FakeReminderPrefWrapper : ReminderPrefWrapper {
     var encodedIntents: String? = null
     override fun getStoredIntents(): String? = encodedIntents

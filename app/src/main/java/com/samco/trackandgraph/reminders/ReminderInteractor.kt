@@ -21,11 +21,7 @@ import com.samco.trackandgraph.data.algorithms.murmurHash3
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
-import com.samco.trackandgraph.reminders.scheduling.AlarmScheduler
-import com.samco.trackandgraph.system.AlarmInfo
-import com.samco.trackandgraph.system.AlarmManagerWrapper
-import com.samco.trackandgraph.system.ReminderPrefWrapper
-import com.samco.trackandgraph.system.StoredAlarmInfo
+import com.samco.trackandgraph.reminders.scheduling.ReminderScheduler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.sync.Mutex
@@ -36,77 +32,80 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-interface AlarmInteractor {
+interface ReminderInteractor {
 
     /**
      * This should be called on app start up, device boot, and any time reminders are modified.
-     * It ensures all reminders in the user database have their **next** alarm scheduled.
-     * Once an alarm is triggered for a reminder, it is the responsibility of the
-     * [AlarmReceiver] to schedule the next alarm for that reminder via [scheduleNext].
+     * It ensures all reminders in the user database have their **next** notification scheduled.
+     * Once a notification is triggered for a reminder, it is the responsibility of the
+     * notifier to schedule the next notification for that reminder via [scheduleNext].
      */
-    suspend fun syncAlarms()
+    suspend fun syncReminderNotifications()
 
     /**
      * This should be called when a reminder notification is triggered to schedule the next
-     * alarm for that reminder.
+     * notification for that reminder. It will schedule only one notification (the next one
+     * for the given reminder). It should also be called any time a reminder is modified
+     * or anything that might change its next notification time. Any previously scheduled
+     * notifications for the reminder will be cancelled/replaced.
      */
     suspend fun scheduleNext(reminder: Reminder)
 
     /**
-     * This should be called when the given reminder is being deleted to cancel all alarms
-     * for that reminder.
+     * This should be called when the given reminder is being deleted to cancel any
+     * upcoming notifications for that reminder.
      */
-    suspend fun deleteAlarms(reminder: Reminder)
+    suspend fun cancelReminderNotifications(reminder: Reminder)
 
     /**
      * This should be called for example when the user is about to restore a different database
-     * to cancel all alarms for all reminders in the users current database.
+     * to cancel all notifications for all reminders in the users current database.
      */
-    suspend fun clearAlarms()
+    suspend fun clearNotifications()
 }
 
 @OptIn(FlowPreview::class)
 @Singleton
-internal class AlarmInteractorImpl @Inject constructor(
+internal class ReminderInteractorImpl @Inject constructor(
     private val reminderPref: ReminderPrefWrapper,
-    private val alarmManager: AlarmManagerWrapper,
+    private val platformScheduler: PlatformScheduler,
     private val dataInteractor: DataInteractor,
-    private val alarmScheduler: AlarmScheduler,
+    private val reminderScheduler: ReminderScheduler,
     private val json: Json,
     @IODispatcher private val io: CoroutineDispatcher,
-) : AlarmInteractor {
+) : ReminderInteractor {
 
     private val mutex = Mutex()
 
-    override suspend fun syncAlarms() = mutex.withLock {
+    override suspend fun syncReminderNotifications() = mutex.withLock {
         withContext(io) {
             clearLegacyReminders()
-            clearAlarmsInternal()
+            clearNotificationsInternal()
             val reminders = dataInteractor.getAllRemindersSync()
-            for (reminder in reminders) createAlarms(reminder)
+            for (reminder in reminders) createNextNotification(reminder)
         }
     }
 
     override suspend fun scheduleNext(reminder: Reminder) = mutex.withLock {
         withContext(io) {
-            createAlarms(reminder)
+            createNextNotification(reminder)
         }
     }
 
-    override suspend fun deleteAlarms(reminder: Reminder) = mutex.withLock {
+    override suspend fun cancelReminderNotifications(reminder: Reminder) = mutex.withLock {
         withContext(io) {
-            val alarmInfo = AlarmInfo(
+            val reminderNotificationParams = ReminderNotificationParams(
                 alarmId = reminder.id.toAlarmId(),
                 reminderId = reminder.id,
-                reminderName = reminder.alarmName
+                reminderName = reminder.reminderName
             )
-            alarmManager.cancel(alarmInfo)
+            platformScheduler.cancel(reminderNotificationParams)
         }
     }
 
-    override suspend fun clearAlarms() = mutex.withLock {
+    override suspend fun clearNotifications() = mutex.withLock {
         withContext(io) {
-            clearAlarmsInternal()
+            clearNotificationsInternal()
         }
     }
 
@@ -121,32 +120,32 @@ internal class AlarmInteractorImpl @Inject constructor(
             emptyList()
         }
 
-        storedIntents.forEach { alarmManager.cancel(it) }
+        storedIntents.forEach { platformScheduler.cancel(it) }
         reminderPref.clear()
     }
 
-    private suspend fun clearAlarmsInternal() {
-        val alarmInfos = dataInteractor.getAllRemindersSync().map {
-            AlarmInfo(
+    private suspend fun clearNotificationsInternal() {
+        val reminderNotificationParams = dataInteractor.getAllRemindersSync().map {
+            ReminderNotificationParams(
                 alarmId = it.id.toAlarmId(),
                 reminderId = it.id,
-                reminderName = it.alarmName,
+                reminderName = it.reminderName,
             )
         }
-        for (alarmInfo in alarmInfos) alarmManager.cancel(alarmInfo)
+        for (params in reminderNotificationParams) platformScheduler.cancel(params)
     }
 
-    private fun createAlarms(reminder: Reminder) {
-        val nextAlarmTimeMillis = alarmScheduler.scheduleNext(reminder)
-        if (nextAlarmTimeMillis != null) {
-            val alarmInfo = AlarmInfo(
+    private fun createNextNotification(reminder: Reminder) {
+        val nextInstant = reminderScheduler.scheduleNext(reminder)
+        if (nextInstant != null) {
+            val reminderNotificationParams = ReminderNotificationParams(
                 alarmId = reminder.id.toAlarmId(),
                 reminderId = reminder.id,
-                reminderName = reminder.alarmName
+                reminderName = reminder.reminderName
             )
-            alarmManager.set(
-                triggerAtMillis = nextAlarmTimeMillis.toEpochMilli(),
-                alarmInfo = alarmInfo
+            platformScheduler.set(
+                triggerAtMillis = nextInstant.toEpochMilli(),
+                reminderNotificationParams = reminderNotificationParams
             )
         }
     }

@@ -17,30 +17,26 @@
 
 package com.samco.trackandgraph.reminders
 
-import com.samco.trackandgraph.system.AlarmInfo
-import com.samco.trackandgraph.system.AlarmManagerWrapper
-import com.samco.trackandgraph.system.StoredAlarmInfo
-
-internal class FakeAlarmManagerWrapper : AlarmManagerWrapper {
-    val setAlarms = mutableListOf<Pair<Long, AlarmInfo>>()
-    val cancelledAlarms = mutableListOf<AlarmInfo>()
+internal class FakePlatformScheduler : PlatformScheduler {
+    val setNotifications = mutableListOf<Pair<Long, ReminderNotificationParams>>()
+    val cancelledNotifications = mutableListOf<ReminderNotificationParams>()
     val cancelledStoredAlarms = mutableListOf<StoredAlarmInfo>()
 
-    override fun set(triggerAtMillis: Long, alarmInfo: AlarmInfo) {
-        setAlarms.add(triggerAtMillis to alarmInfo)
+    override fun set(triggerAtMillis: Long, reminderNotificationParams: ReminderNotificationParams) {
+        setNotifications.add(triggerAtMillis to reminderNotificationParams)
     }
 
     override fun cancel(storedAlarmInfo: StoredAlarmInfo) {
         cancelledStoredAlarms.add(storedAlarmInfo)
     }
 
-    override fun cancel(alarmInfo: AlarmInfo) {
-        cancelledAlarms.add(alarmInfo)
+    override fun cancel(reminderNotificationParams: ReminderNotificationParams) {
+        cancelledNotifications.add(reminderNotificationParams)
     }
 
     fun reset() {
-        setAlarms.clear()
-        cancelledAlarms.clear()
+        setNotifications.clear()
+        cancelledNotifications.clear()
         cancelledStoredAlarms.clear()
     }
 }
