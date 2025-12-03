@@ -58,7 +58,7 @@ data class ReminderViewData(
             return ReminderViewData(
                 id = reminder.id,
                 displayIndex = reminder.displayIndex,
-                name = mutableStateOf(TextFieldValue(reminder.alarmName)),
+                name = mutableStateOf(TextFieldValue(reminder.reminderName)),
                 time = mutableStateOf(reminder.time),
                 checkedDays = mutableStateOf(reminder.checkedDays)
             )
@@ -72,7 +72,7 @@ data class ReminderViewData(
         return Reminder(
             id = id,
             displayIndex = displayIndex,
-            alarmName = name.value.text,
+            reminderName = name.value.text,
             time = time.value,
             checkedDays = checkedDays.value
         )

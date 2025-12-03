@@ -7,7 +7,7 @@ import org.threeten.bp.LocalTime
 val reminderFixture = Reminder(
     id = 1L,
     displayIndex = 0,
-    alarmName = "Test Reminder",
+    reminderName = "Test Reminder",
     time = LocalTime.of(0, 0),
     checkedDays = CheckedDays.none()
 )

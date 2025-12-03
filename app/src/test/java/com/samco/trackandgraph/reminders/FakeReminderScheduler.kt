@@ -18,13 +18,13 @@
 package com.samco.trackandgraph.reminders
 
 import com.samco.trackandgraph.data.database.dto.Reminder
-import com.samco.trackandgraph.reminders.scheduling.AlarmScheduler
+import com.samco.trackandgraph.reminders.scheduling.ReminderScheduler
 import org.threeten.bp.Instant
 
-internal class FakeAlarmScheduler : AlarmScheduler {
+internal class FakeReminderScheduler : ReminderScheduler {
     private val scheduledTimes = mutableMapOf<Long, Instant?>()
 
-    fun setNextAlarmTime(reminderId: Long, instant: Instant?) {
+    fun setNextNotificationTime(reminderId: Long, instant: Instant?) {
         scheduledTimes[reminderId] = instant
     }
 

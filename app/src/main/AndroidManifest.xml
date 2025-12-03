@@ -121,12 +121,12 @@
         </activity>
 
         <receiver
-            android:name=".reminders.AlarmReceiver"
+            android:name=".reminders.androidplatform.ReminderBroadcastReceiver"
             android:exported="false"
             />
 
         <receiver
-            android:name=".reminders.RecreateAlarms"
+            android:name=".reminders.androidplatform.RecreateAlarmsBroadcastReceiver"
             android:enabled="${recreateAlarmsEnabled}"
             android:exported="true"
             >

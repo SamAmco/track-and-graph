@@ -23,14 +23,14 @@ import org.threeten.bp.LocalTime
 data class Reminder(
     val id: Long,
     val displayIndex: Int,
-    val alarmName: String,
+    val reminderName: String,
     val time: LocalTime,
     val checkedDays: CheckedDays
 ) {
     internal fun toEntity() = Reminder(
         id,
         displayIndex,
-        alarmName,
+        reminderName,
         time,
         checkedDays
     )

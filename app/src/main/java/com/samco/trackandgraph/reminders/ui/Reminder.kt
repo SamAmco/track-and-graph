@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.reminders
+package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.CheckedDays.Companion.withSet
+import com.samco.trackandgraph.reminders.ReminderViewData
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.TimePickerDialogContent
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
