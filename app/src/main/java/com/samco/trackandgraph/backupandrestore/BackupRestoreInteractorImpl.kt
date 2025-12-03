@@ -16,7 +16,7 @@ import com.samco.trackandgraph.data.database.TNG_DATABASE_VERSION
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.helpers.PrefHelper
-import com.samco.trackandgraph.reminders.AlarmInteractor
+import com.samco.trackandgraph.reminders.ReminderInteractor
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +36,7 @@ import kotlin.math.max
 
 class BackupRestoreInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
-    private val alarmInteractor: AlarmInteractor,
+    private val reminderInteractor: ReminderInteractor,
     @ApplicationContext private val context: Context,
     private val prefHelper: PrefHelper,
     @IODispatcher private val io: CoroutineDispatcher
@@ -91,7 +91,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
                     return RestoreResult.FAIL_INVALID_DATABASE
                 }
 
-                alarmInteractor.clearAlarms()
+                reminderInteractor.clearNotifications()
                 database.openHelper.close()
 
                 tempFile.inputStream().use {

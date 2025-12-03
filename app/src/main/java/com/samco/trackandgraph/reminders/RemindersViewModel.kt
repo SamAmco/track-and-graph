@@ -60,7 +60,7 @@ interface RemindersViewModel {
 @HiltViewModel
 class RemindersViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
-    private val alarmInteractor: AlarmInteractor,
+    private val reminderInteractor: ReminderInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel(), RemindersViewModel {
@@ -114,14 +114,14 @@ class RemindersViewModelImpl @Inject constructor(
                 
                 // Delete alarms for removed reminders
                 removedReminders.forEach { removedReminder ->
-                    alarmInteractor.deleteAlarms(removedReminder)
+                    reminderInteractor.cancelReminderNotifications(removedReminder)
                 }
                 
                 val withDisplayIndices = reminders.mapIndexed { index, reminderViewData ->
                     reminderViewData.toReminder().copy(displayIndex = index)
                 }
                 dataInteractor.updateReminders(withDisplayIndices)
-                alarmInteractor.syncAlarms()
+                reminderInteractor.syncReminderNotifications()
                 val allReminders = dataInteractor.getAllRemindersSync()
                 savedReminders.clear()
                 savedReminders.addAll(allReminders)
@@ -143,7 +143,7 @@ class RemindersViewModelImpl @Inject constructor(
         val newReminder = Reminder(
             id = getNextReminderId(),
             displayIndex = getNextDisplayIndex(),
-            alarmName = defaultName,
+            reminderName = defaultName,
             time = LocalTime.now(),
             checkedDays = CheckedDays.none()
         )

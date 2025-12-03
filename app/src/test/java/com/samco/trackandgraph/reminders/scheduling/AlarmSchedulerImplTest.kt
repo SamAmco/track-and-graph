@@ -13,7 +13,7 @@ import org.threeten.bp.ZonedDateTime
 internal class AlarmSchedulerImplTest {
 
     private val timeProvider = FakeTimeProvider()
-    private val uut = AlarmSchedulerImpl(timeProvider)
+    private val uut = ReminderSchedulerImpl(timeProvider)
     
     @Test
     fun `schedule next with no days checked returns null`() {

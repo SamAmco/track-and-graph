@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.reminders
+package com.samco.trackandgraph.reminders.androidplatform
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -27,30 +27,28 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat.DEFAULT_ALL
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.algorithms.murmurHash3
+import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.navigation.PendingIntentProvider
+import com.samco.trackandgraph.reminders.ReminderInteractor
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlarmReceiver : BroadcastReceiver() {
+class ReminderBroadcastReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var pendingIntentProvider: PendingIntentProvider
 
     @Inject
-    lateinit var alarmInteractor: AlarmInteractor
+    lateinit var reminderInteractor: ReminderInteractor
 
     @Inject
-    lateinit var dataInteractor: com.samco.trackandgraph.data.interactor.DataInteractor
+    lateinit var dataInteractor: DataInteractor
 
-    companion object {
+    companion object Companion {
         private const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
         const val ALARM_MESSAGE_KEY = "Message"
         const val ALARM_REMINDER_ID_KEY = "ReminderId"
@@ -88,7 +86,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setSmallIcon(R.drawable.notification_icon)
             .setContentText("")
             .setContentIntent(pendingIntent)
-            .setDefaults(DEFAULT_ALL)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
             .build()
         val notificationManager =
@@ -111,52 +109,26 @@ class AlarmReceiver : BroadcastReceiver() {
         val reminderId = intent.extras?.getLong(ALARM_REMINDER_ID_KEY)
         if (reminderId != null) {
             runBlocking {
-                val reminder = dataInteractor.getReminderById(reminderId)
-                if (reminder != null) {
-                    alarmInteractor.scheduleNext(reminder)
+                dataInteractor.getReminderById(reminderId)?.let {
+                    reminderInteractor.scheduleNext(it)
                 }
             }
         }
-
     }
 
     @Suppress("DEPRECATION")
     private fun performVibrate(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= 31) {
             val vibratorManager =
                 context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
             val vibrator = vibratorManager.defaultVibrator
             vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(250, 250, 250, 250), -1))
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        } else if (Build.VERSION.SDK_INT >= 26) {
             val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(250, 250, 250, 250), -1))
         } else {
             val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             vibrator.vibrate(longArrayOf(250, 250, 250, 250), -1)
-        }
-    }
-}
-
-@AndroidEntryPoint
-class RecreateAlarms : BroadcastReceiver() {
-
-    @Inject
-    lateinit var alarmInteractor: AlarmInteractor
-
-    override fun onReceive(context: Context?, intent: Intent?) {
-        val valid = setOf(
-            Intent.ACTION_DATE_CHANGED,
-            Intent.ACTION_TIME_CHANGED,
-            Intent.ACTION_TIMEZONE_CHANGED,
-            Intent.ACTION_BOOT_COMPLETED,
-            Intent.ACTION_LOCKED_BOOT_COMPLETED,
-            Intent.ACTION_MY_PACKAGE_REPLACED
-        )
-        if (intent?.action !in valid) return
-        val pending = goAsync()
-        CoroutineScope(Dispatchers.Default).launch {
-            alarmInteractor.syncAlarms()
-            pending.finish()
         }
     }
 }

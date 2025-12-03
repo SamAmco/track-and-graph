@@ -24,16 +24,16 @@ import org.threeten.bp.Instant
 import javax.inject.Inject
 
 /**
- * Returns the next time an alarm should be scheduled for a given reminder or null if
- * no alarm should be scheduled.
+ * Returns the next time a reminder notification should be scheduled
+ * for a given reminder or null if no reminder should be scheduled.
  */
-interface AlarmScheduler {
+interface ReminderScheduler {
     fun scheduleNext(reminder: Reminder): Instant?
 }
 
-internal class AlarmSchedulerImpl @Inject constructor(
+internal class ReminderSchedulerImpl @Inject constructor(
     private val timeProvider: TimeProvider
-) : AlarmScheduler {
+) : ReminderScheduler {
     override fun scheduleNext(reminder: Reminder): Instant? {
         val now = timeProvider.now()
         val currentZone = timeProvider.defaultZone()

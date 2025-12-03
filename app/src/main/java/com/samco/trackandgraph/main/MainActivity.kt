@@ -41,7 +41,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.data.lua.LuaEngineSwitch
-import com.samco.trackandgraph.reminders.AlarmInteractor
+import com.samco.trackandgraph.reminders.ReminderInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.timers.TimerServiceInteractor
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val alarmInteractor: AlarmInteractor,
+    private val reminderInteractor: ReminderInteractor,
     private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
@@ -199,7 +199,7 @@ class MainActivityViewModel @Inject constructor(
 
     private fun syncAlarms() {
         viewModelScope.launch(io) {
-            alarmInteractor.syncAlarms()
+            reminderInteractor.syncReminderNotifications()
         }
     }
 

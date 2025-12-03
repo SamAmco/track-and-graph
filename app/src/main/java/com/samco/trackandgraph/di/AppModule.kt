@@ -32,8 +32,8 @@ import com.samco.trackandgraph.graphstatview.functions.aggregation.GlobalAggrega
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
-import com.samco.trackandgraph.reminders.AlarmInteractor
-import com.samco.trackandgraph.reminders.AlarmInteractorImpl
+import com.samco.trackandgraph.reminders.ReminderInteractor
+import com.samco.trackandgraph.reminders.ReminderInteractorImpl
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProviderImpl
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
@@ -42,12 +42,10 @@ import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.settings.TngSettingsImpl
 import com.samco.trackandgraph.storage.FileCache
 import com.samco.trackandgraph.storage.FileCacheImpl
-import com.samco.trackandgraph.system.AlarmManagerWrapper
-import com.samco.trackandgraph.system.AlarmManagerWrapperImpl
-import com.samco.trackandgraph.system.ReminderPrefWrapper
-import com.samco.trackandgraph.system.ReminderPrefWrapperImpl
-import com.samco.trackandgraph.system.SystemInfoProvider
-import com.samco.trackandgraph.system.SystemInfoProviderImpl
+import com.samco.trackandgraph.reminders.PlatformScheduler
+import com.samco.trackandgraph.reminders.androidplatform.AndroidPlatformScheduler
+import com.samco.trackandgraph.reminders.ReminderPrefWrapper
+import com.samco.trackandgraph.reminders.ReminderPrefWrapperImpl
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
 import com.samco.trackandgraph.functions.repository.FunctionsRepository
@@ -57,8 +55,8 @@ import com.samco.trackandgraph.functions.service.DebugFunctionsService
 import com.samco.trackandgraph.functions.service.ProductionFunctionsService
 import com.samco.trackandgraph.releasenotes.ReleaseNotesRepository
 import com.samco.trackandgraph.releasenotes.ReleaseNotesRepositoryImpl
-import com.samco.trackandgraph.reminders.scheduling.AlarmScheduler
-import com.samco.trackandgraph.reminders.scheduling.AlarmSchedulerImpl
+import com.samco.trackandgraph.reminders.scheduling.ReminderScheduler
+import com.samco.trackandgraph.reminders.scheduling.ReminderSchedulerImpl
 import com.samco.trackandgraph.versionprovider.VersionProvider
 import com.samco.trackandgraph.versionprovider.VersionProviderImpl
 import com.samco.trackandgraph.storage.PrefsPersistenceProvider
@@ -127,7 +125,7 @@ class AppModule {
     fun provideFunctionsRepository(impl: FunctionsRepositoryImpl): FunctionsRepository = impl
 
     @Provides
-    internal fun getAlarmInteractor(impl: AlarmInteractorImpl): AlarmInteractor = impl
+    internal fun getAlarmInteractor(impl: ReminderInteractorImpl): ReminderInteractor = impl
 
     @Provides
     internal fun getServiceManager(impl: TimerServiceInteractorImpl): TimerServiceInteractor = impl
@@ -138,10 +136,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    internal fun alarmManager(impl: AlarmManagerWrapperImpl): AlarmManagerWrapper = impl
-
-    @Provides
-    fun systemInfoProvider(impl: SystemInfoProviderImpl): SystemInfoProvider = impl
+    internal fun alarmManager(impl: AndroidPlatformScheduler): PlatformScheduler = impl
 
     @Provides
     @Singleton
@@ -161,5 +156,5 @@ class AppModule {
     fun provideVersionProvider(impl: VersionProviderImpl): VersionProvider = impl
 
     @Provides
-    internal fun getAlarmScheduler(impl: AlarmSchedulerImpl): AlarmScheduler = impl
+    internal fun getAlarmScheduler(impl: ReminderSchedulerImpl): ReminderScheduler = impl
 }
