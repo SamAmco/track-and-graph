@@ -27,13 +27,14 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.algorithms.murmurHash3
-import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.navigation.PendingIntentProvider
-import com.samco.trackandgraph.reminders.ReminderInteractor
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,11 +43,6 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var pendingIntentProvider: PendingIntentProvider
 
-    @Inject
-    lateinit var reminderInteractor: ReminderInteractor
-
-    @Inject
-    lateinit var dataInteractor: DataInteractor
 
     companion object Companion {
         private const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
@@ -96,23 +92,15 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
         performVibrate(context)
 
 
-        //TODO should we use the work manager to do this because it might
-        // take time (especially in the case where we need to read a data
-        // point from a function data source) and we don't want to fail
-        // to schedule the next alarm because we timed out in the broadcast
-        // receiver. The tradeoff is I'm not sure the complexity of
-        // triggering the work manager from a broadcast receiver if we
-        // want immediate work to be done with significant enough quota
-        // remaining.
-
-        //Schedule the next notification for this specific reminder
+        //Schedule the next notification for this specific reminder using WorkManager
         val reminderId = intent.extras?.getLong(ALARM_REMINDER_ID_KEY)
         if (reminderId != null) {
-            runBlocking {
-                dataInteractor.getReminderById(reminderId)?.let {
-                    reminderInteractor.scheduleNext(it)
-                }
-            }
+            val work = OneTimeWorkRequestBuilder<ScheduleNextReminderWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInputData(workDataOf(ScheduleNextReminderWorker.REMINDER_ID_KEY to reminderId))
+                .build()
+
+            WorkManager.getInstance(context).enqueue(work)
         }
     }
 

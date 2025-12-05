@@ -26,6 +26,7 @@ internal class FakePlatformScheduler : PlatformScheduler {
         setNotifications.add(triggerAtMillis to reminderNotificationParams)
     }
 
+    @Deprecated("This remains only for users of 9.x who still have persisted alarms to cancel them on first sync")
     override fun cancel(storedAlarmInfo: StoredAlarmInfo) {
         cancelledStoredAlarms.add(storedAlarmInfo)
     }

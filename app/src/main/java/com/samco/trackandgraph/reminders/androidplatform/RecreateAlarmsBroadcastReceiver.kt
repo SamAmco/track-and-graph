@@ -20,19 +20,17 @@ package com.samco.trackandgraph.reminders.androidplatform
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.samco.trackandgraph.reminders.ReminderInteractor
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class RecreateAlarmsBroadcastReceiver : BroadcastReceiver() {
-    @Inject
-    lateinit var reminderInteractor: ReminderInteractor
 
     override fun onReceive(context: Context?, intent: Intent?) {
+        if (context == null) return
+        
         val valid = setOf(
             Intent.ACTION_DATE_CHANGED,
             Intent.ACTION_TIME_CHANGED,
@@ -42,10 +40,11 @@ class RecreateAlarmsBroadcastReceiver : BroadcastReceiver() {
             Intent.ACTION_MY_PACKAGE_REPLACED
         )
         if (intent?.action !in valid) return
-        val pending = goAsync()
-        CoroutineScope(Dispatchers.Default).launch {
-            reminderInteractor.syncReminderNotifications()
-            pending.finish()
-        }
+        
+        val work = OneTimeWorkRequestBuilder<RecreateAlarmsWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .build()
+            
+        WorkManager.getInstance(context).enqueue(work)
     }
 }
