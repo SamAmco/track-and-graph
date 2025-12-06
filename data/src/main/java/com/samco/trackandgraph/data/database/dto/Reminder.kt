@@ -17,21 +17,27 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import com.samco.trackandgraph.data.database.entity.Reminder
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import com.samco.trackandgraph.data.serialization.LocalTimeSerializer
 import org.threeten.bp.LocalTime
 
 data class Reminder(
     val id: Long,
     val displayIndex: Int,
     val reminderName: String,
-    val time: LocalTime,
-    val checkedDays: CheckedDays
-) {
-    internal fun toEntity() = Reminder(
-        id,
-        displayIndex,
-        reminderName,
-        time,
-        checkedDays
-    )
+    val groupId: Long?,
+    val featureId: Long?,
+    val params: ReminderParams
+)
+
+@Serializable
+sealed class ReminderParams {
+    @Serializable
+    @SerialName("weekday")
+    data class WeekDayParams(
+        @Serializable(with = LocalTimeSerializer::class)
+        val time: LocalTime,
+        val checkedDays: CheckedDays
+    ) : ReminderParams()
 }

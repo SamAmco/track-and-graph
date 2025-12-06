@@ -19,12 +19,26 @@ package com.samco.trackandgraph.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.samco.trackandgraph.data.database.dto.CheckedDays
-import com.samco.trackandgraph.data.database.dto.Reminder
-import org.threeten.bp.LocalTime
 
-@Entity(tableName = "reminders_table")
+@Entity(
+    tableName = "reminders_table",
+    foreignKeys = [
+        ForeignKey(
+            entity = Group::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("group_id"),
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Feature::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("feature_id"),
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 internal data class Reminder(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
@@ -36,17 +50,12 @@ internal data class Reminder(
     @ColumnInfo(name = "name")
     val alarmName: String,
 
-    @ColumnInfo(name = "time")
-    val time: LocalTime,
+    @ColumnInfo(name = "group_id", index = true)
+    val groupId: Long?,
 
-    @ColumnInfo(name = "checked_days")
-    val checkedDays: CheckedDays
-) {
-    fun toDto() = Reminder(
-        id,
-        displayIndex,
-        alarmName,
-        time,
-        checkedDays
-    )
-}
+    @ColumnInfo(name = "feature_id", index = true)
+    val featureId: Long?,
+
+    @ColumnInfo(name = "encoded_reminder_params")
+    val encodedReminderParams: String
+)

@@ -32,6 +32,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
@@ -65,30 +66,38 @@ private suspend fun createReminders(dataInteractor: DataInteractor) {
                 1L,
                 0,
                 "Weight",
-                time = LocalTime.of(17, 0),
-                checkedDays = CheckedDays(
-                    monday = false,
-                    tuesday = false,
-                    wednesday = true,
-                    thursday = false,
-                    friday = false,
-                    saturday = false,
-                    sunday = true
+                groupId = null,
+                featureId = null,
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(17, 0),
+                    checkedDays = CheckedDays(
+                        monday = false,
+                        tuesday = false,
+                        wednesday = true,
+                        thursday = false,
+                        friday = false,
+                        saturday = false,
+                        sunday = true
+                    )
                 )
             ),
             Reminder(
                 2L,
                 1,
                 "Tracking dailies",
-                time = LocalTime.of(22, 0),
-                checkedDays = CheckedDays(
-                    monday = true,
-                    tuesday = true,
-                    wednesday = true,
-                    thursday = true,
-                    friday = true,
-                    saturday = true,
-                    sunday = true
+                groupId = null,
+                featureId = null,
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(22, 0),
+                    checkedDays = CheckedDays(
+                        monday = true,
+                        tuesday = true,
+                        wednesday = true,
+                        thursday = true,
+                        friday = true,
+                        saturday = true,
+                        sunday = true
+                    )
                 )
             )
         )

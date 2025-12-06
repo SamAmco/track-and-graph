@@ -39,6 +39,8 @@ sealed class DataUpdateType {
     data object GraphOrStatDeleted : DataUpdateType()
 
     /**A reminder was created/updated/deleted **/
+    //TODO probably need to improve this so we can re-schedule notifications for
+    // the updated reminder when needed, or delete notifications for deleted reminders etc
     data object Reminder : DataUpdateType()
 
     /**A global note was created/updated/deleted **/

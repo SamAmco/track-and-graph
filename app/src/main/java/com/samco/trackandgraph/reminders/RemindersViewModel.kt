@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
@@ -144,8 +145,12 @@ class RemindersViewModelImpl @Inject constructor(
             id = getNextReminderId(),
             displayIndex = getNextDisplayIndex(),
             reminderName = defaultName,
-            time = LocalTime.now(),
-            checkedDays = CheckedDays.none()
+            groupId = null,
+            featureId = null,
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.now(),
+                checkedDays = CheckedDays.none()
+            ),
         )
         _currentReminders.value = _currentReminders.value.plus(ReminderViewData.fromReminder(newReminder))
         onRemindersUpdated()
