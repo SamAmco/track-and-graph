@@ -62,6 +62,7 @@ class DataInteractorImplTest {
     private val dao: TrackAndGraphDatabaseDao = mock()
     private val trackerHelper: TrackerHelper = mock()
     private val functionHelper: FunctionHelper = mock()
+    private val reminderHelper: ReminderHelper = mock()
     private val dependencyAnalyserProvider: DependencyAnalyserProvider = mock()
 
     @Before
@@ -74,6 +75,7 @@ class DataInteractorImplTest {
             io = testDispatcher,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,
+            reminderHelper = reminderHelper,
             dependencyAnalyserProvider = dependencyAnalyserProvider,
         )
     }

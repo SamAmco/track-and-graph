@@ -23,6 +23,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -39,9 +40,7 @@ data class ReminderViewData(
     val time: MutableState<LocalTime>,
     val checkedDays: MutableState<CheckedDays>
 ) {
-    /**
-     * Flow that emits whenever any of the mutable states change
-     */
+    /** Flow that emits whenever any of the mutable states change */
     val stateChanges: Flow<Unit> = merge(
         name.stateEvents(),
         time.stateEvents(),
@@ -51,30 +50,34 @@ data class ReminderViewData(
     private fun <T> MutableState<T>.stateEvents(): Flow<Unit> = snapshotFlow { value }.map { }
 
     companion object {
-        /**
-         * Creates a ReminderViewData from a Reminder DTO
-         */
+        /** Creates a ReminderViewData from a Reminder DTO */
         fun fromReminder(reminder: Reminder): ReminderViewData {
-            return ReminderViewData(
-                id = reminder.id,
-                displayIndex = reminder.displayIndex,
-                name = mutableStateOf(TextFieldValue(reminder.reminderName)),
-                time = mutableStateOf(reminder.time),
-                checkedDays = mutableStateOf(reminder.checkedDays)
-            )
+            return when (val params = reminder.params) {
+                is ReminderParams.WeekDayParams -> {
+                    ReminderViewData(
+                        id = reminder.id,
+                        displayIndex = reminder.displayIndex,
+                        name = mutableStateOf(TextFieldValue(reminder.reminderName)),
+                        time = mutableStateOf(params.time),
+                        checkedDays = mutableStateOf(params.checkedDays)
+                    )
+                }
+            }
         }
     }
 
-    /**
-     * Converts this ReminderViewData back to a Reminder DTO
-     */
+    /** Converts this ReminderViewData back to a Reminder DTO */
     fun toReminder(): Reminder {
         return Reminder(
             id = id,
             displayIndex = displayIndex,
             reminderName = name.value.text,
-            time = time.value,
-            checkedDays = checkedDays.value
+            groupId = null,
+            featureId = null,
+            params = ReminderParams.WeekDayParams(
+                time = time.value,
+                checkedDays = checkedDays.value
+            ),
         )
     }
 }

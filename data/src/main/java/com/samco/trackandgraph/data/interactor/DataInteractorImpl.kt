@@ -62,8 +62,12 @@ internal class DataInteractorImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     private val trackerHelper: TrackerHelper,
     private val functionHelper: FunctionHelper,
+    private val reminderHelper: ReminderHelper,
     private val dependencyAnalyserProvider: DependencyAnalyserProvider,
-) : DataInteractor, TrackerHelper by trackerHelper, FunctionHelper by functionHelper {
+) : DataInteractor,
+    TrackerHelper by trackerHelper,
+    FunctionHelper by functionHelper,
+    ReminderHelper by reminderHelper {
 
     private val dataUpdateEvents = MutableSharedFlow<DataUpdateType>(
         extraBufferCapacity = 100,
@@ -170,13 +174,6 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getGroupById(id).toDto()
     }
 
-    override suspend fun getAllRemindersSync(): List<Reminder> = withContext(io) {
-        dao.getAllRemindersSync().map { it.toDto() }
-    }
-
-    override suspend fun getReminderById(id: Long): Reminder? = withContext(io) {
-        dao.getReminderById(id)?.toDto()
-    }
 
     override suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature> = withContext(io) {
         dao.getFeaturesForGroupSync(groupId).map { it.toDto() }
@@ -273,10 +270,7 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
-        dao.deleteReminders()
-        reminders
-            .map { it.toEntity() }
-            .forEach { dao.insertReminder(it) }
+        transactionHelper.withTransaction { reminderHelper.updateReminders(reminders) }
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
@@ -743,7 +737,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun hasAnyGroups(): Boolean = withContext(io) { dao.hasAnyGroups() }
 
-    override suspend fun hasAnyReminders(): Boolean = withContext(io) { dao.hasAnyReminders() }
 
     // FunctionHelper method overrides with event emission
     override suspend fun insertFunction(function: Function): Long? = withContext(io) {
