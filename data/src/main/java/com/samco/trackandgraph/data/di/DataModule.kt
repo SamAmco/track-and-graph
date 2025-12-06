@@ -30,6 +30,8 @@ import com.samco.trackandgraph.data.interactor.DataPointUpdateHelper
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.interactor.FunctionHelper
 import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
+import com.samco.trackandgraph.data.interactor.ReminderHelper
+import com.samco.trackandgraph.data.interactor.ReminderHelperImpl
 import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
 import com.samco.trackandgraph.data.lua.GuardedLuaEngineWrapper
@@ -92,4 +94,7 @@ class DataModule {
 
     @Provides
     internal fun getModuleLoadInterceptor(): ModuleLoadInterceptor = NoOpModuleLoadInterceptorImpl()
+
+    @Provides
+    internal fun getReminderHelper(impl: ReminderHelperImpl): ReminderHelper = impl
 }

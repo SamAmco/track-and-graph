@@ -32,28 +32,21 @@ import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
-import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
 
-interface DataInteractor : TrackerHelper, FunctionHelper {
+interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
     suspend fun insertGroup(group: Group): Long
 
     suspend fun deleteGroup(id: Long): DeletedGroupInfo
 
     suspend fun updateGroup(group: Group)
 
-    suspend fun getAllRemindersSync(): List<Reminder>
-
-    suspend fun getReminderById(id: Long): Reminder?
-
     suspend fun getAllGroupsSync(): List<Group>
 
     suspend fun getGroupGraphSync(rootGroupId: Long? = null): GroupGraph
-
-    suspend fun updateReminders(reminders: List<Reminder>)
 
     suspend fun getGroupById(id: Long): Group
 
@@ -179,8 +172,6 @@ interface DataInteractor : TrackerHelper, FunctionHelper {
     suspend fun hasAnyFeatures(): Boolean
 
     suspend fun hasAnyGroups(): Boolean
-
-    suspend fun hasAnyReminders(): Boolean
 
     /**
      * Gets all feature IDs that depend on a given feature, either directly or transitively.

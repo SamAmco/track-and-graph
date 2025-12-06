@@ -18,14 +18,15 @@
 package com.samco.trackandgraph.reminders.scheduling
 
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.time.TimeProvider
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Instant
 import javax.inject.Inject
 
 /**
- * Returns the next time a reminder notification should be scheduled
- * for a given reminder or null if no reminder should be scheduled.
+ * Returns the next time a reminder notification should be scheduled for a
+ * given reminder or null if no reminder should be scheduled.
  */
 interface ReminderScheduler {
     fun scheduleNext(reminder: Reminder): Instant?
@@ -34,10 +35,17 @@ interface ReminderScheduler {
 internal class ReminderSchedulerImpl @Inject constructor(
     private val timeProvider: TimeProvider
 ) : ReminderScheduler {
+
     override fun scheduleNext(reminder: Reminder): Instant? {
+        return when (val params = reminder.params) {
+            is ReminderParams.WeekDayParams -> scheduleNextWeekDayReminder(params)
+        }
+    }
+
+    private fun scheduleNextWeekDayReminder(params: ReminderParams.WeekDayParams): Instant? {
         val now = timeProvider.now()
         val currentZone = timeProvider.defaultZone()
-        val checkedDays = reminder.checkedDays.toList()
+        val checkedDays = params.checkedDays.toList()
 
         // If no days are checked, return null
         if (!checkedDays.any { it }) return null
@@ -52,7 +60,7 @@ internal class ReminderSchedulerImpl @Inject constructor(
         val nowWithBuffer = now.plusSeconds(2)
 
         // Start checking from today
-        var candidate = nowWithBuffer.toLocalDate().atTime(reminder.time).atZone(currentZone)
+        var candidate = nowWithBuffer.toLocalDate().atTime(params.time).atZone(currentZone)
 
         // If the time today hasn't passed yet and today is enabled, use today
         if (enabledDays.contains(candidate.dayOfWeek) && candidate.isAfter(nowWithBuffer)) {

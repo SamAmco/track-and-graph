@@ -26,8 +26,10 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataInteractorImpl
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
+import com.samco.trackandgraph.data.interactor.ReminderHelperImpl
 import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
 import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
+import com.samco.trackandgraph.data.serialization.ReminderSerializer
 import com.samco.trackandgraph.data.validation.FunctionValidator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
@@ -84,12 +86,20 @@ object TestDataInteractor {
             io = Dispatchers.IO
         )
 
+        val reminderHelper = ReminderHelperImpl(
+            dao = database.trackAndGraphDatabaseDao,
+            transactionHelper = transactionHelper,
+            reminderSerializer = ReminderSerializer(testJson),
+            io = Dispatchers.IO
+        )
+
         val dataInteractor = DataInteractorImpl(
             transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
             io = Dispatchers.IO,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,
+            reminderHelper = reminderHelper,
             dependencyAnalyserProvider = dependencyAnalyserProvier,
         )
 
