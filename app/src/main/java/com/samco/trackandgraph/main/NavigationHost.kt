@@ -47,8 +47,8 @@ import com.samco.trackandgraph.group.GroupNavKey
 import com.samco.trackandgraph.group.GroupScreen
 import com.samco.trackandgraph.notes.NotesNavKey
 import com.samco.trackandgraph.notes.NotesScreen
-import com.samco.trackandgraph.reminders.RemindersNavKey
-import com.samco.trackandgraph.reminders.RemindersScreen
+import com.samco.trackandgraph.reminders.ui.RemindersNavKey
+import com.samco.trackandgraph.reminders.ui.RemindersScreen
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.viewgraphstat.ViewGraphStatNavKey
 import com.samco.trackandgraph.viewgraphstat.ViewGraphStatScreen
