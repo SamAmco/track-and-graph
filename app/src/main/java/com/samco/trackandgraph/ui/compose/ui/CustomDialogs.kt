@@ -121,40 +121,62 @@ fun CustomContinueCancelDialog(
         top = inputSpacingLarge,
     )
 ) {
+    ContinueCancelDialogContent(
+        onConfirm = onConfirm,
+        onDismissRequest = onDismissRequest,
+        continueText = continueText,
+        cancelText = cancelText,
+        continueEnabled = continueEnabled,
+        cancelVisible = cancelVisible,
+        scrollContent = scrollContent,
+        content = content
+    )
+}
+
+@Composable
+fun ContinueCancelDialogContent(
+    modifier: Modifier = Modifier,
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit,
+    @StringRes continueText: Int = R.string.continue_word,
+    @StringRes cancelText: Int = R.string.cancel,
+    continueEnabled: Boolean = true,
+    cancelVisible: Boolean = true,
+    scrollContent: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit
+) = Column(
+    modifier = modifier.wrapContentWidth()
+) {
     Column(
-        modifier = Modifier.wrapContentWidth()
+        modifier = Modifier
+            .weight(1f, fill = false)
+            .let {
+                if (scrollContent) it.verticalScroll(state = rememberScrollState())
+                else it
+            },
+        content = content
+    )
+
+    DialogInputSpacing()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
     ) {
-        Column(
-            modifier = Modifier
-                .weight(1f, fill = false)
-                .let {
-                    if (scrollContent) it.verticalScroll(state = rememberScrollState())
-                    else it
-                },
-            content = content
-        )
-
-        DialogInputSpacing()
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            if (cancelVisible) {
-                SmallTextButton(
-                    stringRes = cancelText,
-                    onClick = onDismissRequest,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.tngColors.onSurface
-                    )
-                )
-            }
+        if (cancelVisible) {
             SmallTextButton(
-                stringRes = continueText,
-                onClick = onConfirm,
-                enabled = continueEnabled
+                stringRes = cancelText,
+                onClick = onDismissRequest,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.tngColors.onSurface
+                )
             )
         }
+        SmallTextButton(
+            stringRes = continueText,
+            onClick = onConfirm,
+            enabled = continueEnabled
+        )
     }
 }
 

@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.data.interactor
 
-import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.entity.Reminder as ReminderEntity
@@ -29,7 +28,6 @@ import javax.inject.Inject
 
 internal class ReminderHelperImpl @Inject constructor(
     private val dao: TrackAndGraphDatabaseDao,
-    private val transactionHelper: DatabaseTransactionHelper,
     private val reminderSerializer: ReminderSerializer,
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ReminderHelper {
@@ -42,11 +40,18 @@ internal class ReminderHelperImpl @Inject constructor(
         dao.getReminderById(id)?.let(::fromEntity)
     }
 
-    override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
-        transactionHelper.withTransaction {
-            dao.deleteReminders()
-            reminders.mapNotNull(::toEntity).forEach { dao.insertReminder(it) }
-        }
+    override suspend fun insertReminder(reminder: Reminder): Long = withContext(io) {
+        val entity = toEntity(reminder) ?: throw IllegalArgumentException("Failed to serialize reminder")
+        dao.insertReminder(entity)
+    }
+
+    override suspend fun updateReminder(reminder: Reminder) = withContext(io) {
+        val entity = toEntity(reminder) ?: throw IllegalArgumentException("Failed to serialize reminder")
+        dao.updateReminder(entity)
+    }
+
+    override suspend fun deleteReminder(id: Long) = withContext(io) {
+        dao.deleteReminder(id)
     }
 
     override suspend fun hasAnyReminders(): Boolean = withContext(io) {

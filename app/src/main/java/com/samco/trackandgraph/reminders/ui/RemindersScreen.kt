@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.reminders
+package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,20 +47,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
-import com.samco.trackandgraph.reminders.ui.Reminder
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
-import com.samco.trackandgraph.ui.compose.ui.WideButton
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
-import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -70,23 +67,24 @@ data object RemindersNavKey : NavKey
 
 @Composable
 fun RemindersScreen(navArgs: RemindersNavKey) {
-    val viewModel: RemindersViewModel = hiltViewModel<RemindersViewModelImpl>()
+    val viewModel: RemindersScreenViewModel = hiltViewModel<RemindersScreenViewModelImpl>()
 
     val reminders by viewModel.currentReminders.collectAsState()
     val isLoading by viewModel.loading.collectAsState()
-    val hasChanges by viewModel.remindersChanged.collectAsState()
+    val showAddReminderDialog by viewModel.showAddReminderDialog.collectAsState()
 
     TopAppBarContent(navArgs)
 
     RemindersScreen(
         reminders = reminders,
         isLoading = isLoading,
-        hasChanges = hasChanges,
+        showAddReminderDialog = showAddReminderDialog,
         lazyListState = viewModel.lazyListState,
-        scrollToNewItem = viewModel.scrollToNewItem,
-        onSaveChanges = viewModel::saveChanges,
+        onHideAddReminderDialog = viewModel::hideAddReminderDialog,
         onDeleteReminder = viewModel::deleteReminder,
-        onMoveReminder = { from, to -> viewModel.moveItem(from, to) },
+        onDragStart = viewModel::onDragStart,
+        onDragSwap = viewModel::onDragSwap,
+        onDragEnd = viewModel::onDragEnd,
     )
 }
 
@@ -94,19 +92,17 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
 private fun TopAppBarContent(navArgs: RemindersNavKey) {
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.reminders)
-    val defaultReminderName = stringResource(R.string.default_reminder_name)
-    val viewModel: RemindersViewModel = hiltViewModel<RemindersViewModelImpl>()
+    val viewModel: RemindersScreenViewModel = hiltViewModel<RemindersScreenViewModelImpl>()
     val permissionRequester = rememberAlarmAndNotificationPermissionRequester()
 
     val actions: @Composable RowScope.() -> Unit = remember(
         viewModel,
-        defaultReminderName,
         permissionRequester
     ) {
         {
             IconButton(
                 onClick = {
-                    viewModel.addReminder(defaultReminderName)
+                    viewModel.showAddReminderDialog()
                     permissionRequester()
                 }
             ) {
@@ -131,22 +127,24 @@ private fun TopAppBarContent(navArgs: RemindersNavKey) {
 fun RemindersScreen(
     reminders: List<ReminderViewData>,
     isLoading: Boolean,
-    hasChanges: Boolean,
+    showAddReminderDialog: Boolean,
     lazyListState: LazyListState,
-    scrollToNewItem: Flow<Int>,
-    onSaveChanges: () -> Unit,
+    onHideAddReminderDialog: () -> Unit,
     onDeleteReminder: (ReminderViewData) -> Unit,
-    onMoveReminder: (Int, Int) -> Unit,
+    onDragStart: () -> Unit,
+    onDragSwap: (Int, Int) -> Unit,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        onMoveReminder(from.index, to.index)
+        onDragSwap(from.index, to.index)
     }
 
-    // Handle scroll to new item
-    LaunchedEffect(scrollToNewItem, lazyListState) {
-        scrollToNewItem.collect { itemIndex ->
-            lazyListState.animateScrollToItem(itemIndex)
+    LaunchedEffect(reorderableLazyListState.isAnyItemDragging) {
+        if (reorderableLazyListState.isAnyItemDragging) {
+            onDragStart()
+        } else {
+            onDragEnd()
         }
     }
 
@@ -176,8 +174,8 @@ fun RemindersScreen(
                         Reminder(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .animateItem()
-                                .longPressDraggableHandle(),
+                                .longPressDraggableHandle()
+                                .zIndex(if (isDragging) 1f else 0f),
                             isElevated = isDragging,
                             reminderViewData = reminder,
                             onDeleteClick = { onDeleteReminder(reminder) }
@@ -188,19 +186,10 @@ fun RemindersScreen(
             }
         }
 
-        // Save changes button
-        if (hasChanges) {
-            WideButton(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(
-                        WindowInsets.safeDrawing
-                            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
-                            .asPaddingValues()
-                    )
-                    .then(Modifier.padding(inputSpacingLarge)),
-                text = stringResource(id = R.string.save_changes),
-                onClick = onSaveChanges
+        // Add reminder dialog
+        if (showAddReminderDialog) {
+            AddReminderDialog(
+                onDismiss = onHideAddReminderDialog
             )
         }
 
@@ -218,12 +207,13 @@ private fun RemindersScreenPreview() {
             RemindersScreen(
                 reminders = emptyList(),
                 isLoading = false,
-                hasChanges = true,
+                showAddReminderDialog = false,
                 lazyListState = LazyListState(),
-                scrollToNewItem = kotlinx.coroutines.flow.emptyFlow(),
-                onSaveChanges = {},
+                onHideAddReminderDialog = {},
                 onDeleteReminder = {},
-                onMoveReminder = { _, _ -> }
+                onDragStart = {},
+                onDragSwap = { _, _ -> },
+                onDragEnd = {},
             )
         }
     }
