@@ -55,7 +55,7 @@ import com.samco.trackandgraph.aboutpage.AboutNavKey
 import com.samco.trackandgraph.backupandrestore.BackupAndRestoreNavKey
 import com.samco.trackandgraph.group.GroupNavKey
 import com.samco.trackandgraph.notes.NotesNavKey
-import com.samco.trackandgraph.reminders.RemindersNavKey
+import com.samco.trackandgraph.reminders.ui.RemindersNavKey
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing

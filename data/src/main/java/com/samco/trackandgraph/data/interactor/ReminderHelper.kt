@@ -32,7 +32,11 @@ interface ReminderHelper {
 
     suspend fun getReminderById(id: Long): Reminder?
 
-    suspend fun updateReminders(reminders: List<Reminder>)
+    suspend fun insertReminder(reminder: Reminder): Long
+
+    suspend fun updateReminder(reminder: Reminder)
+
+    suspend fun deleteReminder(id: Long)
 
     suspend fun hasAnyReminders(): Boolean
 }

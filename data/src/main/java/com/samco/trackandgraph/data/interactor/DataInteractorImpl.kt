@@ -269,8 +269,19 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
-        transactionHelper.withTransaction { reminderHelper.updateReminders(reminders) }
+    override suspend fun insertReminder(reminder: Reminder): Long = withContext(io) {
+        val id = reminderHelper.insertReminder(reminder)
+        dataUpdateEvents.emit(DataUpdateType.Reminder)
+        return@withContext id
+    }
+
+    override suspend fun updateReminder(reminder: Reminder) = withContext(io) {
+        reminderHelper.updateReminder(reminder)
+        dataUpdateEvents.emit(DataUpdateType.Reminder)
+    }
+
+    override suspend fun deleteReminder(id: Long) = withContext(io) {
+        reminderHelper.deleteReminder(id)
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
