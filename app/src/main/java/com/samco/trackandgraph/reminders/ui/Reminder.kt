@@ -18,17 +18,24 @@
 package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -39,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
@@ -50,6 +58,7 @@ fun Reminder(
     modifier: Modifier = Modifier,
     isElevated: Boolean = false,
     reminderViewData: ReminderViewData,
+    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) = Surface(
     modifier = modifier
@@ -62,39 +71,84 @@ fun Reminder(
         DateTimeFormatter.ofPattern("HH:mm")
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(cardPadding),
-        verticalAlignment = Alignment.CenterVertically
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(cardPadding),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = reminderViewData.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = reminderViewData.time.format(timeFormatter),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = formatCheckedDays(reminderViewData.checkedDays),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = reminderViewData.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = reminderViewData.time.format(timeFormatter),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = formatCheckedDays(reminderViewData.checkedDays),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        ReminderMenuButton(
+            modifier = Modifier.align(Alignment.TopEnd),
+            onEditClick = onEditClick,
+            onDeleteClick = onDeleteClick
+        )
+    }
+}
+
+@Composable
+private fun ReminderMenuButton(
+    modifier: Modifier = Modifier,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    var showContextMenu by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier.size(buttonSize)
+    ) {
+        IconButton(
+            modifier = Modifier.size(buttonSize),
+            onClick = { showContextMenu = true },
+        ) {
+            Icon(
+                painterResource(R.drawable.list_menu_icon),
+                contentDescription = stringResource(R.string.tracked_data_menu_button_content_description),
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
-        IconButton(
-            onClick = onDeleteClick
+        // Context menu
+        DropdownMenu(
+            expanded = showContextMenu,
+            onDismissRequest = { showContextMenu = false }
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.delete_icon),
-                contentDescription = stringResource(id = R.string.delete_reminder_content_description),
-                tint = MaterialTheme.colorScheme.onSurface
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
+                onClick = {
+                    showContextMenu = false
+                    onEditClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) },
+                onClick = {
+                    showContextMenu = false
+                    onDeleteClick()
+                }
             )
         }
     }
@@ -148,6 +202,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 ),
                 reminderDto = null,
             ),
+            onEditClick = {},
             onDeleteClick = {}
         )
 
@@ -162,6 +217,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 checkedDays = CheckedDays.all(),
                 reminderDto = null,
             ),
+            onEditClick = {},
             onDeleteClick = {}
         )
     }

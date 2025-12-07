@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
@@ -29,24 +30,31 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 
 @Composable
 fun AddReminderDialog(
+    editReminderId: Long?,
     onDismiss: () -> Unit
 ) {
     val viewModel: AddReminderViewModel = hiltViewModel<AddReminderViewModelImpl>()
 
-    LaunchedEffect(viewModel.onAddComplete) {
-        for (event in viewModel.onAddComplete) onDismiss()
+    LaunchedEffect(editReminderId) {
+        viewModel.loadStateForReminder(editReminderId)
+    }
+
+    LaunchedEffect(viewModel.onComplete) {
+        for (event in viewModel.onComplete) onDismiss()
     }
 
     AddReminderDialog(
-        onAddReminder = viewModel::addReminder,
-        onDismiss = onDismiss
+        onConfirm = viewModel::upsertReminder,
+        onDismiss = onDismiss,
+        editMode = viewModel.editMode.collectAsStateWithLifecycle().value,
     )
 }
 
 @Composable
 private fun AddReminderDialog(
-    onAddReminder: (Reminder) -> Unit,
+    onConfirm: (Reminder) -> Unit,
     onDismiss: () -> Unit,
+    editMode: Boolean,
 ) = CustomDialog(
     onDismissRequest = onDismiss,
     scrollContent = false,
@@ -58,8 +66,9 @@ private fun AddReminderDialog(
     )
 ) {
     AddReminderDialogContent(
-        onAddReminder = onAddReminder,
-        onDismiss = onDismiss
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+        editMode = editMode,
     )
 }
 
@@ -68,7 +77,8 @@ private fun AddReminderDialog(
 @Composable
 private fun AddReminderDialogPreview() {
     AddReminderDialog(
-        onAddReminder = {},
-        onDismiss = {}
+        onConfirm = {},
+        onDismiss = {},
+        editMode = false,
     )
 }
