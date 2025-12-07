@@ -20,7 +20,6 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.Reminder
@@ -31,14 +30,15 @@ import org.threeten.bp.LocalTime
 @Composable
 fun AddReminderDialogContent(
     modifier: Modifier = Modifier,
-    onAddReminder: (Reminder) -> Unit,
+    onConfirm: (Reminder) -> Unit,
     onDismiss: () -> Unit,
+    editMode: Boolean,
 ) {
     ContinueCancelDialogContent(
         modifier = modifier,
         content = { Text("Add Reminder") },
         onConfirm = {
-            onAddReminder(
+            onConfirm(
                 // Create new reminder with predefined configuration
                 Reminder(
                     id = 0L, // Will be assigned by database
@@ -53,6 +53,7 @@ fun AddReminderDialogContent(
                 )
             )
         },
+        continueText = if (editMode) R.string.update else R.string.add,
         onDismissRequest = onDismiss
     )
 }
