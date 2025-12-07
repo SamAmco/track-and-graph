@@ -31,7 +31,6 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -42,7 +41,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,10 +49,7 @@ interface RemindersScreenViewModel {
     val currentReminders: StateFlow<List<ReminderViewData>>
     val loading: StateFlow<Boolean>
     val lazyListState: LazyListState
-    val showAddReminderDialog: StateFlow<Boolean>
 
-    fun showAddReminderDialog()
-    fun hideAddReminderDialog()
     fun deleteReminder(reminderViewData: ReminderViewData)
     fun moveItem(from: Int, to: Int)
 
@@ -70,9 +65,6 @@ class RemindersScreenViewModelImpl @Inject constructor(
     private val reminderInteractor: ReminderInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ViewModel(), RemindersScreenViewModel {
-
-    private val _showAddReminderDialog = MutableStateFlow(false)
-    override val showAddReminderDialog: StateFlow<Boolean> = _showAddReminderDialog.asStateFlow()
 
     override val lazyListState = LazyListState()
 
@@ -111,14 +103,6 @@ class RemindersScreenViewModelImpl @Inject constructor(
     override val loading: StateFlow<Boolean> = allReminders
         .map { it !is LoadingState.Loaded }
         .stateIn(viewModelScope, SharingStarted.Lazily, true)
-
-    override fun showAddReminderDialog() {
-        _showAddReminderDialog.value = true
-    }
-
-    override fun hideAddReminderDialog() {
-        _showAddReminderDialog.value = false
-    }
 
     override fun deleteReminder(reminderViewData: ReminderViewData) {
         viewModelScope.launch(io) {

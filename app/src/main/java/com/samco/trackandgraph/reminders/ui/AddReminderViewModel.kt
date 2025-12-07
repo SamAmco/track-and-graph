@@ -26,20 +26,28 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.reminders.ReminderInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 interface AddReminderViewModel {
-    val loading: StateFlow<Boolean>
-    val onAddComplete: ReceiveChannel<Unit>
+    fun loadStateForReminder(editReminderId: Long?)
 
-    fun addReminder(reminder: Reminder)
+    val loading: StateFlow<Boolean>
+    val editMode: StateFlow<Boolean>
+    val onComplete: ReceiveChannel<Unit>
+
+    fun upsertReminder(reminder: Reminder)
 }
 
 @HiltViewModel
@@ -47,42 +55,90 @@ class AddReminderViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val reminderInteractor: ReminderInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
-    @MainDispatcher private val ui: CoroutineDispatcher
+    @MainDispatcher private val ui: CoroutineDispatcher,
 ) : ViewModel(), AddReminderViewModel {
 
     private val _loading = MutableStateFlow(false)
     override val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
-    override val onAddComplete: Channel<Unit> = Channel()
+    private var currentLoadingJob: Job? = null
+    private val editingReminder = MutableStateFlow<Reminder?>(null)
 
-    override fun addReminder(reminder: Reminder) {
-        viewModelScope.launch(io) {
+    override val editMode: StateFlow<Boolean> = editingReminder
+        .map { it != null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    override val onComplete: Channel<Unit> = Channel()
+
+    override fun loadStateForReminder(editReminderId: Long?) {
+        currentLoadingJob?.cancel()
+        currentLoadingJob = viewModelScope.launch(io) {
             withContext(ui) { _loading.value = true }
+            if (editReminderId == null) {
+                editingReminder.value = null
+                withContext(ui) { _loading.value = false }
+                return@launch
+            }
+            editingReminder.value = dataInteractor.getReminderById(editReminderId)
+            withContext(ui) { _loading.value = false }
+        }
+    }
 
+    override fun upsertReminder(reminder: Reminder) {
+        viewModelScope.launch(io) {
             try {
-                withContext(io) {
-                    // Get existing reminders and shift their display indices down
-                    val existingReminders = dataInteractor.getAllRemindersSync()
-                    val shiftedReminders = existingReminders.map { existingReminder ->
-                        existingReminder.copy(displayIndex = existingReminder.displayIndex + 1)
-                    }
+                currentLoadingJob?.join()
+                withContext(ui) { _loading.value = true }
 
-                    // Insert new reminder first
-                    val insertedId = dataInteractor.insertReminder(reminder)
-                    val insertedReminder = reminder.copy(id = insertedId)
+                val editingReminder = editingReminder.value
 
-                    // Update existing reminders with shifted display indices
-                    shiftedReminders.forEach { shiftedReminder ->
-                        dataInteractor.updateReminder(shiftedReminder)
-                    }
-                    reminderInteractor.scheduleNext(insertedReminder)
+                if (editingReminder != null) {
+                    updateReminder(editingReminder, reminder)
+                } else {
+                    insertReminder(reminder)
                 }
+            } catch (t: Throwable) {
+                Timber.e(t)
             } finally {
                 withContext(ui) {
                     _loading.value = false
-                    onAddComplete.send(Unit)
+                    onComplete.send(Unit)
                 }
             }
         }
+    }
+
+    private suspend fun updateReminder(oldReminder: Reminder, newReminder: Reminder) {
+        // Update existing reminder
+        val updatedReminder = newReminder.copy(
+            id = oldReminder.id,
+            displayIndex = oldReminder.displayIndex,
+        )
+        dataInteractor.updateReminder(updatedReminder)
+        reminderInteractor.scheduleNext(updatedReminder)
+    }
+
+    private suspend fun insertReminder(reminder: Reminder) {
+        // Get existing reminders and shift their display indices down
+        val existingReminders = dataInteractor.getAllRemindersSync()
+        val shiftedReminders = existingReminders.map { existingReminder ->
+            existingReminder.copy(displayIndex = existingReminder.displayIndex + 1)
+        }
+
+        // Update existing reminders with shifted display indices
+        shiftedReminders.forEach { shiftedReminder ->
+            dataInteractor.updateReminder(shiftedReminder)
+        }
+
+        // Insert new reminder first
+        val insertedId = dataInteractor.insertReminder(reminder)
+        val insertedReminder = reminder.copy(id = insertedId)
+        reminderInteractor.scheduleNext(insertedReminder)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        currentLoadingJob?.cancel()
+        onComplete.close()
     }
 }

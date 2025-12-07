@@ -41,7 +41,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -71,16 +74,25 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
 
     val reminders by viewModel.currentReminders.collectAsState()
     val isLoading by viewModel.loading.collectAsState()
-    val showAddReminderDialog by viewModel.showAddReminderDialog.collectAsState()
+    var showAddReminderDialog by rememberSaveable(navArgs) { mutableStateOf(false) }
+    var editReminderId by rememberSaveable(navArgs) { mutableStateOf<Long?>(null) }
 
-    TopAppBarContent(navArgs)
+    TopAppBarContent(navArgs) {
+        editReminderId = null
+        showAddReminderDialog = true
+    }
 
     RemindersScreen(
         reminders = reminders,
         isLoading = isLoading,
         showAddReminderDialog = showAddReminderDialog,
+        editReminderId = editReminderId,
         lazyListState = viewModel.lazyListState,
-        onHideAddReminderDialog = viewModel::hideAddReminderDialog,
+        onEditReminder = {
+            editReminderId = it
+            showAddReminderDialog = true
+        },
+        onHideAddReminderDialog = { showAddReminderDialog = false },
         onDeleteReminder = viewModel::deleteReminder,
         onDragStart = viewModel::onDragStart,
         onDragSwap = viewModel::onDragSwap,
@@ -89,30 +101,30 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
 }
 
 @Composable
-private fun TopAppBarContent(navArgs: RemindersNavKey) {
+private fun TopAppBarContent(
+    navArgs: RemindersNavKey,
+    showAddReminderDialog: () -> Unit,
+) {
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.reminders)
-    val viewModel: RemindersScreenViewModel = hiltViewModel<RemindersScreenViewModelImpl>()
     val permissionRequester = rememberAlarmAndNotificationPermissionRequester()
 
-    val actions: @Composable RowScope.() -> Unit = remember(
-        viewModel,
-        permissionRequester
-    ) {
-        {
-            IconButton(
-                onClick = {
-                    viewModel.showAddReminderDialog()
-                    permissionRequester()
+    val actions: @Composable RowScope.() -> Unit =
+        remember(permissionRequester, showAddReminderDialog) {
+            {
+                IconButton(
+                    onClick = {
+                        showAddReminderDialog()
+                        permissionRequester()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null
-                )
             }
         }
-    }
 
     topBarController.Set(
         navArgs,
@@ -128,7 +140,9 @@ fun RemindersScreen(
     reminders: List<ReminderViewData>,
     isLoading: Boolean,
     showAddReminderDialog: Boolean,
+    editReminderId: Long?,
     lazyListState: LazyListState,
+    onEditReminder: (Long) -> Unit,
     onHideAddReminderDialog: () -> Unit,
     onDeleteReminder: (ReminderViewData) -> Unit,
     onDragStart: () -> Unit,
@@ -178,7 +192,8 @@ fun RemindersScreen(
                                 .zIndex(if (isDragging) 1f else 0f),
                             isElevated = isDragging,
                             reminderViewData = reminder,
-                            onDeleteClick = { onDeleteReminder(reminder) }
+                            onDeleteClick = { onDeleteReminder(reminder) },
+                            onEditClick = { onEditReminder(reminder.id) }
                         )
                     }
                 }
@@ -189,6 +204,7 @@ fun RemindersScreen(
         // Add reminder dialog
         if (showAddReminderDialog) {
             AddReminderDialog(
+                editReminderId = editReminderId,
                 onDismiss = onHideAddReminderDialog
             )
         }
@@ -208,12 +224,14 @@ private fun RemindersScreenPreview() {
                 reminders = emptyList(),
                 isLoading = false,
                 showAddReminderDialog = false,
+                editReminderId = null,
                 lazyListState = LazyListState(),
                 onHideAddReminderDialog = {},
                 onDeleteReminder = {},
                 onDragStart = {},
                 onDragSwap = { _, _ -> },
                 onDragEnd = {},
+                onEditReminder = {},
             )
         }
     }
