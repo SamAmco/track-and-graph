@@ -47,6 +47,7 @@ import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
@@ -74,7 +75,7 @@ fun DateTimeButtonRow(
     )
     TimeButton(
         modifier = Modifier.widthIn(min = 104.dp),
-        dateTime = selectedDateTime,
+        time = selectedDateTime.toLocalTime(),
         onTimeSelected = { time ->
             onDateTimeSelected(
                 selectedDateTime
@@ -116,31 +117,27 @@ fun DateButton(
     }
 }
 
-data class SelectedTime(
-    val hour: Int,
-    val minute: Int
-)
 
 @Composable
 fun TimeButton(
     modifier: Modifier = Modifier,
-    dateTime: OffsetDateTime,
+    time: LocalTime,
     enabled: Boolean = true,
-    onTimeSelected: (SelectedTime) -> Unit
+    onTimeSelected: (LocalTime) -> Unit
 ) {
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
     SelectorButton(
         modifier = modifier,
-        text = formatHourMinute(dateTime),
+        text = formatHourMinute(time),
         enabled = enabled,
         onClick = { showTimePicker = true }
     )
 
     if (showTimePicker) {
         TimePickerDialogContent(
-            initialHour = dateTime.hour,
-            initialMinute = dateTime.minute,
+            initialHour = time.hour,
+            initialMinute = time.minute,
             onCancel = { showTimePicker = false },
             onConfirm = { selectedTime ->
                 onTimeSelected(selectedTime)
@@ -156,7 +153,7 @@ fun TimePickerDialogContent(
     initialHour: Int = 14,
     initialMinute: Int = 30,
     onCancel: () -> Unit = {},
-    onConfirm: (SelectedTime) -> Unit = {}
+    onConfirm: (LocalTime) -> Unit = {}
 ) {
     val timePickerState = rememberTimePickerState(
         initialHour = initialHour,
@@ -166,7 +163,7 @@ fun TimePickerDialogContent(
 
     CustomContinueCancelDialog(
         onDismissRequest = onCancel,
-        onConfirm = { onConfirm(SelectedTime(timePickerState.hour, timePickerState.minute)) },
+        onConfirm = { onConfirm(LocalTime.of(timePickerState.hour, timePickerState.minute)) },
         continueText = R.string.ok,
         cancelText = R.string.cancel,
         backgroundColor = MaterialTheme.colorScheme.surfaceContainer,

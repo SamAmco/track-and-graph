@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.localisation.TranslatedString
-import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import org.threeten.bp.OffsetDateTime
 
@@ -86,7 +85,7 @@ sealed class LuaScriptConfigurationInput {
      */
     data class LocalTime(
         override val name: TranslatedString?,
-        val time: MutableState<SelectedTime> = mutableStateOf(SelectedTime(0, 0))
+        val time: MutableState<org.threeten.bp.LocalTime> = mutableStateOf(org.threeten.bp.LocalTime.of(0, 0))
     ) : LuaScriptConfigurationInput()
 
     /**
