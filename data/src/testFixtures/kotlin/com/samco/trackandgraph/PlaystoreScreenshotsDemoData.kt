@@ -60,44 +60,44 @@ suspend fun createScreenshotsGroup(dataInteractor: DataInteractor) {
 }
 
 private suspend fun createReminders(dataInteractor: DataInteractor) {
-    dataInteractor.updateReminders(
-        listOf(
-            Reminder(
-                1L,
-                0,
-                "Weight",
-                groupId = null,
-                featureId = null,
-                params = ReminderParams.WeekDayParams(
-                    time = LocalTime.of(17, 0),
-                    checkedDays = CheckedDays(
-                        monday = false,
-                        tuesday = false,
-                        wednesday = true,
-                        thursday = false,
-                        friday = false,
-                        saturday = false,
-                        sunday = true
-                    )
+    dataInteractor.insertReminder(
+        Reminder(
+            1L,
+            0,
+            "Weight",
+            groupId = null,
+            featureId = null,
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(17, 0),
+                checkedDays = CheckedDays(
+                    monday = false,
+                    tuesday = false,
+                    wednesday = true,
+                    thursday = false,
+                    friday = false,
+                    saturday = false,
+                    sunday = true
                 )
-            ),
-            Reminder(
-                2L,
-                1,
-                "Tracking dailies",
-                groupId = null,
-                featureId = null,
-                params = ReminderParams.WeekDayParams(
-                    time = LocalTime.of(22, 0),
-                    checkedDays = CheckedDays(
-                        monday = true,
-                        tuesday = true,
-                        wednesday = true,
-                        thursday = true,
-                        friday = true,
-                        saturday = true,
-                        sunday = true
-                    )
+            )
+        )
+    )
+    dataInteractor.insertReminder(
+        Reminder(
+            2L,
+            1,
+            "Tracking dailies",
+            groupId = null,
+            featureId = null,
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(22, 0),
+                checkedDays = CheckedDays(
+                    monday = true,
+                    tuesday = true,
+                    wednesday = true,
+                    thursday = true,
+                    friday = true,
+                    saturday = true,
+                    sunday = true
                 )
             )
         )
