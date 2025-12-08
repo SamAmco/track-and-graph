@@ -24,7 +24,7 @@ import com.samco.trackandgraph.data.lua.dto.EnumOption
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationEncoder
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
-import com.samco.trackandgraph.ui.compose.ui.SelectedTime
+import org.threeten.bp.LocalTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -74,7 +74,7 @@ class LuaScriptConfigurationEncoderTest {
 
     private val localtimeInput = LuaScriptConfigurationInput.LocalTime(
         name = TranslatedString.Simple("LocalTime Config"),
-        time = mutableStateOf(SelectedTime(14, 30))
+        time = mutableStateOf(LocalTime.of(14, 30))
     )
 
     private val instantInput = LuaScriptConfigurationInput.Instant(
