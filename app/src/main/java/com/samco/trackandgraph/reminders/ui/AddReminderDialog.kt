@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
@@ -43,10 +44,14 @@ fun AddReminderDialog(
         for (event in viewModel.onComplete) onDismiss()
     }
 
+    val editingReminder = viewModel.editingReminder.collectAsStateWithLifecycle().value
+    val editMode = viewModel.editMode.collectAsStateWithLifecycle().value
+
     AddReminderDialog(
         onConfirm = viewModel::upsertReminder,
         onDismiss = onDismiss,
-        editMode = viewModel.editMode.collectAsStateWithLifecycle().value,
+        editMode = editMode,
+        editingReminder = editingReminder
     )
 }
 
@@ -55,6 +60,7 @@ private fun AddReminderDialog(
     onConfirm: (Reminder) -> Unit,
     onDismiss: () -> Unit,
     editMode: Boolean,
+    editingReminder: Reminder? = null,
 ) = CustomDialog(
     onDismissRequest = onDismiss,
     scrollContent = false,
@@ -65,11 +71,22 @@ private fun AddReminderDialog(
         top = inputSpacingLarge,
     )
 ) {
-    AddReminderDialogContent(
-        onConfirm = onConfirm,
-        onDismiss = onDismiss,
-        editMode = editMode,
-    )
+    if (editMode && editingReminder != null) {
+        when (val params = editingReminder.params) {
+            is ReminderParams.WeekDayParams -> WeekDayReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss
+            )
+        }
+    } else {
+        // Add mode: show navigation flow
+        AddReminderDialogContent(
+            onConfirm = onConfirm,
+            onDismiss = onDismiss
+        )
+    }
 }
 
 
