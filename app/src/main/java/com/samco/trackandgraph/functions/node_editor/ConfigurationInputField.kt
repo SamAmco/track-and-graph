@@ -44,7 +44,6 @@ import com.samco.trackandgraph.ui.compose.ui.DurationInput
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
-import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
@@ -199,9 +198,7 @@ private fun LocalTimeField(
         modifier = Modifier
             .widthIn(min = 100.dp)
             .align(Alignment.CenterHorizontally),
-        dateTime = now
-            .withHour(input.time.value.hour.coerceIn(0, 23))
-            .withMinute(input.time.value.minute.coerceIn(0, 59)),
+        time = input.time.value,
         onTimeSelected = { selectedTime ->
             input.time.value = selectedTime
         }
@@ -330,7 +327,7 @@ private fun ConfigurationInputFieldLocalTimePreview() {
             focusManager = LocalFocusManager.current,
             input = LuaScriptConfigurationInput.LocalTime(
                 name = TranslatedString.Simple("Sample Time Parameter"),
-                time = remember { mutableStateOf(SelectedTime(14, 30)) }
+                time = remember { mutableStateOf(org.threeten.bp.LocalTime.of(14, 30)) }
             )
         )
     }
