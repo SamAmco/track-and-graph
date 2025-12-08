@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.reminders
 
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -41,7 +42,7 @@ internal class ReminderInteractorImplTest {
     private val reminderScheduler = FakeReminderScheduler()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val json = Json { ignoreUnknownKeys = true }
-    
+
     private val uut = ReminderInteractorImpl(
         reminderPref = reminderPref,
         platformScheduler = platformScheduler,
@@ -57,35 +58,39 @@ internal class ReminderInteractorImplTest {
         val reminder1 = reminderFixture.copy(
             id = 1L,
             reminderName = "Morning Reminder",
-            time = LocalTime.of(8, 0),
-            checkedDays = CheckedDays.none().copy(monday = true, wednesday = true)
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(8, 0),
+                checkedDays = CheckedDays.none().copy(monday = true, wednesday = true)
+            ),
         )
         val reminder2 = reminderFixture.copy(
             id = 2L,
             displayIndex = 1,
             reminderName = "Evening Reminder",
-            time = LocalTime.of(20, 0),
-            checkedDays = CheckedDays.none().copy(tuesday = true, thursday = true)
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(20, 0),
+                checkedDays = CheckedDays.none().copy(tuesday = true, thursday = true)
+            ),
         )
-        
+
         whenever(dataInteractor.getAllRemindersSync()).thenReturn(listOf(reminder1, reminder2))
-        
+
         val nextNotificationTime1 = Instant.ofEpochMilli(1000000L)
         val nextNotificationTime2 = Instant.ofEpochMilli(2000000L)
         reminderScheduler.setNextNotificationTime(1L, nextNotificationTime1)
         reminderScheduler.setNextNotificationTime(2L, nextNotificationTime2)
-        
+
         // EXECUTE
         uut.syncReminderNotifications()
-        
+
         // VERIFY
         assertEquals(2, platformScheduler.setNotifications.size)
-        
+
         val (triggerTime1, notificationParams1) = platformScheduler.setNotifications[0]
         assertEquals(1000000L, triggerTime1)
         assertEquals(1L, notificationParams1.reminderId)
         assertEquals("Morning Reminder", notificationParams1.reminderName)
-        
+
         val (triggerTime2, notificationParams2) = platformScheduler.setNotifications[1]
         assertEquals(2000000L, triggerTime2)
         assertEquals(2L, notificationParams2.reminderId)
@@ -93,68 +98,89 @@ internal class ReminderInteractorImplTest {
     }
 
     @Test
-    fun `sync notifications with legacy reminders clears legacy and schedules new`() = runTest(testDispatcher) {
-        // PREPARE - Realistic scenario: same reminders exist in database as were stored in legacy JSON
-        val legacyNotifications = """
+    fun `sync notifications with legacy reminders clears legacy and schedules new`() =
+        runTest(testDispatcher) {
+            // PREPARE - Realistic scenario: same reminders exist in database as were stored in legacy JSON
+            val legacyNotifications = """
             [
                 {"reminderId":123,"reminderName":"Morning Workout","pendingIntentId":999},
                 {"reminderId":456,"reminderName":"Evening Meditation","pendingIntentId":888}
             ]
         """.trimIndent()
-        reminderPref.encodedIntents = legacyNotifications
-        
-        val reminders = listOf(
-            reminderFixture.copy(
-                id = 123L,
-                reminderName = "Morning Workout",
-                time = LocalTime.of(7, 0),
-                checkedDays = CheckedDays.none().copy(monday = true, wednesday = true, friday = true)
-            ),
-            reminderFixture.copy(
-                id = 456L,
-                displayIndex = 1,
-                reminderName = "Evening Meditation",
-                time = LocalTime.of(19, 30),
-                checkedDays = CheckedDays.none().copy(tuesday = true, thursday = true)
+            reminderPref.encodedIntents = legacyNotifications
+
+            val reminders = listOf(
+                reminderFixture.copy(
+                    id = 123L,
+                    reminderName = "Morning Workout",
+                    params = ReminderParams.WeekDayParams(
+                        time = LocalTime.of(7, 0),
+                        checkedDays = CheckedDays.none()
+                            .copy(monday = true, wednesday = true, friday = true)
+                    ),
+                ),
+                reminderFixture.copy(
+                    id = 456L,
+                    displayIndex = 1,
+                    reminderName = "Evening Meditation",
+                    params = ReminderParams.WeekDayParams(
+                        time = LocalTime.of(19, 30),
+                        checkedDays = CheckedDays.none().copy(tuesday = true, thursday = true)
+                    ),
+                )
             )
-        )
-        
-        whenever(dataInteractor.getAllRemindersSync()).thenReturn(reminders)
-        reminderScheduler.setNextNotificationTime(123L, Instant.ofEpochMilli(1000000L))
-        reminderScheduler.setNextNotificationTime(456L, Instant.ofEpochMilli(2000000L))
-        
-        // EXECUTE
-        uut.syncReminderNotifications()
-        
-        // VERIFY
-        // Legacy notifications should be cancelled
-        assertEquals(2, platformScheduler.cancelledStoredAlarms.size)
-        assertTrue(platformScheduler.cancelledStoredAlarms.any { it.pendingIntentId == 999 && it.reminderId == 123L })
-        assertTrue(platformScheduler.cancelledStoredAlarms.any { it.pendingIntentId == 888 && it.reminderId == 456L })
-        
-        // New notifications should be scheduled for the same reminders
-        assertEquals(2, platformScheduler.setNotifications.size)
-        
-        val (triggerTime1, notificationParams1) = platformScheduler.setNotifications[0]
-        assertEquals(1000000L, triggerTime1)
-        assertEquals(123L, notificationParams1.reminderId)
-        assertEquals("Morning Workout", notificationParams1.reminderName)
-        
-        val (triggerTime2, notificationParams2) = platformScheduler.setNotifications[1]
-        assertEquals(2000000L, triggerTime2)
-        assertEquals(456L, notificationParams2.reminderId)
-        assertEquals("Evening Meditation", notificationParams2.reminderName)
-        
-        // Verify notification IDs are different from both pending intent IDs and reminder IDs
-        assertTrue("Notification ID should not equal pending intent ID", notificationParams1.alarmId != 999)
-        assertTrue("Notification ID should not equal reminder ID", notificationParams1.alarmId != 123)
-        assertTrue("Notification ID should not equal pending intent ID", notificationParams2.alarmId != 888)
-        assertTrue("Notification ID should not equal reminder ID", notificationParams2.alarmId != 456)
-        assertTrue("Notification IDs should be unique", notificationParams1.alarmId != notificationParams2.alarmId)
-        
-        // Legacy storage should be cleared
-        assertEquals(null, reminderPref.getStoredIntents())
-    }
+
+            whenever(dataInteractor.getAllRemindersSync()).thenReturn(reminders)
+            reminderScheduler.setNextNotificationTime(123L, Instant.ofEpochMilli(1000000L))
+            reminderScheduler.setNextNotificationTime(456L, Instant.ofEpochMilli(2000000L))
+
+            // EXECUTE
+            uut.syncReminderNotifications()
+
+            // VERIFY
+            // Legacy notifications should be cancelled
+            assertEquals(2, platformScheduler.cancelledStoredAlarms.size)
+            assertTrue(platformScheduler.cancelledStoredAlarms.any { it.pendingIntentId == 999 && it.reminderId == 123L })
+            assertTrue(platformScheduler.cancelledStoredAlarms.any { it.pendingIntentId == 888 && it.reminderId == 456L })
+
+            // New notifications should be scheduled for the same reminders
+            assertEquals(2, platformScheduler.setNotifications.size)
+
+            val (triggerTime1, notificationParams1) = platformScheduler.setNotifications[0]
+            assertEquals(1000000L, triggerTime1)
+            assertEquals(123L, notificationParams1.reminderId)
+            assertEquals("Morning Workout", notificationParams1.reminderName)
+
+            val (triggerTime2, notificationParams2) = platformScheduler.setNotifications[1]
+            assertEquals(2000000L, triggerTime2)
+            assertEquals(456L, notificationParams2.reminderId)
+            assertEquals("Evening Meditation", notificationParams2.reminderName)
+
+            // Verify notification IDs are different from both pending intent IDs and reminder IDs
+            assertTrue(
+                "Notification ID should not equal pending intent ID",
+                notificationParams1.alarmId != 999
+            )
+            assertTrue(
+                "Notification ID should not equal reminder ID",
+                notificationParams1.alarmId != 123
+            )
+            assertTrue(
+                "Notification ID should not equal pending intent ID",
+                notificationParams2.alarmId != 888
+            )
+            assertTrue(
+                "Notification ID should not equal reminder ID",
+                notificationParams2.alarmId != 456
+            )
+            assertTrue(
+                "Notification IDs should be unique",
+                notificationParams1.alarmId != notificationParams2.alarmId
+            )
+
+            // Legacy storage should be cleared
+            assertEquals(null, reminderPref.getStoredIntents())
+        }
 
     @Test
     fun `schedule next schedules notification for reminder`() = runTest(testDispatcher) {
@@ -162,16 +188,18 @@ internal class ReminderInteractorImplTest {
         val reminder = reminderFixture.copy(
             id = 5L,
             reminderName = "Next Reminder",
-            time = LocalTime.of(15, 30),
-            checkedDays = CheckedDays.none().copy(friday = true)
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(15, 30),
+                checkedDays = CheckedDays.none().copy(friday = true)
+            ),
         )
-        
+
         val nextNotificationTime = Instant.ofEpochMilli(7000000L)
         reminderScheduler.setNextNotificationTime(5L, nextNotificationTime)
-        
+
         // EXECUTE
         uut.scheduleNext(reminder)
-        
+
         // VERIFY
         assertEquals(1, platformScheduler.setNotifications.size)
         val (triggerTime, notificationParams) = platformScheduler.setNotifications[0]
@@ -179,46 +207,51 @@ internal class ReminderInteractorImplTest {
         assertEquals(5L, notificationParams.reminderId)
         assertEquals("Next Reminder", notificationParams.reminderName)
     }
-    
+
     @Test
-    fun `schedule next with no next time does not schedule notification`() = runTest(testDispatcher) {
-        // PREPARE
-        val reminder = reminderFixture.copy(
-            id = 6L,
-            reminderName = "No Schedule Reminder",
-            time = LocalTime.of(12, 0),
-            checkedDays = CheckedDays.none() // No days checked
-        )
-        
-        reminderScheduler.setNextNotificationTime(6L, null) // No next time
-        
-        // EXECUTE
-        uut.scheduleNext(reminder)
-        
-        // VERIFY
-        assertEquals(0, platformScheduler.setNotifications.size)
-    }
-    
+    fun `schedule next with no next time does not schedule notification`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            val reminder = reminderFixture.copy(
+                id = 6L,
+                reminderName = "No Schedule Reminder",
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(12, 0),
+                    checkedDays = CheckedDays.none() // No days checked
+                ),
+            )
+
+            reminderScheduler.setNextNotificationTime(6L, null) // No next time
+
+            // EXECUTE
+            uut.scheduleNext(reminder)
+
+            // VERIFY
+            assertEquals(0, platformScheduler.setNotifications.size)
+        }
+
     @Test
     fun `cancel notifications cancels notification for reminder`() = runTest(testDispatcher) {
         // PREPARE
         val reminder = reminderFixture.copy(
             id = 10L,
             reminderName = "Delete Me",
-            time = LocalTime.of(11, 0),
-            checkedDays = CheckedDays.none().copy(saturday = true)
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(11, 0),
+                checkedDays = CheckedDays.none().copy(saturday = true)
+            ),
         )
-        
+
         // EXECUTE
         uut.cancelReminderNotifications(reminder)
-        
+
         // VERIFY
         assertEquals(1, platformScheduler.cancelledNotifications.size)
         val cancelledNotification = platformScheduler.cancelledNotifications[0]
         assertEquals(10L, cancelledNotification.reminderId)
         assertEquals("Delete Me", cancelledNotification.reminderName)
     }
-    
+
     @Test
     fun `clear notifications cancels all notifications`() = runTest(testDispatcher) {
         // PREPARE
@@ -226,30 +259,34 @@ internal class ReminderInteractorImplTest {
             reminderFixture.copy(
                 id = 20L,
                 reminderName = "Clear Me 1",
-                time = LocalTime.of(7, 0),
-                checkedDays = CheckedDays.none().copy(monday = true)
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(7, 0),
+                    checkedDays = CheckedDays.none().copy(monday = true)
+                ),
             ),
             reminderFixture.copy(
                 id = 21L,
                 displayIndex = 1,
                 reminderName = "Clear Me 2",
-                time = LocalTime.of(19, 0),
-                checkedDays = CheckedDays.none().copy(tuesday = true)
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(19, 0),
+                    checkedDays = CheckedDays.none().copy(tuesday = true)
+                ),
             )
         )
-        
+
         whenever(dataInteractor.getAllRemindersSync()).thenReturn(reminders)
-        
+
         // EXECUTE
         uut.clearNotifications()
-        
+
         // VERIFY
         assertEquals(2, platformScheduler.cancelledNotifications.size)
-        
+
         val cancelledIds = platformScheduler.cancelledNotifications.map { it.reminderId }
         assertTrue(cancelledIds.contains(20L))
         assertTrue(cancelledIds.contains(21L))
-        
+
         val cancelledNames = platformScheduler.cancelledNotifications.map { it.reminderName }
         assertTrue(cancelledNames.contains("Clear Me 1"))
         assertTrue(cancelledNames.contains("Clear Me 2"))
