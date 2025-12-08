@@ -45,6 +45,7 @@ interface AddReminderViewModel {
 
     val loading: StateFlow<Boolean>
     val editMode: StateFlow<Boolean>
+    val editingReminder: StateFlow<Reminder?>
     val onComplete: ReceiveChannel<Unit>
 
     fun upsertReminder(reminder: Reminder)
@@ -62,9 +63,10 @@ class AddReminderViewModelImpl @Inject constructor(
     override val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
     private var currentLoadingJob: Job? = null
-    private val editingReminder = MutableStateFlow<Reminder?>(null)
-
-    override val editMode: StateFlow<Boolean> = editingReminder
+    private val _editingReminder = MutableStateFlow<Reminder?>(null)
+    
+    override val editingReminder: StateFlow<Reminder?> = _editingReminder.asStateFlow()
+    override val editMode: StateFlow<Boolean> = _editingReminder
         .map { it != null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
@@ -75,11 +77,11 @@ class AddReminderViewModelImpl @Inject constructor(
         currentLoadingJob = viewModelScope.launch(io) {
             withContext(ui) { _loading.value = true }
             if (editReminderId == null) {
-                editingReminder.value = null
+                _editingReminder.value = null
                 withContext(ui) { _loading.value = false }
                 return@launch
             }
-            editingReminder.value = dataInteractor.getReminderById(editReminderId)
+            _editingReminder.value = dataInteractor.getReminderById(editReminderId)
             withContext(ui) { _loading.value = false }
         }
     }
@@ -90,7 +92,7 @@ class AddReminderViewModelImpl @Inject constructor(
                 currentLoadingJob?.join()
                 withContext(ui) { _loading.value = true }
 
-                val editingReminder = editingReminder.value
+                val editingReminder = _editingReminder.value
 
                 if (editingReminder != null) {
                     updateReminder(editingReminder, reminder)
