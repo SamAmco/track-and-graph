@@ -20,7 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionConfigSpec
-import com.samco.trackandgraph.ui.compose.ui.SelectedTime
+import org.threeten.bp.LocalTime
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
@@ -183,7 +183,7 @@ internal class LuaScriptConfigurationInputFactory @Inject constructor() {
 
         return LuaScriptConfigurationInput.LocalTime(
             name = config.name,
-            time = mutableStateOf(SelectedTime(hour, minute))
+            time = mutableStateOf(LocalTime.of(hour, minute))
         )
     }
 

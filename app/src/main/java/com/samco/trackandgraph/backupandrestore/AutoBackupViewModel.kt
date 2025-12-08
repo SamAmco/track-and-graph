@@ -29,7 +29,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.backupandrestore.dto.BackupConfig
 import com.samco.trackandgraph.backupandrestore.dto.BackupResult
-import com.samco.trackandgraph.ui.compose.ui.SelectedTime
+import org.threeten.bp.LocalTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -62,7 +62,7 @@ interface AutoBackupViewModel {
     fun onBackupIntervalChanged(text: TextFieldValue)
     fun onBackupUnitChanged(unit: ChronoUnit)
     fun onAutoBackupFirstDateChanged(offsetDateTime: OffsetDateTime)
-    fun onAutoBackupFirstTimeChanged(selectedTime: SelectedTime)
+    fun onAutoBackupFirstTimeChanged(selectedTime: LocalTime)
     fun onCancelConfig()
 }
 
@@ -195,7 +195,7 @@ class AutoBackupViewModelImpl @Inject constructor(
         viewModelScope.launch { onUserSetAutoBackupDate.emit(new) }
     }
 
-    override fun onAutoBackupFirstTimeChanged(selectedTime: SelectedTime) {
+    override fun onAutoBackupFirstTimeChanged(selectedTime: LocalTime) {
         val current = autoBackupFirstDate.value
         val new = moveUntilValid(
             current

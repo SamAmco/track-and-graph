@@ -94,7 +94,7 @@ import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLin
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
-import com.samco.trackandgraph.ui.compose.ui.SelectedTime
+import org.threeten.bp.LocalTime
 import com.samco.trackandgraph.ui.compose.ui.TextButton
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TimeButton
@@ -573,7 +573,7 @@ private fun AutoBackupInnerLayout(
     onBackupIntervalChanged: (TextFieldValue) -> Unit,
     onBackupUnitChanged: (ChronoUnit) -> Unit,
     onAutoBackupFirstDateChanged: (OffsetDateTime) -> Unit,
-    onAutoBackupFirstTimeChanged: (SelectedTime) -> Unit
+    onAutoBackupFirstTimeChanged: (LocalTime) -> Unit
 ) = Column {
     val selectFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
@@ -681,7 +681,7 @@ private fun AutoBackupInnerLayout(
         DialogInputSpacing()
 
         TimeButton(
-            dateTime = firstDate,
+            time = firstDate.toLocalTime(),
             onTimeSelected = onAutoBackupFirstTimeChanged,
         )
     }
