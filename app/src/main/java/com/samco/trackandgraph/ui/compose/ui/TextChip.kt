@@ -37,23 +37,31 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
+
 @Composable
 fun TextChip(
     modifier: Modifier = Modifier,
-    text: String = "Chip",
+    text: String,
     isSelected: Boolean = false,
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {}
 ) = TngChip(
-    modifier = modifier,
+    modifier = modifier.widthIn(min = buttonSize),
+    isSelected = isSelected,
     onClick = onClick,
     onLongPress = onLongPress,
-    isSelected = isSelected
 ) {
+    CardMarginSmall()
+
     Text(
         text = text,
+        color = if (isSelected)
+            MaterialTheme.tngColors.onPrimary
+        else MaterialTheme.tngColors.onSurface,
         style = MaterialTheme.typography.titleSmall
     )
+
+    CardMarginSmall()
 }
 
 @Composable
@@ -106,10 +114,13 @@ fun TngChip(
                 interactionSource = interactionSource
             )
             .widthIn(min = 60.dp),
+        color =
+            if (isSelected || buttonDown) MaterialTheme.tngColors.primary
+            else MaterialTheme.tngColors.surface,
         border = BorderStroke(
-            1.4.dp,
+            2.dp,
             if (isSelected || buttonDown) SolidColor(MaterialTheme.tngColors.primary)
-            else SolidColor(MaterialTheme.tngColors.secondary)
+            else SolidColor(MaterialTheme.tngColors.selectorButtonColor)
         ),
         shape = shape,
     ) {
@@ -128,7 +139,21 @@ fun TngChip(
 private fun TextChipPreview() {
     TnGComposeTheme {
         var isSelected by remember { mutableStateOf(false) }
-        
+
+        TextChip(
+            text = "Sample Chip",
+            isSelected = isSelected,
+            onClick = { isSelected = !isSelected }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TextChipSelectedPreview() {
+    TnGComposeTheme {
+        var isSelected by remember { mutableStateOf(true) }
+
         TextChip(
             text = "Sample Chip",
             isSelected = isSelected,

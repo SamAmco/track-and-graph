@@ -21,14 +21,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -51,14 +46,12 @@ import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.CardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.TngChip
+import com.samco.trackandgraph.ui.compose.ui.TextChip
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.dateTimeButtonWidth
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 import org.threeten.bp.LocalTime
 
 @Composable
@@ -190,45 +183,21 @@ fun DayCheckboxes(
 
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(dialogInputSpacing, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(
+            dialogInputSpacing,
+            Alignment.CenterHorizontally
+        ),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
         dayNames.forEachIndexed { index, dayName ->
-            TngChip(
+            TextChip(
                 modifier = Modifier.widthIn(min = buttonSize),
+                text = dayName,
                 isSelected = checkedDays[index],
                 onClick = {
                     onCheckedDaysChanged(checkedDays.withSet(index, !checkedDays[index]))
                 }
-            ) {
-
-                CardMarginSmall()
-
-                Text(
-                    text = dayName,
-                    style = MaterialTheme.typography.titleSmall
-                )
-
-                CardMarginSmall()
-
-                if (checkedDays[index]) {
-                    Icon(
-                        modifier = Modifier.size(smallIconSize),
-                        imageVector = Icons.Default.Check,
-                        contentDescription = dayName,
-                        tint = MaterialTheme.tngColors.onSurface
-                    )
-                } else {
-                    Icon(
-                        modifier = Modifier.size(smallIconSize),
-                        imageVector = Icons.Default.Close,
-                        contentDescription = dayName,
-                        tint = MaterialTheme.tngColors.onSurface
-                    )
-                }
-
-                CardMarginSmall()
-            }
+            )
         }
     }
 }
