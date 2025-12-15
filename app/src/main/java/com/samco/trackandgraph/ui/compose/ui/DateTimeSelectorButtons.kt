@@ -51,6 +51,8 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
+val dateTimeButtonWidth = 104.dp
+
 @Composable
 fun DateTimeButtonRow(
     modifier: Modifier = Modifier,
@@ -61,7 +63,7 @@ fun DateTimeButtonRow(
     horizontalArrangement = Arrangement.SpaceEvenly
 ) {
     DateButton(
-        modifier = Modifier.widthIn(min = 104.dp),
+        modifier = Modifier.widthIn(min = dateTimeButtonWidth),
         dateTime = selectedDateTime,
         onDateSelected = { odt ->
             onDateTimeSelected(
@@ -74,7 +76,7 @@ fun DateTimeButtonRow(
         }
     )
     TimeButton(
-        modifier = Modifier.widthIn(min = 104.dp),
+        modifier = Modifier.widthIn(min = dateTimeButtonWidth),
         time = selectedDateTime.toLocalTime(),
         onTimeSelected = { time ->
             onDateTimeSelected(

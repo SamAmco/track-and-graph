@@ -22,9 +22,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 
 @Composable
 fun RowCheckbox(
@@ -43,4 +49,18 @@ fun RowCheckbox(
         onCheckedChange = onCheckedChange,
     )
     Text(text = text)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RowCheckboxPreview() {
+    TnGComposeTheme {
+        var checked by remember { mutableStateOf(true) }
+        
+        RowCheckbox(
+            checked = checked,
+            onCheckedChange = { checked = it },
+            text = "Sample checkbox option"
+        )
+    }
 }

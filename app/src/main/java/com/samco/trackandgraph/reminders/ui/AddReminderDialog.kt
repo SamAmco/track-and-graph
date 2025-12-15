@@ -64,6 +64,7 @@ private fun AddReminderDialog(
 ) = CustomDialog(
     onDismissRequest = onDismiss,
     scrollContent = false,
+    supportSmoothHeightAnimation = true,
     paddingValues = PaddingValues(
         start = inputSpacingLarge,
         end = inputSpacingLarge,

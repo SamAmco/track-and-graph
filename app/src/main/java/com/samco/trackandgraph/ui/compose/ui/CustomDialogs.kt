@@ -17,6 +17,8 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -36,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,6 +80,19 @@ fun CustomDialog(
             modifier = if (supportSmoothHeightAnimation) Modifier.fillMaxHeight() else Modifier,
             contentAlignment = if (supportSmoothHeightAnimation) Alignment.Center else Alignment.TopStart
         ) {
+
+            if (supportSmoothHeightAnimation && dismissOnClickOutside) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            onClick = onDismissRequest,
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        )
+                )
+            }
+
             Surface(
                 modifier = Modifier
                     .systemBarsPadding()
@@ -159,6 +176,27 @@ fun ContinueCancelDialogContent(
 
     DialogInputSpacing()
 
+    ContinueCancelButtons(
+        cancelVisible = cancelVisible,
+        continueVisible = true,
+        cancelText = cancelText,
+        continueText = continueText,
+        onContinue = onConfirm,
+        onCancel = onDismissRequest,
+        continueEnabled = continueEnabled
+    )
+}
+
+@Composable
+fun ContinueCancelButtons(
+    cancelVisible: Boolean = true,
+    continueVisible: Boolean = true,
+    @StringRes cancelText: Int = R.string.cancel,
+    @StringRes continueText: Int = R.string.continue_word,
+    onContinue: () -> Unit = {},
+    onCancel: () -> Unit = {},
+    continueEnabled: Boolean = true,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End
@@ -166,17 +204,19 @@ fun ContinueCancelDialogContent(
         if (cancelVisible) {
             SmallTextButton(
                 stringRes = cancelText,
-                onClick = onDismissRequest,
+                onClick = onCancel,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.tngColors.onSurface
                 )
             )
         }
-        SmallTextButton(
-            stringRes = continueText,
-            onClick = onConfirm,
-            enabled = continueEnabled
-        )
+        if (continueVisible) {
+            SmallTextButton(
+                stringRes = continueText,
+                onClick = onContinue,
+                enabled = continueEnabled
+            )
+        }
     }
 }
 
