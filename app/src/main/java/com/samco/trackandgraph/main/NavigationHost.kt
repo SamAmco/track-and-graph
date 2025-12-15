@@ -31,6 +31,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.NavDisplay.predictivePopTransitionSpec
 import com.samco.trackandgraph.aboutpage.AboutNavKey
 import com.samco.trackandgraph.aboutpage.AboutScreen
 import com.samco.trackandgraph.addtracker.AddTrackerNavKey
@@ -50,10 +51,11 @@ import com.samco.trackandgraph.notes.NotesScreen
 import com.samco.trackandgraph.reminders.ui.RemindersNavKey
 import com.samco.trackandgraph.reminders.ui.RemindersScreen
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.ui.compose.animation.popTransitionSpec
+import com.samco.trackandgraph.ui.compose.animation.predictivePopTransitionSpec
+import com.samco.trackandgraph.ui.compose.animation.transitionSpec
 import com.samco.trackandgraph.viewgraphstat.ViewGraphStatNavKey
 import com.samco.trackandgraph.viewgraphstat.ViewGraphStatScreen
-
-internal const val NAV_ANIM_DURATION_MILLIS = 280
 
 /**
  * POC Navigation implementation using Navigation 3 - demonstrates pattern with NotesScreen only
@@ -71,39 +73,9 @@ fun NavigationHost(
         // Then add the view model store decorator
         rememberViewModelStoreNavEntryDecorator()
     ),
-
-    transitionSpec = {
-        slideInHorizontally(
-            animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
-            initialOffsetX = { it } // start just off the right edge
-        ) + fadeIn() togetherWith
-                slideOutHorizontally(
-                    animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
-                    targetOffsetX = { -(it / 3) } // slight parallax
-                ) + fadeOut()
-    },
-
-    popTransitionSpec = {
-        slideInHorizontally(
-            animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
-            initialOffsetX = { -(it / 3) } // parallax in from left
-        ) + fadeIn() togetherWith
-                slideOutHorizontally(
-                    animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
-                    targetOffsetX = { it } // exit to right
-                ) + fadeOut()
-    },
-
-    predictivePopTransitionSpec = {
-        slideInHorizontally(
-            animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
-            initialOffsetX = { -(it / 3) } // parallax in from left
-        ) + fadeIn() togetherWith
-                slideOutHorizontally(
-                    animationSpec = tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing),
-                    targetOffsetX = { it } // exit to right
-                ) + fadeOut()
-    },
+    transitionSpec = transitionSpec(),
+    popTransitionSpec = popTransitionSpec(),
+    predictivePopTransitionSpec = predictivePopTransitionSpec(),
 
     backStack = backStack,
     onBack = { backStack.removeLastOrNull() },

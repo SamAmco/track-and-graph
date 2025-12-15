@@ -29,7 +29,11 @@ data class CheckedDays (
     val saturday: Boolean,
     val sunday: Boolean
 ) {
+    private val asList by lazy { toList() }
+
     fun toList() = listOf(monday, tuesday, wednesday, thursday, friday, saturday, sunday)
+
+    operator fun get(index: Int) = asList[index]
 
     companion object {
         fun fromList(bools: List<Boolean>): CheckedDays {

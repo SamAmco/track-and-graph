@@ -79,6 +79,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.group.GroupNavKey
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.ui.compose.animation.NAV_ANIM_DURATION_MILLIS
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.appbar.TopBarController
