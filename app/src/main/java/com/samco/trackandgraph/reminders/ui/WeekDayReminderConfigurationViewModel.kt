@@ -38,6 +38,7 @@ interface WeekDayReminderConfigurationViewModel {
     fun updateCheckedDays(days: CheckedDays)
     fun getReminder(): Reminder
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.WeekDayParams?)
+    fun reset()
 }
 
 @HiltViewModel
@@ -90,5 +91,11 @@ class WeekDayReminderConfigurationViewModelImpl @Inject constructor() :
             _selectedTime.value = params.time
             _checkedDays.value = params.checkedDays
         }
+    }
+
+    override fun reset() {
+        _reminderName.value = ""
+        _selectedTime.value = LocalTime.of(9, 0)
+        _checkedDays.value = CheckedDays.all()
     }
 }
