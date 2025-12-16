@@ -43,25 +43,24 @@ fun TextChip(
     modifier: Modifier = Modifier,
     text: String,
     isSelected: Boolean = false,
+    isEnabled: Boolean = true,
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {}
 ) = TngChip(
     modifier = modifier.widthIn(min = buttonSize),
     isSelected = isSelected,
+    isEnabled = isEnabled,
     onClick = onClick,
     onLongPress = onLongPress,
 ) {
-    CardMarginSmall()
-
     Text(
+        modifier = Modifier.padding(horizontal = cardMarginSmall),
         text = text,
         color = if (isSelected)
             MaterialTheme.tngColors.onPrimary
         else MaterialTheme.tngColors.onSurface,
         style = MaterialTheme.typography.titleSmall
     )
-
-    CardMarginSmall()
 }
 
 @Composable
@@ -92,6 +91,7 @@ fun AddChipButton(
 fun TngChip(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
+    isEnabled: Boolean = true,
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {},
     shape: Shape = MaterialTheme.shapes.medium,
@@ -107,19 +107,21 @@ fun TngChip(
     Surface(
         modifier = modifier
             .clip(shape)
-            .combinedClickable(
-                indication = LocalIndication.current,
-                onClick = onClick,
-                onLongClick = onLongPress,
-                interactionSource = interactionSource
-            )
+            .let {
+                if (isEnabled) it.combinedClickable(
+                    indication = LocalIndication.current,
+                    onClick = onClick,
+                    onLongClick = onLongPress,
+                    interactionSource = interactionSource
+                ) else it
+            }
             .widthIn(min = 60.dp),
         color =
-            if (isSelected || buttonDown) MaterialTheme.tngColors.primary
+            if (isSelected || (isEnabled && buttonDown)) MaterialTheme.tngColors.primary
             else MaterialTheme.tngColors.surface,
         border = BorderStroke(
             2.dp,
-            if (isSelected || buttonDown) SolidColor(MaterialTheme.tngColors.primary)
+            if (isSelected || (isEnabled && buttonDown)) SolidColor(MaterialTheme.tngColors.primary)
             else SolidColor(MaterialTheme.tngColors.selectorButtonColor)
         ),
         shape = shape,

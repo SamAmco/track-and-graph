@@ -20,9 +20,12 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.time.TimeProvider
+import com.samco.trackandgraph.reminders.NextScheduled
 import com.samco.trackandgraph.reminders.ReminderInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,6 +45,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -63,6 +67,7 @@ interface RemindersScreenViewModel {
 class RemindersScreenViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val reminderInteractor: ReminderInteractor,
+    private val timeProvider: TimeProvider,
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ViewModel(), RemindersScreenViewModel {
 
@@ -79,9 +84,8 @@ class RemindersScreenViewModelImpl @Inject constructor(
         .flatMapLatest {
             flow {
                 emit(LoadingState.Loading)
-                val reminders = dataInteractor.getAllRemindersSync().map { reminder ->
-                    ReminderViewData.fromReminder(reminder)
-                }
+                val reminders = dataInteractor.getAllRemindersSync()
+                    .map { convertToReminderViewData(it) }
                 emit(LoadingState.Loaded(reminders))
             }
         }
@@ -181,6 +185,17 @@ class RemindersScreenViewModelImpl @Inject constructor(
             isDragging.value = false
             temporaryReminders.value = emptyList()
         }
+    }
+
+    private suspend fun convertToReminderViewData(reminder: Reminder): ReminderViewData {
+        val nextScheduled =
+            when (val nextScheduled = reminderInteractor.getNextScheduled(reminder)) {
+                is NextScheduled.AtInstant -> LocalDateTime
+                    .ofInstant(nextScheduled.instant, timeProvider.defaultZone())
+
+                is NextScheduled.Never -> null
+            }
+        return ReminderViewData.fromReminder(reminder, nextScheduled)
     }
 
     private sealed class LoadingState {

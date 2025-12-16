@@ -35,6 +35,12 @@ internal class AndroidPlatformScheduler @Inject constructor(
         }
     }
 
+    override fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long? {
+        // You can't get scheduled alarms from alarm manager but since we're going to use
+        // work manager as a backup we can use that once implemented
+        return 0
+    }
+
     @Deprecated("See AlarmManagerWrapper interface")
     override fun cancel(storedAlarmInfo: StoredAlarmInfo) = alarmManager.cancel(
         createPendingIntent(

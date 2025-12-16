@@ -20,10 +20,12 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -38,6 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,12 +50,13 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.TngChip
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
+import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import org.threeten.bp.LocalTime
-import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.LocalDateTime
 
 @Composable
 fun Reminder(
@@ -65,12 +70,8 @@ fun Reminder(
         .fillMaxWidth()
         .padding(halfDialogInputSpacing),
     shadowElevation = if (isElevated) cardElevation * 3f else cardElevation,
-    shape = MaterialTheme.shapes.small,
+    shape = MaterialTheme.shapes.medium,
 ) {
-    val timeFormatter = remember {
-        DateTimeFormatter.ofPattern("HH:mm")
-    }
-
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -80,24 +81,17 @@ fun Reminder(
                 .padding(cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column {
                 Text(
                     text = reminderViewData.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium
                 )
-                Text(
-                    text = reminderViewData.time.format(timeFormatter),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = formatCheckedDays(reminderViewData.checkedDays),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                when (reminderViewData) {
+                    is ReminderViewData.WeekDayReminderViewData -> {
+                        WeekDayReminderDetails(reminderViewData)
+                    }
+                }
             }
         }
 
@@ -106,6 +100,59 @@ fun Reminder(
             onEditClick = onEditClick,
             onDeleteClick = onDeleteClick
         )
+    }
+}
+
+@Composable
+private fun WeekDayReminderDetails(
+    reminderViewData: ReminderViewData.WeekDayReminderViewData,
+) = Column(
+    horizontalAlignment = Alignment.Start,
+) {
+
+    val dayNames = listOf(
+        stringResource(id = R.string.mon),
+        stringResource(id = R.string.tue),
+        stringResource(id = R.string.wed),
+        stringResource(id = R.string.thu),
+        stringResource(id = R.string.fri),
+        stringResource(id = R.string.sat),
+        stringResource(id = R.string.sun)
+    )
+    val checkedDays = reminderViewData.checkedDays
+
+    // TODO format next scheduled
+    Text(
+        text = reminderViewData.nextScheduled?.toString() ?: "",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+
+    Row(
+        modifier = Modifier
+            .wrapContentSize(align = Alignment.CenterStart, unbounded = true)
+            .graphicsLayer(
+                transformOrigin = TransformOrigin(0f, 0.5f),
+                scaleX = 0.55f,
+                scaleY = 0.55f
+            ),
+        horizontalArrangement = Arrangement.spacedBy(cardPadding),
+    ) {
+        for (i in 0..6) {
+            TngChip(
+                isSelected = checkedDays[i],
+                isEnabled = false,
+                contentPaddingValues = PaddingValues(vertical = cardMarginSmall),
+            ) {
+                Text(
+                    text = dayNames[i].uppercase(),
+                    style = MaterialTheme.typography.titleMedium,
+                    color =
+                        if (checkedDays[i]) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 
@@ -154,29 +201,6 @@ private fun ReminderMenuButton(
     }
 }
 
-@Composable
-private fun formatCheckedDays(checkedDays: CheckedDays): String {
-    val dayLabels = listOf(
-        stringResource(id = R.string.mon),
-        stringResource(id = R.string.tue),
-        stringResource(id = R.string.wed),
-        stringResource(id = R.string.thu),
-        stringResource(id = R.string.fri),
-        stringResource(id = R.string.sat),
-        stringResource(id = R.string.sun)
-    )
-
-    val activeDays = checkedDays.toList()
-        .mapIndexedNotNull { index, isChecked ->
-            if (isChecked) dayLabels.getOrNull(index) else null
-        }
-
-    return if (activeDays.isNotEmpty()) {
-        activeDays.joinToString(", ")
-    } else ""
-}
-
-
 @Preview(showBackground = true)
 @Composable
 private fun ReminderPreview() = TnGComposeTheme {
@@ -186,11 +210,11 @@ private fun ReminderPreview() = TnGComposeTheme {
     ) {
         // Regular reminder
         Reminder(
-            reminderViewData = ReminderViewData(
+            reminderViewData = ReminderViewData.WeekDayReminderViewData(
                 id = 1L,
                 displayIndex = 0,
                 name = "Morning Workout",
-                time = LocalTime.of(7, 30),
+                nextScheduled = LocalDateTime.of(2025, 12, 16, 7, 30),
                 checkedDays = CheckedDays(
                     monday = true,
                     tuesday = true,
@@ -209,11 +233,11 @@ private fun ReminderPreview() = TnGComposeTheme {
         // Elevated reminder
         Reminder(
             isElevated = true,
-            reminderViewData = ReminderViewData(
+            reminderViewData = ReminderViewData.WeekDayReminderViewData(
                 id = 2L,
                 displayIndex = 1,
                 name = "Evening Meditation",
-                time = LocalTime.of(21, 0),
+                nextScheduled = LocalDateTime.of(2025, 12, 16, 21, 0),
                 checkedDays = CheckedDays.all(),
                 reminderDto = null,
             ),
