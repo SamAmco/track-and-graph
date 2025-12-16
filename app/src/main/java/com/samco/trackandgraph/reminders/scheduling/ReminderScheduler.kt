@@ -29,7 +29,19 @@ import javax.inject.Inject
  * given reminder or null if no reminder should be scheduled.
  */
 interface ReminderScheduler {
+    /**
+     * Returns the next time (from now) a reminder notification should be
+     * scheduled for a given reminder or null if no reminder should be
+     * scheduled.
+     */
     fun scheduleNext(reminder: Reminder): Instant?
+
+    /**
+     * Returns the next time a reminder notification should be scheduled for a
+     * given reminder after the specified time, or null if no reminder should
+     * be scheduled.
+     */
+    fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant?
 }
 
 internal class ReminderSchedulerImpl @Inject constructor(
@@ -37,13 +49,19 @@ internal class ReminderSchedulerImpl @Inject constructor(
 ) : ReminderScheduler {
 
     override fun scheduleNext(reminder: Reminder): Instant? {
+        return scheduleNext(reminder, timeProvider.now().toInstant())
+    }
+
+    override fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant? {
         return when (val params = reminder.params) {
-            is ReminderParams.WeekDayParams -> scheduleNextWeekDayReminder(params)
+            is ReminderParams.WeekDayParams -> scheduleNextWeekDayReminder(params, afterTime)
         }
     }
 
-    private fun scheduleNextWeekDayReminder(params: ReminderParams.WeekDayParams): Instant? {
-        val now = timeProvider.now()
+    private fun scheduleNextWeekDayReminder(
+        params: ReminderParams.WeekDayParams,
+        afterTime: Instant
+    ): Instant? {
         val currentZone = timeProvider.defaultZone()
         val checkedDays = params.checkedDays.toList()
 
@@ -55,15 +73,18 @@ internal class ReminderSchedulerImpl @Inject constructor(
             if (isChecked) DayOfWeek.of(index + 1) else null
         }
 
-        // Add a small buffer to current time to avoid race condition where an alarm
+        // Add a small buffer to afterTime to avoid race condition where an alarm
         // that just fired could be rescheduled for the same time
-        val nowWithBuffer = now.plusSeconds(2)
+        val afterTimeWithBuffer = afterTime.plusSeconds(2)
 
-        // Start checking from today
-        var candidate = nowWithBuffer.toLocalDate().atTime(params.time).atZone(currentZone)
+        // Start checking from the day of afterTime
+        var candidate = afterTimeWithBuffer.atZone(currentZone).toLocalDate().atTime(params.time)
+            .atZone(currentZone)
 
         // If the time today hasn't passed yet and today is enabled, use today
-        if (enabledDays.contains(candidate.dayOfWeek) && candidate.isAfter(nowWithBuffer)) {
+        if (enabledDays.contains(candidate.dayOfWeek) && candidate.toInstant()
+                .isAfter(afterTimeWithBuffer)
+        ) {
             return candidate.toInstant()
         }
 

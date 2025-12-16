@@ -387,4 +387,8 @@
     <string name="release_notes_maybe_later">Quizás más tarde</string>
     <string name="release_notes_support_development">Donar para Apoyar el Desarrollo</string>
     <string name="release_notes_thank_you"><![CDATA[¡Gracias! ❤️\n\nCada apoyo ayuda a que Track & Graph sea mejor para todos 🌱]]></string>
+    <string name="missed_reminders_notifications_channel_name">Recordatorios Perdidos</string>
+    <string name="missed_reminders_notifications_channel_description">Notificaciones para recordatorios que se perdieron</string>
+    <string name="missed_reminder_single_content">Perdiste un recordatorio a las %1$s</string>
+    <string name="missed_reminders_multiple_content">Perdiste %1$d recordatorios</string>
 </resources>
