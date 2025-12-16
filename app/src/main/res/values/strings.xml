@@ -192,6 +192,10 @@
     <string name="reminders_notifications_channel_name">Reminders</string>
     <string name="reminders_notifications_channel_description">User created notifications to remind you when to track</string>
     <string name="default_reminder_name">Time to track!</string>
+    <string name="missed_reminders_notifications_channel_name">Missed Reminders</string>
+    <string name="missed_reminders_notifications_channel_description">Notifications for reminders that were missed</string>
+    <string name="missed_reminder_single_content">You missed a reminder at %1$s</string>
+    <string name="missed_reminders_multiple_content">You missed %1$d reminders</string>
     <string name="range_style">Range style:</string>
 
     <string name="track_widget_configure_no_data_error">Please track some data first.</string>
