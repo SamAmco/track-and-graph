@@ -52,8 +52,8 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
     private fun createNotificationChannel(context: Context) {
         // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        // the NotificationChannel class is not in the support library
+        if (Build.VERSION.SDK_INT >= 26) {
             val name = context.getString(R.string.reminders_notifications_channel_name)
             val descriptionText =
                 context.getString(R.string.reminders_notifications_channel_description)
@@ -95,6 +95,10 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
         //Schedule the next notification for this specific reminder using WorkManager
         val reminderId = intent.extras?.getLong(ALARM_REMINDER_ID_KEY)
         if (reminderId != null) {
+            // Cancel the fallback WorkManager task since the alarm fired successfully
+            WorkManager.getInstance(context)
+                .cancelAllWorkByTag(ReminderFallbackWorker.getWorkManagerTag(reminderId))
+            
             val work = OneTimeWorkRequestBuilder<ScheduleNextReminderWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setInputData(workDataOf(ScheduleNextReminderWorker.REMINDER_ID_KEY to reminderId))
