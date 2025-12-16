@@ -28,6 +28,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import org.threeten.bp.Instant
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,33 +36,43 @@ import javax.inject.Singleton
 interface ReminderInteractor {
 
     /**
-     * This should be called on app start up, device boot, and any time reminders are modified.
-     * It ensures all reminders in the user database have their **next** notification scheduled.
-     * Once a notification is triggered for a reminder, it is the responsibility of the
-     * notifier to schedule the next notification for that reminder via [scheduleNext].
+     * This should be called on app start up, device boot, and any time
+     * reminders are modified. It ensures all reminders in the user database
+     * have their **next** notification scheduled. Once a notification is
+     * triggered for a reminder, it is the responsibility of the notifier to
+     * schedule the next notification for that reminder via [scheduleNext].
      */
     suspend fun syncReminderNotifications()
 
     /**
-     * This should be called when a reminder notification is triggered to schedule the next
-     * notification for that reminder. It will schedule only one notification (the next one
-     * for the given reminder). It should also be called any time a reminder is modified
-     * or anything that might change its next notification time. Any previously scheduled
-     * notifications for the reminder will be cancelled/replaced.
+     * This should be called when a reminder notification is triggered to
+     * schedule the next notification for that reminder. It will schedule only
+     * one notification (the next one for the given reminder). It should also
+     * be called any time a reminder is modified or anything that might change
+     * its next notification time. Any previously scheduled notifications for
+     * the reminder will be cancelled/replaced.
      */
     suspend fun scheduleNext(reminder: Reminder)
 
+    suspend fun getNextScheduled(reminder: Reminder): NextScheduled
+
     /**
-     * This should be called when the given reminder is being deleted to cancel any
-     * upcoming notifications for that reminder.
+     * This should be called when the given reminder is being deleted to cancel
+     * any upcoming notifications for that reminder.
      */
     suspend fun cancelReminderNotifications(reminder: Reminder)
 
     /**
-     * This should be called for example when the user is about to restore a different database
-     * to cancel all notifications for all reminders in the users current database.
+     * This should be called for example when the user is about to restore a
+     * different database to cancel all notifications for all reminders in the
+     * users current database.
      */
     suspend fun clearNotifications()
+}
+
+sealed interface NextScheduled {
+    data class AtInstant(val instant: Instant) : NextScheduled
+    data object Never : NextScheduled
 }
 
 @OptIn(FlowPreview::class)
@@ -89,6 +100,14 @@ internal class ReminderInteractorImpl @Inject constructor(
     override suspend fun scheduleNext(reminder: Reminder) = mutex.withLock {
         withContext(io) {
             createNextNotification(reminder)
+        }
+    }
+
+    override suspend fun getNextScheduled(reminder: Reminder): NextScheduled {
+        val nextEpochMilli = platformScheduler.getNextScheduledMillis(reminder.toReminderNotificationParams())
+        return when (nextEpochMilli) {
+            null -> NextScheduled.Never
+            else -> NextScheduled.AtInstant(Instant.ofEpochMilli(nextEpochMilli))
         }
     }
 
@@ -125,30 +144,26 @@ internal class ReminderInteractorImpl @Inject constructor(
     }
 
     private suspend fun clearNotificationsInternal() {
-        val reminderNotificationParams = dataInteractor.getAllRemindersSync().map {
-            ReminderNotificationParams(
-                alarmId = it.id.toAlarmId(),
-                reminderId = it.id,
-                reminderName = it.reminderName,
-            )
-        }
+        val reminderNotificationParams = dataInteractor.getAllRemindersSync()
+            .map { it.toReminderNotificationParams() }
         for (params in reminderNotificationParams) platformScheduler.cancel(params)
     }
 
     private fun createNextNotification(reminder: Reminder) {
         val nextInstant = reminderScheduler.scheduleNext(reminder)
         if (nextInstant != null) {
-            val reminderNotificationParams = ReminderNotificationParams(
-                alarmId = reminder.id.toAlarmId(),
-                reminderId = reminder.id,
-                reminderName = reminder.reminderName
-            )
             platformScheduler.set(
                 triggerAtMillis = nextInstant.toEpochMilli(),
-                reminderNotificationParams = reminderNotificationParams
+                reminderNotificationParams = reminder.toReminderNotificationParams()
             )
         }
     }
+
+    private fun Reminder.toReminderNotificationParams() = ReminderNotificationParams(
+        alarmId = id.toAlarmId(),
+        reminderId = id,
+        reminderName = reminderName
+    )
 
     private fun Long.toAlarmId(): Int = murmurHash3()
 }
