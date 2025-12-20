@@ -39,6 +39,7 @@ nav3Core = "1.0.0"
 kotlinxSerializationCore = "1.9.0"
 kotlinSerialization = "2.2.21"
 semver = "3.0.0"
+turbine = "1.2.1"
 
 # Gradle script versions
 buildJdk = "21"
@@ -120,5 +121,6 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }
 shot-android = { module = "com.karumi:shot-android", version.ref = "shot" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
