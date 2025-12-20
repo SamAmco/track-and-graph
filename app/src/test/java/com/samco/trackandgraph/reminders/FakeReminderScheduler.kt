@@ -31,4 +31,8 @@ internal class FakeReminderScheduler : ReminderScheduler {
     override fun scheduleNext(reminder: Reminder): Instant? {
         return scheduledTimes[reminder.id]
     }
+
+    override fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant? {
+        return scheduledTimes[reminder.id]
+    }
 }

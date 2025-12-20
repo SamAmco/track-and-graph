@@ -20,6 +20,7 @@ package com.samco.trackandgraph.reminders
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -81,7 +82,7 @@ internal class ReminderInteractorImplTest {
         reminderScheduler.setNextNotificationTime(2L, nextNotificationTime2)
 
         // EXECUTE
-        uut.syncReminderNotifications()
+        uut.ensureReminderNotifications()
 
         // VERIFY
         assertEquals(2, platformScheduler.setNotifications.size)
@@ -135,7 +136,7 @@ internal class ReminderInteractorImplTest {
             reminderScheduler.setNextNotificationTime(456L, Instant.ofEpochMilli(2000000L))
 
             // EXECUTE
-            uut.syncReminderNotifications()
+            uut.ensureReminderNotifications()
 
             // VERIFY
             // Legacy notifications should be cancelled
@@ -250,6 +251,104 @@ internal class ReminderInteractorImplTest {
         val cancelledNotification = platformScheduler.cancelledNotifications[0]
         assertEquals(10L, cancelledNotification.reminderId)
         assertEquals("Delete Me", cancelledNotification.reminderName)
+    }
+
+    @Test
+    fun `schedule next emits SCHEDULED event`() = runTest(testDispatcher) {
+        // PREPARE
+        val reminder = reminderFixture.copy(
+            id = 5L,
+            reminderName = "Event Test Reminder",
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(15, 30),
+                checkedDays = CheckedDays.none().copy(friday = true)
+            ),
+        )
+
+        val nextNotificationTime = Instant.ofEpochMilli(7000000L)
+        reminderScheduler.setNextNotificationTime(5L, nextNotificationTime)
+
+        // EXECUTE and VERIFY
+        uut.schedulingEvents.test {
+            uut.scheduleNext(reminder)
+            
+            val event = awaitItem()
+            assertEquals(5L, event.reminderId)
+            assertEquals(SchedulingEventType.SCHEDULED, event.eventType)
+            assertEquals(7000000L, event.scheduledTimeMillis)
+            
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `cancel notifications emits CANCELLED event`() = runTest(testDispatcher) {
+        // PREPARE
+        val reminder = reminderFixture.copy(
+            id = 10L,
+            reminderName = "Cancel Test Reminder",
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(11, 0),
+                checkedDays = CheckedDays.none().copy(saturday = true)
+            ),
+        )
+
+        // EXECUTE and VERIFY
+        uut.schedulingEvents.test {
+            uut.cancelReminderNotifications(reminder)
+            
+            val event = awaitItem()
+            assertEquals(10L, event.reminderId)
+            assertEquals(SchedulingEventType.CANCELLED, event.eventType)
+            assertEquals(null, event.scheduledTimeMillis)
+            
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `clear notifications emits CANCELLED events for all reminders`() = runTest(testDispatcher) {
+        // PREPARE
+        val reminders = listOf(
+            reminderFixture.copy(
+                id = 20L,
+                reminderName = "Clear Me 1",
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(7, 0),
+                    checkedDays = CheckedDays.none().copy(monday = true)
+                ),
+            ),
+            reminderFixture.copy(
+                id = 21L,
+                displayIndex = 1,
+                reminderName = "Clear Me 2",
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(19, 0),
+                    checkedDays = CheckedDays.none().copy(tuesday = true)
+                ),
+            )
+        )
+
+        whenever(dataInteractor.getAllRemindersSync()).thenReturn(reminders)
+
+        // EXECUTE and VERIFY
+        uut.schedulingEvents.test {
+            uut.clearNotifications()
+            
+            val event1 = awaitItem()
+            val event2 = awaitItem()
+            
+            val eventIds = listOf(event1.reminderId, event2.reminderId)
+            assertTrue(eventIds.contains(20L))
+            assertTrue(eventIds.contains(21L))
+            
+            assertEquals(SchedulingEventType.CANCELLED, event1.eventType)
+            assertEquals(null, event1.scheduledTimeMillis)
+            assertEquals(SchedulingEventType.CANCELLED, event2.eventType)
+            assertEquals(null, event2.scheduledTimeMillis)
+            
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

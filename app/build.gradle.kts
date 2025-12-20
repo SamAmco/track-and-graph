@@ -268,6 +268,7 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.turbine)
     testImplementation(testFixtures(project(":data")))
 
     // Instrumented tests

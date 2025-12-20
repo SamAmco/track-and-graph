@@ -30,10 +30,12 @@ import com.samco.trackandgraph.reminders.ReminderInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -41,6 +43,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -77,20 +80,26 @@ class RemindersScreenViewModelImpl @Inject constructor(
     private val temporaryReminders = MutableStateFlow<List<ReminderViewData>>(emptyList())
 
     // Observable pattern: listen for reminder updates and reload data
-    private val allReminders: StateFlow<LoadingState> = dataInteractor
-        .getDataUpdateEvents()
-        .filter { it == DataUpdateType.Reminder }
-        .onStart { emit(DataUpdateType.Reminder) } // Emit initial event to load data
-        .flatMapLatest {
-            flow {
-                emit(LoadingState.Loading)
-                val reminders = dataInteractor.getAllRemindersSync()
-                    .map { convertToReminderViewData(it) }
-                emit(LoadingState.Loaded(reminders))
+    @OptIn(FlowPreview::class)
+    private val allReminders: StateFlow<LoadingState> =
+        merge(
+            dataInteractor.getDataUpdateEvents()
+                .filter { it == DataUpdateType.Reminder }
+                .map { },
+            reminderInteractor.schedulingEvents.map { }
+        )
+            .debounce(100)
+            .onStart { emit(Unit) } // Emit initial event to load data
+            .flatMapLatest {
+                flow {
+                    emit(LoadingState.Loading)
+                    val reminders = dataInteractor.getAllRemindersSync()
+                        .map { convertToReminderViewData(it) }
+                    emit(LoadingState.Loaded(reminders))
+                }
             }
-        }
-        .flowOn(io)
-        .stateIn(viewModelScope, SharingStarted.Eagerly, LoadingState.Loading)
+            .flowOn(io)
+            .stateIn(viewModelScope, SharingStarted.Eagerly, LoadingState.Loading)
 
     override val currentReminders: StateFlow<List<ReminderViewData>> = isDragging
         .flatMapLatest { dragging ->

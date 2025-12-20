@@ -35,6 +35,11 @@ internal class FakePlatformScheduler : PlatformScheduler {
         cancelledNotifications.add(reminderNotificationParams)
     }
 
+    override suspend fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long? {
+        // For testing, return null (no scheduled notification)
+        return null
+    }
+
     fun reset() {
         setNotifications.clear()
         cancelledNotifications.clear()
