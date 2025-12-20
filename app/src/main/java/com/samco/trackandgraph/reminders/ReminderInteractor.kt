@@ -36,13 +36,25 @@ import javax.inject.Singleton
 interface ReminderInteractor {
 
     /**
-     * This should be called on app start up, device boot, and any time
-     * reminders are modified. It ensures all reminders in the user database
-     * have their **next** notification scheduled. Once a notification is
-     * triggered for a reminder, it is the responsibility of the notifier to
-     * schedule the next notification for that reminder via [scheduleNext].
+     * This should be called when the device is restarted, the app is started,
+     * the app is re-installed etc. This ensures that reminder notifications
+     * are scheduled for all reminders in the user database, scheduling them
+     * if they are not already scheduled.
+     *
+     * This avoids cancelling existing notifications for 2 reasons:
+     *
+     * 1. Calculating when a reminder should be next scheduled can be expensive
+     * in the case of a time since last based on a complex function for example.
+     * This will avoid calling [ReminderScheduler.scheduleNext] for any
+     * reminder in the database that is already scheduled.
+     *
+     * 2. This avoids cancelling missed reminder notifications. For example if the
+     * user turns their device off for several days and misses 3 notifications, when
+     * they restart their device this function will see that there is a missed reminder
+     * notification scheduled and not cancel it (the next reminder will be scheduled after
+     * that missed notification reminder anyway.)
      */
-    suspend fun syncReminderNotifications()
+    suspend fun ensureReminderNotifications()
 
     /**
      * This should be called when a reminder notification is triggered to
@@ -54,6 +66,10 @@ interface ReminderInteractor {
      */
     suspend fun scheduleNext(reminder: Reminder)
 
+    /**
+     * Returns the next scheduled notification for the given reminder, or null if
+     * there is no next scheduled notification.
+     */
     suspend fun getNextScheduled(reminder: Reminder): NextScheduled
 
     /**
@@ -88,12 +104,16 @@ internal class ReminderInteractorImpl @Inject constructor(
 
     private val mutex = Mutex()
 
-    override suspend fun syncReminderNotifications() = mutex.withLock {
+    override suspend fun ensureReminderNotifications() = mutex.withLock {
         withContext(io) {
             clearLegacyReminders()
-            clearNotificationsInternal()
             val reminders = dataInteractor.getAllRemindersSync()
-            for (reminder in reminders) createNextNotification(reminder)
+            for (reminder in reminders) {
+                val params = reminder.toReminderNotificationParams()
+                if (platformScheduler.getNextScheduledMillis(params) == null) {
+                    createNextNotification(reminder)
+                }
+            }
         }
     }
 

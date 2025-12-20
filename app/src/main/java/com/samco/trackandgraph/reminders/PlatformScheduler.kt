@@ -57,7 +57,7 @@ internal interface PlatformScheduler {
     /**
      * Returns the next scheduled notification time in UTC epoch milliseconds for the given reminder.
      */
-    fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long?
+    suspend fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long?
 
     @Deprecated("This remains only for users of 9.x who still have persisted alarms to cancel them on first sync")
     fun cancel(storedAlarmInfo: StoredAlarmInfo)
