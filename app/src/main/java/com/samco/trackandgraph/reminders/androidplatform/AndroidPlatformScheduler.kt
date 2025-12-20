@@ -5,19 +5,26 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.work.Constraints
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.samco.trackandgraph.reminders.ReminderNotificationParams
 import com.samco.trackandgraph.reminders.PlatformScheduler
 import com.samco.trackandgraph.reminders.StoredAlarmInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.threeten.bp.Instant
+import timber.log.Timber
+import java.nio.ByteBuffer
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.random.Random
 
 internal class AndroidPlatformScheduler @Inject constructor(
     @ApplicationContext private val context: Context
 ) : PlatformScheduler {
+
     private val alarmManager: AlarmManager
         get() {
             return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -46,10 +53,24 @@ internal class AndroidPlatformScheduler @Inject constructor(
         scheduleWorkManagerFallback(triggerAtMillis, reminderNotificationParams)
     }
 
-    override fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long? {
-        // You can't get scheduled alarms from alarm manager but since we're going to use
-        // work manager as a backup we can use that once implemented
-        return 0
+    override suspend fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long? {
+        val workManager = WorkManager.getInstance(context)
+        val tag = ReminderFallbackWorker.getWorkManagerTag(reminderNotificationParams.reminderId)
+
+        return try {
+            val workInfos = workManager.getWorkInfosByTag(tag).get()
+
+            // Find the enqueued or running work for this reminder
+            val workInfo = workInfos.firstOrNull { it.state == WorkInfo.State.ENQUEUED }
+            if (workInfo == null) return null
+
+            // Extract the trigger time from the work's UUID
+            extractTriggerTime(workInfo.id)
+        } catch (e: Exception) {
+            // If there's any error querying WorkManager, return null
+            Timber.e(e, "Error querying WorkManager for next scheduled reminder")
+            null
+        }
     }
 
     @Deprecated("See AlarmManagerWrapper interface")
@@ -94,7 +115,17 @@ internal class AndroidPlatformScheduler @Inject constructor(
             triggerAtMillis
         )
 
+        val workId = workIdForTriggerTime(triggerAtMillis)
         val workRequest = OneTimeWorkRequestBuilder<ReminderFallbackWorker>()
+            .setId(workId)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiresDeviceIdle(false)
+                    .setRequiresBatteryNotLow(false)
+                    .setRequiresCharging(false)
+                    .setRequiresStorageNotLow(false)
+                    .build()
+            )
             .setInputData(inputData)
             .setInitialDelay(
                 fallbackTriggerAtMillis - Instant.now().toEpochMilli(),
@@ -124,5 +155,18 @@ internal class AndroidPlatformScheduler @Inject constructor(
                 .putExtra(ReminderBroadcastReceiver.ALARM_REMINDER_ID_KEY, reminderId),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    private fun workIdForTriggerTime(triggerAtMillis: Long): UUID {
+        val bb = ByteBuffer.allocate(16)
+        // First 8 bytes = the scheduled time
+        bb.putLong(triggerAtMillis)
+        // Remaining 8 bytes = entropy
+        bb.putLong(Random.nextLong())
+        return UUID(bb.getLong(0), bb.getLong(8))
+    }
+
+    private fun extractTriggerTime(id: UUID): Long {
+        return ByteBuffer.allocate(8).putLong(0, id.mostSignificantBits).getLong(0)
     }
 }

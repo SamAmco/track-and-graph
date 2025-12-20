@@ -27,7 +27,7 @@ import dagger.assisted.AssistedInject
 import timber.log.Timber
 
 @HiltWorker
-class RecreateAlarmsWorker @AssistedInject constructor(
+class EnsureAlarmsWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val reminderInteractor: ReminderInteractor
@@ -35,7 +35,7 @@ class RecreateAlarmsWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
-            reminderInteractor.syncReminderNotifications()
+            reminderInteractor.ensureReminderNotifications()
         } catch (t: Throwable) {
             Timber.e(t)
             return Result.failure()

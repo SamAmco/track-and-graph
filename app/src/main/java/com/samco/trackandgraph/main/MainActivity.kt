@@ -199,7 +199,7 @@ class MainActivityViewModel @Inject constructor(
 
     private fun syncAlarms() {
         viewModelScope.launch(io) {
-            reminderInteractor.syncReminderNotifications()
+            reminderInteractor.ensureReminderNotifications()
         }
     }
 
