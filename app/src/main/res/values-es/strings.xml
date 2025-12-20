@@ -391,4 +391,6 @@
     <string name="missed_reminders_notifications_channel_description">Notificaciones para recordatorios que se perdieron</string>
     <string name="missed_reminder_single_content">Perdiste un recordatorio a las %1$s</string>
     <string name="missed_reminders_multiple_content">Perdiste %1$d recordatorios</string>
+    <string name="next_reminder_format">Próximo Recordatorio: %1$s</string>
+    <string name="no_upcoming_reminders">No Hay Recordatorios Próximos</string>
 </resources>

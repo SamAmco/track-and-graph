@@ -36,6 +36,11 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
+import com.samco.trackandgraph.ui.compose.utils.scaleShape
+
+// Chip constants
+private val chipMinWidth = 60.dp
+private val chipBorderWidth = 2.dp
 
 
 @Composable
@@ -115,12 +120,12 @@ fun TngChip(
                     interactionSource = interactionSource
                 ) else it
             }
-            .widthIn(min = 60.dp),
+            .widthIn(min = chipMinWidth),
         color =
             if (isSelected || (isEnabled && buttonDown)) MaterialTheme.tngColors.primary
             else MaterialTheme.tngColors.surface,
         border = BorderStroke(
-            2.dp,
+            chipBorderWidth,
             if (isSelected || (isEnabled && buttonDown)) SolidColor(MaterialTheme.tngColors.primary)
             else SolidColor(MaterialTheme.tngColors.selectorButtonColor)
         ),
@@ -132,6 +137,47 @@ fun TngChip(
             verticalAlignment = Alignment.CenterVertically
         ) {
             content()
+        }
+    }
+}
+
+@Composable
+fun ScaledStaticChip(
+    modifier: Modifier = Modifier,
+    text: String,
+    isSelected: Boolean,
+    scale: Float
+) {
+    val scaledShape = scaleShape(MaterialTheme.shapes.medium, scale)
+
+    Surface(
+        modifier = modifier.widthIn(min = (chipMinWidth * scale)),
+        color = if (isSelected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            (chipBorderWidth * scale),
+            if (isSelected) SolidColor(MaterialTheme.colorScheme.primary)
+            else SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
+        ),
+        shape = scaledShape,
+    ) {
+        Row(
+            Modifier.padding(
+                horizontal = (cardPadding * scale),
+                vertical = (cardMarginSmall * scale)
+            ),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize * scale,
+                    lineHeight = MaterialTheme.typography.titleMedium.lineHeight * scale
+                ),
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -161,6 +207,33 @@ private fun TextChipSelectedPreview() {
             isSelected = isSelected,
             onClick = { isSelected = !isSelected }
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ScaledStaticChipPreview() {
+    TnGComposeTheme {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ScaledStaticChip(
+                text = "MON",
+                isSelected = true,
+                scale = 0.55f
+            )
+            ScaledStaticChip(
+                text = "TUE",
+                isSelected = false,
+                scale = 0.55f
+            )
+            ScaledStaticChip(
+                text = "WED",
+                isSelected = true,
+                scale = 0.55f
+            )
+        }
     }
 }
 

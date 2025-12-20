@@ -15,17 +15,20 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.samco.trackandgraph.reminders.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -40,8 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,13 +51,16 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.TngChip
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
-import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.ScaledStaticChip
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
+import java.util.Locale
 
 @Composable
 fun Reminder(
@@ -74,6 +78,7 @@ fun Reminder(
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()
+            .clickable(onClick = onEditClick)
     ) {
         Row(
             modifier = Modifier
@@ -104,6 +109,19 @@ fun Reminder(
 }
 
 @Composable
+private fun formatNextScheduled(nextScheduled: LocalDateTime?): String {
+    return if (nextScheduled != null) {
+        val formatter = DateTimeFormatter
+            .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+            .withLocale(Locale.getDefault())
+        val dateTime = nextScheduled.format(formatter)
+        stringResource(R.string.next_reminder_format, dateTime)
+    } else {
+        stringResource(R.string.no_upcoming_reminders)
+    }
+}
+
+@Composable
 private fun WeekDayReminderDetails(
     reminderViewData: ReminderViewData.WeekDayReminderViewData,
 ) = Column(
@@ -121,37 +139,27 @@ private fun WeekDayReminderDetails(
     )
     val checkedDays = reminderViewData.checkedDays
 
-    // TODO format next scheduled
+
     Text(
-        text = reminderViewData.nextScheduled?.toString() ?: "",
+        text = formatNextScheduled(reminderViewData.nextScheduled),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 
-    Row(
-        modifier = Modifier
-            .wrapContentSize(align = Alignment.CenterStart, unbounded = true)
-            .graphicsLayer(
-                transformOrigin = TransformOrigin(0f, 0.5f),
-                scaleX = 0.55f,
-                scaleY = 0.55f
-            ),
-        horizontalArrangement = Arrangement.spacedBy(cardPadding),
+    DialogInputSpacing()
+
+    val miniChipScale = 0.55f
+
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy((cardPadding * miniChipScale)),
+        verticalArrangement = Arrangement.spacedBy((cardPadding * miniChipScale)),
     ) {
         for (i in 0..6) {
-            TngChip(
+            ScaledStaticChip(
+                text = dayNames[i].uppercase(),
                 isSelected = checkedDays[i],
-                isEnabled = false,
-                contentPaddingValues = PaddingValues(vertical = cardMarginSmall),
-            ) {
-                Text(
-                    text = dayNames[i].uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    color =
-                        if (checkedDays[i]) MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+                scale = miniChipScale
+            )
         }
     }
 }
@@ -205,7 +213,9 @@ private fun ReminderMenuButton(
 @Composable
 private fun ReminderPreview() = TnGComposeTheme {
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+//            .width(200.dp)
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Regular reminder
@@ -239,6 +249,21 @@ private fun ReminderPreview() = TnGComposeTheme {
                 name = "Evening Meditation",
                 nextScheduled = LocalDateTime.of(2025, 12, 16, 21, 0),
                 checkedDays = CheckedDays.all(),
+                reminderDto = null,
+            ),
+            onEditClick = {},
+            onDeleteClick = {}
+        )
+
+        // Non-scheduled reminder
+        Reminder(
+            isElevated = true,
+            reminderViewData = ReminderViewData.WeekDayReminderViewData(
+                id = 2L,
+                displayIndex = 1,
+                name = "Evening Meditation",
+                nextScheduled = null,
+                checkedDays = CheckedDays.none(),
                 reminderDto = null,
             ),
             onEditClick = {},
