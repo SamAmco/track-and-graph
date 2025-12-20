@@ -24,6 +24,9 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.reminders.scheduling.ReminderScheduler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -36,23 +39,28 @@ import javax.inject.Singleton
 interface ReminderInteractor {
 
     /**
+     * SharedFlow that emits scheduling events when reminders are scheduled,
+     * cancelled, or rescheduled.
+     */
+    val schedulingEvents: SharedFlow<ReminderSchedulingEvent>
+
+    /**
      * This should be called when the device is restarted, the app is started,
      * the app is re-installed etc. This ensures that reminder notifications
-     * are scheduled for all reminders in the user database, scheduling them
-     * if they are not already scheduled.
+     * are scheduled for all reminders in the user database, scheduling them if
+     * they are not already scheduled.
      *
      * This avoids cancelling existing notifications for 2 reasons:
-     *
      * 1. Calculating when a reminder should be next scheduled can be expensive
-     * in the case of a time since last based on a complex function for example.
-     * This will avoid calling [ReminderScheduler.scheduleNext] for any
-     * reminder in the database that is already scheduled.
-     *
-     * 2. This avoids cancelling missed reminder notifications. For example if the
-     * user turns their device off for several days and misses 3 notifications, when
-     * they restart their device this function will see that there is a missed reminder
-     * notification scheduled and not cancel it (the next reminder will be scheduled after
-     * that missed notification reminder anyway.)
+     *    in the case of a time since last based on a complex function for
+     *    example. This will avoid calling [ReminderScheduler.scheduleNext] for
+     *    any reminder in the database that is already scheduled.
+     * 2. This avoids cancelling missed reminder notifications. For example if
+     *    the user turns their device off for several days and misses 3
+     *    notifications, when they restart their device this function will see
+     *    that there is a missed reminder notification scheduled and not cancel
+     *    it (the next reminder will be scheduled after that missed
+     *    notification reminder anyway.)
      */
     suspend fun ensureReminderNotifications()
 
@@ -67,8 +75,8 @@ interface ReminderInteractor {
     suspend fun scheduleNext(reminder: Reminder)
 
     /**
-     * Returns the next scheduled notification for the given reminder, or null if
-     * there is no next scheduled notification.
+     * Returns the next scheduled notification for the given reminder, or null
+     * if there is no next scheduled notification.
      */
     suspend fun getNextScheduled(reminder: Reminder): NextScheduled
 
@@ -84,6 +92,18 @@ interface ReminderInteractor {
      * users current database.
      */
     suspend fun clearNotifications()
+}
+
+/** Represents a scheduling event for reminders. */
+data class ReminderSchedulingEvent(
+    val reminderId: Long,
+    val eventType: SchedulingEventType,
+    val scheduledTimeMillis: Long? = null
+)
+
+enum class SchedulingEventType {
+    SCHEDULED,
+    CANCELLED,
 }
 
 sealed interface NextScheduled {
@@ -103,6 +123,13 @@ internal class ReminderInteractorImpl @Inject constructor(
 ) : ReminderInteractor {
 
     private val mutex = Mutex()
+
+    private val _schedulingEvents = MutableSharedFlow<ReminderSchedulingEvent>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+    override val schedulingEvents: SharedFlow<ReminderSchedulingEvent> =
+        _schedulingEvents.asSharedFlow()
 
     override suspend fun ensureReminderNotifications() = mutex.withLock {
         withContext(io) {
@@ -124,14 +151,15 @@ internal class ReminderInteractorImpl @Inject constructor(
     }
 
     override suspend fun getNextScheduled(reminder: Reminder): NextScheduled {
-        val nextEpochMilli = platformScheduler.getNextScheduledMillis(reminder.toReminderNotificationParams())
+        val nextEpochMilli =
+            platformScheduler.getNextScheduledMillis(reminder.toReminderNotificationParams())
         return when (nextEpochMilli) {
             null -> NextScheduled.Never
             else -> NextScheduled.AtInstant(Instant.ofEpochMilli(nextEpochMilli))
         }
     }
 
-    override suspend fun cancelReminderNotifications(reminder: Reminder) = mutex.withLock {
+    override suspend fun cancelReminderNotifications(reminder: Reminder): Unit = mutex.withLock {
         withContext(io) {
             val reminderNotificationParams = ReminderNotificationParams(
                 alarmId = reminder.id.toAlarmId(),
@@ -139,6 +167,14 @@ internal class ReminderInteractorImpl @Inject constructor(
                 reminderName = reminder.reminderName
             )
             platformScheduler.cancel(reminderNotificationParams)
+
+            // Emit cancellation event
+            _schedulingEvents.emit(
+                ReminderSchedulingEvent(
+                    reminderId = reminder.id,
+                    eventType = SchedulingEventType.CANCELLED
+                )
+            )
         }
     }
 
@@ -164,17 +200,40 @@ internal class ReminderInteractorImpl @Inject constructor(
     }
 
     private suspend fun clearNotificationsInternal() {
-        val reminderNotificationParams = dataInteractor.getAllRemindersSync()
-            .map { it.toReminderNotificationParams() }
-        for (params in reminderNotificationParams) platformScheduler.cancel(params)
+        val reminders = dataInteractor.getAllRemindersSync()
+        val reminderNotificationParams = reminders.map { it.toReminderNotificationParams() }
+
+        for (params in reminderNotificationParams) {
+            platformScheduler.cancel(params)
+        }
+
+        // Emit cancellation events for all cleared reminders
+        reminders.forEach { reminder ->
+            _schedulingEvents.emit(
+                ReminderSchedulingEvent(
+                    reminderId = reminder.id,
+                    eventType = SchedulingEventType.CANCELLED
+                )
+            )
+        }
     }
 
-    private fun createNextNotification(reminder: Reminder) {
+    private suspend fun createNextNotification(reminder: Reminder) {
         val nextInstant = reminderScheduler.scheduleNext(reminder)
         if (nextInstant != null) {
+            val triggerAtMillis = nextInstant.toEpochMilli()
             platformScheduler.set(
-                triggerAtMillis = nextInstant.toEpochMilli(),
+                triggerAtMillis = triggerAtMillis,
                 reminderNotificationParams = reminder.toReminderNotificationParams()
+            )
+
+            // Emit scheduling event
+            _schedulingEvents.emit(
+                ReminderSchedulingEvent(
+                    reminderId = reminder.id,
+                    eventType = SchedulingEventType.SCHEDULED,
+                    scheduledTimeMillis = triggerAtMillis
+                )
             )
         }
     }

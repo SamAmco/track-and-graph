@@ -116,8 +116,14 @@ class AddReminderViewModelImpl @Inject constructor(
             id = oldReminder.id,
             displayIndex = oldReminder.displayIndex,
         )
-        dataInteractor.updateReminder(updatedReminder)
-        reminderInteractor.scheduleNext(updatedReminder)
+        
+        try {
+            reminderInteractor.scheduleNext(updatedReminder)
+            dataInteractor.updateReminder(updatedReminder)
+        } catch (t: Throwable) {
+            Timber.e(t)
+            reminderInteractor.cancelReminderNotifications(updatedReminder)
+        }
     }
 
     private suspend fun insertReminder(reminder: Reminder) {
@@ -132,9 +138,11 @@ class AddReminderViewModelImpl @Inject constructor(
             dataInteractor.updateReminder(shiftedReminder)
         }
 
-        // Insert new reminder first
+        // Insert new reminder
         val insertedId = dataInteractor.insertReminder(reminder)
         val insertedReminder = reminder.copy(id = insertedId)
+
+        // Schedule next notification
         reminderInteractor.scheduleNext(insertedReminder)
     }
 
