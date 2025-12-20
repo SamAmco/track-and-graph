@@ -41,7 +41,7 @@ class RecreateAlarmsBroadcastReceiver : BroadcastReceiver() {
         )
         if (intent?.action !in valid) return
         
-        val work = OneTimeWorkRequestBuilder<RecreateAlarmsWorker>()
+        val work = OneTimeWorkRequestBuilder<EnsureAlarmsWorker>()
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
             
