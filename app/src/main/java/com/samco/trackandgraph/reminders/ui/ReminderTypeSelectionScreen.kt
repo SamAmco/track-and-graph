@@ -23,23 +23,28 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
+import org.threeten.bp.LocalDateTime
 
 @Composable
 fun ReminderTypeSelectionScreen(
@@ -59,10 +64,28 @@ fun ReminderTypeSelectionScreen(
 
         ReminderTypeButton(
             modifier = Modifier.fillMaxWidth(),
-            icon = Icons.Default.Check,
             text = "Week Day Reminder",
             onClick = onReminderTypeSelected
-        )
+        ) {
+            Reminder(
+                reminderViewData = ReminderViewData.WeekDayReminderViewData(
+                    id = 1L,
+                    displayIndex = 0,
+                    name = "Reminder",
+                    nextScheduled = LocalDateTime.of(2025, 12, 20, 7, 30),
+                    checkedDays = CheckedDays(
+                        monday = true,
+                        tuesday = true,
+                        wednesday = true,
+                        thursday = true,
+                        friday = true,
+                        saturday = false,
+                        sunday = false
+                    ),
+                    reminderDto = null,
+                )
+            )
+        }
 
         DialogInputSpacing()
 
@@ -75,12 +98,53 @@ fun ReminderTypeSelectionScreen(
     }
 }
 
+fun Modifier.layoutScaled(
+    scale: Float,
+    measuredWidth: Dp? = null,
+    measuredHeight: Dp? = null
+) = this.then(
+    Modifier.layout { measurable, parentConstraints ->
+
+        val measuredWidthPx = measuredWidth?.roundToPx()
+        val measuredHeightPx = measuredHeight?.roundToPx()
+
+        // Measure “normally”, but with optional fixed width/height.
+        val measureConstraints = Constraints(
+            minWidth = measuredWidthPx ?: parentConstraints.minWidth,
+            maxWidth = measuredWidthPx ?: parentConstraints.maxWidth,
+            minHeight = measuredHeightPx ?: parentConstraints.minHeight,
+            maxHeight = measuredHeightPx ?: parentConstraints.maxHeight,
+        )
+
+        val placeable = measurable.measure(measureConstraints)
+
+        // CEIL instead of floor to avoid clipping at small scales
+        val scaledWidth = (placeable.width * scale).toInt()
+        val scaledHeight = (placeable.height * scale).toInt()
+
+        // Optional: 1px guard against AA/stroke rounding
+        val finalWidth = scaledWidth.coerceAtMost(parentConstraints.maxWidth)
+        val finalHeight = scaledHeight.coerceAtMost(parentConstraints.maxHeight)
+
+        layout(finalWidth, finalHeight) {
+            placeable.placeWithLayer(0, 0) {
+                scaleX = scale
+                scaleY = scale
+                transformOrigin = TransformOrigin(0f, 0f)
+            }
+        }
+    }
+)
+
+private const val PREVIEW_SCALE = 0.6f
+private val PREVIEW_MEASURED_WIDTH = 220.dp
+
 @Composable
 fun ReminderTypeButton(
     modifier: Modifier = Modifier,
-    icon: ImageVector,
     text: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    preview: @Composable () -> Unit
 ) {
     Surface(
         modifier = modifier,
@@ -95,36 +159,28 @@ fun ReminderTypeButton(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(cardPadding),
+            horizontalArrangement = Arrangement.spacedBy(halfDialogInputSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.tngColors.onSurface
-            )
+            // Scaled down preview
+            Column(
+                modifier = Modifier
+                    .layoutScaled(
+                        scale = PREVIEW_SCALE,
+                        measuredWidth = PREVIEW_MEASURED_WIDTH,
+                    )
+            ) {
+                preview()
+            }
+            
+            // Text label
             Text(
+                modifier = modifier.weight(1f),
                 text = text,
-                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.tngColors.onSurface
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ReminderTypeButtonPreview() {
-    TnGComposeTheme {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            ReminderTypeButton(
-                icon = Icons.Default.Check,
-                text = "Week Day Reminder",
-                onClick = {}
             )
         }
     }
