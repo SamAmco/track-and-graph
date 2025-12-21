@@ -24,7 +24,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -46,29 +45,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.ScaledStaticChip
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
-import java.util.Locale
 
 @Composable
 fun Reminder(
     modifier: Modifier = Modifier,
     isElevated: Boolean = false,
     reminderViewData: ReminderViewData,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onEditClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null,
 ) = Surface(
     modifier = modifier
         .fillMaxWidth()
@@ -77,8 +72,15 @@ fun Reminder(
     shape = MaterialTheme.shapes.medium,
 ) {
     Box(
-        modifier = Modifier.fillMaxWidth()
-            .clickable(onClick = onEditClick)
+        modifier = Modifier
+            .fillMaxWidth()
+            .let {
+                if (onEditClick != null) {
+                    it.clickable(onClick = onEditClick)
+                } else {
+                    it
+                }
+            }
     ) {
         Row(
             modifier = Modifier
@@ -88,77 +90,28 @@ fun Reminder(
         ) {
             Column {
                 Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
                     text = reminderViewData.name,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium
                 )
                 when (reminderViewData) {
                     is ReminderViewData.WeekDayReminderViewData -> {
-                        WeekDayReminderDetails(reminderViewData)
+                        WeekDayReminderDetails(
+                            nextScheduled = reminderViewData.nextScheduled,
+                            checkedDays = reminderViewData.checkedDays
+                        )
                     }
                 }
             }
         }
 
-        ReminderMenuButton(
-            modifier = Modifier.align(Alignment.TopEnd),
-            onEditClick = onEditClick,
-            onDeleteClick = onDeleteClick
-        )
-    }
-}
-
-@Composable
-private fun formatNextScheduled(nextScheduled: LocalDateTime?): String {
-    return if (nextScheduled != null) {
-        val formatter = DateTimeFormatter
-            .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-            .withLocale(Locale.getDefault())
-        val dateTime = nextScheduled.format(formatter)
-        stringResource(R.string.next_reminder_format, dateTime)
-    } else {
-        stringResource(R.string.no_upcoming_reminders)
-    }
-}
-
-@Composable
-private fun WeekDayReminderDetails(
-    reminderViewData: ReminderViewData.WeekDayReminderViewData,
-) = Column(
-    horizontalAlignment = Alignment.Start,
-) {
-
-    val dayNames = listOf(
-        stringResource(id = R.string.mon),
-        stringResource(id = R.string.tue),
-        stringResource(id = R.string.wed),
-        stringResource(id = R.string.thu),
-        stringResource(id = R.string.fri),
-        stringResource(id = R.string.sat),
-        stringResource(id = R.string.sun)
-    )
-    val checkedDays = reminderViewData.checkedDays
-
-
-    Text(
-        text = formatNextScheduled(reminderViewData.nextScheduled),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-
-    DialogInputSpacing()
-
-    val miniChipScale = 0.55f
-
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy((cardPadding * miniChipScale)),
-        verticalArrangement = Arrangement.spacedBy((cardPadding * miniChipScale)),
-    ) {
-        for (i in 0..6) {
-            ScaledStaticChip(
-                text = dayNames[i].uppercase(),
-                isSelected = checkedDays[i],
-                scale = miniChipScale
+        if (onEditClick != null || onDeleteClick != null) {
+            ReminderMenuButton(
+                modifier = Modifier.align(Alignment.TopEnd),
+                onEditClick = onEditClick ?: {},
+                onDeleteClick = onDeleteClick ?: {},
             )
         }
     }
@@ -236,8 +189,6 @@ private fun ReminderPreview() = TnGComposeTheme {
                 ),
                 reminderDto = null,
             ),
-            onEditClick = {},
-            onDeleteClick = {}
         )
 
         // Elevated reminder
@@ -251,8 +202,6 @@ private fun ReminderPreview() = TnGComposeTheme {
                 checkedDays = CheckedDays.all(),
                 reminderDto = null,
             ),
-            onEditClick = {},
-            onDeleteClick = {}
         )
 
         // Non-scheduled reminder
@@ -266,8 +215,6 @@ private fun ReminderPreview() = TnGComposeTheme {
                 checkedDays = CheckedDays.none(),
                 reminderDto = null,
             ),
-            onEditClick = {},
-            onDeleteClick = {}
         )
     }
 }
