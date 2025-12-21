@@ -36,7 +36,9 @@ sealed class ReminderDialogNavKey : NavKey {
     @Serializable
     object ReminderTypeSelection : ReminderDialogNavKey()
     @Serializable
-    object ReminderConfiguration : ReminderDialogNavKey()
+    object WeekDayReminderConfiguration : ReminderDialogNavKey()
+    @Serializable
+    object PeriodicReminderConfiguration : ReminderDialogNavKey()
 }
 
 @Composable
@@ -58,14 +60,23 @@ fun AddReminderDialogContent(
             when (navKey) {
                 is ReminderDialogNavKey.ReminderTypeSelection -> NavEntry(navKey) {
                     ReminderTypeSelectionScreen(
-                        onReminderTypeSelected = {
-                            navBackStack.add(ReminderDialogNavKey.ReminderConfiguration)
+                        onWeekDayReminderSelected = {
+                            navBackStack.add(ReminderDialogNavKey.WeekDayReminderConfiguration)
+                        },
+                        onPeriodicReminderSelected = {
+                            navBackStack.add(ReminderDialogNavKey.PeriodicReminderConfiguration)
                         },
                         onDismiss = onDismiss
                     )
                 }
-                is ReminderDialogNavKey.ReminderConfiguration -> NavEntry(navKey) {
+                is ReminderDialogNavKey.WeekDayReminderConfiguration -> NavEntry(navKey) {
                     WeekDayReminderConfigurationScreen(
+                        onUpsertReminder = onConfirm,
+                        onDismiss = onDismiss
+                    )
+                }
+                is ReminderDialogNavKey.PeriodicReminderConfiguration -> NavEntry(navKey) {
+                    PeriodicReminderConfigurationScreen(
                         onUpsertReminder = onConfirm,
                         onDismiss = onDismiss
                     )

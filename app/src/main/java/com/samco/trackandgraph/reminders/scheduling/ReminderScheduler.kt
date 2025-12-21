@@ -19,9 +19,11 @@ package com.samco.trackandgraph.reminders.scheduling
 
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
+import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.time.TimeProvider
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 /**
@@ -55,6 +57,7 @@ internal class ReminderSchedulerImpl @Inject constructor(
     override fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant? {
         return when (val params = reminder.params) {
             is ReminderParams.WeekDayParams -> scheduleNextWeekDayReminder(params, afterTime)
+            is ReminderParams.PeriodicParams -> scheduleNextPeriodicReminder(params, afterTime)
         }
     }
 
@@ -97,5 +100,45 @@ internal class ReminderSchedulerImpl @Inject constructor(
         }
 
         error("User has at least one checked day, but no next alarm time was found")
+    }
+
+    private fun scheduleNextPeriodicReminder(
+        params: ReminderParams.PeriodicParams,
+        afterTime: Instant
+    ): Instant? {
+        val currentZone = timeProvider.defaultZone()
+        val afterTimeWithBuffer = afterTime.plusSeconds(2)
+        val afterDateTime = afterTimeWithBuffer.atZone(currentZone)
+        val ends = params.ends?.atZone(currentZone)
+        
+        // Check if the reminder has ended
+        if (ends != null && afterDateTime.isAfter(ends)) {
+            return null
+        }
+        
+        // Start from the initial start time
+        var candidate = params.starts.atZone(currentZone)
+        
+        // If we haven't reached the start time yet, return the start time
+        if (candidate.isAfter(afterDateTime)) {
+            return candidate.toInstant()
+        }
+        
+        // Calculate the next occurrence based on the interval and period
+        while (candidate.isBefore(afterDateTime) || candidate.isEqual(afterDateTime)) {
+            candidate = when (params.period) {
+                Period.DAYS -> candidate.plusDays(params.interval.toLong())
+                Period.WEEKS -> candidate.plusWeeks(params.interval.toLong())
+                Period.MONTHS -> candidate.plusMonths(params.interval.toLong())
+                Period.YEARS -> candidate.plusYears(params.interval.toLong())
+            }
+        }
+        
+        // Check if this occurrence is after the end time
+        if (ends != null && candidate.isAfter(ends)) {
+            return null
+        }
+        
+        return candidate.toInstant()
     }
 }

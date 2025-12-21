@@ -20,7 +20,9 @@ package com.samco.trackandgraph.data.database.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import com.samco.trackandgraph.data.serialization.LocalTimeSerializer
+import com.samco.trackandgraph.data.serialization.LocalDateTimeSerializer
 import org.threeten.bp.LocalTime
+import org.threeten.bp.LocalDateTime
 
 data class Reminder(
     val id: Long,
@@ -40,4 +42,27 @@ sealed class ReminderParams {
         val time: LocalTime,
         val checkedDays: CheckedDays
     ) : ReminderParams()
+
+    @Serializable
+    @SerialName("periodic")
+    data class PeriodicParams(
+        @Serializable(with = LocalDateTimeSerializer::class)
+        val starts: LocalDateTime,
+        @Serializable(with = LocalDateTimeSerializer::class)
+        val ends: LocalDateTime?,
+        val interval: Int,
+        val period: Period
+    ) : ReminderParams()
+}
+
+@Serializable
+enum class Period {
+    @SerialName("days")
+    DAYS,
+    @SerialName("weeks")
+    WEEKS,
+    @SerialName("months")
+    MONTHS,
+    @SerialName("years")
+    YEARS
 }
