@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.reminders.ui
 
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import org.threeten.bp.LocalDateTime
@@ -46,6 +47,21 @@ sealed class ReminderViewData {
         override val reminderDto: Reminder?,
     ) : ReminderViewData()
 
+    /**
+     * View data for periodic reminders, mapping to ReminderParams.PeriodicParams
+     */
+    data class PeriodicReminderViewData(
+        override val id: Long,
+        override val displayIndex: Int,
+        override val name: String,
+        val nextScheduled: LocalDateTime?,
+        val starts: LocalDateTime,
+        val ends: LocalDateTime?,
+        val interval: Int,
+        val period: Period,
+        override val reminderDto: Reminder?,
+    ) : ReminderViewData()
+
     companion object {
         /** Creates a ReminderViewData from a Reminder DTO */
         fun fromReminder(reminder: Reminder, nextScheduled: LocalDateTime?): ReminderViewData {
@@ -57,6 +73,19 @@ sealed class ReminderViewData {
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         checkedDays = params.checkedDays,
+                        reminderDto = reminder,
+                    )
+                }
+                is ReminderParams.PeriodicParams -> {
+                    PeriodicReminderViewData(
+                        id = reminder.id,
+                        displayIndex = reminder.displayIndex,
+                        name = reminder.reminderName,
+                        nextScheduled = nextScheduled,
+                        starts = params.starts,
+                        ends = params.ends,
+                        interval = params.interval,
+                        period = params.period,
                         reminderDto = reminder,
                     )
                 }
