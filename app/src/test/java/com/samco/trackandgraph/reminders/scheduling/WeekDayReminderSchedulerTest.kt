@@ -11,7 +11,7 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 
-internal class AlarmSchedulerImplTest {
+internal class WeekDayReminderSchedulerTest {
 
     private val timeProvider = FakeTimeProvider()
     private val uut = ReminderSchedulerImpl(timeProvider)

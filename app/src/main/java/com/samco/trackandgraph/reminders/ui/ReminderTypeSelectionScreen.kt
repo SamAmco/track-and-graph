@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
@@ -48,7 +49,8 @@ import org.threeten.bp.LocalDateTime
 
 @Composable
 fun ReminderTypeSelectionScreen(
-    onReminderTypeSelected: () -> Unit,
+    onWeekDayReminderSelected: () -> Unit,
+    onPeriodicReminderSelected: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Column {
@@ -60,12 +62,10 @@ fun ReminderTypeSelectionScreen(
 
         DialogInputSpacing()
 
-        // Currently only one reminder type available
-
         ReminderTypeButton(
             modifier = Modifier.fillMaxWidth(),
             text = "Week Day Reminder",
-            onClick = onReminderTypeSelected
+            onClick = onWeekDayReminderSelected
         ) {
             Reminder(
                 reminderViewData = ReminderViewData.WeekDayReminderViewData(
@@ -82,6 +82,28 @@ fun ReminderTypeSelectionScreen(
                         saturday = false,
                         sunday = false
                     ),
+                    reminderDto = null,
+                )
+            )
+        }
+
+        DialogInputSpacing()
+
+        ReminderTypeButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Periodic Reminder",
+            onClick = onPeriodicReminderSelected
+        ) {
+            Reminder(
+                reminderViewData = ReminderViewData.PeriodicReminderViewData(
+                    id = 2L,
+                    displayIndex = 0,
+                    name = "Daily Reminder",
+                    nextScheduled = LocalDateTime.of(2025, 12, 21, 10, 0),
+                    starts = LocalDateTime.of(2025, 12, 20, 10, 0),
+                    ends = null,
+                    interval = 1,
+                    period = Period.DAYS,
                     reminderDto = null,
                 )
             )
@@ -191,7 +213,8 @@ fun ReminderTypeButton(
 fun ReminderTypeSelectionScreenPreview() {
     TnGComposeTheme {
         ReminderTypeSelectionScreen(
-            onReminderTypeSelected = {},
+            onWeekDayReminderSelected = {},
+            onPeriodicReminderSelected = {},
             onDismiss = {}
         )
     }
