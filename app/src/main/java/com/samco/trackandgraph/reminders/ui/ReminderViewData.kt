@@ -21,12 +21,13 @@ import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
+import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
 
 /**
- * Sealed class for view data with 1-to-1 mapping to ReminderParams types.
- * Simplified view data for displaying reminders without mutable state.
- * Since we removed in-place editing, this is now just a read-only
+ * Sealed class for view data with 1-to-1 mapping to ReminderParams
+ * types. Simplified view data for displaying reminders without mutable
+ * state. Since we removed in-place editing, this is now just a read-only
  * representation.
  */
 sealed class ReminderViewData {
@@ -34,32 +35,34 @@ sealed class ReminderViewData {
     abstract val displayIndex: Int
     abstract val name: String
     abstract val reminderDto: Reminder?
+    abstract val nextScheduled: LocalDateTime?
 
-    /**
-     * View data for weekly reminders, mapping to ReminderParams.WeekDayParams
-     */
+    /** View data for weekly reminders, mapping to ReminderParams.WeekDayParams */
     data class WeekDayReminderViewData(
         override val id: Long,
         override val displayIndex: Int,
         override val name: String,
-        val nextScheduled: LocalDateTime?,
+        override val nextScheduled: LocalDateTime?,
         val checkedDays: CheckedDays,
         override val reminderDto: Reminder?,
     ) : ReminderViewData()
 
     /**
-     * View data for periodic reminders, mapping to ReminderParams.PeriodicParams
+     * View data for periodic reminders, mapping to
+     * ReminderParams.PeriodicParams
      */
     data class PeriodicReminderViewData(
         override val id: Long,
         override val displayIndex: Int,
         override val name: String,
-        val nextScheduled: LocalDateTime?,
+        override val nextScheduled: LocalDateTime?,
         val starts: LocalDateTime,
         val ends: LocalDateTime?,
         val interval: Int,
         val period: Period,
         override val reminderDto: Reminder?,
+        val progressToNextReminder: Float,
+        val isBeforeStartTime: Boolean,
     ) : ReminderViewData()
 
     companion object {
@@ -76,7 +79,17 @@ sealed class ReminderViewData {
                         reminderDto = reminder,
                     )
                 }
+
                 is ReminderParams.PeriodicParams -> {
+                    val now = LocalDateTime.now()
+                    val isBeforeStart = now.isBefore(params.starts)
+                    val progress = calculateProgressToNextReminder(
+                        nextScheduled = nextScheduled,
+                        interval = params.interval,
+                        period = params.period,
+                        now = now
+                    )
+
                     PeriodicReminderViewData(
                         id = reminder.id,
                         displayIndex = reminder.displayIndex,
@@ -87,9 +100,41 @@ sealed class ReminderViewData {
                         interval = params.interval,
                         period = params.period,
                         reminderDto = reminder,
+                        progressToNextReminder = progress,
+                        isBeforeStartTime = isBeforeStart,
                     )
                 }
             }
         }
+
+        /** Calculate progress (0.0 to 1.0) from last reminder to next reminder */
+        private fun calculateProgressToNextReminder(
+            nextScheduled: LocalDateTime?,
+            interval: Int,
+            period: Period,
+            now: LocalDateTime
+        ): Float {
+            val next = nextScheduled ?: return 0f
+
+            // Calculate the previous reminder time based on interval and period
+            val previousReminder = when (period) {
+                Period.MINUTES -> next.minusMinutes(interval.toLong())
+                Period.HOURS -> next.minusHours(interval.toLong())
+                Period.DAYS -> next.minusDays(interval.toLong())
+                Period.WEEKS -> next.minusWeeks(interval.toLong())
+                Period.MONTHS -> next.minusMonths(interval.toLong())
+                Period.YEARS -> next.minusYears(interval.toLong())
+            }
+
+            val totalDuration = Duration.between(previousReminder, next).toMillis()
+            val elapsedDuration = Duration.between(previousReminder, now).toMillis()
+
+            return if (totalDuration <= 0) 0f
+            else (elapsedDuration.toDouble() / totalDuration.toDouble())
+                .coerceAtLeast(0.0)
+                .coerceAtMost(1.0)
+                .toFloat()
+        }
+
     }
 }

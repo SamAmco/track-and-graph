@@ -348,6 +348,36 @@
         <item quantity="other">%d Years</item>
     </plurals>
 
+    <plurals name="every_x_minutes">
+        <item quantity="one">Every Minute</item>
+        <item quantity="other">Every %d Minutes</item>
+    </plurals>
+
+    <plurals name="every_x_hours">
+        <item quantity="one">Every Hour</item>
+        <item quantity="other">Every %d Hours</item>
+    </plurals>
+
+    <plurals name="every_x_days">
+        <item quantity="one">Every Day</item>
+        <item quantity="other">Every %d Days</item>
+    </plurals>
+
+    <plurals name="every_x_weeks">
+        <item quantity="one">Every Week</item>
+        <item quantity="other">Every %d Weeks</item>
+    </plurals>
+
+    <plurals name="every_x_months">
+        <item quantity="one">Every Month</item>
+        <item quantity="other">Every %d Months</item>
+    </plurals>
+
+    <plurals name="every_x_years">
+        <item quantity="one">Every Year</item>
+        <item quantity="other">Every %d Years</item>
+    </plurals>
+
     <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. You should back up your data first!</string>
     <string name="backup_now">Backup Now</string>
     <string name="restore_error_could_not_write_to_database">Restore failed! Could not find or write to the database.</string>

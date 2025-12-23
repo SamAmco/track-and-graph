@@ -21,9 +21,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
-import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.time.TimeProvider
 import com.samco.trackandgraph.reminders.NextScheduled
 import com.samco.trackandgraph.reminders.ReminderInteractor
@@ -92,7 +92,6 @@ class RemindersScreenViewModelImpl @Inject constructor(
             .onStart { emit(Unit) } // Emit initial event to load data
             .flatMapLatest {
                 flow {
-                    emit(LoadingState.Loading)
                     val reminders = dataInteractor.getAllRemindersSync()
                         .map { convertToReminderViewData(it) }
                     emit(LoadingState.Loaded(reminders))
