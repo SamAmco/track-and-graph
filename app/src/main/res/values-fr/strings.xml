@@ -334,6 +334,43 @@
         <item quantity="many">%d années</item>
         <item quantity="other">%d années</item>
     </plurals>
+
+    <plurals name="every_x_minutes">
+        <item quantity="one">Chaque minute</item>
+        <item quantity="many">Toutes les %d minutes</item>
+        <item quantity="other">Toutes les %d minutes</item>
+    </plurals>
+
+    <plurals name="every_x_hours">
+        <item quantity="one">Chaque heure</item>
+        <item quantity="many">Toutes les %d heures</item>
+        <item quantity="other">Toutes les %d heures</item>
+    </plurals>
+
+    <plurals name="every_x_days">
+        <item quantity="one">Chaque jour</item>
+        <item quantity="many">Tous les %d jours</item>
+        <item quantity="other">Tous les %d jours</item>
+    </plurals>
+
+    <plurals name="every_x_weeks">
+        <item quantity="one">Chaque semaine</item>
+        <item quantity="many">Toutes les %d semaines</item>
+        <item quantity="other">Toutes les %d semaines</item>
+    </plurals>
+
+    <plurals name="every_x_months">
+        <item quantity="one">Chaque mois</item>
+        <item quantity="many">Tous les %d mois</item>
+        <item quantity="other">Tous les %d mois</item>
+    </plurals>
+
+    <plurals name="every_x_years">
+        <item quantity="one">Chaque année</item>
+        <item quantity="many">Toutes les %d années</item>
+        <item quantity="other">Toutes les %d années</item>
+    </plurals>
+
     <string name="backup_now">Sauvegarder maintenant</string>
     <string name="restore_error_could_not_write_to_database">La restauration a échoué ! Impossible de trouver ou d\'écrire dans la base de données.</string>
     <string name="restore_error_could_not_read_from_database_file">La restauration a échoué ! Impossible de trouver ou de lire le fichier de base de données sélectionné.</string>

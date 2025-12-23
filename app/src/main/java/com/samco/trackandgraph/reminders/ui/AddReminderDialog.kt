@@ -80,6 +80,12 @@ private fun AddReminderDialog(
                 onUpsertReminder = onConfirm,
                 onDismiss = onDismiss
             )
+            is ReminderParams.PeriodicParams -> PeriodicReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss
+            )
         }
     } else {
         // Add mode: show navigation flow

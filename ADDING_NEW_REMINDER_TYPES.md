@@ -57,11 +57,15 @@ Based on current understanding, you'll need to update:
 - [ ] Create new configuration screen for the reminder type
 - [ ] Add new navigation key to `AddReminderDialogContent`
 - [ ] Update navigation logic to handle the new reminder type
+- [ ] Add new case to `when` statement in `AddReminderDialog` for edit mode handling
+- [ ] Create new details composable (e.g., `PeriodicReminderDetails`) that accepts the specific `ReminderViewData` subclass
+- [ ] Add new case to `when` statement in `Reminder.kt` for displaying the reminder details
 
 ## Key Requirements
 
 - **Serialization**: All new data types must have proper kotlinx.serialization support
 - **Time Handling**: Use `org.threeten.bp` classes for time-related fields
 - **Backwards Compatibility**: Existing reminders must continue to work
+- **Preview Time Values**: In `@Preview` composables, use hardcoded parsed date/time strings (e.g., `OffsetDateTime.parse("2025-12-23T14:30:00+00:00")`) instead of `.now()` to avoid `ZoneRulesException`
 
 *Note: This document will be updated as we implement new reminder types and discover additional required steps.*

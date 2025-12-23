@@ -24,27 +24,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.data.database.dto.CheckedDays
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.ScaledStaticChip
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
-import java.util.Locale
 
 @Composable
 fun WeekDayReminderDetails(
-    nextScheduled: LocalDateTime?,
-    checkedDays: CheckedDays,
+    reminderViewData: ReminderViewData.WeekDayReminderViewData,
     modifier: Modifier = Modifier,
     chipScale: Float = 0.65f
 ) = Column(
@@ -61,16 +51,6 @@ fun WeekDayReminderDetails(
         stringResource(id = R.string.sun)
     )
 
-    Text(
-        modifier = modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
-        text = formatNextScheduled(nextScheduled),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-
-    DialogInputSpacing()
-
     FlowRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy((cardPadding * chipScale), Alignment.CenterHorizontally),
@@ -79,22 +59,10 @@ fun WeekDayReminderDetails(
         for (i in 0..6) {
             ScaledStaticChip(
                 text = dayNames[i].uppercase(),
-                isSelected = checkedDays[i],
+                isSelected = reminderViewData.checkedDays[i],
                 scale = chipScale
             )
         }
     }
 }
 
-@Composable
-private fun formatNextScheduled(nextScheduled: LocalDateTime?): String {
-    return if (nextScheduled != null) {
-        val formatter = DateTimeFormatter
-            .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-            .withLocale(Locale.getDefault())
-        val dateTime = nextScheduled.format(formatter)
-        stringResource(R.string.next_reminder_format, dateTime)
-    } else {
-        stringResource(R.string.no_upcoming_reminders)
-    }
-}

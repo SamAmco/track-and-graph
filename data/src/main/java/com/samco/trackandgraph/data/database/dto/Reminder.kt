@@ -57,6 +57,10 @@ sealed class ReminderParams {
 
 @Serializable
 enum class Period {
+    @SerialName("minutes")
+    MINUTES,
+    @SerialName("hours")
+    HOURS,
     @SerialName("days")
     DAYS,
     @SerialName("weeks")

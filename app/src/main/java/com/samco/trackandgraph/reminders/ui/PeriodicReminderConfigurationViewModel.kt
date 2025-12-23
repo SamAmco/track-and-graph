@@ -26,21 +26,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import javax.inject.Inject
 
 interface PeriodicReminderConfigurationViewModel {
     val reminderName: StateFlow<String>
-    val starts: StateFlow<LocalDateTime>
-    val ends: StateFlow<LocalDateTime?>
+    val starts: StateFlow<OffsetDateTime>
+    val ends: StateFlow<OffsetDateTime>
     val interval: StateFlow<Int>
     val period: StateFlow<Period>
+    val hasEndDate: StateFlow<Boolean>
 
+    fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.PeriodicParams?)
     fun updateReminderName(name: String)
-    fun updateStarts(starts: LocalDateTime)
-    fun updateEnds(ends: LocalDateTime?)
+    fun updateStarts(starts: OffsetDateTime)
+    fun updateEnds(ends: OffsetDateTime)
+    fun updateHasEndDate(hasEndDate: Boolean)
     fun updateInterval(interval: Int)
     fun updatePeriod(period: Period)
-    fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.PeriodicParams?)
     fun getReminder(): Reminder
     fun reset()
 }
@@ -51,30 +55,46 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
     private val _reminderName = MutableStateFlow("")
     override val reminderName: StateFlow<String> = _reminderName.asStateFlow()
 
-    private val _starts = MutableStateFlow(LocalDateTime.now().plusHours(1))
-    override val starts: StateFlow<LocalDateTime> = _starts.asStateFlow()
-
-    private val _ends = MutableStateFlow<LocalDateTime?>(null)
-    override val ends: StateFlow<LocalDateTime?> = _ends.asStateFlow()
-
     private val _interval = MutableStateFlow(1)
     override val interval: StateFlow<Int> = _interval.asStateFlow()
 
     private val _period = MutableStateFlow(Period.DAYS)
     override val period: StateFlow<Period> = _period.asStateFlow()
+    
+    private val _starts = MutableStateFlow(OffsetDateTime.now())
+    override val starts: StateFlow<OffsetDateTime> = _starts.asStateFlow()
+    
+    private val _ends = MutableStateFlow<OffsetDateTime>(OffsetDateTime.now())
+    override val ends: StateFlow<OffsetDateTime> = _ends.asStateFlow()
+    
+    private val _hasEndDate = MutableStateFlow(false)
+    override val hasEndDate: StateFlow<Boolean> = _hasEndDate.asStateFlow()
 
     private var editingReminder: Reminder? = null
+    
+    // Helper methods for conversion
+    private fun localDateTimeToOffset(localDateTime: LocalDateTime): OffsetDateTime {
+        return localDateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime()
+    }
+    
+    private fun offsetDateTimeToLocal(offsetDateTime: OffsetDateTime): LocalDateTime {
+        return offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+    }
 
     override fun updateReminderName(name: String) {
         _reminderName.value = name
     }
 
-    override fun updateStarts(starts: LocalDateTime) {
+    override fun updateStarts(starts: OffsetDateTime) {
         _starts.value = starts
     }
-
-    override fun updateEnds(ends: LocalDateTime?) {
+    
+    override fun updateEnds(ends: OffsetDateTime) {
         _ends.value = ends
+    }
+    
+    override fun updateHasEndDate(hasEndDate: Boolean) {
+        _hasEndDate.value = hasEndDate
     }
 
     override fun updateInterval(interval: Int) {
@@ -90,8 +110,9 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
         
         if (params != null) {
             _reminderName.value = reminder?.reminderName ?: ""
-            _starts.value = params.starts
-            _ends.value = params.ends
+            _starts.value = localDateTimeToOffset(params.starts)
+            _ends.value = params.ends?.let { localDateTimeToOffset(it) } ?: OffsetDateTime.now()
+            _hasEndDate.value = params.ends != null
             _interval.value = params.interval
             _period.value = params.period
         }
@@ -99,8 +120,8 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
 
     override fun getReminder(): Reminder {
         val params = ReminderParams.PeriodicParams(
-            starts = _starts.value,
-            ends = _ends.value,
+            starts = offsetDateTimeToLocal(_starts.value),
+            ends = if (_hasEndDate.value) offsetDateTimeToLocal(_ends.value) else null,
             interval = _interval.value,
             period = _period.value
         )
@@ -110,7 +131,7 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
             params = params
         ) ?: Reminder(
             id = 0L, // Will be assigned by database
-            displayIndex = 0, // Will be assigned by interactor
+            displayIndex = 0,
             reminderName = _reminderName.value,
             groupId = null,
             featureId = null,
@@ -120,8 +141,11 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
 
     override fun reset() {
         _reminderName.value = ""
-        _starts.value = LocalDateTime.now().plusHours(1)
-        _ends.value = null
+        val defaultStart = LocalDateTime.now()
+        val defaultEnd = LocalDateTime.now()
+        _starts.value = localDateTimeToOffset(defaultStart)
+        _ends.value = localDateTimeToOffset(defaultEnd)
+        _hasEndDate.value = false
         _interval.value = 1
         _period.value = Period.DAYS
         editingReminder = null

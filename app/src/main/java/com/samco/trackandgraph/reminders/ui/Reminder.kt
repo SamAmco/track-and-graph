@@ -50,12 +50,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
+import java.util.Locale
 
 @Composable
 fun Reminder(
@@ -96,12 +101,22 @@ fun Reminder(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium
                 )
+                
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = formatNextScheduled(reminderViewData.nextScheduled),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
                 when (reminderViewData) {
                     is ReminderViewData.WeekDayReminderViewData -> {
-                        WeekDayReminderDetails(
-                            nextScheduled = reminderViewData.nextScheduled,
-                            checkedDays = reminderViewData.checkedDays
-                        )
+                        DialogInputSpacing()
+                        WeekDayReminderDetails(reminderViewData)
+                    }
+                    is ReminderViewData.PeriodicReminderViewData -> {
+                        PeriodicReminderDetails(reminderViewData)
                     }
                 }
             }
@@ -214,6 +229,58 @@ private fun ReminderPreview() = TnGComposeTheme {
                 nextScheduled = null,
                 checkedDays = CheckedDays.none(),
                 reminderDto = null,
+            ),
+        )
+
+        // Active periodic reminder
+        Reminder(
+            reminderViewData = ReminderViewData.PeriodicReminderViewData(
+                id = 3L,
+                displayIndex = 2,
+                name = "Daily Exercise",
+                nextScheduled = LocalDateTime.of(2025, 12, 17, 14, 30),
+                starts = LocalDateTime.of(2025, 12, 1, 14, 30),
+                ends = LocalDateTime.of(2026, 3, 1, 14, 30),
+                interval = 1,
+                period = Period.DAYS,
+                reminderDto = null,
+                progressToNextReminder = 0.6f,
+                isBeforeStartTime = false,
+            ),
+        )
+
+        // Starting periodic reminder
+        Reminder(
+            reminderViewData = ReminderViewData.PeriodicReminderViewData(
+                id = 4L,
+                displayIndex = 3,
+                name = "Weekly Review",
+                nextScheduled = LocalDateTime.of(2025, 12, 30, 9, 0),
+                starts = LocalDateTime.of(2025, 12, 30, 9, 0),
+                ends = null,
+                interval = 1,
+                period = Period.WEEKS,
+                reminderDto = null,
+                progressToNextReminder = 0f,
+                isBeforeStartTime = true,
+            ),
+        )
+
+        // Ended periodic reminder
+        Reminder(
+            isElevated = true,
+            reminderViewData = ReminderViewData.PeriodicReminderViewData(
+                id = 5L,
+                displayIndex = 4,
+                name = "Monthly Goals",
+                nextScheduled = null,
+                starts = LocalDateTime.of(2025, 6, 1, 10, 0),
+                ends = LocalDateTime.of(2025, 11, 30, 10, 0),
+                interval = 1,
+                period = Period.MONTHS,
+                reminderDto = null,
+                progressToNextReminder = 0f,
+                isBeforeStartTime = false,
             ),
         )
     }

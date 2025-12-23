@@ -20,7 +20,6 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.animation.animateContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -29,7 +28,6 @@ import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.ui.compose.animation.popTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.predictivePopTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.transitionSpec
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import kotlinx.serialization.Serializable
 
 sealed class ReminderDialogNavKey : NavKey {
