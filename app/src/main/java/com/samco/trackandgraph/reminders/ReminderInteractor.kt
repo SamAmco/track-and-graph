@@ -19,8 +19,8 @@ package com.samco.trackandgraph.reminders
 
 import com.samco.trackandgraph.data.algorithms.murmurHash3
 import com.samco.trackandgraph.data.database.dto.Reminder
-import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.reminders.scheduling.ReminderScheduler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview

@@ -20,6 +20,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -37,7 +39,8 @@ fun RowCheckbox(
     modifier: Modifier = Modifier,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
-    text: String
+    text: String,
+    textStyle: TextStyle = LocalTextStyle.current,
 ) = Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier
@@ -48,7 +51,10 @@ fun RowCheckbox(
         checked = checked,
         onCheckedChange = onCheckedChange,
     )
-    Text(text = text)
+    Text(
+        text = text,
+        style = textStyle,
+    )
 }
 
 @Preview(showBackground = true)

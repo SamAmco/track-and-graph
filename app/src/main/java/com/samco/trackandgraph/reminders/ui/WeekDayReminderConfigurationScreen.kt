@@ -42,13 +42,13 @@ import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.CheckedDays.Companion.withSet
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.TextChip
+import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.dateTimeButtonWidth
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing

@@ -302,7 +302,8 @@ private fun TrackerDateTimeArea(
                 text = timeSinceLastText,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

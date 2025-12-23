@@ -17,13 +17,12 @@
 
 package com.samco.trackandgraph.reminders.scheduling
 
+import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
-import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.time.TimeProvider
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Instant
-import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 /**
@@ -127,6 +126,8 @@ internal class ReminderSchedulerImpl @Inject constructor(
         // Calculate the next occurrence based on the interval and period
         while (candidate.isBefore(afterDateTime) || candidate.isEqual(afterDateTime)) {
             candidate = when (params.period) {
+                Period.MINUTES -> candidate.plusMinutes(params.interval.toLong())
+                Period.HOURS -> candidate.plusHours(params.interval.toLong())
                 Period.DAYS -> candidate.plusDays(params.interval.toLong())
                 Period.WEEKS -> candidate.plusWeeks(params.interval.toLong())
                 Period.MONTHS -> candidate.plusMonths(params.interval.toLong())

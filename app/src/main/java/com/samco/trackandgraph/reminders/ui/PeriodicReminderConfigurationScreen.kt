@@ -17,12 +17,11 @@
 
 package com.samco.trackandgraph.reminders.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -47,12 +47,10 @@ import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.TextChip
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.dateTimeButtonWidth
+import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import kotlinx.coroutines.selects.select
-import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun PeriodicReminderConfigurationScreen(
@@ -63,8 +61,9 @@ fun PeriodicReminderConfigurationScreen(
     viewModel: PeriodicReminderConfigurationViewModel = hiltViewModel<PeriodicReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
-    val starts by viewModel.starts.collectAsState()
-    val ends by viewModel.ends.collectAsState()
+    val startsOffset by viewModel.starts.collectAsState()
+    val endsOffset by viewModel.ends.collectAsState()
+    val hasEndDate by viewModel.hasEndDate.collectAsState()
     val interval by viewModel.interval.collectAsState()
     val period by viewModel.period.collectAsState()
 
@@ -75,10 +74,12 @@ fun PeriodicReminderConfigurationScreen(
     PeriodicReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
-        starts = starts,
-        onStartsChanged = viewModel::updateStarts,
-        ends = ends,
-        onEndsChanged = viewModel::updateEnds,
+        startsOffset = startsOffset,
+        onStartsOffsetChanged = viewModel::updateStarts,
+        endsOffset = endsOffset,
+        onEndsOffsetChanged = viewModel::updateEnds,
+        hasEndDate = hasEndDate,
+        onHasEndDateChanged = viewModel::updateHasEndDate,
         interval = interval,
         onIntervalChanged = viewModel::updateInterval,
         period = period,
@@ -96,13 +97,15 @@ fun PeriodicReminderConfigurationScreen(
 }
 
 @Composable
-fun PeriodicReminderConfigurationContent(
+private fun PeriodicReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
-    starts: LocalDateTime,
-    onStartsChanged: (LocalDateTime) -> Unit,
-    ends: LocalDateTime?,
-    onEndsChanged: (LocalDateTime?) -> Unit,
+    startsOffset: OffsetDateTime,
+    onStartsOffsetChanged: (OffsetDateTime) -> Unit,
+    endsOffset: OffsetDateTime,
+    onEndsOffsetChanged: (OffsetDateTime) -> Unit,
+    hasEndDate: Boolean,
+    onHasEndDateChanged: (Boolean) -> Unit,
     interval: Int,
     onIntervalChanged: (Int) -> Unit,
     period: Period,
@@ -130,40 +133,6 @@ fun PeriodicReminderConfigurationContent(
         HorizontalDivider()
         InputSpacingLarge()
 
-        // Start date/time
-        Text(
-            text = "Start Date & Time",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.tngColors.onSurface
-        )
-        DialogInputSpacing()
-        DateTimeButtonRow(
-            modifier = Modifier.widthIn(min = dateTimeButtonWidth),
-            selectedDateTime = starts,
-            onDateTimeSelected = onStartsChanged
-        )
-
-        DialogInputSpacing()
-
-        // End date/time (optional)
-        Text(
-            text = "End Date & Time (Optional)",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.tngColors.onSurface
-        )
-        DialogInputSpacing()
-        DateTimeButtonRow(
-            modifier = Modifier.widthIn(min = dateTimeButtonWidth),
-            dateTime = ends,
-            onDateTimeSelected = onEndsChanged,
-            allowNull = true,
-            nullText = "No End Date"
-        )
-
-        InputSpacingLarge()
-        HorizontalDivider()
-        InputSpacingLarge()
-
         // Interval and Period
         Text(
             text = "Repeat Every",
@@ -183,20 +152,67 @@ fun PeriodicReminderConfigurationContent(
                 onValueChange = { newValue ->
                     newValue.toIntOrNull()?.let { onIntervalChanged(it) }
                 },
-                label = { Text("Number") },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(0.4f),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true
             )
 
             // Period selector
-            PeriodSelector(
-                modifier = Modifier.weight(2f),
-                selectedPeriod = period,
-                onPeriodSelected = onPeriodChanged
+            TextMapSpinner(
+                strings = mapOf(
+                    Period.MINUTES to stringResource(id = R.string.minutes_generic),
+                    Period.HOURS to stringResource(id = R.string.hours_generic),
+                    Period.DAYS to stringResource(id = R.string.days_generic),
+                    Period.WEEKS to stringResource(id = R.string.weeks_generic),
+                    Period.MONTHS to stringResource(id = R.string.months_generic),
+                    Period.YEARS to stringResource(id = R.string.years_generic)
+                ),
+                selectedItem = period,
+                onItemSelected = onPeriodChanged,
+                modifier = Modifier.weight(1f)
             )
         }
 
+
+        InputSpacingLarge()
+        HorizontalDivider()
+        InputSpacingLarge()
+
+        // Start date/time
+        Text(
+            text = "Starting from",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.tngColors.onSurface
+        )
+        DialogInputSpacing()
+        DateTimeButtonRow(
+            modifier = Modifier.fillMaxWidth(),
+            selectedDateTime = startsOffset,
+            onDateTimeSelected = onStartsOffsetChanged
+        )
+
+        InputSpacingLarge()
+        HorizontalDivider()
+        InputSpacingLarge()
+
+        // End date/time (optional)
+        RowCheckbox(
+            checked = hasEndDate,
+            onCheckedChange = onHasEndDateChanged,
+            text = "Ending at",
+            textStyle = MaterialTheme.typography.titleSmall,
+        )
+
+        AnimatedVisibility(hasEndDate) {
+            DialogInputSpacing()
+            DateTimeButtonRow(
+                modifier = Modifier.fillMaxWidth(),
+                selectedDateTime = endsOffset,
+                onDateTimeSelected = { newEndDate ->
+                    onEndsOffsetChanged(newEndDate)
+                }
+            )
+        }
         DialogInputSpacing()
 
         // Action buttons
@@ -210,38 +226,6 @@ fun PeriodicReminderConfigurationContent(
     }
 }
 
-@Composable
-fun PeriodSelector(
-    modifier: Modifier = Modifier,
-    selectedPeriod: Period,
-    onPeriodSelected: (Period) -> Unit
-) {
-    val periods = listOf(
-        Period.DAYS to "Days",
-        Period.WEEKS to "Weeks", 
-        Period.MONTHS to "Months",
-        Period.YEARS to "Years"
-    )
-
-    FlowRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(
-            dialogInputSpacing,
-            Alignment.CenterHorizontally
-        ),
-        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
-    ) {
-        periods.forEach { (period, label) ->
-            TextChip(
-                modifier = Modifier.widthIn(min = buttonSize),
-                text = label,
-                isSelected = selectedPeriod == period,
-                onClick = { onPeriodSelected(period) }
-            )
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun PeriodicReminderConfigurationContentPreview() {
@@ -249,10 +233,12 @@ fun PeriodicReminderConfigurationContentPreview() {
         PeriodicReminderConfigurationContent(
             reminderName = "Daily Exercise",
             onReminderNameChanged = {},
-            starts = LocalDateTime.of(2025, 1, 1, 9, 0),
-            onStartsChanged = {},
-            ends = null,
-            onEndsChanged = {},
+            startsOffset = OffsetDateTime.parse("2025-12-23T14:30:00+00:00"),
+            onStartsOffsetChanged = {},
+            endsOffset = OffsetDateTime.parse("2026-12-23T14:30:00+00:00"),
+            onEndsOffsetChanged = {},
+            hasEndDate = true,
+            onHasEndDateChanged = {},
             interval = 1,
             onIntervalChanged = {},
             period = Period.DAYS,

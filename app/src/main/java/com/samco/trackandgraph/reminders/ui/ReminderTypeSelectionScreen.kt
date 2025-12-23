@@ -105,6 +105,8 @@ fun ReminderTypeSelectionScreen(
                     interval = 1,
                     period = Period.DAYS,
                     reminderDto = null,
+                    progressToNextReminder = 0.4f,
+                    isBeforeStartTime = false,
                 )
             )
         }
