@@ -77,7 +77,12 @@ fun CustomDialog(
         )
     ) {
         Box(
-            modifier = if (supportSmoothHeightAnimation) Modifier.fillMaxHeight() else Modifier,
+            modifier = if (supportSmoothHeightAnimation){
+                Modifier
+                    .fillMaxHeight()
+                    .systemBarsPadding()
+                    .imePadding()
+            } else Modifier,
             contentAlignment = if (supportSmoothHeightAnimation) Alignment.Center else Alignment.TopStart
         ) {
 
@@ -94,9 +99,7 @@ fun CustomDialog(
             }
 
             Surface(
-                modifier = Modifier
-                    .systemBarsPadding()
-                    .imePadding(),
+                modifier = Modifier,
                 shape = MaterialTheme.shapes.large,
                 color = backgroundColor,
             ) {
