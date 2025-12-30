@@ -232,6 +232,60 @@ internal class ReminderInteractorImplTest {
         }
 
     @Test
+    fun `schedule next with no next time cancels existing notification`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            val reminder = reminderFixture.copy(
+                id = 7L,
+                reminderName = "Cancel Existing Reminder",
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(12, 0),
+                    checkedDays = CheckedDays.none() // No days checked
+                ),
+            )
+
+            reminderScheduler.setNextNotificationTime(7L, null) // No next time
+
+            // EXECUTE
+            uut.scheduleNext(reminder)
+
+            // VERIFY
+            assertEquals(0, platformScheduler.setNotifications.size)
+            assertEquals(1, platformScheduler.cancelledNotifications.size)
+            
+            val cancelledNotification = platformScheduler.cancelledNotifications[0]
+            assertEquals(7L, cancelledNotification.reminderId)
+            assertEquals("Cancel Existing Reminder", cancelledNotification.reminderName)
+        }
+
+    @Test
+    fun `schedule next with no next time emits CANCELLED event`() = runTest(testDispatcher) {
+        // PREPARE
+        val reminder = reminderFixture.copy(
+            id = 8L,
+            reminderName = "Cancel Event Test Reminder",
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(12, 0),
+                checkedDays = CheckedDays.none() // No days checked
+            ),
+        )
+
+        reminderScheduler.setNextNotificationTime(8L, null) // No next time
+
+        // EXECUTE and VERIFY
+        uut.schedulingEvents.test {
+            uut.scheduleNext(reminder)
+            
+            val event = awaitItem()
+            assertEquals(8L, event.reminderId)
+            assertEquals(SchedulingEventType.CANCELLED, event.eventType)
+            assertEquals(null, event.scheduledTimeMillis)
+            
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `cancel notifications cancels notification for reminder`() = runTest(testDispatcher) {
         // PREPARE
         val reminder = reminderFixture.copy(
