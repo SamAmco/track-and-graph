@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import org.threeten.bp.LocalDateTime
 
 @Composable
@@ -81,7 +82,7 @@ fun PeriodicReminderDetails(
                 progress = { reminderViewData.progressToNextReminder },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                    .padding(halfDialogInputSpacing),
             )
         }
         
