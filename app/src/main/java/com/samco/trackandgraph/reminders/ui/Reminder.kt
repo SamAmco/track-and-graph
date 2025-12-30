@@ -50,6 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
+import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
@@ -58,9 +60,6 @@ import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
-import java.util.Locale
 
 @Composable
 fun Reminder(
@@ -117,6 +116,10 @@ fun Reminder(
                     }
                     is ReminderViewData.PeriodicReminderViewData -> {
                         PeriodicReminderDetails(reminderViewData)
+                    }
+                    is ReminderViewData.MonthDayReminderViewData -> {
+                        DialogInputSpacing()
+                        MonthDayReminderDetails(reminderViewData)
                     }
                 }
             }
@@ -208,7 +211,6 @@ private fun ReminderPreview() = TnGComposeTheme {
 
         // Elevated reminder
         Reminder(
-            isElevated = true,
             reminderViewData = ReminderViewData.WeekDayReminderViewData(
                 id = 2L,
                 displayIndex = 1,
@@ -221,7 +223,6 @@ private fun ReminderPreview() = TnGComposeTheme {
 
         // Non-scheduled reminder
         Reminder(
-            isElevated = true,
             reminderViewData = ReminderViewData.WeekDayReminderViewData(
                 id = 2L,
                 displayIndex = 1,
@@ -268,7 +269,6 @@ private fun ReminderPreview() = TnGComposeTheme {
 
         // Ended periodic reminder
         Reminder(
-            isElevated = true,
             reminderViewData = ReminderViewData.PeriodicReminderViewData(
                 id = 5L,
                 displayIndex = 4,
@@ -282,6 +282,19 @@ private fun ReminderPreview() = TnGComposeTheme {
                 progressToNextReminder = 0f,
                 isBeforeStartTime = false,
             ),
+        )
+
+        Reminder(
+            reminderViewData = ReminderViewData.MonthDayReminderViewData(
+                id = 4L,
+                displayIndex = 5,
+                name = "Monthly Reminder",
+                nextScheduled = LocalDateTime.of(2025, 6, 1, 10, 0),
+                occurrence = MonthDayOccurrence.LAST,
+                dayType = MonthDayType.DAY,
+                ends = null,
+                reminderDto = null,
+            )
         )
     }
 }

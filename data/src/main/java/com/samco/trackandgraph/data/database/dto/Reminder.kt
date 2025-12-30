@@ -53,6 +53,17 @@ sealed class ReminderParams {
         val interval: Int,
         val period: Period
     ) : ReminderParams()
+
+    @Serializable
+    @SerialName("monthday")
+    data class MonthDayParams(
+        @Serializable(with = LocalTimeSerializer::class)
+        val time: LocalTime,
+        val occurrence: MonthDayOccurrence,
+        val dayType: MonthDayType,
+        @Serializable(with = LocalDateTimeSerializer::class)
+        val ends: LocalDateTime?
+    ) : ReminderParams()
 }
 
 @Serializable
@@ -69,4 +80,38 @@ enum class Period {
     MONTHS,
     @SerialName("years")
     YEARS
+}
+
+@Serializable
+enum class MonthDayOccurrence {
+    @SerialName("first")
+    FIRST,
+    @SerialName("second")
+    SECOND,
+    @SerialName("third")
+    THIRD,
+    @SerialName("fourth")
+    FOURTH,
+    @SerialName("last")
+    LAST
+}
+
+@Serializable
+enum class MonthDayType {
+    @SerialName("monday")
+    MONDAY,
+    @SerialName("tuesday")
+    TUESDAY,
+    @SerialName("wednesday")
+    WEDNESDAY,
+    @SerialName("thursday")
+    THURSDAY,
+    @SerialName("friday")
+    FRIDAY,
+    @SerialName("saturday")
+    SATURDAY,
+    @SerialName("sunday")
+    SUNDAY,
+    @SerialName("day")
+    DAY
 }

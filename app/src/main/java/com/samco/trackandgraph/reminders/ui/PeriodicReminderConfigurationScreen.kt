@@ -180,7 +180,7 @@ private fun PeriodicReminderConfigurationContent(
 
         // Start date/time
         Text(
-            text = "Starting from",
+            text = "Starting From",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -199,7 +199,7 @@ private fun PeriodicReminderConfigurationContent(
         RowCheckbox(
             checked = hasEndDate,
             onCheckedChange = onHasEndDateChanged,
-            text = "Ending at",
+            text = "Ending At",
             textStyle = MaterialTheme.typography.titleSmall,
         )
 

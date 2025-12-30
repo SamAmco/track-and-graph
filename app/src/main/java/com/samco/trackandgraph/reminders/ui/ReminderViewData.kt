@@ -18,6 +18,8 @@
 package com.samco.trackandgraph.reminders.ui
 
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
+import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
@@ -65,6 +67,18 @@ sealed class ReminderViewData {
         val isBeforeStartTime: Boolean,
     ) : ReminderViewData()
 
+    /** View data for month day reminders, mapping to ReminderParams.MonthDayParams */
+    data class MonthDayReminderViewData(
+        override val id: Long,
+        override val displayIndex: Int,
+        override val name: String,
+        override val nextScheduled: LocalDateTime?,
+        val occurrence: MonthDayOccurrence,
+        val dayType: MonthDayType,
+        val ends: LocalDateTime?,
+        override val reminderDto: Reminder?,
+    ) : ReminderViewData()
+
     companion object {
         /** Creates a ReminderViewData from a Reminder DTO */
         fun fromReminder(reminder: Reminder, nextScheduled: LocalDateTime?): ReminderViewData {
@@ -102,6 +116,19 @@ sealed class ReminderViewData {
                         reminderDto = reminder,
                         progressToNextReminder = progress,
                         isBeforeStartTime = isBeforeStart,
+                    )
+                }
+
+                is ReminderParams.MonthDayParams -> {
+                    MonthDayReminderViewData(
+                        id = reminder.id,
+                        displayIndex = reminder.displayIndex,
+                        name = reminder.reminderName,
+                        nextScheduled = nextScheduled,
+                        occurrence = params.occurrence,
+                        dayType = params.dayType,
+                        ends = params.ends,
+                        reminderDto = reminder,
                     )
                 }
             }

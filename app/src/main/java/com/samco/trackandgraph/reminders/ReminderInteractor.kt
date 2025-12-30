@@ -235,6 +235,17 @@ internal class ReminderInteractorImpl @Inject constructor(
                     scheduledTimeMillis = triggerAtMillis
                 )
             )
+        } else {
+            // Cancel any existing scheduled notification when next is null
+            platformScheduler.cancel(reminder.toReminderNotificationParams())
+
+            // Emit cancellation event
+            _schedulingEvents.emit(
+                ReminderSchedulingEvent(
+                    reminderId = reminder.id,
+                    eventType = SchedulingEventType.CANCELLED
+                )
+            )
         }
     }
 

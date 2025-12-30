@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
+import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -51,6 +53,7 @@ import org.threeten.bp.LocalDateTime
 fun ReminderTypeSelectionScreen(
     onWeekDayReminderSelected: () -> Unit,
     onPeriodicReminderSelected: () -> Unit,
+    onMonthDayReminderSelected: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Column {
@@ -107,6 +110,27 @@ fun ReminderTypeSelectionScreen(
                     reminderDto = null,
                     progressToNextReminder = 0.4f,
                     isBeforeStartTime = false,
+                )
+            )
+        }
+
+        DialogInputSpacing()
+
+        ReminderTypeButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Month Day Reminder",
+            onClick = onMonthDayReminderSelected
+        ) {
+            Reminder(
+                reminderViewData = ReminderViewData.MonthDayReminderViewData(
+                    id = 3L,
+                    displayIndex = 0,
+                    name = "Monthly Report",
+                    nextScheduled = LocalDateTime.of(2025, 1, 6, 9, 0),
+                    occurrence = MonthDayOccurrence.FIRST,
+                    dayType = MonthDayType.MONDAY,
+                    ends = null,
+                    reminderDto = null,
                 )
             )
         }
@@ -217,6 +241,7 @@ fun ReminderTypeSelectionScreenPreview() {
         ReminderTypeSelectionScreen(
             onWeekDayReminderSelected = {},
             onPeriodicReminderSelected = {},
+            onMonthDayReminderSelected = {},
             onDismiss = {}
         )
     }
