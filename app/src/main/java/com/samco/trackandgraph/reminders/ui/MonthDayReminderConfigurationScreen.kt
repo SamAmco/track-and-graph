@@ -32,6 +32,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -121,6 +124,14 @@ fun MonthDayReminderConfigurationContent(
 ) = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(isEditMode) {
+        if (!isEditMode) {
+            focusRequester.requestFocus()
+        }
+    }
+
     DialogInputSpacing()
 
     // Name field
@@ -128,7 +139,9 @@ fun MonthDayReminderConfigurationContent(
         value = reminderName,
         onValueChange = onReminderNameChanged,
         label = { Text("Reminder Name") },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         singleLine = true
     )
