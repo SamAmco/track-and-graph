@@ -30,40 +30,40 @@ internal data class StoredAlarmInfo(
 // TODO add support for group ID
 internal data class ReminderNotificationParams(
     /**
-     * The alarm ID is an ID that the platform can use to identify the alarm/notification it
-     * currently has scheduled for this reminder or assign to a new one. It should be generated
-     * from the reminder ID such that there is a 1:1 mapping between the reminder ID and the alarm
-     * ID.
+     * The alarm ID is an ID that the platform can use to identify the
+     * alarm/notification it currently has scheduled for this reminder or
+     * assign to a new one. It should be generated from the reminder ID such
+     * that there is a 1:1 mapping between the reminder ID and the alarm ID.
      */
     val alarmId: Int,
 
     /**
-     * The ID of the reminder this notification is for in the current user database.
+     * The ID of the reminder this notification is for in the current user
+     * database.
      */
     val reminderId: Long,
 
-    /**
-     * The name string displayed to the user for this reminder notification.
-     */
+    /** The name string displayed to the user for this reminder notification. */
     val reminderName: String,
 )
 
 internal interface PlatformScheduler {
     /**
-     * Schedules a notification to trigger at the specified time in UTC epoch milliseconds.
+     * Cancels any notification currently scheduled for the given
+     * alarmId/reminderId and schedules a notification to trigger at the
+     * specified time in UTC epoch milliseconds.
      */
     fun set(triggerAtMillis: Long, reminderNotificationParams: ReminderNotificationParams)
 
     /**
-     * Returns the next scheduled notification time in UTC epoch milliseconds for the given reminder.
+     * Returns the next scheduled notification time in UTC epoch milliseconds
+     * for the given reminder.
      */
     suspend fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long?
 
     @Deprecated("This remains only for users of 9.x who still have persisted alarms to cancel them on first sync")
     fun cancel(storedAlarmInfo: StoredAlarmInfo)
 
-    /**
-     * Cancels the notification for the specified reminder.
-     */
+    /** Cancels the notification for the specified reminder. */
     fun cancel(reminderNotificationParams: ReminderNotificationParams)
 }

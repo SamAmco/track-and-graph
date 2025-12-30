@@ -120,28 +120,9 @@ fun WeekDayReminderConfigurationContent(
         HorizontalDivider()
         InputSpacingLarge()
 
-        DialogInputSpacing()
-
-        // Time selector
+        // Repeat on week days section
         Text(
-            text = "Time",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.tngColors.onSurface
-        )
-        DialogInputSpacing()
-        TimeButton(
-            modifier = Modifier.widthIn(min = dateTimeButtonWidth),
-            time = selectedTime,
-            onTimeSelected = onTimeSelected
-        )
-
-        InputSpacingLarge()
-        HorizontalDivider()
-        InputSpacingLarge()
-
-        // Days checkboxes
-        Text(
-            text = "Days",
+            text = "Repeat On Week Days",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -151,6 +132,23 @@ fun WeekDayReminderConfigurationContent(
         DayCheckboxes(
             checkedDays = checkedDays,
             onCheckedDaysChanged = onCheckedDaysChanged
+        )
+
+        InputSpacingLarge()
+        HorizontalDivider()
+        InputSpacingLarge()
+
+        // At time section
+        Text(
+            text = "At Time",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.tngColors.onSurface
+        )
+        DialogInputSpacing()
+        TimeButton(
+            modifier = Modifier.widthIn(min = dateTimeButtonWidth),
+            time = selectedTime,
+            onTimeSelected = onTimeSelected
         )
 
         DialogInputSpacing()
