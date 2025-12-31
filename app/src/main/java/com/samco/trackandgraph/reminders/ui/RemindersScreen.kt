@@ -150,12 +150,33 @@ fun RemindersScreen(
         onDragSwap(from.index, to.index)
     }
 
+    // Track reminder IDs to detect new additions
+    var previousReminderIds by remember { mutableStateOf(emptySet<Long>()) }
+
     LaunchedEffect(reorderableLazyListState.isAnyItemDragging) {
         if (reorderableLazyListState.isAnyItemDragging) {
             onDragStart()
         } else {
             onDragEnd()
         }
+    }
+
+    // Detect new reminders and scroll to them
+    LaunchedEffect(reminders) {
+        val currentReminderIds = reminders.map { it.id }.toSet()
+        val newReminderIds = currentReminderIds - previousReminderIds
+        
+        if (newReminderIds.isNotEmpty() && previousReminderIds.isNotEmpty()) {
+            // Find the index of the first new reminder
+            val newReminderId = newReminderIds.first()
+            val newReminderIndex = reminders.indexOfFirst { it.id == newReminderId }
+            
+            if (newReminderIndex >= 0) {
+                lazyListState.animateScrollToItem(newReminderIndex)
+            }
+        }
+        
+        previousReminderIds = currentReminderIds
     }
 
     Box(modifier = modifier.fillMaxSize()) {
