@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -109,8 +110,8 @@ private fun PeriodicReminderConfigurationContent(
     onEndsOffsetChanged: (OffsetDateTime) -> Unit,
     hasEndDate: Boolean,
     onHasEndDateChanged: (Boolean) -> Unit,
-    interval: Int,
-    onIntervalChanged: (Int) -> Unit,
+    interval: String,
+    onIntervalChanged: (String) -> Unit,
     period: Period,
     onPeriodChanged: (Period) -> Unit,
     isEditMode: Boolean,
@@ -160,11 +161,20 @@ private fun PeriodicReminderConfigurationContent(
         ) {
             // Interval number input
             OutlinedTextField(
-                value = interval.toString(),
-                onValueChange = { newValue ->
-                    newValue.toIntOrNull()?.let { onIntervalChanged(it) }
-                },
-                modifier = Modifier.weight(0.4f),
+                value = interval,
+                onValueChange = onIntervalChanged,
+                modifier = Modifier
+                    .weight(0.4f)
+                    .onFocusChanged { focusState ->
+                        if (!focusState.isFocused) {
+                            // If the user enters a decimal floor it to the nearest int
+                            val numericValue = interval.toDoubleOrNull()?.toInt() ?: 1
+                            val coercedValue = numericValue.coerceAtLeast(1)
+                            if (coercedValue.toString() != interval) {
+                                onIntervalChanged(coercedValue.toString())
+                            }
+                        }
+                    },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true
             )
@@ -251,7 +261,7 @@ fun PeriodicReminderConfigurationContentPreview() {
             onEndsOffsetChanged = {},
             hasEndDate = true,
             onHasEndDateChanged = {},
-            interval = 1,
+            interval = "1",
             onIntervalChanged = {},
             period = Period.DAYS,
             onPeriodChanged = {},
