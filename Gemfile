@@ -7,3 +7,4 @@ gem "fastlane"
 gem 'logger'
 gem 'mutex_m'
 gem 'abbrev'
+gem 'nkf'

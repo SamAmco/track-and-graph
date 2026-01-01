@@ -103,6 +103,11 @@ snapshots-verify:
 playstore-record:
 	@./scripts/playstore-record.sh
 
+.PHONY: frameit-test
+frameit-test:
+	@echo "Testing frameit with existing screenshots..."
+	bundle exec fastlane run frameit path:"fastlane/frameit/screenshots"
+
 # ---------- 4) RECORD TUTORIAL IMAGES FOR APP ----------
 .PHONY: tutorial-record
 tutorial-record:
