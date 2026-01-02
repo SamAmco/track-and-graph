@@ -17,12 +17,16 @@
 
 package com.samco.trackandgraph.promo
 
+import android.app.Activity
+import android.app.UiModeManager
+import android.content.res.Configuration
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasTestTag
 import com.samco.trackandgraph.screenshots.ScreenshotUtils
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -136,17 +140,20 @@ class PromoScreenshots {
         takeDeviceScreenshot("3")
         composeRule.onNodeWithText("Cancel").performClick()
         composeRule.waitForIdle()
-        composeRule.onNodeWithTag("trackAllFab", true).performClick()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            whenever(mockPrefHelper.getThemeValue(any())).thenReturn(AppCompatDelegate.MODE_NIGHT_YES)
+            activity.getSystemService(UiModeManager::class.java)
+                .setApplicationNightMode(UiModeManager.MODE_NIGHT_YES)
+        }
         composeRule.waitForIdle()
-        composeRule.onNodeWithTag("hoursInput", true).performTextInput("8")
-        composeRule.waitForIdle()
-        composeRule.onNodeWithTag("addNoteChip", true).performClick()
-        composeRule.waitForIdle()
-        composeRule.onNodeWithTag("notesInput", true)
-            .performTextInput("I started using a new pillow")
-        composeRule.waitForIdle()
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("darkTheme"), 2000)
         takeDeviceScreenshot("4")
-        composeRule.onNodeWithText("Cancel").performClick()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            whenever(mockPrefHelper.getThemeValue(any())).thenReturn(AppCompatDelegate.MODE_NIGHT_NO)
+            activity.getSystemService(UiModeManager::class.java)
+                .setApplicationNightMode(UiModeManager.MODE_NIGHT_NO)
+        }
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("lightTheme"), 2000)
         composeRule.waitForIdle()
         composeRule.activity.onBackPressedDispatcher.onBackPressed()
         composeRule.waitForIdle()
@@ -180,12 +187,24 @@ class PromoScreenshots {
         composeRule.waitForIdle()
         composeRule.waitUntilAtLeastOneExists(hasText("Screenshots"))
         composeRule.onNodeWithText("Screenshots").performClick()
+        composeRule.waitForIdle()
         composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
         composeRule.waitForIdle()
-        composeRule.onNodeWithTag("groupGrid").performScrollToNode(hasText("Squats"))
-        composeRule.onNodeWithText("Squats").performClick()
+        composeRule.waitUntilAtLeastOneExists(hasText("Functions"))
+        composeRule.onNodeWithText("Functions").performClick()
         composeRule.waitForIdle()
-        composeRule.waitUntilAtLeastOneExists(hasText("Squats 🏋🏼"))
+        composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
+        composeRule.waitForIdle()
+
+        val exercise = "Exercise"
+        composeRule.onNodeWithTag("groupGrid").performScrollToNode(hasText(exercise))
+        composeRule.waitForIdle()
+        composeRule.onNode(hasTestTag("functionMenuButton")).performClick()
+        composeRule.waitUntilAtLeastOneExists(hasText("Edit"))
+        composeRule.onNodeWithText("Edit").performClick()
+
+        composeRule.waitUntilAtLeastOneExists(hasText("Output"))
+        composeRule.waitUntilAtLeastOneExists(hasText("Data Source"))
         composeRule.waitForIdle()
         takeDeviceScreenshot("8")
         //Wait a sec for any files to flush to disk
