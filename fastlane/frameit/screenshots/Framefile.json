@@ -7,12 +7,12 @@
     },
     "title": {
       "font": "./fonts/Roboto-Bold.ttf",
-      "color": "#7C7C7C"
+      "color": "#f3f3f3"
     },
     "background": "../background.jpg",
     "show_complete_frame": false,
     "padding": "3%x8%",
-    "stack_title" : true,
+    "title_min_height": "15%",
     "use_platform": "ANDROID"
   },
   "data": [ ]

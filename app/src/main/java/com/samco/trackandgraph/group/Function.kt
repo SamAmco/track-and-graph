@@ -163,7 +163,9 @@ private fun FunctionMenuButton(
 ) {
     Box(modifier = modifier) {
         IconButton(
-            modifier = Modifier.size(buttonSize),
+            modifier = Modifier
+                .testTag("functionMenuButton")
+                .size(buttonSize),
             onClick = { onShowContextMenu(true) },
         ) {
             Icon(

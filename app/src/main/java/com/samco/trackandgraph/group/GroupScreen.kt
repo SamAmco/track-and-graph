@@ -23,6 +23,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
@@ -164,9 +165,7 @@ fun GroupScreen(
     )
 }
 
-/**
- * Data classes for click listeners with default empty lambda values
- */
+/** Data classes for click listeners with default empty lambda values */
 data class TrackerClickListeners(
     val onEdit: (DisplayTracker) -> Unit = {},
     val onDelete: (DisplayTracker) -> Unit = {},
@@ -201,9 +200,7 @@ data class FunctionClickListeners(
     val onDuplicate: (DisplayFunction) -> Unit = {}
 )
 
-/**
- * Content component for GroupScreen with navigation callbacks
- */
+/** Content component for GroupScreen with navigation callbacks */
 @Composable
 private fun GroupScreenContent(
     groupViewModel: GroupViewModel,
@@ -227,7 +224,8 @@ private fun GroupScreenContent(
     val allChildren = groupViewModel.currentChildren.collectAsStateWithLifecycle().value
     val context = LocalContext.current
 
-    val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel = hiltViewModel<AddDataPointsViewModelImpl>()
+    val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel =
+        hiltViewModel<AddDataPointsViewModelImpl>()
     val moveItemViewModel: MoveItemViewModel = hiltViewModel()
 
     // Permission handling
@@ -240,8 +238,10 @@ private fun GroupScreenContent(
             .collect { requestAlarmAndNotificationPermission() }
     }
 
-    val showReleaseNotesButton = releaseNotesViewModel.showReleaseNotesButton.collectAsStateWithLifecycle().value
-    val showReleaseNotesDialog = releaseNotesViewModel.showReleaseNotesDialog.collectAsStateWithLifecycle().value
+    val showReleaseNotesButton =
+        releaseNotesViewModel.showReleaseNotesButton.collectAsStateWithLifecycle().value
+    val showReleaseNotesDialog =
+        releaseNotesViewModel.showReleaseNotesDialog.collectAsStateWithLifecycle().value
     val releaseNotes = releaseNotesViewModel.releaseNotes.collectAsStateWithLifecycle().value
 
     GroupScreenView(
@@ -334,7 +334,8 @@ private fun GroupScreenContent(
         )
     }
 
-    val displayTracker = groupDialogsViewModel.featureForDescriptionDialog.collectAsStateWithLifecycle().value
+    val displayTracker =
+        groupDialogsViewModel.featureForDescriptionDialog.collectAsStateWithLifecycle().value
     if (displayTracker != null) {
         FeatureInfoDialog(
             featureName = displayTracker.name,
@@ -401,7 +402,8 @@ private fun GroupScreenContent(
         )
     }
 
-    val showDurationInputDialog = groupViewModel.showDurationInputDialog.collectAsStateWithLifecycle().value
+    val showDurationInputDialog =
+        groupViewModel.showDurationInputDialog.collectAsStateWithLifecycle().value
     LaunchedEffect(showDurationInputDialog) {
         if (showDurationInputDialog == null) return@LaunchedEffect
 
@@ -424,7 +426,8 @@ private fun GroupScreenContent(
 }
 
 /**
- * Pure UI component for GroupScreen that can be previewed without ViewModel dependencies.
+ * Pure UI component for GroupScreen that can be previewed without
+ * ViewModel dependencies.
  */
 @Composable
 private fun GroupScreenView(
@@ -444,12 +447,12 @@ private fun GroupScreenView(
     onDragSwap: (Int, Int) -> Unit = { _, _ -> },
     onDragEnd: () -> Unit = {},
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         // Group grid with items
         GroupGrid(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .testTag(if (isSystemInDarkTheme()) "darkTheme" else "lightTheme")
+                .fillMaxSize(),
             lazyGridState = lazyGridState,
             allChildren = allChildren,
             trackerClickListeners = trackerClickListeners ?: TrackerClickListeners(),
