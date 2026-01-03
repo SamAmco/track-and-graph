@@ -59,6 +59,7 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/test_output
 fastlane/readme.md
+fastlane/frameit/screenshots/**/*.png
 
 # Version control
 vcs.xml
