@@ -91,6 +91,12 @@ private fun AddReminderDialog(
                 onUpsertReminder = onConfirm,
                 onDismiss = onDismiss
             )
+            is ReminderParams.TimeSinceLastParams -> TimeSinceLastReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss
+            )
         }
     } else {
         // Add mode: show navigation flow

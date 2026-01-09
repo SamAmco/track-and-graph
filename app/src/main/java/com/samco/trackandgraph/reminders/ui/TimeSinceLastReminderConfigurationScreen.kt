@@ -29,11 +29,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -41,47 +45,53 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
-import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
-import org.threeten.bp.OffsetDateTime
+import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 
 @Composable
-fun PeriodicReminderConfigurationScreen(
+fun TimeSinceLastReminderConfigurationScreen(
     editReminder: Reminder? = null,
-    editParams: ReminderParams.PeriodicParams? = null,
+    editParams: ReminderParams.TimeSinceLastParams? = null,
     onUpsertReminder: (Reminder) -> Unit,
     onDismiss: () -> Unit,
-    viewModel: PeriodicReminderConfigurationViewModel = hiltViewModel<PeriodicReminderConfigurationViewModelImpl>()
+    viewModel: TimeSinceLastReminderConfigurationViewModel = hiltViewModel<TimeSinceLastReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
-    val startsOffset by viewModel.starts.collectAsState()
-    val endsOffset by viewModel.ends.collectAsState()
-    val hasEndDate by viewModel.hasEndDate.collectAsState()
-    val interval by viewModel.interval.collectAsState()
-    val period by viewModel.period.collectAsState()
+    val firstInterval by viewModel.firstInterval.collectAsState()
+    val firstPeriod by viewModel.firstPeriod.collectAsState()
+    val secondInterval by viewModel.secondInterval.collectAsState()
+    val secondPeriod by viewModel.secondPeriod.collectAsState()
+    val hasSecondInterval by viewModel.hasSecondInterval.collectAsState()
+    val featureName by viewModel.featureName.collectAsState()
+    val continueEnabled by viewModel.continueEnabled.collectAsState()
 
     LaunchedEffect(editReminder, editParams) {
         viewModel.initializeFromReminder(editReminder, editParams)
     }
 
-    PeriodicReminderConfigurationContent(
+    TimeSinceLastReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
-        startsOffset = startsOffset,
-        onStartsOffsetChanged = viewModel::updateStarts,
-        endsOffset = endsOffset,
-        onEndsOffsetChanged = viewModel::updateEnds,
-        hasEndDate = hasEndDate,
-        onHasEndDateChanged = viewModel::updateHasEndDate,
-        interval = interval,
-        onIntervalChanged = viewModel::updateInterval,
-        period = period,
-        onPeriodChanged = viewModel::updatePeriod,
+        firstInterval = firstInterval,
+        onFirstIntervalChanged = viewModel::updateFirstInterval,
+        firstPeriod = firstPeriod,
+        onFirstPeriodChanged = viewModel::updateFirstPeriod,
+        secondInterval = secondInterval,
+        onSecondIntervalChanged = viewModel::updateSecondInterval,
+        secondPeriod = secondPeriod,
+        onSecondPeriodChanged = viewModel::updateSecondPeriod,
+        hasSecondInterval = hasSecondInterval,
+        onHasSecondIntervalChanged = viewModel::updateHasSecondInterval,
+        featureName = featureName,
+        onFeatureIdChanged = viewModel::updateFeatureId,
+        continueEnabled = continueEnabled,
         isEditMode = editReminder != null,
         onConfirm = {
             onUpsertReminder(viewModel.getReminder())
@@ -95,19 +105,22 @@ fun PeriodicReminderConfigurationScreen(
 }
 
 @Composable
-private fun PeriodicReminderConfigurationContent(
+fun TimeSinceLastReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
-    startsOffset: OffsetDateTime,
-    onStartsOffsetChanged: (OffsetDateTime) -> Unit,
-    endsOffset: OffsetDateTime,
-    onEndsOffsetChanged: (OffsetDateTime) -> Unit,
-    hasEndDate: Boolean,
-    onHasEndDateChanged: (Boolean) -> Unit,
-    interval: String,
-    onIntervalChanged: (String) -> Unit,
-    period: Period,
-    onPeriodChanged: (Period) -> Unit,
+    firstInterval: String,
+    onFirstIntervalChanged: (String) -> Unit,
+    firstPeriod: Period,
+    onFirstPeriodChanged: (Period) -> Unit,
+    secondInterval: String,
+    onSecondIntervalChanged: (String) -> Unit,
+    secondPeriod: Period,
+    onSecondPeriodChanged: (Period) -> Unit,
+    hasSecondInterval: Boolean,
+    onHasSecondIntervalChanged: (Boolean) -> Unit,
+    featureName: String,
+    onFeatureIdChanged: (Long?) -> Unit,
+    continueEnabled: Boolean,
     isEditMode: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
@@ -119,6 +132,7 @@ private fun PeriodicReminderConfigurationContent(
             focusRequester.requestFocus()
         }
     }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -140,60 +154,81 @@ private fun PeriodicReminderConfigurationContent(
         HorizontalDivider()
         InputSpacingLarge()
 
-        // Interval and Period
+        // Feature selection section
         Text(
-            text = "Repeat Every",
+            text = "Track Feature",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
+
         DialogInputSpacing()
 
-        IntervalPeriodRow(
-            interval = interval,
-            onIntervalChanged = onIntervalChanged,
-            period = period,
-            onPeriodChanged = onPeriodChanged
-        )
+        var showFeatureSelectDialog by rememberSaveable { mutableStateOf(false) }
 
-        InputSpacingLarge()
-        HorizontalDivider()
-        InputSpacingLarge()
-
-        // Start date/time
-        Text(
-            text = "Starting From",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.tngColors.onSurface
-        )
-        DialogInputSpacing()
-        DateTimeButtonRow(
+        SelectorButton(
             modifier = Modifier.fillMaxWidth(),
-            selectedDateTime = startsOffset,
-            onDateTimeSelected = onStartsOffsetChanged
+            text = featureName.ifEmpty { "Select a feature" },
+            onClick = { showFeatureSelectDialog = true }
         )
 
-        InputSpacingLarge()
-        HorizontalDivider()
-        InputSpacingLarge()
-
-        // End date/time (optional)
-        RowCheckbox(
-            checked = hasEndDate,
-            onCheckedChange = onHasEndDateChanged,
-            text = "Ending At",
-            textStyle = MaterialTheme.typography.titleSmall,
-        )
-
-        AnimatedVisibility(hasEndDate) {
-            DialogInputSpacing()
-            DateTimeButtonRow(
-                modifier = Modifier.fillMaxWidth(),
-                selectedDateTime = endsOffset,
-                onDateTimeSelected = { newEndDate ->
-                    onEndsOffsetChanged(newEndDate)
+        if (showFeatureSelectDialog) {
+            SelectItemDialog(
+                title = stringResource(R.string.select_a_feature),
+                selectableTypes = setOf(SelectableItemType.FEATURE),
+                onFeatureSelected = { selectedFeatureId ->
+                    onFeatureIdChanged(selectedFeatureId)
+                    showFeatureSelectDialog = false
+                },
+                onDismissRequest = {
+                    showFeatureSelectDialog = false
                 }
             )
         }
+
+        InputSpacingLarge()
+        HorizontalDivider()
+        InputSpacingLarge()
+
+        // First interval section
+        Text(
+            text = "Remind After",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.tngColors.onSurface
+        )
+
+        DialogInputSpacing()
+
+        IntervalPeriodRow(
+            interval = firstInterval,
+            onIntervalChanged = onFirstIntervalChanged,
+            period = firstPeriod,
+            onPeriodChanged = onFirstPeriodChanged
+        )
+
+        InputSpacingLarge()
+        HorizontalDivider()
+        InputSpacingLarge()
+
+        // Second interval section (optional)
+        RowCheckbox(
+            checked = hasSecondInterval,
+            onCheckedChange = onHasSecondIntervalChanged,
+            text = "Then Remind Every",
+            textStyle = MaterialTheme.typography.titleSmall,
+        )
+
+        AnimatedVisibility(hasSecondInterval) {
+            Column {
+                DialogInputSpacing()
+                IntervalPeriodRow(
+                    interval = secondInterval,
+                    onIntervalChanged = onSecondIntervalChanged,
+                    period = secondPeriod,
+                    onPeriodChanged = onSecondPeriodChanged
+                )
+            }
+        }
+
         DialogInputSpacing()
 
         // Action buttons
@@ -202,6 +237,7 @@ private fun PeriodicReminderConfigurationContent(
             cancelText = R.string.cancel,
             continueText = if (isEditMode) R.string.update else R.string.add,
             onContinue = onConfirm,
+            continueEnabled = continueEnabled,
             onCancel = onDismiss
         )
     }
@@ -209,21 +245,24 @@ private fun PeriodicReminderConfigurationContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PeriodicReminderConfigurationContentPreview() {
+fun TimeSinceLastReminderConfigurationContentPreview() {
     TnGComposeTheme {
-        PeriodicReminderConfigurationContent(
-            reminderName = "Daily Exercise",
+        TimeSinceLastReminderConfigurationContent(
+            reminderName = "Exercise Reminder",
             onReminderNameChanged = {},
-            startsOffset = OffsetDateTime.parse("2025-12-23T14:30:00+00:00"),
-            onStartsOffsetChanged = {},
-            endsOffset = OffsetDateTime.parse("2026-12-23T14:30:00+00:00"),
-            onEndsOffsetChanged = {},
-            hasEndDate = true,
-            onHasEndDateChanged = {},
-            interval = "1",
-            onIntervalChanged = {},
-            period = Period.DAYS,
-            onPeriodChanged = {},
+            firstInterval = "3",
+            onFirstIntervalChanged = {},
+            firstPeriod = Period.DAYS,
+            onFirstPeriodChanged = {},
+            secondInterval = "1",
+            onSecondIntervalChanged = {},
+            secondPeriod = Period.DAYS,
+            onSecondPeriodChanged = {},
+            hasSecondInterval = true,
+            onHasSecondIntervalChanged = {},
+            featureName = "Exercise Sessions",
+            onFeatureIdChanged = {},
+            continueEnabled = true,
             isEditMode = false,
             onConfirm = {},
             onDismiss = {}

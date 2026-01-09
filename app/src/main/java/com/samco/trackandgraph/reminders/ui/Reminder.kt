@@ -121,6 +121,10 @@ fun Reminder(
                         DialogInputSpacing()
                         MonthDayReminderDetails(reminderViewData)
                     }
+                    is ReminderViewData.TimeSinceLastReminderViewData -> {
+                        DialogInputSpacing()
+                        TimeSinceLastReminderDetails(reminderViewData)
+                    }
                 }
             }
         }

@@ -79,6 +79,16 @@ sealed class ReminderViewData {
         override val reminderDto: Reminder?,
     ) : ReminderViewData()
 
+    /** View data for time since last reminders, mapping to ReminderParams.TimeSinceLastParams */
+    data class TimeSinceLastReminderViewData(
+        override val id: Long,
+        override val displayIndex: Int,
+        override val name: String,
+        override val nextScheduled: LocalDateTime?,
+        override val reminderDto: Reminder?,
+        val progressToNextReminder: Float,
+    ) : ReminderViewData()
+
     companion object {
         /** Creates a ReminderViewData from a Reminder DTO */
         fun fromReminder(reminder: Reminder, nextScheduled: LocalDateTime?): ReminderViewData {
@@ -129,6 +139,22 @@ sealed class ReminderViewData {
                         dayType = params.dayType,
                         ends = params.ends,
                         reminderDto = reminder,
+                    )
+                }
+
+                is ReminderParams.TimeSinceLastParams -> {
+                    // TODO: Calculate progress based on time since last data point was tracked
+                    // for the associated feature. Progress should go from 0 at the last track
+                    // to 1 at the first interval. If past the first interval, progress stays at 1.
+                    val progress = 0f
+
+                    TimeSinceLastReminderViewData(
+                        id = reminder.id,
+                        displayIndex = reminder.displayIndex,
+                        name = reminder.reminderName,
+                        nextScheduled = nextScheduled,
+                        reminderDto = reminder,
+                        progressToNextReminder = progress,
                     )
                 }
             }

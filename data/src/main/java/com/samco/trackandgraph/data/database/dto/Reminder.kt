@@ -64,7 +64,20 @@ sealed class ReminderParams {
         @Serializable(with = LocalDateTimeSerializer::class)
         val ends: LocalDateTime?
     ) : ReminderParams()
+
+    @Serializable
+    @SerialName("timesincelast")
+    data class TimeSinceLastParams(
+        val firstInterval: IntervalPeriodPair,
+        val secondInterval: IntervalPeriodPair?
+    ) : ReminderParams()
 }
+
+@Serializable
+data class IntervalPeriodPair(
+    val interval: Int,
+    val period: Period
+)
 
 @Serializable
 enum class Period {

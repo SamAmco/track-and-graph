@@ -65,6 +65,7 @@ internal class ReminderSchedulerImpl @Inject constructor(
             is ReminderParams.WeekDayParams -> scheduleNextWeekDayReminder(params, afterTime)
             is ReminderParams.PeriodicParams -> scheduleNextPeriodicReminder(params, afterTime)
             is ReminderParams.MonthDayParams -> scheduleNextMonthDayReminder(params, afterTime)
+            is ReminderParams.TimeSinceLastParams -> scheduleNextTimeSinceLastReminder(reminder, params, afterTime)
         }
     }
 
@@ -256,5 +257,22 @@ internal class ReminderSchedulerImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun scheduleNextTimeSinceLastReminder(
+        reminder: Reminder,
+        params: ReminderParams.TimeSinceLastParams,
+        afterTime: Instant
+    ): Instant? {
+        // TODO: Implement custom scheduling logic for time since last reminders
+        // This requires:
+        // 1. Access to DataInteractor to query the last data entry for the feature
+        // 2. Calculate time since last entry based on reminder.featureId
+        // 3. Check if time since last entry exceeds firstInterval
+        // 4. If already reminded once, check secondInterval (if present) for subsequent reminders
+        // 5. Return the appropriate next reminder time based on the intervals
+        
+        // For now, return null to indicate no scheduling until implementation is complete
+        return null
     }
 }
