@@ -22,7 +22,6 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.ReminderParams
-import com.samco.trackandgraph.reminders.reminderFixture
 import com.samco.trackandgraph.time.FakeTimeProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -37,21 +36,18 @@ internal class TimeSinceLastReminderSchedulerTest {
 
     private val timeProvider = FakeTimeProvider()
     private val dataSampler = FakeDataSampler()
-    private val uut = ReminderSchedulerImpl(timeProvider, dataSampler)
+    private val uut = TimeSinceLastReminderScheduler(timeProvider, dataSampler)
 
     @Test
     fun `returns null when feature id is null`() = runTest {
         // PREPARE
-        val reminder = reminderFixture.copy(
-            featureId = null,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(null, params, timeProvider.now().toInstant())
 
         // VERIFY
         assertNull("Should return null when feature id is null", result)
@@ -63,16 +59,13 @@ internal class TimeSinceLastReminderSchedulerTest {
         val featureId = 123L
         dataSampler.setDataPointsForFeature(featureId, emptyList())
 
-        val reminder = reminderFixture.copy(
-            featureId = featureId,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
 
         // VERIFY
         assertNull("Should return null when no data points exist", result)
@@ -81,16 +74,13 @@ internal class TimeSinceLastReminderSchedulerTest {
     @Test
     fun `returns null when feature does not exist`() = runTest {
         // PREPARE - don't set any data for the feature
-        val reminder = reminderFixture.copy(
-            featureId = 999L,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(999L, params, timeProvider.now().toInstant())
 
         // VERIFY
         assertNull("Should return null when feature does not exist", result)
@@ -113,16 +103,13 @@ internal class TimeSinceLastReminderSchedulerTest {
             )
         ))
 
-        val reminder = reminderFixture.copy(
-            featureId = featureId,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
 
         // VERIFY - Should schedule for 3 days after last tracked (Jan 12)
         val expected = ZonedDateTime.of(2024, 1, 12, 10, 0, 0, 0, ZoneId.of("UTC")).toInstant()
@@ -146,16 +133,13 @@ internal class TimeSinceLastReminderSchedulerTest {
             )
         ))
 
-        val reminder = reminderFixture.copy(
-            featureId = featureId,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
 
         // VERIFY - Should return null since there's no second interval and first has passed
         assertNull("Should return null when past first interval with no second interval", result)
@@ -178,16 +162,13 @@ internal class TimeSinceLastReminderSchedulerTest {
             )
         ))
 
-        val reminder = reminderFixture.copy(
-            featureId = featureId,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
-                secondInterval = IntervalPeriodPair(interval = 1, period = Period.DAYS)
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = IntervalPeriodPair(interval = 1, period = Period.DAYS)
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
 
         // VERIFY - First interval is Jan 13, then iterate by 1 day until after Jan 15
         // Jan 13 + 1 = Jan 14, Jan 14 + 1 = Jan 15, Jan 15 + 1 = Jan 16
@@ -212,16 +193,13 @@ internal class TimeSinceLastReminderSchedulerTest {
             )
         ))
 
-        val reminder = reminderFixture.copy(
-            featureId = featureId,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 4, period = Period.HOURS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 4, period = Period.HOURS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
 
         // VERIFY - Should schedule for 4 hours after last tracked (2:00 PM)
         val expected = ZonedDateTime.of(2024, 1, 10, 14, 0, 0, 0, ZoneId.of("UTC")).toInstant()
@@ -245,16 +223,13 @@ internal class TimeSinceLastReminderSchedulerTest {
             )
         ))
 
-        val reminder = reminderFixture.copy(
-            featureId = featureId,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 2, period = Period.WEEKS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 2, period = Period.WEEKS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
 
         // VERIFY - Should schedule for 2 weeks after last tracked (Jan 24)
         val expected = ZonedDateTime.of(2024, 1, 24, 10, 0, 0, 0, ZoneId.of("UTC")).toInstant()
@@ -292,16 +267,13 @@ internal class TimeSinceLastReminderSchedulerTest {
             )
         ))
 
-        val reminder = reminderFixture.copy(
-            featureId = featureId,
-            params = ReminderParams.TimeSinceLastParams(
-                firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
-                secondInterval = null
-            )
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = null
         )
 
         // EXECUTE
-        val result = uut.scheduleNext(reminder)
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
 
         // VERIFY - Should schedule 3 days after Jan 14 (the most recent)
         val expected = ZonedDateTime.of(2024, 1, 17, 10, 0, 0, 0, ZoneId.of("UTC")).toInstant()
