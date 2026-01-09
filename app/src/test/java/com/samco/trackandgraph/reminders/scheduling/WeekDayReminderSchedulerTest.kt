@@ -1,9 +1,11 @@
 package com.samco.trackandgraph.reminders.scheduling
 
+import com.samco.trackandgraph.NoOpDataSampler
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.reminders.reminderFixture
 import com.samco.trackandgraph.time.FakeTimeProvider
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -14,10 +16,10 @@ import org.threeten.bp.ZonedDateTime
 internal class WeekDayReminderSchedulerTest {
 
     private val timeProvider = FakeTimeProvider()
-    private val uut = ReminderSchedulerImpl(timeProvider)
+    private val uut = ReminderSchedulerImpl(timeProvider, NoOpDataSampler())
 
     @Test
-    fun `schedule next with no days checked returns null`() {
+    fun `schedule next with no days checked returns null`() = runTest {
         // PREPARE
         val reminder = reminderFixture.copy(
             params = ReminderParams.WeekDayParams(
@@ -34,7 +36,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next when today is enabled and reminder time is later today returns today`() {
+    fun `schedule next when today is enabled and reminder time is later today returns today`() = runTest {
         // PREPARE - It's Tuesday 10:00 AM, reminder is for 2:00 PM, Tuesday is enabled
         timeProvider.currentTime =
             ZonedDateTime.of(2024, 1, 2, 10, 0, 0, 0, ZoneId.of("UTC")) // Tuesday
@@ -55,7 +57,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next when today is enabled but reminder time already passed returns next occurrence`() {
+    fun `schedule next when today is enabled but reminder time already passed returns next occurrence`() = runTest {
         // PREPARE - It's Tuesday 4:00 PM, reminder was for 2:00 PM, Tuesday and Thursday are enabled
         timeProvider.currentTime =
             ZonedDateTime.of(2024, 1, 2, 16, 0, 0, 0, ZoneId.of("UTC")) // Tuesday 4:00 PM
@@ -81,7 +83,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next with today not enabled returns next enabled day`() {
+    fun `schedule next with today not enabled returns next enabled day`() = runTest {
         // PREPARE - It's Tuesday 10:00 AM, reminder is for 2:00 PM, but only Thursday is enabled
         timeProvider.currentTime =
             ZonedDateTime.of(2024, 1, 2, 10, 0, 0, 0, ZoneId.of("UTC")) // Tuesday
@@ -107,7 +109,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next with multiple days enabled returns earliest next occurrence`() {
+    fun `schedule next with multiple days enabled returns earliest next occurrence`() = runTest {
         // PREPARE - It's Tuesday 10:00 AM, reminder is for 2:00 PM, Wednesday and Friday are enabled
         timeProvider.currentTime =
             ZonedDateTime.of(2024, 1, 2, 10, 0, 0, 0, ZoneId.of("UTC")) // Tuesday
@@ -134,7 +136,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next wraps to next week when needed`() {
+    fun `schedule next wraps to next week when needed`() = runTest {
         // PREPARE - It's Friday 10:00 AM, reminder is for 2:00 PM, but only Monday is enabled
         timeProvider.currentTime =
             ZonedDateTime.of(2024, 1, 5, 10, 0, 0, 0, ZoneId.of("UTC")) // Friday
@@ -160,7 +162,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles timezone correctly`() {
+    fun `schedule next handles timezone correctly`() = runTest {
         // PREPARE - Set a different timezone (EST) and test scheduling
         val estZone = ZoneId.of("America/New_York")
         timeProvider.timeZone = estZone
@@ -183,7 +185,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next adds buffer to avoid race conditions`() {
+    fun `schedule next adds buffer to avoid race conditions`() = runTest {
         // PREPARE - It's Tuesday exactly at 2:00 PM, reminder is for 2:00 PM, Tuesday is enabled
         // The buffer should prevent scheduling for the exact same time
         timeProvider.currentTime =
@@ -207,7 +209,7 @@ internal class WeekDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next with all days enabled returns next occurrence`() {
+    fun `schedule next with all days enabled returns next occurrence`() = runTest {
         // PREPARE - It's Tuesday 4:00 PM, reminder is for 2:00 PM, all days are enabled (daily reminder)
         timeProvider.currentTime =
             ZonedDateTime.of(2024, 1, 2, 16, 0, 0, 0, ZoneId.of("UTC")) // Tuesday 4:00 PM
