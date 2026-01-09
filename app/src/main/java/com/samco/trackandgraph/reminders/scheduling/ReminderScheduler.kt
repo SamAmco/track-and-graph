@@ -17,11 +17,13 @@
 
 package com.samco.trackandgraph.reminders.scheduling
 
+import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.time.TimeProvider
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Instant
@@ -35,32 +37,36 @@ import javax.inject.Inject
 /**
  * Returns the next time a reminder notification should be scheduled for a
  * given reminder or null if no reminder should be scheduled.
+ *
+ * Implementations must never return an instant in the past. If there is no
+ * valid future time for the reminder, null should be returned.
  */
 interface ReminderScheduler {
     /**
      * Returns the next time (from now) a reminder notification should be
      * scheduled for a given reminder or null if no reminder should be
-     * scheduled.
+     * scheduled. The returned instant is always in the future.
      */
-    fun scheduleNext(reminder: Reminder): Instant?
+    suspend fun scheduleNext(reminder: Reminder): Instant?
 
     /**
      * Returns the next time a reminder notification should be scheduled for a
      * given reminder after the specified time, or null if no reminder should
-     * be scheduled.
+     * be scheduled. The returned instant is always after [afterTime].
      */
-    fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant?
+    suspend fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant?
 }
 
 internal class ReminderSchedulerImpl @Inject constructor(
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val dataSampler: DataSampler
 ) : ReminderScheduler {
 
-    override fun scheduleNext(reminder: Reminder): Instant? {
+    override suspend fun scheduleNext(reminder: Reminder): Instant? {
         return scheduleNext(reminder, timeProvider.now().toInstant())
     }
 
-    override fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant? {
+    override suspend fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant? {
         return when (val params = reminder.params) {
             is ReminderParams.WeekDayParams -> scheduleNextWeekDayReminder(params, afterTime)
             is ReminderParams.PeriodicParams -> scheduleNextPeriodicReminder(params, afterTime)
@@ -259,20 +265,61 @@ internal class ReminderSchedulerImpl @Inject constructor(
         }
     }
 
-    private fun scheduleNextTimeSinceLastReminder(
+    private suspend fun scheduleNextTimeSinceLastReminder(
         reminder: Reminder,
         params: ReminderParams.TimeSinceLastParams,
         afterTime: Instant
     ): Instant? {
-        // TODO: Implement custom scheduling logic for time since last reminders
-        // This requires:
-        // 1. Access to DataInteractor to query the last data entry for the feature
-        // 2. Calculate time since last entry based on reminder.featureId
-        // 3. Check if time since last entry exceeds firstInterval
-        // 4. If already reminded once, check secondInterval (if present) for subsequent reminders
-        // 5. Return the appropriate next reminder time based on the intervals
-        
-        // For now, return null to indicate no scheduling until implementation is complete
-        return null
+        // If no feature is associated, can't schedule
+        val featureId = reminder.featureId ?: return null
+
+        // Get the latest data point for the feature
+        val dataSample = dataSampler.getRawDataSampleForFeatureId(featureId) ?: return null
+        val latestDataPoint = try {
+            dataSample.iterator().asSequence().firstOrNull()
+        } finally {
+            dataSample.dispose()
+        } ?: return null
+
+        val lastTrackedInstant = latestDataPoint.timestamp.toInstant()
+        val currentZone = timeProvider.defaultZone()
+        val afterTimeWithBuffer = afterTime.plusSeconds(2)
+
+        // Calculate the first reminder time (lastTracked + firstInterval)
+        val firstReminderTime = addIntervalToInstant(lastTrackedInstant, params.firstInterval, currentZone)
+
+        // If first reminder time is after now, schedule it
+        if (firstReminderTime.isAfter(afterTimeWithBuffer)) {
+            return firstReminderTime
+        }
+
+        // We're past the first interval. If there's no second interval,
+        // there's no future reminder time to schedule
+        val secondInterval = params.secondInterval ?: return null
+
+        // Iterate forward by secondInterval until we find a time after afterTime
+        var candidate = firstReminderTime
+        while (!candidate.isAfter(afterTimeWithBuffer)) {
+            candidate = addIntervalToInstant(candidate, secondInterval, currentZone)
+        }
+
+        return candidate
+    }
+
+    private fun addIntervalToInstant(
+        instant: Instant,
+        intervalPeriod: IntervalPeriodPair,
+        zone: ZoneId
+    ): Instant {
+        val zonedDateTime = instant.atZone(zone)
+        val result = when (intervalPeriod.period) {
+            Period.MINUTES -> zonedDateTime.plusMinutes(intervalPeriod.interval.toLong())
+            Period.HOURS -> zonedDateTime.plusHours(intervalPeriod.interval.toLong())
+            Period.DAYS -> zonedDateTime.plusDays(intervalPeriod.interval.toLong())
+            Period.WEEKS -> zonedDateTime.plusWeeks(intervalPeriod.interval.toLong())
+            Period.MONTHS -> zonedDateTime.plusMonths(intervalPeriod.interval.toLong())
+            Period.YEARS -> zonedDateTime.plusYears(intervalPeriod.interval.toLong())
+        }
+        return result.toInstant()
     }
 }

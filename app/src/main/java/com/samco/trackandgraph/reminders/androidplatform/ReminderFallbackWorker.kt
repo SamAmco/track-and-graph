@@ -147,7 +147,7 @@ class ReminderFallbackWorker @AssistedInject constructor(
         }
     }
 
-    private fun calculateMissedReminders(
+    private suspend fun calculateMissedReminders(
         reminder: Reminder,
         expectedInstant: Instant,
         now: Instant

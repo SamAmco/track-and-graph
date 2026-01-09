@@ -17,11 +17,13 @@
 
 package com.samco.trackandgraph.reminders.scheduling
 
+import com.samco.trackandgraph.NoOpDataSampler
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.reminders.reminderFixture
 import com.samco.trackandgraph.time.FakeTimeProvider
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -33,10 +35,10 @@ import org.threeten.bp.ZonedDateTime
 internal class MonthDayReminderSchedulerTest {
 
     private val timeProvider = FakeTimeProvider()
-    private val uut = ReminderSchedulerImpl(timeProvider)
+    private val uut = ReminderSchedulerImpl(timeProvider, NoOpDataSampler())
 
     @Test
-    fun `schedule next returns current month occurrence when time has not passed`() {
+    fun `schedule next returns current month occurrence when time has not passed`() = runTest {
         // PREPARE - It's January 10th 10:00 AM, reminder is for 1st of month at 2:00 PM
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 10, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -59,7 +61,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns current month occurrence when time has not passed today`() {
+    fun `schedule next returns current month occurrence when time has not passed today`() = runTest {
         // PREPARE - It's January 15th 10:00 AM, reminder is for 20th of month at 2:00 PM
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 4, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -81,7 +83,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles last day of month correctly`() {
+    fun `schedule next handles last day of month correctly`() = runTest {
         // PREPARE - It's January 15th, reminder is for last day of month
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 15, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -103,7 +105,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles first Monday of month`() {
+    fun `schedule next handles first Monday of month`() = runTest {
         // PREPARE - It's January 5th 2024 (Friday), reminder is for first Monday of month
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 5, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -125,7 +127,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles second Tuesday of month`() {
+    fun `schedule next handles second Tuesday of month`() = runTest {
         // PREPARE - It's January 5th 2024, reminder is for second Tuesday of month
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 5, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -147,7 +149,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles last Friday of month`() {
+    fun `schedule next handles last Friday of month`() = runTest {
         // PREPARE - It's January 15th 2024, reminder is for last Friday of month
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 15, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -169,7 +171,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns null when past end time`() {
+    fun `schedule next returns null when past end time`() = runTest {
         // PREPARE - Current time is after end time
         timeProvider.currentTime = ZonedDateTime.of(2024, 3, 15, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -190,7 +192,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns null when next occurrence would be past end time`() {
+    fun `schedule next returns null when next occurrence would be past end time`() = runTest {
         // PREPARE - Current time is before end, but next occurrence would be after end
         timeProvider.currentTime = ZonedDateTime.of(2024, 2, 25, 10, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -211,7 +213,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles timezone correctly`() {
+    fun `schedule next handles timezone correctly`() = runTest {
         // PREPARE - Set a different timezone (EST) and test scheduling
         val estZone = ZoneId.of("America/New_York")
         timeProvider.timeZone = estZone
@@ -235,7 +237,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next adds buffer to avoid race conditions`() {
+    fun `schedule next adds buffer to avoid race conditions`() = runTest {
         // PREPARE - It's exactly 2:00 PM on the second of February, reminder is for 2:00 PM on the second
         timeProvider.currentTime = ZonedDateTime.of(2024, 2, 2, 14, 0, 0, 0, ZoneId.of("UTC"))
 
@@ -257,7 +259,7 @@ internal class MonthDayReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles leap year February correctly`() {
+    fun `schedule next handles leap year February correctly`() = runTest {
         // PREPARE - It's February 15th 2024 (leap year), reminder is for last day of month
         timeProvider.currentTime = ZonedDateTime.of(2024, 2, 15, 10, 0, 0, 0, ZoneId.of("UTC"))
 

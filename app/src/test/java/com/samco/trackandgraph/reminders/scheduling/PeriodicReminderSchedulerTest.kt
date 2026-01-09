@@ -17,10 +17,12 @@
 
 package com.samco.trackandgraph.reminders.scheduling
 
+import com.samco.trackandgraph.NoOpDataSampler
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.reminders.reminderFixture
 import com.samco.trackandgraph.time.FakeTimeProvider
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -31,10 +33,10 @@ import org.threeten.bp.ZonedDateTime
 internal class PeriodicReminderSchedulerTest {
 
     private val timeProvider = FakeTimeProvider()
-    private val uut = ReminderSchedulerImpl(timeProvider)
+    private val uut = ReminderSchedulerImpl(timeProvider, NoOpDataSampler())
 
     @Test
-    fun `schedule next returns start time when current time is before start`() {
+    fun `schedule next returns start time when current time is before start`() = runTest {
         // PREPARE - Current time is before the start time
         val startTime = LocalDateTime.of(2024, 1, 15, 10, 0)
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 10, 9, 0, 0, 0, ZoneId.of("UTC"))
@@ -57,7 +59,7 @@ internal class PeriodicReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns next daily occurrence`() {
+    fun `schedule next returns next daily occurrence`() = runTest {
         // PREPARE - Current time is after 2nd daily occurrence
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 12, 11, 0, 0, 0, ZoneId.of("UTC"))
         
@@ -79,7 +81,7 @@ internal class PeriodicReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns next weekly occurrence`() {
+    fun `schedule next returns next weekly occurrence`() = runTest {
         // PREPARE - Current time is after first weekly occurrence
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 18, 11, 0, 0, 0, ZoneId.of("UTC")) // Wednesday + 1 hour
         
@@ -101,7 +103,7 @@ internal class PeriodicReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns next monthly occurrence`() {
+    fun `schedule next returns next monthly occurrence`() = runTest {
         // PREPARE - Current time is after February occurrence
         timeProvider.currentTime = ZonedDateTime.of(2024, 2, 16, 11, 0, 0, 0, ZoneId.of("UTC"))
         
@@ -123,7 +125,7 @@ internal class PeriodicReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns next yearly occurrence`() {
+    fun `schedule next returns next yearly occurrence`() = runTest {
         // PREPARE - Current time is same year, after start
         timeProvider.currentTime = ZonedDateTime.of(2024, 2, 16, 11, 0, 0, 0, ZoneId.of("UTC"))
         
@@ -145,7 +147,7 @@ internal class PeriodicReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next handles multi-interval periods`() {
+    fun `schedule next handles multi-interval periods`() = runTest {
         // PREPARE - Current time is after first occurrence, every 3 days
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 13, 11, 0, 0, 0, ZoneId.of("UTC"))
         
@@ -167,7 +169,7 @@ internal class PeriodicReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns null when past end time`() {
+    fun `schedule next returns null when past end time`() = runTest {
         // PREPARE - Current time is after end time
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 25, 11, 0, 0, 0, ZoneId.of("UTC"))
         
@@ -188,7 +190,7 @@ internal class PeriodicReminderSchedulerTest {
     }
 
     @Test
-    fun `schedule next returns null when next occurrence would be past end time`() {
+    fun `schedule next returns null when next occurrence would be past end time`() = runTest {
         // PREPARE - Current time is before end, but next occurrence would be after end
         timeProvider.currentTime = ZonedDateTime.of(2024, 1, 14, 11, 0, 0, 0, ZoneId.of("UTC"))
         
