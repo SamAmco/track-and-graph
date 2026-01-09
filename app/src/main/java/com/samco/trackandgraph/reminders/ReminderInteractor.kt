@@ -92,6 +92,7 @@ interface ReminderInteractor {
      * users current database.
      */
     suspend fun clearNotifications()
+
 }
 
 /** Represents a scheduling event for reminders. */
@@ -121,6 +122,8 @@ internal class ReminderInteractorImpl @Inject constructor(
     private val json: Json,
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ReminderInteractor {
+
+    // TODO: Add method to observe data changes and re-schedule TimeSinceLast reminders
 
     private val mutex = Mutex()
 

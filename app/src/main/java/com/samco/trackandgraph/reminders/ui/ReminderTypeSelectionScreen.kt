@@ -54,6 +54,7 @@ fun ReminderTypeSelectionScreen(
     onWeekDayReminderSelected: () -> Unit,
     onPeriodicReminderSelected: () -> Unit,
     onMonthDayReminderSelected: () -> Unit,
+    onTimeSinceLastReminderSelected: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Column {
@@ -130,6 +131,25 @@ fun ReminderTypeSelectionScreen(
                     occurrence = MonthDayOccurrence.FIRST,
                     dayType = MonthDayType.MONDAY,
                     ends = null,
+                    reminderDto = null,
+                )
+            )
+        }
+
+        DialogInputSpacing()
+
+        ReminderTypeButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Time Since Last Reminder",
+            onClick = onTimeSinceLastReminderSelected
+        ) {
+            Reminder(
+                reminderViewData = ReminderViewData.TimeSinceLastReminderViewData(
+                    id = 4L,
+                    displayIndex = 0,
+                    name = "Data Entry Reminder",
+                    nextScheduled = LocalDateTime.of(2025, 12, 22, 14, 0),
+                    progressToNextReminder = 0.7f,
                     reminderDto = null,
                 )
             )
@@ -242,6 +262,7 @@ fun ReminderTypeSelectionScreenPreview() {
             onWeekDayReminderSelected = {},
             onPeriodicReminderSelected = {},
             onMonthDayReminderSelected = {},
+            onTimeSinceLastReminderSelected = {},
             onDismiss = {}
         )
     }

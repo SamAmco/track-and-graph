@@ -39,6 +39,8 @@ sealed class ReminderDialogNavKey : NavKey {
     object PeriodicReminderConfiguration : ReminderDialogNavKey()
     @Serializable
     object MonthDayReminderConfiguration : ReminderDialogNavKey()
+    @Serializable
+    object TimeSinceLastReminderConfiguration : ReminderDialogNavKey()
 }
 
 @Composable
@@ -69,6 +71,9 @@ fun AddReminderDialogContent(
                         onMonthDayReminderSelected = {
                             navBackStack.add(ReminderDialogNavKey.MonthDayReminderConfiguration)
                         },
+                        onTimeSinceLastReminderSelected = {
+                            navBackStack.add(ReminderDialogNavKey.TimeSinceLastReminderConfiguration)
+                        },
                         onDismiss = onDismiss
                     )
                 }
@@ -86,6 +91,12 @@ fun AddReminderDialogContent(
                 }
                 is ReminderDialogNavKey.MonthDayReminderConfiguration -> NavEntry(navKey) {
                     MonthDayReminderConfigurationScreen(
+                        onUpsertReminder = onConfirm,
+                        onDismiss = onDismiss
+                    )
+                }
+                is ReminderDialogNavKey.TimeSinceLastReminderConfiguration -> NavEntry(navKey) {
+                    TimeSinceLastReminderConfigurationScreen(
                         onUpsertReminder = onConfirm,
                         onDismiss = onDismiss
                     )
