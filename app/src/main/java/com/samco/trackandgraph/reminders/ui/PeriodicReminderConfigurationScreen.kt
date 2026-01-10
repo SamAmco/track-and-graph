@@ -56,6 +56,7 @@ fun PeriodicReminderConfigurationScreen(
     editParams: ReminderParams.PeriodicParams? = null,
     onUpsertReminder: (Reminder) -> Unit,
     onDismiss: () -> Unit,
+    onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: PeriodicReminderConfigurationViewModel = hiltViewModel<PeriodicReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
@@ -67,6 +68,10 @@ fun PeriodicReminderConfigurationScreen(
 
     LaunchedEffect(editReminder, editParams) {
         viewModel.initializeFromReminder(editReminder, editParams)
+    }
+
+    LaunchedEffect(viewModel) {
+        onSetCleanup { viewModel.reset() }
     }
 
     PeriodicReminderConfigurationContent(
@@ -85,12 +90,9 @@ fun PeriodicReminderConfigurationScreen(
         isEditMode = editReminder != null,
         onConfirm = {
             onUpsertReminder(viewModel.getReminder())
-            viewModel.reset()
-        },
-        onDismiss = {
-            viewModel.reset()
             onDismiss()
-        }
+        },
+        onDismiss = onDismiss
     )
 }
 

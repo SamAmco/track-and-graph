@@ -20,6 +20,10 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,49 +65,63 @@ private fun AddReminderDialog(
     onDismiss: () -> Unit,
     editMode: Boolean,
     editingReminder: Reminder? = null,
-) = CustomDialog(
-    onDismissRequest = onDismiss,
-    supportSmoothHeightAnimation = true,
-    paddingValues = PaddingValues(
-        start = inputSpacingLarge,
-        end = inputSpacingLarge,
-        bottom = halfDialogInputSpacing,
-        top = inputSpacingLarge,
-    )
 ) {
-    if (editMode && editingReminder != null) {
-        when (val params = editingReminder.params) {
-            is ReminderParams.WeekDayParams -> WeekDayReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss
-            )
-            is ReminderParams.PeriodicParams -> PeriodicReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss
-            )
-            is ReminderParams.MonthDayParams -> MonthDayReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss
-            )
-            is ReminderParams.TimeSinceLastParams -> TimeSinceLastReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss
+    var onCleanup by remember { mutableStateOf<() -> Unit>({}) }
+
+    val wrappedDismiss = {
+        onCleanup()
+        onDismiss()
+    }
+
+    CustomDialog(
+        onDismissRequest = wrappedDismiss,
+        supportSmoothHeightAnimation = true,
+        paddingValues = PaddingValues(
+            start = inputSpacingLarge,
+            end = inputSpacingLarge,
+            bottom = halfDialogInputSpacing,
+            top = inputSpacingLarge,
+        )
+    ) {
+        if (editMode && editingReminder != null) {
+            when (val params = editingReminder.params) {
+                is ReminderParams.WeekDayParams -> WeekDayReminderConfigurationScreen(
+                    editReminder = editingReminder,
+                    editParams = params,
+                    onUpsertReminder = onConfirm,
+                    onDismiss = wrappedDismiss,
+                    onSetCleanup = { onCleanup = it }
+                )
+                is ReminderParams.PeriodicParams -> PeriodicReminderConfigurationScreen(
+                    editReminder = editingReminder,
+                    editParams = params,
+                    onUpsertReminder = onConfirm,
+                    onDismiss = wrappedDismiss,
+                    onSetCleanup = { onCleanup = it }
+                )
+                is ReminderParams.MonthDayParams -> MonthDayReminderConfigurationScreen(
+                    editReminder = editingReminder,
+                    editParams = params,
+                    onUpsertReminder = onConfirm,
+                    onDismiss = wrappedDismiss,
+                    onSetCleanup = { onCleanup = it }
+                )
+                is ReminderParams.TimeSinceLastParams -> TimeSinceLastReminderConfigurationScreen(
+                    editReminder = editingReminder,
+                    editParams = params,
+                    onUpsertReminder = onConfirm,
+                    onDismiss = wrappedDismiss,
+                    onSetCleanup = { onCleanup = it }
+                )
+            }
+        } else {
+            // Add mode: show navigation flow
+            AddReminderDialogContent(
+                onConfirm = onConfirm,
+                onDismiss = wrappedDismiss,
+                onSetCleanup = { onCleanup = it }
             )
         }
-    } else {
-        // Add mode: show navigation flow
-        AddReminderDialogContent(
-            onConfirm = onConfirm,
-            onDismiss = onDismiss
-        )
     }
 }
 

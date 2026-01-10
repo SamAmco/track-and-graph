@@ -48,9 +48,10 @@ fun AddReminderDialogContent(
     modifier: Modifier = Modifier,
     onConfirm: (Reminder) -> Unit,
     onDismiss: () -> Unit,
+    onSetCleanup: (() -> Unit) -> Unit = {},
 ) {
     val navBackStack = rememberNavBackStack(ReminderDialogNavKey.ReminderTypeSelection)
-    
+
     NavDisplay(
         modifier = modifier.animateContentSize(),
         backStack = navBackStack,
@@ -80,25 +81,29 @@ fun AddReminderDialogContent(
                 is ReminderDialogNavKey.WeekDayReminderConfiguration -> NavEntry(navKey) {
                     WeekDayReminderConfigurationScreen(
                         onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        onSetCleanup = onSetCleanup
                     )
                 }
                 is ReminderDialogNavKey.PeriodicReminderConfiguration -> NavEntry(navKey) {
                     PeriodicReminderConfigurationScreen(
                         onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        onSetCleanup = onSetCleanup
                     )
                 }
                 is ReminderDialogNavKey.MonthDayReminderConfiguration -> NavEntry(navKey) {
                     MonthDayReminderConfigurationScreen(
                         onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        onSetCleanup = onSetCleanup
                     )
                 }
                 is ReminderDialogNavKey.TimeSinceLastReminderConfiguration -> NavEntry(navKey) {
                     TimeSinceLastReminderConfigurationScreen(
                         onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        onSetCleanup = onSetCleanup
                     )
                 }
                 else -> error("Unknown navKey: $navKey")
