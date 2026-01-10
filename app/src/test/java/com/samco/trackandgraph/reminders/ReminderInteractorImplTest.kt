@@ -18,11 +18,16 @@
 package com.samco.trackandgraph.reminders
 
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
+import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataUpdateType
 import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
@@ -444,5 +449,167 @@ internal class ReminderInteractorImplTest {
         assertTrue(cancelledNames.contains("Clear Me 1"))
         assertTrue(cancelledNames.contains("Clear Me 2"))
     }
+
+    @Test
+    fun `data point change reschedules time since last reminder for that feature`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            val featureId = 100L
+            val dataUpdateEvents = MutableSharedFlow<DataUpdateType>()
+            whenever(dataInteractor.getDataUpdateEvents()).thenReturn(dataUpdateEvents)
+
+            val timeSinceLastReminder = reminderFixture.copy(
+                id = 50L,
+                featureId = featureId,
+                reminderName = "Time Since Last Reminder",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+                    secondInterval = null
+                )
+            )
+
+            val otherReminder = reminderFixture.copy(
+                id = 51L,
+                featureId = 200L, // Different feature
+                reminderName = "Other Reminder",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 1, period = Period.DAYS),
+                    secondInterval = null
+                )
+            )
+
+            whenever(dataInteractor.getAllRemindersSync())
+                .thenReturn(listOf(timeSinceLastReminder, otherReminder))
+
+            val nextNotificationTime = Instant.ofEpochMilli(5000000L)
+            reminderScheduler.setNextNotificationTime(50L, nextNotificationTime)
+
+            // EXECUTE
+            uut.startObservingDataChanges()
+            advanceUntilIdle() // Let the flow initialize via onStart
+
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+            advanceUntilIdle()
+
+            // VERIFY - Only the reminder for the affected feature should be rescheduled
+            assertEquals(1, platformScheduler.setNotifications.size)
+            val (triggerTime, notificationParams) = platformScheduler.setNotifications[0]
+            assertEquals(5000000L, triggerTime)
+            assertEquals(50L, notificationParams.reminderId)
+            assertEquals("Time Since Last Reminder", notificationParams.reminderName)
+        }
+
+    @Test
+    fun `data point change does not reschedule non-time-since-last reminders`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            val featureId = 100L
+            val dataUpdateEvents = MutableSharedFlow<DataUpdateType>()
+            whenever(dataInteractor.getDataUpdateEvents()).thenReturn(dataUpdateEvents)
+
+            // WeekDay reminder associated with the same feature - should NOT be rescheduled
+            val weekDayReminder = reminderFixture.copy(
+                id = 60L,
+                featureId = featureId,
+                reminderName = "Weekly Reminder",
+                params = ReminderParams.WeekDayParams(
+                    time = LocalTime.of(9, 0),
+                    checkedDays = CheckedDays.none().copy(monday = true)
+                )
+            )
+
+            whenever(dataInteractor.getAllRemindersSync()).thenReturn(listOf(weekDayReminder))
+            reminderScheduler.setNextNotificationTime(60L, Instant.ofEpochMilli(6000000L))
+
+            // EXECUTE
+            uut.startObservingDataChanges()
+            advanceUntilIdle() // Let the flow initialize via onStart
+
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+            advanceUntilIdle()
+
+            // VERIFY - No notifications should be scheduled
+            assertEquals(0, platformScheduler.setNotifications.size)
+        }
+
+    @Test
+    fun `data point change for unrelated feature does not reschedule reminder`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            val dataUpdateEvents = MutableSharedFlow<DataUpdateType>()
+            whenever(dataInteractor.getDataUpdateEvents()).thenReturn(dataUpdateEvents)
+
+            val timeSinceLastReminder = reminderFixture.copy(
+                id = 70L,
+                featureId = 100L,
+                reminderName = "Time Since Last Reminder",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 2, period = Period.HOURS),
+                    secondInterval = null
+                )
+            )
+
+            whenever(dataInteractor.getAllRemindersSync()).thenReturn(listOf(timeSinceLastReminder))
+            reminderScheduler.setNextNotificationTime(70L, Instant.ofEpochMilli(7000000L))
+
+            // EXECUTE - Emit event for a different feature ID
+            uut.startObservingDataChanges()
+            advanceUntilIdle() // Let the flow initialize via onStart
+
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(999L)) // Different feature
+            advanceUntilIdle()
+
+            // VERIFY - No notifications should be scheduled
+            assertEquals(0, platformScheduler.setNotifications.size)
+        }
+
+    @Test
+    fun `reminders refresh when reminder update event is emitted`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            val featureId = 100L
+            val dataUpdateEvents = MutableSharedFlow<DataUpdateType>()
+            whenever(dataInteractor.getDataUpdateEvents()).thenReturn(dataUpdateEvents)
+
+            // Initially no TimeSinceLast reminders
+            whenever(dataInteractor.getAllRemindersSync()).thenReturn(emptyList())
+
+            // EXECUTE - Start observing
+            uut.startObservingDataChanges()
+            advanceUntilIdle() // Let the flow initialize (empty)
+
+            // Emit a data point event - should not trigger anything since no reminders
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+            advanceUntilIdle()
+
+            assertEquals(0, platformScheduler.setNotifications.size)
+
+            // Now add a reminder and emit a Reminder update event
+            val newReminder = reminderFixture.copy(
+                id = 90L,
+                featureId = featureId,
+                reminderName = "New Reminder",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 1, period = Period.HOURS),
+                    secondInterval = null
+                )
+            )
+            whenever(dataInteractor.getAllRemindersSync()).thenReturn(listOf(newReminder))
+            reminderScheduler.setNextNotificationTime(90L, Instant.ofEpochMilli(9000000L))
+
+            // Emit reminder update to refresh the inner flow via flatMapLatest
+            dataUpdateEvents.emit(DataUpdateType.Reminder)
+            advanceUntilIdle()
+
+            // Now emit data point event - should trigger reschedule
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+            advanceUntilIdle()
+
+            // VERIFY - Now the reminder should be scheduled
+            assertEquals(1, platformScheduler.setNotifications.size)
+            val (triggerTime, notificationParams) = platformScheduler.setNotifications[0]
+            assertEquals(9000000L, triggerTime)
+            assertEquals(90L, notificationParams.reminderId)
+        }
 
 }
