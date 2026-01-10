@@ -151,6 +151,34 @@ internal class DependencyAnalyser private constructor(
     }
 
     /**
+     * Gets all features that a given feature depends on, either directly or transitively.
+     * This includes the feature itself. Used for determining which features could affect
+     * the output of a given feature.
+     */
+    fun getDependenciesOf(featureId: Long): DependentFeatures {
+        val result = mutableSetOf(featureId)
+        val visited = mutableSetOf<DependencyNode>()
+        val toVisit = mutableListOf<DependencyNode>()
+
+        // Start with the initial feature's dependencies
+        featureNodes[featureId]?.let { featureNode ->
+            toVisit.addAll(featureNode.dependencies)
+        }
+
+        while (toVisit.isNotEmpty()) {
+            val node = toVisit.removeAt(0)
+
+            if (node !is DependencyNode.Feature || node in visited) continue
+            visited.add(node)
+
+            result.add(node.featureId)
+            toVisit.addAll(node.dependencies)
+        }
+
+        return DependentFeatures(result)
+    }
+
+    /**
      * Checks if all the given feature IDs exist in the dependency graph.
      * Returns true if all features exist, false otherwise.
      */

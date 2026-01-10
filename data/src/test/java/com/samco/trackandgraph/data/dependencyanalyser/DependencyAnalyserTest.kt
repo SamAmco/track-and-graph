@@ -316,4 +316,58 @@ class DependencyAnalyserTest {
         // So we not allow feature 1 to depend on features 1, 2, or 3
         assertEquals(setOf(1L, 2L, 3L), dependents.featureIds)
     }
+
+    @Test
+    fun `test getDependenciesOf - simple function dependency`() = runTest {
+        // Given: Function feature 2 depends on feature 1
+        whenever(mockDao.getAllSingleDependencyGraphs()).thenReturn(emptyList())
+        whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L))
+        whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(emptyList())
+
+        // When
+        dependencyAnalyser = DependencyAnalyser.create(mockDao)
+        val result = dependencyAnalyser.getDependenciesOf(2)
+
+        // Then: Feature 2 depends on feature 1 (and itself)
+        assertEquals(setOf(1L, 2L), result.featureIds)
+    }
+
+    @Test
+    fun `test getDependenciesOf - transitive function dependencies`() = runTest {
+        // Given: Chain of function dependencies: 3 depends on 2, 2 depends on 1
+        whenever(mockDao.getAllSingleDependencyGraphs()).thenReturn(emptyList())
+        whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L, 3L))
+        whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
+        whenever(mockDao.getFunctionInputFeatureIds(3L)).thenReturn(listOf(2L))
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(emptyList())
+
+        // When
+        dependencyAnalyser = DependencyAnalyser.create(mockDao)
+        val result = dependencyAnalyser.getDependenciesOf(3)
+
+        // Then: Feature 3 transitively depends on features 1 and 2 (and itself)
+        assertEquals(setOf(1L, 2L, 3L), result.featureIds)
+    }
+
+    @Test
+    fun `test getDependenciesOf - tracker has no dependencies`() = runTest {
+        // Given: Feature 1 is a tracker with no dependencies
+        whenever(mockDao.getAllSingleDependencyGraphs()).thenReturn(emptyList())
+        whenever(mockDao.getLineGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
+        whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
+        whenever(mockDao.getAllGraphStatsSync()).thenReturn(emptyList())
+
+        // When
+        dependencyAnalyser = DependencyAnalyser.create(mockDao)
+        val result = dependencyAnalyser.getDependenciesOf(1)
+
+        // Then: Feature 1 only depends on itself
+        assertEquals(setOf(1L), result.featureIds)
+    }
 }

@@ -214,7 +214,7 @@ internal class ReminderInteractorImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun startObservingDataChanges() {
-        // Observe reminder changes to keep cache up to date
+        // Observe reminder changes to refresh the TimeSinceLast reminders cache.
         scope.launch {
             dataInteractor.getDataUpdateEvents()
                 .filter { it == DataUpdateType.Reminder }
@@ -228,8 +228,18 @@ internal class ReminderInteractorImpl @Inject constructor(
     private suspend fun getRescheduleTimeSinceLastReminderEvents(): Flow<RescheduleTimeSinceLastRemindersParams> {
         val timeSinceLastReminders = fetchTimeSinceLastReminders()
         return dataInteractor.getDataUpdateEvents()
-            .filterIsInstance<DataUpdateType.DataPoint>()
-            .mapNotNull { getRescheduleParams(it.featureId, timeSinceLastReminders) }
+            .mapNotNull { event ->
+                when (event) {
+                    // When a data point changes, reschedule reminders for that feature
+                    is DataUpdateType.DataPoint ->
+                        getRescheduleParams(event.featureId, timeSinceLastReminders)
+                    // When a feature is updated (e.g. Lua code changed), reschedule
+                    // reminders that depend on that feature
+                    is DataUpdateType.FeatureUpdate ->
+                        getRescheduleParams(event.featureId, timeSinceLastReminders)
+                    else -> null
+                }
+            }
     }
 
     private fun getRescheduleParams(
@@ -237,15 +247,29 @@ internal class ReminderInteractorImpl @Inject constructor(
         timeSinceLastReminders: Map<Long, List<Reminder>>
     ): RescheduleTimeSinceLastRemindersParams? {
         val remindersForFeature = timeSinceLastReminders[featureId] ?: return null
-
         return RescheduleTimeSinceLastRemindersParams(featureId, remindersForFeature)
     }
 
     private suspend fun fetchTimeSinceLastReminders(): Map<Long, List<Reminder>> {
         val reminders = dataInteractor.getAllRemindersSync()
-        return reminders
             .filter { it.params is ReminderParams.TimeSinceLastParams && it.featureId != null }
-            .groupBy { it.featureId!! }
+
+        // Build a map where each reminder is indexed by its feature AND all features
+        // that could affect it (its dependencies). This way, when any dependency is
+        // updated, we can find the reminders that need rescheduling.
+        val result = mutableMapOf<Long, MutableList<Reminder>>()
+
+        for (reminder in reminders) {
+            val featureId = reminder.featureId!!
+            // Get all features that this reminder's feature depends on (including itself)
+            val dependencyFeatureIds = dataInteractor.getDependencyFeatureIdsOf(featureId)
+
+            for (depFeatureId in dependencyFeatureIds) {
+                result.getOrPut(depFeatureId) { mutableListOf() }.add(reminder)
+            }
+        }
+
+        return result
     }
 
     private suspend fun handleDataPointChange(params: RescheduleTimeSinceLastRemindersParams) {
