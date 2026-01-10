@@ -194,7 +194,7 @@
     <string name="default_reminder_name">Time to track!</string>
     <string name="missed_reminders_notifications_channel_name">Missed Reminders</string>
     <string name="missed_reminders_notifications_channel_description">Notifications for reminders that were missed</string>
-    <string name="missed_reminder_single_content">You missed a reminder at %1$s</string>
+    <string name="missed_reminder_single_content">Reminder from %1$s</string>
     <string name="missed_reminders_multiple_content">You missed %1$d reminders</string>
     <string name="next_reminder_format">Next Reminder: %1$s</string>
     <string name="no_upcoming_reminders">No Upcoming Reminders</string>
