@@ -285,6 +285,12 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
+    override suspend fun duplicateReminder(reminder: Reminder): Long = withContext(io) {
+        val id = reminderHelper.duplicateReminder(reminder)
+        dataUpdateEvents.emit(DataUpdateType.Reminder)
+        return@withContext id
+    }
+
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {
         dao.deleteDataPoint(dataPoint.toEntity())
         dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoint.featureId))

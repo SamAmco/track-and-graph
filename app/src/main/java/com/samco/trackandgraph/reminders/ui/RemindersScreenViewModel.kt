@@ -61,6 +61,7 @@ interface RemindersScreenViewModel {
     val lazyListState: LazyListState
 
     fun deleteReminder(reminderViewData: ReminderViewData)
+    fun duplicateReminder(reminderViewData: ReminderViewData)
     fun moveItem(from: Int, to: Int)
 
     fun onDragStart()
@@ -126,6 +127,14 @@ class RemindersScreenViewModelImpl @Inject constructor(
             reminderViewData.reminderDto?.let { reminder ->
                 reminderInteractor.cancelReminderNotifications(reminder)
                 dataInteractor.deleteReminder(reminder.id)
+            }
+        }
+    }
+
+    override fun duplicateReminder(reminderViewData: ReminderViewData) {
+        viewModelScope.launch(io) {
+            reminderViewData.reminderDto?.let { reminder ->
+                dataInteractor.duplicateReminder(reminder)
             }
         }
     }
