@@ -19,14 +19,27 @@ package com.samco.trackandgraph.reminders
 
 import com.samco.trackandgraph.data.algorithms.murmurHash3
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.reminders.scheduling.ReminderScheduler
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -93,6 +106,13 @@ interface ReminderInteractor {
      */
     suspend fun clearNotifications()
 
+    /**
+     * Starts observing data changes to automatically re-schedule TimeSinceLast
+     * reminders when data points are tracked for their associated features.
+     * This should be called once at application startup.
+     */
+    fun startObservingDataChanges()
+
 }
 
 /** Represents a scheduling event for reminders. */
@@ -123,7 +143,7 @@ internal class ReminderInteractorImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ReminderInteractor {
 
-    // TODO: Add method to observe data changes and re-schedule TimeSinceLast reminders
+    private val scope = CoroutineScope(SupervisorJob() + io)
 
     private val mutex = Mutex()
 
@@ -184,6 +204,55 @@ internal class ReminderInteractorImpl @Inject constructor(
     override suspend fun clearNotifications() = mutex.withLock {
         withContext(io) {
             clearNotificationsInternal()
+        }
+    }
+
+    data class RescheduleTimeSinceLastRemindersParams(
+        val featureId: Long,
+        val timeSinceLastReminders: List<Reminder>,
+    )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun startObservingDataChanges() {
+        // Observe reminder changes to keep cache up to date
+        scope.launch {
+            dataInteractor.getDataUpdateEvents()
+                .filter { it == DataUpdateType.Reminder }
+                .debounce(10)
+                .onStart { emit(DataUpdateType.Reminder) } // Initial load
+                .flatMapLatest { getRescheduleTimeSinceLastReminderEvents() }
+                .collect { handleDataPointChange(it) }
+        }
+    }
+
+    private suspend fun getRescheduleTimeSinceLastReminderEvents(): Flow<RescheduleTimeSinceLastRemindersParams> {
+        val timeSinceLastReminders = fetchTimeSinceLastReminders()
+        return dataInteractor.getDataUpdateEvents()
+            .filterIsInstance<DataUpdateType.DataPoint>()
+            .mapNotNull { getRescheduleParams(it.featureId, timeSinceLastReminders) }
+    }
+
+    private fun getRescheduleParams(
+        featureId: Long,
+        timeSinceLastReminders: Map<Long, List<Reminder>>
+    ): RescheduleTimeSinceLastRemindersParams? {
+        val remindersForFeature = timeSinceLastReminders[featureId] ?: return null
+
+        return RescheduleTimeSinceLastRemindersParams(featureId, remindersForFeature)
+    }
+
+    private suspend fun fetchTimeSinceLastReminders(): Map<Long, List<Reminder>> {
+        val reminders = dataInteractor.getAllRemindersSync()
+        return reminders
+            .filter { it.params is ReminderParams.TimeSinceLastParams && it.featureId != null }
+            .groupBy { it.featureId!! }
+    }
+
+    private suspend fun handleDataPointChange(params: RescheduleTimeSinceLastRemindersParams) {
+        // Re-schedule each affected reminder
+        for (reminder in params.timeSinceLastReminders) {
+            Timber.d("Re-scheduling TimeSinceLast reminder ${reminder.id} due to data point change for feature ${params.featureId}")
+            scheduleNext(reminder)
         }
     }
 
