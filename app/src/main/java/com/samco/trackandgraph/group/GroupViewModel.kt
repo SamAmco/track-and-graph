@@ -194,17 +194,17 @@ class GroupViewModelImpl @Inject constructor(
             UpdateType.Trackers
         )
 
-        DataUpdateType.FunctionCreated -> listOf(
+        is DataUpdateType.FunctionCreated -> listOf(
             UpdateType.Functions,
             UpdateType.DisplayIndices
         )
 
-        DataUpdateType.FunctionDeleted -> listOf(
+        is DataUpdateType.FunctionDeleted -> listOf(
             UpdateType.Functions,
             UpdateType.DisplayIndices
         )
 
-        DataUpdateType.FunctionUpdated -> listOf(
+        is DataUpdateType.FunctionUpdated -> listOf(
             UpdateType.Functions
         )
 

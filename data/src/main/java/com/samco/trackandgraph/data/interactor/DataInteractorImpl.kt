@@ -255,7 +255,7 @@ internal class DataInteractorImpl @Inject constructor(
         performAtomicUpdate { dao.deleteFeature(featureId) }
 
         if (isTracker) dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
-        else dataUpdateEvents.emit(DataUpdateType.FunctionDeleted)
+        else dataUpdateEvents.emit(DataUpdateType.FunctionDeleted(featureId))
 
         val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
         for (graphStatId in orphanedGraphs.graphStatIds) {
@@ -752,13 +752,13 @@ internal class DataInteractorImpl @Inject constructor(
     // FunctionHelper method overrides with event emission
     override suspend fun insertFunction(function: Function): Long? = withContext(io) {
         val id = functionHelper.insertFunction(function)
-        dataUpdateEvents.emit(DataUpdateType.FunctionCreated)
+        if (id != null) dataUpdateEvents.emit(DataUpdateType.FunctionCreated(id))
         return@withContext id
     }
 
     override suspend fun updateFunction(function: Function) = withContext(io) {
         functionHelper.updateFunction(function)
-        dataUpdateEvents.emit(DataUpdateType.FunctionUpdated)
+        dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(function.featureId))
         val dependentGraphs = dependencyAnalyserProvider.create()
             .getDependentGraphs(function.featureId)
         for (graphStatId in dependentGraphs.graphStatIds) {
@@ -769,7 +769,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
         val newFunctionId = functionHelper.duplicateFunction(function)
         if (newFunctionId != null) {
-            dataUpdateEvents.emit(DataUpdateType.FunctionCreated)
+            dataUpdateEvents.emit(DataUpdateType.FunctionCreated(newFunctionId))
         }
         return@withContext newFunctionId
     }
@@ -785,5 +785,9 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getFeatureIdsDependingOn(featureId: Long): Set<Long> = withContext(io) {
         dependencyAnalyserProvider.create().getFeaturesDependingOn(featureId).featureIds
+    }
+
+    override suspend fun getDependencyFeatureIdsOf(featureId: Long): Set<Long> = withContext(io) {
+        dependencyAnalyserProvider.create().getDependenciesOf(featureId).featureIds
     }
 }

@@ -28,11 +28,13 @@ sealed class DataUpdateType {
     data object GroupUpdated : DataUpdateType()
     data object GroupDeleted : DataUpdateType()
 
-    interface FeatureUpdate
+    interface FeatureUpdate {
+        val featureId: Long
+    }
 
-    data object TrackerCreated : DataUpdateType(), FeatureUpdate
-    data object TrackerUpdated : DataUpdateType(), FeatureUpdate
-    data object TrackerDeleted : DataUpdateType(), FeatureUpdate
+    data object TrackerCreated : DataUpdateType()
+    data object TrackerUpdated : DataUpdateType()
+    data object TrackerDeleted : DataUpdateType()
 
     data class GraphOrStatCreated(val graphStatId: Long) : DataUpdateType()
     data class GraphOrStatUpdated(val graphStatId: Long) : DataUpdateType()
@@ -47,7 +49,7 @@ sealed class DataUpdateType {
     /**Display indices were updated **/
     data object DisplayIndex : DataUpdateType()
 
-    data object FunctionCreated : DataUpdateType(), FeatureUpdate
-    data object FunctionUpdated : DataUpdateType(), FeatureUpdate
-    data object FunctionDeleted : DataUpdateType(), FeatureUpdate
+    data class FunctionCreated(override val featureId: Long) : DataUpdateType(), FeatureUpdate
+    data class FunctionUpdated(override val featureId: Long) : DataUpdateType(), FeatureUpdate
+    data class FunctionDeleted(override val featureId: Long) : DataUpdateType(), FeatureUpdate
 }

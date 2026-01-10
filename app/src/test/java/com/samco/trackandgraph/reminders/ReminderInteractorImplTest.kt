@@ -480,6 +480,8 @@ internal class ReminderInteractorImplTest {
 
             whenever(dataInteractor.getAllRemindersSync())
                 .thenReturn(listOf(timeSinceLastReminder, otherReminder))
+            whenever(dataInteractor.getDependencyFeatureIdsOf(featureId)).thenReturn(setOf(featureId))
+            whenever(dataInteractor.getDependencyFeatureIdsOf(200L)).thenReturn(setOf(200L))
 
             val nextNotificationTime = Instant.ofEpochMilli(5000000L)
             reminderScheduler.setNextNotificationTime(50L, nextNotificationTime)
@@ -550,6 +552,7 @@ internal class ReminderInteractorImplTest {
             )
 
             whenever(dataInteractor.getAllRemindersSync()).thenReturn(listOf(timeSinceLastReminder))
+            whenever(dataInteractor.getDependencyFeatureIdsOf(100L)).thenReturn(setOf(100L))
             reminderScheduler.setNextNotificationTime(70L, Instant.ofEpochMilli(7000000L))
 
             // EXECUTE - Emit event for a different feature ID
@@ -595,6 +598,7 @@ internal class ReminderInteractorImplTest {
                 )
             )
             whenever(dataInteractor.getAllRemindersSync()).thenReturn(listOf(newReminder))
+            whenever(dataInteractor.getDependencyFeatureIdsOf(featureId)).thenReturn(setOf(featureId))
             reminderScheduler.setNextNotificationTime(90L, Instant.ofEpochMilli(9000000L))
 
             // Emit reminder update to refresh the inner flow via flatMapLatest
@@ -610,6 +614,121 @@ internal class ReminderInteractorImplTest {
             val (triggerTime, notificationParams) = platformScheduler.setNotifications[0]
             assertEquals(9000000L, triggerTime)
             assertEquals(90L, notificationParams.reminderId)
+        }
+
+    @Test
+    fun `feature update reschedules time since last reminder for that feature`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            val featureId1 = 100L
+            val featureId2 = 200L
+            val dataUpdateEvents = MutableSharedFlow<DataUpdateType>()
+            whenever(dataInteractor.getDataUpdateEvents()).thenReturn(dataUpdateEvents)
+
+            // Two TimeSinceLast reminders for different features (both are trackers with no dependencies)
+            val reminder1 = reminderFixture.copy(
+                id = 95L,
+                featureId = featureId1,
+                reminderName = "Tracker Reminder 1",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 2, period = Period.HOURS),
+                    secondInterval = null
+                )
+            )
+            val reminder2 = reminderFixture.copy(
+                id = 96L,
+                featureId = featureId2,
+                reminderName = "Tracker Reminder 2",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 1, period = Period.DAYS),
+                    secondInterval = null
+                )
+            )
+            whenever(dataInteractor.getAllRemindersSync()).thenReturn(listOf(reminder1, reminder2))
+            // Each feature only depends on itself (trackers have no dependencies)
+            whenever(dataInteractor.getDependencyFeatureIdsOf(featureId1)).thenReturn(setOf(featureId1))
+            whenever(dataInteractor.getDependencyFeatureIdsOf(featureId2)).thenReturn(setOf(featureId2))
+            reminderScheduler.setNextNotificationTime(95L, Instant.ofEpochMilli(9500000L))
+            reminderScheduler.setNextNotificationTime(96L, Instant.ofEpochMilli(9600000L))
+
+            // EXECUTE - Start observing
+            uut.startObservingDataChanges()
+            advanceUntilIdle() // Let the flow initialize
+
+            // Emit FunctionUpdated for featureId1
+            // This should only reschedule the reminder for that feature
+            dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(featureId1))
+            advanceUntilIdle()
+
+            // VERIFY - Only reminder1 should be rescheduled
+            assertEquals(1, platformScheduler.setNotifications.size)
+            val (triggerTime, notificationParams) = platformScheduler.setNotifications[0]
+            assertEquals(9500000L, triggerTime)
+            assertEquals(95L, notificationParams.reminderId)
+        }
+
+    @Test
+    fun `feature update reschedules reminders on features that depend on it`() =
+        runTest(testDispatcher) {
+            // PREPARE
+            // Scenario: trackerFeatureId is a tracker, functionFeatureId is a function derived from it
+            // The reminder is on the function. When the tracker is updated, the reminder should be
+            // rescheduled because the function depends on the tracker.
+            val trackerFeatureId = 100L
+            val functionFeatureId = 200L
+            val unrelatedFeatureId = 300L
+
+            val dataUpdateEvents = MutableSharedFlow<DataUpdateType>()
+            whenever(dataInteractor.getDataUpdateEvents()).thenReturn(dataUpdateEvents)
+
+            // Reminder on the derived function (not directly on the tracker)
+            val reminderOnFunction = reminderFixture.copy(
+                id = 95L,
+                featureId = functionFeatureId,
+                reminderName = "Reminder on derived function",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 2, period = Period.HOURS),
+                    secondInterval = null
+                )
+            )
+            // Unrelated reminder that should not be rescheduled
+            val unrelatedReminder = reminderFixture.copy(
+                id = 96L,
+                featureId = unrelatedFeatureId,
+                reminderName = "Unrelated reminder",
+                params = ReminderParams.TimeSinceLastParams(
+                    firstInterval = IntervalPeriodPair(interval = 1, period = Period.DAYS),
+                    secondInterval = null
+                )
+            )
+
+            whenever(dataInteractor.getAllRemindersSync())
+                .thenReturn(listOf(reminderOnFunction, unrelatedReminder))
+
+            // The function depends on the tracker (plus itself)
+            whenever(dataInteractor.getDependencyFeatureIdsOf(functionFeatureId))
+                .thenReturn(setOf(functionFeatureId, trackerFeatureId))
+            // The unrelated feature only depends on itself
+            whenever(dataInteractor.getDependencyFeatureIdsOf(unrelatedFeatureId))
+                .thenReturn(setOf(unrelatedFeatureId))
+
+            reminderScheduler.setNextNotificationTime(95L, Instant.ofEpochMilli(9500000L))
+            reminderScheduler.setNextNotificationTime(96L, Instant.ofEpochMilli(9600000L))
+
+            // EXECUTE - Start observing
+            uut.startObservingDataChanges()
+            advanceUntilIdle() // Let the flow initialize
+
+            // Emit FunctionUpdated for the tracker
+            // This should reschedule the reminder on the function because function depends on tracker
+            dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(trackerFeatureId))
+            advanceUntilIdle()
+
+            // VERIFY - The reminder on the derived function should be rescheduled
+            assertEquals(1, platformScheduler.setNotifications.size)
+            val (triggerTime, notificationParams) = platformScheduler.setNotifications[0]
+            assertEquals(9500000L, triggerTime)
+            assertEquals(95L, notificationParams.reminderId)
         }
 
 }

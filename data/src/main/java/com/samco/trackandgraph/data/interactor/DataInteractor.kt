@@ -178,4 +178,11 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
      * This includes the feature itself and is used for cycle detection to prevent circular dependencies.
      */
     suspend fun getFeatureIdsDependingOn(featureId: Long): Set<Long>
+
+    /**
+     * Gets all feature IDs that a given feature depends on, either directly or transitively.
+     * This includes the feature itself. Used for determining which features could affect
+     * the output of a given feature.
+     */
+    suspend fun getDependencyFeatureIdsOf(featureId: Long): Set<Long>
 }
