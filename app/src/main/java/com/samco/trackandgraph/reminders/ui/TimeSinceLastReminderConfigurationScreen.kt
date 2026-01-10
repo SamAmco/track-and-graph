@@ -61,6 +61,7 @@ fun TimeSinceLastReminderConfigurationScreen(
     editParams: ReminderParams.TimeSinceLastParams? = null,
     onUpsertReminder: (Reminder) -> Unit,
     onDismiss: () -> Unit,
+    onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: TimeSinceLastReminderConfigurationViewModel = hiltViewModel<TimeSinceLastReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
@@ -74,6 +75,10 @@ fun TimeSinceLastReminderConfigurationScreen(
 
     LaunchedEffect(editReminder, editParams) {
         viewModel.initializeFromReminder(editReminder, editParams)
+    }
+
+    LaunchedEffect(viewModel) {
+        onSetCleanup { viewModel.reset() }
     }
 
     TimeSinceLastReminderConfigurationContent(
@@ -95,12 +100,9 @@ fun TimeSinceLastReminderConfigurationScreen(
         isEditMode = editReminder != null,
         onConfirm = {
             onUpsertReminder(viewModel.getReminder())
-            viewModel.reset()
-        },
-        onDismiss = {
-            viewModel.reset()
             onDismiss()
-        }
+        },
+        onDismiss = onDismiss
     )
 }
 
