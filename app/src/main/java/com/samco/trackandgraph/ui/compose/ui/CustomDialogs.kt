@@ -70,7 +70,8 @@ fun CustomDialog(
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
-            decorFitsSystemWindows = decorFitsSystemWindows ?: usePlatformDefaultWidth,
+            decorFitsSystemWindows = decorFitsSystemWindows
+                ?: if (supportSmoothHeightAnimation) false else usePlatformDefaultWidth,
             dismissOnClickOutside = dismissOnClickOutside,
             dismissOnBackPress = dismissOnBackPress,
             usePlatformDefaultWidth = usePlatformDefaultWidth,
