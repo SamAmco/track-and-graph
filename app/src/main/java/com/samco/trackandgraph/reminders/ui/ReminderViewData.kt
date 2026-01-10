@@ -18,12 +18,14 @@
 package com.samco.trackandgraph.reminders.ui
 
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 
 /**
@@ -90,8 +92,18 @@ sealed class ReminderViewData {
     ) : ReminderViewData()
 
     companion object {
-        /** Creates a ReminderViewData from a Reminder DTO */
-        fun fromReminder(reminder: Reminder, nextScheduled: LocalDateTime?): ReminderViewData {
+        /**
+         * Creates a ReminderViewData from a Reminder DTO.
+         * @param reminder The reminder to convert
+         * @param nextScheduled The next scheduled time for the reminder
+         * @param lastTrackedInstant For TimeSinceLastParams reminders, the instant of the last
+         *   tracked data point. Pass null if unknown or if the reminder type doesn't need it.
+         */
+        fun fromReminder(
+            reminder: Reminder,
+            nextScheduled: LocalDateTime?,
+            lastTrackedInstant: Instant? = null
+        ): ReminderViewData {
             return when (val params = reminder.params) {
                 is ReminderParams.WeekDayParams -> {
                     WeekDayReminderViewData(
@@ -143,10 +155,10 @@ sealed class ReminderViewData {
                 }
 
                 is ReminderParams.TimeSinceLastParams -> {
-                    // TODO: Calculate progress based on time since last data point was tracked
-                    // for the associated feature. Progress should go from 0 at the last track
-                    // to 1 at the first interval. If past the first interval, progress stays at 1.
-                    val progress = 0f
+                    val progress = calculateTimeSinceLastProgress(
+                        lastTrackedInstant = lastTrackedInstant,
+                        firstInterval = params.firstInterval
+                    )
 
                     TimeSinceLastReminderViewData(
                         id = reminder.id,
@@ -158,6 +170,36 @@ sealed class ReminderViewData {
                     )
                 }
             }
+        }
+
+        /**
+         * Calculate progress (0.0 to 1.0) for time-since-last reminders.
+         * Progress goes from 0 at the last track to 1 at the first interval.
+         * Returns 1.0 if past the first interval, 0.0 if data is unavailable.
+         */
+        private fun calculateTimeSinceLastProgress(
+            lastTrackedInstant: Instant?,
+            firstInterval: IntervalPeriodPair
+        ): Float {
+            val lastTracked = lastTrackedInstant ?: return 0f
+
+            val now = Instant.now()
+            val elapsedMillis = Duration.between(lastTracked, now).toMillis()
+
+            // Calculate the total duration of the first interval in milliseconds
+            val totalMillis = when (firstInterval.period) {
+                Period.MINUTES -> Duration.ofMinutes(firstInterval.interval.toLong()).toMillis()
+                Period.HOURS -> Duration.ofHours(firstInterval.interval.toLong()).toMillis()
+                Period.DAYS -> Duration.ofDays(firstInterval.interval.toLong()).toMillis()
+                Period.WEEKS -> Duration.ofDays(firstInterval.interval.toLong() * 7).toMillis()
+                Period.MONTHS -> Duration.ofDays(firstInterval.interval.toLong() * 30).toMillis()
+                Period.YEARS -> Duration.ofDays(firstInterval.interval.toLong() * 365).toMillis()
+            }
+
+            if (totalMillis <= 0) return 0f
+
+            val progress = elapsedMillis.toDouble() / totalMillis.toDouble()
+            return progress.coerceIn(0.0, 1.0).toFloat()
         }
 
         /** Calculate progress (0.0 to 1.0) from last reminder to next reminder */

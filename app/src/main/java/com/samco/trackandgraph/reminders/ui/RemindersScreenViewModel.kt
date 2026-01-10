@@ -21,12 +21,15 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
+import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.time.TimeProvider
 import com.samco.trackandgraph.reminders.NextScheduled
 import com.samco.trackandgraph.reminders.ReminderInteractor
+import org.threeten.bp.Instant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -71,6 +74,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val reminderInteractor: ReminderInteractor,
     private val timeProvider: TimeProvider,
+    private val dataSampler: DataSampler,
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ViewModel(), RemindersScreenViewModel {
 
@@ -203,7 +207,24 @@ class RemindersScreenViewModelImpl @Inject constructor(
 
                 is NextScheduled.Never -> null
             }
-        return ReminderViewData.fromReminder(reminder, nextScheduled)
+
+        // For time-since-last reminders, fetch the last tracked instant
+        val lastTrackedInstant = getLastTrackedInstant(reminder)
+
+        return ReminderViewData.fromReminder(reminder, nextScheduled, lastTrackedInstant)
+    }
+
+    private suspend fun getLastTrackedInstant(reminder: Reminder): Instant? {
+        if (reminder.params !is ReminderParams.TimeSinceLastParams) return null
+
+        val featureId = reminder.featureId ?: return null
+        val dataSample = dataSampler.getRawDataSampleForFeatureId(featureId) ?: return null
+
+        return try {
+            dataSample.iterator().asSequence().firstOrNull()?.timestamp?.toInstant()
+        } finally {
+            dataSample.dispose()
+        }
     }
 
     private sealed class LoadingState {
