@@ -38,5 +38,7 @@ interface ReminderHelper {
 
     suspend fun deleteReminder(id: Long)
 
+    suspend fun duplicateReminder(reminder: Reminder): Long
+
     suspend fun hasAnyReminders(): Boolean
 }

@@ -93,6 +93,7 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
         },
         onHideAddReminderDialog = { showAddReminderDialog = false },
         onDeleteReminder = viewModel::deleteReminder,
+        onDuplicateReminder = viewModel::duplicateReminder,
         onDragStart = viewModel::onDragStart,
         onDragSwap = viewModel::onDragSwap,
         onDragEnd = viewModel::onDragEnd,
@@ -141,6 +142,7 @@ fun RemindersScreen(
     onEditReminder: (Long) -> Unit,
     onHideAddReminderDialog: () -> Unit,
     onDeleteReminder: (ReminderViewData) -> Unit,
+    onDuplicateReminder: (ReminderViewData) -> Unit,
     onDragStart: () -> Unit,
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
@@ -210,7 +212,8 @@ fun RemindersScreen(
                             isElevated = isDragging,
                             reminderViewData = reminder,
                             onDeleteClick = { onDeleteReminder(reminder) },
-                            onEditClick = { onEditReminder(reminder.id) }
+                            onEditClick = { onEditReminder(reminder.id) },
+                            onDuplicateClick = { onDuplicateReminder(reminder) }
                         )
                     }
                 }
@@ -245,6 +248,7 @@ private fun RemindersScreenPreview() {
                 lazyListState = LazyListState(),
                 onHideAddReminderDialog = {},
                 onDeleteReminder = {},
+                onDuplicateReminder = {},
                 onDragStart = {},
                 onDragSwap = { _, _ -> },
                 onDragEnd = {},

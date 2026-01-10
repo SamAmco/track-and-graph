@@ -54,6 +54,10 @@ internal class ReminderHelperImpl @Inject constructor(
         dao.deleteReminder(id)
     }
 
+    override suspend fun duplicateReminder(reminder: Reminder): Long = withContext(io) {
+        insertReminder(reminder.copy(id = 0L))
+    }
+
     override suspend fun hasAnyReminders(): Boolean = withContext(io) {
         dao.hasAnyReminders()
     }
