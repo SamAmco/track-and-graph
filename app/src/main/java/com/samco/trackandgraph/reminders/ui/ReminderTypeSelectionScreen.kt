@@ -17,37 +17,22 @@
 
 package com.samco.trackandgraph.reminders.ui
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.data.database.dto.CheckedDays
-import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
-import com.samco.trackandgraph.data.database.dto.MonthDayType
-import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import org.threeten.bp.LocalDateTime
+import com.samco.trackandgraph.ui.compose.ui.HeroCardButton
+import com.samco.trackandgraph.ui.compose.ui.cardElevation
 
 @Composable
 fun ReminderTypeSelectionScreen(
@@ -57,103 +42,51 @@ fun ReminderTypeSelectionScreen(
     onTimeSinceLastReminderSelected: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier.padding(horizontal = cardElevation),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Text(
-            text = "Select Reminder Type",
+            text = "Select a Reminder Type",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.tngColors.onSurface
         )
 
         DialogInputSpacing()
 
-        ReminderTypeButton(
+        HeroCardButton(
             modifier = Modifier.fillMaxWidth(),
-            text = "Week Day Reminder",
+            title = "Week Day Reminder",
+            description = "Set reminders for specific days of the week, e.g. every Monday, Wednesday, and Friday.",
             onClick = onWeekDayReminderSelected
-        ) {
-            Reminder(
-                reminderViewData = ReminderViewData.WeekDayReminderViewData(
-                    id = 1L,
-                    displayIndex = 0,
-                    name = "Reminder",
-                    nextScheduled = LocalDateTime.of(2025, 12, 20, 7, 30),
-                    checkedDays = CheckedDays(
-                        monday = true,
-                        tuesday = true,
-                        wednesday = true,
-                        thursday = true,
-                        friday = true,
-                        saturday = false,
-                        sunday = false
-                    ),
-                    reminderDto = null,
-                )
-            )
-        }
+        )
 
         DialogInputSpacing()
 
-        ReminderTypeButton(
+        HeroCardButton(
             modifier = Modifier.fillMaxWidth(),
-            text = "Periodic Reminder",
+            title = "Periodic Reminder",
+            description = "Repeat at regular intervals, e.g. every 3 days or every 2 weeks.",
             onClick = onPeriodicReminderSelected
-        ) {
-            Reminder(
-                reminderViewData = ReminderViewData.PeriodicReminderViewData(
-                    id = 2L,
-                    displayIndex = 0,
-                    name = "Daily Reminder",
-                    nextScheduled = LocalDateTime.of(2025, 12, 21, 10, 0),
-                    starts = LocalDateTime.of(2025, 12, 20, 10, 0),
-                    ends = null,
-                    interval = 1,
-                    period = Period.DAYS,
-                    reminderDto = null,
-                    progressToNextReminder = 0.4f,
-                    isBeforeStartTime = false,
-                )
-            )
-        }
+        )
 
         DialogInputSpacing()
 
-        ReminderTypeButton(
+        HeroCardButton(
             modifier = Modifier.fillMaxWidth(),
-            text = "Month Day Reminder",
+            title = "Month Day Reminder",
+            description = "Set reminders for specific days of the month, e.g. the first Monday or the last day.",
             onClick = onMonthDayReminderSelected
-        ) {
-            Reminder(
-                reminderViewData = ReminderViewData.MonthDayReminderViewData(
-                    id = 3L,
-                    displayIndex = 0,
-                    name = "Monthly Report",
-                    nextScheduled = LocalDateTime.of(2025, 1, 6, 9, 0),
-                    occurrence = MonthDayOccurrence.FIRST,
-                    dayType = MonthDayType.MONDAY,
-                    ends = null,
-                    reminderDto = null,
-                )
-            )
-        }
+        )
 
         DialogInputSpacing()
 
-        ReminderTypeButton(
+        HeroCardButton(
             modifier = Modifier.fillMaxWidth(),
-            text = "Time Since Last Reminder",
+            title = "Time Since Last Reminder",
+            description = "Get reminded when you haven't tracked for a period of time.",
             onClick = onTimeSinceLastReminderSelected
-        ) {
-            Reminder(
-                reminderViewData = ReminderViewData.TimeSinceLastReminderViewData(
-                    id = 4L,
-                    displayIndex = 0,
-                    name = "Data Entry Reminder",
-                    nextScheduled = LocalDateTime.of(2025, 12, 22, 14, 0),
-                    progressToNextReminder = 0.7f,
-                    reminderDto = null,
-                )
-            )
-        }
+        )
 
         DialogInputSpacing()
 
@@ -163,94 +96,6 @@ fun ReminderTypeSelectionScreen(
             cancelText = R.string.cancel,
             onCancel = onDismiss
         )
-    }
-}
-
-fun Modifier.layoutScaled(
-    scale: Float,
-    measuredWidth: Dp? = null,
-    measuredHeight: Dp? = null
-) = this.then(
-    Modifier.layout { measurable, parentConstraints ->
-
-        val measuredWidthPx = measuredWidth?.roundToPx()
-        val measuredHeightPx = measuredHeight?.roundToPx()
-
-        // Measure “normally”, but with optional fixed width/height.
-        val measureConstraints = Constraints(
-            minWidth = measuredWidthPx ?: parentConstraints.minWidth,
-            maxWidth = measuredWidthPx ?: parentConstraints.maxWidth,
-            minHeight = measuredHeightPx ?: parentConstraints.minHeight,
-            maxHeight = measuredHeightPx ?: parentConstraints.maxHeight,
-        )
-
-        val placeable = measurable.measure(measureConstraints)
-
-        // CEIL instead of floor to avoid clipping at small scales
-        val scaledWidth = (placeable.width * scale).toInt()
-        val scaledHeight = (placeable.height * scale).toInt()
-
-        // Optional: 1px guard against AA/stroke rounding
-        val finalWidth = scaledWidth.coerceAtMost(parentConstraints.maxWidth)
-        val finalHeight = scaledHeight.coerceAtMost(parentConstraints.maxHeight)
-
-        layout(finalWidth, finalHeight) {
-            placeable.placeWithLayer(0, 0) {
-                scaleX = scale
-                scaleY = scale
-                transformOrigin = TransformOrigin(0f, 0f)
-            }
-        }
-    }
-)
-
-private const val PREVIEW_SCALE = 0.6f
-private val PREVIEW_MEASURED_WIDTH = 220.dp
-
-@Composable
-fun ReminderTypeButton(
-    modifier: Modifier = Modifier,
-    text: String,
-    onClick: () -> Unit,
-    preview: @Composable () -> Unit
-) {
-    Surface(
-        modifier = modifier,
-        onClick = onClick,
-        shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.tngColors.outline
-        ),
-        color = MaterialTheme.tngColors.surface
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(cardPadding),
-            horizontalArrangement = Arrangement.spacedBy(halfDialogInputSpacing),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Scaled down preview
-            Column(
-                modifier = Modifier
-                    .layoutScaled(
-                        scale = PREVIEW_SCALE,
-                        measuredWidth = PREVIEW_MEASURED_WIDTH,
-                    )
-            ) {
-                preview()
-            }
-            
-            // Text label
-            Text(
-                modifier = modifier.weight(1f),
-                text = text,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.tngColors.onSurface
-            )
-        }
     }
 }
 

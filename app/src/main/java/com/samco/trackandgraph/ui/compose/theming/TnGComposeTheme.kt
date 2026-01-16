@@ -61,6 +61,7 @@ val black = Color(0xFF000000)
 data class TngColors(
     val colorScheme: ColorScheme,
     val selectorButtonColor: Color,
+    val heroCardButtonBackgroundColor: Color,
     val textColorSecondary: Color,
     val toolbarBackgroundColor: Color,
     val hyperlinkColor: Color,
@@ -199,6 +200,7 @@ val DarkColorScheme = darkColorScheme(
 private val LightTngColors = TngColors(
     colorScheme = LightColorScheme,
     selectorButtonColor = lightGray,
+    heroCardButtonBackgroundColor = chalkyWhite,
     textColorSecondary = darkGray,
     toolbarBackgroundColor = blueWhitePastel,
     hyperlinkColor = darkBlue, // Using dark_blue from colorSecondaryVariant
@@ -207,7 +209,8 @@ private val LightTngColors = TngColors(
 private val DarkTngColors = TngColors(
     colorScheme = DarkColorScheme,
     selectorButtonColor = darkGray,
-    textColorSecondary = lightGray,
+    heroCardButtonBackgroundColor = darkCharcoal,
+    textColorSecondary = midGray,
     toolbarBackgroundColor = midCharcoal,
     hyperlinkColor = fadedDarkBlue, // Using faded_dark_blue from colorSecondaryVariant
 )

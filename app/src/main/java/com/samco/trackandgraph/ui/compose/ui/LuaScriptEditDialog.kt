@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import kotlin.math.log10
@@ -154,11 +155,13 @@ private fun getLinesText(numLines: Int): String {
 
 @Preview(showBackground = true)
 @Composable
-private fun LuaScriptEditDialogPreview() = LuaScriptEditDialog(
-    script = TextFieldValue(exampleScript),
-    onDismiss = {},
-    onValueChanged = {}
-)
+private fun LuaScriptEditDialogPreview() = TnGComposeTheme(darkTheme = true) {
+    LuaScriptEditDialog(
+        script = TextFieldValue(exampleScript),
+        onDismiss = {},
+        onValueChanged = {}
+    )
+}
 
 private val exampleScript = """
 --- A Lua script
