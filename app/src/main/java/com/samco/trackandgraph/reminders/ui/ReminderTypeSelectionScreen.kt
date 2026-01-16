@@ -40,7 +40,8 @@ fun ReminderTypeSelectionScreen(
     onPeriodicReminderSelected: () -> Unit,
     onMonthDayReminderSelected: () -> Unit,
     onTimeSinceLastReminderSelected: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    hasAnyFeatures: Boolean = false
 ) {
     Column(
         modifier = Modifier.padding(horizontal = cardElevation),
@@ -79,14 +80,16 @@ fun ReminderTypeSelectionScreen(
             onClick = onMonthDayReminderSelected
         )
 
-        DialogInputSpacing()
+        if (hasAnyFeatures) {
+            DialogInputSpacing()
 
-        HeroCardButton(
-            modifier = Modifier.fillMaxWidth(),
-            title = "Time Since Last Reminder",
-            description = "Get reminded when you haven't tracked for a period of time.",
-            onClick = onTimeSinceLastReminderSelected
-        )
+            HeroCardButton(
+                modifier = Modifier.fillMaxWidth(),
+                title = "Time Since Last Reminder",
+                description = "Get reminded when you haven't tracked for a period of time.",
+                onClick = onTimeSinceLastReminderSelected
+            )
+        }
 
         DialogInputSpacing()
 

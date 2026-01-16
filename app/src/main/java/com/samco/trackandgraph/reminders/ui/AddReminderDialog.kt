@@ -50,12 +50,14 @@ fun AddReminderDialog(
 
     val editingReminder = viewModel.editingReminder.collectAsStateWithLifecycle().value
     val editMode = viewModel.editMode.collectAsStateWithLifecycle().value
+    val hasAnyFeatures = viewModel.hasAnyFeatures.collectAsStateWithLifecycle().value
 
     AddReminderDialog(
         onConfirm = viewModel::upsertReminder,
         onDismiss = onDismiss,
         editMode = editMode,
-        editingReminder = editingReminder
+        editingReminder = editingReminder,
+        hasAnyFeatures = hasAnyFeatures
     )
 }
 
@@ -65,6 +67,7 @@ private fun AddReminderDialog(
     onDismiss: () -> Unit,
     editMode: Boolean,
     editingReminder: Reminder? = null,
+    hasAnyFeatures: Boolean = false,
 ) {
     var onCleanup by remember { mutableStateOf<() -> Unit>({}) }
 
@@ -119,7 +122,8 @@ private fun AddReminderDialog(
             AddReminderDialogContent(
                 onConfirm = onConfirm,
                 onDismiss = wrappedDismiss,
-                onSetCleanup = { onCleanup = it }
+                onSetCleanup = { onCleanup = it },
+                hasAnyFeatures = hasAnyFeatures
             )
         }
     }
