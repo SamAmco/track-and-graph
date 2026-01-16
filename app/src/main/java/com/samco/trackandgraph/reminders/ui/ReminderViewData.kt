@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.database.dto.ReminderParams
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneId
 
 /**
  * Sealed class for view data with 1-to-1 mapping to ReminderParams
@@ -89,6 +90,8 @@ sealed class ReminderViewData {
         override val nextScheduled: LocalDateTime?,
         override val reminderDto: Reminder?,
         val progressToNextReminder: Float,
+        val currentInterval: Int?,
+        val currentPeriod: Period?,
     ) : ReminderViewData()
 
     companion object {
@@ -160,6 +163,12 @@ sealed class ReminderViewData {
                         firstInterval = params.firstInterval
                     )
 
+                    val currentIntervalPair = calculateCurrentInterval(
+                        nextScheduled = nextScheduled,
+                        lastTrackedInstant = lastTrackedInstant,
+                        params = params
+                    )
+
                     TimeSinceLastReminderViewData(
                         id = reminder.id,
                         displayIndex = reminder.displayIndex,
@@ -167,6 +176,8 @@ sealed class ReminderViewData {
                         nextScheduled = nextScheduled,
                         reminderDto = reminder,
                         progressToNextReminder = progress,
+                        currentInterval = currentIntervalPair?.interval,
+                        currentPeriod = currentIntervalPair?.period,
                     )
                 }
             }
@@ -229,6 +240,56 @@ sealed class ReminderViewData {
                 .coerceAtLeast(0.0)
                 .coerceAtMost(1.0)
                 .toFloat()
+        }
+
+        /**
+         * Determine which interval is currently active for a time-since-last reminder.
+         * Returns the first interval if we're waiting for the initial reminder,
+         * or the second interval if we've moved to recurring reminders.
+         * Returns null if there's no next scheduled reminder or we can't determine the interval.
+         */
+        private fun calculateCurrentInterval(
+            nextScheduled: LocalDateTime?,
+            lastTrackedInstant: Instant?,
+            params: ReminderParams.TimeSinceLastParams
+        ): IntervalPeriodPair? {
+            // Can't determine current interval without a next scheduled time or last tracked time
+            if (nextScheduled == null) return null
+            val lastTracked = lastTrackedInstant ?: return null
+
+            // Calculate when the first reminder would fire (lastTracked + firstInterval)
+            val firstReminderTime = addIntervalToInstant(
+                instant = lastTracked,
+                intervalPeriod = params.firstInterval,
+                zone = ZoneId.systemDefault()
+            )
+
+            val nextScheduledInstant = nextScheduled.atZone(ZoneId.systemDefault()).toInstant()
+
+            // If nextScheduled is at or before firstReminderTime, we're on the first interval.
+            // Otherwise we're past the first reminder and using the second interval.
+            return if (!nextScheduledInstant.isAfter(firstReminderTime)) {
+                params.firstInterval
+            } else {
+                params.secondInterval
+            }
+        }
+
+        private fun addIntervalToInstant(
+            instant: Instant,
+            intervalPeriod: IntervalPeriodPair,
+            zone: ZoneId
+        ): Instant {
+            val zonedDateTime = instant.atZone(zone)
+            val result = when (intervalPeriod.period) {
+                Period.MINUTES -> zonedDateTime.plusMinutes(intervalPeriod.interval.toLong())
+                Period.HOURS -> zonedDateTime.plusHours(intervalPeriod.interval.toLong())
+                Period.DAYS -> zonedDateTime.plusDays(intervalPeriod.interval.toLong())
+                Period.WEEKS -> zonedDateTime.plusWeeks(intervalPeriod.interval.toLong())
+                Period.MONTHS -> zonedDateTime.plusMonths(intervalPeriod.interval.toLong())
+                Period.YEARS -> zonedDateTime.plusYears(intervalPeriod.interval.toLong())
+            }
+            return result.toInstant()
         }
 
     }
