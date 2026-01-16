@@ -49,6 +49,7 @@ fun AddReminderDialogContent(
     onConfirm: (Reminder) -> Unit,
     onDismiss: () -> Unit,
     onSetCleanup: (() -> Unit) -> Unit = {},
+    hasAnyFeatures: Boolean = false,
 ) {
     val navBackStack = rememberNavBackStack(ReminderDialogNavKey.ReminderTypeSelection)
 
@@ -75,7 +76,8 @@ fun AddReminderDialogContent(
                         onTimeSinceLastReminderSelected = {
                             navBackStack.add(ReminderDialogNavKey.TimeSinceLastReminderConfiguration)
                         },
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        hasAnyFeatures = hasAnyFeatures
                     )
                 }
                 is ReminderDialogNavKey.WeekDayReminderConfiguration -> NavEntry(navKey) {

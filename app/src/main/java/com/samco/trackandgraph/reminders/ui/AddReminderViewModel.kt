@@ -46,6 +46,7 @@ interface AddReminderViewModel {
     val loading: StateFlow<Boolean>
     val editMode: StateFlow<Boolean>
     val editingReminder: StateFlow<Reminder?>
+    val hasAnyFeatures: StateFlow<Boolean>
     val onComplete: ReceiveChannel<Unit>
 
     fun upsertReminder(reminder: Reminder)
@@ -64,13 +65,22 @@ class AddReminderViewModelImpl @Inject constructor(
 
     private var currentLoadingJob: Job? = null
     private val _editingReminder = MutableStateFlow<Reminder?>(null)
-    
+
     override val editingReminder: StateFlow<Reminder?> = _editingReminder.asStateFlow()
     override val editMode: StateFlow<Boolean> = _editingReminder
         .map { it != null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    private val _hasAnyFeatures = MutableStateFlow(false)
+    override val hasAnyFeatures: StateFlow<Boolean> = _hasAnyFeatures.asStateFlow()
+
     override val onComplete: Channel<Unit> = Channel()
+
+    init {
+        viewModelScope.launch(io) {
+            _hasAnyFeatures.value = dataInteractor.hasAnyFeatures()
+        }
+    }
 
     override fun loadStateForReminder(editReminderId: Long?) {
         currentLoadingJob?.cancel()
