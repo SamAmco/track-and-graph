@@ -32,9 +32,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Surface
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -138,17 +137,18 @@ fun Tracker(
         }
     }
 
-    Card(
+    Surface(
         modifier = Modifier
             .testTag("trackerCard")
             .fillMaxWidth()
-            .padding(cardMarginSmall)
-            .clickable { onHistory(tracker) },
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            .padding(cardMarginSmall),
+        shadowElevation = if (isElevated) cardElevation * 3 else cardElevation,
+        color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.medium,
     ) {
-        BoxWithConstraints {
+        BoxWithConstraints(
+            modifier = Modifier.clickable { onHistory(tracker) }
+        ) {
             // Calculate ripple radius to fill entire card
             val rippleRadius = remember(maxWidth, maxHeight) {
                 with(density) {
