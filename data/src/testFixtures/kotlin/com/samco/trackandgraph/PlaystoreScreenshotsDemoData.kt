@@ -31,9 +31,13 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
+import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
+import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
+import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
+import com.samco.trackandgraph.data.database.dto.Period as ReminderPeriod
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
@@ -42,6 +46,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import kotlinx.serialization.json.Json
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
@@ -52,40 +57,20 @@ private val json = Json { ignoreUnknownKeys = true }
 suspend fun createScreenshotsGroup(dataInteractor: DataInteractor) {
     val outerGroupId = dataInteractor.insertGroup(createGroup("Screenshots"))
     createGroupListForScreenshots(dataInteractor, outerGroupId)
-    createDailyGroup(dataInteractor, outerGroupId)
+    val exerciseFeatureId = createDailyGroup(dataInteractor, outerGroupId)
     createExerciseGroup(dataInteractor, outerGroupId)
     createRestDaysGroup(dataInteractor, outerGroupId)
     createFunctionsGroup(dataInteractor, outerGroupId)
-    createReminders(dataInteractor)
+    createReminders(dataInteractor, exerciseFeatureId)
 }
 
-private suspend fun createReminders(dataInteractor: DataInteractor) {
+private suspend fun createReminders(dataInteractor: DataInteractor, exerciseFeatureId: Long) {
+    // Week Day Reminder
     dataInteractor.insertReminder(
         Reminder(
-            1L,
-            0,
-            "Weight",
-            groupId = null,
-            featureId = null,
-            params = ReminderParams.WeekDayParams(
-                time = LocalTime.of(17, 0),
-                checkedDays = CheckedDays(
-                    monday = false,
-                    tuesday = false,
-                    wednesday = true,
-                    thursday = false,
-                    friday = false,
-                    saturday = false,
-                    sunday = true
-                )
-            )
-        )
-    )
-    dataInteractor.insertReminder(
-        Reminder(
-            2L,
-            1,
-            "Tracking dailies",
+            id = 1L,
+            displayIndex = 0,
+            reminderName = "Tracking dailies",
             groupId = null,
             featureId = null,
             params = ReminderParams.WeekDayParams(
@@ -98,6 +83,61 @@ private suspend fun createReminders(dataInteractor: DataInteractor) {
                     friday = true,
                     saturday = true,
                     sunday = true
+                )
+            )
+        )
+    )
+
+    // Periodic Reminder
+    dataInteractor.insertReminder(
+        Reminder(
+            id = 2L,
+            displayIndex = 1,
+            reminderName = "Weekly review",
+            groupId = null,
+            featureId = null,
+            params = ReminderParams.PeriodicParams(
+                starts = LocalDateTime.now().withHour(10).withMinute(0),
+                ends = null,
+                interval = 1,
+                period = ReminderPeriod.WEEKS
+            )
+        )
+    )
+
+    // Month Day Reminder
+    dataInteractor.insertReminder(
+        Reminder(
+            id = 3L,
+            displayIndex = 2,
+            reminderName = "Monthly goals",
+            groupId = null,
+            featureId = null,
+            params = ReminderParams.MonthDayParams(
+                time = LocalTime.of(9, 0),
+                occurrence = MonthDayOccurrence.FIRST,
+                dayType = MonthDayType.MONDAY,
+                ends = null
+            )
+        )
+    )
+
+    // Time Since Last Reminder
+    dataInteractor.insertReminder(
+        Reminder(
+            id = 4L,
+            displayIndex = 3,
+            reminderName = "2 days without Exercise",
+            groupId = null,
+            featureId = exerciseFeatureId,
+            params = ReminderParams.TimeSinceLastParams(
+                firstInterval = IntervalPeriodPair(
+                    interval = 2,
+                    period = ReminderPeriod.DAYS
+                ),
+                secondInterval = IntervalPeriodPair(
+                    interval = 1,
+                    period = ReminderPeriod.DAYS
                 )
             )
         )
@@ -468,18 +508,18 @@ private suspend fun createExerciseGraph1(
     dataInteractor.insertLineGraph(graphStat, lineGraph)
 }
 
-private suspend fun createDailyGroup(dataInteractor: DataInteractor, parent: Long) {
-    dataInteractor.insertGroup(createGroup("Daily", parentGroupId = parent)).let {
-        createSleepTracker(dataInteractor, it)
-        createProductivityTracker(dataInteractor, it)
-        createAlcoholTracker(dataInteractor, it)
-        createMeditationTracker(dataInteractor, it)
-        createWorkTracker(dataInteractor, it)
-        createWeightTracker(dataInteractor, it)
-        createExerciseTracker(dataInteractor, it)
-        createStudyingTracker(dataInteractor, it)
-        createStressTracker(dataInteractor, it)
-    }
+private suspend fun createDailyGroup(dataInteractor: DataInteractor, parent: Long): Long {
+    val dailyGroupId = dataInteractor.insertGroup(createGroup("Daily", parentGroupId = parent))
+    createSleepTracker(dataInteractor, dailyGroupId)
+    createProductivityTracker(dataInteractor, dailyGroupId)
+    createAlcoholTracker(dataInteractor, dailyGroupId)
+    createMeditationTracker(dataInteractor, dailyGroupId)
+    createWorkTracker(dataInteractor, dailyGroupId)
+    createWeightTracker(dataInteractor, dailyGroupId)
+    val exerciseFeatureId = createExerciseTracker(dataInteractor, dailyGroupId)
+    createStudyingTracker(dataInteractor, dailyGroupId)
+    createStressTracker(dataInteractor, dailyGroupId)
+    return exerciseFeatureId
 }
 
 private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGroupId: Long) {
@@ -532,7 +572,7 @@ private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyG
     )
 }
 
-private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyGroupId: Long) {
+private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
     val exerciseTracker = dataInteractor.insertTracker(
         createTracker(
             name = "Exercise",
@@ -555,6 +595,8 @@ private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyG
         spacingRandomisationHours = 4,
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
+
+    return dataInteractor.getTrackerById(exerciseTracker)!!.featureId
 }
 
 private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGroupId: Long) {
