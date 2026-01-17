@@ -520,4 +520,82 @@ class BarChartDataFactoryTest {
         type = GraphStatType.BAR_CHART,
         displayIndex = 1
     )
+
+    @Test
+    fun `test monthly bar chart with data points at end of each month`() {
+        //PREPARE
+        // Create data points at the last second of each month for a year (2024 is a leap year)
+        // Going from December 2023 to November 2024 (12 months)
+        val dataPoints = listOf(
+            dp(ZonedDateTime.of(2024, 11, 30, 23, 59, 59, 0, ZoneId.of("UTC"))), // Nov 2024
+            dp(ZonedDateTime.of(2024, 10, 31, 23, 59, 59, 0, ZoneId.of("UTC"))), // Oct 2024
+            dp(ZonedDateTime.of(2024, 9, 30, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Sep 2024
+            dp(ZonedDateTime.of(2024, 8, 31, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Aug 2024
+            dp(ZonedDateTime.of(2024, 7, 31, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Jul 2024
+            dp(ZonedDateTime.of(2024, 6, 30, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Jun 2024
+            dp(ZonedDateTime.of(2024, 5, 31, 23, 59, 59, 0, ZoneId.of("UTC"))),  // May 2024
+            dp(ZonedDateTime.of(2024, 4, 30, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Apr 2024
+            dp(ZonedDateTime.of(2024, 3, 31, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Mar 2024
+            dp(ZonedDateTime.of(2024, 2, 29, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Feb 2024 (leap year)
+            dp(ZonedDateTime.of(2024, 1, 31, 23, 59, 59, 0, ZoneId.of("UTC"))),  // Jan 2024
+            dp(ZonedDateTime.of(2023, 12, 31, 23, 59, 59, 0, ZoneId.of("UTC"))), // Dec 2023
+        )
+
+        val timeHelper = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay: Duration = Duration.ZERO
+            },
+            ZoneId.of("UTC")
+        )
+
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence()) {}
+
+        //EXECUTE
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = timeHelper,
+            dataSample = dataSample,
+            endTime = null,
+            barSize = BarChartBarPeriod.MONTH,
+            sampleSize = null,
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
+        )
+
+        //VERIFY
+        // We should have 12 bars, one for each month
+        // If the bug exists, some months will be merged because bar boundaries
+        // are calculated incorrectly using end-period instead of beginning-of-period
+        val values = barData.segmentSeries[0].segmentSeries.getyVals()
+
+        // Build a description of what we got for the error message
+        val barSummary = barData.dates.mapIndexed { i, date ->
+            "${date.month} ${date.year}: ${values[i]}"
+        }.joinToString(", ")
+
+        assertEquals(
+            "Expected 12 bars (one per month), but got ${barData.dates.size}. " +
+                "Bars: [$barSummary]. " +
+                "This bug occurs because bar boundaries are calculated using " +
+                "currentBarEndTime.minus(period) instead of finding the actual " +
+                "beginning of the period.",
+            12,
+            barData.dates.size
+        )
+
+        assertEquals(12, values.size)
+
+        // All values should be 1.0 - if the bug exists, some months will have 0.0
+        // and others will have 2.0 because data points jumped to wrong months
+        values.forEachIndexed { index, value ->
+            assertEquals(
+                "Bar at index $index (date: ${barData.dates[index]}) should have value 1.0",
+                1.0,
+                value.toDouble(),
+                0.0001
+            )
+        }
+    }
 }
