@@ -1,16 +1,16 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
@@ -47,23 +48,22 @@ fun GraphStatCardView(
         .padding(cardMarginSmall)
         .fillMaxWidth()
 ) {
-    Card(
+    Surface(
         modifier = modifier
             .testTag("graphStatCard")
-            .fillMaxWidth()
-            .let {
-                if (clickListener != null) {
-                    it.clickable { clickListener.onClick(graphStatViewData) }
-                } else it
-            },
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3f else cardElevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            .fillMaxWidth(),
+        shadowElevation = if (isElevated) cardElevation * 3f else cardElevation,
+        color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.medium
     ) {
         Box(
             modifier = Modifier
-                .padding(cardPadding)
                 .fillMaxWidth()
+                .let {
+                    if (clickListener != null) {
+                        it.clickable { clickListener.onClick(graphStatViewData) }
+                    } else it
+                }
         ) {
             if (clickListener != null) {
                 MenuSection(
@@ -73,7 +73,13 @@ fun GraphStatCardView(
                 )
             }
 
-            ListItemGraphStatView(graphStatViewData = graphStatViewData)
+            Box(
+                modifier = Modifier
+                    .padding(cardPadding)
+                    .fillMaxWidth()
+            ) {
+                ListItemGraphStatView(graphStatViewData = graphStatViewData)
+            }
         }
     }
 }
@@ -83,19 +89,19 @@ private fun MenuSection(
     modifier: Modifier = Modifier,
     clickListener: GraphStatClickListener,
     graphStatViewData: IGraphStatViewData
-) = Box(modifier = modifier) {
+) = Box(modifier = modifier.size(buttonSize)) {
 
     var expanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
 
-    Icon(
-        modifier = modifier.clickable(
-            interactionSource = interactionSource,
-            indication = null
-        ) { expanded = true },
-        painter = painterResource(id = R.drawable.list_menu_icon),
-        contentDescription = null
-    )
+    IconButton(
+        modifier = Modifier.size(buttonSize),
+        onClick = { expanded = true }
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.list_menu_icon),
+            contentDescription = null
+        )
+    }
 
     DropdownMenu(
         expanded = expanded,

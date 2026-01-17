@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Surface
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -95,20 +96,20 @@ fun Function(
     }
     val peekDistance = fontSizeDp + (dialogInputSpacing * 1.15f)
 
-    Card(
+    Surface(
         modifier = Modifier
             .testTag("functionCard")
             .fillMaxWidth()
-            .padding(cardMarginSmall)
-            .clickable { onClick(displayFunction) },
+            .padding(cardMarginSmall),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
+        color = MaterialTheme.colorScheme.secondary,
+        shadowElevation = if (isElevated) cardElevation * 3 else cardElevation,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = minTrackerCardHeight)
+                .clickable { onClick(displayFunction) }
         ) {
             Card(
                 modifier = Modifier

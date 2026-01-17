@@ -24,9 +24,8 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Surface
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,20 +74,20 @@ fun Group(
 ) = Box(modifier = modifier.fillMaxWidth()) {
     var showContextMenu by remember { mutableStateOf(false) }
 
-    Card(
+    Surface(
         modifier = Modifier
             .testTag("groupCard")
             .fillMaxWidth()
-            .padding(cardMarginSmall)
-            .clickable { onClick(group) },
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            .padding(cardMarginSmall),
+        shadowElevation = if (isElevated) cardElevation * 3 else cardElevation,
+        color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.medium,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = minHeight)
+                .clickable { onClick(group) }
         ) {
             // Corner decoration image
             Image(
