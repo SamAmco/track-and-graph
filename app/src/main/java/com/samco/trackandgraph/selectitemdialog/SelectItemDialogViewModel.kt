@@ -253,7 +253,7 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             name = if (groupGraph.group.parentGroupId == null) "/" else groupGraph.group.name,
             colorIndex = groupGraph.group.colorIndex,
             expanded = mutableStateOf(groupGraph.group.parentGroupId == null),
-            children = children.sortedBy { it.name },
+            children = children.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }),
         )
 
         // If groups are not selectable, only include this group if it has selectable descendants
