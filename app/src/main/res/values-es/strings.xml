@@ -424,4 +424,46 @@
     <string name="missed_reminders_multiple_content">Perdiste %1$d recordatorios</string>
     <string name="next_reminder_format">Próximo Recordatorio: %1$s</string>
     <string name="no_upcoming_reminders">No Hay Recordatorios Próximos</string>
+
+    <!-- Reminder type selection -->
+    <string name="select_reminder_type">Seleccionar tipo de recordatorio</string>
+    <string name="week_day_reminder">Recordatorio semanal</string>
+    <string name="week_day_reminder_description">Días específicos como lunes, miércoles, viernes</string>
+    <string name="periodic_reminder">Recordatorio periódico</string>
+    <string name="periodic_reminder_description">Intervalos regulares como cada 3 días</string>
+    <string name="month_day_reminder">Recordatorio mensual</string>
+    <string name="month_day_reminder_description">Patrones mensuales como el primer lunes</string>
+    <string name="time_since_last_reminder">Tiempo desde el último registro</string>
+    <string name="time_since_last_reminder_description">Cuando no has registrado algo por un tiempo</string>
+
+    <!-- Reminder configuration -->
+    <string name="reminder_name">Nombre del recordatorio</string>
+    <string name="repeat_every">Repetir cada</string>
+    <string name="at_time">A las</string>
+    <string name="ending_at">Termina el</string>
+    <string name="starting_from">Comenzando desde</string>
+    <string name="repeat_on_week_days">Repetir en días de la semana</string>
+    <string name="track_feature">Seleccionar tracker</string>
+    <string name="select_tracker_placeholder">Seleccionar un tracker</string>
+    <string name="remind_after">Recordar después de</string>
+    <string name="then_remind_every">Luego recordar cada</string>
+    <string name="every_colon">Cada:</string>
+    <string name="ended_at_format">Terminó el: %1$s</string>
+    <string name="starting_at_format">Comienza el: %1$s</string>
+
+    <!-- Month day occurrence -->
+    <string name="occurrence_first">Primer</string>
+    <string name="occurrence_second">Segundo</string>
+    <string name="occurrence_third">Tercer</string>
+    <string name="occurrence_fourth">Cuarto</string>
+    <string name="occurrence_last">Último</string>
+
+    <!-- Full day names -->
+    <string name="monday">Lunes</string>
+    <string name="tuesday">Martes</string>
+    <string name="wednesday">Miércoles</string>
+    <string name="thursday">Jueves</string>
+    <string name="friday">Viernes</string>
+    <string name="saturday">Sábado</string>
+    <string name="sunday">Domingo</string>
 </resources>

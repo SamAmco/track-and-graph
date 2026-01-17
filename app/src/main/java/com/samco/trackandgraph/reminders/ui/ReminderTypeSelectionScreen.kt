@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -41,14 +42,14 @@ fun ReminderTypeSelectionScreen(
     onMonthDayReminderSelected: () -> Unit,
     onTimeSinceLastReminderSelected: () -> Unit,
     onDismiss: () -> Unit,
-    hasAnyFeatures: Boolean = false
+    hasAnyFeatures: Boolean = true
 ) {
     Column(
         modifier = Modifier.padding(horizontal = cardElevation),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Select a Reminder Type",
+            text = stringResource(R.string.select_reminder_type),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -57,8 +58,8 @@ fun ReminderTypeSelectionScreen(
 
         HeroCardButton(
             modifier = Modifier.fillMaxWidth(),
-            title = "Week Day Reminder",
-            description = "Set reminders for specific days of the week, e.g. every Monday, Wednesday, and Friday.",
+            title = stringResource(R.string.week_day_reminder),
+            description = stringResource(R.string.week_day_reminder_description),
             onClick = onWeekDayReminderSelected
         )
 
@@ -66,8 +67,8 @@ fun ReminderTypeSelectionScreen(
 
         HeroCardButton(
             modifier = Modifier.fillMaxWidth(),
-            title = "Periodic Reminder",
-            description = "Repeat at regular intervals, e.g. every 3 days or every 2 weeks.",
+            title = stringResource(R.string.periodic_reminder),
+            description = stringResource(R.string.periodic_reminder_description),
             onClick = onPeriodicReminderSelected
         )
 
@@ -75,8 +76,8 @@ fun ReminderTypeSelectionScreen(
 
         HeroCardButton(
             modifier = Modifier.fillMaxWidth(),
-            title = "Month Day Reminder",
-            description = "Set reminders for specific days of the month, e.g. the first Monday or the last day.",
+            title = stringResource(R.string.month_day_reminder),
+            description = stringResource(R.string.month_day_reminder_description),
             onClick = onMonthDayReminderSelected
         )
 
@@ -85,8 +86,8 @@ fun ReminderTypeSelectionScreen(
 
             HeroCardButton(
                 modifier = Modifier.fillMaxWidth(),
-                title = "Time Since Last Reminder",
-                description = "Get reminded when you haven't tracked for a period of time.",
+                title = stringResource(R.string.time_since_last_reminder),
+                description = stringResource(R.string.time_since_last_reminder_description),
                 onClick = onTimeSinceLastReminderSelected
             )
         }

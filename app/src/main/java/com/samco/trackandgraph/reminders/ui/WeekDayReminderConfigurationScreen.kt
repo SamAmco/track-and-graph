@@ -122,7 +122,7 @@ fun WeekDayReminderConfigurationContent(
         OutlinedTextField(
             value = reminderName,
             onValueChange = onReminderNameChanged,
-            label = { Text("Reminder Name") },
+            label = { Text(stringResource(R.string.reminder_name)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
@@ -136,7 +136,7 @@ fun WeekDayReminderConfigurationContent(
 
         // Repeat on week days section
         Text(
-            text = "Repeat On Week Days",
+            text = stringResource(R.string.repeat_on_week_days),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -154,7 +154,7 @@ fun WeekDayReminderConfigurationContent(
 
         // At time section
         Text(
-            text = "At Time",
+            text = stringResource(R.string.at_time),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )

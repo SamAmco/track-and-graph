@@ -38,14 +38,13 @@ fun formatNextScheduled(nextScheduled: LocalDateTime?): String {
     }
 }
 
-// TODO extract these strings
 @Composable
 fun formatEndedAt(endDateTime: LocalDateTime): String {
     val formatter = DateTimeFormatter
         .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
         .withLocale(Locale.getDefault())
     val dateTime = endDateTime.format(formatter)
-    return "Ended at: $dateTime"
+    return stringResource(R.string.ended_at_format, dateTime)
 }
 
 @Composable
@@ -54,5 +53,5 @@ fun formatStartingAt(startDateTime: LocalDateTime): String {
         .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
         .withLocale(Locale.getDefault())
     val dateTime = startDateTime.format(formatter)
-    return "Starting at: $dateTime"
+    return stringResource(R.string.starting_at_format, dateTime)
 }
