@@ -76,7 +76,6 @@ fun Group(
 
     Surface(
         modifier = Modifier
-            .testTag("groupCard")
             .fillMaxWidth()
             .padding(cardMarginSmall),
         shadowElevation = if (isElevated) cardElevation * 3 else cardElevation,
@@ -85,6 +84,7 @@ fun Group(
     ) {
         Box(
             modifier = Modifier
+                .testTag("groupCard")
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = minHeight)
                 .clickable { onClick(group) }

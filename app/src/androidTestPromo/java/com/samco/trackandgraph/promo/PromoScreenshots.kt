@@ -122,6 +122,11 @@ class PromoScreenshots {
         takeDeviceScreenshot("1")
         composeRule.activity.onBackPressedDispatcher.onBackPressed()
         composeRule.waitForIdle()
+        // Wait for group children to load by checking for Daily
+        composeRule.waitUntilAtLeastOneExists(hasText("Daily"))
+        composeRule.onNodeWithTag("groupGrid")
+            .performScrollToNode(hasText("Exercise").and(hasTestTag("groupCard")))
+        composeRule.waitForIdle()
         composeRule.onNode(hasText("Exercise").and(hasTestTag("groupCard"))).performClick()
         composeRule.waitForIdle()
         composeRule.waitUntilAtLeastOneExists(hasText("Exercise weekly totals in the last 6 months"))
@@ -145,18 +150,26 @@ class PromoScreenshots {
             activity.getSystemService(UiModeManager::class.java)
                 .setApplicationNightMode(UiModeManager.MODE_NIGHT_YES)
         }
+        // Give time for activity recreation and WorkManager to settle after theme change
+        Thread.sleep(1000)
         composeRule.waitForIdle()
-        composeRule.waitUntilAtLeastOneExists(hasTestTag("darkTheme"), 2000)
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("darkTheme"), 3000)
         takeDeviceScreenshot("4")
         composeRule.activityRule.scenario.onActivity { activity ->
             whenever(mockPrefHelper.getThemeValue(any())).thenReturn(AppCompatDelegate.MODE_NIGHT_NO)
             activity.getSystemService(UiModeManager::class.java)
                 .setApplicationNightMode(UiModeManager.MODE_NIGHT_NO)
         }
-        composeRule.waitUntilAtLeastOneExists(hasTestTag("lightTheme"), 2000)
+        // Give time for activity recreation after theme change
+        Thread.sleep(500)
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("lightTheme"), 3000)
         composeRule.waitForIdle()
+        // Wait for UI to fully stabilize after theme change - Sleep tracker is in Daily group
+        composeRule.waitUntilAtLeastOneExists(hasText("Sleep"), 3000)
         composeRule.activity.onBackPressedDispatcher.onBackPressed()
         composeRule.waitForIdle()
+        // Wait for Screenshots group to load after navigating back
+        composeRule.waitUntilAtLeastOneExists(hasText("Rest day statistics"), 3000)
         composeRule.onNodeWithText("Rest day statistics").performClick()
         composeRule.waitForIdle()
         composeRule.waitUntilAtLeastOneExists(hasText("Stress pie chart"))
