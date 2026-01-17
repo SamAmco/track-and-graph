@@ -144,7 +144,7 @@ fun TimeSinceLastReminderConfigurationContent(
         OutlinedTextField(
             value = reminderName,
             onValueChange = onReminderNameChanged,
-            label = { Text("Reminder Name") },
+            label = { Text(stringResource(R.string.reminder_name)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
@@ -158,7 +158,7 @@ fun TimeSinceLastReminderConfigurationContent(
 
         // Feature selection section
         Text(
-            text = "Track Feature",
+            text = stringResource(R.string.track_feature),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -167,9 +167,10 @@ fun TimeSinceLastReminderConfigurationContent(
 
         var showFeatureSelectDialog by rememberSaveable { mutableStateOf(false) }
 
+        val selectFeatureText = stringResource(R.string.select_tracker_placeholder)
         SelectorButton(
             modifier = Modifier.fillMaxWidth(),
-            text = featureName.ifEmpty { "Select a feature" },
+            text = featureName.ifEmpty { selectFeatureText },
             onClick = { showFeatureSelectDialog = true }
         )
 
@@ -193,7 +194,7 @@ fun TimeSinceLastReminderConfigurationContent(
 
         // First interval section
         Text(
-            text = "Remind After",
+            text = stringResource(R.string.remind_after),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -215,7 +216,7 @@ fun TimeSinceLastReminderConfigurationContent(
         RowCheckbox(
             checked = hasSecondInterval,
             onCheckedChange = onHasSecondIntervalChanged,
-            text = "Then Remind Every",
+            text = stringResource(R.string.then_remind_every),
             textStyle = MaterialTheme.typography.titleSmall,
         )
 

@@ -37,6 +37,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -140,7 +141,7 @@ fun MonthDayReminderConfigurationContent(
     OutlinedTextField(
         value = reminderName,
         onValueChange = onReminderNameChanged,
-        label = { Text("Reminder Name") },
+        label = { Text(stringResource(R.string.reminder_name)) },
         modifier = Modifier
             .fillMaxWidth()
             .focusRequester(focusRequester),
@@ -154,7 +155,7 @@ fun MonthDayReminderConfigurationContent(
 
     // Repeat every section
     Text(
-        text = "Repeat Every",
+        text = stringResource(R.string.repeat_every),
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.tngColors.onSurface
     )
@@ -168,11 +169,11 @@ fun MonthDayReminderConfigurationContent(
         // Occurrence selector
         TextMapSpinner(
             strings = mapOf(
-                MonthDayOccurrence.FIRST to "First",
-                MonthDayOccurrence.SECOND to "Second",
-                MonthDayOccurrence.THIRD to "Third",
-                MonthDayOccurrence.FOURTH to "Fourth",
-                MonthDayOccurrence.LAST to "Last"
+                MonthDayOccurrence.FIRST to stringResource(R.string.occurrence_first),
+                MonthDayOccurrence.SECOND to stringResource(R.string.occurrence_second),
+                MonthDayOccurrence.THIRD to stringResource(R.string.occurrence_third),
+                MonthDayOccurrence.FOURTH to stringResource(R.string.occurrence_fourth),
+                MonthDayOccurrence.LAST to stringResource(R.string.occurrence_last)
             ),
             selectedItem = occurrence,
             onItemSelected = onOccurrenceChanged,
@@ -182,14 +183,14 @@ fun MonthDayReminderConfigurationContent(
         // Day type selector
         TextMapSpinner(
             strings = mapOf(
-                MonthDayType.DAY to "Day",
-                MonthDayType.MONDAY to "Monday",
-                MonthDayType.TUESDAY to "Tuesday",
-                MonthDayType.WEDNESDAY to "Wednesday",
-                MonthDayType.THURSDAY to "Thursday",
-                MonthDayType.FRIDAY to "Friday",
-                MonthDayType.SATURDAY to "Saturday",
-                MonthDayType.SUNDAY to "Sunday"
+                MonthDayType.DAY to stringResource(R.string.day),
+                MonthDayType.MONDAY to stringResource(R.string.monday),
+                MonthDayType.TUESDAY to stringResource(R.string.tuesday),
+                MonthDayType.WEDNESDAY to stringResource(R.string.wednesday),
+                MonthDayType.THURSDAY to stringResource(R.string.thursday),
+                MonthDayType.FRIDAY to stringResource(R.string.friday),
+                MonthDayType.SATURDAY to stringResource(R.string.saturday),
+                MonthDayType.SUNDAY to stringResource(R.string.sunday)
             ),
             selectedItem = dayType,
             onItemSelected = onDayTypeChanged,
@@ -203,7 +204,7 @@ fun MonthDayReminderConfigurationContent(
 
     // At time section
     Text(
-        text = "At Time",
+        text = stringResource(R.string.at_time),
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.tngColors.onSurface
     )
@@ -222,7 +223,7 @@ fun MonthDayReminderConfigurationContent(
     RowCheckbox(
         checked = endsEnabled,
         onCheckedChange = onEndsEnabledChanged,
-        text = "Ending at",
+        text = stringResource(R.string.ending_at),
         textStyle = MaterialTheme.typography.titleSmall,
     )
 

@@ -45,10 +45,6 @@ fun HeroCardButton(
         modifier = modifier,
         onClick = onClick,
         shape = MaterialTheme.shapes.medium,
-//        border = BorderStroke(
-//            width = 1.dp,
-//            color = MaterialTheme.tngColors.outline
-//        ),
         color = backgroundColor,
         shadowElevation = cardElevation,
     ) {
@@ -76,7 +72,7 @@ fun HeroCardButton(
 @Preview(showBackground = true)
 @Composable
 private fun HeroCardButtonPreview() {
-    DialogTheme(darkTheme = true) {
+    DialogTheme(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

@@ -34,6 +34,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -130,7 +131,7 @@ private fun PeriodicReminderConfigurationContent(
         OutlinedTextField(
             value = reminderName,
             onValueChange = onReminderNameChanged,
-            label = { Text("Reminder Name") },
+            label = { Text(stringResource(R.string.reminder_name)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
@@ -144,7 +145,7 @@ private fun PeriodicReminderConfigurationContent(
 
         // Interval and Period
         Text(
-            text = "Repeat Every",
+            text = stringResource(R.string.repeat_every),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -163,7 +164,7 @@ private fun PeriodicReminderConfigurationContent(
 
         // Start date/time
         Text(
-            text = "Starting From",
+            text = stringResource(R.string.starting_from),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onSurface
         )
@@ -182,7 +183,7 @@ private fun PeriodicReminderConfigurationContent(
         RowCheckbox(
             checked = hasEndDate,
             onCheckedChange = onHasEndDateChanged,
-            text = "Ending At",
+            text = stringResource(R.string.ending_at),
             textStyle = MaterialTheme.typography.titleSmall,
         )
 

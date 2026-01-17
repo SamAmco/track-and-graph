@@ -198,6 +198,49 @@
     <string name="missed_reminders_multiple_content">You missed %1$d reminders</string>
     <string name="next_reminder_format">Next Reminder: %1$s</string>
     <string name="no_upcoming_reminders">No Upcoming Reminders</string>
+
+    <!-- Reminder type selection -->
+    <string name="select_reminder_type">Select a Reminder Type</string>
+    <string name="week_day_reminder">Week Day Reminder</string>
+    <string name="week_day_reminder_description">Specific days like Monday, Wednesday, Friday</string>
+    <string name="periodic_reminder">Periodic Reminder</string>
+    <string name="periodic_reminder_description">Regular intervals like every 3 days</string>
+    <string name="month_day_reminder">Month Day Reminder</string>
+    <string name="month_day_reminder_description">Monthly patterns like the first Monday</string>
+    <string name="time_since_last_reminder">Time Since Last Reminder</string>
+    <string name="time_since_last_reminder_description">When you haven\'t tracked something for a while</string>
+
+    <!-- Reminder configuration -->
+    <string name="reminder_name">Reminder Name</string>
+    <string name="repeat_every">Repeat Every</string>
+    <string name="at_time">At Time</string>
+    <string name="ending_at">Ending at</string>
+    <string name="starting_from">Starting From</string>
+    <string name="repeat_on_week_days">Repeat On Week Days</string>
+    <string name="track_feature">Track Feature</string>
+    <string name="select_tracker_placeholder">Select a tracker</string>
+    <string name="remind_after">Remind After</string>
+    <string name="then_remind_every">Then Remind Every</string>
+    <string name="every_colon">Every:</string>
+    <string name="ended_at_format">Ended at: %1$s</string>
+    <string name="starting_at_format">Starting at: %1$s</string>
+
+    <!-- Month day occurrence -->
+    <string name="occurrence_first">First</string>
+    <string name="occurrence_second">Second</string>
+    <string name="occurrence_third">Third</string>
+    <string name="occurrence_fourth">Fourth</string>
+    <string name="occurrence_last">Last</string>
+
+    <!-- Full day names -->
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+
     <string name="range_style">Range style:</string>
 
     <string name="track_widget_configure_no_data_error">Please track some data first.</string>
