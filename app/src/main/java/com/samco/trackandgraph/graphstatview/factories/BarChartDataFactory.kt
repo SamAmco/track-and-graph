@@ -133,7 +133,7 @@ class BarChartDataFactory @Inject constructor(
                     roundedEndTime = endTime?.let {
                         timeHelper.findEndOfTemporal(it, barSize.asTemporalAmount())
                     } ?: timeHelper.findEndOfTemporal(timestamp, barSize.asTemporalAmount())
-                    currentBarStartTime = roundedEndTime.minus(barPeriod)
+                    currentBarStartTime = timeHelper.findBeginningOfTemporal(roundedEndTime, barPeriod)
                     currentBarEndTime = roundedEndTime
                     endTimeMinusDuration = sampleSize?.let { roundedEndTime.minus(it) }
 
@@ -146,8 +146,8 @@ class BarChartDataFactory @Inject constructor(
 
                 while (timestamp.isBefore(currentBarStartTime)) {
                     //we have reached the end of the current bar, so we need to move to the next one
-                    currentBarStartTime = currentBarStartTime!!.minus(barPeriod)
                     currentBarEndTime = currentBarEndTime!!.minus(barPeriod)
+                    currentBarStartTime = timeHelper.findBeginningOfTemporal(currentBarEndTime, barPeriod)
                     barDates.add(currentBarEndTime)
                 }
 
