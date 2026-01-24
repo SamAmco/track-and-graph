@@ -1,0 +1,1841 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../writing-graph-scripts/">
+      
+      
+      
+      <link rel="icon" href="../../../img/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
+    
+    
+      
+        <title>Writing Custom Functions - Track & Graph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#writing-custom-functions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Track &amp; Graph" class="md-header__button md-logo" aria-label="Track & Graph" data-md-component="logo">
+      
+  <img src="../../../img/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Track & Graph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Writing Custom Functions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Track &amp; Graph" class="md-nav__button md-logo" aria-label="Track & Graph" data-md-component="logo">
+      
+  <img src="../../../img/logo.png" alt="logo">
+
+    </a>
+    Track & Graph
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/tracking/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get started with tracking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/import-export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Importing and exporting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_3" id="__nav_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Creating graphs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            Creating graphs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/line/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Line graphs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/pie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pie charts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/statistics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Statistics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/histograms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Time histograms
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/bar-charts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bar charts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/lua-graphs/lua-graphs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lua Graphs and Statistics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/timestamps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Timestamps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Lua
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Lua
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Community Scripts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing-graph-scripts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Writing Graph Scripts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Writing Custom Functions
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Writing Custom Functions
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-custom-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Are Custom Functions?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-simplest-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Simplest Function
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-point-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Point Fields
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Metadata
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-metadata-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Metadata Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filtering-data-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      Filtering Data Points
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multiple Inputs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available APIs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing-to-the-community-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contributing to the Community Catalog
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contributing to the Community Catalog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-version-field" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Version Field
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Localization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-testing-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Testing Approach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test File Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Points
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-assertions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Assertions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended Test Coverage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging Tests
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learning-more" class="md-nav__link">
+    <span class="md-ellipsis">
+      Learning More
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-custom-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Are Custom Functions?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-simplest-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Simplest Function
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-point-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Point Fields
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Metadata
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-metadata-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Metadata Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filtering-data-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      Filtering Data Points
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multiple Inputs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available APIs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing-to-the-community-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contributing to the Community Catalog
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contributing to the Community Catalog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-version-field" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Version Field
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Localization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-testing-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Testing Approach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test File Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Points
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-assertions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Assertions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended Test Coverage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging Tests
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learning-more" class="md-nav__link">
+    <span class="md-ellipsis">
+      Learning More
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="writing-custom-functions">Writing Custom Functions<a class="headerlink" href="#writing-custom-functions" title="Permanent link">#</a></h1>
+<p>This guide covers writing your own Lua functions for the node editor. If you're looking for how to use the visual node editor with existing functions, see <a href="../../../tutorial/functions/">Functions</a>.</p>
+<h2 id="what-are-custom-functions">What Are Custom Functions?<a class="headerlink" href="#what-are-custom-functions" title="Permanent link">#</a></h2>
+<p>When you long-press in the node editor, you can select functions from the catalog. But you can also write your own! A custom function is a Lua script that transforms data points - it takes data in, processes it, and outputs transformed data.</p>
+<h2 id="the-simplest-function">The Simplest Function<a class="headerlink" href="#the-simplest-function" title="Permanent link">#</a></h2>
+<p>Here's the generator from the "Absolute Value" function, stripped down to show the minimum structure:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">source</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">source</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">        </span><span class="kr">end</span>
+
+<span class="w">        </span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.abs</span><span class="p">(</span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="p">)</span>
+
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="nv">data_point</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>This demonstrates the core pattern:</p>
+<ol>
+<li>Your script returns a <strong>generator function</strong> that accepts <code>source</code> (and optionally <code>config</code>)</li>
+<li>The generator returns an <strong>iterator function</strong> that yields data points one at a time</li>
+<li>The iterator calls <code>source.dp()</code> to get the next data point (in reverse chronological order)</li>
+<li>Return <code>nil</code> when there are no more data points</li>
+</ol>
+<p>To use this:</p>
+<ol>
+<li>Create a new Function in the app</li>
+<li>Long-press to add a node and scroll to the bottom for "Custom Lua Script"</li>
+<li>Paste your script (or load from a file)</li>
+<li>Connect a data source to the input and the output to your Output Node</li>
+</ol>
+<h2 id="data-point-fields">Data Point Fields<a class="headerlink" href="#data-point-fields" title="Permanent link">#</a></h2>
+<p>Each data point has these fields you can read and modify:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timestamp</code></td>
+<td>number</td>
+<td>Unix timestamp in milliseconds</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>number</td>
+<td>The numeric value</td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td>string</td>
+<td>Optional label text</td>
+</tr>
+<tr>
+<td><code>note</code></td>
+<td>string</td>
+<td>Optional note text</td>
+</tr>
+<tr>
+<td><code>offset</code></td>
+<td>number</td>
+<td>Timezone offset in milliseconds</td>
+</tr>
+</tbody>
+</table>
+<h2 id="adding-metadata">Adding Metadata<a class="headerlink" href="#adding-metadata" title="Permanent link">#</a></h2>
+<p>To add metadata like a title and description, return a table instead of a bare function. The table contains a <code>generator</code> field with your function, plus any metadata fields you want. Here's the full "Absolute Value" function:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;absolute-value&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">inputCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Absolute Value&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[[</span>
+<span class="s">Converts each data point&#39;s value to its absolute value (removes negative sign).</span>
+<span class="s">]]</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{},</span>
+
+<span class="w">    </span><span class="nv">generator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">source</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">            </span><span class="kd">local</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">source</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span>
+<span class="w">            </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">                </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">            </span><span class="kr">end</span>
+
+<span class="w">            </span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.abs</span><span class="p">(</span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="p">)</span>
+
+<span class="w">            </span><span class="kr">return</span><span class="w"> </span><span class="nv">data_point</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Now your function shows a title and description in the UI. You can tap the info button on the node card to see the description, which is rendered as markdown.</p>
+<h3 id="available-metadata-fields">Available Metadata Fields<a class="headerlink" href="#available-metadata-fields" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>title</code></td>
+<td>string or table</td>
+<td>No</td>
+<td>Display name for the function</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>string or table</td>
+<td>No</td>
+<td>Detailed description (supports markdown)</td>
+</tr>
+<tr>
+<td><code>inputCount</code></td>
+<td>number</td>
+<td>No</td>
+<td>Number of input connections (default: 1)</td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td>table</td>
+<td>No</td>
+<td>Configuration parameters (see below)</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td>No</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>string</td>
+<td>No</td>
+<td>Semantic version - see <a href="#contributing-to-the-community-catalog">Contributing</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="adding-configuration">Adding Configuration<a class="headerlink" href="#adding-configuration" title="Permanent link">#</a></h2>
+<p>Make your function configurable with the config DSL. Here's the "Multiply Values" function:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.config&quot;</span><span class="p">).</span><span class="nv">number</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;multiply&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">inputCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Multiply Values&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[[</span>
+<span class="s">Multiplies all incoming data point values by a specified multiplier.</span>
+
+<span class="s">Configuration:</span>
+<span class="s">- **Multiplier**: The number to multiply all values by (default: 1.0)</span>
+<span class="s">]]</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">number</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;multiplier&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Multiplier&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="nv">generator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">source</span><span class="p">,</span><span class="w"> </span><span class="nv">config</span><span class="p">)</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">config</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">config</span><span class="p">.</span><span class="py">multiplier</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mf">1.0</span>
+
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">            </span><span class="kd">local</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">source</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span>
+<span class="w">            </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="w">            </span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">multiplier</span>
+
+<span class="w">            </span><span class="kr">return</span><span class="w"> </span><span class="nv">data_point</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The app will show an input field for "Multiplier" when you add this node.</p>
+<h3 id="configuration-types">Configuration Types<a class="headerlink" href="#configuration-types" title="Permanent link">#</a></h3>
+<p>Import config helpers from <code>tng.config</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">tng_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.config&quot;</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">text</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">number</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">checkbox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">checkbox</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">enum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">enum</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">uint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">uint</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">duration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">duration</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">localtime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">localtime</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">instant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">instant</span>
+</code></pre></div>
+<p><strong>text</strong> - String input:
+<div class="highlight"><pre><span></span><code><span class="nv">text</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;filter&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Filter Text&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>number</strong> - Floating point:
+<div class="highlight"><pre><span></span><code><span class="nv">number</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Threshold&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>checkbox</strong> - Boolean:
+<div class="highlight"><pre><span></span><code><span class="nv">checkbox</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Enabled&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>enum</strong> - Dropdown selection:
+<div class="highlight"><pre><span></span><code><span class="nv">enum</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mode&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;add&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Add&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;subtract&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Subtract&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;add&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><strong>uint</strong> - Positive integer:
+<div class="highlight"><pre><span></span><code><span class="nv">uint</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;count&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Count&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>duration</strong> - Time duration (shown as hours:minutes:seconds picker):
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">)</span>
+<span class="nv">duration</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;window&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Time Window&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">HOUR</span><span class="w"> </span><span class="p">}</span>
+<span class="c1">-- Your function receives milliseconds</span>
+</code></pre></div></p>
+<p><strong>localtime</strong> - Time of day (shown as time picker):
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">)</span>
+<span class="nv">localtime</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;start_time&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Start Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">HOUR</span><span class="w"> </span><span class="p">}</span>
+<span class="c1">-- Your function receives milliseconds since midnight</span>
+</code></pre></div></p>
+<p><strong>instant</strong> - Date and time (shown as date/time picker):
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">)</span>
+<span class="nv">instant</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;cutoff&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Cutoff Date&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="nf">time</span><span class="p">().</span><span class="nv">timestamp</span><span class="w"> </span><span class="p">}</span>
+<span class="c1">-- Your function receives epoch milliseconds</span>
+</code></pre></div></p>
+<h2 id="filtering-data-points">Filtering Data Points<a class="headerlink" href="#filtering-data-points" title="Permanent link">#</a></h2>
+<p>Functions can filter by returning only some data points. Here's "Filter Greater Than":</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">tng_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.config&quot;</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">number</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">checkbox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tng_config</span><span class="p">.</span><span class="py">checkbox</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;filter-greater-than&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">inputCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Filter Greater Than&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[[</span>
+<span class="s">Filters data points by value. Only data points with values greater than the threshold will pass through.</span>
+
+<span class="s">Configuration:</span>
+<span class="s">- **Threshold**: The minimum value (exclusive by default)</span>
+<span class="s">- **Include Equal**: Also include values equal to the threshold (default: false)</span>
+<span class="s">]]</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">number</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Threshold&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nv">checkbox</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;include_equal&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Include Equal&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+
+<span class="w">    </span><span class="nv">generator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">source</span><span class="p">,</span><span class="w"> </span><span class="nv">config</span><span class="p">)</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">config</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">config</span><span class="p">.</span><span class="py">threshold</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mf">0.0</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">include_equal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">config</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">config</span><span class="p">.</span><span class="py">include_equal</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">            </span><span class="kr">while</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">                </span><span class="kd">local</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">source</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span>
+<span class="w">                </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">data_point</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">                    </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">                </span><span class="kr">end</span>
+
+<span class="w">                </span><span class="kd">local</span><span class="w"> </span><span class="nv">passes</span>
+<span class="w">                </span><span class="kr">if</span><span class="w"> </span><span class="nv">include_equal</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">                    </span><span class="nv">passes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="nv">threshold</span>
+<span class="w">                </span><span class="kr">else</span>
+<span class="w">                    </span><span class="nv">passes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data_point</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">threshold</span>
+<span class="w">                </span><span class="kr">end</span>
+
+<span class="w">                </span><span class="kr">if</span><span class="w"> </span><span class="nv">passes</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">                    </span><span class="kr">return</span><span class="w"> </span><span class="nv">data_point</span>
+<span class="w">                </span><span class="kr">end</span>
+<span class="w">            </span><span class="kr">end</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="multiple-inputs">Multiple Inputs<a class="headerlink" href="#multiple-inputs" title="Permanent link">#</a></h2>
+<p>Set <code>inputCount</code> greater than 1 to accept multiple data sources. The first parameter becomes a table of sources. Here's a simplified version of "Pair and Operate":</p>
+<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pair-and-operate&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">inputCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Pair and Operate&quot;</span><span class="p">,</span>
+
+<span class="w">    </span><span class="nv">generator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">sources</span><span class="p">,</span><span class="w"> </span><span class="nv">config</span><span class="p">)</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">source1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">source2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">sources</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">            </span><span class="kd">local</span><span class="w"> </span><span class="nv">dp1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">source1</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span>
+<span class="w">            </span><span class="kd">local</span><span class="w"> </span><span class="nv">dp2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">source2</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span>
+
+<span class="w">            </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">dp1</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">dp2</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="w">            </span><span class="c1">-- Add values from both sources</span>
+<span class="w">            </span><span class="nv">dp1</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dp1</span><span class="p">.</span><span class="py">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">dp2</span><span class="p">.</span><span class="py">value</span>
+<span class="w">            </span><span class="kr">return</span><span class="w"> </span><span class="nv">dp1</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="available-apis">Available APIs<a class="headerlink" href="#available-apis" title="Permanent link">#</a></h2>
+<p>The Track &amp; Graph Lua environment provides several modules you can import:</p>
+<ul>
+<li><code>tng.core</code> - Time utilities, duration constants, date parsing, data source helpers</li>
+<li><code>tng.config</code> - Configuration DSL for defining user inputs</li>
+<li><code>tng.graph</code> - Graph creation (for graph scripts, not function scripts)</li>
+</ul>
+<p>The API source files are well-documented with comments. Browse them on GitHub: <strong><a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/tng">lua/src/tng/</a></strong></p>
+<p>The <a href="../writing-graph-scripts/">Writing Graph Scripts</a> guide also covers these APIs in the context of graph scripts.</p>
+<h2 id="tips">Tips<a class="headerlink" href="#tips" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Always handle nil</strong>: Check if <code>source.dp()</code> returns nil before using the data point</li>
+<li><strong>Config fallbacks</strong>: Always provide defaults like <code>config and config.x or default_value</code></li>
+<li><strong>Use core.date() with full data points</strong>: Pass the entire data point, not just the timestamp, to get correct timezone handling</li>
+</ul>
+<h2 id="contributing-to-the-community-catalog">Contributing to the Community Catalog<a class="headerlink" href="#contributing-to-the-community-catalog" title="Permanent link">#</a></h2>
+<p>If you've created a useful function and want to share it with the community, you can submit a pull request to include it in the catalog.</p>
+<h3 id="the-version-field">The Version Field<a class="headerlink" href="#the-version-field" title="Permanent link">#</a></h3>
+<p>When you add a <code>version</code> field to your function, the UI changes: the script preview and Paste/File buttons are hidden, showing only the configuration fields. This is the "catalog mode" - users interact with your function through its config UI rather than seeing the code.</p>
+<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-function&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1">-- Adding this enables catalog mode</span>
+<span class="w">    </span><span class="c1">-- ...</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The major version number declares API compatibility. If your function uses API features from level 1, your version should be "1.x.x".</p>
+<h3 id="localization">Localization<a class="headerlink" href="#localization" title="Permanent link">#</a></h3>
+<p>Community catalog functions must provide translations for all text in four languages: English (en), German (de), Spanish (es), and French (fr).</p>
+<p><strong>Inline translations</strong> - provide a table with all four languages:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Filter Greater Than&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;de&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Filtern größer als&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;es&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Filtrar mayor que&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;fr&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Filtrer supérieur à&quot;</span><span class="p">,</span>
+<span class="p">},</span>
+</code></pre></div>
+<p><strong>Shared translations</strong> - for common strings, use a translation key (prefixed with <code>_</code>) that references <a href="https://github.com/SamAmco/track-and-graph/blob/master/lua/src/community/shared-translations.lua">shared-translations.lua</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">duration</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;_time_threshold&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1">-- References shared translation</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nv">enum</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;operation&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;_operation&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;_addition&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;_subtraction&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;_multiplication&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;_division&quot;</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="c1">-- All reference shared translations</span>
+<span class="w">        </span><span class="nv">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;_addition&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">},</span>
+<span class="nv">categories</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;_filter&quot;</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="c1">-- Also uses shared translations</span>
+</code></pre></div>
+<p>This is especially useful for enum options where the same values (like days of the week, aggregation types, etc.) appear in multiple functions. Check the shared translations file for available keys before adding new inline translations.</p>
+<h3 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">#</a></h3>
+<p>Functions must include tests. Test files live alongside your function in the same directory with names prefixed with <code>test_</code>.</p>
+<h4 id="the-testing-approach">The Testing Approach<a class="headerlink" href="#the-testing-approach" title="Permanent link">#</a></h4>
+<p>Function scripts return a Lua table with metadata and a <code>generator</code> field. The test harness loads this table directly and can override config values before calling the generator.</p>
+<h4 id="test-file-structure">Test File Structure<a class="headerlink" href="#test-file-structure" title="Permanent link">#</a></h4>
+<p>Test files export a table of test cases:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;test.core&quot;</span><span class="p">)</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">DDAY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">DAY</span>
+
+<span class="nv">M</span><span class="p">.</span><span class="py">test_multiply_basic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">-- Config values are actual Lua types, not strings</span>
+<span class="w">        </span><span class="nv">multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.5</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nv">sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="nf">time</span><span class="p">().</span><span class="nv">timestamp</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="p">{</span><span class="w">  </span><span class="c1">-- First input source (array of data points)</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">DDAY</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
+<span class="w">                    </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span>
+<span class="w">                    </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;test1&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">DDAY</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span>
+<span class="w">                    </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span>
+<span class="w">                    </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;test2&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assert</span><span class="p">(</span><span class="s2">&quot;result was nil&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c1">-- Result is an array of transformed data points</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">#</span><span class="nv">result</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mf">25.0</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">value</span><span class="p">)</span><span class="w">  </span><span class="c1">-- 10.0 * 2.5</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nv">value</span><span class="p">)</span><span class="w">  </span><span class="c1">-- 4.0 * 2.5</span>
+
+<span class="w">        </span><span class="c1">-- Verify other fields are preserved</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="s2">&quot;test1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">label</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nv">M</span><span class="p">.</span><span class="py">test_with_default_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{},</span><span class="w">  </span><span class="c1">-- Test default behavior</span>
+<span class="w">    </span><span class="nv">sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="nf">time</span><span class="p">().</span><span class="nv">timestamp</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">7.5</span><span class="p">,</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assert</span><span class="p">(</span><span class="s2">&quot;result was nil&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">#</span><span class="nv">result</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mf">7.5</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">value</span><span class="p">)</span><span class="w">  </span><span class="c1">-- Default multiplier is 1.0</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="nv">M</span>
+</code></pre></div>
+<h4 id="key-points">Key Points<a class="headerlink" href="#key-points" title="Permanent link">#</a></h4>
+<ul>
+<li><strong>Config values are actual Lua types</strong>: Use <code>multiplier = 2.5</code> (number), <code>enabled = true</code> (boolean), not strings like <code>"2.5"</code> or <code>"true"</code>.</li>
+<li><strong>Sources is an array of arrays</strong>: Each inner array represents one input source. For single-input functions, return <code>{ { dp1, dp2, ... } }</code>. For multi-input functions, return <code>{ { source1_points }, { source2_points } }</code>.</li>
+<li><strong>Assertions receive an array of data points</strong>: All the data points that passed through your function.</li>
+</ul>
+<h4 id="test-assertions">Test Assertions<a class="headerlink" href="#test-assertions" title="Permanent link">#</a></h4>
+<p>The <code>test.core</code> module provides:</p>
+<ul>
+<li><code>test.assert(message, condition)</code> - Assert condition is truthy</li>
+<li><code>test.assertEquals(expected, actual)</code> - Assert values are equal</li>
+<li><code>test.assertClose(expected, actual, tolerance)</code> - Assert numbers are close (default tolerance: 0.01)</li>
+</ul>
+<h4 id="recommended-test-coverage">Recommended Test Coverage<a class="headerlink" href="#recommended-test-coverage" title="Permanent link">#</a></h4>
+<p>For each function, write tests for:</p>
+<ol>
+<li><strong>Basic functionality</strong> - Happy path with typical inputs</li>
+<li><strong>Edge cases</strong> - Zero, negative, empty values as relevant</li>
+<li><strong>Default config</strong> - Behavior when config is empty <code>{}</code></li>
+<li><strong>Data preservation</strong> - Verify unchanged fields (label, note, timestamp) remain intact</li>
+</ol>
+<h4 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">#</a></h4>
+<p>From the repository root:</p>
+<div class="highlight"><pre><span></span><code>make<span class="w"> </span>run-community-functions-tests
+</code></pre></div>
+<h4 id="debugging-tests">Debugging Tests<a class="headerlink" href="#debugging-tests" title="Permanent link">#</a></h4>
+<p>If a test fails:</p>
+<ol>
+<li>Check that config keys match your function's config item IDs exactly</li>
+<li>Verify you're using actual Lua types, not strings (e.g., <code>true</code> not <code>"true"</code>)</li>
+<li>Remember sources is an array of arrays, even for single-input functions</li>
+<li>Add <code>print()</code> statements to your generator to debug data flow (visible in test output)</li>
+</ol>
+<h3 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">#</a></h3>
+<p>Community functions live in <code>lua/src/community/functions/</code>:</p>
+<div class="highlight"><pre><span></span><code>lua/src/community/functions/your-function/
+  ├── your-function.lua      # Main script
+  └── test_your-function.lua # Test file(s)
+</code></pre></div>
+<h3 id="learning-more">Learning More<a class="headerlink" href="#learning-more" title="Permanent link">#</a></h3>
+<p>For comprehensive documentation on contributing to the catalog:</p>
+<ul>
+<li><strong><a href="https://github.com/SamAmco/track-and-graph/blob/master/lua/src/community/functions/README.md">Community Functions README</a></strong> - Full guide covering structure, testing, shared translations, and the config DSL</li>
+<li><strong><a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/functions">Example Functions</a></strong> - Browse existing functions to see patterns and conventions</li>
+</ul>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">#</a></h2>
+<ul>
+<li>See <a href="../writing-graph-scripts/">Writing Graph Scripts</a> for creating custom visualizations (a different type of Lua script)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.path"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1495 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../intro/">
+      
+      
+        <link rel="next" href="../writing-custom-functions/">
+      
+      
+      <link rel="icon" href="../../../img/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
+    
+    
+      
+        <title>Writing Graph Scripts - Track & Graph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#writing-graph-scripts" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Track &amp; Graph" class="md-header__button md-logo" aria-label="Track & Graph" data-md-component="logo">
+      
+  <img src="../../../img/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Track & Graph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Writing Graph Scripts
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Track &amp; Graph" class="md-nav__button md-logo" aria-label="Track & Graph" data-md-component="logo">
+      
+  <img src="../../../img/logo.png" alt="logo">
+
+    </a>
+    Track & Graph
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/tracking/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get started with tracking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/import-export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Importing and exporting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_3" id="__nav_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Creating graphs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            Creating graphs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/line/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Line graphs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/pie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pie charts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/statistics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Statistics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/histograms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Time histograms
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/bar-charts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bar charts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/graphs/lua-graphs/lua-graphs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lua Graphs and Statistics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/timestamps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Timestamps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorial/functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Lua
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Lua
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Community Scripts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Writing Graph Scripts
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Writing Graph Scripts
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#writing-your-first-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Writing Your First Script
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing Your First Script">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#understanding-the-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Understanding the script
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-graphs-can-i-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      What graphs can I create?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using data sources
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#script-previews" class="md-nav__link">
+    <span class="md-ellipsis">
+      Script Previews
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing-to-the-community-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contributing to the community scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contributing to the community scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Writing Tests
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-testing-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Testing Framework
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-testing-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Testing Approach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test File Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-test-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating Test Cases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Test Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-config-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. config (table)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-sources-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. sources (function)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-assertions-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. assertions (function)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-assertions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Assertions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging Tests
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing-custom-functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Writing Custom Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#writing-your-first-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Writing Your First Script
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing Your First Script">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#understanding-the-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Understanding the script
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-graphs-can-i-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      What graphs can I create?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using data sources
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#script-previews" class="md-nav__link">
+    <span class="md-ellipsis">
+      Script Previews
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing-to-the-community-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contributing to the community scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contributing to the community scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Writing Tests
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-testing-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Testing Framework
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-testing-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Testing Approach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test File Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-test-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating Test Cases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Test Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-config-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. config (table)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-sources-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. sources (function)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-assertions-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. assertions (function)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-assertions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Assertions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging Tests
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="writing-graph-scripts">Writing Graph Scripts<a class="headerlink" href="#writing-graph-scripts" title="Permanent link">#</a></h1>
+<p>This guide covers writing Lua graph scripts for custom visualizations. If you just want a reference for how to use the Lua graph feature in the app, check out <a href="../../../tutorial/graphs/lua-graphs/lua-graphs/">the tutorial here</a>.</p>
+<h2 id="writing-your-first-script">Writing Your First Script<a class="headerlink" href="#writing-your-first-script" title="Permanent link">#</a></h2>
+<p>To get started let's write and save a super simple script: </p>
+<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nf">text</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Now is a good time to figure out your development flow for testing the script on your device. If you have an easy way to copy and paste text between devices you can use the paste button in the Lua graph configuration. You can also save your workspace to a shared cloud directory or send the file to your device some other way and access it using the file button.</p>
+<p>If you load that script into the Lua graph configuration you should see a simple text graph with the words "Hello world!" in it like this: </p>
+<p><img alt="&quot;Hello world text demo&quot;" src="../hello_world_card.jpg" width="400" /></p>
+<h3 id="understanding-the-script">Understanding the script<a class="headerlink" href="#understanding-the-script" title="Permanent link">#</a></h3>
+<p>Let's break down what is going on here. First we are using the <code>require</code> function to load the <code>tng.graph</code> module. This module contains all of the functions that you can use to create graphs. The <code>text</code> function creates a simple text graph. Let's take a look at the definition of that function:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">--- Creates a text graph.</span>
+<span class="c1">--- @since v5.1.0</span>
+<span class="c1">--- @param params (string|number|TextGraphParams): Either the text to display or the parameters for the text graph.</span>
+<span class="c1">--- @return table: A table representing the text graph.</span>
+<span class="nv">M</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">params</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="nv">params</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">M</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span>
+<span class="w">            </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">,</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">M</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">.</span><span class="py">text</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">.</span><span class="py">size</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">align</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">.</span><span class="py">align</span><span class="p">,</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Essentially this function takes a string, number, or a table of parameters and returns a table that represents the graph. The table contains a <code>type</code> field that tells the app what type of graph it is, and then any other parameters that are needed to create the graph. In this case we are just passing in a string, so the function creates a table with the <code>type</code> field set to <code>GRAPH_TYPE.TEXT</code> and the <code>text</code> field set to the string we passed in.</p>
+<p>So our script ultimately returned a table that looks like this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;TEXT&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Notice you could get the same result by writing your script like this:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">)</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">graph</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span>
+<span class="w">  </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Whenever Track &amp; Graph needs to generate the view data for your Lua graph it will call the script and use the returned table to create the graph. For example your script is run to generate the preview in the Lua graph configuration screen, and whenever you open the group that contains your Lua graph.</p>
+<h2 id="what-graphs-can-i-create">What graphs can I create?<a class="headerlink" href="#what-graphs-can-i-create" title="Permanent link">#</a></h2>
+<p>Returning to the tng/graph.lua file notice the params object references the class name TextGraphParams. If you look further up the file you will find the definition of that class:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">--- @since v5.1.0</span>
+<span class="c1">--- @class TextGraphParams</span>
+<span class="c1">--- @field text (string|number): The text to display.</span>
+<span class="c1">--- @field size? integer: 1-3 The size of the text small, medium or large. Defaults to large.</span>
+<span class="c1">--- @field align? string: start, centre, or end The alignment of the text. Defaults to centre.</span>
+</code></pre></div>
+<p>Note that a parameter with a <code>?</code> after it means that it is optional. If you don't provide a value for that parameter, the function will use a default value. </p>
+<p>You can also see the other types of graphs you can return and the parameters they expect in this file, they are: </p>
+<ul>
+<li>Text</li>
+<li>Data Point</li>
+<li>Time Bar charts (but not Histograms currently)</li>
+<li>Line Graphs</li>
+<li>Pie Charts</li>
+</ul>
+<p>For further inspiration I recommend checking out the <a href="../../community/">community scripts</a>.</p>
+<h2 id="using-data-sources">Using data sources<a class="headerlink" href="#using-data-sources" title="Permanent link">#</a></h2>
+<p>A Lua graph script can actually return one of two things. It can return a table with the data in it as we've seen above, or it can return a function which accepts a table of named data sources. Track &amp; Graph will then:</p>
+<ol>
+<li>Execute the script to get it's return value (in this case a function).</li>
+<li>Realise that the return value is a function and call it, passing in the data sources configured in the app.</li>
+<li>Use the return value of that function to create the graph.</li>
+</ol>
+<p>For example if you were to configure your Lua graph with a data source that contains at least one data point like this:</p>
+<p><img alt="&quot;data_source&quot;" src="../data_source_configuration.jpg" width="300" /></p>
+<p>Then you could use the following script to return the most recent data point from that data source:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">sources</span><span class="p">)</span>
+<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nv">GRAPH_TYPE</span><span class="p">.</span><span class="py">DATA_POINT</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">datapoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">sources</span><span class="p">[</span><span class="s2">&quot;my_data_source&quot;</span><span class="p">].</span><span class="nf">dp</span><span class="p">(),</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Here <code>sources["my_data_source"]</code> is actually returning a <code>DataSource</code> object. Take a look at the <code>tng/core.lua</code> file to see the definition of this class and what other functions are available on it. Notice the definition of this function is empty:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">--- Fetches the next data point from the data source.</span>
+<span class="c1">--- Data points are iterated in reverse chronological order.</span>
+<span class="c1">--- @since v5.1.0</span>
+<span class="c1">--- @return DataPoint</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">DataSource</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span><span class="w"> </span><span class="kr">end</span>
+</code></pre></div>
+<p>That's because the implementation of this data source is actually written in the kotlin code of the android app. <a href="https://github.com/SamAmco/track-and-graph/blob/master/app/src/main/java/com/samco/trackandgraph/lua/apiimpl/LuaDataSourceProviderImpl.kt"> You can see that here </a> if you are interested but it is not necessary to read the kotlin code.</p>
+<h2 id="script-previews">Script Previews<a class="headerlink" href="#script-previews" title="Permanent link">#</a></h2>
+<p>If you have downloaded any of the community scripts you may have noticed that only the configuration parameters of the script are immediately visible. This is because the script preview will only show the code between the comments:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">--- PREVIEW_START</span>
+</code></pre></div>
+<p>and </p>
+<div class="highlight"><pre><span></span><code><span class="c1">--- PREVIEW_END</span>
+</code></pre></div>
+<p>You can use this to make the most important information about your script immediately visible like the name of the script and any configuration parameters e.g.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">--- PREVIEW_START</span>
+<span class="c1">-- Script: Text - Total This Period</span>
+<span class="c1">-- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">WEEK</span>
+<span class="c1">--- PREVIEW_END</span>
+</code></pre></div>
+<h2 id="contributing-to-the-community-scripts">Contributing to the community scripts<a class="headerlink" href="#contributing-to-the-community-scripts" title="Permanent link">#</a></h2>
+<p>You already have all the tools you need to write and run your own scripts. If you create something you think is very useful and you want to share it with the community, you can create a PR into the Track &amp; Graph repository. However community scripts will require a few more things before they can be committed to the repository. In general you will need 4 things:</p>
+<ol>
+<li>A README.md file that describes the script and how to use it</li>
+<li>A screenshot of the graph that the script generates</li>
+<li>A test file, or multiple test files, that contain the test cases for the script</li>
+<li>The script file that contains the code</li>
+</ol>
+<h3 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">#</a></h3>
+<p>Community scripts are organized in two separate locations:</p>
+<p><strong>Lua scripts and tests</strong> go in <code>lua/src/community/graphs/</code>:
+<div class="highlight"><pre><span></span><code>lua/src/community/graphs/&lt;category&gt;/&lt;script-name&gt;/
+  ├── &lt;script-name&gt;.lua          # Main script file
+  └── test_&lt;script-name&gt;.lua     # Test file(s) (prefix with test_)
+</code></pre></div></p>
+<p><strong>Documentation and images</strong> go in <code>docs/docs/lua/community/</code>:
+<div class="highlight"><pre><span></span><code>docs/docs/lua/community/&lt;category&gt;/&lt;script-name&gt;/
+  ├── script.lua                 # Generated from lua/src via make sync-lua-to-docs
+  ├── README.md                  # Documentation
+  └── image.png                  # Screenshot
+</code></pre></div></p>
+<p>For example, the fraction script has:
+- Code: <code>lua/src/community/graphs/text/fraction/fraction.lua</code> and <code>test_fraction.lua</code>
+- Docs: <code>docs/docs/lua/community/text/fraction/script.lua</code>, <code>README.md</code>, and <code>image.png</code></p>
+<p>You can see examples of <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs">scripts here</a> and <a href="https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community">docs here</a>.</p>
+<p><strong>Important:</strong> The <code>script.lua</code> file in the docs directory is automatically generated. After making changes to your script in <code>lua/src/community/graphs/</code>, run <code>make sync-lua-to-docs</code> to copy it to the docs location. You only need to manually create the <code>README.md</code> and image files in the docs directory.</p>
+<h2 id="writing-tests">Writing Tests<a class="headerlink" href="#writing-tests" title="Permanent link">#</a></h2>
+<p>Writing tests is important not only to ensure your code works as expected (particularly around edge cases) but also to make sure that your script continues to work as the Track &amp; Graph API evolves. If your script relies on some implementation detail or method call in the Track &amp; Graph Lua API, and that function changes in a future version, then your script may be left broken without anyone noticing except disgruntled users.</p>
+<h3 id="the-testing-framework">The Testing Framework<a class="headerlink" href="#the-testing-framework" title="Permanent link">#</a></h3>
+<p>Track &amp; Graph provides a testing framework for Lua scripts that runs your tests in the same Lua environment that's used in the production app. This gives greater assurances that if your tests pass, your script will work correctly in the actual app.</p>
+<p>You can create as many test files as you like for your script as long as each one starts with the word <code>test_</code> and ends with <code>.lua</code>. For example, if your script is called <code>my_script.lua</code>, you could create a test file called <code>test_my_script.lua</code>. The test files should be placed in the same directory as your script.</p>
+<h3 id="the-testing-approach">The Testing Approach<a class="headerlink" href="#the-testing-approach" title="Permanent link">#</a></h3>
+<p>Graph scripts use <strong>text-based config overrides</strong>. Your script defines local variables for configuration (like <code>local period = nil</code>), and the test harness uses regex to replace these declarations with test values. This is why config values in tests are strings containing Lua code.</p>
+<h3 id="test-file-structure">Test File Structure<a class="headerlink" href="#test-file-structure" title="Permanent link">#</a></h3>
+<p>A test file is a Lua module that returns a table of test cases. Each test case specifies:</p>
+<ol>
+<li>Configuration overrides (as strings of Lua code)</li>
+<li>A set of named mock data sources</li>
+<li>Assertions to validate the script's output</li>
+</ol>
+<p>Here's an example test file:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;test.core&quot;</span><span class="p">)</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">DDAY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">DAY</span>
+
+<span class="nv">M</span><span class="p">.</span><span class="py">test_basic_case</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">-- Config values are strings of Lua code that replace local variable declarations</span>
+<span class="w">        </span><span class="nv">numerator_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{&#39;A&#39;, &#39;B&#39;}&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;core.PERIOD.WEEK&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">count_by_label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nv">sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="nf">time</span><span class="p">().</span><span class="nv">timestamp</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">source1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">-- Named data source matching your script</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">DDAY</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
+<span class="w">                    </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span>
+<span class="w">                    </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nv">DDAY</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span>
+<span class="w">                    </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span>
+<span class="w">                    </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assert</span><span class="p">(</span><span class="s2">&quot;result was nil&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="nv">graph</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">type</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="s2">&quot;15/30&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="nv">M</span>
+</code></pre></div>
+<h3 id="creating-test-cases">Creating Test Cases<a class="headerlink" href="#creating-test-cases" title="Permanent link">#</a></h3>
+<p>Each test should be defined as a field in your module's table. The value should be a table with the following fields:</p>
+<h4 id="1-config-table">1. <code>config</code> (table)<a class="headerlink" href="#1-config-table" title="Permanent link">#</a></h4>
+<p>The <code>config</code> table contains values that will override variables in your script. For example, if your script defines <code>local period = core.PERIOD.MONTH</code>, your test can override it with <code>config = { period = "core.PERIOD.WEEK" }</code>.</p>
+<p><strong>Important</strong>: Configuration overrides are always strings, not references to the values themselves. Use <code>"core.PERIOD.WEEK"</code> rather than <code>core.PERIOD.WEEK</code>. That's because the testing framework uses a regex to overwrite the first declaration matching the config name in your script before executing it.</p>
+<h4 id="2-sources-function">2. <code>sources</code> (function)<a class="headerlink" href="#2-sources-function" title="Permanent link">#</a></h4>
+<p>The <code>sources</code> function should return a table of named mock data sources that will be passed to your script. Each source is a table of data points:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
+<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="nf">time</span><span class="p">().</span><span class="nv">timestamp</span>
+
+<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">-- First data source named &quot;steps&quot;</span>
+<span class="w">    </span><span class="nv">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">86400</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;walking&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">172800</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7500</span><span class="p">,</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;running&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="c1">-- Second data source named &quot;calories&quot;</span>
+<span class="w">    </span><span class="nv">calories</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">86400</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">300</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">172800</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">450</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h4 id="3-assertions-function">3. <code>assertions</code> (function)<a class="headerlink" href="#3-assertions-function" title="Permanent link">#</a></h4>
+<p>The <code>assertions</code> function receives the result of your script and should validate that it's correct:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;test.core&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nv">test</span><span class="p">.</span><span class="nf">assert</span><span class="p">(</span><span class="s2">&quot;result was nil&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span>
+<span class="w">  </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="nv">graph</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">type</span><span class="p">)</span>
+<span class="w">  </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="s2">&quot;12500&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h3 id="test-assertions">Test Assertions<a class="headerlink" href="#test-assertions" title="Permanent link">#</a></h3>
+<p>The <code>test.core</code> module provides:</p>
+<ul>
+<li><code>test.assert(message, condition)</code> - Assert condition is truthy</li>
+<li><code>test.assertEquals(expected, actual)</code> - Assert values are equal (converts to strings for comparison)</li>
+<li><code>test.assertClose(expected, actual, tolerance)</code> - Assert numbers are close (default tolerance: 0.01)</li>
+</ul>
+<p>You can also use the <code>error</code> function directly:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
+<span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s2">&quot;Expected &#39;Hello world!&#39;, got &#39;&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>For more comprehensive testing examples, see the <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs">community script test files</a> which demonstrate common patterns for time-based scenarios, multi-source testing, and edge cases.</p>
+<h3 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">#</a></h3>
+<p>From the repository root:</p>
+<div class="highlight"><pre><span></span><code>make<span class="w"> </span>run-community-graph-tests
+</code></pre></div>
+<h3 id="debugging-tests">Debugging Tests<a class="headerlink" href="#debugging-tests" title="Permanent link">#</a></h3>
+<p>Debugging scripts and tests can be a bit tricky since you will generally have to work without a breakpoint debugger in your Lua code.</p>
+<p>You can use the <code>error</code> and <code>print</code> functions to help narrow down issues. The <code>print</code> function takes any set of arguments and tries to convert them to strings before printing them to the test output:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">-- prints &quot;Hello world!&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span><span class="w"> </span><span class="c1">-- prints &quot;123&quot;</span>
+<span class="nb">print</span><span class="p">({</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">-- prints e.g. &quot;table: 1ddd3478&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello &quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;world!&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">-- prints &quot;Hello world!&quot;</span>
+</code></pre></div>
+<p>Notice that only primitives like strings and numbers will print readably. Tables will not print their contents but instead their memory address, so you need to access their fields to print them effectively.</p>
+<p><strong>Tips for debugging:</strong></p>
+<ol>
+<li>Check that config keys match your script's local variable names exactly</li>
+<li>Verify the config values are valid Lua code (strings, not actual Lua types)</li>
+<li>Ensure source names match how your script accesses them</li>
+<li>Add <code>print()</code> statements to your script to debug data flow (visible in test output)</li>
+</ol>
+<p>Please make sure to remove any <code>print</code> statements before you submit your PR.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.path"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>

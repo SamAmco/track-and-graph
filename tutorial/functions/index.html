@@ -655,6 +655,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#a-note-on-time-since-last-reminders" class="md-nav__link">
+    <span class="md-ellipsis">
+      A note on "Time Since Last" reminders
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#disabling-lua" class="md-nav__link">
     <span class="md-ellipsis">
       Disabling Lua
@@ -743,17 +752,105 @@
   
   
   
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../../lua/developer-guide/intro/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Lua Developer Guide
+    Getting Started
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lua/developer-guide/writing-graph-scripts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Writing Graph Scripts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lua/developer-guide/writing-custom-functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Writing Custom Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -871,6 +968,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#a-note-on-time-since-last-reminders" class="md-nav__link">
+    <span class="md-ellipsis">
+      A note on "Time Since Last" reminders
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#disabling-lua" class="md-nav__link">
     <span class="md-ellipsis">
       Disabling Lua
@@ -937,6 +1043,12 @@
 <h2 id="exploring-further">Exploring Further<a class="headerlink" href="#exploring-further" title="Permanent link">#</a></h2>
 <p>For a deeper understanding of what's possible with Functions, I recommend exploring the Function Catalog and experimenting with different nodes. If you click the 'i' icon on any node in the catalog, you'll see detailed documentation about what it does and how to use it.</p>
 <p><img alt="Function info dialog showing detailed documentation" src="../images/functions_info_dialog.jpg" /></p>
+<h2 id="a-note-on-time-since-last-reminders">A note on "Time Since Last" reminders<a class="headerlink" href="#a-note-on-time-since-last-reminders" title="Permanent link">#</a></h2>
+<p>You can use the "Time Since Last" reminder type to get notified after a certain amount of time has passed since the last data point in a tracker or function. When you select a tracker, this works exactly as you'd expect—the reminder is re-scheduled whenever you add, update, or delete data.</p>
+<p>Functions work a bit differently. Since functions derive their data from other trackers and functions, Track &amp; Graph automatically tracks these dependencies. When any upstream tracker changes, the reminder is re-scheduled based on the function's latest data point.</p>
+<p>However, there's an important caveat: <strong>this only works reliably if your function is deterministic</strong>. A deterministic function always produces the same output given the same inputs. Most functions are naturally deterministic—for example, a function that adds two trackers together, or filters data by date.</p>
+<p>If you create a function that includes randomness, references the current time in unpredictable ways, or has other non-deterministic behaviour, the reminder system may not behave as expected. The reminder is scheduled based on what the function outputs at the moment it's evaluated, which could change between evaluations even without any new data being tracked.</p>
+<p>For best results with reminders, stick to functions that process your data in a consistent, repeatable way.</p>
 <h2 id="disabling-lua">Disabling Lua<a class="headerlink" href="#disabling-lua" title="Permanent link">#</a></h2>
 <p>Function nodes are powered by the Lua scripting engine. It should be hard to create a function graph that crashes the app, but if you somehow manage to do this you can start the app without the lua engine enabled by long pressing on the app launcher on your home screen and selecting "Launch Lua disabled". You will still see the cards for the Lua functions you created so you can delete them before restarting the app again.</p>
 
