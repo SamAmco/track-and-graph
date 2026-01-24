@@ -49,5 +49,8 @@ nav:
     - tutorial/functions.md
   - Lua:
     - lua/community/index.md
-    - lua/developer-guide/intro.md
+    - 'Developer Guide':
+      - lua/developer-guide/intro.md
+      - lua/developer-guide/writing-graph-scripts.md
+      - lua/developer-guide/writing-custom-functions.md
 
