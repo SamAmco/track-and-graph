@@ -12,13 +12,15 @@
         <link rel="prev" href="../../community/">
       
       
+        <link rel="next" href="../writing-graph-scripts/">
+      
       
       <link rel="icon" href="../../../img/logo.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
-        <title>Lua Developer Guide - Track & Graph</title>
+        <title>Getting Started - Track & Graph</title>
       
     
     
@@ -72,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#lua-developer-guide" class="md-skip">
+        <a href="#getting-started" class="md-skip">
           Skip to content
         </a>
       
@@ -107,7 +109,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Lua Developer Guide
+              Getting Started
             
           </span>
         </div>
@@ -615,6 +617,44 @@
   
   
   
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -627,7 +667,7 @@
           
   
   <span class="md-ellipsis">
-    Lua Developer Guide
+    Getting Started
     
   </span>
   
@@ -639,7 +679,7 @@
         
   
   <span class="md-ellipsis">
-    Lua Developer Guide
+    Getting Started
     
   </span>
   
@@ -662,9 +702,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
+  <a href="#getting-started_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Introduction
+      Getting Started
     </span>
   </a>
   
@@ -673,49 +713,7 @@
         <li class="md-nav__item">
   <a href="#setting-up-your-environment" class="md-nav__link">
     <span class="md-ellipsis">
-      Setting up your environment
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-your-first-script" class="md-nav__link">
-    <span class="md-ellipsis">
-      Writing your first script
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Writing your first script">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#understanding-the-script" class="md-nav__link">
-    <span class="md-ellipsis">
-      Understanding the script
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-graphs-can-i-create" class="md-nav__link">
-    <span class="md-ellipsis">
-      What graphs can I create?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-data-sources" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using data sources
+      Setting Up Your Environment
     </span>
   </a>
   
@@ -724,132 +722,85 @@
         <li class="md-nav__item">
   <a href="#scripting-limitations" class="md-nav__link">
     <span class="md-ellipsis">
-      Scripting limitations
+      Scripting Limitations
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#script-previews" class="md-nav__link">
+  <a href="#api-reference" class="md-nav__link">
     <span class="md-ellipsis">
-      Script previews
+      API Reference
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#contributing-to-the-community-scripts" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Contributing to the community scripts
+      Examples
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Contributing to the community scripts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#file-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      File Structure
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Writing tests
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Writing tests">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-testing-framework" class="md-nav__link">
-    <span class="md-ellipsis">
-      The testing framework
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#creating-test-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating test cases
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Creating test cases">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-config-table" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. config (table)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-sources-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. sources (function)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-assertions-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. assertions (function)
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Running tests
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#debugging-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Debugging tests
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
     </ul>
   
 </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing-graph-scripts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Writing Graph Scripts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing-custom-functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Writing Custom Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -890,9 +841,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
+  <a href="#getting-started_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Introduction
+      Getting Started
     </span>
   </a>
   
@@ -901,49 +852,7 @@
         <li class="md-nav__item">
   <a href="#setting-up-your-environment" class="md-nav__link">
     <span class="md-ellipsis">
-      Setting up your environment
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-your-first-script" class="md-nav__link">
-    <span class="md-ellipsis">
-      Writing your first script
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Writing your first script">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#understanding-the-script" class="md-nav__link">
-    <span class="md-ellipsis">
-      Understanding the script
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-graphs-can-i-create" class="md-nav__link">
-    <span class="md-ellipsis">
-      What graphs can I create?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-data-sources" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using data sources
+      Setting Up Your Environment
     </span>
   </a>
   
@@ -952,126 +861,27 @@
         <li class="md-nav__item">
   <a href="#scripting-limitations" class="md-nav__link">
     <span class="md-ellipsis">
-      Scripting limitations
+      Scripting Limitations
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#script-previews" class="md-nav__link">
+  <a href="#api-reference" class="md-nav__link">
     <span class="md-ellipsis">
-      Script previews
+      API Reference
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#contributing-to-the-community-scripts" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Contributing to the community scripts
+      Examples
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Contributing to the community scripts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#file-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      File Structure
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Writing tests
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Writing tests">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-testing-framework" class="md-nav__link">
-    <span class="md-ellipsis">
-      The testing framework
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#creating-test-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating test cases
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Creating test cases">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-config-table" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. config (table)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-sources-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. sources (function)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-assertions-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. assertions (function)
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Running tests
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#debugging-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Debugging tests
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1091,13 +901,20 @@
 
 
 
-<h1 id="lua-developer-guide">Lua Developer Guide<a class="headerlink" href="#lua-developer-guide" title="Permanent link">#</a></h1>
-<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
-<p>This guide is for people who are interested in writing their own Lua graph scripts. If you just want a reference for how to use the Lua graph feature in the app then check out <a href="../../../tutorial/graphs/lua-graphs/lua-graphs/">the tutorial here.</a></p>
-<p>Throughout this guide I will assume some basic experience with programming. There are plenty of resources out there to help you get started if you need to build that foundation first.</p>
+<h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">#</a></h1>
+<p>Track &amp; Graph exposes Lua interfaces for two purposes:</p>
+<ol>
+<li><strong>Function Scripts</strong> - Data transformers for the node editor that process streams of data points</li>
+<li><strong>Graph Scripts</strong> - Custom visualizations that return graph data (line graphs, pie charts, text displays, etc.)</li>
+</ol>
 <p>If you don't know Lua, don't worry - it is a very simple and easy language to learn. If you already have some experience with programming and just want a quick guide to the syntax, then you can read the guide over at <a href="https://learnxinyminutes.com/docs/lua/">learnxinyminutes.com/lua</a> in around 15-20 minutes. For more comprehensive learning, see the <a href="https://www.lua.org/docs.html">official Lua documentation</a> (however please keep in mind the <a href="#scripting-limitations">limitations below</a>). If you are comfortable with Lua you may want to just take a look at the examples in the <a href="../../community/">community scripts</a>. Each one has a link to the source code and they are generally quite short and readable.</p>
-<h2 id="setting-up-your-environment">Setting up your environment<a class="headerlink" href="#setting-up-your-environment" title="Permanent link">#</a></h2>
-<p>Before you can start writing any scripts you need to set up a development environment. You can use any text editor but I recommend finding an IDE that you like that supports Lua. Lua supports <a href="https://en.wikipedia.org/wiki/Language_Server_Protocol">LSP</a> so there are <a href="http://lua-users.org/wiki/LuaIntegratedDevelopmentEnvironments"> many IDE's </a> out there that work well out of the box.</p>
+<h2 id="getting-started_1">Getting Started<a class="headerlink" href="#getting-started_1" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../writing-custom-functions/">Writing Custom Functions</a> - Create data transformers for the node editor</li>
+<li><a href="../writing-graph-scripts/">Writing Graph Scripts</a> - Create custom visualizations</li>
+</ul>
+<h2 id="setting-up-your-environment">Setting Up Your Environment<a class="headerlink" href="#setting-up-your-environment" title="Permanent link">#</a></h2>
+<p>Before you can start writing any scripts you need to set up a development environment. You can use any text editor but I recommend finding an IDE that you like that supports Lua. Lua supports <a href="https://en.wikipedia.org/wiki/Language_Server_Protocol">LSP</a> so there are <a href="http://lua-users.org/wiki/LuaIntegratedDevelopmentEnvironments">many IDE's</a> out there that work well out of the box.</p>
 <p>Once you have an editor you need to create a new directory somewhere to work in e.g.</p>
 <div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>my_workspace
 <span class="nb">cd</span><span class="w"> </span>my_workspace
@@ -1108,254 +925,38 @@
 <span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span>track-and-graph-master/lua/src/*<span class="w"> </span>.<span class="w"> </span><span class="se">\</span>
 <span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>track-and-graph-master<span class="w"> </span>master.zip
 </code></pre></div></p>
-<p>(This command is ultimately just getting all of the <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src"> files and folders here </a> and copying them to your current directory.)</p>
+<p>(This command is ultimately just getting all of the <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src">files and folders here</a> and copying them to your current directory.)</p>
 <p>Now create a new Lua script file in the root of your workspace directory to write your code in e.g.</p>
 <div class="highlight"><pre><span></span><code>nvim<span class="w"> </span>my_script.lua
 </code></pre></div>
-<p>Your IDE should now recognise the Track &amp; Graph API and give you code completion hints when you type something like: </p>
+<p>Your IDE should now recognise the Track &amp; Graph API and give you code completion hints when you type something like:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">).</span>
 </code></pre></div>
-<h2 id="writing-your-first-script">Writing your first script<a class="headerlink" href="#writing-your-first-script" title="Permanent link">#</a></h2>
-<p>To get started let's write and save a super simple script: </p>
-<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nf">text</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>Now is a good time to figure out your development flow for testing the script on your device. If you have an easy way to copy and paste text between devices you can use the paste button in the Lua graph configuration. You can also save your workspace to a shared cloud directory or send the file to your device some other way and access it using the file button.</p>
-<p>If you load that script into the Lua graph configuration you should see a simple text graph with the words "Hello world!" in it like this: </p>
-<p><img alt="&quot;Hello world text demo&quot;" src="../hello_world_card.jpg" width="400" /></p>
-<h3 id="understanding-the-script">Understanding the script<a class="headerlink" href="#understanding-the-script" title="Permanent link">#</a></h3>
-<p>Let's break down what is going on here. First we are using the <code>require</code> function to load the <code>tng.graph</code> module. This module contains all of the functions that you can use to create graphs. The <code>text</code> function creates a simple text graph. Let's take a look at the definition of that function:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">--- Creates a text graph.</span>
-<span class="c1">--- @since v5.1.0</span>
-<span class="c1">--- @param params (string|number|TextGraphParams): Either the text to display or the parameters for the text graph.</span>
-<span class="c1">--- @return table: A table representing the text graph.</span>
-<span class="nv">M</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">params</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="nv">params</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">M</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span>
-<span class="w">            </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">,</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="kr">end</span>
-<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">M</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span>
-<span class="w">        </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">.</span><span class="py">text</span><span class="p">,</span>
-<span class="w">        </span><span class="nv">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">.</span><span class="py">size</span><span class="p">,</span>
-<span class="w">        </span><span class="nv">align</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">params</span><span class="p">.</span><span class="py">align</span><span class="p">,</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="kr">end</span>
-</code></pre></div>
-<p>Essentially this function takes a string, number, or a table of parameters and returns a table that represents the graph. The table contains a <code>type</code> field that tells the app what type of graph it is, and then any other parameters that are needed to create the graph. In this case we are just passing in a string, so the function creates a table with the <code>type</code> field set to <code>GRAPH_TYPE.TEXT</code> and the <code>text</code> field set to the string we passed in.</p>
-<p>So our script ultimately returned a table that looks like this:</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;TEXT&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>Notice you could get the same result by writing your script like this:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">)</span>
-
-<span class="kr">return</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">graph</span><span class="p">.</span><span class="py">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">,</span>
-<span class="w">  </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>Whenever Track &amp; Graph needs to generate the view data for your Lua graph it will call the script and use the returned table to create the graph. For example your script is run to generate the preview in the Lua graph configuration screen, and whenever you open the group that contains your Lua graph.</p>
-<h2 id="what-graphs-can-i-create">What graphs can I create?<a class="headerlink" href="#what-graphs-can-i-create" title="Permanent link">#</a></h2>
-<p>Returning to the tng/graph.lua file notice the params object references the class name TextGraphParams. If you look further up the file you will find the definition of that class:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">--- @since v5.1.0</span>
-<span class="c1">--- @class TextGraphParams</span>
-<span class="c1">--- @field text (string|number): The text to display.</span>
-<span class="c1">--- @field size? integer: 1-3 The size of the text small, medium or large. Defaults to large.</span>
-<span class="c1">--- @field align? string: start, centre, or end The alignment of the text. Defaults to centre.</span>
-</code></pre></div>
-<p>Note that a parameter with a <code>?</code> after it means that it is optional. If you don't provide a value for that parameter, the function will use a default value. </p>
-<p>You can also see the other types of graphs you can return and the parameters they expect in this file, they are: </p>
+<h2 id="scripting-limitations">Scripting Limitations<a class="headerlink" href="#scripting-limitations" title="Permanent link">#</a></h2>
+<p>There are a few limitations to be aware of when writing Lua scripts:</p>
 <ul>
-<li>Text</li>
-<li>Data Point</li>
-<li>Time Bar charts (but not Histograms currently)</li>
-<li>Line Graphs</li>
-<li>Pie Charts</li>
-</ul>
-<p>For further inspiration I recommend checking out the <a href="../../community/">community scripts</a>.</p>
-<h2 id="using-data-sources">Using data sources<a class="headerlink" href="#using-data-sources" title="Permanent link">#</a></h2>
-<p>A Lua graph script can actually return one of two things. It can return a table with the data in it as we've seen above, or it can return a function which accepts a table of named data sources. Track &amp; Graph will then:</p>
-<ol>
-<li>Execute the script to get it's return value (in this case a function).</li>
-<li>Realise that the return value is a function and call it, passing in the data sources configured in the app.</li>
-<li>Use the return value of that function to create the graph.</li>
-</ol>
-<p>For example if you were to configure your Lua graph with a data source that contains at least one data point like this:</p>
-<p><img alt="&quot;data_source&quot;" src="../data_source_configuration.jpg" width="300" /></p>
-<p>Then you could use the following script to return the most recent data point from that data source:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">sources</span><span class="p">)</span>
-<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nv">GRAPH_TYPE</span><span class="p">.</span><span class="py">DATA_POINT</span><span class="p">,</span>
-<span class="w">    </span><span class="nv">datapoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">sources</span><span class="p">[</span><span class="s2">&quot;my_data_source&quot;</span><span class="p">].</span><span class="nf">dp</span><span class="p">(),</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="kr">end</span>
-</code></pre></div>
-<p>Here <code>sources["my_data_source"]</code> is actually returning a <code>DataSource</code> object. Take a look at the <code>tng/core.lua</code> file to see the definition of this class and what other functions are available on it. Notice the definition of this function is empty:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">--- Fetches the next data point from the data source.</span>
-<span class="c1">--- Data points are iterated in reverse chronological order.</span>
-<span class="c1">--- @since v5.1.0</span>
-<span class="c1">--- @return DataPoint</span>
-<span class="kr">function</span><span class="w"> </span><span class="nc">DataSource</span><span class="p">.</span><span class="nf">dp</span><span class="p">()</span><span class="w"> </span><span class="kr">end</span>
-</code></pre></div>
-<p>That's because the implementation of this data source is actually written in the kotlin code of the android app. <a href="https://github.com/SamAmco/track-and-graph/blob/master/app/src/main/java/com/samco/trackandgraph/lua/apiimpl/LuaDataSourceProviderImpl.kt"> You can see that here </a> if you are interested but it is not necessary to read the kotlin code.</p>
-<h2 id="scripting-limitations">Scripting limitations<a class="headerlink" href="#scripting-limitations" title="Permanent link">#</a></h2>
-<p>There are a few limitations to be aware of when writing Lua scripts: </p>
-<ul>
-<li>Lua graph scripts are single files and they can not require or use symbols from other files except those that are provided by the Track &amp; Graph API.</li>
+<li>Scripts are single files and cannot require or use symbols from other files except those provided by the Track &amp; Graph API.</li>
 <li>The Lua engine under the hood is LuaK which is a Kotlin port of LuaJ based on Lua 5.2.x so language features should be compatible with that version of Lua.</li>
-<li>Some of the core api's have been stripped out for safety. For example:<ul>
+<li>Some of the core APIs have been stripped out for safety. For example:<ul>
 <li><code>dofile</code></li>
 <li><code>loadfile</code></li>
-<li><code>pcall</code></li>
-<li><code>xpcall</code></li>
 <li><code>package</code></li>
 </ul>
 </li>
 </ul>
 <p>In general your scripts should not try to access the OS to run commands, network requests, or access the file system.</p>
-<h2 id="script-previews">Script previews<a class="headerlink" href="#script-previews" title="Permanent link">#</a></h2>
-<p>If you have downloaded any of the community scripts you may have noticed that only the configuration parameters of the script are immediately visible. This is because the script preview will only show the code between the comments:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">--- PREVIEW_START</span>
-</code></pre></div>
-<p>and </p>
-<div class="highlight"><pre><span></span><code><span class="c1">--- PREVIEW_END</span>
-</code></pre></div>
-<p>You can use this to make the most important information about your script immediately visible like the name of the script and any configuration parameters e.g.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">--- PREVIEW_START</span>
-<span class="c1">-- Script: Text - Total This Period</span>
-<span class="c1">-- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week</span>
-<span class="kd">local</span><span class="w"> </span><span class="nv">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">WEEK</span>
-<span class="c1">--- PREVIEW_END</span>
-</code></pre></div>
-<h2 id="contributing-to-the-community-scripts">Contributing to the community scripts<a class="headerlink" href="#contributing-to-the-community-scripts" title="Permanent link">#</a></h2>
-<p>You already have all the tools you need to write and run your own scripts. If you create something you think is very useful and you want to share it with the community, you can create a PR into the Track &amp; Graph repository. However community scripts will require a few more things before they can be committed to the repository. In general you will need 4 things:</p>
-<ol>
-<li>A README.md file that describes the script and how to use it</li>
-<li>A screenshot of the graph that the script generates</li>
-<li>A test file, or multiple test files, that contain the test cases for the script</li>
-<li>The script file that contains the code</li>
-</ol>
-<h3 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">#</a></h3>
-<p>Community scripts are organized in two separate locations:</p>
-<p><strong>Lua scripts and tests</strong> go in <code>lua/src/community/graphs/</code>:
-<div class="highlight"><pre><span></span><code>lua/src/community/graphs/&lt;category&gt;/&lt;script-name&gt;/
-  ├── &lt;script-name&gt;.lua          # Main script file
-  └── test_&lt;script-name&gt;.lua     # Test file(s) (prefix with test_)
-</code></pre></div></p>
-<p><strong>Documentation and images</strong> go in <code>docs/docs/lua/community/</code>:
-<div class="highlight"><pre><span></span><code>docs/docs/lua/community/&lt;category&gt;/&lt;script-name&gt;/
-  ├── script.lua                 # Generated from lua/src via make sync-lua-to-docs
-  ├── README.md                  # Documentation
-  └── image.png                  # Screenshot
-</code></pre></div></p>
-<p>For example, the fraction script has:
-- Code: <code>lua/src/community/graphs/text/fraction/fraction.lua</code> and <code>test_fraction.lua</code>
-- Docs: <code>docs/docs/lua/community/text/fraction/script.lua</code>, <code>README.md</code>, and <code>image.png</code></p>
-<p>You can see examples of <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs">scripts here</a> and <a href="https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community">docs here</a>.</p>
-<p><strong>Important:</strong> The <code>script.lua</code> file in the docs directory is automatically generated. After making changes to your script in <code>lua/src/community/graphs/</code>, run <code>make sync-lua-to-docs</code> to copy it to the docs location. You only need to manually create the <code>README.md</code> and image files in the docs directory.</p>
-<h2 id="writing-tests">Writing tests<a class="headerlink" href="#writing-tests" title="Permanent link">#</a></h2>
-<p>Writing tests is important not only to ensure your code works as expected (particularly around edge cases) but also to make sure that your script continues to work as the Track &amp; Graph API evolves. If your script relies on some implementation detail or method call in the Track &amp; Graph Lua API, and that function changes in a future version, then your script may be left broken without anyone noticing except disgruntled users.</p>
-<h3 id="the-testing-framework">The testing framework<a class="headerlink" href="#the-testing-framework" title="Permanent link">#</a></h3>
-<p>Track &amp; Graph provides a testing framework for Lua scripts that runs your tests in the same Lua environment that's used in the production app. This gives greater assurances that if your tests pass, your script will work correctly in the actual app.</p>
-<p>You can create as many test files as you like for your script as long as each one starts with the word test and ends with .lua. For example, if your script is called <code>my_script.lua</code>, you could create a test file called <code>test_my_script.lua</code> or just <code>test.lua</code>. The test files should be placed in the same directory as your script. A test file is a Lua module that returns a table of test cases. Each test case specifies:</p>
-<ol>
-<li>Configuration overrides</li>
-<li>A set of named mock data sources</li>
-<li>Assertions to validate the script's output</li>
-</ol>
-<p>Here's a simple example of a test file:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
-<span class="kd">local</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;test.core&quot;</span><span class="p">)</span>
-
-<span class="nv">M</span><span class="p">.</span><span class="py">test_simple_case</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="c1">-- Configuration overrides for your script</span>
-<span class="w">  </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nv">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;core.PERIOD.WEEK&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="p">},</span>
-
-<span class="w">  </span><span class="c1">-- Function that returns mock data sources</span>
-<span class="w">  </span><span class="nv">sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
-<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nv">my_source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1620000000</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="p">},</span>
-<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1620086400</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="kr">end</span><span class="p">,</span>
-
-<span class="w">  </span><span class="c1">-- Function that validates the result</span>
-<span class="w">  </span><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="p">)</span>
-<span class="w">  </span><span class="kr">end</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="kr">return</span><span class="w"> </span><span class="nv">M</span>
-</code></pre></div>
-<h3 id="creating-test-cases">Creating test cases<a class="headerlink" href="#creating-test-cases" title="Permanent link">#</a></h3>
-<p>Each test should be defined as a field in your module's table. The value should be a table with the following fields:</p>
-<h4 id="1-config-table">1. <code>config</code> (table)<a class="headerlink" href="#1-config-table" title="Permanent link">#</a></h4>
-<p>The <code>config</code> table contains values that will override variables in your script. For example, if your script defines <code>local period = core.PERIOD.MONTH</code>, your test can override it with <code>local period = core.PERIOD.WEEK</code>. Notice that the configuration overrides always use strings and not references to the values themselves. e.g. <code>"core.PERIOD.WEEK"</code> rather than <code>core.PERIOD.WEEK</code>. That's because the testing framework actually just uses a regex to overwrite the first declaration matching the config name in your script before executing it.</p>
-<h4 id="2-sources-function">2. <code>sources</code> (function)<a class="headerlink" href="#2-sources-function" title="Permanent link">#</a></h4>
-<p>The <code>sources</code> function should return a table of mock data sources that will be passed to your script. Each source is a table of data points with <code>timestamp</code> and <code>value</code> fields:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span>
-<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.core&quot;</span><span class="p">)</span>
-<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="nf">time</span><span class="p">().</span><span class="nv">timestamp</span>
-
-<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">-- First data source named &quot;steps&quot;</span>
-<span class="w">    </span><span class="nv">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">86400</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5000</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">172800</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7500</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="c1">-- Second data source named &quot;calories&quot;</span>
-<span class="w">    </span><span class="nv">calories</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">86400</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">300</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nv">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">172800</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">450</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="kr">end</span>
-</code></pre></div>
-<h4 id="3-assertions-function">3. <code>assertions</code> (function)<a class="headerlink" href="#3-assertions-function" title="Permanent link">#</a></h4>
-<p>The <code>assertions</code> function receives the result of your script and should validate that it's correct using the test utility functions:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
-<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;test.core&quot;</span><span class="p">)</span>
-<span class="w">  </span><span class="nv">test</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mi">12500</span><span class="p">,</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="p">)</span>
-<span class="w">  </span><span class="nv">test</span><span class="p">.</span><span class="nf">assert</span><span class="p">(</span><span class="nv">result</span><span class="p">.</span><span class="py">type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nv">GRAPH_TYPE</span><span class="p">.</span><span class="py">TEXT</span><span class="p">)</span>
-<span class="kr">end</span>
-</code></pre></div>
-<p>Currently there are only two assertion functions available: <code>assertEquals</code> and <code>assert</code>. The assertEquals function will convert the left and right side to strings and compare string equality. </p>
-<p>It is also valid to use the error function to throw an error if the test fails. For example:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">assertions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">result</span><span class="p">)</span>
-<span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s2">&quot;Expected &#39;Hello world!&#39;, got &#39;&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">result</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
-<span class="w">  </span><span class="kr">end</span>
-<span class="kr">end</span>
-</code></pre></div>
-<p>For more comprehensive testing examples, see the <a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs">community script test files</a> which demonstrate common patterns for time-based scenarios, multi-source testing, and edge cases.</p>
-<h3 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">#</a></h3>
-<p>Since the tests run in the actual Track &amp; Graph Lua engine, you need an Android development environment to run them. You should be ok with just the CLI tools, or you can install Android Studio if you prefer. <a href="https://developer.android.com/studio"> You can download those things here. </a></p>
-<p>You will also need Track &amp; Graph cloned locally:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:SamAmco/track-and-graph.git
-<span class="nb">cd</span><span class="w"> </span>track-and-graph
-</code></pre></div>
-<p>The tests are run using the <a href="https://github.com/SamAmco/track-and-graph/blob/master/data/src/test/java/com/samco/trackandgraph/data/lua/CommunityTestRunner.kt"> CommunityTestRunner.kt </a> in the Android project. You can run them using the gradlew file inside the repo with:</p>
-<div class="highlight"><pre><span></span><code>./gradlew<span class="w"> </span>:data:testDebugUnitTest<span class="w"> </span>--tests<span class="w"> </span><span class="s2">&quot;com.samco.trackandgraph.data.lua.CommunityTestRunner&quot;</span>
-</code></pre></div>
-<h3 id="debugging-tests">Debugging tests<a class="headerlink" href="#debugging-tests" title="Permanent link">#</a></h3>
-<p>Debugging scripts and tests can be a bit tricky since you will generally have to work without a breakpoint debugger in your Lua code. </p>
-<p>You can use the <code>error</code> and <code>print</code> functions to help narrow down issues. The <code>print</code> function takes any set of arguments and tries to convert them to strings before printing them to the test output. The following are all valid uses of <code>print</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">-- prints &quot;Hello world!&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span><span class="w"> </span><span class="c1">-- prints &quot;123&quot;</span>
-<span class="nb">print</span><span class="p">({</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">-- prints e.g. &quot;table: 1ddd3478&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello &quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;world!&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">-- prints &quot;Hello world!&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">123</span><span class="p">)</span><span class="w"> </span><span class="c1">-- prints &quot;Hello 123&quot;</span>
-</code></pre></div>
-<p>Notice that only primitives like strings and numbers will print readably. Tables will not print their contents but instead their memory address, so you need to access their fields to print them effectively.</p>
-<p>You can use <code>print</code> and <code>error</code> anywhere in your script or test to narrow down issues, but please make sure to remove any <code>print</code> statements before you submit your PR.</p>
+<h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">#</a></h2>
+<p>The API source files are documented with comments. Browse them on GitHub:</p>
+<ul>
+<li><strong><a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/tng">lua/src/tng/</a></strong> - All API modules (<code>core</code>, <code>config</code>, <code>graph</code>, etc.)</li>
+</ul>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">#</a></h2>
+<p>The best way to learn is by reading existing scripts:</p>
+<ul>
+<li><strong><a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/functions">Community Functions</a></strong> - Filters, transforms, aggregations</li>
+<li><strong><a href="https://github.com/SamAmco/track-and-graph/tree/master/lua/src/community/graphs">Community Graph Scripts</a></strong> - Line graphs, pie charts, text displays</li>
+</ul>
+<p>You can also browse the <a href="../../community/">Community Scripts</a> page in the app to install and inspect scripts.</p>
 
 
 
