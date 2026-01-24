@@ -14,6 +14,7 @@
         "tutorial-tracking",
         "tutorial-lua",
         "tutorial-graphs",
+        "tutorial-functions-reminders",
         "lua-community-scripts-root",
         "play-store-page",
         "function-catalogue-location",
@@ -41,6 +42,11 @@
         "tutorial-graphs": {
           "type": "string",
           "format": "uri"
+        },
+        "tutorial-functions-reminders": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the functions reminders documentation section"
         },
         "lua-community-scripts-root": {
           "type": "string",

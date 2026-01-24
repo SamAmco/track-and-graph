@@ -40,6 +40,8 @@ data class Endpoints(
     val tutorialLua: String,
     @SerialName("tutorial-graphs")
     val tutorialGraphs: String,
+    @SerialName("tutorial-functions-reminders")
+    val tutorialFunctionsReminders: String,
     @SerialName("lua-community-scripts-root")
     val luaCommunityScriptsRoot: String,
     @SerialName("play-store-page")
