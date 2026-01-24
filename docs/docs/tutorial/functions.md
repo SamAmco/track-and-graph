@@ -71,6 +71,18 @@ For a deeper understanding of what's possible with Functions, I recommend explor
 
 ![Function info dialog showing detailed documentation](images/functions_info_dialog.jpg)
 
+## A note on "Time Since Last" reminders
+
+You can use the "Time Since Last" reminder type to get notified after a certain amount of time has passed since the last data point in a tracker or function. When you select a tracker, this works exactly as you'd expect—the reminder is re-scheduled whenever you add, update, or delete data.
+
+Functions work a bit differently. Since functions derive their data from other trackers and functions, Track & Graph automatically tracks these dependencies. When any upstream tracker changes, the reminder is re-scheduled based on the function's latest data point.
+
+However, there's an important caveat: **this only works reliably if your function is deterministic**. A deterministic function always produces the same output given the same inputs. Most functions are naturally deterministic—for example, a function that adds two trackers together, or filters data by date.
+
+If you create a function that includes randomness, references the current time in unpredictable ways, or has other non-deterministic behaviour, the reminder system may not behave as expected. The reminder is scheduled based on what the function outputs at the moment it's evaluated, which could change between evaluations even without any new data being tracked.
+
+For best results with reminders, stick to functions that process your data in a consistent, repeatable way.
+
 ## Disabling Lua
 
 Function nodes are powered by the Lua scripting engine. It should be hard to create a function graph that crashes the app, but if you somehow manage to do this you can start the app without the lua engine enabled by long pressing on the app launcher on your home screen and selecting "Launch Lua disabled". You will still see the cards for the Lua functions you created so you can delete them before restarting the app again.

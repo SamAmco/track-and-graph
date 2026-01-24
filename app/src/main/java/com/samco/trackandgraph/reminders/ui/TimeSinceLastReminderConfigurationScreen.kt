@@ -19,9 +19,12 @@ package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,6 +40,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,6 +77,7 @@ fun TimeSinceLastReminderConfigurationScreen(
     val hasSecondInterval by viewModel.hasSecondInterval.collectAsState()
     val featureName by viewModel.featureName.collectAsState()
     val continueEnabled by viewModel.continueEnabled.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(editReminder, editParams) {
         viewModel.initializeFromReminder(editReminder, editParams)
@@ -96,6 +102,7 @@ fun TimeSinceLastReminderConfigurationScreen(
         onHasSecondIntervalChanged = viewModel::updateHasSecondInterval,
         featureName = featureName,
         onFeatureIdChanged = viewModel::updateFeatureId,
+        onInfoClick = { viewModel.onOpenFunctionsRemindersInfo(context) },
         continueEnabled = continueEnabled,
         isEditMode = editReminder != null,
         onConfirm = {
@@ -122,6 +129,7 @@ fun TimeSinceLastReminderConfigurationContent(
     onHasSecondIntervalChanged: (Boolean) -> Unit,
     featureName: String,
     onFeatureIdChanged: (Long?) -> Unit,
+    onInfoClick: () -> Unit,
     continueEnabled: Boolean,
     isEditMode: Boolean,
     onConfirm: () -> Unit,
@@ -168,11 +176,22 @@ fun TimeSinceLastReminderConfigurationContent(
         var showFeatureSelectDialog by rememberSaveable { mutableStateOf(false) }
 
         val selectFeatureText = stringResource(R.string.select_tracker_placeholder)
-        SelectorButton(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            text = featureName.ifEmpty { selectFeatureText },
-            onClick = { showFeatureSelectDialog = true }
-        )
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SelectorButton(
+                modifier = Modifier.weight(1f),
+                text = featureName.ifEmpty { selectFeatureText },
+                onClick = { showFeatureSelectDialog = true }
+            )
+            IconButton(onClick = onInfoClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.about_icon),
+                    contentDescription = stringResource(id = R.string.info)
+                )
+            }
+        }
 
         if (showFeatureSelectDialog) {
             SelectItemDialog(
@@ -265,6 +284,7 @@ fun TimeSinceLastReminderConfigurationContentPreview() {
             onHasSecondIntervalChanged = {},
             featureName = "Exercise Sessions",
             onFeatureIdChanged = {},
+            onInfoClick = {},
             continueEnabled = true,
             isEditMode = false,
             onConfirm = {},

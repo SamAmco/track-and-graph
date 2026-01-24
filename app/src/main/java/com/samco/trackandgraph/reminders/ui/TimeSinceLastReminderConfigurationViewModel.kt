@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.reminders.ui
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
@@ -24,6 +25,7 @@ import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,11 +59,13 @@ interface TimeSinceLastReminderConfigurationViewModel {
     fun getReminder(): Reminder
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.TimeSinceLastParams?)
     fun reset()
+    fun onOpenFunctionsRemindersInfo(context: Context)
 }
 
 @HiltViewModel
 class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    private val urlNavigator: UrlNavigator
 ) : ViewModel(), TimeSinceLastReminderConfigurationViewModel {
 
     private val _reminderName = MutableStateFlow("")
@@ -202,5 +206,9 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
         _featureId.value = null
         _featureName.value = ""
         editingReminder = null
+    }
+
+    override fun onOpenFunctionsRemindersInfo(context: Context) {
+        urlNavigator.triggerNavigation(context, UrlNavigator.Location.TUTORIAL_FUNCTIONS_REMINDERS)
     }
 }
