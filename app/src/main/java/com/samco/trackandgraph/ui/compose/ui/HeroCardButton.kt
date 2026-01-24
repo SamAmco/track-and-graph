@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +26,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,12 +45,16 @@ fun HeroCardButton(
     onClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.tngColors.heroCardButtonBackgroundColor,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     Surface(
         modifier = modifier,
         onClick = onClick,
         shape = MaterialTheme.shapes.medium,
         color = backgroundColor,
-        shadowElevation = cardElevation,
+        shadowElevation = if (isPressed) 0.dp else cardElevation,
+        interactionSource = interactionSource,
     ) {
         Column(
             modifier = Modifier.padding(cardPadding),

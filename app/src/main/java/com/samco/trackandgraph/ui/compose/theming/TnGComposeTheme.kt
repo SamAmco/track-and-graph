@@ -44,6 +44,7 @@ val blueBlack = Color(0xFF2B3B45)
 
 val darkCharcoal = Color(0xFF121212)
 val midCharcoal = Color(0xFF282828)
+val lightCharcoal = Color(0xFF3C3C3C)
 val fadedLightBlue = Color(0xFF88AABF)
 val fadedDarkBlue = Color(0xFF54788C)
 val fadedOrange = Color(0xFFE17656)
@@ -209,7 +210,7 @@ private val LightTngColors = TngColors(
 private val DarkTngColors = TngColors(
     colorScheme = DarkColorScheme,
     selectorButtonColor = darkGray,
-    heroCardButtonBackgroundColor = darkCharcoal,
+    heroCardButtonBackgroundColor = lightCharcoal,
     textColorSecondary = midGray,
     toolbarBackgroundColor = midCharcoal,
     hyperlinkColor = fadedDarkBlue, // Using faded_dark_blue from colorSecondaryVariant
