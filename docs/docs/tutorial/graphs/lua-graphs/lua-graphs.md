@@ -14,7 +14,7 @@ end
 
 Don't worry if that seems a bit complicated, there are many scripts already written for you over at [the community script hub](../../../lua/community/index.md). 
 
-If you would like to learn how to write your own scripts check out [the developer guides](../../../lua/developer-guide/intro.md).
+If you would like to learn how to write your own scripts check out [the developer guide](../../../lua/developer-guide/intro.md).
 
 ## Community Scripts
 
