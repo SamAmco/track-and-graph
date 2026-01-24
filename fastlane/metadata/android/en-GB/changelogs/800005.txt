@@ -1,0 +1,3 @@
+- Add link to Time Since Last Reminder documentation for functions caveat
+- Improve hero button card style and interaction
+			

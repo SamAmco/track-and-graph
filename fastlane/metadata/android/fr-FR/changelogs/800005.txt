@@ -1,0 +1,3 @@
+- Ajouter un lien vers la documentation "Time Since Last Reminder" pour l'avertissement sur les fonctions
+- Améliorer le style et l'interaction de la carte de bouton principal
+			

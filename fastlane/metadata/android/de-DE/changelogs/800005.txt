@@ -1,0 +1,3 @@
+- Link zur "Time Since Last Reminder" Dokumentation für Funktionshinweis hinzufügen
+- Stil und Interaktion der Haupt-Button-Karte verbessern
+			
