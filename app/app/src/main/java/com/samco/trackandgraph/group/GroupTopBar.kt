@@ -135,13 +135,13 @@ private fun createTopBarActions(
     groupId: Long
 ): @Composable RowScope.() -> Unit {
     return {
-        // Import CSV action
-        IconButton(onClick = { groupDialogsViewModel.showImportDialog() }) {
-            Icon(painterResource(R.drawable.import_icon), null)
+        // Import/Export action
+        IconButton(onClick = { groupDialogsViewModel.showImportExportDialog() }) {
+            Icon(painterResource(R.drawable.swap_vert_icon), stringResource(R.string.import_export))
         }
-        // Export CSV action  
-        IconButton(onClick = { groupDialogsViewModel.showExportDialog() }) {
-            Icon(painterResource(R.drawable.export_icon), null)
+        // Search action (to be implemented)
+        IconButton(onClick = { /* TODO: implement search */ }) {
+            Icon(painterResource(R.drawable.search_icon), stringResource(R.string.search))
         }
         // Add dropdown menu
         GroupAddDropdownMenu(
