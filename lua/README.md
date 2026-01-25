@@ -91,7 +91,7 @@ Signs the catalog and publishes to debug assets with a fresh keypair:
 ```bash
 lua tools/publish-functions-debug.lua
 ```
-Creates three files in `app/src/debug/assets/functions-catalog/`:
+Creates three files in `app/app/src/debug/assets/functions-catalog/`:
 - `community-functions.lua` - The catalog
 - `community-functions.sig.json` - Signature metadata
 - `debug-<timestamp>.pub` - Public key (referenced by keyId in JSON)
@@ -126,7 +126,7 @@ Guide for adding new configuration input types (text, number, checkbox, enum, et
 
 ### 1. Add to LuaFunctionConfigSpec
 
-**File**: `data/src/main/java/com/samco/trackandgraph/data/lua/dto/LuaFunctionMetadata.kt`
+**File**: `app/data/src/main/java/com/samco/trackandgraph/data/lua/dto/LuaFunctionMetadata.kt`
 
 ```kotlin
 sealed class LuaFunctionConfigSpec {
@@ -143,7 +143,7 @@ sealed class LuaFunctionConfigSpec {
 
 ### 2. Add to LuaScriptConfigurationValue
 
-**File**: `data/src/main/java/com/samco/trackandgraph/data/database/dto/FunctionGraph.kt`
+**File**: `app/data/src/main/java/com/samco/trackandgraph/data/database/dto/FunctionGraph.kt`
 
 ```kotlin
 @Serializable
@@ -156,7 +156,7 @@ data class YourType(
 
 ### 3. Add to LuaScriptConfigurationInput
 
-**File**: `app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationInput.kt`
+**File**: `app/app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationInput.kt`
 
 ```kotlin
 data class YourType(
@@ -167,7 +167,7 @@ data class YourType(
 
 ### 4. Update LuaScriptConfigurationInputFactory
 
-**File**: `app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationInputFactory.kt`
+**File**: `app/app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationInputFactory.kt`
 
 Add case to `createConfigurationInput()`:
 ```kotlin
@@ -197,7 +197,7 @@ private fun createYourTypeInput(
 
 ### 5. Update LuaScriptConfigurationEncoder
 
-**File**: `app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationEncoder.kt`
+**File**: `app/app/src/main/java/com/samco/trackandgraph/functions/viewmodel/LuaScriptConfigurationEncoder.kt`
 
 ```kotlin
 is LuaScriptConfigurationInput.YourType -> {
@@ -210,7 +210,7 @@ is LuaScriptConfigurationInput.YourType -> {
 
 ### 6. Update ConfigurationValueParser
 
-**File**: `data/src/main/java/com/samco/trackandgraph/data/lua/apiimpl/ConfigurationValueParser.kt`
+**File**: `app/data/src/main/java/com/samco/trackandgraph/data/lua/apiimpl/ConfigurationValueParser.kt`
 
 ```kotlin
 is LuaScriptConfigurationValue.YourType -> LuaValue.valueOf(value.value)
@@ -218,7 +218,7 @@ is LuaScriptConfigurationValue.YourType -> LuaValue.valueOf(value.value)
 
 ### 7. Update LuaFunctionMetadataAdapter
 
-**File**: `data/src/main/java/com/samco/trackandgraph/data/lua/functionadapters/LuaFunctionMetadataAdapter.kt`
+**File**: `app/data/src/main/java/com/samco/trackandgraph/data/lua/functionadapters/LuaFunctionMetadataAdapter.kt`
 
 Add case to `parseConfigItem()`:
 ```kotlin
@@ -245,7 +245,7 @@ private fun parseYourTypeConfig(
 
 ### 8. Add UI Component
 
-**File**: `app/src/main/java/com/samco/trackandgraph/functions/node_editor/ConfigurationInputField.kt`
+**File**: `app/app/src/main/java/com/samco/trackandgraph/functions/node_editor/ConfigurationInputField.kt`
 
 Add case:
 ```kotlin

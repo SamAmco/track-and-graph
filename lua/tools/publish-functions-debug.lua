@@ -7,7 +7,7 @@ local file_traversal = require("tools.lib.file-traversal")
 
 -- Configuration
 local CATALOG_PATH = "catalog/community-functions.lua"
-local DEBUG_CATALOG_DIR = "../app/src/debug/assets/functions-catalog"
+local DEBUG_CATALOG_DIR = "../app/app/src/debug/assets/functions-catalog"
 
 -- Main function
 local function main()

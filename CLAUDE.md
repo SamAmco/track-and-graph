@@ -31,9 +31,9 @@ Track & Graph is an Android app for tracking personal data and creating custom g
 
 ### Building (Prefer Debug Variants)
 ```bash
-./gradlew assembleDebug           # Build debug APK (fast, no minification)
-./gradlew :app:testDebugUnitTest  # Run unit tests on debug variant
-./gradlew connectedDebugAndroidTest  # Run instrumented tests on debug
+app/gradlew :app:assembleDebug           # Build debug APK (fast, no minification)
+app/gradlew :app:testDebugUnitTest       # Run unit tests on debug variant
+app/gradlew :app:connectedDebugAndroidTest  # Run instrumented tests on debug
 ```
 
 ### Screenshot Testing (Use Makefile Commands)
