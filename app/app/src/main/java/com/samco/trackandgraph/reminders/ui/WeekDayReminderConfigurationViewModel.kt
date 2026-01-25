@@ -69,7 +69,6 @@ class WeekDayReminderConfigurationViewModelImpl @Inject constructor() :
     override fun getReminder(): Reminder {
         return Reminder(
             id = 0L,
-            displayIndex = 0,
             reminderName = _reminderName.value,
             groupId = null,
             featureId = null,

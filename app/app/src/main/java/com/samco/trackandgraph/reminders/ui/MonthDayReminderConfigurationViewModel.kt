@@ -110,7 +110,6 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
             params = params
         ) ?: Reminder(
             id = 0L,
-            displayIndex = 0,
             reminderName = _reminderName.value,
             groupId = null,
             featureId = null,

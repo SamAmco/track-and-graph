@@ -145,7 +145,6 @@ class GraphStatInputViewModelImpl @Inject constructor(
     private var configData: GraphStatConfigEvent.ConfigData<*>? = null
     private var graphStatGroupId: Long = -1L
     private var graphStatId: Long? = null
-    private var graphStatDisplayIndex: Int? = null
     private var subConfigException: GraphStatConfigEvent.ValidationException? = null
 
     override fun initViewModel(graphStatGroupId: Long, graphStatId: Long) {
@@ -171,7 +170,6 @@ class GraphStatInputViewModelImpl @Inject constructor(
             this@GraphStatInputViewModelImpl.graphName = graphStat.name.asTfv()
             this@GraphStatInputViewModelImpl.graphStatType.value = graphStat.type
             this@GraphStatInputViewModelImpl.graphStatId = graphStat.id
-            this@GraphStatInputViewModelImpl.graphStatDisplayIndex = graphStat.displayIndex
             this@GraphStatInputViewModelImpl.updateMode.value = true
         }
     }
@@ -278,7 +276,6 @@ class GraphStatInputViewModelImpl @Inject constructor(
         id = graphStatId ?: 0L,
         groupId = graphStatGroupId,
         name = graphName.text,
-        type = graphStatType.value!!,
-        displayIndex = graphStatDisplayIndex ?: 0
+        type = graphStatType.value!!
     )
 }

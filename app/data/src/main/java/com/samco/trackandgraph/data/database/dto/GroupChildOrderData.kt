@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-enum class GroupChildType { GROUP, FEATURE, GRAPH }
+enum class GroupChildType { GROUP, FEATURE, GRAPH, REMINDER }
 
 /**
  * Represents all relevant view data for child ordering

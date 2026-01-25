@@ -30,7 +30,6 @@ import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LayoutItem
-import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
@@ -199,25 +198,4 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
      * Returns a Flow of layout items for a given group, ordered by display_index.
      */
     fun getLayoutItemsForGroupFlow(groupId: Long): Flow<List<LayoutItem>>
-
-    /**
-     * Updates the display order of items within a group.
-     * The list should contain all items in the new desired order.
-     */
-    suspend fun updateLayoutOrder(groupId: Long, items: List<LayoutItem>)
-
-    /**
-     * Gets a layout item by its item ID and type.
-     */
-    suspend fun getLayoutItemByItemIdAndType(itemId: Long, type: LayoutItemType): LayoutItem?
-
-    /**
-     * Inserts a new layout item.
-     */
-    suspend fun insertLayoutItem(layoutItem: LayoutItem): Long
-
-    /**
-     * Deletes a layout item by its item ID and type.
-     */
-    suspend fun deleteLayoutItemByItemIdAndType(itemId: Long, type: LayoutItemType)
 }

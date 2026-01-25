@@ -17,8 +17,11 @@
 
 package com.samco.trackandgraph.data.interactor
 
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.entity.LayoutItem
 import com.samco.trackandgraph.data.database.entity.Reminder as ReminderEntity
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.serialization.ReminderSerializer
@@ -27,6 +30,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class ReminderHelperImpl @Inject constructor(
+    private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
     private val reminderSerializer: ReminderSerializer,
     @IODispatcher private val io: CoroutineDispatcher,
@@ -41,8 +45,30 @@ internal class ReminderHelperImpl @Inject constructor(
     }
 
     override suspend fun insertReminder(reminder: Reminder): Long = withContext(io) {
-        val entity = toEntity(reminder) ?: throw IllegalArgumentException("Failed to serialize reminder")
-        dao.insertReminder(entity)
+        transactionHelper.withTransaction {
+            val entity = toEntity(reminder) ?: throw IllegalArgumentException("Failed to serialize reminder")
+            val reminderId = dao.insertReminder(entity)
+
+            // Insert layout item at top of the reminders group (groupId = -1)
+            shiftUpGroupChildIndexes(REMINDER_LAYOUT_GROUP_ID)
+            dao.insertLayoutItem(
+                LayoutItem(
+                    id = 0,
+                    groupId = REMINDER_LAYOUT_GROUP_ID,
+                    type = LayoutItemType.REMINDER,
+                    itemId = reminderId,
+                    displayIndex = 0
+                )
+            )
+
+            reminderId
+        }
+    }
+
+    private fun shiftUpGroupChildIndexes(groupId: Long) {
+        val layoutItems = dao.getLayoutItemsForGroup(groupId)
+        val updates = layoutItems.map { it.copy(displayIndex = it.displayIndex + 1) }
+        dao.updateLayoutItems(updates)
     }
 
     override suspend fun updateReminder(reminder: Reminder) = withContext(io) {
@@ -51,7 +77,10 @@ internal class ReminderHelperImpl @Inject constructor(
     }
 
     override suspend fun deleteReminder(id: Long) = withContext(io) {
-        dao.deleteReminder(id)
+        transactionHelper.withTransaction {
+            dao.deleteLayoutItemByItemIdAndType(id, LayoutItemType.REMINDER)
+            dao.deleteReminder(id)
+        }
     }
 
     override suspend fun duplicateReminder(reminder: Reminder): Long = withContext(io) {
@@ -71,7 +100,6 @@ internal class ReminderHelperImpl @Inject constructor(
 
         return Reminder(
             id = entity.id,
-            displayIndex = entity.displayIndex,
             reminderName = entity.alarmName,
             groupId = entity.groupId,
             featureId = entity.featureId,
@@ -88,11 +116,16 @@ internal class ReminderHelperImpl @Inject constructor(
 
         return ReminderEntity(
             id = reminder.id,
-            displayIndex = reminder.displayIndex,
             alarmName = reminder.reminderName,
             groupId = reminder.groupId,
             featureId = reminder.featureId,
             encodedReminderParams = encodedParams
         )
+    }
+
+    companion object {
+        // Reminders use a special group ID of -1 in the layout table since they
+        // are displayed in a separate section rather than within regular groups
+        private const val REMINDER_LAYOUT_GROUP_ID = -1L
     }
 }

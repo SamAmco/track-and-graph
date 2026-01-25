@@ -272,7 +272,6 @@ internal class CSVReadWriterImpl @Inject constructor(
             name = rec.trackerName,
             groupId = trackGroupId,
             featureId = 0L,
-            displayIndex = 0,
             description = "",
             dataType = dataType,
             hasDefaultValue = false,

@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.data.di.DefaultDispatcher
@@ -301,8 +302,17 @@ class GroupViewModelImpl @Inject constructor(
     private suspend fun getGraphObjects(groupId: Long): List<GraphOrStat> = dataInteractor
         .getGraphsAndStatsByGroupIdSync(groupId)
 
-    private fun graphsToGroupChildren(graphs: List<GraphWithViewData>) = graphs
-        .map { GroupChild.ChildGraph(it.graph.id, it.graph.displayIndex, it.viewData) }
+    private suspend fun graphsToGroupChildren(graphs: List<GraphWithViewData>): List<GroupChild.ChildGraph> {
+        if (graphs.isEmpty()) return emptyList()
+        val groupId = graphs.first().graph.groupId
+        val layoutItems = dataInteractor.getLayoutItemsForGroup(groupId)
+        val displayIndexById = layoutItems
+            .filter { it.type == LayoutItemType.GRAPH }
+            .associate { it.itemId to it.displayIndex }
+        return graphs.map {
+            GroupChild.ChildGraph(it.graph.id, displayIndexById[it.graph.id] ?: 0, it.viewData)
+        }
+    }
 
     private fun mapNewGraphsToOldViewData(
         viewData: List<GraphWithViewData>,
@@ -490,18 +500,30 @@ class GroupViewModelImpl @Inject constructor(
     }
 
     private suspend fun getTrackerChildren(groupId: Long): List<GroupChild> {
+        val layoutItems = dataInteractor.getLayoutItemsForGroup(groupId)
+        val displayIndexByFeatureId = layoutItems
+            .filter { it.type == LayoutItemType.TRACKER }
+            .associate { it.itemId to it.displayIndex }
         return dataInteractor.getDisplayTrackersForGroupSync(groupId).map {
-            GroupChild.ChildTracker(it.id, it.displayIndex, it)
+            GroupChild.ChildTracker(it.id, displayIndexByFeatureId[it.featureId] ?: 0, it)
         }
     }
 
     private suspend fun getGroupChildren(groupId: Long): List<GroupChild> {
+        val layoutItems = dataInteractor.getLayoutItemsForGroup(groupId)
+        val displayIndexById = layoutItems
+            .filter { it.type == LayoutItemType.GROUP }
+            .associate { it.itemId to it.displayIndex }
         return dataInteractor.getGroupsForGroupSync(groupId).map {
-            GroupChild.ChildGroup(it.id, it.displayIndex, it)
+            GroupChild.ChildGroup(it.id, displayIndexById[it.id] ?: 0, it)
         }
     }
 
     private suspend fun getFunctionChildren(groupId: Long): List<GroupChild> {
+        val layoutItems = dataInteractor.getLayoutItemsForGroup(groupId)
+        val displayIndexByFeatureId = layoutItems
+            .filter { it.type == LayoutItemType.FUNCTION }
+            .associate { it.itemId to it.displayIndex }
         return dataInteractor.getFunctionsForGroupSync(groupId).map { function ->
             val displayFunction = DisplayFunction(
                 id = function.id,
@@ -509,7 +531,7 @@ class GroupViewModelImpl @Inject constructor(
                 name = function.name,
                 description = function.description
             )
-            GroupChild.ChildFunction(function.id, function.displayIndex, displayFunction)
+            GroupChild.ChildFunction(function.id, displayIndexByFeatureId[function.featureId] ?: 0, displayFunction)
         }
     }
 

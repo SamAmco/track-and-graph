@@ -77,11 +77,21 @@ internal class DataInteractorImpl @Inject constructor(
     )
 
     override suspend fun insertGroup(group: Group): Long = withContext(io) {
-        dao.insertGroup(group.toEntity())
-            .also { dataUpdateEvents.emit(DataUpdateType.GroupCreated) }
+        val id = dao.insertGroup(group.toEntity())
+        // Only insert layout item for subgroups (groups with a parent)
+        if (group.parentGroupId != null) {
+            insertLayoutItemAtTop(group.parentGroupId, id, LayoutItemType.GROUP)
+        }
+        dataUpdateEvents.emit(DataUpdateType.GroupCreated)
+        id
     }
 
     override suspend fun deleteGroup(id: Long) = withContext(io) {
+        // Get the group to find its parent before deleting
+        val group = dao.getGroupById(id)
+        if (group.parentGroupId != null) {
+            dao.deleteLayoutItemByItemIdAndType(id, LayoutItemType.GROUP)
+        }
         //Get all feature ids before we delete the group
         val allFeatureIdsBeforeDelete = dao.getAllFeaturesSync().map { it.id }.toSet()
         //Delete the group
@@ -252,6 +262,10 @@ internal class DataInteractorImpl @Inject constructor(
             .getDependentGraphs(featureId)
         val isTracker = dao.getTrackerByFeatureId(featureId) != null
 
+        // Delete the layout item first
+        val layoutType = if (isTracker) LayoutItemType.TRACKER else LayoutItemType.FUNCTION
+        dao.deleteLayoutItemByItemIdAndType(featureId, layoutType)
+
         // We need to make sure all cascade deletes are complete before we continue
         // hence the atomic update
         performAtomicUpdate { dao.deleteFeature(featureId) }
@@ -304,11 +318,13 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun deleteGraphOrStat(id: Long) = withContext(io) {
+        dao.deleteLayoutItemByItemIdAndType(id, LayoutItemType.GRAPH)
         dao.deleteGraphOrStat(id)
         dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
     }
 
     override suspend fun deleteGraphOrStat(graphOrStat: GraphOrStat) = withContext(io) {
+        dao.deleteLayoutItemByItemIdAndType(graphOrStat.id, LayoutItemType.GRAPH)
         dao.deleteGraphOrStat(graphOrStat.toEntity())
         dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
     }
@@ -409,8 +425,11 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllGlobalNotesSync().map { it.toDto() }
     }
 
-    private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) =
-        dao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
+    private fun duplicateGraphOrStat(graphOrStat: GraphOrStat): Long {
+        val id = dao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
+        insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
+        return id
+    }
 
     private suspend fun <R> performAtomicUpdate(
         updateType: DataUpdateType? = null,
@@ -421,23 +440,24 @@ internal class DataInteractorImpl @Inject constructor(
             .also { updateType?.let { dataUpdateEvents.emit(it) } }
     }
 
-    private suspend fun shiftUpGroupChildIndexes(groupId: Long) =
-        performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
-                dao.updateFeatures(features.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
+    private fun shiftUpGroupChildIndexes(groupId: Long) {
+        val layoutItems = dao.getLayoutItemsForGroup(groupId)
+        val updates = layoutItems.map { it.copy(displayIndex = it.displayIndex + 1) }
+        dao.updateLayoutItems(updates)
+    }
 
-            //Update graphs
-            dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
-                dao.updateGraphStats(graphs.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
-
-            //Update groups
-            dao.getGroupsForGroupSync(groupId).let { groups ->
-                dao.updateGroups(groups.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
-        }
+    private fun insertLayoutItemAtTop(groupId: Long, itemId: Long, type: LayoutItemType) {
+        shiftUpGroupChildIndexes(groupId)
+        dao.insertLayoutItem(
+            com.samco.trackandgraph.data.database.entity.LayoutItem(
+                id = 0,
+                groupId = groupId,
+                type = type,
+                itemId = itemId,
+                displayIndex = 0
+            )
+        )
+    }
 
     override suspend fun duplicateLineGraph(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
@@ -500,10 +520,8 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         lineGraph: LineGraphWithFeatures
     ): Long = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        if (graphOrStat.displayIndex == 0) {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
-        }
         val id = insertGraphStat(graphOrStat)
+        insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
         val lineGraphId =
             dao.insertLineGraph(lineGraph.toLineGraph().copy(graphStatId = id).toEntity())
         val features = lineGraph.features.map { it.copy(lineGraphId = lineGraphId).toEntity() }
@@ -513,10 +531,8 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun insertPieChart(graphOrStat: GraphOrStat, pieChart: PieChart): Long =
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-            if (graphOrStat.displayIndex == 0) {
-                shiftUpGroupChildIndexes(graphOrStat.groupId)
-            }
             val id = insertGraphStat(graphOrStat)
+            insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
             dao.insertPieChart(pieChart.copy(graphStatId = id).toEntity())
         }
 
@@ -524,10 +540,8 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         averageTimeBetweenStat: AverageTimeBetweenStat
     ): Long = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        if (graphOrStat.displayIndex == 0) {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
-        }
         val id = insertGraphStat(graphOrStat)
+        insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
         dao.insertAverageTimeBetweenStat(
             averageTimeBetweenStat.copy(graphStatId = id).toEntity()
         )
@@ -537,10 +551,8 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         timeHistogram: TimeHistogram
     ) = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        if (graphOrStat.displayIndex == 0) {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
-        }
         val id = insertGraphStat(graphOrStat)
+        insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
         dao.insertTimeHistogram(timeHistogram.copy(graphStatId = id).toEntity())
     }
 
@@ -548,19 +560,15 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         config: LastValueStat
     ): Long = performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-        if (graphOrStat.displayIndex == 0) {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
-        }
         val id = insertGraphStat(graphOrStat)
+        insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
         dao.insertLastValueStat(config.copy(graphStatId = id).toEntity())
     }
 
     override suspend fun insertBarChart(graphOrStat: GraphOrStat, barChart: BarChart): Long =
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-            if (graphOrStat.displayIndex == 0) {
-                shiftUpGroupChildIndexes(graphOrStat.groupId)
-            }
             val id = insertGraphStat(graphOrStat)
+            insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
             dao.insertBarChart(barChart.copy(graphStatId = id).toEntity())
         }
 
@@ -621,38 +629,20 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>) =
         performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
-                val updates = features.map { feature ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.FEATURE && it.id == feature.id
-                    }
-                    feature.copy(displayIndex = newDisplayIndex)
+            val layoutItems = dao.getLayoutItemsForGroup(groupId)
+            val updates = layoutItems.map { layoutItem ->
+                val childType = when (layoutItem.type) {
+                    LayoutItemType.TRACKER, LayoutItemType.FUNCTION -> GroupChildType.FEATURE
+                    LayoutItemType.GROUP -> GroupChildType.GROUP
+                    LayoutItemType.GRAPH -> GroupChildType.GRAPH
+                    LayoutItemType.REMINDER -> GroupChildType.REMINDER
                 }
-                dao.updateFeatures(updates)
-            }
-
-            //Update graphs
-            dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
-                val updates = graphs.map { graph ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.GRAPH && it.id == graph.id
-                    }
-                    graph.copy(displayIndex = newDisplayIndex)
+                val newDisplayIndex = children.indexOfFirst {
+                    it.type == childType && it.id == layoutItem.itemId
                 }
-                dao.updateGraphStats(updates)
+                layoutItem.copy(displayIndex = newDisplayIndex)
             }
-
-            //Update groups
-            dao.getGroupsForGroupSync(groupId).let { groups ->
-                val updates = groups.map { group ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.GROUP && it.id == group.id
-                    }
-                    group.copy(displayIndex = newDisplayIndex)
-                }
-                dao.updateGroups(updates)
-            }
+            dao.updateLayoutItems(updates)
         }
 
     override suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram? =
@@ -718,10 +708,8 @@ internal class DataInteractorImpl @Inject constructor(
         luaGraph: LuaGraphWithFeatures
     ): Long =
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
-            if (graphOrStat.displayIndex == 0) {
-                shiftUpGroupChildIndexes(graphOrStat.groupId)
-            }
             val id = insertGraphStat(graphOrStat)
+            insertLayoutItemAtTop(graphOrStat.groupId, id, LayoutItemType.GRAPH)
             val luaGraphId = dao.insertLuaGraph(
                 luaGraph.toLuaGraph().copy(
                     id = 0L,
@@ -809,32 +797,4 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getLayoutItemsForGroupFlow(groupId).map { items ->
             items.map { it.toDto() }
         }
-
-    override suspend fun updateLayoutOrder(groupId: Long, items: List<LayoutItem>) =
-        performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            val updatedItems = items.mapIndexed { index, item ->
-                item.copy(displayIndex = index).toEntity()
-            }
-            dao.updateLayoutItems(updatedItems)
-        }
-
-    override suspend fun getLayoutItemByItemIdAndType(
-        itemId: Long,
-        type: LayoutItemType
-    ): LayoutItem? = withContext(io) {
-        dao.getLayoutItemByItemIdAndType(itemId, type)?.toDto()
-    }
-
-    override suspend fun insertLayoutItem(layoutItem: LayoutItem): Long = withContext(io) {
-        dao.insertLayoutItem(layoutItem.toEntity())
-            .also { dataUpdateEvents.emit(DataUpdateType.DisplayIndex) }
-    }
-
-    override suspend fun deleteLayoutItemByItemIdAndType(
-        itemId: Long,
-        type: LayoutItemType
-    ) = withContext(io) {
-        dao.deleteLayoutItemByItemIdAndType(itemId, type)
-        dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-    }
 }

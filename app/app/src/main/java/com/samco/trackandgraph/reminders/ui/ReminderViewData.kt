@@ -104,6 +104,7 @@ sealed class ReminderViewData {
          */
         fun fromReminder(
             reminder: Reminder,
+            displayIndex: Int,
             nextScheduled: LocalDateTime?,
             lastTrackedInstant: Instant? = null
         ): ReminderViewData {
@@ -111,7 +112,7 @@ sealed class ReminderViewData {
                 is ReminderParams.WeekDayParams -> {
                     WeekDayReminderViewData(
                         id = reminder.id,
-                        displayIndex = reminder.displayIndex,
+                        displayIndex = displayIndex,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         checkedDays = params.checkedDays,
@@ -131,7 +132,7 @@ sealed class ReminderViewData {
 
                     PeriodicReminderViewData(
                         id = reminder.id,
-                        displayIndex = reminder.displayIndex,
+                        displayIndex = displayIndex,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         starts = params.starts,
@@ -147,7 +148,7 @@ sealed class ReminderViewData {
                 is ReminderParams.MonthDayParams -> {
                     MonthDayReminderViewData(
                         id = reminder.id,
-                        displayIndex = reminder.displayIndex,
+                        displayIndex = displayIndex,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         occurrence = params.occurrence,
@@ -171,7 +172,7 @@ sealed class ReminderViewData {
 
                     TimeSinceLastReminderViewData(
                         id = reminder.id,
-                        displayIndex = reminder.displayIndex,
+                        displayIndex = displayIndex,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         reminderDto = reminder,

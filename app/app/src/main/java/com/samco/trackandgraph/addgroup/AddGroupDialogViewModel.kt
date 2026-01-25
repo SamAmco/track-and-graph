@@ -113,7 +113,6 @@ class AddGroupDialogViewModelImpl @Inject constructor(
                     Group(
                         id = current.id,
                         name = name,
-                        displayIndex = current.displayIndex,
                         parentGroupId = current.parentGroupId,
                         colorIndex = colorIndex
                     )
@@ -123,7 +122,6 @@ class AddGroupDialogViewModelImpl @Inject constructor(
                     Group(
                         id = 0,
                         name = name,
-                        displayIndex = 0,
                         parentGroupId = parentGroupId ?: 0L,
                         colorIndex = colorIndex
                     )

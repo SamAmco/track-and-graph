@@ -160,7 +160,6 @@ private fun PreviewCardButtonPreviewHero() {
                         defaultValue = 0.0,
                         defaultLabel = "",
                         timestamp = null,
-                        displayIndex = 0,
                         description = "",
                         timerStartInstant = null
                     ),

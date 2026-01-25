@@ -20,8 +20,10 @@ package com.samco.trackandgraph.data.interactor
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
+import com.samco.trackandgraph.data.database.entity.LayoutItem
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
 import com.samco.trackandgraph.data.validation.FunctionValidator
@@ -52,10 +54,21 @@ internal class FunctionHelperImpl @Inject constructor(
                 id = 0L, // Let the database generate the ID
                 name = function.name,
                 groupId = function.groupId,
-                displayIndex = function.displayIndex,
                 description = function.description
             )
             val featureId = dao.insertFeature(feature)
+
+            // Insert layout item at top of the group
+            shiftUpGroupChildIndexes(function.groupId)
+            dao.insertLayoutItem(
+                LayoutItem(
+                    id = 0,
+                    groupId = function.groupId,
+                    type = LayoutItemType.FUNCTION,
+                    itemId = featureId,
+                    displayIndex = 0
+                )
+            )
 
             // Now create the Function entity with the correct featureId
             val functionId =
@@ -76,6 +89,12 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
+    private fun shiftUpGroupChildIndexes(groupId: Long) {
+        val layoutItems = dao.getLayoutItemsForGroup(groupId)
+        val updates = layoutItems.map { it.copy(displayIndex = it.displayIndex + 1) }
+        dao.updateLayoutItems(updates)
+    }
+
     override suspend fun updateFunction(function: Function) = withContext(io) {
         transactionHelper.withTransaction {
             functionValidator.validateFunction(function)
@@ -87,7 +106,6 @@ internal class FunctionHelperImpl @Inject constructor(
                 id = function.featureId,
                 name = function.name,
                 groupId = function.groupId,
-                displayIndex = function.displayIndex,
                 description = function.description
             )
             dao.updateFeature(feature)
@@ -167,6 +185,18 @@ internal class FunctionHelperImpl @Inject constructor(
             //Create a copy of the feature
             val feature = dao.getFeatureById(function.featureId) ?: return@withTransaction null
             val newFeatureId = dao.insertFeature(feature.copy(id = 0L))
+
+            // Insert layout item at top of the group
+            shiftUpGroupChildIndexes(function.groupId)
+            dao.insertLayoutItem(
+                LayoutItem(
+                    id = 0,
+                    groupId = function.groupId,
+                    type = LayoutItemType.FUNCTION,
+                    itemId = newFeatureId,
+                    displayIndex = 0
+                )
+            )
 
             // Create a copy of the function with id = 0 to generate new id
             val duplicatedFunction = function.copy(id = 0L, featureId = newFeatureId)

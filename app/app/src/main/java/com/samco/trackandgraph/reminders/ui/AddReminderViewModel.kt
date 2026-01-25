@@ -122,11 +122,8 @@ class AddReminderViewModelImpl @Inject constructor(
 
     private suspend fun updateReminder(oldReminder: Reminder, newReminder: Reminder) {
         // Update existing reminder
-        val updatedReminder = newReminder.copy(
-            id = oldReminder.id,
-            displayIndex = oldReminder.displayIndex,
-        )
-        
+        val updatedReminder = newReminder.copy(id = oldReminder.id)
+
         try {
             reminderInteractor.scheduleNext(updatedReminder)
             dataInteractor.updateReminder(updatedReminder)
@@ -137,18 +134,7 @@ class AddReminderViewModelImpl @Inject constructor(
     }
 
     private suspend fun insertReminder(reminder: Reminder) {
-        // Get existing reminders and shift their display indices down
-        val existingReminders = dataInteractor.getAllRemindersSync()
-        val shiftedReminders = existingReminders.map { existingReminder ->
-            existingReminder.copy(displayIndex = existingReminder.displayIndex + 1)
-        }
-
-        // Update existing reminders with shifted display indices
-        shiftedReminders.forEach { shiftedReminder ->
-            dataInteractor.updateReminder(shiftedReminder)
-        }
-
-        // Insert new reminder
+        // Insert new reminder - the data layer handles layout item creation at index 0
         val insertedId = dataInteractor.insertReminder(reminder)
         val insertedReminder = reminder.copy(id = insertedId)
 

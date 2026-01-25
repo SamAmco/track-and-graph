@@ -132,7 +132,6 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
             params = params
         ) ?: Reminder(
             id = 0L, // Will be assigned by database
-            displayIndex = 0,
             reminderName = _reminderName.value,
             groupId = null,
             featureId = null,

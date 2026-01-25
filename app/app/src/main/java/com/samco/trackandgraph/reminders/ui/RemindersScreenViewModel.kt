@@ -20,6 +20,9 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
+import com.samco.trackandgraph.data.database.dto.GroupChildType
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -89,7 +92,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
     private val allReminders: StateFlow<LoadingState> =
         merge(
             dataInteractor.getDataUpdateEvents()
-                .filter { it == DataUpdateType.Reminder }
+                .filter { it == DataUpdateType.Reminder || it == DataUpdateType.DisplayIndex }
                 .map { },
             reminderInteractor.schedulingEvents.map { }
         )
@@ -97,8 +100,18 @@ class RemindersScreenViewModelImpl @Inject constructor(
             .onStart { emit(Unit) } // Emit initial event to load data
             .flatMapLatest {
                 flow {
+                    // Get layout items for the reminder group (groupId = -1)
+                    val layoutItems = dataInteractor.getLayoutItemsForGroup(REMINDER_LAYOUT_GROUP_ID)
+                    val displayIndexById = layoutItems
+                        .filter { it.type == LayoutItemType.REMINDER }
+                        .associate { it.itemId to it.displayIndex }
+
                     val reminders = dataInteractor.getAllRemindersSync()
-                        .map { convertToReminderViewData(it) }
+                        .map { reminder ->
+                            val displayIndex = displayIndexById[reminder.id] ?: 0
+                            convertToReminderViewData(reminder, displayIndex)
+                        }
+                        .sortedBy { it.displayIndex }
                     emit(LoadingState.Loaded(reminders))
                 }
             }
@@ -167,18 +180,17 @@ class RemindersScreenViewModelImpl @Inject constructor(
         if (!isDragging.value) return
 
         viewModelScope.launch {
-            // Get all reminders from database and update display indices
-            val allRemindersFromDb = dataInteractor.getAllRemindersSync()
-            val updatedReminders =
-                temporaryReminders.value.mapIndexedNotNull { index, reminderViewData ->
-                    allRemindersFromDb.find { it.id == reminderViewData.id }
-                        ?.copy(displayIndex = index)
-                }
-
-            // Update each reminder individually
-            updatedReminders.forEach { reminder ->
-                dataInteractor.updateReminder(reminder)
+            // Create GroupChildOrderData for each reminder in the new order
+            val orderData = temporaryReminders.value.mapIndexed { index, reminderViewData ->
+                GroupChildOrderData(
+                    type = GroupChildType.REMINDER,
+                    id = reminderViewData.id,
+                    displayIndex = index
+                )
             }
+
+            // Update the layout items for reminders
+            dataInteractor.updateGroupChildOrder(REMINDER_LAYOUT_GROUP_ID, orderData)
 
             val expectedOrder = temporaryReminders.value.map { it.id }
 
@@ -208,7 +220,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
         }
     }
 
-    private suspend fun convertToReminderViewData(reminder: Reminder): ReminderViewData {
+    private suspend fun convertToReminderViewData(reminder: Reminder, displayIndex: Int): ReminderViewData {
         val nextScheduled =
             when (val nextScheduled = reminderInteractor.getNextScheduled(reminder)) {
                 is NextScheduled.AtInstant -> LocalDateTime
@@ -220,7 +232,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
         // For time-since-last reminders, fetch the last tracked instant
         val lastTrackedInstant = getLastTrackedInstant(reminder)
 
-        return ReminderViewData.fromReminder(reminder, nextScheduled, lastTrackedInstant)
+        return ReminderViewData.fromReminder(reminder, displayIndex, nextScheduled, lastTrackedInstant)
     }
 
     private suspend fun getLastTrackedInstant(reminder: Reminder): Instant? {
@@ -239,5 +251,11 @@ class RemindersScreenViewModelImpl @Inject constructor(
     private sealed class LoadingState {
         data object Loading : LoadingState()
         data class Loaded(val data: List<ReminderViewData>) : LoadingState()
+    }
+
+    companion object {
+        // Reminders use a special group ID of -1 in the layout table since they
+        // are displayed in a separate section rather than within regular groups
+        private const val REMINDER_LAYOUT_GROUP_ID = -1L
     }
 }

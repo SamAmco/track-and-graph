@@ -268,7 +268,6 @@ class AddTrackerViewModelImpl @Inject constructor(
             name = trackerName.text,
             groupId = groupId,
             featureId = 0L,
-            displayIndex = 0,
             description = trackerDescription.text,
             dataType = getDataType(),
             hasDefaultValue = hasDefaultValue.value ?: false,

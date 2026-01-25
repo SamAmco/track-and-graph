@@ -117,7 +117,6 @@ internal class TrackerHelperImpl @Inject constructor(
                 id = oldTracker.featureId,
                 name = newName ?: oldTracker.name,
                 groupId = oldTracker.groupId,
-                displayIndex = oldTracker.displayIndex,
                 description = featureDescription ?: oldTracker.description
             )
             val newTracker = com.samco.trackandgraph.data.database.entity.Tracker(
@@ -271,8 +270,25 @@ internal class TrackerHelperImpl @Inject constructor(
     override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
         return@withContext transactionHelper.withTransaction {
             val featureId = dao.insertFeature(tracker.toFeatureEntity())
+            // Insert layout item at top of the group
+            shiftUpGroupChildIndexes(tracker.groupId)
+            dao.insertLayoutItem(
+                com.samco.trackandgraph.data.database.entity.LayoutItem(
+                    id = 0,
+                    groupId = tracker.groupId,
+                    type = LayoutItemType.TRACKER,
+                    itemId = featureId,
+                    displayIndex = 0
+                )
+            )
             dao.insertTracker(tracker.toEntity().copy(featureId = featureId))
         }
+    }
+
+    private fun shiftUpGroupChildIndexes(groupId: Long) {
+        val layoutItems = dao.getLayoutItemsForGroup(groupId)
+        val updates = layoutItems.map { it.copy(displayIndex = it.displayIndex + 1) }
+        dao.updateLayoutItems(updates)
     }
 
     override suspend fun updateTracker(tracker: Tracker) = withContext(io) {

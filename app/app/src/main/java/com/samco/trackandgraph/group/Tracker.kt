@@ -410,7 +410,6 @@ fun TrackerPreview() {
                     defaultLabel = "Glass",
                     featureId = 4,
                     timestamp = null,
-                    displayIndex = 3,
                     timerStartInstant = null
                 ),
                 onEdit = {},
@@ -436,7 +435,6 @@ fun TrackerPreview() {
                     defaultLabel = "",
                     featureId = 1,
                     timestamp = OffsetDateTime.parse("2024-01-15T10:30:00+01:00"),
-                    displayIndex = 0,
                     timerStartInstant = null
                 ),
                 onEdit = {},
@@ -462,7 +460,6 @@ fun TrackerPreview() {
                     defaultLabel = "",
                     featureId = 2,
                     timestamp = null,
-                    displayIndex = 1,
                     timerStartInstant = Instant.parse("2025-07-15T10:30:00.00Z").minusSeconds(125)
                 ),
                 onEdit = {},
@@ -488,7 +485,6 @@ fun TrackerPreview() {
                     defaultLabel = "",
                     featureId = 3,
                     timestamp = OffsetDateTime.parse("2024-01-15T02:30:00+01:00"),
-                    displayIndex = 2,
                     timerStartInstant = null
                 ),
                 onEdit = {},
