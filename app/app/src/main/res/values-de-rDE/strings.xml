@@ -38,6 +38,9 @@
     <string name="feature_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
     <string name="data_points">%1$d Datenpunkte</string>
+    <string name="items_selected">%1$d Ausgewählt</string>
+    <string name="ru_sure_del_data_points">Sind Sie sicher, dass Sie diese Datenpunkte löschen möchten?</string>
+    <string name="delete_selected_content_description">Ausgewählte Einträge löschen</string>
     <string name="no_data">Keine Daten</string>
     <string name="skip">Überspringen</string>
     <string name="exportButton">Exportieren</string>
