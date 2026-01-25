@@ -19,7 +19,7 @@ def run_command(cmd, capture=True, check=True):
 
 def get_version_from_gradle():
     """Extract versionName from app/build.gradle.kts"""
-    gradle_file = Path(__file__).parent.parent / "app" / "build.gradle.kts"
+    gradle_file = Path(__file__).parent.parent / "app" / "app" / "build.gradle.kts"
 
     with open(gradle_file) as f:
         content = f.read()

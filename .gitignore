@@ -36,7 +36,8 @@ captures/
 
 # IntelliJ
 *.iml
-.idea/*
+**/.idea/*
+app/.idea/*
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.
@@ -80,9 +81,9 @@ todo.txt
 kls_database.db
 
 # Generated files
-data/src/main/assets/generated/
-data/src/test/resources/generated/
-app/src/debug/assets/functions-catalog/
+app/data/src/main/assets/generated/
+app/data/src/test/resources/generated/
+app/app/src/debug/assets/functions-catalog/
 
 lua/local
 

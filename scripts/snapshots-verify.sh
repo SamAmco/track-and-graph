@@ -21,7 +21,7 @@ boot_and_prep "$AVD_NAME"
 set_display 548 1280 210
 
 echo "==> Verifying snapshots"
-./gradlew :app:screenshotsExecuteScreenshotTests -PdirectorySuffix=api35-low
+app/gradlew :app:screenshotsExecuteScreenshotTests -PdirectorySuffix=api35-low
 
 # Cleanup
 kill_emulator

@@ -121,7 +121,7 @@ Here `sources["my_data_source"]` is actually returning a `DataSource` object. Ta
 function DataSource.dp() end
 ```
 
-That's because the implementation of this data source is actually written in the kotlin code of the android app. [ You can see that here ](https://github.com/SamAmco/track-and-graph/blob/master/app/src/main/java/com/samco/trackandgraph/lua/apiimpl/LuaDataSourceProviderImpl.kt) if you are interested but it is not necessary to read the kotlin code.
+That's because the implementation of this data source is actually written in the kotlin code of the android app. [ You can see that here ](https://github.com/SamAmco/track-and-graph/blob/master/app/app/src/main/java/com/samco/trackandgraph/lua/apiimpl/LuaDataSourceProviderImpl.kt) if you are interested but it is not necessary to read the kotlin code.
 
 ## Script Previews
 

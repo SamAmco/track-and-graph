@@ -11,7 +11,7 @@ local SIGNATURE_OUTPUT = "catalog/community-functions.sig.json"
 local SIGNATURE_BYTES = "catalog/community-functions.sig"
 local PRIVATE_KEY_PATH_FILE = ".private-key-path"
 local KEY_ID = "prod-key-1-pub.pem"
-local PUBLIC_KEY_PATH = "../app/src/main/assets/functions-catalog/" .. KEY_ID
+local PUBLIC_KEY_PATH = "../app/app/src/main/assets/functions-catalog/" .. KEY_ID
 
 -- Main function
 local function main()

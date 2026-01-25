@@ -34,7 +34,7 @@ def check_working_tree_clean():
 
 def get_version_from_gradle():
     """Extract versionName and versionCode from app/build.gradle.kts"""
-    gradle_file = Path(__file__).parent.parent / "app" / "build.gradle.kts"
+    gradle_file = Path(__file__).parent.parent / "app" / "app" / "build.gradle.kts"
 
     with open(gradle_file) as f:
         content = f.read()
@@ -76,7 +76,7 @@ def get_current_branch():
 
 def find_apk():
     """Find the release APK file"""
-    apk_dir = Path(__file__).parent.parent / "app" / \
+    apk_dir = Path(__file__).parent.parent / "app" / "app" / \
         "build" / "outputs" / "apk" / "release"
     apk_files = list(apk_dir.glob("*.apk"))
 
