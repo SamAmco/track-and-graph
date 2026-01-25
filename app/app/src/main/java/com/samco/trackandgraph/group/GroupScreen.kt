@@ -127,6 +127,9 @@ fun GroupScreen(
     val groupDialogsViewModel: GroupDialogsViewModel = hiltViewModel()
     val addGroupDialogViewModel: AddGroupDialogViewModelImpl = hiltViewModel()
     val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel<ReleaseNotesViewModelImpl>()
+    val searchViewModel: GroupSearchViewModel = hiltViewModel<GroupSearchViewModelImpl>()
+
+    val isSearchVisible by searchViewModel.isSearchVisible.collectAsStateWithLifecycle()
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)
@@ -135,33 +138,41 @@ fun GroupScreen(
     // Local state for FAB visibility based on scroll behavior
     val showFab = remember { mutableStateOf(true) }
 
-    GroupTopBarContent(
-        navArgs = navArgs,
-        groupViewModel = groupViewModel,
-        groupDialogsViewModel = groupDialogsViewModel,
-        addGroupDialogViewModel = addGroupDialogViewModel,
-        onAddTracker = onAddTracker,
-        onAddGraphStat = onAddGraphStat,
-        onAddFunction = onAddFunction,
-        showFab = showFab,
-    )
+    if (isSearchVisible) {
+        SearchScreen(
+            navArgs = navArgs,
+            onBack = { searchViewModel.hideSearch() }
+        )
+    } else {
+        GroupTopBarContent(
+            navArgs = navArgs,
+            groupViewModel = groupViewModel,
+            groupDialogsViewModel = groupDialogsViewModel,
+            addGroupDialogViewModel = addGroupDialogViewModel,
+            onAddTracker = onAddTracker,
+            onAddGraphStat = onAddGraphStat,
+            onAddFunction = onAddFunction,
+            showFab = showFab,
+            onSearchClick = { searchViewModel.showSearch() },
+        )
 
-    GroupScreenContent(
-        groupViewModel = groupViewModel,
-        groupDialogsViewModel = groupDialogsViewModel,
-        addGroupDialogViewModel = addGroupDialogViewModel,
-        releaseNotesViewModel = releaseNotesViewModel,
-        groupId = navArgs.groupId,
-        groupName = navArgs.groupName,
-        onTrackerEdit = onTrackerEdit,
-        onGraphStatEdit = onGraphStatEdit,
-        onGraphStatClick = onGraphStatClick,
-        onGroupClick = onGroupClick,
-        onTrackerHistory = onTrackerHistory,
-        onFunctionEdit = onFunctionEdit,
-        onFunctionClick = onFunctionClick,
-        showFab = showFab,
-    )
+        GroupScreenContent(
+            groupViewModel = groupViewModel,
+            groupDialogsViewModel = groupDialogsViewModel,
+            addGroupDialogViewModel = addGroupDialogViewModel,
+            releaseNotesViewModel = releaseNotesViewModel,
+            groupId = navArgs.groupId,
+            groupName = navArgs.groupName,
+            onTrackerEdit = onTrackerEdit,
+            onGraphStatEdit = onGraphStatEdit,
+            onGraphStatClick = onGraphStatClick,
+            onGroupClick = onGroupClick,
+            onTrackerHistory = onTrackerHistory,
+            onFunctionEdit = onFunctionEdit,
+            onFunctionClick = onFunctionClick,
+            showFab = showFab,
+        )
+    }
 }
 
 /** Data classes for click listeners with default empty lambda values */

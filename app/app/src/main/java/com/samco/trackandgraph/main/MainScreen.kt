@@ -271,8 +271,11 @@ fun AppBar(
                 NavigationIcon(
                     navButtonStyle = if (config.backNavigationAction) NavButtonStyle.UP else NavButtonStyle.MENU,
                     onClick = {
-                        if (config.backNavigationAction && backStack.size > 1) backStack.removeLastOrNull()
-                        else scope.launch { drawerState.open() }
+                        when {
+                            config.overrideBackNavigationAction != null -> config.overrideBackNavigationAction.invoke()
+                            config.backNavigationAction && backStack.size > 1 -> backStack.removeLastOrNull()
+                            else -> scope.launch { drawerState.open() }
+                        }
                     }
                 )
             }
