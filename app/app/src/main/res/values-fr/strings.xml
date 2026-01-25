@@ -45,6 +45,8 @@
     <string name="skip">Passez</string>
     <string name="exportButton">Exporter</string>
     <string name="importButton">Importer</string>
+    <string name="import_export">Importer/Exporter</string>
+    <string name="search">Rechercher</string>
     <string name="export_to">Exportez les données suivies de ce groupe au format CSV :</string>
     <string name="export_error_message">Échec de l\'exportation : %1$s</string>
     <string name="import_from">Importez les données suivies dans ce groupe à partir d\'un fichier CSV:</string>

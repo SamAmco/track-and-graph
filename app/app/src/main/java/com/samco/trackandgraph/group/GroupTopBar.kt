@@ -55,6 +55,7 @@ internal fun GroupTopBarContent(
     onAddGraphStat: (Long) -> Unit,
     showFab: MutableState<Boolean>,
     onAddFunction: (Long) -> Unit,
+    onSearchClick: () -> Unit,
 ) {
     val topBarController = LocalTopBarController.current
 
@@ -73,6 +74,7 @@ internal fun GroupTopBarContent(
         groupViewModel,
         onAddTracker,
         onAddGraphStat,
+        onSearchClick,
         navArgs.groupId
     ) {
         createTopBarActions(
@@ -82,6 +84,7 @@ internal fun GroupTopBarContent(
             onAddTracker = onAddTracker,
             onAddGraphStat = onAddGraphStat,
             onAddFunction = onAddFunction,
+            onSearchClick = onSearchClick,
             groupId = navArgs.groupId
         )
     }
@@ -132,6 +135,7 @@ private fun createTopBarActions(
     onAddTracker: (Long) -> Unit,
     onAddGraphStat: (Long) -> Unit,
     onAddFunction: (Long) -> Unit,
+    onSearchClick: () -> Unit,
     groupId: Long
 ): @Composable RowScope.() -> Unit {
     return {
@@ -139,8 +143,8 @@ private fun createTopBarActions(
         IconButton(onClick = { groupDialogsViewModel.showImportExportDialog() }) {
             Icon(painterResource(R.drawable.swap_vert_icon), stringResource(R.string.import_export))
         }
-        // Search action (to be implemented)
-        IconButton(onClick = { /* TODO: implement search */ }) {
+        // Search action
+        IconButton(onClick = onSearchClick) {
             Icon(painterResource(R.drawable.search_icon), stringResource(R.string.search))
         }
         // Add dropdown menu
