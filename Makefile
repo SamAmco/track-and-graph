@@ -26,11 +26,11 @@ run-community-tests: run-community-functions-tests run-community-graph-tests
 
 .PHONY: run-community-functions-tests
 run-community-functions-tests:
-	app/gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.FunctionTestRunner"
+	cd app && ./gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.FunctionTestRunner"
 
 .PHONY: run-community-graph-tests
 run-community-graph-tests:
-	app/gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.GraphScriptTestRunner"
+	cd app && ./gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.GraphScriptTestRunner"
 
 .PHONY: sync-lua-to-docs
 sync-lua-to-docs:
@@ -78,15 +78,15 @@ validate-all: lua-test-api validate-remote-config run-community-tests lua-verify
 
 .PHONY: assemble-release
 assemble-release:
-	app/gradlew :app:clean :app:assembleRelease
+	cd app && ./gradlew :app:clean :app:assembleRelease
 
 .PHONY: bundle-release
 bundle-release:
-	app/gradlew :app:clean :app:bundleRelease
+	cd app && ./gradlew :app:clean :app:bundleRelease
 
 .PHONY: assemble-bundle-release
 assemble-bundle-release:
-	app/gradlew :app:clean :app:assembleRelease :app:bundleRelease
+	cd app && ./gradlew :app:clean :app:assembleRelease :app:bundleRelease
 
 # ---------- 1) RECORD LOW-RES SNAPSHOT BASELINES ----------
 .PHONY: snapshots-record

@@ -21,7 +21,7 @@ boot_and_prep "$AVD_NAME"
 set_display 548 1280 210
 
 echo "==> Recording low-res baselines"
-app/gradlew :app:screenshotsExecuteScreenshotTests -Precord -PdirectorySuffix=api35-low
+(cd app && ./gradlew :app:screenshotsExecuteScreenshotTests -Precord -PdirectorySuffix=api35-low)
 
 # Cleanup
 kill_emulator

@@ -24,7 +24,7 @@ set_display 1080 2340 420
 cleanup_device_screenshots "/sdcard/Pictures/TutorialScreenshots/"
 
 echo "==> Running tutorial captures"
-app/gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.tutorial.TutorialScreenshots
+(cd app && ./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.tutorial.TutorialScreenshots)
 
 # Wait for files to be written
 wait_for_files
