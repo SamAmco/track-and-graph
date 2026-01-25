@@ -48,28 +48,16 @@ enum class DeleteType {
 @HiltViewModel
 class GroupDialogsViewModel @Inject constructor() : ViewModel() {
 
-    // Import Features Dialog
-    private val _showImportDialog = MutableStateFlow(false)
-    val showImportDialog: StateFlow<Boolean> = _showImportDialog.asStateFlow()
+    // Import/Export Dialog
+    private val _showImportExportDialog = MutableStateFlow(false)
+    val showImportExportDialog: StateFlow<Boolean> = _showImportExportDialog.asStateFlow()
 
-    fun showImportDialog() {
-        _showImportDialog.value = true
+    fun showImportExportDialog() {
+        _showImportExportDialog.value = true
     }
 
-    fun hideImportDialog() {
-        _showImportDialog.value = false
-    }
-
-    // Export Features Dialog - ready for future implementation
-    private val _showExportDialog = MutableStateFlow(false)
-    val showExportDialog: StateFlow<Boolean> = _showExportDialog.asStateFlow()
-
-    fun showExportDialog() {
-        _showExportDialog.value = true
-    }
-
-    fun hideExportDialog() {
-        _showExportDialog.value = false
+    fun hideImportExportDialog() {
+        _showImportExportDialog.value = false
     }
 
     // Feature Description Dialog
