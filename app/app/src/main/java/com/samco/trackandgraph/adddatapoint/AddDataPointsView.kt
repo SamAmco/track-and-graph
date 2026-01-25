@@ -20,9 +20,11 @@ package com.samco.trackandgraph.adddatapoint
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
@@ -39,6 +41,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -54,14 +58,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -83,7 +94,9 @@ import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () -> Unit = {}) {
@@ -151,7 +164,9 @@ private data class DataPointInputViewState(
     val skipButtonVisible: Boolean = false,
     val updateMode: Boolean = false,
     val dataPointPages: Int = 0,
-    val currentPageIndex: Int = 0
+    val currentPageIndex: Int = 0,
+    val trackedCount: Int = 0,
+    val anyFieldLocked: Boolean = false
 )
 
 // Callback interfaces
@@ -176,6 +191,7 @@ private fun AddDataPointsScreen(
     val updateMode by viewModel.updateMode.observeAsState(false)
     val trackerPages by viewModel.pageViewModels.collectAsStateWithLifecycle()
     val currentPageIndex by viewModel.currentPageIndex.observeAsState(0)
+    val trackedCount by viewModel.trackedCount.collectAsStateWithLifecycle()
 
     val callbacks = remember(viewModel) {
         object : AddDataPointsCallbacks {
@@ -194,12 +210,15 @@ private fun AddDataPointsScreen(
         showCancelConfirmDialog = showCancelConfirmDialog
     )
 
+    val currentPageLockState = trackerPages.getOrNull(currentPageIndex)?.lockState
     val inputState = DataPointInputViewState(
         indexText = indexText,
         skipButtonVisible = skipButtonVisible,
         updateMode = updateMode,
         dataPointPages = trackerPages.size,
-        currentPageIndex = currentPageIndex
+        currentPageIndex = currentPageIndex,
+        trackedCount = trackedCount,
+        anyFieldLocked = currentPageLockState?.anyLocked == true
     )
 
     if (state.showTutorial) {
@@ -230,6 +249,7 @@ private fun DataPointInputView(
     Column(modifier = Modifier.heightIn(max = maxHeight)) {
         HintHeader(
             indexText = state.indexText,
+            trackedCount = state.trackedCount,
             onTutorialButtonPressed = callbacks::onTutorialButtonPressed
         )
 
@@ -246,6 +266,7 @@ private fun DataPointInputView(
         BottomButtons(
             skipButtonVisible = state.skipButtonVisible,
             updateMode = state.updateMode,
+            anyFieldLocked = state.anyFieldLocked,
             onCancelClicked = callbacks::onCancelClicked,
             onSkipClicked = callbacks::onSkipClicked,
             onAddClicked = callbacks::onAddClicked
@@ -257,6 +278,7 @@ private fun DataPointInputView(
 private fun BottomButtons(
     skipButtonVisible: Boolean,
     updateMode: Boolean,
+    anyFieldLocked: Boolean,
     onCancelClicked: () -> Unit,
     onSkipClicked: () -> Unit,
     onAddClicked: () -> Unit
@@ -289,7 +311,10 @@ private fun BottomButtons(
         SmallTextButton(
             stringRes = addButtonRes,
             onClick = {
-                focusManager.clearFocus()
+                // Keep keyboard open when fields are locked for rapid data entry
+                if (!anyFieldLocked) {
+                    focusManager.clearFocus()
+                }
                 onAddClicked()
             }
         )
@@ -298,8 +323,8 @@ private fun BottomButtons(
 
 /**
  * Blocks child (descendant) scrollables from handing off any leftover
- * drag/fling to ancestors. The parent itself remains scrollable when
- * the gesture starts on it directly.
+ * drag/fling to ancestors. The parent itself remains scrollable when the
+ * gesture starts on it directly.
  */
 fun Modifier.blockDescendantHandoff(): Modifier = composed {
     val connection = remember {
@@ -425,23 +450,108 @@ private fun TrackerPager(
 @Composable
 private fun HintHeader(
     indexText: String,
+    trackedCount: Int,
     onTutorialButtonPressed: () -> Unit
-) = Row(
-    modifier = Modifier.fillMaxWidth(),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.SpaceBetween
+) = Box(
+    modifier = Modifier.fillMaxWidth()
 ) {
+    // Left-aligned index text
     Text(
         text = indexText,
         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
+        modifier = Modifier.align(Alignment.CenterStart)
     )
-    //Faq vector icon as a button
-    IconButton(onClick = onTutorialButtonPressed) {
+
+    // Center-aligned tracked count indicator with animation
+    if (trackedCount > 0) {
+        TrackedCountIndicator(
+            modifier = Modifier.align(Alignment.Center),
+            count = trackedCount
+        )
+    }
+
+    // Right-aligned FAQ button
+    IconButton(
+        onClick = onTutorialButtonPressed,
+        modifier = Modifier.align(Alignment.CenterEnd)
+    ) {
         Icon(
             painter = painterResource(id = R.drawable.faq_icon),
             contentDescription = stringResource(id = R.string.help),
             tint = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+private fun TrackedCountIndicator(
+    modifier: Modifier = Modifier,
+    count: Int
+) {
+    // Animation state for the expanding/fading icon
+    val scale = remember { Animatable(1f) }
+    val alpha = remember { Animatable(0f) }
+
+    // Track previous count to detect increases
+    val previousCount = remember { mutableIntStateOf(0) }
+
+    // Track text width to position icon dynamically
+    var textWidth by remember { mutableIntStateOf(0) }
+    val density = LocalDensity.current
+
+    // Trigger animation when count increases (handles first addition too)
+    LaunchedEffect(count) {
+        if (count > previousCount.intValue) {
+            // Reset and start the animation
+            launch {
+                scale.snapTo(1f)
+                scale.animateTo(
+                    targetValue = 3.0f,
+                    animationSpec = tween(durationMillis = 400)
+                )
+            }
+            launch {
+                alpha.snapTo(1f)
+                alpha.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 400)
+                )
+            }
+        }
+        previousCount.intValue = count
+    }
+
+    // Box where only the text affects the size, icon is positioned absolutely
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.onGloballyPositioned { coordinates ->
+                textWidth = coordinates.size.width
+            }
+        )
+
+        // Icon positioned to the right of the text based on measured width
+        Icon(
+            painter = painterResource(id = R.drawable.ic_add_record),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .offset {
+                    // Position from center: text width + small gap
+                    IntOffset(
+                        x = textWidth + with(density) { 8.dp.roundToPx() },
+                        y = 0
+                    )
+                }
+                .size(smallIconSize)
+                .scale(scale.value)
+                .alpha(alpha.value)
         )
     }
 }
@@ -456,7 +566,8 @@ fun AddDataPointsViewPreview() {
             skipButtonVisible = true,
             updateMode = false,
             dataPointPages = 3,
-            currentPageIndex = 0
+            currentPageIndex = 0,
+            trackedCount = 3
         )
 
         val sampleCallbacks = object : AddDataPointsCallbacks {
