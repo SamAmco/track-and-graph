@@ -40,10 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -77,9 +74,17 @@ fun ImportExportDialog(
     trackGroupName: String?,
     onDismissRequest: () -> Unit,
 ) {
+    val dialogViewModel: ImportExportDialogViewModel = hiltViewModel<ImportExportDialogViewModelImpl>()
     val importViewModel: ImportFeaturesModuleViewModel = hiltViewModel<ImportFeaturesModuleViewModelImpl>()
     val exportViewModel: ExportFeaturesViewModel = hiltViewModel<ExportFeaturesViewModelImpl>()
     val context = LocalContext.current
+
+    // Initialize the dialog ViewModel with the group ID to load saved tab
+    LaunchedEffect(trackGroupId) {
+        dialogViewModel.initialize(trackGroupId)
+    }
+
+    val selectedTab by dialogViewModel.selectedTab.collectAsStateWithLifecycle()
 
     // Import state
     val selectedImportFileUri by importViewModel.selectedFileUri.collectAsStateWithLifecycle()
@@ -168,11 +173,9 @@ fun ImportExportDialog(
         uri?.let { exportViewModel.setSelectedFileUri(it) }
     }
 
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-
     ImportExportDialogContent(
         selectedTab = selectedTab,
-        onTabSelected = { selectedTab = it },
+        onTabSelected = { dialogViewModel.setSelectedTab(it) },
         // Import state
         selectedImportFileUri = selectedImportFileUri,
         selectedImportFileName = selectedImportFileName,
