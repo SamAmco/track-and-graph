@@ -37,6 +37,7 @@ data class AppBarConfig(
     val title: String = "",
     val subtitle: String? = null,
     val backNavigationAction: Boolean = false,
+    val overrideBackNavigationAction: (() -> Unit)? = null,
     val actions: @Composable RowScope.() -> Unit = {},
     val visible: Boolean = true,
     val nestedScrollConnection: NestedScrollConnection? = null,

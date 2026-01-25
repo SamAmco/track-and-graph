@@ -45,6 +45,8 @@
     <string name="skip">Überspringen</string>
     <string name="exportButton">Exportieren</string>
     <string name="importButton">Importieren</string>
+    <string name="import_export">Importieren/Exportieren</string>
+    <string name="search">Suchen</string>
     <string name="export_to">Exportieren Sie getrackte Daten in dieser Gruppe nach CSV:</string>
     <string name="export_error_message">Export fehlgeschlagen: %1$s</string>
     <string name="import_from">Importieren Sie getrackte Daten von CSV in diese Gruppe:</string>
