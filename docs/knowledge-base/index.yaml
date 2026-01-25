@@ -93,6 +93,11 @@ docs:
     description: Dual changelog system (public markdown for in-app/website, fastlane .txt for Play Store), the make changelog lua workflow, Play Store 500-character limit, 4-language localization requirement, and index.json maintenance.
     keywords: [changelog, release, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
 
+  - file: search-feature.md
+    title: Search feature — in-place screen swap pattern
+    description: GroupSearchViewModel visibility toggle, SearchScreen composable, in-place swap inside GroupScreen (if/else replaces top bar + content), overrideBackNavigationAction for back handling, and current stub status.
+    keywords: [search, GroupSearchViewModel, SearchScreen, isSearchVisible, in-place, screen-swap, overrideBackNavigationAction, BackHandler, AppBarConfig, GroupScreen, GroupTopBar, onSearchClick]
+
 plans:
   - file: plans/group-view-model-testing-plan.md
     title: GroupViewModel testing plan (3 phases)
