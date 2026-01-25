@@ -45,6 +45,7 @@ fun FullWidthTextField(
     keyboardController: SoftwareKeyboardController? = null,
     singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val keyboardActions =
         if (focusManager != null) KeyboardActions(onNext = {
@@ -70,6 +71,7 @@ fun FullWidthTextField(
         keyboardActions = keyboardActions,
         keyboardOptions = keyboardOptions1,
         singleLine = singleLine,
+        trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
             .slimOutlinedTextField()

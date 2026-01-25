@@ -49,12 +49,14 @@ fun LabelInputTextField(
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
     onNextOverride: (() -> Unit)? = null,
-    label: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.label)) }
+    label: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.label)) },
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = label,
+        trailingIcon = trailingIcon,
         keyboardActions = KeyboardActions(
             onNext = {
                 if (onNextOverride != null) onNextOverride()
@@ -83,6 +85,7 @@ fun ValueInputTextField(
     onNextOverride: (() -> Unit)? = null,
     label: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.value)) },
     keyboardType: KeyboardType = KeyboardType.Decimal,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val focusUpdateScope = rememberCoroutineScope()
 
@@ -90,6 +93,7 @@ fun ValueInputTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = label,
+        trailingIcon = trailingIcon,
         keyboardActions = KeyboardActions(
             onNext = {
                 if (onNextOverride != null) onNextOverride()

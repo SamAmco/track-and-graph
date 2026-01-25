@@ -21,12 +21,17 @@ import android.os.Parcelable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -41,11 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +61,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.mockSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.AddChipButton
 import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
@@ -85,11 +93,37 @@ internal data class TrackerPageState(
     // Duration fields (from DurationInputViewModel interface)
     val hours: TextFieldValue = TextFieldValue(),
     val minutes: TextFieldValue = TextFieldValue(),
-    val seconds: TextFieldValue = TextFieldValue()
+    val seconds: TextFieldValue = TextFieldValue(),
+    // Lock state (only enabled when not in update mode)
+    val lockState: FieldLockState = FieldLockState(),
+    val isUpdateMode: Boolean = false
 )
 
 internal enum class TrackerType {
     NUMERICAL, DURATION
+}
+
+@Composable
+private fun LockToggleButton(
+    isLocked: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier.size(24.dp)
+    ) {
+        Icon(
+            painter = painterResource(
+                id = if (isLocked) R.drawable.ic_lock else R.drawable.ic_lock_open
+            ),
+            contentDescription = if (isLocked) "Unlock field" else "Lock field",
+            tint = MaterialTheme.tngColors.onSurface,
+            modifier = Modifier.alpha(
+                if (isLocked) 1f else MaterialTheme.tngColors.disabledAlpha
+            )
+        )
+    }
 }
 
 // Callback interfaces
@@ -104,6 +138,9 @@ internal interface TrackerPageCallbacks {
     fun onMinutesChanged(minutes: TextFieldValue)
     fun onSecondsChanged(seconds: TextFieldValue)
     fun onAddDataPoint()
+    fun onToggleValueLock()
+    fun onToggleLabelLock()
+    fun onToggleNoteLock()
 }
 
 @Composable
@@ -158,6 +195,9 @@ internal fun TrackerPage(
             }
 
             override fun onAddDataPoint() = viewModel.addDataPoint()
+            override fun onToggleValueLock() = viewModel.toggleValueLock()
+            override fun onToggleLabelLock() = viewModel.toggleLabelLock()
+            override fun onToggleNoteLock() = viewModel.toggleNoteLock()
         }
     }
 
@@ -193,7 +233,9 @@ internal fun TrackerPage(
         value = value,
         hours = hours,
         minutes = minutes,
-        seconds = seconds
+        seconds = seconds,
+        lockState = viewModel.lockState,
+        isUpdateMode = viewModel.oldDataPoint != null
     )
 
     TrackerPageView(
@@ -277,25 +319,44 @@ internal fun TrackerPageView(
                     onNextOverride = {
                         if (labelFieldAdded || noteFieldAdded) focusManager.moveFocus(FocusDirection.Down)
                         else callbacks.onAddDataPoint()
-                    }
+                    },
+                    trailingIcon = if (!state.isUpdateMode) {
+                        {
+                            LockToggleButton(
+                                isLocked = state.lockState.valueLocked,
+                                onClick = callbacks::onToggleValueLock
+                            )
+                        }
+                    } else null
                 )
             }
 
             TrackerType.DURATION -> {
-                DurationInputView(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = inputSpacingLarge),
-                    hours = state.hours,
-                    minutes = state.minutes,
-                    seconds = state.seconds,
-                    onHoursChanged = callbacks::onHoursChanged,
-                    onMinutesChanged = callbacks::onMinutesChanged,
-                    onSecondsChanged = callbacks::onSecondsChanged,
-                    focusManager = focusManager,
-                    nextFocusDirection = FocusDirection.Down,
-                    focusRequester = if (shouldFocusValue) valueFocusRequester else null
-                )
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    DurationInputView(
+                        modifier = Modifier.weight(1f),
+                        hours = state.hours,
+                        minutes = state.minutes,
+                        seconds = state.seconds,
+                        onHoursChanged = callbacks::onHoursChanged,
+                        onMinutesChanged = callbacks::onMinutesChanged,
+                        onSecondsChanged = callbacks::onSecondsChanged,
+                        focusManager = focusManager,
+                        nextFocusDirection = FocusDirection.Down,
+                        focusRequester = if (shouldFocusValue) valueFocusRequester else null
+                    )
+                    if (!state.isUpdateMode) {
+                        LockToggleButton(
+                            isLocked = state.lockState.valueLocked,
+                            onClick = callbacks::onToggleValueLock
+                        )
+                    }
+                }
             }
         }
 
@@ -309,7 +370,12 @@ internal fun TrackerPageView(
                 onNoteAdded = { noteFieldAdded = true },
                 onLabelChanged = callbacks::onLabelChanged,
                 onNoteChanged = callbacks::onNoteChanged,
-                onAddDataPoint = callbacks::onAddDataPoint
+                onAddDataPoint = callbacks::onAddDataPoint,
+                labelLocked = state.lockState.labelLocked,
+                noteLocked = state.lockState.noteLocked,
+                onToggleLabelLock = callbacks::onToggleLabelLock,
+                onToggleNoteLock = callbacks::onToggleNoteLock,
+                isUpdateMode = state.isUpdateMode
             )
         }
     }
@@ -327,7 +393,12 @@ private fun LabelAndNoteInputsView(
     onNoteAdded: () -> Unit,
     onLabelChanged: (TextFieldValue) -> Unit,
     onNoteChanged: (TextFieldValue) -> Unit,
-    onAddDataPoint: () -> Unit
+    onAddDataPoint: () -> Unit,
+    labelLocked: Boolean,
+    noteLocked: Boolean,
+    onToggleLabelLock: () -> Unit,
+    onToggleNoteLock: () -> Unit,
+    isUpdateMode: Boolean
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -376,7 +447,15 @@ private fun LabelAndNoteInputsView(
             onNextOverride = {
                 if (noteAdded) focusManager.moveFocus(FocusDirection.Down)
                 else onAddDataPoint()
-            }
+            },
+            trailingIcon = if (!isUpdateMode) {
+                {
+                    LockToggleButton(
+                        isLocked = labelLocked,
+                        onClick = onToggleLabelLock
+                    )
+                }
+            } else null
         )
     }
 
@@ -408,7 +487,15 @@ private fun LabelAndNoteInputsView(
             onValueChange = onNoteChanged,
             focusRequester = noteInputFocusRequester,
             label = stringResource(id = R.string.note_input_hint),
-            singleLine = false
+            singleLine = false,
+            trailingIcon = if (!isUpdateMode) {
+                {
+                    LockToggleButton(
+                        isLocked = noteLocked,
+                        onClick = onToggleNoteLock
+                    )
+                }
+            } else null
         )
     }
 
@@ -531,6 +618,9 @@ fun TrackerPageViewPreview() {
                 override fun onMinutesChanged(minutes: TextFieldValue) {}
                 override fun onSecondsChanged(seconds: TextFieldValue) {}
                 override fun onAddDataPoint() {}
+                override fun onToggleValueLock() {}
+                override fun onToggleLabelLock() {}
+                override fun onToggleNoteLock() {}
             }
 
             TrackerPageView(
@@ -572,6 +662,9 @@ fun TrackerPageViewPreviewWithChips() {
                 override fun onMinutesChanged(minutes: TextFieldValue) {}
                 override fun onSecondsChanged(seconds: TextFieldValue) {}
                 override fun onAddDataPoint() {}
+                override fun onToggleValueLock() {}
+                override fun onToggleLabelLock() {}
+                override fun onToggleNoteLock() {}
             }
 
             TrackerPageView(

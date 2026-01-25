@@ -77,6 +77,14 @@ data class SuggestedValueViewData(
     val label: String?
 ) : Parcelable
 
+data class FieldLockState(
+    val valueLocked: Boolean = false,
+    val labelLocked: Boolean = false,
+    val noteLocked: Boolean = false
+) {
+    val anyLocked: Boolean get() = valueLocked || labelLocked || noteLocked
+}
+
 sealed interface AddDataPointViewModel {
     val name: LiveData<String>
     val timestamp: LiveData<OffsetDateTime>
@@ -84,6 +92,7 @@ sealed interface AddDataPointViewModel {
     val note: TextFieldValue
     val suggestedValues: LiveData<List<SuggestedValueViewData>?>
     val currentValueAsSuggestion: LiveData<SuggestedValueViewData?>
+    val lockState: FieldLockState
 
     val focusOnValueEvent: Flow<Unit>
 
@@ -96,6 +105,9 @@ sealed interface AddDataPointViewModel {
     fun addDataPoint()
     fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData)
     fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData)
+    fun toggleValueLock()
+    fun toggleLabelLock()
+    fun toggleNoteLock()
 
     interface NumericalDataPointViewModel : AddDataPointViewModel {
         val value: TextFieldValue
@@ -117,6 +129,8 @@ interface AddDataPointsViewModel {
     val showCancelConfirmDialog: LiveData<Boolean>
     val dismissEvents: Flow<Unit>
     val pageViewModels: StateFlow<List<AddDataPointViewModel>>
+    val trackedCount: StateFlow<Int>
+    val dataPointAddedEvent: Flow<Unit>
 
     fun onTutorialButtonPressed()
 
@@ -159,6 +173,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
     private interface AddDataPointViewModelInner : AddDataPointViewModel {
         var tracked: Boolean
         fun getDouble(): Double
+        fun clearUnlockedFields()
     }
 
     private data class Config(
@@ -175,6 +190,12 @@ class AddDataPointsViewModelImpl @Inject constructor(
     override val hidden = MutableLiveData(true)
     override val dismissEvents = MutableSharedFlow<Unit>()
     private val tutorialButtonPresses = MutableSharedFlow<Unit>()
+
+    private val _trackedCount = MutableStateFlow(0)
+    override val trackedCount: StateFlow<Int> = _trackedCount
+
+    private val _dataPointAddedEvent = MutableSharedFlow<Unit>()
+    override val dataPointAddedEvent: Flow<Unit> = _dataPointAddedEvent
 
     override val tutorialViewModel = AddDataPointTutorialViewModelImpl {
         viewModelScope.launch {
@@ -241,6 +262,29 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override val name = MutableLiveData(config.tracker.name)
 
         override val focusOnValueEvent = MutableSharedFlow<Unit>()
+
+        override var lockState by mutableStateOf(FieldLockState())
+            protected set
+
+        override fun toggleValueLock() {
+            lockState = lockState.copy(valueLocked = !lockState.valueLocked)
+        }
+
+        override fun toggleLabelLock() {
+            lockState = lockState.copy(labelLocked = !lockState.labelLocked)
+        }
+
+        override fun toggleNoteLock() {
+            lockState = lockState.copy(noteLocked = !lockState.noteLocked)
+        }
+
+        protected open fun clearValue() {}
+
+        override fun clearUnlockedFields() {
+            if (!lockState.valueLocked) clearValue()
+            if (!lockState.labelLocked) label = TextFieldValue("")
+            if (!lockState.noteLocked) note = TextFieldValue("")
+        }
 
         private val onTimestampSelected = MutableSharedFlow<OffsetDateTime>()
         override val timestamp = merge(
@@ -381,6 +425,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
                     this.value = TextFieldValue(it.toString(), TextRange(0, it.toString().length))
                 }
             }
+
+            override fun clearValue() {
+                this.value = TextFieldValue("")
+            }
         }
 
     private inner class DataPointDurationViewModel(
@@ -420,6 +468,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
             suggestedValue.value?.let { this.setDurationFromDouble(it) }
             super.onSuggestedValueLongPress(suggestedValue)
+        }
+
+        override fun clearValue() {
+            durationInputViewModel.setDurationFromDouble(0.0)
         }
     }
 
@@ -471,9 +523,21 @@ class AddDataPointsViewModelImpl @Inject constructor(
         viewModel.oldDataPoint?.let { dataInteractor.deleteDataPoint(it) }
         getDataPoint(viewModel)?.let { newDataPoint ->
             dataInteractor.insertDataPoint(newDataPoint)
-            withContext(ui) { incrementPageIndex() }
+            // Increment tracked count and emit event for UI feedback
+            _trackedCount.value++
+            _dataPointAddedEvent.emit(Unit)
+            if (viewModel.lockState.anyLocked) {
+                // Add 1 millisecond to timestamp to avoid primary key conflicts
+                viewModel.updateTimestamp(newDataPoint.timestamp.plusNanos(1_000_000))
+                // Clear unlocked fields but keep locked ones
+                withContext(ui) { viewModel.clearUnlockedFields() }
+                // Don't advance to next page - stay on current page
+                // Don't set tracked = true so user can continue changing time manually
+            } else {
+                withContext(ui) { incrementPageIndex() }
+                viewModel.tracked = true
+            }
         }
-        viewModel.tracked = true
     }
 
     private fun getDataPoint(viewModel: AddDataPointViewModelInner): DataPoint? {
@@ -497,6 +561,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private fun setPageIndex(index: Int): Boolean {
         return if (index >= 0 && index < configFlow.value.size) {
+            if (index != indexFlow.value) {
+                // Reset tracked count when changing pages
+                _trackedCount.value = 0
+            }
             indexFlow.value = index
             true
         } else false
@@ -556,6 +624,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
     override fun reset() {
         showCancelConfirmDialog.value = false
         indexFlow.value = 0
+        _trackedCount.value = 0
         lastSelectedTimestampGlobal.resetReplayCache()
         initialized = false
         tutorialViewModel.reset()
