@@ -82,6 +82,11 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     val showUpdateDialog: LiveData<Boolean>
     val error: StateFlow<Exception?>
 
+    // Multi-select state
+    val isMultiSelectMode: StateFlow<Boolean>
+    val selectedDataPoints: StateFlow<Set<DataPointInfo>>
+    val showDeleteSelectedConfirmDialog: StateFlow<Boolean>
+
     fun showUpdateAllDialog()
     fun onDeleteClicked(dataPoint: DataPointInfo)
     fun onDeleteConfirmed()
@@ -90,6 +95,14 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     fun onDismissDataPoint()
     fun onShowFeatureInfo()
     fun onHideFeatureInfo()
+
+    // Multi-select functions
+    fun onDataPointLongPressed(dataPoint: DataPointInfo)
+    fun onDataPointSelected(dataPoint: DataPointInfo, selected: Boolean)
+    fun exitMultiSelectMode()
+    fun onDeleteSelectedClicked()
+    fun onDeleteSelectedConfirmed()
+    fun onDeleteSelectedDismissed()
 }
 
 @HiltViewModel
@@ -181,6 +194,16 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     override val showUpdateDialog = MutableLiveData(false)
 
+    // Multi-select state
+    private val _isMultiSelectMode = MutableStateFlow(false)
+    override val isMultiSelectMode: StateFlow<Boolean> = _isMultiSelectMode
+
+    private val _selectedDataPoints = MutableStateFlow<Set<DataPointInfo>>(emptySet())
+    override val selectedDataPoints: StateFlow<Set<DataPointInfo>> = _selectedDataPoints
+
+    private val _showDeleteSelectedConfirmDialog = MutableStateFlow(false)
+    override val showDeleteSelectedConfirmDialog: StateFlow<Boolean> = _showDeleteSelectedConfirmDialog
+
     private val trackerFlow: StateFlow<Tracker?> = featureIdFlow
         .map { dataInteractor.getTrackerByFeatureId(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -229,6 +252,47 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     override fun onHideFeatureInfo() {
         showFeatureInfoFlow.value = false
+    }
+
+    // Multi-select functions
+    override fun onDataPointLongPressed(dataPoint: DataPointInfo) {
+        _isMultiSelectMode.value = true
+        _selectedDataPoints.value = setOf(dataPoint)
+    }
+
+    override fun onDataPointSelected(dataPoint: DataPointInfo, selected: Boolean) {
+        _selectedDataPoints.value = if (selected) {
+            _selectedDataPoints.value + dataPoint
+        } else {
+            _selectedDataPoints.value - dataPoint
+        }
+    }
+
+    override fun exitMultiSelectMode() {
+        _isMultiSelectMode.value = false
+        _selectedDataPoints.value = emptySet()
+    }
+
+    override fun onDeleteSelectedClicked() {
+        if (_selectedDataPoints.value.isNotEmpty()) {
+            _showDeleteSelectedConfirmDialog.value = true
+        }
+    }
+
+    override fun onDeleteSelectedConfirmed() {
+        viewModelScope.launch(io) {
+            _selectedDataPoints.value.forEach { dataPoint ->
+                dataInteractor.deleteDataPoint(dataPoint.toDataPoint())
+            }
+            withContext(ui) {
+                _showDeleteSelectedConfirmDialog.value = false
+                exitMultiSelectMode()
+            }
+        }
+    }
+
+    override fun onDeleteSelectedDismissed() {
+        _showDeleteSelectedConfirmDialog.value = false
     }
 
     override val isUpdating = MutableLiveData(false)

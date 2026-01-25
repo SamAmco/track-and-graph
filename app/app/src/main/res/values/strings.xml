@@ -48,6 +48,9 @@
     <string name="feature_name_cannot_be_null">Please add a name</string>
     <string name="tracker_with_that_name_exists">You are already tracking something with that name</string>
     <string name="data_points">%1$d Data Points</string>
+    <string name="items_selected">%1$d Selected</string>
+    <string name="ru_sure_del_data_points">Are you sure you want to delete these data points?</string>
+    <string name="delete_selected_content_description">Delete selected items</string>
     <string name="no_data">No Data</string>
     <string name="skip">Skip</string>
     <string name="exportButton">Export</string>

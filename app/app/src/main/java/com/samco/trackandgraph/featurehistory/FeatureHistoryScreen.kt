@@ -16,19 +16,25 @@
  */
 package com.samco.trackandgraph.featurehistory
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -76,6 +82,7 @@ import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -113,29 +120,41 @@ private fun TopAppBarContent(
     // Observe data points count for subtitle
     val dataPointsCount by viewModel.dateScrollData.map { it.items.size }.observeAsState(0)
     val tracker by viewModel.tracker.observeAsState(null)
+    val isMultiSelectMode by viewModel.isMultiSelectMode.collectAsStateWithLifecycle()
+    val selectedCount by viewModel.selectedDataPoints.collectAsStateWithLifecycle()
 
-    val subtitle = if (dataPointsCount > 0) {
-        stringResource(R.string.data_points, dataPointsCount)
-    } else {
-        null
+    val subtitle = when {
+        isMultiSelectMode -> stringResource(R.string.items_selected, selectedCount.size)
+        dataPointsCount > 0 -> stringResource(R.string.data_points, dataPointsCount)
+        else -> null
     }
 
-    val actions: @Composable RowScope.() -> Unit = remember(viewModel, tracker) {
+    val actions: @Composable RowScope.() -> Unit = remember(viewModel, tracker, isMultiSelectMode) {
         {
-            // Info action
-            IconButton(onClick = { viewModel.onShowFeatureInfo() }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.about_icon),
-                    contentDescription = stringResource(id = R.string.info)
-                )
-            }
-            if (tracker != null) {
-                // Update action
-                IconButton(onClick = { viewModel.showUpdateAllDialog() }) {
+            if (isMultiSelectMode) {
+                // Close multi-select action
+                IconButton(onClick = { viewModel.exitMultiSelectMode() }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.edit_icon),
-                        contentDescription = stringResource(id = R.string.update)
+                        painter = painterResource(id = R.drawable.close),
+                        contentDescription = stringResource(id = R.string.cancel)
                     )
+                }
+            } else {
+                // Info action
+                IconButton(onClick = { viewModel.onShowFeatureInfo() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.about_icon),
+                        contentDescription = stringResource(id = R.string.info)
+                    )
+                }
+                if (tracker != null) {
+                    // Update action
+                    IconButton(onClick = { viewModel.showUpdateAllDialog() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.edit_icon),
+                            contentDescription = stringResource(id = R.string.update)
+                        )
+                    }
                 }
             }
         }
@@ -162,30 +181,55 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     val dataPointDialogViewModel = hiltViewModel<AddDataPointsViewModelImpl>()
     val error by viewModel.error.collectAsStateWithLifecycle()
 
-    when {
-        dateScrollData != null && dateScrollData.items.isEmpty() -> {
-            EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
+    // Multi-select state
+    val isMultiSelectMode by viewModel.isMultiSelectMode.collectAsStateWithLifecycle()
+    val selectedDataPoints by viewModel.selectedDataPoints.collectAsStateWithLifecycle()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            dateScrollData != null && dateScrollData.items.isEmpty() -> {
+                EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
+            }
+
+            dateScrollData != null -> {
+                DateScrollData(
+                    dateScrollData = dateScrollData,
+                    dataPointDialogViewModel = dataPointDialogViewModel,
+                    viewModel = viewModel,
+                    isDuration = isDuration,
+                    tracker = tracker,
+                    isMultiSelectMode = isMultiSelectMode,
+                    selectedDataPoints = selectedDataPoints
+                )
+            }
+
+            error != null -> {
+                val message =
+                    if (error is LuaEngineDisabledException) stringResource(R.string.lua_engine_disabled)
+                    else error?.message ?: ""
+                EmptyScreenText(
+                    text = stringResource(R.string.data_resolution_error, message),
+                    color = MaterialTheme.colorScheme.error,
+                    alpha = 1f
+                )
+            }
         }
 
-        dateScrollData != null -> {
-            DateScrollData(
-                dateScrollData = dateScrollData,
-                dataPointDialogViewModel = dataPointDialogViewModel,
-                viewModel = viewModel,
-                isDuration = isDuration,
-                tracker = tracker
-            )
-        }
-
-        error != null -> {
-            val message =
-                if (error is LuaEngineDisabledException) stringResource(R.string.lua_engine_disabled)
-                else error?.message ?: ""
-            EmptyScreenText(
-                text = stringResource(R.string.data_resolution_error, message),
-                color = MaterialTheme.colorScheme.error,
-                alpha = 1f
-            )
+        // FAB for delete when in multi-select mode
+        if (isMultiSelectMode && selectedDataPoints.isNotEmpty()) {
+            FloatingActionButton(
+                onClick = viewModel::onDeleteSelectedClicked,
+                containerColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .padding(inputSpacingLarge)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.delete_icon),
+                    contentDescription = stringResource(id = R.string.delete_selected_content_description)
+                )
+            }
         }
     }
 
@@ -210,6 +254,14 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
             body = R.string.ru_sure_del_data_point,
             onDismissRequest = viewModel::onDeleteDismissed,
             onConfirm = viewModel::onDeleteConfirmed
+        )
+    }
+
+    if (viewModel.showDeleteSelectedConfirmDialog.collectAsStateWithLifecycle().value) {
+        ContinueCancelDialog(
+            body = R.string.ru_sure_del_data_points,
+            onDismissRequest = viewModel::onDeleteSelectedDismissed,
+            onConfirm = viewModel::onDeleteSelectedConfirmed
         )
     }
 
@@ -242,7 +294,9 @@ private fun DateScrollData(
     dataPointDialogViewModel: AddDataPointsViewModelImpl,
     viewModel: FeatureHistoryViewModel,
     isDuration: Boolean,
-    tracker: Tracker?
+    tracker: Tracker?,
+    isMultiSelectMode: Boolean,
+    selectedDataPoints: Set<DataPointInfo>
 ) {
     DateScrollLazyColumn(
         modifier = Modifier.padding(cardMarginSmall),
@@ -257,7 +311,9 @@ private fun DateScrollData(
             viewModel = viewModel,
             weekdayNames = getWeekDayNames(LocalContext.current),
             isDuration = isDuration,
-            tracker = tracker
+            tracker = tracker,
+            isMultiSelectMode = isMultiSelectMode,
+            isSelected = it in selectedDataPoints
         )
         Spacer(modifier = Modifier.height(cardMarginSmall))
     }
@@ -404,6 +460,7 @@ private fun WhereValueInput(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DataPoint(
     dataPoint: DataPointInfo,
@@ -411,10 +468,25 @@ private fun DataPoint(
     viewModel: FeatureHistoryViewModel,
     weekdayNames: List<String>,
     isDuration: Boolean,
-    tracker: Tracker?
+    tracker: Tracker?,
+    isMultiSelectMode: Boolean,
+    isSelected: Boolean
 ) = Card(
     modifier = Modifier
-        .clickable { viewModel.onDataPointClicked(dataPoint) },
+        .combinedClickable(
+            onClick = {
+                if (isMultiSelectMode) {
+                    viewModel.onDataPointSelected(dataPoint, !isSelected)
+                } else {
+                    viewModel.onDataPointClicked(dataPoint)
+                }
+            },
+            onLongClick = {
+                if (tracker != null && !isMultiSelectMode) {
+                    viewModel.onDataPointLongPressed(dataPoint)
+                }
+            }
+        ),
     elevation = CardDefaults.cardElevation(defaultElevation = cardMarginSmall),
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
 ) {
@@ -438,7 +510,12 @@ private fun DataPoint(
             dataPoint = dataPoint.toDataPoint(),
             isDuration = isDuration
         )
-        if (tracker != null) {
+        if (isMultiSelectMode) {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = { viewModel.onDataPointSelected(dataPoint, it) }
+            )
+        } else if (tracker != null) {
             IconButton(onClick = {
                 addDataPointsViewModel.showAddDataPointDialog(
                     trackerId = tracker.id,
