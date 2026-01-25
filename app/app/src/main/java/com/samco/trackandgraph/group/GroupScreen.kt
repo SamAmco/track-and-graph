@@ -75,8 +75,7 @@ import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.ui.GraphStatClickListener
-import com.samco.trackandgraph.importexport.ExportFeaturesDialog
-import com.samco.trackandgraph.importexport.ImportFeaturesDialog
+import com.samco.trackandgraph.importexport.ImportExportDialog
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
 import com.samco.trackandgraph.releasenotes.ReleaseNotesDialog
@@ -316,18 +315,11 @@ private fun GroupScreenContent(
         onDismissRequest = { addGroupDialogViewModel.hide() }
     )
 
-    if (groupDialogsViewModel.showImportDialog.collectAsStateWithLifecycle().value) {
-        ImportFeaturesDialog(
-            trackGroupId = groupId,
-            onDismissRequest = { groupDialogsViewModel.hideImportDialog() }
-        )
-    }
-
-    if (groupDialogsViewModel.showExportDialog.collectAsStateWithLifecycle().value) {
-        ExportFeaturesDialog(
+    if (groupDialogsViewModel.showImportExportDialog.collectAsStateWithLifecycle().value) {
+        ImportExportDialog(
             trackGroupId = groupId,
             trackGroupName = groupName,
-            onDismissRequest = { groupDialogsViewModel.hideExportDialog() }
+            onDismissRequest = { groupDialogsViewModel.hideImportExportDialog() }
         )
     }
 

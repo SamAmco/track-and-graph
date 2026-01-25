@@ -55,6 +55,8 @@
     <string name="skip">Skip</string>
     <string name="exportButton">Export</string>
     <string name="importButton">Import</string>
+    <string name="import_export">Import/Export</string>
+    <string name="search">Search</string>
     <string name="export_to">Export tracked data in this group to CSV:</string>
     <string name="export_error_message">Export failed: %1$s</string>
     <string name="import_from">Import tracked data to this group from CSV:</string>
