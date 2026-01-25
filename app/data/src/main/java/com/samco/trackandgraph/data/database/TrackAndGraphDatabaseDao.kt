@@ -24,6 +24,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.database.entity.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.entity.BarChart
 import com.samco.trackandgraph.data.database.entity.DataPoint
@@ -35,6 +36,7 @@ import com.samco.trackandgraph.data.database.entity.GlobalNote
 import com.samco.trackandgraph.data.database.entity.GraphOrStat
 import com.samco.trackandgraph.data.database.entity.Group
 import com.samco.trackandgraph.data.database.entity.LastValueStat
+import com.samco.trackandgraph.data.database.entity.LayoutItem
 import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
 import com.samco.trackandgraph.data.database.entity.LuaGraph
@@ -53,10 +55,9 @@ import com.samco.trackandgraph.data.dependencyanalyser.queryresponse.GraphDepend
 import kotlinx.coroutines.flow.Flow
 
 private const val getTrackersQuery = """
-    SELECT 
+    SELECT
         features_table.name as name,
         features_table.group_id as group_id,
-        features_table.display_index as display_index,
         features_table.feature_description as feature_description,
         trackers_table.id as id,
         trackers_table.feature_id as feature_id,
@@ -70,11 +71,10 @@ private const val getTrackersQuery = """
     LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             """
 
-private const val getDisplayTrackersQuery = """ 
+private const val getDisplayTrackersQuery = """
     SELECT
         features_table.name as name,
         features_table.group_id as group_id,
-        features_table.display_index as display_index,
         features_table.feature_description as feature_description,
         trackers_table.id as id,
         trackers_table.feature_id as feature_id,
@@ -84,7 +84,7 @@ private const val getDisplayTrackersQuery = """
         trackers_table.default_label as default_label,
         last_epoch_milli,
         last_utc_offset_sec,
-        start_instant 
+        start_instant
         FROM (
             trackers_table
             LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
@@ -93,7 +93,7 @@ private const val getDisplayTrackersQuery = """
                 FROM data_points_table as dpt
                 INNER JOIN (
                     SELECT feature_id as fid, MAX(epoch_milli) as max_epoch_milli
-                    FROM data_points_table 
+                    FROM data_points_table
                     GROUP BY feature_id
                 ) as max_data ON max_data.fid = dpt.feature_id AND dpt.epoch_milli = max_data.max_epoch_milli
             ) as last_data ON last_data.feature_id = trackers_table.feature_id
@@ -117,22 +117,22 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateGroups(groups: List<Group>)
 
-    @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * FROM reminders_table""")
     fun getAllReminders(): Flow<List<Reminder>>
 
-    @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * FROM reminders_table""")
     fun getAllRemindersSync(): List<Reminder>
 
     @Query("""SELECT * FROM reminders_table WHERE id = :id""")
     fun getReminderById(id: Long): Reminder?
 
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * FROM groups_table""")
     fun getAllGroups(): Flow<List<Group>>
 
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * FROM groups_table""")
     fun getAllGroupsSync(): List<Group>
 
-    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * FROM features_table""")
     fun getAllFeaturesSync(): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -153,10 +153,10 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    @Query("$getDisplayTrackersQuery WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC")
+    @Query("$getDisplayTrackersQuery WHERE group_id = :groupId")
     fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
 
-    @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
+    @Query("SELECT * FROM features_table WHERE group_id = :groupId")
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
     @Query(
@@ -164,7 +164,6 @@ internal interface TrackAndGraphDatabaseDao {
             SELECT
                 features_table.name as name,
                 features_table.group_id as group_id,
-                features_table.display_index as display_index,
                 features_table.feature_description as feature_description,
                 trackers_table.id as id,
                 trackers_table.feature_id as feature_id,
@@ -176,7 +175,7 @@ internal interface TrackAndGraphDatabaseDao {
                 trackers_table.suggestion_type as suggestion_type
             FROM trackers_table
             LEFT JOIN features_table ON features_table.id = trackers_table.feature_id
-            WHERE features_table.group_id = :groupId ORDER BY features_table.display_index ASC
+            WHERE features_table.group_id = :groupId
         """
     )
     fun getTrackersForGroupSync(groupId: Long): List<TrackerWithFeature>
@@ -184,7 +183,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
     fun getFeatureById(featureId: Long): Feature?
 
-    @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * from features_table WHERE id IN (:featureIds)""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -252,10 +251,10 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM average_time_between_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
-    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId")
     fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
-    @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC, id DESC")
+    @Query("SELECT * FROM graphs_and_stats_table2")
     fun getAllGraphStatsSync(): List<GraphOrStat>
 
     @Query(
@@ -439,13 +438,12 @@ internal interface TrackAndGraphDatabaseDao {
     fun updateFunction(function: Function)
 
     @Query("""
-        SELECT 
+        SELECT
             f.id as id,
             f.feature_id as feature_id,
             f.function_graph as function_graph,
             ft.name as name,
             ft.group_id as group_id,
-            ft.display_index as display_index,
             ft.feature_description as feature_description
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
@@ -455,13 +453,12 @@ internal interface TrackAndGraphDatabaseDao {
     fun getFunctionById(functionId: Long): FunctionWithFeature?
 
     @Query("""
-        SELECT 
+        SELECT
             f.id as id,
             f.feature_id as feature_id,
             f.function_graph as function_graph,
             ft.name as name,
             ft.group_id as group_id,
-            ft.display_index as display_index,
             ft.feature_description as feature_description
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
@@ -471,33 +468,29 @@ internal interface TrackAndGraphDatabaseDao {
     fun getFunctionByFeatureId(featureId: Long): FunctionWithFeature?
 
     @Query("""
-        SELECT 
+        SELECT
             f.id as id,
             f.feature_id as feature_id,
             f.function_graph as function_graph,
             ft.name as name,
             ft.group_id as group_id,
-            ft.display_index as display_index,
             ft.feature_description as feature_description
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
-        ORDER BY ft.display_index ASC, f.id DESC
     """)
     fun getAllFunctionsSync(): List<FunctionWithFeature>
 
     @Query("""
-        SELECT 
+        SELECT
             f.id as id,
             f.feature_id as feature_id,
             f.function_graph as function_graph,
             ft.name as name,
             ft.group_id as group_id,
-            ft.display_index as display_index,
             ft.feature_description as feature_description
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
         WHERE ft.group_id = :groupId
-        ORDER BY ft.display_index ASC, f.id DESC
     """)
     fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
 
@@ -545,4 +538,35 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT feature_id FROM lua_graph_features_table WHERE lua_graph_id = (SELECT id FROM lua_graphs_table WHERE graph_stat_id = :graphStatId)")
     fun getLuaGraphFeatureIds(graphStatId: Long): List<Long>
+
+    // Layout item methods
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertLayoutItem(layoutItem: LayoutItem): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertLayoutItems(layoutItems: List<LayoutItem>)
+
+    @Update
+    fun updateLayoutItem(layoutItem: LayoutItem)
+
+    @Update
+    fun updateLayoutItems(layoutItems: List<LayoutItem>)
+
+    @Query("DELETE FROM layout_items_table WHERE id = :id")
+    fun deleteLayoutItem(id: Long)
+
+    @Query("DELETE FROM layout_items_table WHERE item_id = :itemId AND type = :type")
+    fun deleteLayoutItemByItemIdAndType(itemId: Long, type: LayoutItemType)
+
+    @Query("SELECT * FROM layout_items_table WHERE group_id = :groupId ORDER BY display_index ASC, id ASC")
+    fun getLayoutItemsForGroup(groupId: Long): List<LayoutItem>
+
+    @Query("SELECT * FROM layout_items_table WHERE group_id = :groupId ORDER BY display_index ASC, id ASC")
+    fun getLayoutItemsForGroupFlow(groupId: Long): Flow<List<LayoutItem>>
+
+    @Query("SELECT * FROM layout_items_table WHERE item_id = :itemId AND type = :type LIMIT 1")
+    fun getLayoutItemByItemIdAndType(itemId: Long, type: LayoutItemType): LayoutItem?
+
+    @Query("SELECT MAX(display_index) FROM layout_items_table WHERE group_id = :groupId")
+    fun getMaxDisplayIndexForGroup(groupId: Long): Int?
 }

@@ -26,7 +26,6 @@ import org.threeten.bp.LocalDateTime
 
 data class Reminder(
     val id: Long,
-    val displayIndex: Int,
     val reminderName: String,
     val groupId: Long?,
     val featureId: Long?,

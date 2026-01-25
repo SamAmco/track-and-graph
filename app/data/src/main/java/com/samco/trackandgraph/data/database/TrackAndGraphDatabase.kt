@@ -46,6 +46,7 @@ import com.samco.trackandgraph.data.database.entity.GlobalNote
 import com.samco.trackandgraph.data.database.entity.GraphOrStat
 import com.samco.trackandgraph.data.database.entity.Group
 import com.samco.trackandgraph.data.database.entity.LastValueStat
+import com.samco.trackandgraph.data.database.entity.LayoutItem
 import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
 import com.samco.trackandgraph.data.database.entity.LuaGraph
@@ -54,6 +55,7 @@ import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.Reminder
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
 import com.samco.trackandgraph.data.database.entity.Tracker
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.database.migrations.allMigrations
 import kotlinx.serialization.json.Json
 import org.threeten.bp.Duration
@@ -66,7 +68,7 @@ import org.threeten.bp.temporal.TemporalAmount
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-const val TNG_DATABASE_VERSION = 58
+const val TNG_DATABASE_VERSION = 59
 
 @Database(
     entities = [
@@ -89,6 +91,7 @@ const val TNG_DATABASE_VERSION = 58
         LuaGraphFeature::class,
         Function::class,
         FunctionInputFeature::class,
+        LayoutItem::class,
     ],
     version = TNG_DATABASE_VERSION
 )
@@ -127,9 +130,9 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 super.onCreate(db)
                 db.execSQL(
                     """
-                    INSERT OR REPLACE INTO 
-                    groups_table(id, name, display_index, parent_group_id, color_index) 
-                    VALUES(0, '', 0, NULL, 0)
+                    INSERT OR REPLACE INTO
+                    groups_table(id, name, parent_group_id, color_index)
+                    VALUES(0, '', NULL, 0)
                     """.trimMargin()
                 )
             }
@@ -298,6 +301,11 @@ internal class Converters {
         }
     }
 
+    @TypeConverter
+    fun layoutItemTypeToInt(type: LayoutItemType): Int = type.ordinal
+
+    @TypeConverter
+    fun intToLayoutItemType(index: Int): LayoutItemType = LayoutItemType.values()[index]
 }
 
 fun odtFromString(value: String): OffsetDateTime? =

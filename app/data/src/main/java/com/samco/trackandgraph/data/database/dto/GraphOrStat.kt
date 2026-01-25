@@ -22,14 +22,12 @@ data class GraphOrStat(
     val id: Long,
     val groupId: Long,
     val name: String,
-    val type: GraphStatType,
-    val displayIndex: Int
+    val type: GraphStatType
 ) {
     internal fun toEntity() = GraphOrStat(
         id,
         groupId,
         name,
-        type,
-        displayIndex
+        type
     )
 }

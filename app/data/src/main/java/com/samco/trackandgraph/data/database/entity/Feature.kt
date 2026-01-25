@@ -45,9 +45,6 @@ internal data class Feature(
     @ColumnInfo(name = "group_id", index = true)
     val groupId: Long,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "feature_description")
     val description: String
 ) {
@@ -55,7 +52,6 @@ internal data class Feature(
         featureId = this@Feature.id,
         name = this@Feature.name,
         groupId = this@Feature.groupId,
-        displayIndex = this@Feature.displayIndex,
         description = this@Feature.description
     )
 }

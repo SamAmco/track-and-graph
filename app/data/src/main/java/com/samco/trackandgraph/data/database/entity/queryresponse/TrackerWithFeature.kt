@@ -19,9 +19,6 @@ internal data class TrackerWithFeature(
     @ColumnInfo(name = "feature_id")
     val featureId: Long,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "feature_description")
     val description: String,
 
@@ -47,7 +44,6 @@ internal data class TrackerWithFeature(
         id = featureId,
         name = name,
         groupId = groupId,
-        displayIndex = displayIndex,
         description = description
     )
 }

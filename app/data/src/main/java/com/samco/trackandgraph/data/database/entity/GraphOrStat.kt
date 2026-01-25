@@ -44,16 +44,12 @@ internal data class GraphOrStat(
     val name: String,
 
     @ColumnInfo(name = "graph_stat_type")
-    val type: GraphStatType,
-
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int
+    val type: GraphStatType
 ) {
     fun toDto() = GraphOrStat(
         id,
         groupId,
         name,
-        type,
-        displayIndex
+        type
     )
 }

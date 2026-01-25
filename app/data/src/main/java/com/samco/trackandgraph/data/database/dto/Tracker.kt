@@ -24,7 +24,6 @@ data class Tracker(
     override val name: String,
     override val groupId: Long,
     override val featureId: Long,
-    override val displayIndex: Int,
     override val description: String,
     val dataType: DataType,
     val hasDefaultValue: Boolean,
@@ -40,7 +39,6 @@ data class Tracker(
             name = twf.name,
             groupId = twf.groupId,
             featureId = twf.featureId,
-            displayIndex = twf.displayIndex,
             description = twf.description,
             dataType = twf.dataType,
             hasDefaultValue = twf.hasDefaultValue,
@@ -66,7 +64,6 @@ data class Tracker(
         id = featureId,
         name = name,
         groupId = groupId,
-        displayIndex = displayIndex,
         description = description,
     )
 }

@@ -35,6 +35,8 @@ import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.database.dto.LastValueStat
+import com.samco.trackandgraph.data.database.dto.LayoutItem
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
@@ -795,5 +797,44 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getDependencyFeatureIdsOf(featureId: Long): Set<Long> = withContext(io) {
         dependencyAnalyserProvider.create().getDependenciesOf(featureId).featureIds
+    }
+
+    // Layout management methods
+
+    override suspend fun getLayoutItemsForGroup(groupId: Long): List<LayoutItem> = withContext(io) {
+        dao.getLayoutItemsForGroup(groupId).map { it.toDto() }
+    }
+
+    override fun getLayoutItemsForGroupFlow(groupId: Long): Flow<List<LayoutItem>> =
+        dao.getLayoutItemsForGroupFlow(groupId).map { items ->
+            items.map { it.toDto() }
+        }
+
+    override suspend fun updateLayoutOrder(groupId: Long, items: List<LayoutItem>) =
+        performAtomicUpdate(DataUpdateType.DisplayIndex) {
+            val updatedItems = items.mapIndexed { index, item ->
+                item.copy(displayIndex = index).toEntity()
+            }
+            dao.updateLayoutItems(updatedItems)
+        }
+
+    override suspend fun getLayoutItemByItemIdAndType(
+        itemId: Long,
+        type: LayoutItemType
+    ): LayoutItem? = withContext(io) {
+        dao.getLayoutItemByItemIdAndType(itemId, type)?.toDto()
+    }
+
+    override suspend fun insertLayoutItem(layoutItem: LayoutItem): Long = withContext(io) {
+        dao.insertLayoutItem(layoutItem.toEntity())
+            .also { dataUpdateEvents.emit(DataUpdateType.DisplayIndex) }
+    }
+
+    override suspend fun deleteLayoutItemByItemIdAndType(
+        itemId: Long,
+        type: LayoutItemType
+    ) = withContext(io) {
+        dao.deleteLayoutItemByItemIdAndType(itemId, type)
+        dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
     }
 }

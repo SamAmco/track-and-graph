@@ -44,9 +44,6 @@ internal data class Reminder(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "name")
     val alarmName: String,
 

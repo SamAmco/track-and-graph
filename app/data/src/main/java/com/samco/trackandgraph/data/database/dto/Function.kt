@@ -24,7 +24,6 @@ data class Function(
     val featureId: Long = 0L,
     val name: String,
     val groupId: Long,
-    val displayIndex: Int = 0,
     val description: String,
     val functionGraph: FunctionGraph,
     val inputFeatureIds: List<Long>

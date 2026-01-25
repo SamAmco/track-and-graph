@@ -29,7 +29,6 @@ interface Feature {
     val featureId: Long
     val name: String
     val groupId: Long
-    val displayIndex: Int
     val description: String
 }
 
@@ -37,7 +36,6 @@ internal data class FeatureDtoImpl(
     override val featureId: Long,
     override val name: String,
     override val groupId: Long,
-    override val displayIndex: Int,
     override val description: String
 ) : Feature
 
@@ -45,6 +43,5 @@ internal fun Feature.toEntity() = com.samco.trackandgraph.data.database.entity.F
     featureId,
     name,
     groupId,
-    displayIndex,
     description
 )

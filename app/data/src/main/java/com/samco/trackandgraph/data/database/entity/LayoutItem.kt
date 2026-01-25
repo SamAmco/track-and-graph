@@ -15,39 +15,44 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.data.database.entity.queryresponse
+package com.samco.trackandgraph.data.database.entity
 
 import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.samco.trackandgraph.data.database.dto.LayoutItem
+import com.samco.trackandgraph.data.database.dto.LayoutItemType
 
-internal data class FunctionWithFeature(
-    @ColumnInfo(name = "id")
+@Entity(
+    tableName = "layout_items_table",
+    indices = [
+        Index(value = ["group_id"]),
+        Index(value = ["item_id", "type"], unique = true)
+    ]
+)
+internal data class LayoutItem(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id", index = true)
     val id: Long,
-
-    @ColumnInfo(name = "feature_id")
-    val featureId: Long,
-
-    @ColumnInfo(name = "function_graph")
-    val functionGraph: String,
-
-    @ColumnInfo(name = "name")
-    val name: String,
 
     @ColumnInfo(name = "group_id")
     val groupId: Long,
 
-    @ColumnInfo(name = "feature_description")
-    val description: String
+    @ColumnInfo(name = "type")
+    val type: LayoutItemType,
+
+    @ColumnInfo(name = "item_id")
+    val itemId: Long,
+
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int
 ) {
-    fun toDto(
-        functionGraphDto: com.samco.trackandgraph.data.database.dto.FunctionGraph,
-        inputFeatures: List<Long>,
-    ) = com.samco.trackandgraph.data.database.dto.Function(
+    fun toDto() = LayoutItem(
         id = id,
-        featureId = featureId,
-        name = name,
         groupId = groupId,
-        description = description,
-        functionGraph = functionGraphDto,
-        inputFeatureIds = inputFeatures
+        type = type,
+        itemId = itemId,
+        displayIndex = displayIndex
     )
 }

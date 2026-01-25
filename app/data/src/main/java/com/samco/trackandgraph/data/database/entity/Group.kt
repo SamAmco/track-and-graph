@@ -39,9 +39,6 @@ internal data class Group(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "parent_group_id", index = true)
     val parentGroupId: Long?,
 
@@ -51,7 +48,6 @@ internal data class Group(
     fun toDto() = com.samco.trackandgraph.data.database.dto.Group(
         id,
         name,
-        displayIndex,
         parentGroupId,
         colorIndex,
     )

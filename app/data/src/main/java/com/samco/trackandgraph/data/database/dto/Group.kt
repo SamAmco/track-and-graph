@@ -17,17 +17,15 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-data class Group (
+data class Group(
     val id: Long,
     val name: String,
-    val displayIndex: Int,
     val parentGroupId: Long?,
     val colorIndex: Int,
 ) {
-    internal fun toEntity()  = com.samco.trackandgraph.data.database.entity.Group(
+    internal fun toEntity() = com.samco.trackandgraph.data.database.entity.Group(
         id,
         name,
-        displayIndex,
         parentGroupId,
         colorIndex,
     )
