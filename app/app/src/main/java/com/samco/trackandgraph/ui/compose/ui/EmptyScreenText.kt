@@ -18,6 +18,7 @@ package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +42,7 @@ fun EmptyScreenText(
     text: String,
     color: Color = MaterialTheme.colorScheme.onSurface,
     alpha: Float = 0.6f
-) = Box {
+) = Box(modifier = Modifier.fillMaxSize()) {
     Text(
         modifier = Modifier
             .width(250.dp)

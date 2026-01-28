@@ -102,10 +102,11 @@ fun IDataPoint.getDisplayValue(isDuration: Boolean): String {
 fun formatDayMonthYearHourMinuteWeekDayTwoLines(
     context: Context,
     weekDayNames: List<String>,
-    dateTime: OffsetDateTime
+    dateTime: OffsetDateTime,
+    offsetDiffHours: Int? = null
 ) = formatDayMonthYear(context, weekDayNames, dateTime) +
     "\n" +
-    formatHourMinuteSecondAndOffset(dateTime)
+    formatHourMinuteSecondAndOffset(dateTime, offsetDiffHours)
 
 /**
  * Formats time with optional timezone offset display as "HH:MM:SS (±hours)"
