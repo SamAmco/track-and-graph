@@ -19,8 +19,9 @@ package com.samco.trackandgraph.group
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.ComponentType
 import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
+import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -40,6 +41,7 @@ enum class MovableItemType { GROUP, GRAPH, TRACKER, FUNCTION }
 data class MoveDialogConfig(
     val itemId: Long,
     val itemType: MovableItemType,
+    val fromGroupId: Long,
     val hiddenItems: Set<HiddenItem>
 )
 
@@ -57,6 +59,7 @@ class MoveItemViewModel @Inject constructor(
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = group.id,
             itemType = MovableItemType.GROUP,
+            fromGroupId = group.parentGroupId ?: 0L,
             hiddenItems = setOf(HiddenItem(SelectableItemType.GROUP, group.id))
         )
     }
@@ -65,6 +68,7 @@ class MoveItemViewModel @Inject constructor(
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = graphOrStat.graphOrStat.id,
             itemType = MovableItemType.GRAPH,
+            fromGroupId = graphOrStat.graphOrStat.groupId,
             hiddenItems = emptySet()
         )
     }
@@ -73,6 +77,7 @@ class MoveItemViewModel @Inject constructor(
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = tracker.id,
             itemType = MovableItemType.TRACKER,
+            fromGroupId = tracker.groupId,
             hiddenItems = emptySet()
         )
     }
@@ -81,6 +86,7 @@ class MoveItemViewModel @Inject constructor(
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = displayFunction.id,
             itemType = MovableItemType.FUNCTION,
+            fromGroupId = displayFunction.groupId,
             hiddenItems = emptySet()
         )
     }
@@ -102,11 +108,13 @@ class MoveItemViewModel @Inject constructor(
                     MovableItemType.TRACKER -> {
                         val tracker = dataInteractor.getTrackerById(config.itemId)
                         tracker?.let {
-                            val request = TrackerUpdateRequest(
+                            val request = MoveComponentRequest(
+                                type = ComponentType.TRACKER,
                                 id = it.id,
-                                groupId = targetGroupId
+                                fromGroupId = config.fromGroupId,
+                                toGroupId = targetGroupId
                             )
-                            dataInteractor.updateTracker(request)
+                            dataInteractor.moveComponent(request)
                             timerServiceInteractor.requestWidgetUpdatesForFeatureId(it.featureId)
                         }
                     }

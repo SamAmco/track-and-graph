@@ -51,10 +51,12 @@ internal data class Feature(
     @ColumnInfo(name = "feature_description")
     val description: String
 ) {
+    // TODO: When features can exist in multiple groups, this will need to look up
+    // all groups the feature belongs to
     fun toDto(): Feature = FeatureDtoImpl(
         featureId = this@Feature.id,
         name = this@Feature.name,
-        groupId = this@Feature.groupId,
+        groupIds = setOf(this@Feature.groupId),
         displayIndex = this@Feature.displayIndex,
         description = this@Feature.description
     )

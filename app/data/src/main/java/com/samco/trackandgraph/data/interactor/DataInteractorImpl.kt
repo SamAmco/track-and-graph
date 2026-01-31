@@ -37,6 +37,8 @@ import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
+import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
+import com.samco.trackandgraph.data.database.dto.ComponentType
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
@@ -778,5 +780,20 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getDependencyFeatureIdsOf(featureId: Long): Set<Long> = withContext(io) {
         dependencyAnalyserProvider.create().getDependenciesOf(featureId).featureIds
+    }
+
+    override suspend fun moveComponent(request: MoveComponentRequest) = withContext(io) {
+        // TODO: When features can exist in multiple groups, this will need to handle
+        // adding/removing group associations rather than just updating the single groupId
+        when (request.type) {
+            ComponentType.TRACKER -> {
+                val tracker = dao.getTrackerById(request.id)
+                    ?: throw IllegalArgumentException("Tracker not found: ${request.id}")
+                val feature = dao.getFeatureById(tracker.featureId)
+                    ?: throw IllegalArgumentException("Feature not found: ${tracker.featureId}")
+                dao.updateFeature(feature.copy(groupId = request.toGroupId))
+                dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+            }
+        }
     }
 }

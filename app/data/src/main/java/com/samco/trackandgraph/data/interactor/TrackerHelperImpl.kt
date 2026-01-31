@@ -106,10 +106,13 @@ internal class TrackerHelperImpl @Inject constructor(
                 request.durationNumericConversionMode
             )
 
+            // TODO: When features can exist in multiple groups, this will need to handle
+            // multiple group associations
+            val currentGroupId = old.groupIds.first()
             val newFeature = com.samco.trackandgraph.data.database.entity.Feature(
                 id = old.featureId,
                 name = request.name ?: old.name,
-                groupId = request.groupId ?: old.groupId,
+                groupId = currentGroupId,
                 displayIndex = old.displayIndex,
                 description = request.description ?: old.description
             )
@@ -287,7 +290,10 @@ internal class TrackerHelperImpl @Inject constructor(
 
     override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
-            // Delete the feature, which will cascade delete the tracker and data points
+            // TODO: When features can exist in multiple groups, check request.groupId:
+            // - If groupId is specified, only remove the tracker from that group
+            // - If groupId is null, delete the tracker from all groups (full delete)
+            // For now, we always do a full delete since features only exist in one group
             dao.deleteFeature(request.featureId)
         }
     }

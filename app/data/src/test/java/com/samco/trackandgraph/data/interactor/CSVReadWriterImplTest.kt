@@ -316,7 +316,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
         Tracker(
             id = 0L,
             name = "B",
-            groupId = groupId,
+            groupIds = setOf(groupId),
             featureId = 0L,
             displayIndex = 0,
             description = "",
@@ -328,7 +328,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
         Tracker(
             id = 1L,
             name = "A",
-            groupId = groupId,
+            groupIds = setOf(groupId),
             featureId = 1L,
             displayIndex = 0,
             description = "",
@@ -340,7 +340,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
         Tracker(
             id = 2L,
             name = "Tracker C",
-            groupId = groupId,
+            groupIds = setOf(groupId),
             featureId = 2L,
             displayIndex = 0,
             description = "",
@@ -352,7 +352,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
         Tracker(
             id = 3L,
             name = "D",
-            groupId = groupId,
+            groupIds = setOf(groupId),
             featureId = 3L,
             displayIndex = 0,
             description = "",
@@ -400,7 +400,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
             Tracker(
                 id = 0L,
                 name = "B",
-                groupId = groupId,
+                groupIds = setOf(groupId),
                 featureId = 0L,
                 displayIndex = 0,
                 description = "",
@@ -419,7 +419,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
                 id = newId,
                 featureId = newId,
                 name = request.name,
-                groupId = request.groupId,
+                groupIds = setOf(request.groupId),
                 displayIndex = 0,
                 description = request.description,
                 dataType = request.dataType,
@@ -518,7 +518,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
         verify(trackerHelper, never()).createTracker(
             TrackerCreateRequest(
                 name = testTrackers[0].name,
-                groupId = testTrackers[0].groupId,
+                groupId = testTrackers[0].groupIds.first(),
                 dataType = testTrackers[0].dataType,
                 description = testTrackers[0].description,
                 hasDefaultValue = testTrackers[0].hasDefaultValue,
@@ -532,7 +532,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
             verify(trackerHelper, times(1)).createTracker(
                 TrackerCreateRequest(
                     name = it.name,
-                    groupId = it.groupId,
+                    groupId = it.groupIds.first(),
                     dataType = it.dataType,
                     description = it.description,
                     hasDefaultValue = it.hasDefaultValue,

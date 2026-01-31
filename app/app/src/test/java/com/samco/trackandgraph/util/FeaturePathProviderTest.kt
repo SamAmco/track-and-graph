@@ -10,10 +10,11 @@ class FeaturePathProviderTest {
     private data class FeatureDto(
         override val featureId: Long,
         override val name: String,
-        override val groupId: Long,
+        private val groupId: Long,
     ) : Feature {
         override val displayIndex: Int = 0
         override val description: String = ""
+        override val groupIds: Set<Long> = setOf(groupId)
     }
 
     @Test
