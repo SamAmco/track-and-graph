@@ -25,8 +25,11 @@ open class FeaturePathProvider(
     groups: List<Group>,
 ) : GroupPathProvider(groups) {
 
+    // TODO: When features can exist in multiple groups, this will need to handle
+    // showing the feature in multiple paths
     private val featureGroupMap: Map<Feature, Group> = features.mapNotNull { feature ->
-        val group = groups.firstOrNull { it.id == feature.groupId }
+        val groupId = feature.groupIds.firstOrNull() ?: return@mapNotNull null
+        val group = groups.firstOrNull { it.id == groupId }
             ?: return@mapNotNull null
         feature to group
     }.toMap()

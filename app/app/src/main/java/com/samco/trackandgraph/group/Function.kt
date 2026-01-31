@@ -68,6 +68,7 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 data class DisplayFunction(
     val id: Long,
     val featureId: Long,
+    val groupId: Long,
     val name: String,
     val description: String
 )
@@ -241,6 +242,7 @@ fun FunctionPreview() {
                 displayFunction = DisplayFunction(
                     id = 1,
                     featureId = 101,
+                    groupId = 1,
                     name = "Calculate Average",
                     description = "Calculates the average of selected data points"
                 ),
@@ -255,6 +257,7 @@ fun FunctionPreview() {
                 displayFunction = DisplayFunction(
                     id = 2,
                     featureId = 102,
+                    groupId = 1,
                     name = "Weekly Summary Report",
                     description = "Generates a comprehensive weekly summary with trends and insights"
                 ),

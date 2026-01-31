@@ -23,7 +23,7 @@ import com.samco.trackandgraph.data.interactor.TrackerHelper.DurationNumericConv
 data class Tracker(
     val id: Long,
     override val name: String,
-    override val groupId: Long,
+    override val groupIds: Set<Long>,
     override val featureId: Long,
     override val displayIndex: Int,
     override val description: String,
@@ -39,7 +39,8 @@ data class Tracker(
         internal fun fromTrackerWithFeature(twf: TrackerWithFeature) = Tracker(
             id = twf.id,
             name = twf.name,
-            groupId = twf.groupId,
+            // TODO: Currently features only exist in one group, but this will change
+            groupIds = setOf(twf.groupId),
             featureId = twf.featureId,
             displayIndex = twf.displayIndex,
             description = twf.description,
@@ -63,7 +64,7 @@ data class Tracker(
         suggestionOrder = suggestionOrder.toEntity()
     )
 
-    internal fun toFeatureEntity() = com.samco.trackandgraph.data.database.entity.Feature(
+    internal fun toFeatureEntity(groupId: Long) = com.samco.trackandgraph.data.database.entity.Feature(
         id = featureId,
         name = name,
         groupId = groupId,
@@ -94,13 +95,14 @@ data class TrackerCreateRequest(
  *
  * All fields except [id] are optional. A null value means "don't change this field".
  *
+ * Note: To move a tracker between groups, use [MoveFeatureRequest] instead.
+ *
  * @param durationNumericConversionMode When changing dataType to/from DURATION, specifies
  * how to convert existing data points (to HOURS, MINUTES, or SECONDS).
  */
 data class TrackerUpdateRequest(
     val id: Long,
     val name: String? = null,
-    val groupId: Long? = null,
     val description: String? = null,
     val dataType: DataType? = null,
     val hasDefaultValue: Boolean? = null,
@@ -112,13 +114,15 @@ data class TrackerUpdateRequest(
 )
 
 /**
- * Request object for deleting a Tracker from a specific group.
+ * Request object for deleting a Tracker.
  *
- * Note: In the future, trackers may exist in multiple groups. This request specifies
- * which group to remove the tracker from.
+ * @param groupId If specified, the tracker will only be removed from this group.
+ *                If null, the tracker will be deleted entirely from all groups.
+ * @param trackerId The ID of the tracker to delete.
+ * @param featureId The feature ID associated with the tracker.
  */
 data class TrackerDeleteRequest(
-    val groupId: Long,
     val trackerId: Long,
     val featureId: Long,
+    val groupId: Long? = null,
 )
