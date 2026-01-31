@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.data.di.DefaultDispatcher
@@ -91,7 +92,7 @@ interface GroupViewModel {
     suspend fun userHasAnyTrackers(): Boolean
     fun getTrackersInGroup(): List<DisplayTracker>
     fun addDefaultTrackerValue(tracker: DisplayTracker)
-    fun onDeleteFeature(id: Long)
+    fun onDeleteTracker(trackerId: Long)
     fun onDeleteGraphStat(id: Long)
     fun onDeleteGroup(id: Long)
     fun onDeleteFunction(id: Long)
@@ -521,10 +522,11 @@ class GroupViewModelImpl @Inject constructor(
         }
     }
 
-    override fun onDeleteFeature(id: Long) {
+    override fun onDeleteTracker(trackerId: Long) {
         viewModelScope.launch(io) {
-            dataInteractor.deleteFeature(id)
-            timerServiceInteractor.requestWidgetsDisabledForFeatureId(id)
+            val tracker = dataInteractor.getTrackerById(trackerId) ?: return@launch
+            dataInteractor.deleteTracker(TrackerDeleteRequest(trackerId = trackerId))
+            timerServiceInteractor.requestWidgetsDisabledForFeatureId(tracker.featureId)
         }
     }
 

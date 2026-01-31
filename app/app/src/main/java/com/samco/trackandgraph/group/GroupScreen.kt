@@ -374,7 +374,7 @@ private fun GroupScreenContent(
                 when (itemForDeletion.type) {
                     DeleteType.GROUP -> groupViewModel.onDeleteGroup(itemForDeletion.id)
                     DeleteType.GRAPH_STAT -> groupViewModel.onDeleteGraphStat(itemForDeletion.id)
-                    DeleteType.TRACKER -> groupViewModel.onDeleteFeature(itemForDeletion.id)
+                    DeleteType.TRACKER -> groupViewModel.onDeleteTracker(itemForDeletion.id)
                     DeleteType.FUNCTION -> groupViewModel.onDeleteFunction(itemForDeletion.id)
                 }
                 groupDialogsViewModel.hideDeleteDialog()
