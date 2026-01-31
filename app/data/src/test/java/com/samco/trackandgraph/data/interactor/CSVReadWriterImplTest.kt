@@ -6,6 +6,7 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.entity.DataPoint
 import com.samco.trackandgraph.data.sampling.DataSampleProperties
 import com.samco.trackandgraph.data.sampling.DataSampler
@@ -411,11 +412,22 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
         )
 
         whenever(trackerHelper.getTrackersForGroupSync(groupId)).thenAnswer { storedTrackers }
-        whenever(trackerHelper.insertTracker(any())).thenAnswer {
+        whenever(trackerHelper.createTracker(any())).thenAnswer {
+            val request = it.arguments[0] as TrackerCreateRequest
             val newId = storedTrackers.size.toLong()
-            val newTracker = (it.arguments[0] as Tracker).copy(
+            val newTracker = Tracker(
                 id = newId,
-                featureId = newId
+                featureId = newId,
+                name = request.name,
+                groupId = request.groupId,
+                displayIndex = 0,
+                description = request.description,
+                dataType = request.dataType,
+                hasDefaultValue = request.hasDefaultValue,
+                defaultValue = request.defaultValue,
+                defaultLabel = request.defaultLabel,
+                suggestionType = request.suggestionType,
+                suggestionOrder = request.suggestionOrder
             )
             storedTrackers.add(newTracker)
             return@thenAnswer newId
@@ -502,11 +514,32 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
     }
 
     private suspend fun verifyInsertedTrackers() {
-        verify(trackerHelper, never()).insertTracker(testTrackers[0])
+        // The first tracker (B) already exists, so createTracker should not be called for it
+        verify(trackerHelper, never()).createTracker(
+            TrackerCreateRequest(
+                name = testTrackers[0].name,
+                groupId = testTrackers[0].groupId,
+                dataType = testTrackers[0].dataType,
+                description = testTrackers[0].description,
+                hasDefaultValue = testTrackers[0].hasDefaultValue,
+                defaultValue = testTrackers[0].defaultValue,
+                defaultLabel = testTrackers[0].defaultLabel
+            )
+        )
 
+        // The remaining trackers should be created
         testTrackers.drop(1).forEach {
-            verify(trackerHelper, times(1))
-                .insertTracker(it.copy(id = 0, featureId = 0))
+            verify(trackerHelper, times(1)).createTracker(
+                TrackerCreateRequest(
+                    name = it.name,
+                    groupId = it.groupId,
+                    dataType = it.dataType,
+                    description = it.description,
+                    hasDefaultValue = it.hasDefaultValue,
+                    defaultValue = it.defaultValue,
+                    defaultLabel = it.defaultLabel
+                )
+            )
         }
     }
 

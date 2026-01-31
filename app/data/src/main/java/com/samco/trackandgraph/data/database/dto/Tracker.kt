@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.data.database.dto
 
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
+import com.samco.trackandgraph.data.interactor.TrackerHelper.DurationNumericConversionMode
 
 data class Tracker(
     val id: Long,
@@ -70,3 +71,54 @@ data class Tracker(
         description = description,
     )
 }
+
+/**
+ * Request object for creating a new Tracker.
+ *
+ * Note: id, featureId, and displayIndex are handled by the data layer and should not be provided.
+ */
+data class TrackerCreateRequest(
+    val name: String,
+    val groupId: Long,
+    val dataType: DataType,
+    val description: String = "",
+    val hasDefaultValue: Boolean = false,
+    val defaultValue: Double = 0.0,
+    val defaultLabel: String = "",
+    val suggestionType: TrackerSuggestionType = TrackerSuggestionType.VALUE_AND_LABEL,
+    val suggestionOrder: TrackerSuggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
+)
+
+/**
+ * Request object for updating an existing Tracker.
+ *
+ * All fields except [id] are optional. A null value means "don't change this field".
+ *
+ * @param durationNumericConversionMode When changing dataType to/from DURATION, specifies
+ * how to convert existing data points (to HOURS, MINUTES, or SECONDS).
+ */
+data class TrackerUpdateRequest(
+    val id: Long,
+    val name: String? = null,
+    val groupId: Long? = null,
+    val description: String? = null,
+    val dataType: DataType? = null,
+    val hasDefaultValue: Boolean? = null,
+    val defaultValue: Double? = null,
+    val defaultLabel: String? = null,
+    val suggestionType: TrackerSuggestionType? = null,
+    val suggestionOrder: TrackerSuggestionOrder? = null,
+    val durationNumericConversionMode: DurationNumericConversionMode? = null,
+)
+
+/**
+ * Request object for deleting a Tracker from a specific group.
+ *
+ * Note: In the future, trackers may exist in multiple groups. This request specifies
+ * which group to remove the tracker from.
+ */
+data class TrackerDeleteRequest(
+    val groupId: Long,
+    val trackerId: Long,
+    val featureId: Long,
+)

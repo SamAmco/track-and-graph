@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -100,8 +101,12 @@ class MoveItemViewModel @Inject constructor(
                 when (config.itemType) {
                     MovableItemType.TRACKER -> {
                         val tracker = dataInteractor.getTrackerById(config.itemId)
-                        tracker?.copy(groupId = targetGroupId)?.let {
-                            dataInteractor.updateTracker(it)
+                        tracker?.let {
+                            val request = TrackerUpdateRequest(
+                                id = it.id,
+                                groupId = targetGroupId
+                            )
+                            dataInteractor.updateTracker(request)
                             timerServiceInteractor.requestWidgetUpdatesForFeatureId(it.featureId)
                         }
                     }

@@ -92,44 +92,37 @@ internal class TrackerHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateTracker(
-        oldTracker: Tracker,
-        durationNumericConversionMode: DurationNumericConversionMode?,
-        newName: String?,
-        newType: DataType?,
-        hasDefaultValue: Boolean?,
-        defaultValue: Double?,
-        defaultLabel: String?,
-        featureDescription: String?,
-        suggestionType: TrackerSuggestionType?,
-        suggestionOrder: TrackerSuggestionOrder?
-    ) = withContext(io) {
+    override suspend fun updateTracker(request: TrackerUpdateRequest) = withContext(io) {
         transactionHelper.withTransaction {
-            val newDataType = newType ?: oldTracker.dataType
+            val oldTracker = dao.getTrackerById(request.id)
+                ?: throw IllegalArgumentException("Tracker with id ${request.id} not found")
+            val old = Tracker.fromTrackerWithFeature(oldTracker)
+
+            val newDataType = request.dataType ?: old.dataType
 
             updateAllExistingDataPointsForTransformation(
-                oldTracker,
+                old,
                 newDataType,
-                durationNumericConversionMode
+                request.durationNumericConversionMode
             )
 
             val newFeature = com.samco.trackandgraph.data.database.entity.Feature(
-                id = oldTracker.featureId,
-                name = newName ?: oldTracker.name,
-                groupId = oldTracker.groupId,
-                displayIndex = oldTracker.displayIndex,
-                description = featureDescription ?: oldTracker.description
+                id = old.featureId,
+                name = request.name ?: old.name,
+                groupId = request.groupId ?: old.groupId,
+                displayIndex = old.displayIndex,
+                description = request.description ?: old.description
             )
             val newTracker = com.samco.trackandgraph.data.database.entity.Tracker(
-                id = oldTracker.id,
-                featureId = oldTracker.featureId,
+                id = old.id,
+                featureId = old.featureId,
                 dataType = newDataType,
-                hasDefaultValue = hasDefaultValue ?: oldTracker.hasDefaultValue,
-                defaultValue = defaultValue ?: oldTracker.defaultValue,
-                defaultLabel = defaultLabel ?: oldTracker.defaultLabel,
-                suggestionType = suggestionType?.toEntity() ?: oldTracker.suggestionType.toEntity(),
-                suggestionOrder = suggestionOrder?.toEntity()
-                    ?: oldTracker.suggestionOrder.toEntity()
+                hasDefaultValue = request.hasDefaultValue ?: old.hasDefaultValue,
+                defaultValue = request.defaultValue ?: old.defaultValue,
+                defaultLabel = request.defaultLabel ?: old.defaultLabel,
+                suggestionType = request.suggestionType?.toEntity() ?: old.suggestionType.toEntity(),
+                suggestionOrder = request.suggestionOrder?.toEntity()
+                    ?: old.suggestionOrder.toEntity()
             )
             dao.updateFeature(newFeature)
             dao.updateTracker(newTracker)
@@ -268,17 +261,34 @@ internal class TrackerHelperImpl @Inject constructor(
         return@withContext dao.hasAtLeastOneDataPoint()
     }
 
-    override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
+    override suspend fun createTracker(request: TrackerCreateRequest): Long = withContext(io) {
         return@withContext transactionHelper.withTransaction {
-            val featureId = dao.insertFeature(tracker.toFeatureEntity())
-            dao.insertTracker(tracker.toEntity().copy(featureId = featureId))
+            val feature = com.samco.trackandgraph.data.database.entity.Feature(
+                id = 0L,
+                name = request.name,
+                groupId = request.groupId,
+                displayIndex = 0,
+                description = request.description
+            )
+            val featureId = dao.insertFeature(feature)
+            val tracker = com.samco.trackandgraph.data.database.entity.Tracker(
+                id = 0L,
+                featureId = featureId,
+                dataType = request.dataType,
+                hasDefaultValue = request.hasDefaultValue,
+                defaultValue = request.defaultValue,
+                defaultLabel = request.defaultLabel,
+                suggestionType = request.suggestionType.toEntity(),
+                suggestionOrder = request.suggestionOrder.toEntity()
+            )
+            dao.insertTracker(tracker)
         }
     }
 
-    override suspend fun updateTracker(tracker: Tracker) = withContext(io) {
+    override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
-            dao.updateFeature(tracker.toFeatureEntity())
-            dao.updateTracker(tracker.toEntity())
+            // Delete the feature, which will cascade delete the tracker and data points
+            dao.deleteFeature(request.featureId)
         }
     }
 

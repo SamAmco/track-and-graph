@@ -41,8 +41,9 @@ import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.Tracker
-import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
-import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
+import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
+import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
+import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
 import com.samco.trackandgraph.data.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
@@ -183,42 +184,24 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getFeatureById(featureId)?.toDto()
     }
 
-    override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
-        val id = trackerHelper.insertTracker(tracker)
+    override suspend fun createTracker(request: TrackerCreateRequest): Long = withContext(io) {
+        val id = trackerHelper.createTracker(request)
         dataUpdateEvents.emit(DataUpdateType.TrackerCreated)
         return@withContext id
     }
 
-    override suspend fun updateTracker(tracker: Tracker) = withContext(io) {
-        trackerHelper.updateTracker(tracker)
+    override suspend fun updateTracker(request: TrackerUpdateRequest) = withContext(io) {
+        trackerHelper.updateTracker(request)
         dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
     }
 
-    override suspend fun updateTracker(
-        oldTracker: Tracker,
-        durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode?,
-        newName: String?,
-        newType: DataType?,
-        hasDefaultValue: Boolean?,
-        defaultValue: Double?,
-        defaultLabel: String?,
-        featureDescription: String?,
-        suggestionType: TrackerSuggestionType?,
-        suggestionOrder: TrackerSuggestionOrder?
-    ) = withContext(io) {
-        trackerHelper.updateTracker(
-            oldTracker = oldTracker,
-            durationNumericConversionMode = durationNumericConversionMode,
-            newName = newName,
-            newType = newType,
-            hasDefaultValue = hasDefaultValue,
-            defaultValue = defaultValue,
-            defaultLabel = defaultLabel,
-            featureDescription = featureDescription,
-            suggestionType = suggestionType,
-            suggestionOrder = suggestionOrder
-        ).also {
-            dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+    override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
+        val allDependentGraphs = dependencyAnalyserProvider.create()
+            .getDependentGraphs(request.featureId)
+        trackerHelper.deleteTracker(request)
+        dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
+        for (graphStatId in allDependentGraphs.graphStatIds) {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
         }
     }
 

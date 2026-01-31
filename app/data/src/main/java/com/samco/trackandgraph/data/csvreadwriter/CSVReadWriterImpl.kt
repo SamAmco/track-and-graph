@@ -22,6 +22,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.odtFromString
 import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -267,19 +268,13 @@ internal class CSVReadWriterImpl @Inject constructor(
             true -> DataType.DURATION
             false -> DataType.CONTINUOUS
         }
-        val newTracker = Tracker(
-            id = 0,
+        val request = TrackerCreateRequest(
             name = rec.trackerName,
             groupId = trackGroupId,
-            featureId = 0L,
-            displayIndex = 0,
-            description = "",
             dataType = dataType,
-            hasDefaultValue = false,
-            defaultValue = 1.0,
-            defaultLabel = ""
+            defaultValue = 1.0
         )
-        val trackerId = trackerHelper.insertTracker(newTracker)
+        val trackerId = trackerHelper.createTracker(request)
         return trackerHelper.getTrackerById(trackerId)!!
     }
 

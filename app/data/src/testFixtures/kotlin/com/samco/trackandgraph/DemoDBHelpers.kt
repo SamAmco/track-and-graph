@@ -3,7 +3,7 @@ package com.samco.trackandgraph
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -99,10 +99,9 @@ fun createGroup(
     colorIndex = colorIndex
 )
 
-fun createTracker(
+fun createTrackerRequest(
     name: String,
     groupId: Long,
-    displayIndex: Int = 0,
     description: String = "",
     dataType: DataType = DataType.CONTINUOUS,
     hasDefaultValue: Boolean = false,
@@ -110,12 +109,9 @@ fun createTracker(
     defaultLabel: String = "",
     suggestionType: TrackerSuggestionType = TrackerSuggestionType.VALUE_AND_LABEL,
     suggestionOrder: TrackerSuggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
-) = Tracker(
-    id = 0L,
+) = TrackerCreateRequest(
     name = name,
     groupId = groupId,
-    featureId = 0L,
-    displayIndex = displayIndex,
     description = description,
     dataType = dataType,
     hasDefaultValue = hasDefaultValue,

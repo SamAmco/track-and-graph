@@ -51,16 +51,14 @@ private suspend fun createScreenshot1Group(
         createGroup(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
-            displayIndex = 0,
         )
     )
 
     // Create Relaxation tracker
-    val relaxationTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val relaxationTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = "Relaxation",
             groupId = groupId,
-            displayIndex = 0,
         )
     )
 
@@ -79,11 +77,10 @@ private suspend fun createScreenshot1Group(
     )
 
     // Create Stress tracker
-    val stressTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val stressTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = "Stress",
             groupId = groupId,
-            displayIndex = 1,
             description = "Track daily stress level (0-10)",
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
@@ -116,7 +113,6 @@ private suspend fun createScreenshot2Group(
         createGroup(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
-            displayIndex = 1,
         )
     )
 
@@ -127,21 +123,19 @@ private suspend fun createScreenshot2Group(
         .first { it.name == "Stress" && it.groupId == screenshot1GroupId }
 
     // Create new trackers with same names but in Screenshot 2 group
-    val relaxationTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val relaxationTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = relaxationTracker.name,
             groupId = groupId,
-            displayIndex = 0,
             description = relaxationTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
     )
 
-    val stressTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val stressTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = stressTracker.name,
             groupId = groupId,
-            displayIndex = 1,
             description = stressTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
@@ -191,7 +185,6 @@ private suspend fun createScreenshot2Group(
         groupId = groupId,
         relaxationFeatureId = relaxationFeatureId,
         stressFeatureId = stressFeatureId,
-        displayIndex = 3,
     )
 
     return groupId
@@ -207,7 +200,6 @@ private suspend fun createScreenshot3Group(
         createGroup(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
-            displayIndex = 3,
         )
     )
 
@@ -218,21 +210,19 @@ private suspend fun createScreenshot3Group(
         .first { it.name == "Stress" && it.groupId == screenshot2GroupId }
 
     // Create new trackers with same names but in Screenshot 3 group
-    val relaxationTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val relaxationTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = relaxationTracker.name,
             groupId = groupId,
-            displayIndex = 0,
             description = relaxationTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
     )
 
-    val stressTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val stressTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = stressTracker.name,
             groupId = groupId,
-            displayIndex = 1,
             description = stressTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
@@ -283,7 +273,6 @@ private suspend fun createScreenshot3Group(
         groupId = groupId,
         relaxationFeatureId = relaxationFeatureId,
         stressFeatureId = stressFeatureId,
-        displayIndex = 3,
     )
 
     // Add empty Health group
@@ -299,14 +288,13 @@ private suspend fun createMonthlyMovingAverageGraph(
     groupId: Long,
     relaxationFeatureId: Long,
     stressFeatureId: Long,
-    displayIndex: Int,
 ): Long {
     val graphStat = GraphOrStat(
         id = 0L,
         groupId = groupId,
         name = "Relaxation Vs Stress (Monthly moving averages)",
         type = GraphStatType.LINE_GRAPH,
-        displayIndex = 2
+        displayIndex = 0,
     )
 
     val lineGraph = LineGraphWithFeatures(

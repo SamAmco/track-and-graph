@@ -22,7 +22,8 @@ import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.GlobalNote
-import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
+import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
@@ -84,17 +85,19 @@ class DataInteractorImplTest {
     fun `Modifying the data should cause a data update event`() = runTest {
 
         //PREPARE
-        val testTracker = Tracker(
-            id = 0L,
-            featureId = 0L,
+        val testCreateRequest = TrackerCreateRequest(
             name = "none",
             groupId = 0L,
             dataType = DataType.CONTINUOUS,
-            displayIndex = 0,
             hasDefaultValue = false,
             defaultValue = 0.0,
             description = "none",
             defaultLabel = ""
+        )
+
+        val testUpdateRequest = TrackerUpdateRequest(
+            id = 0L,
+            name = "updated"
         )
 
         val dataPointTime = OffsetDateTime.parse("2020-01-02T00:00:00Z")
@@ -117,7 +120,7 @@ class DataInteractorImplTest {
             uut.getDataUpdateEvents().collect { count++ }
         }
 
-        whenever(trackerHelper.insertTracker(any())).thenReturn(0L)
+        whenever(trackerHelper.createTracker(any())).thenReturn(0L)
         whenever(dao.getTrackerById(any())).thenReturn(
             TrackerWithFeature(
                 id = 0L,
@@ -151,8 +154,8 @@ class DataInteractorImplTest {
         yield()
 
         uut.deleteGroup(0L)
-        uut.insertTracker(testTracker)
-        uut.updateTracker(testTracker)
+        uut.createTracker(testCreateRequest)
+        uut.updateTracker(testUpdateRequest)
         uut.deleteFeature(0L)
         uut.deleteDataPoint(testDataPoint)
         uut.insertDataPoint(testDataPoint)
@@ -166,7 +169,7 @@ class DataInteractorImplTest {
         //VERIFY
         assertEquals(10, count)
         collectJob.cancel()
-        verify(trackerHelper, times(1)).insertTracker(eq(testTracker))
-        verify(trackerHelper, times(1)).updateTracker(eq(testTracker))
+        verify(trackerHelper, times(1)).createTracker(eq(testCreateRequest))
+        verify(trackerHelper, times(1)).updateTracker(eq(testUpdateRequest))
     }
 }

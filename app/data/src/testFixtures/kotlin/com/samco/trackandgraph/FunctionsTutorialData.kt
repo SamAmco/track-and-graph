@@ -19,6 +19,8 @@ package com.samco.trackandgraph
 
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -52,11 +54,10 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
     val groupId = dataInteractor.insertGroup(createGroup("FunctionsTutorial"))
 
     // Create trackers in display order
-    val weightTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val weightTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = "Weight",
             groupId = groupId,
-            displayIndex = 4,
             dataType = DataType.CONTINUOUS,
             hasDefaultValue = false,
             suggestionType = TrackerSuggestionType.LABEL_ONLY,
@@ -65,11 +66,10 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
     )
     val weightFeatureId = dataInteractor.getTrackerById(weightTrackerId)!!.featureId
 
-    val runningTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val runningTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = "Running ",
             groupId = groupId,
-            displayIndex = 5,
             dataType = DataType.DURATION,
             hasDefaultValue = false,
             suggestionType = TrackerSuggestionType.LABEL_ONLY,
@@ -78,11 +78,10 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
     )
     val runningFeatureId = dataInteractor.getTrackerById(runningTrackerId)!!.featureId
 
-    val weightLbsTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val weightLbsTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = "Weight (lbs)",
             groupId = groupId,
-            displayIndex = 6,
             dataType = DataType.CONTINUOUS,
             hasDefaultValue = false,
             suggestionType = TrackerSuggestionType.LABEL_ONLY,
@@ -91,11 +90,10 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
     )
     val weightLbsFeatureId = dataInteractor.getTrackerById(weightLbsTrackerId)!!.featureId
 
-    val cyclingTrackerId = dataInteractor.insertTracker(
-        createTracker(
+    val cyclingTrackerId = dataInteractor.createTracker(
+        createTrackerRequest(
             name = "Cycling ",
             groupId = groupId,
-            displayIndex = 7,
             dataType = DataType.DURATION,
             hasDefaultValue = false,
             suggestionType = TrackerSuggestionType.LABEL_ONLY,
@@ -108,58 +106,69 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
     val json = Json { ignoreUnknownKeys = true }
 
     // Function: Exercise - combines Running and Cycling
-    dataInteractor.insertFunction(
+    val exerciseFunctionId = dataInteractor.insertFunction(
         Function(
             name = "Exercise",
             groupId = groupId,
-            displayIndex = 0,
             description = "",
             functionGraph = json.decodeFromString(
                 exercise_function_graph(runningFeatureId, cyclingFeatureId)
             ),
             inputFeatureIds = listOf(runningFeatureId, cyclingFeatureId)
         )
-    )
+    )!!
 
     // Function: Exercise This Week - filters Exercise data to current week
-    dataInteractor.insertFunction(
+    val exerciseThisWeekFunctionId = dataInteractor.insertFunction(
         Function(
             name = "Exercise This Week",
             groupId = groupId,
-            displayIndex = 1,
             description = "",
             functionGraph = json.decodeFromString(
                 exercise_this_week_function_graph(runningFeatureId, cyclingFeatureId)
             ),
             inputFeatureIds = listOf(runningFeatureId, cyclingFeatureId)
         )
-    )
+    )!!
 
     // Function: Weight (Kg) - converts Weight (lbs) to kg
-    dataInteractor.insertFunction(
+    val weightKgFunctionId = dataInteractor.insertFunction(
         Function(
             name = "Weight (Kg)",
             groupId = groupId,
-            displayIndex = 2,
             description = "",
             functionGraph = json.decodeFromString(
                 weight_kg_function_graph(weightLbsFeatureId)
             ),
             inputFeatureIds = listOf(weightLbsFeatureId)
         )
-    )
+    )!!
 
     // Function: All Weight (Kg) - merges weight from both kg and lbs labels
-    dataInteractor.insertFunction(
+    val allWeightKgFunctionId = dataInteractor.insertFunction(
         Function(
             name = "All Weight (Kg)",
             groupId = groupId,
-            displayIndex = 3,
             description = "",
             functionGraph = json.decodeFromString(
                 all_weight_kg_function_graph(weightFeatureId)
             ),
             inputFeatureIds = listOf(weightFeatureId)
+        )
+    )!!
+
+    // Reorder all items to correct display order
+    dataInteractor.updateGroupChildOrder(
+        groupId,
+        listOf(
+            GroupChildOrderData(GroupChildType.FEATURE, weightFeatureId, 0),
+            GroupChildOrderData(GroupChildType.FEATURE, runningFeatureId, 1),
+            GroupChildOrderData(GroupChildType.FEATURE, weightLbsFeatureId, 2),
+            GroupChildOrderData(GroupChildType.FEATURE, cyclingFeatureId, 3),
+            GroupChildOrderData(GroupChildType.FEATURE, exerciseFunctionId, 4),
+            GroupChildOrderData(GroupChildType.FEATURE, exerciseThisWeekFunctionId, 5),
+            GroupChildOrderData(GroupChildType.FEATURE, weightKgFunctionId, 6),
+            GroupChildOrderData(GroupChildType.FEATURE, allWeightKgFunctionId, 7),
         )
     )
 }
