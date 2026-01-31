@@ -63,8 +63,6 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
 
     suspend fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
-    suspend fun deleteFeature(featureId: Long)
-
     suspend fun insertDataPoint(dataPoint: DataPoint): Long
 
     suspend fun insertDataPoints(dataPoints: List<DataPoint>)

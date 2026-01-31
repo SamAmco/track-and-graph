@@ -294,7 +294,9 @@ internal class TrackerHelperImpl @Inject constructor(
             // - If groupId is specified, only remove the tracker from that group
             // - If groupId is null, delete the tracker from all groups (full delete)
             // For now, we always do a full delete since features only exist in one group
-            dao.deleteFeature(request.featureId)
+            val tracker = dao.getTrackerById(request.trackerId)
+                ?: throw IllegalArgumentException("Tracker not found: ${request.trackerId}")
+            dao.deleteFeature(tracker.featureId)
         }
     }
 
