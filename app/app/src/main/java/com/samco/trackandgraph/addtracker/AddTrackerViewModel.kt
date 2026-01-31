@@ -14,8 +14,10 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
+import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.TrackerHelper
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -247,28 +249,26 @@ class AddTrackerViewModelImpl @Inject constructor(
     }
 
     private suspend fun updateTracker(existingTracker: Tracker) {
-        dataInteractor.updateTracker(
-            oldTracker = existingTracker,
+        val request = TrackerUpdateRequest(
+            id = existingTracker.id,
             durationNumericConversionMode = durationNumericConversionMode.value,
-            newName = trackerName.text,
-            newType = getDataType(),
+            name = trackerName.text,
+            dataType = getDataType(),
             hasDefaultValue = hasDefaultValue.value,
             defaultValue = getDefaultValue() ?: 1.0,
-            featureDescription = trackerDescription.text,
+            description = trackerDescription.text,
             defaultLabel = defaultLabel.text,
             suggestionType = suggestionType.value,
             suggestionOrder = suggestionOrder.value
         )
+        dataInteractor.updateTracker(request)
         timerServiceInteractor.requestWidgetUpdatesForFeatureId(featureId = existingTracker.featureId)
     }
 
     private suspend fun addTracker() {
-        val tracker = Tracker(
-            id = 0L,
+        val request = TrackerCreateRequest(
             name = trackerName.text,
             groupId = groupId,
-            featureId = 0L,
-            displayIndex = 0,
             description = trackerDescription.text,
             dataType = getDataType(),
             hasDefaultValue = hasDefaultValue.value ?: false,
@@ -277,6 +277,6 @@ class AddTrackerViewModelImpl @Inject constructor(
             suggestionType = suggestionType.value ?: TrackerSuggestionType.VALUE_AND_LABEL,
             suggestionOrder = suggestionOrder.value ?: TrackerSuggestionOrder.VALUE_ASCENDING
         )
-        dataInteractor.insertTracker(tracker)
+        dataInteractor.createTracker(request)
     }
 }
