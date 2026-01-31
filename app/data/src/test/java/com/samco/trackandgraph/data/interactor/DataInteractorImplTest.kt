@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
+import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
@@ -156,7 +157,7 @@ class DataInteractorImplTest {
         uut.deleteGroup(0L)
         uut.createTracker(testCreateRequest)
         uut.updateTracker(testUpdateRequest)
-        uut.deleteFeature(0L)
+        uut.deleteTracker(TrackerDeleteRequest(trackerId = 0L))
         uut.deleteDataPoint(testDataPoint)
         uut.insertDataPoint(testDataPoint)
         uut.insertDataPoints(listOf(testDataPoint))

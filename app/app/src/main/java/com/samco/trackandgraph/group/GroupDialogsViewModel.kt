@@ -104,7 +104,7 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
 
     fun showDeleteTrackerDialog(tracker: DisplayTracker) {
         _itemForDeletion.value = DeleteItemDto(
-            id = tracker.featureId,
+            id = tracker.id,
             type = DeleteType.TRACKER
         )
     }

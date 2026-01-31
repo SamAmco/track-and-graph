@@ -198,11 +198,30 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
+        val tracker = dao.getTrackerById(request.trackerId)
+            ?: throw IllegalArgumentException("Tracker not found: ${request.trackerId}")
+        deleteFeature(tracker.featureId, isTracker = true)
+    }
+
+    private suspend fun deleteFeature(featureId: Long, isTracker: Boolean) {
         val allDependentGraphs = dependencyAnalyserProvider.create()
-            .getDependentGraphs(request.featureId)
-        trackerHelper.deleteTracker(request)
-        dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
-        for (graphStatId in allDependentGraphs.graphStatIds) {
+            .getDependentGraphs(featureId)
+
+        // We need to make sure all cascade deletes are complete before we continue
+        // hence the atomic update
+        performAtomicUpdate { dao.deleteFeature(featureId) }
+
+        if (isTracker) dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
+        else dataUpdateEvents.emit(DataUpdateType.FunctionDeleted(featureId))
+
+        val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
+        for (graphStatId in orphanedGraphs.graphStatIds) {
+            dao.deleteGraphOrStat(graphStatId)
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
+        }
+
+        val graphsNeedingUpdate = allDependentGraphs.graphStatIds - orphanedGraphs.graphStatIds
+        for (graphStatId in graphsNeedingUpdate) {
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
         }
     }
@@ -226,30 +245,6 @@ internal class DataInteractorImpl @Inject constructor(
         val graphsNeedingUpdate = dependencyAnalyserProvider.create()
             .getDependentGraphs(featureId)
         for (graphStatId in graphsNeedingUpdate.graphStatIds) {
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
-        }
-    }
-
-    override suspend fun deleteFeature(featureId: Long) = withContext(io) {
-        val allDependentGraphs = dependencyAnalyserProvider.create()
-            .getDependentGraphs(featureId)
-        val isTracker = dao.getTrackerByFeatureId(featureId) != null
-
-        // We need to make sure all cascade deletes are complete before we continue
-        // hence the atomic update
-        performAtomicUpdate { dao.deleteFeature(featureId) }
-
-        if (isTracker) dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
-        else dataUpdateEvents.emit(DataUpdateType.FunctionDeleted(featureId))
-
-        val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
-        for (graphStatId in orphanedGraphs.graphStatIds) {
-            dao.deleteGraphOrStat(graphStatId)
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
-        }
-
-        val graphsNeedingUpdate = allDependentGraphs.graphStatIds - orphanedGraphs.graphStatIds
-        for (graphStatId in graphsNeedingUpdate) {
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
         }
     }
@@ -766,12 +761,8 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun deleteFunction(functionId: Long) = withContext(io) {
-        // Get the function to find its feature ID, then delete the feature
-        // This will cascade delete the function and emit the correct event
-        val function = dao.getFunctionById(functionId)
-        if (function != null) {
-            deleteFeature(function.featureId)
-        }
+        val function = dao.getFunctionById(functionId) ?: return@withContext
+        deleteFeature(function.featureId, isTracker = false)
     }
 
     override suspend fun getFeatureIdsDependingOn(featureId: Long): Set<Long> = withContext(io) {

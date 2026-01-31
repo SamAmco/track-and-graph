@@ -119,10 +119,8 @@ data class TrackerUpdateRequest(
  * @param groupId If specified, the tracker will only be removed from this group.
  *                If null, the tracker will be deleted entirely from all groups.
  * @param trackerId The ID of the tracker to delete.
- * @param featureId The feature ID associated with the tracker.
  */
 data class TrackerDeleteRequest(
     val trackerId: Long,
-    val featureId: Long,
     val groupId: Long? = null,
 )
