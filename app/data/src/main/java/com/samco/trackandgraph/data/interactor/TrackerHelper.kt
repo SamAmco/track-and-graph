@@ -18,11 +18,11 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Tracker
-import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
-import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
+import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
+import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
+import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -46,26 +46,28 @@ interface TrackerHelper {
         toLabel: String? = null
     )
 
-    suspend fun updateTracker(
-        oldTracker: Tracker,
-        durationNumericConversionMode: DurationNumericConversionMode? = null,
-        newName: String? = null,
-        newType: DataType? = null,
-        hasDefaultValue: Boolean? = null,
-        defaultValue: Double? = null,
-        defaultLabel: String?,
-        featureDescription: String? = null,
-        suggestionType: TrackerSuggestionType?,
-        suggestionOrder: TrackerSuggestionOrder?
-    )
+    /**
+     * Creates a new tracker and returns the tracker ID.
+     */
+    suspend fun createTracker(request: TrackerCreateRequest): Long
+
+    /**
+     * Updates an existing tracker. Only non-null fields in the request will be changed.
+     *
+     * If [TrackerUpdateRequest.dataType] is being changed to/from DURATION, the
+     * [TrackerUpdateRequest.durationNumericConversionMode] should be specified to indicate
+     * how to convert existing data points.
+     */
+    suspend fun updateTracker(request: TrackerUpdateRequest)
+
+    /**
+     * Deletes a tracker from a specific group.
+     */
+    suspend fun deleteTracker(request: TrackerDeleteRequest)
 
     suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker>
 
     suspend fun getTrackerById(trackerId: Long): Tracker?
-
-    suspend fun insertTracker(tracker: Tracker): Long
-
-    suspend fun updateTracker(tracker: Tracker)
 
     suspend fun getAllTrackersSync(): List<Tracker>
 
