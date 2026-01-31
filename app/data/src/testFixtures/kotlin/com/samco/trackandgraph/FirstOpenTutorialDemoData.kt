@@ -118,9 +118,9 @@ private suspend fun createScreenshot2Group(
 
     // Copy the trackers from Screenshot 1
     val relaxationTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Relaxation" && it.groupId == screenshot1GroupId }
+        .first { it.name == "Relaxation" && it.groupIds.contains(screenshot1GroupId) }
     val stressTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Stress" && it.groupId == screenshot1GroupId }
+        .first { it.name == "Stress" && it.groupIds.contains(screenshot1GroupId) }
 
     // Create new trackers with same names but in Screenshot 2 group
     val relaxationTrackerId = dataInteractor.createTracker(
@@ -205,9 +205,9 @@ private suspend fun createScreenshot3Group(
 
     // Copy the trackers from Screenshot 2
     val relaxationTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Relaxation" && it.groupId == screenshot2GroupId }
+        .first { it.name == "Relaxation" && it.groupIds.contains(screenshot2GroupId) }
     val stressTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Stress" && it.groupId == screenshot2GroupId }
+        .first { it.name == "Stress" && it.groupIds.contains(screenshot2GroupId) }
 
     // Create new trackers with same names but in Screenshot 3 group
     val relaxationTrackerId = dataInteractor.createTracker(

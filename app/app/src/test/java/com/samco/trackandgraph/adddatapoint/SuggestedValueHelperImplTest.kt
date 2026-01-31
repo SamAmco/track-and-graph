@@ -53,7 +53,7 @@ class SuggestedValueHelperImplTest {
     private val testTracker = Tracker(
         id = 1,
         name = "test",
-        groupId = 1,
+        groupIds = setOf(1),
         featureId = 1,
         displayIndex = 1,
         description = "test",

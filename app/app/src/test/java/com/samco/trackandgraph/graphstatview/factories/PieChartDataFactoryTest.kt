@@ -62,7 +62,7 @@ class PieChartDataFactoryTest {
     private val feature = object : Feature {
         override val featureId: Long = this@PieChartDataFactoryTest.featureId
         override val name: String = "feature"
-        override val groupId: Long = 1L
+        override val groupIds: Set<Long> = setOf(1)
         override val displayIndex: Int = 1
         override val description: String = "description"
     }

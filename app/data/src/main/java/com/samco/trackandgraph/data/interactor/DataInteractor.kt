@@ -31,6 +31,7 @@ import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
+import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import kotlinx.coroutines.flow.Flow
@@ -185,4 +186,11 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
      * the output of a given feature.
      */
     suspend fun getDependencyFeatureIdsOf(featureId: Long): Set<Long>
+
+    /**
+     * Moves a feature from one group to another.
+     *
+     * @param request The move request containing the feature type, ID, and source/destination groups.
+     */
+    suspend fun moveComponent(request: MoveComponentRequest)
 }

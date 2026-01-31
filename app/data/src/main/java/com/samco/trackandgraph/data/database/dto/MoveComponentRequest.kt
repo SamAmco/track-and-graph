@@ -14,23 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.data.database.dto.Feature
-import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.data.sampling.DataSampleProperties
+package com.samco.trackandgraph.data.database.dto
 
-class FeatureDataProvider(
-    private val dataSourceData: List<DataSourceData>,
-    groups: List<Group>,
-) : FeaturePathProvider(dataSourceData.map { it.feature }, groups) {
-
-    fun getDataSampleProperties(featureId: Long) = dataSourceData
-        .firstOrNull { it.feature.featureId == featureId }
-        ?.dataProperties
-
-    data class DataSourceData(
-        val feature: Feature,
-        val dataProperties: DataSampleProperties?
-    )
+/**
+ * The type of component being moved between groups.
+ */
+enum class ComponentType {
+    TRACKER
 }
+
+/**
+ * Request object for moving a component from one group to another.
+ *
+ * @param type The type of the component being moved.
+ * @param id The ID of the component to move.
+ * @param fromGroupId The source group ID.
+ * @param toGroupId The destination group ID.
+ */
+data class MoveComponentRequest(
+    val type: ComponentType,
+    val id: Long,
+    val fromGroupId: Long,
+    val toGroupId: Long,
+)

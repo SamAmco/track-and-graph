@@ -24,11 +24,14 @@ package com.samco.trackandgraph.data.database.dto
  * All implementations of [Feature] should override [equals] and [hashCode] as it may be used as a
  * map key. You should not need to construct an implementation of [Feature] directly from the app
  * module.
+ *
+ * Note: A feature can exist in multiple groups. The [groupIds] set contains all groups
+ * that this feature belongs to.
  */
 interface Feature {
     val featureId: Long
     val name: String
-    val groupId: Long
+    val groupIds: Set<Long>
     val displayIndex: Int
     val description: String
 }
@@ -36,12 +39,12 @@ interface Feature {
 internal data class FeatureDtoImpl(
     override val featureId: Long,
     override val name: String,
-    override val groupId: Long,
+    override val groupIds: Set<Long>,
     override val displayIndex: Int,
     override val description: String
 ) : Feature
 
-internal fun Feature.toEntity() = com.samco.trackandgraph.data.database.entity.Feature(
+internal fun Feature.toEntity(groupId: Long) = com.samco.trackandgraph.data.database.entity.Feature(
     featureId,
     name,
     groupId,

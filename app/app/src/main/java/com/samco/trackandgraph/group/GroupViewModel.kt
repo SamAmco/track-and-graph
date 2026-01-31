@@ -500,6 +500,7 @@ class GroupViewModelImpl @Inject constructor(
             val displayFunction = DisplayFunction(
                 id = function.id,
                 featureId = function.featureId,
+                groupId = groupId,
                 name = function.name,
                 description = function.description
             )
