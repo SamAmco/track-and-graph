@@ -132,7 +132,7 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
     ) {
         val tracker = if (featureId != -1L) {
             try {
-                dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId)
+                dataInteractor.tryGetTrackerByFeatureId(featureId)
             } catch (e: Exception) {
                 null
             }
@@ -228,12 +228,12 @@ class StartTimerAction : ActionCallback {
 
             val featureId = parameters[FeatureIdKey] ?: return
 
-            val tracker = dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId) ?: return
+            val tracker = dataInteractor.tryGetTrackerByFeatureId(featureId) ?: return
             dataInteractor.playTimerForTracker(tracker.id)
             timerServiceInteractor.startTimerNotificationService()
 
             // Update widget state with fresh data
-            val updatedTracker = dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId)
+            val updatedTracker = dataInteractor.tryGetTrackerByFeatureId(featureId)
             updateAppWidgetState(context, glanceId) { prefs ->
                 prefs.updateFromTracker(featureId, updatedTracker)
             }

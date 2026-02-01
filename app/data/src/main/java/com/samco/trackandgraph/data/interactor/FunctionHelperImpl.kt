@@ -127,7 +127,7 @@ internal class FunctionHelperImpl @Inject constructor(
         functionWithFeature.toDto(functionGraphDto, inputFeatures)
     }
 
-    override suspend fun getFunctionByFeatureId(featureId: Long): Function? = withContext(io) {
+    override suspend fun tryGetFunctionByFeatureId(featureId: Long): Function? = withContext(io) {
         val functionWithFeature = dao.getFunctionByFeatureId(featureId) ?: return@withContext null
         val inputFeatures =
             dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.featureId }
