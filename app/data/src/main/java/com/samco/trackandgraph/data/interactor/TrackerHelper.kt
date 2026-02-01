@@ -73,7 +73,7 @@ interface TrackerHelper {
 
     suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
 
-    suspend fun tryGetDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
+    suspend fun tryGetTrackerByFeatureId(featureId: Long): DisplayTracker?
 
     suspend fun getDataPointByTimestampAndTrackerSync(
         trackerId: Long,
