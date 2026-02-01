@@ -135,8 +135,14 @@ class MoveItemViewModel @Inject constructor(
 
                     MovableItemType.FUNCTION -> {
                         val function = dataInteractor.getFunctionById(config.itemId)
-                        function?.copy(groupId = targetGroupId)?.let {
-                            dataInteractor.updateFunction(it)
+                        function?.let {
+                            val request = MoveComponentRequest(
+                                type = ComponentType.FUNCTION,
+                                id = it.id,
+                                fromGroupId = config.fromGroupId,
+                                toGroupId = targetGroupId
+                            )
+                            dataInteractor.moveComponent(request)
                         }
                     }
                 }
