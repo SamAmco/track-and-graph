@@ -21,7 +21,8 @@ package com.samco.trackandgraph.data.database.dto
  * The type of component being moved between groups.
  */
 enum class ComponentType {
-    TRACKER
+    TRACKER,
+    FUNCTION
 }
 
 /**

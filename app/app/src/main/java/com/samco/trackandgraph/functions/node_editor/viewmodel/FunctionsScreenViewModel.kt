@@ -33,6 +33,8 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
+import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
@@ -533,23 +535,24 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                 val existing = existingFunction
                 if (existing != null) {
                     // Update existing function
-                    val updatedFunction = existing.copy(
+                    val updateRequest = FunctionUpdateRequest(
+                        id = existing.id,
                         name = outputNode.name.value.text,
                         description = outputNode.description.value.text,
                         functionGraph = functionGraph,
                         inputFeatureIds = inputFeatureIds
                     )
-                    dataInteractor.updateFunction(updatedFunction)
+                    dataInteractor.updateFunction(updateRequest)
                 } else {
                     // Create new function
-                    val function = Function(
+                    val createRequest = FunctionCreateRequest(
                         name = outputNode.name.value.text,
                         groupId = groupId,
                         description = outputNode.description.value.text,
                         functionGraph = functionGraph,
                         inputFeatureIds = inputFeatureIds
                     )
-                    dataInteractor.insertFunction(function)
+                    dataInteractor.insertFunction(createRequest)
                 }
                 complete.trySend(Unit)
             } catch (e: IllegalStateException) {

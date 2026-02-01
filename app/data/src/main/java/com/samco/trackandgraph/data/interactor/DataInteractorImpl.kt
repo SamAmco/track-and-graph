@@ -27,6 +27,9 @@ import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
+import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
+import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.Group
@@ -736,17 +739,18 @@ internal class DataInteractorImpl @Inject constructor(
 
 
     // FunctionHelper method overrides with event emission
-    override suspend fun insertFunction(function: Function): Long? = withContext(io) {
-        val id = functionHelper.insertFunction(function)
+    override suspend fun insertFunction(request: FunctionCreateRequest): Long? = withContext(io) {
+        val id = functionHelper.insertFunction(request)
         if (id != null) dataUpdateEvents.emit(DataUpdateType.FunctionCreated(id))
         return@withContext id
     }
 
-    override suspend fun updateFunction(function: Function) = withContext(io) {
-        functionHelper.updateFunction(function)
-        dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(function.featureId))
+    override suspend fun updateFunction(request: FunctionUpdateRequest) = withContext(io) {
+        val existingFunction = dao.getFunctionById(request.id) ?: return@withContext
+        functionHelper.updateFunction(request)
+        dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(existingFunction.featureId))
         val dependentGraphs = dependencyAnalyserProvider.create()
-            .getDependentGraphs(function.featureId)
+            .getDependentGraphs(existingFunction.featureId)
         for (graphStatId in dependentGraphs.graphStatIds) {
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
         }
@@ -760,8 +764,10 @@ internal class DataInteractorImpl @Inject constructor(
         return@withContext newFunctionId
     }
 
-    override suspend fun deleteFunction(functionId: Long) = withContext(io) {
-        val function = dao.getFunctionById(functionId) ?: return@withContext
+    override suspend fun deleteFunction(request: FunctionDeleteRequest) = withContext(io) {
+        val function = dao.getFunctionById(request.functionId) ?: return@withContext
+        // TODO: When multi-group support is added, check request.groupId
+        // to determine if we should remove from one group or delete entirely
         deleteFeature(function.featureId, isTracker = false)
     }
 
@@ -784,6 +790,14 @@ internal class DataInteractorImpl @Inject constructor(
                     ?: throw IllegalArgumentException("Feature not found: ${tracker.featureId}")
                 dao.updateFeature(feature.copy(groupId = request.toGroupId))
                 dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+            }
+            ComponentType.FUNCTION -> {
+                val function = dao.getFunctionById(request.id)
+                    ?: throw IllegalArgumentException("Function not found: ${request.id}")
+                val feature = dao.getFeatureById(function.featureId)
+                    ?: throw IllegalArgumentException("Feature not found: ${function.featureId}")
+                dao.updateFeature(feature.copy(groupId = request.toGroupId))
+                dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(function.featureId))
             }
         }
     }

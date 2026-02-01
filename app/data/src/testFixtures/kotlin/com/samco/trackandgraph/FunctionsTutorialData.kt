@@ -18,7 +18,7 @@
 package com.samco.trackandgraph
 
 import com.samco.trackandgraph.data.database.dto.DataType
-import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
 import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
@@ -107,7 +107,7 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
 
     // Function: Exercise - combines Running and Cycling
     val exerciseFunctionId = dataInteractor.insertFunction(
-        Function(
+        FunctionCreateRequest(
             name = "Exercise",
             groupId = groupId,
             description = "",
@@ -120,7 +120,7 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
 
     // Function: Exercise This Week - filters Exercise data to current week
     val exerciseThisWeekFunctionId = dataInteractor.insertFunction(
-        Function(
+        FunctionCreateRequest(
             name = "Exercise This Week",
             groupId = groupId,
             description = "",
@@ -133,7 +133,7 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
 
     // Function: Weight (Kg) - converts Weight (lbs) to kg
     val weightKgFunctionId = dataInteractor.insertFunction(
-        Function(
+        FunctionCreateRequest(
             name = "Weight (Kg)",
             groupId = groupId,
             description = "",
@@ -146,7 +146,7 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
 
     // Function: All Weight (Kg) - merges weight from both kg and lbs labels
     val allWeightKgFunctionId = dataInteractor.insertFunction(
-        Function(
+        FunctionCreateRequest(
             name = "All Weight (Kg)",
             groupId = groupId,
             description = "",

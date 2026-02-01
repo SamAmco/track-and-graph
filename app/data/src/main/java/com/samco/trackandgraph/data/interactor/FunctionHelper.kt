@@ -18,6 +18,9 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
+import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
+import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 
 /**
  * An interface for managing functions. Do not use this interface directly, it is implemented by
@@ -28,11 +31,11 @@ import com.samco.trackandgraph.data.database.dto.Function
  * throw an exception if anything goes wrong.
  */
 interface FunctionHelper {
-    suspend fun insertFunction(function: Function): Long?
+    suspend fun insertFunction(request: FunctionCreateRequest): Long?
 
-    suspend fun updateFunction(function: Function)
+    suspend fun updateFunction(request: FunctionUpdateRequest)
 
-    suspend fun deleteFunction(functionId: Long)
+    suspend fun deleteFunction(request: FunctionDeleteRequest)
 
     suspend fun getFunctionById(functionId: Long): Function?
 

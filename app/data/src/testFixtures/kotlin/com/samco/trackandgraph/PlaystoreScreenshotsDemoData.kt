@@ -20,7 +20,7 @@ package com.samco.trackandgraph
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
-import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
@@ -816,7 +816,7 @@ private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent:
 
     // Function: Exercise - combines Running and Cycling
     val exerciseFunctionId = dataInteractor.insertFunction(
-        Function(
+        FunctionCreateRequest(
             name = "Exercise",
             groupId = groupId,
             description = "",
