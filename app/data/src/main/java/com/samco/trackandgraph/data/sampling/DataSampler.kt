@@ -104,7 +104,7 @@ internal class DataSamplerImpl @Inject constructor(
                 onDispose = cursorSequence::dispose
             )
         }
-        val function = dataInteractor.getFunctionByFeatureId(featureId)
+        val function = dataInteractor.tryGetFunctionByFeatureId(featureId)
         if (function != null) {
             return FunctionGraphDataSample.create(
                 vmLock = vmLock,
@@ -130,7 +130,7 @@ internal class DataSamplerImpl @Inject constructor(
                 onDispose = cursorSequence::dispose
             )
         }
-        val function = dataInteractor.getFunctionByFeatureId(featureId)
+        val function = dataInteractor.tryGetFunctionByFeatureId(featureId)
         if (function != null) {
             val properties = getDataSamplePropertiesForFeatureId(featureId)
             return FunctionGraphDataSample.create(
@@ -148,7 +148,7 @@ internal class DataSamplerImpl @Inject constructor(
         if (tracker != null) {
             return DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION)
         }
-        val function = dataInteractor.getFunctionByFeatureId(featureId)
+        val function = dataInteractor.tryGetFunctionByFeatureId(featureId)
         if (function != null) {
             return DataSampleProperties(isDuration = function.functionGraph.isDuration)
         }

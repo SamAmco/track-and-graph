@@ -309,7 +309,7 @@ internal class TrackerHelperImpl @Inject constructor(
             dao.getDisplayTrackersForGroupSync(groupId).map { it.toDto() }
         }
 
-    override suspend fun tryGetDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker? =
+    override suspend fun tryGetTrackerByFeatureId(featureId: Long): DisplayTracker? =
         withContext(io) {
             dao.getDisplayTrackerByFeatureIdSync(featureId)?.toDto()
         }

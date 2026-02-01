@@ -36,7 +36,7 @@ interface FunctionHelper {
 
     suspend fun getFunctionById(functionId: Long): Function?
 
-    suspend fun getFunctionByFeatureId(featureId: Long): Function?
+    suspend fun tryGetFunctionByFeatureId(featureId: Long): Function?
 
     suspend fun getAllFunctionsSync(): List<Function>
 
