@@ -25,33 +25,97 @@ open class FeaturePathProvider(
     groups: List<Group>,
 ) : GroupPathProvider(groups) {
 
-    // TODO: When features can exist in multiple groups, this will need to handle
-    // showing the feature in multiple paths
-    private val featureGroupMap: Map<Feature, Group> = features.mapNotNull { feature ->
-        val groupId = feature.groupIds.firstOrNull() ?: return@mapNotNull null
-        val group = groups.firstOrNull { it.id == groupId }
-            ?: return@mapNotNull null
-        feature to group
-    }.toMap()
+    private val groupsById: Map<Long, Group> = groups.associateBy { it.id }
 
-    fun sortedFeatureMap(): Map<Long, String> = sortedPaths()
-        .associate { it.first.featureId to it.second }
+    private val featureGroupMap: Map<Feature, List<Group>> = features.mapNotNull { feature ->
+        val featureGroups = feature.groupIds.mapNotNull { groupId ->
+            groupsById[groupId]
+        }
+        if (featureGroups.isEmpty()) return@mapNotNull null
+        feature to featureGroups
+    }.toMap()
 
     val features get() = featureGroupMap.keys
 
     fun featureName(featureId: Long) = featureGroupMap.keys
         .firstOrNull { it.featureId == featureId }?.name
 
-    fun sortedPaths(): List<Pair<Feature, String>> = featureGroupMap.keys
+    fun getPathForFeature(featureId: Long): String {
+        val feature = featureGroupMap.keys.firstOrNull { it.featureId == featureId } ?: return ""
+        val featureGroups = featureGroupMap[feature] ?: return ""
+
+        val pathSegments = featureGroups.map { group ->
+            getPathSegmentsForGroup(group.id) + feature.name
+        }
+
+        if (pathSegments.size == 1) {
+            return pathSegments.first().joinToString(separator, prefix = separator)
+        }
+
+        return computeCollapsedPath(pathSegments)
+    }
+
+    private fun computeCollapsedPath(paths: List<List<String>>): String {
+        if (paths.isEmpty()) return ""
+        if (paths.size == 1) return paths.first().joinToString(separator, prefix = separator)
+
+        val prefix = findLongestCommonPrefix(paths)
+        val suffix = findLongestCommonSuffix(paths)
+
+        val minPathLength = paths.minOf { it.size }
+        if (prefix.size + suffix.size >= minPathLength) {
+            return paths.first().joinToString(separator, prefix = separator)
+        }
+
+        val prefixStr = if (prefix.isEmpty()) "" else prefix.joinToString(separator, prefix = separator)
+        val suffixStr = suffix.joinToString(separator, prefix = separator)
+
+        return "$prefixStr$separator...$suffixStr"
+    }
+
+    private fun findLongestCommonPrefix(paths: List<List<String>>): List<String> {
+        if (paths.isEmpty()) return emptyList()
+
+        val firstPath = paths.first()
+        val minLength = paths.minOf { it.size }
+        val result = mutableListOf<String>()
+
+        for (i in 0 until minLength) {
+            val segment = firstPath[i]
+            if (paths.all { it[i] == segment }) {
+                result.add(segment)
+            } else {
+                break
+            }
+        }
+
+        return result
+    }
+
+    private fun findLongestCommonSuffix(paths: List<List<String>>): List<String> {
+        if (paths.isEmpty()) return emptyList()
+
+        val firstPath = paths.first()
+        val firstPathSize = firstPath.size
+        val minLength = paths.minOf { it.size }
+        val result = mutableListOf<String>()
+
+        for (i in 1..minLength) {
+            val segment = firstPath[firstPathSize - i]
+            if (paths.all { it[it.size - i] == segment }) {
+                result.add(0, segment)
+            } else {
+                break
+            }
+        }
+
+        return result
+    }
+
+    private fun sortedPaths(): List<Pair<Feature, String>> = featureGroupMap.keys
         .map { it to getPathForFeature(it.featureId) }
         .sortedBy { it.second }
 
-    fun getPathForFeature(featureId: Long): String {
-        val dataSource = featureGroupMap.keys.firstOrNull { it.featureId == featureId } ?: return ""
-        val group = featureGroupMap[dataSource] ?: return ""
-        val groupPath = getPathForGroup(group.id)
-        var path = groupPath
-        if (groupPath.lastOrNull() != '/') path += '/'
-        return path + dataSource.name
-    }
+    fun sortedFeatureMap(): Map<Long, String> = sortedPaths()
+        .associate { it.first.featureId to it.second }
 }
