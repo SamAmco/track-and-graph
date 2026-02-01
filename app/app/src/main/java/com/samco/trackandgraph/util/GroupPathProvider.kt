@@ -22,11 +22,11 @@ import com.samco.trackandgraph.data.database.dto.Group
 open class GroupPathProvider(
     val groups: Collection<Group>,
 ) {
-    private val separator = "/"
+    protected val separator = "/"
 
     private val groupsById = groups.associateBy { it.id }
 
-    private val groupPaths = groups
+    private val groupPathSegments: Map<Long, List<String>> = groups
         .associate { group ->
             group.id to run {
                 val chain = mutableListOf<Group>()
@@ -48,9 +48,13 @@ open class GroupPathProvider(
                 .asReversed()
                 //Ignore the root group, as it has no name
                 .filter { it.parentGroupId != null }
-                //Join to / separated string starting with the root /
-                .joinToString(separator = separator, prefix = separator) { it.name }
+                .map { it.name }
         }
 
-    fun getPathForGroup(id: Long): String = groupPaths[id] ?: ""
+    protected fun getPathSegmentsForGroup(id: Long): List<String> = groupPathSegments[id] ?: emptyList()
+
+    fun getPathForGroup(id: Long): String {
+        val segments = groupPathSegments[id] ?: return ""
+        return segments.joinToString(separator = separator, prefix = separator)
+    }
 }

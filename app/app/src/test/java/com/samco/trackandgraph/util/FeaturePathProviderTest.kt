@@ -10,11 +10,11 @@ class FeaturePathProviderTest {
     private data class FeatureDto(
         override val featureId: Long,
         override val name: String,
-        private val groupId: Long,
+        override val groupIds: Set<Long>,
     ) : Feature {
+        constructor(featureId: Long, name: String, groupId: Long) : this(featureId, name, setOf(groupId))
         override val displayIndex: Int = 0
         override val description: String = ""
-        override val groupIds: Set<Long> = setOf(groupId)
     }
 
     @Test
@@ -93,5 +93,133 @@ class FeaturePathProviderTest {
             listOf(1L to "/Apple/Banana/Carrot"),
             sorted.map { it.key to it.value }
         )
+    }
+
+    @Test
+    fun `feature in two groups with common prefix shows collapsed path`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("a", 1, 0),
+            group("b", 2, 1),
+            group("c", 3, 1),
+        )
+
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(2L, 3L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals("/a/.../feat", provider.getPathForFeature(1L))
+    }
+
+    @Test
+    fun `feature in two groups with no common prefix shows ellipsis after root`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("a", 1, 0),
+            group("b", 2, 1),
+            group("c", 3, 0),
+            group("d", 4, 3),
+        )
+
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(2L, 4L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals("/.../feat", provider.getPathForFeature(1L))
+    }
+
+    @Test
+    fun `feature in multiple groups with longer common prefix`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("path", 1, 0),
+            group("to", 2, 1),
+            group("ga", 3, 2),
+            group("gb", 4, 2),
+        )
+
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(3L, 4L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals("/path/to/.../feat", provider.getPathForFeature(1L))
+    }
+
+    @Test
+    fun `feature in three groups`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("a", 1, 0),
+            group("x", 2, 1),
+            group("y", 3, 1),
+            group("z", 4, 1),
+        )
+
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(2L, 3L, 4L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals("/a/.../feat", provider.getPathForFeature(1L))
+    }
+
+    @Test
+    fun `feature in groups with identical paths returns single path without ellipsis`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("same", 1, 0),
+        )
+
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(1L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals("/same/feat", provider.getPathForFeature(1L))
+    }
+
+    @Test
+    fun `feature with duplicate group id in set shows full path`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("a", 1, 0),
+            group("b", 2, 1),
+        )
+
+        // Set deduplicates, so this is effectively setOf(2L)
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(2L, 2L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals("/a/b/feat", provider.getPathForFeature(1L))
+    }
+
+    @Test
+    fun `feature with duplicate group id plus another group shows collapsed path`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("a", 1, 0),
+            group("b", 2, 1),
+            group("c", 3, 1),
+        )
+
+        // Set deduplicates, so this is effectively setOf(2L, 3L)
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(2L, 2L, 3L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals("/a/.../feat", provider.getPathForFeature(1L))
     }
 }
