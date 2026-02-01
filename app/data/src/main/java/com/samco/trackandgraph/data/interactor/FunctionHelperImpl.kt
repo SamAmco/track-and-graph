@@ -20,6 +20,9 @@ package com.samco.trackandgraph.data.interactor
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
+import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
+import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
+import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -39,8 +42,19 @@ internal class FunctionHelperImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher
 ) : FunctionHelper {
 
-    override suspend fun insertFunction(function: Function): Long? = withContext(io) {
+    override suspend fun insertFunction(request: FunctionCreateRequest): Long? = withContext(io) {
         transactionHelper.withTransaction {
+            val function = Function(
+                id = 0L,
+                featureId = 0L,
+                name = request.name,
+                groupId = request.groupId,
+                displayIndex = 0,
+                description = request.description,
+                functionGraph = request.functionGraph,
+                inputFeatureIds = request.inputFeatureIds
+            )
+
             functionValidator.validateFunction(function)
 
             val serializedGraph = functionGraphSerializer
@@ -76,30 +90,39 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateFunction(function: Function) = withContext(io) {
+    override suspend fun updateFunction(request: FunctionUpdateRequest) = withContext(io) {
         transactionHelper.withTransaction {
-            functionValidator.validateFunction(function)
+            val existingFunction = getFunctionById(request.id) ?: return@withTransaction
 
-            val serializedGraph = functionGraphSerializer.serialize(function.functionGraph)
+            val updatedFunction = existingFunction.copy(
+                name = request.name ?: existingFunction.name,
+                description = request.description ?: existingFunction.description,
+                functionGraph = request.functionGraph ?: existingFunction.functionGraph,
+                inputFeatureIds = request.inputFeatureIds ?: existingFunction.inputFeatureIds
+            )
+
+            functionValidator.validateFunction(updatedFunction)
+
+            val serializedGraph = functionGraphSerializer.serialize(updatedFunction.functionGraph)
                 ?: return@withTransaction
 
             val feature = Feature(
-                id = function.featureId,
-                name = function.name,
-                groupId = function.groupId,
-                displayIndex = function.displayIndex,
-                description = function.description
+                id = updatedFunction.featureId,
+                name = updatedFunction.name,
+                groupId = updatedFunction.groupId,
+                displayIndex = updatedFunction.displayIndex,
+                description = updatedFunction.description
             )
             dao.updateFeature(feature)
-            dao.updateFunction(function.toEntity(serializedGraph))
+            dao.updateFunction(updatedFunction.toEntity(serializedGraph))
 
             // Now re-create the FunctionInputFeature entities
-            dao.deleteFunctionInputFeatures(function.id)
-            function.inputFeatureIds.forEach { inputFeatureId ->
+            dao.deleteFunctionInputFeatures(updatedFunction.id)
+            updatedFunction.inputFeatureIds.forEach { inputFeatureId ->
                 dao.insertFunctionInputFeature(
                     FunctionInputFeature(
                         id = 0L,
-                        functionId = function.id,
+                        functionId = updatedFunction.id,
                         featureId = inputFeatureId
                     )
                 )
@@ -107,11 +130,13 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteFunction(functionId: Long) = withContext(io) {
+    override suspend fun deleteFunction(request: FunctionDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
             // Get the function to find its feature ID
-            val function = dao.getFunctionById(functionId)
+            val function = dao.getFunctionById(request.functionId)
             if (function != null) {
+                // TODO: When multi-group support is added, check request.groupId
+                // to determine if we should remove from one group or delete entirely
                 // Delete the feature, which will cascade delete the function
                 dao.deleteFeature(function.featureId)
             }
