@@ -48,7 +48,8 @@ internal data class FunctionWithFeature(
         id = id,
         featureId = featureId,
         name = name,
-        groupId = groupId,
+        // TODO: Currently features only exist in one group, but this will change
+        groupIds = setOf(groupId),
         displayIndex = displayIndex,
         description = description,
         functionGraph = functionGraphDto,

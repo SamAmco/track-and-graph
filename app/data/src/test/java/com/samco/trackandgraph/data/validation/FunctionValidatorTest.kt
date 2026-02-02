@@ -718,8 +718,7 @@ class FunctionValidatorTest {
             id = id,
             featureId = featureId,
             name = "Test Function",
-            groupId = 1L,
-            displayIndex = 0,
+            groupIds = setOf(1L),
             description = "Test Description",
             functionGraph = FunctionGraph(
                 nodes = nodes,
