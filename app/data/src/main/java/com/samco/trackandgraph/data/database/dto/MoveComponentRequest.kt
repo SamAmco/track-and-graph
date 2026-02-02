@@ -22,7 +22,8 @@ package com.samco.trackandgraph.data.database.dto
  */
 enum class ComponentType {
     TRACKER,
-    FUNCTION
+    FUNCTION,
+    GROUP
 }
 
 /**

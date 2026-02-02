@@ -20,12 +20,10 @@ package com.samco.trackandgraph.data.interactor
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
-import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.LastValueStat
@@ -38,18 +36,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
 
-interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
-    suspend fun insertGroup(group: Group): Long
-
-    suspend fun deleteGroup(id: Long): DeletedGroupInfo
-
-    suspend fun updateGroup(group: Group)
-
-    suspend fun getAllGroupsSync(): List<Group>
-
+interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupHelper {
     suspend fun getGroupGraphSync(rootGroupId: Long? = null): GroupGraph
-
-    suspend fun getGroupById(id: Long): Group
 
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>)
 
@@ -150,8 +138,6 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
 
     suspend fun updateTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram)
 
-    suspend fun getGroupsForGroupSync(id: Long): List<Group>
-
     fun onImportedExternalData()
 
     suspend fun getAllFeaturesSync(): List<Feature>
@@ -169,8 +155,6 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper {
     suspend fun hasAnyGraphs(): Boolean
 
     suspend fun hasAnyFeatures(): Boolean
-
-    suspend fun hasAnyGroups(): Boolean
 
     /**
      * Gets all feature IDs that depend on a given feature, either directly or transitively.
