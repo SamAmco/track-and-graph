@@ -127,10 +127,13 @@ class MoveItemViewModel @Inject constructor(
                     }
 
                     MovableItemType.GROUP -> {
-                        val group = dataInteractor.getGroupById(config.itemId)
-                        group.copy(parentGroupId = targetGroupId).let {
-                            dataInteractor.updateGroup(it)
-                        }
+                        val request = MoveComponentRequest(
+                            type = ComponentType.GROUP,
+                            id = config.itemId,
+                            fromGroupId = config.fromGroupId,
+                            toGroupId = targetGroupId
+                        )
+                        dataInteractor.moveComponent(request)
                     }
 
                     MovableItemType.FUNCTION -> {

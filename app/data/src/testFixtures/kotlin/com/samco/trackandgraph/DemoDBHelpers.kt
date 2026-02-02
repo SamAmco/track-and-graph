@@ -2,7 +2,7 @@ package com.samco.trackandgraph
 
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
-import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
@@ -88,14 +88,11 @@ fun clamp(value: Double, min: Double, max: Double): Double {
 
 fun createGroup(
     name: String = "",
-    displayIndex: Int = 0,
     parentGroupId: Long? = null,
     colorIndex: Int = 0,
-) = Group(
-    id = 0L,
+) = GroupCreateRequest(
     name = name,
-    displayIndex = displayIndex,
-    parentGroupId = parentGroupId ?: 0L,
+    parentGroupId = parentGroupId,
     colorIndex = colorIndex
 )
 

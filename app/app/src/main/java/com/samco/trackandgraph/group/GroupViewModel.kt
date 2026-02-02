@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
@@ -539,7 +540,7 @@ class GroupViewModelImpl @Inject constructor(
 
     override fun onDeleteGroup(id: Long) {
         viewModelScope.launch(io) {
-            val deletedFeatureIds = dataInteractor.deleteGroup(id).deletedFeatureIds
+            val deletedFeatureIds = dataInteractor.deleteGroup(GroupDeleteRequest(groupId = id)).deletedFeatureIds
             deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
         }
     }
