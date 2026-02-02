@@ -44,72 +44,17 @@ open class FeaturePathProvider(
         val feature = featureGroupMap.keys.firstOrNull { it.featureId == featureId } ?: return ""
         val featureGroups = featureGroupMap[feature] ?: return ""
 
-        val pathSegments = featureGroups.map { group ->
-            getPathSegmentsForGroup(group.id) + feature.name
-        }
-
-        if (pathSegments.size == 1) {
-            return pathSegments.first().joinToString(separator, prefix = separator)
-        }
-
-        return computeCollapsedPath(pathSegments)
-    }
-
-    private fun computeCollapsedPath(paths: List<List<String>>): String {
-        if (paths.isEmpty()) return ""
-        if (paths.size == 1) return paths.first().joinToString(separator, prefix = separator)
-
-        val prefix = findLongestCommonPrefix(paths)
-        val suffix = findLongestCommonSuffix(paths)
-
-        val minPathLength = paths.minOf { it.size }
-        if (prefix.size + suffix.size >= minPathLength) {
-            return paths.first().joinToString(separator, prefix = separator)
-        }
-
-        val prefixStr = if (prefix.isEmpty()) "" else prefix.joinToString(separator, prefix = separator)
-        val suffixStr = suffix.joinToString(separator, prefix = separator)
-
-        return "$prefixStr$separator...$suffixStr"
-    }
-
-    private fun findLongestCommonPrefix(paths: List<List<String>>): List<String> {
-        if (paths.isEmpty()) return emptyList()
-
-        val firstPath = paths.first()
-        val minLength = paths.minOf { it.size }
-        val result = mutableListOf<String>()
-
-        for (i in 0 until minLength) {
-            val segment = firstPath[i]
-            if (paths.all { it[i] == segment }) {
-                result.add(segment)
-            } else {
-                break
+        val allPaths = featureGroups.flatMap { group ->
+            getAllPathSegmentsForGroup(group.id).map { pathSegments ->
+                pathSegments + feature.name
             }
         }
 
-        return result
-    }
-
-    private fun findLongestCommonSuffix(paths: List<List<String>>): List<String> {
-        if (paths.isEmpty()) return emptyList()
-
-        val firstPath = paths.first()
-        val firstPathSize = firstPath.size
-        val minLength = paths.minOf { it.size }
-        val result = mutableListOf<String>()
-
-        for (i in 1..minLength) {
-            val segment = firstPath[firstPathSize - i]
-            if (paths.all { it[it.size - i] == segment }) {
-                result.add(0, segment)
-            } else {
-                break
-            }
+        if (allPaths.size == 1) {
+            return allPaths.first().joinToString(separator, prefix = separator)
         }
 
-        return result
+        return computeCollapsedPath(allPaths)
     }
 
     private fun sortedPaths(): List<Pair<Feature, String>> = featureGroupMap.keys
