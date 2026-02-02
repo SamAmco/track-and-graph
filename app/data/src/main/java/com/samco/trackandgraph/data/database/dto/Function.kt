@@ -21,19 +21,20 @@ import com.samco.trackandgraph.data.database.entity.Function
 
 data class Function(
     val id: Long = 0L,
-    val featureId: Long = 0L,
-    val name: String,
-    val groupId: Long,
-    val displayIndex: Int = 0,
-    val description: String,
+    override val featureId: Long = 0L,
+    override val name: String,
+    override val groupIds: Set<Long>,
+    override val displayIndex: Int = 0,
+    override val description: String,
     val functionGraph: FunctionGraph,
     val inputFeatureIds: List<Long>
-) {
-    internal fun toEntity(serializedFunctionGraph: String) = Function(
-        id = id,
-        featureId = featureId,
-        functionGraph = serializedFunctionGraph
-    )
+) : Feature {
+    internal fun toEntity(serializedFunctionGraph: String) =
+        com.samco.trackandgraph.data.database.entity.Function(
+            id = id,
+            featureId = featureId,
+            functionGraph = serializedFunctionGraph
+        )
 }
 
 /**

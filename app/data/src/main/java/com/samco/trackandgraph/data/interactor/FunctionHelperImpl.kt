@@ -48,7 +48,7 @@ internal class FunctionHelperImpl @Inject constructor(
                 id = 0L,
                 featureId = 0L,
                 name = request.name,
-                groupId = request.groupId,
+                groupIds = setOf(request.groupId),
                 displayIndex = 0,
                 description = request.description,
                 functionGraph = request.functionGraph,
@@ -62,10 +62,11 @@ internal class FunctionHelperImpl @Inject constructor(
                 ?: return@withTransaction null
 
             // First, create the Feature entity that the Function will reference
+            // TODO: When multi-group support is added, this will need to handle multiple groups
             val feature = Feature(
                 id = 0L, // Let the database generate the ID
                 name = function.name,
-                groupId = function.groupId,
+                groupId = request.groupId,
                 displayIndex = function.displayIndex,
                 description = function.description
             )
@@ -106,10 +107,11 @@ internal class FunctionHelperImpl @Inject constructor(
             val serializedGraph = functionGraphSerializer.serialize(updatedFunction.functionGraph)
                 ?: return@withTransaction
 
+            // TODO: When multi-group support is added, this will need to handle multiple groups
             val feature = Feature(
                 id = updatedFunction.featureId,
                 name = updatedFunction.name,
-                groupId = updatedFunction.groupId,
+                groupId = updatedFunction.groupIds.first(),
                 displayIndex = updatedFunction.displayIndex,
                 description = updatedFunction.description
             )
