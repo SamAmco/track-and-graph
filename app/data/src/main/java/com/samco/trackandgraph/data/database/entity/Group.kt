@@ -52,7 +52,7 @@ internal data class Group(
         id,
         name,
         displayIndex,
-        parentGroupId,
+        parentGroupIds = parentGroupId?.let { setOf(it) } ?: emptySet(),
         colorIndex,
     )
 }

@@ -190,7 +190,7 @@ private fun GroupPreview() {
                 name = "Health & Fitness",
                 colorIndex = 2,
                 displayIndex = 0,
-                parentGroupId = null
+                parentGroupIds = emptySet()
             ),
             onEdit = {},
             onDelete = {},
@@ -211,7 +211,7 @@ private fun GroupElevatedPreview() {
                 name = "Work & Productivity Goals",
                 colorIndex = 5,
                 displayIndex = 0,
-                parentGroupId = null
+                parentGroupIds = emptySet()
             ),
             onEdit = {},
             onDelete = {},

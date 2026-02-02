@@ -206,10 +206,7 @@ private fun GroupAddDropdownMenu(
                 text = { Text(stringResource(R.string.group)) },
                 onClick = {
                     showAddMenu = false
-                    addGroupDialogViewModel.show(
-                        parentGroupId = groupId,
-                        groupId = null
-                    )
+                    addGroupDialogViewModel.showForCreate(parentGroupId = groupId)
                 }
             )
             // Add Function
