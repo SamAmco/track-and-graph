@@ -48,7 +48,8 @@ interface AddGroupDialogViewModel {
     val updateMode: StateFlow<Boolean>
     val addEnabled: StateFlow<Boolean>
 
-    fun show(parentGroupId: Long?, groupId: Long?)
+    fun showForCreate(parentGroupId: Long)
+    fun showForEdit(groupId: Long)
     fun addOrUpdateGroup()
     fun hide()
     fun updateColorIndex(index: Int)
@@ -85,23 +86,28 @@ class AddGroupDialogViewModelImpl @Inject constructor(
         .map { it != null }
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    override fun show(parentGroupId: Long?, groupId: Long?) {
+    override fun showForCreate(parentGroupId: Long) {
         colorIndex = 0
         name = TextFieldValue()
         this.parentGroupId = parentGroupId
+        this.currentGroup.value = null
         loading = false
         hidden = false
-        if (groupId != null) {
-            viewModelScope.launch {
-                loading = true
-                val group = dataInteractor.getGroupById(groupId)
-                this@AddGroupDialogViewModelImpl.currentGroup.value = group
-                colorIndex = group.colorIndex
-                name = TextFieldValue(group.name, TextRange(group.name.length))
-                loading = false
-            }
-        } else {
-            this.currentGroup.value = null
+    }
+
+    override fun showForEdit(groupId: Long) {
+        colorIndex = 0
+        name = TextFieldValue()
+        this.parentGroupId = null
+        loading = false
+        hidden = false
+        viewModelScope.launch {
+            loading = true
+            val group = dataInteractor.getGroupById(groupId)
+            this@AddGroupDialogViewModelImpl.currentGroup.value = group
+            colorIndex = group.colorIndex
+            name = TextFieldValue(group.name, TextRange(group.name.length))
+            loading = false
         }
     }
 

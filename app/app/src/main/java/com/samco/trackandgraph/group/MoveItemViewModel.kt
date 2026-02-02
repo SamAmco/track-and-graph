@@ -59,7 +59,7 @@ class MoveItemViewModel @Inject constructor(
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = group.id,
             itemType = MovableItemType.GROUP,
-            fromGroupId = group.parentGroupId ?: 0L,
+            fromGroupId = group.parentGroupIds.firstOrNull() ?: 0L,
             hiddenItems = setOf(HiddenItem(SelectableItemType.GROUP, group.id))
         )
     }
