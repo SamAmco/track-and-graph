@@ -277,7 +277,7 @@ private suspend fun createScreenshot3Group(
 
     // Add empty Health group
     dataInteractor.insertGroup(
-        createGroup(name = "Health", parentGroupId = groupId, displayIndex = 4)
+        createGroup(name = "Health", parentGroupId = groupId)
     )
 
     return groupId
