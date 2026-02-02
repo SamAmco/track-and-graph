@@ -111,8 +111,7 @@ class FunctionGraphDataSampleTest {
             id = 1L,
             featureId = 2L,
             name = "Test Function",
-            groupId = 1L,
-            displayIndex = 0,
+            groupIds = setOf(1L),
             description = "Test",
             functionGraph = functionGraph,
             inputFeatureIds = listOf(featureId)
@@ -220,8 +219,7 @@ class FunctionGraphDataSampleTest {
             id = 1L,
             featureId = 3L,
             name = "Test Merge Function",
-            groupId = 1L,
-            displayIndex = 0,
+            groupIds = setOf(1L),
             description = "Test merge",
             functionGraph = functionGraph,
             inputFeatureIds = listOf(featureId1, featureId2)
@@ -313,8 +311,7 @@ class FunctionGraphDataSampleTest {
             id = 1L,
             featureId = 3L,
             name = "Test Duplicate Function",
-            groupId = 1L,
-            displayIndex = 0,
+            groupIds = setOf(1L),
             description = "Test duplicate dependencies",
             functionGraph = functionGraph,
             inputFeatureIds = listOf(featureId)
@@ -416,8 +413,7 @@ class FunctionGraphDataSampleTest {
             id = 1L,
             featureId = 2L,
             name = "Lua Script Test Function",
-            groupId = 1L,
-            displayIndex = 0,
+            groupIds = setOf(1L),
             description = "Test Lua script processing",
             functionGraph = functionGraph,
             inputFeatureIds = listOf(featureId)
@@ -494,8 +490,7 @@ class FunctionGraphDataSampleTest {
             id = 1L,
             featureId = 2L,
             name = "VM Lock Test Function",
-            groupId = 1L,
-            displayIndex = 0,
+            groupIds = setOf(1L),
             description = "Test VM lock disposal",
             functionGraph = functionGraph,
             inputFeatureIds = listOf(featureId)
