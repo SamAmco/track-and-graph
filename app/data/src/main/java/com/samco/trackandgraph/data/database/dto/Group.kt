@@ -17,14 +17,14 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-data class Group (
+data class Group(
     val id: Long,
     val name: String,
     val displayIndex: Int,
     val parentGroupId: Long?,
     val colorIndex: Int,
 ) {
-    internal fun toEntity()  = com.samco.trackandgraph.data.database.entity.Group(
+    internal fun toEntity() = com.samco.trackandgraph.data.database.entity.Group(
         id,
         name,
         displayIndex,
@@ -32,3 +32,40 @@ data class Group (
         colorIndex,
     )
 }
+
+/**
+ * Request object for creating a new Group.
+ *
+ * Note: id and displayIndex are handled by the data layer and should not be provided.
+ */
+data class GroupCreateRequest(
+    val name: String,
+    val parentGroupId: Long? = null,
+    val colorIndex: Int = 0,
+)
+
+/**
+ * Request object for updating an existing Group.
+ *
+ * All fields except [id] are optional. A null value means "don't change this field".
+ *
+ * Note: To move a group to a different parent, use [MoveGroupRequest] instead (when implemented).
+ */
+data class GroupUpdateRequest(
+    val id: Long,
+    val name: String? = null,
+    val colorIndex: Int? = null,
+)
+
+/**
+ * Request object for deleting a Group.
+ *
+ * @param groupId The ID of the group to delete.
+ * @param parentGroupId If specified in the future when groups can have multiple parents,
+ *                      the group will only be removed from this parent.
+ *                      If null, the group will be deleted entirely.
+ */
+data class GroupDeleteRequest(
+    val groupId: Long,
+    val parentGroupId: Long? = null,
+)

@@ -30,6 +30,8 @@ import com.samco.trackandgraph.data.interactor.DataPointUpdateHelper
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.interactor.FunctionHelper
 import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
+import com.samco.trackandgraph.data.interactor.GroupHelper
+import com.samco.trackandgraph.data.interactor.GroupHelperImpl
 import com.samco.trackandgraph.data.interactor.ReminderHelper
 import com.samco.trackandgraph.data.interactor.ReminderHelperImpl
 import com.samco.trackandgraph.data.interactor.TrackerHelper
@@ -97,4 +99,7 @@ class DataModule {
 
     @Provides
     internal fun getReminderHelper(impl: ReminderHelperImpl): ReminderHelper = impl
+
+    @Provides
+    internal fun getGroupHelper(impl: GroupHelperImpl): GroupHelper = impl
 }

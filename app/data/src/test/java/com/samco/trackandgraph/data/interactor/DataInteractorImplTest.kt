@@ -21,7 +21,9 @@ import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.GlobalNote
+import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
@@ -65,6 +67,7 @@ class DataInteractorImplTest {
     private val trackerHelper: TrackerHelper = mock()
     private val functionHelper: FunctionHelper = mock()
     private val reminderHelper: ReminderHelper = mock()
+    private val groupHelper: GroupHelper = mock()
     private val dependencyAnalyserProvider: DependencyAnalyserProvider = mock()
 
     @Before
@@ -78,6 +81,7 @@ class DataInteractorImplTest {
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,
             reminderHelper = reminderHelper,
+            groupHelper = groupHelper,
             dependencyAnalyserProvider = dependencyAnalyserProvider,
         )
     }
@@ -149,12 +153,14 @@ class DataInteractorImplTest {
             )
         )
 
+        whenever(groupHelper.deleteGroup(any())).thenReturn(DeletedGroupInfo(emptySet()))
+
         //EXECUTE
 
         //let the async start collecting
         yield()
 
-        uut.deleteGroup(0L)
+        uut.deleteGroup(GroupDeleteRequest(groupId = 0L))
         uut.createTracker(testCreateRequest)
         uut.updateTracker(testUpdateRequest)
         uut.deleteTracker(TrackerDeleteRequest(trackerId = 0L))

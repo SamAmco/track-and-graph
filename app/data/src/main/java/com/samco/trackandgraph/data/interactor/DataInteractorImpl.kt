@@ -23,7 +23,6 @@ import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
-import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.Function
@@ -33,7 +32,11 @@ import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
+import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
+import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
 import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
+import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
@@ -69,60 +72,42 @@ internal class DataInteractorImpl @Inject constructor(
     private val trackerHelper: TrackerHelper,
     private val functionHelper: FunctionHelper,
     private val reminderHelper: ReminderHelper,
+    private val groupHelper: GroupHelper,
     private val dependencyAnalyserProvider: DependencyAnalyserProvider,
 ) : DataInteractor,
     TrackerHelper by trackerHelper,
     FunctionHelper by functionHelper,
-    ReminderHelper by reminderHelper {
+    ReminderHelper by reminderHelper,
+    GroupHelper by groupHelper {
 
     private val dataUpdateEvents = MutableSharedFlow<DataUpdateType>(
         extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    override suspend fun insertGroup(group: Group): Long = withContext(io) {
-        dao.insertGroup(group.toEntity())
+    // GroupHelper method overrides with event emission
+    override suspend fun insertGroup(request: GroupCreateRequest): Long = withContext(io) {
+        groupHelper.insertGroup(request)
             .also { dataUpdateEvents.emit(DataUpdateType.GroupCreated) }
     }
 
-    override suspend fun deleteGroup(id: Long) = withContext(io) {
-        //Get all feature ids before we delete the group
-        val allFeatureIdsBeforeDelete = dao.getAllFeaturesSync().map { it.id }.toSet()
-        //Delete the group
-        dao.deleteGroup(id)
-        //Get all feature ids after deleting the group
-        val allFeatureIdsAfterDelete = dao.getAllFeaturesSync().map { it.id }.toSet()
-        val deletedFeatureIds = allFeatureIdsBeforeDelete.minus(allFeatureIdsAfterDelete)
-        //Delete any orphaned graphs
+    override suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo = withContext(io) {
+        val deletedGroupInfo = groupHelper.deleteGroup(request)
+
+        // Delete any orphaned graphs
         val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
         for (graphStatId in orphanedGraphs.graphStatIds) {
             dao.deleteGraphOrStat(graphStatId)
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
         }
-        //Emit a data update event
+
         dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
-        return@withContext DeletedGroupInfo(
-            deletedFeatureIds = deletedFeatureIds,
-        )
+        return@withContext deletedGroupInfo
     }
 
-    override suspend fun updateGroup(group: Group) = withContext(io) {
-        //We need to ensure we're not attempting to move a group to its own child
-        // as this would create an infinite loop
-        val visited = mutableListOf(group.id)
-        var currentParentId = group.parentGroupId
-        while (currentParentId != null) {
-            if (visited.contains(currentParentId)) throw IllegalArgumentException("Illegal group move detected")
-            visited.add(currentParentId)
-            currentParentId = dao.getGroupById(currentParentId).parentGroupId
-        }
-
-        dao.updateGroup(group.toEntity())
-            .also { dataUpdateEvents.emit(DataUpdateType.GroupUpdated) }
-    }
-
-    override suspend fun getAllGroupsSync(): List<Group> = withContext(io) {
-        dao.getAllGroupsSync().map { it.toDto() }
+    override suspend fun updateGroup(request: GroupUpdateRequest) = withContext(io) {
+        groupHelper.updateGroup(request)
+        dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
     }
 
     override suspend fun getGroupGraphSync(rootGroupId: Long?): GroupGraph = withContext(io) {
@@ -175,11 +160,6 @@ internal class DataInteractorImpl @Inject constructor(
 
         return GroupGraph(group, children)
     }
-
-    override suspend fun getGroupById(id: Long): Group = withContext(io) {
-        dao.getGroupById(id).toDto()
-    }
-
 
     override suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature> = withContext(io) {
         dao.getFeaturesForGroupSync(groupId).map { it.toDto() }
@@ -651,10 +631,6 @@ internal class DataInteractorImpl @Inject constructor(
             dao.getBarChartByGraphStatId(graphStatId)?.toDto()
         }
 
-    override suspend fun getGroupsForGroupSync(id: Long): List<Group> = withContext(io) {
-        dao.getGroupsForGroupSync(id).map { it.toDto() }
-    }
-
     override fun onImportedExternalData() {
         // Emit data update event to notify observers that external data was imported
         dataUpdateEvents.tryEmit(DataUpdateType.Unknown)
@@ -735,9 +711,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun hasAnyFeatures(): Boolean = withContext(io) { dao.hasAnyFeatures() }
 
-    override suspend fun hasAnyGroups(): Boolean = withContext(io) { dao.hasAnyGroups() }
-
-
     // FunctionHelper method overrides with event emission
     override suspend fun insertFunction(request: FunctionCreateRequest): Long? = withContext(io) {
         val id = functionHelper.insertFunction(request)
@@ -798,6 +771,23 @@ internal class DataInteractorImpl @Inject constructor(
                     ?: throw IllegalArgumentException("Feature not found: ${function.featureId}")
                 dao.updateFeature(feature.copy(groupId = request.toGroupId))
                 dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(function.featureId))
+            }
+            ComponentType.GROUP -> {
+                val group = dao.getGroupById(request.id)
+
+                // Validate: ensure we're not moving a group to its own descendant
+                val visited = mutableListOf(request.id)
+                var currentParentId: Long? = request.toGroupId
+                while (currentParentId != null && currentParentId != 0L) {
+                    if (visited.contains(currentParentId)) {
+                        throw IllegalArgumentException("Cannot move group to its own descendant")
+                    }
+                    visited.add(currentParentId)
+                    currentParentId = dao.getGroupById(currentParentId).parentGroupId
+                }
+
+                dao.updateGroup(group.copy(parentGroupId = request.toGroupId))
+                dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
             }
         }
     }

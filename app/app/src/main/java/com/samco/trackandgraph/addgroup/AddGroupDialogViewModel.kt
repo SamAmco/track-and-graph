@@ -25,6 +25,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
+import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.ui.dataVisColorList
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -110,21 +112,17 @@ class AddGroupDialogViewModelImpl @Inject constructor(
         viewModelScope.launch {
             currentGroup.value?.let { current ->
                 dataInteractor.updateGroup(
-                    Group(
+                    GroupUpdateRequest(
                         id = current.id,
                         name = name,
-                        displayIndex = current.displayIndex,
-                        parentGroupId = current.parentGroupId,
                         colorIndex = colorIndex
                     )
                 )
             } ?: run {
                 dataInteractor.insertGroup(
-                    Group(
-                        id = 0,
+                    GroupCreateRequest(
                         name = name,
-                        displayIndex = 0,
-                        parentGroupId = parentGroupId ?: 0L,
+                        parentGroupId = parentGroupId,
                         colorIndex = colorIndex
                     )
                 )
