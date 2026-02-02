@@ -20,5 +20,9 @@ package com.samco.trackandgraph.util
 import com.samco.trackandgraph.data.database.dto.Group
 
 fun group(name: String = "", id: Long = 0, parentId: Long? = 0): Group {
-    return Group(id, name, 0, parentId, 0)
+    return Group(id, name, 0, parentId?.let { setOf(it) } ?: emptySet(), 0)
+}
+
+fun group(name: String = "", id: Long = 0, parentIds: Set<Long>): Group {
+    return Group(id, name, 0, parentIds, 0)
 }

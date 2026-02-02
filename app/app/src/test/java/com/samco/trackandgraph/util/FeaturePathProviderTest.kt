@@ -129,7 +129,7 @@ class FeaturePathProviderTest {
 
         val provider = FeaturePathProvider(features, groups)
 
-        assertEquals("/.../feat", provider.getPathForFeature(1L))
+        assertEquals(".../feat", provider.getPathForFeature(1L))
     }
 
     @Test
@@ -221,5 +221,34 @@ class FeaturePathProviderTest {
         val provider = FeaturePathProvider(features, groups)
 
         assertEquals("/a/.../feat", provider.getPathForFeature(1L))
+    }
+
+    @Test
+    fun `feature in single group whose parent has multiple parents shows collapsed path`() {
+        // Structure:
+        // Root (0)
+        // ├── c (1)
+        // │   └── b (3)
+        // │       └── feat
+        // └── d (2)
+        //     └── b (3, same b in both c and d)
+        //         └── feat
+        //
+        // Feature is only in group b, but b has two parents (c and d),
+        // so the feature effectively has two paths: /c/b/feat and /d/b/feat
+        val groups = listOf(
+            group(parentId = null),
+            group("c", 1, 0),
+            group("d", 2, 0),
+            group("b", 3, parentIds = setOf(1L, 2L)),
+        )
+
+        val features = listOf(
+            FeatureDto(1L, "feat", setOf(3L))
+        )
+
+        val provider = FeaturePathProvider(features, groups)
+
+        assertEquals(".../b/feat", provider.getPathForFeature(1L))
     }
 }
