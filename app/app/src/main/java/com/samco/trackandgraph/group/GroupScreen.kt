@@ -288,10 +288,7 @@ private fun GroupScreenContent(
         groupClickListeners = GroupClickListeners(
             onClick = onGroupClick,
             onEdit = { group ->
-                addGroupDialogViewModel.show(
-                    parentGroupId = group.parentGroupId,
-                    groupId = group.id
-                )
+                addGroupDialogViewModel.showForEdit(groupId = group.id)
             },
             onDelete = { groupDialogsViewModel.showDeleteGroupDialog(it) },
             onMove = { moveItemViewModel.showMoveGroupDialog(it) }

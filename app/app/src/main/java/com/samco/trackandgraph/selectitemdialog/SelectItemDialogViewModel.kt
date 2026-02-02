@@ -248,11 +248,11 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         }
 
         val group = GraphNode.Group(
-            isRoot = groupGraph.group.parentGroupId == null,
+            isRoot = groupGraph.group.parentGroupIds.isEmpty(),
             id = groupGraph.group.id,
-            name = if (groupGraph.group.parentGroupId == null) "/" else groupGraph.group.name,
+            name = if (groupGraph.group.parentGroupIds.isEmpty()) "/" else groupGraph.group.name,
             colorIndex = groupGraph.group.colorIndex,
-            expanded = mutableStateOf(groupGraph.group.parentGroupId == null),
+            expanded = mutableStateOf(groupGraph.group.parentGroupIds.isEmpty()),
             children = children.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }),
         )
 

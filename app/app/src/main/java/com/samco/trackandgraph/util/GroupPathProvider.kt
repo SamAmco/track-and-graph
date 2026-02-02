@@ -33,7 +33,9 @@ open class GroupPathProvider(
                 var currentGroup = group
                 do {
                     chain.add(currentGroup)
-                    currentGroup = groupsById[currentGroup.parentGroupId] ?: break
+                    // For path calculation, use the first parent (primary parent)
+                    val parentId = currentGroup.parentGroupIds.firstOrNull()
+                    currentGroup = groupsById[parentId] ?: break
 
                     // It shouldn't be possible in the current version to create an infinite
                     // loop, but legacy versions may have a bug that allows this, so we must break
@@ -47,7 +49,7 @@ open class GroupPathProvider(
                 //Iterate from root to leaf
                 .asReversed()
                 //Ignore the root group, as it has no name
-                .filter { it.parentGroupId != null }
+                .filter { it.parentGroupIds.isNotEmpty() }
                 .map { it.name }
         }
 
