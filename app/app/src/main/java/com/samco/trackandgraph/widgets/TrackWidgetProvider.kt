@@ -24,6 +24,7 @@
 package com.samco.trackandgraph.base.service
 
 import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver.PendingResult
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -48,7 +49,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -68,7 +71,8 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
         intent.extras?.let { extras ->
             when {
                 extras.containsKey(UPDATE_FEATURE_ID) -> {
-                    updateWidgetsForFeature(context, extras.getLong(UPDATE_FEATURE_ID))
+                    val pendingResult = goAsync()
+                    updateWidgetsForFeatureAsync(context, extras.getLong(UPDATE_FEATURE_ID), pendingResult)
                 }
 
                 extras.containsKey(DELETE_FEATURE_ID) -> {
@@ -84,13 +88,23 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
         appWidgetIds: IntArray
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        runBlocking {
-            val glanceManager = GlanceAppWidgetManager(context)
-            appWidgetIds.forEach { appWidgetId ->
-                val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
-                updateWidgetState(context, glanceId, appWidgetId)
+        // goAsync() returns null if not called during an active broadcast
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val glanceManager = GlanceAppWidgetManager(context)
+                appWidgetIds.forEach { appWidgetId ->
+                    runCatching {
+                        val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
+                        updateWidgetState(context, glanceId, appWidgetId)
+                    }.onFailure { Timber.e(it, "Failed to update widget $appWidgetId") }
+                }
+                glanceAppWidget.updateAll(context)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to update widgets")
+            } finally {
+                pendingResult?.finish()
             }
-            glanceAppWidget.updateAll(context)
         }
     }
 
@@ -129,24 +143,36 @@ class TrackWidgetProvider : GlanceAppWidgetReceiver() {
         }
     }
 
-    private fun updateWidgetsForFeature(context: Context, featureId: Long) {
-        runBlocking {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, TrackWidgetProvider::class.java)
-            )
-            val glanceManager = GlanceAppWidgetManager(context)
+    private fun updateWidgetsForFeatureAsync(
+        context: Context,
+        featureId: Long,
+        pendingResult: PendingResult?
+    ) {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val appWidgetIds = appWidgetManager.getAppWidgetIds(
+                    ComponentName(context, TrackWidgetProvider::class.java)
+                )
+                val glanceManager = GlanceAppWidgetManager(context)
 
-            appWidgetIds.forEach { appWidgetId ->
-                val widgetFeatureId = context
-                    .getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
-                    .getLong(getFeatureIdPref(appWidgetId), -1L)
-                if (widgetFeatureId == featureId) {
-                    val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
-                    updateWidgetState(context, glanceId, featureId)
+                appWidgetIds.forEach { appWidgetId ->
+                    val widgetFeatureId = context
+                        .getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+                        .getLong(getFeatureIdPref(appWidgetId), -1L)
+                    if (widgetFeatureId == featureId) {
+                        runCatching {
+                            val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
+                            updateWidgetState(context, glanceId, featureId)
+                        }.onFailure { Timber.e(it, "Failed to update widget $appWidgetId") }
+                    }
                 }
+                glanceAppWidget.updateAll(context)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to update widgets for feature $featureId")
+            } finally {
+                pendingResult?.finish()
             }
-            glanceAppWidget.updateAll(context)
         }
     }
 
