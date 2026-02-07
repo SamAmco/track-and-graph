@@ -27,6 +27,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
@@ -96,15 +97,22 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
         val reminderId = intent.extras?.getLong(ALARM_REMINDER_ID_KEY)
         if (reminderId != null) {
             // Cancel the fallback WorkManager task since the alarm fired successfully
+            // Cancel by tag for backwards compatibility with old work scheduled before unique work names
             WorkManager.getInstance(context)
                 .cancelAllWorkByTag(ReminderFallbackWorker.getWorkManagerTag(reminderId))
+            WorkManager.getInstance(context)
+                .cancelUniqueWork(ReminderFallbackWorker.getUniqueWorkName(reminderId))
             
             val work = OneTimeWorkRequestBuilder<ScheduleNextReminderWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setInputData(workDataOf(ScheduleNextReminderWorker.REMINDER_ID_KEY to reminderId))
                 .build()
 
-            WorkManager.getInstance(context).enqueue(work)
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "schedule_next_$reminderId",
+                ExistingWorkPolicy.REPLACE,
+                work
+            )
         }
     }
 

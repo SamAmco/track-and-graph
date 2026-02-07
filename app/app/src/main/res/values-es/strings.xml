@@ -359,6 +359,36 @@
         <item quantity="other">Cada %d años</item>
     </plurals>
 
+    <plurals name="after_x_minutes">
+        <item quantity="one">Después de 1 minuto</item>
+        <item quantity="other">Después de %d minutos</item>
+    </plurals>
+
+    <plurals name="after_x_hours">
+        <item quantity="one">Después de 1 hora</item>
+        <item quantity="other">Después de %d horas</item>
+    </plurals>
+
+    <plurals name="after_x_days">
+        <item quantity="one">Después de 1 día</item>
+        <item quantity="other">Después de %d días</item>
+    </plurals>
+
+    <plurals name="after_x_weeks">
+        <item quantity="one">Después de 1 semana</item>
+        <item quantity="other">Después de %d semanas</item>
+    </plurals>
+
+    <plurals name="after_x_months">
+        <item quantity="one">Después de 1 mes</item>
+        <item quantity="other">Después de %d meses</item>
+    </plurals>
+
+    <plurals name="after_x_years">
+        <item quantity="one">Después de 1 año</item>
+        <item quantity="other">Después de %d años</item>
+    </plurals>
+
     <string name="backup_now">Copia ahora</string>
     <string name="restore_error_could_not_write_to_database">¡La restauración falló! No se pudo encontrar ni escribir en la base de datos.</string>
     <string name="restore_error_could_not_read_from_database_file">¡La restauración falló! No se pudo encontrar ni leer el archivo de base de datos seleccionado.</string>

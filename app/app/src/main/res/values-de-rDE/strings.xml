@@ -360,6 +360,36 @@
         <item quantity="other">Alle %d Jahre</item>
     </plurals>
 
+    <plurals name="after_x_minutes">
+        <item quantity="one">Nach 1 Minute</item>
+        <item quantity="other">Nach %d Minuten</item>
+    </plurals>
+
+    <plurals name="after_x_hours">
+        <item quantity="one">Nach 1 Stunde</item>
+        <item quantity="other">Nach %d Stunden</item>
+    </plurals>
+
+    <plurals name="after_x_days">
+        <item quantity="one">Nach 1 Tag</item>
+        <item quantity="other">Nach %d Tagen</item>
+    </plurals>
+
+    <plurals name="after_x_weeks">
+        <item quantity="one">Nach 1 Woche</item>
+        <item quantity="other">Nach %d Wochen</item>
+    </plurals>
+
+    <plurals name="after_x_months">
+        <item quantity="one">Nach 1 Monat</item>
+        <item quantity="other">Nach %d Monaten</item>
+    </plurals>
+
+    <plurals name="after_x_years">
+        <item quantity="one">Nach 1 Jahr</item>
+        <item quantity="other">Nach %d Jahren</item>
+    </plurals>
+
     <string name="backup_now">Jetzt sichern</string>
     <string name="restore_error_could_not_write_to_database">Wiederherstellung fehlgeschlagen! Die Datenbank konnte nicht gefunden oder beschrieben werden.</string>
     <string name="restore_error_could_not_read_from_database_file">Wiederherstellung fehlgeschlagen! Die ausgewählte Datenbankdatei konnte nicht gefunden oder gelesen werden.</string>
