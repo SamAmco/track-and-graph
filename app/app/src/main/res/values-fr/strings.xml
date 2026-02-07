@@ -374,6 +374,42 @@
         <item quantity="other">Toutes les %d années</item>
     </plurals>
 
+    <plurals name="after_x_minutes">
+        <item quantity="one">Après 1 minute</item>
+        <item quantity="many">Après %d minutes</item>
+        <item quantity="other">Après %d minutes</item>
+    </plurals>
+
+    <plurals name="after_x_hours">
+        <item quantity="one">Après 1 heure</item>
+        <item quantity="many">Après %d heures</item>
+        <item quantity="other">Après %d heures</item>
+    </plurals>
+
+    <plurals name="after_x_days">
+        <item quantity="one">Après 1 jour</item>
+        <item quantity="many">Après %d jours</item>
+        <item quantity="other">Après %d jours</item>
+    </plurals>
+
+    <plurals name="after_x_weeks">
+        <item quantity="one">Après 1 semaine</item>
+        <item quantity="many">Après %d semaines</item>
+        <item quantity="other">Après %d semaines</item>
+    </plurals>
+
+    <plurals name="after_x_months">
+        <item quantity="one">Après 1 mois</item>
+        <item quantity="many">Après %d mois</item>
+        <item quantity="other">Après %d mois</item>
+    </plurals>
+
+    <plurals name="after_x_years">
+        <item quantity="one">Après 1 an</item>
+        <item quantity="many">Après %d ans</item>
+        <item quantity="other">Après %d ans</item>
+    </plurals>
+
     <string name="backup_now">Sauvegarder maintenant</string>
     <string name="restore_error_could_not_write_to_database">La restauration a échoué ! Impossible de trouver ou d\'écrire dans la base de données.</string>
     <string name="restore_error_could_not_read_from_database_file">La restauration a échoué ! Impossible de trouver ou de lire le fichier de base de données sélectionné.</string>

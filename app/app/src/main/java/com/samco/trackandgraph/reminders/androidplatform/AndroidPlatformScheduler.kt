@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -134,12 +135,18 @@ internal class AndroidPlatformScheduler @Inject constructor(
             .addTag(ReminderFallbackWorker.getWorkManagerTag(reminderNotificationParams.reminderId))
             .build()
 
-        WorkManager.getInstance(context).enqueue(workRequest)
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            ReminderFallbackWorker.getUniqueWorkName(reminderNotificationParams.reminderId),
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
     }
 
     private fun cancelWorkManagerFallback(reminderNotificationParams: ReminderNotificationParams) {
-        WorkManager.getInstance(context)
-            .cancelAllWorkByTag(ReminderFallbackWorker.getWorkManagerTag(reminderNotificationParams.reminderId))
+        val tag = ReminderFallbackWorker.getWorkManagerTag(reminderNotificationParams.reminderId)
+        // Cancel by tag for backwards compatibility with old work scheduled before unique work names
+        WorkManager.getInstance(context).cancelAllWorkByTag(tag)
+        WorkManager.getInstance(context).cancelUniqueWork(ReminderFallbackWorker.getUniqueWorkName(reminderNotificationParams.reminderId))
     }
 
     private fun createPendingIntent(

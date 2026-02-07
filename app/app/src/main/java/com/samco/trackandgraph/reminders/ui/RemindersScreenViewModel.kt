@@ -134,7 +134,11 @@ class RemindersScreenViewModelImpl @Inject constructor(
     override fun duplicateReminder(reminderViewData: ReminderViewData) {
         viewModelScope.launch(io) {
             reminderViewData.reminderDto?.let { reminder ->
-                dataInteractor.duplicateReminder(reminder)
+                val newId = dataInteractor.duplicateReminder(reminder)
+                val newReminder = dataInteractor.getReminderById(newId)
+                if (newReminder != null) {
+                    reminderInteractor.scheduleNext(newReminder)
+                }
             }
         }
     }

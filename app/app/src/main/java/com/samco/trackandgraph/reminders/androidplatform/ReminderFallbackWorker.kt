@@ -92,9 +92,11 @@ class ReminderFallbackWorker @AssistedInject constructor(
         const val EXPECTED_TRIGGER_TIME_KEY = "EXPECTED_TRIGGER_TIME_KEY"
         private const val MISSED_REMINDERS_CHANNEL_ID = "missed_reminder_notifications_channel"
 
-        fun getWorkManagerTag(reminderId: Long): String {
+        fun getUniqueWorkName(reminderId: Long): String {
             return "reminder_fallback_$reminderId"
         }
+
+        fun getWorkManagerTag(reminderId: Long): String = getUniqueWorkName(reminderId)
 
         fun createInputData(reminderId: Long, expectedTriggerTimeEpochMilli: Long): Data {
             return Data.Builder()
