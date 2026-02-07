@@ -18,6 +18,9 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LastValueStat
+import com.samco.trackandgraph.data.database.dto.LastValueStatConfig
+import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
+import com.samco.trackandgraph.data.database.dto.LastValueStatUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
 
@@ -29,8 +32,33 @@ class LastValueDataSourceAdapter @Inject constructor(
         config: LastValueStat,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateLastValueStat(graphOrStat, config)
-        else dataInteractor.insertLastValueStat(graphOrStat, config)
+        val lastValueStatConfig = LastValueStatConfig(
+            featureId = config.featureId,
+            endDate = config.endDate,
+            fromValue = config.fromValue,
+            toValue = config.toValue,
+            labels = config.labels,
+            filterByRange = config.filterByRange,
+            filterByLabels = config.filterByLabels
+        )
+
+        if (updateMode) {
+            dataInteractor.updateLastValueStat(
+                LastValueStatUpdateRequest(
+                    graphStatId = graphOrStat.id,
+                    name = graphOrStat.name,
+                    config = lastValueStatConfig
+                )
+            )
+        } else {
+            dataInteractor.createLastValueStat(
+                LastValueStatCreateRequest(
+                    name = graphOrStat.name,
+                    groupId = graphOrStat.groupId,
+                    config = lastValueStatConfig
+                )
+            )
+        }
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LastValueStat>? {
@@ -39,6 +67,6 @@ class LastValueDataSourceAdapter @Inject constructor(
     }
 
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateLastValueStat(graphOrStat)
+        dataInteractor.duplicateLastValueStat(graphOrStat.id)
     }
 }

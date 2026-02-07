@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
+import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
@@ -534,7 +535,7 @@ class GroupViewModelImpl @Inject constructor(
 
     override fun onDeleteGraphStat(id: Long) {
         viewModelScope.launch(io) {
-            dataInteractor.deleteGraphOrStat(id)
+            dataInteractor.deleteGraph(GraphDeleteRequest(graphStatId = id))
         }
     }
 

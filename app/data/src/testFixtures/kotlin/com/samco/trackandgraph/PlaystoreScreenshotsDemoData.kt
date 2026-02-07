@@ -22,23 +22,25 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
-import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupChildType
-import com.samco.trackandgraph.data.database.dto.LastValueStat
+import com.samco.trackandgraph.data.database.dto.LastValueStatConfig
+import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
-import com.samco.trackandgraph.data.database.dto.LineGraphFeature
+import com.samco.trackandgraph.data.database.dto.LineGraphConfig
+import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
+import com.samco.trackandgraph.data.database.dto.LineGraphFeatureConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
-import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.data.database.dto.PieChart
+import com.samco.trackandgraph.data.database.dto.PieChartConfig
+import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderParams
-import com.samco.trackandgraph.data.database.dto.TimeHistogram
+import com.samco.trackandgraph.data.database.dto.TimeHistogramConfig
+import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
 import com.samco.trackandgraph.data.database.dto.Period as ReminderPeriod
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
@@ -197,25 +199,19 @@ private suspend fun createStressfulDaysHistogram(
     stressFeatureId: Long,
     parent: Long
 ): Long {
-    val graphStat = GraphOrStat(
-        id = 0L,
-        groupId = parent,
-        name = "Most stressful days",
-        type = GraphStatType.TIME_HISTOGRAM,
-        displayIndex = 0,
+    return dataInteractor.createTimeHistogram(
+        TimeHistogramCreateRequest(
+            name = "Most stressful days",
+            groupId = parent,
+            config = TimeHistogramConfig(
+                featureId = stressFeatureId,
+                sampleSize = null,
+                window = TimeHistogramWindow.WEEK,
+                sumByCount = false,
+                endDate = GraphEndDate.Latest
+            )
+        )
     )
-
-    val timeHistogram = TimeHistogram(
-        id = 0L,
-        graphStatId = 0L,
-        featureId = stressFeatureId,
-        sampleSize = null,
-        window = TimeHistogramWindow.WEEK,
-        sumByCount = false,
-        endDate = GraphEndDate.Latest
-    )
-
-    return dataInteractor.insertTimeHistogram(graphStat, timeHistogram)
 }
 
 private suspend fun createTimeSinceDayOff(
@@ -223,27 +219,21 @@ private suspend fun createTimeSinceDayOff(
     dayOffFeatureId: Long,
     parent: Long
 ): Long {
-    val graphStat = GraphOrStat(
-        id = 0L,
-        groupId = parent,
-        name = "Time since taking a day off",
-        type = GraphStatType.LAST_VALUE,
-        displayIndex = 1,
+    return dataInteractor.createLastValueStat(
+        LastValueStatCreateRequest(
+            name = "Time since taking a day off",
+            groupId = parent,
+            config = LastValueStatConfig(
+                featureId = dayOffFeatureId,
+                endDate = GraphEndDate.Latest,
+                fromValue = 0.0,
+                toValue = 1.0,
+                labels = emptyList(),
+                filterByRange = false,
+                filterByLabels = false
+            )
+        )
     )
-
-    val lastValueStat = LastValueStat(
-        id = 0L,
-        graphStatId = 0L,
-        featureId = dayOffFeatureId,
-        endDate = GraphEndDate.Latest,
-        fromValue = 0.0,
-        toValue = 1.0,
-        labels = emptyList(),
-        filterByRange = false,
-        filterByLabels = false
-    )
-
-    return dataInteractor.insertLastValueStat(graphStat, lastValueStat)
 }
 
 private suspend fun createStressPieChart(
@@ -251,24 +241,18 @@ private suspend fun createStressPieChart(
     stressFeatureId: Long,
     parent: Long
 ): Long {
-    val graphStat = GraphOrStat(
-        id = 0L,
-        groupId = parent,
-        name = "Stress pie chart",
-        type = GraphStatType.PIE_CHART,
-        displayIndex = 0,
+    return dataInteractor.createPieChart(
+        PieChartCreateRequest(
+            name = "Stress pie chart",
+            groupId = parent,
+            config = PieChartConfig(
+                featureId = stressFeatureId,
+                sampleSize = null,
+                endDate = GraphEndDate.Latest,
+                sumByCount = true
+            )
+        )
     )
-
-    val pieChart = PieChart(
-        id = 0L,
-        graphStatId = 0L,
-        featureId = stressFeatureId,
-        sampleSize = null,
-        endDate = GraphEndDate.Latest,
-        sumByCount = true
-    )
-
-    return dataInteractor.insertPieChart(graphStat, pieChart)
 }
 
 private suspend fun createGroupListForScreenshots(dataInteractor: DataInteractor, parent: Long) {
@@ -417,40 +401,32 @@ private suspend fun createExerciseGraph2(
     exerciseFeatureId: Long,
     parent: Long
 ): Long {
-    val graphStat = GraphOrStat(
-        id = 0L,
-        groupId = parent,
-        name = "Exercise weekly totals in the last 6 months",
-        type = GraphStatType.LINE_GRAPH,
-        displayIndex = 0,
-    )
-
-    val lineGraph = LineGraphWithFeatures(
-        id = 0L,
-        graphStatId = 0L,
-        features = listOf(
-            LineGraphFeature(
-                id = 0L,
-                lineGraphId = 0L,
-                featureId = exerciseFeatureId,
-                name = "Exercise",
-                colorIndex = 0,
-                averagingMode = LineGraphAveraginModes.NO_AVERAGING,
-                plottingMode = LineGraphPlottingModes.GENERATE_WEEKLY_TOTALS,
-                pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
-                offset = 0.0,
-                scale = 1.0,
-                durationPlottingMode = DurationPlottingMode.NONE
+    return dataInteractor.createLineGraph(
+        LineGraphCreateRequest(
+            name = "Exercise weekly totals in the last 6 months",
+            groupId = parent,
+            config = LineGraphConfig(
+                features = listOf(
+                    LineGraphFeatureConfig(
+                        featureId = exerciseFeatureId,
+                        name = "Exercise",
+                        colorIndex = 0,
+                        averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                        plottingMode = LineGraphPlottingModes.GENERATE_WEEKLY_TOTALS,
+                        pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
+                        offset = 0.0,
+                        scale = 1.0,
+                        durationPlottingMode = DurationPlottingMode.NONE
+                    )
+                ),
+                sampleSize = Period.ofMonths(6),
+                yRangeType = YRangeType.DYNAMIC,
+                yFrom = 0.0,
+                yTo = 0.0,
+                endDate = GraphEndDate.Latest
             )
-        ),
-        sampleSize = Period.ofMonths(6),
-        yRangeType = YRangeType.DYNAMIC,
-        yFrom = 0.0,
-        yTo = 0.0,
-        endDate = GraphEndDate.Latest
+        )
     )
-
-    return dataInteractor.insertLineGraph(graphStat, lineGraph)
 }
 
 private suspend fun createExerciseGraph1(
@@ -459,79 +435,65 @@ private suspend fun createExerciseGraph1(
     illnessFeatureId: Long,
     parent: Long
 ): Long {
-    val graphStat = GraphOrStat(
-        id = 0L,
-        groupId = parent,
-        name = "Exercise Vs illness moving averages in the last 6 months",
-        type = GraphStatType.LINE_GRAPH,
-        displayIndex = 1,
+    return dataInteractor.createLineGraph(
+        LineGraphCreateRequest(
+            name = "Exercise Vs illness moving averages in the last 6 months",
+            groupId = parent,
+            config = LineGraphConfig(
+                features = listOf(
+                    LineGraphFeatureConfig(
+                        featureId = exerciseFeatureId,
+                        name = "Weekly",
+                        colorIndex = 7,
+                        averagingMode = LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE,
+                        plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                        pointStyle = LineGraphPointStyle.NONE,
+                        offset = 0.0,
+                        scale = 1.0,
+                        durationPlottingMode = DurationPlottingMode.NONE
+                    ),
+                    LineGraphFeatureConfig(
+                        featureId = exerciseFeatureId,
+                        name = "Monthly",
+                        colorIndex = 0,
+                        averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
+                        plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                        pointStyle = LineGraphPointStyle.NONE,
+                        offset = 0.0,
+                        scale = 1.0,
+                        durationPlottingMode = DurationPlottingMode.NONE
+                    ),
+                    LineGraphFeatureConfig(
+                        featureId = exerciseFeatureId,
+                        name = "Yearly",
+                        colorIndex = 5,
+                        averagingMode = LineGraphAveraginModes.YEARLY_MOVING_AVERAGE,
+                        plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                        pointStyle = LineGraphPointStyle.NONE,
+                        offset = 0.0,
+                        scale = 1.0,
+                        durationPlottingMode = DurationPlottingMode.NONE
+                    ),
+                    LineGraphFeatureConfig(
+                        featureId = illnessFeatureId,
+                        name = "Sick day (weekly)",
+                        colorIndex = 11,
+                        averagingMode = LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE,
+                        plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                        pointStyle = LineGraphPointStyle.NONE,
+                        offset = 0.0,
+                        scale = 0.1,
+                        durationPlottingMode = DurationPlottingMode.NONE
+                    ),
+                ),
+                sampleSize = Period.ofMonths(6),
+                yRangeType = YRangeType.DYNAMIC,
+                yFrom = 0.0,
+                yTo = 0.0,
+                endDate = GraphEndDate.Latest
+            )
+        )
     )
-
-    val lineGraph = LineGraphWithFeatures(
-        id = 0L,
-        graphStatId = 0L,
-        features = listOf(
-            LineGraphFeature(
-                id = 0L,
-                lineGraphId = 0L,
-                featureId = exerciseFeatureId,
-                name = "Weekly",
-                colorIndex = 7,
-                averagingMode = LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE,
-                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
-                pointStyle = LineGraphPointStyle.NONE,
-                offset = 0.0,
-                scale = 1.0,
-                durationPlottingMode = DurationPlottingMode.NONE
-            ),
-            LineGraphFeature(
-                id = 0L,
-                lineGraphId = 0L,
-                featureId = exerciseFeatureId,
-                name = "Monthly",
-                colorIndex = 0,
-                averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
-                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
-                pointStyle = LineGraphPointStyle.NONE,
-                offset = 0.0,
-                scale = 1.0,
-                durationPlottingMode = DurationPlottingMode.NONE
-            ),
-            LineGraphFeature(
-                id = 0L,
-                lineGraphId = 0L,
-                featureId = exerciseFeatureId,
-                name = "Yearly",
-                colorIndex = 5,
-                averagingMode = LineGraphAveraginModes.YEARLY_MOVING_AVERAGE,
-                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
-                pointStyle = LineGraphPointStyle.NONE,
-                offset = 0.0,
-                scale = 1.0,
-                durationPlottingMode = DurationPlottingMode.NONE
-            ),
-            LineGraphFeature(
-                id = 0L,
-                lineGraphId = 0L,
-                featureId = illnessFeatureId,
-                name = "Sick day (weekly)",
-                colorIndex = 11,
-                averagingMode = LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE,
-                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
-                pointStyle = LineGraphPointStyle.NONE,
-                offset = 0.0,
-                scale = 0.1,
-                durationPlottingMode = DurationPlottingMode.NONE
-            ),
-        ),
-        sampleSize = Period.ofMonths(6),
-        yRangeType = YRangeType.DYNAMIC,
-        yFrom = 0.0,
-        yTo = 0.0,
-        endDate = GraphEndDate.Latest
-    )
-
-    return dataInteractor.insertLineGraph(graphStat, lineGraph)
 }
 
 private suspend fun createDailyGroup(dataInteractor: DataInteractor, parent: Long): Long {

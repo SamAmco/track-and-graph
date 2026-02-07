@@ -19,13 +19,12 @@ package com.samco.trackandgraph
 
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
-import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
-import com.samco.trackandgraph.data.database.dto.LineGraphFeature
+import com.samco.trackandgraph.data.database.dto.LineGraphConfig
+import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
+import com.samco.trackandgraph.data.database.dto.LineGraphFeatureConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
-import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -289,51 +288,41 @@ private suspend fun createMonthlyMovingAverageGraph(
     relaxationFeatureId: Long,
     stressFeatureId: Long,
 ): Long {
-    val graphStat = GraphOrStat(
-        id = 0L,
-        groupId = groupId,
-        name = "Relaxation Vs Stress (Monthly moving averages)",
-        type = GraphStatType.LINE_GRAPH,
-        displayIndex = 0,
-    )
-
-    val lineGraph = LineGraphWithFeatures(
-        id = 0L,
-        graphStatId = 0L,
-        features = listOf(
-            LineGraphFeature(
-                id = 0L,
-                lineGraphId = 0L,
-                featureId = relaxationFeatureId,
-                name = "Relaxation",
-                colorIndex = 7,
-                averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
-                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
-                pointStyle = LineGraphPointStyle.NONE,
-                offset = 0.0,
-                scale = 1.0,
-                durationPlottingMode = DurationPlottingMode.NONE
-            ),
-            LineGraphFeature(
-                id = 0L,
-                lineGraphId = 0L,
-                featureId = stressFeatureId,
-                name = "Stress",
-                colorIndex = 1,
-                averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
-                plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
-                pointStyle = LineGraphPointStyle.NONE,
-                offset = 0.0,
-                scale = 1.0,
-                durationPlottingMode = DurationPlottingMode.NONE
+    return dataInteractor.createLineGraph(
+        LineGraphCreateRequest(
+            name = "Relaxation Vs Stress (Monthly moving averages)",
+            groupId = groupId,
+            config = LineGraphConfig(
+                features = listOf(
+                    LineGraphFeatureConfig(
+                        featureId = relaxationFeatureId,
+                        name = "Relaxation",
+                        colorIndex = 7,
+                        averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
+                        plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                        pointStyle = LineGraphPointStyle.NONE,
+                        offset = 0.0,
+                        scale = 1.0,
+                        durationPlottingMode = DurationPlottingMode.NONE
+                    ),
+                    LineGraphFeatureConfig(
+                        featureId = stressFeatureId,
+                        name = "Stress",
+                        colorIndex = 1,
+                        averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
+                        plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                        pointStyle = LineGraphPointStyle.NONE,
+                        offset = 0.0,
+                        scale = 1.0,
+                        durationPlottingMode = DurationPlottingMode.NONE
+                    )
+                ),
+                sampleSize = Period.ofMonths(6),
+                yRangeType = YRangeType.FIXED,
+                yFrom = 0.0,
+                yTo = 10.0,
+                endDate = GraphEndDate.Latest
             )
-        ),
-        sampleSize = Period.ofMonths(6),
-        yRangeType = YRangeType.FIXED,
-        yFrom = 0.0,
-        yTo = 10.0,
-        endDate = GraphEndDate.Latest
+        )
     )
-
-    return dataInteractor.insertLineGraph(graphStat, lineGraph)
 }

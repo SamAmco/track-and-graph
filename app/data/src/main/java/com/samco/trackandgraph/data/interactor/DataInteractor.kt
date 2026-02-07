@@ -17,26 +17,18 @@
 
 package com.samco.trackandgraph.data.interactor
 
-import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
-import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.GlobalNote
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupGraph
-import com.samco.trackandgraph.data.database.dto.LastValueStat
-import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
-import com.samco.trackandgraph.data.database.dto.PieChart
-import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
 
-interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupHelper {
+interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupHelper, GraphHelper {
     suspend fun getGroupGraphSync(rootGroupId: Long? = null): GroupGraph
 
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>)
@@ -46,10 +38,6 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupH
     suspend fun getFeatureById(featureId: Long): Feature?
 
     suspend fun deleteDataPoint(dataPoint: DataPoint)
-
-    suspend fun deleteGraphOrStat(id: Long)
-
-    suspend fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
     suspend fun insertDataPoint(dataPoint: DataPoint): Long
 
@@ -61,26 +49,6 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupH
      * @see [DataUpdateType]
      */
     fun getDataUpdateEvents(): SharedFlow<DataUpdateType>
-
-    suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
-
-    suspend fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
-
-    suspend fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
-
-    suspend fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
-
-    suspend fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
-
-    suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
-
-    suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat?
-
-    suspend fun getBarChartByGraphStatId(graphStatId: Long): BarChart?
-
-    suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
-
-    suspend fun getAllGraphStatsSync(): List<GraphOrStat>
 
     fun getAllDisplayNotes(): Flow<List<DisplayNote>>
 
@@ -94,65 +62,9 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupH
 
     suspend fun getAllGlobalNotesSync(): List<GlobalNote>
 
-    suspend fun duplicateLineGraph(graphOrStat: GraphOrStat): Long?
-
-    suspend fun duplicatePieChart(graphOrStat: GraphOrStat): Long?
-
-    suspend fun duplicateAverageTimeBetweenStat(graphOrStat: GraphOrStat): Long?
-
-    suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long?
-
-    suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long?
-
-    suspend fun duplicateBarChart(graphOrStat: GraphOrStat): Long?
-
-    suspend fun insertLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures): Long
-
-    suspend fun insertPieChart(graphOrStat: GraphOrStat, pieChart: PieChart): Long
-
-    suspend fun insertAverageTimeBetweenStat(
-        graphOrStat: GraphOrStat,
-        averageTimeBetweenStat: AverageTimeBetweenStat
-    ): Long
-
-    suspend fun insertTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram): Long
-
-    suspend fun insertLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat): Long
-
-    suspend fun insertBarChart(graphOrStat: GraphOrStat, barChart: BarChart): Long
-
-    suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart)
-
-    suspend fun updateAverageTimeBetweenStat(
-        graphOrStat: GraphOrStat,
-        averageTimeBetweenStat: AverageTimeBetweenStat
-    )
-
-    suspend fun updateLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures)
-
-    suspend fun updateLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat)
-
-    suspend fun updateBarChart(graphOrStat: GraphOrStat, barChart: BarChart)
-
-    suspend fun updateGraphOrStat(graphOrStat: GraphOrStat)
-
-    suspend fun updateTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram)
-
     fun onImportedExternalData()
 
     suspend fun getAllFeaturesSync(): List<Feature>
-
-    suspend fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures?
-
-    suspend fun duplicateLuaGraph(graphOrStat: GraphOrStat): Long?
-
-    suspend fun insertLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures): Long
-
-    suspend fun updateLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures)
-
-    suspend fun hasAnyLuaGraphs(): Boolean
-
-    suspend fun hasAnyGraphs(): Boolean
 
     suspend fun hasAnyFeatures(): Boolean
 
