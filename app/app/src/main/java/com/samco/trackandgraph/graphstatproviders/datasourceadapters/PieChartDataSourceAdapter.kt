@@ -19,6 +19,9 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.PieChart
+import com.samco.trackandgraph.data.database.dto.PieChartConfig
+import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
+import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
 
@@ -30,8 +33,30 @@ class PieChartDataSourceAdapter @Inject constructor(
         config: PieChart,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updatePieChart(graphOrStat, config)
-        else dataInteractor.insertPieChart(graphOrStat, config)
+        val pieChartConfig = PieChartConfig(
+            featureId = config.featureId,
+            sampleSize = config.sampleSize,
+            endDate = config.endDate,
+            sumByCount = config.sumByCount
+        )
+
+        if (updateMode) {
+            dataInteractor.updatePieChart(
+                PieChartUpdateRequest(
+                    graphStatId = graphOrStat.id,
+                    name = graphOrStat.name,
+                    config = pieChartConfig
+                )
+            )
+        } else {
+            dataInteractor.createPieChart(
+                PieChartCreateRequest(
+                    name = graphOrStat.name,
+                    groupId = graphOrStat.groupId,
+                    config = pieChartConfig
+                )
+            )
+        }
     }
 
     override suspend fun getConfigDataFromDatabase(
@@ -42,6 +67,6 @@ class PieChartDataSourceAdapter @Inject constructor(
     }
 
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicatePieChart(graphOrStat)
+        dataInteractor.duplicatePieChart(graphOrStat.id)
     }
 }

@@ -19,6 +19,9 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
+import com.samco.trackandgraph.data.database.dto.TimeHistogramConfig
+import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
+import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
 
@@ -30,8 +33,31 @@ class TimeHistogramDataSourceAdapter @Inject constructor(
         config: TimeHistogram,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateTimeHistogram(graphOrStat, config)
-        else dataInteractor.insertTimeHistogram(graphOrStat, config)
+        val timeHistogramConfig = TimeHistogramConfig(
+            featureId = config.featureId,
+            sampleSize = config.sampleSize,
+            window = config.window,
+            sumByCount = config.sumByCount,
+            endDate = config.endDate
+        )
+
+        if (updateMode) {
+            dataInteractor.updateTimeHistogram(
+                TimeHistogramUpdateRequest(
+                    graphStatId = graphOrStat.id,
+                    name = graphOrStat.name,
+                    config = timeHistogramConfig
+                )
+            )
+        } else {
+            dataInteractor.createTimeHistogram(
+                TimeHistogramCreateRequest(
+                    name = graphOrStat.name,
+                    groupId = graphOrStat.groupId,
+                    config = timeHistogramConfig
+                )
+            )
+        }
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, TimeHistogram>? {
@@ -40,6 +66,6 @@ class TimeHistogramDataSourceAdapter @Inject constructor(
     }
 
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateTimeHistogram(graphOrStat)
+        dataInteractor.duplicateTimeHistogram(graphOrStat.id)
     }
 }

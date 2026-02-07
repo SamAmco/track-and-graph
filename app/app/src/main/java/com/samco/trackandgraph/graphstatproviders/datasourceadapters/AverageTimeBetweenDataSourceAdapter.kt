@@ -18,6 +18,9 @@
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
+import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatConfig
+import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatCreateRequest
+import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateRequest
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
@@ -30,8 +33,34 @@ class AverageTimeBetweenDataSourceAdapter @Inject constructor(
         config: AverageTimeBetweenStat,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateAverageTimeBetweenStat(graphOrStat, config)
-        else dataInteractor.insertAverageTimeBetweenStat(graphOrStat, config)
+        val atbConfig = AverageTimeBetweenStatConfig(
+            featureId = config.featureId,
+            fromValue = config.fromValue,
+            toValue = config.toValue,
+            sampleSize = config.sampleSize,
+            labels = config.labels,
+            endDate = config.endDate,
+            filterByRange = config.filterByRange,
+            filterByLabels = config.filterByLabels
+        )
+
+        if (updateMode) {
+            dataInteractor.updateAverageTimeBetweenStat(
+                AverageTimeBetweenStatUpdateRequest(
+                    graphStatId = graphOrStat.id,
+                    name = graphOrStat.name,
+                    config = atbConfig
+                )
+            )
+        } else {
+            dataInteractor.createAverageTimeBetweenStat(
+                AverageTimeBetweenStatCreateRequest(
+                    name = graphOrStat.name,
+                    groupId = graphOrStat.groupId,
+                    config = atbConfig
+                )
+            )
+        }
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, AverageTimeBetweenStat>? {
@@ -41,6 +70,6 @@ class AverageTimeBetweenDataSourceAdapter @Inject constructor(
     }
 
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateAverageTimeBetweenStat(graphOrStat)
+        dataInteractor.duplicateAverageTimeBetweenStat(graphOrStat.id)
     }
 }

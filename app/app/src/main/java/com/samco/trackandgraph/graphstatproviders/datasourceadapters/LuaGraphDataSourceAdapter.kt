@@ -17,6 +17,10 @@
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.LuaGraphConfig
+import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
+import com.samco.trackandgraph.data.database.dto.LuaGraphFeatureConfig
+import com.samco.trackandgraph.data.database.dto.LuaGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
@@ -29,8 +33,33 @@ class LuaGraphDataSourceAdapter @Inject constructor(
         config: LuaGraphWithFeatures,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateLuaGraph(graphOrStat, config)
-        else dataInteractor.insertLuaGraph(graphOrStat, config)
+        val luaGraphConfig = LuaGraphConfig(
+            features = config.features.map { feature ->
+                LuaGraphFeatureConfig(
+                    featureId = feature.featureId,
+                    name = feature.name
+                )
+            },
+            script = config.script
+        )
+
+        if (updateMode) {
+            dataInteractor.updateLuaGraph(
+                LuaGraphUpdateRequest(
+                    graphStatId = graphOrStat.id,
+                    name = graphOrStat.name,
+                    config = luaGraphConfig
+                )
+            )
+        } else {
+            dataInteractor.createLuaGraph(
+                LuaGraphCreateRequest(
+                    name = graphOrStat.name,
+                    groupId = graphOrStat.groupId,
+                    config = luaGraphConfig
+                )
+            )
+        }
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LuaGraphWithFeatures>? {
@@ -39,6 +68,6 @@ class LuaGraphDataSourceAdapter @Inject constructor(
     }
 
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateLuaGraph(graphOrStat)
+        dataInteractor.duplicateLuaGraph(graphOrStat.id)
     }
 }

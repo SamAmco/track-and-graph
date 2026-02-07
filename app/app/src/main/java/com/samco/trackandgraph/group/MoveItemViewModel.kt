@@ -120,10 +120,13 @@ class MoveItemViewModel @Inject constructor(
                     }
 
                     MovableItemType.GRAPH -> {
-                        val graphStat = dataInteractor.getGraphStatById(config.itemId)
-                        graphStat.copy(groupId = targetGroupId).let {
-                            dataInteractor.updateGraphOrStat(it)
-                        }
+                        val request = MoveComponentRequest(
+                            type = ComponentType.GRAPH,
+                            id = config.itemId,
+                            fromGroupId = config.fromGroupId,
+                            toGroupId = targetGroupId
+                        )
+                        dataInteractor.moveComponent(request)
                     }
 
                     MovableItemType.GROUP -> {
