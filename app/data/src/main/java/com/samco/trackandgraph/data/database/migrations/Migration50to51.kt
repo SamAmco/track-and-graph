@@ -4,8 +4,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_50_51 = object : Migration(50, 51) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `last_value_stats_table` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -23,21 +23,21 @@ val MIGRATION_50_51 = object : Migration(50, 51) {
             """.trimIndent()
         )
 
-        database.execSQL(
+        db.execSQL(
             "CREATE INDEX IF NOT EXISTS `index_last_value_stats_table_id` ON `last_value_stats_table` (`id`)"
         )
 
-        database.execSQL(
+        db.execSQL(
             "CREATE INDEX IF NOT EXISTS `index_last_value_stats_table_graph_stat_id` ON `last_value_stats_table` (`graph_stat_id`)"
         )
 
-        database.execSQL(
+        db.execSQL(
             "CREATE INDEX IF NOT EXISTS `index_last_value_stats_table_feature_id` ON `last_value_stats_table` (`feature_id`)"
         )
 
         // Copy data from old table to new table from time_since_last_stat_table4
         //use null for end_date
-        database.execSQL(
+        db.execSQL(
             """
                 INSERT INTO last_value_stats_table (
                     graph_stat_id, 
@@ -63,12 +63,12 @@ val MIGRATION_50_51 = object : Migration(50, 51) {
         )
 
         // Drop old table
-        database.execSQL("DROP TABLE IF EXISTS time_since_last_stat_table4")
+        db.execSQL("DROP TABLE IF EXISTS time_since_last_stat_table4")
 
         //Drop old indexes
-        database.execSQL("DROP INDEX IF EXISTS index_time_since_last_stat_table4_id")
-        database.execSQL("DROP INDEX IF EXISTS index_time_since_last_stat_table4_graph_stat_id")
-        database.execSQL("DROP INDEX IF EXISTS index_time_since_last_stat_table4_feature_id")
+        db.execSQL("DROP INDEX IF EXISTS index_time_since_last_stat_table4_id")
+        db.execSQL("DROP INDEX IF EXISTS index_time_since_last_stat_table4_graph_stat_id")
+        db.execSQL("DROP INDEX IF EXISTS index_time_since_last_stat_table4_feature_id")
 
         //Update the
     }

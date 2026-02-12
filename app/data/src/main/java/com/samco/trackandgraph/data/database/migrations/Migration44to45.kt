@@ -25,14 +25,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 val MIGRATION_44_45 = object : Migration(44, 45) {
     private val helper = MigrationJsonHelper.getMigrationJsonHelper()
 
-    override fun migrate(database: SupportSQLiteDatabase) {
-        createTimeSinceLastTable(database)
-        createAverageTimeBetweenTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        createTimeSinceLastTable(db)
+        createAverageTimeBetweenTable(db)
 
-        copyTimeSinceLastData(database)
-        copyAverageTimeBetweenData(database)
-        database.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table2`")
-        database.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table2`")
+        copyTimeSinceLastData(db)
+        copyAverageTimeBetweenData(db)
+        db.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table2`")
+        db.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table2`")
     }
 
     private fun getDiscreteValues(value: String): List<MigrationJsonHelper.DiscreteValue> {
@@ -43,9 +43,9 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
         return helper.toJson(labels)
     }
 
-    private fun copyTimeSinceLastData(database: SupportSQLiteDatabase) {
+    private fun copyTimeSinceLastData(db: SupportSQLiteDatabase) {
         val inserts = mutableListOf<NTuple6<Long, Long, Long, Double, Double, String>>()
-        val graphsCursor = database.query("SELECT * FROM time_since_last_stat_table2")
+        val graphsCursor = db.query("SELECT * FROM time_since_last_stat_table2")
         while (graphsCursor.moveToNext()) {
             try {
                 val id = graphsCursor.getLong(0)
@@ -57,7 +57,7 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
 
                 val discreteIdInts = discreteIds.split("||").mapNotNull { it.toIntOrNull() }
                 val featureCursor =
-                    database.query("SELECT discrete_values FROM features_table WHERE id = $featureId")
+                    db.query("SELECT discrete_values FROM features_table WHERE id = $featureId")
                 val discreteValuesString = try {
                     if (featureCursor.moveToNext()) featureCursor.getString(0) else ""
                 } catch (t: Throwable) {
@@ -79,14 +79,14 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
                 ) VALUES (?,?,?,?,?,?)
             """.trimIndent()
         if (inserts.size > 0) inserts.forEach { args ->
-            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+            db.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
         }
     }
 
-    private fun copyAverageTimeBetweenData(database: SupportSQLiteDatabase) {
+    private fun copyAverageTimeBetweenData(db: SupportSQLiteDatabase) {
         val inserts =
             mutableListOf<NTuple8<Long, Long, Long, Double, Double, String, String, String>>()
-        val graphsCursor = database.query("SELECT * FROM average_time_between_stat_table2")
+        val graphsCursor = db.query("SELECT * FROM average_time_between_stat_table2")
         while (graphsCursor.moveToNext()) {
             try {
                 val id = graphsCursor.getLong(0)
@@ -101,7 +101,7 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
                 val discreteIdInts = discreteIds.split("||").mapNotNull { it.toIntOrNull() }
 
                 val featureCursor =
-                    database.query("SELECT discrete_values FROM features_table WHERE id = $featureId")
+                    db.query("SELECT discrete_values FROM features_table WHERE id = $featureId")
                 val discreteValuesString = try {
                     if (featureCursor.moveToNext()) featureCursor.getString(0) else ""
                 } catch (t: Throwable) {
@@ -134,12 +134,12 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
                 ) VALUES (?,?,?,?,?,?,?,?)
             """.trimIndent()
         if (inserts.size > 0) inserts.forEach { args ->
-            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+            db.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
         }
     }
 
-    private fun createTimeSinceLastTable(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun createTimeSinceLastTable(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `time_since_last_stat_table3` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -152,13 +152,13 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
                     FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_id` ON `time_since_last_stat_table3` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_graph_stat_id` ON `time_since_last_stat_table3` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_feature_id` ON `time_since_last_stat_table3` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_id` ON `time_since_last_stat_table3` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_graph_stat_id` ON `time_since_last_stat_table3` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_feature_id` ON `time_since_last_stat_table3` (`feature_id`)")
     }
 
-    private fun createAverageTimeBetweenTable(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun createAverageTimeBetweenTable(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS average_time_between_stat_table3 (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -173,8 +173,8 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
                     FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_id` ON average_time_between_stat_table3 (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_graph_stat_id` ON average_time_between_stat_table3 (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_feature_id` ON average_time_between_stat_table3 (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_id` ON average_time_between_stat_table3 (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_graph_stat_id` ON average_time_between_stat_table3 (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_feature_id` ON average_time_between_stat_table3 (`feature_id`)")
     }
 }

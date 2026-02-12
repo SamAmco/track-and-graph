@@ -23,9 +23,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_40_41 = object : Migration(40, 41) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         //UPDATE graphs_and_stats_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `graphs_and_stats_table2` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -37,12 +37,12 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
             )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table2_id` ON `graphs_and_stats_table2` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table2_graph_stat_group_id` ON `graphs_and_stats_table2` (`graph_stat_group_id`)")
-        database.execSQL("INSERT INTO graphs_and_stats_table2 SELECT id, graph_stat_group_id, name, graph_stat_type, display_index FROM graphs_and_stats_table")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table2_id` ON `graphs_and_stats_table2` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table2_graph_stat_group_id` ON `graphs_and_stats_table2` (`graph_stat_group_id`)")
+        db.execSQL("INSERT INTO graphs_and_stats_table2 SELECT id, graph_stat_group_id, name, graph_stat_type, display_index FROM graphs_and_stats_table")
 
         //UPDATE time_since_last_stat_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `time_since_last_stat_table2` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -56,13 +56,13 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
             )
             """.trimIndent()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table2_id` ON `time_since_last_stat_table2` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table2_graph_stat_id` ON `time_since_last_stat_table2` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table2_feature_id` ON `time_since_last_stat_table2` (`feature_id`)")
-        database.execSQL("INSERT INTO time_since_last_stat_table2 SELECT id, graph_stat_id, feature_id, from_value, to_value, discrete_values FROM time_since_last_stat_table")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table2_id` ON `time_since_last_stat_table2` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table2_graph_stat_id` ON `time_since_last_stat_table2` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table2_feature_id` ON `time_since_last_stat_table2` (`feature_id`)")
+        db.execSQL("INSERT INTO time_since_last_stat_table2 SELECT id, graph_stat_id, feature_id, from_value, to_value, discrete_values FROM time_since_last_stat_table")
 
         //UPDATE pie_charts_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `pie_charts_table2` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -75,11 +75,11 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
             )
             """.trimIndent()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_id` ON `pie_charts_table2` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_graph_stat_id` ON `pie_charts_table2` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_feature_id` ON `pie_charts_table2` (`feature_id`)")
-        database.execSQL("INSERT INTO pie_charts_table2 SELECT id, graph_stat_id, feature_id, duration, NULL FROM pie_chart_table")
-        database.execSQL(
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_id` ON `pie_charts_table2` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_graph_stat_id` ON `pie_charts_table2` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_feature_id` ON `pie_charts_table2` (`feature_id`)")
+        db.execSQL("INSERT INTO pie_charts_table2 SELECT id, graph_stat_id, feature_id, duration, NULL FROM pie_chart_table")
+        db.execSQL(
             """UPDATE pie_charts_table2 SET end_date= (
                 SELECT end_date FROM graphs_and_stats_table 
                 WHERE id=pie_charts_table2.graph_stat_id
@@ -87,7 +87,7 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
         )
 
         //UPDATE line_graphs_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `line_graphs_table3` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -101,10 +101,10 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
             )
         """.trimIndent()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table3_id` ON `line_graphs_table3` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table3_graph_stat_id` ON `line_graphs_table3` (`graph_stat_id`)")
-        database.execSQL("INSERT INTO line_graphs_table3 SELECT id, graph_stat_id, duration, y_range_type, y_from, y_to, NULL FROM line_graphs_table2")
-        database.execSQL(
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table3_id` ON `line_graphs_table3` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table3_graph_stat_id` ON `line_graphs_table3` (`graph_stat_id`)")
+        db.execSQL("INSERT INTO line_graphs_table3 SELECT id, graph_stat_id, duration, y_range_type, y_from, y_to, NULL FROM line_graphs_table2")
+        db.execSQL(
             """UPDATE line_graphs_table3 SET end_date= (
                 SELECT end_date FROM graphs_and_stats_table 
                 WHERE id=line_graphs_table3.graph_stat_id
@@ -112,7 +112,7 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
         )
 
         //UPDATE average_time_between_stat_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `average_time_between_stat_table2` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -127,11 +127,11 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
                 FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
         )""".trimIndent()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_id` ON `average_time_between_stat_table2` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_graph_stat_id` ON `average_time_between_stat_table2` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_feature_id` ON `average_time_between_stat_table2` (`feature_id`)")
-        database.execSQL("INSERT INTO average_time_between_stat_table2 SELECT id, graph_stat_id, feature_id, from_value, to_value, duration, discrete_values, NULL FROM average_time_between_stat_table")
-        database.execSQL(
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_id` ON `average_time_between_stat_table2` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_graph_stat_id` ON `average_time_between_stat_table2` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_feature_id` ON `average_time_between_stat_table2` (`feature_id`)")
+        db.execSQL("INSERT INTO average_time_between_stat_table2 SELECT id, graph_stat_id, feature_id, from_value, to_value, duration, discrete_values, NULL FROM average_time_between_stat_table")
+        db.execSQL(
             """UPDATE average_time_between_stat_table2 SET end_date= (
                 SELECT end_date FROM graphs_and_stats_table 
                 WHERE id=average_time_between_stat_table2.graph_stat_id
@@ -139,7 +139,7 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
         )
 
         //UPDATE line_graph_features_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `line_graph_features_table2` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -158,17 +158,17 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
             )
         """.trimIndent()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table2_id` ON `line_graph_features_table2` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table2_line_graph_id` ON `line_graph_features_table2` (`line_graph_id`)")
-        database.execSQL("INSERT INTO line_graph_features_table2 SELECT id, line_graph_id, feature_id, name, color_index, averaging_mode, plotting_mode, point_style, offset, scale, duration_plotting_mode FROM line_graph_features_table")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table2_id` ON `line_graph_features_table2` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table2_line_graph_id` ON `line_graph_features_table2` (`line_graph_id`)")
+        db.execSQL("INSERT INTO line_graph_features_table2 SELECT id, line_graph_id, feature_id, name, color_index, averaging_mode, plotting_mode, point_style, offset, scale, duration_plotting_mode FROM line_graph_features_table")
 
 
         //DROP UNUSED TABLES
-        database.execSQL("DROP TABLE IF EXISTS `graphs_and_stats_table`")
-        database.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table`")
-        database.execSQL("DROP TABLE IF EXISTS `pie_chart_table`")
-        database.execSQL("DROP TABLE IF EXISTS `line_graphs_table2`")
-        database.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table`")
-        database.execSQL("DROP TABLE IF EXISTS `line_graph_features_table`")
+        db.execSQL("DROP TABLE IF EXISTS `graphs_and_stats_table`")
+        db.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table`")
+        db.execSQL("DROP TABLE IF EXISTS `pie_chart_table`")
+        db.execSQL("DROP TABLE IF EXISTS `line_graphs_table2`")
+        db.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table`")
+        db.execSQL("DROP TABLE IF EXISTS `line_graph_features_table`")
     }
 }

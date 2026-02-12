@@ -20,17 +20,17 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_55_56 = object : Migration(55, 56) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
 
         //Drop the function table
-        database.execSQL(
+        db.execSQL(
             """
             DROP TABLE IF EXISTS `functions_table`
             """.trimIndent()
         )
 
         // Create lua_graphs_table
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `lua_graphs_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -41,7 +41,7 @@ val MIGRATION_55_56 = object : Migration(55, 56) {
         )
 
         // Create lua_graph_features_table
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `lua_graph_features_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -55,12 +55,12 @@ val MIGRATION_55_56 = object : Migration(55, 56) {
 
         // Create indexes for lua_graphs_table
         
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_lua_graphs_table_id` ON lua_graphs_table (`id`)
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_lua_graphs_table_graph_stat_id` ON lua_graphs_table (`graph_stat_id`)
             """.trimIndent()
@@ -68,17 +68,17 @@ val MIGRATION_55_56 = object : Migration(55, 56) {
 
         
         // Create indexes for lua_graph_features_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_lua_graph_features_table_id` ON lua_graph_features_table (`id`)
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_lua_graph_features_table_lua_graph_id` ON lua_graph_features_table (`lua_graph_id`)
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_lua_graph_features_table_feature_id` ON lua_graph_features_table (`feature_id`)
             """.trimIndent()

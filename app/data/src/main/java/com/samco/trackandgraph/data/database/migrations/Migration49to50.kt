@@ -4,14 +4,14 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_49_50 = object : Migration(49, 50) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         //migrate table pie_charts_table2 to add column sum_by_count
 
         //alter table to old
-        database.execSQL("ALTER TABLE pie_charts_table2 RENAME TO pie_charts_table2_old")
+        db.execSQL("ALTER TABLE pie_charts_table2 RENAME TO pie_charts_table2_old")
 
         //create new table
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `pie_charts_table2` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -27,7 +27,7 @@ val MIGRATION_49_50 = object : Migration(49, 50) {
         )
 
         //copy data from old table to new table
-        database.execSQL(
+        db.execSQL(
             """
                 INSERT INTO pie_charts_table2
                 SELECT 
@@ -42,11 +42,11 @@ val MIGRATION_49_50 = object : Migration(49, 50) {
         )
 
         //drop old table
-        database.execSQL("DROP TABLE pie_charts_table2_old")
+        db.execSQL("DROP TABLE pie_charts_table2_old")
 
         //Create index's
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_id` ON `pie_charts_table2` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_graph_stat_id` ON `pie_charts_table2` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_feature_id` ON `pie_charts_table2` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_id` ON `pie_charts_table2` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_graph_stat_id` ON `pie_charts_table2` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_feature_id` ON `pie_charts_table2` (`feature_id`)")
     }
 }

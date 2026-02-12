@@ -23,8 +23,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_32_33 = object : Migration(32, 33) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        val lineGraphsCursor = database.query("SELECT * FROM line_graphs_table")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        val lineGraphsCursor = db.query("SELECT * FROM line_graphs_table")
         val updates = mutableListOf<Pair<String, List<String>>>()
         while (lineGraphsCursor.moveToNext()) {
             val id = lineGraphsCursor.getLong(0)
@@ -46,7 +46,7 @@ val MIGRATION_32_33 = object : Migration(32, 33) {
             )
         }
         if (updates.size > 0) updates.forEach {
-            database.execSQL(
+            db.execSQL(
                 it.first,
                 it.second.toTypedArray()
             )

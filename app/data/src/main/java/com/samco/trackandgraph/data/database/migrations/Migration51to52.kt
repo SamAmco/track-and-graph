@@ -21,10 +21,10 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_51_52 = object : Migration(51, 52) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         //add the bar charts table
         val tableName = "bar_charts_table"
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `$tableName` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -44,8 +44,8 @@ val MIGRATION_51_52 = object : Migration(51, 52) {
         )
 
         //create indexes
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_bar_charts_table_id` ON `$tableName` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_bar_charts_table_graph_stat_id` ON `$tableName` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_bar_charts_table_feature_id` ON `$tableName` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_bar_charts_table_id` ON `$tableName` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_bar_charts_table_graph_stat_id` ON `$tableName` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_bar_charts_table_feature_id` ON `$tableName` (`feature_id`)")
     }
 }

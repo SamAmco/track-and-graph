@@ -20,10 +20,10 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_56_57 = object : Migration(56, 57) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
 
         // Create functions_table
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `functions_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -34,7 +34,7 @@ val MIGRATION_56_57 = object : Migration(56, 57) {
         )
 
         // Create function_input_features_table
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `function_input_features_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -46,29 +46,29 @@ val MIGRATION_56_57 = object : Migration(56, 57) {
         )
 
         // Create indexes for functions_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_functions_table_id` ON functions_table (`id`)
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_functions_table_feature_id` ON functions_table (`feature_id`)
             """.trimIndent()
         )
 
         // Create indexes for function_input_features_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_function_input_features_table_id` ON function_input_features_table (`id`)
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_function_input_features_table_function_id` ON function_input_features_table (`function_id`)
             """.trimIndent()
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_function_input_features_table_feature_id` ON function_input_features_table (`feature_id`)
             """.trimIndent()

@@ -23,19 +23,19 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_45_46 = object : Migration(45, 46) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        updateAverageTimeBetween(database)
-        updateTimeSinceLast(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        updateAverageTimeBetween(db)
+        updateTimeSinceLast(db)
     }
 
-    private fun updateAverageTimeBetween(database: SupportSQLiteDatabase) {
-        createAverageTimeBetweenTable(database)
-        insertAverageTimeBetweenData(database)
-        database.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table3`")
+    private fun updateAverageTimeBetween(db: SupportSQLiteDatabase) {
+        createAverageTimeBetweenTable(db)
+        insertAverageTimeBetweenData(db)
+        db.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table3`")
     }
 
-    private fun insertAverageTimeBetweenData(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun insertAverageTimeBetweenData(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 INSERT INTO average_time_between_stat_table4 
                     SELECT id, graph_stat_id, feature_id, from_value, to_value, duration, labels, end_date, 0, 0
@@ -43,7 +43,7 @@ val MIGRATION_45_46 = object : Migration(45, 46) {
             """.trimIndent()
         )
         val updates = mutableListOf<NTuple3<Int, Int, Long>>()
-        val graphsCursor = database.query("SELECT * FROM average_time_between_stat_table4")
+        val graphsCursor = db.query("SELECT * FROM average_time_between_stat_table4")
         while (graphsCursor.moveToNext()) {
             try {
                 val id = graphsCursor.getLong(0)
@@ -60,12 +60,12 @@ val MIGRATION_45_46 = object : Migration(45, 46) {
                 UPDATE average_time_between_stat_table4 SET filter_by_range=?, filter_by_labels=? WHERE id=?
             """.trimIndent()
         if (updates.size > 0) updates.forEach { args ->
-            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+            db.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
         }
     }
 
-    private fun createAverageTimeBetweenTable(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun createAverageTimeBetweenTable(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `average_time_between_stat_table4` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -83,19 +83,19 @@ val MIGRATION_45_46 = object : Migration(45, 46) {
                 )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_id` ON `average_time_between_stat_table4` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_graph_stat_id` ON `average_time_between_stat_table4` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_feature_id` ON `average_time_between_stat_table4` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_id` ON `average_time_between_stat_table4` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_graph_stat_id` ON `average_time_between_stat_table4` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_feature_id` ON `average_time_between_stat_table4` (`feature_id`)")
     }
 
-    private fun updateTimeSinceLast(database: SupportSQLiteDatabase) {
-        createTimeSinceLastTable(database)
-        insertTimeSinceLastData(database)
-        database.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table3`")
+    private fun updateTimeSinceLast(db: SupportSQLiteDatabase) {
+        createTimeSinceLastTable(db)
+        insertTimeSinceLastData(db)
+        db.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table3`")
     }
 
-    private fun insertTimeSinceLastData(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun insertTimeSinceLastData(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 INSERT INTO time_since_last_stat_table4 
                 SELECT id, graph_stat_id, feature_id, from_value, to_value, labels, 0, 0
@@ -103,7 +103,7 @@ val MIGRATION_45_46 = object : Migration(45, 46) {
             """.trimIndent()
         )
         val updates = mutableListOf<NTuple3<Int, Int, Long>>()
-        val graphsCursor = database.query("SELECT * FROM time_since_last_stat_table4")
+        val graphsCursor = db.query("SELECT * FROM time_since_last_stat_table4")
         while (graphsCursor.moveToNext()) {
             try {
                 val id = graphsCursor.getLong(0)
@@ -120,12 +120,12 @@ val MIGRATION_45_46 = object : Migration(45, 46) {
                 UPDATE time_since_last_stat_table4 SET filter_by_range=?, filter_by_labels=? WHERE id=?
             """.trimIndent()
         if (updates.size > 0) updates.forEach { args ->
-            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+            db.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
         }
     }
 
-    private fun createTimeSinceLastTable(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun createTimeSinceLastTable(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `time_since_last_stat_table4` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -141,8 +141,8 @@ val MIGRATION_45_46 = object : Migration(45, 46) {
                 )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_id` ON `time_since_last_stat_table4` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_graph_stat_id` ON `time_since_last_stat_table4` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_feature_id` ON `time_since_last_stat_table4` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_id` ON `time_since_last_stat_table4` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_graph_stat_id` ON `time_since_last_stat_table4` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_feature_id` ON `time_since_last_stat_table4` (`feature_id`)")
     }
 }

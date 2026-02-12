@@ -22,17 +22,17 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 val MIGRATION_53_54 = object : Migration(53, 54) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        migrateDataPointsTable(database)
-        migrateGlobalNotesTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateDataPointsTable(db)
+        migrateGlobalNotesTable(db)
     }
 
-    private fun migrateDataPointsTable(database: SupportSQLiteDatabase) {
+    private fun migrateDataPointsTable(db: SupportSQLiteDatabase) {
         //rename data_points_table to data_points_table_old
-        database.execSQL("ALTER TABLE data_points_table RENAME TO data_points_table_old")
+        db.execSQL("ALTER TABLE data_points_table RENAME TO data_points_table_old")
 
         //create new data_points_table
-        database.execSQL(
+        db.execSQL(
             """
            CREATE TABLE IF NOT EXISTS `data_points_table` (
                `epoch_milli` INTEGER NOT NULL,
@@ -48,7 +48,7 @@ val MIGRATION_53_54 = object : Migration(53, 54) {
         )
 
         //Copy data across
-        val cursor = database.query("SELECT * FROM data_points_table_old")
+        val cursor = db.query("SELECT * FROM data_points_table_old")
         cursor.moveToFirst()
         val count = cursor.count
 
@@ -63,7 +63,7 @@ val MIGRATION_53_54 = object : Migration(53, 54) {
             val epochMilli = odt.toInstant().toEpochMilli()
             val utcOffsetSec = odt.offset.totalSeconds
 
-            database.execSQL(
+            db.execSQL(
                 """
                     INSERT INTO data_points_table (epoch_milli, feature_id, utc_offset_sec, value, label, note)
                     VALUES (?, ?, ?, ?, ?, ?)
@@ -75,28 +75,28 @@ val MIGRATION_53_54 = object : Migration(53, 54) {
         }
 
         //drop the old table
-        database.execSQL("DROP TABLE data_points_table_old")
+        db.execSQL("DROP TABLE data_points_table_old")
 
         //re-create indexes
-        database.execSQL(
+        db.execSQL(
             """
            CREATE INDEX IF NOT EXISTS `index_data_points_table_epoch_milli` ON `data_points_table` (`epoch_milli`)
         """.trimIndent()
         )
 
-        database.execSQL(
+        db.execSQL(
             """
            CREATE INDEX IF NOT EXISTS `index_data_points_table_feature_id` ON `data_points_table` (`feature_id`)
         """.trimIndent()
         )
     }
 
-    private fun migrateGlobalNotesTable(database: SupportSQLiteDatabase) {
+    private fun migrateGlobalNotesTable(db: SupportSQLiteDatabase) {
         //rename notes_table to notes_table_old
-        database.execSQL("ALTER TABLE notes_table RENAME TO notes_table_old")
+        db.execSQL("ALTER TABLE notes_table RENAME TO notes_table_old")
 
         //create new notes_table
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `notes_table` (
                 `epoch_milli` INTEGER NOT NULL,
@@ -108,7 +108,7 @@ val MIGRATION_53_54 = object : Migration(53, 54) {
         )
 
         //copy data across
-        val cursor = database.query("SELECT * FROM notes_table_old")
+        val cursor = db.query("SELECT * FROM notes_table_old")
         cursor.moveToFirst()
         val count = cursor.count
 
@@ -120,7 +120,7 @@ val MIGRATION_53_54 = object : Migration(53, 54) {
             val epochMilli = odt.toInstant().toEpochMilli()
             val utcOffsetSec = odt.offset.totalSeconds
 
-            database.execSQL(
+            db.execSQL(
                 """
                     INSERT INTO notes_table (epoch_milli, utc_offset_sec, note)
                     VALUES (?, ?, ?)
@@ -132,10 +132,10 @@ val MIGRATION_53_54 = object : Migration(53, 54) {
         }
 
         //drop old table
-        database.execSQL("DROP TABLE notes_table_old")
+        db.execSQL("DROP TABLE notes_table_old")
 
         //create index
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_notes_table_epoch_milli` ON `notes_table` (`epoch_milli`)
         """.trimIndent()

@@ -23,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_37_38 = object : Migration(37, 38) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE graphs_and_stats_table ADD end_date TEXT")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE graphs_and_stats_table ADD end_date TEXT")
     }
 }

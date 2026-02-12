@@ -26,13 +26,13 @@ import com.samco.trackandgraph.data.database.dto.CheckedDays
 val MIGRATION_42_43 = object : Migration(42, 43) {
     private val helper = MigrationJsonHelper.getMigrationJsonHelper()
 
-    override fun migrate(database: SupportSQLiteDatabase) {
-        updateDiscreteValues(database)
-        updateCheckedDays(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        updateDiscreteValues(db)
+        updateCheckedDays(db)
     }
 
-    private fun updateCheckedDays(database: SupportSQLiteDatabase) {
-        val remindersCursor = database.query("SELECT * FROM reminders_table")
+    private fun updateCheckedDays(db: SupportSQLiteDatabase) {
+        val remindersCursor = db.query("SELECT * FROM reminders_table")
         val updates = mutableListOf<List<String>>()
         while (remindersCursor.moveToNext()) {
             val id = remindersCursor.getString(0)
@@ -51,12 +51,12 @@ val MIGRATION_42_43 = object : Migration(42, 43) {
                     SET checked_days = ?
                     WHERE id = ?
             """.trimIndent()
-            database.execSQL(featureUpdateStatement, it.toTypedArray())
+            db.execSQL(featureUpdateStatement, it.toTypedArray())
         }
     }
 
-    private fun updateDiscreteValues(database: SupportSQLiteDatabase) {
-        val featureCursor = database.query("SELECT * FROM features_table WHERE type = 0")
+    private fun updateDiscreteValues(db: SupportSQLiteDatabase) {
+        val featureCursor = db.query("SELECT * FROM features_table WHERE type = 0")
         val updates = mutableListOf<List<String>>()
         val deletes = mutableListOf<String>()
         while (featureCursor.moveToNext()) {
@@ -74,7 +74,7 @@ val MIGRATION_42_43 = object : Migration(42, 43) {
             updates.add(listOf(jsonString, id))
         }
         if (deletes.size > 0) deletes.forEach {
-            database.execSQL("""DELETE FROM features_table WHERE id = ?""", arrayOf(it))
+            db.execSQL("""DELETE FROM features_table WHERE id = ?""", arrayOf(it))
         }
         if (updates.size > 0) updates.forEach {
             val featureUpdateStatement =
@@ -82,7 +82,7 @@ val MIGRATION_42_43 = object : Migration(42, 43) {
                     SET discrete_values = ?
                     WHERE id = ?
             """.trimIndent()
-            database.execSQL(featureUpdateStatement, it.toTypedArray())
+            db.execSQL(featureUpdateStatement, it.toTypedArray())
         }
     }
 }

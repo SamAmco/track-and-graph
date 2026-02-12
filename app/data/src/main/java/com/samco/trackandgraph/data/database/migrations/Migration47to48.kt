@@ -21,43 +21,43 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_47_48 = object : Migration(47, 48) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        createNewFeaturesTable(database)
-        createNewTrackersTable(database)
-        createNewDataPointsTable(database)
-        copyOldFeaturesToNewFeaturesTable(database)
-        copyOldFeaturesToNewTrackersTable(database)
-        copyOldDataPointsToNewDataPointsTable(database)
-        removeOldFeaturesTable(database)
-        removeOldDataPointsTable(database)
-        createNewFeaturesIndex(database)
-        createNewDataPointsIndex(database)
-        createFunctionsTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        createNewFeaturesTable(db)
+        createNewTrackersTable(db)
+        createNewDataPointsTable(db)
+        copyOldFeaturesToNewFeaturesTable(db)
+        copyOldFeaturesToNewTrackersTable(db)
+        copyOldDataPointsToNewDataPointsTable(db)
+        removeOldFeaturesTable(db)
+        removeOldDataPointsTable(db)
+        createNewFeaturesIndex(db)
+        createNewDataPointsIndex(db)
+        createFunctionsTable(db)
     }
 
-    private fun createNewDataPointsIndex(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_data_points_table_feature_id` ON `data_points_table` (`feature_id`)")
+    private fun createNewDataPointsIndex(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_data_points_table_feature_id` ON `data_points_table` (`feature_id`)")
     }
 
-    private fun createNewFeaturesIndex(database: SupportSQLiteDatabase) {
+    private fun createNewFeaturesIndex(db: SupportSQLiteDatabase) {
         val tableName = "features_table"
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_features_table_id` ON `${tableName}` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_features_table_group_id` ON `${tableName}` (`group_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_features_table_id` ON `${tableName}` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_features_table_group_id` ON `${tableName}` (`group_id`)")
     }
 
-    private fun removeOldDataPointsTable(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS `data_points_table_old`")
+    private fun removeOldDataPointsTable(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS `data_points_table_old`")
     }
 
-    private fun copyOldDataPointsToNewDataPointsTable(database: SupportSQLiteDatabase) {
-        database.execSQL("INSERT INTO data_points_table SELECT * FROM data_points_table_old")
+    private fun copyOldDataPointsToNewDataPointsTable(db: SupportSQLiteDatabase) {
+        db.execSQL("INSERT INTO data_points_table SELECT * FROM data_points_table_old")
     }
 
-    private fun createNewDataPointsTable(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE data_points_table RENAME TO data_points_table_old")
+    private fun createNewDataPointsTable(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE data_points_table RENAME TO data_points_table_old")
 
         val tableName = "data_points_table"
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `timestamp` TEXT NOT NULL,
@@ -71,9 +71,9 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
         )
     }
 
-    private fun createFunctionsTable(database: SupportSQLiteDatabase) {
+    private fun createFunctionsTable(db: SupportSQLiteDatabase) {
         val tableName = "functions_table"
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -83,16 +83,16 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
                     FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_functions_table_id` ON `${tableName}` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_functions_table_feature_id` ON `${tableName}` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_functions_table_id` ON `${tableName}` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_functions_table_feature_id` ON `${tableName}` (`feature_id`)")
     }
 
-    private fun removeOldFeaturesTable(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS `features_table_old`")
+    private fun removeOldFeaturesTable(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS `features_table_old`")
     }
 
-    private fun copyOldFeaturesToNewTrackersTable(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun copyOldFeaturesToNewTrackersTable(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 INSERT INTO trackers_table(feature_id, type, discrete_values, has_default_value, default_value)
                 SELECT id as feature_id, type, discrete_values, has_default_value, default_value
@@ -101,8 +101,8 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
         )
     }
 
-    private fun copyOldFeaturesToNewFeaturesTable(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun copyOldFeaturesToNewFeaturesTable(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 INSERT INTO features_table
                 SELECT id, name, group_id, display_index, feature_description
@@ -111,9 +111,9 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
         )
     }
 
-    private fun createNewTrackersTable(database: SupportSQLiteDatabase) {
+    private fun createNewTrackersTable(db: SupportSQLiteDatabase) {
         val tableName = "trackers_table"
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -126,14 +126,14 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
             """.trimMargin()
         )
 
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_id` ON `${tableName}` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_feature_id` ON `${tableName}` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_id` ON `${tableName}` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_feature_id` ON `${tableName}` (`feature_id`)")
     }
 
-    private fun createNewFeaturesTable(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE features_table RENAME TO features_table_old")
+    private fun createNewFeaturesTable(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE features_table RENAME TO features_table_old")
         val tableName = "features_table"
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

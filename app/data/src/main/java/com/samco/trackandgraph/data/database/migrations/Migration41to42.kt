@@ -23,8 +23,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_41_42 = object : Migration(41, 42) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `time_histograms_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -39,8 +39,8 @@ val MIGRATION_41_42 = object : Migration(41, 42) {
             )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_id` ON `time_histograms_table` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_graph_stat_id` ON `time_histograms_table` (`graph_stat_id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_feature_id` ON `time_histograms_table` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_id` ON `time_histograms_table` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_graph_stat_id` ON `time_histograms_table` (`graph_stat_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_feature_id` ON `time_histograms_table` (`feature_id`)")
     }
 }

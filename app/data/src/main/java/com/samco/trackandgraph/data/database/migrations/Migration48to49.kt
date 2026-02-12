@@ -23,23 +23,23 @@ import kotlin.math.abs
 import kotlin.math.floor
 
 val MIGRATION_48_49 = object : Migration(48, 49) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        createFeatureTimerIndex(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        createFeatureTimerIndex(db)
 
-        createNewTrackersTable(database)
-        copyTrackersToNewTable(database)
-        deleteOldTrackersTableAndCreateIndexes(database)
+        createNewTrackersTable(db)
+        copyTrackersToNewTable(db)
+        deleteOldTrackersTableAndCreateIndexes(db)
     }
 
-    private fun deleteOldTrackersTableAndCreateIndexes(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS `trackers_table_old`")
+    private fun deleteOldTrackersTableAndCreateIndexes(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS `trackers_table_old`")
         val tableName = "trackers_table"
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_id` ON `${tableName}` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_feature_id` ON `${tableName}` (`feature_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_id` ON `${tableName}` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_trackers_table_feature_id` ON `${tableName}` (`feature_id`)")
     }
 
-    private fun copyTrackersToNewTable(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    private fun copyTrackersToNewTable(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 INSERT INTO trackers_table
                 SELECT 
@@ -54,7 +54,7 @@ val MIGRATION_48_49 = object : Migration(48, 49) {
                 FROM trackers_table_old
             """.trimIndent()
         )
-        val cursor = database.query("SELECT * FROM trackers_table_old WHERE has_default_value = 1")
+        val cursor = db.query("SELECT * FROM trackers_table_old WHERE has_default_value = 1")
         val helper = MigrationJsonHelper.getMigrationJsonHelper()
         val updates = mutableListOf<Pair<Long, String>>()
         while (cursor.moveToNext()) {
@@ -67,17 +67,17 @@ val MIGRATION_48_49 = object : Migration(48, 49) {
             }
         }
         for (update in updates) {
-            database.execSQL(
+            db.execSQL(
                 "UPDATE trackers_table SET default_label=? WHERE id=?",
-                arrayOf(update.second, update.first)
+                arrayOf<Any>(update.second, update.first)
             )
         }
     }
 
-    private fun createNewTrackersTable(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE trackers_table RENAME TO trackers_table_old")
+    private fun createNewTrackersTable(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE trackers_table RENAME TO trackers_table_old")
         val tableName = "trackers_table"
-        database.execSQL(
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -95,7 +95,7 @@ val MIGRATION_48_49 = object : Migration(48, 49) {
 
     }
 
-    private fun createFeatureTimerIndex(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_feature_id` ON `feature_timers_table` (`feature_id`)")
+    private fun createFeatureTimerIndex(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_feature_id` ON `feature_timers_table` (`feature_id`)")
     }
 }

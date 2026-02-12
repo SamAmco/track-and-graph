@@ -23,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_35_36 = object : Migration(35, 36) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE features_table ADD feature_description TEXT NOT NULL DEFAULT ''")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE features_table ADD feature_description TEXT NOT NULL DEFAULT ''")
     }
 }

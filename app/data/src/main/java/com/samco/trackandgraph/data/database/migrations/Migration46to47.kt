@@ -23,8 +23,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_46_47 = object : Migration(46, 47) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `feature_timers_table` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -33,7 +33,7 @@ val MIGRATION_46_47 = object : Migration(46, 47) {
                     FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_id` ON `feature_timers_table` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_start_instant` ON `feature_timers_table` (`start_instant`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_id` ON `feature_timers_table` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_start_instant` ON `feature_timers_table` (`start_instant`)")
     }
 }

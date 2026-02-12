@@ -23,8 +23,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_39_40 = object : Migration(39, 40) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `line_graphs_table2` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -38,9 +38,9 @@ val MIGRATION_39_40 = object : Migration(39, 40) {
             )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table2_id` ON `line_graphs_table2` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table2_graph_stat_id` ON `line_graphs_table2` (`graph_stat_id`)")
-        database.execSQL(
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table2_id` ON `line_graphs_table2` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table2_graph_stat_id` ON `line_graphs_table2` (`graph_stat_id`)")
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `line_graph_features_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -59,11 +59,11 @@ val MIGRATION_39_40 = object : Migration(39, 40) {
             )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table_id` ON `line_graph_features_table` (`id`)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table_line_graph_id` ON `line_graph_features_table` (`line_graph_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table_id` ON `line_graph_features_table` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table_line_graph_id` ON `line_graph_features_table` (`line_graph_id`)")
 
-        database.execSQL("INSERT INTO line_graphs_table2 SELECT id, graph_stat_id, duration, y_range_type, y_from, y_to FROM line_graphs_table")
-        val lineGraphsCursor = database.query("SELECT * FROM line_graphs_table")
+        db.execSQL("INSERT INTO line_graphs_table2 SELECT id, graph_stat_id, duration, y_range_type, y_from, y_to FROM line_graphs_table")
+        val lineGraphsCursor = db.query("SELECT * FROM line_graphs_table")
         val inserts = mutableListOf<Pair<String, List<String>>>()
         var index = 0L
         val lineGraphFeatureInsertStatement =
@@ -88,11 +88,11 @@ val MIGRATION_39_40 = object : Migration(39, 40) {
             }
         }
         if (inserts.size > 0) inserts.forEach {
-            database.execSQL(
+            db.execSQL(
                 it.first,
                 it.second.toTypedArray()
             )
         }
-        database.execSQL("DROP TABLE IF EXISTS `line_graphs_table`")
+        db.execSQL("DROP TABLE IF EXISTS `line_graphs_table`")
     }
 }

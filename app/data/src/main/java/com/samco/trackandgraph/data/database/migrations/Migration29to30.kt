@@ -21,8 +21,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_29_30 = object : Migration(29, 30) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `reminders_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -33,6 +33,6 @@ val MIGRATION_29_30 = object : Migration(29, 30) {
             )
             """.trimMargin()
         )
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `reminders_table` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `reminders_table` (`id`)")
     }
 }

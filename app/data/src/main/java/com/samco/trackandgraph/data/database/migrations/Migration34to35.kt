@@ -23,11 +23,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 
 val MIGRATION_34_35 = object : Migration(34, 35) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE average_time_between_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
-        database.execSQL("ALTER TABLE time_since_last_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE average_time_between_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE time_since_last_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
         val updates = mutableListOf<Pair<String, List<String>>>()
-        val avTimeCursor = database.query("SELECT * FROM average_time_between_stat_table")
+        val avTimeCursor = db.query("SELECT * FROM average_time_between_stat_table")
         while (avTimeCursor.moveToNext()) {
             val id = avTimeCursor.getLong(0)
             val from = avTimeCursor.getString(3)
@@ -37,7 +37,7 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             val args = listOf(discreteValues, id.toString())
             updates.add(Pair(query, args))
         }
-        val timeSinceCursor = database.query("SELECT * FROM time_since_last_stat_table")
+        val timeSinceCursor = db.query("SELECT * FROM time_since_last_stat_table")
         while (timeSinceCursor.moveToNext()) {
             val id = timeSinceCursor.getLong(0)
             val from = timeSinceCursor.getString(3)
@@ -48,7 +48,7 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             updates.add(Pair(query, args))
         }
         if (updates.size > 0) updates.forEach {
-            database.execSQL(
+            db.execSQL(
                 it.first,
                 it.second.toTypedArray()
             )
