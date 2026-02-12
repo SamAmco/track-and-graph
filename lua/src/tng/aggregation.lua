@@ -243,7 +243,7 @@ M.variance_aggregator = function()
   local agg = new_aggregator(function(self)
     if #self.window == 0 then error("Cannot compute variance of empty window") end
     local mean = sum_x / count
-    local variance = (sum_x2 / count) - (mean * mean)
+    local variance = math.max(0, (sum_x2 / count) - (mean * mean))
     return self:mid_point(variance)
   end)
 

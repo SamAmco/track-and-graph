@@ -74,5 +74,23 @@ test("stdev_aggregator throws error on empty window", function()
 	assert(err and string.find(tostring(err), "empty window") ~= nil)
 end)
 
+-- Test stdev aggregator safe with floating point precision errors
+test("stdev_aggregator safe with floating point precision errors", function()
+	local stdev_agg = aggregation.stdev_aggregator()
+
+	-- Values: 1, 3, 5 (mean = 3, variance = 8/3, stdev = sqrt(8/3))
+	stdev_agg:push(create_data_point(1000, 1.1111111))
+	stdev_agg:push(create_data_point(2000, 1.1111111))
+	stdev_agg:push(create_data_point(4000, 1.1111111))
+	stdev_agg:push(create_data_point(5000, 1.1111111))
+	stdev_agg:push(create_data_point(6000, 1.1111111))
+	stdev_agg:push(create_data_point(7000, 1.1111111))
+
+	local result = stdev_agg:run()
+	local expected_stdev = 0
+	assert(math.abs(result.value - expected_stdev) < 0.0001)
+end)
+
+
 -- Summary
 helpers.finish_tests()
