@@ -91,7 +91,6 @@ fun PeriodicReminderConfigurationScreen(
         isEditMode = editReminder != null,
         onConfirm = {
             onUpsertReminder(viewModel.getReminder())
-            onDismiss()
         },
         onDismiss = onDismiss
     )

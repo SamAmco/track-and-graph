@@ -88,7 +88,6 @@ fun WeekDayReminderConfigurationScreen(
         isEditMode = editReminder != null,
         onConfirm = {
             onUpsertReminder(viewModel.getReminder())
-            onDismiss()
         },
         onDismiss = onDismiss
     )
