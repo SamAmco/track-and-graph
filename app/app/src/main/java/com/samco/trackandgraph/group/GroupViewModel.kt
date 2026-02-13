@@ -275,28 +275,21 @@ class GroupViewModelImpl @Inject constructor(
 
             //Get the graph data for any graphs that need updating
             return@flatMapLatestScan when (type) {
-                UpdateType.All, UpdateType.AllGraphs -> getGraphViewData(graphStats)
-                UpdateType.DisplayIndices, UpdateType.GraphDeleted -> {
-                    mapNewGraphsToOldViewData(viewData, graphStats)
-                }
+                UpdateType.All, UpdateType.AllGraphs ->
+                    getGraphViewData(graphStats)
 
-                is UpdateType.Graph -> withUpdatedGraph(viewData, graphStats, type.graphId)
+                UpdateType.DisplayIndices, UpdateType.GraphDeleted ->
+                    mapNewGraphsToOldViewData(viewData, graphStats)
+
+                is UpdateType.Graph ->
+                    mapNewGraphsToOldViewData(viewData, graphStats, setOf(type.graphId))
+
                 //Shouldn't ever happen
                 else -> flowOf(viewData)
             }
         }
         .map { graphsToGroupChildren(it) }
         .flowOn(io)
-
-    private fun withUpdatedGraph(
-        viewData: List<GraphWithViewData>,
-        newGraphStats: List<GraphOrStat>,
-        updateGraphId: Long
-    ): Flow<List<GraphWithViewData>> {
-        val dontUpdate = viewData.filter { it.graph.id != updateGraphId }
-        return getGraphViewData(newGraphStats.filter { it.id == updateGraphId })
-            .map { dontUpdate + it }
-    }
 
     private suspend fun getGraphObjects(groupId: Long): List<GraphOrStat> = dataInteractor
         .getGraphsAndStatsByGroupIdSync(groupId)
@@ -306,7 +299,8 @@ class GroupViewModelImpl @Inject constructor(
 
     private fun mapNewGraphsToOldViewData(
         viewData: List<GraphWithViewData>,
-        newGraphStats: List<GraphOrStat>
+        newGraphStats: List<GraphOrStat>,
+        forceUpdateIds: Set<Long> = emptySet(),
     ): Flow<List<GraphWithViewData>> {
         val oldGraphsById = viewData.associateBy { it.graph.id }
 
@@ -314,14 +308,14 @@ class GroupViewModelImpl @Inject constructor(
         // new GraphOrStat objects.
         val dontUpdate = newGraphStats
             .map { Pair(it, oldGraphsById[it.id]?.viewData) }
-            .filter { it.second?.viewData?.state == IGraphStatViewData.State.READY }
+            .filter { it.first.id !in forceUpdateIds && it.second?.isReady() == true }
             .mapNotNull { pair -> pair.second?.let { GraphWithViewData(pair.first, it) } }
 
         // But any graphs that had not finished loading we have lost the opportunity to
         // get their view data
         val update = newGraphStats
             .map { Pair(it, oldGraphsById[it.id]?.viewData) }
-            .filter { it.second?.viewData?.state != IGraphStatViewData.State.READY }
+            .filter { forceUpdateIds.contains(it.first.id) || it.second?.isLoading() != false }
             .map { it.first }
 
         // So we ensure we get the view data for any graphs that have not finished loading
