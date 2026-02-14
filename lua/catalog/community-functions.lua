@@ -3668,6 +3668,95 @@ Configuration:
 ]=],
 			version="1.0.0",
 		},
+		["set-value-from-timestamp"]={
+			script=[=[
+-- Sets each data point's value to a chosen component of its timestamp
+
+local core = require("tng.core")
+local enum = require("tng.config").enum
+
+local extractors = {
+	["_year_value"] = function(date)
+		return date.year
+	end,
+	["_month_of_year"] = function(date)
+		return date.month
+	end,
+	["_day_of_month"] = function(date)
+		return date.day
+	end,
+	["_day_of_week"] = function(date)
+		return date.wday
+	end,
+	["_hour_of_day"] = function(date)
+		return date.hour or 0
+	end,
+	["_minute_of_hour"] = function(date)
+		return date.min or 0
+	end,
+	["_second_of_minute"] = function(date)
+		return date.sec or 0
+	end,
+	["_duration_since_midnight"] = function(date)
+		return (date.hour or 0) * 3600 + (date.min or 0) * 60 + (date.sec or 0)
+	end,
+}
+
+return {
+	id = "set-value-from-timestamp",
+	version = "1.0.0",
+	inputCount = 1,
+	categories = { "_time" },
+	title = {
+		["en"] = "Set Value from Timestamp",
+		["de"] = "Wert aus Zeitstempel setzen",
+		["es"] = "Establecer valor desde marca de tiempo",
+		["fr"] = "Définir la valeur depuis l'horodatage",
+	},
+	description = {
+		["en"] = "Sets each data point's value to a chosen component of its timestamp.",
+		["de"] = "Setzt den Wert jedes Datenpunkts auf eine gewählte Komponente seines Zeitstempels.",
+		["es"] = "Establece el valor de cada punto de datos en un componente elegido de su marca de tiempo.",
+		["fr"] = "Définit la valeur de chaque point de données sur un composant choisi de son horodatage.",
+	},
+	config = {
+		enum {
+			id = "component",
+			name = "_component",
+			options = {
+				"_year_value",
+				"_month_of_year",
+				"_day_of_month",
+				"_day_of_week",
+				"_hour_of_day",
+				"_minute_of_hour",
+				"_second_of_minute",
+				"_duration_since_midnight",
+			},
+			default = "_day_of_month",
+		},
+	},
+
+	generator = function(source, config)
+		local component = config and config.component or "_day_of_month"
+		local extract = extractors[component]
+
+		return function()
+			local data_point = source.dp()
+			if not data_point then
+				return nil
+			end
+
+			local date = core.date(data_point)
+			data_point.value = extract(date)
+
+			return data_point
+		end
+	end,
+}
+]=],
+			version="1.0.0",
+		},
 		["snap-time-to"]={
 			script=[=[
 -- Lua Function to snap data point timestamps to a specific time of day
@@ -4038,7 +4127,7 @@ local checkbox = require("tng.config").checkbox
 return {
 	-- Configuration metadata
 	id = "time-between",
-	version = "1.0.0",
+	version = "1.0.1",
 	inputCount = 1,
 	categories = {"_time"},
 	title = {
@@ -4052,43 +4141,43 @@ return {
 Calculates the duration in seconds between each data point and the previous one. The output value is the time difference in seconds and can be treated as a duration.
 
 Configuration:
-- **Include Time to First**: Include the time between now and the first data point (default: false)
+- **Include Time to Last**: Include the time between now and the last data point (default: false)
 ]],
 		["de"] = [[
 Berechnet die Dauer in Sekunden zwischen jedem Datenpunkt und dem vorherigen. Der Ausgabewert ist die Zeitdifferenz in Sekunden und kann als Dauer behandelt werden.
 
 Konfiguration:
-- **Zeit zum Ersten einschließen**: Die Zeit zwischen jetzt und dem ersten Datenpunkt einschließen (Standard: false)
+- **Zeit zum Letzten einschließen**: Die Zeit zwischen jetzt und dem letzten Datenpunkt einschließen (Standard: false)
 ]],
 		["es"] = [[
 Calcula la duración en segundos entre cada punto de datos y el anterior. El valor de salida es la diferencia de tiempo en segundos y puede tratarse como una duración.
 
 Configuración:
-- **Incluir tiempo al primero**: Incluir el tiempo entre ahora y el primer punto de datos (predeterminado: false)
+- **Incluir tiempo al último**: Incluir el tiempo entre ahora y el último punto de datos (predeterminado: false)
 ]],
 		["fr"] = [[
 Calcule la durée en secondes entre chaque point de données et le précédent. La valeur de sortie est la différence de temps en secondes et peut être traitée comme une durée.
 
 Configuration:
-- **Inclure le temps jusqu'au premier**: Inclure le temps entre maintenant et le premier point de données (par défaut: false)
+- **Inclure le temps jusqu'au dernier**: Inclure le temps entre maintenant et le dernier point de données (par défaut: false)
 ]],
 	},
 	config = {
 		checkbox {
-			id = "include_first",
+			id = "include_last",
 			default = false,
 			name = {
-				["en"] = "Include Time to First",
-				["de"] = "Zeit zum Ersten einschließen",
-				["es"] = "Incluir tiempo al primero",
-				["fr"] = "Inclure le temps jusqu'au premier",
+				["en"] = "Include Time to Last",
+				["de"] = "Zeit zum Letzten einschließen",
+				["es"] = "Incluir tiempo al último",
+				["fr"] = "Inclure le temps jusqu'au dernier",
 			},
 		},
 	},
 
 	-- Generator function
 	generator = function(source, config)
-		local include_first = config and config.include_first or false
+		local include_last = config and config.include_last or false
 		local previous_point = nil
 
 		return function()
@@ -4101,8 +4190,8 @@ Configuration:
 
 				previous_point = first_point
 
-				if include_first then
-					-- Return synthetic point with time from now to first
+				if include_last then
+					-- Return synthetic point with time from now to last (oldest)
 					local now = core.time().timestamp
 					local duration_seconds = (now - first_point.timestamp) / 1000.0
 
@@ -4142,7 +4231,7 @@ Configuration:
 	end,
 }
 ]=],
-			version="1.0.0",
+			version="1.0.1",
 		},
 		["value-difference"]={
 			script=[=[
@@ -4217,441 +4306,8 @@ Calcule la différence entre la valeur de chaque point de données et la suivant
 ]=],
 			version="1.0.0",
 		},
-		["value-to-day-of-month"]={
-			script=[=[
--- Lua Function to set value to day of month
--- Sets each data point's value to its day of the month (1-31)
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-day-of-month",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Day of Month",
-		["de"] = "Wert zu Tag des Monats",
-		["es"] = "Valor a día del mes",
-		["fr"] = "Valeur au jour du mois",
 	},
-	description = {
-		["en"] = [[
-Sets each data point's value to its day of the month (1-31).
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf seinen Tag des Monats (1-31).
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en su día del mes (1-31).
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur son jour du mois (1-31).
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			local date = core.date(data_point)
-			data_point.value = date.day
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-		["value-to-day-of-week"]={
-			script=[=[
--- Lua Function to set value to day of week
--- Sets each data point's value to its day of the week (1-7, Monday is 1)
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-day-of-week",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Day of Week",
-		["de"] = "Wert zu Wochentag",
-		["es"] = "Valor a día de la semana",
-		["fr"] = "Valeur au jour de la semaine",
-	},
-	description = {
-		["en"] = [[
-Sets each data point's value to its day of the week (1-7, where Monday is 1 and Sunday is 7).
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf seinen Wochentag (1-7, wobei Montag 1 und Sonntag 7 ist).
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en su día de la semana (1-7, donde lunes es 1 y domingo es 7).
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur son jour de la semaine (1-7, où lundi est 1 et dimanche est 7).
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			-- Get the date from the timestamp
-			local date = core.date(data_point)
-
-			-- Set value to day of week
-			data_point.value = date.wday
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-		["value-to-hour-of-day"]={
-			script=[=[
--- Lua Function to set value to hour of day
--- Sets each data point's value to its hour of the day (0-23)
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-hour-of-day",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Hour (0-23)",
-		["de"] = "Wert zu Stunde (0-23)",
-		["es"] = "Valor a hora (0-23)",
-		["fr"] = "Valeur à l'heure (0-23)",
-	},
-	description = {
-		["en"] = [[
-Sets each data point's value to its hour of the day (0-23).
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf seine Stunde des Tages (0-23).
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en su hora del día (0-23).
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur son heure du jour (0-23).
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			local date = core.date(data_point)
-			data_point.value = date.hour or 0
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-		["value-to-minute-of-hour"]={
-			script=[=[
--- Lua Function to set value to minute of hour
--- Sets each data point's value to its minute of the hour (0-59)
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-minute-of-hour",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Minute of Hour",
-		["de"] = "Wert zu Minute der Stunde",
-		["es"] = "Valor a minuto de la hora",
-		["fr"] = "Valeur à la minute de l'heure",
-	},
-	description = {
-		["en"] = [[
-Sets each data point's value to its minute of the hour (0-59).
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf seine Minute der Stunde (0-59).
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en su minuto de la hora (0-59).
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur sa minute de l'heure (0-59).
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			local date = core.date(data_point)
-			data_point.value = date.min or 0
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-		["value-to-month-of-year"]={
-			script=[=[
--- Lua Function to set value to month of year
--- Sets each data point's value to its month of the year (1-12)
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-month-of-year",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Month of Year",
-		["de"] = "Wert zu Monat des Jahres",
-		["es"] = "Valor a mes del año",
-		["fr"] = "Valeur au mois de l'année",
-	},
-	description = {
-		["en"] = [[
-Sets each data point's value to its month of the year (1-12, where January is 1).
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf seinen Monat des Jahres (1-12, wobei Januar 1 ist).
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en su mes del año (1-12, donde enero es 1).
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur son mois de l'année (1-12, où janvier est 1).
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			local date = core.date(data_point)
-			data_point.value = date.month
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-		["value-to-second-of-minute"]={
-			script=[=[
--- Lua Function to set value to second of minute
--- Sets each data point's value to its second of the minute (0-59)
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-second-of-minute",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Second of Minute",
-		["de"] = "Wert zu Sekunde der Minute",
-		["es"] = "Valor a segundo del minuto",
-		["fr"] = "Valeur à la seconde de la minute",
-	},
-	description = {
-		["en"] = [[
-Sets each data point's value to its second of the minute (0-59).
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf seine Sekunde der Minute (0-59).
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en su segundo del minuto (0-59).
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur sa seconde de la minute (0-59).
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			local date = core.date(data_point)
-			data_point.value = date.sec or 0
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-		["value-to-time-of-day"]={
-			script=[=[
--- Lua Function to set value to time of day
--- Sets each data point's value to the time of day in seconds since midnight
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-time-of-day",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Time of Day",
-		["de"] = "Wert zu Tageszeit",
-		["es"] = "Valor a hora del día",
-		["fr"] = "Valeur à l'heure de la journée",
-	},
-	description = {
-		["en"] = [[
-Sets each data point's value to the time of day in seconds since midnight. The output is a duration value representing elapsed time since the start of the day.
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf die Tageszeit in Sekunden seit Mitternacht. Die Ausgabe ist ein Dauerwert, der die verstrichene Zeit seit Tagesbeginn darstellt.
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en la hora del día en segundos desde la medianoche. La salida es un valor de duración que representa el tiempo transcurrido desde el comienzo del día.
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur l'heure de la journée en secondes depuis minuit. La sortie est une valeur de durée représentant le temps écoulé depuis le début de la journée.
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			-- Get the date from the data point
-			local date = core.date(data_point)
-
-			-- Calculate seconds since midnight
-			local seconds_since_midnight = (date.hour or 0) * 3600 + (date.min or 0) * 60 + (date.sec or 0)
-
-			-- Set value to time of day in seconds
-			data_point.value = seconds_since_midnight
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-		["value-to-year"]={
-			script=[=[
--- Lua Function to set value to year
--- Sets each data point's value to its year
-
-local core = require("tng.core")
-
-return {
-	-- Configuration metadata
-	id = "value-to-year",
-	version = "1.0.0",
-	inputCount = 1,
-	categories = {"_time"},
-	title = {
-		["en"] = "Value to Year",
-		["de"] = "Wert zu Jahr",
-		["es"] = "Valor a año",
-		["fr"] = "Valeur à l'année",
-	},
-	description = {
-		["en"] = [[
-Sets each data point's value to its year (e.g., 2025).
-]],
-		["de"] = [[
-Setzt den Wert jedes Datenpunkts auf sein Jahr (z.B. 2025).
-]],
-		["es"] = [[
-Establece el valor de cada punto de datos en su año (p. ej., 2025).
-]],
-		["fr"] = [[
-Définit la valeur de chaque point de données sur son année (par exemple, 2025).
-]],
-	},
-	config = {},
-
-	-- Generator function
-	generator = function(source)
-		return function()
-			local data_point = source.dp()
-			if not data_point then
-				return nil
-			end
-
-			local date = core.date(data_point)
-			data_point.value = date.year
-
-			return data_point
-		end
-	end,
-}
-]=],
-			version="1.0.0",
-		},
-	},
-	published_at="2026-02-14T14:49:44Z",
+	published_at="2026-02-15T13:43:11Z",
 	translations={
 		_addition={
 			de="Addition",
@@ -4701,6 +4357,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Comparar por",
 			fr="Comparer par",
 		},
+		_component={
+			de="Komponente",
+			en="Component",
+			es="Componente",
+			fr="Composant",
+		},
 		_count={
 			de="Anzahl",
 			en="Count",
@@ -4719,6 +4381,18 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Día",
 			fr="Jour",
 		},
+		_day_of_month={
+			de="Tag des Monats (1-31)",
+			en="Day of Month (1-31)",
+			es="Día del mes (1-31)",
+			fr="Jour du mois (1-31)",
+		},
+		_day_of_week={
+			de="Wochentag (1-7)",
+			en="Day of Week (1-7)",
+			es="Día de la semana (1-7)",
+			fr="Jour de la semaine (1-7)",
+		},
 		_days={
 			de="Tage",
 			en="Days",
@@ -4730,6 +4404,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			en="Division",
 			es="División",
 			fr="Division",
+		},
+		_duration_since_midnight={
+			de="Dauer seit Mitternacht",
+			en="Duration since Midnight",
+			es="Duración desde medianoche",
+			fr="Durée depuis minuit",
 		},
 		_filter={
 			de="Filter",
@@ -4748,6 +4428,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			en="Generators",
 			es="Generadores",
 			fr="Générateurs",
+		},
+		_hour_of_day={
+			de="Stunde (0-23)",
+			en="Hour (0-23)",
+			es="Hora (0-23)",
+			fr="Heure (0-23)",
 		},
 		_hours={
 			de="Stunden",
@@ -4803,6 +4489,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			es="Valor Mínimo",
 			fr="Valeur Minimale",
 		},
+		_minute_of_hour={
+			de="Minute (0-59)",
+			en="Minute (0-59)",
+			es="Minuto (0-59)",
+			fr="Minute (0-59)",
+		},
 		_minutes={
 			de="Minuten",
 			en="Minutes",
@@ -4820,6 +4512,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			en="Month",
 			es="Mes",
 			fr="Mois",
+		},
+		_month_of_year={
+			de="Monat des Jahres (1-12)",
+			en="Month of Year (1-12)",
+			es="Mes del año (1-12)",
+			fr="Mois de l'année (1-12)",
 		},
 		_months={
 			de="Monate",
@@ -4916,6 +4614,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			en="Saturday",
 			es="Sábado",
 			fr="Samedi",
+		},
+		_second_of_minute={
+			de="Sekunde (0-59)",
+			en="Second (0-59)",
+			es="Segundo (0-59)",
+			fr="Seconde (0-59)",
 		},
 		_seconds={
 			de="Sekunden",
@@ -5062,6 +4766,12 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			fr="Window Start",
 		},
 		_year={
+			de="Jahr",
+			en="Year",
+			es="Año",
+			fr="Année",
+		},
+		_year_value={
 			de="Jahr",
 			en="Year",
 			es="Año",
