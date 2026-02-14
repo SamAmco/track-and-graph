@@ -9,7 +9,7 @@ local now = core.time().timestamp
 
 M.test_time_between_basic = {
   config = {
-    include_first = false,
+    include_last = false,
   },
   sources = function()
     return {
@@ -34,7 +34,7 @@ M.test_time_between_basic = {
   end,
   assertions = function(result)
     test.assert("result was nil", result)
-    -- Should have 2 results (first is skipped without include_first)
+    -- Should have 2 results (first is skipped without include_last)
     test.assertEquals(2, #result)
 
     -- Point1 with duration to point2 = 1 day = 86400 seconds
@@ -51,7 +51,7 @@ M.test_time_between_basic = {
 
 M.test_time_between_include_first = {
   config = {
-    include_first = true,
+    include_last = true,
   },
   sources = function()
     return {
@@ -89,7 +89,7 @@ M.test_time_between_include_first = {
 
 M.test_time_between_single_point_no_include = {
   config = {
-    include_first = false,
+    include_last = false,
   },
   sources = function()
     return {
@@ -111,7 +111,7 @@ M.test_time_between_single_point_no_include = {
 
 M.test_time_between_single_point_with_include = {
   config = {
-    include_first = true,
+    include_last = true,
   },
   sources = function()
     return {
