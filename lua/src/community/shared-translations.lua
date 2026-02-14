@@ -465,6 +465,34 @@ local translations = {
 		["es"] = "Unidades de Umbral",
 		["fr"] = "Unités de Seuil",
 	},
+	{
+		_id = "_placement",
+		["en"] = "Placement",
+		["de"] = "Placement",
+		["es"] = "Placement",
+		["fr"] = "Placement",
+	},
+	{
+		_id = "_window_start",
+		["en"] = "Window Start",
+		["de"] = "Window Start",
+		["es"] = "Window Start",
+		["fr"] = "Window Start",
+	},
+	{
+		_id = "_window_midpoint",
+		["en"] = "Window Midpoint",
+		["de"] = "Window Midpoint",
+		["es"] = "Window Midpoint",
+		["fr"] = "Window Midpoint",
+	},
+	{
+		_id = "_window_end",
+		["en"] = "Window End",
+		["de"] = "Window End",
+		["es"] = "Window End",
+		["fr"] = "Window End",
+	},
 }
 
 -- Validation: ensure all entries have all 4 required languages

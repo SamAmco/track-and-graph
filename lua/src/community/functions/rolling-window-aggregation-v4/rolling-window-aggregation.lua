@@ -2,25 +2,32 @@ local core = require("tng.core")
 local enum = require("tng.config").enum
 local uint = require("tng.config").uint
 
+local PLACEMENT_MAP = {
+  _window_start = "start",
+  _window_midpoint = "mid",
+  _window_end = "end",
+}
+
 local get_aggregator = function(config)
   local aggregation = require("tng.aggregation")
   local type = config.aggregation_type or error("aggregation_type required")
+  local placement = PLACEMENT_MAP[config.placement] or "end"
   local aggregator
 
   if type == "_min" then
-    aggregator = aggregation.running_min_aggregator()
+    aggregator = aggregation.running_min_aggregator(placement)
   elseif type == "_max" then
-    aggregator = aggregation.running_max_aggregator()
+    aggregator = aggregation.running_max_aggregator(placement)
   elseif type == "_average" then
-    aggregator = aggregation.avg_aggregator()
+    aggregator = aggregation.avg_aggregator(placement)
   elseif type == "_sum" then
-    aggregator = aggregation.sum_aggregator()
+    aggregator = aggregation.sum_aggregator(placement)
   elseif type == "_variance" then
-    aggregator = aggregation.variance_aggregator()
+    aggregator = aggregation.variance_aggregator(placement)
   elseif type == "_standard_deviation" then
-    aggregator = aggregation.stdev_aggregator()
+    aggregator = aggregation.stdev_aggregator(placement)
   elseif type == "_count" then
-    aggregator = aggregation.count_aggregator()
+    aggregator = aggregation.count_aggregator(placement)
   else
     error("Unknown aggregation_type " .. tostring(type))
   end
@@ -53,9 +60,8 @@ local get_window = function(config)
 end
 
 return {
-  id = "rolling-window-aggregation",
-  version = "3.0.1",
-  deprecated = 4,
+  id = "rolling-window-aggregation-v4",
+  version = "4.0.0",
   inputCount = 1,
   title = {
     ["en"] = "Rolling Window",
@@ -84,6 +90,11 @@ For example, with a 7-day window and average aggregation, each output point repr
 - **Window Size**: The time unit for the lookback period (seconds, minutes, hours, days, weeks, months, or years)
 
 - **Multiplier**: How many window size units to look back (e.g., multiplier of 3 with window size "days" = 3-day window)
+
+- **Placement**: Where in the time window to place each output data point:
+  - Window End: At the most recent data point in the window (default)
+  - Window Midpoint: At the temporal center of the window
+  - Window Start: At the oldest data point in the window
     ]],
     ["de"] = [[
 Berechnet Aggregationsstatistiken über ein bewegliches Zeitfenster für jeden Datenpunkt. Die Funktion schaut von jedem Punkt aus rückwärts in der Zeit und aggregiert alle Werte innerhalb des angegebenen Fensterzeitraums.
@@ -104,6 +115,11 @@ Zum Beispiel repräsentiert bei einem 7-Tage-Fenster und Durchschnittsaggregatio
 - **Fenstergröße**: Die Zeiteinheit für den Rückblickzeitraum (Sekunden, Minuten, Stunden, Tage, Wochen, Monate oder Jahre)
 
 - **Multiplikator**: Wie viele Fenstergrößeneinheiten zurückgeschaut werden soll (z.B. Multiplikator von 3 mit Fenstergröße "Tage" = 3-Tage-Fenster)
+
+- **Platzierung**: Wo im Zeitfenster jeder Ausgabedatenpunkt platziert wird:
+  - Fensterende: Am neuesten Datenpunkt im Fenster (Standard)
+  - Fenstermitte: In der zeitlichen Mitte des Fensters
+  - Fensteranfang: Am ältesten Datenpunkt im Fenster
     ]],
     ["es"] = [[
 Calcula estadísticas agregadas sobre una ventana de tiempo móvil para cada punto de datos. La función mira hacia atrás en el tiempo desde cada punto y agrega todos los valores dentro del período de ventana especificado.
@@ -124,6 +140,11 @@ Por ejemplo, con una ventana de 7 días y agregación promedio, cada punto de sa
 - **Tamaño de Ventana**: La unidad de tiempo para el período de retrospección (segundos, minutos, horas, días, semanas, meses o años)
 
 - **Multiplicador**: Cuántas unidades de tamaño de ventana mirar hacia atrás (p.ej., multiplicador de 3 con tamaño de ventana "días" = ventana de 3 días)
+
+- **Colocación**: Dónde en la ventana de tiempo colocar cada punto de datos de salida:
+  - Fin de Ventana: En el punto de datos más reciente en la ventana (predeterminado)
+  - Punto Medio de Ventana: En el centro temporal de la ventana
+  - Inicio de Ventana: En el punto de datos más antiguo en la ventana
     ]],
     ["fr"] = [[
 Calcule des statistiques agrégées sur une fenêtre de temps mobile pour chaque point de données. La fonction regarde en arrière dans le temps à partir de chaque point et agrège toutes les valeurs dans la période de fenêtre spécifiée.
@@ -144,6 +165,11 @@ Par exemple, avec une fenêtre de 7 jours et une agrégation moyenne, chaque poi
 - **Taille de Fenêtre**: L'unité de temps pour la période de rétrospection (secondes, minutes, heures, jours, semaines, mois ou années)
 
 - **Multiplicateur**: Combien d'unités de taille de fenêtre regarder en arrière (par ex., multiplicateur de 3 avec taille de fenêtre "jours" = fenêtre de 3 jours)
+
+- **Placement**: Où dans la fenêtre de temps placer chaque point de données de sortie:
+  - Fin de Fenêtre: Au point de données le plus récent dans la fenêtre (par défaut)
+  - Point Médian de Fenêtre: Au centre temporel de la fenêtre
+  - Début de Fenêtre: Au point de données le plus ancien dans la fenêtre
     ]]
   },
   config = {
@@ -163,6 +189,12 @@ Par exemple, avec une fenêtre de 7 jours et une agrégation moyenne, chaque poi
       name = "_window_size",
       options = { "_seconds", "_minutes", "_hours", "_days", "_weeks", "_months", "_years", },
       default = "_weeks"
+    },
+    enum {
+      id = "placement",
+      name = "_placement",
+      options = { "_window_end", "_window_midpoint", "_window_start" },
+      default = "_window_end"
     },
   },
   generator = function(source, config)

@@ -2,25 +2,32 @@ local core = require("tng.core")
 local enum = require("tng.config").enum
 local uint = require("tng.config").uint
 
+local PLACEMENT_MAP = {
+  _window_start = "start",
+  _window_midpoint = "mid",
+  _window_end = "end",
+}
+
 local get_aggregator_factory = function(config)
   local aggregation = require("tng.aggregation")
   local type = config.aggregation_type or error("aggregation_type required")
+  local placement = PLACEMENT_MAP[config.placement] or "end"
   local aggregator
 
   if type == "_min" then
-    aggregator = aggregation.running_min_aggregator
+    aggregator = function() return aggregation.running_min_aggregator(placement) end
   elseif type == "_max" then
-    aggregator = aggregation.running_max_aggregator
+    aggregator = function() return aggregation.running_max_aggregator(placement) end
   elseif type == "_average" then
-    aggregator = aggregation.avg_aggregator
+    aggregator = function() return aggregation.avg_aggregator(placement) end
   elseif type == "_sum" then
-    aggregator = aggregation.sum_aggregator
+    aggregator = function() return aggregation.sum_aggregator(placement) end
   elseif type == "_variance" then
-    aggregator = aggregation.variance_aggregator
+    aggregator = function() return aggregation.variance_aggregator(placement) end
   elseif type == "_standard_deviation" then
-    aggregator = aggregation.stdev_aggregator
+    aggregator = function() return aggregation.stdev_aggregator(placement) end
   elseif type == "_count" then
-    aggregator = aggregation.count_aggregator
+    aggregator = function() return aggregation.count_aggregator(placement) end
   else
     error("Unknown aggregation_type " .. tostring(type))
   end
@@ -53,9 +60,8 @@ local get_threshold = function(config)
 end
 
 return {
-  id = "adaptve-clustering-aggregation",
-  version = "3.0.1",
-  deprecated = 4,
+  id = "adaptve-clustering-aggregation-v4",
+  version = "4.0.0",
   inputCount = 1,
   title = {
     ["en"] = "Adaptive Clustering",
@@ -84,6 +90,11 @@ For example, with a 1-hour threshold, if you have several data points at 9:00am,
 - **Threshold Units**: The time unit for clustering proximity (seconds, minutes, hours, days, weeks, months, or years)
 
 - **Multiplier**: How many threshold size units define the clustering threshold (e.g., multiplier of 2 with threshold units "hours" = 2-hour clustering threshold)
+
+- **Placement**: Where in the cluster to place each output data point:
+  - Window End: At the most recent data point in the cluster (default)
+  - Window Midpoint: At the temporal center of the cluster
+  - Window Start: At the oldest data point in the cluster
     ]],
     ["de"] = [[
 Gruppiert nahe beieinander liegende Datenpunkte in Cluster und aggregiert jeden Cluster zu einem einzelnen Wert. Die Funktion gruppiert jede Sequenz von Datenpunkten mit weniger als dem angegebenen Zeitschwellenwert zwischen jedem Datenpunkt.
@@ -104,6 +115,11 @@ Zum Beispiel, mit einem 1-Stunden-Schwellenwert, wenn Sie mehrere Datenpunkte um
 - **Schwellenwert-Einheiten**: Die Zeiteinheit für Clustering-Nähe (Sekunden, Minuten, Stunden, Tage, Wochen, Monate oder Jahre)
 
 - **Multiplikator**: Wie viele Schwellenwert-Einheiten den Clustering-Schwellenwert definieren (z.B. Multiplikator von 2 mit Schwellenwert-Einheiten "Stunden" = 2-Stunden-Clustering-Schwellenwert)
+
+- **Platzierung**: Wo im Cluster jeder Ausgabedatenpunkt platziert wird:
+  - Clusterende: Am neuesten Datenpunkt im Cluster (Standard)
+  - Clustermitte: In der zeitlichen Mitte des Clusters
+  - Clusteranfang: Am ältesten Datenpunkt im Cluster
     ]],
     ["es"] = [[
 Agrupa puntos de datos cercanos en clústeres y agrega cada clúster en un único valor. La función agrupa cualquier secuencia de puntos de datos con menos del umbral de tiempo dado entre cada punto de datos.
@@ -124,6 +140,11 @@ Por ejemplo, con un umbral de 1 hora, si tiene varios puntos de datos a las 9:00
 - **Unidades de Umbral**: La unidad de tiempo para la proximidad de agrupación (segundos, minutos, horas, días, semanas, meses o años)
 
 - **Multiplicador**: Cuántas unidades de tamaño de umbral definen el umbral de agrupación (p.ej., multiplicador de 2 con unidades de umbral "horas" = umbral de agrupación de 2 horas)
+
+- **Colocación**: Dónde en el clúster colocar cada punto de datos de salida:
+  - Fin del Clúster: En el punto de datos más reciente en el clúster (predeterminado)
+  - Punto Medio del Clúster: En el centro temporal del clúster
+  - Inicio del Clúster: En el punto de datos más antiguo en el clúster
     ]],
     ["fr"] = [[
 Regroupe les points de données proches en clusters et agrège chaque cluster en une valeur unique. La fonction regroupe toute séquence de points de données avec moins que le seuil de temps donné entre chaque point de données.
@@ -144,6 +165,11 @@ Par exemple, avec un seuil de 1 heure, si vous avez plusieurs points de données
 - **Unités de Seuil**: L'unité de temps pour la proximité de regroupement (secondes, minutes, heures, jours, semaines, mois ou années)
 
 - **Multiplicateur**: Combien d'unités de taille de seuil définissent le seuil de regroupement (par ex., multiplicateur de 2 avec unités de seuil "heures" = seuil de regroupement de 2 heures)
+
+- **Placement**: Où dans le cluster placer chaque point de données de sortie:
+  - Fin du Cluster: Au point de données le plus récent dans le cluster (par défaut)
+  - Point Médian du Cluster: Au centre temporel du cluster
+  - Début du Cluster: Au point de données le plus ancien dans le cluster
     ]]
   },
   config = {
@@ -163,6 +189,12 @@ Par exemple, avec un seuil de 1 heure, si vous avez plusieurs points de données
       name = "_threshold_units",
       options = { "_seconds", "_minutes", "_hours", "_days", "_weeks", "_months", "_years", },
       default = "_hours"
+    },
+    enum {
+      id = "placement",
+      name = "_placement",
+      options = { "_window_end", "_window_midpoint", "_window_start" },
+      default = "_window_end"
     },
   },
   generator = function(source, config)

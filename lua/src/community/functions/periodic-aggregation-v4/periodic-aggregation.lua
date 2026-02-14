@@ -1,25 +1,32 @@
 local core = require("tng.core")
 local enum = require("tng.config").enum
 
+local PLACEMENT_MAP = {
+  _window_start = "start",
+  _window_midpoint = "mid",
+  _window_end = "end",
+}
+
 local get_aggregator_factory = function(config)
   local aggregation = require("tng.aggregation")
   local type = config.aggregation_type or error("aggregation_type required")
+  local placement = PLACEMENT_MAP[config.placement] or "end"
   local aggregator
 
   if type == "_min" then
-    aggregator = aggregation.simple_min_aggregator
+    aggregator = function() return aggregation.simple_min_aggregator(placement) end
   elseif type == "_max" then
-    aggregator = aggregation.simple_max_aggregator
+    aggregator = function() return aggregation.simple_max_aggregator(placement) end
   elseif type == "_average" then
-    aggregator = aggregation.avg_aggregator
+    aggregator = function() return aggregation.avg_aggregator(placement) end
   elseif type == "_sum" then
-    aggregator = aggregation.sum_aggregator
+    aggregator = function() return aggregation.sum_aggregator(placement) end
   elseif type == "_variance" then
-    aggregator = aggregation.variance_aggregator
+    aggregator = function() return aggregation.variance_aggregator(placement) end
   elseif type == "_standard_deviation" then
-    aggregator = aggregation.stdev_aggregator
+    aggregator = function() return aggregation.stdev_aggregator(placement) end
   elseif type == "_count" then
-    aggregator = aggregation.count_aggregator
+    aggregator = function() return aggregation.count_aggregator(placement) end
   else
     error("Unknown aggregation_type " .. tostring(type))
   end
@@ -46,9 +53,8 @@ local get_period = function(config)
 end
 
 return {
-  id = "periodic-aggregation",
-  version = "3.0.1",
-  deprecated = 4,
+  id = "periodic-aggregation-v4",
+  version = "4.0.0",
   inputCount = 1,
   title = {
     ["en"] = "Periodic Aggregation",
@@ -75,6 +81,11 @@ For example, with a daily period and average aggregation, all measurements from 
   - Count: Number of data points
   - Variance: Statistical variance
   - Standard Deviation: Statistical standard deviation
+
+- **Placement**: Where in the time window to place each output data point:
+  - Window End: At the most recent data point in the window (default)
+  - Window Midpoint: At the temporal center of the window
+  - Window Start: At the oldest data point in the window
     ]],
     ["de"] = [[
 Aggregiert Datenpunkte in feste Kalenderperioden (Tage, Wochen, Monate oder Jahre). Jede Periode erzeugt einen aggregierten Wert, der alle Datenpunkte enthält, die innerhalb der Grenzen dieser Periode liegen.
@@ -93,6 +104,11 @@ Zum Beispiel, mit einer täglichen Periode und Durchschnittsaggregation werden a
   - Anzahl: Anzahl der Datenpunkte
   - Varianz: Statistische Varianz
   - Standardabweichung: Statistische Standardabweichung
+
+- **Platzierung**: Wo im Zeitfenster jeder Ausgabedatenpunkt platziert wird:
+  - Fensterende: Am neuesten Datenpunkt im Fenster (Standard)
+  - Fenstermitte: In der zeitlichen Mitte des Fensters
+  - Fensteranfang: Am ältesten Datenpunkt im Fenster
     ]],
     ["es"] = [[
 Agrega puntos de datos en períodos de calendario fijos (días, semanas, meses o años). Cada período produce un valor agregado que contiene todos los puntos de datos que caen dentro de los límites de ese período.
@@ -112,6 +128,11 @@ Por ejemplo, con un período diario y agregación promedio, todas las mediciones
   - Varianza: Varianza estadística
   - Desviación Estándar: Desviación estándar estadística
 
+- **Colocación**: Dónde en la ventana de tiempo colocar cada punto de datos de salida:
+  - Fin de Ventana: En el punto de datos más reciente en la ventana (predeterminado)
+  - Punto Medio de Ventana: En el centro temporal de la ventana
+  - Inicio de Ventana: En el punto de datos más antiguo en la ventana
+
     ]],
     ["fr"] = [[
 Agrège les points de données en périodes de calendrier fixes (jours, semaines, mois ou années). Chaque période produit une valeur agrégée contenant tous les points de données qui se situent dans les limites de cette période.
@@ -130,6 +151,11 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
   - Comptage: Nombre de points de données
   - Variance: Variance statistique
   - Écart-Type: Écart-type statistique
+
+- **Placement**: Où dans la fenêtre de temps placer chaque point de données de sortie:
+  - Fin de Fenêtre: Au point de données le plus récent dans la fenêtre (par défaut)
+  - Point Médian de Fenêtre: Au centre temporel de la fenêtre
+  - Début de Fenêtre: Au point de données le plus ancien dans la fenêtre
     ]]
   },
   config = {
@@ -144,6 +170,12 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
       name = "_aggregation",
       options = { "_min", "_max", "_average", "_sum", "_count", "_variance", "_standard_deviation" },
       default = "_average"
+    },
+    enum {
+      id = "placement",
+      name = "_placement",
+      options = { "_window_end", "_window_midpoint", "_window_start" },
+      default = "_window_end"
     },
   },
   generator = function(source, config)
