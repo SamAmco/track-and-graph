@@ -15,19 +15,19 @@ local get_aggregator_factory = function(config)
   local aggregator
 
   if type == "_min" then
-    aggregator = function() return aggregation.running_min_aggregator(placement) end
+    aggregator = function() return aggregation.running_min_aggregator2(placement) end
   elseif type == "_max" then
-    aggregator = function() return aggregation.running_max_aggregator(placement) end
+    aggregator = function() return aggregation.running_max_aggregator2(placement) end
   elseif type == "_average" then
-    aggregator = function() return aggregation.avg_aggregator(placement) end
+    aggregator = function() return aggregation.avg_aggregator2(placement) end
   elseif type == "_sum" then
-    aggregator = function() return aggregation.sum_aggregator(placement) end
+    aggregator = function() return aggregation.sum_aggregator2(placement) end
   elseif type == "_variance" then
-    aggregator = function() return aggregation.variance_aggregator(placement) end
+    aggregator = function() return aggregation.variance_aggregator2(placement) end
   elseif type == "_standard_deviation" then
-    aggregator = function() return aggregation.stdev_aggregator(placement) end
+    aggregator = function() return aggregation.stdev_aggregator2(placement) end
   elseif type == "_count" then
-    aggregator = function() return aggregation.count_aggregator(placement) end
+    aggregator = function() return aggregation.count_aggregator2(placement) end
   else
     error("Unknown aggregation_type " .. tostring(type))
   end
@@ -61,7 +61,7 @@ end
 
 return {
   id = "adaptve-clustering-aggregation-v4",
-  version = "4.0.0",
+  version = "4.0.1",
   inputCount = 1,
   title = {
     ["en"] = "Adaptive Clustering",

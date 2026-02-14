@@ -45,6 +45,8 @@ local function main()
 				id = module.id,
 				title = module.title,
 				file_path = file_path,
+				version = module.version,
+				deprecated = module.deprecated,
 			})
 		else
 			print("✗ " .. file_path)

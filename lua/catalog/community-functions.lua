@@ -287,19 +287,19 @@ local get_aggregator_factory = function(config)
   local aggregator
 
   if type == "_min" then
-    aggregator = function() return aggregation.running_min_aggregator(placement) end
+    aggregator = function() return aggregation.running_min_aggregator2(placement) end
   elseif type == "_max" then
-    aggregator = function() return aggregation.running_max_aggregator(placement) end
+    aggregator = function() return aggregation.running_max_aggregator2(placement) end
   elseif type == "_average" then
-    aggregator = function() return aggregation.avg_aggregator(placement) end
+    aggregator = function() return aggregation.avg_aggregator2(placement) end
   elseif type == "_sum" then
-    aggregator = function() return aggregation.sum_aggregator(placement) end
+    aggregator = function() return aggregation.sum_aggregator2(placement) end
   elseif type == "_variance" then
-    aggregator = function() return aggregation.variance_aggregator(placement) end
+    aggregator = function() return aggregation.variance_aggregator2(placement) end
   elseif type == "_standard_deviation" then
-    aggregator = function() return aggregation.stdev_aggregator(placement) end
+    aggregator = function() return aggregation.stdev_aggregator2(placement) end
   elseif type == "_count" then
-    aggregator = function() return aggregation.count_aggregator(placement) end
+    aggregator = function() return aggregation.count_aggregator2(placement) end
   else
     error("Unknown aggregation_type " .. tostring(type))
   end
@@ -333,7 +333,7 @@ end
 
 return {
   id = "adaptve-clustering-aggregation-v4",
-  version = "4.0.0",
+  version = "4.0.1",
   inputCount = 1,
   title = {
     ["en"] = "Adaptive Clustering",
@@ -514,7 +514,7 @@ Par exemple, avec un seuil de 1 heure, si vous avez plusieurs points de données
   end
 }
 ]=],
-			version="4.0.0",
+			version="4.0.1",
 		},
 		ceil={
 			script=[=[
@@ -2583,19 +2583,19 @@ local get_aggregator_factory = function(config)
   local aggregator
 
   if type == "_min" then
-    aggregator = function() return aggregation.simple_min_aggregator(placement) end
+    aggregator = function() return aggregation.simple_min_aggregator2(placement) end
   elseif type == "_max" then
-    aggregator = function() return aggregation.simple_max_aggregator(placement) end
+    aggregator = function() return aggregation.simple_max_aggregator2(placement) end
   elseif type == "_average" then
-    aggregator = function() return aggregation.avg_aggregator(placement) end
+    aggregator = function() return aggregation.avg_aggregator2(placement) end
   elseif type == "_sum" then
-    aggregator = function() return aggregation.sum_aggregator(placement) end
+    aggregator = function() return aggregation.sum_aggregator2(placement) end
   elseif type == "_variance" then
-    aggregator = function() return aggregation.variance_aggregator(placement) end
+    aggregator = function() return aggregation.variance_aggregator2(placement) end
   elseif type == "_standard_deviation" then
-    aggregator = function() return aggregation.stdev_aggregator(placement) end
+    aggregator = function() return aggregation.stdev_aggregator2(placement) end
   elseif type == "_count" then
-    aggregator = function() return aggregation.count_aggregator(placement) end
+    aggregator = function() return aggregation.count_aggregator2(placement) end
   else
     error("Unknown aggregation_type " .. tostring(type))
   end
@@ -2623,7 +2623,7 @@ end
 
 return {
   id = "periodic-aggregation-v4",
-  version = "4.0.0",
+  version = "4.0.1",
   inputCount = 1,
   title = {
     ["en"] = "Periodic Aggregation",
@@ -2804,7 +2804,7 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
   end
 }
 ]=],
-			version="4.0.0",
+			version="4.0.1",
 		},
 		["periodic-data-points"]={
 			script=[=[
@@ -3348,19 +3348,19 @@ local get_aggregator = function(config)
   local aggregator
 
   if type == "_min" then
-    aggregator = aggregation.running_min_aggregator(placement)
+    aggregator = aggregation.running_min_aggregator2(placement)
   elseif type == "_max" then
-    aggregator = aggregation.running_max_aggregator(placement)
+    aggregator = aggregation.running_max_aggregator2(placement)
   elseif type == "_average" then
-    aggregator = aggregation.avg_aggregator(placement)
+    aggregator = aggregation.avg_aggregator2(placement)
   elseif type == "_sum" then
-    aggregator = aggregation.sum_aggregator(placement)
+    aggregator = aggregation.sum_aggregator2(placement)
   elseif type == "_variance" then
-    aggregator = aggregation.variance_aggregator(placement)
+    aggregator = aggregation.variance_aggregator2(placement)
   elseif type == "_standard_deviation" then
-    aggregator = aggregation.stdev_aggregator(placement)
+    aggregator = aggregation.stdev_aggregator2(placement)
   elseif type == "_count" then
-    aggregator = aggregation.count_aggregator(placement)
+    aggregator = aggregation.count_aggregator2(placement)
   else
     error("Unknown aggregation_type " .. tostring(type))
   end
@@ -3394,7 +3394,7 @@ end
 
 return {
   id = "rolling-window-aggregation-v4",
-  version = "4.0.0",
+  version = "4.0.1",
   inputCount = 1,
   title = {
     ["en"] = "Rolling Window",
@@ -3588,7 +3588,7 @@ Par exemple, avec une fenêtre de 7 jours et une agrégation moyenne, chaque poi
   end
 }
 ]=],
-			version="4.0.0",
+			version="4.0.1",
 		},
 		round={
 			script=[=[
@@ -4651,7 +4651,7 @@ Définit la valeur de chaque point de données sur son année (par exemple, 2025
 			version="1.0.0",
 		},
 	},
-	published_at="2026-02-14T13:09:38Z",
+	published_at="2026-02-14T14:49:44Z",
 	translations={
 		_addition={
 			de="Addition",
