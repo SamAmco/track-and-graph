@@ -224,6 +224,50 @@ test("check_uniqueness rejects duplicate titles", function()
 	assert(#errors > 0)
 end)
 
+test("check_uniqueness accepts duplicate titles with non-overlapping versions", function()
+	local functions = {
+		{
+			id = "func1",
+			title = {en = "Same Title"},
+			file_path = "func1.lua",
+			version = "3.0.0",
+			deprecated = 4,
+		},
+		{
+			id = "func2",
+			title = {en = "Same Title"},
+			file_path = "func2.lua",
+			version = "4.0.0",
+		}
+	}
+	local ok, errors = validation.check_uniqueness(functions)
+	assert(ok == true)
+	assert(#errors == 0)
+end)
+
+test("check_uniqueness rejects duplicate titles with overlapping versions", function()
+	local functions = {
+		{
+			id = "func1",
+			title = {en = "Same Title"},
+			file_path = "func1.lua",
+			version = "3.0.0",
+			deprecated = 5,
+		},
+		{
+			id = "func2",
+			title = {en = "Same Title"},
+			file_path = "func2.lua",
+			version = "4.0.0",
+			deprecated = 6,
+		}
+	}
+	local ok, errors = validation.check_uniqueness(functions)
+	assert(ok == false)
+	assert(#errors > 0)
+end)
+
+
 -- Summary
 print("\n" .. string.rep("=", 40))
 print(string.format("Tests: %d/%d passed", passed_count, test_count))

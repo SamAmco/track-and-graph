@@ -72,6 +72,10 @@ lua-print-catalog:
 lua-test-api:
 	cd lua && lua src/tng/test/test_all.lua
 
+.PHONY: lua-test-tools
+lua-test-tools:
+	cd lua && lua tools/test/test_all.lua
+
 .PHONY: validate-all
 validate-all: lua-test-api validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
 	@echo "All validations passed."

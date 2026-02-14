@@ -202,24 +202,77 @@ function M.validate_function(module, file_path, valid_translations)
 	return #errors == 0, errors
 end
 
---- Check uniqueness of titles for a specific language
---- @param functions table: Array of {id, title, file_path} tables
+--- Check if two version ranges overlap
+--- @param f1 table: Function 1 {min, max}
+--- @param f2 table: Function 2 {min, max}
+--- @return boolean: True if they overlap
+local function ranges_overlap(f1, f2)
+	-- Default nil to infinity/negative infinity
+	local min1 = f1.min or -math.huge
+	local max1 = f1.max or math.huge
+	local min2 = f2.min or -math.huge
+	local max2 = f2.max or math.huge
+
+	return max1 > min2 and max2 > min1
+end
+
+--- Format a version string for error messages
+local function fmt_ver(f)
+	local s = ""
+	if f.min then s = s .. "min:" .. f.min else s = s .. "min:-inf" end
+	s = s .. ", "
+	if f.max then s = s .. "max:" .. f.max else s = s .. "max:inf" end
+	return "(" .. s .. ")"
+end
+
+--- Check uniqueness of titles for a specific language, considering version overlaps
+--- @param functions table: Array of {id, title, file_path, version, deprecated} tables
 --- @param lang string: Language code (e.g., "en", "de")
 --- @return table: Array of error messages for this language
 local function check_title_uniqueness_for_language(functions, lang)
 	local errors = {}
-	local seen = {}
+	local by_title = {}
 
+	-- 1. Group functions by title
 	for _, func in ipairs(functions) do
 		local title = func.title and func.title[lang]
 		if title then
-			if seen[title] then
-				table.insert(errors, string.format(
-					"Duplicate title['%s'] '%s' in %s (already seen in %s)",
-					lang, title, func.file_path, seen[title]
-				))
-			else
-				seen[title] = func.file_path
+			if not by_title[title] then
+				by_title[title] = {}
+			end
+			table.insert(by_title[title], func)
+		end
+	end
+
+	-- 2. Check for overlaps within each title group
+	for title, entries in pairs(by_title) do
+		-- We only care if there is more than one function with this title
+		if #entries > 1 then
+			-- Compare every entry against every other entry (O(N^2) for this specific title)
+			for i = 1, #entries do
+				for j = i + 1, #entries do
+					local f1Ver = semver.parse(entries[i].version)
+					local f2Ver = semver.parse(entries[j].version)
+					local f1 = {
+						file_path = entries[i].file_path,
+						min = f1Ver and f1Ver.major,
+						max = entries[i].deprecated,
+					}
+					local f2 = {
+						file_path = entries[j].file_path,
+						min = f2Ver and f2Ver.major,
+						max = entries[j].deprecated,
+					}
+
+					if ranges_overlap(f1, f2) then
+						table.insert(errors, string.format(
+							"Overlap detected for title['%s'] '%s':\n  File 1: %s %s\n  File 2: %s %s",
+							lang, title,
+							f1.file_path, fmt_ver(f1),
+							f2.file_path, fmt_ver(f2)
+						))
+					end
+				end
 			end
 		end
 	end
