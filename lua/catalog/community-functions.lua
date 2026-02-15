@@ -594,6 +594,69 @@ Configuration:
 ]=],
 			version="1.0.0",
 		},
+		["copy-value-to-label"]={
+			script=[=[
+-- Copies the value of each data point to its label
+
+local enum = require("tng.config").enum
+
+return {
+	id = "copy-value-to-label",
+	version = "1.0.0",
+	inputCount = 1,
+	categories = { "_transform" },
+	title = {
+		["en"] = "Copy Value to Label",
+		["de"] = "Wert in Label kopieren",
+		["es"] = "Copiar valor a etiqueta",
+		["fr"] = "Copier la valeur vers l'étiquette",
+	},
+	description = {
+		["en"] = "Copies each data point's value to its label as a string.",
+		["de"] = "Kopiert den Wert jedes Datenpunkts als Zeichenkette in sein Label.",
+		["es"] = "Copia el valor de cada punto de datos a su etiqueta como cadena.",
+		["fr"] = "Copie la valeur de chaque point de données vers son étiquette sous forme de chaîne.",
+	},
+	config = {
+		enum {
+			id = "mode",
+			name = "_mode",
+			options = {
+				"_overwrite",
+				"_prepend",
+				"_append",
+			},
+			default = "_overwrite",
+		},
+	},
+
+	generator = function(source, config)
+		local mode = config and config.mode or "_overwrite"
+
+		return function()
+			local data_point = source.dp()
+			if not data_point then
+				return nil
+			end
+
+			local value_str = tostring(data_point.value)
+			local existing = data_point.label or ""
+
+			if mode == "_overwrite" then
+				data_point.label = value_str
+			elseif mode == "_prepend" then
+				data_point.label = value_str .. existing
+			elseif mode == "_append" then
+				data_point.label = existing .. value_str
+			end
+
+			return data_point
+		end
+	end,
+}
+]=],
+			version="1.0.0",
+		},
 		["cumulative-value"]={
 			script=[=[
 -- Lua Function to calculate cumulative sum of data point values
@@ -3704,7 +3767,7 @@ local extractors = {
 
 return {
 	id = "set-value-from-timestamp",
-	version = "1.0.0",
+	version = "1.0.1",
 	inputCount = 1,
 	categories = { "_time" },
 	title = {
@@ -3755,7 +3818,7 @@ return {
 	end,
 }
 ]=],
-			version="1.0.0",
+			version="1.0.1",
 		},
 		["snap-time-to"]={
 			script=[=[
@@ -4307,7 +4370,7 @@ Calcule la différence entre la valeur de chaque point de données et la suivant
 			version="1.0.0",
 		},
 	},
-	published_at="2026-02-15T13:43:11Z",
+	published_at="2026-02-15T14:02:02Z",
 	translations={
 		_addition={
 			de="Addition",
@@ -4326,6 +4389,12 @@ Calcule la différence entre la valeur de chaque point de données et la suivant
 			en="All Fields",
 			es="Todos los campos",
 			fr="Tous les champs",
+		},
+		_append={
+			de="Anhängen",
+			en="Append",
+			es="Agregar",
+			fr="Ajouter",
 		},
 		_arithmetic={
 			de="Arithmetik",
@@ -4388,10 +4457,10 @@ Calcule la différence entre la valeur de chaque point de données et la suivant
 			fr="Jour du mois (1-31)",
 		},
 		_day_of_week={
-			de="Wochentag (1-7)",
-			en="Day of Week (1-7)",
-			es="Día de la semana (1-7)",
-			fr="Jour de la semaine (1-7)",
+			de="Wochentag (1=Mo, 7=So)",
+			en="Day of Week (1=Mon, 7=Sun)",
+			es="Día de la semana (1=Lun, 7=Dom)",
+			fr="Jour de la semaine (1=Lun, 7=Dim)",
 		},
 		_days={
 			de="Tage",
@@ -4501,6 +4570,12 @@ Calcule la différence entre la valeur de chaque point de données et la suivant
 			es="Minutos",
 			fr="Minutes",
 		},
+		_mode={
+			de="Modus",
+			en="Mode",
+			es="Modo",
+			fr="Mode",
+		},
 		_monday={
 			de="Montag",
 			en="Monday",
@@ -4567,6 +4642,12 @@ Calcule la différence entre la valeur de chaque point de données et la suivant
 			es="Operación",
 			fr="Opération",
 		},
+		_overwrite={
+			de="Überschreiben",
+			en="Overwrite",
+			es="Sobrescribir",
+			fr="Écraser",
+		},
 		_pass_through={
 			de="Durchleiten",
 			en="Pass Through",
@@ -4590,6 +4671,12 @@ Calcule la différence entre la valeur de chaque point de données et la suivant
 			en="Placement",
 			es="Placement",
 			fr="Placement",
+		},
+		_prepend={
+			de="Voranstellen",
+			en="Prepend",
+			es="Anteponer",
+			fr="Préfixer",
 		},
 		_randomisers={
 			de="Zufallsgeneratoren",

@@ -32,7 +32,7 @@ local extractors = {
 
 return {
 	id = "set-value-from-timestamp",
-	version = "1.0.0",
+	version = "1.0.1",
 	inputCount = 1,
 	categories = { "_time" },
 	title = {

@@ -509,10 +509,10 @@ local translations = {
 	},
 	{
 		_id = "_day_of_week",
-		["en"] = "Day of Week (1-7)",
-		["de"] = "Wochentag (1-7)",
-		["es"] = "Día de la semana (1-7)",
-		["fr"] = "Jour de la semaine (1-7)",
+		["en"] = "Day of Week (1=Mon, 7=Sun)",
+		["de"] = "Wochentag (1=Mo, 7=So)",
+		["es"] = "Día de la semana (1=Lun, 7=Dom)",
+		["fr"] = "Jour de la semaine (1=Lun, 7=Dim)",
 	},
 	{
 		_id = "_hour_of_day",
@@ -555,6 +555,34 @@ local translations = {
 		["de"] = "Jahr",
 		["es"] = "Año",
 		["fr"] = "Année",
+	},
+	{
+		_id = "_mode",
+		["en"] = "Mode",
+		["de"] = "Modus",
+		["es"] = "Modo",
+		["fr"] = "Mode",
+	},
+	{
+		_id = "_overwrite",
+		["en"] = "Overwrite",
+		["de"] = "Überschreiben",
+		["es"] = "Sobrescribir",
+		["fr"] = "Écraser",
+	},
+	{
+		_id = "_prepend",
+		["en"] = "Prepend",
+		["de"] = "Voranstellen",
+		["es"] = "Anteponer",
+		["fr"] = "Préfixer",
+	},
+	{
+		_id = "_append",
+		["en"] = "Append",
+		["de"] = "Anhängen",
+		["es"] = "Agregar",
+		["fr"] = "Ajouter",
 	},
 }
 
