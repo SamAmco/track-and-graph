@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     alias(libs.plugins.jetbrains.kotlin.serialization)
@@ -40,10 +39,6 @@ android {
             annotationProcessorOptions {
                 arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")
             }
-        }
-
-        sourceSets {
-            getByName("androidTest").assets.srcDirs("$projectDir/schemas")
         }
 
         defaultConfig {

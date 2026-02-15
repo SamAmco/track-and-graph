@@ -20,7 +20,6 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
@@ -163,6 +162,7 @@ android {
         dataBinding = true
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     // Dependency info blocks may present a security vulnerability in some cases and they are not
