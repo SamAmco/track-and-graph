@@ -29,9 +29,9 @@ plugins {
 }
 
 // Load local.properties if it exists
-val localPropsFile = rootProject.file("local.properties")
+val localPropsFile: File? = rootProject.file("local.properties")
 val localProps = Properties().apply {
-    if (localPropsFile.exists()) {
+    if (localPropsFile?.exists() == true) {
         load(localPropsFile.inputStream())
     }
 }
@@ -42,16 +42,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
-    }
-
-    kotlin {
-        jvmToolchain(libs.versions.buildJdk.get().toInt())
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-            optIn.add("kotlin.RequiresOptIn")
-            freeCompilerArgs.add("-Xannotation-default-target=param-property")
-        }
     }
 
     defaultConfig {
@@ -69,13 +59,6 @@ android {
             useSupportLibrary = true
         }
     }
-
-    //TODO you won't get syntax highlighting in the promo directory code
-    // in android studio because this if check will default to screenshots
-    // but you can just comment it to say promo during development for now.
-    //
-    // Dynamic testBuildType switching based on project properties
-    testBuildType = if (project.hasProperty("usePromoTests")) "promo" else "screenshots"
 
     signingConfigs {
         create("release") {
@@ -178,6 +161,16 @@ android {
 
 
     namespace = "com.samco.trackandgraph"
+}
+
+kotlin {
+    jvmToolchain(libs.versions.buildJdk.get().toInt())
+
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        optIn.add("kotlin.RequiresOptIn")
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
+    }
 }
 
 dependencies {
