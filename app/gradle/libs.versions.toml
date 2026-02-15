@@ -46,7 +46,7 @@ buildJdk = "21"
 jdk = "17"
 androidSdk = "36"
 minSdk = "24"
-targetSdk = "35"
+targetSdk = "36"
 rules = "1.7.0"
 uiautomator = "2.3.0"
 
