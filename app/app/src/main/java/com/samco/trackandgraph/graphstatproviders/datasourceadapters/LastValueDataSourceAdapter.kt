@@ -18,7 +18,6 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LastValueStat
-import com.samco.trackandgraph.data.database.dto.LastValueStatConfig
 import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.LastValueStatUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -27,38 +26,33 @@ import javax.inject.Inject
 class LastValueDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<LastValueStat>(dataInteractor) {
-    override suspend fun writeConfigToDatabase(
-        graphOrStat: GraphOrStat,
-        config: LastValueStat,
-        updateMode: Boolean
-    ) {
-        val lastValueStatConfig = LastValueStatConfig(
-            featureId = config.featureId,
-            endDate = config.endDate,
-            fromValue = config.fromValue,
-            toValue = config.toValue,
-            labels = config.labels,
-            filterByRange = config.filterByRange,
-            filterByLabels = config.filterByLabels
-        )
 
-        if (updateMode) {
-            dataInteractor.updateLastValueStat(
-                LastValueStatUpdateRequest(
-                    graphStatId = graphOrStat.id,
-                    name = graphOrStat.name,
-                    config = lastValueStatConfig
-                )
+    override suspend fun createInDatabase(
+        name: String,
+        groupId: Long,
+        config: LastValueStat
+    ) {
+        dataInteractor.createLastValueStat(
+            LastValueStatCreateRequest(
+                name = name,
+                groupId = groupId,
+                config = config.toConfig()
             )
-        } else {
-            dataInteractor.createLastValueStat(
-                LastValueStatCreateRequest(
-                    name = graphOrStat.name,
-                    groupId = graphOrStat.groupId,
-                    config = lastValueStatConfig
-                )
+        )
+    }
+
+    override suspend fun updateInDatabase(
+        graphStatId: Long,
+        name: String,
+        config: LastValueStat
+    ) {
+        dataInteractor.updateLastValueStat(
+            LastValueStatUpdateRequest(
+                graphStatId = graphStatId,
+                name = name,
+                config = config.toConfig()
             )
-        }
+        )
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LastValueStat>? {

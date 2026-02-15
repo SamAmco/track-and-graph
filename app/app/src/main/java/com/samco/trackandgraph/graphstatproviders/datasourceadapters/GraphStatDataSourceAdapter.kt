@@ -28,10 +28,16 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 abstract class GraphStatDataSourceAdapter<I>(
     protected val dataInteractor: DataInteractor
 ) {
-    protected abstract suspend fun writeConfigToDatabase(
-        graphOrStat: GraphOrStat,
-        config: I,
-        updateMode: Boolean
+    protected abstract suspend fun createInDatabase(
+        name: String,
+        groupId: Long,
+        config: I
+    )
+
+    protected abstract suspend fun updateInDatabase(
+        graphStatId: Long,
+        name: String,
+        config: I
     )
 
     protected abstract suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, I>?
@@ -43,8 +49,13 @@ abstract class GraphStatDataSourceAdapter<I>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    suspend fun writeConfig(graphOrStat: GraphOrStat, config: Any, updateMode: Boolean) {
-        writeConfigToDatabase(graphOrStat, config as I, updateMode)
+    suspend fun create(name: String, groupId: Long, config: Any) {
+        createInDatabase(name, groupId, config as I)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    suspend fun update(graphStatId: Long, name: String, config: Any) {
+        updateInDatabase(graphStatId, name, config as I)
     }
 
     abstract suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat)

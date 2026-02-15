@@ -31,4 +31,9 @@ data class LuaGraphFeature(
         featureId,
         name
     )
+
+    fun toFeatureConfig() = LuaGraphFeatureConfig(
+        featureId = featureId,
+        name = name
+    )
 }

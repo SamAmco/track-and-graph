@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
-import com.samco.trackandgraph.data.database.dto.TimeHistogramConfig
 import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -28,36 +27,33 @@ import javax.inject.Inject
 class TimeHistogramDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<TimeHistogram>(dataInteractor) {
-    override suspend fun writeConfigToDatabase(
-        graphOrStat: GraphOrStat,
-        config: TimeHistogram,
-        updateMode: Boolean
-    ) {
-        val timeHistogramConfig = TimeHistogramConfig(
-            featureId = config.featureId,
-            sampleSize = config.sampleSize,
-            window = config.window,
-            sumByCount = config.sumByCount,
-            endDate = config.endDate
-        )
 
-        if (updateMode) {
-            dataInteractor.updateTimeHistogram(
-                TimeHistogramUpdateRequest(
-                    graphStatId = graphOrStat.id,
-                    name = graphOrStat.name,
-                    config = timeHistogramConfig
-                )
+    override suspend fun createInDatabase(
+        name: String,
+        groupId: Long,
+        config: TimeHistogram
+    ) {
+        dataInteractor.createTimeHistogram(
+            TimeHistogramCreateRequest(
+                name = name,
+                groupId = groupId,
+                config = config.toConfig()
             )
-        } else {
-            dataInteractor.createTimeHistogram(
-                TimeHistogramCreateRequest(
-                    name = graphOrStat.name,
-                    groupId = graphOrStat.groupId,
-                    config = timeHistogramConfig
-                )
+        )
+    }
+
+    override suspend fun updateInDatabase(
+        graphStatId: Long,
+        name: String,
+        config: TimeHistogram
+    ) {
+        dataInteractor.updateTimeHistogram(
+            TimeHistogramUpdateRequest(
+                graphStatId = graphStatId,
+                name = name,
+                config = config.toConfig()
             )
-        }
+        )
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, TimeHistogram>? {

@@ -24,4 +24,9 @@ data class LuaGraphWithFeatures(
     val script: String
 ) {
     fun toLuaGraph() = LuaGraph(id, graphStatId, script)
+
+    fun toConfig() = LuaGraphConfig(
+        features = features.map { it.toFeatureConfig() },
+        script = script
+    )
 }

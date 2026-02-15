@@ -27,4 +27,15 @@ data class BarChart(
         barPeriod = barPeriod,
         sumByCount = sumByCount
     )
+
+    fun toConfig() = BarChartConfig(
+        featureId = featureId,
+        endDate = endDate,
+        sampleSize = sampleSize,
+        yRangeType = yRangeType,
+        yTo = yTo,
+        scale = scale,
+        barPeriod = barPeriod,
+        sumByCount = sumByCount
+    )
 }

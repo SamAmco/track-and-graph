@@ -17,9 +17,7 @@
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
-import com.samco.trackandgraph.data.database.dto.LuaGraphConfig
 import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
-import com.samco.trackandgraph.data.database.dto.LuaGraphFeatureConfig
 import com.samco.trackandgraph.data.database.dto.LuaGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -28,38 +26,33 @@ import javax.inject.Inject
 class LuaGraphDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<LuaGraphWithFeatures>(dataInteractor) {
-    override suspend fun writeConfigToDatabase(
-        graphOrStat: GraphOrStat,
-        config: LuaGraphWithFeatures,
-        updateMode: Boolean
-    ) {
-        val luaGraphConfig = LuaGraphConfig(
-            features = config.features.map { feature ->
-                LuaGraphFeatureConfig(
-                    featureId = feature.featureId,
-                    name = feature.name
-                )
-            },
-            script = config.script
-        )
 
-        if (updateMode) {
-            dataInteractor.updateLuaGraph(
-                LuaGraphUpdateRequest(
-                    graphStatId = graphOrStat.id,
-                    name = graphOrStat.name,
-                    config = luaGraphConfig
-                )
+    override suspend fun createInDatabase(
+        name: String,
+        groupId: Long,
+        config: LuaGraphWithFeatures
+    ) {
+        dataInteractor.createLuaGraph(
+            LuaGraphCreateRequest(
+                name = name,
+                groupId = groupId,
+                config = config.toConfig()
             )
-        } else {
-            dataInteractor.createLuaGraph(
-                LuaGraphCreateRequest(
-                    name = graphOrStat.name,
-                    groupId = graphOrStat.groupId,
-                    config = luaGraphConfig
-                )
+        )
+    }
+
+    override suspend fun updateInDatabase(
+        graphStatId: Long,
+        name: String,
+        config: LuaGraphWithFeatures
+    ) {
+        dataInteractor.updateLuaGraph(
+            LuaGraphUpdateRequest(
+                graphStatId = graphStatId,
+                name = name,
+                config = config.toConfig()
             )
-        }
+        )
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LuaGraphWithFeatures>? {

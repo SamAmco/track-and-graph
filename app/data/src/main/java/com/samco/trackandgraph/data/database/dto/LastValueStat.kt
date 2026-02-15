@@ -40,4 +40,14 @@ data class LastValueStat(
         filterByRange = filterByRange,
         filterByLabels = filterByLabels
     )
+
+    fun toConfig() = LastValueStatConfig(
+        featureId = featureId,
+        endDate = endDate,
+        fromValue = fromValue,
+        toValue = toValue,
+        labels = labels,
+        filterByRange = filterByRange,
+        filterByLabels = filterByLabels
+    )
 }

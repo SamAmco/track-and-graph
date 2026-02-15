@@ -46,11 +46,11 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun PieChartConfigView(
-    graphStatId: Long,
+    graphStatId: Long?,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) = Column {
     val viewModel = hiltViewModel<PieChartConfigViewModel>().apply {
-        initFromGraphStatId(graphStatId)
+        init(graphStatId)
     }
 
     LaunchedEffect(viewModel) {

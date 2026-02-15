@@ -35,4 +35,11 @@ data class PieChart(
         endDate = endDate,
         sumByCount = sumByCount
     )
+
+    fun toConfig() = PieChartConfig(
+        featureId = featureId,
+        sampleSize = sampleSize,
+        endDate = endDate,
+        sumByCount = sumByCount
+    )
 }

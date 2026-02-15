@@ -104,7 +104,8 @@ interface GraphStatInputViewModel {
     val showLuaFirstTimeUserDialog: LiveData<Boolean>
     val complete: ReceiveChannel<Unit>
 
-    fun initViewModel(graphStatGroupId: Long, graphStatId: Long)
+    fun initViewModelForCreate(groupId: Long)
+    fun initViewModelForUpdate(graphStatId: Long)
     fun setGraphStatName(name: TextFieldValue)
     fun setGraphType(type: GraphStatType)
 
@@ -143,17 +144,21 @@ class GraphStatInputViewModelImpl @Inject constructor(
 
     private var updateJob: Job? = null
     private var configData: GraphStatConfigEvent.ConfigData<*>? = null
-    private var graphStatGroupId: Long = -1L
+    private var graphStatGroupIds: Set<Long>? = null
     private var graphStatId: Long? = null
     private var graphStatDisplayIndex: Int? = null
     private var subConfigException: GraphStatConfigEvent.ValidationException? = null
 
-    override fun initViewModel(graphStatGroupId: Long, graphStatId: Long) {
-        if (this.graphStatGroupId != -1L) return
-        this.graphStatGroupId = graphStatGroupId
+    override fun initViewModelForCreate(groupId: Long) {
+        if (this.graphStatGroupIds != null) return
+        this.graphStatGroupIds = setOf(groupId)
+    }
+
+    override fun initViewModelForUpdate(graphStatId: Long) {
+        if (this.graphStatGroupIds != null) return
         viewModelScope.launch(io) {
             thisIsLoading.value = true
-            if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
+            initFromExistingGraphStat(graphStatId)
             thisIsLoading.value = false
         }
     }
@@ -168,6 +173,7 @@ class GraphStatInputViewModelImpl @Inject constructor(
                 return@withContext
             }
 
+            this@GraphStatInputViewModelImpl.graphStatGroupIds = graphStat.groupIds
             this@GraphStatInputViewModelImpl.graphName = graphStat.name.asTfv()
             this@GraphStatInputViewModelImpl.graphStatType.value = graphStat.type
             this@GraphStatInputViewModelImpl.graphStatId = graphStat.id
@@ -216,12 +222,16 @@ class GraphStatInputViewModelImpl @Inject constructor(
 
     override fun createGraphOrStat() {
         if (thisIsLoading.value) return
-        configData?.config?.let {
+        configData?.config?.let { config ->
             thisIsLoading.value = true
             viewModelScope.launch(io) {
-                gsiProvider
-                    .getDataSourceAdapter(graphStatType.value!!)
-                    .writeConfig(constructGraphOrStat(), it, updateMode.value!!)
+                val adapter = gsiProvider.getDataSourceAdapter(graphStatType.value!!)
+                val existingId = graphStatId
+                if (existingId != null) {
+                    adapter.update(existingId, graphName.text, config)
+                } else {
+                    adapter.create(graphName.text, graphStatGroupIds!!.first(), config)
+                }
                 withContext(ui) { complete.send(Unit) }
             }
         }
@@ -276,7 +286,7 @@ class GraphStatInputViewModelImpl @Inject constructor(
 
     private fun constructGraphOrStat() = GraphOrStat(
         id = graphStatId ?: 0L,
-        groupId = graphStatGroupId,
+        groupIds = graphStatGroupIds ?: emptySet(),
         name = graphName.text,
         type = graphStatType.value!!,
         displayIndex = graphStatDisplayIndex ?: 0

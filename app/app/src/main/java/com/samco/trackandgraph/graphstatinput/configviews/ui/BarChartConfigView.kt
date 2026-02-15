@@ -56,11 +56,11 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun BarChartConfigView(
-    graphStatId: Long,
+    graphStatId: Long?,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
     val viewModel = hiltViewModel<BarChartConfigViewModel>().apply {
-        initFromGraphStatId(graphStatId)
+        init(graphStatId)
     }
 
     LaunchedEffect(viewModel) {

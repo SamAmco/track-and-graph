@@ -102,7 +102,7 @@ class LuaGraphDataFactoryTest {
     private suspend fun callGetViewData(features: Map<String, Long> = emptyMap()): ILuaGraphViewData {
         val graphOrStat = GraphOrStat(
             id = 1,
-            groupId = 1,
+            groupIds = setOf(1),
             name = "name",
             type = GraphStatType.LUA_SCRIPT,
             displayIndex = 1

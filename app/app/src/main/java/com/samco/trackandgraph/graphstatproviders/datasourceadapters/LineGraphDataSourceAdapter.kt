@@ -18,9 +18,7 @@
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
-import com.samco.trackandgraph.data.database.dto.LineGraphConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
-import com.samco.trackandgraph.data.database.dto.LineGraphFeatureConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -29,49 +27,33 @@ import javax.inject.Inject
 class LineGraphDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<LineGraphWithFeatures>(dataInteractor) {
-    override suspend fun writeConfigToDatabase(
-        graphOrStat: GraphOrStat,
-        config: LineGraphWithFeatures,
-        updateMode: Boolean
-    ) {
-        val lineGraphConfig = LineGraphConfig(
-            features = config.features.map { feature ->
-                LineGraphFeatureConfig(
-                    featureId = feature.featureId,
-                    name = feature.name,
-                    colorIndex = feature.colorIndex,
-                    averagingMode = feature.averagingMode,
-                    plottingMode = feature.plottingMode,
-                    pointStyle = feature.pointStyle,
-                    offset = feature.offset,
-                    scale = feature.scale,
-                    durationPlottingMode = feature.durationPlottingMode
-                )
-            },
-            sampleSize = config.sampleSize,
-            yRangeType = config.yRangeType,
-            yFrom = config.yFrom,
-            yTo = config.yTo,
-            endDate = config.endDate
-        )
 
-        if (updateMode) {
-            dataInteractor.updateLineGraph(
-                LineGraphUpdateRequest(
-                    graphStatId = graphOrStat.id,
-                    name = graphOrStat.name,
-                    config = lineGraphConfig
-                )
+    override suspend fun createInDatabase(
+        name: String,
+        groupId: Long,
+        config: LineGraphWithFeatures
+    ) {
+        dataInteractor.createLineGraph(
+            LineGraphCreateRequest(
+                name = name,
+                groupId = groupId,
+                config = config.toConfig()
             )
-        } else {
-            dataInteractor.createLineGraph(
-                LineGraphCreateRequest(
-                    name = graphOrStat.name,
-                    groupId = graphOrStat.groupId,
-                    config = lineGraphConfig
-                )
+        )
+    }
+
+    override suspend fun updateInDatabase(
+        graphStatId: Long,
+        name: String,
+        config: LineGraphWithFeatures
+    ) {
+        dataInteractor.updateLineGraph(
+            LineGraphUpdateRequest(
+                graphStatId = graphStatId,
+                name = name,
+                config = config.toConfig()
             )
-        }
+        )
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LineGraphWithFeatures>? {

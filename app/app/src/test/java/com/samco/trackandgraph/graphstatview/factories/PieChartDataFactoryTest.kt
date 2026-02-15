@@ -33,7 +33,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -53,7 +52,7 @@ class PieChartDataFactoryTest {
 
     private val graphOrStat = GraphOrStat(
         id = 1L,
-        groupId = 1L,
+        groupIds = setOf(1),
         name = "name",
         type = GraphStatType.PIE_CHART,
         displayIndex = 1

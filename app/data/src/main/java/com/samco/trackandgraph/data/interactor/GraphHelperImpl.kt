@@ -612,5 +612,5 @@ internal class GraphHelperImpl @Inject constructor(
         )
 
     private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) =
-        graphDao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
+        graphDao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity(graphOrStat.groupIds.first()))
 }

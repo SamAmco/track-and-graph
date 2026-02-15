@@ -45,4 +45,16 @@ data class LineGraphFeature(
         scale,
         durationPlottingMode
     )
+
+    fun toFeatureConfig() = LineGraphFeatureConfig(
+        featureId = featureId,
+        name = name,
+        colorIndex = colorIndex,
+        averagingMode = averagingMode,
+        plottingMode = plottingMode,
+        pointStyle = pointStyle,
+        offset = offset,
+        scale = scale,
+        durationPlottingMode = durationPlottingMode
+    )
 }

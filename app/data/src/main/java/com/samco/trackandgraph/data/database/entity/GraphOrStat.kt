@@ -51,7 +51,8 @@ internal data class GraphOrStat(
 ) {
     fun toDto() = GraphOrStat(
         id,
-        groupId,
+        // TODO: Currently graphs only exist in one group, but this will change
+        setOf(groupId),
         name,
         type,
         displayIndex

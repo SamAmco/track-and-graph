@@ -42,6 +42,7 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
 
     private var updateJob: Job? = null
 
+    private var initialized = false
     private var graphStatId: Long? = null
 
     //This will be available after onDataLoaded is called
@@ -49,18 +50,20 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
         private set
 
     /**
-     * You must call this before using the view model even if the intention is to create a new graph
-     * or stat. This will load the config data from the database and set the [featurePathProvider].
-     * If creating a new graph or stat then you can pass in -1L as the graphStatId.
+     * Initialize the view model. Must be called before using. This will load the
+     * [featurePathProvider] and optionally load existing config data from the database.
+     *
+     * @param graphStatId The ID of an existing graph/stat to edit, or null to create a new one.
      */
-    fun initFromGraphStatId(graphStatId: Long) {
-        if (this.graphStatId == graphStatId) return
+    fun init(graphStatId: Long? = null) {
+        if (initialized) return
+        initialized = true
         this.graphStatId = graphStatId
 
         initJob = viewModelScope.launch(io) {
             configFlow.emit(GraphStatConfigEvent.Loading)
             loadFeaturePathProvider()
-            loadGraphStat(graphStatId)
+            graphStatId?.let { loadGraphStat(it) } ?: withContext(ui) { onDataLoaded(null) }
         }
         viewModelScope.launch(ui) { onUpdate() }
     }

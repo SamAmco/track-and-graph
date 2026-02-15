@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.PieChart
-import com.samco.trackandgraph.data.database.dto.PieChartConfig
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -28,35 +27,33 @@ import javax.inject.Inject
 class PieChartDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<PieChart>(dataInteractor) {
-    override suspend fun writeConfigToDatabase(
-        graphOrStat: GraphOrStat,
-        config: PieChart,
-        updateMode: Boolean
-    ) {
-        val pieChartConfig = PieChartConfig(
-            featureId = config.featureId,
-            sampleSize = config.sampleSize,
-            endDate = config.endDate,
-            sumByCount = config.sumByCount
-        )
 
-        if (updateMode) {
-            dataInteractor.updatePieChart(
-                PieChartUpdateRequest(
-                    graphStatId = graphOrStat.id,
-                    name = graphOrStat.name,
-                    config = pieChartConfig
-                )
+    override suspend fun createInDatabase(
+        name: String,
+        groupId: Long,
+        config: PieChart
+    ) {
+        dataInteractor.createPieChart(
+            PieChartCreateRequest(
+                name = name,
+                groupId = groupId,
+                config = config.toConfig()
             )
-        } else {
-            dataInteractor.createPieChart(
-                PieChartCreateRequest(
-                    name = graphOrStat.name,
-                    groupId = graphOrStat.groupId,
-                    config = pieChartConfig
-                )
+        )
+    }
+
+    override suspend fun updateInDatabase(
+        graphStatId: Long,
+        name: String,
+        config: PieChart
+    ) {
+        dataInteractor.updatePieChart(
+            PieChartUpdateRequest(
+                graphStatId = graphStatId,
+                name = name,
+                config = config.toConfig()
             )
-        }
+        )
     }
 
     override suspend fun getConfigDataFromDatabase(

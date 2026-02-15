@@ -515,7 +515,7 @@ class BarChartDataFactoryTest {
 
     private fun dummyGraphOrStat() = GraphOrStat(
         id = 1,
-        groupId = 1,
+        groupIds = setOf(1),
         name = "name",
         type = GraphStatType.BAR_CHART,
         displayIndex = 1

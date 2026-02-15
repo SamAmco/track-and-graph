@@ -45,11 +45,11 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun LastValueConfigView(
-    graphStatId: Long,
+    graphStatId: Long?,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
     val viewModel = hiltViewModel<LastValueConfigViewModel>().apply {
-        initFromGraphStatId(graphStatId)
+        init(graphStatId)
     }
 
     LaunchedEffect(viewModel) {

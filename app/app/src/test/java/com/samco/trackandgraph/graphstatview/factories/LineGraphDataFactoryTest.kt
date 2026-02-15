@@ -86,7 +86,7 @@ class LineGraphDataFactoryTest {
 
         val graphOrStat = GraphOrStat(
             id = 1L,
-            groupId = 1L,
+            groupIds = setOf(1),
             name = "Graph",
             type = GraphStatType.LINE_GRAPH,
             displayIndex = 0

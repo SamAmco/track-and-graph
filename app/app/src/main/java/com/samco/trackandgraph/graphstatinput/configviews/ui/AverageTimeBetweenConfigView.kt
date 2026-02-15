@@ -46,11 +46,11 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun AverageTimeBetweenConfigView(
-    graphStatId: Long,
+    graphStatId: Long?,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
     val viewModel = hiltViewModel<AverageTimeBetweenConfigViewModel>().apply {
-        initFromGraphStatId(graphStatId)
+        init(graphStatId)
     }
 
     LaunchedEffect(viewModel) {

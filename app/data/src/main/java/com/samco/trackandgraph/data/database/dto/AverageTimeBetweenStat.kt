@@ -43,4 +43,15 @@ data class AverageTimeBetweenStat(
         filterByRange = filterByRange,
         filterByLabels = filterByLabels
     )
+
+    fun toConfig() = AverageTimeBetweenStatConfig(
+        featureId = featureId,
+        fromValue = fromValue,
+        toValue = toValue,
+        sampleSize = sampleSize,
+        labels = labels,
+        endDate = endDate,
+        filterByRange = filterByRange,
+        filterByLabels = filterByLabels
+    )
 }

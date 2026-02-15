@@ -52,11 +52,11 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun TimeHistogramConfigView(
-    graphStatId: Long,
+    graphStatId: Long?,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) = Column {
     val viewModel = hiltViewModel<TimeHistogramConfigViewModel>().apply {
-        initFromGraphStatId(graphStatId)
+        init(graphStatId)
     }
 
     LaunchedEffect(viewModel) {

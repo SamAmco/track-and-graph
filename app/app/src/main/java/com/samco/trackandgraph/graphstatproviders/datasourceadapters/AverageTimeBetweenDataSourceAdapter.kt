@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
-import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatConfig
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateRequest
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
@@ -28,39 +27,33 @@ import javax.inject.Inject
 class AverageTimeBetweenDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<AverageTimeBetweenStat>(dataInteractor) {
-    override suspend fun writeConfigToDatabase(
-        graphOrStat: GraphOrStat,
-        config: AverageTimeBetweenStat,
-        updateMode: Boolean
-    ) {
-        val atbConfig = AverageTimeBetweenStatConfig(
-            featureId = config.featureId,
-            fromValue = config.fromValue,
-            toValue = config.toValue,
-            sampleSize = config.sampleSize,
-            labels = config.labels,
-            endDate = config.endDate,
-            filterByRange = config.filterByRange,
-            filterByLabels = config.filterByLabels
-        )
 
-        if (updateMode) {
-            dataInteractor.updateAverageTimeBetweenStat(
-                AverageTimeBetweenStatUpdateRequest(
-                    graphStatId = graphOrStat.id,
-                    name = graphOrStat.name,
-                    config = atbConfig
-                )
+    override suspend fun createInDatabase(
+        name: String,
+        groupId: Long,
+        config: AverageTimeBetweenStat
+    ) {
+        dataInteractor.createAverageTimeBetweenStat(
+            AverageTimeBetweenStatCreateRequest(
+                name = name,
+                groupId = groupId,
+                config = config.toConfig()
             )
-        } else {
-            dataInteractor.createAverageTimeBetweenStat(
-                AverageTimeBetweenStatCreateRequest(
-                    name = graphOrStat.name,
-                    groupId = graphOrStat.groupId,
-                    config = atbConfig
-                )
+        )
+    }
+
+    override suspend fun updateInDatabase(
+        graphStatId: Long,
+        name: String,
+        config: AverageTimeBetweenStat
+    ) {
+        dataInteractor.updateAverageTimeBetweenStat(
+            AverageTimeBetweenStatUpdateRequest(
+                graphStatId = graphStatId,
+                name = name,
+                config = config.toConfig()
             )
-        }
+        )
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, AverageTimeBetweenStat>? {

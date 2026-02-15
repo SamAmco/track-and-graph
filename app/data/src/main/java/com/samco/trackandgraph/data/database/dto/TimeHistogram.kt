@@ -38,4 +38,12 @@ data class TimeHistogram(
         sumByCount = sumByCount,
         endDate = endDate
     )
+
+    fun toConfig() = TimeHistogramConfig(
+        featureId = featureId,
+        sampleSize = sampleSize,
+        window = window,
+        sumByCount = sumByCount,
+        endDate = endDate
+    )
 }

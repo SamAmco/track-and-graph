@@ -88,11 +88,11 @@ import org.threeten.bp.Duration
 @Composable
 fun LineGraphConfigView(
     scrollState: ScrollState,
-    graphStatId: Long,
+    graphStatId: Long?,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
     val viewModel = hiltViewModel<LineGraphConfigViewModel>().apply {
-        initFromGraphStatId(graphStatId)
+        init(graphStatId)
     }
 
     LaunchedEffect(viewModel) {

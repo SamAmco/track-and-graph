@@ -68,7 +68,7 @@ class MoveItemViewModel @Inject constructor(
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = graphOrStat.graphOrStat.id,
             itemType = MovableItemType.GRAPH,
-            fromGroupId = graphOrStat.graphOrStat.groupId,
+            fromGroupId = graphOrStat.graphOrStat.groupIds.first(),
             hiddenItems = emptySet()
         )
     }

@@ -95,11 +95,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun LuaGraphConfigView(
     scrollState: ScrollState,
-    graphStatId: Long,
+    graphStatId: Long?,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
     val viewModel = hiltViewModel<LuaGraphConfigViewModel>().apply {
-        initFromGraphStatId(graphStatId)
+        init(graphStatId)
     }
 
     LaunchedEffect(viewModel) {

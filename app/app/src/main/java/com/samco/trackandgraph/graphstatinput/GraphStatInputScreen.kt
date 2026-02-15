@@ -102,7 +102,7 @@ import java.lang.Float.min
 @Serializable
 data class GraphStatInputNavKey(
     val groupId: Long,
-    val graphStatId: Long = -1L
+    val graphStatId: Long? = null
 ) : NavKey
 
 @Composable
@@ -115,7 +115,11 @@ fun GraphStatInputScreen(
 
     // Initialize ViewModel with arguments
     LaunchedEffect(navArgs.groupId, navArgs.graphStatId) {
-        viewModel.initViewModel(navArgs.groupId, navArgs.graphStatId)
+        if (navArgs.graphStatId != null) {
+            viewModel.initViewModelForUpdate(navArgs.graphStatId)
+        } else {
+            viewModel.initViewModelForCreate(navArgs.groupId)
+        }
     }
 
     // Handle navigation back when complete
@@ -169,7 +173,7 @@ private fun TopAppBarContent(navArgs: GraphStatInputNavKey, urlNavigator: UrlNav
 @Composable
 internal fun GraphStatInputView(
     viewModel: GraphStatInputViewModel,
-    graphStatId: Long
+    graphStatId: Long?
 ) = Box(
     modifier = Modifier.fillMaxSize()
 ) {
@@ -445,7 +449,7 @@ fun GraphStatTypeSelector(
 fun ConfigInputView(
     graphType: State<GraphStatType>,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit,
-    graphStatId: Long,
+    graphStatId: Long?,
     scrollState: ScrollState
 ) {
     when (graphType.value) {

@@ -29,4 +29,13 @@ data class LineGraphWithFeatures(
     val endDate: GraphEndDate
 ) {
     fun toLineGraph() = LineGraph(id, graphStatId, sampleSize, yRangeType, yFrom, yTo, endDate)
+
+    fun toConfig() = LineGraphConfig(
+        features = features.map { it.toFeatureConfig() },
+        sampleSize = sampleSize,
+        yRangeType = yRangeType,
+        yFrom = yFrom,
+        yTo = yTo,
+        endDate = endDate
+    )
 }
