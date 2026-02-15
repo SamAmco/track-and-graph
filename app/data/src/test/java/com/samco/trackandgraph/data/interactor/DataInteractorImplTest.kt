@@ -68,6 +68,7 @@ class DataInteractorImplTest {
     private val functionHelper: FunctionHelper = mock()
     private val reminderHelper: ReminderHelper = mock()
     private val groupHelper: GroupHelper = mock()
+    private val graphHelper: GraphHelper = mock()
     private val dependencyAnalyserProvider: DependencyAnalyserProvider = mock()
 
     @Before
@@ -82,6 +83,7 @@ class DataInteractorImplTest {
             functionHelper = functionHelper,
             reminderHelper = reminderHelper,
             groupHelper = groupHelper,
+            graphHelper = graphHelper,
             dependencyAnalyserProvider = dependencyAnalyserProvider,
         )
     }

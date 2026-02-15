@@ -30,7 +30,7 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphStatType
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
@@ -240,10 +240,10 @@ internal class Converters {
     fun intToYRangeType(index: Int) = YRangeType.values()[index]
 
     @TypeConverter
-    fun averagingModeToInt(averagingMode: LineGraphAveraginModes) = averagingMode.ordinal
+    fun averagingModeToInt(averagingMode: LineGraphAveragingModes) = averagingMode.ordinal
 
     @TypeConverter
-    fun intToAveragingMode(index: Int) = LineGraphAveraginModes.values()[index]
+    fun intToAveragingMode(index: Int) = LineGraphAveragingModes.values()[index]
 
     @TypeConverter
     fun lineGraphPlottingModeToInt(lineGraphPlottingMode: LineGraphPlottingModes) =

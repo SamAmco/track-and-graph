@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph
 
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import org.threeten.bp.Duration
@@ -72,14 +72,14 @@ data class TimeHistogramWindowData(
 
 
 val movingAverageDurations = mapOf(
-    LineGraphAveraginModes.NO_AVERAGING to null,
-    LineGraphAveraginModes.DAILY_MOVING_AVERAGE to Duration.ofDays(1),
-    LineGraphAveraginModes.THREE_DAY_MOVING_AVERAGE to Duration.ofDays(3),
-    LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE to Duration.ofDays(7),
-    LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE to Duration.ofDays(31),
-    LineGraphAveraginModes.THREE_MONTH_MOVING_AVERAGE to Duration.ofDays(93),
-    LineGraphAveraginModes.SIX_MONTH_MOVING_AVERAGE to Duration.ofDays(183),
-    LineGraphAveraginModes.YEARLY_MOVING_AVERAGE to Duration.ofDays(365)
+    LineGraphAveragingModes.NO_AVERAGING to null,
+    LineGraphAveragingModes.DAILY_MOVING_AVERAGE to Duration.ofDays(1),
+    LineGraphAveragingModes.THREE_DAY_MOVING_AVERAGE to Duration.ofDays(3),
+    LineGraphAveragingModes.WEEKLY_MOVING_AVERAGE to Duration.ofDays(7),
+    LineGraphAveragingModes.MONTHLY_MOVING_AVERAGE to Duration.ofDays(31),
+    LineGraphAveragingModes.THREE_MONTH_MOVING_AVERAGE to Duration.ofDays(93),
+    LineGraphAveragingModes.SIX_MONTH_MOVING_AVERAGE to Duration.ofDays(183),
+    LineGraphAveragingModes.YEARLY_MOVING_AVERAGE to Duration.ofDays(365)
 )
 
 val plottingModePeriods: Map<LineGraphPlottingModes, TemporalAmount?> = mapOf(

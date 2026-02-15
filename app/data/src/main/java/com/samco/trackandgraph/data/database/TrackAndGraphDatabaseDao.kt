@@ -104,7 +104,7 @@ private const val getDisplayTrackersQuery = """
     """
 
 @Dao
-internal interface TrackAndGraphDatabaseDao {
+internal interface TrackAndGraphDatabaseDao : GraphDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGroup(group: Group): Long
 
@@ -200,7 +200,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double)
 
     @Query("DELETE FROM graphs_and_stats_table2 WHERE id = :id")
-    fun deleteGraphOrStat(id: Long)
+    override fun deleteGraphOrStat(id: Long)
 
     @Delete
     fun deleteGraphOrStat(graphOrStat: GraphOrStat)
@@ -233,30 +233,30 @@ internal interface TrackAndGraphDatabaseDao {
     fun getDataPointsCursor(featureId: Long): Cursor
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE id = :graphStatId LIMIT 1")
-    fun getGraphStatById(graphStatId: Long): GraphOrStat
+    override fun getGraphStatById(graphStatId: Long): GraphOrStat
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE id = :graphStatId LIMIT 1")
-    fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
+    override fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
 
     @Query("SELECT * FROM line_graphs_table3 WHERE graph_stat_id = :graphStatId LIMIT 1")
     @Transaction
-    fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
+    override fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
     @Query("SELECT * FROM lua_graphs_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     @Transaction
-    fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures?
+    override fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures?
 
     @Query("SELECT * FROM pie_charts_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
+    override fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
 
     @Query("SELECT * FROM average_time_between_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
+    override fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
-    fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
+    override fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
     @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC, id DESC")
-    fun getAllGraphStatsSync(): List<GraphOrStat>
+    override fun getAllGraphStatsSync(): List<GraphOrStat>
 
     @Query(
         """
@@ -291,64 +291,64 @@ internal interface TrackAndGraphDatabaseDao {
     fun getAllGlobalNotesSync(): List<GlobalNote>
 
     @Query("DELETE FROM line_graph_features_table2 WHERE line_graph_id = :lineGraphId")
-    fun deleteFeaturesForLineGraph(lineGraphId: Long)
+    override fun deleteFeaturesForLineGraph(lineGraphId: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertLineGraphFeatures(lineGraphFeatures: List<LineGraphFeature>)
+    override fun insertLineGraphFeatures(lineGraphFeatures: List<LineGraphFeature>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertLineGraph(lineGraph: LineGraph): Long
+    override fun insertLineGraph(lineGraph: LineGraph): Long
 
     @Update
-    fun updateLineGraph(lineGraph: LineGraph)
+    override fun updateLineGraph(lineGraph: LineGraph)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPieChart(pieChart: PieChart): Long
+    override fun insertPieChart(pieChart: PieChart): Long
 
     @Update
-    fun updatePieChart(pieChart: PieChart)
+    override fun updatePieChart(pieChart: PieChart)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat): Long
+    override fun insertAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat): Long
 
     @Update
-    fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat)
+    override fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
+    override fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
 
     @Update
-    fun updateGraphOrStat(graphOrStat: GraphOrStat)
+    override fun updateGraphOrStat(graphOrStat: GraphOrStat)
 
     @Update
     fun updateGraphStats(graphStat: List<GraphOrStat>)
 
     @Update
-    fun updateTimeHistogram(timeHistogram: TimeHistogram)
+    override fun updateTimeHistogram(timeHistogram: TimeHistogram)
 
     @Update
-    fun updateLastValueStat(lastValueStat: LastValueStat)
+    override fun updateLastValueStat(lastValueStat: LastValueStat)
 
     @Update
-    fun updateBarChart(barChart: BarChart)
+    override fun updateBarChart(barChart: BarChart)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTimeHistogram(timeHistogram: TimeHistogram): Long
+    override fun insertTimeHistogram(timeHistogram: TimeHistogram): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertLastValueStat(lastValueStat: LastValueStat): Long
+    override fun insertLastValueStat(lastValueStat: LastValueStat): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBarChart(barChart: BarChart): Long
+    override fun insertBarChart(barChart: BarChart): Long
 
     @Query("SELECT * FROM time_histograms_table WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
+    override fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
     @Query("SELECT * FROM last_value_stats_table WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getLastValueStatByGraphStatId(graphStatId: Long): LastValueStat?
+    override fun getLastValueStatByGraphStatId(graphStatId: Long): LastValueStat?
 
     @Query("SELECT * FROM bar_charts_table WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getBarChartByGraphStatId(graphStatId: Long): BarChart?
+    override fun getBarChartByGraphStatId(graphStatId: Long): BarChart?
 
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
     fun getGroupsForGroupSync(id: Long): List<Group>
@@ -406,22 +406,22 @@ internal interface TrackAndGraphDatabaseDao {
     fun hasAtLeastOneDataPoint(): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertLuaGraph(luaGraph: LuaGraph): Long
+    override fun insertLuaGraph(luaGraph: LuaGraph): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertLuaGraphFeatures(map: List<LuaGraphFeature>)
+    override fun insertLuaGraphFeatures(luaGraphFeatures: List<LuaGraphFeature>)
 
     @Update
-    fun updateLuaGraph(luaGraph: LuaGraph)
+    override fun updateLuaGraph(luaGraph: LuaGraph)
 
     @Query("DELETE FROM lua_graph_features_table WHERE lua_graph_id = :luaGraphId")
-    fun deleteFeaturesForLuaGraph(luaGraphId: Long)
+    override fun deleteFeaturesForLuaGraph(luaGraphId: Long)
 
     @Query("SELECT EXISTS (SELECT 1 FROM lua_graphs_table LIMIT 1)")
-    fun hasAnyLuaGraphs(): Boolean
+    override fun hasAnyLuaGraphs(): Boolean
 
     @Query("SELECT EXISTS (SELECT 1 FROM graphs_and_stats_table2 LIMIT 1)")
-    fun hasAnyGraphs(): Boolean
+    override fun hasAnyGraphs(): Boolean
 
     @Query("SELECT EXISTS (SELECT 1 FROM features_table LIMIT 1)")
     fun hasAnyFeatures(): Boolean

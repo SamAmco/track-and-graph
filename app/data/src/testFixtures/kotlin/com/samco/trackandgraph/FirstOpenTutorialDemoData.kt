@@ -19,7 +19,7 @@ package com.samco.trackandgraph
 
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphFeatureConfig
@@ -298,7 +298,7 @@ private suspend fun createMonthlyMovingAverageGraph(
                         featureId = relaxationFeatureId,
                         name = "Relaxation",
                         colorIndex = 7,
-                        averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
+                        averagingMode = LineGraphAveragingModes.MONTHLY_MOVING_AVERAGE,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.NONE,
                         offset = 0.0,
@@ -309,7 +309,7 @@ private suspend fun createMonthlyMovingAverageGraph(
                         featureId = stressFeatureId,
                         name = "Stress",
                         colorIndex = 1,
-                        averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
+                        averagingMode = LineGraphAveragingModes.MONTHLY_MOVING_AVERAGE,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.NONE,
                         offset = 0.0,

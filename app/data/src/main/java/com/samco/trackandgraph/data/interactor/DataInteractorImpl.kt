@@ -19,10 +19,8 @@ package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateRequest
-import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.BarChartUpdateRequest
 import com.samco.trackandgraph.data.database.dto.ComponentType
@@ -36,8 +34,6 @@ import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
 import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
-import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupChildType
@@ -46,23 +42,16 @@ import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
-import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.LastValueStatUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
-import com.samco.trackandgraph.data.database.dto.LineGraphFeature
 import com.samco.trackandgraph.data.database.dto.LineGraphUpdateRequest
-import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
-import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.data.database.dto.LuaGraphUpdateRequest
-import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
-import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
 import com.samco.trackandgraph.data.database.dto.Reminder
-import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
@@ -89,12 +78,14 @@ internal class DataInteractorImpl @Inject constructor(
     private val functionHelper: FunctionHelper,
     private val reminderHelper: ReminderHelper,
     private val groupHelper: GroupHelper,
+    private val graphHelper: GraphHelper,
     private val dependencyAnalyserProvider: DependencyAnalyserProvider,
 ) : DataInteractor,
     TrackerHelper by trackerHelper,
     FunctionHelper by functionHelper,
     ReminderHelper by reminderHelper,
-    GroupHelper by groupHelper {
+    GroupHelper by groupHelper,
+    GraphHelper by graphHelper {
 
     private val dataUpdateEvents = MutableSharedFlow<DataUpdateType>(
         extraBufferCapacity = 100,
@@ -307,530 +298,140 @@ internal class DataInteractorImpl @Inject constructor(
 
     override fun getDataUpdateEvents(): SharedFlow<DataUpdateType> = dataUpdateEvents
 
-    // =========================================================================
-    // GraphHelper - Get methods
-    // =========================================================================
-
-    override suspend fun getGraphStatById(graphStatId: Long): GraphOrStat = withContext(io) {
-        dao.getGraphStatById(graphStatId).toDto()
-    }
-
-    override suspend fun tryGetGraphStatById(graphStatId: Long): GraphOrStat? = withContext(io) {
-        dao.tryGetGraphStatById(graphStatId)?.toDto()
-    }
-
-    override suspend fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures? =
-        withContext(io) {
-            dao.getLineGraphByGraphStatId(graphStatId)?.toDto()
-        }
-
-    override suspend fun getPieChartByGraphStatId(graphStatId: Long): PieChart? = withContext(io) {
-        dao.getPieChartByGraphStatId(graphStatId)?.toDto()
-    }
-
-    override suspend fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat? =
-        withContext(io) {
-            dao.getAverageTimeBetweenStatByGraphStatId(graphStatId)?.toDto()
-        }
-
-    override suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram? =
-        withContext(io) {
-            dao.getTimeHistogramByGraphStatId(graphStatId)?.toDto()
-        }
-
-    override suspend fun getLastValueStatByGraphStatId(graphStatId: Long): LastValueStat? =
-        withContext(io) {
-            dao.getLastValueStatByGraphStatId(graphStatId)?.toDto()
-        }
-
-    override suspend fun getBarChartByGraphStatId(graphStatId: Long): BarChart? =
-        withContext(io) {
-            dao.getBarChartByGraphStatId(graphStatId)?.toDto()
-        }
-
-    override suspend fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures? =
-        withContext(io) {
-            dao.getLuaGraphByGraphStatId(graphStatId)?.toDto()
-        }
-
-    override suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat> =
-        withContext(io) {
-            dao.getGraphsAndStatsByGroupIdSync(groupId).map { it.toDto() }
-        }
-
-    override suspend fun getAllGraphStatsSync(): List<GraphOrStat> = withContext(io) {
-        dao.getAllGraphStatsSync().map { it.toDto() }
-    }
-
-    override suspend fun hasAnyGraphs(): Boolean = withContext(io) { dao.hasAnyGraphs() }
-
-    override suspend fun hasAnyLuaGraphs(): Boolean = withContext(io) { dao.hasAnyLuaGraphs() }
-
     override suspend fun hasAnyFeatures(): Boolean = withContext(io) { dao.hasAnyFeatures() }
 
     // =========================================================================
-    // GraphHelper - Delete method
+    // GraphHelper method overrides with event emission
     // =========================================================================
 
     override suspend fun deleteGraph(request: GraphDeleteRequest) = withContext(io) {
-        dao.deleteGraphOrStat(request.graphStatId)
+        graphHelper.deleteGraph(request)
         dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
     }
-
-    // =========================================================================
-    // GraphHelper - Create methods
-    // =========================================================================
 
     override suspend fun createLineGraph(request: LineGraphCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            val graphStatId = insertGraphOrStat(request.name, request.groupId, GraphStatType.LINE_GRAPH)
-            val lineGraphId = dao.insertLineGraph(
-                com.samco.trackandgraph.data.database.entity.LineGraph(
-                    id = 0L,
-                    graphStatId = graphStatId,
-                    sampleSize = request.config.sampleSize,
-                    yRangeType = request.config.yRangeType,
-                    yFrom = request.config.yFrom,
-                    yTo = request.config.yTo,
-                    endDate = request.config.endDate
-                )
-            )
-            val features = request.config.features.map { config ->
-                com.samco.trackandgraph.data.database.entity.LineGraphFeature(
-                    id = 0L,
-                    lineGraphId = lineGraphId,
-                    featureId = config.featureId,
-                    name = config.name,
-                    colorIndex = config.colorIndex,
-                    averagingMode = config.averagingMode,
-                    plottingMode = config.plottingMode,
-                    pointStyle = config.pointStyle,
-                    offset = config.offset,
-                    scale = config.scale,
-                    durationPlottingMode = config.durationPlottingMode
-                )
-            }
-            dao.insertLineGraphFeatures(features)
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(graphStatId))
-            graphStatId
+            graphHelper.createLineGraph(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createPieChart(request: PieChartCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            val graphStatId = insertGraphOrStat(request.name, request.groupId, GraphStatType.PIE_CHART)
-            dao.insertPieChart(
-                com.samco.trackandgraph.data.database.entity.PieChart(
-                    id = 0L,
-                    graphStatId = graphStatId,
-                    featureId = request.config.featureId,
-                    sampleSize = request.config.sampleSize,
-                    endDate = request.config.endDate,
-                    sumByCount = request.config.sumByCount
-                )
-            )
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(graphStatId))
-            graphStatId
+            graphHelper.createPieChart(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            val graphStatId = insertGraphOrStat(request.name, request.groupId, GraphStatType.AVERAGE_TIME_BETWEEN)
-            dao.insertAverageTimeBetweenStat(
-                com.samco.trackandgraph.data.database.entity.AverageTimeBetweenStat(
-                    id = 0L,
-                    graphStatId = graphStatId,
-                    featureId = request.config.featureId,
-                    fromValue = request.config.fromValue,
-                    toValue = request.config.toValue,
-                    sampleSize = request.config.sampleSize,
-                    labels = request.config.labels,
-                    endDate = request.config.endDate,
-                    filterByRange = request.config.filterByRange,
-                    filterByLabels = request.config.filterByLabels
-                )
-            )
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(graphStatId))
-            graphStatId
+            graphHelper.createAverageTimeBetweenStat(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            val graphStatId = insertGraphOrStat(request.name, request.groupId, GraphStatType.TIME_HISTOGRAM)
-            dao.insertTimeHistogram(
-                com.samco.trackandgraph.data.database.entity.TimeHistogram(
-                    id = 0L,
-                    graphStatId = graphStatId,
-                    featureId = request.config.featureId,
-                    sampleSize = request.config.sampleSize,
-                    window = request.config.window,
-                    sumByCount = request.config.sumByCount,
-                    endDate = request.config.endDate
-                )
-            )
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(graphStatId))
-            graphStatId
+            graphHelper.createTimeHistogram(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createLastValueStat(request: LastValueStatCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            val graphStatId = insertGraphOrStat(request.name, request.groupId, GraphStatType.LAST_VALUE)
-            dao.insertLastValueStat(
-                com.samco.trackandgraph.data.database.entity.LastValueStat(
-                    id = 0L,
-                    graphStatId = graphStatId,
-                    featureId = request.config.featureId,
-                    endDate = request.config.endDate,
-                    fromValue = request.config.fromValue,
-                    toValue = request.config.toValue,
-                    labels = request.config.labels,
-                    filterByRange = request.config.filterByRange,
-                    filterByLabels = request.config.filterByLabels
-                )
-            )
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(graphStatId))
-            graphStatId
+            graphHelper.createLastValueStat(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createBarChart(request: BarChartCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            val graphStatId = insertGraphOrStat(request.name, request.groupId, GraphStatType.BAR_CHART)
-            dao.insertBarChart(
-                com.samco.trackandgraph.data.database.entity.BarChart(
-                    id = 0L,
-                    graphStatId = graphStatId,
-                    featureId = request.config.featureId,
-                    endDate = request.config.endDate,
-                    sampleSize = request.config.sampleSize,
-                    yRangeType = request.config.yRangeType,
-                    yTo = request.config.yTo,
-                    scale = request.config.scale,
-                    barPeriod = request.config.barPeriod,
-                    sumByCount = request.config.sumByCount
-                )
-            )
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(graphStatId))
-            graphStatId
+            graphHelper.createBarChart(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createLuaGraph(request: LuaGraphCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            val graphStatId = insertGraphOrStat(request.name, request.groupId, GraphStatType.LUA_SCRIPT)
-            val luaGraphId = dao.insertLuaGraph(
-                com.samco.trackandgraph.data.database.entity.LuaGraph(
-                    id = 0L,
-                    graphStatId = graphStatId,
-                    script = request.config.script
-                )
-            )
-            val features = request.config.features.map { config ->
-                com.samco.trackandgraph.data.database.entity.LuaGraphFeature(
-                    id = 0L,
-                    luaGraphId = luaGraphId,
-                    featureId = config.featureId,
-                    name = config.name
-                )
-            }
-            dao.insertLuaGraphFeatures(features)
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(graphStatId))
-            graphStatId
+            graphHelper.createLuaGraph(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
-    // =========================================================================
-    // GraphHelper - Update methods
-    // =========================================================================
+    override suspend fun updateLineGraph(request: LineGraphUpdateRequest) = withContext(io) {
+        graphHelper.updateLineGraph(request)
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+    }
 
-    override suspend fun updateLineGraph(request: LineGraphUpdateRequest) =
-        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(request.graphStatId)) {
-            val existing = dao.getGraphStatById(request.graphStatId)
-            val existingLineGraph = dao.getLineGraphByGraphStatId(request.graphStatId)
-                ?: throw IllegalArgumentException("Line graph not found for graphStatId: ${request.graphStatId}")
-
-            // Update GraphOrStat if name changed
-            if (request.name != null) {
-                dao.updateGraphOrStat(existing.copy(name = request.name))
-            }
-
-            // Update config if provided
-            if (request.config != null) {
-                dao.updateLineGraph(
-                    existingLineGraph.toLineGraph().copy(
-                        sampleSize = request.config.sampleSize,
-                        yRangeType = request.config.yRangeType,
-                        yFrom = request.config.yFrom,
-                        yTo = request.config.yTo,
-                        endDate = request.config.endDate
-                    )
-                )
-                dao.deleteFeaturesForLineGraph(existingLineGraph.id)
-                val features = request.config.features.map { config ->
-                    com.samco.trackandgraph.data.database.entity.LineGraphFeature(
-                        id = 0L,
-                        lineGraphId = existingLineGraph.id,
-                        featureId = config.featureId,
-                        name = config.name,
-                        colorIndex = config.colorIndex,
-                        averagingMode = config.averagingMode,
-                        plottingMode = config.plottingMode,
-                        pointStyle = config.pointStyle,
-                        offset = config.offset,
-                        scale = config.scale,
-                        durationPlottingMode = config.durationPlottingMode
-                    )
-                }
-                dao.insertLineGraphFeatures(features)
-            }
-        }
-
-    override suspend fun updatePieChart(request: PieChartUpdateRequest) =
-        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(request.graphStatId)) {
-            val existing = dao.getGraphStatById(request.graphStatId)
-            val existingPieChart = dao.getPieChartByGraphStatId(request.graphStatId)
-                ?: throw IllegalArgumentException("Pie chart not found for graphStatId: ${request.graphStatId}")
-
-            if (request.name != null) {
-                dao.updateGraphOrStat(existing.copy(name = request.name))
-            }
-
-            if (request.config != null) {
-                dao.updatePieChart(
-                    existingPieChart.copy(
-                        featureId = request.config.featureId,
-                        sampleSize = request.config.sampleSize,
-                        endDate = request.config.endDate,
-                        sumByCount = request.config.sumByCount
-                    )
-                )
-            }
-        }
+    override suspend fun updatePieChart(request: PieChartUpdateRequest) = withContext(io) {
+        graphHelper.updatePieChart(request)
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+    }
 
     override suspend fun updateAverageTimeBetweenStat(request: AverageTimeBetweenStatUpdateRequest) =
-        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(request.graphStatId)) {
-            val existing = dao.getGraphStatById(request.graphStatId)
-            val existingStat = dao.getAverageTimeBetweenStatByGraphStatId(request.graphStatId)
-                ?: throw IllegalArgumentException("Average time between stat not found for graphStatId: ${request.graphStatId}")
-
-            if (request.name != null) {
-                dao.updateGraphOrStat(existing.copy(name = request.name))
-            }
-
-            if (request.config != null) {
-                dao.updateAverageTimeBetweenStat(
-                    existingStat.copy(
-                        featureId = request.config.featureId,
-                        fromValue = request.config.fromValue,
-                        toValue = request.config.toValue,
-                        sampleSize = request.config.sampleSize,
-                        labels = request.config.labels,
-                        endDate = request.config.endDate,
-                        filterByRange = request.config.filterByRange,
-                        filterByLabels = request.config.filterByLabels
-                    )
-                )
-            }
+        withContext(io) {
+            graphHelper.updateAverageTimeBetweenStat(request)
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
         }
 
-    override suspend fun updateTimeHistogram(request: TimeHistogramUpdateRequest) =
-        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(request.graphStatId)) {
-            val existing = dao.getGraphStatById(request.graphStatId)
-            val existingStat = dao.getTimeHistogramByGraphStatId(request.graphStatId)
-                ?: throw IllegalArgumentException("Time histogram not found for graphStatId: ${request.graphStatId}")
+    override suspend fun updateTimeHistogram(request: TimeHistogramUpdateRequest) = withContext(io) {
+        graphHelper.updateTimeHistogram(request)
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+    }
 
-            if (request.name != null) {
-                dao.updateGraphOrStat(existing.copy(name = request.name))
-            }
+    override suspend fun updateLastValueStat(request: LastValueStatUpdateRequest) = withContext(io) {
+        graphHelper.updateLastValueStat(request)
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+    }
 
-            if (request.config != null) {
-                dao.updateTimeHistogram(
-                    existingStat.copy(
-                        featureId = request.config.featureId,
-                        sampleSize = request.config.sampleSize,
-                        window = request.config.window,
-                        sumByCount = request.config.sumByCount,
-                        endDate = request.config.endDate
-                    )
-                )
-            }
-        }
+    override suspend fun updateBarChart(request: BarChartUpdateRequest) = withContext(io) {
+        graphHelper.updateBarChart(request)
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+    }
 
-    override suspend fun updateLastValueStat(request: LastValueStatUpdateRequest) =
-        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(request.graphStatId)) {
-            val existing = dao.getGraphStatById(request.graphStatId)
-            val existingStat = dao.getLastValueStatByGraphStatId(request.graphStatId)
-                ?: throw IllegalArgumentException("Last value stat not found for graphStatId: ${request.graphStatId}")
+    override suspend fun updateLuaGraph(request: LuaGraphUpdateRequest) = withContext(io) {
+        graphHelper.updateLuaGraph(request)
+        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+    }
 
-            if (request.name != null) {
-                dao.updateGraphOrStat(existing.copy(name = request.name))
-            }
+    override suspend fun duplicateLineGraph(graphStatId: Long): Long? = withContext(io) {
+        graphHelper.duplicateLineGraph(graphStatId)
+            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+    }
 
-            if (request.config != null) {
-                dao.updateLastValueStat(
-                    existingStat.copy(
-                        featureId = request.config.featureId,
-                        endDate = request.config.endDate,
-                        fromValue = request.config.fromValue,
-                        toValue = request.config.toValue,
-                        labels = request.config.labels,
-                        filterByRange = request.config.filterByRange,
-                        filterByLabels = request.config.filterByLabels
-                    )
-                )
-            }
-        }
+    override suspend fun duplicatePieChart(graphStatId: Long): Long? = withContext(io) {
+        graphHelper.duplicatePieChart(graphStatId)
+            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+    }
 
-    override suspend fun updateBarChart(request: BarChartUpdateRequest) =
-        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(request.graphStatId)) {
-            val existing = dao.getGraphStatById(request.graphStatId)
-            val existingStat = dao.getBarChartByGraphStatId(request.graphStatId)
-                ?: throw IllegalArgumentException("Bar chart not found for graphStatId: ${request.graphStatId}")
+    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long): Long? = withContext(io) {
+        graphHelper.duplicateAverageTimeBetweenStat(graphStatId)
+            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+    }
 
-            if (request.name != null) {
-                dao.updateGraphOrStat(existing.copy(name = request.name))
-            }
+    override suspend fun duplicateTimeHistogram(graphStatId: Long): Long? = withContext(io) {
+        graphHelper.duplicateTimeHistogram(graphStatId)
+            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+    }
 
-            if (request.config != null) {
-                dao.updateBarChart(
-                    existingStat.copy(
-                        featureId = request.config.featureId,
-                        endDate = request.config.endDate,
-                        sampleSize = request.config.sampleSize,
-                        yRangeType = request.config.yRangeType,
-                        yTo = request.config.yTo,
-                        scale = request.config.scale,
-                        barPeriod = request.config.barPeriod,
-                        sumByCount = request.config.sumByCount
-                    )
-                )
-            }
-        }
+    override suspend fun duplicateLastValueStat(graphStatId: Long): Long? = withContext(io) {
+        graphHelper.duplicateLastValueStat(graphStatId)
+            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+    }
 
-    override suspend fun updateLuaGraph(request: LuaGraphUpdateRequest) =
-        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(request.graphStatId)) {
-            val existing = dao.getGraphStatById(request.graphStatId)
-            val existingLuaGraph = dao.getLuaGraphByGraphStatId(request.graphStatId)
-                ?: throw IllegalArgumentException("Lua graph not found for graphStatId: ${request.graphStatId}")
+    override suspend fun duplicateBarChart(graphStatId: Long): Long? = withContext(io) {
+        graphHelper.duplicateBarChart(graphStatId)
+            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+    }
 
-            if (request.name != null) {
-                dao.updateGraphOrStat(existing.copy(name = request.name))
-            }
-
-            if (request.config != null) {
-                dao.updateLuaGraph(
-                    existingLuaGraph.toLuaGraph().copy(
-                        script = request.config.script
-                    )
-                )
-                dao.deleteFeaturesForLuaGraph(existingLuaGraph.id)
-                val features = request.config.features.map { config ->
-                    com.samco.trackandgraph.data.database.entity.LuaGraphFeature(
-                        id = 0L,
-                        luaGraphId = existingLuaGraph.id,
-                        featureId = config.featureId,
-                        name = config.name
-                    )
-                }
-                dao.insertLuaGraphFeatures(features)
-            }
-        }
-
-    // =========================================================================
-    // GraphHelper - Duplicate methods
-    // =========================================================================
-
-    override suspend fun duplicateLineGraph(graphStatId: Long): Long? =
-        performAtomicUpdate {
-            val graphOrStat = dao.tryGetGraphStatById(graphStatId)?.toDto() ?: return@performAtomicUpdate null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
-            dao.getLineGraphByGraphStatId(graphStatId)?.let {
-                val copy = dao.insertLineGraph(
-                    it.toLineGraph().copy(id = 0L, graphStatId = newGraphStatId)
-                )
-                dao.insertLineGraphFeatures(it.features.map { f ->
-                    f.copy(id = 0L, lineGraphId = copy)
-                })
-                copy
-            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStatId)) }
-            newGraphStatId
-        }
-
-    override suspend fun duplicatePieChart(graphStatId: Long): Long? =
-        performAtomicUpdate {
-            val graphOrStat = dao.tryGetGraphStatById(graphStatId)?.toDto() ?: return@performAtomicUpdate null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
-            dao.getPieChartByGraphStatId(graphStatId)?.let {
-                dao.insertPieChart(it.copy(id = 0L, graphStatId = newGraphStatId))
-            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStatId)) }
-            newGraphStatId
-        }
-
-    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long): Long? =
-        performAtomicUpdate {
-            val graphOrStat = dao.tryGetGraphStatById(graphStatId)?.toDto() ?: return@performAtomicUpdate null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
-            dao.getAverageTimeBetweenStatByGraphStatId(graphStatId)?.let {
-                dao.insertAverageTimeBetweenStat(it.copy(id = 0L, graphStatId = newGraphStatId))
-            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStatId)) }
-            newGraphStatId
-        }
-
-    override suspend fun duplicateTimeHistogram(graphStatId: Long): Long? =
-        performAtomicUpdate {
-            val graphOrStat = dao.tryGetGraphStatById(graphStatId)?.toDto() ?: return@performAtomicUpdate null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
-            dao.getTimeHistogramByGraphStatId(graphStatId)?.let {
-                dao.insertTimeHistogram(it.copy(id = 0L, graphStatId = newGraphStatId))
-            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStatId)) }
-            newGraphStatId
-        }
-
-    override suspend fun duplicateLastValueStat(graphStatId: Long): Long? =
-        performAtomicUpdate {
-            val graphOrStat = dao.tryGetGraphStatById(graphStatId)?.toDto() ?: return@performAtomicUpdate null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
-            dao.getLastValueStatByGraphStatId(graphStatId)?.let {
-                dao.insertLastValueStat(it.copy(id = 0L, graphStatId = newGraphStatId))
-            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStatId)) }
-            newGraphStatId
-        }
-
-    override suspend fun duplicateBarChart(graphStatId: Long): Long? =
-        performAtomicUpdate {
-            val graphOrStat = dao.tryGetGraphStatById(graphStatId)?.toDto() ?: return@performAtomicUpdate null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
-            dao.getBarChartByGraphStatId(graphStatId)?.let {
-                dao.insertBarChart(it.copy(id = 0L, graphStatId = newGraphStatId))
-            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStatId)) }
-            newGraphStatId
-        }
-
-    override suspend fun duplicateLuaGraph(graphStatId: Long): Long? =
-        performAtomicUpdate {
-            val graphOrStat = dao.tryGetGraphStatById(graphStatId)?.toDto() ?: return@performAtomicUpdate null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
-            dao.getLuaGraphByGraphStatId(graphStatId)?.let {
-                val copy = dao.insertLuaGraph(
-                    it.toLuaGraph().copy(id = 0L, graphStatId = newGraphStatId)
-                )
-                dao.insertLuaGraphFeatures(it.features.map { f ->
-                    f.copy(id = 0L, luaGraphId = copy)
-                })
-                copy
-            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStatId)) }
-            newGraphStatId
-        }
+    override suspend fun duplicateLuaGraph(graphStatId: Long): Long? = withContext(io) {
+        graphHelper.duplicateLuaGraph(graphStatId)
+            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+    }
 
     // =========================================================================
     // Private helper methods
     // =========================================================================
-
-    private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) =
-        dao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
 
     private suspend fun <R> performAtomicUpdate(
         updateType: DataUpdateType? = null,
@@ -858,17 +459,6 @@ internal class DataInteractorImpl @Inject constructor(
                 dao.updateGroups(groups.map { it.copy(displayIndex = it.displayIndex + 1) })
             }
         }
-
-    private fun insertGraphOrStat(name: String, groupId: Long, type: GraphStatType): Long =
-        dao.insertGraphOrStat(
-            com.samco.trackandgraph.data.database.entity.GraphOrStat(
-                id = 0L,
-                groupId = groupId,
-                name = name,
-                type = type,
-                displayIndex = 0
-            )
-        )
 
     // =========================================================================
     // Other DataInteractor methods

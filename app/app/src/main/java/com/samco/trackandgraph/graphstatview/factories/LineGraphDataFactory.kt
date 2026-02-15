@@ -24,7 +24,7 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.IDataPoint
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphFeature
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
@@ -226,7 +226,7 @@ class LineGraphDataFactory @Inject constructor(
             )
         }
         val averageCalculator = when (lineGraphFeature.averagingMode) {
-            LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
+            LineGraphAveragingModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)
         }
         return CompositeFunction(aggregationCalculator, averageCalculator).mapSample(dataSample)

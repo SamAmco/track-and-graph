@@ -53,7 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.YRangeType
@@ -151,7 +151,7 @@ private fun LineGraphFeaturesInputView(
     onUpdateFeatureScale: (Int, TextFieldValue) -> Unit,
     onUpdateFeatureColor: (Int, Int) -> Unit,
     onUpdateFeaturePointStyle: (Int, LineGraphPointStyle) -> Unit,
-    onUpdateFeatureAveragingMode: (Int, LineGraphAveraginModes) -> Unit,
+    onUpdateFeatureAveragingMode: (Int, LineGraphAveragingModes) -> Unit,
     onUpdateFeaturePlottingMode: (Int, LineGraphPlottingModes) -> Unit,
     onUpdateFeatureDurationPlottingMode: (Int, DurationPlottingMode) -> Unit,
     onSelectFeature: (Int, Long) -> Unit,
@@ -199,7 +199,7 @@ private fun LineGraphFeatureInputView(
     onUpdateScale: (TextFieldValue) -> Unit,
     onUpdateColor: (Int) -> Unit,
     onUpdatePointStyle: (LineGraphPointStyle) -> Unit,
-    onUpdateAveragingMode: (LineGraphAveraginModes) -> Unit,
+    onUpdateAveragingMode: (LineGraphAveragingModes) -> Unit,
     onUpdatePlottingMode: (LineGraphPlottingModes) -> Unit,
     onUpdateDurationPlottingMode: (DurationPlottingMode) -> Unit,
     onSelectFeature: (Long) -> Unit,
@@ -297,7 +297,7 @@ private fun LineGraphFeatureInputView(
                 val averagingModeNames =
                     stringArrayResource(id = R.array.line_graph_averaging_mode_names)
                         .mapIndexed { index, name -> index to name }
-                        .associate { (index, name) -> LineGraphAveraginModes.entries.toTypedArray()[index] to name }
+                        .associate { (index, name) -> LineGraphAveragingModes.entries.toTypedArray()[index] to name }
 
                 TextMapSpinner(
                     strings = averagingModeNames,
@@ -376,7 +376,7 @@ private fun LineGraphConfigViewPreview() {
                         scaleTextField = TextFieldValue("1"),
                         selectedFeatureText = "Daily Steps",
                         colorIndex = 0,
-                        averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                        averagingMode = LineGraphAveragingModes.NO_AVERAGING,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.CIRCLES,
                         isDurationFeature = false,
@@ -389,7 +389,7 @@ private fun LineGraphConfigViewPreview() {
                         scaleTextField = TextFieldValue("1"),
                         selectedFeatureText = "Sleep Time",
                         colorIndex = 1,
-                        averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                        averagingMode = LineGraphAveragingModes.NO_AVERAGING,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
                         isDurationFeature = true,

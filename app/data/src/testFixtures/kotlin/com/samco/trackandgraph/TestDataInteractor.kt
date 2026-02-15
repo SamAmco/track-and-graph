@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataInteractorImpl
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
+import com.samco.trackandgraph.data.interactor.GraphHelperImpl
 import com.samco.trackandgraph.data.interactor.GroupHelperImpl
 import com.samco.trackandgraph.data.interactor.ReminderHelperImpl
 import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
@@ -98,6 +99,12 @@ object TestDataInteractor {
             io = Dispatchers.IO
         )
 
+        val graphHelper = GraphHelperImpl(
+            transactionHelper = transactionHelper,
+            graphDao = database.trackAndGraphDatabaseDao,
+            io = Dispatchers.IO
+        )
+
         val dataInteractor = DataInteractorImpl(
             transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
@@ -106,6 +113,7 @@ object TestDataInteractor {
             functionHelper = functionHelper,
             reminderHelper = reminderHelper,
             groupHelper = groupHelper,
+            graphHelper = graphHelper,
             dependencyAnalyserProvider = dependencyAnalyserProvier,
         )
 

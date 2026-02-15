@@ -27,7 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphFeature
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
@@ -116,7 +116,7 @@ class LineGraphConfigViewModel @Inject constructor(
         val scaleTextField: TextFieldValue,
         val selectedFeatureText: String,
         val colorIndex: Int,
-        val averagingMode: LineGraphAveraginModes,
+        val averagingMode: LineGraphAveragingModes,
         val plottingMode: LineGraphPlottingModes,
         val pointStyle: LineGraphPointStyle,
         val isDurationFeature: Boolean,
@@ -228,7 +228,7 @@ class LineGraphConfigViewModel @Inject constructor(
                     featureId = firstFeature?.featureId ?: -1L,
                     name = featureName,
                     colorIndex = (size * dataVisColorGenerator) % dataVisColorList.size,
-                    averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                    averagingMode = LineGraphAveragingModes.NO_AVERAGING,
                     plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                     pointStyle = LineGraphPointStyle.NONE,
                     offset = 0.toDouble(),
@@ -309,7 +309,7 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
-    fun onUpdateFeatureAveragingMode(index: Int, averagingMode: LineGraphAveraginModes) {
+    fun onUpdateFeatureAveragingMode(index: Int, averagingMode: LineGraphAveragingModes) {
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
             set(index, get(index).copy(averagingMode = averagingMode))
         }

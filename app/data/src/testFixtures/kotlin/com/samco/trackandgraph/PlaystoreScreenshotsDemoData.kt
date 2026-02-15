@@ -26,7 +26,7 @@ import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.LastValueStatConfig
 import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphFeatureConfig
@@ -411,7 +411,7 @@ private suspend fun createExerciseGraph2(
                         featureId = exerciseFeatureId,
                         name = "Exercise",
                         colorIndex = 0,
-                        averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                        averagingMode = LineGraphAveragingModes.NO_AVERAGING,
                         plottingMode = LineGraphPlottingModes.GENERATE_WEEKLY_TOTALS,
                         pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
                         offset = 0.0,
@@ -445,7 +445,7 @@ private suspend fun createExerciseGraph1(
                         featureId = exerciseFeatureId,
                         name = "Weekly",
                         colorIndex = 7,
-                        averagingMode = LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE,
+                        averagingMode = LineGraphAveragingModes.WEEKLY_MOVING_AVERAGE,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.NONE,
                         offset = 0.0,
@@ -456,7 +456,7 @@ private suspend fun createExerciseGraph1(
                         featureId = exerciseFeatureId,
                         name = "Monthly",
                         colorIndex = 0,
-                        averagingMode = LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE,
+                        averagingMode = LineGraphAveragingModes.MONTHLY_MOVING_AVERAGE,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.NONE,
                         offset = 0.0,
@@ -467,7 +467,7 @@ private suspend fun createExerciseGraph1(
                         featureId = exerciseFeatureId,
                         name = "Yearly",
                         colorIndex = 5,
-                        averagingMode = LineGraphAveraginModes.YEARLY_MOVING_AVERAGE,
+                        averagingMode = LineGraphAveragingModes.YEARLY_MOVING_AVERAGE,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.NONE,
                         offset = 0.0,
@@ -478,7 +478,7 @@ private suspend fun createExerciseGraph1(
                         featureId = illnessFeatureId,
                         name = "Sick day (weekly)",
                         colorIndex = 11,
-                        averagingMode = LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE,
+                        averagingMode = LineGraphAveragingModes.WEEKLY_MOVING_AVERAGE,
                         plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
                         pointStyle = LineGraphPointStyle.NONE,
                         offset = 0.0,

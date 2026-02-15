@@ -24,12 +24,15 @@ import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriterImpl
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
+import com.samco.trackandgraph.data.database.GraphDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelper
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.interactor.FunctionHelper
 import com.samco.trackandgraph.data.interactor.FunctionHelperImpl
+import com.samco.trackandgraph.data.interactor.GraphHelper
+import com.samco.trackandgraph.data.interactor.GraphHelperImpl
 import com.samco.trackandgraph.data.interactor.GroupHelper
 import com.samco.trackandgraph.data.interactor.GroupHelperImpl
 import com.samco.trackandgraph.data.interactor.ReminderHelper
@@ -63,6 +66,9 @@ class DataModule {
     @Provides
     internal fun getDao(database: TrackAndGraphDatabase): TrackAndGraphDatabaseDao =
         database.trackAndGraphDatabaseDao
+
+    @Provides
+    internal fun getGraphDao(dao: TrackAndGraphDatabaseDao): GraphDao = dao
 
     @Provides
     internal fun getCSVReadWriter(impl: CSVReadWriterImpl): CSVReadWriter = impl
@@ -102,4 +108,7 @@ class DataModule {
 
     @Provides
     internal fun getGroupHelper(impl: GroupHelperImpl): GroupHelper = impl
+
+    @Provides
+    internal fun getGraphHelper(impl: GraphHelperImpl): GraphHelper = impl
 }

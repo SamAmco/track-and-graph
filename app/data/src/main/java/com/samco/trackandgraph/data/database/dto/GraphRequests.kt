@@ -31,7 +31,7 @@ data class LineGraphFeatureConfig(
     val featureId: Long,
     val name: String,
     val colorIndex: Int,
-    val averagingMode: LineGraphAveraginModes,
+    val averagingMode: LineGraphAveragingModes,
     val plottingMode: LineGraphPlottingModes,
     val pointStyle: LineGraphPointStyle,
     val offset: Double,

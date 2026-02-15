@@ -21,7 +21,7 @@ import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.IDataPoint
-import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphFeature
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
@@ -98,7 +98,7 @@ class LineGraphDataFactoryTest {
             featureId = 1L,
             name = "Feature",
             colorIndex = 0,
-            averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+            averagingMode = LineGraphAveragingModes.NO_AVERAGING,
             plottingMode = LineGraphPlottingModes.GENERATE_DAILY_TOTALS,
             pointStyle = LineGraphPointStyle.NONE,
             offset = 0.0,

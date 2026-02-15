@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-enum class LineGraphAveraginModes {
+enum class LineGraphAveragingModes {
     NO_AVERAGING,
     DAILY_MOVING_AVERAGE,
     THREE_DAY_MOVING_AVERAGE,
