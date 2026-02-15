@@ -44,7 +44,7 @@ class BarChartDataSourceAdapter @Inject constructor(
         return Pair(lvs.id, lvs)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateBarChart(graphOrStat.id)
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
+        dataInteractor.duplicateBarChart(graphOrStat.id, groupId)
     }
 }

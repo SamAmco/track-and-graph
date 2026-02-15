@@ -186,7 +186,7 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
+    override suspend fun duplicateFunction(function: Function, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val serializedGraph = functionGraphSerializer.serialize(function.functionGraph)
                 ?: return@withTransaction null

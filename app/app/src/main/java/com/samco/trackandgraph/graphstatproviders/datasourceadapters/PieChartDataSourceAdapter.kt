@@ -63,7 +63,7 @@ class PieChartDataSourceAdapter @Inject constructor(
         return Pair(pieChart.id, pieChart)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicatePieChart(graphOrStat.id)
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
+        dataInteractor.duplicatePieChart(graphOrStat.id, groupId)
     }
 }

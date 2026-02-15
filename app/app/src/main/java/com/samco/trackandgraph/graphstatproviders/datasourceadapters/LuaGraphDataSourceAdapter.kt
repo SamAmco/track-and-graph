@@ -60,7 +60,7 @@ class LuaGraphDataSourceAdapter @Inject constructor(
         return Pair(luaGraph.id, luaGraph)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateLuaGraph(graphOrStat.id)
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
+        dataInteractor.duplicateLuaGraph(graphOrStat.id, groupId)
     }
 }

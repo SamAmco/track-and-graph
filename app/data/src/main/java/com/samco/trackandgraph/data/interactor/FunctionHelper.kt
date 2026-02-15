@@ -45,7 +45,7 @@ interface FunctionHelper {
 
     suspend fun getFunctionsForGroupSync(groupId: Long): List<Function>
 
-    suspend fun duplicateFunction(function: Function): Long?
+    suspend fun duplicateFunction(function: Function, groupId: Long): Long?
 
     suspend fun hasAnyFunctions(): Boolean
 }

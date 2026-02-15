@@ -61,7 +61,7 @@ class LineGraphDataSourceAdapter @Inject constructor(
         return Pair(lineGraph.id, lineGraph)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateLineGraph(graphOrStat.id)
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
+        dataInteractor.duplicateLineGraph(graphOrStat.id, groupId)
     }
 }

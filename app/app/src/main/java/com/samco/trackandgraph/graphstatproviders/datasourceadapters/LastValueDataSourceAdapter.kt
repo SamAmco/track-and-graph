@@ -60,7 +60,7 @@ class LastValueDataSourceAdapter @Inject constructor(
         return Pair(lvs.id, lvs)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateLastValueStat(graphOrStat.id)
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
+        dataInteractor.duplicateLastValueStat(graphOrStat.id, groupId)
     }
 }

@@ -444,11 +444,11 @@ internal class GraphHelperImpl @Inject constructor(
     // Duplicate methods
     // =========================================================================
 
-    override suspend fun duplicateLineGraph(graphStatId: Long): Long? = withContext(io) {
+    override suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val graphOrStat = graphDao.tryGetGraphStatById(graphStatId)?.toDto()
                 ?: return@withTransaction null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
+            val newGraphStatId = duplicateGraphOrStat(graphOrStat, groupId)
             graphDao.getLineGraphByGraphStatId(graphStatId)?.let {
                 val copy = graphDao.insertLineGraph(
                     it.toLineGraph().copy(id = 0L, graphStatId = newGraphStatId)
@@ -461,11 +461,11 @@ internal class GraphHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicatePieChart(graphStatId: Long): Long? = withContext(io) {
+    override suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val graphOrStat = graphDao.tryGetGraphStatById(graphStatId)?.toDto()
                 ?: return@withTransaction null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
+            val newGraphStatId = duplicateGraphOrStat(graphOrStat, groupId)
             graphDao.getPieChartByGraphStatId(graphStatId)?.let {
                 graphDao.insertPieChart(it.copy(id = 0L, graphStatId = newGraphStatId))
             }
@@ -473,11 +473,11 @@ internal class GraphHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long): Long? = withContext(io) {
+    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val graphOrStat = graphDao.tryGetGraphStatById(graphStatId)?.toDto()
                 ?: return@withTransaction null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
+            val newGraphStatId = duplicateGraphOrStat(graphOrStat, groupId)
             graphDao.getAverageTimeBetweenStatByGraphStatId(graphStatId)?.let {
                 graphDao.insertAverageTimeBetweenStat(it.copy(id = 0L, graphStatId = newGraphStatId))
             }
@@ -485,11 +485,11 @@ internal class GraphHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateTimeHistogram(graphStatId: Long): Long? = withContext(io) {
+    override suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val graphOrStat = graphDao.tryGetGraphStatById(graphStatId)?.toDto()
                 ?: return@withTransaction null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
+            val newGraphStatId = duplicateGraphOrStat(graphOrStat, groupId)
             graphDao.getTimeHistogramByGraphStatId(graphStatId)?.let {
                 graphDao.insertTimeHistogram(it.copy(id = 0L, graphStatId = newGraphStatId))
             }
@@ -497,11 +497,11 @@ internal class GraphHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateLastValueStat(graphStatId: Long): Long? = withContext(io) {
+    override suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val graphOrStat = graphDao.tryGetGraphStatById(graphStatId)?.toDto()
                 ?: return@withTransaction null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
+            val newGraphStatId = duplicateGraphOrStat(graphOrStat, groupId)
             graphDao.getLastValueStatByGraphStatId(graphStatId)?.let {
                 graphDao.insertLastValueStat(it.copy(id = 0L, graphStatId = newGraphStatId))
             }
@@ -509,11 +509,11 @@ internal class GraphHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateBarChart(graphStatId: Long): Long? = withContext(io) {
+    override suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val graphOrStat = graphDao.tryGetGraphStatById(graphStatId)?.toDto()
                 ?: return@withTransaction null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
+            val newGraphStatId = duplicateGraphOrStat(graphOrStat, groupId)
             graphDao.getBarChartByGraphStatId(graphStatId)?.let {
                 graphDao.insertBarChart(it.copy(id = 0L, graphStatId = newGraphStatId))
             }
@@ -521,11 +521,11 @@ internal class GraphHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateLuaGraph(graphStatId: Long): Long? = withContext(io) {
+    override suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long? = withContext(io) {
         transactionHelper.withTransaction {
             val graphOrStat = graphDao.tryGetGraphStatById(graphStatId)?.toDto()
                 ?: return@withTransaction null
-            val newGraphStatId = duplicateGraphOrStat(graphOrStat)
+            val newGraphStatId = duplicateGraphOrStat(graphOrStat, groupId)
             graphDao.getLuaGraphByGraphStatId(graphStatId)?.let {
                 val copy = graphDao.insertLuaGraph(
                     it.toLuaGraph().copy(id = 0L, graphStatId = newGraphStatId)
@@ -611,6 +611,6 @@ internal class GraphHelperImpl @Inject constructor(
             )
         )
 
-    private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) =
-        graphDao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity(graphOrStat.groupIds.first()))
+    private fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) =
+        graphDao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity(groupId))
 }

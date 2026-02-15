@@ -58,5 +58,5 @@ abstract class GraphStatDataSourceAdapter<I>(
         updateInDatabase(graphStatId, name, config as I)
     }
 
-    abstract suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat)
+    abstract suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long)
 }

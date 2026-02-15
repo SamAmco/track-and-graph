@@ -149,39 +149,39 @@ interface GraphHelper {
     // =========================================================================
 
     /**
-     * Duplicates an existing line graph and returns the new graphStatId.
+     * Duplicates an existing line graph into the specified group and returns the new graphStatId.
      */
-    suspend fun duplicateLineGraph(graphStatId: Long): Long?
+    suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long?
 
     /**
-     * Duplicates an existing pie chart and returns the new graphStatId.
+     * Duplicates an existing pie chart into the specified group and returns the new graphStatId.
      */
-    suspend fun duplicatePieChart(graphStatId: Long): Long?
+    suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long?
 
     /**
-     * Duplicates an existing average time between stat and returns the new graphStatId.
+     * Duplicates an existing average time between stat into the specified group and returns the new graphStatId.
      */
-    suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long): Long?
+    suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long?
 
     /**
-     * Duplicates an existing time histogram and returns the new graphStatId.
+     * Duplicates an existing time histogram into the specified group and returns the new graphStatId.
      */
-    suspend fun duplicateTimeHistogram(graphStatId: Long): Long?
+    suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long?
 
     /**
-     * Duplicates an existing last value stat and returns the new graphStatId.
+     * Duplicates an existing last value stat into the specified group and returns the new graphStatId.
      */
-    suspend fun duplicateLastValueStat(graphStatId: Long): Long?
+    suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long?
 
     /**
-     * Duplicates an existing bar chart and returns the new graphStatId.
+     * Duplicates an existing bar chart into the specified group and returns the new graphStatId.
      */
-    suspend fun duplicateBarChart(graphStatId: Long): Long?
+    suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long?
 
     /**
-     * Duplicates an existing Lua graph and returns the new graphStatId.
+     * Duplicates an existing Lua graph into the specified group and returns the new graphStatId.
      */
-    suspend fun duplicateLuaGraph(graphStatId: Long): Long?
+    suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long?
 
     // =========================================================================
     // Get methods

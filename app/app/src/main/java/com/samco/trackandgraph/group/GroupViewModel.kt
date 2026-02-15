@@ -554,15 +554,17 @@ class GroupViewModelImpl @Inject constructor(
 
     override fun duplicateFunction(displayFunction: DisplayFunction) {
         viewModelScope.launch(io) {
+            val currentGroupId = groupId.value ?: return@launch
             val function = dataInteractor.getFunctionById(displayFunction.id)
-            function?.let { dataInteractor.duplicateFunction(it) }
+            function?.let { dataInteractor.duplicateFunction(it, currentGroupId) }
         }
     }
 
     override fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         viewModelScope.launch(io) {
+            val currentGroupId = groupId.value ?: return@launch
             val gs = graphOrStatViewData.graphOrStat
-            gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs)
+            gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs, currentGroupId)
         }
     }
 

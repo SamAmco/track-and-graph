@@ -405,7 +405,7 @@ class GraphHelperImplTest {
         )
 
         // EXECUTE
-        val duplicatedGraphStatId = uut.duplicateLineGraph(originalGraphStatId)
+        val duplicatedGraphStatId = uut.duplicateLineGraph(originalGraphStatId, groupId = 1L)
 
         // VERIFY
         assertNotNull(duplicatedGraphStatId)
@@ -438,7 +438,7 @@ class GraphHelperImplTest {
     @Test
     fun `duplicateLineGraph returns null when graph does not exist`() = runTest(dispatcher) {
         // EXECUTE
-        val result = uut.duplicateLineGraph(999L)
+        val result = uut.duplicateLineGraph(999L, groupId = 1L)
 
         // VERIFY
         assertNull(result)

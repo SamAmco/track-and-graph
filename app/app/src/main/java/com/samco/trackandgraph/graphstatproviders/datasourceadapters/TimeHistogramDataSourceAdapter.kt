@@ -61,7 +61,7 @@ class TimeHistogramDataSourceAdapter @Inject constructor(
         return Pair(th.id, th)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateTimeHistogram(graphOrStat.id)
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
+        dataInteractor.duplicateTimeHistogram(graphOrStat.id, groupId)
     }
 }

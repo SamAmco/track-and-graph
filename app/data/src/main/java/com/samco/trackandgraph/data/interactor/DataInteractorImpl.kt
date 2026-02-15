@@ -394,38 +394,38 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
     }
 
-    override suspend fun duplicateLineGraph(graphStatId: Long): Long? = withContext(io) {
-        graphHelper.duplicateLineGraph(graphStatId)
+    override suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long? = withContext(io) {
+        graphHelper.duplicateLineGraph(graphStatId, groupId)
             ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
     }
 
-    override suspend fun duplicatePieChart(graphStatId: Long): Long? = withContext(io) {
-        graphHelper.duplicatePieChart(graphStatId)
+    override suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long? = withContext(io) {
+        graphHelper.duplicatePieChart(graphStatId, groupId)
             ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
     }
 
-    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long): Long? = withContext(io) {
-        graphHelper.duplicateAverageTimeBetweenStat(graphStatId)
+    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long? = withContext(io) {
+        graphHelper.duplicateAverageTimeBetweenStat(graphStatId, groupId)
             ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
     }
 
-    override suspend fun duplicateTimeHistogram(graphStatId: Long): Long? = withContext(io) {
-        graphHelper.duplicateTimeHistogram(graphStatId)
+    override suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long? = withContext(io) {
+        graphHelper.duplicateTimeHistogram(graphStatId, groupId)
             ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
     }
 
-    override suspend fun duplicateLastValueStat(graphStatId: Long): Long? = withContext(io) {
-        graphHelper.duplicateLastValueStat(graphStatId)
+    override suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long? = withContext(io) {
+        graphHelper.duplicateLastValueStat(graphStatId, groupId)
             ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
     }
 
-    override suspend fun duplicateBarChart(graphStatId: Long): Long? = withContext(io) {
-        graphHelper.duplicateBarChart(graphStatId)
+    override suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long? = withContext(io) {
+        graphHelper.duplicateBarChart(graphStatId, groupId)
             ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
     }
 
-    override suspend fun duplicateLuaGraph(graphStatId: Long): Long? = withContext(io) {
-        graphHelper.duplicateLuaGraph(graphStatId)
+    override suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long? = withContext(io) {
+        graphHelper.duplicateLuaGraph(graphStatId, groupId)
             ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
     }
 
@@ -576,8 +576,8 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateFunction(function: Function): Long? = withContext(io) {
-        val newFunctionId = functionHelper.duplicateFunction(function)
+    override suspend fun duplicateFunction(function: Function, groupId: Long): Long? = withContext(io) {
+        val newFunctionId = functionHelper.duplicateFunction(function, groupId)
         if (newFunctionId != null) {
             dataUpdateEvents.emit(DataUpdateType.FunctionCreated(newFunctionId))
         }
