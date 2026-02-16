@@ -282,7 +282,7 @@ private fun GroupScreenContent(
             onDelete = { groupDialogsViewModel.showDeleteGraphStatDialog(it) },
             onEdit = onGraphStatEdit,
             onClick = onGraphStatClick,
-            onMove = { moveItemViewModel.showMoveGraphDialog(it) },
+            onMove = { moveItemViewModel.showMoveGraphDialog(groupId, it) },
             onDuplicate = { groupViewModel.duplicateGraphOrStat(it) }
         ),
         groupClickListeners = GroupClickListeners(
@@ -291,7 +291,7 @@ private fun GroupScreenContent(
                 addGroupDialogViewModel.showForEdit(groupId = group.id)
             },
             onDelete = { groupDialogsViewModel.showDeleteGroupDialog(it) },
-            onMove = { moveItemViewModel.showMoveGroupDialog(it) }
+            onMove = { moveItemViewModel.showMoveGroupDialog(groupId, it) }
         ),
         functionClickListeners = FunctionClickListeners(
             onClick = onFunctionClick,

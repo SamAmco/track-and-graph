@@ -55,20 +55,20 @@ class MoveItemViewModel @Inject constructor(
     private val _moveDialogConfig = MutableStateFlow<MoveDialogConfig?>(null)
     val moveDialogConfig: StateFlow<MoveDialogConfig?> = _moveDialogConfig.asStateFlow()
 
-    fun showMoveGroupDialog(group: Group) {
+    fun showMoveGroupDialog(fromGroupId: Long, group: Group) {
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = group.id,
             itemType = MovableItemType.GROUP,
-            fromGroupId = group.parentGroupIds.firstOrNull() ?: 0L,
+            fromGroupId = fromGroupId,
             hiddenItems = setOf(HiddenItem(SelectableItemType.GROUP, group.id))
         )
     }
 
-    fun showMoveGraphDialog(graphOrStat: IGraphStatViewData) {
+    fun showMoveGraphDialog(fromGroupId: Long, graphOrStat: IGraphStatViewData) {
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = graphOrStat.graphOrStat.id,
             itemType = MovableItemType.GRAPH,
-            fromGroupId = graphOrStat.graphOrStat.groupIds.first(),
+            fromGroupId = fromGroupId,
             hiddenItems = emptySet()
         )
     }
