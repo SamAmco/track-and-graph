@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
@@ -53,7 +54,7 @@ fun AddReminderDialog(
     val hasAnyFeatures = viewModel.hasAnyFeatures.collectAsStateWithLifecycle().value
 
     AddReminderDialog(
-        onConfirm = viewModel::upsertReminder,
+        onConfirm = viewModel::saveReminder,
         onDismiss = onDismiss,
         editMode = editMode,
         editingReminder = editingReminder,
@@ -63,7 +64,7 @@ fun AddReminderDialog(
 
 @Composable
 private fun AddReminderDialog(
-    onConfirm: (Reminder) -> Unit,
+    onConfirm: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     editMode: Boolean,
     editingReminder: Reminder? = null,

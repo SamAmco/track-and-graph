@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,7 @@ interface MonthDayReminderConfigurationViewModel {
     fun updateDayType(dayType: MonthDayType)
     fun updateEndsEnabled(enabled: Boolean)
     fun updateEnds(ends: LocalDateTime)
-    fun getReminder(): Reminder
+    fun getReminderInput(): ReminderInput
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.MonthDayParams?)
     fun reset()
 }
@@ -71,8 +72,6 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
     private val _ends = MutableStateFlow<LocalDateTime>(LocalDateTime.now())
     override val ends: StateFlow<LocalDateTime> = _ends.asStateFlow()
 
-    private var editingReminder: Reminder? = null
-
     override fun updateReminderName(name: String) {
         _reminderName.value = name
     }
@@ -97,24 +96,16 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
         _ends.value = ends
     }
 
-    override fun getReminder(): Reminder {
-        val params = ReminderParams.MonthDayParams(
-            time = _selectedTime.value,
-            occurrence = _occurrence.value,
-            dayType = _dayType.value,
-            ends = if (endsEnabled.value) _ends.value else null
-        )
-
-        return editingReminder?.copy(
+    override fun getReminderInput(): ReminderInput {
+        return ReminderInput(
             reminderName = _reminderName.value,
-            params = params
-        ) ?: Reminder(
-            id = 0L,
-            displayIndex = 0,
-            reminderName = _reminderName.value,
-            groupId = null,
             featureId = null,
-            params = params
+            params = ReminderParams.MonthDayParams(
+                time = _selectedTime.value,
+                occurrence = _occurrence.value,
+                dayType = _dayType.value,
+                ends = if (endsEnabled.value) _ends.value else null
+            )
         )
     }
 
@@ -122,8 +113,6 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
         reminder: Reminder?,
         params: ReminderParams.MonthDayParams?
     ) {
-        editingReminder = reminder
-
         if (reminder != null) {
             _reminderName.value = reminder.reminderName
         }
@@ -137,7 +126,6 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
     }
 
     override fun reset() {
-        editingReminder = null
         _reminderName.value = ""
         _selectedTime.value = LocalTime.of(9, 0)
         _occurrence.value = MonthDayOccurrence.FIRST

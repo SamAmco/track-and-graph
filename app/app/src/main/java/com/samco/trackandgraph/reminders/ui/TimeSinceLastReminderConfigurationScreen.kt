@@ -49,6 +49,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
@@ -64,7 +65,7 @@ import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 fun TimeSinceLastReminderConfigurationScreen(
     editReminder: Reminder? = null,
     editParams: ReminderParams.TimeSinceLastParams? = null,
-    onUpsertReminder: (Reminder) -> Unit,
+    onUpsertReminder: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: TimeSinceLastReminderConfigurationViewModel = hiltViewModel<TimeSinceLastReminderConfigurationViewModelImpl>()
@@ -106,7 +107,7 @@ fun TimeSinceLastReminderConfigurationScreen(
         continueEnabled = continueEnabled,
         isEditMode = editReminder != null,
         onConfirm = {
-            onUpsertReminder(viewModel.getReminder())
+            onUpsertReminder(viewModel.getReminderInput())
         },
         onDismiss = onDismiss
     )

@@ -44,6 +44,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.CheckedDays.Companion.withSet
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -61,7 +62,7 @@ import org.threeten.bp.LocalTime
 fun WeekDayReminderConfigurationScreen(
     editReminder: Reminder? = null,
     editParams: ReminderParams.WeekDayParams? = null,
-    onUpsertReminder: (Reminder) -> Unit,
+    onUpsertReminder: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: WeekDayReminderConfigurationViewModel = hiltViewModel<WeekDayReminderConfigurationViewModelImpl>()
@@ -87,7 +88,7 @@ fun WeekDayReminderConfigurationScreen(
         onCheckedDaysChanged = viewModel::updateCheckedDays,
         isEditMode = editReminder != null,
         onConfirm = {
-            onUpsertReminder(viewModel.getReminder())
+            onUpsertReminder(viewModel.getReminderInput())
         },
         onDismiss = onDismiss
     )

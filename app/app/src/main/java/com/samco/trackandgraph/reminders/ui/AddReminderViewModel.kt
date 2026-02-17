@@ -20,6 +20,9 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderInput
+import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -41,7 +44,14 @@ import timber.log.Timber
 import javax.inject.Inject
 
 interface AddReminderViewModel {
-    fun loadStateForReminder(editReminderId: Long?)
+    /**
+     * Initialize the view model for creating or editing a reminder.
+     *
+     * @param editReminderId If non-null, load this reminder for editing. If null, prepare for creating.
+     * @param groupId The group to create the reminder in (only used when editReminderId is null).
+     *                Pass null for reminders that appear on the main reminders screen.
+     */
+    fun loadStateForReminder(editReminderId: Long?, groupId: Long? = null)
 
     val loading: StateFlow<Boolean>
     val editMode: StateFlow<Boolean>
@@ -49,7 +59,7 @@ interface AddReminderViewModel {
     val hasAnyFeatures: StateFlow<Boolean>
     val onComplete: ReceiveChannel<Unit>
 
-    fun upsertReminder(reminder: Reminder)
+    fun saveReminder(input: ReminderInput)
 }
 
 @HiltViewModel
@@ -65,6 +75,7 @@ class AddReminderViewModelImpl @Inject constructor(
 
     private var currentLoadingJob: Job? = null
     private val _editingReminder = MutableStateFlow<Reminder?>(null)
+    private var createGroupId: Long? = null
 
     override val editingReminder: StateFlow<Reminder?> = _editingReminder.asStateFlow()
     override val editMode: StateFlow<Boolean> = _editingReminder
@@ -82,21 +93,23 @@ class AddReminderViewModelImpl @Inject constructor(
         }
     }
 
-    override fun loadStateForReminder(editReminderId: Long?) {
+    override fun loadStateForReminder(editReminderId: Long?, groupId: Long?) {
         currentLoadingJob?.cancel()
         currentLoadingJob = viewModelScope.launch(io) {
             withContext(ui) { _loading.value = true }
             if (editReminderId == null) {
                 _editingReminder.value = null
+                createGroupId = groupId
                 withContext(ui) { _loading.value = false }
                 return@launch
             }
             _editingReminder.value = dataInteractor.getReminderById(editReminderId)
+            createGroupId = null // Not used when editing
             withContext(ui) { _loading.value = false }
         }
     }
 
-    override fun upsertReminder(reminder: Reminder) {
+    override fun saveReminder(input: ReminderInput) {
         viewModelScope.launch(io) {
             try {
                 currentLoadingJob?.join()
@@ -105,9 +118,9 @@ class AddReminderViewModelImpl @Inject constructor(
                 val editingReminder = _editingReminder.value
 
                 if (editingReminder != null) {
-                    updateReminder(editingReminder, reminder)
+                    updateReminder(editingReminder, input)
                 } else {
-                    insertReminder(reminder)
+                    createReminder(input)
                 }
             } catch (t: Throwable) {
                 Timber.e(t)
@@ -120,39 +133,44 @@ class AddReminderViewModelImpl @Inject constructor(
         }
     }
 
-    private suspend fun updateReminder(oldReminder: Reminder, newReminder: Reminder) {
-        // Update existing reminder
-        val updatedReminder = newReminder.copy(
-            id = oldReminder.id,
-            displayIndex = oldReminder.displayIndex,
+    private suspend fun updateReminder(existingReminder: Reminder, input: ReminderInput) {
+        // Build the updated reminder for scheduling
+        val updatedReminder = existingReminder.copy(
+            reminderName = input.reminderName,
+            featureId = input.featureId,
+            params = input.params
         )
-        
+
         try {
             reminderInteractor.scheduleNext(updatedReminder)
-            dataInteractor.updateReminder(updatedReminder)
+            dataInteractor.updateReminder(
+                ReminderUpdateRequest(
+                    id = existingReminder.id,
+                    reminderName = input.reminderName,
+                    featureId = input.featureId,
+                    params = input.params
+                )
+            )
         } catch (t: Throwable) {
             Timber.e(t)
             reminderInteractor.cancelReminderNotifications(updatedReminder)
         }
     }
 
-    private suspend fun insertReminder(reminder: Reminder) {
-        // Get existing reminders and shift their display indices down
-        val existingReminders = dataInteractor.getAllRemindersSync()
-        val shiftedReminders = existingReminders.map { existingReminder ->
-            existingReminder.copy(displayIndex = existingReminder.displayIndex + 1)
-        }
+    private suspend fun createReminder(input: ReminderInput) {
+        // Create the new reminder (data layer handles display index shifting)
+        val insertedId = dataInteractor.createReminder(
+            ReminderCreateRequest(
+                reminderName = input.reminderName,
+                groupId = createGroupId,
+                featureId = input.featureId,
+                params = input.params
+            )
+        )
 
-        // Update existing reminders with shifted display indices
-        shiftedReminders.forEach { shiftedReminder ->
-            dataInteractor.updateReminder(shiftedReminder)
-        }
-
-        // Insert new reminder
-        val insertedId = dataInteractor.insertReminder(reminder)
-        val insertedReminder = reminder.copy(id = insertedId)
-
-        // Schedule next notification
+        // Fetch the created reminder for scheduling
+        val insertedReminder = dataInteractor.getReminderById(insertedId)
+            ?: error("Failed to fetch newly created reminder with id $insertedId")
         reminderInteractor.scheduleNext(insertedReminder)
     }
 

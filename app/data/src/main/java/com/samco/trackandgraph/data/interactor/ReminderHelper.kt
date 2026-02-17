@@ -18,6 +18,9 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
+import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 
 /**
  * An interface for managing reminders. Do not use this interface directly, it is implemented by
@@ -32,13 +35,26 @@ interface ReminderHelper {
 
     suspend fun getReminderById(id: Long): Reminder?
 
-    suspend fun insertReminder(reminder: Reminder): Long
+    suspend fun createReminder(request: ReminderCreateRequest): Long
 
-    suspend fun updateReminder(reminder: Reminder)
+    suspend fun updateReminder(request: ReminderUpdateRequest)
+
+    /**
+     * Updates the display order of reminders within a specific group.
+     *
+     * This method uses a forgiving approach:
+     * - Only reminders belonging to [groupId] are affected
+     * - Reminders not included in [orders] retain their current display index
+     * - IDs in [orders] that don't belong to [groupId] are ignored
+     *
+     * @param groupId The group to update, or null for ungrouped reminders
+     * @param orders The new display order data for reminders in this group
+     */
+    suspend fun updateReminderDisplayOrder(groupId: Long?, orders: List<ReminderDisplayOrderData>)
 
     suspend fun deleteReminder(id: Long)
 
-    suspend fun duplicateReminder(reminder: Reminder): Long
+    suspend fun duplicateReminder(id: Long): Long
 
     suspend fun hasAnyReminders(): Boolean
 }

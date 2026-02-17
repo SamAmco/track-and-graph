@@ -45,6 +45,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -65,7 +66,7 @@ import org.threeten.bp.OffsetDateTime
 fun MonthDayReminderConfigurationScreen(
     editReminder: Reminder? = null,
     editParams: ReminderParams.MonthDayParams? = null,
-    onUpsertReminder: (Reminder) -> Unit,
+    onUpsertReminder: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: MonthDayReminderConfigurationViewModel = hiltViewModel<MonthDayReminderConfigurationViewModelImpl>()
@@ -100,7 +101,7 @@ fun MonthDayReminderConfigurationScreen(
         onEndsChanged = viewModel::updateEnds,
         isEditMode = editReminder != null,
         onConfirm = {
-            onUpsertReminder(viewModel.getReminder())
+            onUpsertReminder(viewModel.getReminderInput())
         },
         onDismiss = onDismiss
     )

@@ -89,7 +89,7 @@ object TestDataInteractor {
         )
 
         val reminderHelper = ReminderHelperImpl(
-            dao = database.trackAndGraphDatabaseDao,
+            reminderDao = database.trackAndGraphDatabaseDao,
             reminderSerializer = ReminderSerializer(testJson),
             io = Dispatchers.IO
         )

@@ -41,6 +41,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -55,7 +56,7 @@ import org.threeten.bp.OffsetDateTime
 fun PeriodicReminderConfigurationScreen(
     editReminder: Reminder? = null,
     editParams: ReminderParams.PeriodicParams? = null,
-    onUpsertReminder: (Reminder) -> Unit,
+    onUpsertReminder: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: PeriodicReminderConfigurationViewModel = hiltViewModel<PeriodicReminderConfigurationViewModelImpl>()
@@ -90,7 +91,7 @@ fun PeriodicReminderConfigurationScreen(
         onPeriodChanged = viewModel::updatePeriod,
         isEditMode = editReminder != null,
         onConfirm = {
-            onUpsertReminder(viewModel.getReminder())
+            onUpsertReminder(viewModel.getReminderInput())
         },
         onDismiss = onDismiss
     )

@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -134,7 +135,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
     override fun duplicateReminder(reminderViewData: ReminderViewData) {
         viewModelScope.launch(io) {
             reminderViewData.reminderDto?.let { reminder ->
-                val newId = dataInteractor.duplicateReminder(reminder)
+                val newId = dataInteractor.duplicateReminder(reminder.id)
                 val newReminder = dataInteractor.getReminderById(newId)
                 if (newReminder != null) {
                     reminderInteractor.scheduleNext(newReminder)
@@ -171,18 +172,16 @@ class RemindersScreenViewModelImpl @Inject constructor(
         if (!isDragging.value) return
 
         viewModelScope.launch {
-            // Get all reminders from database and update display indices
-            val allRemindersFromDb = dataInteractor.getAllRemindersSync()
-            val updatedReminders =
-                temporaryReminders.value.mapIndexedNotNull { index, reminderViewData ->
-                    allRemindersFromDb.find { it.id == reminderViewData.id }
-                        ?.copy(displayIndex = index)
-                }
-
-            // Update each reminder individually
-            updatedReminders.forEach { reminder ->
-                dataInteractor.updateReminder(reminder)
+            // Build display order data from the temporary (reordered) list
+            val orders = temporaryReminders.value.mapIndexed { index, reminderViewData ->
+                ReminderDisplayOrderData(
+                    id = reminderViewData.id,
+                    displayIndex = index
+                )
             }
+
+            // Update all display indices in one call (null groupId = reminders screen)
+            dataInteractor.updateReminderDisplayOrder(groupId = null, orders = orders)
 
             val expectedOrder = temporaryReminders.value.map { it.id }
 

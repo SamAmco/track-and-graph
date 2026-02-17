@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
@@ -56,7 +57,7 @@ interface TimeSinceLastReminderConfigurationViewModel {
     fun updateSecondPeriod(period: Period)
     fun updateHasSecondInterval(hasSecondInterval: Boolean)
     fun updateFeatureId(id: Long?)
-    fun getReminder(): Reminder
+    fun getReminderInput(): ReminderInput
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.TimeSinceLastParams?)
     fun reset()
     fun onOpenFunctionsRemindersInfo(context: Context)
@@ -96,8 +97,6 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val featurePathMap = MutableStateFlow<Map<Long, String>?>(null)
-    
-    private var editingReminder: Reminder? = null
 
     init {
         // Initialize feature path map
@@ -145,28 +144,19 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
         }
     }
 
-    override fun getReminder(): Reminder {
+    override fun getReminderInput(): ReminderInput {
         val firstIntervalInt = (_firstInterval.value.toDoubleOrNull()?.toInt() ?: 1).coerceAtLeast(1)
         val secondIntervalInt = (_secondInterval.value.toDoubleOrNull()?.toInt() ?: 1).coerceAtLeast(1)
 
-        val params = ReminderParams.TimeSinceLastParams(
-            firstInterval = IntervalPeriodPair(interval = firstIntervalInt, period = _firstPeriod.value),
-            secondInterval = if (_hasSecondInterval.value) {
-                IntervalPeriodPair(interval = secondIntervalInt, period = _secondPeriod.value)
-            } else null
-        )
-
-        return editingReminder?.copy(
+        return ReminderInput(
             reminderName = _reminderName.value,
             featureId = _featureId.value,
-            params = params
-        ) ?: Reminder(
-            id = 0L,
-            displayIndex = 0,
-            reminderName = _reminderName.value,
-            groupId = null,
-            featureId = _featureId.value,
-            params = params
+            params = ReminderParams.TimeSinceLastParams(
+                firstInterval = IntervalPeriodPair(interval = firstIntervalInt, period = _firstPeriod.value),
+                secondInterval = if (_hasSecondInterval.value) {
+                    IntervalPeriodPair(interval = secondIntervalInt, period = _secondPeriod.value)
+                } else null
+            )
         )
     }
 
@@ -174,8 +164,6 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
         reminder: Reminder?,
         params: ReminderParams.TimeSinceLastParams?
     ) {
-        editingReminder = reminder
-        
         if (reminder != null) {
             _reminderName.value = reminder.reminderName
             _featureId.value = reminder.featureId
@@ -205,7 +193,6 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
         _hasSecondInterval.value = false
         _featureId.value = null
         _featureName.value = ""
-        editingReminder = null
     }
 
     override fun onOpenFunctionsRemindersInfo(context: Context) {

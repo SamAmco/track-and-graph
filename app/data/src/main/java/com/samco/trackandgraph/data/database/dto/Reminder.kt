@@ -33,6 +33,50 @@ data class Reminder(
     val params: ReminderParams
 )
 
+/**
+ * Request object for creating a new Reminder.
+ *
+ * Note: id and displayIndex are handled by the data layer and should not be provided.
+ */
+data class ReminderCreateRequest(
+    val reminderName: String,
+    val groupId: Long?,
+    val featureId: Long?,
+    val params: ReminderParams
+)
+
+/**
+ * Request object for updating an existing Reminder.
+ *
+ * All fields except [id] are optional. A null value means "don't change this field".
+ *
+ * Note: To move a reminder to a different group or change display order, use dedicated methods.
+ */
+data class ReminderUpdateRequest(
+    val id: Long,
+    val reminderName: String? = null,
+    val featureId: Long? = null,
+    val params: ReminderParams? = null
+)
+
+/**
+ * Represents display order data for a reminder, used when reordering reminders.
+ */
+data class ReminderDisplayOrderData(
+    val id: Long,
+    val displayIndex: Int
+)
+
+/**
+ * Represents the user-provided input for creating or updating a reminder.
+ * This contains only the fields that the UI can actually modify.
+ */
+data class ReminderInput(
+    val reminderName: String,
+    val featureId: Long?,
+    val params: ReminderParams
+)
+
 @Serializable
 sealed class ReminderParams {
     @Serializable

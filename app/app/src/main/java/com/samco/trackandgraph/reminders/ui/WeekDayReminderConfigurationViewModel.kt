@@ -20,6 +20,7 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,7 @@ interface WeekDayReminderConfigurationViewModel {
     fun updateReminderName(name: String)
     fun updateSelectedTime(time: LocalTime)
     fun updateCheckedDays(days: CheckedDays)
-    fun getReminder(): Reminder
+    fun getReminderInput(): ReminderInput
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.WeekDayParams?)
     fun reset()
 }
@@ -66,12 +67,9 @@ class WeekDayReminderConfigurationViewModelImpl @Inject constructor() :
         _checkedDays.value = days
     }
 
-    override fun getReminder(): Reminder {
-        return Reminder(
-            id = 0L,
-            displayIndex = 0,
+    override fun getReminderInput(): ReminderInput {
+        return ReminderInput(
             reminderName = _reminderName.value,
-            groupId = null,
             featureId = null,
             params = ReminderParams.WeekDayParams(
                 time = _selectedTime.value,

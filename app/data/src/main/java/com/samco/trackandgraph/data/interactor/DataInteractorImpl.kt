@@ -52,6 +52,9 @@ import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
+import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
@@ -239,14 +242,22 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertReminder(reminder: Reminder): Long = withContext(io) {
-        val id = reminderHelper.insertReminder(reminder)
+    override suspend fun createReminder(request: ReminderCreateRequest): Long = withContext(io) {
+        val id = reminderHelper.createReminder(request)
         dataUpdateEvents.emit(DataUpdateType.Reminder)
         return@withContext id
     }
 
-    override suspend fun updateReminder(reminder: Reminder) = withContext(io) {
-        reminderHelper.updateReminder(reminder)
+    override suspend fun updateReminder(request: ReminderUpdateRequest) = withContext(io) {
+        reminderHelper.updateReminder(request)
+        dataUpdateEvents.emit(DataUpdateType.Reminder)
+    }
+
+    override suspend fun updateReminderDisplayOrder(
+        groupId: Long?,
+        orders: List<ReminderDisplayOrderData>
+    ) = withContext(io) {
+        reminderHelper.updateReminderDisplayOrder(groupId, orders)
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
@@ -255,8 +266,8 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
-    override suspend fun duplicateReminder(reminder: Reminder): Long = withContext(io) {
-        val id = reminderHelper.duplicateReminder(reminder)
+    override suspend fun duplicateReminder(id: Long): Long = withContext(io) {
+        val id = reminderHelper.duplicateReminder(id)
         dataUpdateEvents.emit(DataUpdateType.Reminder)
         return@withContext id
     }

@@ -37,7 +37,7 @@ import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
-import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.database.dto.TimeHistogramConfig
 import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
@@ -68,10 +68,8 @@ suspend fun createScreenshotsGroup(dataInteractor: DataInteractor) {
 
 private suspend fun createReminders(dataInteractor: DataInteractor, exerciseFeatureId: Long) {
     // Week Day Reminder
-    dataInteractor.insertReminder(
-        Reminder(
-            id = 1L,
-            displayIndex = 0,
+    dataInteractor.createReminder(
+        ReminderCreateRequest(
             reminderName = "Tracking dailies",
             groupId = null,
             featureId = null,
@@ -91,10 +89,8 @@ private suspend fun createReminders(dataInteractor: DataInteractor, exerciseFeat
     )
 
     // Periodic Reminder
-    dataInteractor.insertReminder(
-        Reminder(
-            id = 2L,
-            displayIndex = 1,
+    dataInteractor.createReminder(
+        ReminderCreateRequest(
             reminderName = "Weekly review",
             groupId = null,
             featureId = null,
@@ -108,10 +104,8 @@ private suspend fun createReminders(dataInteractor: DataInteractor, exerciseFeat
     )
 
     // Month Day Reminder
-    dataInteractor.insertReminder(
-        Reminder(
-            id = 3L,
-            displayIndex = 2,
+    dataInteractor.createReminder(
+        ReminderCreateRequest(
             reminderName = "Monthly goals",
             groupId = null,
             featureId = null,
@@ -125,10 +119,8 @@ private suspend fun createReminders(dataInteractor: DataInteractor, exerciseFeat
     )
 
     // Time Since Last Reminder
-    dataInteractor.insertReminder(
-        Reminder(
-            id = 4L,
-            displayIndex = 3,
+    dataInteractor.createReminder(
+        ReminderCreateRequest(
             reminderName = "2 days without Exercise",
             groupId = null,
             featureId = exerciseFeatureId,

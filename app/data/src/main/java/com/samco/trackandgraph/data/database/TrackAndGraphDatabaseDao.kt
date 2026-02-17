@@ -104,7 +104,7 @@ private const val getDisplayTrackersQuery = """
     """
 
 @Dao
-internal interface TrackAndGraphDatabaseDao : GraphDao {
+internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGroup(group: Group): Long
 
@@ -121,10 +121,10 @@ internal interface TrackAndGraphDatabaseDao : GraphDao {
     fun getAllReminders(): Flow<List<Reminder>>
 
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
-    fun getAllRemindersSync(): List<Reminder>
+    override fun getAllRemindersSync(): List<Reminder>
 
     @Query("""SELECT * FROM reminders_table WHERE id = :id""")
-    fun getReminderById(id: Long): Reminder?
+    override fun getReminderById(id: Long): Reminder?
 
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroups(): Flow<List<Group>>
@@ -136,16 +136,16 @@ internal interface TrackAndGraphDatabaseDao : GraphDao {
     fun getAllFeaturesSync(): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertReminder(reminder: Reminder): Long
+    override fun insertReminder(reminder: Reminder): Long
 
     @Update
-    fun updateReminder(reminder: Reminder)
+    override fun updateReminder(reminder: Reminder)
 
     @Query("DELETE FROM reminders_table")
     fun deleteReminders()
 
     @Query("DELETE FROM reminders_table WHERE id = :id")
-    fun deleteReminder(id: Long)
+    override fun deleteReminder(id: Long)
 
     @Query("SELECT * FROM groups_table WHERE id = :id LIMIT 1")
     fun getGroupById(id: Long): Group
@@ -430,7 +430,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao {
     fun hasAnyGroups(): Boolean
 
     @Query("SELECT EXISTS (SELECT 1 FROM reminders_table LIMIT 1)")
-    fun hasAnyReminders(): Boolean
+    override fun hasAnyReminders(): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFunction(function: Function): Long

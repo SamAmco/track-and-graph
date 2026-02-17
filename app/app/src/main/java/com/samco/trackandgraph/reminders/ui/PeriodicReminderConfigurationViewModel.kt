@@ -20,6 +20,7 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +46,7 @@ interface PeriodicReminderConfigurationViewModel {
     fun updateHasEndDate(hasEndDate: Boolean)
     fun updateInterval(interval: String)
     fun updatePeriod(period: Period)
-    fun getReminder(): Reminder
+    fun getReminderInput(): ReminderInput
     fun reset()
 }
 
@@ -70,8 +71,6 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
     private val _hasEndDate = MutableStateFlow(false)
     override val hasEndDate: StateFlow<Boolean> = _hasEndDate.asStateFlow()
 
-    private var editingReminder: Reminder? = null
-    
     // Helper methods for conversion
     private fun localDateTimeToOffset(localDateTime: LocalDateTime): OffsetDateTime {
         return localDateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime()
@@ -106,10 +105,10 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
     }
 
     override fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.PeriodicParams?) {
-        editingReminder = reminder
-        
+        if (reminder != null) {
+            _reminderName.value = reminder.reminderName
+        }
         if (params != null) {
-            _reminderName.value = reminder?.reminderName ?: ""
             _starts.value = localDateTimeToOffset(params.starts)
             _ends.value = params.ends?.let { localDateTimeToOffset(it) } ?: OffsetDateTime.now()
             _hasEndDate.value = params.ends != null
@@ -118,25 +117,17 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
         }
     }
 
-    override fun getReminder(): Reminder {
-        val params = ReminderParams.PeriodicParams(
-            starts = offsetDateTimeToLocal(_starts.value),
-            ends = if (_hasEndDate.value) offsetDateTimeToLocal(_ends.value) else null,
-            // If the user enters a decimal floor it to the nearest int
-            interval = (_intervalText.value.toDoubleOrNull()?.toInt() ?: 1).coerceAtLeast(1),
-            period = _period.value
-        )
-
-        return editingReminder?.copy(
+    override fun getReminderInput(): ReminderInput {
+        return ReminderInput(
             reminderName = _reminderName.value,
-            params = params
-        ) ?: Reminder(
-            id = 0L, // Will be assigned by database
-            displayIndex = 0,
-            reminderName = _reminderName.value,
-            groupId = null,
             featureId = null,
-            params = params
+            params = ReminderParams.PeriodicParams(
+                starts = offsetDateTimeToLocal(_starts.value),
+                ends = if (_hasEndDate.value) offsetDateTimeToLocal(_ends.value) else null,
+                // If the user enters a decimal floor it to the nearest int
+                interval = (_intervalText.value.toDoubleOrNull()?.toInt() ?: 1).coerceAtLeast(1),
+                period = _period.value
+            )
         )
     }
 
@@ -149,6 +140,5 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
         _hasEndDate.value = false
         _intervalText.value = "1"
         _period.value = Period.DAYS
-        editingReminder = null
     }
 }

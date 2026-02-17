@@ -24,7 +24,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.ui.compose.animation.popTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.predictivePopTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.transitionSpec
@@ -46,7 +46,7 @@ sealed class ReminderDialogNavKey : NavKey {
 @Composable
 fun AddReminderDialogContent(
     modifier: Modifier = Modifier,
-    onConfirm: (Reminder) -> Unit,
+    onConfirm: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     onSetCleanup: (() -> Unit) -> Unit = {},
     hasAnyFeatures: Boolean = false,
