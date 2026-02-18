@@ -25,11 +25,9 @@ data class GraphOrStat(
     val type: GraphStatType,
     val displayIndex: Int
 ) {
-    internal fun toEntity(groupId: Long) = GraphOrStat(
+    internal fun toEntity() = GraphOrStat(
         id,
-        groupId,
         name,
-        type,
-        displayIndex
+        type
     )
 }

@@ -27,8 +27,6 @@ data class Group(
     internal fun toEntity() = com.samco.trackandgraph.data.database.entity.Group(
         id,
         name,
-        displayIndex,
-        parentGroupIds.firstOrNull(),
         colorIndex,
     )
 }

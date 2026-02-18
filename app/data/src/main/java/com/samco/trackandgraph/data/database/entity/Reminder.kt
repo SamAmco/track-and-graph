@@ -26,12 +26,6 @@ import androidx.room.PrimaryKey
     tableName = "reminders_table",
     foreignKeys = [
         ForeignKey(
-            entity = Group::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("group_id"),
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
             entity = Feature::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("feature_id"),
@@ -44,14 +38,8 @@ internal data class Reminder(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "name")
     val alarmName: String,
-
-    @ColumnInfo(name = "group_id", index = true)
-    val groupId: Long?,
 
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long?,

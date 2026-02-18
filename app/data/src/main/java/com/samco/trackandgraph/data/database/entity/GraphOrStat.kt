@@ -18,41 +18,26 @@ package com.samco.trackandgraph.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 
-@Entity(
-    tableName = "graphs_and_stats_table2",
-    foreignKeys = [ForeignKey(
-        entity = Group::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("group_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
-)
+@Entity(tableName = "graphs_and_stats_table2")
 internal data class GraphOrStat(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "group_id", index = true)
-    val groupId: Long,
-
     @ColumnInfo(name = "name")
     val name: String,
 
     @ColumnInfo(name = "graph_stat_type")
-    val type: GraphStatType,
-
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int
+    val type: GraphStatType
 ) {
-    fun toDto() = GraphOrStat(
+    // TODO: groupIds and displayIndex must be looked up from group_items_table
+    fun toDto(groupIds: Set<Long>, displayIndex: Int) = GraphOrStat(
         id,
-        // TODO: Currently graphs only exist in one group, but this will change
-        setOf(groupId),
+        groupIds,
         name,
         type,
         displayIndex

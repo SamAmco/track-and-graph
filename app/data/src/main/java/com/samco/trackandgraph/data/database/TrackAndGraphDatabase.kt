@@ -45,6 +45,8 @@ import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.database.entity.GlobalNote
 import com.samco.trackandgraph.data.database.entity.GraphOrStat
 import com.samco.trackandgraph.data.database.entity.Group
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.database.entity.LastValueStat
 import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
@@ -66,7 +68,7 @@ import org.threeten.bp.temporal.TemporalAmount
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-const val TNG_DATABASE_VERSION = 58
+const val TNG_DATABASE_VERSION = 59
 
 @Database(
     entities = [
@@ -74,6 +76,7 @@ const val TNG_DATABASE_VERSION = 58
         Tracker::class,
         DataPoint::class,
         Group::class,
+        GroupItem::class,
         GraphOrStat::class,
         LineGraph::class,
         AverageTimeBetweenStat::class,
@@ -297,6 +300,12 @@ internal class Converters {
             }
         }
     }
+
+    @TypeConverter
+    fun groupItemTypeToString(type: GroupItemType): String = type.name
+
+    @TypeConverter
+    fun stringToGroupItemType(value: String): GroupItemType = GroupItemType.valueOf(value)
 
 }
 

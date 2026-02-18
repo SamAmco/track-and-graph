@@ -19,18 +19,9 @@ package com.samco.trackandgraph.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(
-    tableName = "groups_table",
-    foreignKeys = [ForeignKey(
-        entity = Group::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("parent_group_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
-)
+@Entity(tableName = "groups_table")
 internal data class Group(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
@@ -39,20 +30,15 @@ internal data class Group(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
-    @ColumnInfo(name = "parent_group_id", index = true)
-    val parentGroupId: Long?,
-
     @ColumnInfo(name = "color_index")
     val colorIndex: Int,
 ) {
-    fun toDto() = com.samco.trackandgraph.data.database.dto.Group(
+    // TODO: parentGroupIds and displayIndex must be looked up from group_items_table
+    fun toDto(parentGroupIds: Set<Long>, displayIndex: Int) = com.samco.trackandgraph.data.database.dto.Group(
         id,
         name,
         displayIndex,
-        parentGroupIds = parentGroupId?.let { setOf(it) } ?: emptySet(),
+        parentGroupIds = parentGroupIds,
         colorIndex,
     )
 }

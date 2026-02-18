@@ -18,22 +18,13 @@ package com.samco.trackandgraph.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.FeatureDtoImpl
 import kotlinx.serialization.Serializable
 
 @Serializable
-@Entity(
-    tableName = "features_table",
-    foreignKeys = [ForeignKey(
-        entity = Group::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("group_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
-)
+@Entity(tableName = "features_table")
 internal data class Feature(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
@@ -42,22 +33,15 @@ internal data class Feature(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "group_id", index = true)
-    val groupId: Long,
-
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "feature_description")
     val description: String
 ) {
-    // TODO: When features can exist in multiple groups, this will need to look up
-    // all groups the feature belongs to
-    fun toDto(): Feature = FeatureDtoImpl(
+    // TODO: groupIds and displayIndex must be looked up from group_items_table
+    fun toDto(groupIds: Set<Long>, displayIndex: Int): Feature = FeatureDtoImpl(
         featureId = this@Feature.id,
         name = this@Feature.name,
-        groupIds = setOf(this@Feature.groupId),
-        displayIndex = this@Feature.displayIndex,
+        groupIds = groupIds,
+        displayIndex = displayIndex,
         description = this@Feature.description
     )
 }

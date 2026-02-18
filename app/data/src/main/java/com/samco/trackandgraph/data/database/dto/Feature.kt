@@ -44,10 +44,8 @@ internal data class FeatureDtoImpl(
     override val description: String
 ) : Feature
 
-internal fun Feature.toEntity(groupId: Long) = com.samco.trackandgraph.data.database.entity.Feature(
+internal fun Feature.toEntity() = com.samco.trackandgraph.data.database.entity.Feature(
     featureId,
     name,
-    groupId,
-    displayIndex,
     description
 )
