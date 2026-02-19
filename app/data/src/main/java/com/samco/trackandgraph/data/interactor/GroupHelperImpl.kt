@@ -17,12 +17,15 @@
 
 package com.samco.trackandgraph.data.interactor
 
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -32,6 +35,7 @@ import javax.inject.Singleton
 @Singleton
 internal class GroupHelperImpl @Inject constructor(
     private val dao: TrackAndGraphDatabaseDao,
+    private val groupItemDao: GroupItemDao,
     @IODispatcher private val io: CoroutineDispatcher
 ) : GroupHelper {
 
@@ -39,11 +43,27 @@ internal class GroupHelperImpl @Inject constructor(
         val group = com.samco.trackandgraph.data.database.entity.Group(
             id = 0L,
             name = request.name,
-            displayIndex = 0,
-            parentGroupId = request.parentGroupId,
             colorIndex = request.colorIndex
         )
-        dao.insertGroup(group)
+        val groupId = dao.insertGroup(group)
+
+        // Create GroupItem entry for this group in its parent
+        if (request.parentGroupId != null) {
+            groupItemDao.shiftDisplayIndexesDown(request.parentGroupId)
+        } else {
+            groupItemDao.shiftDisplayIndexesDownForNullGroup()
+        }
+
+        val groupItem = GroupItem(
+            groupId = request.parentGroupId,
+            displayIndex = 0,
+            childId = groupId,
+            type = GroupItemType.GROUP,
+            createdAt = System.currentTimeMillis()
+        )
+        groupItemDao.insertGroupItem(groupItem)
+
+        groupId
     }
 
     override suspend fun updateGroup(request: GroupUpdateRequest) = withContext(io) {
@@ -74,15 +94,29 @@ internal class GroupHelperImpl @Inject constructor(
         }
 
     override suspend fun getGroupById(id: Long): Group = withContext(io) {
-        dao.getGroupById(id).toDto()
+        val entity = dao.getGroupById(id)
+        val groupItems = groupItemDao.getGroupItemsForChild(id, GroupItemType.GROUP)
+        val parentGroupIds = groupItems.mapNotNull { it.groupId }.toSet()
+        val displayIndex = groupItems.firstOrNull()?.displayIndex ?: 0
+        entity.toDto(parentGroupIds, displayIndex)
     }
 
     override suspend fun getAllGroupsSync(): List<Group> = withContext(io) {
-        dao.getAllGroupsSync().map { it.toDto() }
+        dao.getAllGroupsSync().map { entity ->
+            val groupItems = groupItemDao.getGroupItemsForChild(entity.id, GroupItemType.GROUP)
+            val parentGroupIds = groupItems.mapNotNull { it.groupId }.toSet()
+            val displayIndex = groupItems.firstOrNull()?.displayIndex ?: 0
+            entity.toDto(parentGroupIds, displayIndex)
+        }
     }
 
     override suspend fun getGroupsForGroupSync(parentGroupId: Long): List<Group> = withContext(io) {
-        dao.getGroupsForGroupSync(parentGroupId).map { it.toDto() }
+        dao.getGroupsForGroupSync(parentGroupId).map { entity ->
+            val groupItems = groupItemDao.getGroupItemsForChild(entity.id, GroupItemType.GROUP)
+            val parentGroupIds = groupItems.mapNotNull { it.groupId }.toSet()
+            val displayIndex = groupItems.firstOrNull()?.displayIndex ?: 0
+            entity.toDto(parentGroupIds, displayIndex)
+        }
     }
 
     override suspend fun hasAnyGroups(): Boolean = withContext(io) {

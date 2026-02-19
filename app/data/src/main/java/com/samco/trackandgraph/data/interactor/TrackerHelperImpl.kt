@@ -18,8 +18,11 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.*
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.interactor.TrackerHelper.DurationNumericConversionMode
 import com.samco.trackandgraph.data.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
@@ -34,6 +37,7 @@ import com.samco.trackandgraph.data.database.entity.DataPoint as DataPointEntity
 internal class TrackerHelperImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
+    private val groupItemDao: GroupItemDao,
     private val dataPointUpdateHelper: DataPointUpdateHelper,
     @IODispatcher private val io: CoroutineDispatcher
 ) : TrackerHelper {
@@ -106,14 +110,9 @@ internal class TrackerHelperImpl @Inject constructor(
                 request.durationNumericConversionMode
             )
 
-            // TODO: When features can exist in multiple groups, this will need to handle
-            // multiple group associations
-            val currentGroupId = old.groupIds.first()
             val newFeature = com.samco.trackandgraph.data.database.entity.Feature(
                 id = old.featureId,
                 name = request.name ?: old.name,
-                groupId = currentGroupId,
-                displayIndex = old.displayIndex,
                 description = request.description ?: old.description
             )
             val newTracker = com.samco.trackandgraph.data.database.entity.Tracker(
@@ -269,11 +268,21 @@ internal class TrackerHelperImpl @Inject constructor(
             val feature = com.samco.trackandgraph.data.database.entity.Feature(
                 id = 0L,
                 name = request.name,
-                groupId = request.groupId,
-                displayIndex = 0,
                 description = request.description
             )
             val featureId = dao.insertFeature(feature)
+
+            // Create GroupItem entry
+            groupItemDao.shiftDisplayIndexesDown(request.groupId)
+            val groupItem = GroupItem(
+                groupId = request.groupId,
+                displayIndex = 0,
+                childId = featureId,
+                type = GroupItemType.FEATURE,
+                createdAt = System.currentTimeMillis()
+            )
+            groupItemDao.insertGroupItem(groupItem)
+
             val tracker = com.samco.trackandgraph.data.database.entity.Tracker(
                 id = 0L,
                 featureId = featureId,

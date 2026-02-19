@@ -17,11 +17,14 @@
 
 package com.samco.trackandgraph.data.interactor
 
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.ReminderDao
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.database.entity.Reminder as ReminderEntity
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.serialization.ReminderSerializer
@@ -31,12 +34,15 @@ import javax.inject.Inject
 
 internal class ReminderHelperImpl @Inject constructor(
     private val reminderDao: ReminderDao,
+    private val groupItemDao: GroupItemDao,
     private val reminderSerializer: ReminderSerializer,
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ReminderHelper {
 
     override suspend fun getAllRemindersSync(): List<Reminder> = withContext(io) {
-        reminderDao.getAllRemindersSync().mapNotNull(::fromEntity)
+        reminderDao.getAllRemindersSync()
+            .mapNotNull(::fromEntity)
+            .sortedWith(compareBy({ it.displayIndex }, { -it.id }))
     }
 
     override suspend fun getReminderById(id: Long): Reminder? = withContext(io) {
@@ -47,23 +53,31 @@ internal class ReminderHelperImpl @Inject constructor(
         val encodedParams = reminderSerializer.serializeParams(request.params)
             ?: throw IllegalArgumentException("Failed to serialize reminder params")
 
-        // Shift existing reminders in the same group down to make room at index 0
-        val existingInGroup = reminderDao.getAllRemindersSync()
-            .filter { it.groupId == request.groupId }
-
-        existingInGroup.forEach { existing ->
-            reminderDao.updateReminder(existing.copy(displayIndex = existing.displayIndex + 1))
+        // Shift existing reminders via GroupItem
+        if (request.groupId != null) {
+            groupItemDao.shiftDisplayIndexesDown(request.groupId)
+        } else {
+            groupItemDao.shiftDisplayIndexesDownForNullGroup()
         }
 
         val entity = ReminderEntity(
             id = 0L,
-            displayIndex = 0,
             alarmName = request.reminderName,
-            groupId = request.groupId,
             featureId = request.featureId,
             encodedReminderParams = encodedParams
         )
-        reminderDao.insertReminder(entity)
+        val reminderId = reminderDao.insertReminder(entity)
+
+        val groupItem = GroupItem(
+            groupId = request.groupId,
+            displayIndex = 0,
+            childId = reminderId,
+            type = GroupItemType.REMINDER,
+            createdAt = System.currentTimeMillis()
+        )
+        groupItemDao.insertGroupItem(groupItem)
+
+        reminderId
     }
 
     override suspend fun updateReminder(request: ReminderUpdateRequest) = withContext(io) {
@@ -88,21 +102,24 @@ internal class ReminderHelperImpl @Inject constructor(
         groupId: Long?,
         orders: List<ReminderDisplayOrderData>
     ) = withContext(io) {
-        val remindersInGroup = reminderDao.getAllRemindersSync()
-            .filter { it.groupId == groupId }
-
         val orderMap = orders.associate { it.id to it.displayIndex }
 
-        val updatedEntities = remindersInGroup.mapNotNull { entity ->
-            val newIndex = orderMap[entity.id]
-            if (newIndex != null && newIndex != entity.displayIndex) {
-                entity.copy(displayIndex = newIndex)
+        val groupItems = if (groupId != null) {
+            groupItemDao.getGroupItemsForGroup(groupId)
+        } else {
+            groupItemDao.getGroupItemsWithNoGroup()
+        }
+
+        val groupItemsToUpdate = groupItems.mapNotNull { groupItem ->
+            val newIndex = orderMap[groupItem.childId]
+            if (newIndex != null && newIndex != groupItem.displayIndex) {
+                groupItem.copy(displayIndex = newIndex)
             } else {
                 null
             }
         }
 
-        updatedEntities.forEach { reminderDao.updateReminder(it) }
+        groupItemsToUpdate.forEach { groupItemDao.updateGroupItem(it) }
     }
 
     override suspend fun deleteReminder(id: Long) = withContext(io) {
@@ -113,8 +130,25 @@ internal class ReminderHelperImpl @Inject constructor(
         val existing = reminderDao.getReminderById(id)
             ?: throw IllegalArgumentException("Reminder with id $id not found")
 
+        // Get the existing GroupItem to find the groupId
+        val existingGroupItem = groupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            .firstOrNull()
+        val groupId = existingGroupItem?.groupId
+
         val newEntity = existing.copy(id = 0L)
-        reminderDao.insertReminder(newEntity)
+        val newReminderId = reminderDao.insertReminder(newEntity)
+
+        // Create GroupItem for the new reminder
+        val newGroupItem = GroupItem(
+            groupId = groupId,
+            displayIndex = 0,
+            childId = newReminderId,
+            type = GroupItemType.REMINDER,
+            createdAt = System.currentTimeMillis()
+        )
+        groupItemDao.insertGroupItem(newGroupItem)
+
+        newReminderId
     }
 
     override suspend fun hasAnyReminders(): Boolean = withContext(io) {
@@ -128,11 +162,14 @@ internal class ReminderHelperImpl @Inject constructor(
         val params = reminderSerializer.deserializeParams(entity.encodedReminderParams)
             ?: return null
 
+        val groupItem = groupItemDao.getGroupItemsForChild(entity.id, GroupItemType.REMINDER)
+            .firstOrNull()
+
         return Reminder(
             id = entity.id,
-            displayIndex = entity.displayIndex,
+            displayIndex = groupItem?.displayIndex ?: 0,
             reminderName = entity.alarmName,
-            groupId = entity.groupId,
+            groupId = groupItem?.groupId,
             featureId = entity.featureId,
             params = params
         )

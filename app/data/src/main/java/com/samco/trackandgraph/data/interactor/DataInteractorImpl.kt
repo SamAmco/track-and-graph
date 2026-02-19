@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateRequest
@@ -60,6 +61,7 @@ import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
 import com.samco.trackandgraph.data.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
@@ -76,6 +78,7 @@ import javax.inject.Inject
 internal class DataInteractorImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
+    private val groupItemDao: GroupItemDao,
     @IODispatcher private val io: CoroutineDispatcher,
     private val trackerHelper: TrackerHelper,
     private val functionHelper: FunctionHelper,
@@ -122,10 +125,10 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getGroupGraphSync(rootGroupId: Long?): GroupGraph = withContext(io) {
         val rootGroup = if (rootGroupId != null) {
-            dao.getGroupById(rootGroupId).toDto()
+            convertGroupToDto(dao.getGroupById(rootGroupId))
         } else {
             // Get the root group (group with no parent)
-            dao.getRootGroupSync()?.toDto() ?: throw IllegalStateException("No root group found")
+            dao.getRootGroupSync()?.let { convertGroupToDto(it) } ?: throw IllegalStateException("No root group found")
         }
 
         buildGroupGraph(rootGroup)
@@ -136,14 +139,14 @@ internal class DataInteractorImpl @Inject constructor(
 
         // Get child groups for this specific group
         val childGroups = dao.getGroupsForGroupSync(group.id)
-            .map { it.toDto() }
+            .map { convertGroupToDto(it) }
 
         // Get trackers for this specific group using TrackerHelper
         val trackers = getTrackersForGroupSync(group.id)
 
         // Get graphs for this specific group
         val graphs = dao.getGraphsAndStatsByGroupIdSync(group.id)
-            .map { it.toDto() }
+            .map { convertGraphOrStatToDto(it) }
 
         // Get functions for this specific group using FunctionHelper
         val functions = getFunctionsForGroupSync(group.id)
@@ -172,11 +175,11 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature> = withContext(io) {
-        dao.getFeaturesForGroupSync(groupId).map { it.toDto() }
+        dao.getFeaturesForGroupSync(groupId).map { convertFeatureToDto(it) }
     }
 
     override suspend fun getFeatureById(featureId: Long): Feature? = withContext(io) {
-        dao.getFeatureById(featureId)?.toDto()
+        dao.getFeatureById(featureId)?.let { convertFeatureToDto(it) }
     }
 
     override suspend fun createTracker(request: TrackerCreateRequest): Long = withContext(io) {
@@ -455,20 +458,7 @@ internal class DataInteractorImpl @Inject constructor(
 
     private suspend fun shiftUpGroupChildIndexes(groupId: Long) =
         performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
-                dao.updateFeatures(features.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
-
-            //Update graphs
-            dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
-                dao.updateGraphStats(graphs.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
-
-            //Update groups
-            dao.getGroupsForGroupSync(groupId).let { groups ->
-                dao.updateGroups(groups.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
+            groupItemDao.shiftDisplayIndexesDown(groupId)
         }
 
     // =========================================================================
@@ -515,38 +505,20 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>) =
         performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
-                val updates = features.map { feature ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.FEATURE && it.id == feature.id
-                    }
-                    feature.copy(displayIndex = newDisplayIndex)
+            val groupItems = groupItemDao.getGroupItemsForGroup(groupId)
+
+            val updates = groupItems.mapNotNull { groupItem ->
+                val newDisplayIndex = children.indexOfFirst { child ->
+                    child.id == groupItem.childId
                 }
-                dao.updateFeatures(updates)
+                if (newDisplayIndex >= 0 && newDisplayIndex != groupItem.displayIndex) {
+                    groupItem.copy(displayIndex = newDisplayIndex)
+                } else {
+                    null
+                }
             }
 
-            //Update graphs
-            dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
-                val updates = graphs.map { graph ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.GRAPH && it.id == graph.id
-                    }
-                    graph.copy(displayIndex = newDisplayIndex)
-                }
-                dao.updateGraphStats(updates)
-            }
-
-            //Update groups
-            dao.getGroupsForGroupSync(groupId).let { groups ->
-                val updates = groups.map { group ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.GROUP && it.id == group.id
-                    }
-                    group.copy(displayIndex = newDisplayIndex)
-                }
-                dao.updateGroups(updates)
-            }
+            updates.forEach { groupItemDao.updateGroupItem(it) }
         }
 
     override fun onImportedExternalData() {
@@ -566,7 +538,7 @@ internal class DataInteractorImpl @Inject constructor(
         }
 
     override suspend fun getAllFeaturesSync(): List<Feature> = withContext(io) {
-        dao.getAllFeaturesSync().map { it.toDto() }
+        dao.getAllFeaturesSync().map { convertFeatureToDto(it) }
     }
 
     // FunctionHelper method overrides with event emission
@@ -617,22 +589,24 @@ internal class DataInteractorImpl @Inject constructor(
             ComponentType.TRACKER -> {
                 val tracker = dao.getTrackerById(request.id)
                     ?: throw IllegalArgumentException("Tracker not found: ${request.id}")
-                val feature = dao.getFeatureById(tracker.featureId)
-                    ?: throw IllegalArgumentException("Feature not found: ${tracker.featureId}")
-                dao.updateFeature(feature.copy(groupId = request.toGroupId))
+                val groupItem = groupItemDao.getGroupItemsForChild(tracker.featureId, GroupItemType.FEATURE)
+                    .firstOrNull()
+                if (groupItem != null) {
+                    groupItemDao.updateGroupItem(groupItem.copy(groupId = request.toGroupId))
+                }
                 dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
             }
             ComponentType.FUNCTION -> {
                 val function = dao.getFunctionById(request.id)
                     ?: throw IllegalArgumentException("Function not found: ${request.id}")
-                val feature = dao.getFeatureById(function.featureId)
-                    ?: throw IllegalArgumentException("Feature not found: ${function.featureId}")
-                dao.updateFeature(feature.copy(groupId = request.toGroupId))
+                val groupItem = groupItemDao.getGroupItemsForChild(function.featureId, GroupItemType.FEATURE)
+                    .firstOrNull()
+                if (groupItem != null) {
+                    groupItemDao.updateGroupItem(groupItem.copy(groupId = request.toGroupId))
+                }
                 dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(function.featureId))
             }
             ComponentType.GROUP -> {
-                val group = dao.getGroupById(request.id)
-
                 // Validate: ensure we're not moving a group to its own descendant
                 val visited = mutableListOf(request.id)
                 var currentParentId: Long? = request.toGroupId
@@ -641,17 +615,50 @@ internal class DataInteractorImpl @Inject constructor(
                         throw IllegalArgumentException("Cannot move group to its own descendant")
                     }
                     visited.add(currentParentId)
-                    currentParentId = dao.getGroupById(currentParentId).parentGroupId
+                    val parentGroupItem = groupItemDao.getGroupItemsForChild(currentParentId, GroupItemType.GROUP)
+                        .firstOrNull()
+                    currentParentId = parentGroupItem?.groupId
                 }
 
-                dao.updateGroup(group.copy(parentGroupId = request.toGroupId))
+                val groupItem = groupItemDao.getGroupItemsForChild(request.id, GroupItemType.GROUP)
+                    .firstOrNull()
+                if (groupItem != null) {
+                    groupItemDao.updateGroupItem(groupItem.copy(groupId = request.toGroupId))
+                }
                 dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
             }
             ComponentType.GRAPH -> {
                 val graphStat = dao.getGraphStatById(request.id)
-                dao.updateGraphOrStat(graphStat.copy(groupId = request.toGroupId))
+                val graphStatEntity = dao.tryGetGraphStatById(request.id)
+                    ?: throw IllegalArgumentException("Graph not found: ${request.id}")
+                val graphItems = groupItemDao.getGroupItemsForChild(request.id, GroupItemType.GRAPH)
+                val graphItem = graphItems.firstOrNull()
+                if (graphItem != null) {
+                    groupItemDao.updateGroupItem(graphItem.copy(groupId = request.toGroupId))
+                }
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.id))
             }
         }
+    }
+
+    private fun convertGroupToDto(entity: com.samco.trackandgraph.data.database.entity.Group): Group {
+        val groupItems = groupItemDao.getGroupItemsForChild(entity.id, GroupItemType.GROUP)
+        val parentGroupIds = groupItems.mapNotNull { it.groupId }.toSet()
+        val displayIndex = groupItems.firstOrNull()?.displayIndex ?: 0
+        return entity.toDto(parentGroupIds, displayIndex)
+    }
+
+    private fun convertFeatureToDto(entity: com.samco.trackandgraph.data.database.entity.Feature): Feature {
+        val groupItems = groupItemDao.getGroupItemsForChild(entity.id, GroupItemType.FEATURE)
+        val groupIds = groupItems.mapNotNull { it.groupId }.toSet()
+        val displayIndex = groupItems.firstOrNull()?.displayIndex ?: 0
+        return entity.toDto(groupIds, displayIndex)
+    }
+
+    private fun convertGraphOrStatToDto(entity: com.samco.trackandgraph.data.database.entity.GraphOrStat): com.samco.trackandgraph.data.database.dto.GraphOrStat {
+        val groupItems = groupItemDao.getGroupItemsForChild(entity.id, GroupItemType.GRAPH)
+        val groupIds = groupItems.mapNotNull { it.groupId }.toSet()
+        val displayIndex = groupItems.firstOrNull()?.displayIndex ?: 0
+        return entity.toDto(groupIds, displayIndex)
     }
 }

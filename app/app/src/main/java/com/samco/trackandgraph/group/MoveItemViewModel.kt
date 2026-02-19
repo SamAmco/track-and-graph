@@ -41,7 +41,7 @@ enum class MovableItemType { GROUP, GRAPH, TRACKER, FUNCTION }
 data class MoveDialogConfig(
     val itemId: Long,
     val itemType: MovableItemType,
-    val fromGroupId: Long,
+    val fromGroupId: Long?,
     val hiddenItems: Set<HiddenItem>
 )
 

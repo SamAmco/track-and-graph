@@ -32,12 +32,12 @@ enum class ComponentType {
  *
  * @param type The type of the component being moved.
  * @param id The ID of the component to move.
- * @param fromGroupId The source group ID.
+ * @param fromGroupId The source group ID (null if the component has no group).
  * @param toGroupId The destination group ID.
  */
 data class MoveComponentRequest(
     val type: ComponentType,
     val id: Long,
-    val fromGroupId: Long,
+    val fromGroupId: Long?,
     val toGroupId: Long,
 )

@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
@@ -25,6 +26,8 @@ import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
 import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
 import com.samco.trackandgraph.data.validation.FunctionValidator
@@ -37,6 +40,7 @@ import javax.inject.Singleton
 internal class FunctionHelperImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
+    private val groupItemDao: GroupItemDao,
     private val functionGraphSerializer: FunctionGraphSerializer,
     private val functionValidator: FunctionValidator,
     @IODispatcher private val io: CoroutineDispatcher
@@ -62,15 +66,23 @@ internal class FunctionHelperImpl @Inject constructor(
                 ?: return@withTransaction null
 
             // First, create the Feature entity that the Function will reference
-            // TODO: When multi-group support is added, this will need to handle multiple groups
             val feature = Feature(
                 id = 0L, // Let the database generate the ID
                 name = function.name,
-                groupId = request.groupId,
-                displayIndex = function.displayIndex,
                 description = function.description
             )
             val featureId = dao.insertFeature(feature)
+
+            // Create GroupItem entry
+            groupItemDao.shiftDisplayIndexesDown(request.groupId)
+            val groupItem = GroupItem(
+                groupId = request.groupId,
+                displayIndex = 0,
+                childId = featureId,
+                type = GroupItemType.FEATURE,
+                createdAt = System.currentTimeMillis()
+            )
+            groupItemDao.insertGroupItem(groupItem)
 
             // Now create the Function entity with the correct featureId
             val functionId =
@@ -107,12 +119,9 @@ internal class FunctionHelperImpl @Inject constructor(
             val serializedGraph = functionGraphSerializer.serialize(updatedFunction.functionGraph)
                 ?: return@withTransaction
 
-            // TODO: When multi-group support is added, this will need to handle multiple groups
             val feature = Feature(
                 id = updatedFunction.featureId,
                 name = updatedFunction.name,
-                groupId = updatedFunction.groupIds.first(),
-                displayIndex = updatedFunction.displayIndex,
                 description = updatedFunction.description
             )
             dao.updateFeature(feature)
@@ -194,6 +203,17 @@ internal class FunctionHelperImpl @Inject constructor(
             //Create a copy of the feature
             val feature = dao.getFeatureById(function.featureId) ?: return@withTransaction null
             val newFeatureId = dao.insertFeature(feature.copy(id = 0L))
+
+            // Create GroupItem entry for the duplicated feature
+            groupItemDao.shiftDisplayIndexesDown(groupId)
+            val groupItem = GroupItem(
+                groupId = groupId,
+                displayIndex = 0,
+                childId = newFeatureId,
+                type = GroupItemType.FEATURE,
+                createdAt = System.currentTimeMillis()
+            )
+            groupItemDao.insertGroupItem(groupItem)
 
             // Create a copy of the function with id = 0 to generate new id
             val duplicatedFunction = function.copy(id = 0L, featureId = newFeatureId)

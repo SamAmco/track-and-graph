@@ -39,8 +39,8 @@ data class Tracker(
         internal fun fromTrackerWithFeature(twf: TrackerWithFeature) = Tracker(
             id = twf.id,
             name = twf.name,
-            // TODO: Currently features only exist in one group, but this will change
-            groupIds = setOf(twf.groupId),
+            // Currently features only exist in one group
+            groupIds = twf.groupId?.let { setOf(it) } ?: emptySet(),
             featureId = twf.featureId,
             displayIndex = twf.displayIndex,
             description = twf.description,
@@ -62,14 +62,6 @@ data class Tracker(
         defaultLabel = defaultLabel,
         suggestionType = suggestionType.toEntity(),
         suggestionOrder = suggestionOrder.toEntity()
-    )
-
-    internal fun toFeatureEntity(groupId: Long) = com.samco.trackandgraph.data.database.entity.Feature(
-        id = featureId,
-        name = name,
-        groupId = groupId,
-        displayIndex = displayIndex,
-        description = description,
     )
 }
 
