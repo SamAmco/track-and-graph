@@ -98,6 +98,7 @@ const val TNG_DATABASE_VERSION = 59
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
     internal abstract val trackAndGraphDatabaseDao: TrackAndGraphDatabaseDao
+    internal abstract val groupItemDao: GroupItemDao
 
     companion object {
         @Volatile
