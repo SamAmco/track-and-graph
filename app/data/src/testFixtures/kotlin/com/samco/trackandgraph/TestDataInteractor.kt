@@ -61,6 +61,7 @@ object TestDataInteractor {
                 database = database
             ),
             dao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             dataPointUpdateHelper = DataPointUpdateHelperImpl(),
             io = Dispatchers.IO
         )
@@ -83,6 +84,7 @@ object TestDataInteractor {
         val functionHelper = FunctionHelperImpl(
             transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             functionGraphSerializer = functionGraphSerializer,
             functionValidator = functionValidator,
             io = Dispatchers.IO
@@ -90,24 +92,28 @@ object TestDataInteractor {
 
         val reminderHelper = ReminderHelperImpl(
             reminderDao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             reminderSerializer = ReminderSerializer(testJson),
             io = Dispatchers.IO
         )
 
         val groupHelper = GroupHelperImpl(
             dao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             io = Dispatchers.IO
         )
 
         val graphHelper = GraphHelperImpl(
             transactionHelper = transactionHelper,
             graphDao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             io = Dispatchers.IO
         )
 
         val dataInteractor = DataInteractorImpl(
             transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             io = Dispatchers.IO,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,

@@ -64,6 +64,7 @@ class DataInteractorImplTest {
             override suspend fun <R> withTransaction(block: suspend () -> R): R = block()
         }
     private val dao: TrackAndGraphDatabaseDao = mock()
+    private val groupItemDao: com.samco.trackandgraph.data.database.GroupItemDao = mock()
     private val trackerHelper: TrackerHelper = mock()
     private val functionHelper: FunctionHelper = mock()
     private val reminderHelper: ReminderHelper = mock()
@@ -78,6 +79,7 @@ class DataInteractorImplTest {
         uut = DataInteractorImpl(
             transactionHelper = transactionHelper,
             dao = dao,
+            groupItemDao = groupItemDao,
             io = testDispatcher,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,

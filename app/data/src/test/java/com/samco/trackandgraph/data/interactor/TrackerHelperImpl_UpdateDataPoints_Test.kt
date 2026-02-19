@@ -24,6 +24,7 @@ import org.mockito.kotlin.whenever
 class TrackerHelperImpl_UpdateDataPoints_Test {
 
     private val dao: TrackAndGraphDatabaseDao = mock()
+    private val groupItemDao: com.samco.trackandgraph.data.database.GroupItemDao = mock()
     private val dataPointUpdateHelper: DataPointUpdateHelper = DataPointUpdateHelperImpl()
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -40,6 +41,7 @@ class TrackerHelperImpl_UpdateDataPoints_Test {
         uut = TrackerHelperImpl(
             transactionHelper = transactionHelper,
             dao = dao,
+            groupItemDao = groupItemDao,
             dataPointUpdateHelper = dataPointUpdateHelper,
             io = dispatcher
         )

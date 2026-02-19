@@ -30,8 +30,7 @@ internal class FakeReminderDao : ReminderDao {
     private val reminders = mutableMapOf<Long, Reminder>()
 
     override fun getAllRemindersSync(): List<Reminder> {
-        return reminders.values
-            .sortedWith(compareBy({ it.displayIndex }, { -it.id }))
+        return reminders.values.toList()
     }
 
     override fun getReminderById(id: Long): Reminder? {

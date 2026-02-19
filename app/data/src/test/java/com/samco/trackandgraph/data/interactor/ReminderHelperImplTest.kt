@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.data.interactor
 
+import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.FakeReminderDao
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
@@ -42,6 +43,7 @@ import org.threeten.bp.LocalTime
 class ReminderHelperImplTest {
 
     private lateinit var fakeReminderDao: FakeReminderDao
+    private lateinit var fakeGroupItemDao: FakeGroupItemDao
     private lateinit var reminderSerializer: ReminderSerializer
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -63,10 +65,12 @@ class ReminderHelperImplTest {
     @Before
     fun before() {
         fakeReminderDao = FakeReminderDao()
+        fakeGroupItemDao = FakeGroupItemDao()
         reminderSerializer = ReminderSerializer(Json { ignoreUnknownKeys = true })
 
         uut = ReminderHelperImpl(
             reminderDao = fakeReminderDao,
+            groupItemDao = fakeGroupItemDao,
             reminderSerializer = reminderSerializer,
             io = dispatcher
         )

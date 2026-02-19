@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.FakeGraphDao
+import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphStatType
@@ -49,6 +50,7 @@ import org.junit.Test
 class GraphHelperImplTest {
 
     private lateinit var fakeGraphDao: FakeGraphDao
+    private lateinit var fakeGroupItemDao: FakeGroupItemDao
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var uut: GraphHelperImpl
@@ -56,6 +58,7 @@ class GraphHelperImplTest {
     @Before
     fun before() {
         fakeGraphDao = FakeGraphDao()
+        fakeGroupItemDao = FakeGroupItemDao()
 
         val transactionHelper = object : DatabaseTransactionHelper {
             override suspend fun <R> withTransaction(block: suspend () -> R): R = block()
@@ -64,6 +67,7 @@ class GraphHelperImplTest {
         uut = GraphHelperImpl(
             transactionHelper = transactionHelper,
             graphDao = fakeGraphDao,
+            groupItemDao = fakeGroupItemDao,
             io = dispatcher
         )
     }
@@ -95,8 +99,10 @@ class GraphHelperImplTest {
             // VERIFY
             val graphOrStat = fakeGraphDao.getGraphStatById(graphStatId)
             assertEquals("Test Line Graph", graphOrStat.name)
-            assertEquals(1L, graphOrStat.groupId)
             assertEquals(GraphStatType.LINE_GRAPH, graphOrStat.type)
+            // Note: groupId is stored in group_items_table, not in the entity
+            val groupItem = fakeGroupItemDao.getGroupItem(1L, graphStatId, com.samco.trackandgraph.data.database.entity.GroupItemType.GRAPH)
+            assertNotNull(groupItem)
 
             val lineGraph = fakeGraphDao.getLineGraphByGraphStatId(graphStatId)
             assertNotNull(lineGraph)
@@ -200,8 +206,10 @@ class GraphHelperImplTest {
             // VERIFY
             val graphOrStat = fakeGraphDao.getGraphStatById(graphStatId)
             assertEquals("Test Pie Chart", graphOrStat.name)
-            assertEquals(2L, graphOrStat.groupId)
             assertEquals(GraphStatType.PIE_CHART, graphOrStat.type)
+            // Note: groupId is stored in group_items_table, not in the entity
+            val groupItem = fakeGroupItemDao.getGroupItem(2L, graphStatId, com.samco.trackandgraph.data.database.entity.GroupItemType.GRAPH)
+            assertNotNull(groupItem)
 
             val pieChart = fakeGraphDao.getPieChartByGraphStatId(graphStatId)
             assertNotNull(pieChart)
@@ -415,8 +423,13 @@ class GraphHelperImplTest {
         val duplicate = fakeGraphDao.getGraphStatById(duplicatedGraphStatId!!)
 
         assertEquals(original.name, duplicate.name)
-        assertEquals(original.groupId, duplicate.groupId)
         assertEquals(original.type, duplicate.type)
+        // Note: groupId is stored in group_items_table, not in the entity
+        // Both should be in the same group (groupId 1L)
+        val originalGroupItem = fakeGroupItemDao.getGroupItem(1L, originalGraphStatId, com.samco.trackandgraph.data.database.entity.GroupItemType.GRAPH)
+        val duplicateGroupItem = fakeGroupItemDao.getGroupItem(1L, duplicatedGraphStatId, com.samco.trackandgraph.data.database.entity.GroupItemType.GRAPH)
+        assertNotNull(originalGroupItem)
+        assertNotNull(duplicateGroupItem)
 
         val originalLineGraph = fakeGraphDao.getLineGraphByGraphStatId(originalGraphStatId)
         val duplicateLineGraph = fakeGraphDao.getLineGraphByGraphStatId(duplicatedGraphStatId)

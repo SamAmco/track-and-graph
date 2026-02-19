@@ -696,8 +696,6 @@ class FunctionValidatorTest {
         return Feature(
             id = id,
             name = "Feature $id",
-            groupId = 1L,
-            displayIndex = 0,
             description = ""
         )
     }
