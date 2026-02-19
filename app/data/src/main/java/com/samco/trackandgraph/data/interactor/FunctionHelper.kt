@@ -41,8 +41,6 @@ interface FunctionHelper {
 
     suspend fun tryGetFunctionByFeatureId(featureId: Long): Function?
 
-    suspend fun getAllFunctionsSync(): List<Function>
-
     suspend fun getFunctionsForGroupSync(groupId: Long): List<Function>
 
     suspend fun duplicateFunction(function: Function, groupId: Long): Long?

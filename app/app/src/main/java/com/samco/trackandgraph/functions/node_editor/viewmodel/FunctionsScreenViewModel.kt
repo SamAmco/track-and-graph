@@ -253,8 +253,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
             // Check if user has any functions at all (for first-time user dialog)
             if (functionId == null) {
-                val allFunctions = dataInteractor.getAllFunctionsSync()
-                _showFirstTimeUserDialog.value = allFunctions.isEmpty()
+                _showFirstTimeUserDialog.value = !dataInteractor.hasAnyFunctions()
             }
 
             val allFeatures = dataInteractor.getAllFeaturesSync()

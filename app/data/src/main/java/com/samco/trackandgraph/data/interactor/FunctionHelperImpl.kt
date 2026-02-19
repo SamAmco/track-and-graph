@@ -158,17 +158,6 @@ internal class FunctionHelperImpl @Inject constructor(
         functionWithFeature.toDto(functionGraphDto, inputFeatures)
     }
 
-    override suspend fun getAllFunctionsSync(): List<Function> = withContext(io) {
-        dao.getAllFunctionsSync().mapNotNull { functionWithFeature ->
-            val inputFeatures =
-                dao.getFunctionInputFeaturesSync(functionWithFeature.id).map { it.featureId }
-            val functionGraphDto =
-                functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
-                    ?: return@mapNotNull null
-            functionWithFeature.toDto(functionGraphDto, inputFeatures)
-        }
-    }
-
     override suspend fun getFunctionsForGroupSync(groupId: Long): List<Function> = withContext(io) {
         dao.getFunctionsForGroupSync(groupId).mapNotNull { functionWithFeature ->
             val inputFeatures =

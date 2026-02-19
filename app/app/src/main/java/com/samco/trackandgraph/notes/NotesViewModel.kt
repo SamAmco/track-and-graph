@@ -51,7 +51,6 @@ data class NoteInfo(
     val featureId: Long?,
     val featureName: String?,
     val featurePath: String,
-    val groupId: Long?,
     val note: String
 ) : Datable
 
@@ -119,7 +118,6 @@ class NotesViewModel @Inject constructor(
             ?.let { featurePathProvider.getPathForFeature(it) }
             ?: featureName
             ?: "",
-        groupId = groupId,
         note = note
     )
 }

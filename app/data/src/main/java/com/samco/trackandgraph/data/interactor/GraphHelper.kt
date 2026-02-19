@@ -207,8 +207,6 @@ interface GraphHelper {
 
     suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
-    suspend fun getAllGraphStatsSync(): List<GraphOrStat>
-
     // =========================================================================
     // Utility methods
     // =========================================================================

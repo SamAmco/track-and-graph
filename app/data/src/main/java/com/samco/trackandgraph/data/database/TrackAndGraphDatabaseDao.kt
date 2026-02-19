@@ -53,10 +53,8 @@ import com.samco.trackandgraph.data.dependencyanalyser.queryresponse.GraphDepend
 import kotlinx.coroutines.flow.Flow
 
 private const val getTrackersQuery = """
-    SELECT 
+    SELECT
         features_table.name as name,
-        features_table.group_id as group_id,
-        features_table.display_index as display_index,
         features_table.feature_description as feature_description,
         trackers_table.id as id,
         trackers_table.feature_id as feature_id,
@@ -70,11 +68,9 @@ private const val getTrackersQuery = """
     LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             """
 
-private const val getDisplayTrackersQuery = """ 
+private const val getDisplayTrackersQuery = """
     SELECT
         features_table.name as name,
-        features_table.group_id as group_id,
-        features_table.display_index as display_index,
         features_table.feature_description as feature_description,
         trackers_table.id as id,
         trackers_table.feature_id as feature_id,
@@ -84,7 +80,7 @@ private const val getDisplayTrackersQuery = """
         trackers_table.default_label as default_label,
         last_epoch_milli,
         last_utc_offset_sec,
-        start_instant 
+        start_instant
         FROM (
             trackers_table
             LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
@@ -93,7 +89,7 @@ private const val getDisplayTrackersQuery = """
                 FROM data_points_table as dpt
                 INNER JOIN (
                     SELECT feature_id as fid, MAX(epoch_milli) as max_epoch_milli
-                    FROM data_points_table 
+                    FROM data_points_table
                     GROUP BY feature_id
                 ) as max_data ON max_data.fid = dpt.feature_id AND dpt.epoch_milli = max_data.max_epoch_milli
             ) as last_data ON last_data.feature_id = trackers_table.feature_id
@@ -117,22 +113,19 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     @Update
     fun updateGroups(groups: List<Group>)
 
-    @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
+    @Query("SELECT r.* FROM reminders_table r")
     fun getAllReminders(): Flow<List<Reminder>>
 
-    @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
+    @Query("SELECT r.* FROM reminders_table r")
     override fun getAllRemindersSync(): List<Reminder>
 
-    @Query("""SELECT * FROM reminders_table WHERE id = :id""")
+    @Query("SELECT * FROM reminders_table WHERE id = :id")
     override fun getReminderById(id: Long): Reminder?
 
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
-    fun getAllGroups(): Flow<List<Group>>
-
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
+    @Query("SELECT g.* FROM groups_table g")
     fun getAllGroupsSync(): List<Group>
 
-    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
+    @Query("SELECT f.* FROM features_table f")
     fun getAllFeaturesSync(): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -148,23 +141,34 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     override fun deleteReminder(id: Long)
 
     @Query("SELECT * FROM groups_table WHERE id = :id LIMIT 1")
-    fun getGroupById(id: Long): Group
+    fun getGroupById(id: Long): Group?
 
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    @Query("$getDisplayTrackersQuery WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC")
-    fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
-
-    @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
+    @Query("""
+        SELECT DISTINCT f.*
+        FROM features_table f
+        WHERE f.id IN (
+            SELECT feature_id FROM trackers_table t
+            WHERE EXISTS (
+                SELECT 1 FROM group_items_table gi
+                WHERE t.id = gi.child_id AND gi.type = 'TRACKER' AND gi.group_id = :groupId
+            )
+        ) OR f.id IN (
+            SELECT feature_id FROM functions_table fn
+            WHERE EXISTS (
+                SELECT 1 FROM group_items_table gi
+                WHERE fn.id = gi.child_id AND gi.type = 'FUNCTION' AND gi.group_id = :groupId
+            )
+        )
+    """)
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
     @Query(
         """
             SELECT
                 features_table.name as name,
-                features_table.group_id as group_id,
-                features_table.display_index as display_index,
                 features_table.feature_description as feature_description,
                 trackers_table.id as id,
                 trackers_table.feature_id as feature_id,
@@ -176,7 +180,9 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
                 trackers_table.suggestion_type as suggestion_type
             FROM trackers_table
             LEFT JOIN features_table ON features_table.id = trackers_table.feature_id
-            WHERE features_table.group_id = :groupId ORDER BY features_table.display_index ASC
+            LEFT JOIN group_items_table gi ON trackers_table.id = gi.child_id AND gi.type = 'TRACKER'
+            WHERE gi.group_id = :groupId
+            ORDER BY gi.display_index ASC
         """
     )
     fun getTrackersForGroupSync(groupId: Long): List<TrackerWithFeature>
@@ -184,7 +190,11 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
     fun getFeatureById(featureId: Long): Feature?
 
-    @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
+    @Query("""
+        SELECT f.*
+        FROM features_table f
+        WHERE f.id IN (:featureIds)
+    """)
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -232,6 +242,9 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY epoch_milli DESC")
     fun getDataPointsCursor(featureId: Long): Cursor
 
+    @Query("SELECT * FROM graphs_and_stats_table2")
+    override fun getAllGraphStatsSync(): List<GraphOrStat>
+
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE id = :graphStatId LIMIT 1")
     override fun getGraphStatById(graphStatId: Long): GraphOrStat
 
@@ -252,23 +265,25 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     @Query("SELECT * FROM average_time_between_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
     override fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
-    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
+    @Query("""
+        SELECT g.*
+        FROM graphs_and_stats_table2 g
+        INNER JOIN group_items_table gi ON g.id = gi.child_id AND gi.type = 'GRAPH'
+        WHERE gi.group_id = :groupId
+        ORDER BY gi.display_index ASC, g.id DESC
+    """)
     override fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
-
-    @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC, id DESC")
-    override fun getAllGraphStatsSync(): List<GraphOrStat>
 
     @Query(
         """
         SELECT * FROM (
-            SELECT dp.epoch_milli as epoch_milli, dp.utc_offset_sec as utc_offset_sec, t.id as tracker_id, dp.feature_id as feature_id, f.name as feature_name, g.id as group_id, dp.note as note
+            SELECT dp.epoch_milli as epoch_milli, dp.utc_offset_sec as utc_offset_sec, t.id as tracker_id, dp.feature_id as feature_id, f.name as feature_name, dp.note as note
             FROM data_points_table as dp
             LEFT JOIN features_table as f ON dp.feature_id = f.id
             LEFT JOIN trackers_table as t ON dp.feature_id = t.feature_id
-            LEFT JOIN groups_table as g ON f.group_id = g.id
             WHERE dp.note IS NOT NULL AND dp.note != ""
         ) UNION SELECT * FROM (
-            SELECT n.epoch_milli as epoch_milli, n.utc_offset_sec as utc_offset_sec, NULL as tracker_id, NULL as feature_id, NULL as feature_name, NULL as group_id, n.note as note
+            SELECT n.epoch_milli as epoch_milli, n.utc_offset_sec as utc_offset_sec, NULL as tracker_id, NULL as feature_id, NULL as feature_name, n.note as note
             FROM notes_table as n
         ) ORDER BY epoch_milli DESC
         """
@@ -350,10 +365,22 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     @Query("SELECT * FROM bar_charts_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     override fun getBarChartByGraphStatId(graphStatId: Long): BarChart?
 
-    @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
+    @Query("""
+        SELECT g.*
+        FROM groups_table g
+        INNER JOIN group_items_table gi ON g.id = gi.child_id AND gi.type = 'GROUP'
+        WHERE gi.group_id = :id
+    """)
     fun getGroupsForGroupSync(id: Long): List<Group>
 
-    @Query("SELECT * FROM groups_table WHERE parent_group_id IS NULL LIMIT 1")
+    @Query("""
+        SELECT g.*
+        FROM groups_table g
+        WHERE g.id = 0 OR g.id NOT IN (
+            SELECT DISTINCT child_id FROM group_items_table WHERE type = 'GROUP'
+        )
+        LIMIT 1
+    """)
     fun getRootGroupSync(): Group?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -367,6 +394,9 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
 
     @Query("$getDisplayTrackersQuery WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC")
     fun getAllActiveTimerTrackers(): List<DisplayTracker>
+
+    @Query("$getDisplayTrackersQuery WHERE trackers_table.id IN (:ids)")
+    fun getDisplayTrackerByTrackerIdsSync(ids: Set<Long>): List<DisplayTracker>
 
     @Query("$getDisplayTrackersQuery WHERE trackers_table.feature_id=:featureId LIMIT 1")
     fun getDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
@@ -426,7 +456,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     @Query("SELECT EXISTS (SELECT 1 FROM features_table LIMIT 1)")
     fun hasAnyFeatures(): Boolean
 
-    @Query("SELECT EXISTS (SELECT 1 FROM groups_table WHERE parent_group_id IS NOT NULL LIMIT 1)")
+    @Query("SELECT EXISTS (SELECT 1 FROM group_items_table WHERE type = 'GROUP' LIMIT 1)")
     fun hasAnyGroups(): Boolean
 
     @Query("SELECT EXISTS (SELECT 1 FROM reminders_table LIMIT 1)")
@@ -439,13 +469,11 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     fun updateFunction(function: Function)
 
     @Query("""
-        SELECT 
+        SELECT
             f.id as id,
             f.feature_id as feature_id,
             f.function_graph as function_graph,
             ft.name as name,
-            ft.group_id as group_id,
-            ft.display_index as display_index,
             ft.feature_description as feature_description
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
@@ -455,13 +483,11 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     fun getFunctionById(functionId: Long): FunctionWithFeature?
 
     @Query("""
-        SELECT 
+        SELECT
             f.id as id,
             f.feature_id as feature_id,
             f.function_graph as function_graph,
             ft.name as name,
-            ft.group_id as group_id,
-            ft.display_index as display_index,
             ft.feature_description as feature_description
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
@@ -471,33 +497,16 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     fun getFunctionByFeatureId(featureId: Long): FunctionWithFeature?
 
     @Query("""
-        SELECT 
+        SELECT
             f.id as id,
             f.feature_id as feature_id,
             f.function_graph as function_graph,
             ft.name as name,
-            ft.group_id as group_id,
-            ft.display_index as display_index,
             ft.feature_description as feature_description
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
-        ORDER BY ft.display_index ASC, f.id DESC
-    """)
-    fun getAllFunctionsSync(): List<FunctionWithFeature>
-
-    @Query("""
-        SELECT 
-            f.id as id,
-            f.feature_id as feature_id,
-            f.function_graph as function_graph,
-            ft.name as name,
-            ft.group_id as group_id,
-            ft.display_index as display_index,
-            ft.feature_description as feature_description
-        FROM functions_table f
-        INNER JOIN features_table ft ON f.feature_id = ft.id
-        WHERE ft.group_id = :groupId
-        ORDER BY ft.display_index ASC, f.id DESC
+        LEFT JOIN group_items_table gi ON f.id = gi.child_id AND gi.type = 'FUNCTION'
+        WHERE gi.group_id = :groupId
     """)
     fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
 

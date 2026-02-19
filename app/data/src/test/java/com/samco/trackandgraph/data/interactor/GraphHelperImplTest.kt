@@ -511,41 +511,4 @@ class GraphHelperImplTest {
         // EXECUTE & VERIFY
         assertEquals(true, uut.hasAnyGraphs())
     }
-
-    @Test
-    fun `getAllGraphStatsSync returns all graphs`() = runTest(dispatcher) {
-        // PREPARE
-        uut.createLineGraph(
-            LineGraphCreateRequest(
-                name = "Graph 1",
-                groupId = 1L,
-                config = LineGraphConfig(
-                    features = emptyList(),
-                    sampleSize = null,
-                    yRangeType = YRangeType.DYNAMIC,
-                    yFrom = 0.0,
-                    yTo = 100.0,
-                    endDate = GraphEndDate.Latest
-                )
-            )
-        )
-        uut.createPieChart(
-            PieChartCreateRequest(
-                name = "Graph 2",
-                groupId = 1L,
-                config = PieChartConfig(
-                    featureId = 10L,
-                    sampleSize = null,
-                    endDate = GraphEndDate.Latest,
-                    sumByCount = false
-                )
-            )
-        )
-
-        // EXECUTE
-        val result = uut.getAllGraphStatsSync()
-
-        // VERIFY
-        assertEquals(2, result.size)
-    }
 }

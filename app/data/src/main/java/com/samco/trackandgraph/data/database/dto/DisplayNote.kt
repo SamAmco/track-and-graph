@@ -24,6 +24,5 @@ data class DisplayNote(
     val trackerId: Long?,
     val featureId: Long?,
     val featureName: String?,
-    val groupId: Long?,
     val note: String
 )

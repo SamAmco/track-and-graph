@@ -588,10 +588,6 @@ internal class GraphHelperImpl @Inject constructor(
             graphDao.getGraphsAndStatsByGroupIdSync(groupId).map { it.toDto() }
         }
 
-    override suspend fun getAllGraphStatsSync(): List<GraphOrStat> = withContext(io) {
-        graphDao.getAllGraphStatsSync().map { it.toDto() }
-    }
-
     override suspend fun hasAnyGraphs(): Boolean = withContext(io) { graphDao.hasAnyGraphs() }
 
     override suspend fun hasAnyLuaGraphs(): Boolean = withContext(io) { graphDao.hasAnyLuaGraphs() }
