@@ -24,13 +24,11 @@ data class DisplayTracker(
     val id: Long,
     val featureId: Long,
     val name: String,
-    val groupId: Long,
     val dataType: DataType = DataType.CONTINUOUS,
     val hasDefaultValue: Boolean,
     val defaultValue: Double,
     val defaultLabel: String,
     val timestamp: OffsetDateTime?,
-    val displayIndex: Int,
     val description: String,
     val timerStartInstant: Instant?
 )

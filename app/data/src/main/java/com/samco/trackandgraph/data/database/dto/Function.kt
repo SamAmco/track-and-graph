@@ -17,14 +17,10 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import com.samco.trackandgraph.data.database.entity.Function
-
 data class Function(
     val id: Long = 0L,
     override val featureId: Long = 0L,
     override val name: String,
-    override val groupIds: Set<Long>,
-    override val displayIndex: Int = 0,
     override val description: String,
     val functionGraph: FunctionGraph,
     val inputFeatureIds: List<Long>

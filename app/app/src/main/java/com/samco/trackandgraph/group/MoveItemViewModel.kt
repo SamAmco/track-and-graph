@@ -73,20 +73,20 @@ class MoveItemViewModel @Inject constructor(
         )
     }
 
-    fun showMoveTrackerDialog(tracker: DisplayTracker) {
+    fun showMoveTrackerDialog(fromGroupId: Long, tracker: DisplayTracker) {
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = tracker.id,
             itemType = MovableItemType.TRACKER,
-            fromGroupId = tracker.groupId,
+            fromGroupId = fromGroupId,
             hiddenItems = emptySet()
         )
     }
 
-    fun showMoveFunctionDialog(displayFunction: DisplayFunction) {
+    fun showMoveFunctionDialog(fromGroupId: Long, displayFunction: DisplayFunction) {
         _moveDialogConfig.value = MoveDialogConfig(
             itemId = displayFunction.id,
             itemType = MovableItemType.FUNCTION,
-            fromGroupId = displayFunction.groupId,
+            fromGroupId = fromGroupId,
             hiddenItems = emptySet()
         )
     }

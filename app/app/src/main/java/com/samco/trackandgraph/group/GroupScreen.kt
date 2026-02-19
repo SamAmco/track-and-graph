@@ -261,7 +261,7 @@ private fun GroupScreenContent(
         trackerClickListeners = TrackerClickListeners(
             onEdit = onTrackerEdit,
             onDelete = { groupDialogsViewModel.showDeleteTrackerDialog(it) },
-            onMoveTo = { moveItemViewModel.showMoveTrackerDialog(it) },
+            onMoveTo = { moveItemViewModel.showMoveTrackerDialog(fromGroupId = groupId, tracker = it) },
             onDescription = { groupDialogsViewModel.showFeatureDescriptionDialog(it) },
             onAdd = { tracker, useDefault ->
                 if (tracker.hasDefaultValue && useDefault) {
@@ -297,7 +297,7 @@ private fun GroupScreenContent(
             onClick = onFunctionClick,
             onEdit = onFunctionEdit,
             onDelete = { groupDialogsViewModel.showDeleteFunctionDialog(it) },
-            onMove = { moveItemViewModel.showMoveFunctionDialog(it) },
+            onMove = { moveItemViewModel.showMoveFunctionDialog(fromGroupId = groupId, displayFunction = it) },
             onDuplicate = { groupViewModel.duplicateFunction(it) }
         ),
         onDragStart = groupViewModel::onDragStart,

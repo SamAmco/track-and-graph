@@ -20,8 +20,6 @@ package com.samco.trackandgraph.data.database.dto
 data class Group(
     val id: Long,
     val name: String,
-    val displayIndex: Int,
-    val parentGroupIds: Set<Long>,
     val colorIndex: Int,
 ) {
     internal fun toEntity() = com.samco.trackandgraph.data.database.entity.Group(
@@ -46,8 +44,6 @@ data class GroupCreateRequest(
  * Request object for updating an existing Group.
  *
  * All fields except [id] are optional. A null value means "don't change this field".
- *
- * Note: To move a group to a different parent, use [MoveGroupRequest] instead (when implemented).
  */
 data class GroupUpdateRequest(
     val id: Long,

@@ -48,8 +48,6 @@ internal class FunctionHelperImpl @Inject constructor(
                 id = 0L,
                 featureId = 0L,
                 name = request.name,
-                groupIds = setOf(request.groupId),
-                displayIndex = 0,
                 description = request.description,
                 functionGraph = request.functionGraph,
                 inputFeatureIds = request.inputFeatureIds
@@ -66,8 +64,6 @@ internal class FunctionHelperImpl @Inject constructor(
             val feature = Feature(
                 id = 0L, // Let the database generate the ID
                 name = function.name,
-                groupId = request.groupId,
-                displayIndex = function.displayIndex,
                 description = function.description
             )
             val featureId = dao.insertFeature(feature)
@@ -111,8 +107,6 @@ internal class FunctionHelperImpl @Inject constructor(
             val feature = Feature(
                 id = updatedFunction.featureId,
                 name = updatedFunction.name,
-                groupId = updatedFunction.groupIds.first(),
-                displayIndex = updatedFunction.displayIndex,
                 description = updatedFunction.description
             )
             dao.updateFeature(feature)

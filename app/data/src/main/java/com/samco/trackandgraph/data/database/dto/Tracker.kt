@@ -23,9 +23,7 @@ import com.samco.trackandgraph.data.interactor.TrackerHelper.DurationNumericConv
 data class Tracker(
     val id: Long,
     override val name: String,
-    override val groupIds: Set<Long>,
     override val featureId: Long,
-    override val displayIndex: Int,
     override val description: String,
     val dataType: DataType,
     val hasDefaultValue: Boolean,
@@ -39,10 +37,7 @@ data class Tracker(
         internal fun fromTrackerWithFeature(twf: TrackerWithFeature) = Tracker(
             id = twf.id,
             name = twf.name,
-            // TODO: Currently features only exist in one group, but this will change
-            groupIds = setOf(twf.groupId),
             featureId = twf.featureId,
-            displayIndex = twf.displayIndex,
             description = twf.description,
             dataType = twf.dataType,
             hasDefaultValue = twf.hasDefaultValue,
@@ -62,14 +57,6 @@ data class Tracker(
         defaultLabel = defaultLabel,
         suggestionType = suggestionType.toEntity(),
         suggestionOrder = suggestionOrder.toEntity()
-    )
-
-    internal fun toFeatureEntity(groupId: Long) = com.samco.trackandgraph.data.database.entity.Feature(
-        id = featureId,
-        name = name,
-        groupId = groupId,
-        displayIndex = displayIndex,
-        description = description,
     )
 }
 

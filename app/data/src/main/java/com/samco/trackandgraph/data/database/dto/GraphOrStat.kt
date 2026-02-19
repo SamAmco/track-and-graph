@@ -20,10 +20,8 @@ import com.samco.trackandgraph.data.database.entity.GraphOrStat
 
 data class GraphOrStat(
     val id: Long,
-    val groupIds: Set<Long>,
     val name: String,
     val type: GraphStatType,
-    val displayIndex: Int
 ) {
     internal fun toEntity() = GraphOrStat(
         id,
