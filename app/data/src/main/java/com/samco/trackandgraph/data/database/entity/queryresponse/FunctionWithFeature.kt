@@ -32,14 +32,15 @@ internal data class FunctionWithFeature(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "group_id")
-    val groupId: Long,
-
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "feature_description")
-    val description: String
+    val description: String,
+
+    // These come from group_items_table via JOIN
+    @ColumnInfo(name = "gi_group_id")
+    val groupId: Long?,
+
+    @ColumnInfo(name = "gi_display_index")
+    val displayIndex: Int
 ) {
     fun toDto(
         functionGraphDto: com.samco.trackandgraph.data.database.dto.FunctionGraph,
@@ -48,8 +49,7 @@ internal data class FunctionWithFeature(
         id = id,
         featureId = featureId,
         name = name,
-        // TODO: Currently features only exist in one group, but this will change
-        groupIds = setOf(groupId),
+        groupIds = groupId?.let { setOf(it) } ?: emptySet(),
         displayIndex = displayIndex,
         description = description,
         functionGraph = functionGraphDto,

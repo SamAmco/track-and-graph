@@ -13,14 +13,8 @@ internal data class TrackerWithFeature(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "group_id")
-    val groupId: Long,
-
     @ColumnInfo(name = "feature_id")
     val featureId: Long,
-
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
 
     @ColumnInfo(name = "feature_description")
     val description: String,
@@ -41,13 +35,18 @@ internal data class TrackerWithFeature(
     val suggestionType: TrackerSuggestionType,
 
     @ColumnInfo(name = "suggestion_order")
-    val suggestionOrder: TrackerSuggestionOrder
+    val suggestionOrder: TrackerSuggestionOrder,
+
+    // These come from group_items_table via JOIN
+    @ColumnInfo(name = "gi_group_id")
+    val groupId: Long?,
+
+    @ColumnInfo(name = "gi_display_index")
+    val displayIndex: Int
 ) {
     fun toFeatureEntity() = Feature(
         id = featureId,
         name = name,
-        groupId = groupId,
-        displayIndex = displayIndex,
         description = description
     )
 }

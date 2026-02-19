@@ -34,9 +34,6 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "group_id")
-    val groupId: Long,
-
     @ColumnInfo(name = "type")
     val featureType: DataType = DataType.CONTINUOUS,
 
@@ -55,14 +52,18 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "last_utc_offset_sec")
     val lastUtcOffsetSec: Int,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "feature_description")
     val description: String,
 
     @ColumnInfo(name = "start_instant")
-    val timerStartInstant: Instant?
+    val timerStartInstant: Instant?,
+
+    // These come from group_items_table via JOIN
+    @ColumnInfo(name = "gi_group_id")
+    val groupId: Long?,
+
+    @ColumnInfo(name = "gi_display_index")
+    val displayIndex: Int
 ) {
     fun toDto() = DisplayTracker(
         id = id,
