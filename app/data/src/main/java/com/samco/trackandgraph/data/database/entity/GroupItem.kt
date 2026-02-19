@@ -74,7 +74,8 @@ internal data class GroupItem(
 )
 
 enum class GroupItemType {
-    FEATURE,
+    TRACKER,
+    FUNCTION,
     GRAPH,
     GROUP,
     REMINDER

@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriterImpl
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.data.database.GraphDao
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.ReminderDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
@@ -73,6 +74,10 @@ class DataModule {
 
     @Provides
     internal fun getReminderDao(dao: TrackAndGraphDatabaseDao): ReminderDao = dao
+
+    @Provides
+    internal fun getGroupItemDao(database: TrackAndGraphDatabase): GroupItemDao =
+        database.groupItemDao
 
     @Provides
     internal fun getCSVReadWriter(impl: CSVReadWriterImpl): CSVReadWriter = impl
