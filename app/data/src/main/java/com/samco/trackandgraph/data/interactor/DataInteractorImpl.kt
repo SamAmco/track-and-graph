@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateRequest
@@ -60,6 +61,8 @@ import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
 import com.samco.trackandgraph.data.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
@@ -76,6 +79,7 @@ import javax.inject.Inject
 internal class DataInteractorImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
+    private val groupItemDao: GroupItemDao,
     @IODispatcher private val io: CoroutineDispatcher,
     private val trackerHelper: TrackerHelper,
     private val functionHelper: FunctionHelper,
@@ -101,19 +105,20 @@ internal class DataInteractorImpl @Inject constructor(
             .also { dataUpdateEvents.emit(DataUpdateType.GroupCreated) }
     }
 
-    override suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo = withContext(io) {
-        val deletedGroupInfo = groupHelper.deleteGroup(request)
+    override suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo =
+        withContext(io) {
+            val deletedGroupInfo = groupHelper.deleteGroup(request)
 
-        // Delete any orphaned graphs
-        val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
-        for (graphStatId in orphanedGraphs.graphStatIds) {
-            dao.deleteGraphOrStat(graphStatId)
-            dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
+            // Delete any orphaned graphs
+            val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
+            for (graphStatId in orphanedGraphs.graphStatIds) {
+                dao.deleteGraphOrStat(graphStatId)
+                dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
+            }
+
+            dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
+            return@withContext deletedGroupInfo
         }
-
-        dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
-        return@withContext deletedGroupInfo
-    }
 
     override suspend fun updateGroup(request: GroupUpdateRequest) = withContext(io) {
         groupHelper.updateGroup(request)
@@ -385,15 +390,17 @@ internal class DataInteractorImpl @Inject constructor(
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
         }
 
-    override suspend fun updateTimeHistogram(request: TimeHistogramUpdateRequest) = withContext(io) {
-        graphHelper.updateTimeHistogram(request)
-        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
-    }
+    override suspend fun updateTimeHistogram(request: TimeHistogramUpdateRequest) =
+        withContext(io) {
+            graphHelper.updateTimeHistogram(request)
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+        }
 
-    override suspend fun updateLastValueStat(request: LastValueStatUpdateRequest) = withContext(io) {
-        graphHelper.updateLastValueStat(request)
-        dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
-    }
+    override suspend fun updateLastValueStat(request: LastValueStatUpdateRequest) =
+        withContext(io) {
+            graphHelper.updateLastValueStat(request)
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
+        }
 
     override suspend fun updateBarChart(request: BarChartUpdateRequest) = withContext(io) {
         graphHelper.updateBarChart(request)
@@ -405,40 +412,47 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
     }
 
-    override suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long? = withContext(io) {
-        graphHelper.duplicateLineGraph(graphStatId, groupId)
-            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
-    }
+    override suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long? =
+        withContext(io) {
+            graphHelper.duplicateLineGraph(graphStatId, groupId)
+                ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+        }
 
-    override suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long? = withContext(io) {
-        graphHelper.duplicatePieChart(graphStatId, groupId)
-            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
-    }
+    override suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long? =
+        withContext(io) {
+            graphHelper.duplicatePieChart(graphStatId, groupId)
+                ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+        }
 
-    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long? = withContext(io) {
-        graphHelper.duplicateAverageTimeBetweenStat(graphStatId, groupId)
-            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
-    }
+    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long? =
+        withContext(io) {
+            graphHelper.duplicateAverageTimeBetweenStat(graphStatId, groupId)
+                ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+        }
 
-    override suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long? = withContext(io) {
-        graphHelper.duplicateTimeHistogram(graphStatId, groupId)
-            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
-    }
+    override suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long? =
+        withContext(io) {
+            graphHelper.duplicateTimeHistogram(graphStatId, groupId)
+                ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+        }
 
-    override suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long? = withContext(io) {
-        graphHelper.duplicateLastValueStat(graphStatId, groupId)
-            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
-    }
+    override suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long? =
+        withContext(io) {
+            graphHelper.duplicateLastValueStat(graphStatId, groupId)
+                ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+        }
 
-    override suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long? = withContext(io) {
-        graphHelper.duplicateBarChart(graphStatId, groupId)
-            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
-    }
+    override suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long? =
+        withContext(io) {
+            graphHelper.duplicateBarChart(graphStatId, groupId)
+                ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+        }
 
-    override suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long? = withContext(io) {
-        graphHelper.duplicateLuaGraph(graphStatId, groupId)
-            ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
-    }
+    override suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long? =
+        withContext(io) {
+            graphHelper.duplicateLuaGraph(graphStatId, groupId)
+                ?.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+        }
 
     // =========================================================================
     // Private helper methods
@@ -455,20 +469,7 @@ internal class DataInteractorImpl @Inject constructor(
 
     private suspend fun shiftUpGroupChildIndexes(groupId: Long) =
         performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
-                dao.updateFeatures(features.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
-
-            //Update graphs
-            dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
-                dao.updateGraphStats(graphs.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
-
-            //Update groups
-            dao.getGroupsForGroupSync(groupId).let { groups ->
-                dao.updateGroups(groups.map { it.copy(displayIndex = it.displayIndex + 1) })
-            }
+            groupItemDao.shiftDisplayIndexesDown(groupId)
         }
 
     // =========================================================================
@@ -515,38 +516,21 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>) =
         performAtomicUpdate(DataUpdateType.DisplayIndex) {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
-                val updates = features.map { feature ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.FEATURE && it.id == feature.id
-                    }
-                    feature.copy(displayIndex = newDisplayIndex)
+            val groupItems = groupItemDao.getGroupItemsForGroup(groupId)
+            val newIndices = children.associateBy { it.id }
+
+            val updates = groupItems.mapNotNull { groupItem ->
+                val newDisplayIndex = newIndices[groupItem.childId]
+                    ?.displayIndex
+                    ?: return@mapNotNull null
+                if (newDisplayIndex >= 0 && newDisplayIndex != groupItem.displayIndex) {
+                    groupItem.copy(displayIndex = newDisplayIndex)
+                } else {
+                    null
                 }
-                dao.updateFeatures(updates)
             }
 
-            //Update graphs
-            dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
-                val updates = graphs.map { graph ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.GRAPH && it.id == graph.id
-                    }
-                    graph.copy(displayIndex = newDisplayIndex)
-                }
-                dao.updateGraphStats(updates)
-            }
-
-            //Update groups
-            dao.getGroupsForGroupSync(groupId).let { groups ->
-                val updates = groups.map { group ->
-                    val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.GROUP && it.id == group.id
-                    }
-                    group.copy(displayIndex = newDisplayIndex)
-                }
-                dao.updateGroups(updates)
-            }
+            updates.forEach { groupItemDao.updateGroupItem(it) }
         }
 
     override fun onImportedExternalData() {
@@ -587,13 +571,14 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateFunction(function: Function, groupId: Long): Long? = withContext(io) {
-        val newFunctionId = functionHelper.duplicateFunction(function, groupId)
-        if (newFunctionId != null) {
-            dataUpdateEvents.emit(DataUpdateType.FunctionCreated(newFunctionId))
+    override suspend fun duplicateFunction(function: Function, groupId: Long): Long? =
+        withContext(io) {
+            val newFunctionId = functionHelper.duplicateFunction(function, groupId)
+            if (newFunctionId != null) {
+                dataUpdateEvents.emit(DataUpdateType.FunctionCreated(newFunctionId))
+            }
+            return@withContext newFunctionId
         }
-        return@withContext newFunctionId
-    }
 
     override suspend fun deleteFunction(request: FunctionDeleteRequest) = withContext(io) {
         val function = dao.getFunctionById(request.functionId) ?: return@withContext
@@ -611,47 +596,54 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun moveComponent(request: MoveComponentRequest) = withContext(io) {
-        // TODO: When features can exist in multiple groups, this will need to handle
-        // adding/removing group associations rather than just updating the single groupId
+        if (request.fromGroupId == request.toGroupId) return@withContext
+
+        val itemType = when (request.type) {
+            ComponentType.TRACKER -> GroupItemType.TRACKER
+            ComponentType.FUNCTION -> GroupItemType.FUNCTION
+            ComponentType.GROUP -> GroupItemType.GROUP
+            ComponentType.GRAPH -> GroupItemType.GRAPH
+        }
+
+        if (request.type == ComponentType.GROUP) {
+            validateGroupNotMovingToDescendant(request.id, request.toGroupId)
+        }
+
+        val existingItem = groupItemDao.getGroupItem(request.fromGroupId, request.id, itemType)
+            ?: return@withContext
+
+        groupItemDao.deleteGroupItem(existingItem.id)
+        groupItemDao.shiftDisplayIndexesDown(request.toGroupId)
+        groupItemDao.insertGroupItem(
+            GroupItem(
+                groupId = request.toGroupId,
+                displayIndex = 0,
+                childId = request.id,
+                type = itemType,
+            )
+        )
+
         when (request.type) {
-            ComponentType.TRACKER -> {
-                val tracker = dao.getTrackerById(request.id)
-                    ?: throw IllegalArgumentException("Tracker not found: ${request.id}")
-                val feature = dao.getFeatureById(tracker.featureId)
-                    ?: throw IllegalArgumentException("Feature not found: ${tracker.featureId}")
-                dao.updateFeature(feature.copy(groupId = request.toGroupId))
-                dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
-            }
-            ComponentType.FUNCTION -> {
-                val function = dao.getFunctionById(request.id)
-                    ?: throw IllegalArgumentException("Function not found: ${request.id}")
-                val feature = dao.getFeatureById(function.featureId)
-                    ?: throw IllegalArgumentException("Feature not found: ${function.featureId}")
-                dao.updateFeature(feature.copy(groupId = request.toGroupId))
-                dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(function.featureId))
-            }
-            ComponentType.GROUP -> {
-                val group = dao.getGroupById(request.id)
+            ComponentType.TRACKER -> dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+            ComponentType.FUNCTION -> dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(request.id))
+            ComponentType.GROUP -> dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
+            ComponentType.GRAPH -> dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.id))
+        }
+    }
 
-                // Validate: ensure we're not moving a group to its own descendant
-                val visited = mutableListOf(request.id)
-                var currentParentId: Long? = request.toGroupId
-                while (currentParentId != null && currentParentId != 0L) {
-                    if (visited.contains(currentParentId)) {
-                        throw IllegalArgumentException("Cannot move group to its own descendant")
-                    }
-                    visited.add(currentParentId)
-                    currentParentId = dao.getGroupById(currentParentId).parentGroupId
+    private fun validateGroupNotMovingToDescendant(groupId: Long, toGroupId: Long) {
+        val toVisit = ArrayDeque<Long>()
+        toVisit.add(groupId)
+        while (toVisit.isNotEmpty()) {
+            val current = toVisit.removeFirst()
+            val childGroups = groupItemDao.getGroupItemsByType(current, GroupItemType.GROUP)
+            for (item in childGroups) {
+                if (item.childId == toGroupId) {
+                    throw IllegalArgumentException("Cannot move group to its own descendant")
                 }
-
-                dao.updateGroup(group.copy(parentGroupId = request.toGroupId))
-                dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
-            }
-            ComponentType.GRAPH -> {
-                val graphStat = dao.getGraphStatById(request.id)
-                dao.updateGraphOrStat(graphStat.copy(groupId = request.toGroupId))
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.id))
+                toVisit.add(item.childId)
             }
         }
     }
+
 }

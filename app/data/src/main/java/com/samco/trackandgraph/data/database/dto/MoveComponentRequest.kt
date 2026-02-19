@@ -31,7 +31,7 @@ enum class ComponentType {
  * Request object for moving a component from one group to another.
  *
  * @param type The type of the component being moved.
- * @param id The ID of the component to move.
+ * @param id The ID of the component to move (tracker ID, function ID, group ID, or graph ID).
  * @param fromGroupId The source group ID.
  * @param toGroupId The destination group ID.
  */
