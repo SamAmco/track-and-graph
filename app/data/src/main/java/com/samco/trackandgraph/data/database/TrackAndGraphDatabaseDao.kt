@@ -100,15 +100,15 @@ private const val getDisplayTrackersQuery = """
     """
 
 @Dao
-internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
+internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertGroup(group: Group): Long
+    override fun insertGroup(group: Group): Long
 
     @Query("DELETE FROM groups_table WHERE id = :id")
-    fun deleteGroup(id: Long)
+    override fun deleteGroup(id: Long)
 
     @Update
-    fun updateGroup(group: Group)
+    override fun updateGroup(group: Group)
 
     @Update
     fun updateGroups(groups: List<Group>)
@@ -123,7 +123,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     override fun getReminderById(id: Long): Reminder?
 
     @Query("SELECT g.* FROM groups_table g")
-    fun getAllGroupsSync(): List<Group>
+    override fun getAllGroupsSync(): List<Group>
 
     @Query("SELECT f.* FROM features_table f")
     fun getAllFeaturesSync(): List<Feature>
@@ -141,7 +141,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     override fun deleteReminder(id: Long)
 
     @Query("SELECT * FROM groups_table WHERE id = :id LIMIT 1")
-    fun getGroupById(id: Long): Group?
+    override fun getGroupById(id: Long): Group?
 
     @Update
     fun updateFeatures(features: List<Feature>)
@@ -216,7 +216,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
     @Query("DELETE FROM features_table WHERE id = :id")
-    fun deleteFeature(id: Long)
+    override fun deleteFeature(id: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDataPoint(dataPoint: DataPoint): Long
@@ -370,8 +370,9 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
         FROM groups_table g
         INNER JOIN group_items_table gi ON g.id = gi.child_id AND gi.type = 'GROUP'
         WHERE gi.group_id = :id
+        ORDER BY gi.display_index ASC
     """)
-    fun getGroupsForGroupSync(id: Long): List<Group>
+    override fun getGroupsForGroupSync(id: Long): List<Group>
 
     @Query("""
         SELECT g.*
@@ -405,7 +406,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     fun getAllTrackersSync(): List<TrackerWithFeature>
 
     @Query("$getTrackersQuery WHERE trackers_table.id = :trackerId LIMIT 1")
-    fun getTrackerById(trackerId: Long): TrackerWithFeature?
+    override fun getTrackerById(trackerId: Long): TrackerWithFeature?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTracker(tracker: Tracker): Long
@@ -457,7 +458,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
     fun hasAnyFeatures(): Boolean
 
     @Query("SELECT EXISTS (SELECT 1 FROM group_items_table WHERE type = 'GROUP' LIMIT 1)")
-    fun hasAnyGroups(): Boolean
+    override fun hasAnyGroups(): Boolean
 
     @Query("SELECT EXISTS (SELECT 1 FROM reminders_table LIMIT 1)")
     override fun hasAnyReminders(): Boolean
@@ -480,7 +481,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao {
         WHERE f.id = :functionId
         LIMIT 1
     """)
-    fun getFunctionById(functionId: Long): FunctionWithFeature?
+    override fun getFunctionById(functionId: Long): FunctionWithFeature?
 
     @Query("""
         SELECT

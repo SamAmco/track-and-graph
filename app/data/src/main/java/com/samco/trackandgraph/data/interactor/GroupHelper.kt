@@ -37,7 +37,7 @@ interface GroupHelper {
 
     suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo
 
-    suspend fun getGroupById(id: Long): Group
+    suspend fun getGroupById(id: Long): Group?
 
     suspend fun getAllGroupsSync(): List<Group>
 

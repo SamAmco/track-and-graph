@@ -65,4 +65,7 @@ internal interface GroupItemDao {
 
     @Query("SELECT * FROM group_items_table WHERE group_id = :groupId AND child_id = :childId AND type = :type LIMIT 1")
     fun getGroupItem(groupId: Long, childId: Long, type: GroupItemType): GroupItem?
+
+    @Query("SELECT * FROM group_items_table")
+    fun getAllGroupItems(): List<GroupItem>
 }
