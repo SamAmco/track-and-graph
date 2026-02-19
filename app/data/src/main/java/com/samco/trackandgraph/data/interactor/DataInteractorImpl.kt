@@ -125,7 +125,8 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getGroupGraphSync(rootGroupId: Long?): GroupGraph = withContext(io) {
         val rootGroup = if (rootGroupId != null) {
-            dao.getGroupById(rootGroupId).toDto()
+            dao.getGroupById(rootGroupId)?.toDto()
+                ?: throw IllegalStateException("Group with id $rootGroupId not found")
         } else {
             // Get the root group (group with no parent)
             dao.getRootGroupSync()?.toDto() ?: throw IllegalStateException("No root group found")

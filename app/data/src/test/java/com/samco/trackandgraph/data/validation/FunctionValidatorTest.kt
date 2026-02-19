@@ -696,8 +696,6 @@ class FunctionValidatorTest {
         return Feature(
             id = id,
             name = "Feature $id",
-            groupId = 1L,
-            displayIndex = 0,
             description = ""
         )
     }
@@ -718,7 +716,6 @@ class FunctionValidatorTest {
             id = id,
             featureId = featureId,
             name = "Test Function",
-            groupIds = setOf(1L),
             description = "Test Description",
             functionGraph = FunctionGraph(
                 nodes = nodes,

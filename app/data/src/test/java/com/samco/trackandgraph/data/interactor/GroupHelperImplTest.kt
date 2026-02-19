@@ -54,7 +54,8 @@ class GroupHelperImplTest {
         val fakeTimeProvider = object : TimeProvider {
             override fun now(): org.threeten.bp.ZonedDateTime = org.threeten.bp.ZonedDateTime.now()
             override fun epochMilli(): Long = 1000L
-            override fun defaultZone(): org.threeten.bp.ZoneId = org.threeten.bp.ZoneId.systemDefault()
+            override fun defaultZone(): org.threeten.bp.ZoneId =
+                org.threeten.bp.ZoneId.systemDefault()
         }
 
         val fakeTransactionHelper = object : DatabaseTransactionHelper {
@@ -186,7 +187,8 @@ class GroupHelperImplTest {
 
             // VERIFY - Group still exists, only removed from parent1
             assertNotNull(fakeGroupDao.getGroupById(childGroup))
-            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(childGroup, GroupItemType.GROUP)
+            val remainingItems =
+                fakeGroupItemDao.getGroupItemsForChild(childGroup, GroupItemType.GROUP)
             assertEquals(1, remainingItems.size)
             assertEquals(parentGroup2, remainingItems[0].groupId)
             assertTrue(result.deletedFeatureIds.isEmpty())
@@ -226,7 +228,8 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            val result = uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+            val result =
+                uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
 
             // VERIFY
             assertNull(fakeGroupDao.getGroupById(groupId))
@@ -279,7 +282,8 @@ class GroupHelperImplTest {
             assertTrue(fakeGroupDao.deletedFeatureIds.isEmpty())
 
             // Tracker still exists in otherGroup
-            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)
+            val remainingItems =
+                fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)
             assertEquals(1, remainingItems.size)
             assertEquals(otherGroup, remainingItems[0].groupId)
         }
@@ -309,7 +313,8 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            val result = uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+            val result =
+                uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
 
             // VERIFY
             assertTrue(featureId in result.deletedFeatureIds)
@@ -381,7 +386,8 @@ class GroupHelperImplTest {
 
             // VERIFY
             assertTrue(fakeGroupDao.deletedGraphIds.isEmpty())
-            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(graphId, GroupItemType.GRAPH)
+            val remainingItems =
+                fakeGroupItemDao.getGroupItemsForChild(graphId, GroupItemType.GRAPH)
             assertEquals(1, remainingItems.size)
         }
 
@@ -437,7 +443,8 @@ class GroupHelperImplTest {
 
             // VERIFY - Reminder is not deleted
             assertTrue(fakeGroupDao.deletedReminderIds.isEmpty())
-            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(reminderId, GroupItemType.REMINDER)
+            val remainingItems =
+                fakeGroupItemDao.getGroupItemsForChild(reminderId, GroupItemType.REMINDER)
             assertEquals(1, remainingItems.size)
             assertNull(remainingItems[0].groupId)
         }
@@ -477,7 +484,8 @@ class GroupHelperImplTest {
 
             // VERIFY - Reminder preserved, but GroupItem linking to deleted group is removed
             assertTrue(fakeGroupDao.deletedReminderIds.isEmpty())
-            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(reminderId, GroupItemType.REMINDER)
+            val remainingItems =
+                fakeGroupItemDao.getGroupItemsForChild(reminderId, GroupItemType.REMINDER)
             assertEquals(1, remainingItems.size)
             assertNull(remainingItems[0].groupId)
         }
@@ -532,7 +540,8 @@ class GroupHelperImplTest {
         )
 
         // EXECUTE
-        val result = uut.deleteGroup(GroupDeleteRequest(groupId = parentGroup, parentGroupId = null))
+        val result =
+            uut.deleteGroup(GroupDeleteRequest(groupId = parentGroup, parentGroupId = null))
 
         // VERIFY
         assertTrue(featureId in result.deletedFeatureIds)
@@ -623,7 +632,8 @@ class GroupHelperImplTest {
             assertTrue(result.deletedFeatureIds.isEmpty())
             assertTrue(fakeGroupDao.deletedFeatureIds.isEmpty())
 
-            val trackerItems = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)
+            val trackerItems =
+                fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)
             assertEquals(1, trackerItems.size)
             assertEquals(parentToKeep, trackerItems[0].groupId)
         }
@@ -661,16 +671,34 @@ class GroupHelperImplTest {
         val feature1Id = 201L
         fakeGroupDao.addTracker(tracker1Id, feature1Id)
         fakeGroupItemDao.insertGroupItem(
-            GroupItem(groupId = groupA, displayIndex = 0, childId = tracker1Id, type = GroupItemType.TRACKER, createdAt = 1000L)
+            GroupItem(
+                groupId = groupA,
+                displayIndex = 0,
+                childId = tracker1Id,
+                type = GroupItemType.TRACKER,
+                createdAt = 1000L
+            )
         )
 
         // Graph 1 - in both Group A and Group B
         val graph1Id = 301L
         fakeGroupItemDao.insertGroupItem(
-            GroupItem(groupId = groupA, displayIndex = 1, childId = graph1Id, type = GroupItemType.GRAPH, createdAt = 1000L)
+            GroupItem(
+                groupId = groupA,
+                displayIndex = 1,
+                childId = graph1Id,
+                type = GroupItemType.GRAPH,
+                createdAt = 1000L
+            )
         )
         fakeGroupItemDao.insertGroupItem(
-            GroupItem(groupId = groupB, displayIndex = 0, childId = graph1Id, type = GroupItemType.GRAPH, createdAt = 1000L)
+            GroupItem(
+                groupId = groupB,
+                displayIndex = 0,
+                childId = graph1Id,
+                type = GroupItemType.GRAPH,
+                createdAt = 1000L
+            )
         )
 
         // Tracker 2 - only in Group C
@@ -678,7 +706,13 @@ class GroupHelperImplTest {
         val feature2Id = 202L
         fakeGroupDao.addTracker(tracker2Id, feature2Id)
         fakeGroupItemDao.insertGroupItem(
-            GroupItem(groupId = groupC, displayIndex = 0, childId = tracker2Id, type = GroupItemType.TRACKER, createdAt = 1000L)
+            GroupItem(
+                groupId = groupC,
+                displayIndex = 0,
+                childId = tracker2Id,
+                type = GroupItemType.TRACKER,
+                createdAt = 1000L
+            )
         )
 
         // Function 1 - only in Group C
@@ -686,7 +720,13 @@ class GroupHelperImplTest {
         val feature3Id = 203L
         fakeGroupDao.addFunction(function1Id, feature3Id)
         fakeGroupItemDao.insertGroupItem(
-            GroupItem(groupId = groupC, displayIndex = 1, childId = function1Id, type = GroupItemType.FUNCTION, createdAt = 1000L)
+            GroupItem(
+                groupId = groupC,
+                displayIndex = 1,
+                childId = function1Id,
+                type = GroupItemType.FUNCTION,
+                createdAt = 1000L
+            )
         )
 
         // EXECUTE
@@ -724,14 +764,27 @@ class GroupHelperImplTest {
 
         // Tracker in both parent and child
         fakeGroupItemDao.insertGroupItem(
-            GroupItem(groupId = parentGroup, displayIndex = 0, childId = trackerId, type = GroupItemType.TRACKER, createdAt = 1000L)
+            GroupItem(
+                groupId = parentGroup,
+                displayIndex = 0,
+                childId = trackerId,
+                type = GroupItemType.TRACKER,
+                createdAt = 1000L
+            )
         )
         fakeGroupItemDao.insertGroupItem(
-            GroupItem(groupId = childGroup, displayIndex = 0, childId = trackerId, type = GroupItemType.TRACKER, createdAt = 1000L)
+            GroupItem(
+                groupId = childGroup,
+                displayIndex = 0,
+                childId = trackerId,
+                type = GroupItemType.TRACKER,
+                createdAt = 1000L
+            )
         )
 
         // EXECUTE
-        val result = uut.deleteGroup(GroupDeleteRequest(groupId = parentGroup, parentGroupId = null))
+        val result =
+            uut.deleteGroup(GroupDeleteRequest(groupId = parentGroup, parentGroupId = null))
 
         // VERIFY - Feature should be deleted (exists only in deleted groups)
         assertEquals(setOf(featureId), result.deletedFeatureIds)

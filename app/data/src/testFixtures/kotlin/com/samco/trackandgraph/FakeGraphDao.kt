@@ -96,14 +96,11 @@ internal class FakeGraphDao : GraphDao {
     }
 
     override fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat> {
-        return graphOrStats.values
-            .filter { it.groupId == groupId }
-            .sortedWith(compareBy({ it.displayIndex }, { -it.id }))
+        return graphOrStats.values.toList()
     }
 
     override fun getAllGraphStatsSync(): List<GraphOrStat> {
-        return graphOrStats.values
-            .sortedWith(compareBy({ it.displayIndex }, { -it.id }))
+        return graphOrStats.values.toList()
     }
 
     override fun hasAnyGraphs(): Boolean = graphOrStats.isNotEmpty()

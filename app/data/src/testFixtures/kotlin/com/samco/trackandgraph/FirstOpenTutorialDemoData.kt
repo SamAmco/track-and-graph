@@ -33,19 +33,25 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 
+private data class ScreenshotGroupData(
+    val groupId: Long,
+    val relaxationTrackerId: Long,
+    val stressTrackerId: Long
+)
+
 suspend fun createFirstOpenTutorialGroup(dataInteractor: DataInteractor, dataSampler: DataSampler) {
     val mainGroupId = dataInteractor.insertGroup(createGroup("First open tutorial"))
 
     // Create the three screenshot groups
-    val screenshot1GroupId = createScreenshot1Group(dataInteractor, mainGroupId)
-    val screenshot2GroupId = createScreenshot2Group(dataInteractor, dataSampler, mainGroupId, screenshot1GroupId)
-    createScreenshot3Group(dataInteractor, dataSampler, mainGroupId, screenshot2GroupId)
+    val screenshot1Data = createScreenshot1Group(dataInteractor, mainGroupId)
+    val screenshot2Data = createScreenshot2Group(dataInteractor, dataSampler, mainGroupId, screenshot1Data)
+    createScreenshot3Group(dataInteractor, dataSampler, mainGroupId, screenshot2Data)
 }
 
 private suspend fun createScreenshot1Group(
     dataInteractor: DataInteractor,
     parentGroupId: Long
-): Long {
+): ScreenshotGroupData {
     val groupId = dataInteractor.insertGroup(
         createGroup(
             name = "Track & Graph",
@@ -99,15 +105,15 @@ private suspend fun createScreenshot1Group(
         roundToInt = false,
     )
 
-    return groupId
+    return ScreenshotGroupData(groupId, relaxationTrackerId, stressTrackerId)
 }
 
 private suspend fun createScreenshot2Group(
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
     parentGroupId: Long,
-    screenshot1GroupId: Long
-): Long {
+    screenshot1Data: ScreenshotGroupData
+): ScreenshotGroupData {
     val groupId = dataInteractor.insertGroup(
         createGroup(
             name = "Track & Graph",
@@ -115,11 +121,9 @@ private suspend fun createScreenshot2Group(
         )
     )
 
-    // Copy the trackers from Screenshot 1
-    val relaxationTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Relaxation" && it.groupIds.contains(screenshot1GroupId) }
-    val stressTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Stress" && it.groupIds.contains(screenshot1GroupId) }
+    // Get the trackers from Screenshot 1
+    val relaxationTracker = dataInteractor.getTrackerById(screenshot1Data.relaxationTrackerId)!!
+    val stressTracker = dataInteractor.getTrackerById(screenshot1Data.stressTrackerId)!!
 
     // Create new trackers with same names but in Screenshot 2 group
     val relaxationTrackerId = dataInteractor.createTracker(
@@ -186,15 +190,15 @@ private suspend fun createScreenshot2Group(
         stressFeatureId = stressFeatureId,
     )
 
-    return groupId
+    return ScreenshotGroupData(groupId, relaxationTrackerId, stressTrackerId)
 }
 
 private suspend fun createScreenshot3Group(
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
     parentGroupId: Long,
-    screenshot2GroupId: Long
-): Long {
+    screenshot2Data: ScreenshotGroupData
+): ScreenshotGroupData {
     val groupId = dataInteractor.insertGroup(
         createGroup(
             name = "Track & Graph",
@@ -202,11 +206,9 @@ private suspend fun createScreenshot3Group(
         )
     )
 
-    // Copy the trackers from Screenshot 2
-    val relaxationTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Relaxation" && it.groupIds.contains(screenshot2GroupId) }
-    val stressTracker = dataInteractor.getAllTrackersSync()
-        .first { it.name == "Stress" && it.groupIds.contains(screenshot2GroupId) }
+    // Get the trackers from Screenshot 2
+    val relaxationTracker = dataInteractor.getTrackerById(screenshot2Data.relaxationTrackerId)!!
+    val stressTracker = dataInteractor.getTrackerById(screenshot2Data.stressTrackerId)!!
 
     // Create new trackers with same names but in Screenshot 3 group
     val relaxationTrackerId = dataInteractor.createTracker(
@@ -267,7 +269,7 @@ private suspend fun createScreenshot3Group(
     }
 
     // Create Monthly Moving Average Line Graph
-    val lineGraphId = createMonthlyMovingAverageGraph(
+    createMonthlyMovingAverageGraph(
         dataInteractor = dataInteractor,
         groupId = groupId,
         relaxationFeatureId = relaxationFeatureId,
@@ -279,7 +281,7 @@ private suspend fun createScreenshot3Group(
         createGroup(name = "Health", parentGroupId = groupId)
     )
 
-    return groupId
+    return ScreenshotGroupData(groupId, relaxationTrackerId, stressTrackerId)
 }
 
 private suspend fun createMonthlyMovingAverageGraph(

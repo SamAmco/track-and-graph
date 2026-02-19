@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
@@ -64,6 +65,7 @@ class DataInteractorImplTest {
             override suspend fun <R> withTransaction(block: suspend () -> R): R = block()
         }
     private val dao: TrackAndGraphDatabaseDao = mock()
+    private val groupItemDao: GroupItemDao = mock()
     private val trackerHelper: TrackerHelper = mock()
     private val functionHelper: FunctionHelper = mock()
     private val reminderHelper: ReminderHelper = mock()
@@ -78,6 +80,7 @@ class DataInteractorImplTest {
         uut = DataInteractorImpl(
             transactionHelper = transactionHelper,
             dao = dao,
+            groupItemDao = groupItemDao,
             io = testDispatcher,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,
@@ -132,9 +135,7 @@ class DataInteractorImplTest {
             TrackerWithFeature(
                 id = 0L,
                 name = "name",
-                groupId = 0L,
                 featureId = 0L,
-                displayIndex = 0,
                 description = "",
                 dataType = DataType.CONTINUOUS,
                 hasDefaultValue = false,

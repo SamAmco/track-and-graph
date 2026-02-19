@@ -32,6 +32,7 @@ import com.samco.trackandgraph.data.interactor.ReminderHelperImpl
 import com.samco.trackandgraph.data.interactor.TrackerHelperImpl
 import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
 import com.samco.trackandgraph.data.serialization.ReminderSerializer
+import com.samco.trackandgraph.data.time.TimeProviderImpl
 import com.samco.trackandgraph.data.validation.FunctionValidator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
@@ -56,12 +57,15 @@ object TestDataInteractor {
         val transactionHelper = DatabaseTransactionHelperImpl(
             database = database
         )
+        val timeProvider = TimeProviderImpl()
         val trackerHelper = TrackerHelperImpl(
             transactionHelper = DatabaseTransactionHelperImpl(
                 database = database
             ),
             dao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             dataPointUpdateHelper = DataPointUpdateHelperImpl(),
+            timeProvider = timeProvider,
             io = Dispatchers.IO
         )
 
@@ -83,31 +87,40 @@ object TestDataInteractor {
         val functionHelper = FunctionHelperImpl(
             transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             functionGraphSerializer = functionGraphSerializer,
             functionValidator = functionValidator,
+            timeProvider = timeProvider,
             io = Dispatchers.IO
         )
 
         val reminderHelper = ReminderHelperImpl(
             reminderDao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             reminderSerializer = ReminderSerializer(testJson),
             io = Dispatchers.IO
         )
 
         val groupHelper = GroupHelperImpl(
-            dao = database.trackAndGraphDatabaseDao,
+            groupDao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
+            timeProvider = timeProvider,
+            transactionHelper = transactionHelper,
             io = Dispatchers.IO
         )
 
         val graphHelper = GraphHelperImpl(
             transactionHelper = transactionHelper,
             graphDao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
+            timeProvider = timeProvider,
             io = Dispatchers.IO
         )
 
         val dataInteractor = DataInteractorImpl(
             transactionHelper = transactionHelper,
             dao = database.trackAndGraphDatabaseDao,
+            groupItemDao = database.groupItemDao,
             io = Dispatchers.IO,
             trackerHelper = trackerHelper,
             functionHelper = functionHelper,

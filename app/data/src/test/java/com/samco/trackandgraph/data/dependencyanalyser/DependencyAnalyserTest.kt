@@ -49,7 +49,7 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0)
+            GraphOrStat(id = 10, name = "Graph 10", type = GraphStatType.PIE_CHART)
         ))
 
         // When
@@ -74,7 +74,7 @@ class DependencyAnalyserTest {
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L))
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 0)
+            GraphOrStat(id = 20, name = "Graph 20", type = GraphStatType.PIE_CHART)
         ))
 
         // When
@@ -94,7 +94,7 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 30, groupId = 1, name = "Graph 30", type = GraphStatType.LINE_GRAPH, displayIndex = 0)
+            GraphOrStat(id = 30, name = "Graph 30", type = GraphStatType.LINE_GRAPH)
         ))
 
         // When
@@ -122,9 +122,9 @@ class DependencyAnalyserTest {
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(2L))
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(listOf(1L))
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
-            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 1),
-            GraphOrStat(id = 30, groupId = 1, name = "Graph 30", type = GraphStatType.LINE_GRAPH, displayIndex = 2)
+            GraphOrStat(id = 10, name = "Graph 10", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 20, name = "Graph 20", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 30, name = "Graph 30", type = GraphStatType.LINE_GRAPH)
         ))
 
         // When
@@ -184,9 +184,9 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
-            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 1),
-            GraphOrStat(id = 40, groupId = 1, name = "Graph 40", type = GraphStatType.LINE_GRAPH, displayIndex = 2)
+            GraphOrStat(id = 10, name = "Graph 10", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 20, name = "Graph 20", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 40, name = "Graph 40", type = GraphStatType.LINE_GRAPH)
         ))
 
         // When
@@ -207,8 +207,8 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
-            GraphOrStat(id = 50, groupId = 1, name = "Orphaned Graph", type = GraphStatType.PIE_CHART, displayIndex = 1) // No associated entity
+            GraphOrStat(id = 10, name = "Graph 10", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 50, name = "Orphaned Graph", type = GraphStatType.PIE_CHART) // No associated entity
         ))
 
         // When
@@ -232,9 +232,9 @@ class DependencyAnalyserTest {
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(listOf(1L))
         whenever(mockDao.getFunctionInputFeatureIds(1L)).thenReturn(emptyList())
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 10, groupId = 1, name = "Valid Graph", type = GraphStatType.PIE_CHART, displayIndex = 0),
-            GraphOrStat(id = 50, groupId = 1, name = "No Entity Graph", type = GraphStatType.PIE_CHART, displayIndex = 1), // No associated entity
-            GraphOrStat(id = 70, groupId = 1, name = "Empty Deps Graph", type = GraphStatType.LINE_GRAPH, displayIndex = 2) // Empty dependencies
+            GraphOrStat(id = 10, name = "Valid Graph", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 50, name = "No Entity Graph", type = GraphStatType.PIE_CHART), // No associated entity
+            GraphOrStat(id = 70, name = "Empty Deps Graph", type = GraphStatType.LINE_GRAPH) // Empty dependencies
         ))
 
         // When
@@ -259,9 +259,9 @@ class DependencyAnalyserTest {
         whenever(mockDao.getFunctionInputFeatureIds(1L)).thenReturn(emptyList())
         whenever(mockDao.getFunctionInputFeatureIds(2L)).thenReturn(emptyList())
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0),
-            GraphOrStat(id = 20, groupId = 1, name = "Graph 20", type = GraphStatType.PIE_CHART, displayIndex = 1),
-            GraphOrStat(id = 30, groupId = 1, name = "Graph 30", type = GraphStatType.LINE_GRAPH, displayIndex = 2)
+            GraphOrStat(id = 10, name = "Graph 10", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 20, name = "Graph 20", type = GraphStatType.PIE_CHART),
+            GraphOrStat(id = 30, name = "Graph 30", type = GraphStatType.LINE_GRAPH)
         ))
 
         // When
@@ -282,7 +282,7 @@ class DependencyAnalyserTest {
         whenever(mockDao.getLuaGraphGraphStatIds()).thenReturn(emptyList())
         whenever(mockDao.getFunctionFeatureIds()).thenReturn(emptyList())
         whenever(mockDao.getAllGraphStatsSync()).thenReturn(listOf(
-            GraphOrStat(id = 10, groupId = 1, name = "Graph 10", type = GraphStatType.PIE_CHART, displayIndex = 0)
+            GraphOrStat(id = 10, name = "Graph 10", type = GraphStatType.PIE_CHART)
         ))
 
         // When

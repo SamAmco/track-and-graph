@@ -24,7 +24,9 @@ import org.threeten.bp.ZonedDateTime
 class FakeTimeProvider : TimeProvider {
     var currentTime: ZonedDateTime = ZonedDateTime.now()
     var timeZone: ZoneId = ZoneId.systemDefault()
+    var epochMilliValue: Long = System.currentTimeMillis()
 
     override fun now(): ZonedDateTime = currentTime
+    override fun epochMilli(): Long = epochMilliValue
     override fun defaultZone(): ZoneId = timeZone
 }

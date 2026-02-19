@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.FakeGraphDao
+import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphStatType
@@ -33,6 +34,8 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.data.database.entity.GroupItemType
+import com.samco.trackandgraph.data.time.TimeProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -49,6 +52,7 @@ import org.junit.Test
 class GraphHelperImplTest {
 
     private lateinit var fakeGraphDao: FakeGraphDao
+    private lateinit var fakeGroupItemDao: FakeGroupItemDao
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var uut: GraphHelperImpl
@@ -56,14 +60,23 @@ class GraphHelperImplTest {
     @Before
     fun before() {
         fakeGraphDao = FakeGraphDao()
+        fakeGroupItemDao = FakeGroupItemDao()
 
         val transactionHelper = object : DatabaseTransactionHelper {
             override suspend fun <R> withTransaction(block: suspend () -> R): R = block()
         }
 
+        val timeProvider = object : TimeProvider {
+            override fun now(): org.threeten.bp.ZonedDateTime = org.threeten.bp.ZonedDateTime.now()
+            override fun epochMilli(): Long = 1000L
+            override fun defaultZone(): org.threeten.bp.ZoneId = org.threeten.bp.ZoneId.systemDefault()
+        }
+
         uut = GraphHelperImpl(
             transactionHelper = transactionHelper,
             graphDao = fakeGraphDao,
+            groupItemDao = fakeGroupItemDao,
+            timeProvider = timeProvider,
             io = dispatcher
         )
     }
@@ -95,8 +108,9 @@ class GraphHelperImplTest {
             // VERIFY
             val graphOrStat = fakeGraphDao.getGraphStatById(graphStatId)
             assertEquals("Test Line Graph", graphOrStat.name)
-            assertEquals(1L, graphOrStat.groupId)
             assertEquals(GraphStatType.LINE_GRAPH, graphOrStat.type)
+            val groupItem = fakeGroupItemDao.getGroupItem(1L, graphStatId, GroupItemType.GRAPH)
+            assertNotNull(groupItem)
 
             val lineGraph = fakeGraphDao.getLineGraphByGraphStatId(graphStatId)
             assertNotNull(lineGraph)
@@ -200,8 +214,9 @@ class GraphHelperImplTest {
             // VERIFY
             val graphOrStat = fakeGraphDao.getGraphStatById(graphStatId)
             assertEquals("Test Pie Chart", graphOrStat.name)
-            assertEquals(2L, graphOrStat.groupId)
             assertEquals(GraphStatType.PIE_CHART, graphOrStat.type)
+            val groupItem = fakeGroupItemDao.getGroupItem(2L, graphStatId, GroupItemType.GRAPH)
+            assertNotNull(groupItem)
 
             val pieChart = fakeGraphDao.getPieChartByGraphStatId(graphStatId)
             assertNotNull(pieChart)
@@ -415,8 +430,12 @@ class GraphHelperImplTest {
         val duplicate = fakeGraphDao.getGraphStatById(duplicatedGraphStatId!!)
 
         assertEquals(original.name, duplicate.name)
-        assertEquals(original.groupId, duplicate.groupId)
         assertEquals(original.type, duplicate.type)
+        // Both should be in the same group (groupId 1L)
+        val originalGroupItem = fakeGroupItemDao.getGroupItem(1L, originalGraphStatId, GroupItemType.GRAPH)
+        val duplicateGroupItem = fakeGroupItemDao.getGroupItem(1L, duplicatedGraphStatId, GroupItemType.GRAPH)
+        assertNotNull(originalGroupItem)
+        assertNotNull(duplicateGroupItem)
 
         val originalLineGraph = fakeGraphDao.getLineGraphByGraphStatId(originalGraphStatId)
         val duplicateLineGraph = fakeGraphDao.getLineGraphByGraphStatId(duplicatedGraphStatId)

@@ -48,6 +48,9 @@ internal interface GroupItemDao {
     @Query("SELECT * FROM group_items_table WHERE group_id = :groupId ORDER BY display_index ASC")
     fun getGroupItemsForGroup(groupId: Long): List<GroupItem>
 
+    @Query("SELECT * FROM group_items_table WHERE group_id IS NULL ORDER BY display_index ASC")
+    fun getGroupItemsWithNoGroup(): List<GroupItem>
+
     @Query("SELECT * FROM group_items_table WHERE type = :type ORDER BY display_index ASC")
     fun getGroupItemsByType(type: GroupItemType): List<GroupItem>
 

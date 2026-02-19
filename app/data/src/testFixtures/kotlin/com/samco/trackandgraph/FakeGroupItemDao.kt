@@ -72,16 +72,19 @@ internal class FakeGroupItemDao : GroupItemDao {
     }
 
     override fun getGroupItemsForGroup(groupId: Long): List<GroupItem> {
-        return items.values.filter { it.groupId == groupId }.sortedBy { it.displayIndex }
+        return items.values.filter { it.groupId == groupId }
+    }
+
+    override fun getGroupItemsWithNoGroup(): List<GroupItem> {
+        return items.values.filter { it.groupId == null }
     }
 
     override fun getGroupItemsByType(type: GroupItemType): List<GroupItem> {
-        return items.values.filter { it.type == type }.sortedBy { it.displayIndex }
+        return items.values.filter { it.type == type }
     }
 
     override fun getGroupItemsByType(groupId: Long, type: GroupItemType): List<GroupItem> {
         return items.values.filter { it.groupId == groupId && it.type == type }
-            .sortedBy { it.displayIndex }
     }
 
     override fun shiftDisplayIndexesDown(groupId: Long) {

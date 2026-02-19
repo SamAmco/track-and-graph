@@ -7,6 +7,7 @@ import com.samco.trackandgraph.data.database.entity.DataPoint
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
+import com.samco.trackandgraph.data.time.TimeProvider
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +25,7 @@ import org.mockito.kotlin.whenever
 class TrackerHelperImpl_UpdateDataPoints_Test {
 
     private val dao: TrackAndGraphDatabaseDao = mock()
+    private val groupItemDao: com.samco.trackandgraph.data.database.GroupItemDao = mock()
     private val dataPointUpdateHelper: DataPointUpdateHelper = DataPointUpdateHelperImpl()
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -37,10 +39,18 @@ class TrackerHelperImpl_UpdateDataPoints_Test {
             }
         }
 
+        val timeProvider = object : TimeProvider {
+            override fun now(): org.threeten.bp.ZonedDateTime = org.threeten.bp.ZonedDateTime.now()
+            override fun epochMilli(): Long = 1000L
+            override fun defaultZone(): org.threeten.bp.ZoneId = org.threeten.bp.ZoneId.systemDefault()
+        }
+
         uut = TrackerHelperImpl(
             transactionHelper = transactionHelper,
             dao = dao,
+            groupItemDao = groupItemDao,
             dataPointUpdateHelper = dataPointUpdateHelper,
+            timeProvider = timeProvider,
             io = dispatcher
         )
     }
@@ -288,9 +298,7 @@ class TrackerHelperImpl_UpdateDataPoints_Test {
             TrackerWithFeature(
                 id = 0L,
                 name = "",
-                groupId = 0L,
                 featureId = 0L,
-                displayIndex = 0,
                 description = "",
                 dataType = if (isDuration) DataType.DURATION else DataType.CONTINUOUS,
                 hasDefaultValue = false,

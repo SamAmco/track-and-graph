@@ -88,7 +88,7 @@ fun clamp(value: Double, min: Double, max: Double): Double {
 
 fun createGroup(
     name: String = "",
-    parentGroupId: Long? = null,
+    parentGroupId: Long = 0L,
     colorIndex: Int = 0,
 ) = GroupCreateRequest(
     name = name,

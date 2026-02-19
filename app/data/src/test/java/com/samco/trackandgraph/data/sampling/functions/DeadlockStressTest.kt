@@ -216,7 +216,6 @@ class DeadlockStressTest {
             id = functionId,
             featureId = featureId,
             name = name,
-            groupIds = setOf(1L),
             description = "Leaf function for deadlock test",
             functionGraph = functionGraph,
             inputFeatureIds = emptyList()
@@ -276,7 +275,6 @@ class DeadlockStressTest {
             id = functionId,
             featureId = featureId,
             name = name,
-            groupIds = setOf(1L),
             description = "Pass-through function for deadlock test",
             functionGraph = functionGraph,
             inputFeatureIds = listOf(inputFeatureId)

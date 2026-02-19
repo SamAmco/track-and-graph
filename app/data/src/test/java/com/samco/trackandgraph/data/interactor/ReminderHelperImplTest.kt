@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.data.interactor
 
+import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.FakeReminderDao
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
@@ -42,6 +43,7 @@ import org.threeten.bp.LocalTime
 class ReminderHelperImplTest {
 
     private lateinit var fakeReminderDao: FakeReminderDao
+    private lateinit var fakeGroupItemDao: FakeGroupItemDao
     private lateinit var reminderSerializer: ReminderSerializer
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -63,10 +65,12 @@ class ReminderHelperImplTest {
     @Before
     fun before() {
         fakeReminderDao = FakeReminderDao()
+        fakeGroupItemDao = FakeGroupItemDao()
         reminderSerializer = ReminderSerializer(Json { ignoreUnknownKeys = true })
 
         uut = ReminderHelperImpl(
             reminderDao = fakeReminderDao,
+            groupItemDao = fakeGroupItemDao,
             reminderSerializer = reminderSerializer,
             io = dispatcher
         )
@@ -94,9 +98,7 @@ class ReminderHelperImplTest {
         val reminder = uut.getReminderById(id)
         assertNotNull(reminder)
         assertEquals("Morning Reminder", reminder!!.reminderName)
-        assertEquals(null, reminder.groupId)
         assertEquals(null, reminder.featureId)
-        assertEquals(0, reminder.displayIndex)
         assertEquals(defaultParams, reminder.params)
     }
 
@@ -116,12 +118,11 @@ class ReminderHelperImplTest {
         // VERIFY
         val reminder = uut.getReminderById(id)
         assertNotNull(reminder)
-        assertEquals(5L, reminder!!.groupId)
-        assertEquals(10L, reminder.featureId)
+        assertEquals(10L, reminder!!.featureId)
     }
 
     @Test
-    fun `createReminder sets displayIndex to 0`() = runTest(dispatcher) {
+    fun `createReminder returns valid id`() = runTest(dispatcher) {
         // PREPARE
         val request = ReminderCreateRequest(
             reminderName = "Test",
@@ -135,7 +136,8 @@ class ReminderHelperImplTest {
 
         // VERIFY
         val reminder = uut.getReminderById(id)
-        assertEquals(0, reminder!!.displayIndex)
+        assertNotNull(reminder)
+        assertEquals("Test", reminder!!.reminderName)
     }
 
     // =========================================================================
@@ -239,7 +241,7 @@ class ReminderHelperImplTest {
     }
 
     @Test
-    fun `updateReminder preserves groupId`() = runTest(dispatcher) {
+    fun `updateReminder updates only provided fields`() = runTest(dispatcher) {
         // PREPARE
         val id = uut.createReminder(
             ReminderCreateRequest(
@@ -250,7 +252,7 @@ class ReminderHelperImplTest {
             )
         )
 
-        // EXECUTE - update something else
+        // EXECUTE - update name only
         uut.updateReminder(
             ReminderUpdateRequest(
                 id = id,
@@ -260,9 +262,9 @@ class ReminderHelperImplTest {
             )
         )
 
-        // VERIFY - groupId should be unchanged
+        // VERIFY - name should be updated
         val reminder = uut.getReminderById(id)
-        assertEquals(5L, reminder!!.groupId)
+        assertEquals("New Name", reminder!!.reminderName)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -276,108 +278,6 @@ class ReminderHelperImplTest {
                 params = null
             )
         )
-    }
-
-    // =========================================================================
-    // Display order tests
-    // =========================================================================
-
-    @Test
-    fun `updateReminderDisplayOrder updates indices for matching group`() = runTest(dispatcher) {
-        // PREPARE - create 3 reminders in same group (null)
-        val id1 = uut.createReminder(
-            ReminderCreateRequest("Reminder 1", null, null, defaultParams)
-        )
-        val id2 = uut.createReminder(
-            ReminderCreateRequest("Reminder 2", null, null, defaultParams)
-        )
-        val id3 = uut.createReminder(
-            ReminderCreateRequest("Reminder 3", null, null, defaultParams)
-        )
-
-        // EXECUTE - reorder: 3, 1, 2
-        uut.updateReminderDisplayOrder(
-            groupId = null,
-            orders = listOf(
-                ReminderDisplayOrderData(id3, 0),
-                ReminderDisplayOrderData(id1, 1),
-                ReminderDisplayOrderData(id2, 2)
-            )
-        )
-
-        // VERIFY
-        assertEquals(1, uut.getReminderById(id1)!!.displayIndex)
-        assertEquals(2, uut.getReminderById(id2)!!.displayIndex)
-        assertEquals(0, uut.getReminderById(id3)!!.displayIndex)
-    }
-
-    @Test
-    fun `updateReminderDisplayOrder ignores reminders from different group`() = runTest(dispatcher) {
-        // PREPARE - create reminders in different groups
-        val idGroup1 = uut.createReminder(
-            ReminderCreateRequest("Group 1 Reminder", 1L, null, defaultParams)
-        )
-        val idGroupNull = uut.createReminder(
-            ReminderCreateRequest("Null Group Reminder", null, null, defaultParams)
-        )
-
-        // EXECUTE - try to update null group, including id from group 1
-        uut.updateReminderDisplayOrder(
-            groupId = null,
-            orders = listOf(
-                ReminderDisplayOrderData(idGroupNull, 5),
-                ReminderDisplayOrderData(idGroup1, 10) // Should be ignored
-            )
-        )
-
-        // VERIFY
-        assertEquals(5, uut.getReminderById(idGroupNull)!!.displayIndex)
-        assertEquals(0, uut.getReminderById(idGroup1)!!.displayIndex) // Unchanged
-    }
-
-    @Test
-    fun `updateReminderDisplayOrder preserves indices for reminders not in orders list`() =
-        runTest(dispatcher) {
-            // PREPARE
-            val id1 = uut.createReminder(
-                ReminderCreateRequest("Reminder 1", null, null, defaultParams)
-            )
-            val id2 = uut.createReminder(
-                ReminderCreateRequest("Reminder 2", null, null, defaultParams)
-            )
-
-            // Manually set display indices
-            uut.updateReminderDisplayOrder(
-                groupId = null,
-                orders = listOf(
-                    ReminderDisplayOrderData(id1, 10),
-                    ReminderDisplayOrderData(id2, 20)
-                )
-            )
-
-            // EXECUTE - only update id1
-            uut.updateReminderDisplayOrder(
-                groupId = null,
-                orders = listOf(ReminderDisplayOrderData(id1, 5))
-            )
-
-            // VERIFY
-            assertEquals(5, uut.getReminderById(id1)!!.displayIndex)
-            assertEquals(20, uut.getReminderById(id2)!!.displayIndex) // Unchanged
-        }
-
-    @Test
-    fun `updateReminderDisplayOrder handles empty orders list`() = runTest(dispatcher) {
-        // PREPARE
-        val id = uut.createReminder(
-            ReminderCreateRequest("Test", null, null, defaultParams)
-        )
-
-        // EXECUTE
-        uut.updateReminderDisplayOrder(groupId = null, orders = emptyList())
-
-        // VERIFY - no crash, index unchanged
-        assertEquals(0, uut.getReminderById(id)!!.displayIndex)
     }
 
     // =========================================================================
@@ -428,7 +328,6 @@ class ReminderHelperImplTest {
         assertNotNull(duplicate)
         assertNotEquals(original!!.id, duplicate!!.id)
         assertEquals(original.reminderName, duplicate.reminderName)
-        assertEquals(original.groupId, duplicate.groupId)
         assertEquals(original.featureId, duplicate.featureId)
         assertEquals(original.params, duplicate.params)
     }
@@ -448,40 +347,6 @@ class ReminderHelperImplTest {
         // EXECUTE & VERIFY
         assertNull(uut.getReminderById(999L))
     }
-
-    @Test
-    fun `getAllRemindersSync returns all reminders sorted by displayIndex`() =
-        runTest(dispatcher) {
-            // PREPARE
-            val id1 = uut.createReminder(
-                ReminderCreateRequest("First", null, null, defaultParams)
-            )
-            val id2 = uut.createReminder(
-                ReminderCreateRequest("Second", null, null, defaultParams)
-            )
-            val id3 = uut.createReminder(
-                ReminderCreateRequest("Third", null, null, defaultParams)
-            )
-
-            // Set display indices: 3, 1, 2
-            uut.updateReminderDisplayOrder(
-                groupId = null,
-                orders = listOf(
-                    ReminderDisplayOrderData(id1, 1),
-                    ReminderDisplayOrderData(id2, 2),
-                    ReminderDisplayOrderData(id3, 0)
-                )
-            )
-
-            // EXECUTE
-            val reminders = uut.getAllRemindersSync()
-
-            // VERIFY - sorted by displayIndex
-            assertEquals(3, reminders.size)
-            assertEquals("Third", reminders[0].reminderName)
-            assertEquals("First", reminders[1].reminderName)
-            assertEquals("Second", reminders[2].reminderName)
-        }
 
     @Test
     fun `hasAnyReminders returns false when empty`() = runTest(dispatcher) {

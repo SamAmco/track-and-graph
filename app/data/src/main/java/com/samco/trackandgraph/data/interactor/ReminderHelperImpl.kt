@@ -40,9 +40,7 @@ internal class ReminderHelperImpl @Inject constructor(
 ) : ReminderHelper {
 
     override suspend fun getAllRemindersSync(): List<Reminder> = withContext(io) {
-        reminderDao.getAllRemindersSync()
-            .mapNotNull(::fromEntity)
-            .sortedWith(compareBy({ it.displayIndex }, { -it.id }))
+        reminderDao.getAllRemindersSync().mapNotNull(::fromEntity)
     }
 
     override suspend fun getReminderById(id: Long): Reminder? = withContext(io) {
@@ -84,7 +82,8 @@ internal class ReminderHelperImpl @Inject constructor(
         val existing = reminderDao.getReminderById(request.id)
             ?: throw IllegalArgumentException("Reminder with id ${request.id} not found")
 
-        val newParams = request.params ?: reminderSerializer.deserializeParams(existing.encodedReminderParams)
+        val newParams =
+            request.params ?: reminderSerializer.deserializeParams(existing.encodedReminderParams)
             ?: throw IllegalArgumentException("Failed to deserialize existing reminder params")
 
         val encodedParams = reminderSerializer.serializeParams(newParams)
@@ -162,14 +161,9 @@ internal class ReminderHelperImpl @Inject constructor(
         val params = reminderSerializer.deserializeParams(entity.encodedReminderParams)
             ?: return null
 
-        val groupItem = groupItemDao.getGroupItemsForChild(entity.id, GroupItemType.REMINDER)
-            .firstOrNull()
-
         return Reminder(
             id = entity.id,
-            displayIndex = groupItem?.displayIndex ?: 0,
             reminderName = entity.alarmName,
-            groupId = groupItem?.groupId,
             featureId = entity.featureId,
             params = params
         )
