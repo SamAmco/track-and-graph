@@ -18,10 +18,14 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.*
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.interactor.TrackerHelper.DurationNumericConversionMode
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.time.TimeProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
@@ -34,7 +38,9 @@ import com.samco.trackandgraph.data.database.entity.DataPoint as DataPointEntity
 internal class TrackerHelperImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
+    private val groupItemDao: GroupItemDao,
     private val dataPointUpdateHelper: DataPointUpdateHelper,
+    private val timeProvider: TimeProvider,
     @IODispatcher private val io: CoroutineDispatcher
 ) : TrackerHelper {
 
@@ -106,14 +112,9 @@ internal class TrackerHelperImpl @Inject constructor(
                 request.durationNumericConversionMode
             )
 
-            // TODO: When features can exist in multiple groups, this will need to handle
-            // multiple group associations
-            val currentGroupId = old.groupIds.first()
             val newFeature = com.samco.trackandgraph.data.database.entity.Feature(
                 id = old.featureId,
                 name = request.name ?: old.name,
-                groupId = currentGroupId,
-                displayIndex = old.displayIndex,
                 description = request.description ?: old.description
             )
             val newTracker = com.samco.trackandgraph.data.database.entity.Tracker(
@@ -123,7 +124,8 @@ internal class TrackerHelperImpl @Inject constructor(
                 hasDefaultValue = request.hasDefaultValue ?: old.hasDefaultValue,
                 defaultValue = request.defaultValue ?: old.defaultValue,
                 defaultLabel = request.defaultLabel ?: old.defaultLabel,
-                suggestionType = request.suggestionType?.toEntity() ?: old.suggestionType.toEntity(),
+                suggestionType = request.suggestionType?.toEntity()
+                    ?: old.suggestionType.toEntity(),
                 suggestionOrder = request.suggestionOrder?.toEntity()
                     ?: old.suggestionOrder.toEntity()
             )
@@ -165,7 +167,7 @@ internal class TrackerHelperImpl @Inject constructor(
     }
 
     private fun noConversionModeError(): Nothing =
-        throw Exception("You must provide durationNumericConversionMode if you convert from CONTINUOUS TO DURATION")
+        error("You must provide durationNumericConversionMode if you convert from CONTINUOUS TO DURATION")
 
     private fun updateDurationDataPointsToContinuous(
         oldTracker: Tracker,
@@ -191,7 +193,6 @@ internal class TrackerHelperImpl @Inject constructor(
         dao.updateDataPoints(newDataPoints)
     }
 
-    //TODO this would probably be faster in SQL
     private fun updateContinuousDataPointsToDurations(
         oldTracker: Tracker,
         durationNumericConversionMode: DurationNumericConversionMode
@@ -269,11 +270,10 @@ internal class TrackerHelperImpl @Inject constructor(
             val feature = com.samco.trackandgraph.data.database.entity.Feature(
                 id = 0L,
                 name = request.name,
-                groupId = request.groupId,
-                displayIndex = 0,
                 description = request.description
             )
             val featureId = dao.insertFeature(feature)
+
             val tracker = com.samco.trackandgraph.data.database.entity.Tracker(
                 id = 0L,
                 featureId = featureId,
@@ -284,18 +284,40 @@ internal class TrackerHelperImpl @Inject constructor(
                 suggestionType = request.suggestionType.toEntity(),
                 suggestionOrder = request.suggestionOrder.toEntity()
             )
-            dao.insertTracker(tracker)
+            val trackerId = dao.insertTracker(tracker)
+
+            // Create GroupItem entry with tracker ID
+            groupItemDao.shiftDisplayIndexesDown(request.groupId)
+            val groupItem = GroupItem(
+                groupId = request.groupId,
+                displayIndex = 0,
+                childId = trackerId,
+                type = GroupItemType.TRACKER,
+                createdAt = timeProvider.epochMilli(),
+            )
+            groupItemDao.insertGroupItem(groupItem)
+
+            trackerId
         }
     }
 
     override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
-            // TODO: When features can exist in multiple groups, check request.groupId:
-            // - If groupId is specified, only remove the tracker from that group
-            // - If groupId is null, delete the tracker from all groups (full delete)
-            // For now, we always do a full delete since features only exist in one group
-            val tracker = dao.getTrackerById(request.trackerId)
-                ?: throw IllegalArgumentException("Tracker not found: ${request.trackerId}")
+            val tracker = dao.getTrackerById(request.trackerId) ?: return@withTransaction
+
+            val groupItems = groupItemDao.getGroupItemsForChild(
+                tracker.id,
+                GroupItemType.TRACKER
+            )
+
+            if (request.groupId != null && groupItems.size > 1) {
+                groupItems
+                    .filter { it.groupId == request.groupId }
+                    .forEach { groupItemDao.deleteGroupItem(it.id) }
+                return@withTransaction
+            }
+
+            groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
             dao.deleteFeature(tracker.featureId)
         }
     }
@@ -306,7 +328,11 @@ internal class TrackerHelperImpl @Inject constructor(
 
     override suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker> =
         withContext(io) {
-            dao.getDisplayTrackersForGroupSync(groupId).map { it.toDto() }
+            val trackerIds = groupItemDao
+                .getGroupItemsByType(groupId, GroupItemType.TRACKER)
+                .map { it.childId }
+                .toSet()
+            dao.getDisplayTrackerByTrackerIdsSync(trackerIds).map { it.toDto() }
         }
 
     override suspend fun tryGetTrackerByFeatureId(featureId: Long): DisplayTracker? =

@@ -37,7 +37,6 @@ import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
-import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupGraph
@@ -52,7 +51,6 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
-import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
@@ -196,29 +194,25 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
-        val tracker = dao.getTrackerById(request.trackerId)
-            ?: throw IllegalArgumentException("Tracker not found: ${request.trackerId}")
-        deleteFeature(tracker.featureId, isTracker = true)
+        val tracker = dao.getTrackerById(request.trackerId) ?: return@withContext
+        val featureId = tracker.featureId
+
+        val dependentGraphs = dependencyAnalyserProvider.create().getDependentGraphs(featureId)
+
+        trackerHelper.deleteTracker(request)
+
+        dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
+        handleOrphanedAndDependentGraphsForFeatureDelete(dependentGraphs.graphStatIds)
     }
 
-    private suspend fun deleteFeature(featureId: Long, isTracker: Boolean) {
-        val allDependentGraphs = dependencyAnalyserProvider.create()
-            .getDependentGraphs(featureId)
-
-        // We need to make sure all cascade deletes are complete before we continue
-        // hence the atomic update
-        performAtomicUpdate { dao.deleteFeature(featureId) }
-
-        if (isTracker) dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
-        else dataUpdateEvents.emit(DataUpdateType.FunctionDeleted(featureId))
-
+    private suspend fun handleOrphanedAndDependentGraphsForFeatureDelete(dependentGraphIds: Set<Long>) {
         val orphanedGraphs = dependencyAnalyserProvider.create().getOrphanedGraphs()
         for (graphStatId in orphanedGraphs.graphStatIds) {
             dao.deleteGraphOrStat(graphStatId)
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
         }
 
-        val graphsNeedingUpdate = allDependentGraphs.graphStatIds - orphanedGraphs.graphStatIds
+        val graphsNeedingUpdate = dependentGraphIds - orphanedGraphs.graphStatIds
         for (graphStatId in graphsNeedingUpdate) {
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
         }
@@ -582,9 +576,14 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun deleteFunction(request: FunctionDeleteRequest) = withContext(io) {
         val function = dao.getFunctionById(request.functionId) ?: return@withContext
-        // TODO: When multi-group support is added, check request.groupId
-        // to determine if we should remove from one group or delete entirely
-        deleteFeature(function.featureId, isTracker = false)
+        val featureId = function.featureId
+
+        val dependentGraphs = dependencyAnalyserProvider.create().getDependentGraphs(featureId)
+
+        functionHelper.deleteFunction(request)
+
+        dataUpdateEvents.emit(DataUpdateType.FunctionDeleted(featureId))
+        handleOrphanedAndDependentGraphsForFeatureDelete(dependentGraphs.graphStatIds)
     }
 
     override suspend fun getFeatureIdsDependingOn(featureId: Long): Set<Long> = withContext(io) {

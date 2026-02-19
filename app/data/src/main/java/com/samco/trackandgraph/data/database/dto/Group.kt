@@ -36,7 +36,7 @@ data class Group(
  */
 data class GroupCreateRequest(
     val name: String,
-    val parentGroupId: Long? = null,
+    val parentGroupId: Long,
     val colorIndex: Int = 0,
 )
 

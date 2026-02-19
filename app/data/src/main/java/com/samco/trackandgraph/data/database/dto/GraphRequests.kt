@@ -304,7 +304,10 @@ data class LuaGraphUpdateRequest(
  * Request object for deleting a graph or stat.
  *
  * @param graphStatId The ID of the graph/stat to delete.
+ * @param groupId If specified, the graph will only be removed from this group.
+ *                If null, the graph will be deleted entirely from all groups.
  */
 data class GraphDeleteRequest(
-    val graphStatId: Long
+    val graphStatId: Long,
+    val groupId: Long? = null,
 )

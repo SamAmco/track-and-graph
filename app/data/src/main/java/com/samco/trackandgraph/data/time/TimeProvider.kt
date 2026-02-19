@@ -22,11 +22,14 @@ import javax.inject.Inject
 
 interface TimeProvider {
     fun now(): ZonedDateTime
+    fun epochMilli(): Long
     fun defaultZone(): ZoneId
 }
 
 class TimeProviderImpl @Inject constructor() : TimeProvider {
     override fun now(): ZonedDateTime = ZonedDateTime.now()
+
+    override fun epochMilli(): Long = System.currentTimeMillis()
     
     override fun defaultZone(): ZoneId = ZonedDateTime.now().zone
 }

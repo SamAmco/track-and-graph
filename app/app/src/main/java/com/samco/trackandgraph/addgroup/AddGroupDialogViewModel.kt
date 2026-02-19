@@ -103,7 +103,7 @@ class AddGroupDialogViewModelImpl @Inject constructor(
         hidden = false
         viewModelScope.launch {
             loading = true
-            val group = dataInteractor.getGroupById(groupId)
+            val group = dataInteractor.getGroupById(groupId) ?: return@launch
             this@AddGroupDialogViewModelImpl.currentGroup.value = group
             colorIndex = group.colorIndex
             name = TextFieldValue(group.name, TextRange(group.name.length))
@@ -116,15 +116,18 @@ class AddGroupDialogViewModelImpl @Inject constructor(
         val name = name.text
         val colorIndex = colorIndex
         viewModelScope.launch {
-            currentGroup.value?.let { current ->
+            val currentGroup = currentGroup.value
+            val parentGroupId = parentGroupId
+
+            if (currentGroup != null) {
                 dataInteractor.updateGroup(
                     GroupUpdateRequest(
-                        id = current.id,
+                        id = currentGroup.id,
                         name = name,
                         colorIndex = colorIndex
                     )
                 )
-            } ?: run {
+            } else if (parentGroupId != null) {
                 dataInteractor.insertGroup(
                     GroupCreateRequest(
                         name = name,
@@ -133,6 +136,7 @@ class AddGroupDialogViewModelImpl @Inject constructor(
                     )
                 )
             }
+
             hide()
         }
     }
