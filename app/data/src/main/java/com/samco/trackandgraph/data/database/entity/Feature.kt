@@ -36,12 +36,9 @@ internal data class Feature(
     @ColumnInfo(name = "feature_description")
     val description: String
 ) {
-    // TODO: groupIds and displayIndex must be looked up from group_items_table
-    fun toDto(groupIds: Set<Long>, displayIndex: Int): Feature = FeatureDtoImpl(
+    fun toDto(): Feature = FeatureDtoImpl(
         featureId = this@Feature.id,
         name = this@Feature.name,
-        groupIds = groupIds,
-        displayIndex = displayIndex,
         description = this@Feature.description
     )
 }

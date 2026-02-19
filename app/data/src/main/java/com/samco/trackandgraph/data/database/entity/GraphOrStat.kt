@@ -34,12 +34,5 @@ internal data class GraphOrStat(
     @ColumnInfo(name = "graph_stat_type")
     val type: GraphStatType
 ) {
-    // TODO: groupIds and displayIndex must be looked up from group_items_table
-    fun toDto(groupIds: Set<Long>, displayIndex: Int) = GraphOrStat(
-        id,
-        groupIds,
-        name,
-        type,
-        displayIndex
-    )
+    fun toDto() = GraphOrStat(id, name, type)
 }

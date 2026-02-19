@@ -34,9 +34,6 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "group_id")
-    val groupId: Long,
-
     @ColumnInfo(name = "type")
     val featureType: DataType = DataType.CONTINUOUS,
 
@@ -55,20 +52,16 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "last_utc_offset_sec")
     val lastUtcOffsetSec: Int,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "feature_description")
     val description: String,
 
     @ColumnInfo(name = "start_instant")
-    val timerStartInstant: Instant?
+    val timerStartInstant: Instant?,
 ) {
     fun toDto() = DisplayTracker(
         id = id,
         featureId = featureId,
         name = name,
-        groupId = groupId,
         dataType = featureType,
         hasDefaultValue = hasDefaultValue,
         defaultValue = defaultValue,
@@ -79,7 +72,6 @@ internal data class DisplayTracker(
                 ZoneOffset.ofTotalSeconds(lastUtcOffsetSec)
             )
         },
-        displayIndex = displayIndex,
         description = description,
         timerStartInstant = timerStartInstant
     )

@@ -2,7 +2,6 @@ package com.samco.trackandgraph.data.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
 import com.samco.trackandgraph.data.database.dto.DataType
-import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 
@@ -13,14 +12,8 @@ internal data class TrackerWithFeature(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "group_id")
-    val groupId: Long,
-
     @ColumnInfo(name = "feature_id")
     val featureId: Long,
-
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
 
     @ColumnInfo(name = "feature_description")
     val description: String,
@@ -41,13 +34,5 @@ internal data class TrackerWithFeature(
     val suggestionType: TrackerSuggestionType,
 
     @ColumnInfo(name = "suggestion_order")
-    val suggestionOrder: TrackerSuggestionOrder
-) {
-    fun toFeatureEntity() = Feature(
-        id = featureId,
-        name = name,
-        groupId = groupId,
-        displayIndex = displayIndex,
-        description = description
-    )
-}
+    val suggestionOrder: TrackerSuggestionOrder,
+)

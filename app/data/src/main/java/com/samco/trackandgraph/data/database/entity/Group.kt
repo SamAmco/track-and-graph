@@ -33,12 +33,9 @@ internal data class Group(
     @ColumnInfo(name = "color_index")
     val colorIndex: Int,
 ) {
-    // TODO: parentGroupIds and displayIndex must be looked up from group_items_table
-    fun toDto(parentGroupIds: Set<Long>, displayIndex: Int) = com.samco.trackandgraph.data.database.dto.Group(
-        id,
-        name,
-        displayIndex,
-        parentGroupIds = parentGroupIds,
-        colorIndex,
+    fun toDto() = com.samco.trackandgraph.data.database.dto.Group(
+        id = id,
+        name = name,
+        colorIndex = colorIndex,
     )
 }

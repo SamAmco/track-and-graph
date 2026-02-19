@@ -38,9 +38,6 @@ internal data class DisplayNote(
     @ColumnInfo(name = "feature_name")
     val featureName: String?,
 
-    @ColumnInfo(name = "group_id")
-    val groupId: Long?,
-
     @ColumnInfo(name = "note")
     val note: String
 ) {
@@ -52,7 +49,6 @@ internal data class DisplayNote(
         trackerId = trackerId,
         featureId = featureId,
         featureName = featureName,
-        groupId = groupId,
         note = note
     )
 }
