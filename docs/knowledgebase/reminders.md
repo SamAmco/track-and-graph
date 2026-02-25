@@ -65,6 +65,22 @@ sealed class ReminderParams {
 }
 ```
 
+## Delete Behavior
+
+Deletion uses `ReminderDeleteRequest(reminderId, groupId?)` and follows the symlink pattern:
+
+- **`groupId` provided AND reminder in multiple locations** → remove only that group's symlink (GroupItem), reminder survives
+- **Otherwise** → delete all GroupItems and the reminder itself
+
+This means deleting from the Reminders screen (where `groupId` is always null) always deletes the reminder everywhere. A future dialog will warn the user if the reminder also exists in groups.
+
+```kotlin
+data class ReminderDeleteRequest(
+    val reminderId: Long,
+    val groupId: Long? = null,
+)
+```
+
 ## Operations
 
 ### Create Reminder in Group

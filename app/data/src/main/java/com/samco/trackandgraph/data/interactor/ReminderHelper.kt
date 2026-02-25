@@ -19,6 +19,7 @@ package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 
@@ -52,7 +53,14 @@ interface ReminderHelper {
      */
     suspend fun updateReminderDisplayOrder(groupId: Long?, orders: List<ReminderDisplayOrderData>)
 
-    suspend fun deleteReminder(id: Long)
+    /**
+     * Deletes a reminder or removes it from a specific location.
+     *
+     * If [ReminderDeleteRequest.groupId] is provided
+     * and the reminder exists in multiple locations, only the symlink in that location
+     * is removed. Otherwise, the reminder and all its symlinks are deleted.
+     */
+    suspend fun deleteReminder(request: ReminderDeleteRequest)
 
     suspend fun duplicateReminder(id: Long): Long
 

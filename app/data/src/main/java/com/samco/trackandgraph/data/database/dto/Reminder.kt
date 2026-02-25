@@ -24,6 +24,9 @@ import com.samco.trackandgraph.data.serialization.LocalDateTimeSerializer
 import org.threeten.bp.LocalTime
 import org.threeten.bp.LocalDateTime
 
+/**
+ * DTO representing a Reminder.
+ */
 data class Reminder(
     val id: Long,
     val reminderName: String,
@@ -55,6 +58,19 @@ data class ReminderUpdateRequest(
     val reminderName: String? = null,
     val featureId: Long? = null,
     val params: ReminderParams? = null
+)
+
+/**
+ * Request object for deleting a Reminder.
+ *
+ * @param reminderId The ID of the reminder to delete.
+ * @param groupId Optional group ID. If provided and the reminder exists in multiple places,
+ *                only the symlink in this group is removed (the reminder itself is preserved).
+ *                If null, the reminder and all its symlinks are deleted.
+ */
+data class ReminderDeleteRequest(
+    val reminderId: Long,
+    val groupId: Long? = null,
 )
 
 /**

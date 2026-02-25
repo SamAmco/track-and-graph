@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.ReminderDao
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 import com.samco.trackandgraph.data.database.entity.GroupItem
@@ -121,8 +122,23 @@ internal class ReminderHelperImpl @Inject constructor(
         groupItemsToUpdate.forEach { groupItemDao.updateGroupItem(it) }
     }
 
-    override suspend fun deleteReminder(id: Long) = withContext(io) {
-        reminderDao.deleteReminder(id)
+    override suspend fun deleteReminder(request: ReminderDeleteRequest) = withContext(io) {
+        val groupItems = groupItemDao.getGroupItemsForChild(
+            request.reminderId,
+            GroupItemType.REMINDER
+        )
+
+        if (request.groupId != null && groupItems.size > 1) {
+            // Only remove the symlink from the specified group
+            groupItems
+                .filter { it.groupId == request.groupId }
+                .forEach { groupItemDao.deleteGroupItem(it.id) }
+            return@withContext
+        }
+
+        // Delete all GroupItems and the reminder itself
+        groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
+        reminderDao.deleteReminder(request.reminderId)
     }
 
     override suspend fun duplicateReminder(id: Long): Long = withContext(io) {

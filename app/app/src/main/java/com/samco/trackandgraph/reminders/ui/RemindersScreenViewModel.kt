@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -127,7 +128,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
             // Cancel notifications for this reminder
             reminderViewData.reminderDto?.let { reminder ->
                 reminderInteractor.cancelReminderNotifications(reminder)
-                dataInteractor.deleteReminder(reminder.id)
+                dataInteractor.deleteReminder(ReminderDeleteRequest(reminderId = reminder.id))
             }
         }
     }

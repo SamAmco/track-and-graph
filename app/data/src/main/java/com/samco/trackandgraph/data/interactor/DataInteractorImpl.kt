@@ -52,6 +52,7 @@ import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
@@ -261,8 +262,8 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
-    override suspend fun deleteReminder(id: Long) = withContext(io) {
-        reminderHelper.deleteReminder(id)
+    override suspend fun deleteReminder(request: ReminderDeleteRequest) = withContext(io) {
+        reminderHelper.deleteReminder(request)
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 

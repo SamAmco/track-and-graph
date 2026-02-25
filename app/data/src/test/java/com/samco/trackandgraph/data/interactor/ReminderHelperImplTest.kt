@@ -21,9 +21,12 @@ import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.FakeReminderDao
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.serialization.ReminderSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -281,23 +284,211 @@ class ReminderHelperImplTest {
     }
 
     // =========================================================================
-    // Delete tests
+    // Delete tests - Simple cases
     // =========================================================================
 
     @Test
-    fun `deleteReminder removes reminder from dao`() = runTest(dispatcher) {
+    fun `deleteReminder removes reminder and GroupItem when only in one location`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val id = uut.createReminder(
+                ReminderCreateRequest("To Delete", null, null, defaultParams)
+            )
+            assertNotNull(uut.getReminderById(id))
+            assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+
+            // EXECUTE
+            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+
+            // VERIFY
+            assertNull(uut.getReminderById(id))
+            assertTrue(fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).isEmpty())
+        }
+
+    @Test
+    fun `deleteReminder removes reminder in group and its GroupItem`() = runTest(dispatcher) {
         // PREPARE
+        val groupId = 5L
         val id = uut.createReminder(
-            ReminderCreateRequest("To Delete", null, null, defaultParams)
+            ReminderCreateRequest("Grouped Reminder", groupId, null, defaultParams)
         )
         assertNotNull(uut.getReminderById(id))
+        val groupItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+        assertEquals(1, groupItems.size)
+        assertEquals(groupId, groupItems[0].groupId)
 
         // EXECUTE
-        uut.deleteReminder(id)
+        uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
 
         // VERIFY
         assertNull(uut.getReminderById(id))
+        assertTrue(fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).isEmpty())
     }
+
+    // =========================================================================
+    // Delete tests - Multiple locations (symlink behavior)
+    // =========================================================================
+
+    @Test
+    fun `deleteReminder with groupId removes only symlink when in multiple groups`() =
+        runTest(dispatcher) {
+            // PREPARE - Create reminder in group1, then add symlink to group2
+            val group1 = 1L
+            val group2 = 2L
+            val id = uut.createReminder(
+                ReminderCreateRequest("Multi-group Reminder", group1, null, defaultParams)
+            )
+            // Add symlink to group2
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = id,
+                    type = GroupItemType.REMINDER,
+                    createdAt = 1000L
+                )
+            )
+            assertEquals(2, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+
+            // EXECUTE - Delete from group1 only
+            uut.deleteReminder(ReminderDeleteRequest(reminderId = id, groupId = group1))
+
+            // VERIFY - Reminder still exists, only removed from group1
+            assertNotNull(uut.getReminderById(id))
+            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(1, remainingItems.size)
+            assertEquals(group2, remainingItems[0].groupId)
+        }
+
+    @Test
+    fun `deleteReminder from reminders screen deletes reminder and all symlinks`() =
+        runTest(dispatcher) {
+            // PREPARE - Create reminder in reminders screen (null groupId), then add to a group
+            val groupId = 5L
+            val id = uut.createReminder(
+                ReminderCreateRequest("Multi-location Reminder", null, null, defaultParams)
+            )
+            // Add symlink to group
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = groupId,
+                    displayIndex = 0,
+                    childId = id,
+                    type = GroupItemType.REMINDER,
+                    createdAt = 1000L
+                )
+            )
+            assertEquals(2, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+
+            // EXECUTE - Delete from reminders screen (no groupId = delete everything)
+            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+
+            // VERIFY - Reminder and all GroupItems deleted
+            assertNull(uut.getReminderById(id))
+            assertTrue(fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).isEmpty())
+        }
+
+    @Test
+    fun `deleteReminder with groupId removes only symlink from group when also in reminders screen`() =
+        runTest(dispatcher) {
+            // PREPARE - Create reminder in a group, then add to reminders screen
+            val groupId = 5L
+            val id = uut.createReminder(
+                ReminderCreateRequest("Multi-location Reminder", groupId, null, defaultParams)
+            )
+            // Add symlink to reminders screen (null groupId)
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = null,
+                    displayIndex = 0,
+                    childId = id,
+                    type = GroupItemType.REMINDER,
+                    createdAt = 1000L
+                )
+            )
+            assertEquals(2, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+
+            // EXECUTE - Delete from group only
+            uut.deleteReminder(ReminderDeleteRequest(reminderId = id, groupId = groupId))
+
+            // VERIFY - Reminder still exists, only removed from group
+            assertNotNull(uut.getReminderById(id))
+            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(1, remainingItems.size)
+            assertNull(remainingItems[0].groupId)
+        }
+
+    @Test
+    fun `deleteReminder without location deletes reminder and all symlinks`() =
+        runTest(dispatcher) {
+            // PREPARE - Create reminder in multiple locations
+            val group1 = 1L
+            val group2 = 2L
+            val id = uut.createReminder(
+                ReminderCreateRequest("Multi-group Reminder", group1, null, defaultParams)
+            )
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = id,
+                    type = GroupItemType.REMINDER,
+                    createdAt = 1000L
+                )
+            )
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = null,
+                    displayIndex = 0,
+                    childId = id,
+                    type = GroupItemType.REMINDER,
+                    createdAt = 1000L
+                )
+            )
+            assertEquals(3, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+
+            // EXECUTE - Delete without specifying location
+            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+
+            // VERIFY - Reminder and all GroupItems deleted
+            assertNull(uut.getReminderById(id))
+            assertTrue(fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).isEmpty())
+        }
+
+    @Test
+    fun `deleteReminder with groupId deletes reminder when only in that group`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val groupId = 5L
+            val id = uut.createReminder(
+                ReminderCreateRequest("Single Group Reminder", groupId, null, defaultParams)
+            )
+            assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+
+            // EXECUTE - Delete from group (but it's the only location)
+            uut.deleteReminder(ReminderDeleteRequest(reminderId = id, groupId = groupId))
+
+            // VERIFY - Reminder fully deleted since it was only in one location
+            assertNull(uut.getReminderById(id))
+            assertTrue(fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).isEmpty())
+        }
+
+    @Test
+    fun `deleteReminder from reminders screen when only in reminders screen deletes reminder`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val id = uut.createReminder(
+                ReminderCreateRequest("Ungrouped Reminder", null, null, defaultParams)
+            )
+            assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+
+            // EXECUTE - Delete from reminders screen (no groupId)
+            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+
+            // VERIFY
+            assertNull(uut.getReminderById(id))
+            assertTrue(fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).isEmpty())
+        }
 
     // =========================================================================
     // Duplicate tests
