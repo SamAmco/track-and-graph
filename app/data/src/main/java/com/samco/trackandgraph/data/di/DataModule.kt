@@ -25,10 +25,12 @@ import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriterImpl
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.data.database.GraphDao
+import com.samco.trackandgraph.data.database.GroupDao
 import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.ReminderDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.database.TrackerDao
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelper
 import com.samco.trackandgraph.data.interactor.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.data.interactor.FunctionHelper
@@ -74,6 +76,12 @@ class DataModule {
 
     @Provides
     internal fun getReminderDao(dao: TrackAndGraphDatabaseDao): ReminderDao = dao
+
+    @Provides
+    internal fun getTrackerDao(dao: TrackAndGraphDatabaseDao): TrackerDao = dao
+
+    @Provides
+    internal fun getGroupDao(dao: TrackAndGraphDatabaseDao): GroupDao = dao
 
     @Provides
     internal fun getGroupItemDao(database: TrackAndGraphDatabase): GroupItemDao =

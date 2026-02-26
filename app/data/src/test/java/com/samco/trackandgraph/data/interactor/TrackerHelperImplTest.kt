@@ -18,20 +18,15 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.FakeGroupItemDao
+import com.samco.trackandgraph.FakeTrackerDao
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
-import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
-import com.samco.trackandgraph.data.database.entity.Tracker
-import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
-import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder as EntitySuggestionOrder
-import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType as EntitySuggestionType
 import com.samco.trackandgraph.data.time.TimeProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,98 +38,40 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerHelperImplTest {
 
-    private val dao: TrackAndGraphDatabaseDao = mock()
+    private lateinit var fakeTrackerDao: FakeTrackerDao
     private lateinit var fakeGroupItemDao: FakeGroupItemDao
     private val dataPointUpdateHelper: DataPointUpdateHelper = mock()
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var uut: TrackerHelperImpl
 
-    private var nextFeatureId = 1L
-    private var nextTrackerId = 1L
-    private val features = mutableMapOf<Long, Feature>()
-    private val trackers = mutableMapOf<Long, Tracker>()
-
     @Before
     fun before() {
+        fakeTrackerDao = FakeTrackerDao()
         fakeGroupItemDao = FakeGroupItemDao()
-        nextFeatureId = 1L
-        nextTrackerId = 1L
-        features.clear()
-        trackers.clear()
 
-        val transactionHelper = object : DatabaseTransactionHelper {
+        val fakeTransactionHelper = object : DatabaseTransactionHelper {
             override suspend fun <R> withTransaction(block: suspend () -> R): R = block()
         }
 
-        val timeProvider = object : TimeProvider {
+        val fakeTimeProvider = object : TimeProvider {
             override fun now(): org.threeten.bp.ZonedDateTime = org.threeten.bp.ZonedDateTime.now()
             override fun epochMilli(): Long = 1000L
             override fun defaultZone(): org.threeten.bp.ZoneId =
                 org.threeten.bp.ZoneId.systemDefault()
         }
 
-        // Setup mock for insertFeature
-        whenever(dao.insertFeature(any())).thenAnswer {
-            val feature = it.arguments[0] as Feature
-            val id = nextFeatureId++
-            features[id] = feature.copy(id = id)
-            id
-        }
-
-        // Setup mock for insertTracker
-        whenever(dao.insertTracker(any())).thenAnswer {
-            val tracker = it.arguments[0] as Tracker
-            val id = nextTrackerId++
-            trackers[id] = tracker.copy(id = id)
-            id
-        }
-
-        // Setup mock for getTrackerById
-        whenever(dao.getTrackerById(any())).thenAnswer {
-            val trackerId = it.arguments[0] as Long
-            val tracker = trackers[trackerId] ?: return@thenAnswer null
-            val feature = features[tracker.featureId] ?: return@thenAnswer null
-            TrackerWithFeature(
-                id = tracker.id,
-                featureId = tracker.featureId,
-                name = feature.name,
-                description = feature.description,
-                dataType = tracker.dataType,
-                hasDefaultValue = tracker.hasDefaultValue,
-                defaultValue = tracker.defaultValue,
-                defaultLabel = tracker.defaultLabel,
-                suggestionType = tracker.suggestionType,
-                suggestionOrder = tracker.suggestionOrder
-            )
-        }
-
-        // Setup mock for deleteFeature (cascade delete)
-        whenever(dao.deleteFeature(any())).thenAnswer {
-            val featureId = it.arguments[0] as Long
-            features.remove(featureId)
-            trackers.entries.removeIf { entry -> entry.value.featureId == featureId }
-            Unit
-        }
-
-        // Setup mock for numTrackers
-        whenever(dao.numTrackers()).thenAnswer { trackers.size }
-
         uut = TrackerHelperImpl(
-            transactionHelper = transactionHelper,
-            dao = dao,
+            transactionHelper = fakeTransactionHelper,
+            dao = fakeTrackerDao,
             groupItemDao = fakeGroupItemDao,
             dataPointUpdateHelper = dataPointUpdateHelper,
-            timeProvider = timeProvider,
+            timeProvider = fakeTimeProvider,
             io = dispatcher
         )
     }
@@ -211,8 +148,8 @@ class TrackerHelperImplTest {
         // EXECUTE
         uut.deleteTracker(TrackerDeleteRequest(trackerId = 999L))
 
-        // VERIFY - no exception thrown, deleteFeature not called
-        verify(dao, never()).deleteFeature(any())
+        // VERIFY - no exception thrown, no features deleted
+        assertEquals(0, fakeTrackerDao.numTrackers())
     }
 
     // =========================================================================
@@ -258,7 +195,7 @@ class TrackerHelperImplTest {
             val remainingItems = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)
             assertEquals(1, remainingItems.size)
             assertEquals(group2, remainingItems[0].groupId)
-            verify(dao, never()).deleteFeature(any())
+            assertEquals(1, fakeTrackerDao.numTrackers())
         }
 
     @Test

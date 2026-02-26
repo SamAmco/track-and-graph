@@ -100,7 +100,7 @@ private const val getDisplayTrackersQuery = """
     """
 
 @Dao
-internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao {
+internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, TrackerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertGroup(group: Group): Long
 
@@ -185,7 +185,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao {
             ORDER BY gi.display_index ASC
         """
     )
-    fun getTrackersForGroupSync(groupId: Long): List<TrackerWithFeature>
+    override fun getTrackersForGroupSync(groupId: Long): List<TrackerWithFeature>
 
     @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
     fun getFeatureById(featureId: Long): Feature?
@@ -198,10 +198,10 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao {
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertFeature(feature: Feature): Long
+    override fun insertFeature(feature: Feature): Long
 
     @Update
-    fun updateFeature(feature: Feature)
+    override fun updateFeature(feature: Feature)
 
     @Delete
     fun deleteDataPoint(dataPoint: DataPoint)
@@ -225,19 +225,19 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao {
     fun insertDataPoints(dataPoint: List<DataPoint>)
 
     @Update
-    fun updateDataPoints(dataPoint: List<DataPoint>)
+    override fun updateDataPoints(dataPoint: List<DataPoint>)
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY epoch_milli DESC")
-    fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
+    override fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND epoch_milli = :epochMilli")
-    fun getDataPointByTimestampAndFeatureSync(featureId: Long, epochMilli: Long): DataPoint?
+    override fun getDataPointByTimestampAndFeatureSync(featureId: Long, epochMilli: Long): DataPoint?
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :featureId")
-    fun getDataPointCount(featureId: Long): Int
+    override fun getDataPointCount(featureId: Long): Int
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY epoch_milli DESC LIMIT :limit OFFSET :offset")
-    fun getDataPoints(featureId: Long, limit: Int, offset: Int): List<DataPoint>
+    override fun getDataPoints(featureId: Long, limit: Int, offset: Int): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY epoch_milli DESC")
     fun getDataPointsCursor(featureId: Long): Cursor
@@ -385,40 +385,40 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao {
     fun getRootGroupSync(): Group?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertFeatureTimer(featureTimer: FeatureTimer)
+    override fun insertFeatureTimer(featureTimer: FeatureTimer)
 
     @Query("DELETE FROM feature_timers_table WHERE feature_id=:featureId")
-    fun deleteFeatureTimer(featureId: Long)
+    override fun deleteFeatureTimer(featureId: Long)
 
     @Query("SELECT * FROM feature_timers_table WHERE feature_id=:featureId LIMIT 1")
-    fun getFeatureTimer(featureId: Long): FeatureTimer?
+    override fun getFeatureTimer(featureId: Long): FeatureTimer?
 
     @Query("$getDisplayTrackersQuery WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC")
-    fun getAllActiveTimerTrackers(): List<DisplayTracker>
+    override fun getAllActiveTimerTrackers(): List<DisplayTracker>
 
     @Query("$getDisplayTrackersQuery WHERE trackers_table.id IN (:ids)")
-    fun getDisplayTrackerByTrackerIdsSync(ids: Set<Long>): List<DisplayTracker>
+    override fun getDisplayTrackerByTrackerIdsSync(ids: Set<Long>): List<DisplayTracker>
 
     @Query("$getDisplayTrackersQuery WHERE trackers_table.feature_id=:featureId LIMIT 1")
-    fun getDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
+    override fun getDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
 
     @Query(getTrackersQuery)
-    fun getAllTrackersSync(): List<TrackerWithFeature>
+    override fun getAllTrackersSync(): List<TrackerWithFeature>
 
     @Query("$getTrackersQuery WHERE trackers_table.id = :trackerId LIMIT 1")
     override fun getTrackerById(trackerId: Long): TrackerWithFeature?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTracker(tracker: Tracker): Long
+    override fun insertTracker(tracker: Tracker): Long
 
     @Update
-    fun updateTracker(tracker: Tracker)
+    override fun updateTracker(tracker: Tracker)
 
     @Query("$getTrackersQuery WHERE feature_id = :featureId LIMIT 1")
-    fun getTrackerByFeatureId(featureId: Long): TrackerWithFeature?
+    override fun getTrackerByFeatureId(featureId: Long): TrackerWithFeature?
 
     @Query("SELECT COUNT(*) FROM trackers_table")
-    fun numTrackers(): Int
+    override fun numTrackers(): Int
 
     @Query(
         """
@@ -434,7 +434,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao {
     fun getLabelsForTracker(trackerId: Long): List<String>
 
     @Query(" SELECT EXISTS ( SELECT 1 FROM data_points_table LIMIT 1 ) ")
-    fun hasAtLeastOneDataPoint(): Boolean
+    override fun hasAtLeastOneDataPoint(): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertLuaGraph(luaGraph: LuaGraph): Long

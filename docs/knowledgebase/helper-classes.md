@@ -99,28 +99,43 @@ interface TrackAndGraphDatabaseDao : GroupDao, GraphDao, ReminderDao {
 
 This allows tests to use small fake implementations.
 
-## Testing Approach
+## Delete Pattern (Symlink Logic)
 
-Helpers are tested with fake DAOs:
+All delete operations follow the same pattern for multi-group membership. The request object carries an optional `groupId`:
+
+- **`groupId` provided AND component in multiple groups** → remove only that GroupItem (symlink); the component itself is preserved
+- **Otherwise** → delete all GroupItems then delete the component
 
 ```kotlin
-class GroupHelperImplTest {
-    private lateinit var fakeGroupDao: FakeGroupDao
-    private lateinit var fakeGroupItemDao: FakeGroupItemDao
+// Example from TrackerHelperImpl
+val groupItems = groupItemDao.getGroupItemsForChild(tracker.id, GroupItemType.TRACKER)
 
-    @Before
-    fun before() {
-        fakeGroupDao = FakeGroupDao()
-        fakeGroupItemDao = FakeGroupItemDao()
-
-        uut = GroupHelperImpl(
-            groupDao = fakeGroupDao,
-            groupItemDao = fakeGroupItemDao,
-            // ... other dependencies
-        )
-    }
+if (request.groupId != null && groupItems.size > 1) {
+    groupItems.filter { it.groupId == request.groupId }
+              .forEach { groupItemDao.deleteGroupItem(it.id) }
+    return@withTransaction
 }
+
+groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
+dao.deleteFeature(tracker.featureId)
 ```
+
+This pattern is used consistently by `TrackerHelper`, `GraphHelper`, and `ReminderHelper`. For **reminders**, `null` groupId always deletes everywhere (the Reminders screen never passes a groupId).
+
+## Testing Approach
+
+**Always use fake implementations, never mocks.** The project avoids Mockito/mocking frameworks because the codebase may eventually migrate to Kotlin Multiplatform (KMP), which is incompatible with Android-specific mocking tools.
+
+The pattern: define a small `*Dao` interface for each helper (as shown in "Specialized DAOs" above), then create a `Fake*Dao` in `testFixtures` that implements it in-memory.
+
+| Helper | Test approach |
+|--------|---------------|
+| GroupHelperImpl | `FakeGroupDao` + `FakeGroupItemDao` |
+| GraphHelperImpl | `FakeGraphDao` + `FakeGroupItemDao` |
+| ReminderHelperImpl | `FakeReminderDao` + `FakeGroupItemDao` |
+| TrackerHelperImpl | Should use `FakeTrackerDao` + `FakeGroupItemDao` (not Mockito) |
+
+If a helper currently depends on the large `TrackAndGraphDatabaseDao` directly, the fix is to extract a focused `TrackerDao` interface (following the same pattern as `GroupDao`, `GraphDao`, `ReminderDao`) and create a `FakeTrackerDao` in testFixtures.
 
 Fake DAOs are in `app/data/src/testFixtures/kotlin/com/samco/trackandgraph/`.
 

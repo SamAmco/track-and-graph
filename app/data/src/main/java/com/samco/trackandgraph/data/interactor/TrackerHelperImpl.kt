@@ -19,7 +19,7 @@ package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.GroupItemDao
-import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.database.TrackerDao
 import com.samco.trackandgraph.data.database.dto.*
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
@@ -37,7 +37,7 @@ import com.samco.trackandgraph.data.database.entity.DataPoint as DataPointEntity
 
 internal class TrackerHelperImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
-    private val dao: TrackAndGraphDatabaseDao,
+    private val dao: TrackerDao,
     private val groupItemDao: GroupItemDao,
     private val dataPointUpdateHelper: DataPointUpdateHelper,
     private val timeProvider: TimeProvider,

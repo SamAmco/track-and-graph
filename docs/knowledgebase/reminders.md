@@ -108,8 +108,19 @@ groupItemDao.getGroupItemsWithNoGroup()
     .filter { it.type == GroupItemType.REMINDER }
 ```
 
+## Scheduling Architecture
+
+The reminder scheduler deliberately isolates Android platform code behind an interface — this is an intentional KMP-compatibility pattern (see [architecture.md](architecture.md)):
+
+- **`PlatformScheduler`** — pure Kotlin interface: `set(triggerAtMillis, params)`, `cancel(params)`, `getNextScheduledMillis(params)`
+- **`AndroidPlatformScheduler`** — Android implementation using `AlarmManager`; lives in `androidplatform/` subpackage
+- **`ReminderScheduler` / `*ReminderScheduler`** — pure Kotlin scheduling logic, depend only on `PlatformScheduler`
+- **`FakePlatformScheduler`** — used in tests instead of mocking
+
 ## Key Files
 
 - `ReminderHelperImpl.kt` - CRUD operations
 - `ReminderDao.kt` - Database interface
 - `ReminderSerializer.kt` - JSON serialization for params
+- `PlatformScheduler.kt` - Platform abstraction interface
+- `androidplatform/AndroidPlatformScheduler.kt` - Android implementation

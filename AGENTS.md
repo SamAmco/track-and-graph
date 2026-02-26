@@ -7,6 +7,11 @@ Android app for personal data tracking and custom graph visualization.
 ```
 app/
 ├── app/                        # UI layer (Compose, ViewModels, navigation)
+│   └── src/main/.../
+│       ├── adddatapoint/       # Each top-level package = a future feature module
+│       ├── reminders/          # (see architecture.md for full list)
+│       ├── di/                 # Hilt wiring (stays in :app shell)
+│       └── ...
 └── data/                       # Data layer (Room, DTOs, business logic)
     └── src/
         ├── main/.../database/       # Entities, DAOs, Room database
