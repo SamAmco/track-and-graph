@@ -207,7 +207,6 @@ private fun ReminderPreview() = TnGComposeTheme {
         Reminder(
             reminderViewData = ReminderViewData.WeekDayReminderViewData(
                 id = 1L,
-                displayIndex = 0,
                 name = "Morning Workout",
                 nextScheduled = LocalDateTime.of(2025, 12, 16, 7, 30),
                 checkedDays = CheckedDays(
@@ -227,7 +226,6 @@ private fun ReminderPreview() = TnGComposeTheme {
         Reminder(
             reminderViewData = ReminderViewData.WeekDayReminderViewData(
                 id = 2L,
-                displayIndex = 1,
                 name = "Evening Meditation",
                 nextScheduled = LocalDateTime.of(2025, 12, 16, 21, 0),
                 checkedDays = CheckedDays.all(),
@@ -239,7 +237,6 @@ private fun ReminderPreview() = TnGComposeTheme {
         Reminder(
             reminderViewData = ReminderViewData.WeekDayReminderViewData(
                 id = 2L,
-                displayIndex = 1,
                 name = "Evening Meditation",
                 nextScheduled = null,
                 checkedDays = CheckedDays.none(),
@@ -251,7 +248,6 @@ private fun ReminderPreview() = TnGComposeTheme {
         Reminder(
             reminderViewData = ReminderViewData.PeriodicReminderViewData(
                 id = 3L,
-                displayIndex = 2,
                 name = "Daily Exercise",
                 nextScheduled = LocalDateTime.of(2025, 12, 17, 14, 30),
                 starts = LocalDateTime.of(2025, 12, 1, 14, 30),
@@ -268,7 +264,6 @@ private fun ReminderPreview() = TnGComposeTheme {
         Reminder(
             reminderViewData = ReminderViewData.PeriodicReminderViewData(
                 id = 4L,
-                displayIndex = 3,
                 name = "Weekly Review",
                 nextScheduled = LocalDateTime.of(2025, 12, 30, 9, 0),
                 starts = LocalDateTime.of(2025, 12, 30, 9, 0),
@@ -285,7 +280,6 @@ private fun ReminderPreview() = TnGComposeTheme {
         Reminder(
             reminderViewData = ReminderViewData.PeriodicReminderViewData(
                 id = 5L,
-                displayIndex = 4,
                 name = "Monthly Goals",
                 nextScheduled = null,
                 starts = LocalDateTime.of(2025, 6, 1, 10, 0),
@@ -301,7 +295,6 @@ private fun ReminderPreview() = TnGComposeTheme {
         Reminder(
             reminderViewData = ReminderViewData.MonthDayReminderViewData(
                 id = 4L,
-                displayIndex = 5,
                 name = "Monthly Reminder",
                 nextScheduled = LocalDateTime.of(2025, 6, 1, 10, 0),
                 occurrence = MonthDayOccurrence.LAST,

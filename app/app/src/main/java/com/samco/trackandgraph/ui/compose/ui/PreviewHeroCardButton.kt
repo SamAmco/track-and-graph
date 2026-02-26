@@ -154,13 +154,11 @@ private fun PreviewCardButtonPreviewHero() {
                         id = 1L,
                         featureId = 1L,
                         name = "Tracker",
-                        groupId = 1L,
                         dataType = DataType.CONTINUOUS,
                         hasDefaultValue = false,
                         defaultValue = 0.0,
                         defaultLabel = "",
                         timestamp = null,
-                        displayIndex = 0,
                         description = "",
                         timerStartInstant = null
                     ),

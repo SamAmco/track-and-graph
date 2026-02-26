@@ -100,7 +100,6 @@ internal class FunctionGraphDecoderTest {
         val functionWithInvalidFeature = Function(
             id = 1L,
             name = "Test Function",
-            groupIds = setOf(1L),
             description = "Test Description",
             functionGraph = FunctionGraph(
                 nodes = listOf(
@@ -214,7 +213,6 @@ internal class FunctionGraphDecoderTest {
         return Function(
             id = 1L,
             name = "Test Function",
-            groupIds = setOf(1L),
             description = "Test Description",
             functionGraph = FunctionGraph(
                 nodes = listOf(

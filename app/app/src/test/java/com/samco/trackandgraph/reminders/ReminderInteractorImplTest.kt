@@ -71,7 +71,6 @@ internal class ReminderInteractorImplTest {
         )
         val reminder2 = reminderFixture.copy(
             id = 2L,
-            displayIndex = 1,
             reminderName = "Evening Reminder",
             params = ReminderParams.WeekDayParams(
                 time = LocalTime.of(20, 0),
@@ -127,7 +126,6 @@ internal class ReminderInteractorImplTest {
                 ),
                 reminderFixture.copy(
                     id = 456L,
-                    displayIndex = 1,
                     reminderName = "Evening Meditation",
                     params = ReminderParams.WeekDayParams(
                         time = LocalTime.of(19, 30),
@@ -379,7 +377,6 @@ internal class ReminderInteractorImplTest {
             ),
             reminderFixture.copy(
                 id = 21L,
-                displayIndex = 1,
                 reminderName = "Clear Me 2",
                 params = ReminderParams.WeekDayParams(
                     time = LocalTime.of(19, 0),
@@ -424,7 +421,6 @@ internal class ReminderInteractorImplTest {
             ),
             reminderFixture.copy(
                 id = 21L,
-                displayIndex = 1,
                 reminderName = "Clear Me 2",
                 params = ReminderParams.WeekDayParams(
                     time = LocalTime.of(19, 0),

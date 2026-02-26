@@ -52,17 +52,13 @@ class PieChartDataFactoryTest {
 
     private val graphOrStat = GraphOrStat(
         id = 1L,
-        groupIds = setOf(1),
         name = "name",
         type = GraphStatType.PIE_CHART,
-        displayIndex = 1
     )
 
     private val feature = object : Feature {
         override val featureId: Long = this@PieChartDataFactoryTest.featureId
         override val name: String = "feature"
-        override val groupIds: Set<Long> = setOf(1)
-        override val displayIndex: Int = 1
         override val description: String = "description"
     }
 

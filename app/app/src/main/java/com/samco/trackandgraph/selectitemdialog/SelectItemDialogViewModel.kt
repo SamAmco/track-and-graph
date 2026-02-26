@@ -123,7 +123,8 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             buildGraphNodeTree(
                 groupGraph = dataInteractor.getGroupGraphSync(rootGroupId = null),
                 selectableTypes = it.selectableTypes,
-                hiddenItems = it.hiddenItems
+                hiddenItems = it.hiddenItems,
+                isRoot = true
             )
         }
         .flowOn(io)
@@ -190,7 +191,8 @@ class SelectItemDialogViewModelImpl @Inject constructor(
     private fun buildGraphNodeTree(
         groupGraph: ModelGroupGraph,
         selectableTypes: Set<SelectableItemType>,
-        hiddenItems: Set<HiddenItem>
+        hiddenItems: Set<HiddenItem>,
+        isRoot: Boolean = false,
     ): GraphNode? {
         // If the group is hidden, skip its entire subgraph
         if (HiddenItem(SelectableItemType.GROUP, groupGraph.group.id) in hiddenItems) {
@@ -248,11 +250,11 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         }
 
         val group = GraphNode.Group(
-            isRoot = groupGraph.group.parentGroupIds.isEmpty(),
+            isRoot = isRoot,
             id = groupGraph.group.id,
-            name = if (groupGraph.group.parentGroupIds.isEmpty()) "/" else groupGraph.group.name,
+            name = if (isRoot) "/" else groupGraph.group.name,
             colorIndex = groupGraph.group.colorIndex,
-            expanded = mutableStateOf(groupGraph.group.parentGroupIds.isEmpty()),
+            expanded = mutableStateOf(isRoot),
             children = children.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }),
         )
 

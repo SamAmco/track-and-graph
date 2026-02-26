@@ -401,7 +401,6 @@ fun TrackerPreview() {
             Tracker(
                 tracker = DisplayTracker(
                     id = 4,
-                    groupId = 1,
                     name = "Water Intake",
                     description = "",
                     dataType = DataType.CONTINUOUS,
@@ -410,7 +409,6 @@ fun TrackerPreview() {
                     defaultLabel = "Glass",
                     featureId = 4,
                     timestamp = null,
-                    displayIndex = 3,
                     timerStartInstant = null
                 ),
                 onEdit = {},
@@ -427,7 +425,6 @@ fun TrackerPreview() {
             Tracker(
                 tracker = DisplayTracker(
                     id = 1,
-                    groupId = 1,
                     name = "Daily Exercise",
                     description = "",
                     dataType = DataType.CONTINUOUS,
@@ -436,7 +433,6 @@ fun TrackerPreview() {
                     defaultLabel = "",
                     featureId = 1,
                     timestamp = OffsetDateTime.parse("2024-01-15T10:30:00+01:00"),
-                    displayIndex = 0,
                     timerStartInstant = null
                 ),
                 onEdit = {},
@@ -453,7 +449,6 @@ fun TrackerPreview() {
             Tracker(
                 tracker = DisplayTracker(
                     id = 2,
-                    groupId = 1,
                     name = "Work Session",
                     description = "",
                     dataType = DataType.DURATION,
@@ -462,7 +457,6 @@ fun TrackerPreview() {
                     defaultLabel = "",
                     featureId = 2,
                     timestamp = null,
-                    displayIndex = 1,
                     timerStartInstant = Instant.parse("2025-07-15T10:30:00.00Z").minusSeconds(125)
                 ),
                 onEdit = {},
@@ -479,7 +473,6 @@ fun TrackerPreview() {
             Tracker(
                 tracker = DisplayTracker(
                     id = 3,
-                    groupId = 1,
                     name = "Sleep Tracking",
                     description = "",
                     dataType = DataType.DURATION,
@@ -488,7 +481,6 @@ fun TrackerPreview() {
                     defaultLabel = "",
                     featureId = 3,
                     timestamp = OffsetDateTime.parse("2024-01-15T02:30:00+01:00"),
-                    displayIndex = 2,
                     timerStartInstant = null
                 ),
                 onEdit = {},

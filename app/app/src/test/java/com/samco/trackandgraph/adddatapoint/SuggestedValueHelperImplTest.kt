@@ -53,9 +53,7 @@ class SuggestedValueHelperImplTest {
     private val testTracker = Tracker(
         id = 1,
         name = "test",
-        groupIds = setOf(1),
         featureId = 1,
-        displayIndex = 1,
         description = "test",
         dataType = DataType.CONTINUOUS,
         hasDefaultValue = true,

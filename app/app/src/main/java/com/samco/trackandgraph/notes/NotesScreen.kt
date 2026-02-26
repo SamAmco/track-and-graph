@@ -286,7 +286,6 @@ private fun NotesViewPreview() {
             featurePath = "",
             featureId = null,
             featureName = null,
-            groupId = null,
             trackerId = null,
         ),
         NoteInfo(
@@ -296,7 +295,6 @@ private fun NotesViewPreview() {
             trackerId = 1,
             featureId = 2,
             featureName = "Systolic",
-            groupId = 1,
         ),
         NoteInfo(
             date = OffsetDateTime.parse("2023-01-02T18:45:00Z"),
@@ -305,7 +303,6 @@ private fun NotesViewPreview() {
             trackerId = 2,
             featureId = null,
             featureName = null,
-            groupId = null,
         ),
     )
 

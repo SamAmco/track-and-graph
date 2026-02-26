@@ -101,7 +101,6 @@ fun MonthDayReminderDetailsPreview() {
         MonthDayReminderDetails(
             reminderViewData = ReminderViewData.MonthDayReminderViewData(
                 id = 1L,
-                displayIndex = 0,
                 name = "Monthly Report",
                 nextScheduled = LocalDateTime.of(2025, 1, 6, 9, 0),
                 occurrence = MonthDayOccurrence.FIRST,
