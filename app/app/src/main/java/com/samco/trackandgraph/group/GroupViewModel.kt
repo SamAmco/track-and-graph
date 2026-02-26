@@ -299,7 +299,7 @@ class GroupViewModelImpl @Inject constructor(
         .getGraphsAndStatsByGroupIdSync(groupId)
 
     private fun graphsToGroupChildren(graphs: List<GraphWithViewData>) = graphs
-        .map { GroupChild.ChildGraph(it.graph.id, it.graph.displayIndex, it.viewData) }
+        .map { GroupChild.ChildGraph(it.graph.id, 0 /*TODO: displayIndex removed*/, it.viewData) }
 
     private fun mapNewGraphsToOldViewData(
         viewData: List<GraphWithViewData>,
@@ -489,13 +489,13 @@ class GroupViewModelImpl @Inject constructor(
 
     private suspend fun getTrackerChildren(groupId: Long): List<GroupChild> {
         return dataInteractor.getDisplayTrackersForGroupSync(groupId).map {
-            GroupChild.ChildTracker(it.id, it.displayIndex, it)
+            GroupChild.ChildTracker(it.id, 0 /*TODO: displayIndex removed*/, it)
         }
     }
 
     private suspend fun getGroupChildren(groupId: Long): List<GroupChild> {
         return dataInteractor.getGroupsForGroupSync(groupId).map {
-            GroupChild.ChildGroup(it.id, it.displayIndex, it)
+            GroupChild.ChildGroup(it.id, 0 /*TODO: displayIndex removed*/, it)
         }
     }
 
@@ -508,7 +508,7 @@ class GroupViewModelImpl @Inject constructor(
                 name = function.name,
                 description = function.description
             )
-            GroupChild.ChildFunction(function.id, function.displayIndex, displayFunction)
+            GroupChild.ChildFunction(function.id, 0 /*TODO: displayIndex removed*/, displayFunction)
         }
     }
 
