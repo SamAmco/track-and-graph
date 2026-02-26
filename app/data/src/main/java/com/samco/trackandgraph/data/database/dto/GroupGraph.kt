@@ -5,6 +5,7 @@ data class GroupGraph(
     val children: List<GroupGraphItem>,
 )
 
+
 sealed class GroupGraphItem {
     interface FeatureNode
 

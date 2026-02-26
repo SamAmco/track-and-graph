@@ -256,10 +256,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                 _showFirstTimeUserDialog.value = !dataInteractor.hasAnyFunctions()
             }
 
-            val allFeatures = dataInteractor.getAllFeaturesSync()
-            val allGroups = dataInteractor.getAllGroupsSync()
-            val pathProvider = FeaturePathProvider(allFeatures, allGroups)
-            featurePathMap = pathProvider.sortedFeatureMap()
+            featurePathMap = FeaturePathProvider(dataInteractor.getGroupGraphSync()).sortedFeatureMap()
 
             val existing = existingFunction
             if (existing != null) {

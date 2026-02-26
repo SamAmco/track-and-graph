@@ -16,21 +16,13 @@
  */
 package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.data.database.dto.Feature
-import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.sampling.DataSampleProperties
 
 class FeatureDataProvider(
-    private val dataSourceData: List<DataSourceData>,
-    groups: List<Group>,
-) : FeaturePathProvider(dataSourceData.map { it.feature }, groups) {
+    groupGraph: GroupGraph,
+    private val dataSamplePropertiesMap: Map<Long, DataSampleProperties?>,
+) : FeaturePathProvider(groupGraph) {
 
-    fun getDataSampleProperties(featureId: Long) = dataSourceData
-        .firstOrNull { it.feature.featureId == featureId }
-        ?.dataProperties
-
-    data class DataSourceData(
-        val feature: Feature,
-        val dataProperties: DataSampleProperties?
-    )
+    fun getDataSampleProperties(featureId: Long) = dataSamplePropertiesMap[featureId]
 }

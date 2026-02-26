@@ -67,9 +67,7 @@ class NotesViewModel @Inject constructor(
         .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     private val featureNameProvider = flow {
-        val trackers = dataInteractor.getAllTrackersSync()
-        val groups = dataInteractor.getAllGroupsSync()
-        emit(FeaturePathProvider(trackers, groups))
+        emit(FeaturePathProvider(dataInteractor.getGroupGraphSync()))
     }.flowOn(io)
 
     val dateScrollData: LiveData<DateScrollData<NoteInfo>> = notesFlow

@@ -101,10 +101,7 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
     init {
         // Initialize feature path map
         viewModelScope.launch {
-            val allFeatures = dataInteractor.getAllFeaturesSync()
-            val allGroups = dataInteractor.getAllGroupsSync()
-            val pathProvider = FeaturePathProvider(allFeatures, allGroups)
-            featurePathMap.value = pathProvider.sortedFeatureMap()
+            featurePathMap.value = FeaturePathProvider(dataInteractor.getGroupGraphSync()).sortedFeatureMap()
         }
     }
 

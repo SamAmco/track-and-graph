@@ -20,7 +20,6 @@ package com.samco.trackandgraph.viewgraphstat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -28,6 +27,7 @@ import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.helpers.getDisplayValue
 import com.samco.trackandgraph.util.FeatureDataProvider
+import com.samco.trackandgraph.util.allFeatureIds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -119,22 +119,14 @@ class ViewGraphStatViewModelImpl @Inject constructor(
     private val featureDataProvider = graphStatId
         .filterNotNull()
         .map {
-            val allGroups = dataInteractor.getAllGroupsSync()
-            val dataSourceData = getDataSourceData(dataInteractor.getAllFeaturesSync())
-            FeatureDataProvider(dataSourceData, allGroups)
+            val groupGraph = dataInteractor.getGroupGraphSync()
+            val dataSamplePropertiesMap = groupGraph.allFeatureIds().associate { featureId ->
+                featureId to dataSampler.getDataSamplePropertiesForFeatureId(featureId)
+            }
+            FeatureDataProvider(groupGraph, dataSamplePropertiesMap)
         }
         .flowOn(io)
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
-
-    private suspend fun getDataSourceData(allFeatures: List<Feature>): List<FeatureDataProvider.DataSourceData> {
-        return allFeatures.map { feature ->
-            FeatureDataProvider.DataSourceData(
-                feature,
-                dataSampler.getDataSamplePropertiesForFeatureId(feature.featureId)
-                    ?: return@map null
-            )
-        }.filterNotNull()
-    }
 
     private val globalNotes = graphStatId
         .filterNotNull()

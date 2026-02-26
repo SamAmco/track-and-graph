@@ -18,49 +18,153 @@
 package com.samco.trackandgraph.util
 
 import com.samco.trackandgraph.data.database.dto.Feature
-import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupGraph
+import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 
-open class FeaturePathProvider(
-    features: List<Feature>,
-    groups: List<Group>,
-) : GroupPathProvider(groups) {
-
-    private val groupsById: Map<Long, Group> = groups.associateBy { it.id }
-
-    private val featureGroupMap: Map<Feature, List<Group>> = features.mapNotNull { feature ->
-        val featureGroups = feature.groupIds.mapNotNull { groupId ->
-            groupsById[groupId]
+fun GroupGraph.allFeatureIds(): List<Long> {
+    val result = mutableListOf<Long>()
+    fun walk(graph: GroupGraph) {
+        for (child in graph.children) {
+            when (child) {
+                is GroupGraphItem.GroupNode -> walk(child.groupGraph)
+                is GroupGraphItem.TrackerNode -> result.add(child.tracker.featureId)
+                is GroupGraphItem.FunctionNode -> result.add(child.function.featureId)
+                is GroupGraphItem.GraphNode -> Unit
+            }
         }
-        if (featureGroups.isEmpty()) return@mapNotNull null
-        feature to featureGroups
-    }.toMap()
+    }
+    walk(this)
+    return result
+}
 
-    val features get() = featureGroupMap.keys
+open class FeaturePathProvider(groupGraph: GroupGraph) {
 
-    fun featureName(featureId: Long) = featureGroupMap.keys
-        .firstOrNull { it.featureId == featureId }?.name
+    private val separator = "/"
 
-    fun getPathForFeature(featureId: Long): String {
-        val feature = featureGroupMap.keys.firstOrNull { it.featureId == featureId } ?: return ""
-        val featureGroups = featureGroupMap[feature] ?: return ""
+    /**
+     * For each group ID, all paths from root to that group.
+     * A group appearing under multiple parents in the tree will have multiple paths.
+     */
+    private val groupPathsById: Map<Long, List<List<String>>>
 
-        val allPaths = featureGroups.flatMap { group ->
-            getAllPathSegmentsForGroup(group.id).map { pathSegments ->
-                pathSegments + feature.name
+    /**
+     * For each feature ID, all paths from root to that feature (including the feature name).
+     */
+    private val featurePathsById: Map<Long, List<List<String>>>
+    private val featureNames: Map<Long, String>
+
+    val features: Set<Feature>
+
+    init {
+        val groupPaths = mutableMapOf<Long, MutableList<List<String>>>()
+        val featurePaths = mutableMapOf<Long, MutableList<List<String>>>()
+        val namesById = mutableMapOf<Long, String>()
+        val featuresSet = mutableSetOf<Feature>()
+
+        fun walk(graph: GroupGraph, currentPath: List<String>) {
+            for (child in graph.children) {
+                when (child) {
+                    is GroupGraphItem.GroupNode -> {
+                        val childGroup = child.groupGraph.group
+                        val childPath = currentPath + childGroup.name
+                        groupPaths.getOrPut(childGroup.id) { mutableListOf() }.add(childPath)
+                        walk(child.groupGraph, childPath)
+                    }
+                    is GroupGraphItem.TrackerNode -> {
+                        val f = child.tracker
+                        featuresSet.add(f)
+                        namesById[f.featureId] = f.name
+                        featurePaths.getOrPut(f.featureId) { mutableListOf() }
+                            .add(currentPath + f.name)
+                    }
+                    is GroupGraphItem.FunctionNode -> {
+                        val f = child.function
+                        featuresSet.add(f)
+                        namesById[f.featureId] = f.name
+                        featurePaths.getOrPut(f.featureId) { mutableListOf() }
+                            .add(currentPath + f.name)
+                    }
+                    is GroupGraphItem.GraphNode -> Unit
+                }
             }
         }
 
-        if (allPaths.size == 1) {
-            return allPaths.first().joinToString(separator, prefix = separator)
-        }
+        // Root group has empty path
+        groupPaths[groupGraph.group.id] = mutableListOf(emptyList())
+        walk(groupGraph, emptyList())
 
-        return computeCollapsedPath(allPaths)
+        groupPathsById = groupPaths
+        featurePathsById = featurePaths
+        featureNames = namesById
+        features = featuresSet
     }
 
-    private fun sortedPaths(): List<Pair<Feature, String>> = featureGroupMap.keys
-        .map { it to getPathForFeature(it.featureId) }
-        .sortedBy { it.second }
+    private val groupPathCache = mutableMapOf<Long, String>()
+    private val featurePathCache = mutableMapOf<Long, String>()
 
-    fun sortedFeatureMap(): Map<Long, String> = sortedPaths()
-        .associate { it.first.featureId to it.second }
+    fun featureName(featureId: Long) = featureNames[featureId]
+
+    fun getPathForGroup(id: Long): String = groupPathCache.getOrPut(id) {
+        val allPaths = groupPathsById[id] ?: return@getOrPut separator
+        val nonEmpty = allPaths.filter { it.isNotEmpty() }
+        if (nonEmpty.isEmpty()) return@getOrPut separator
+        if (nonEmpty.size == 1) return@getOrPut separator + nonEmpty.first().joinToString(separator)
+        collapsePaths(nonEmpty)
+    }
+
+    fun getPathForFeature(featureId: Long): String = featurePathCache.getOrPut(featureId) {
+        val allPaths = featurePathsById[featureId] ?: return@getOrPut ""
+        if (allPaths.size == 1) return@getOrPut separator + allPaths.first().joinToString(separator)
+        collapsePaths(allPaths)
+    }
+
+    fun sortedFeatureMap(): Map<Long, String> {
+        return featurePathsById.keys
+            .associateWith { getPathForFeature(it) }
+            .entries
+            .sortedBy { it.value }
+            .associate { it.key to it.value }
+    }
+
+    private fun collapsePaths(paths: List<List<String>>): String {
+        if (paths.isEmpty()) return ""
+        if (paths.size == 1) return separator + paths.first().joinToString(separator)
+        if (paths.all { it == paths.first() }) {
+            return separator + paths.first().joinToString(separator)
+        }
+
+        val prefix = findLongestCommonPrefix(paths)
+        val suffix = findLongestCommonSuffix(paths)
+        val suffixStr = separator + suffix.joinToString(separator)
+
+        return if (prefix.isEmpty()) {
+            "...$suffixStr"
+        } else {
+            separator + prefix.joinToString(separator) + separator + "..." + suffixStr
+        }
+    }
+
+    private fun findLongestCommonPrefix(paths: List<List<String>>): List<String> {
+        if (paths.isEmpty()) return emptyList()
+        val minLength = paths.minOf { it.size }
+        val result = mutableListOf<String>()
+        for (i in 0 until minLength) {
+            val segment = paths.first()[i]
+            if (paths.all { it[i] == segment }) result.add(segment)
+            else break
+        }
+        return result
+    }
+
+    private fun findLongestCommonSuffix(paths: List<List<String>>): List<String> {
+        if (paths.isEmpty()) return emptyList()
+        val minLength = paths.minOf { it.size }
+        val result = mutableListOf<String>()
+        for (i in 1..minLength) {
+            val segment = paths.first()[paths.first().size - i]
+            if (paths.all { it[it.size - i] == segment }) result.add(0, segment)
+            else break
+        }
+        return result
+    }
 }

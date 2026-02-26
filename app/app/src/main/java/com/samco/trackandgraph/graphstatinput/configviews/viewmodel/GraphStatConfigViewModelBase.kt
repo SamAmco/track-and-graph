@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.util.FeatureDataProvider
+import com.samco.trackandgraph.util.allFeatureIds
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -69,21 +70,16 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     }
 
     private suspend fun loadFeaturePathProvider() {
-        val allFeatures = dataInteractor.getAllFeaturesSync().map {
-            val dataSampleProperties = try {
-                dataSampler.getDataSamplePropertiesForFeatureId(it.featureId)
+        val groupGraph = dataInteractor.getGroupGraphSync()
+        val dataSamplePropertiesMap = groupGraph.allFeatureIds().associate { featureId ->
+            featureId to try {
+                dataSampler.getDataSamplePropertiesForFeatureId(featureId)
             } catch (e: Throwable) {
                 Timber.e(e)
                 null
             }
-
-            FeatureDataProvider.DataSourceData(it, dataSampleProperties)
         }
-        val allGroups = dataInteractor.getAllGroupsSync()
-        featurePathProvider = FeatureDataProvider(
-            allFeatures,
-            allGroups
-        )
+        featurePathProvider = FeatureDataProvider(groupGraph, dataSamplePropertiesMap)
     }
 
     private suspend fun loadGraphStat(graphStatId: Long) {
