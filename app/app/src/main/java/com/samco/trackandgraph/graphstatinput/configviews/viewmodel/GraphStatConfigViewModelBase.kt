@@ -22,7 +22,8 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.util.FeatureDataProvider
+import com.samco.trackandgraph.data.sampling.DataSampleProperties
+import com.samco.trackandgraph.util.FeaturePathProvider
 import com.samco.trackandgraph.util.allFeatureIds
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -46,8 +47,10 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     private var initialized = false
     private var graphStatId: Long? = null
 
-    //This will be available after onDataLoaded is called
-    protected lateinit var featurePathProvider: FeatureDataProvider
+    //These will be available after onDataLoaded is called
+    protected lateinit var featurePathProvider: FeaturePathProvider
+        private set
+    protected lateinit var dataSamplePropertiesMap: Map<Long, DataSampleProperties?>
         private set
 
     /**
@@ -63,23 +66,24 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
 
         initJob = viewModelScope.launch(io) {
             configFlow.emit(GraphStatConfigEvent.Loading)
-            loadFeaturePathProvider()
+            loadFeatureData()
             graphStatId?.let { loadGraphStat(it) } ?: withContext(ui) { onDataLoaded(null) }
         }
         viewModelScope.launch(ui) { onUpdate() }
     }
 
-    private suspend fun loadFeaturePathProvider() {
+    private suspend fun loadFeatureData() {
         val groupGraph = dataInteractor.getGroupGraphSync()
-        val dataSamplePropertiesMap = groupGraph.allFeatureIds().associate { featureId ->
-            featureId to try {
-                dataSampler.getDataSamplePropertiesForFeatureId(featureId)
+        val dataSamplePropertiesMap = groupGraph.allFeatureIds().associateWith {
+            try {
+                dataSampler.getDataSamplePropertiesForFeatureId(it)
             } catch (e: Throwable) {
                 Timber.e(e)
                 null
             }
         }
-        featurePathProvider = FeatureDataProvider(groupGraph, dataSamplePropertiesMap)
+        this.featurePathProvider = FeaturePathProvider(groupGraph)
+        this.dataSamplePropertiesMap = dataSamplePropertiesMap
     }
 
     private suspend fun loadGraphStat(graphStatId: Long) {

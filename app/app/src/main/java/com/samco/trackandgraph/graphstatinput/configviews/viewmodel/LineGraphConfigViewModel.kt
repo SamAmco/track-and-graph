@@ -129,7 +129,7 @@ class LineGraphConfigViewModel @Inject constructor(
 
     val lineGraphFeatureUiDataList by derivedStateOf {
         lineGraphFeatures.mapIndexed { index, feature ->
-            val isDuration = featurePathProvider.getDataSampleProperties(feature.featureId)?.isDuration == true
+            val isDuration = dataSamplePropertiesMap[feature.featureId]?.isDuration == true
             val textFields = featureTextFields.getOrNull(index)
             LineGraphFeatureUiData(
                 nameTextField = textFields?.name ?: TextFieldValue(),
@@ -214,7 +214,7 @@ class LineGraphConfigViewModel @Inject constructor(
         val firstFeature = featurePathProvider.features.firstOrNull()
         val featureName = firstFeature?.name ?: ""
         val isDuration = firstFeature?.featureId?.let {
-            featurePathProvider.getDataSampleProperties(it)?.isDuration
+            dataSamplePropertiesMap[it]?.isDuration
         } == true
         val durationPlottingMode =
             if (isDuration) DurationPlottingMode.DURATION_IF_POSSIBLE
@@ -331,7 +331,7 @@ class LineGraphConfigViewModel @Inject constructor(
     }
 
     fun onSelectFeature(index: Int, featureId: Long) {
-        val isDuration = featurePathProvider.getDataSampleProperties(featureId)?.isDuration == true
+        val isDuration = dataSamplePropertiesMap[featureId]?.isDuration == true
         val defaultDurationMode = if (isDuration) DurationPlottingMode.DURATION_IF_POSSIBLE else DurationPlottingMode.NONE
         val newFeatureName = featurePathProvider.featureName(featureId) ?: ""
         val oldFeatureName = featurePathProvider.featureName(lineGraphFeatures[index].featureId) ?: ""

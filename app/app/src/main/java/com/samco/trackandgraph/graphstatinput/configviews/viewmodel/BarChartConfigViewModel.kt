@@ -80,7 +80,7 @@ class BarChartConfigViewModel @Inject constructor(
 
     private val isTimeBasedRange = snapshotFlow { singleFeatureConfigBehaviour.featureId }
         .filterNotNull()
-        .map { featurePathProvider.getDataSampleProperties(it)?.isDuration == true }
+        .map { dataSamplePropertiesMap[it]?.isDuration == true }
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     var selectedBarPeriod: BarChartBarPeriod by mutableStateOf(BarChartBarPeriod.WEEK)

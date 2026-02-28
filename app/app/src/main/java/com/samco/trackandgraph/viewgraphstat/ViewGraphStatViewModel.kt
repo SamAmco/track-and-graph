@@ -26,7 +26,8 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.helpers.getDisplayValue
-import com.samco.trackandgraph.util.FeatureDataProvider
+import com.samco.trackandgraph.data.sampling.DataSampleProperties
+import com.samco.trackandgraph.util.FeaturePathProvider
 import com.samco.trackandgraph.util.allFeatureIds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -116,14 +117,18 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         .map { it.dataPoints }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
+    private data class FeatureData(
+        val pathProvider: FeaturePathProvider,
+        val dataSamplePropertiesMap: Map<Long, DataSampleProperties?>
+    )
+
     private val featureDataProvider = graphStatId
         .filterNotNull()
         .map {
             val groupGraph = dataInteractor.getGroupGraphSync()
-            val dataSamplePropertiesMap = groupGraph.allFeatureIds().associate { featureId ->
-                featureId to dataSampler.getDataSamplePropertiesForFeatureId(featureId)
-            }
-            FeatureDataProvider(groupGraph, dataSamplePropertiesMap)
+            val dataSamplePropertiesMap = groupGraph.allFeatureIds()
+                .associateWith { dataSampler.getDataSamplePropertiesForFeatureId(it) }
+            FeatureData(FeaturePathProvider(groupGraph), dataSamplePropertiesMap)
         }
         .flowOn(io)
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
@@ -135,14 +140,14 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     private val dataPointNotes =
-        combine(dataPoints, featureDataProvider) { dataPoints, featureProvider ->
+        combine(dataPoints, featureDataProvider) { dataPoints, featureData ->
             dataPoints
                 .distinct()
                 .filter { dp -> dp.note.isNotEmpty() }
                 .map { dp ->
-                    val featurePath = featureProvider.getPathForFeature(dp.featureId)
+                    val featurePath = featureData.pathProvider.getPathForFeature(dp.featureId)
                     val isDuration =
-                        featureProvider.getDataSampleProperties(dp.featureId)?.isDuration ?: false
+                        featureData.dataSamplePropertiesMap[dp.featureId]?.isDuration ?: false
                     GraphNote.DataPointNote(
                         timestamp = dp.timestamp,
                         noteText = dp.note,
