@@ -74,6 +74,15 @@ enum class GroupItemType {
 
 **Special Behavior**: Can contain any component type including other groups. See [group-hierarchy.md](group-hierarchy.md).
 
+## Type Enums
+
+There are two type enums:
+
+- **`GroupItemType`** (internal, entity layer): `TRACKER`, `FUNCTION`, `GRAPH`, `REMINDER`, `GROUP` — used in the `group_items_table`
+- **`GroupChildType`** (public, DTO layer): `TRACKER`, `FUNCTION`, `GRAPH`, `REMINDER`, `GROUP` — used in UI code (`GroupChild`, `GroupChildDisplayIndex`)
+
+These are 1:1 mappings. `GroupChildType` exists to avoid exposing the internal entity enum.
+
 ## Common Patterns
 
 All components (except groups themselves):

@@ -17,7 +17,7 @@ sealed class GroupChild {
     class ChildTracker(
         override val id: Long,
         val displayTracker: DisplayTracker,
-        override val type: GroupChildType = GroupChildType.FEATURE
+        override val type: GroupChildType = GroupChildType.TRACKER
     ) : GroupChild()
 
     class ChildGraph(
@@ -29,6 +29,6 @@ sealed class GroupChild {
     class ChildFunction(
         override val id: Long,
         val displayFunction: DisplayFunction,
-        override val type: GroupChildType = GroupChildType.FEATURE
+        override val type: GroupChildType = GroupChildType.FUNCTION
     ) : GroupChild()
 }

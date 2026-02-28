@@ -35,6 +35,8 @@ data class GroupItem(
 - Stored on GroupItem, NOT on the component itself
 - When inserting at the top, existing items are shifted down (`displayIndex + 1`)
 - Managed by helper classes (TrackerHelper, GraphHelper, etc.)
+- **UI layer**: `GroupViewModel` fetches display indices as a separate flow via `GroupHelper.getDisplayIndicesForGroup()` and combines them with children at the `currentChildren` stage. Children are NOT sorted in the data flows — sorting happens last using O(1) map lookups.
+- **Drag-and-drop**: During a drag, a temporary local list is used for instant UI updates. On drop, `GroupHelper.updateGroupChildOrder()` writes to DB, then the VM waits for `dbDisplayIndices` to align before switching back to the real flow.
 
 ### Multi-Group Membership
 

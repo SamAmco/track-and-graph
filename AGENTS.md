@@ -28,6 +28,8 @@ schemas/                        # Room migration schemas
 
 ## Knowledgebase Index
 
+ALWAYS search the knowledgebase and read any potentially related docs before attempting to execute a task. 
+
 | Topic | File |
 |-------|------|
 | Architecture, conventions, build commands | [architecture.md](docs/knowledgebase/architecture.md) |

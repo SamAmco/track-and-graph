@@ -54,13 +54,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -134,122 +133,55 @@ class GroupViewModelImpl @Inject constructor(
 
     private val groupId = MutableStateFlow<Long?>(null)
 
-    private sealed class UpdateType {
-        data object Trackers : UpdateType()
-        data object Groups : UpdateType()
-        data object Functions : UpdateType()
-        data object AllGraphs : UpdateType()
-        data object GraphDeleted : UpdateType()
-        data class Graph(val graphId: Long) : UpdateType()
-        data object All : UpdateType()
-        data object DisplayIndices : UpdateType()
-    }
-
-    /**
-     * Whenever the database is updated get the type of update to determine what to update in the UI
-     */
-    private fun asUpdateType(dataUpdateType: DataUpdateType) = when (dataUpdateType) {
-        is DataUpdateType.DataPoint -> listOf(
-            UpdateType.Trackers,
-        )
-
-        DataUpdateType.TrackerCreated -> listOf(UpdateType.Trackers)
-
-        DataUpdateType.TrackerDeleted -> listOf(
-            UpdateType.Trackers,
-            UpdateType.AllGraphs
-        )
-
-        DataUpdateType.GroupCreated, DataUpdateType.GroupDeleted -> listOf(UpdateType.Groups)
-
-        DataUpdateType.GroupDeleted -> listOf(UpdateType.Groups)
-
-        is DataUpdateType.DisplayIndex -> listOf(UpdateType.DisplayIndices)
-
-        is DataUpdateType.GraphOrStatCreated -> listOf(UpdateType.Graph(dataUpdateType.graphStatId))
-
-        DataUpdateType.GraphOrStatDeleted -> listOf(UpdateType.GraphDeleted)
-
-        is DataUpdateType.GraphOrStatUpdated -> listOf(UpdateType.Graph(dataUpdateType.graphStatId))
-
-        DataUpdateType.GroupUpdated -> listOf(UpdateType.Groups)
-
-        DataUpdateType.TrackerUpdated -> listOf(UpdateType.Trackers)
-
-        is DataUpdateType.FunctionCreated -> listOf(UpdateType.Functions)
-
-        is DataUpdateType.FunctionDeleted -> listOf(UpdateType.Functions)
-
-        is DataUpdateType.FunctionUpdated -> listOf(UpdateType.Functions)
-
-        DataUpdateType.Unknown -> listOf(UpdateType.All)
-
-        DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
-    }
-
-    private val onUpdateChildrenForGroup =
+    private val onUpdateChildrenForGroup: SharedFlow<Pair<Long, DataUpdateType>> =
         combine(
             groupId.filterNotNull(),
             dataInteractor.getDataUpdateEvents()
-                .map { asUpdateType(it) }
-                .filterNotNull()
-                .flatMapConcat { it.asFlow() }
-                .onStart { emit(UpdateType.All) }
-        ) { a, b -> Pair(a, b) }
+                .filter { it !is DataUpdateType.GlobalNote }
+                .onStart { emit(DataUpdateType.Unknown) }
+        ) { groupId, event -> Pair(groupId, event) }
             .shareIn(viewModelScope, SharingStarted.Lazily, 1)
 
 
     private val graphChildren = onUpdateChildrenForGroup
-        .filter {
-            it.second in arrayOf(
-                UpdateType.All,
-                UpdateType.AllGraphs,
-                UpdateType.GraphDeleted
-            ) || it.second is UpdateType.Graph
+        .filter { (_, event) ->
+            event is DataUpdateType.Unknown ||
+            event is DataUpdateType.GraphOrStatDeleted ||
+            event is DataUpdateType.GraphOrStatCreated ||
+            event is DataUpdateType.GraphOrStatUpdated
         }
         .debounceBuffer(10)
-        //Get any buffered events and only emit the most significant one
-        .mapNotNull { bufferedEvents ->
-            sequence {
-                val types = bufferedEvents.associateBy { it.second }
-                types[UpdateType.All]?.let { yield(it) }
-                types[UpdateType.AllGraphs]?.let { yield(it) }
-
-                //If we missed more than one specific event just update all
-                //graphs. This should happen very rarely
-                if (types.size > 1) yield(Pair(bufferedEvents[0].first, UpdateType.AllGraphs))
-                else if (types.size == 1) yield(bufferedEvents[0])
-            }.firstOrNull()
+        // Collect all buffered events and determine which graph IDs need recalculating.
+        // null = full recalculation (Unknown event), non-null set = reuse surviving view data,
+        // recalculate only the IDs in the set (empty for delete-only, specific IDs for updates/creates).
+        .map { bufferedEvents ->
+            val groupId = bufferedEvents[0].first
+            val events = bufferedEvents.map { it.second }
+            val forceIds: Set<Long>? = if (events.any { it is DataUpdateType.Unknown }) {
+                null
+            } else {
+                events.mapNotNull {
+                    when (it) {
+                        is DataUpdateType.GraphOrStatCreated -> it.graphStatId
+                        is DataUpdateType.GraphOrStatUpdated -> it.graphStatId
+                        else -> null
+                    }
+                }.toSet()
+            }
+            Pair(groupId, forceIds)
         }
-        //Get the graph objects for the group
-        .scan<Pair<Long, UpdateType>, Pair<UpdateType, List<GraphOrStat>>>(
-            Pair(UpdateType.All, emptyList())
-        ) { _, event ->
-            val eventType = event.second
-            val groupId = event.first
-
-            //Don't need to get the graphs from the database again if the update type is
-            //GraphsForFeature as this simply means a feature was updated, and we need to
-            //recalculate the inner graph data
-            Pair(eventType, getGraphObjects(groupId))
+        // Get the graph objects for the group
+        .scan<Pair<Long, Set<Long>?>, Pair<Set<Long>?, List<GraphOrStat>>>(
+            Pair(null, emptyList())
+        ) { _, (groupId, forceIds) ->
+            Pair(forceIds, getGraphObjects(groupId))
         }
-        //Get the graph view data for the graphs
-        .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, graphUpdate ->
-            val (type, graphStats) = graphUpdate
-
-            //Get the graph data for any graphs that need updating
-            return@flatMapLatestScan when (type) {
-                UpdateType.All, UpdateType.AllGraphs ->
-                    getGraphViewData(graphStats)
-
-                UpdateType.GraphDeleted ->
-                    mapNewGraphsToOldViewData(viewData, graphStats)
-
-                is UpdateType.Graph ->
-                    mapNewGraphsToOldViewData(viewData, graphStats, setOf(type.graphId))
-
-                //Shouldn't ever happen
-                else -> flowOf(viewData)
+        // Get the graph view data for the graphs
+        .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, (forceIds, graphStats) ->
+            if (forceIds == null) {
+                getGraphViewData(graphStats)
+            } else {
+                mapNewGraphsToOldViewData(viewData, graphStats, forceIds)
             }
         }
         .map { graphsToGroupChildren(it) }
@@ -322,36 +254,37 @@ class GroupViewModelImpl @Inject constructor(
         }
 
     private val trackersChildren = onUpdateChildrenForGroup
-        .filter {
-            it.second in arrayOf(
-                UpdateType.Trackers,
-                UpdateType.All,
-            )
+        .filter { (_, event) ->
+            event is DataUpdateType.Unknown ||
+            event is DataUpdateType.DataPoint ||
+            event is DataUpdateType.TrackerCreated ||
+            event is DataUpdateType.TrackerDeleted ||
+            event is DataUpdateType.TrackerUpdated
         }
         .debounce(10L)
-        .map { getTrackerChildren(it.first) }
+        .map { (groupId, _) -> getTrackerChildren(groupId) }
         .flowOn(io)
 
     private val groupChildren = onUpdateChildrenForGroup
-        .filter {
-            it.second in arrayOf(
-                UpdateType.Groups,
-                UpdateType.All,
-            )
+        .filter { (_, event) ->
+            event is DataUpdateType.Unknown ||
+            event is DataUpdateType.GroupCreated ||
+            event is DataUpdateType.GroupDeleted ||
+            event is DataUpdateType.GroupUpdated
         }
         .debounce(10L)
-        .map { getGroupChildren(it.first) }
+        .map { (groupId, _) -> getGroupChildren(groupId) }
         .flowOn(io)
 
     private val functionChildren = onUpdateChildrenForGroup
-        .filter {
-            it.second in arrayOf(
-                UpdateType.Functions,
-                UpdateType.All,
-            )
+        .filter { (_, event) ->
+            event is DataUpdateType.Unknown ||
+            event is DataUpdateType.FunctionCreated ||
+            event is DataUpdateType.FunctionDeleted ||
+            event is DataUpdateType.FunctionUpdated
         }
         .debounce(10L)
-        .map { getFunctionChildren(it.first) }
+        .map { (groupId, _) -> getFunctionChildren(groupId) }
         .flowOn(io)
 
     private val allChildren: StateFlow<List<GroupChild>> =
@@ -371,8 +304,8 @@ class GroupViewModelImpl @Inject constructor(
      */
     private val dbDisplayIndices: StateFlow<Map<Pair<GroupChildType, Long>, Int>?> =
         onUpdateChildrenForGroup
-            .filter {
-                it.second in arrayOf(UpdateType.DisplayIndices, UpdateType.All)
+            .filter { (_, event) ->
+                event is DataUpdateType.DisplayIndex || event is DataUpdateType.Unknown
             }
             .debounce(10L)
             .map { (groupId, _) ->

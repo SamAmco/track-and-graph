@@ -139,14 +139,22 @@ If a helper currently depends on the large `TrackAndGraphDatabaseDao` directly, 
 
 Fake DAOs are in `app/data/src/testFixtures/kotlin/com/samco/trackandgraph/`.
 
+## Data Update Events
+
+`DataInteractorImpl` emits `DataUpdateType` events via a `SharedFlow` after every mutation. UI layers (e.g. `GroupViewModel`) subscribe to filter for relevant events.
+
+**Contract**: The data layer is responsible for emitting ALL relevant events. For example, creating a tracker emits both `TrackerCreated` and `DisplayIndex(groupId)`. Deleting a tracker emits `TrackerDeleted` plus `GraphOrStatDeleted`/`GraphOrStatUpdated` for any affected graphs. Consumers should NOT need to infer secondary effects from primary events.
+
+`DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged.
+
 ## Key Files
 
 | File | Purpose |
 |------|---------|
 | `DataInteractor.kt` | Public interface |
-| `DataInteractorImpl.kt` | Implementation delegating to helpers |
+| `DataInteractorImpl.kt` | Implementation delegating to helpers, emits `DataUpdateType` events |
 | `TrackerHelperImpl.kt` | Tracker CRUD |
 | `FunctionHelperImpl.kt` | Function CRUD |
 | `GraphHelperImpl.kt` | Graph/stat CRUD |
-| `GroupHelperImpl.kt` | Group CRUD and recursive deletion |
+| `GroupHelperImpl.kt` | Group CRUD, recursive deletion, display index queries |
 | `ReminderHelperImpl.kt` | Reminder CRUD |

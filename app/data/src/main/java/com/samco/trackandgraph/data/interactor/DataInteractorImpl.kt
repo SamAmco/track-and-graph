@@ -102,7 +102,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun insertGroup(request: GroupCreateRequest): Long = withContext(io) {
         groupHelper.insertGroup(request).also {
             dataUpdateEvents.emit(DataUpdateType.GroupCreated)
-            dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+            dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.parentGroupId))
         }
     }
 
@@ -189,7 +189,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun createTracker(request: TrackerCreateRequest): Long = withContext(io) {
         val id = trackerHelper.createTracker(request)
         dataUpdateEvents.emit(DataUpdateType.TrackerCreated)
-        dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+        dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.groupId))
         return@withContext id
     }
 
@@ -327,64 +327,50 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun createLineGraph(request: LineGraphCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            graphHelper.createLineGraph(request).also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-            }
+            graphHelper.createLineGraph(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createPieChart(request: PieChartCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            graphHelper.createPieChart(request).also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-            }
+            graphHelper.createPieChart(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            graphHelper.createAverageTimeBetweenStat(request).also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-            }
+            graphHelper.createAverageTimeBetweenStat(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            graphHelper.createTimeHistogram(request).also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-            }
+            graphHelper.createTimeHistogram(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createLastValueStat(request: LastValueStatCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            graphHelper.createLastValueStat(request).also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-            }
+            graphHelper.createLastValueStat(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createBarChart(request: BarChartCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            graphHelper.createBarChart(request).also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-            }
+            graphHelper.createBarChart(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun createLuaGraph(request: LuaGraphCreateRequest): Long =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
-            graphHelper.createLuaGraph(request).also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
-            }
+            graphHelper.createLuaGraph(request)
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
         }
 
     override suspend fun updateLineGraph(request: LineGraphUpdateRequest) = withContext(io) {
@@ -429,7 +415,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             graphHelper.duplicateLineGraph(graphStatId, groupId)?.also {
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
         }
 
@@ -437,7 +423,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             graphHelper.duplicatePieChart(graphStatId, groupId)?.also {
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
         }
 
@@ -445,7 +431,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             graphHelper.duplicateAverageTimeBetweenStat(graphStatId, groupId)?.also {
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
         }
 
@@ -453,7 +439,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             graphHelper.duplicateTimeHistogram(graphStatId, groupId)?.also {
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
         }
 
@@ -461,7 +447,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             graphHelper.duplicateLastValueStat(graphStatId, groupId)?.also {
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
         }
 
@@ -469,7 +455,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             graphHelper.duplicateBarChart(graphStatId, groupId)?.also {
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
         }
 
@@ -477,7 +463,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             graphHelper.duplicateLuaGraph(graphStatId, groupId)?.also {
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
         }
 
@@ -497,6 +483,7 @@ internal class DataInteractorImpl @Inject constructor(
     private suspend fun shiftUpGroupChildIndexes(groupId: Long) =
         performAtomicUpdate(DataUpdateType.DisplayIndex(groupId)) {
             groupItemDao.shiftDisplayIndexesDown(groupId)
+            dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
         }
 
     // =========================================================================
@@ -572,7 +559,7 @@ internal class DataInteractorImpl @Inject constructor(
         val id = functionHelper.insertFunction(request)
         if (id != null) {
             dataUpdateEvents.emit(DataUpdateType.FunctionCreated(id))
-            dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+            dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.groupId))
         }
         return@withContext id
     }
@@ -593,7 +580,7 @@ internal class DataInteractorImpl @Inject constructor(
             val newFunctionId = functionHelper.duplicateFunction(function, groupId)
             if (newFunctionId != null) {
                 dataUpdateEvents.emit(DataUpdateType.FunctionCreated(newFunctionId))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
             }
             return@withContext newFunctionId
         }
@@ -652,7 +639,7 @@ internal class DataInteractorImpl @Inject constructor(
             ComponentType.GROUP -> dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
             ComponentType.GRAPH -> dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.id))
         }
-        dataUpdateEvents.emit(DataUpdateType.DisplayIndex)
+        dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.toGroupId))
     }
 
     private fun validateGroupNotMovingToDescendant(groupId: Long, toGroupId: Long) {
