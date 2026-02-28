@@ -5,54 +5,30 @@ import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 
 sealed class GroupChild {
-    fun toDto() = com.samco.trackandgraph.data.database.dto.GroupChildOrderData(
-        type = when (this) {
-            is ChildGroup -> GroupChildType.GROUP
-            is ChildTracker -> GroupChildType.FEATURE
-            is ChildGraph -> GroupChildType.GRAPH
-            is ChildFunction -> GroupChildType.FEATURE
-        },
-        id = idForGroupOrdering,
-        displayIndex = displayIndex
-    )
-
-    abstract val displayIndex: Int
+    abstract val id: Long
     abstract val type: GroupChildType
-    abstract val idForGroupOrdering: Long
 
     class ChildGroup(
-        val id: Long,
-        override val displayIndex: Int,
+        override val id: Long,
         val group: Group,
         override val type: GroupChildType = GroupChildType.GROUP
-    ) : GroupChild() {
-        override val idForGroupOrdering: Long = id
-    }
+    ) : GroupChild()
 
     class ChildTracker(
-        val id: Long,
-        override val displayIndex: Int,
+        override val id: Long,
         val displayTracker: DisplayTracker,
         override val type: GroupChildType = GroupChildType.FEATURE
-    ) : GroupChild() {
-        override val idForGroupOrdering: Long = displayTracker.featureId
-    }
+    ) : GroupChild()
 
     class ChildGraph(
-        val id: Long,
-        override val displayIndex: Int,
+        override val id: Long,
         val graph: CalculatedGraphViewData,
         override val type: GroupChildType = GroupChildType.GRAPH
-    ) : GroupChild() {
-        override val idForGroupOrdering: Long = id
-    }
+    ) : GroupChild()
 
     class ChildFunction(
-        val id: Long,
-        override val displayIndex: Int,
+        override val id: Long,
         val displayFunction: DisplayFunction,
         override val type: GroupChildType = GroupChildType.FEATURE
-    ) : GroupChild() {
-        override val idForGroupOrdering: Long = displayFunction.featureId
-    }
+    ) : GroupChild()
 }

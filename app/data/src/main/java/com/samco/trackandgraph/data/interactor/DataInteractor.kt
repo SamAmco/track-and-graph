@@ -21,7 +21,6 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.GlobalNote
-import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import kotlinx.coroutines.flow.Flow
@@ -30,8 +29,6 @@ import org.threeten.bp.OffsetDateTime
 
 interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupHelper, GraphHelper {
     suspend fun getGroupGraphSync(rootGroupId: Long? = null): GroupGraph
-
-    suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildOrderData>)
 
     suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 

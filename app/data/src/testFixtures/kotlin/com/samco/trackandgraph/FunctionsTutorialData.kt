@@ -19,7 +19,7 @@ package com.samco.trackandgraph
 
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
-import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
@@ -78,7 +78,7 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
     )
     val runningFeatureId = dataInteractor.getTrackerById(runningTrackerId)!!.featureId
 
-    val weightLbsTrackerId = dataInteractor.createTracker(
+    val weightLbsId = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Weight (lbs)",
             groupId = groupId,
@@ -88,7 +88,7 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
             suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
         )
     )
-    val weightLbsFeatureId = dataInteractor.getTrackerById(weightLbsTrackerId)!!.featureId
+    val weightLbsFeatureId = dataInteractor.getTrackerById(weightLbsId)!!.featureId
 
     val cyclingTrackerId = dataInteractor.createTracker(
         createTrackerRequest(
@@ -161,14 +161,14 @@ suspend fun createFunctionsTutorialGroup(dataInteractor: DataInteractor) {
     dataInteractor.updateGroupChildOrder(
         groupId,
         listOf(
-            GroupChildOrderData(GroupChildType.FEATURE, weightFeatureId, 0),
-            GroupChildOrderData(GroupChildType.FEATURE, runningFeatureId, 1),
-            GroupChildOrderData(GroupChildType.FEATURE, weightLbsFeatureId, 2),
-            GroupChildOrderData(GroupChildType.FEATURE, cyclingFeatureId, 3),
-            GroupChildOrderData(GroupChildType.FEATURE, exerciseFunctionId, 4),
-            GroupChildOrderData(GroupChildType.FEATURE, exerciseThisWeekFunctionId, 5),
-            GroupChildOrderData(GroupChildType.FEATURE, weightKgFunctionId, 6),
-            GroupChildOrderData(GroupChildType.FEATURE, allWeightKgFunctionId, 7),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, weightTrackerId, 0),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, runningTrackerId, 1),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, weightLbsId, 2),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, cyclingTrackerId, 3),
+            GroupChildDisplayIndex(GroupChildType.FUNCTION, exerciseFunctionId, 4),
+            GroupChildDisplayIndex(GroupChildType.FUNCTION, exerciseThisWeekFunctionId, 5),
+            GroupChildDisplayIndex(GroupChildType.FUNCTION, weightKgFunctionId, 6),
+            GroupChildDisplayIndex(GroupChildType.FUNCTION, allWeightKgFunctionId, 7),
         )
     )
 }

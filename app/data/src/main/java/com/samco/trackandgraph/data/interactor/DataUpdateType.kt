@@ -47,7 +47,7 @@ sealed class DataUpdateType {
     data object GlobalNote : DataUpdateType()
 
     /**Display indices were updated **/
-    data object DisplayIndex : DataUpdateType()
+    data class DisplayIndex(val groupId: Long) : DataUpdateType()
 
     data class FunctionCreated(override val featureId: Long) : DataUpdateType(), FeatureUpdate
     data class FunctionUpdated(override val featureId: Long) : DataUpdateType(), FeatureUpdate

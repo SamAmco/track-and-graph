@@ -22,7 +22,7 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
-import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.LastValueStatConfig
 import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
@@ -179,9 +179,9 @@ private suspend fun createRestDaysGroup(dataInteractor: DataInteractor, parent: 
     dataInteractor.updateGroupChildOrder(
         restDayStatsGroupId,
         listOf(
-            GroupChildOrderData(GroupChildType.GRAPH, pieChartId, 0),
-            GroupChildOrderData(GroupChildType.GRAPH, timeSinceId, 1),
-            GroupChildOrderData(GroupChildType.GRAPH, histogramId, 2),
+            GroupChildDisplayIndex(GroupChildType.GRAPH, pieChartId, 0),
+            GroupChildDisplayIndex(GroupChildType.GRAPH, timeSinceId, 1),
+            GroupChildDisplayIndex(GroupChildType.GRAPH, histogramId, 2),
         )
     )
 }
@@ -316,14 +316,14 @@ private suspend fun createGroupListForScreenshots(dataInteractor: DataInteractor
     dataInteractor.updateGroupChildOrder(
         groupListGroup,
         listOf(
-            GroupChildOrderData(GroupChildType.GROUP, mealTimeId, 1),
-            GroupChildOrderData(GroupChildType.GROUP, morningId, 2),
-            GroupChildOrderData(GroupChildType.GROUP, dailyId, 3),
-            GroupChildOrderData(GroupChildType.GROUP, weeklyId, 4),
-            GroupChildOrderData(GroupChildType.GROUP, exerciseRoutineId, 5),
-            GroupChildOrderData(GroupChildType.GROUP, weightLossId, 6),
-            GroupChildOrderData(GroupChildType.GROUP, moodQualityId, 7),
-            GroupChildOrderData(GroupChildType.GROUP, stressRestId, 8),
+            GroupChildDisplayIndex(GroupChildType.GROUP, mealTimeId, 1),
+            GroupChildDisplayIndex(GroupChildType.GROUP, morningId, 2),
+            GroupChildDisplayIndex(GroupChildType.GROUP, dailyId, 3),
+            GroupChildDisplayIndex(GroupChildType.GROUP, weeklyId, 4),
+            GroupChildDisplayIndex(GroupChildType.GROUP, exerciseRoutineId, 5),
+            GroupChildDisplayIndex(GroupChildType.GROUP, weightLossId, 6),
+            GroupChildDisplayIndex(GroupChildType.GROUP, moodQualityId, 7),
+            GroupChildDisplayIndex(GroupChildType.GROUP, stressRestId, 8),
         )
     )
 }
@@ -382,8 +382,8 @@ private suspend fun createExerciseGroup(dataInteractor: DataInteractor, parent: 
     dataInteractor.updateGroupChildOrder(
         exerciseGroupId,
         listOf(
-            GroupChildOrderData(GroupChildType.GRAPH, graph2Id, 0),
-            GroupChildOrderData(GroupChildType.GRAPH, graph1Id, 1),
+            GroupChildDisplayIndex(GroupChildType.GRAPH, graph2Id, 0),
+            GroupChildDisplayIndex(GroupChildType.GRAPH, graph1Id, 1),
         )
     )
 }
@@ -490,33 +490,33 @@ private suspend fun createExerciseGraph1(
 
 private suspend fun createDailyGroup(dataInteractor: DataInteractor, parent: Long): Long {
     val dailyGroupId = dataInteractor.insertGroup(createGroup("Daily", parentGroupId = parent))
-    val sleepFeatureId = createSleepTracker(dataInteractor, dailyGroupId)
-    val productivityFeatureId = createProductivityTracker(dataInteractor, dailyGroupId)
-    val alcoholFeatureId = createAlcoholTracker(dataInteractor, dailyGroupId)
-    val meditationFeatureId = createMeditationTracker(dataInteractor, dailyGroupId)
-    val workFeatureId = createWorkTracker(dataInteractor, dailyGroupId)
-    val weightFeatureId = createWeightTracker(dataInteractor, dailyGroupId)
-    val exerciseFeatureId = createExerciseTracker(dataInteractor, dailyGroupId)
-    val studyingFeatureId = createStudyingTracker(dataInteractor, dailyGroupId)
-    val stressFeatureId = createStressTracker(dataInteractor, dailyGroupId)
+    val sleepTrackerId = createSleepTracker(dataInteractor, dailyGroupId)
+    val productivityTrackerId = createProductivityTracker(dataInteractor, dailyGroupId)
+    val alcoholTrackerId = createAlcoholTracker(dataInteractor, dailyGroupId)
+    val meditationTrackerId = createMeditationTracker(dataInteractor, dailyGroupId)
+    val workTrackerId = createWorkTracker(dataInteractor, dailyGroupId)
+    val weightTrackerId = createWeightTracker(dataInteractor, dailyGroupId)
+    val exerciseTrackerId = createExerciseTracker(dataInteractor, dailyGroupId)
+    val studyingTrackerId = createStudyingTracker(dataInteractor, dailyGroupId)
+    val stressTrackerId = createStressTracker(dataInteractor, dailyGroupId)
 
     // Reorder trackers to correct order
     dataInteractor.updateGroupChildOrder(
         dailyGroupId,
         listOf(
-            GroupChildOrderData(GroupChildType.FEATURE, sleepFeatureId, 0),
-            GroupChildOrderData(GroupChildType.FEATURE, productivityFeatureId, 1),
-            GroupChildOrderData(GroupChildType.FEATURE, alcoholFeatureId, 2),
-            GroupChildOrderData(GroupChildType.FEATURE, meditationFeatureId, 3),
-            GroupChildOrderData(GroupChildType.FEATURE, workFeatureId, 4),
-            GroupChildOrderData(GroupChildType.FEATURE, weightFeatureId, 5),
-            GroupChildOrderData(GroupChildType.FEATURE, exerciseFeatureId, 6),
-            GroupChildOrderData(GroupChildType.FEATURE, studyingFeatureId, 7),
-            GroupChildOrderData(GroupChildType.FEATURE, stressFeatureId, 8),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, sleepTrackerId, 0),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, productivityTrackerId, 1),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, alcoholTrackerId, 2),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, meditationTrackerId, 3),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, workTrackerId, 4),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, weightTrackerId, 5),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, exerciseTrackerId, 6),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, studyingTrackerId, 7),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, stressTrackerId, 8),
         )
     )
 
-    return exerciseFeatureId
+    return dataInteractor.getTrackerById(exerciseTrackerId)!!.featureId
 }
 
 private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -543,7 +543,7 @@ private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGro
         labels = listOf("None", "Low", "Medium", "High")
     )
 
-    return dataInteractor.getTrackerById(stressTracker)!!.featureId
+    return stressTracker
 }
 
 private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -568,7 +568,7 @@ private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyG
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(studyingTracker)!!.featureId
+    return studyingTracker
 }
 
 private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -594,7 +594,7 @@ private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyG
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(exerciseTracker)!!.featureId
+    return exerciseTracker
 }
 
 private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -618,7 +618,7 @@ private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGro
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(weightTracker)!!.featureId
+    return weightTracker
 }
 
 private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -643,7 +643,7 @@ private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroup
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(workTracker)!!.featureId
+    return workTracker
 }
 
 private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -668,7 +668,7 @@ private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dail
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(meditationTracker)!!.featureId
+    return meditationTracker
 }
 
 private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -692,7 +692,7 @@ private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGr
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(alcoholTracker)!!.featureId
+    return alcoholTracker
 }
 
 private suspend fun createProductivityTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -716,7 +716,7 @@ private suspend fun createProductivityTracker(dataInteractor: DataInteractor, da
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(productivityTracker)!!.featureId
+    return productivityTracker
 }
 
 private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
@@ -738,7 +738,7 @@ private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGrou
         endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 
-    return dataInteractor.getTrackerById(sleepTracker)!!.featureId
+    return sleepTracker
 }
 
 private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent: Long) {
@@ -785,9 +785,9 @@ private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent:
     dataInteractor.updateGroupChildOrder(
         groupId,
         listOf(
-            GroupChildOrderData(GroupChildType.FEATURE, exerciseFunctionId, 0),
-            GroupChildOrderData(GroupChildType.FEATURE, runningFeatureId, 5),
-            GroupChildOrderData(GroupChildType.FEATURE, cyclingFeatureId, 7),
+            GroupChildDisplayIndex(GroupChildType.FUNCTION, exerciseFunctionId, 0),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, runningTrackerId, 5),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, cyclingTrackerId, 7),
         )
     )
 }

@@ -19,6 +19,7 @@ package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
@@ -44,4 +45,8 @@ interface GroupHelper {
     suspend fun getGroupsForGroupSync(parentGroupId: Long): List<Group>
 
     suspend fun hasAnyGroups(): Boolean
+
+    suspend fun getDisplayIndicesForGroup(groupId: Long): List<GroupChildDisplayIndex>
+
+    suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>)
 }

@@ -1,7 +1,7 @@
 package com.samco.trackandgraph
 
 import com.samco.trackandgraph.data.database.dto.DataType
-import com.samco.trackandgraph.data.database.dto.GroupChildOrderData
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -19,9 +19,9 @@ suspend fun createFaq1Group(dataInteractor: DataInteractor) {
     dataInteractor.updateGroupChildOrder(
         outerGroupId,
         listOf(
-            GroupChildOrderData(GroupChildType.GROUP, exerciseGroupId, 0),
-            GroupChildOrderData(GroupChildType.GROUP, caloriesGroupId, 1),
-            GroupChildOrderData(GroupChildType.GROUP, dailyGroupId, 2),
+            GroupChildDisplayIndex(GroupChildType.GROUP, exerciseGroupId, 0),
+            GroupChildDisplayIndex(GroupChildType.GROUP, caloriesGroupId, 1),
+            GroupChildDisplayIndex(GroupChildType.GROUP, dailyGroupId, 2),
         )
     )
 }
@@ -30,23 +30,23 @@ private suspend fun createDailyGroup(dataInteractor: DataInteractor, parent: Lon
     val group = dataInteractor.insertGroup(
         createGroup(name = "Daily", parentGroupId = parent)
     )
-    val sleepFeatureId = createSleepTracker(dataInteractor, group)
-    val productivityFeatureId = createProductivityTracker(dataInteractor, group)
-    val weatherFeatureId = createWeatherTracker(dataInteractor, group)
-    val sickDayFeatureId = createSickDayTracker(dataInteractor, group)
-    val workFeatureId = createWorkTracker(dataInteractor, group)
-    val stressFeatureId = createStressTracker(dataInteractor, group)
+    val sleepTrackerId = createSleepTracker(dataInteractor, group)
+    val productivityTrackerId = createProductivityTracker(dataInteractor, group)
+    val weatherTrackerId = createWeatherTracker(dataInteractor, group)
+    val sickDayTrackerId = createSickDayTracker(dataInteractor, group)
+    val workTrackerId = createWorkTracker(dataInteractor, group)
+    val stressTrackerId = createStressTracker(dataInteractor, group)
 
     // Reorder trackers to correct order
     dataInteractor.updateGroupChildOrder(
         group,
         listOf(
-            GroupChildOrderData(GroupChildType.FEATURE, sleepFeatureId, 0),
-            GroupChildOrderData(GroupChildType.FEATURE, productivityFeatureId, 1),
-            GroupChildOrderData(GroupChildType.FEATURE, weatherFeatureId, 2),
-            GroupChildOrderData(GroupChildType.FEATURE, sickDayFeatureId, 3),
-            GroupChildOrderData(GroupChildType.FEATURE, workFeatureId, 4),
-            GroupChildOrderData(GroupChildType.FEATURE, stressFeatureId, 5),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, sleepTrackerId, 0),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, productivityTrackerId, 1),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, weatherTrackerId, 2),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, sickDayTrackerId, 3),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, workTrackerId, 4),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, stressTrackerId, 5),
         )
     )
 
@@ -74,7 +74,7 @@ private suspend fun createStressTracker(dataInteractor: DataInteractor, parent: 
         )
     }
 
-    return featureId
+    return tracker
 }
 
 private suspend fun createWorkTracker(dataInteractor: DataInteractor, parent: Long): Long {
@@ -98,7 +98,7 @@ private suspend fun createWorkTracker(dataInteractor: DataInteractor, parent: Lo
         )
     }
 
-    return featureId
+    return tracker
 }
 
 private suspend fun createSickDayTracker(dataInteractor: DataInteractor, parent: Long): Long {
@@ -122,7 +122,7 @@ private suspend fun createSickDayTracker(dataInteractor: DataInteractor, parent:
         )
     }
 
-    return featureId
+    return tracker
 }
 
 private suspend fun createWeatherTracker(dataInteractor: DataInteractor, parent: Long): Long {
@@ -146,7 +146,7 @@ private suspend fun createWeatherTracker(dataInteractor: DataInteractor, parent:
         )
     }
 
-    return featureId
+    return tracker
 }
 
 private suspend fun createProductivityTracker(dataInteractor: DataInteractor, parent: Long): Long {
@@ -172,7 +172,7 @@ private suspend fun createProductivityTracker(dataInteractor: DataInteractor, pa
         labels = listOf("None", "Low", "Medium", "High")
     )
 
-    return dataInteractor.getTrackerById(tracker)!!.featureId
+    return tracker
 }
 
 private suspend fun createSleepTracker(dataInteractor: DataInteractor, parent: Long): Long {
@@ -184,7 +184,7 @@ private suspend fun createSleepTracker(dataInteractor: DataInteractor, parent: L
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
         )
     )
-    return dataInteractor.getTrackerById(tracker)!!.featureId
+    return tracker
 }
 
 private suspend fun createCaloriesAndExerciseGroup(dataInteractor: DataInteractor, parent: Long): Long {
@@ -192,14 +192,14 @@ private suspend fun createCaloriesAndExerciseGroup(dataInteractor: DataInteracto
         createGroup(name = "Track & Graph                  Calories & Exercise", parentGroupId = parent)
     )
 
-    val calories = dataInteractor.createTracker(
+    val caloriesTrackerId = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Calories",
             groupId = group,
             description = "I track the number of calories I eat each day."
         )
     )
-    val caloriesFeatureId = dataInteractor.getTrackerById(calories)!!.featureId
+    val caloriesFeatureId = dataInteractor.getTrackerById(caloriesTrackerId)!!.featureId
 
     dataInteractor.insertDataPoint(
         createDataPoint(
@@ -209,21 +209,21 @@ private suspend fun createCaloriesAndExerciseGroup(dataInteractor: DataInteracto
         )
     )
 
-    val exercise = dataInteractor.createTracker(
+    val exerciseTrackerId = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Exercise",
             groupId = group,
             description = "I track a value of 1 every time I exercise."
         )
     )
-    val exerciseFeatureId = dataInteractor.getTrackerById(exercise)!!.featureId
+    val exerciseFeatureId = dataInteractor.getTrackerById(exerciseTrackerId)!!.featureId
 
     // Reorder trackers to correct order
     dataInteractor.updateGroupChildOrder(
         group,
         listOf(
-            GroupChildOrderData(GroupChildType.FEATURE, caloriesFeatureId, 0),
-            GroupChildOrderData(GroupChildType.FEATURE, exerciseFeatureId, 1),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, caloriesTrackerId, 0),
+            GroupChildDisplayIndex(GroupChildType.TRACKER, exerciseTrackerId, 1),
         )
     )
 

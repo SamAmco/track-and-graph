@@ -27,6 +27,8 @@ import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -151,66 +153,34 @@ class GroupViewModelImpl @Inject constructor(
             UpdateType.Trackers,
         )
 
-        DataUpdateType.TrackerCreated -> listOf(
-            UpdateType.Trackers,
-            UpdateType.DisplayIndices
-        )
+        DataUpdateType.TrackerCreated -> listOf(UpdateType.Trackers)
 
         DataUpdateType.TrackerDeleted -> listOf(
             UpdateType.Trackers,
-            UpdateType.DisplayIndices,
             UpdateType.AllGraphs
         )
 
-        DataUpdateType.GroupCreated, DataUpdateType.GroupDeleted -> listOf(
-            UpdateType.Groups,
-            UpdateType.DisplayIndices
-        )
+        DataUpdateType.GroupCreated, DataUpdateType.GroupDeleted -> listOf(UpdateType.Groups)
 
-        DataUpdateType.GroupDeleted -> listOf(
-            UpdateType.Groups,
-            UpdateType.DisplayIndices
-        )
+        DataUpdateType.GroupDeleted -> listOf(UpdateType.Groups)
 
-        DataUpdateType.DisplayIndex -> listOf(
-            UpdateType.DisplayIndices
-        )
+        is DataUpdateType.DisplayIndex -> listOf(UpdateType.DisplayIndices)
 
-        is DataUpdateType.GraphOrStatCreated -> listOf(
-            UpdateType.Graph(dataUpdateType.graphStatId),
-            UpdateType.DisplayIndices
-        )
+        is DataUpdateType.GraphOrStatCreated -> listOf(UpdateType.Graph(dataUpdateType.graphStatId))
 
-        DataUpdateType.GraphOrStatDeleted -> listOf(
-            UpdateType.DisplayIndices,
-            UpdateType.GraphDeleted
-        )
+        DataUpdateType.GraphOrStatDeleted -> listOf(UpdateType.GraphDeleted)
 
-        is DataUpdateType.GraphOrStatUpdated -> listOf(
-            UpdateType.Graph(dataUpdateType.graphStatId)
-        )
+        is DataUpdateType.GraphOrStatUpdated -> listOf(UpdateType.Graph(dataUpdateType.graphStatId))
 
-        DataUpdateType.GroupUpdated -> listOf(
-            UpdateType.Groups
-        )
+        DataUpdateType.GroupUpdated -> listOf(UpdateType.Groups)
 
-        DataUpdateType.TrackerUpdated -> listOf(
-            UpdateType.Trackers
-        )
+        DataUpdateType.TrackerUpdated -> listOf(UpdateType.Trackers)
 
-        is DataUpdateType.FunctionCreated -> listOf(
-            UpdateType.Functions,
-            UpdateType.DisplayIndices
-        )
+        is DataUpdateType.FunctionCreated -> listOf(UpdateType.Functions)
 
-        is DataUpdateType.FunctionDeleted -> listOf(
-            UpdateType.Functions,
-            UpdateType.DisplayIndices
-        )
+        is DataUpdateType.FunctionDeleted -> listOf(UpdateType.Functions)
 
-        is DataUpdateType.FunctionUpdated -> listOf(
-            UpdateType.Functions
-        )
+        is DataUpdateType.FunctionUpdated -> listOf(UpdateType.Functions)
 
         DataUpdateType.Unknown -> listOf(UpdateType.All)
 
@@ -234,7 +204,6 @@ class GroupViewModelImpl @Inject constructor(
             it.second in arrayOf(
                 UpdateType.All,
                 UpdateType.AllGraphs,
-                UpdateType.DisplayIndices,
                 UpdateType.GraphDeleted
             ) || it.second is UpdateType.Graph
         }
@@ -245,15 +214,6 @@ class GroupViewModelImpl @Inject constructor(
                 val types = bufferedEvents.associateBy { it.second }
                 types[UpdateType.All]?.let { yield(it) }
                 types[UpdateType.AllGraphs]?.let { yield(it) }
-
-                //Special case if you delete a graph you typically get both display indices and
-                //graph deleted events. Graph deleted is more significant so we only emit that
-                if (types.size == 2
-                    && types.containsKey(UpdateType.GraphDeleted)
-                    && types.containsKey(UpdateType.DisplayIndices)
-                ) {
-                    yield(types[UpdateType.GraphDeleted])
-                }
 
                 //If we missed more than one specific event just update all
                 //graphs. This should happen very rarely
@@ -269,7 +229,7 @@ class GroupViewModelImpl @Inject constructor(
             val groupId = event.first
 
             //Don't need to get the graphs from the database again if the update type is
-            //GraphsForFeature as this simply means a feature was updated and we need to
+            //GraphsForFeature as this simply means a feature was updated, and we need to
             //recalculate the inner graph data
             Pair(eventType, getGraphObjects(groupId))
         }
@@ -282,7 +242,7 @@ class GroupViewModelImpl @Inject constructor(
                 UpdateType.All, UpdateType.AllGraphs ->
                     getGraphViewData(graphStats)
 
-                UpdateType.DisplayIndices, UpdateType.GraphDeleted ->
+                UpdateType.GraphDeleted ->
                     mapNewGraphsToOldViewData(viewData, graphStats)
 
                 is UpdateType.Graph ->
@@ -299,7 +259,7 @@ class GroupViewModelImpl @Inject constructor(
         .getGraphsAndStatsByGroupIdSync(groupId)
 
     private fun graphsToGroupChildren(graphs: List<GraphWithViewData>) = graphs
-        .map { GroupChild.ChildGraph(it.graph.id, 0 /*TODO: displayIndex removed*/, it.viewData) }
+        .map { GroupChild.ChildGraph(it.graph.id, it.viewData) }
 
     private fun mapNewGraphsToOldViewData(
         viewData: List<GraphWithViewData>,
@@ -346,7 +306,7 @@ class GroupViewModelImpl @Inject constructor(
                     val calculatedData = gsiProvider.getDataFactory(graph.type).getViewData(graph)
                     GraphWithViewData(
                         graph,
-                        //Shouldn't really need to add one here but it just forces the times to be different
+                        //Shouldn't really need to add one here, but it just forces the times to be different
                         // There was a bug previously where the loading and ready states had the same time using
                         // Instant.now() which caused ready states to be missed and infinite loading to be shown
                         CalculatedGraphViewData(System.nanoTime() + 1, calculatedData)
@@ -366,7 +326,6 @@ class GroupViewModelImpl @Inject constructor(
             it.second in arrayOf(
                 UpdateType.Trackers,
                 UpdateType.All,
-                UpdateType.DisplayIndices,
             )
         }
         .debounce(10L)
@@ -378,7 +337,6 @@ class GroupViewModelImpl @Inject constructor(
             it.second in arrayOf(
                 UpdateType.Groups,
                 UpdateType.All,
-                UpdateType.DisplayIndices,
             )
         }
         .debounce(10L)
@@ -390,7 +348,6 @@ class GroupViewModelImpl @Inject constructor(
             it.second in arrayOf(
                 UpdateType.Functions,
                 UpdateType.All,
-                UpdateType.DisplayIndices,
             )
         }
         .debounce(10L)
@@ -405,24 +362,41 @@ class GroupViewModelImpl @Inject constructor(
         }
             //This debounce should be longer than the children debounce
             .debounce(50L)
-            .map { childrenLists ->
-                val children = mutableListOf<GroupChild>().apply {
-                    childrenLists.forEach { addAll(it) }
-                }
-                sortChildren(children)
-                children
+            .map { it.flatten() }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /**
+     * A flow of display indices from the database, represented as a map from
+     * (type, childId) to displayIndex for O(1) lookups during sorting.
+     */
+    private val dbDisplayIndices: StateFlow<Map<Pair<GroupChildType, Long>, Int>?> =
+        onUpdateChildrenForGroup
+            .filter {
+                it.second in arrayOf(UpdateType.DisplayIndices, UpdateType.All)
+            }
+            .debounce(10L)
+            .map { (groupId, _) ->
+                dataInteractor.getDisplayIndicesForGroup(groupId)
+                    .associate { Pair(it.type, it.id) to it.displayIndex }
             }
             .flowOn(io)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val isDragging = MutableStateFlow(false)
     private val temporaryDragDropChildren = MutableStateFlow<List<GroupChild>>(emptyList())
 
     override val currentChildren: StateFlow<List<GroupChild>> = isDragging
-        // We use a temporary copy of the current children for faster
-        // responsive mutations while dragging, so we don't have to wait
-        // for the database updates from a background thread
-        .flatMapLatest { if (it) temporaryDragDropChildren else allChildren }
+        .flatMapLatest { dragging ->
+            if (dragging) {
+                temporaryDragDropChildren
+            } else {
+                combine(allChildren, dbDisplayIndices.filterNotNull()) { children, indices ->
+                    children.sortedBy { child ->
+                        indices[Pair(child.type, child.id)] ?: Int.MAX_VALUE
+                    }
+                }
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
@@ -469,33 +443,15 @@ class GroupViewModelImpl @Inject constructor(
         viewModelScope.launch { this@GroupViewModelImpl.groupId.emit(groupId) }
     }
 
-    private fun sortChildren(children: MutableList<GroupChild>) = children.sortWith { a, b ->
-        val aInd = a.displayIndex
-        val bInd = b.displayIndex
-        when {
-            aInd < bInd -> -1
-            bInd < aInd -> 1
-            else -> {
-                val aId = a.idForGroupOrdering
-                val bId = b.idForGroupOrdering
-                when {
-                    aId > bId -> -1
-                    bId > aId -> 1
-                    else -> 0
-                }
-            }
-        }
-    }
-
     private suspend fun getTrackerChildren(groupId: Long): List<GroupChild> {
         return dataInteractor.getDisplayTrackersForGroupSync(groupId).map {
-            GroupChild.ChildTracker(it.id, 0 /*TODO: displayIndex removed*/, it)
+            GroupChild.ChildTracker(it.id, it)
         }
     }
 
     private suspend fun getGroupChildren(groupId: Long): List<GroupChild> {
         return dataInteractor.getGroupsForGroupSync(groupId).map {
-            GroupChild.ChildGroup(it.id, 0 /*TODO: displayIndex removed*/, it)
+            GroupChild.ChildGroup(it.id, it)
         }
     }
 
@@ -508,7 +464,7 @@ class GroupViewModelImpl @Inject constructor(
                 name = function.name,
                 description = function.description
             )
-            GroupChild.ChildFunction(function.id, 0 /*TODO: displayIndex removed*/, displayFunction)
+            GroupChild.ChildFunction(function.id, displayFunction)
         }
     }
 
@@ -541,7 +497,8 @@ class GroupViewModelImpl @Inject constructor(
 
     override fun onDeleteGroup(id: Long) {
         viewModelScope.launch(io) {
-            val deletedFeatureIds = dataInteractor.deleteGroup(GroupDeleteRequest(groupId = id)).deletedFeatureIds
+            val deletedFeatureIds =
+                dataInteractor.deleteGroup(GroupDeleteRequest(groupId = id)).deletedFeatureIds
             deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
         }
     }
@@ -613,26 +570,37 @@ class GroupViewModelImpl @Inject constructor(
         if (!isDragging.value) return
 
         viewModelScope.launch {
+            val children = temporaryDragDropChildren.value
             dataInteractor.updateGroupChildOrder(
                 groupId.value ?: return@launch,
-                temporaryDragDropChildren.value.map(GroupChild::toDto)
+                children.mapIndexed { index, child ->
+                    GroupChildDisplayIndex(
+                        type = child.type,
+                        id = child.id,
+                        displayIndex = index
+                    )
+                }
             )
 
-            val expectedOrder = temporaryDragDropChildren.value
-                .map { Pair(it.idForGroupOrdering, it.type) }
+            val expectedIndices = children
+                .mapIndexed { index, child -> Pair(child.type, child.id) to index }
+                .toMap()
 
-            // Wait until all children have been updated in the database
-            // before switching back to the real children or the UI could
-            // glitch swapping back and forth.
+            // Wait until dbDisplayIndices reflects the new order before switching back
+            // to the real children, otherwise the UI could glitch swapping back and forth.
             try {
                 withTimeout(500) {
-                    allChildren.first { allChildren ->
-                        val actualOrder = allChildren.map { Pair(it.idForGroupOrdering, it.type) }
-                        actualOrder == expectedOrder
+                    dbDisplayIndices.first { indices ->
+                        expectedIndices.all { (key, expectedIndex) ->
+                            indices[key] == expectedIndex
+                        }
                     }
                 }
             } catch (e: TimeoutCancellationException) {
-                Timber.e("The database did not update the group child indexes within 500ms. Drag and drop update may have failed.")
+                Timber.e(
+                    e,
+                    "The database did not update the group child indexes within 500ms. Drag and drop update may have failed."
+                )
             }
 
             // Switch back to showing the real children from the database

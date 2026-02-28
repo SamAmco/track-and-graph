@@ -22,6 +22,8 @@ import com.samco.trackandgraph.data.database.GroupDao
 import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
@@ -260,4 +262,41 @@ internal class GroupHelperImpl @Inject constructor(
     override suspend fun hasAnyGroups(): Boolean = withContext(io) {
         groupDao.hasAnyGroups()
     }
+
+    override suspend fun getDisplayIndicesForGroup(groupId: Long): List<GroupChildDisplayIndex> =
+        withContext(io) {
+            groupItemDao.getGroupItemsForGroup(groupId).map { item ->
+                val type = when (item.type) {
+                    GroupItemType.GROUP -> GroupChildType.GROUP
+                    GroupItemType.GRAPH -> GroupChildType.GRAPH
+                    GroupItemType.TRACKER -> GroupChildType.TRACKER
+                    GroupItemType.FUNCTION -> GroupChildType.FUNCTION
+                    GroupItemType.REMINDER -> GroupChildType.REMINDER
+                }
+                GroupChildDisplayIndex(
+                    id = item.childId,
+                    type = type,
+                    displayIndex = item.displayIndex
+                )
+            }
+        }
+
+    override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>) =
+        transactionHelper.withTransaction {
+            val groupItems = groupItemDao.getGroupItemsForGroup(groupId)
+            val newIndices = children.associateBy { it.id }
+
+            val updates = groupItems.mapNotNull { groupItem ->
+                val newDisplayIndex = newIndices[groupItem.childId]
+                    ?.displayIndex
+                    ?: return@mapNotNull null
+                if (newDisplayIndex >= 0 && newDisplayIndex != groupItem.displayIndex) {
+                    groupItem.copy(displayIndex = newDisplayIndex)
+                } else {
+                    null
+                }
+            }
+
+            updates.forEach { groupItemDao.updateGroupItem(it) }
+        }
 }
