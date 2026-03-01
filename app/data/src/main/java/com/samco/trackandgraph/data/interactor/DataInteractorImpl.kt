@@ -284,6 +284,20 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteDataPoints(dataPoints: List<DataPoint>) = withContext(io) {
+        if (dataPoints.isEmpty()) return@withContext
+        dao.deleteDataPoints(dataPoints.map { it.toEntity() })
+        val featureIds = dataPoints.map { it.featureId }.toSet()
+        for (featureId in featureIds) {
+            dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+            val graphsNeedingUpdate = dependencyAnalyserProvider.create()
+                .getDependentGraphs(featureId)
+            for (graphStatId in graphsNeedingUpdate.graphStatIds) {
+                dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
+            }
+        }
+    }
+
     override suspend fun insertDataPoint(dataPoint: DataPoint): Long = withContext(io) {
         dao.insertDataPoint(dataPoint.toEntity()).also {
             dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoint.featureId))

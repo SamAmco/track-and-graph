@@ -206,6 +206,9 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     @Delete
     fun deleteDataPoint(dataPoint: DataPoint)
 
+    @Delete
+    fun deleteDataPoints(dataPoints: List<DataPoint>)
+
     @Query("DELETE FROM data_points_table WHERE feature_id = :featureId AND value = :index")
     fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double)
 

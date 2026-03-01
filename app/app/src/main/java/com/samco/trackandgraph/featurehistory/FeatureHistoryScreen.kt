@@ -113,16 +113,19 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     val showUpdateWarning by viewModel.showUpdateWarning.observeAsState(false)
     val isUpdating by viewModel.isUpdating.observeAsState(false)
 
+    val dataPointsCount = dateScrollData?.items?.size ?: 0
+
     TopAppBarContent(
         navArgs = navArgs,
         featureName = navArgs.featureName,
-        dataPointsCount = dateScrollData?.items?.size ?: 0,
+        dataPointsCount = dataPointsCount,
         isTracker = isTracker,
         isMultiSelectMode = isMultiSelectMode,
         selectedCount = selectedDataPoints.size,
         onInfoClick = viewModel::onShowFeatureInfo,
         onUpdateClick = viewModel::showUpdateAllDialog,
-        onExitMultiSelect = viewModel::exitMultiSelectMode
+        onExitMultiSelect = viewModel::exitMultiSelectMode,
+        appBarPinned = dataPointsCount == 0,
     )
 
     FeatureHistoryView(
@@ -227,7 +230,8 @@ private fun TopAppBarContent(
     selectedCount: Int,
     onInfoClick: () -> Unit,
     onUpdateClick: () -> Unit,
-    onExitMultiSelect: () -> Unit
+    onExitMultiSelect: () -> Unit,
+    appBarPinned: Boolean = false,
 ) {
     val topBarController = LocalTopBarController.current
 
@@ -277,7 +281,8 @@ private fun TopAppBarContent(
             title = featureName,
             backNavigationAction = true,
             subtitle = subtitle,
-            actions = actions
+            actions = actions,
+            appBarPinned = appBarPinned,
         )
     )
 }

@@ -36,6 +36,8 @@ interface DataInteractor : TrackerHelper, FunctionHelper, ReminderHelper, GroupH
 
     suspend fun deleteDataPoint(dataPoint: DataPoint)
 
+    suspend fun deleteDataPoints(dataPoints: List<DataPoint>)
+
     suspend fun insertDataPoint(dataPoint: DataPoint): Long
 
     suspend fun insertDataPoints(dataPoints: List<DataPoint>)

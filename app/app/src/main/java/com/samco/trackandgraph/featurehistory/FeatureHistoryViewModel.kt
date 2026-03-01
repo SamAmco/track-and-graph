@@ -158,23 +158,9 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> = getDataPointsResult
             .flowOn(io)
             .filterIsInstance<GetDataPointsResult.Success>()
-            .filter { it.dataPoints.isNotEmpty() }
             .map { it.dataPoints }
-            .map { dataPoints ->
-                val range = Duration
-                    .between(dataPoints.last().date, dataPoints.first().date)
-                    .abs()
-
-                val dateDisplayResolution = when {
-                    range.toDays() > 365 -> DateDisplayResolution.MONTH_YEAR
-                    else -> DateDisplayResolution.MONTH_DAY
-                }
-
-                DateScrollData(
-                    dateDisplayResolution = dateDisplayResolution,
-                    items = dataPoints
-                )
-            }.asLiveData(viewModelScope.coroutineContext)
+            .map { toDateScrollData(it) }
+            .asLiveData(viewModelScope.coroutineContext)
 
     private val showFeatureInfoFlow = MutableStateFlow(false)
 
@@ -281,9 +267,7 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     override fun onDeleteSelectedConfirmed() {
         viewModelScope.launch(io) {
-            _selectedDataPoints.value.forEach { dataPoint ->
-                dataInteractor.deleteDataPoint(dataPoint.toDataPoint())
-            }
+            dataInteractor.deleteDataPoints(_selectedDataPoints.value.map { it.toDataPoint() })
             withContext(ui) {
                 _showDeleteSelectedConfirmDialog.value = false
                 exitMultiSelectMode()
@@ -322,6 +306,22 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     override fun onCancelUpdate() {
         showUpdateDialog.value = false
         showUpdateWarning.value = false
+    }
+
+    private fun toDateScrollData(dataPoints: List<DataPointInfo>): DateScrollData<DataPointInfo> {
+        val dateDisplayResolution = if (dataPoints.size >= 2) {
+            val range = Duration
+                .between(dataPoints.last().date, dataPoints.first().date)
+                .abs()
+            if (range.toDays() > 365) DateDisplayResolution.MONTH_YEAR
+            else DateDisplayResolution.MONTH_DAY
+        } else {
+            DateDisplayResolution.MONTH_DAY
+        }
+        return DateScrollData(
+            dateDisplayResolution = dateDisplayResolution,
+            items = dataPoints
+        )
     }
 
     private fun toDataPointInfo(dp: DataPoint) = DataPointInfo(
