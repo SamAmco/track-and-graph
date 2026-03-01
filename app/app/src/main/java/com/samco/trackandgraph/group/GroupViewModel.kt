@@ -41,7 +41,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.util.Stopwatch
 import com.samco.trackandgraph.util.debounceBuffer
-import com.samco.trackandgraph.util.flatMapLatestScan
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
@@ -50,7 +49,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -62,12 +63,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -142,49 +140,50 @@ class GroupViewModelImpl @Inject constructor(
         ) { groupId, event -> Pair(groupId, event) }
             .shareIn(viewModelScope, SharingStarted.Lazily, 1)
 
-    private val graphChildren = onUpdateChildrenForGroup
-        .filter { (_, event) ->
-            event is DataUpdateType.Unknown ||
-            event is DataUpdateType.GraphOrStatDeleted ||
-            event is DataUpdateType.GraphOrStatCreated ||
-            event is DataUpdateType.GraphOrStatUpdated
-        }
-        .debounceBuffer(10)
-        // Collect all buffered events and determine which graph IDs need recalculating.
-        // null = full recalculation (Unknown event), non-null set = reuse surviving view data,
-        // recalculate only the IDs in the set (empty for delete-only, specific IDs for updates/creates).
-        .map { bufferedEvents ->
-            val groupId = bufferedEvents[0].first
-            val events = bufferedEvents.map { it.second }
-            val forceIds: Set<Long>? = if (events.any { it is DataUpdateType.Unknown }) {
-                null
-            } else {
-                events.mapNotNull {
-                    when (it) {
-                        is DataUpdateType.GraphOrStatCreated -> it.graphStatId
-                        is DataUpdateType.GraphOrStatUpdated -> it.graphStatId
-                        else -> null
+    private val graphChildren: Flow<List<GroupChild>> = channelFlow {
+        var currentViewData = emptyList<GraphWithViewData>()
+        var innerJob: Job? = null
+
+        onUpdateChildrenForGroup
+            .filter { (_, event) ->
+                event is DataUpdateType.Unknown ||
+                event is DataUpdateType.GraphOrStatDeleted ||
+                event is DataUpdateType.GraphOrStatCreated ||
+                event is DataUpdateType.GraphOrStatUpdated
+            }
+            .debounceBuffer(10)
+            .collect { bufferedEvents ->
+                val groupId = bufferedEvents[0].first
+                val events = bufferedEvents.map { it.second }
+                val graphStats = getGraphObjects(groupId)
+
+                // Cancel any in-flight view data computation for the previous batch
+                innerJob?.cancel()
+                innerJob?.join()
+
+                // Unknown event = full recalculation; otherwise reuse surviving view data
+                // and only recalculate created/updated IDs (empty set = delete-only)
+                val viewDataFlow = if (events.any { it is DataUpdateType.Unknown }) {
+                    getGraphViewData(graphStats)
+                } else {
+                    val forceIds = events.mapNotNull {
+                        when (it) {
+                            is DataUpdateType.GraphOrStatCreated -> it.graphStatId
+                            is DataUpdateType.GraphOrStatUpdated -> it.graphStatId
+                            else -> null
+                        }
+                    }.toSet()
+                    mapNewGraphsToOldViewData(currentViewData, graphStats, forceIds)
+                }
+
+                innerJob = launch {
+                    viewDataFlow.collect { viewData ->
+                        currentViewData = viewData
+                        send(graphsToGroupChildren(viewData))
                     }
-                }.toSet()
+                }
             }
-            Pair(groupId, forceIds)
-        }
-        // Get the graph objects for the group
-        .scan<Pair<Long, Set<Long>?>, Pair<Set<Long>?, List<GraphOrStat>>>(
-            Pair(null, emptyList())
-        ) { _, (groupId, forceIds) ->
-            Pair(forceIds, getGraphObjects(groupId))
-        }
-        // Get the graph view data for the graphs
-        .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, (forceIds, graphStats) ->
-            if (forceIds == null) {
-                getGraphViewData(graphStats)
-            } else {
-                mapNewGraphsToOldViewData(viewData, graphStats, forceIds)
-            }
-        }
-        .map { graphsToGroupChildren(it) }
-        .flowOn(io)
+    }.flowOn(io)
 
     private suspend fun getGraphObjects(groupId: Long): List<GraphOrStat> = dataInteractor
         .getGraphsAndStatsByGroupIdSync(groupId)
