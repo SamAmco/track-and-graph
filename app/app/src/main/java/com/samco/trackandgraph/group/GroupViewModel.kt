@@ -142,7 +142,6 @@ class GroupViewModelImpl @Inject constructor(
         ) { groupId, event -> Pair(groupId, event) }
             .shareIn(viewModelScope, SharingStarted.Lazily, 1)
 
-
     private val graphChildren = onUpdateChildrenForGroup
         .filter { (_, event) ->
             event is DataUpdateType.Unknown ||
