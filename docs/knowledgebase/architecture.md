@@ -62,7 +62,4 @@ When adding new code, place it in the most appropriate existing package and avoi
 
 ## Build Commands
 
-```bash
-cd app && ./gradlew assembleDebug        # Build debug APK
-cd app && ./gradlew testDebugUnitTest    # Run unit tests
-```
+See [build-commands.md](build-commands.md).

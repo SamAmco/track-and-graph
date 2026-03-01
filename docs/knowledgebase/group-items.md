@@ -29,6 +29,10 @@ data class GroupItem(
 
 ## Key Concepts
 
+### Composite Identity — Critical
+
+A child is uniquely identified by the **combination of `(type, child_id)`**, not by `child_id` alone. Two different component types (e.g. a TRACKER and a GRAPH) can share the same `child_id` value and must not be confused. Any map or lookup over group items must key on both fields.
+
 ### child_id Identity — Critical
 
 `child_id` stores the **type-specific entity ID**, NOT the `features_table.id`:

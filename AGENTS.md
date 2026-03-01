@@ -26,13 +26,19 @@ lua/                            # Community Lua functions
 schemas/                        # Room migration schemas
 ```
 
+## Rules
+
+- ALWAYS read this file and any relevant knowledgebase docs before executing a task.
+- NEVER create personal memory files (e.g. MEMORY.md). If something is worth remembering, update the knowledgebase instead.
+
 ## Knowledgebase Index
 
-ALWAYS search the knowledgebase and read any potentially related docs before attempting to execute a task. 
+ALWAYS search the knowledgebase and read any potentially related docs before attempting to execute a task.
 
 | Topic | File |
 |-------|------|
-| Architecture, conventions, build commands | [architecture.md](docs/knowledgebase/architecture.md) |
+| Architecture and conventions | [architecture.md](docs/knowledgebase/architecture.md) |
+| Build and test commands | [build-commands.md](docs/knowledgebase/build-commands.md) |
 | Database tables and relationships | [database-schema.md](docs/knowledgebase/database-schema.md) |
 | Group DAG structure and symlinks | [group-hierarchy.md](docs/knowledgebase/group-hierarchy.md) |
 | Trackers, Functions, Graphs, Reminders, Groups | [component-types.md](docs/knowledgebase/component-types.md) |

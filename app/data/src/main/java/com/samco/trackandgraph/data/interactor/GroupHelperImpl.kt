@@ -284,10 +284,17 @@ internal class GroupHelperImpl @Inject constructor(
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>) =
         transactionHelper.withTransaction {
             val groupItems = groupItemDao.getGroupItemsForGroup(groupId)
-            val newIndices = children.associateBy { it.id }
+            val newIndices = children.associateBy { Pair(it.type, it.id) }
 
             val updates = groupItems.mapNotNull { groupItem ->
-                val newDisplayIndex = newIndices[groupItem.childId]
+                val childType = when (groupItem.type) {
+                    GroupItemType.GROUP -> GroupChildType.GROUP
+                    GroupItemType.GRAPH -> GroupChildType.GRAPH
+                    GroupItemType.TRACKER -> GroupChildType.TRACKER
+                    GroupItemType.FUNCTION -> GroupChildType.FUNCTION
+                    GroupItemType.REMINDER -> GroupChildType.REMINDER
+                }
+                val newDisplayIndex = newIndices[Pair(childType, groupItem.childId)]
                     ?.displayIndex
                     ?: return@mapNotNull null
                 if (newDisplayIndex >= 0 && newDisplayIndex != groupItem.displayIndex) {

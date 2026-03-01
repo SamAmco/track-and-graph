@@ -20,6 +20,8 @@ package com.samco.trackandgraph.data.interactor
 import com.samco.trackandgraph.FakeGroupDao
 import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
@@ -830,6 +832,69 @@ class GroupHelperImplTest {
 
         // VERIFY
         assertEquals(3, groups.size)
+    }
+
+    // =========================================================================
+    // updateGroupChildOrder tests
+    // =========================================================================
+
+    @Test
+    fun `updateGroupChildOrder updates display indices correctly`() = runTest(dispatcher) {
+        // PREPARE
+        val groupId = uut.insertGroup(
+            GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
+        )
+        val trackerId = 10L
+        val graphId = 20L
+        fakeGroupItemDao.insertGroupItem(
+            GroupItem(groupId = groupId, displayIndex = 0, childId = trackerId, type = GroupItemType.TRACKER)
+        )
+        fakeGroupItemDao.insertGroupItem(
+            GroupItem(groupId = groupId, displayIndex = 1, childId = graphId, type = GroupItemType.GRAPH)
+        )
+
+        // EXECUTE - swap order
+        uut.updateGroupChildOrder(
+            groupId, listOf(
+                GroupChildDisplayIndex(GroupChildType.TRACKER, trackerId, 1),
+                GroupChildDisplayIndex(GroupChildType.GRAPH, graphId, 0),
+            )
+        )
+
+        // VERIFY
+        val trackerItem = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER).first { it.groupId == groupId }
+        val graphItem = fakeGroupItemDao.getGroupItemsForChild(graphId, GroupItemType.GRAPH).first { it.groupId == groupId }
+        assertEquals(1, trackerItem.displayIndex)
+        assertEquals(0, graphItem.displayIndex)
+    }
+
+    @Test
+    fun `updateGroupChildOrder distinguishes items with same id but different type`() = runTest(dispatcher) {
+        // PREPARE - A TRACKER and a GROUP sharing the same childId
+        val groupId = uut.insertGroup(
+            GroupCreateRequest(name = "Parent", colorIndex = 0, parentGroupId = 0L)
+        )
+        val sharedId = 42L
+        fakeGroupItemDao.insertGroupItem(
+            GroupItem(groupId = groupId, displayIndex = 0, childId = sharedId, type = GroupItemType.TRACKER)
+        )
+        fakeGroupItemDao.insertGroupItem(
+            GroupItem(groupId = groupId, displayIndex = 1, childId = sharedId, type = GroupItemType.GRAPH)
+        )
+
+        // EXECUTE - only update the GRAPH's index; TRACKER should remain unchanged
+        uut.updateGroupChildOrder(
+            groupId, listOf(
+                GroupChildDisplayIndex(GroupChildType.TRACKER, sharedId, 0),
+                GroupChildDisplayIndex(GroupChildType.GRAPH, sharedId, 5),
+            )
+        )
+
+        // VERIFY - TRACKER stays at 0, GRAPH moves to 5
+        val trackerItem = fakeGroupItemDao.getGroupItemsForChild(sharedId, GroupItemType.TRACKER).first { it.groupId == groupId }
+        val graphItem = fakeGroupItemDao.getGroupItemsForChild(sharedId, GroupItemType.GRAPH).first { it.groupId == groupId }
+        assertEquals(0, trackerItem.displayIndex)
+        assertEquals(5, graphItem.displayIndex)
     }
 
     @Test

@@ -73,7 +73,7 @@ internal data class GroupItem(
     val createdAt: Long = 0
 )
 
-enum class GroupItemType {
+internal enum class GroupItemType {
     TRACKER,
     FUNCTION,
     GRAPH,
