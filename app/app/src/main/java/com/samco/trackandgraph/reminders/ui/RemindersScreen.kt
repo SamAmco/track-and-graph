@@ -60,6 +60,7 @@ import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -75,6 +76,12 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
     val isLoading by viewModel.loading.collectAsState()
     var showAddReminderDialog by rememberSaveable(navArgs) { mutableStateOf(false) }
     var editReminderId by rememberSaveable(navArgs) { mutableStateOf<Long?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.scrollToTopEvents.receiveAsFlow().collect {
+            viewModel.lazyListState.animateScrollToItem(0)
+        }
+    }
 
     TopAppBarContent(navArgs) {
         editReminderId = null
@@ -152,33 +159,12 @@ fun RemindersScreen(
         onDragSwap(from.index, to.index)
     }
 
-    // Track reminder IDs to detect new additions
-    var previousReminderIds by remember { mutableStateOf(emptySet<Long>()) }
-
     LaunchedEffect(reorderableLazyListState.isAnyItemDragging) {
         if (reorderableLazyListState.isAnyItemDragging) {
             onDragStart()
         } else {
             onDragEnd()
         }
-    }
-
-    // Detect new reminders and scroll to them
-    LaunchedEffect(reminders) {
-        val currentReminderIds = reminders.map { it.id }.toSet()
-        val newReminderIds = currentReminderIds - previousReminderIds
-        
-        if (newReminderIds.isNotEmpty() && previousReminderIds.isNotEmpty()) {
-            // Find the index of the first new reminder
-            val newReminderId = newReminderIds.first()
-            val newReminderIndex = reminders.indexOfFirst { it.id == newReminderId }
-            
-            if (newReminderIndex >= 0) {
-                lazyListState.animateScrollToItem(newReminderIndex)
-            }
-        }
-        
-        previousReminderIds = currentReminderIds
     }
 
     Box(modifier = modifier.fillMaxSize()) {

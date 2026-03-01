@@ -53,6 +53,34 @@ The intent is to split into feature modules eventually. To make that easier, the
 
 When adding new code, place it in the most appropriate existing package and avoid creating imports that would form circular dependencies between packages.
 
+## ViewModel → UI Events (one-shot)
+
+For one-shot UI commands (e.g. scroll to position, show snackbar, navigate) use a `Channel` exposed as a `ReceiveChannel`:
+
+```kotlin
+// ViewModel interface
+val myEvents: ReceiveChannel<MyEvent>
+
+// ViewModel impl — capacity 1 buffers one event while the UI isn't yet collecting
+override val myEvents = Channel<MyEvent>(1)
+
+// emit from a non-suspending context — use launch/send rather than trySend for testability
+viewModelScope.launch { myEvents.send(MyEvent.ScrollToTop) }
+// emit from a suspending context — call send directly
+myEvents.send(MyEvent.ScrollToTop)
+```
+
+```kotlin
+// Composable — convert to Flow at the call site
+LaunchedEffect(Unit) {
+    viewModel.myEvents.receiveAsFlow().collect { event -> /* handle */ }
+}
+```
+
+**Why Channel over MutableSharedFlow:** `SharedFlow` only delivers to active subscribers — events emitted before the `LaunchedEffect` starts collecting are lost. A `Channel` queues events regardless of whether a consumer is ready, guaranteeing delivery. It also semantically models "consumed once" rather than "broadcast to all".
+
+**Why `launch { send() }` over `trySend`:** `send` is a suspend function that respects back-pressure and coroutine cancellation, making it easier to control in tests (you can verify the coroutine ran to completion rather than racing with a fire-and-forget).
+
 ## Conventions
 
 - Prefer imports over fully qualified paths

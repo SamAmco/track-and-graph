@@ -37,6 +37,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -63,6 +65,7 @@ interface RemindersScreenViewModel {
     val currentReminders: StateFlow<List<ReminderViewData>>
     val loading: StateFlow<Boolean>
     val lazyListState: LazyListState
+    val scrollToTopEvents: ReceiveChannel<Unit>
 
     fun deleteReminder(reminderViewData: ReminderViewData)
     fun duplicateReminder(reminderViewData: ReminderViewData)
@@ -84,6 +87,11 @@ class RemindersScreenViewModelImpl @Inject constructor(
 ) : ViewModel(), RemindersScreenViewModel {
 
     override val lazyListState = LazyListState()
+
+    override val scrollToTopEvents = Channel<Unit>(1)
+
+    // IDs of reminders created via duplicate — excluded from scroll-to-top
+    private val duplicatedReminderIds = mutableSetOf<Long>()
 
     private val isDragging = MutableStateFlow(false)
     private val temporaryReminders = MutableStateFlow<List<ReminderViewData>>(emptyList())
@@ -149,6 +157,26 @@ class RemindersScreenViewModelImpl @Inject constructor(
         .map { it !is LoadingState.Loaded }
         .stateIn(viewModelScope, SharingStarted.Lazily, true)
 
+    init {
+        // Emit scroll-to-top when a genuinely new (non-duplicate) reminder is added
+        var previousIds = emptySet<Long>()
+        viewModelScope.launch {
+            currentReminders.collect { reminders ->
+                val currentIds = reminders.map { it.id }.toSet()
+                val newIds = currentIds - previousIds
+                if (newIds.isNotEmpty() && previousIds.isNotEmpty()) {
+                    val isAllDuplicates = synchronized(duplicatedReminderIds) {
+                        duplicatedReminderIds.containsAll(newIds).also {
+                            duplicatedReminderIds.removeAll(newIds)
+                        }
+                    }
+                    if (!isAllDuplicates) scrollToTopEvents.send(Unit)
+                }
+                previousIds = currentIds
+            }
+        }
+    }
+
     override fun deleteReminder(reminderViewData: ReminderViewData) {
         viewModelScope.launch(io) {
             // Cancel notifications for this reminder
@@ -163,6 +191,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
         viewModelScope.launch(io) {
             reminderViewData.reminderDto?.let { reminder ->
                 val newId = dataInteractor.duplicateReminder(reminder.id)
+                synchronized(duplicatedReminderIds) { duplicatedReminderIds.add(newId) }
                 val newReminder = dataInteractor.getReminderById(newId)
                 if (newReminder != null) {
                     reminderInteractor.scheduleNext(newReminder)
