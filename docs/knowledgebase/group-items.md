@@ -29,6 +29,20 @@ data class GroupItem(
 
 ## Key Concepts
 
+### child_id Identity — Critical
+
+`child_id` stores the **type-specific entity ID**, NOT the `features_table.id`:
+
+| type | child_id references |
+|------|---------------------|
+| TRACKER | `trackers_table.id` |
+| FUNCTION | `functions_table.id` |
+| GRAPH | `graphs_and_stats_table2.id` |
+| GROUP | `groups_table.id` |
+| REMINDER | `reminders_table.id` |
+
+Both Trackers and Functions also have a `featureId` (pointing to `features_table`), but that is a **different ID** from the tracker/function ID. The group_items_table always uses the tracker/function primary key, not the shared feature key. Getting these confused causes items to silently end up in the wrong groups or not appear at all.
+
 ### Display Index
 
 - Determines the visual sort order of items within a group

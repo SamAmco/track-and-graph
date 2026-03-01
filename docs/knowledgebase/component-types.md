@@ -14,6 +14,14 @@ enum class GroupItemType {
 }
 ```
 
+## ID Relationships — Critical
+
+Both Trackers and Functions have **two IDs**:
+- `tracker.id` / `function.id` — the primary key in `trackers_table` / `functions_table`
+- `tracker.featureId` / `function.featureId` — a foreign key into `features_table`
+
+These are different values. `group_items_table.child_id` always stores the **tracker/function primary key**, not the feature ID. See [group-items.md](group-items.md).
+
 ## Trackers
 
 **Purpose**: Manual data entry points for tracking values over time.

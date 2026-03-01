@@ -37,6 +37,7 @@ ALWAYS search the knowledgebase and read any potentially related docs before att
 | Group DAG structure and symlinks | [group-hierarchy.md](docs/knowledgebase/group-hierarchy.md) |
 | Trackers, Functions, Graphs, Reminders, Groups | [component-types.md](docs/knowledgebase/component-types.md) |
 | Junction table and display ordering | [group-items.md](docs/knowledgebase/group-items.md) |
+| Writing and pitfalls of Room migrations | [database-migrations.md](docs/knowledgebase/database-migrations.md) |
 | Groupless reminders | [reminders.md](docs/knowledgebase/reminders.md) |
 | DataInteractor and Helper pattern | [helper-classes.md](docs/knowledgebase/helper-classes.md) |
 | Lua functions app architecture | [lua-architecture.md](docs/knowledgebase/lua-architecture.md) |

@@ -521,7 +521,7 @@ class GroupViewModelImpl @Inject constructor(
             // to the real children, otherwise the UI could glitch swapping back and forth.
             try {
                 withTimeout(500) {
-                    dbDisplayIndices.first { indices ->
+                    dbDisplayIndices.filterNotNull().first { indices ->
                         expectedIndices.all { (key, expectedIndex) ->
                             indices[key] == expectedIndex
                         }
