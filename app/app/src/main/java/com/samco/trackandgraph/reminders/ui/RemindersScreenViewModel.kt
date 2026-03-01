@@ -40,9 +40,11 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -107,14 +109,37 @@ class RemindersScreenViewModelImpl @Inject constructor(
             .flowOn(io)
             .stateIn(viewModelScope, SharingStarted.Eagerly, LoadingState.Loading)
 
+    /**
+     * A flow of display indices from the database for the reminders screen, represented as a
+     * map from reminder ID to displayIndex for O(1) lookups during sorting.
+     *
+     * Reacts to [DataUpdateType.ReminderScreenDisplayOrder] (display-only reorders) and
+     * [DataUpdateType.Reminder] (creates/deletes which may also change indices).
+     */
+    @OptIn(FlowPreview::class)
+    private val dbDisplayIndices: StateFlow<Map<Long, Int>?> =
+        dataInteractor.getDataUpdateEvents()
+            .filter {
+                it is DataUpdateType.ReminderScreenDisplayOrder ||
+                it is DataUpdateType.Unknown
+            }
+            .debounce(10L)
+            .onStart { emit(DataUpdateType.ReminderScreenDisplayOrder) }
+            .map { dataInteractor.getDisplayIndicesForRemindersScreen() }
+            .flowOn(io)
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     override val currentReminders: StateFlow<List<ReminderViewData>> = isDragging
         .flatMapLatest { dragging ->
             if (dragging) {
                 temporaryReminders
             } else {
-                allReminders
-                    .filterIsInstance<LoadingState.Loaded>()
-                    .map { it.data }
+                combine(
+                    allReminders.filterIsInstance<LoadingState.Loaded>().map { it.data },
+                    dbDisplayIndices.filterNotNull()
+                ) { reminders, indices ->
+                    reminders.sortedBy { indices[it.id] ?: Int.MAX_VALUE }
+                }
             }
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -182,28 +207,24 @@ class RemindersScreenViewModelImpl @Inject constructor(
             }
 
             // Update all display indices in one call (null groupId = reminders screen)
-            dataInteractor.updateReminderDisplayOrder(groupId = null, orders = orders)
+            dataInteractor.updateReminderScreenDisplayOrder(orders = orders)
 
-            val expectedOrder = temporaryReminders.value.map { it.id }
-
-            // Wait until all reminders have been updated in the database
-            // before switching back to the real reminders or the UI could
-            // glitch swapping back and forth.
+            // Wait until dbDisplayIndices reflects the new order before switching back
+            // to the real reminders, otherwise the UI could glitch swapping back and forth.
+            val expectedIndices = orders.associate { it.id to it.displayIndex }
             try {
                 withTimeout(500) {
-                    allReminders.first { loadingState ->
-                        when (loadingState) {
-                            is LoadingState.Loaded -> {
-                                val actualOrder = loadingState.data.map { it.id }
-                                actualOrder == expectedOrder
-                            }
-
-                            else -> false
+                    dbDisplayIndices.filterNotNull().first { indices ->
+                        expectedIndices.all { (id, expectedIndex) ->
+                            indices[id] == expectedIndex
                         }
                     }
                 }
             } catch (e: TimeoutCancellationException) {
-                Timber.e("The database did not update the reminder indexes within 500ms. Drag and drop update may have failed.")
+                Timber.e(
+                    e,
+                    "The database did not update the reminder indexes within 500ms. Drag and drop update may have failed."
+                )
             }
 
             // Switch back to showing the real reminders from the database

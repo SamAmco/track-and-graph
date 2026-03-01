@@ -98,6 +98,7 @@ object TestDataInteractor {
             reminderDao = database.trackAndGraphDatabaseDao,
             groupItemDao = database.groupItemDao,
             reminderSerializer = ReminderSerializer(testJson),
+            transactionHelper = transactionHelper,
             io = Dispatchers.IO
         )
 

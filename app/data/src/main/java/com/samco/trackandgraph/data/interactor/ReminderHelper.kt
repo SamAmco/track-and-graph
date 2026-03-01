@@ -44,14 +44,12 @@ interface ReminderHelper {
      * Updates the display order of reminders within a specific group.
      *
      * This method uses a forgiving approach:
-     * - Only reminders belonging to [groupId] are affected
+     * - Only the order of reminders in the reminders screen is affected
      * - Reminders not included in [orders] retain their current display index
-     * - IDs in [orders] that don't belong to [groupId] are ignored
      *
-     * @param groupId The group to update, or null for ungrouped reminders
-     * @param orders The new display order data for reminders in this group
+     * @param orders The new display order data for reminders
      */
-    suspend fun updateReminderDisplayOrder(groupId: Long?, orders: List<ReminderDisplayOrderData>)
+    suspend fun updateReminderScreenDisplayOrder(orders: List<ReminderDisplayOrderData>)
 
     /**
      * Deletes a reminder or removes it from a specific location.
@@ -65,4 +63,10 @@ interface ReminderHelper {
     suspend fun duplicateReminder(id: Long): Long
 
     suspend fun hasAnyReminders(): Boolean
+
+    /**
+     * Returns display indices for all reminders shown on the reminders screen
+     * (i.e. reminders with a null groupId), as a map from reminder ID to display index.
+     */
+    suspend fun getDisplayIndicesForRemindersScreen(): Map<Long, Int>
 }

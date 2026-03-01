@@ -257,13 +257,11 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
-    override suspend fun updateReminderDisplayOrder(
-        groupId: Long?,
-        orders: List<ReminderDisplayOrderData>
-    ) = withContext(io) {
-        reminderHelper.updateReminderDisplayOrder(groupId, orders)
-        dataUpdateEvents.emit(DataUpdateType.Reminder)
-    }
+    override suspend fun updateReminderScreenDisplayOrder(orders: List<ReminderDisplayOrderData>) =
+        withContext(io) {
+            reminderHelper.updateReminderScreenDisplayOrder(orders)
+            dataUpdateEvents.emit(DataUpdateType.ReminderScreenDisplayOrder)
+        }
 
     override suspend fun deleteReminder(request: ReminderDeleteRequest) = withContext(io) {
         reminderHelper.deleteReminder(request)
@@ -528,7 +526,10 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllGlobalNotesSync().map { it.toDto() }
     }
 
-    override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>) {
+    override suspend fun updateGroupChildOrder(
+        groupId: Long,
+        children: List<GroupChildDisplayIndex>
+    ) {
         groupHelper.updateGroupChildOrder(groupId, children)
         dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
 

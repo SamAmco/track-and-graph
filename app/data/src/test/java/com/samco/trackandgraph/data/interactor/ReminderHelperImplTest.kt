@@ -19,6 +19,7 @@ package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.FakeReminderDao
+import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
@@ -71,10 +72,15 @@ class ReminderHelperImplTest {
         fakeGroupItemDao = FakeGroupItemDao()
         reminderSerializer = ReminderSerializer(Json { ignoreUnknownKeys = true })
 
+        val transactionHelper = object : DatabaseTransactionHelper {
+            override suspend fun <R> withTransaction(block: suspend () -> R): R = block()
+        }
+
         uut = ReminderHelperImpl(
             reminderDao = fakeReminderDao,
             groupItemDao = fakeGroupItemDao,
             reminderSerializer = reminderSerializer,
+            transactionHelper = transactionHelper,
             io = dispatcher
         )
     }

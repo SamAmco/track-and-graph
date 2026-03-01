@@ -164,7 +164,7 @@ class DataInteractorImplTest {
         yield()
 
         uut.deleteGroup(GroupDeleteRequest(groupId = 0L))
-        uut.createTracker(testCreateRequest)
+        uut.createTracker(testCreateRequest) // create tracker emits 2 for tracker and display indices
         uut.updateTracker(testUpdateRequest)
         uut.deleteTracker(TrackerDeleteRequest(trackerId = 0L))
         uut.deleteDataPoint(testDataPoint)
@@ -177,7 +177,7 @@ class DataInteractorImplTest {
         uut.insertGlobalNote(testGlobalNote)
 
         //VERIFY
-        assertEquals(10, count)
+        assertEquals(11, count)
         collectJob.cancel()
         verify(trackerHelper, times(1)).createTracker(eq(testCreateRequest))
         verify(trackerHelper, times(1)).updateTracker(eq(testUpdateRequest))
