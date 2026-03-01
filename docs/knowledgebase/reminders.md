@@ -101,6 +101,19 @@ val reminderId = reminderDao.insertReminder(entity)
 groupItemDao.insertGroupItem(GroupItem(groupId = null, ...))
 ```
 
+### Duplicate Reminder
+
+Inserts the copy immediately **after** the original (not at the top). Only items below the original are shifted:
+
+```kotlin
+val originalIndex = existingGroupItem.displayIndex
+val insertAtIndex = originalIndex + 1
+// Shift only items after the original
+if (groupId != null) groupItemDao.shiftDisplayIndexesDownAfter(groupId, originalIndex)
+else groupItemDao.shiftDisplayIndexesDownAfterForNullGroup(originalIndex)
+groupItemDao.insertGroupItem(GroupItem(displayIndex = insertAtIndex, ...))
+```
+
 ### Query Groupless Reminders
 
 ```kotlin
@@ -116,6 +129,15 @@ The reminder scheduler deliberately isolates Android platform code behind an int
 - **`AndroidPlatformScheduler`** — Android implementation using `AlarmManager`; lives in `androidplatform/` subpackage
 - **`ReminderScheduler` / `*ReminderScheduler`** — pure Kotlin scheduling logic, depend only on `PlatformScheduler`
 - **`FakePlatformScheduler`** — used in tests instead of mocking
+
+## RemindersScreenViewModel — Display Ordering
+
+The screen combines two independent flows:
+
+- `allReminders` — reacts to `DataUpdateType.Reminder`; holds the list of `ReminderViewData`
+- `dbDisplayIndices` — reacts to `DataUpdateType.ReminderScreenDisplayOrder` **and** `DataUpdateType.Reminder`; holds a `Map<reminderId, displayIndex>`
+
+Both flows **must** react to `DataUpdateType.Reminder`. If `dbDisplayIndices` only listens for `ReminderScreenDisplayOrder`, a newly created reminder won't appear in the index map and will fall to the bottom of the list (sorted with `Int.MAX_VALUE` as the fallback).
 
 ## Key Files
 

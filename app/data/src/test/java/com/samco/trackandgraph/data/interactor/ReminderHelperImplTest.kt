@@ -535,6 +535,81 @@ class ReminderHelperImplTest {
         uut.duplicateReminder(999L)
     }
 
+    @Test
+    fun `duplicateReminder inserts duplicate immediately after original in null group`() =
+        runTest(dispatcher) {
+            // PREPARE - create three reminders so we can check indices around the duplicated one
+            val idA = uut.createReminder(ReminderCreateRequest("A", null, null, defaultParams))
+            val idB = uut.createReminder(ReminderCreateRequest("B", null, null, defaultParams))
+            val idC = uut.createReminder(ReminderCreateRequest("C", null, null, defaultParams))
+
+            // After 3 creates (each shifts others down then inserts at 0):
+            // C=0, B=1, A=2
+            fun indexOf(id: Long) = fakeGroupItemDao
+                .getGroupItemsForChild(id, GroupItemType.REMINDER)
+                .first().displayIndex
+
+            assertEquals(0, indexOf(idC))
+            assertEquals(1, indexOf(idB))
+            assertEquals(2, indexOf(idA))
+
+            // EXECUTE - duplicate B (currently at index 1)
+            val idBCopy = uut.duplicateReminder(idB)
+
+            // VERIFY - B-copy should be at index 2, A shifted to 3, C and B unchanged
+            assertEquals(0, indexOf(idC))
+            assertEquals(1, indexOf(idB))
+            assertEquals(2, indexOf(idBCopy))
+            assertEquals(3, indexOf(idA))
+        }
+
+    @Test
+    fun `duplicateReminder inserts duplicate immediately after original in named group`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val groupId = 7L
+            val idA = uut.createReminder(ReminderCreateRequest("A", groupId, null, defaultParams))
+            val idB = uut.createReminder(ReminderCreateRequest("B", groupId, null, defaultParams))
+
+            fun indexOf(id: Long) = fakeGroupItemDao
+                .getGroupItemsForChild(id, GroupItemType.REMINDER)
+                .first { it.groupId == groupId }.displayIndex
+
+            // B=0, A=1
+            assertEquals(0, indexOf(idB))
+            assertEquals(1, indexOf(idA))
+
+            // EXECUTE - duplicate A (at index 1, the last item)
+            val idACopy = uut.duplicateReminder(idA)
+
+            // VERIFY - A-copy at index 2, nothing else shifts
+            assertEquals(0, indexOf(idB))
+            assertEquals(1, indexOf(idA))
+            assertEquals(2, indexOf(idACopy))
+        }
+
+    @Test
+    fun `duplicateReminder does not shift items before the original`() = runTest(dispatcher) {
+        // PREPARE
+        val idA = uut.createReminder(ReminderCreateRequest("A", null, null, defaultParams))
+        val idB = uut.createReminder(ReminderCreateRequest("B", null, null, defaultParams))
+        val idC = uut.createReminder(ReminderCreateRequest("C", null, null, defaultParams))
+
+        // C=0, B=1, A=2
+        fun indexOf(id: Long) = fakeGroupItemDao
+            .getGroupItemsForChild(id, GroupItemType.REMINDER)
+            .first().displayIndex
+
+        // EXECUTE - duplicate C (at index 0)
+        val idCCopy = uut.duplicateReminder(idC)
+
+        // VERIFY - C stays at 0, C-copy at 1, B and A each shift by 1
+        assertEquals(0, indexOf(idC))
+        assertEquals(1, indexOf(idCCopy))
+        assertEquals(2, indexOf(idB))
+        assertEquals(3, indexOf(idA))
+    }
+
     // =========================================================================
     // Get tests
     // =========================================================================

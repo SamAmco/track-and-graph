@@ -121,6 +121,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
         dataInteractor.getDataUpdateEvents()
             .filter {
                 it is DataUpdateType.ReminderScreenDisplayOrder ||
+                it is DataUpdateType.Reminder ||
                 it is DataUpdateType.Unknown
             }
             .debounce(10L)

@@ -149,18 +149,27 @@ internal class ReminderHelperImpl @Inject constructor(
             val existing = reminderDao.getReminderById(id)
                 ?: throw IllegalArgumentException("Reminder with id $id not found")
 
-            // Get the existing GroupItem to find the groupId
-            val existingGroupItem = groupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            // Get the existing GroupItem to find the groupId and displayIndex
+            val existingGroupItem = groupItemDao
+                .getGroupItemsForChild(id, GroupItemType.REMINDER)
                 .firstOrNull()
             val groupId = existingGroupItem?.groupId
+            val insertAtIndex = (existingGroupItem?.displayIndex ?: -1) + 1
+
+            // Shift items after the original down to make room
+            if (groupId != null) {
+                groupItemDao.shiftDisplayIndexesDownAfter(groupId, insertAtIndex - 1)
+            } else {
+                groupItemDao.shiftDisplayIndexesDownAfterForNullGroup(insertAtIndex - 1)
+            }
 
             val newEntity = existing.copy(id = 0L)
             val newReminderId = reminderDao.insertReminder(newEntity)
 
-            // Create GroupItem for the new reminder
+            // Create GroupItem for the new reminder, right after the original
             val newGroupItem = GroupItem(
                 groupId = groupId,
-                displayIndex = 0,
+                displayIndex = insertAtIndex,
                 childId = newReminderId,
                 type = GroupItemType.REMINDER,
                 createdAt = System.currentTimeMillis()

@@ -107,6 +107,14 @@ internal class FakeGroupItemDao : GroupItemDao {
         }
     }
 
+    override fun shiftDisplayIndexesDownAfterForNullGroup(afterIndex: Int) {
+        items.entries
+            .filter { it.value.groupId == null && it.value.displayIndex > afterIndex }
+            .forEach { entry ->
+                items[entry.key] = entry.value.copy(displayIndex = entry.value.displayIndex + 1)
+            }
+    }
+
     override fun getGroupItem(groupId: Long, childId: Long, type: GroupItemType): GroupItem? {
         return items.values.find {
             it.groupId == groupId && it.childId == childId && it.type == type
