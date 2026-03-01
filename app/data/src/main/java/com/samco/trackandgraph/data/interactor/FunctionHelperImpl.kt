@@ -49,22 +49,22 @@ internal class FunctionHelperImpl @Inject constructor(
 ) : FunctionHelper {
 
     override suspend fun insertFunction(request: FunctionCreateRequest): Long? = withContext(io) {
+        val function = Function(
+            id = 0L,
+            featureId = 0L,
+            name = request.name,
+            description = request.description,
+            functionGraph = request.functionGraph,
+            inputFeatureIds = request.inputFeatureIds
+        )
+
+        functionValidator.validateFunction(function)
+
+        val serializedGraph = functionGraphSerializer
+            .serialize(function.functionGraph)
+            ?: return@withContext null
+
         transactionHelper.withTransaction {
-            val function = Function(
-                id = 0L,
-                featureId = 0L,
-                name = request.name,
-                description = request.description,
-                functionGraph = request.functionGraph,
-                inputFeatureIds = request.inputFeatureIds
-            )
-
-            functionValidator.validateFunction(function)
-
-            val serializedGraph = functionGraphSerializer
-                .serialize(function.functionGraph)
-                ?: return@withTransaction null
-
             // First, create the Feature entity that the Function will reference
             val feature = Feature(
                 id = 0L, // Let the database generate the ID
@@ -106,21 +106,21 @@ internal class FunctionHelperImpl @Inject constructor(
     }
 
     override suspend fun updateFunction(request: FunctionUpdateRequest) = withContext(io) {
+        val existingFunction = getFunctionById(request.id) ?: return@withContext
+
+        val updatedFunction = existingFunction.copy(
+            name = request.name ?: existingFunction.name,
+            description = request.description ?: existingFunction.description,
+            functionGraph = request.functionGraph ?: existingFunction.functionGraph,
+            inputFeatureIds = request.inputFeatureIds ?: existingFunction.inputFeatureIds
+        )
+
+        functionValidator.validateFunction(updatedFunction)
+
+        val serializedGraph = functionGraphSerializer.serialize(updatedFunction.functionGraph)
+            ?: return@withContext
+
         transactionHelper.withTransaction {
-            val existingFunction = getFunctionById(request.id) ?: return@withTransaction
-
-            val updatedFunction = existingFunction.copy(
-                name = request.name ?: existingFunction.name,
-                description = request.description ?: existingFunction.description,
-                functionGraph = request.functionGraph ?: existingFunction.functionGraph,
-                inputFeatureIds = request.inputFeatureIds ?: existingFunction.inputFeatureIds
-            )
-
-            functionValidator.validateFunction(updatedFunction)
-
-            val serializedGraph = functionGraphSerializer.serialize(updatedFunction.functionGraph)
-                ?: return@withTransaction
-
             val feature = Feature(
                 id = updatedFunction.featureId,
                 name = updatedFunction.name,
@@ -215,7 +215,10 @@ internal class FunctionHelperImpl @Inject constructor(
                     GroupItemType.FUNCTION
                 )
                 val newDisplayIndex = if (originalGroupItem != null) {
-                    groupItemDao.shiftDisplayIndexesDownAfter(groupId, originalGroupItem.displayIndex)
+                    groupItemDao.shiftDisplayIndexesDownAfter(
+                        groupId,
+                        originalGroupItem.displayIndex
+                    )
                     originalGroupItem.displayIndex + 1
                 } else {
                     groupItemDao.shiftDisplayIndexesDown(groupId)
