@@ -33,9 +33,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-
-        javaCompileOptions {
+javaCompileOptions {
             annotationProcessorOptions {
                 arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")
             }
@@ -98,6 +96,21 @@ android {
     }
 
     namespace = "com.samco.trackandgraph.data"
+
+    lint {
+        // TODO: Investigate and re-enable. lintVitalAnalyzeRelease crashes with a
+        // KotlinIllegalArgumentExceptionWithAttachments ("findFirCompiledSymbol only works on
+        // compiled declarations") when lint analyzes lua-tasks.gradle.kts via UastGradleVisitor.
+        // Root cause unknown — possibly a version mismatch introduced during a dependency update.
+        // Disabling checkReleaseBuilds alone is insufficient for library modules, so the task is
+        // also disabled explicitly below.
+        checkReleaseBuilds = false
+    }
+}
+
+// TODO: Remove once the lint crash is investigated and resolved (see lint block above).
+tasks.matching { it.name == "lintVitalAnalyzeRelease" }.configureEach {
+    enabled = false
 }
 
 tasks.withType<Test>().configureEach {
