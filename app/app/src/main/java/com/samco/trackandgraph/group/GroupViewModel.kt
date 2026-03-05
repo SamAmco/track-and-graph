@@ -285,17 +285,6 @@ class GroupViewModelImpl @Inject constructor(
         .map { (groupId, _) -> getFunctionChildren(groupId) }
         .flowOn(io)
 
-    private val allChildren: StateFlow<List<GroupChild>> =
-        combine(
-            graphChildren, trackersChildren, groupChildren, functionChildren
-        ) { graphs, trackers, groups, functions ->
-            listOf(graphs, trackers, groups, functions)
-        }
-            //This debounce should be longer than the children debounce
-            .debounce(50L)
-            .map { it.flatten() }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
     /**
      * A flow of display indices from the database, represented as a map from
      * (type, childId) to displayIndex for O(1) lookups during sorting.
@@ -313,20 +302,26 @@ class GroupViewModelImpl @Inject constructor(
             .flowOn(io)
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    // Merging dbDisplayIndices into the same combine and filtering to only items present in
+    // indices prevents the race where dbDisplayIndices updates before allChildren (or vice versa),
+    // which would cause removed items to temporarily sort to Int.MAX_VALUE (visual flicker).
+    private val allChildren: StateFlow<List<GroupChild>> =
+        combine(
+            graphChildren, trackersChildren, groupChildren, functionChildren, dbDisplayIndices.filterNotNull()
+        ) { graphs, trackers, groups, functions, indices ->
+            listOf(graphs, trackers, groups, functions).flatten()
+                .filter { child -> indices.containsKey(Pair(child.type, child.id)) }
+                .sortedBy { child -> indices[Pair(child.type, child.id)] }
+        }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
     private val isDragging = MutableStateFlow(false)
     private val temporaryDragDropChildren = MutableStateFlow<List<GroupChild>>(emptyList())
 
     override val currentChildren: StateFlow<List<GroupChild>> = isDragging
         .flatMapLatest { dragging ->
-            if (dragging) {
-                temporaryDragDropChildren
-            } else {
-                combine(allChildren, dbDisplayIndices.filterNotNull()) { children, indices ->
-                    children.sortedBy { child ->
-                        indices[Pair(child.type, child.id)] ?: Int.MAX_VALUE
-                    }
-                }
-            }
+            if (dragging) temporaryDragDropChildren
+            else allChildren
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 

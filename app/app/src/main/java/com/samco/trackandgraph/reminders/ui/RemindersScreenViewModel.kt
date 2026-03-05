@@ -42,7 +42,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
@@ -96,12 +95,18 @@ class RemindersScreenViewModelImpl @Inject constructor(
     private val isDragging = MutableStateFlow(false)
     private val temporaryReminders = MutableStateFlow<List<ReminderViewData>>(emptyList())
 
-    // Observable pattern: listen for reminder updates and reload data
+    // Observable pattern: listen for reminder updates and reload data.
+    // Display indices are fetched in the same flatMapLatest block as the reminder list so that
+    // the sorted result is always consistent — there is no race between two separate flows.
     @OptIn(FlowPreview::class)
     private val allReminders: StateFlow<LoadingState> =
         merge(
             dataInteractor.getDataUpdateEvents()
-                .filter { it == DataUpdateType.Reminder }
+                .filter {
+                    it == DataUpdateType.Reminder ||
+                    it is DataUpdateType.ReminderScreenDisplayOrder ||
+                    it is DataUpdateType.Unknown
+                }
                 .map { },
             reminderInteractor.schedulingEvents.map { }
         )
@@ -111,7 +116,8 @@ class RemindersScreenViewModelImpl @Inject constructor(
                 flow {
                     val reminders = dataInteractor.getAllRemindersSync()
                         .map { convertToReminderViewData(it) }
-                    emit(LoadingState.Loaded(reminders))
+                    val indices = dataInteractor.getDisplayIndicesForRemindersScreen()
+                    emit(LoadingState.Loaded(reminders.sortedBy { indices[it.id] ?: Int.MAX_VALUE }))
                 }
             }
             .flowOn(io)
@@ -121,8 +127,8 @@ class RemindersScreenViewModelImpl @Inject constructor(
      * A flow of display indices from the database for the reminders screen, represented as a
      * map from reminder ID to displayIndex for O(1) lookups during sorting.
      *
-     * Reacts to [DataUpdateType.ReminderScreenDisplayOrder] (display-only reorders) and
-     * [DataUpdateType.Reminder] (creates/deletes which may also change indices).
+     * Used only by [onDragEnd] to confirm the database has persisted the new order before
+     * switching back from the temporary drag list to the real data.
      */
     @OptIn(FlowPreview::class)
     private val dbDisplayIndices: StateFlow<Map<Long, Int>?> =
@@ -140,16 +146,8 @@ class RemindersScreenViewModelImpl @Inject constructor(
 
     override val currentReminders: StateFlow<List<ReminderViewData>> = isDragging
         .flatMapLatest { dragging ->
-            if (dragging) {
-                temporaryReminders
-            } else {
-                combine(
-                    allReminders.filterIsInstance<LoadingState.Loaded>().map { it.data },
-                    dbDisplayIndices.filterNotNull()
-                ) { reminders, indices ->
-                    reminders.sortedBy { indices[it.id] ?: Int.MAX_VALUE }
-                }
-            }
+            if (dragging) temporaryReminders
+            else allReminders.filterIsInstance<LoadingState.Loaded>().map { it.data }
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
