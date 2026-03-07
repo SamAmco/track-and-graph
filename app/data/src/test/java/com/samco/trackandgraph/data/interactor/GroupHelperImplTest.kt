@@ -911,4 +911,230 @@ class GroupHelperImplTest {
         // EXECUTE & VERIFY
         assertEquals(true, uut.hasAnyGroups())
     }
+
+    // =========================================================================
+    // getAncestorAndSelfGroupIds tests
+    // =========================================================================
+
+    @Test
+    fun `getAncestorAndSelfGroupIds returns only self for root group`() = runTest(dispatcher) {
+        // PREPARE - root group (groupId = 0) has no parent in the group_items_table
+        val rootGroupId = 0L
+
+        // EXECUTE
+        val result = uut.getAncestorAndSelfGroupIds(rootGroupId)
+
+        // VERIFY
+        assertEquals(setOf(0L), result)
+    }
+
+    @Test
+    fun `getAncestorAndSelfGroupIds returns self and direct parent`() = runTest(dispatcher) {
+        // PREPARE: root -> groupA
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+
+        // EXECUTE
+        val result = uut.getAncestorAndSelfGroupIds(groupAId)
+
+        // VERIFY: groupA + its parent (root = 0)
+        assertEquals(setOf(groupAId, 0L), result)
+    }
+
+    @Test
+    fun `getAncestorAndSelfGroupIds returns full ancestor chain`() = runTest(dispatcher) {
+        // PREPARE: root -> A -> B -> C
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupAId))
+        val groupCId = uut.insertGroup(GroupCreateRequest(name = "C", parentGroupId = groupBId))
+
+        // EXECUTE
+        val result = uut.getAncestorAndSelfGroupIds(groupCId)
+
+        // VERIFY
+        assertEquals(setOf(groupCId, groupBId, groupAId, 0L), result)
+    }
+
+    @Test
+    fun `getAncestorAndSelfGroupIds handles group with multiple parents`() = runTest(dispatcher) {
+        // PREPARE: groupB appears in both groupA and root (symlink scenario)
+        // root -> A -> B
+        // root -> B (symlink)
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupAId))
+        // Also place B in root directly (symlink)
+        uut.createSymlink(inGroupId = 0L, childId = groupBId, childType = GroupChildType.GROUP)
+
+        // EXECUTE - ancestors of B should include A and root (via both paths), no duplicates
+        val result = uut.getAncestorAndSelfGroupIds(groupBId)
+
+        // VERIFY
+        assertEquals(setOf(groupBId, groupAId, 0L), result)
+    }
+
+    // =========================================================================
+    // createSymlink tests
+    // =========================================================================
+
+    @Test
+    fun `createSymlink adds group item for tracker`() = runTest(dispatcher) {
+        // PREPARE
+        val trackerId = 100L
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+
+        // EXECUTE
+        uut.createSymlink(
+            inGroupId = groupId,
+            childId = trackerId,
+            childType = GroupChildType.TRACKER
+        )
+
+        // VERIFY
+        val items = fakeGroupItemDao.getGroupItemsForGroup(groupId)
+        // The group itself was inserted at index 0 and then shifted, symlink at 0
+        val symlinkItem = items.find { it.childId == trackerId }
+        assertNotNull(symlinkItem)
+        assertEquals(GroupItemType.TRACKER, symlinkItem!!.type)
+        assertEquals(groupId, symlinkItem.groupId)
+    }
+
+    @Test
+    fun `createSymlink adds group item for graph`() = runTest(dispatcher) {
+        // PREPARE
+        val graphId = 200L
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+
+        // EXECUTE
+        uut.createSymlink(
+            inGroupId = groupId,
+            childId = graphId,
+            childType = GroupChildType.GRAPH
+        )
+
+        // VERIFY
+        val items = fakeGroupItemDao.getGroupItemsForGroup(groupId)
+        val symlinkItem = items.find { it.childId == graphId }
+        assertNotNull(symlinkItem)
+        assertEquals(GroupItemType.GRAPH, symlinkItem!!.type)
+    }
+
+    @Test
+    fun `createSymlink adds group item for function`() = runTest(dispatcher) {
+        // PREPARE
+        val functionId = 300L
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+
+        // EXECUTE
+        uut.createSymlink(
+            inGroupId = groupId,
+            childId = functionId,
+            childType = GroupChildType.FUNCTION
+        )
+
+        // VERIFY
+        val items = fakeGroupItemDao.getGroupItemsForGroup(groupId)
+        val symlinkItem = items.find { it.childId == functionId }
+        assertNotNull(symlinkItem)
+        assertEquals(GroupItemType.FUNCTION, symlinkItem!!.type)
+    }
+
+    @Test
+    fun `createSymlink adds group item for group`() = runTest(dispatcher) {
+        // PREPARE: root -> A, create symlink of A inside itself is not tested here.
+        // Instead: root -> A and root -> B, then symlink A into B.
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = 0L))
+
+        // EXECUTE: symlink A into B
+        uut.createSymlink(
+            inGroupId = groupBId,
+            childId = groupAId,
+            childType = GroupChildType.GROUP
+        )
+
+        // VERIFY: A appears in B
+        val items = fakeGroupItemDao.getGroupItemsForGroup(groupBId)
+        val symlinkItem = items.find { it.childId == groupAId }
+        assertNotNull(symlinkItem)
+        assertEquals(GroupItemType.GROUP, symlinkItem!!.type)
+    }
+
+    @Test
+    fun `createSymlink throws when symlinking a group into itself`() = runTest(dispatcher) {
+        // PREPARE
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+
+        // EXECUTE & VERIFY
+        var threw = false
+        try {
+            uut.createSymlink(inGroupId = groupId, childId = groupId, childType = GroupChildType.GROUP)
+        } catch (e: IllegalStateException) {
+            threw = true
+        }
+        assertTrue(threw)
+    }
+
+    @Test
+    fun `createSymlink throws when symlinking an ancestor group into a descendant`() = runTest(dispatcher) {
+        // PREPARE: root -> A -> B
+        val groupA = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupB = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupA))
+
+        // EXECUTE & VERIFY: placing A inside B would create A -> B -> A cycle
+        var threw = false
+        try {
+            uut.createSymlink(inGroupId = groupB, childId = groupA, childType = GroupChildType.GROUP)
+        } catch (e: IllegalStateException) {
+            threw = true
+        }
+        assertTrue(threw)
+    }
+
+    @Test
+    fun `createSymlink throws when symlinking root ancestor into deep descendant`() = runTest(dispatcher) {
+        // PREPARE: root -> A -> B -> C
+        val groupA = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupB = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupA))
+        val groupC = uut.insertGroup(GroupCreateRequest(name = "C", parentGroupId = groupB))
+
+        // EXECUTE & VERIFY: placing A inside C would create a cycle
+        var threw = false
+        try {
+            uut.createSymlink(inGroupId = groupC, childId = groupA, childType = GroupChildType.GROUP)
+        } catch (e: IllegalStateException) {
+            threw = true
+        }
+        assertTrue(threw)
+    }
+
+    @Test
+    fun `createSymlink does not throw for non-group types even with same id`() = runTest(dispatcher) {
+        // PREPARE
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+
+        // EXECUTE & VERIFY: tracker with same id as the group should not trigger cycle check
+        uut.createSymlink(inGroupId = groupId, childId = groupId, childType = GroupChildType.TRACKER)
+
+        val items = fakeGroupItemDao.getGroupItemsForGroup(groupId)
+        assertNotNull(items.find { it.childId == groupId && it.type == GroupItemType.TRACKER })
+    }
+
+    @Test
+    fun `createSymlink inserts at display index 0 and shifts existing items`() = runTest(dispatcher) {
+        // PREPARE: create a group and insert a tracker into it first
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+        // Insert a tracker symlink first so it gets display index 0
+        uut.createSymlink(groupId, 100L, GroupChildType.TRACKER)
+
+        // EXECUTE: insert another symlink - should push the first one to index 1
+        uut.createSymlink(groupId, 200L, GroupChildType.GRAPH)
+
+        // VERIFY
+        val items = fakeGroupItemDao.getGroupItemsForGroup(groupId)
+        val graphItem = items.find { it.childId == 200L }
+        val trackerItem = items.find { it.childId == 100L }
+        assertNotNull(graphItem)
+        assertNotNull(trackerItem)
+        assertEquals(0, graphItem!!.displayIndex)
+        assertEquals(1, trackerItem!!.displayIndex)
+    }
 }

@@ -281,6 +281,55 @@ internal class GroupHelperImpl @Inject constructor(
             }
         }
 
+    override suspend fun getAncestorAndSelfGroupIds(groupId: Long): Set<Long> = withContext(io) {
+        val allItems = groupItemDao.getAllGroupItems()
+        // Build a map from (childId, type) -> list of parent groupIds
+        val parentGroupIds = allItems
+            .filter { it.type == GroupItemType.GROUP }
+            .groupBy { it.childId }
+            .mapValues { entry -> entry.value.mapNotNull { it.groupId } }
+
+        val result = mutableSetOf<Long>()
+
+        fun collectAncestors(id: Long) {
+            if (!result.add(id)) return
+            parentGroupIds[id]?.forEach { collectAncestors(it) }
+        }
+
+        collectAncestors(groupId)
+        result
+    }
+
+    override suspend fun createSymlink(inGroupId: Long, childId: Long, childType: GroupChildType) =
+        withContext(io) {
+            if (childType == GroupChildType.GROUP) {
+                val ancestors = getAncestorAndSelfGroupIds(inGroupId)
+                if (childId in ancestors) {
+                    error("Creating this symlink would cause an infinite loop")
+                }
+            }
+            transactionHelper.withTransaction {
+                val entityType = when (childType) {
+                    GroupChildType.GROUP -> GroupItemType.GROUP
+                    GroupChildType.TRACKER -> GroupItemType.TRACKER
+                    GroupChildType.FUNCTION -> GroupItemType.FUNCTION
+                    GroupChildType.GRAPH -> GroupItemType.GRAPH
+                    GroupChildType.REMINDER -> GroupItemType.REMINDER
+                }
+                groupItemDao.shiftDisplayIndexesDown(inGroupId)
+                groupItemDao.insertGroupItem(
+                    GroupItem(
+                        groupId = inGroupId,
+                        displayIndex = 0,
+                        childId = childId,
+                        type = entityType,
+                        createdAt = timeProvider.epochMilli()
+                    )
+                )
+                Unit
+            }
+        }
+
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>) =
         transactionHelper.withTransaction {
             val groupItems = groupItemDao.getGroupItemsForGroup(groupId)

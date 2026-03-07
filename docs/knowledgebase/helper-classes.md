@@ -122,6 +122,31 @@ dao.deleteFeature(tracker.featureId)
 
 This pattern is used consistently by `TrackerHelper`, `GraphHelper`, and `ReminderHelper`. For **reminders**, `null` groupId always deletes everywhere (the Reminders screen never passes a groupId).
 
+## Coroutine + Transaction Pitfall
+
+**Never call `withContext` inside a `withTransaction` block**, even if switching to the same dispatcher. Room binds a transaction to a specific coroutine context; switching context mid-transaction breaks thread confinement and can cause a crash or incorrect behaviour.
+
+This means you must not call any `suspend` function that internally calls `withContext` from within a transaction block — including other helper methods on the same class.
+
+```kotlin
+// BAD - getAncestorAndSelfGroupIds calls withContext(io) internally
+override suspend fun createSymlink(...) = withContext(io) {
+    transactionHelper.withTransaction {
+        val ancestors = getAncestorAndSelfGroupIds(inGroupId) // ← withContext inside transaction!
+        ...
+    }
+}
+
+// GOOD - do the context-switching work before entering the transaction
+override suspend fun createSymlink(...) = withContext(io) {
+    val ancestors = getAncestorAndSelfGroupIds(inGroupId) // ← outside transaction
+    transactionHelper.withTransaction {
+        if (childId in ancestors) error("...")
+        ...
+    }
+}
+```
+
 ## Testing Approach
 
 **Always use fake implementations, never mocks.** The project avoids Mockito/mocking frameworks because the codebase may eventually migrate to Kotlin Multiplatform (KMP), which is incompatible with Android-specific mocking tools.

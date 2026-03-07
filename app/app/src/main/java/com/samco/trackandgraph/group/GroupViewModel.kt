@@ -147,6 +147,7 @@ class GroupViewModelImpl @Inject constructor(
         onUpdateChildrenForGroup
             .filter { (_, event) ->
                 event is DataUpdateType.Unknown ||
+                event is DataUpdateType.SymlinkCreated ||
                 event is DataUpdateType.GraphOrStatDeleted ||
                 event is DataUpdateType.GraphOrStatCreated ||
                 event is DataUpdateType.GraphOrStatUpdated
@@ -254,6 +255,7 @@ class GroupViewModelImpl @Inject constructor(
     private val trackersChildren = onUpdateChildrenForGroup
         .filter { (_, event) ->
             event is DataUpdateType.Unknown ||
+            event is DataUpdateType.SymlinkCreated ||
             event is DataUpdateType.DataPoint ||
             event is DataUpdateType.TrackerCreated ||
             event is DataUpdateType.TrackerDeleted ||
@@ -266,6 +268,7 @@ class GroupViewModelImpl @Inject constructor(
     private val groupChildren = onUpdateChildrenForGroup
         .filter { (_, event) ->
             event is DataUpdateType.Unknown ||
+            event is DataUpdateType.SymlinkCreated ||
             event is DataUpdateType.GroupCreated ||
             event is DataUpdateType.GroupDeleted ||
             event is DataUpdateType.GroupUpdated
@@ -277,6 +280,7 @@ class GroupViewModelImpl @Inject constructor(
     private val functionChildren = onUpdateChildrenForGroup
         .filter { (_, event) ->
             event is DataUpdateType.Unknown ||
+            event is DataUpdateType.SymlinkCreated ||
             event is DataUpdateType.FunctionCreated ||
             event is DataUpdateType.FunctionDeleted ||
             event is DataUpdateType.FunctionUpdated
@@ -292,7 +296,9 @@ class GroupViewModelImpl @Inject constructor(
     private val dbDisplayIndices: StateFlow<Map<Pair<GroupChildType, Long>, Int>?> =
         onUpdateChildrenForGroup
             .filter { (_, event) ->
-                event is DataUpdateType.DisplayIndex || event is DataUpdateType.Unknown
+                event is DataUpdateType.DisplayIndex ||
+                event is DataUpdateType.SymlinkCreated ||
+                event is DataUpdateType.Unknown
             }
             .debounce(10L)
             .map { (groupId, _) ->

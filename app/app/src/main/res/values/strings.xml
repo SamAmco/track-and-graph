@@ -22,6 +22,7 @@
     <string name="tracker">Tracker</string>
     <string name="function">Function</string>
     <string name="graph_or_stat">Graph or Statistic</string>
+    <string name="symlink">Symlink</string>
     <string name="add_tracker">Track something:</string>
     <string name="add">Add</string>
     <string name="group_name">e.g. Daily Activities</string>

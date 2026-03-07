@@ -16,6 +16,7 @@
   -->
 <resources>
     <string name="home">Accueil</string>
+    <string name="symlink">Lien symbolique</string>
     <string name="add_tracker">Suivre quelquechose : </string>
     <string name="add">Ajouter</string>
     <string name="group_name">ex. Activités quotidiennes</string>

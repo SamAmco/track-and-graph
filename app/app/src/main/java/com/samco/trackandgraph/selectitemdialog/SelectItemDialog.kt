@@ -62,6 +62,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.TngColors
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
@@ -76,6 +78,7 @@ fun SelectItemDialog(
     title: String,
     selectableTypes: Set<SelectableItemType>,
     hiddenItems: Set<HiddenItem> = emptySet(),
+    disabledItems: Set<HiddenItem> = emptySet(),
     onGroupSelected: ((Long) -> Unit)? = null,
     onTrackerSelected: ((Long) -> Unit)? = null,
     onFeatureSelected: ((Long) -> Unit)? = null,
@@ -86,8 +89,8 @@ fun SelectItemDialog(
 ) {
     val viewModel: SelectItemDialogViewModel = hiltViewModel<SelectItemDialogViewModelImpl>()
 
-    LaunchedEffect(selectableTypes, hiddenItems) {
-        viewModel.init(selectableTypes, hiddenItems)
+    LaunchedEffect(selectableTypes, hiddenItems, disabledItems) {
+        viewModel.init(selectableTypes, hiddenItems, disabledItems)
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -173,7 +176,7 @@ private fun SelectItemDialogContent(
                         Text(
                             text = stringResource(R.string.no_data),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = MaterialTheme.colorScheme.onSurface.copy(MaterialTheme.tngColors.disabledAlpha)
                         )
                     }
                 } else {
@@ -289,9 +292,11 @@ private fun SelectableItemRow(
     onWidthMeasured: (Dp) -> Unit = {},
     onClick: () -> Unit
 ) {
+    val disabledAlpha = MaterialTheme.tngColors.disabledAlpha
+    val disabledModifier = if (item.isDisabled) modifier.alpha(disabledAlpha) else modifier
     when (item) {
         is GraphNode.Group -> GroupItemRow(
-            modifier = modifier,
+            modifier = disabledModifier,
             item = item,
             indentLevel = indentLevel,
             isSelected = selectedItem == item,
@@ -300,7 +305,7 @@ private fun SelectableItemRow(
         )
 
         is GraphNode.Tracker -> IconItemRow(
-            modifier = modifier,
+            modifier = disabledModifier,
             name = item.name,
             icon = R.drawable.add_box,
             indentLevel = indentLevel,
@@ -310,7 +315,7 @@ private fun SelectableItemRow(
         )
 
         is GraphNode.Graph -> IconItemRow(
-            modifier = modifier,
+            modifier = disabledModifier,
             name = item.name,
             icon = R.drawable.chart_data,
             indentLevel = indentLevel,
@@ -320,7 +325,7 @@ private fun SelectableItemRow(
         )
 
         is GraphNode.Function -> IconItemRow(
-            modifier = modifier,
+            modifier = disabledModifier,
             name = item.name,
             icon = R.drawable.function,
             indentLevel = indentLevel,
@@ -461,6 +466,7 @@ private fun SelectItemDialogContentPreview() {
                     GraphNode.Group(
                         id = 2L,
                         name = "Physical Fitness & Exercise Routines",
+                        isDisabled = true,
                         colorIndex = 1,
                         expanded = remember { mutableStateOf(false) },
                         children = listOf(
@@ -493,6 +499,7 @@ private fun SelectItemDialogContentPreview() {
                             ),
                             GraphNode.Graph(
                                 id = 21L,
+                                isDisabled = true,
                                 name = "Stress Level Trends Analysis"
                             )
                         )
@@ -500,6 +507,7 @@ private fun SelectItemDialogContentPreview() {
                     GraphNode.Tracker(
                         trackerId = 13L,
                         featureId = 13L,
+                        isDisabled = true,
                         name = "Blood Pressure & Heart Rate Monitoring"
                     ),
                     GraphNode.Graph(

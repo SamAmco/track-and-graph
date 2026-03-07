@@ -127,6 +127,7 @@ fun GroupScreen(
     val groupViewModel: GroupViewModel = hiltViewModel<GroupViewModelImpl>()
     val groupDialogsViewModel: GroupDialogsViewModel = hiltViewModel()
     val addGroupDialogViewModel: AddGroupDialogViewModelImpl = hiltViewModel()
+    val addSymlinkViewModel: AddSymlinkViewModel = hiltViewModel<AddSymlinkViewModelImpl>()
     val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel<ReleaseNotesViewModelImpl>()
 
     LaunchedEffect(navArgs.groupId) {
@@ -144,6 +145,7 @@ fun GroupScreen(
         onAddTracker = onAddTracker,
         onAddGraphStat = onAddGraphStat,
         onAddFunction = onAddFunction,
+        onAddSymlink = { addSymlinkViewModel.show(it) },
         showFab = showFab,
     )
 
@@ -151,6 +153,7 @@ fun GroupScreen(
         groupViewModel = groupViewModel,
         groupDialogsViewModel = groupDialogsViewModel,
         addGroupDialogViewModel = addGroupDialogViewModel,
+        addSymlinkViewModel = addSymlinkViewModel,
         releaseNotesViewModel = releaseNotesViewModel,
         groupId = navArgs.groupId,
         groupName = navArgs.groupName,
@@ -206,6 +209,7 @@ private fun GroupScreenContent(
     groupViewModel: GroupViewModel,
     groupDialogsViewModel: GroupDialogsViewModel,
     addGroupDialogViewModel: AddGroupDialogViewModelImpl,
+    addSymlinkViewModel: AddSymlinkViewModel,
     releaseNotesViewModel: ReleaseNotesViewModel,
     groupId: Long,
     groupName: String?,
@@ -314,6 +318,11 @@ private fun GroupScreenContent(
     AddGroupDialog(
         viewModel = addGroupDialogViewModel,
         onDismissRequest = { addGroupDialogViewModel.hide() }
+    )
+
+    AddSymlinkDialog(
+        viewModel = addSymlinkViewModel,
+        onDismissRequest = { addSymlinkViewModel.hide() }
     )
 
     if (groupDialogsViewModel.showImportDialog.collectAsStateWithLifecycle().value) {

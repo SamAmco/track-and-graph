@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateReq
 import com.samco.trackandgraph.data.database.dto.BarChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.BarChartUpdateRequest
 import com.samco.trackandgraph.data.database.dto.ComponentType
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.DisplayNote
@@ -125,6 +126,12 @@ internal class DataInteractorImpl @Inject constructor(
         groupHelper.updateGroup(request)
         dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
     }
+
+    override suspend fun createSymlink(inGroupId: Long, childId: Long, childType: GroupChildType) =
+        withContext(io) {
+            groupHelper.createSymlink(inGroupId, childId, childType)
+            dataUpdateEvents.emit(DataUpdateType.SymlinkCreated(inGroupId))
+        }
 
     override suspend fun getGroupGraphSync(rootGroupId: Long?): GroupGraph = withContext(io) {
         val rootGroup = if (rootGroupId != null) {

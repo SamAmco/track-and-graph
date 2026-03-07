@@ -55,6 +55,7 @@ internal fun GroupTopBarContent(
     onAddGraphStat: (Long) -> Unit,
     showFab: MutableState<Boolean>,
     onAddFunction: (Long) -> Unit,
+    onAddSymlink: (Long) -> Unit,
 ) {
     val topBarController = LocalTopBarController.current
 
@@ -82,6 +83,7 @@ internal fun GroupTopBarContent(
             onAddTracker = onAddTracker,
             onAddGraphStat = onAddGraphStat,
             onAddFunction = onAddFunction,
+            onAddSymlink = onAddSymlink,
             groupId = navArgs.groupId
         )
     }
@@ -132,6 +134,7 @@ private fun createTopBarActions(
     onAddTracker: (Long) -> Unit,
     onAddGraphStat: (Long) -> Unit,
     onAddFunction: (Long) -> Unit,
+    onAddSymlink: (Long) -> Unit,
     groupId: Long
 ): @Composable RowScope.() -> Unit {
     return {
@@ -139,7 +142,7 @@ private fun createTopBarActions(
         IconButton(onClick = { groupDialogsViewModel.showImportDialog() }) {
             Icon(painterResource(R.drawable.import_icon), null)
         }
-        // Export CSV action  
+        // Export CSV action
         IconButton(onClick = { groupDialogsViewModel.showExportDialog() }) {
             Icon(painterResource(R.drawable.export_icon), null)
         }
@@ -151,6 +154,7 @@ private fun createTopBarActions(
             onAddTracker = onAddTracker,
             onAddGraphStat = onAddGraphStat,
             onAddFunction = onAddFunction,
+            onAddSymlink = onAddSymlink,
             groupId = groupId
         )
     }
@@ -167,6 +171,7 @@ private fun GroupAddDropdownMenu(
     onAddTracker: (Long) -> Unit,
     onAddGraphStat: (Long) -> Unit,
     onAddFunction: (Long) -> Unit,
+    onAddSymlink: (Long) -> Unit,
     groupId: Long
 ) {
     var showAddMenu by remember { mutableStateOf(false) }
@@ -221,6 +226,14 @@ private fun GroupAddDropdownMenu(
                             groupDialogsViewModel.showNoTrackersFunctionsDialog()
                         }
                     }
+                }
+            )
+            // Add Symlink
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.symlink)) },
+                onClick = {
+                    showAddMenu = false
+                    onAddSymlink(groupId)
                 }
             )
         }

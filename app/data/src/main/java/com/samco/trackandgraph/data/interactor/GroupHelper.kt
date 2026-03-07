@@ -20,6 +20,7 @@ package com.samco.trackandgraph.data.interactor
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
 import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
@@ -49,4 +50,17 @@ interface GroupHelper {
     suspend fun getDisplayIndicesForGroup(groupId: Long): List<GroupChildDisplayIndex>
 
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>)
+
+    /**
+     * Returns the set of group IDs that must not be used as symlink targets when creating a
+     * symlink inside [groupId]. Includes [groupId] itself and all its transitive ancestors.
+     * Selecting any of these as a GROUP symlink target would create a cycle in the hierarchy.
+     */
+    suspend fun getAncestorAndSelfGroupIds(groupId: Long): Set<Long>
+
+    /**
+     * Creates a symlink: adds an entry to group_items_table so that [childId] of [childType]
+     * appears in the group [inGroupId]. The component itself is not moved or modified.
+     */
+    suspend fun createSymlink(inGroupId: Long, childId: Long, childType: GroupChildType)
 }

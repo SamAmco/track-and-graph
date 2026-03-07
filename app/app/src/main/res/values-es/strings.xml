@@ -16,6 +16,7 @@
   -->
 <resources>
     <string name="home">Inicio</string>
+    <string name="symlink">Enlace simbólico</string>
     <string name="add_tracker">Añadir trazas:</string>
     <string name="add">Añadir</string>
     <string name="group_name">Por ejemplo, las actividades diarias</string>

@@ -54,6 +54,12 @@ data class HiddenItem(
 sealed class GraphNode {
     abstract val name: String
 
+    /**
+     * Whether this item is visible but cannot be selected (e.g. ancestor groups in symlink dialog).
+     * Disabled groups can still be expanded to reveal their children.
+     */
+    abstract val isDisabled: Boolean
+
     data class Group(
         val id: Long,
         override val name: String,
@@ -61,23 +67,27 @@ sealed class GraphNode {
         val expanded: MutableState<Boolean>,
         val children: List<GraphNode>,
         val isRoot: Boolean = false,
+        override val isDisabled: Boolean = false,
     ) : GraphNode()
 
     data class Tracker(
         val trackerId: Long,
         val featureId: Long,
         override val name: String,
+        override val isDisabled: Boolean = false,
     ) : GraphNode()
 
     data class Graph(
         val id: Long,
         override val name: String,
+        override val isDisabled: Boolean = false,
     ) : GraphNode()
 
     data class Function(
         val functionId: Long,
         val featureId: Long,
         override val name: String,
+        override val isDisabled: Boolean = false,
     ) : GraphNode()
 }
 
@@ -88,7 +98,11 @@ interface SelectItemDialogViewModel {
     val lazyListState: LazyListState
     val horizontalScrollState: ScrollState
 
-    fun init(selectableTypes: Set<SelectableItemType>, hiddenItems: Set<HiddenItem>)
+    fun init(
+        selectableTypes: Set<SelectableItemType>,
+        hiddenItems: Set<HiddenItem>,
+        disabledItems: Set<HiddenItem> = emptySet(),
+    )
     fun onItemClicked(item: GraphNode)
     fun reset()
 }
@@ -108,7 +122,8 @@ class SelectItemDialogViewModelImpl @Inject constructor(
 
     private data class Config(
         val selectableTypes: Set<SelectableItemType>,
-        val hiddenItems: Set<HiddenItem>
+        val hiddenItems: Set<HiddenItem>,
+        val disabledItems: Set<HiddenItem>,
     )
 
     private val config = MutableStateFlow<Config?>(null)
@@ -124,6 +139,7 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 groupGraph = dataInteractor.getGroupGraphSync(rootGroupId = null),
                 selectableTypes = it.selectableTypes,
                 hiddenItems = it.hiddenItems,
+                disabledItems = it.disabledItems,
                 isRoot = true
             )
         }
@@ -144,9 +160,10 @@ class SelectItemDialogViewModelImpl @Inject constructor(
 
     override fun init(
         selectableTypes: Set<SelectableItemType>,
-        hiddenItems: Set<HiddenItem>
+        hiddenItems: Set<HiddenItem>,
+        disabledItems: Set<HiddenItem>,
     ) {
-        config.value = Config(selectableTypes, hiddenItems)
+        config.value = Config(selectableTypes, hiddenItems, disabledItems)
     }
 
     override fun onItemClicked(item: GraphNode) {
@@ -156,13 +173,14 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 // Always toggle expansion when a group is clicked unless it is the root
                 if (!item.isRoot) item.expanded.value = !item.expanded.value
 
-                // Only set as selected if groups are selectable
-                if (SelectableItemType.GROUP in selectableTypes) {
+                // Only set as selected if groups are selectable and this item is not disabled
+                if (!item.isDisabled && SelectableItemType.GROUP in selectableTypes) {
                     _selectedItem.value = item
                 }
             }
 
             is GraphNode.Tracker -> {
+                if (item.isDisabled) return
                 if (SelectableItemType.TRACKER !in selectableTypes
                     && SelectableItemType.FEATURE !in selectableTypes
                 ) return
@@ -170,11 +188,13 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             }
 
             is GraphNode.Graph -> {
+                if (item.isDisabled) return
                 if (SelectableItemType.GRAPH !in selectableTypes) return
                 _selectedItem.value = item
             }
 
             is GraphNode.Function -> {
+                if (item.isDisabled) return
                 if (SelectableItemType.FUNCTION !in selectableTypes
                     && SelectableItemType.FEATURE !in selectableTypes
                 ) return
@@ -192,12 +212,15 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         groupGraph: ModelGroupGraph,
         selectableTypes: Set<SelectableItemType>,
         hiddenItems: Set<HiddenItem>,
+        disabledItems: Set<HiddenItem> = emptySet(),
         isRoot: Boolean = false,
     ): GraphNode? {
         // If the group is hidden, skip its entire subgraph
         if (HiddenItem(SelectableItemType.GROUP, groupGraph.group.id) in hiddenItems) {
             return null
         }
+
+        val isGroupDisabled = HiddenItem(SelectableItemType.GROUP, groupGraph.group.id) in disabledItems
 
         // Process children of this group
         val children = groupGraph.children.mapNotNull { child ->
@@ -210,7 +233,8 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                     buildGraphNodeTree(
                         groupGraph = child.groupGraph,
                         selectableTypes = selectableTypes,
-                        hiddenItems = hiddenItems
+                        hiddenItems = hiddenItems,
+                        disabledItems = disabledItems,
                     )
                 }
 
@@ -224,14 +248,18 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                     ) {
                         return@mapNotNull null
                     }
-                    child.toGraphNode()
+                    child.toGraphNode(
+                        isDisabled = HiddenItem(SelectableItemType.TRACKER, child.tracker.id) in disabledItems
+                    )
                 }
 
                 is ModelGroupGraphItem.GraphNode -> {
                     if (graphHidden(graphId = child.graph.id, selectableTypes, hiddenItems)) {
                         return@mapNotNull null
                     }
-                    child.toGraphNode()
+                    child.toGraphNode(
+                        isDisabled = HiddenItem(SelectableItemType.GRAPH, child.graph.id) in disabledItems
+                    )
                 }
 
                 is ModelGroupGraphItem.FunctionNode -> {
@@ -244,7 +272,9 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                     ) {
                         return@mapNotNull null
                     }
-                    child.toGraphNode()
+                    child.toGraphNode(
+                        isDisabled = HiddenItem(SelectableItemType.FUNCTION, child.function.id) in disabledItems
+                    )
                 }
             }
         }
@@ -254,8 +284,9 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             id = groupGraph.group.id,
             name = if (isRoot) "/" else groupGraph.group.name,
             colorIndex = groupGraph.group.colorIndex,
-            expanded = mutableStateOf(isRoot),
+            expanded = mutableStateOf(isRoot || isGroupDisabled),
             children = children.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }),
+            isDisabled = isGroupDisabled,
         )
 
         // If groups are not selectable, only include this group if it has selectable descendants
@@ -311,21 +342,24 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 || HiddenItem(SelectableItemType.GRAPH, graphId) in hiddenItems
     }
 
-    private fun ModelGroupGraphItem.TrackerNode.toGraphNode() = GraphNode.Tracker(
+    private fun ModelGroupGraphItem.TrackerNode.toGraphNode(isDisabled: Boolean = false) = GraphNode.Tracker(
         trackerId = tracker.id,
         featureId = tracker.featureId,
         name = tracker.name,
+        isDisabled = isDisabled,
     )
 
-    private fun ModelGroupGraphItem.GraphNode.toGraphNode() = GraphNode.Graph(
+    private fun ModelGroupGraphItem.GraphNode.toGraphNode(isDisabled: Boolean = false) = GraphNode.Graph(
         id = graph.id,
         name = graph.name,
+        isDisabled = isDisabled,
     )
 
-    private fun ModelGroupGraphItem.FunctionNode.toGraphNode() = GraphNode.Function(
+    private fun ModelGroupGraphItem.FunctionNode.toGraphNode(isDisabled: Boolean = false) = GraphNode.Function(
         functionId = function.id,
         featureId = function.featureId,
         name = function.name,
+        isDisabled = isDisabled,
     )
 
     private fun functionHidden(

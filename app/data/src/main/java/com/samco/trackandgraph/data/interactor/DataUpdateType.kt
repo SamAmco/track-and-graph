@@ -50,6 +50,9 @@ sealed class DataUpdateType {
     /**Display indices were updated **/
     data class DisplayIndex(val groupId: Long) : DataUpdateType()
 
+    /**A new symlink was created **/
+    data class SymlinkCreated(val groupId: Long) : DataUpdateType()
+
     data class FunctionCreated(override val featureId: Long) : DataUpdateType(), FeatureUpdate
     data class FunctionUpdated(override val featureId: Long) : DataUpdateType(), FeatureUpdate
     data class FunctionDeleted(override val featureId: Long) : DataUpdateType(), FeatureUpdate
