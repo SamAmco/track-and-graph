@@ -16,10 +16,12 @@ DataInteractor (public interface)
     │       └── ReminderHelper
     │
     └── DAOs (Room interfaces)
-            ├── TrackAndGraphDatabaseDao
+            ├── TrackAndGraphDatabaseDao  ← extends all focused DAOs below
             ├── GroupItemDao
-            ├── GroupDao
+            ├── TrackerDao
+            ├── FunctionDao
             ├── GraphDao
+            ├── GroupDao
             └── ReminderDao
 ```
 
@@ -54,12 +56,12 @@ interface DataInteractor {
 
 ## Helper Pattern
 
-Each component type has a dedicated helper class:
+Each component type has a dedicated helper class injected with a focused DAO interface:
 
 ```kotlin
 internal class TrackerHelperImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
-    private val dao: TrackAndGraphDatabaseDao,
+    private val dao: TrackerDao,          // focused interface, not the full DAO
     private val groupItemDao: GroupItemDao,
     private val dataPointUpdateHelper: DataPointUpdateHelper,
     private val timeProvider: TimeProvider,
@@ -72,32 +74,34 @@ internal class TrackerHelperImpl @Inject constructor(
 ### Common Dependencies
 
 - **transactionHelper**: Wraps operations in database transactions
-- **dao**: Main database DAO for component-specific queries
+- **dao**: Focused DAO interface for this component type (see Specialized DAOs)
 - **groupItemDao**: For managing group membership
 - **timeProvider**: For timestamps (injectable for testing)
 - **io**: Coroutine dispatcher for background work
 
 ## Specialized DAOs
 
-For testability, some helpers use smaller interfaces:
+Each helper injects a **focused DAO interface** containing only the methods it needs, rather than the full `TrackAndGraphDatabaseDao`. This enables small in-memory fakes for unit tests.
 
 ```kotlin
-// Instead of injecting the full TrackAndGraphDatabaseDao
-internal interface GroupDao {
-    fun insertGroup(group: Group): Long
-    fun getGroupById(id: Long): Group?
-    fun deleteGroup(id: Long)
-    // Only methods needed by GroupHelper
+// Focused interface — only what FunctionHelper needs
+internal interface FunctionDao {
+    fun insertFeature(feature: Feature): Long
+    fun insertFunction(function: Function): Long
+    fun getFunctionById(functionId: Long): FunctionWithFeature?
+    fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
+    // ... etc
 }
 
-// TrackAndGraphDatabaseDao extends GroupDao
+// The full Room DAO extends all focused interfaces
 @Dao
-interface TrackAndGraphDatabaseDao : GroupDao, GraphDao, ReminderDao {
-    // Full interface
+internal interface TrackAndGraphDatabaseDao : TrackerDao, FunctionDao, GraphDao, GroupDao, ReminderDao {
+    // All methods satisfied by extending focused interfaces
 }
 ```
 
-This allows tests to use small fake implementations.
+Focused DAO interfaces: `TrackerDao`, `FunctionDao`, `GraphDao`, `GroupDao`, `ReminderDao`.
+`DataModule` provides each interface with a `@Provides` binding that simply returns the `TrackAndGraphDatabaseDao` instance.
 
 ## Delete Pattern (Symlink Logic)
 
@@ -149,18 +153,17 @@ override suspend fun createSymlink(...) = withContext(io) {
 
 ## Testing Approach
 
-**Always use fake implementations, never mocks.** The project avoids Mockito/mocking frameworks because the codebase may eventually migrate to Kotlin Multiplatform (KMP), which is incompatible with Android-specific mocking tools.
+**Never introduce mocks without asking the user first** — see [architecture.md](architecture.md#kmp-compatibility) for the rationale. Always create a real fake implementation instead.
 
-The pattern: define a small `*Dao` interface for each helper (as shown in "Specialized DAOs" above), then create a `Fake*Dao` in `testFixtures` that implements it in-memory.
+**Fake DAO pattern**: For DAO interfaces, create a `Fake*Dao` in `testFixtures` that implements the interface with an in-memory map/list.
 
-| Helper | Test approach |
-|--------|---------------|
-| GroupHelperImpl | `FakeGroupDao` + `FakeGroupItemDao` |
+| Helper | Fake DAO used |
+|--------|--------------|
+| TrackerHelperImpl | `FakeTrackerDao` + `FakeGroupItemDao` |
+| FunctionHelperImpl | `FakeFunctionDao` + `FakeGroupItemDao` |
 | GraphHelperImpl | `FakeGraphDao` + `FakeGroupItemDao` |
+| GroupHelperImpl | `FakeGroupDao` + `FakeGroupItemDao` |
 | ReminderHelperImpl | `FakeReminderDao` + `FakeGroupItemDao` |
-| TrackerHelperImpl | Should use `FakeTrackerDao` + `FakeGroupItemDao` (not Mockito) |
-
-If a helper currently depends on the large `TrackAndGraphDatabaseDao` directly, the fix is to extract a focused `TrackerDao` interface (following the same pattern as `GroupDao`, `GraphDao`, `ReminderDao`) and create a `FakeTrackerDao` in testFixtures.
 
 Fake DAOs are in `app/data/src/testFixtures/kotlin/com/samco/trackandgraph/`.
 

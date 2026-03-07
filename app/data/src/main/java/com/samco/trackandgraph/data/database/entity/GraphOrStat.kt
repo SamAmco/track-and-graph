@@ -34,5 +34,5 @@ internal data class GraphOrStat(
     @ColumnInfo(name = "graph_stat_type")
     val type: GraphStatType
 ) {
-    fun toDto() = GraphOrStat(id, name, type)
+    fun toDto(unique: Boolean) = GraphOrStat(id, name, type, unique)
 }

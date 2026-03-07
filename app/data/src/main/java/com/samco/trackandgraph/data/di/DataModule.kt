@@ -24,6 +24,7 @@ import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriter
 import com.samco.trackandgraph.data.csvreadwriter.CSVReadWriterImpl
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelperImpl
+import com.samco.trackandgraph.data.database.FunctionDao
 import com.samco.trackandgraph.data.database.GraphDao
 import com.samco.trackandgraph.data.database.GroupDao
 import com.samco.trackandgraph.data.database.GroupItemDao
@@ -51,6 +52,8 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.DataSamplerImpl
 import com.samco.trackandgraph.data.time.TimeProvider
 import com.samco.trackandgraph.data.time.TimeProviderImpl
+import com.samco.trackandgraph.data.validation.FunctionValidator
+import com.samco.trackandgraph.data.validation.FunctionValidatorImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -84,6 +87,9 @@ class DataModule {
     internal fun getGroupDao(dao: TrackAndGraphDatabaseDao): GroupDao = dao
 
     @Provides
+    internal fun getFunctionDao(dao: TrackAndGraphDatabaseDao): FunctionDao = dao
+
+    @Provides
     internal fun getGroupItemDao(database: TrackAndGraphDatabase): GroupItemDao =
         database.groupItemDao
 
@@ -113,6 +119,9 @@ class DataModule {
 
     @Provides
     fun provideTimeProvider(impl: TimeProviderImpl): TimeProvider = impl
+
+    @Provides
+    internal fun getFunctionValidator(impl: FunctionValidatorImpl): FunctionValidator = impl
 
     @Provides
     fun getAssetReader(impl: AssetReaderImpl): AssetReader = impl

@@ -23,22 +23,26 @@ import com.samco.trackandgraph.data.database.dto.FunctionGraphNode
 import com.samco.trackandgraph.data.dependencyanalyser.DependencyAnalyserProvider
 import javax.inject.Inject
 
-/**
- * Validates functions for consistency and correctness before database operations.
- * Performs both inter-function cycle detection (cycles between different functions/features)
- * and intra-function cycle detection (cycles within a function's own node graph).
- */
-internal class FunctionValidator @Inject constructor(
-    private val dependencyAnalyserProvider: DependencyAnalyserProvider,
-    private val dao: TrackAndGraphDatabaseDao
-) {
+internal interface FunctionValidator {
     /**
      * Validates a function before insert or update.
      *
      * @param function The function to validate
      * @throws IllegalStateException if validation fails
      */
-    suspend fun validateFunction(function: Function) {
+    suspend fun validateFunction(function: Function)
+}
+
+/**
+ * Validates functions for consistency and correctness before database operations.
+ * Performs both inter-function cycle detection (cycles between different functions/features)
+ * and intra-function cycle detection (cycles within a function's own node graph).
+ */
+internal class FunctionValidatorImpl @Inject constructor(
+    private val dependencyAnalyserProvider: DependencyAnalyserProvider,
+    private val dao: TrackAndGraphDatabaseDao
+) : FunctionValidator {
+    override suspend fun validateFunction(function: Function) {
         validateFunctionGraphStructure(function)
         validateIntraFunctionDependencies(function.functionGraph.nodes)
         validateInterFunctionDependencies(function)

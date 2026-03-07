@@ -104,6 +104,7 @@ class LuaGraphDataFactoryTest {
             id = 1,
             name = "name",
             type = GraphStatType.LUA_SCRIPT,
+            unique = true,
         )
         val luaGraph = luaGraph(
             features = features.map { (name, id) ->

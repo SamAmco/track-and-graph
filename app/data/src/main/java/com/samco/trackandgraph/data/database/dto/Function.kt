@@ -23,7 +23,8 @@ data class Function(
     override val name: String,
     override val description: String,
     val functionGraph: FunctionGraph,
-    val inputFeatureIds: List<Long>
+    val inputFeatureIds: List<Long>,
+    val unique: Boolean,
 ) : Feature {
     internal fun toEntity(serializedFunctionGraph: String) =
         com.samco.trackandgraph.data.database.entity.Function(

@@ -12,7 +12,7 @@
 
 The project aims to keep the door open for a future Kotlin Multiplatform (KMP) migration. This shapes several decisions:
 
-- **No Android-specific mocking frameworks** (e.g. Mockito) in tests — use fake implementations instead, since mocking tools don't work on KMP targets
+- **No mocking frameworks, ever, without explicit user approval.** This is a hard rule. Mockito, MockK, and similar tools are Android-specific and incompatible with KMP. Before introducing any mock, exhaust all alternatives and ask the user first. Prefer real fake implementations in `testFixtures/`.
 - **Avoid Android-only APIs** in business logic and data layer code where possible — keep platform-specific code in the UI/app layer
 - **Prefer pure Kotlin** abstractions over Android framework dependencies in shared modules
 

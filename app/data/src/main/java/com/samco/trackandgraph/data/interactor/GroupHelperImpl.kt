@@ -247,16 +247,21 @@ internal class GroupHelperImpl @Inject constructor(
         hierarchy.getParents(childId, type).forEach { groupItemIds.add(it.id) }
     }
 
+    private fun isGroupUnique(groupId: Long) =
+        groupItemDao.getGroupItemsForChild(groupId, GroupItemType.GROUP).size == 1
+
     override suspend fun getGroupById(id: Long): Group? = withContext(io) {
-        groupDao.getGroupById(id)?.toDto()
+        groupDao.getGroupById(id)?.let { it.toDto(unique = isGroupUnique(it.id)) }
     }
 
     override suspend fun getAllGroupsSync(): List<Group> = withContext(io) {
-        groupDao.getAllGroupsSync().map { it.toDto() }
+        groupDao.getAllGroupsSync().map { it.toDto(unique = isGroupUnique(it.id)) }
     }
 
     override suspend fun getGroupsForGroupSync(parentGroupId: Long): List<Group> = withContext(io) {
-        groupDao.getGroupsForGroupSync(parentGroupId).map { it.toDto() }
+        groupDao.getGroupsForGroupSync(parentGroupId).map { entity ->
+            entity.toDto(unique = isGroupUnique(entity.id))
+        }
     }
 
     override suspend fun hasAnyGroups(): Boolean = withContext(io) {

@@ -113,7 +113,8 @@ class FunctionGraphDataSampleTest {
             name = "Test Function",
             description = "Test",
             functionGraph = functionGraph,
-            inputFeatureIds = listOf(featureId)
+            inputFeatureIds = listOf(featureId),
+            unique = true,
         )
 
         val mockDataSampler = mock<DataSampler>()
@@ -220,7 +221,8 @@ class FunctionGraphDataSampleTest {
             name = "Test Merge Function",
             description = "Test merge",
             functionGraph = functionGraph,
-            inputFeatureIds = listOf(featureId1, featureId2)
+            inputFeatureIds = listOf(featureId1, featureId2),
+            unique = true,
         )
 
         val mockDataSampler = mock<DataSampler>()
@@ -311,7 +313,8 @@ class FunctionGraphDataSampleTest {
             name = "Test Duplicate Function",
             description = "Test duplicate dependencies",
             functionGraph = functionGraph,
-            inputFeatureIds = listOf(featureId)
+            inputFeatureIds = listOf(featureId),
+            unique = true,
         )
 
         val mockDataSampler = mock<DataSampler>()
@@ -412,7 +415,8 @@ class FunctionGraphDataSampleTest {
             name = "Lua Script Test Function",
             description = "Test Lua script processing",
             functionGraph = functionGraph,
-            inputFeatureIds = listOf(featureId)
+            inputFeatureIds = listOf(featureId),
+            unique = true,
         )
 
         val mockDataSampler = mock<DataSampler>()
@@ -488,7 +492,8 @@ class FunctionGraphDataSampleTest {
             name = "VM Lock Test Function",
             description = "Test VM lock disposal",
             functionGraph = functionGraph,
-            inputFeatureIds = listOf(featureId)
+            inputFeatureIds = listOf(featureId),
+            unique = true,
         )
 
         val mockDataSampler = mock<DataSampler>()

@@ -21,6 +21,7 @@ data class Group(
     val id: Long,
     val name: String,
     val colorIndex: Int,
+    val unique: Boolean,
 ) {
     internal fun toEntity() = com.samco.trackandgraph.data.database.entity.Group(
         id,

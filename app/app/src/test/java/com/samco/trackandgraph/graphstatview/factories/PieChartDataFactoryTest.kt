@@ -54,6 +54,7 @@ class PieChartDataFactoryTest {
         id = 1L,
         name = "name",
         type = GraphStatType.PIE_CHART,
+        unique = true,
     )
 
     private val feature = object : Feature {

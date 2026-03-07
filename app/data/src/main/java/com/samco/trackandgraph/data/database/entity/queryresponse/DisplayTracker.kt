@@ -58,7 +58,7 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "start_instant")
     val timerStartInstant: Instant?,
 ) {
-    fun toDto() = DisplayTracker(
+    fun toDto(unique: Boolean) = DisplayTracker(
         id = id,
         featureId = featureId,
         name = name,
@@ -73,6 +73,7 @@ internal data class DisplayTracker(
             )
         },
         description = description,
-        timerStartInstant = timerStartInstant
+        timerStartInstant = timerStartInstant,
+        unique = unique,
     )
 }

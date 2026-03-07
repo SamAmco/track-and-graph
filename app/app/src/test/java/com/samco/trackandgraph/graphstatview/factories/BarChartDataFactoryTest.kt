@@ -517,6 +517,7 @@ class BarChartDataFactoryTest {
         id = 1,
         name = "name",
         type = GraphStatType.BAR_CHART,
+        unique = true,
     )
 
     @Test

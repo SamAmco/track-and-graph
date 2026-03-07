@@ -127,7 +127,8 @@ internal class FunctionGraphDecoderTest {
                 ),
                 isDuration = false
             ),
-            inputFeatureIds = listOf(101L, 999L)
+            inputFeatureIds = listOf(101L, 999L),
+            unique = true,
         )
 
         // Feature path map only contains 101L, not 999L
@@ -259,7 +260,8 @@ internal class FunctionGraphDecoderTest {
                 ),
                 isDuration = true
             ),
-            inputFeatureIds = listOf(101L, 102L)
+            inputFeatureIds = listOf(101L, 102L),
+            unique = true,
         )
     }
 

@@ -13,4 +13,5 @@ val reminderFixture = Reminder(
         time = LocalTime.of(0, 0),
         checkedDays = CheckedDays.none()
     ),
+    unique = true,
 )

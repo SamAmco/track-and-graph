@@ -288,5 +288,6 @@ class GraphStatInputViewModelImpl @Inject constructor(
         id = graphStatId ?: 0L,
         name = graphName.text,
         type = graphStatType.value!!,
+        unique = true,
     )
 }

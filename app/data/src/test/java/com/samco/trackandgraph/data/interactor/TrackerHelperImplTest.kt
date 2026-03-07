@@ -275,6 +275,131 @@ class TrackerHelperImplTest {
         }
 
     // =========================================================================
+    // Display tracker uniqueness tests
+    // =========================================================================
+
+    @Test
+    fun `getDisplayTrackersForGroupSync returns unique=true when tracker in only one group`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val groupId = 1L
+            val trackerId = uut.createTracker(
+                TrackerCreateRequest(
+                    name = "Single Group Tracker",
+                    groupId = groupId,
+                    dataType = DataType.CONTINUOUS,
+                    hasDefaultValue = false,
+                    defaultValue = 0.0,
+                    defaultLabel = "",
+                    description = "",
+                    suggestionType = TrackerSuggestionType.NONE,
+                    suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getDisplayTrackersForGroupSync(groupId)
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(trackerId, result[0].id)
+            assertEquals(true, result[0].unique)
+        }
+
+    @Test
+    fun `getDisplayTrackersForGroupSync returns unique=false when tracker in multiple groups`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val group1 = 1L
+            val group2 = 2L
+            val trackerId = uut.createTracker(
+                TrackerCreateRequest(
+                    name = "Multi Group Tracker",
+                    groupId = group1,
+                    dataType = DataType.CONTINUOUS,
+                    hasDefaultValue = false,
+                    defaultValue = 0.0,
+                    defaultLabel = "",
+                    description = "",
+                    suggestionType = TrackerSuggestionType.NONE,
+                    suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
+                )
+            )
+            // Add symlink to group2
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = trackerId,
+                    type = GroupItemType.TRACKER,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE - check from group1's perspective
+            val result = uut.getDisplayTrackersForGroupSync(group1)
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(trackerId, result[0].id)
+            assertEquals(false, result[0].unique)
+        }
+
+    @Test
+    fun `getDisplayTrackersForGroupSync sets unique independently per tracker`() =
+        runTest(dispatcher) {
+            // PREPARE - one unique tracker, one non-unique tracker in the same group
+            val group1 = 1L
+            val group2 = 2L
+
+            val uniqueTrackerId = uut.createTracker(
+                TrackerCreateRequest(
+                    name = "Unique Tracker",
+                    groupId = group1,
+                    dataType = DataType.CONTINUOUS,
+                    hasDefaultValue = false,
+                    defaultValue = 0.0,
+                    defaultLabel = "",
+                    description = "",
+                    suggestionType = TrackerSuggestionType.NONE,
+                    suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
+                )
+            )
+            val sharedTrackerId = uut.createTracker(
+                TrackerCreateRequest(
+                    name = "Shared Tracker",
+                    groupId = group1,
+                    dataType = DataType.CONTINUOUS,
+                    hasDefaultValue = false,
+                    defaultValue = 0.0,
+                    defaultLabel = "",
+                    description = "",
+                    suggestionType = TrackerSuggestionType.NONE,
+                    suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
+                )
+            )
+            // Add symlink for sharedTracker to group2
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = sharedTrackerId,
+                    type = GroupItemType.TRACKER,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getDisplayTrackersForGroupSync(group1)
+
+            // VERIFY
+            val uniqueResult = result.first { it.id == uniqueTrackerId }
+            val sharedResult = result.first { it.id == sharedTrackerId }
+            assertEquals(true, uniqueResult.unique)
+            assertEquals(false, sharedResult.unique)
+        }
+
+    // =========================================================================
     // Get tests
     // =========================================================================
 

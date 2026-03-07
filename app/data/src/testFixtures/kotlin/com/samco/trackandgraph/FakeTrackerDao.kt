@@ -137,7 +137,23 @@ internal class FakeTrackerDao : TrackerDao {
     override fun getAllActiveTimerTrackers(): List<DisplayTracker> = emptyList()
 
     override fun getDisplayTrackerByTrackerIdsSync(ids: Set<Long>): List<DisplayTracker> =
-        emptyList()
+        ids.mapNotNull { id ->
+            val tracker = trackers[id] ?: return@mapNotNull null
+            val feature = features[tracker.featureId] ?: return@mapNotNull null
+            DisplayTracker(
+                id = tracker.id,
+                featureId = tracker.featureId,
+                name = feature.name,
+                featureType = tracker.dataType,
+                hasDefaultValue = tracker.hasDefaultValue,
+                defaultValue = tracker.defaultValue,
+                defaultLabel = tracker.defaultLabel,
+                lastEpochMilli = 0L,
+                lastUtcOffsetSec = 0,
+                description = feature.description,
+                timerStartInstant = null,
+            )
+        }
 
     override fun getDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker? = null
 

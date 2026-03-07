@@ -133,13 +133,20 @@ internal class DataInteractorImpl @Inject constructor(
             dataUpdateEvents.emit(DataUpdateType.SymlinkCreated(inGroupId))
         }
 
+    private fun isGroupUnique(groupId: Long) =
+        groupItemDao.getGroupItemsForChild(groupId, GroupItemType.GROUP).size == 1
+
+    private fun isGraphUnique(graphStatId: Long) =
+        groupItemDao.getGroupItemsForChild(graphStatId, GroupItemType.GRAPH).size == 1
+
     override suspend fun getGroupGraphSync(rootGroupId: Long?): GroupGraph = withContext(io) {
         val rootGroup = if (rootGroupId != null) {
-            dao.getGroupById(rootGroupId)?.toDto()
+            dao.getGroupById(rootGroupId)?.let { it.toDto(unique = isGroupUnique(it.id)) }
                 ?: throw IllegalStateException("Group with id $rootGroupId not found")
         } else {
             // Get the root group (group with no parent)
-            dao.getRootGroupSync()?.toDto() ?: throw IllegalStateException("No root group found")
+            dao.getRootGroupSync()?.let { it.toDto(unique = isGroupUnique(it.id)) }
+                ?: throw IllegalStateException("No root group found")
         }
 
         buildGroupGraph(rootGroup)
@@ -150,14 +157,14 @@ internal class DataInteractorImpl @Inject constructor(
 
         // Get child groups for this specific group
         val childGroups = dao.getGroupsForGroupSync(group.id)
-            .map { it.toDto() }
+            .map { it.toDto(unique = isGroupUnique(it.id)) }
 
         // Get trackers for this specific group using TrackerHelper
         val trackers = getTrackersForGroupSync(group.id)
 
         // Get graphs for this specific group
         val graphs = dao.getGraphsAndStatsByGroupIdSync(group.id)
-            .map { it.toDto() }
+            .map { it.toDto(unique = isGraphUnique(it.id)) }
 
         // Get functions for this specific group using FunctionHelper
         val functions = getFunctionsForGroupSync(group.id)

@@ -246,8 +246,11 @@ internal class TrackerHelperImpl @Inject constructor(
         }
     }
 
+    private fun isTrackerUnique(trackerId: Long) =
+        groupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER).size == 1
+
     override suspend fun getAllActiveTimerTrackers(): List<DisplayTracker> = withContext(io) {
-        dao.getAllActiveTimerTrackers().map { it.toDto() }
+        dao.getAllActiveTimerTrackers().map { it.toDto(unique = isTrackerUnique(it.id)) }
     }
 
     override suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker> =
@@ -332,12 +335,17 @@ internal class TrackerHelperImpl @Inject constructor(
                 .getGroupItemsByType(groupId, GroupItemType.TRACKER)
                 .map { it.childId }
                 .toSet()
-            dao.getDisplayTrackerByTrackerIdsSync(trackerIds).map { it.toDto() }
+            val uniquenessMap = trackerIds.associateWith { trackerId ->
+                groupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER).size == 1
+            }
+            dao.getDisplayTrackerByTrackerIdsSync(trackerIds).map { tracker ->
+                tracker.toDto(unique = uniquenessMap[tracker.id] ?: false)
+            }
         }
 
     override suspend fun tryGetTrackerByFeatureId(featureId: Long): DisplayTracker? =
         withContext(io) {
-            dao.getDisplayTrackerByFeatureIdSync(featureId)?.toDto()
+            dao.getDisplayTrackerByFeatureIdSync(featureId)?.let { it.toDto(unique = isTrackerUnique(it.id)) }
         }
 
     override suspend fun getDataPointByTimestampAndTrackerSync(

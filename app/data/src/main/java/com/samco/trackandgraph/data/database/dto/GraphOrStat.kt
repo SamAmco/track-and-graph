@@ -22,6 +22,7 @@ data class GraphOrStat(
     val id: Long,
     val name: String,
     val type: GraphStatType,
+    val unique: Boolean,
 ) {
     internal fun toEntity() = GraphOrStat(
         id,

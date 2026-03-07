@@ -30,5 +30,6 @@ data class DisplayTracker(
     val defaultLabel: String,
     val timestamp: OffsetDateTime?,
     val description: String,
-    val timerStartInstant: Instant?
+    val timerStartInstant: Instant?,
+    val unique: Boolean,
 )

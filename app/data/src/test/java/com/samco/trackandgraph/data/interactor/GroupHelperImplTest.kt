@@ -1137,4 +1137,116 @@ class GroupHelperImplTest {
         assertEquals(0, graphItem!!.displayIndex)
         assertEquals(1, trackerItem!!.displayIndex)
     }
+
+    // =========================================================================
+    // Uniqueness tests
+    // =========================================================================
+
+    @Test
+    fun `getGroupsForGroupSync returns unique=true when group in only one parent`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val parentId = 1L
+            uut.insertGroup(GroupCreateRequest(name = "Single Parent Group", parentGroupId = parentId))
+
+            // EXECUTE
+            val result = uut.getGroupsForGroupSync(parentId)
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].unique)
+        }
+
+    @Test
+    fun `getGroupsForGroupSync returns unique=false when group in multiple parents`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val parent1 = 1L
+            val parent2 = 2L
+            val groupId = uut.insertGroup(
+                GroupCreateRequest(name = "Shared Group", parentGroupId = parent1)
+            )
+            // Add symlink to parent2
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = parent2,
+                    displayIndex = 0,
+                    childId = groupId,
+                    type = GroupItemType.GROUP,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getGroupsForGroupSync(parent1)
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(groupId, result[0].id)
+            assertEquals(false, result[0].unique)
+        }
+
+    @Test
+    fun `getGroupsForGroupSync sets unique independently per group`() =
+        runTest(dispatcher) {
+            // PREPARE - one unique group, one non-unique group in the same parent
+            val parent1 = 1L
+            val parent2 = 2L
+
+            val uniqueGroupId = uut.insertGroup(
+                GroupCreateRequest(name = "Unique Group", parentGroupId = parent1)
+            )
+            val sharedGroupId = uut.insertGroup(
+                GroupCreateRequest(name = "Shared Group", parentGroupId = parent1)
+            )
+            // Add symlink for sharedGroup to parent2
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = parent2,
+                    displayIndex = 0,
+                    childId = sharedGroupId,
+                    type = GroupItemType.GROUP,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getGroupsForGroupSync(parent1)
+
+            // VERIFY
+            assertEquals(2, result.size)
+            val uniqueResult = result.first { it.id == uniqueGroupId }
+            val sharedResult = result.first { it.id == sharedGroupId }
+            assertEquals(true, uniqueResult.unique)
+            assertEquals(false, sharedResult.unique)
+        }
+
+    @Test
+    fun `getGroupById returns unique=true when group in only one parent`() = runTest(dispatcher) {
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Test Group", parentGroupId = 1L))
+        val result = uut.getGroupById(groupId)
+        assertNotNull(result)
+        assertEquals(true, result!!.unique)
+    }
+
+    @Test
+    fun `getGroupById returns unique=false when group in multiple parents`() = runTest(dispatcher) {
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Test Group", parentGroupId = 1L))
+        fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 2L, displayIndex = 0, childId = groupId, type = GroupItemType.GROUP, createdAt = 1000L))
+        val result = uut.getGroupById(groupId)
+        assertNotNull(result)
+        assertEquals(false, result!!.unique)
+    }
+
+    @Test
+    fun `getAllGroupsSync sets unique correctly`() = runTest(dispatcher) {
+        val uniqueGroupId = uut.insertGroup(GroupCreateRequest(name = "Unique Group", parentGroupId = 1L))
+        val sharedGroupId = uut.insertGroup(GroupCreateRequest(name = "Shared Group", parentGroupId = 1L))
+        fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 2L, displayIndex = 0, childId = sharedGroupId, type = GroupItemType.GROUP, createdAt = 1000L))
+        val result = uut.getAllGroupsSync()
+        val uniqueResult = result.first { it.id == uniqueGroupId }
+        val sharedResult = result.first { it.id == sharedGroupId }
+        assertEquals(true, uniqueResult.unique)
+        assertEquals(false, sharedResult.unique)
+    }
 }

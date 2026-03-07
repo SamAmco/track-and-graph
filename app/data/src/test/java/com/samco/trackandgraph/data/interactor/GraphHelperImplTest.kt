@@ -34,6 +34,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.time.TimeProvider
 import kotlinx.coroutines.CoroutineDispatcher
@@ -529,5 +530,157 @@ class GraphHelperImplTest {
 
         // EXECUTE & VERIFY
         assertEquals(true, uut.hasAnyGraphs())
+    }
+
+    // =========================================================================
+    // Uniqueness tests
+    // =========================================================================
+
+    @Test
+    fun `getGraphsAndStatsByGroupIdSync returns unique=true when graph in only one group`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val groupId = 1L
+            val graphStatId = uut.createLineGraph(
+                LineGraphCreateRequest(
+                    name = "Single Group Graph",
+                    groupId = groupId,
+                    config = LineGraphConfig(
+                        features = emptyList(),
+                        sampleSize = null,
+                        yRangeType = YRangeType.DYNAMIC,
+                        yFrom = 0.0,
+                        yTo = 100.0,
+                        endDate = GraphEndDate.Latest
+                    )
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getGraphsAndStatsByGroupIdSync(groupId)
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(graphStatId, result[0].id)
+            assertEquals(true, result[0].unique)
+        }
+
+    @Test
+    fun `getGraphsAndStatsByGroupIdSync returns unique=false when graph in multiple groups`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val group1 = 1L
+            val group2 = 2L
+            val graphStatId = uut.createLineGraph(
+                LineGraphCreateRequest(
+                    name = "Shared Graph",
+                    groupId = group1,
+                    config = LineGraphConfig(
+                        features = emptyList(),
+                        sampleSize = null,
+                        yRangeType = YRangeType.DYNAMIC,
+                        yFrom = 0.0,
+                        yTo = 100.0,
+                        endDate = GraphEndDate.Latest
+                    )
+                )
+            )
+            // Add symlink to group2
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = graphStatId,
+                    type = GroupItemType.GRAPH,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getGraphsAndStatsByGroupIdSync(group1)
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(graphStatId, result[0].id)
+            assertEquals(false, result[0].unique)
+        }
+
+    @Test
+    fun `getGraphsAndStatsByGroupIdSync sets unique independently per graph`() =
+        runTest(dispatcher) {
+            // PREPARE - one unique graph, one non-unique graph in the same group
+            val group1 = 1L
+            val group2 = 2L
+
+            val lineGraphConfig = LineGraphConfig(
+                features = emptyList(),
+                sampleSize = null,
+                yRangeType = YRangeType.DYNAMIC,
+                yFrom = 0.0,
+                yTo = 100.0,
+                endDate = GraphEndDate.Latest
+            )
+            val uniqueGraphId = uut.createLineGraph(
+                LineGraphCreateRequest(name = "Unique Graph", groupId = group1, config = lineGraphConfig)
+            )
+            val sharedGraphId = uut.createLineGraph(
+                LineGraphCreateRequest(name = "Shared Graph", groupId = group1, config = lineGraphConfig)
+            )
+            // Add symlink for sharedGraph to group2
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = sharedGraphId,
+                    type = GroupItemType.GRAPH,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getGraphsAndStatsByGroupIdSync(group1)
+
+            // VERIFY
+            assertEquals(2, result.size)
+            val uniqueResult = result.first { it.id == uniqueGraphId }
+            val sharedResult = result.first { it.id == sharedGraphId }
+            assertEquals(true, uniqueResult.unique)
+            assertEquals(false, sharedResult.unique)
+        }
+
+    @Test
+    fun `getGraphStatById returns unique=true when graph in only one group`() = runTest(dispatcher) {
+        val lineGraphConfig = LineGraphConfig(features = emptyList(), sampleSize = null, yRangeType = YRangeType.DYNAMIC, yFrom = 0.0, yTo = 100.0, endDate = GraphEndDate.Latest)
+        val graphId = uut.createLineGraph(LineGraphCreateRequest(name = "Test", groupId = 1L, config = lineGraphConfig))
+        val result = uut.getGraphStatById(graphId)
+        assertEquals(true, result.unique)
+    }
+
+    @Test
+    fun `getGraphStatById returns unique=false when graph in multiple groups`() = runTest(dispatcher) {
+        val lineGraphConfig = LineGraphConfig(features = emptyList(), sampleSize = null, yRangeType = YRangeType.DYNAMIC, yFrom = 0.0, yTo = 100.0, endDate = GraphEndDate.Latest)
+        val graphId = uut.createLineGraph(LineGraphCreateRequest(name = "Test", groupId = 1L, config = lineGraphConfig))
+        fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 2L, displayIndex = 0, childId = graphId, type = GroupItemType.GRAPH, createdAt = 1000L))
+        val result = uut.getGraphStatById(graphId)
+        assertEquals(false, result.unique)
+    }
+
+    @Test
+    fun `tryGetGraphStatById returns unique=true when graph in only one group`() = runTest(dispatcher) {
+        val lineGraphConfig = LineGraphConfig(features = emptyList(), sampleSize = null, yRangeType = YRangeType.DYNAMIC, yFrom = 0.0, yTo = 100.0, endDate = GraphEndDate.Latest)
+        val graphId = uut.createLineGraph(LineGraphCreateRequest(name = "Test", groupId = 1L, config = lineGraphConfig))
+        val result = uut.tryGetGraphStatById(graphId)
+        assertNotNull(result)
+        assertEquals(true, result!!.unique)
+    }
+
+    @Test
+    fun `tryGetGraphStatById returns unique=false when graph in multiple groups`() = runTest(dispatcher) {
+        val lineGraphConfig = LineGraphConfig(features = emptyList(), sampleSize = null, yRangeType = YRangeType.DYNAMIC, yFrom = 0.0, yTo = 100.0, endDate = GraphEndDate.Latest)
+        val graphId = uut.createLineGraph(LineGraphCreateRequest(name = "Test", groupId = 1L, config = lineGraphConfig))
+        fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 2L, displayIndex = 0, childId = graphId, type = GroupItemType.GRAPH, createdAt = 1000L))
+        val result = uut.tryGetGraphStatById(graphId)
+        assertNotNull(result)
+        assertEquals(false, result!!.unique)
     }
 }

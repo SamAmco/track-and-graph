@@ -18,8 +18,8 @@
 package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
+import com.samco.trackandgraph.data.database.FunctionDao
 import com.samco.trackandgraph.data.database.GroupItemDao
-import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
 import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
@@ -30,7 +30,7 @@ import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.serialization.FunctionGraphSerializer
-import com.samco.trackandgraph.data.time.TimeProviderImpl
+import com.samco.trackandgraph.data.time.TimeProvider
 import com.samco.trackandgraph.data.validation.FunctionValidator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -40,11 +40,11 @@ import javax.inject.Singleton
 @Singleton
 internal class FunctionHelperImpl @Inject constructor(
     private val transactionHelper: DatabaseTransactionHelper,
-    private val dao: TrackAndGraphDatabaseDao,
+    private val dao: FunctionDao,
     private val groupItemDao: GroupItemDao,
     private val functionGraphSerializer: FunctionGraphSerializer,
     private val functionValidator: FunctionValidator,
-    private val timeProvider: TimeProviderImpl,
+    private val timeProvider: TimeProvider,
     @IODispatcher private val io: CoroutineDispatcher
 ) : FunctionHelper {
 
@@ -55,7 +55,8 @@ internal class FunctionHelperImpl @Inject constructor(
             name = request.name,
             description = request.description,
             functionGraph = request.functionGraph,
-            inputFeatureIds = request.inputFeatureIds
+            inputFeatureIds = request.inputFeatureIds,
+            unique = true,
         )
 
         functionValidator.validateFunction(function)
@@ -164,13 +165,16 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
+    private fun isFunctionUnique(functionId: Long) =
+        groupItemDao.getGroupItemsForChild(functionId, GroupItemType.FUNCTION).size == 1
+
     override suspend fun getFunctionById(functionId: Long): Function? = withContext(io) {
         val functionWithFeature = dao.getFunctionById(functionId) ?: return@withContext null
         val inputFeatures = dao.getFunctionInputFeaturesSync(functionId).map { it.featureId }
         val functionGraphDto =
             functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
                 ?: return@withContext null
-        functionWithFeature.toDto(functionGraphDto, inputFeatures)
+        functionWithFeature.toDto(functionGraphDto, inputFeatures, unique = isFunctionUnique(functionWithFeature.id))
     }
 
     override suspend fun tryGetFunctionByFeatureId(featureId: Long): Function? = withContext(io) {
@@ -180,7 +184,7 @@ internal class FunctionHelperImpl @Inject constructor(
         val functionGraphDto =
             functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
                 ?: return@withContext null
-        functionWithFeature.toDto(functionGraphDto, inputFeatures)
+        functionWithFeature.toDto(functionGraphDto, inputFeatures, unique = isFunctionUnique(functionWithFeature.id))
     }
 
     override suspend fun getFunctionsForGroupSync(groupId: Long): List<Function> = withContext(io) {
@@ -190,7 +194,7 @@ internal class FunctionHelperImpl @Inject constructor(
             val functionGraphDto =
                 functionGraphSerializer.deserialize(functionWithFeature.functionGraph)
                     ?: return@mapNotNull null
-            functionWithFeature.toDto(functionGraphDto, inputFeatures)
+            functionWithFeature.toDto(functionGraphDto, inputFeatures, unique = isFunctionUnique(functionWithFeature.id))
         }
     }
 

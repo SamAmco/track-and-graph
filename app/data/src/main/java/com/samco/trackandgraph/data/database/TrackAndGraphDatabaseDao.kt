@@ -100,7 +100,7 @@ private const val getDisplayTrackersQuery = """
     """
 
 @Dao
-internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, TrackerDao {
+internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, TrackerDao, FunctionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertGroup(group: Group): Long
 
@@ -188,7 +188,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     override fun getTrackersForGroupSync(groupId: Long): List<TrackerWithFeature>
 
     @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
-    fun getFeatureById(featureId: Long): Feature?
+    override fun getFeatureById(featureId: Long): Feature?
 
     @Query("""
         SELECT f.*
@@ -467,10 +467,10 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     override fun hasAnyReminders(): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertFunction(function: Function): Long
+    override fun insertFunction(function: Function): Long
 
     @Update
-    fun updateFunction(function: Function)
+    override fun updateFunction(function: Function)
 
     @Query("""
         SELECT
@@ -498,7 +498,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
         WHERE f.feature_id = :featureId
         LIMIT 1
     """)
-    fun getFunctionByFeatureId(featureId: Long): FunctionWithFeature?
+    override fun getFunctionByFeatureId(featureId: Long): FunctionWithFeature?
 
     @Query("""
         SELECT
@@ -512,19 +512,19 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
         LEFT JOIN group_items_table gi ON f.id = gi.child_id AND gi.type = 'FUNCTION'
         WHERE gi.group_id = :groupId
     """)
-    fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
+    override fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
 
     @Query("SELECT EXISTS (SELECT 1 FROM functions_table LIMIT 1)")
-    fun hasAnyFunctions(): Boolean
+    override fun hasAnyFunctions(): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertFunctionInputFeature(functionInputFeature: FunctionInputFeature): Long
+    override fun insertFunctionInputFeature(functionInputFeature: FunctionInputFeature): Long
 
     @Query("SELECT * FROM function_input_features_table WHERE function_id = :functionId ORDER BY id ASC")
-    fun getFunctionInputFeaturesSync(functionId: Long): List<FunctionInputFeature>
+    override fun getFunctionInputFeaturesSync(functionId: Long): List<FunctionInputFeature>
 
     @Query("DELETE FROM function_input_features_table WHERE function_id = :functionId")
-    fun deleteFunctionInputFeatures(functionId: Long)
+    override fun deleteFunctionInputFeatures(functionId: Long)
 
     // Dependency analysis queries - single-dependency graphs unified
     @Query("""

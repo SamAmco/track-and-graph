@@ -636,4 +636,98 @@ class ReminderHelperImplTest {
         // EXECUTE & VERIFY
         assertEquals(true, uut.hasAnyReminders())
     }
+
+    // =========================================================================
+    // Uniqueness tests
+    // =========================================================================
+
+    @Test
+    fun `getAllRemindersSync returns unique=true when reminder has only one group item`() =
+        runTest(dispatcher) {
+            // PREPARE
+            uut.createReminder(ReminderCreateRequest("Single Reminder", null, null, defaultParams))
+
+            // EXECUTE
+            val result = uut.getAllRemindersSync()
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].unique)
+        }
+
+    @Test
+    fun `getAllRemindersSync returns unique=false when reminder has multiple group items`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val reminderId = uut.createReminder(
+                ReminderCreateRequest("Shared Reminder", null, null, defaultParams)
+            )
+            // Add a second group item (symlink to a group)
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = 1L,
+                    displayIndex = 0,
+                    childId = reminderId,
+                    type = GroupItemType.REMINDER,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getAllRemindersSync()
+
+            // VERIFY
+            assertEquals(1, result.size)
+            assertEquals(reminderId, result[0].id)
+            assertEquals(false, result[0].unique)
+        }
+
+    @Test
+    fun `getAllRemindersSync sets unique independently per reminder`() =
+        runTest(dispatcher) {
+            // PREPARE - one unique reminder, one with extra group item
+            val uniqueId = uut.createReminder(
+                ReminderCreateRequest("Unique Reminder", null, null, defaultParams)
+            )
+            val sharedId = uut.createReminder(
+                ReminderCreateRequest("Shared Reminder", null, null, defaultParams)
+            )
+            // Add extra group item for sharedId only
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = 1L,
+                    displayIndex = 0,
+                    childId = sharedId,
+                    type = GroupItemType.REMINDER,
+                    createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result = uut.getAllRemindersSync()
+
+            // VERIFY
+            assertEquals(2, result.size)
+            val uniqueResult = result.first { it.id == uniqueId }
+            val sharedResult = result.first { it.id == sharedId }
+            assertEquals(true, uniqueResult.unique)
+            assertEquals(false, sharedResult.unique)
+        }
+
+    @Test
+    fun `getReminderById returns unique=true when reminder in only one group`() = runTest(dispatcher) {
+        val id = uut.createReminder(ReminderCreateRequest("Test", null, null, defaultParams))
+        val result = uut.getReminderById(id)
+        assertNotNull(result)
+        assertEquals(true, result!!.unique)
+    }
+
+    @Test
+    fun `getReminderById returns unique=false when reminder in multiple groups`() = runTest(dispatcher) {
+        val id = uut.createReminder(ReminderCreateRequest("Test", null, null, defaultParams))
+        fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 1L, displayIndex = 0, childId = id, type = GroupItemType.REMINDER, createdAt = 1000L))
+        val result = uut.getReminderById(id)
+        assertNotNull(result)
+        assertEquals(false, result!!.unique)
+    }
 }

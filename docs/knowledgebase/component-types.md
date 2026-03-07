@@ -98,3 +98,14 @@ All components (except groups themselves):
 - Can exist in multiple groups simultaneously
 - Have their display order stored in `GroupItem.displayIndex`
 - Do NOT store `groupId` or `displayIndex` on their own entity/DTO
+
+### `unique` Field on DTOs
+
+All component DTOs that can appear in the group screen (`DisplayTracker`, `Function`, `GraphOrStat`, `Group`, `Reminder`) carry a `unique: Boolean = true` field. It is `true` if the component has exactly **one** row in `group_items_table`, `false` if it exists in multiple groups (i.e. has symlinks).
+
+This field is computed in the helper's group-listing method using:
+```kotlin
+groupItemDao.getGroupItemsForChild(id, type).size == 1
+```
+
+The UI uses this to decide the delete dialog: unique → "are you sure?" dialog; non-unique → "delete everywhere or just here?" dialog. The field defaults to `true` on construction, so get-by-ID methods (not used for deletion) are unaffected.

@@ -33,9 +33,10 @@ internal data class Group(
     @ColumnInfo(name = "color_index")
     val colorIndex: Int,
 ) {
-    fun toDto() = com.samco.trackandgraph.data.database.dto.Group(
+    fun toDto(unique: Boolean) = com.samco.trackandgraph.data.database.dto.Group(
         id = id,
         name = name,
         colorIndex = colorIndex,
+        unique = unique,
     )
 }

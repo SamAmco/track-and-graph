@@ -93,7 +93,7 @@ fun buildGroupGraph(
 
         // Cycle detection
         if (groupId in visited) {
-            return GroupGraph(Group(g.id, g.name, 0), emptyList())
+            return GroupGraph(Group(g.id, g.name, 0, unique = true), emptyList())
         }
         visited.add(groupId)
 
@@ -123,7 +123,7 @@ fun buildGroupGraph(
         }
 
         visited.remove(groupId)
-        return GroupGraph(Group(g.id, g.name, 0), children)
+        return GroupGraph(Group(g.id, g.name, 0, unique = true), children)
     }
 
     return buildNode(root.id, mutableSetOf())

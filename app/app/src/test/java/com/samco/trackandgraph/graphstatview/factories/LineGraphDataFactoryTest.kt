@@ -88,6 +88,7 @@ class LineGraphDataFactoryTest {
             id = 1L,
             name = "Graph",
             type = GraphStatType.LINE_GRAPH,
+            unique = true,
         )
 
         val lineGraphFeature = LineGraphFeature(

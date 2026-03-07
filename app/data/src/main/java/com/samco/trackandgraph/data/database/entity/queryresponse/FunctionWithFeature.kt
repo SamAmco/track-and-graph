@@ -38,12 +38,14 @@ internal data class FunctionWithFeature(
     fun toDto(
         functionGraphDto: com.samco.trackandgraph.data.database.dto.FunctionGraph,
         inputFeatures: List<Long>,
+        unique: Boolean,
     ) = com.samco.trackandgraph.data.database.dto.Function(
         id = id,
         featureId = featureId,
         name = name,
         description = description,
         functionGraph = functionGraphDto,
-        inputFeatureIds = inputFeatures
+        inputFeatureIds = inputFeatures,
+        unique = unique,
     )
 }

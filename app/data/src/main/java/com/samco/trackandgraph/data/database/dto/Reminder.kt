@@ -31,7 +31,8 @@ data class Reminder(
     val id: Long,
     val reminderName: String,
     val featureId: Long?,
-    val params: ReminderParams
+    val params: ReminderParams,
+    val unique: Boolean,
 )
 
 /**

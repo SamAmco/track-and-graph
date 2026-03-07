@@ -42,12 +42,17 @@ internal class ReminderHelperImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ReminderHelper {
 
+    private fun isReminderUnique(reminderId: Long) =
+        groupItemDao.getGroupItemsForChild(reminderId, GroupItemType.REMINDER).size == 1
+
     override suspend fun getAllRemindersSync(): List<Reminder> = withContext(io) {
-        reminderDao.getAllRemindersSync().mapNotNull(::fromEntity)
+        reminderDao.getAllRemindersSync().mapNotNull { entity ->
+            fromEntity(entity, unique = isReminderUnique(entity.id))
+        }
     }
 
     override suspend fun getReminderById(id: Long): Reminder? = withContext(io) {
-        reminderDao.getReminderById(id)?.let(::fromEntity)
+        reminderDao.getReminderById(id)?.let { fromEntity(it, unique = isReminderUnique(it.id)) }
     }
 
     override suspend fun createReminder(request: ReminderCreateRequest): Long = withContext(io) {
@@ -193,6 +198,7 @@ internal class ReminderHelperImpl @Inject constructor(
     /** Converts a ReminderEntity to a Reminder DTO. */
     private fun fromEntity(
         entity: ReminderEntity,
+        unique: Boolean,
     ): Reminder? {
         val params = reminderSerializer.deserializeParams(entity.encodedReminderParams)
             ?: return null
@@ -201,7 +207,8 @@ internal class ReminderHelperImpl @Inject constructor(
             id = entity.id,
             reminderName = entity.alarmName,
             featureId = entity.featureId,
-            params = params
+            params = params,
+            unique = unique,
         )
     }
 }

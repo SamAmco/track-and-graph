@@ -102,8 +102,7 @@ internal class FakeGroupDao : GroupDao {
     override fun getAllGroupsSync(): List<Group> = groups.values.toList()
 
     override fun getGroupsForGroupSync(id: Long): List<Group> {
-        // This would need group items to work properly, simplified for tests
-        return emptyList()
+        return groups.values.toList()
     }
 
     override fun hasAnyGroups(): Boolean = groups.isNotEmpty()

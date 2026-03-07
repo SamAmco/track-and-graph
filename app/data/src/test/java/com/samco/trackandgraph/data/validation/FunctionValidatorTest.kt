@@ -40,7 +40,7 @@ class FunctionValidatorTest {
     private val mockDependencyAnalyserProvider: DependencyAnalyserProvider = mock()
     private val mockDependencyAnalyser: DependencyAnalyser = mock()
     private val mockDao: TrackAndGraphDatabaseDao = mock()
-    private val validator: FunctionValidator = FunctionValidator(mockDependencyAnalyserProvider, mockDao)
+    private val validator: FunctionValidator = FunctionValidatorImpl(mockDependencyAnalyserProvider, mockDao)
 
     @Before
     fun setup() {
@@ -722,7 +722,8 @@ class FunctionValidatorTest {
                 outputNode = outputNode,
                 isDuration = false
             ),
-            inputFeatureIds = inputFeatureIds
+            inputFeatureIds = inputFeatureIds,
+            unique = true,
         )
     }
 }
