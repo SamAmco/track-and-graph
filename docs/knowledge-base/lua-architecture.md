@@ -1,3 +1,16 @@
+---
+title: Lua functions — app architecture and data model
+description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), configuration value types (8 types), serialization pipeline, and LuaEngine execution flow with 4 modes.
+topics:
+  - Functions: derived data sources using Lua; stored as Features in features_table
+  - Visual node editor: FeatureNode → LuaScriptNode → OutputNode; data flows left to right
+  - FunctionGraph DTO and JSON serialization via FunctionGraphSerializer (kotlinx.serialization)
+  - Config value types: text, number, checkbox, enum, uint, duration (→ms), localtime (→ms), instant
+  - LuaEngine: 4 modes — runLuaFunction, runLuaFunctionGenerator, runLuaGraph, runLuaCatalogue
+  - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
+keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder]
+---
+
 # Lua Functions Architecture
 
 ## What Are Functions?

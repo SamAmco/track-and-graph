@@ -1,3 +1,16 @@
+---
+title: Reminders — groupless reminders, scheduling, and display ordering
+description: Reminders can exist with null group_id (groupless), appearing only in the Reminders screen. Covers ReminderParams types, delete/duplicate behavior, KMP-compatible PlatformScheduler pattern, and RemindersScreenViewModel display ordering pitfall.
+topics:
+  - Groupless reminders: group_id = null, appear only in Reminders screen (not group views)
+  - ReminderParams types: WeekDayParams, PeriodicParams, MonthDayParams, TimeSinceLastParams
+  - Delete: groupId=null (Reminders screen) always deletes everywhere; groupId provided → symlink removal
+  - Duplicate: inserts AFTER original (not at top); shifts only items below
+  - Scheduling: PlatformScheduler interface isolates Android AlarmManager (KMP pattern)
+  - PITFALL: RemindersScreenViewModel dbDisplayIndices MUST react to DataUpdateType.Reminder or new reminders fall to bottom
+keywords: [reminder, groupless, null, ReminderParams, PlatformScheduler, scheduling, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
+---
+
 # Reminders
 
 Reminders have special handling compared to other components.

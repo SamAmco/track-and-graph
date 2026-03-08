@@ -1,3 +1,15 @@
+---
+title: Writing Room database migrations
+description: How to write Room migrations safely — always copy CREATE TABLE SQL from schema JSON, SQLite table-rebuild pattern (can't drop columns), DROP TABLE cascade pitfall, and migration 58→59 as a detailed example with child_id pitfall.
+topics:
+  - Always copy CREATE TABLE SQL from schema JSON using jq (never infer from entity code)
+  - SQLite table rebuild: CREATE new, INSERT FROM old, DROP old, RENAME new
+  - DROP TABLE does NOT trigger ON DELETE CASCADE on child tables
+  - child_id must be tracker/function primary key, NOT features_table.id (use JOIN)
+  - Migration 58→59: introduced group_items_table, migrated group_id/display_index columns
+keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 58-59]
+---
+
 # Database Migrations
 
 Room migrations live in `app/data/src/main/java/com/samco/trackandgraph/data/database/migrations/`. All migrations are registered in `DatabaseMigrations.kt`.

@@ -1,3 +1,16 @@
+---
+title: Writing Lua graph scripts and contributing graph scripts
+description: Graph scripts return graph data structures (not data streams); covers 5 graph types (text, data_point, line, time_bar, pie), DataSource API, script configuration with local variables, DURATION vs PERIOD distinction, and the graph test framework (config as Lua code strings, named sources).
+topics:
+  - Graph types: graph.text, graph.data_point, graph.line, graph.time_bar, graph.pie
+  - DataSource API: sources["name"].dp() iterates data points in reverse chronological order
+  - Script config: local variables modified directly by users; PREVIEW_START/END for collapsed view
+  - core.DURATION (ms, arithmetic ok) vs core.PERIOD (variable length — NO arithmetic)
+  - Graph tests DIFFER from function tests: config values are Lua code strings (regex replacement); sources are named table
+  - File structure: lua/src/community/graphs/<category>/<script-name>/
+keywords: [lua, graph, script, visualization, line, pie, bar, text, data_point, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, sync-lua-to-docs]
+---
+
 # Lua Graph Scripts
 
 Graph scripts create custom visualizations. Unlike function scripts (which transform data streams), graph scripts return graph data structures for rendering.

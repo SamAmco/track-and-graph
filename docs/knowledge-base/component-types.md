@@ -1,3 +1,14 @@
+---
+title: Component types — Trackers, Functions, Graphs, Reminders, Groups
+description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default — must always be computed), and GroupItemType vs GroupChildType enums.
+topics:
+  - 5 types: TRACKER, FUNCTION, GRAPH, REMINDER, GROUP (GroupItemType enum)
+  - Dual IDs: tracker/function have both a primary key and featureId; group_items_table.child_id uses the primary key NOT featureId
+  - unique field on DTOs: true if component has exactly one GroupItem row, false if symlinked elsewhere
+  - GroupItemType (internal/entity layer) vs GroupChildType (public/DTO/UI layer) — 1:1 mapping
+keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, component, GroupItemType, GroupChildType, unique, symlink, dual-id]
+---
+
 # Component Types
 
 Track & Graph has five types of components that can exist within the group hierarchy.
@@ -101,11 +112,15 @@ All components (except groups themselves):
 
 ### `unique` Field on DTOs
 
-All component DTOs that can appear in the group screen (`DisplayTracker`, `Function`, `GraphOrStat`, `Group`, `Reminder`) carry a `unique: Boolean = true` field. It is `true` if the component has exactly **one** row in `group_items_table`, `false` if it exists in multiple groups (i.e. has symlinks).
+All component DTOs that can appear in the group screen (`DisplayTracker`, `Function`, `GraphOrStat`, `Group`, `Reminder`) carry a `unique: Boolean` field (no default). It is `true` if the component has exactly **one** row in `group_items_table`, `false` if it exists in multiple groups (i.e. has symlinks).
 
-This field is computed in the helper's group-listing method using:
+**Every** helper method that returns one of these DTOs must compute uniqueness:
 ```kotlin
 groupItemDao.getGroupItemsForChild(id, type).size == 1
 ```
 
-The UI uses this to decide the delete dialog: unique → "are you sure?" dialog; non-unique → "delete everywhere or just here?" dialog. The field defaults to `true` on construction, so get-by-ID methods (not used for deletion) are unaffected.
+Each helper has a private helper for this, e.g. `isFunctionUnique(id)`, `isGraphUnique(id)`, etc. This applies to both list methods (`getFunctionsForGroupSync`) and single-item lookups (`getFunctionById`, `tryGetFunctionByFeatureId`).
+
+The `unique: Boolean` field has **no default value** intentionally — the compiler will catch any call site that forgets to pass it. Call sites that construct these DTOs for UI previews or tests unrelated to uniqueness should pass `unique = true` explicitly.
+
+The UI uses this to decide the delete dialog: unique → "are you sure?" dialog; non-unique → "delete everywhere or just here?" dialog.

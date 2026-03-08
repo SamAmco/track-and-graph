@@ -1,3 +1,16 @@
+---
+title: DataInteractor and Helper pattern
+description: DataInteractor public interface, DataInteractorImpl delegation to typed helpers (TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper), focused DAO interfaces, symlink-aware delete pattern, withContext-inside-withTransaction pitfall, and DataUpdateType events.
+topics:
+  - DataInteractor: public interface; UI layer depends only on this
+  - Helpers: TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper
+  - Focused DAO interfaces injected per helper (enables small in-memory fakes for testing)
+  - Delete pattern: groupId provided + multi-group → remove symlink only; otherwise delete all
+  - CRITICAL pitfall: never call withContext inside withTransaction (breaks Room thread confinement)
+  - DataUpdateType events: emitted by DataInteractorImpl after every mutation; UI subscribes to filter
+keywords: [DataInteractor, helper, DAO, TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper, delete, symlink, withTransaction, withContext, DataUpdateType, events, testing, fakes, DisplayIndex]
+---
+
 # Helper Classes and DataInteractor
 
 The data layer uses a hierarchy of helper classes for clean separation of concerns.

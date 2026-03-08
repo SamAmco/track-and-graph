@@ -1,3 +1,15 @@
+---
+title: Lua tooling, build process, and adding new config types
+description: Directory structure for lua/, building the function catalog (pack-functions.lua), validation and inspection tools, debug publishing, and the complete list of 7 implementation + 5 test files to update when adding a new configuration type.
+topics:
+  - Directory: lua/src/community/functions/, lua/catalog/, lua/tools/, lua/src/tng/
+  - Build catalog: lua tools/pack-functions.lua → catalog/community-functions.lua
+  - Validation tools: verify-api-specs, validate-functions, validate-function-categories, detect-changes
+  - Debug publish: lua tools/publish-functions-debug.lua (signs with fresh keypair for debug builds)
+  - Adding config types: 7 implementation files + 5 test files must ALL be updated
+keywords: [lua, tooling, build, pack-functions, catalog, luarocks, serpent, validation, config-types, debug-publish, api-specs, make]
+---
+
 # Lua Tooling and Project Structure
 
 ## Directory Structure

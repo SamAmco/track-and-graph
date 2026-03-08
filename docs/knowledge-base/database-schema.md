@@ -1,3 +1,16 @@
+---
+title: Database tables and relationships
+description: Room/SQLite schema overview — all core tables (groups, group_items, features, trackers, functions, graphs, reminders, data_points), their columns, and foreign key relationships.
+topics:
+  - groups_table: id, name, color_index
+  - group_items_table: id, group_id (nullable), display_index, child_id, type, created_at
+  - features_table: id, name, feature_description (base for trackers and functions)
+  - trackers_table, functions_table: reference features_table (1:1, CASCADE delete)
+  - data_points_table: references features_table (1:many)
+  - graphs_and_stats_table, reminders_table
+keywords: [database, schema, Room, SQLite, tables, columns, foreign-key, groups, features, trackers, functions, data_points, cascade]
+---
+
 # Database Schema Overview
 
 Track & Graph uses Room (SQLite) for persistence. The database is defined in `app/data/src/main/java/com/samco/trackandgraph/data/database/`.

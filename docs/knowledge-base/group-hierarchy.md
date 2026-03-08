@@ -1,3 +1,16 @@
+---
+title: Group DAG structure and symlinks
+description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion must handle shared membership; GroupGraph and FeaturePathProvider resolve display paths. DTOs never carry hierarchy info.
+topics:
+  - Groups can have multiple parents (symlink-like, via group_items_table)
+  - Structure must remain acyclic (no circular references)
+  - Deletion: remove only GroupItem if group exists in other parents; recursive delete if deleting entirely
+  - GroupGraph: tree built from DAG by DataInteractorImpl.buildGroupGraph(); same node may appear at multiple positions
+  - FeaturePathProvider: resolves display paths; collapses multi-path items with "..."
+  - DTOs do NOT carry hierarchy info (no groupId/parentGroupIds/displayIndex fields)
+keywords: [group, DAG, symlink, hierarchy, acyclic, parent, child, GroupGraph, FeaturePathProvider, deletion, GroupHelperImpl, path-resolution]
+---
+
 # Group Hierarchy
 
 Groups in Track & Graph form a **Directed Acyclic Graph (DAG)**, similar to a filesystem with symlinks.

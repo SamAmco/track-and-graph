@@ -1,4 +1,15 @@
-I would like to test the GroupViewModel on a couple of its core functionalities that are crucial where the implementation is a little complex. To make this possible we need to approach the task in phases. 
+---
+title: GroupViewModel testing plan (3 phases)
+description: Plan to enable unit testing of GroupViewModel by refactoring ViewDataFactory/GraphStatDataSourceAdapter into interfaces, splitting DataInteractor DI into specific helpers, and writing display-index and graph-update test suites.
+topics:
+  - Phase 1: Refactor ViewDataFactory and GraphStatDataSourceAdapter into interface + impl
+  - Phase 2: Inject specific helpers (GroupHelper, GraphHelper, etc.) instead of DataInteractor
+  - Phase 3: Unit tests for display indices and graph updates
+  - Blocker: DataEventsInteractor decomposition needed before fully removing DataInteractor dependency
+keywords: [GroupViewModel, testing, ViewDataFactory, GraphStatDataSourceAdapter, DataInteractor, GroupHelper, GraphHelper, display-index, unit-test, plan]
+---
+
+I would like to test the GroupViewModel on a couple of its core functionalities that are crucial where the implementation is a little complex. To make this possible we need to approach the task in phases.
 
 ## Phase 1: Refactor ViewDataFactory
 To make testing simpler you should start by splitting ViewDataFactory and GraphStatDataSourceAdapter into an interface and renaming the existing abstract classes to e.g. ViewDataFactoryImpl. This way in our tests we should be able to write concise fakes for the graph data calculators that don't need to depend on a full graph data calculator implementation. We can have a fake of the GraphStatInteractorProvider that provides fake GraphStatDataSourceAdapters and ViewDataFactorys.
@@ -34,4 +45,3 @@ Can you write me two unit test files that test the GroupViewModel.
 - When an unknown event is emitted, all graphs are re-calculated
 - If a create/update/delete all happen at the same time, we calculate the data for the created and updated graphs and drop the deleted
 - Two updates to the same graph in quick succession result in a single re-calculation of that graphs view data
-

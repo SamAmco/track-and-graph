@@ -2,51 +2,26 @@
 
 Android app for personal data tracking and custom graph visualization.
 
-## Project Map
-
-```
-app/
-├── app/                        # UI layer (Compose, ViewModels, navigation)
-│   └── src/main/.../
-│       ├── adddatapoint/       # Each top-level package = a future feature module
-│       ├── reminders/          # (see architecture.md for full list)
-│       ├── di/                 # Hilt wiring (stays in :app shell)
-│       └── ...
-└── data/                       # Data layer (Room, DTOs, business logic)
-    └── src/
-        ├── main/.../database/       # Entities, DAOs, Room database
-        ├── main/.../dto/            # Data Transfer Objects
-        ├── main/.../interactor/     # DataInteractor and Helpers
-        ├── test/                    # Unit tests
-        └── testFixtures/            # Fake implementations for testing
-docs/
-├── knowledgebase/              # Technical docs (see index below)
-└── docs/                       # User-facing docs (tutorials, Lua)
-lua/                            # Community Lua functions
-schemas/                        # Room migration schemas
-```
-
 ## Rules
 
-- ALWAYS read this file and any relevant knowledgebase docs before executing a task.
-- NEVER create personal memory files (e.g. MEMORY.md). If something is worth remembering, update the knowledgebase instead.
+NEVER create personal memory files (e.g. MEMORY.md). If something is worth remembering, update the knowledge base instead.
 
-## Knowledgebase Index
+ALWAYS ALWAYS ALWAYS consult the knowledge base FIRST!
 
-ALWAYS search the knowledgebase and read any potentially related docs before attempting to execute a task.
+All technical documentation is in `docs/knowledge-base/`. The correct workflow is:
 
-| Topic | File |
-|-------|------|
-| Architecture and conventions | [architecture.md](docs/knowledgebase/architecture.md) |
-| Build and test commands | [build-commands.md](docs/knowledgebase/build-commands.md) |
-| Database tables and relationships | [database-schema.md](docs/knowledgebase/database-schema.md) |
-| Group DAG structure and symlinks | [group-hierarchy.md](docs/knowledgebase/group-hierarchy.md) |
-| Trackers, Functions, Graphs, Reminders, Groups | [component-types.md](docs/knowledgebase/component-types.md) |
-| Junction table and display ordering | [group-items.md](docs/knowledgebase/group-items.md) |
-| Writing and pitfalls of Room migrations | [database-migrations.md](docs/knowledgebase/database-migrations.md) |
-| Groupless reminders | [reminders.md](docs/knowledgebase/reminders.md) |
-| DataInteractor and Helper pattern | [helper-classes.md](docs/knowledgebase/helper-classes.md) |
-| Lua functions app architecture | [lua-architecture.md](docs/knowledgebase/lua-architecture.md) |
-| Writing Lua function scripts | [lua-community-functions.md](docs/knowledgebase/lua-community-functions.md) |
-| Writing Lua graph scripts | [lua-graph-scripts.md](docs/knowledgebase/lua-graph-scripts.md) |
-| Lua tooling, building, config types | [lua-tooling.md](docs/knowledgebase/lua-tooling.md) |
+### Step 1 — Grep the index for relevant keywords
+```
+Grep: <keywords from your task> in docs/knowledge-base/index.yaml
+```
+Each entry in the index looks like this:
+```yaml
+  - file: helper-classes.md
+    title: DataInteractor and Helper pattern
+    description: DataInteractor public interface, DataInteractorImpl delegation...
+    keywords: [DataInteractor, helper, DAO, TrackerHelper, delete, symlink, withTransaction]
+```
+Grep matches against any field. The `file` value is what you pass to Read. Match against your task domain (e.g. "tracker", "migration", "reminder", "lua", "display_index").
+
+### Step 2 — Read only the matched files
+Open the 1–3 files that matched. Each file has front-matter at the top (title, description, topics) so you can confirm relevance before reading the full content.

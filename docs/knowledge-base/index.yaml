@@ -1,0 +1,80 @@
+# Track & Graph Knowledge Base Index
+# Read this file first to identify relevant docs before opening them.
+# Each entry has: file, title, description, keywords
+
+docs:
+  - file: project-map.md
+    title: Project map — directory structure
+    description: Top-level directory layout of the repository — app/app UI module, app/data data module, docs/, lua/, schemas/ — with notes on each folder's purpose.
+    keywords: [project-map, directory, structure, modules, app, data, ui, docs, lua, schemas, layout]
+
+  - file: architecture.md
+    title: Architecture and conventions
+    description: MVVM pattern, module structure (app/app UI, app/data data layer), KMP compatibility constraints (no mocking frameworks), Hilt DI, Channel-based UI events, and coding conventions.
+    keywords: [architecture, MVVM, Hilt, KMP, modules, Room, coroutines, DataInteractor, Channel, conventions, testing]
+
+  - file: build-commands.md
+    title: Build and test commands
+    description: Gradle commands for building and running tests; all run from app/ directory; test results location; --tests flag not supported.
+    keywords: [build, gradle, test, assembleDebug, commands, gradlew, testDebugUnitTest]
+
+  - file: component-types.md
+    title: Component types — Trackers, Functions, Graphs, Reminders, Groups
+    description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default, must always be computed by querying group_items_table), and GroupItemType vs GroupChildType enums.
+    keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, component, GroupItemType, GroupChildType, unique, symlink, dual-id]
+
+  - file: database-schema.md
+    title: Database tables and relationships
+    description: Room/SQLite schema — all core tables (groups, group_items, features, trackers, functions, graphs, reminders, data_points), their columns, and foreign key relationships.
+    keywords: [database, schema, Room, SQLite, tables, columns, foreign-key, groups, features, trackers, functions, data_points, cascade]
+
+  - file: database-migrations.md
+    title: Writing Room database migrations
+    description: How to write Room migrations safely — copy CREATE TABLE SQL from schema JSON (jq), SQLite table-rebuild pattern, DROP TABLE cascade pitfall, and migration 58→59 as a detailed example with child_id pitfall.
+    keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items]
+
+  - file: group-hierarchy.md
+    title: Group DAG structure and symlinks
+    description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion handles shared membership; GroupGraph and FeaturePathProvider resolve display paths; DTOs never carry hierarchy info.
+    keywords: [group, DAG, symlink, hierarchy, acyclic, parent, child, GroupGraph, FeaturePathProvider, deletion, path-resolution]
+
+  - file: group-items.md
+    title: group_items_table — junction table and display ordering
+    description: The group_items_table schema, composite identity (type + child_id), display_index ordering managed by helpers, multi-group membership, drag-and-drop flow, and null group_id for groupless reminders.
+    keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group]
+
+  - file: helper-classes.md
+    title: DataInteractor and Helper pattern
+    description: DataInteractor public interface, DataInteractorImpl delegation to typed helpers, focused DAO interfaces, symlink-aware delete pattern, withContext-inside-withTransaction pitfall, and DataUpdateType events.
+    keywords: [DataInteractor, helper, DAO, TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper, delete, symlink, withTransaction, DataUpdateType, events, testing, fakes, DisplayIndex]
+
+  - file: reminders.md
+    title: Reminders — groupless reminders, scheduling, and display ordering
+    description: Reminders can exist with null group_id (groupless), appearing only in the Reminders screen. Covers ReminderParams types, delete/duplicate behavior, KMP-compatible PlatformScheduler pattern, and RemindersScreenViewModel display ordering pitfall.
+    keywords: [reminder, groupless, null, ReminderParams, PlatformScheduler, scheduling, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType]
+
+  - file: lua-architecture.md
+    title: Lua functions — app architecture and data model
+    description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), 8 configuration value types, serialization pipeline, and LuaEngine execution flow with 4 modes.
+    keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer]
+
+  - file: lua-community-functions.md
+    title: Writing Lua function scripts and contributing to the community catalog
+    description: How to write Lua function scripts (generator/iterator pattern, data point fields, 8 config types, multiple inputs, filtering); catalog contribution requirements (version, 4-language localization, categories, tests).
+    keywords: [lua, function, script, generator, iterator, datapoint, config, community, catalog, localization, tests, tng.config, inputCount, version]
+
+  - file: lua-graph-scripts.md
+    title: Writing Lua graph scripts and contributing graph scripts
+    description: Graph scripts return graph data structures (not data streams); 5 graph types (text, data_point, line, time_bar, pie), DataSource API, script configuration with local variables, DURATION vs PERIOD distinction, and the graph test framework.
+    keywords: [lua, graph, script, visualization, line, pie, bar, text, data_point, DataSource, DURATION, PERIOD, tests, tng.graph, community]
+
+  - file: lua-tooling.md
+    title: Lua tooling, build process, and adding new config types
+    description: Directory structure for lua/, building the function catalog (pack-functions.lua), validation and inspection tools, debug publishing, and the 7 implementation + 5 test files to update when adding a new configuration type.
+    keywords: [lua, tooling, build, pack-functions, catalog, luarocks, serpent, validation, config-types, debug-publish, api-specs]
+
+plans:
+  - file: plans/group-view-model-testing-plan.md
+    title: GroupViewModel testing plan (3 phases)
+    description: Plan to enable GroupViewModel unit testing — refactor ViewDataFactory into interface, split DataInteractor DI into specific helpers, write display-index and graph-update test suites.
+    keywords: [GroupViewModel, testing, ViewDataFactory, DataInteractor, GroupHelper, GraphHelper, display-index, unit-test, plan]

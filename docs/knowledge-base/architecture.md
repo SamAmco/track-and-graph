@@ -1,3 +1,15 @@
+---
+title: Architecture and conventions
+description: MVVM pattern, module structure (app/app UI, app/data data layer), KMP compatibility constraints, Hilt DI, Channel-based UI events, and coding conventions.
+topics:
+  - Module structure: app/app (Compose/ViewModels) and app/data (Room/DAOs/DTOs)
+  - KMP compatibility: no mocking frameworks without user approval; prefer testFixtures fakes
+  - DataInteractor: single entry point for all data operations from UI layer
+  - ViewModel UI events: Channel<T> pattern (not SharedFlow)
+  - Conventions: DTOs in dto/, entities in entity/, fakes in testFixtures/
+keywords: [architecture, MVVM, Hilt, KMP, modules, Room, coroutines, DataInteractor, Channel, conventions, testing]
+---
+
 # Architecture
 
 ## Overview

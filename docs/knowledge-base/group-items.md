@@ -1,3 +1,16 @@
+---
+title: group_items_table — junction table and display ordering
+description: The group_items_table schema, composite identity (type + child_id together identify a component), display_index ordering managed by helpers, multi-group membership, drag-and-drop flow, and null group_id for groupless reminders.
+topics:
+  - Schema: id, group_id (nullable), display_index, child_id, type, created_at
+  - Composite identity: (type, child_id) together identify a component — NOT child_id alone
+  - child_id is the type-specific entity ID (NOT features_table.id for trackers/functions)
+  - Display index: managed by helpers; UI combines via GroupViewModel flows (children not pre-sorted)
+  - Drag-and-drop: temporary local list for instant UI; DB write on drop; VM waits for dbDisplayIndices alignment
+  - null group_id: valid ONLY for reminders (Reminders screen)
+keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group]
+---
+
 # Group Items (Junction Table)
 
 `group_items_table` is the central junction table that places components into groups.
