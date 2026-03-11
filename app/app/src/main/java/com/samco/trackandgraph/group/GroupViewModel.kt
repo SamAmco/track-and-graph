@@ -94,7 +94,12 @@ interface GroupViewModel {
     suspend fun userHasAnyTrackers(): Boolean
     fun getTrackersInGroup(): List<DisplayTracker>
     fun addDefaultTrackerValue(tracker: DisplayTracker)
-    fun onDeleteTracker(trackerId: Long)
+    /**
+     * Delete a tracker. If [groupId] is provided and the tracker exists in multiple groups,
+     * only the GroupItem link for that group is removed (symlink removal). If [groupId] is null
+     * or the tracker is unique, the tracker is deleted entirely from all groups.
+     */
+    fun onDeleteTracker(trackerId: Long, groupId: Long? = null)
     fun onDeleteGraphStat(id: Long)
     fun onDeleteGroup(id: Long)
     fun onDeleteFunction(id: Long)
@@ -413,11 +418,14 @@ class GroupViewModelImpl @Inject constructor(
         }
     }
 
-    override fun onDeleteTracker(trackerId: Long) {
+    override fun onDeleteTracker(trackerId: Long, groupId: Long?) {
         viewModelScope.launch(io) {
             val tracker = dataInteractor.getTrackerById(trackerId) ?: return@launch
-            dataInteractor.deleteTracker(TrackerDeleteRequest(trackerId = trackerId))
-            timerServiceInteractor.requestWidgetsDisabledForFeatureId(tracker.featureId)
+            dataInteractor.deleteTracker(TrackerDeleteRequest(trackerId = trackerId, groupId = groupId))
+            // Only disable widgets when the tracker is fully deleted (groupId = null means delete everywhere)
+            if (groupId == null) {
+                timerServiceInteractor.requestWidgetsDisabledForFeatureId(tracker.featureId)
+            }
         }
     }
 

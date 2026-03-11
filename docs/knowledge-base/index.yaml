@@ -8,6 +8,11 @@ docs:
     description: Top-level directory layout of the repository — app/app UI module, app/data data module, docs/, lua/, schemas/ — with notes on each folder's purpose.
     keywords: [project-map, directory, structure, modules, app, data, ui, docs, lua, schemas, layout]
 
+  - file: compose-ui-patterns.md
+    title: Compose UI patterns — ViewModel binding, pure UI, and previews
+    description: The standard three-layer composable pattern — ViewModel-binding composable collects state and calls a pure-UI composable; pure-UI composable takes only state/callbacks; @Preview calls the pure-UI composable with hardcoded data.
+    keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View]
+
   - file: architecture.md
     title: Architecture and conventions
     description: MVVM pattern, module structure (app/app UI, app/data data layer), KMP compatibility constraints (no mocking frameworks), Hilt DI, Channel-based UI events, and coding conventions.

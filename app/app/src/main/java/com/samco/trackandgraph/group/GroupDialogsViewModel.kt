@@ -28,10 +28,16 @@ import javax.inject.Inject
 
 /**
  * Simple DTO for delete confirmation dialogs containing only the essential data needed.
+ *
+ * @param unique Whether the item exists in only one group. If false, the user should be asked
+ *               whether to delete from this group only or everywhere.
+ * @param groupId The current group context, used for "remove from this group" operations.
  */
 data class DeleteItemDto(
     val id: Long,
-    val type: DeleteType
+    val type: DeleteType,
+    val unique: Boolean = true,
+    val groupId: Long? = null,
 )
 
 /**
@@ -102,10 +108,12 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
         )
     }
 
-    fun showDeleteTrackerDialog(tracker: DisplayTracker) {
+    fun showDeleteTrackerDialog(tracker: DisplayTracker, groupId: Long) {
         _itemForDeletion.value = DeleteItemDto(
             id = tracker.id,
-            type = DeleteType.TRACKER
+            type = DeleteType.TRACKER,
+            unique = tracker.unique,
+            groupId = groupId,
         )
     }
 

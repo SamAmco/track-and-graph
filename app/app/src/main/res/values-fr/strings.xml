@@ -34,6 +34,9 @@
     <string name="no_trackers_functions_hint">Veuillez créer un suivi avant de créer des fonctions.</string>
     <string name="ru_sure_del_group">Êtes-vous sûr de vouloir supprimer ce groupe et tout ce qu\'il contient ? Vous ne pouvez pas faire marche arrière.</string>
     <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ce suivi ?</string>
+    <string name="item_in_multiple_groups">Cet élément existe dans plusieurs groupes. Vous pouvez le retirer uniquement de ce groupe ou le supprimer partout.</string>
+    <string name="remove_from_this_group">Retirer du groupe</string>
+    <string name="delete_everywhere">Supprimer partout</string>
     <string name="ru_sure_del_function">Êtes-vous sûr de vouloir supprimer cette fonction ? Vous ne pouvez pas revenir en arrière.</string>
     <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette entrée ?</string>
     <string name="feature_name_cannot_be_null">Veuillez préciser un nom</string>

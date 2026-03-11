@@ -124,3 +124,5 @@ Each helper has a private helper for this, e.g. `isFunctionUnique(id)`, `isGraph
 The `unique: Boolean` field has **no default value** intentionally — the compiler will catch any call site that forgets to pass it. Call sites that construct these DTOs for UI previews or tests unrelated to uniqueness should pass `unique = true` explicitly.
 
 The UI uses this to decide the delete dialog: unique → "are you sure?" dialog; non-unique → "delete everywhere or just here?" dialog.
+
+When the user chooses "remove from this group", the UI passes the current `groupId` to the ViewModel delete method (e.g. `onDeleteTracker(trackerId, groupId)`), which forwards it to the request object. The data layer then removes only the GroupItem link for that group. When the user chooses "delete everywhere" (or the item is unique), `groupId` is passed as `null` and the item is fully deleted. See also: **Delete Pattern (Symlink Logic)** in `helper-classes.md`.

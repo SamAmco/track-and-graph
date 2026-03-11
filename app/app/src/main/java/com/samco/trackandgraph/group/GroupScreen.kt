@@ -85,7 +85,6 @@ import com.samco.trackandgraph.releasenotes.ReleaseNotesViewModelImpl
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
@@ -264,7 +263,7 @@ private fun GroupScreenContent(
         allChildren = allChildren,
         trackerClickListeners = TrackerClickListeners(
             onEdit = onTrackerEdit,
-            onDelete = { groupDialogsViewModel.showDeleteTrackerDialog(it) },
+            onDelete = { groupDialogsViewModel.showDeleteTrackerDialog(it, groupId) },
             onMoveTo = { moveItemViewModel.showMoveTrackerDialog(fromGroupId = groupId, tracker = it) },
             onDescription = { groupDialogsViewModel.showFeatureDescriptionDialog(it) },
             onAdd = { tracker, useDefault ->
@@ -364,31 +363,7 @@ private fun GroupScreenContent(
     }
 
     // Confirmation dialogs
-    val itemForDeletion = groupDialogsViewModel.itemForDeletion.collectAsStateWithLifecycle().value
-    if (itemForDeletion != null) {
-        val bodyRes = when (itemForDeletion.type) {
-            DeleteType.GROUP -> R.string.ru_sure_del_group
-            DeleteType.GRAPH_STAT -> R.string.ru_sure_del_graph
-            DeleteType.TRACKER -> R.string.ru_sure_del_feature
-            DeleteType.FUNCTION -> R.string.ru_sure_del_function
-        }
-
-        ContinueCancelDialog(
-            body = bodyRes,
-            onDismissRequest = { groupDialogsViewModel.hideDeleteDialog() },
-            onConfirm = {
-                when (itemForDeletion.type) {
-                    DeleteType.GROUP -> groupViewModel.onDeleteGroup(itemForDeletion.id)
-                    DeleteType.GRAPH_STAT -> groupViewModel.onDeleteGraphStat(itemForDeletion.id)
-                    DeleteType.TRACKER -> groupViewModel.onDeleteTracker(itemForDeletion.id)
-                    DeleteType.FUNCTION -> groupViewModel.onDeleteFunction(itemForDeletion.id)
-                }
-                groupDialogsViewModel.hideDeleteDialog()
-            },
-            continueText = R.string.delete,
-            cancelText = R.string.cancel
-        )
-    }
+    GroupDeleteDialog(groupDialogsViewModel, groupViewModel)
 
     if (groupDialogsViewModel.showNoTrackersDialog.collectAsStateWithLifecycle().value) {
         ContinueDialog(
