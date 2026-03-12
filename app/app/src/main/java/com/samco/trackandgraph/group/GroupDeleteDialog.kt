@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.group
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.ButtonDefaults
@@ -33,6 +34,8 @@ import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
+import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 
 @Composable
 internal fun GroupDeleteDialog(
@@ -62,7 +65,21 @@ internal fun GroupDeleteDialog(
                     itemForDeletion.id,
                     itemForDeletion.groupId,
                 )
-                else -> Unit
+
+                DeleteType.GRAPH_STAT -> groupViewModel.onDeleteGraphStat(
+                    itemForDeletion.id,
+                    itemForDeletion.groupId,
+                )
+
+                DeleteType.GROUP -> groupViewModel.onDeleteGroup(
+                    itemForDeletion.id,
+                    itemForDeletion.groupId,
+                )
+
+                DeleteType.FUNCTION -> groupViewModel.onDeleteFunction(
+                    itemForDeletion.id,
+                    itemForDeletion.groupId,
+                )
             }
             onDismiss()
         },
@@ -91,7 +108,15 @@ private fun GroupDeleteDialogContent(
             cancelText = R.string.cancel,
         )
     } else {
-        CustomDialog(onDismissRequest = onDismiss) {
+        CustomDialog(
+            onDismissRequest = onDismiss,
+            paddingValues = PaddingValues(
+                start = inputSpacingLarge,
+                end = inputSpacingLarge,
+                bottom = halfDialogInputSpacing,
+                top = inputSpacingLarge,
+            )
+        ) {
             Text(
                 text = stringResource(R.string.item_in_multiple_groups),
                 style = MaterialTheme.typography.titleMedium,

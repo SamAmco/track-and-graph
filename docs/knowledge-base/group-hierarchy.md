@@ -39,25 +39,7 @@ In this example, the "Exercise" group appears in both "Health" and "Dashboard".
 
 ## Implementation
 
-The hierarchy is implemented via `group_items_table`:
-
-```kotlin
-// Group A contains Group B
-GroupItem(
-    groupId = groupA.id,      // parent
-    childId = groupB.id,      // child
-    type = GroupItemType.GROUP,
-    displayIndex = 0
-)
-
-// Group B also appears in Group C (symlink)
-GroupItem(
-    groupId = groupC.id,      // different parent
-    childId = groupB.id,      // same child
-    type = GroupItemType.GROUP,
-    displayIndex = 1
-)
-```
+The hierarchy is implemented via `group_items_table` — each parent-child relationship is a `GroupItem` row with `type = GROUP`. A group appearing in multiple parents simply has multiple `GroupItem` rows with the same `childId` but different `groupId` values. See [group-items.md](group-items.md).
 
 ## Deletion Behavior
 
@@ -84,9 +66,6 @@ See `GroupHelperImpl.deleteGroup()` for the implementation:
 
 **Important**: Group and Feature DTOs do **not** carry hierarchy information (`groupId`, `parentGroupIds`, `displayIndex`). All hierarchy is expressed through `group_items_table` and `GroupGraph`. Do not add hierarchy fields to DTOs.
 
-## Key Files
+## Finding Code
 
-- `GroupHelperImpl.kt` - Group CRUD operations and recursive deletion
-- `GroupItemDao.kt` - Database queries for group relationships
-- `GroupItem.kt` - Entity definition
-- `FeaturePathProvider.kt` - Path resolution for groups and features
+Search for `GroupHelperImpl` (CRUD + recursive deletion), `GroupItemDao` (relationship queries), and `FeaturePathProvider` (path resolution).

@@ -70,7 +70,8 @@ data class DisplayFunction(
     val featureId: Long,
     val groupId: Long,
     val name: String,
-    val description: String
+    val description: String,
+    val unique: Boolean,
 )
 
 /**
@@ -244,7 +245,8 @@ fun FunctionPreview() {
                     featureId = 101,
                     groupId = 1,
                     name = "Calculate Average",
-                    description = "Calculates the average of selected data points"
+                    description = "Calculates the average of selected data points",
+                    unique = true,
                 ),
                 onEdit = {},
                 onDelete = {},
@@ -259,7 +261,8 @@ fun FunctionPreview() {
                     featureId = 102,
                     groupId = 1,
                     name = "Weekly Summary Report",
-                    description = "Generates a comprehensive weekly summary with trends and insights"
+                    description = "Generates a comprehensive weekly summary with trends and insights",
+                    unique = true,
                 ),
                 onEdit = {},
                 onDelete = {},

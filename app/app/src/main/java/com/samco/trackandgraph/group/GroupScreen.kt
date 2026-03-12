@@ -282,7 +282,7 @@ private fun GroupScreenContent(
             onStopTimer = { groupViewModel.stopTimer(it) }
         ),
         graphStatClickListeners = GraphStatClickListeners(
-            onDelete = { groupDialogsViewModel.showDeleteGraphStatDialog(it) },
+            onDelete = { groupDialogsViewModel.showDeleteGraphStatDialog(it, groupId) },
             onEdit = onGraphStatEdit,
             onClick = onGraphStatClick,
             onMove = { moveItemViewModel.showMoveGraphDialog(groupId, it) },
@@ -293,7 +293,7 @@ private fun GroupScreenContent(
             onEdit = { group ->
                 addGroupDialogViewModel.showForEdit(groupId = group.id)
             },
-            onDelete = { groupDialogsViewModel.showDeleteGroupDialog(it) },
+            onDelete = { groupDialogsViewModel.showDeleteGroupDialog(it, groupId) },
             onMove = { moveItemViewModel.showMoveGroupDialog(groupId, it) }
         ),
         functionClickListeners = FunctionClickListeners(

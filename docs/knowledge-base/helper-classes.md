@@ -40,81 +40,17 @@ DataInteractor (public interface)
 
 ## DataInteractor
 
-**Location**: `app/data/src/main/java/com/samco/trackandgraph/data/interactor/DataInteractor.kt`
-
-The public interface for all data operations. UI layer depends only on this interface.
-
-```kotlin
-interface DataInteractor {
-    // Trackers
-    suspend fun createTracker(request: TrackerCreateRequest): Long
-    suspend fun getTrackerById(id: Long): Tracker?
-
-    // Functions
-    suspend fun insertFunction(request: FunctionCreateRequest): Long?
-
-    // Graphs
-    suspend fun createLineGraph(request: LineGraphCreateRequest): Long
-
-    // Groups
-    suspend fun insertGroup(request: GroupCreateRequest): Long
-    suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo
-
-    // Reminders
-    suspend fun createReminder(request: ReminderCreateRequest): Long
-
-    // ... many more methods
-}
-```
+The public interface for all data operations. UI layer depends only on this interface (search `DataInteractor.kt` in the data interactor package). All methods accept/return request/response DTOs — search for `*Request` and `*Response` classes in the data module.
 
 ## Helper Pattern
 
-Each component type has a dedicated helper class injected with a focused DAO interface:
-
-```kotlin
-internal class TrackerHelperImpl @Inject constructor(
-    private val transactionHelper: DatabaseTransactionHelper,
-    private val dao: TrackerDao,          // focused interface, not the full DAO
-    private val groupItemDao: GroupItemDao,
-    private val dataPointUpdateHelper: DataPointUpdateHelper,
-    private val timeProvider: TimeProvider,
-    @IODispatcher private val io: CoroutineDispatcher
-) : TrackerHelper {
-    // CRUD operations for trackers
-}
-```
-
-### Common Dependencies
-
-- **transactionHelper**: Wraps operations in database transactions
-- **dao**: Focused DAO interface for this component type (see Specialized DAOs)
-- **groupItemDao**: For managing group membership
-- **timeProvider**: For timestamps (injectable for testing)
-- **io**: Coroutine dispatcher for background work
+Each component type has a dedicated helper class (e.g. `TrackerHelperImpl`, `FunctionHelperImpl`) injected with a focused DAO interface rather than the full DAO. Search for `*HelperImpl` in the data module. Common injected dependencies include `DatabaseTransactionHelper`, a focused DAO, `GroupItemDao`, `TimeProvider`, and an IO dispatcher.
 
 ## Specialized DAOs
 
-Each helper injects a **focused DAO interface** containing only the methods it needs, rather than the full `TrackAndGraphDatabaseDao`. This enables small in-memory fakes for unit tests.
+Each helper injects a **focused DAO interface** (e.g. `TrackerDao`, `FunctionDao`) containing only the methods it needs, rather than the full `TrackAndGraphDatabaseDao`. The full Room DAO extends all focused interfaces. `DataModule` provides each focused interface with a `@Provides` binding that returns the `TrackAndGraphDatabaseDao` instance.
 
-```kotlin
-// Focused interface — only what FunctionHelper needs
-internal interface FunctionDao {
-    fun insertFeature(feature: Feature): Long
-    fun insertFunction(function: Function): Long
-    fun getFunctionById(functionId: Long): FunctionWithFeature?
-    fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
-    // ... etc
-}
-
-// The full Room DAO extends all focused interfaces
-@Dao
-internal interface TrackAndGraphDatabaseDao : TrackerDao, FunctionDao, GraphDao, GroupDao, ReminderDao {
-    // All methods satisfied by extending focused interfaces
-}
-```
-
-Focused DAO interfaces: `TrackerDao`, `FunctionDao`, `GraphDao`, `GroupDao`, `ReminderDao`.
-`DataModule` provides each interface with a `@Provides` binding that simply returns the `TrackAndGraphDatabaseDao` instance.
+This design enables small in-memory fakes for unit tests — each fake only needs to implement the focused interface, not the entire DAO.
 
 ## Delete Pattern (Symlink Logic)
 
@@ -123,21 +59,9 @@ All delete operations follow the same pattern for multi-group membership. The re
 - **`groupId` provided AND component in multiple groups** → remove only that GroupItem (symlink); the component itself is preserved
 - **Otherwise** → delete all GroupItems then delete the component
 
-```kotlin
-// Example from TrackerHelperImpl
-val groupItems = groupItemDao.getGroupItemsForChild(tracker.id, GroupItemType.TRACKER)
-
-if (request.groupId != null && groupItems.size > 1) {
-    groupItems.filter { it.groupId == request.groupId }
-              .forEach { groupItemDao.deleteGroupItem(it.id) }
-    return@withTransaction
-}
-
-groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
-dao.deleteFeature(tracker.featureId)
-```
-
-This pattern is used consistently by `TrackerHelper`, `GraphHelper`, and `ReminderHelper`. For **reminders**, `null` groupId always deletes everywhere (the Reminders screen never passes a groupId).
+This pattern is implemented consistently by all helpers — search for `getGroupItemsForChild` in any `*HelperImpl` to see it. Special cases:
+- **Reminders**: `null` groupId always deletes everywhere (the Reminders screen never passes a groupId)
+- **Groups**: the parameter is named `parentGroupId` in both `GroupDeleteRequest` and `GroupViewModel.onDeleteGroup`
 
 ## Coroutine + Transaction Pitfall
 
@@ -168,17 +92,7 @@ override suspend fun createSymlink(...) = withContext(io) {
 
 **Never introduce mocks without asking the user first** — see [architecture.md](architecture.md#kmp-compatibility) for the rationale. Always create a real fake implementation instead.
 
-**Fake DAO pattern**: For DAO interfaces, create a `Fake*Dao` in `testFixtures` that implements the interface with an in-memory map/list.
-
-| Helper | Fake DAO used |
-|--------|--------------|
-| TrackerHelperImpl | `FakeTrackerDao` + `FakeGroupItemDao` |
-| FunctionHelperImpl | `FakeFunctionDao` + `FakeGroupItemDao` |
-| GraphHelperImpl | `FakeGraphDao` + `FakeGroupItemDao` |
-| GroupHelperImpl | `FakeGroupDao` + `FakeGroupItemDao` |
-| ReminderHelperImpl | `FakeReminderDao` + `FakeGroupItemDao` |
-
-Fake DAOs are in `app/data/src/testFixtures/kotlin/com/samco/trackandgraph/`.
+**Fake DAO pattern**: For each focused DAO interface, create a `Fake*Dao` in `testFixtures` (search for `Fake*Dao` in the data module). Each fake implements the interface with an in-memory map/list. Every helper test also needs `FakeGroupItemDao` for group membership operations.
 
 ## Data Update Events
 
@@ -188,14 +102,6 @@ Fake DAOs are in `app/data/src/testFixtures/kotlin/com/samco/trackandgraph/`.
 
 `DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged.
 
-## Key Files
+## Finding Code
 
-| File | Purpose |
-|------|---------|
-| `DataInteractor.kt` | Public interface |
-| `DataInteractorImpl.kt` | Implementation delegating to helpers, emits `DataUpdateType` events |
-| `TrackerHelperImpl.kt` | Tracker CRUD |
-| `FunctionHelperImpl.kt` | Function CRUD |
-| `GraphHelperImpl.kt` | Graph/stat CRUD |
-| `GroupHelperImpl.kt` | Group CRUD, recursive deletion, display index queries |
-| `ReminderHelperImpl.kt` | Reminder CRUD |
+Search for `DataInteractor.kt` (public interface), `DataInteractorImpl.kt` (delegation + event emission), and `*HelperImpl.kt` (per-type CRUD) in the data module. Fake DAOs live in `testFixtures` — search for `Fake*Dao`.

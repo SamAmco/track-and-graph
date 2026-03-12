@@ -100,9 +100,23 @@ interface GroupViewModel {
      * or the tracker is unique, the tracker is deleted entirely from all groups.
      */
     fun onDeleteTracker(trackerId: Long, groupId: Long? = null)
-    fun onDeleteGraphStat(id: Long)
-    fun onDeleteGroup(id: Long)
-    fun onDeleteFunction(id: Long)
+    /**
+     * Delete a graph/stat. If [groupId] is provided and the graph exists in multiple groups,
+     * only the GroupItem link for that group is removed. If [groupId] is null or the graph is
+     * unique, it is deleted entirely.
+     */
+    fun onDeleteGraphStat(id: Long, groupId: Long? = null)
+    /**
+     * Delete a group. If [parentGroupId] is provided and the group exists in multiple parent
+     * groups, only the GroupItem link for that parent is removed. If null or unique, it is
+     * deleted entirely along with all contents.
+     */
+    fun onDeleteGroup(id: Long, parentGroupId: Long? = null)
+    /**
+     * Delete a function. If [groupId] is provided and the function exists in multiple groups,
+     * only the GroupItem link for that group is removed. If null or unique, it is deleted entirely.
+     */
+    fun onDeleteFunction(id: Long, groupId: Long? = null)
 
     fun duplicateFunction(displayFunction: DisplayFunction)
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData)
@@ -399,7 +413,8 @@ class GroupViewModelImpl @Inject constructor(
                 featureId = function.featureId,
                 groupId = groupId,
                 name = function.name,
-                description = function.description
+                description = function.description,
+                unique = function.unique,
             )
             GroupChild.ChildFunction(function.id, displayFunction)
         }
@@ -429,23 +444,23 @@ class GroupViewModelImpl @Inject constructor(
         }
     }
 
-    override fun onDeleteGraphStat(id: Long) {
+    override fun onDeleteGraphStat(id: Long, groupId: Long?) {
         viewModelScope.launch(io) {
-            dataInteractor.deleteGraph(GraphDeleteRequest(graphStatId = id))
+            dataInteractor.deleteGraph(GraphDeleteRequest(graphStatId = id, groupId = groupId))
         }
     }
 
-    override fun onDeleteGroup(id: Long) {
+    override fun onDeleteGroup(id: Long, parentGroupId: Long?) {
         viewModelScope.launch(io) {
             val deletedFeatureIds =
-                dataInteractor.deleteGroup(GroupDeleteRequest(groupId = id)).deletedFeatureIds
+                dataInteractor.deleteGroup(GroupDeleteRequest(groupId = id, parentGroupId = parentGroupId)).deletedFeatureIds
             deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
         }
     }
 
-    override fun onDeleteFunction(id: Long) {
+    override fun onDeleteFunction(id: Long, groupId: Long?) {
         viewModelScope.launch(io) {
-            dataInteractor.deleteFunction(FunctionDeleteRequest(functionId = id))
+            dataInteractor.deleteFunction(FunctionDeleteRequest(functionId = id, groupId = groupId))
         }
     }
 

@@ -11,118 +11,36 @@ keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, com
 
 # Component Types
 
-Track & Graph has five types of components that can exist within the group hierarchy.
+Track & Graph has five component types: TRACKER, FUNCTION, GRAPH, REMINDER, GROUP (see `GroupItemType` enum).
 
-## GroupItemType Enum
+## Dual-ID Pattern — Critical
 
-```kotlin
-enum class GroupItemType {
-    TRACKER,
-    FUNCTION,
-    GRAPH,
-    REMINDER,
-    GROUP
-}
-```
-
-## ID Relationships — Critical
-
-Both Trackers and Functions have **two IDs**:
-- `tracker.id` / `function.id` — the primary key in `trackers_table` / `functions_table`
-- `tracker.featureId` / `function.featureId` — a foreign key into `features_table`
-
-These are different values. `group_items_table.child_id` always stores the **tracker/function primary key**, not the feature ID. See [group-items.md](group-items.md).
-
-## Trackers
-
-**Purpose**: Manual data entry points for tracking values over time.
-
-**Tables**: `trackers_table` + `features_table` (1:1 relationship)
-
-**Key Properties**:
-- Data type (continuous, duration, discrete)
-- Default value and label
-- Suggestion settings
-
-**Deletion**: Deleting a tracker deletes its Feature, which cascades to delete all DataPoints.
-
-## Functions
-
-**Purpose**: Computed/derived data using Lua scripts. Can reference other features as inputs.
-
-**Tables**: `functions_table` + `features_table` (1:1 relationship)
-
-**Key Properties**:
-- Lua function graph (serialized JSON)
-- Input feature IDs (dependencies)
-
-**Deletion**: Same as trackers - deletes Feature and cascades.
-
-## Graphs
-
-**Purpose**: Visual representations of data (line graphs, pie charts, bar charts, histograms, statistics).
-
-**Tables**: `graphs_and_stats_table` + type-specific tables (line_graphs, pie_charts, etc.)
-
-**Key Properties**:
-- Graph type
-- Configuration (features to display, time range, styling)
-
-**Deletion**: Simple deletion from graphs_and_stats_table.
-
-## Reminders
-
-**Purpose**: Scheduled notifications to prompt data entry.
-
-**Tables**: `reminders_table`
-
-**Key Properties**:
-- Name, associated feature (optional)
-- Encoded reminder parameters (schedule type, times, days)
-
-**Special Behavior**: Can exist with `groupId = null`, appearing only in the dedicated Reminders screen. See [reminders.md](reminders.md).
-
-## Groups
-
-**Purpose**: Organizational containers (like folders/directories).
-
-**Tables**: `groups_table`
-
-**Key Properties**:
-- Name, color index
-
-**Special Behavior**: Can contain any component type including other groups. See [group-hierarchy.md](group-hierarchy.md).
+Trackers and Functions each have **two IDs**: a primary key (`id`) and a `featureId` (FK into `features_table`). These are different values. `group_items_table.child_id` always stores the **primary key**, not the featureId. See [group-items.md](group-items.md).
 
 ## Type Enums
 
-There are two type enums:
+There are two parallel type enums with a 1:1 mapping:
+- **`GroupItemType`** (internal, entity layer) — used in `group_items_table`
+- **`GroupChildType`** (public, DTO layer) — used in UI code (`GroupChild`, `GroupChildDisplayIndex`)
 
-- **`GroupItemType`** (internal, entity layer): `TRACKER`, `FUNCTION`, `GRAPH`, `REMINDER`, `GROUP` — used in the `group_items_table`
-- **`GroupChildType`** (public, DTO layer): `TRACKER`, `FUNCTION`, `GRAPH`, `REMINDER`, `GROUP` — used in UI code (`GroupChild`, `GroupChildDisplayIndex`)
+`GroupChildType` exists to avoid exposing the internal entity enum to the UI layer.
 
-These are 1:1 mappings. `GroupChildType` exists to avoid exposing the internal entity enum.
-
-## Common Patterns
+## Component Hierarchy Rules
 
 All components (except groups themselves):
 - Are placed into groups via `group_items_table`
-- Can exist in multiple groups simultaneously
+- Can exist in multiple groups simultaneously (symlinks)
 - Have their display order stored in `GroupItem.displayIndex`
 - Do NOT store `groupId` or `displayIndex` on their own entity/DTO
 
+Reminders are special: they can exist with `groupId = null` (groupless). See [reminders.md](reminders.md). Groups can contain any component type including other groups — see [group-hierarchy.md](group-hierarchy.md).
+
 ### `unique` Field on DTOs
 
-All component DTOs that can appear in the group screen (`DisplayTracker`, `Function`, `GraphOrStat`, `Group`, `Reminder`) carry a `unique: Boolean` field (no default). It is `true` if the component has exactly **one** row in `group_items_table`, `false` if it exists in multiple groups (i.e. has symlinks).
+All component DTOs that can appear in the group screen carry a `unique: Boolean` field. It is `true` if the component has exactly one row in `group_items_table`, `false` if symlinked elsewhere. Each helper computes this via `groupItemDao.getGroupItemsForChild(id, type).size == 1` — search for `isTrackerUnique`, `isFunctionUnique`, etc.
 
-**Every** helper method that returns one of these DTOs must compute uniqueness:
-```kotlin
-groupItemDao.getGroupItemsForChild(id, type).size == 1
-```
-
-Each helper has a private helper for this, e.g. `isFunctionUnique(id)`, `isGraphUnique(id)`, etc. This applies to both list methods (`getFunctionsForGroupSync`) and single-item lookups (`getFunctionById`, `tryGetFunctionByFeatureId`).
-
-The `unique: Boolean` field has **no default value** intentionally — the compiler will catch any call site that forgets to pass it. Call sites that construct these DTOs for UI previews or tests unrelated to uniqueness should pass `unique = true` explicitly.
-
-The UI uses this to decide the delete dialog: unique → "are you sure?" dialog; non-unique → "delete everywhere or just here?" dialog.
-
-When the user chooses "remove from this group", the UI passes the current `groupId` to the ViewModel delete method (e.g. `onDeleteTracker(trackerId, groupId)`), which forwards it to the request object. The data layer then removes only the GroupItem link for that group. When the user chooses "delete everywhere" (or the item is unique), `groupId` is passed as `null` and the item is fully deleted. See also: **Delete Pattern (Symlink Logic)** in `helper-classes.md`.
+**Design decisions:**
+- **No default value** — intentionally forces the compiler to catch any call site that forgets to compute it. For UI previews or tests unrelated to uniqueness, pass `unique = true` explicitly.
+- **UI flow**: unique → simple "are you sure?" delete dialog; non-unique → "delete everywhere or just here?" dialog. "Remove from this group" passes the current `groupId` to the data layer (removes only that GroupItem link); "delete everywhere" passes `null` (full delete). See [helper-classes.md](helper-classes.md) for the data layer delete pattern.
+- **`DisplayFunction`** is a UI-layer DTO (search `Function.kt` in the group package), unlike other group screen DTOs which come from the data layer. Its `unique` field is populated from the data-layer `Function` DTO.
+- For GROUP deletion, the parameter is named `parentGroupId` (in both `GroupDeleteRequest` and `GroupViewModel.onDeleteGroup`).

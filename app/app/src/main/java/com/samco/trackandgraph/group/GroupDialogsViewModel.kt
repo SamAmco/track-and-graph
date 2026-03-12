@@ -94,17 +94,21 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
     private val _itemForDeletion = MutableStateFlow<DeleteItemDto?>(null)
     val itemForDeletion: StateFlow<DeleteItemDto?> = _itemForDeletion.asStateFlow()
 
-    fun showDeleteGroupDialog(group: Group) {
+    fun showDeleteGroupDialog(group: Group, parentGroupId: Long) {
         _itemForDeletion.value = DeleteItemDto(
             id = group.id,
-            type = DeleteType.GROUP
+            type = DeleteType.GROUP,
+            unique = group.unique,
+            groupId = parentGroupId,
         )
     }
 
-    fun showDeleteGraphStatDialog(graphStat: IGraphStatViewData) {
+    fun showDeleteGraphStatDialog(graphStat: IGraphStatViewData, groupId: Long) {
         _itemForDeletion.value = DeleteItemDto(
             id = graphStat.graphOrStat.id,
-            type = DeleteType.GRAPH_STAT
+            type = DeleteType.GRAPH_STAT,
+            unique = graphStat.graphOrStat.unique,
+            groupId = groupId,
         )
     }
 
@@ -120,7 +124,9 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
     fun showDeleteFunctionDialog(displayFunction: DisplayFunction) {
         _itemForDeletion.value = DeleteItemDto(
             id = displayFunction.id,
-            type = DeleteType.FUNCTION
+            type = DeleteType.FUNCTION,
+            unique = displayFunction.unique,
+            groupId = displayFunction.groupId,
         )
     }
 
