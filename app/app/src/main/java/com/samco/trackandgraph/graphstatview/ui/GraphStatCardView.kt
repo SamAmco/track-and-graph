@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.group.SymlinkIcon
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
@@ -65,6 +66,10 @@ fun GraphStatCardView(
                     } else it
                 }
         ) {
+            if (!graphStatViewData.graphOrStat.unique) {
+                SymlinkIcon(modifier = Modifier.align(Alignment.TopStart))
+            }
+
             if (clickListener != null) {
                 MenuSection(
                     modifier = Modifier.align(Alignment.TopEnd),

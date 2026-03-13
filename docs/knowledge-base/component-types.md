@@ -41,6 +41,9 @@ All component DTOs that can appear in the group screen carry a `unique: Boolean`
 
 **Design decisions:**
 - **No default value** — intentionally forces the compiler to catch any call site that forgets to compute it. For UI previews or tests unrelated to uniqueness, pass `unique = true` explicitly.
-- **UI flow**: unique → simple "are you sure?" delete dialog; non-unique → "delete everywhere or just here?" dialog. "Remove from this group" passes the current `groupId` to the data layer (removes only that GroupItem link); "delete everywhere" passes `null` (full delete). See [helper-classes.md](helper-classes.md) for the data layer delete pattern.
+- **UI uses** (both triggered when `unique == false`):
+  - **Symlink icon**: A link icon (`SymlinkIcon` composable in the group package) is shown in the top-left corner of each card. Each card composable (Tracker, Function, Group, GraphStatCardView) checks `!unique` and overlays the icon at `Alignment.TopStart`.
+  - **Delete dialog**: non-unique → "delete everywhere or just here?" dialog. "Remove from this group" passes the current `groupId` to the data layer (removes only that GroupItem link); "delete everywhere" passes `null` (full delete). See [helper-classes.md](helper-classes.md) for the data layer delete pattern.
 - **`DisplayFunction`** is a UI-layer DTO (search `Function.kt` in the group package), unlike other group screen DTOs which come from the data layer. Its `unique` field is populated from the data-layer `Function` DTO.
 - For GROUP deletion, the parameter is named `parentGroupId` (in both `GroupDeleteRequest` and `GroupViewModel.onDeleteGroup`).
+- For graphs/stats, `unique` lives on the `GraphOrStat` DTO (accessed via `graphStatViewData.graphOrStat.unique`), not on `IGraphStatViewData` itself.

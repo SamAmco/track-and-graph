@@ -101,6 +101,10 @@ fun Group(
                 )
             )
 
+            if (!group.unique) {
+                SymlinkIcon(modifier = Modifier.align(Alignment.TopStart))
+            }
+
             // Menu button
             GroupMenuButton(
                 modifier = Modifier.align(Alignment.TopEnd),

@@ -156,6 +156,10 @@ fun Tracker(
                 }
             }
 
+            if (!tracker.unique) {
+                SymlinkIcon(modifier = Modifier.align(Alignment.TopStart))
+            }
+
             Column(
                 modifier = Modifier
                     .requiredHeightIn(min = minTrackerCardHeight)

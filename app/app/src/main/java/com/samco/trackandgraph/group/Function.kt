@@ -123,23 +123,29 @@ fun Function(
                 ),
                 shape = MaterialTheme.shapes.medium,
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    // Menu button in top end
-                    FunctionMenuButton(
-                        modifier = Modifier.align(Alignment.End),
-                        showContextMenu = showContextMenu,
-                        onShowContextMenu = { showContextMenu = it },
-                        displayFunction = displayFunction,
-                        onEdit = onEdit,
-                        onDelete = onDelete,
-                        onMoveTo = onMoveTo,
-                        onDuplicate = onDuplicate
-                    )
-                    // Function name
-                    FunctionNameText(functionName = displayFunction.name)
-                    InputSpacingLarge()
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    if (!displayFunction.unique) {
+                        SymlinkIcon(modifier = Modifier.align(Alignment.TopStart))
+                    }
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        // Menu button in top end
+                        FunctionMenuButton(
+                            modifier = Modifier.align(Alignment.End),
+                            showContextMenu = showContextMenu,
+                            onShowContextMenu = { showContextMenu = it },
+                            displayFunction = displayFunction,
+                            onEdit = onEdit,
+                            onDelete = onDelete,
+                            onMoveTo = onMoveTo,
+                            onDuplicate = onDuplicate
+                        )
+                        // Function name
+                        FunctionNameText(functionName = displayFunction.name)
+                        InputSpacingLarge()
+                    }
                 }
             }
             Text(
@@ -246,7 +252,7 @@ fun FunctionPreview() {
                     groupId = 1,
                     name = "Calculate Average",
                     description = "Calculates the average of selected data points",
-                    unique = true,
+                    unique = false,
                 ),
                 onEdit = {},
                 onDelete = {},
