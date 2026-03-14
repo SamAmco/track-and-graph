@@ -45,8 +45,8 @@ docs:
 
   - file: group-items.md
     title: group_items_table — junction table and display ordering
-    description: The group_items_table schema, composite identity (type + child_id), display_index ordering managed by helpers, multi-group membership, drag-and-drop flow, and null group_id for groupless reminders.
-    keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group]
+    description: The group_items_table schema, composite identity (type + child_id), display_index ordering, unique constraint on (group_id, child_id, type), symlink creation disabled-items pattern (AddSymlinkViewModel), drag-and-drop flow, and null group_id for groupless reminders.
+    keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, unique-constraint, symlink, AddSymlinkViewModel, disabled-items, SelectItemDialog]
 
   - file: helper-classes.md
     title: DataInteractor and Helper pattern

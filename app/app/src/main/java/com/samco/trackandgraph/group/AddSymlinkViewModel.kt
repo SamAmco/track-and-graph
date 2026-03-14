@@ -18,6 +18,7 @@ package com.samco.trackandgraph.group
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -42,8 +43,9 @@ interface AddSymlinkViewModel {
     val showDialogForGroupId: StateFlow<Long?>
 
     /**
-     * The set of items that should be disabled (visible but not selectable) in the SelectItemDialog
-     * to prevent cycles. Contains all ancestor group IDs (including self) as GROUP disabled items.
+     * The set of items that should be disabled (visible but not selectable) in the SelectItemDialog.
+     * Includes ancestor group IDs (cycle prevention) and items already in the current group
+     * (duplicate prevention).
      */
     val disabledItems: StateFlow<Set<HiddenItem>>
 
@@ -65,10 +67,15 @@ class AddSymlinkViewModelImpl @Inject constructor(
     override val disabledItems: StateFlow<Set<HiddenItem>> = _showDialogForGroupId
         .filterNotNull()
         .map { groupId ->
-            dataInteractor
+            val ancestorDisabled = dataInteractor
                 .getAncestorAndSelfGroupIds(groupId)
                 .map { HiddenItem(SelectableItemType.GROUP, it) }
-                .toSet()
+
+            val alreadyInGroup = dataInteractor
+                .getDisplayIndicesForGroup(groupId)
+                .mapNotNull { it.toHiddenItem() }
+
+            (ancestorDisabled + alreadyInGroup).toSet()
         }
         .flowOn(io)
         .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
@@ -79,6 +86,17 @@ class AddSymlinkViewModelImpl @Inject constructor(
 
     override fun hide() {
         _showDialogForGroupId.value = null
+    }
+
+    private fun GroupChildDisplayIndex.toHiddenItem(): HiddenItem? {
+        val selectableType = when (type) {
+            GroupChildType.GROUP -> SelectableItemType.GROUP
+            GroupChildType.TRACKER -> SelectableItemType.TRACKER
+            GroupChildType.FUNCTION -> SelectableItemType.FUNCTION
+            GroupChildType.GRAPH -> SelectableItemType.GRAPH
+            GroupChildType.REMINDER -> return null
+        }
+        return HiddenItem(selectableType, id)
     }
 
     override fun createSymlink(inGroupId: Long, childId: Long, childType: GroupChildType) {
