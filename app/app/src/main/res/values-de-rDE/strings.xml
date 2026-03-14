@@ -45,6 +45,8 @@
     <string name="items_selected">%1$d Ausgewählt</string>
     <string name="ru_sure_del_data_points">Sind Sie sicher, dass Sie diese Datenpunkte löschen möchten?</string>
     <string name="delete_selected_content_description">Ausgewählte Einträge löschen</string>
+    <string name="copy_selected_content_description">Ausgewählte Einträge kopieren</string>
+    <string name="move_selected_content_description">Ausgewählte Einträge verschieben</string>
     <string name="no_data">Keine Daten</string>
     <string name="skip">Überspringen</string>
     <string name="exportButton">Exportieren</string>
@@ -160,6 +162,7 @@
     <string name="got_it">Ich habs!</string>
     <string name="move_to_colon">Verschieben nach:</string>
     <string name="move_to">Verschieben nach</string>
+    <string name="copy_to">Kopieren nach</string>
 
     <string name="ru_sure_update_data">Diese Aktualisierung kann die Daten, die Sie bereits getrackt haben, unwiderruflich verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\n Möchten Sie fortfahren?</string>
     <string name="ok">OK</string>

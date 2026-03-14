@@ -1,11 +1,11 @@
 ---
 title: Build and test commands
-description: Gradle commands for building and running tests; all run from the app/ directory. Includes test result locations.
+description: Gradle commands for building and running tests; all run from the app/ directory. Includes test result locations and --tests filtering.
 topics:
   - Build: cd app && ./gradlew assembleDebug
   - Test: cd app && ./gradlew :data:testDebugUnitTest
+  - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
-  - Note: --tests filter flag is NOT supported; run full task and inspect XML results
 keywords: [build, gradle, test, assembleDebug, commands, gradlew, testDebugUnitTest]
 ---
 
@@ -18,5 +18,9 @@ cd app && ./gradlew assembleDebug              # Build debug APK
 cd app && ./gradlew :data:testDebugUnitTest    # Run data unit tests
 ```
 
-`--tests` filter flag is NOT supported. Run the full task and inspect XML results:
-`data/build/test-results/testDebugUnitTest/`
+Use `--tests` to filter by fully qualified class name:
+```bash
+cd app && ./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.interactor.TrackerHelperImplTest"
+```
+
+Test results XML: `data/build/test-results/testDebugUnitTest/`

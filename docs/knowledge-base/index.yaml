@@ -20,7 +20,7 @@ docs:
 
   - file: build-commands.md
     title: Build and test commands
-    description: Gradle commands for building and running tests; all run from app/ directory; test results location; --tests flag not supported.
+    description: Gradle commands for building and running tests; all run from app/ directory; --tests filtering by class name; test results location.
     keywords: [build, gradle, test, assembleDebug, commands, gradlew, testDebugUnitTest]
 
   - file: component-types.md

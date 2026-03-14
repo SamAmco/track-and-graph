@@ -55,6 +55,9 @@
     <string name="items_selected">%1$d Selected</string>
     <string name="ru_sure_del_data_points">Are you sure you want to delete these data points?</string>
     <string name="delete_selected_content_description">Delete selected items</string>
+    <string name="copy_selected_content_description">Copy selected items</string>
+    <string name="move_selected_content_description">Move selected items</string>
+    <string name="copy_to">Copy to</string>
     <string name="no_data">No Data</string>
     <string name="skip">Skip</string>
     <string name="exportButton">Export</string>

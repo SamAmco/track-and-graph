@@ -45,6 +45,8 @@
     <string name="items_selected">%1$d Sélectionnés</string>
     <string name="ru_sure_del_data_points">Êtes-vous sûr de vouloir supprimer ces points de données ?</string>
     <string name="delete_selected_content_description">Supprimer les éléments sélectionnés</string>
+    <string name="copy_selected_content_description">Copier les éléments sélectionnés</string>
+    <string name="move_selected_content_description">Déplacer les éléments sélectionnés</string>
     <string name="no_data">Aucune donnée</string>
     <string name="skip">Passez</string>
     <string name="exportButton">Exporter</string>
@@ -161,6 +163,7 @@
     <string name="got_it">J\'ai compris!</string>
     <string name="move_to_colon">Déplacer vers : </string>
     <string name="move_to">Déplacer vers</string>
+    <string name="copy_to">Copier vers</string>
 
     <string name="ru_sure_update_data">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.</string>
     <string name="ok">OK</string>

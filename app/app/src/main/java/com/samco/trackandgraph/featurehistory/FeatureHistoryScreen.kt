@@ -16,9 +16,15 @@
  */
 package com.samco.trackandgraph.featurehistory
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -76,6 +82,8 @@ import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.EmptyScreenText
 import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.serialization.Serializable
@@ -109,6 +117,8 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     val selectedDataPoints by viewModel.selectedDataPoints.collectAsStateWithLifecycle()
     val showDeleteConfirmDialog by viewModel.showDeleteConfirmDialog.observeAsState(false)
     val showDeleteSelectedConfirmDialog by viewModel.showDeleteSelectedConfirmDialog.collectAsStateWithLifecycle()
+    val showCopyToDialog by viewModel.showCopyToDialog.collectAsStateWithLifecycle()
+    val showMoveToDialog by viewModel.showMoveToDialog.collectAsStateWithLifecycle()
     val showUpdateDialog by viewModel.showUpdateDialog.observeAsState(false)
     val showUpdateWarning by viewModel.showUpdateWarning.observeAsState(false)
     val isUpdating by viewModel.isUpdating.observeAsState(false)
@@ -151,7 +161,9 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
             }
         },
         onDeleteClick = viewModel::onDeleteClicked,
-        onDeleteSelectedClick = viewModel::onDeleteSelectedClicked
+        onDeleteSelectedClick = viewModel::onDeleteSelectedClicked,
+        onCopySelectedClick = viewModel::onCopySelectedClicked,
+        onMoveSelectedClick = viewModel::onMoveSelectedClicked
     )
 
     // Dialogs
@@ -184,6 +196,24 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
             body = R.string.ru_sure_del_data_points,
             onDismissRequest = viewModel::onDeleteSelectedDismissed,
             onConfirm = viewModel::onDeleteSelectedConfirmed
+        )
+    }
+
+    if (showCopyToDialog) {
+        SelectItemDialog(
+            title = stringResource(R.string.copy_to),
+            selectableTypes = setOf(SelectableItemType.TRACKER),
+            onTrackerSelected = viewModel::onCopyToTrackerSelected,
+            onDismissRequest = viewModel::onDismissCopyToDialog
+        )
+    }
+
+    if (showMoveToDialog) {
+        SelectItemDialog(
+            title = stringResource(R.string.move_to),
+            selectableTypes = setOf(SelectableItemType.TRACKER),
+            onTrackerSelected = viewModel::onMoveToTrackerSelected,
+            onDismissRequest = viewModel::onDismissMoveToDialog
         )
     }
 
@@ -301,7 +331,9 @@ private fun FeatureHistoryView(
     onDataPointSelected: (DataPointInfo, Boolean) -> Unit = { _, _ -> },
     onEditClick: (DataPointInfo) -> Unit = {},
     onDeleteClick: (DataPointInfo) -> Unit = {},
-    onDeleteSelectedClick: () -> Unit = {}
+    onDeleteSelectedClick: () -> Unit = {},
+    onCopySelectedClick: () -> Unit = {},
+    onMoveSelectedClick: () -> Unit = {}
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -334,19 +366,47 @@ private fun FeatureHistoryView(
             }
         }
 
-        if (isMultiSelectMode && selectedDataPoints.isNotEmpty()) {
-            FloatingActionButton(
-                onClick = onDeleteSelectedClick,
-                containerColor = MaterialTheme.colorScheme.primary,
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            visible = isMultiSelectMode && selectedDataPoints.isNotEmpty(),
+            enter = scaleIn() + fadeIn(),
+            exit = scaleOut() + fadeOut(),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.End,
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
                     .padding(WindowInsets.navigationBars.asPaddingValues())
                     .padding(inputSpacingLarge)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.delete_icon),
-                    contentDescription = stringResource(id = R.string.delete_selected_content_description)
-                )
+                FloatingActionButton(
+                    onClick = onCopySelectedClick,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.content_copy_24px),
+                        contentDescription = stringResource(id = R.string.copy_selected_content_description)
+                    )
+                }
+                Spacer(modifier = Modifier.height(cardMarginSmall))
+                FloatingActionButton(
+                    onClick = onMoveSelectedClick,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.move_item_24px),
+                        contentDescription = stringResource(id = R.string.move_selected_content_description)
+                    )
+                }
+                Spacer(modifier = Modifier.height(cardMarginSmall))
+                FloatingActionButton(
+                    onClick = onDeleteSelectedClick,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.delete_icon),
+                        contentDescription = stringResource(id = R.string.delete_selected_content_description)
+                    )
+                }
             }
         }
     }

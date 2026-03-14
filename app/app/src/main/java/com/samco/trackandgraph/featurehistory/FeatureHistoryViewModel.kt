@@ -86,6 +86,8 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     val isMultiSelectMode: StateFlow<Boolean>
     val selectedDataPoints: StateFlow<Set<DataPointInfo>>
     val showDeleteSelectedConfirmDialog: StateFlow<Boolean>
+    val showCopyToDialog: StateFlow<Boolean>
+    val showMoveToDialog: StateFlow<Boolean>
 
     fun showUpdateAllDialog()
     fun onDeleteClicked(dataPoint: DataPointInfo)
@@ -103,6 +105,12 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     fun onDeleteSelectedClicked()
     fun onDeleteSelectedConfirmed()
     fun onDeleteSelectedDismissed()
+    fun onCopySelectedClicked()
+    fun onMoveSelectedClicked()
+    fun onCopyToTrackerSelected(trackerId: Long)
+    fun onMoveToTrackerSelected(trackerId: Long)
+    fun onDismissCopyToDialog()
+    fun onDismissMoveToDialog()
 }
 
 @HiltViewModel
@@ -190,6 +198,12 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     private val _showDeleteSelectedConfirmDialog = MutableStateFlow(false)
     override val showDeleteSelectedConfirmDialog: StateFlow<Boolean> = _showDeleteSelectedConfirmDialog
 
+    private val _showCopyToDialog = MutableStateFlow(false)
+    override val showCopyToDialog: StateFlow<Boolean> = _showCopyToDialog
+
+    private val _showMoveToDialog = MutableStateFlow(false)
+    override val showMoveToDialog: StateFlow<Boolean> = _showMoveToDialog
+
     private val trackerFlow: StateFlow<Tracker?> = featureIdFlow
         .map { dataInteractor.getTrackerByFeatureId(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -266,17 +280,54 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     }
 
     override fun onDeleteSelectedConfirmed() {
+        if (!_showDeleteSelectedConfirmDialog.compareAndSet(expect = true, update = false)) return
+        val dataPoints = _selectedDataPoints.value.map { it.toDataPoint() }
+        exitMultiSelectMode()
         viewModelScope.launch(io) {
-            dataInteractor.deleteDataPoints(_selectedDataPoints.value.map { it.toDataPoint() })
-            withContext(ui) {
-                _showDeleteSelectedConfirmDialog.value = false
-                exitMultiSelectMode()
-            }
+            dataInteractor.deleteDataPoints(dataPoints)
         }
     }
 
     override fun onDeleteSelectedDismissed() {
         _showDeleteSelectedConfirmDialog.value = false
+    }
+
+    override fun onCopySelectedClicked() {
+        if (_selectedDataPoints.value.isNotEmpty()) {
+            _showCopyToDialog.value = true
+        }
+    }
+
+    override fun onMoveSelectedClicked() {
+        if (_selectedDataPoints.value.isNotEmpty()) {
+            _showMoveToDialog.value = true
+        }
+    }
+
+    override fun onCopyToTrackerSelected(trackerId: Long) {
+        if (!_showCopyToDialog.compareAndSet(expect = true, update = false)) return
+        val dataPoints = _selectedDataPoints.value.map { it.toDataPoint() }
+        exitMultiSelectMode()
+        viewModelScope.launch(io) {
+            dataInteractor.copyDataPointsToTracker(dataPoints, trackerId)
+        }
+    }
+
+    override fun onMoveToTrackerSelected(trackerId: Long) {
+        if (!_showMoveToDialog.compareAndSet(expect = true, update = false)) return
+        val dataPoints = _selectedDataPoints.value.map { it.toDataPoint() }
+        exitMultiSelectMode()
+        viewModelScope.launch(io) {
+            dataInteractor.moveDataPointsToTracker(dataPoints, trackerId)
+        }
+    }
+
+    override fun onDismissCopyToDialog() {
+        _showCopyToDialog.value = false
+    }
+
+    override fun onDismissMoveToDialog() {
+        _showMoveToDialog.value = false
     }
 
     override val isUpdating = MutableLiveData(false)

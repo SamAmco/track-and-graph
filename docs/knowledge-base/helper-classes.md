@@ -94,6 +94,10 @@ override suspend fun createSymlink(...) = withContext(io) {
 
 **Fake DAO pattern**: For each focused DAO interface, create a `Fake*Dao` in `testFixtures` (search for `Fake*Dao` in the data module). Each fake implements the interface with an in-memory map/list. Every helper test also needs `FakeGroupItemDao` for group membership operations.
 
+**Visibility**: Many helper interfaces and their dependencies (e.g. `DataPointUpdateHelper`) are `internal`. Fakes for `internal` interfaces must also be `internal` — a `public` fake that exposes `internal` types in its signature will fail to compile.
+
+**Composite key pitfall**: Fake DAOs must mirror the real table's primary key for their in-memory storage. For example, `FakeTrackerDao` stores data points keyed by `Pair<epochMilli, featureId>` (matching the real `(epoch_milli, feature_id)` composite PK). Using `epochMilli` alone would silently overwrite data points from different features that share a timestamp.
+
 ## Data Update Events
 
 `DataInteractorImpl` emits `DataUpdateType` events via a `SharedFlow` after every mutation. UI layers (e.g. `GroupViewModel`) subscribe to filter for relevant events.
@@ -101,6 +105,10 @@ override suspend fun createSymlink(...) = withContext(io) {
 **Contract**: The data layer is responsible for emitting ALL relevant events. For example, creating a tracker emits both `TrackerCreated` and `DisplayIndex(groupId)`. Deleting a tracker emits `TrackerDeleted` plus `GraphOrStatDeleted`/`GraphOrStatUpdated` for any affected graphs. Consumers should NOT need to infer secondary effects from primary events.
 
 `DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged.
+
+### Delegation Pitfall — New Helper Methods Need Event Overrides
+
+`DataInteractorImpl` uses Kotlin `by` delegation (e.g. `TrackerHelper by trackerHelper`) to forward helper methods. When you **add a new method** to a helper interface, it is automatically delegated — but it **won't emit `DataUpdateType` events**. You must explicitly override the method in `DataInteractorImpl` to call the helper and then emit the appropriate events. This is easy to miss because the code compiles without the override.
 
 ## Finding Code
 
