@@ -94,4 +94,8 @@ internal interface TrackerDao {
     fun getDataPoints(featureId: Long, limit: Int, offset: Int): List<DataPoint>
 
     fun updateDataPoints(dataPoint: List<DataPoint>)
+
+    fun insertDataPoints(dataPoints: List<DataPoint>)
+
+    fun deleteDataPoints(dataPoints: List<DataPoint>)
 }

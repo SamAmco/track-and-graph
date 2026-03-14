@@ -38,14 +38,14 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
+import com.samco.trackandgraph.FakeDataPointUpdateHelper
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerHelperImplTest {
 
     private lateinit var fakeTrackerDao: FakeTrackerDao
     private lateinit var fakeGroupItemDao: FakeGroupItemDao
-    private val dataPointUpdateHelper: DataPointUpdateHelper = mock()
+    private val dataPointUpdateHelper: DataPointUpdateHelper = FakeDataPointUpdateHelper()
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var uut: TrackerHelperImpl

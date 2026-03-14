@@ -348,6 +348,39 @@ internal class TrackerHelperImpl @Inject constructor(
             dao.getDisplayTrackerByFeatureIdSync(featureId)?.let { it.toDto(unique = isTrackerUnique(it.id)) }
         }
 
+    override suspend fun copyDataPointsToTracker(
+        dataPoints: List<DataPoint>,
+        targetTrackerId: Long
+    ) = withContext(io) {
+        if (dataPoints.isEmpty()) return@withContext
+        val targetTracker = dao.getTrackerById(targetTrackerId)
+            ?: throw IllegalArgumentException("Target tracker with id $targetTrackerId not found")
+        val targetFeatureId = targetTracker.featureId
+        transactionHelper.withTransaction {
+            val newDataPoints = dataPoints.map {
+                it.toEntity().copy(featureId = targetFeatureId)
+            }
+            dao.insertDataPoints(newDataPoints)
+        }
+    }
+
+    override suspend fun moveDataPointsToTracker(
+        dataPoints: List<DataPoint>,
+        targetTrackerId: Long
+    ) = withContext(io) {
+        if (dataPoints.isEmpty()) return@withContext
+        val targetTracker = dao.getTrackerById(targetTrackerId)
+            ?: throw IllegalArgumentException("Target tracker with id $targetTrackerId not found")
+        val targetFeatureId = targetTracker.featureId
+        transactionHelper.withTransaction {
+            dao.deleteDataPoints(dataPoints.map { it.toEntity() })
+            val newDataPoints = dataPoints.map {
+                it.toEntity().copy(featureId = targetFeatureId)
+            }
+            dao.insertDataPoints(newDataPoints)
+        }
+    }
+
     override suspend fun getDataPointByTimestampAndTrackerSync(
         trackerId: Long,
         timestamp: OffsetDateTime

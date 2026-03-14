@@ -260,6 +260,36 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
+    override suspend fun copyDataPointsToTracker(
+        dataPoints: List<DataPoint>,
+        targetTrackerId: Long
+    ) = withContext(io) {
+        trackerHelper.copyDataPointsToTracker(dataPoints, targetTrackerId)
+        val targetFeatureId = dao.getTrackerById(targetTrackerId)?.featureId ?: return@withContext
+        emitDataPointEvents(targetFeatureId)
+    }
+
+    override suspend fun moveDataPointsToTracker(
+        dataPoints: List<DataPoint>,
+        targetTrackerId: Long
+    ) = withContext(io) {
+        val sourceFeatureIds = dataPoints.map { it.featureId }.toSet()
+        trackerHelper.moveDataPointsToTracker(dataPoints, targetTrackerId)
+        val targetFeatureId = dao.getTrackerById(targetTrackerId)?.featureId ?: return@withContext
+        for (featureId in sourceFeatureIds + targetFeatureId) {
+            emitDataPointEvents(featureId)
+        }
+    }
+
+    private suspend fun emitDataPointEvents(featureId: Long) {
+        dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
+        val graphsNeedingUpdate = dependencyAnalyserProvider.create()
+            .getDependentGraphs(featureId)
+        for (graphStatId in graphsNeedingUpdate.graphStatIds) {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(graphStatId))
+        }
+    }
+
     override suspend fun createReminder(request: ReminderCreateRequest): Long = withContext(io) {
         val id = reminderHelper.createReminder(request)
         dataUpdateEvents.emit(DataUpdateType.Reminder)

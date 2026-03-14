@@ -35,7 +35,7 @@ internal class FakeTrackerDao : TrackerDao {
     private var nextTrackerId = 1L
     private val features = mutableMapOf<Long, Feature>()
     private val trackers = mutableMapOf<Long, Tracker>()
-    private val dataPoints = mutableMapOf<Long, DataPoint>()
+    private val dataPoints = mutableMapOf<Pair<Long, Long>, DataPoint>()
     private val timers = mutableMapOf<Long, FeatureTimer>()
 
     // =========================================================================
@@ -202,6 +202,16 @@ internal class FakeTrackerDao : TrackerDao {
     }
 
     override fun updateDataPoints(dataPoint: List<DataPoint>) {
-        dataPoint.forEach { dataPoints[it.epochMilli] = it }
+        dataPoint.forEach { dataPoints[it.epochMilli to it.featureId] = it }
+    }
+
+    override fun insertDataPoints(dataPoints: List<DataPoint>) {
+        dataPoints.forEach { this.dataPoints[it.epochMilli to it.featureId] = it }
+    }
+
+    override fun deleteDataPoints(dataPoints: List<DataPoint>) {
+        dataPoints.forEach { dp ->
+            this.dataPoints.remove(dp.epochMilli to dp.featureId)
+        }
     }
 }

@@ -207,7 +207,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     fun deleteDataPoint(dataPoint: DataPoint)
 
     @Delete
-    fun deleteDataPoints(dataPoints: List<DataPoint>)
+    override fun deleteDataPoints(dataPoints: List<DataPoint>)
 
     @Query("DELETE FROM data_points_table WHERE feature_id = :featureId AND value = :index")
     fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double)
@@ -225,7 +225,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     fun insertDataPoint(dataPoint: DataPoint): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertDataPoints(dataPoint: List<DataPoint>)
+    override fun insertDataPoints(dataPoint: List<DataPoint>)
 
     @Update
     override fun updateDataPoints(dataPoint: List<DataPoint>)

@@ -96,4 +96,14 @@ interface TrackerHelper {
     suspend fun hasAtLeastOneTracker(): Boolean
 
     suspend fun hasAtLeastOneDataPoint(): Boolean
+
+    suspend fun copyDataPointsToTracker(
+        dataPoints: List<DataPoint>,
+        targetTrackerId: Long
+    )
+
+    suspend fun moveDataPointsToTracker(
+        dataPoints: List<DataPoint>,
+        targetTrackerId: Long
+    )
 }
