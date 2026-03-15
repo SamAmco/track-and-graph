@@ -250,6 +250,7 @@ private fun DataPointInputView(
         HintHeader(
             indexText = state.indexText,
             trackedCount = state.trackedCount,
+            anyFieldLocked = state.anyFieldLocked,
             onTutorialButtonPressed = callbacks::onTutorialButtonPressed
         )
 
@@ -451,7 +452,8 @@ private fun TrackerPager(
 private fun HintHeader(
     indexText: String,
     trackedCount: Int,
-    onTutorialButtonPressed: () -> Unit
+    anyFieldLocked: Boolean,
+    onTutorialButtonPressed: () -> Unit,
 ) = Box(
     modifier = Modifier.fillMaxWidth()
 ) {
@@ -464,7 +466,7 @@ private fun HintHeader(
     )
 
     // Center-aligned tracked count indicator with animation
-    if (trackedCount > 0) {
+    if (trackedCount > 0 && anyFieldLocked) {
         TrackedCountIndicator(
             modifier = Modifier.align(Alignment.Center),
             count = trackedCount
