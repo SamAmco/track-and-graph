@@ -134,6 +134,8 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         selectedCount = selectedDataPoints.size,
         onInfoClick = viewModel::onShowFeatureInfo,
         onUpdateClick = viewModel::showUpdateAllDialog,
+        onSelectAll = viewModel::selectAllDataPoints,
+        onDeselectAll = viewModel::deselectAllDataPoints,
         onExitMultiSelect = viewModel::exitMultiSelectMode,
         appBarPinned = dataPointsCount == 0,
     )
@@ -260,6 +262,8 @@ private fun TopAppBarContent(
     selectedCount: Int,
     onInfoClick: () -> Unit,
     onUpdateClick: () -> Unit,
+    onSelectAll: () -> Unit,
+    onDeselectAll: () -> Unit,
     onExitMultiSelect: () -> Unit,
     appBarPinned: Boolean = false,
 ) {
@@ -276,10 +280,24 @@ private fun TopAppBarContent(
         isMultiSelectMode,
         onInfoClick,
         onUpdateClick,
+        onSelectAll,
+        onDeselectAll,
         onExitMultiSelect
     ) {
         {
             if (isMultiSelectMode) {
+                IconButton(onClick = onSelectAll) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.select_all_24px),
+                        contentDescription = stringResource(id = R.string.select_all)
+                    )
+                }
+                IconButton(onClick = onDeselectAll) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.deselect_24px),
+                        contentDescription = stringResource(id = R.string.deselect_all)
+                    )
+                }
                 IconButton(onClick = onExitMultiSelect) {
                     Icon(
                         painter = painterResource(id = R.drawable.close),

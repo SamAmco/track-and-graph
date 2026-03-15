@@ -101,6 +101,8 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     // Multi-select functions
     fun onDataPointLongPressed(dataPoint: DataPointInfo)
     fun onDataPointSelected(dataPoint: DataPointInfo, selected: Boolean)
+    fun selectAllDataPoints()
+    fun deselectAllDataPoints()
     fun exitMultiSelectMode()
     fun onDeleteSelectedClicked()
     fun onDeleteSelectedConfirmed()
@@ -266,6 +268,15 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         } else {
             _selectedDataPoints.value - dataPoint
         }
+    }
+
+    override fun selectAllDataPoints() {
+        val allDataPoints = dateScrollData.value?.items?.toSet() ?: return
+        _selectedDataPoints.value = allDataPoints
+    }
+
+    override fun deselectAllDataPoints() {
+        _selectedDataPoints.value = emptySet()
     }
 
     override fun exitMultiSelectMode() {
