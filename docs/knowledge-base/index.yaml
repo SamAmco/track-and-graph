@@ -25,8 +25,8 @@ docs:
 
   - file: component-types.md
     title: Component types — Trackers, Functions, Graphs, Reminders, Groups
-    description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default, must always be computed by querying group_items_table), and GroupItemType vs GroupChildType enums.
-    keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, component, GroupItemType, GroupChildType, unique, symlink, dual-id]
+    description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default, must always be computed by querying group_items_table), GroupItemType vs GroupChildType enums, and all three UI behaviors triggered by unique==false (icon, delete dialog, symlinks menu).
+    keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, component, GroupItemType, GroupChildType, unique, symlink, dual-id, SymlinksDialog, context-menu]
 
   - file: database-schema.md
     title: Database tables and relationships
@@ -40,8 +40,8 @@ docs:
 
   - file: group-hierarchy.md
     title: Group DAG structure and symlinks
-    description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion handles shared membership; GroupGraph and FeaturePathProvider resolve display paths; DTOs never carry hierarchy info.
-    keywords: [group, DAG, symlink, hierarchy, acyclic, parent, child, GroupGraph, FeaturePathProvider, deletion, path-resolution]
+    description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion handles shared membership; GroupGraph, FeaturePathProvider, and ComponentPathProvider resolve display paths; DTOs never carry hierarchy info.
+    keywords: [group, DAG, symlink, hierarchy, acyclic, parent, child, GroupGraph, FeaturePathProvider, ComponentPathProvider, deletion, path-resolution, SymlinksDialog]
 
   - file: group-items.md
     title: group_items_table — junction table and display ordering
