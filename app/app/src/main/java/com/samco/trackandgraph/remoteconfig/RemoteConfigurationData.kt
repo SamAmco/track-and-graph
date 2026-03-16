@@ -52,6 +52,8 @@ data class Endpoints(
     val functionCatalogueSignature: String,
     @SerialName("functions-docs")
     val functionsDocs: String,
+    @SerialName("lua-custom-functions-docs")
+    val luaCustomFunctionsDocs: String,
     @SerialName("donate-url")
     val donateUrl: String
 )

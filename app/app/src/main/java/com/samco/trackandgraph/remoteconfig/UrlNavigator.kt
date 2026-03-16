@@ -29,6 +29,7 @@ interface UrlNavigator {
         LUA_COMMUNITY_SCRIPTS_ROOT,
         PLAY_STORE_PAGE,
         FUNCTIONS_DOCS,
+        LUA_CUSTOM_FUNCTIONS_DOCS,
         DONATE
     }
 

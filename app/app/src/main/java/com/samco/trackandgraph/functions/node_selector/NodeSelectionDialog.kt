@@ -101,7 +101,8 @@ fun NodeSelectionDialog(
         isLandscape = isLandscape,
         infoDisplay = infoDisplay,
         onShowInfo = { infoDisplay = it },
-        onCloseInfo = { infoDisplay = null }
+        onCloseInfo = { infoDisplay = null },
+        onLuaScriptInfoClick = viewModel::navigateToLuaCustomFunctionsDocs
     )
 }
 
@@ -116,6 +117,7 @@ private fun NodeSelectionDialogUi(
     infoDisplay: InfoDisplay? = null,
     onShowInfo: (InfoDisplay) -> Unit = {},
     onCloseInfo: () -> Unit = {},
+    onLuaScriptInfoClick: () -> Unit = {},
 ) {
     val usePlatformDefaultWidth = when {
         state !is NodeSelectionUiState.Ready -> true
@@ -143,7 +145,8 @@ private fun NodeSelectionDialogUi(
                 },
                 onRetry = onRetry,
                 onSelectCategory = onSelectCategory,
-                onShowInfo = onShowInfo
+                onShowInfo = onShowInfo,
+                onLuaScriptInfoClick = onLuaScriptInfoClick
             )
         }
     }
@@ -165,6 +168,7 @@ private fun SelectionView(
     onRetry: () -> Unit,
     onSelectCategory: (String?) -> Unit,
     onShowInfo: (InfoDisplay) -> Unit,
+    onLuaScriptInfoClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.sizeIn(minHeight = buttonSize),
@@ -207,14 +211,16 @@ private fun SelectionView(
                     state = state,
                     onSelect = onSelect,
                     onSelectCategory = onSelectCategory,
-                    onShowInfo = onShowInfo
+                    onShowInfo = onShowInfo,
+                    onLuaScriptInfoClick = onLuaScriptInfoClick
                 )
             } else {
                 PortraitReadyState(
                     state = state,
                     onSelect = onSelect,
                     onSelectCategory = onSelectCategory,
-                    onShowInfo = onShowInfo
+                    onShowInfo = onShowInfo,
+                    onLuaScriptInfoClick = onLuaScriptInfoClick
                 )
             }
         }
@@ -234,6 +240,7 @@ private fun PortraitReadyState(
     onSelect: (AddNodeData) -> Unit,
     onSelectCategory: (String?) -> Unit,
     onShowInfo: (InfoDisplay) -> Unit,
+    onLuaScriptInfoClick: () -> Unit,
 ) = AnimatedContent(state.selectedCategory) {
     if (it == null) {
         // Show category list first
@@ -242,6 +249,7 @@ private fun PortraitReadyState(
             onSelect = onSelect,
             onSelectCategory = onSelectCategory,
             onShowInfo = onShowInfo,
+            onLuaScriptInfoClick = onLuaScriptInfoClick,
             modifier = Modifier.fillMaxWidth()
         )
     } else {
@@ -276,6 +284,7 @@ private fun CategoryList(
     onSelect: (AddNodeData) -> Unit,
     onSelectCategory: (String?) -> Unit,
     onShowInfo: (InfoDisplay) -> Unit,
+    onLuaScriptInfoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     FadingScrollColumn(modifier = modifier) {
@@ -320,9 +329,7 @@ private fun CategoryList(
                 onSelect(AddNodeData.LuaScriptNode)
             },
             showInfoIcon = true,
-            onInfoClick = {
-                onShowInfo(InfoDisplay.LuaScript)
-            }
+            onInfoClick = onLuaScriptInfoClick
         )
 
         Divider()
@@ -370,6 +377,7 @@ private fun LandscapeReadyState(
     onSelect: (AddNodeData) -> Unit,
     onSelectCategory: (String?) -> Unit,
     onShowInfo: (InfoDisplay) -> Unit,
+    onLuaScriptInfoClick: () -> Unit,
 ) = Row(
     modifier = Modifier.fillMaxWidth()
 ) {
@@ -379,6 +387,7 @@ private fun LandscapeReadyState(
         onSelect = onSelect,
         onSelectCategory = onSelectCategory,
         onShowInfo = onShowInfo,
+        onLuaScriptInfoClick = onLuaScriptInfoClick,
         modifier = Modifier.weight(1f)
     )
 
@@ -596,29 +605,6 @@ private fun NodeSelectionDialogDataSourceInfoPreview() {
             onSelectCategory = {},
             isLandscape = true,
             infoDisplay = InfoDisplay.DataSource,
-            onShowInfo = {},
-            onCloseInfo = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun NodeSelectionDialogLuaScriptInfoPreview() {
-    TnGComposeTheme {
-        NodeSelectionDialogUi(
-            state = NodeSelectionUiState.Ready(
-                allFunctions = emptyList(),
-                displayedFunctions = emptyList(),
-                selectedCategory = null,
-                allCategories = emptyMap()
-            ),
-            onDismiss = {},
-            onSelect = {},
-            onRetry = {},
-            onSelectCategory = {},
-            isLandscape = true,
-            infoDisplay = InfoDisplay.LuaScript,
             onShowInfo = {},
             onCloseInfo = {}
         )

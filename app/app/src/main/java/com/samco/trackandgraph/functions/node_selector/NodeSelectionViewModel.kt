@@ -16,13 +16,16 @@
  */
 package com.samco.trackandgraph.functions.node_selector
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.repository.FunctionsRepository
 import com.samco.trackandgraph.functions.repository.SignatureVerificationException
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,11 +55,14 @@ interface NodeSelectionViewModel {
     fun selectCategory(categoryId: String?)
     fun clearSelection()
     fun retry()
+    fun navigateToLuaCustomFunctionsDocs()
 }
 
 @HiltViewModel
 class NodeSelectionViewModelImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val repository: FunctionsRepository,
+    private val urlNavigator: UrlNavigator,
 ) : ViewModel(), NodeSelectionViewModel {
 
     private val _state = MutableStateFlow<NodeSelectionUiState>(NodeSelectionUiState.Loading)
@@ -83,6 +89,10 @@ class NodeSelectionViewModelImpl @Inject constructor(
     override fun retry() {
         _state.value = NodeSelectionUiState.Loading
         fetchFunctions()
+    }
+
+    override fun navigateToLuaCustomFunctionsDocs() {
+        urlNavigator.triggerNavigation(context, UrlNavigator.Location.LUA_CUSTOM_FUNCTIONS_DOCS)
     }
 
     private fun updateReadyState() {

@@ -20,6 +20,7 @@
         "function-catalogue-location",
         "function-catalogue-signature",
         "functions-docs",
+        "lua-custom-functions-docs",
         "donate-url"
       ],
       "properties": {
@@ -70,6 +71,11 @@
           "type": "string",
           "format": "uri",
           "description": "URL to the functions documentation"
+        },
+        "lua-custom-functions-docs": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to documentation for writing custom Lua function nodes"
         },
         "donate-url": {
           "type": "string",

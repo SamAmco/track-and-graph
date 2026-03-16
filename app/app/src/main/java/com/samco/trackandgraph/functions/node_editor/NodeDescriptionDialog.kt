@@ -51,7 +51,6 @@ import io.github.z4kn4fein.semver.toVersion
 
 sealed class InfoDisplay {
     data object DataSource : InfoDisplay()
-    data object LuaScript : InfoDisplay()
     data class Function(val metadata: LuaFunctionMetadata) : InfoDisplay()
 }
 
@@ -86,7 +85,6 @@ fun NodeDescriptionDialog(
             // Header
             when (infoDisplay) {
                 is InfoDisplay.Function -> FunctionHeader(infoDisplay.metadata)
-                is InfoDisplay.LuaScript -> DefaultHeader(stringResource(R.string.lua_script))
                 is InfoDisplay.DataSource -> DefaultHeader(stringResource(R.string.data_source))
             }
 
@@ -99,10 +97,6 @@ fun NodeDescriptionDialog(
                 val descriptionText = when (infoDisplay) {
                     is InfoDisplay.DataSource -> {
                         stringResource(R.string.data_source_description)
-                    }
-
-                    is InfoDisplay.LuaScript -> {
-                        stringResource(R.string.lua_script_description)
                     }
 
                     is InfoDisplay.Function -> {
@@ -145,17 +139,6 @@ private fun InfoDisplayDialogDataSourcePreview() {
     TnGComposeTheme {
         NodeDescriptionDialog(
             infoDisplay = InfoDisplay.DataSource,
-            onDismiss = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun InfoDisplayDialogLuaScriptPreview() {
-    TnGComposeTheme {
-        NodeDescriptionDialog(
-            infoDisplay = InfoDisplay.LuaScript,
             onDismiss = {}
         )
     }
