@@ -90,6 +90,7 @@ fun Tracker(
     onDelete: (DisplayTracker) -> Unit,
     onMoveTo: (DisplayTracker) -> Unit,
     onDescription: (DisplayTracker) -> Unit,
+    onSymlinks: (DisplayTracker) -> Unit,
     onAdd: (DisplayTracker, useDefault: Boolean) -> Unit,
     onHistory: (DisplayTracker) -> Unit,
     onPlayTimer: (DisplayTracker) -> Unit,
@@ -177,7 +178,8 @@ fun Tracker(
                         onEdit = onEdit,
                         onDelete = onDelete,
                         onMoveTo = onMoveTo,
-                        onDescription = onDescription
+                        onDescription = onDescription,
+                        onSymlinks = onSymlinks,
                     )
 
                     TrackerNameText(trackerName = tracker.name)
@@ -210,7 +212,8 @@ private fun TrackerMenuButton(
     onEdit: (DisplayTracker) -> Unit,
     onDelete: (DisplayTracker) -> Unit,
     onMoveTo: (DisplayTracker) -> Unit,
-    onDescription: (DisplayTracker) -> Unit
+    onDescription: (DisplayTracker) -> Unit,
+    onSymlinks: (DisplayTracker) -> Unit,
 ) {
     Box(
         modifier = modifier.size(buttonSize)
@@ -259,6 +262,15 @@ private fun TrackerMenuButton(
                     onDescription(tracker)
                 }
             )
+            if (!tracker.unique) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.symlinks)) },
+                    onClick = {
+                        onShowContextMenu(false)
+                        onSymlinks(tracker)
+                    }
+                )
+            }
         }
     }
 }
@@ -420,6 +432,7 @@ fun TrackerPreview() {
                 onDelete = {},
                 onMoveTo = {},
                 onDescription = {},
+                onSymlinks = {},
                 onAdd = { _, _ -> },
                 onHistory = {},
                 onPlayTimer = {},
@@ -445,6 +458,7 @@ fun TrackerPreview() {
                 onDelete = {},
                 onMoveTo = {},
                 onDescription = {},
+                onSymlinks = {},
                 onAdd = { _, _ -> },
                 onHistory = {},
                 onPlayTimer = {},
@@ -470,6 +484,7 @@ fun TrackerPreview() {
                 onDelete = {},
                 onMoveTo = {},
                 onDescription = {},
+                onSymlinks = {},
                 onAdd = { _, _ -> },
                 onHistory = {},
                 onPlayTimer = {},
@@ -495,6 +510,7 @@ fun TrackerPreview() {
                 onDelete = {},
                 onMoveTo = {},
                 onDescription = {},
+                onSymlinks = {},
                 onAdd = { _, _ -> },
                 onHistory = {},
                 onPlayTimer = {},

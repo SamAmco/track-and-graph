@@ -86,6 +86,7 @@ fun Function(
     onDelete: (DisplayFunction) -> Unit,
     onMoveTo: (DisplayFunction) -> Unit,
     onDuplicate: (DisplayFunction) -> Unit,
+    onSymlinks: (DisplayFunction) -> Unit,
     onClick: (DisplayFunction) -> Unit,
 ) = Box(modifier = modifier.fillMaxWidth()) {
     var showContextMenu by remember { mutableStateOf(false) }
@@ -140,7 +141,8 @@ fun Function(
                             onEdit = onEdit,
                             onDelete = onDelete,
                             onMoveTo = onMoveTo,
-                            onDuplicate = onDuplicate
+                            onDuplicate = onDuplicate,
+                            onSymlinks = onSymlinks,
                         )
                         // Function name
                         FunctionNameText(functionName = displayFunction.name)
@@ -168,7 +170,8 @@ private fun FunctionMenuButton(
     onEdit: (DisplayFunction) -> Unit,
     onDelete: (DisplayFunction) -> Unit,
     onMoveTo: (DisplayFunction) -> Unit,
-    onDuplicate: (DisplayFunction) -> Unit
+    onDuplicate: (DisplayFunction) -> Unit,
+    onSymlinks: (DisplayFunction) -> Unit,
 ) {
     Box(modifier = modifier) {
         IconButton(
@@ -217,6 +220,15 @@ private fun FunctionMenuButton(
                     onDuplicate(displayFunction)
                 }
             )
+            if (!displayFunction.unique) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.symlinks)) },
+                    onClick = {
+                        onShowContextMenu(false)
+                        onSymlinks(displayFunction)
+                    }
+                )
+            }
         }
     }
 }
@@ -258,6 +270,7 @@ fun FunctionPreview() {
                 onDelete = {},
                 onMoveTo = {},
                 onDuplicate = {},
+                onSymlinks = {},
                 onClick = {}
             )
 
@@ -274,6 +287,7 @@ fun FunctionPreview() {
                 onDelete = {},
                 onMoveTo = {},
                 onDuplicate = {},
+                onSymlinks = {},
                 onClick = {}
             )
         }

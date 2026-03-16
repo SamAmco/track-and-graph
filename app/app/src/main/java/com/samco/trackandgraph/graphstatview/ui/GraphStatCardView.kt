@@ -35,7 +35,8 @@ class GraphStatClickListener(
     val onEdit: (graphStat: IGraphStatViewData) -> Unit,
     val onClick: (graphStat: IGraphStatViewData) -> Unit,
     val onMove: (graphStat: IGraphStatViewData) -> Unit,
-    val onDuplicate: (graphStat: IGraphStatViewData) -> Unit
+    val onDuplicate: (graphStat: IGraphStatViewData) -> Unit,
+    val onSymlinks: (graphStat: IGraphStatViewData) -> Unit = {},
 )
 
 @Composable
@@ -140,5 +141,14 @@ private fun MenuSection(
                 expanded = false
             }
         )
+        if (!graphStatViewData.graphOrStat.unique) {
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.symlinks)) },
+                onClick = {
+                    clickListener.onSymlinks(graphStatViewData)
+                    expanded = false
+                }
+            )
+        }
     }
 }

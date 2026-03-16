@@ -72,6 +72,7 @@ import com.samco.trackandgraph.addgroup.AddGroupDialog
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.ui.GraphStatClickListener
@@ -128,6 +129,7 @@ fun GroupScreen(
     val addGroupDialogViewModel: AddGroupDialogViewModelImpl = hiltViewModel()
     val addSymlinkViewModel: AddSymlinkViewModel = hiltViewModel<AddSymlinkViewModelImpl>()
     val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel<ReleaseNotesViewModelImpl>()
+    val symlinksDialogViewModel: SymlinksDialogViewModel = hiltViewModel()
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)
@@ -154,6 +156,7 @@ fun GroupScreen(
         addGroupDialogViewModel = addGroupDialogViewModel,
         addSymlinkViewModel = addSymlinkViewModel,
         releaseNotesViewModel = releaseNotesViewModel,
+        symlinksDialogViewModel = symlinksDialogViewModel,
         groupId = navArgs.groupId,
         groupName = navArgs.groupName,
         onTrackerEdit = onTrackerEdit,
@@ -173,6 +176,7 @@ data class TrackerClickListeners(
     val onDelete: (DisplayTracker) -> Unit = {},
     val onMoveTo: (DisplayTracker) -> Unit = {},
     val onDescription: (DisplayTracker) -> Unit = {},
+    val onSymlinks: (DisplayTracker) -> Unit = {},
     val onAdd: (DisplayTracker, Boolean) -> Unit = { _, _ -> },
     val onHistory: (DisplayTracker) -> Unit = {},
     val onPlayTimer: (DisplayTracker) -> Unit = {},
@@ -184,14 +188,16 @@ data class GraphStatClickListeners(
     val onEdit: (IGraphStatViewData) -> Unit = {},
     val onClick: (IGraphStatViewData) -> Unit = {},
     val onMove: (IGraphStatViewData) -> Unit = {},
-    val onDuplicate: (IGraphStatViewData) -> Unit = {}
+    val onDuplicate: (IGraphStatViewData) -> Unit = {},
+    val onSymlinks: (IGraphStatViewData) -> Unit = {},
 )
 
 data class GroupClickListeners(
     val onClick: (Group) -> Unit = {},
     val onEdit: (Group) -> Unit = {},
     val onDelete: (Group) -> Unit = {},
-    val onMove: (Group) -> Unit = {}
+    val onMove: (Group) -> Unit = {},
+    val onSymlinks: (Group) -> Unit = {},
 )
 
 data class FunctionClickListeners(
@@ -199,7 +205,8 @@ data class FunctionClickListeners(
     val onEdit: (DisplayFunction) -> Unit = {},
     val onDelete: (DisplayFunction) -> Unit = {},
     val onMove: (DisplayFunction) -> Unit = {},
-    val onDuplicate: (DisplayFunction) -> Unit = {}
+    val onDuplicate: (DisplayFunction) -> Unit = {},
+    val onSymlinks: (DisplayFunction) -> Unit = {},
 )
 
 /** Content component for GroupScreen with navigation callbacks */
@@ -210,6 +217,7 @@ private fun GroupScreenContent(
     addGroupDialogViewModel: AddGroupDialogViewModelImpl,
     addSymlinkViewModel: AddSymlinkViewModel,
     releaseNotesViewModel: ReleaseNotesViewModel,
+    symlinksDialogViewModel: SymlinksDialogViewModel,
     groupId: Long,
     groupName: String?,
     onTrackerEdit: (DisplayTracker) -> Unit = {},
@@ -266,6 +274,7 @@ private fun GroupScreenContent(
             onDelete = { groupDialogsViewModel.showDeleteTrackerDialog(it, groupId) },
             onMoveTo = { moveItemViewModel.showMoveTrackerDialog(fromGroupId = groupId, tracker = it) },
             onDescription = { groupDialogsViewModel.showFeatureDescriptionDialog(it) },
+            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.id, GroupChildType.TRACKER, it.name) },
             onAdd = { tracker, useDefault ->
                 if (tracker.hasDefaultValue && useDefault) {
                     context.performTrackVibrate()
@@ -286,7 +295,8 @@ private fun GroupScreenContent(
             onEdit = onGraphStatEdit,
             onClick = onGraphStatClick,
             onMove = { moveItemViewModel.showMoveGraphDialog(groupId, it) },
-            onDuplicate = { groupViewModel.duplicateGraphOrStat(it) }
+            onDuplicate = { groupViewModel.duplicateGraphOrStat(it) },
+            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.graphOrStat.id, GroupChildType.GRAPH, it.graphOrStat.name) },
         ),
         groupClickListeners = GroupClickListeners(
             onClick = onGroupClick,
@@ -294,14 +304,16 @@ private fun GroupScreenContent(
                 addGroupDialogViewModel.showForEdit(groupId = group.id)
             },
             onDelete = { groupDialogsViewModel.showDeleteGroupDialog(it, groupId) },
-            onMove = { moveItemViewModel.showMoveGroupDialog(groupId, it) }
+            onMove = { moveItemViewModel.showMoveGroupDialog(groupId, it) },
+            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.id, GroupChildType.GROUP, it.name) },
         ),
         functionClickListeners = FunctionClickListeners(
             onClick = onFunctionClick,
             onEdit = onFunctionEdit,
             onDelete = { groupDialogsViewModel.showDeleteFunctionDialog(it) },
             onMove = { moveItemViewModel.showMoveFunctionDialog(fromGroupId = groupId, displayFunction = it) },
-            onDuplicate = { groupViewModel.duplicateFunction(it) }
+            onDuplicate = { groupViewModel.duplicateFunction(it) },
+            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.id, GroupChildType.FUNCTION, it.name) },
         ),
         onDragStart = groupViewModel::onDragStart,
         onDragSwap = groupViewModel::onDragSwap,
@@ -361,6 +373,9 @@ private fun GroupScreenContent(
             onDismissRequest = { moveItemViewModel.dismissMoveDialog() }
         )
     }
+
+    // Symlinks dialog
+    SymlinksDialog(viewModel = symlinksDialogViewModel)
 
     // Confirmation dialogs
     GroupDeleteDialog(groupDialogsViewModel, groupViewModel)
@@ -639,6 +654,7 @@ private fun ReorderableCollectionItemScope.TrackerItem(
     onDelete = { clickListeners.onDelete(it) },
     onMoveTo = { clickListeners.onMoveTo(it) },
     onDescription = { clickListeners.onDescription(it) },
+    onSymlinks = { clickListeners.onSymlinks(it) },
     onAdd = { t, useDefault -> clickListeners.onAdd(t, useDefault) },
     onHistory = { clickListeners.onHistory(it) },
     onPlayTimer = { clickListeners.onPlayTimer(it) },
@@ -657,6 +673,7 @@ private fun ReorderableCollectionItemScope.GroupItem(
     onEdit = { clickListeners.onEdit(it) },
     onDelete = { clickListeners.onDelete(it) },
     onMoveTo = { clickListeners.onMove(it) },
+    onSymlinks = { clickListeners.onSymlinks(it) },
     onClick = { clickListeners.onClick(it) }
 )
 
@@ -675,6 +692,7 @@ private fun ReorderableCollectionItemScope.GraphStatItem(
         onClick = { clickListeners.onClick(it) },
         onMove = { clickListeners.onMove(it) },
         onDuplicate = { clickListeners.onDuplicate(it) },
+        onSymlinks = { clickListeners.onSymlinks(it) },
     )
 )
 
@@ -691,7 +709,8 @@ private fun ReorderableCollectionItemScope.FunctionItem(
     onEdit = { clickListeners.onEdit(displayFunction) },
     onDelete = { clickListeners.onDelete(displayFunction) },
     onMoveTo = { clickListeners.onMove(displayFunction) },
-    onDuplicate = { clickListeners.onDuplicate(displayFunction) }
+    onDuplicate = { clickListeners.onDuplicate(displayFunction) },
+    onSymlinks = { clickListeners.onSymlinks(displayFunction) }
 )
 
 @Preview(showBackground = true)

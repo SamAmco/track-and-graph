@@ -17,6 +17,8 @@
 <resources>
     <string name="home">Startseite</string>
     <string name="symlink">Symlink</string>
+    <string name="symlinks">Symlinks</string>
+    <string name="symlink_locations_title">Standorte von \"%1$s\"</string>
     <string name="add_tracker">Etwas tracken:</string>
     <string name="add">Hinzufügen</string>
     <string name="group_name">z.B. Tägliche Aktivitäten</string>

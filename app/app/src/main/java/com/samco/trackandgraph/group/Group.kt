@@ -70,6 +70,7 @@ fun Group(
     onEdit: (Group) -> Unit,
     onDelete: (Group) -> Unit,
     onMoveTo: (Group) -> Unit,
+    onSymlinks: (Group) -> Unit,
     onClick: (Group) -> Unit,
 ) = Box(modifier = modifier.fillMaxWidth()) {
     var showContextMenu by remember { mutableStateOf(false) }
@@ -113,7 +114,8 @@ fun Group(
                 group = group,
                 onEdit = onEdit,
                 onDelete = onDelete,
-                onMoveTo = onMoveTo
+                onMoveTo = onMoveTo,
+                onSymlinks = onSymlinks,
             )
 
             // Group name text
@@ -138,7 +140,8 @@ private fun GroupMenuButton(
     group: Group,
     onEdit: (Group) -> Unit,
     onDelete: (Group) -> Unit,
-    onMoveTo: (Group) -> Unit
+    onMoveTo: (Group) -> Unit,
+    onSymlinks: (Group) -> Unit,
 ) {
     Box(
         modifier = modifier.size(buttonSize)
@@ -180,6 +183,15 @@ private fun GroupMenuButton(
                     onMoveTo(group)
                 }
             )
+            if (!group.unique) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.symlinks)) },
+                    onClick = {
+                        onShowContextMenu(false)
+                        onSymlinks(group)
+                    }
+                )
+            }
         }
     }
 }
@@ -198,6 +210,7 @@ private fun GroupPreview() {
             onEdit = {},
             onDelete = {},
             onMoveTo = {},
+            onSymlinks = {},
             onClick = {}
         )
     }
@@ -218,6 +231,7 @@ private fun GroupElevatedPreview() {
             onEdit = {},
             onDelete = {},
             onMoveTo = {},
+            onSymlinks = {},
             onClick = {}
         )
     }
