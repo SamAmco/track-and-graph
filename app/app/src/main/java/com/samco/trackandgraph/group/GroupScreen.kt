@@ -18,11 +18,6 @@ package com.samco.trackandgraph.group
 
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -92,6 +87,8 @@ import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
 import com.samco.trackandgraph.ui.compose.ui.FloatingBarButton
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.compose.ui.fabEnterTransition
+import com.samco.trackandgraph.ui.compose.ui.fabExitTransition
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.utils.plus
@@ -470,20 +467,12 @@ private fun GroupScreenView(
             )
         }
 
-        // Extract animation specs for reuse
-        val fabEnterAnimation = scaleIn(
-            animationSpec = tween(300)
-        ) + fadeIn(animationSpec = tween(300))
-        val fabExitAnimation = scaleOut(
-            animationSpec = tween(300)
-        ) + fadeOut(animationSpec = tween(300))
-
         // FAB positioned manually at bottom end
         AnimatedVisibility(
             visible = showFab,
             modifier = Modifier.align(Alignment.BottomEnd),
-            enter = fabEnterAnimation,
-            exit = fabExitAnimation
+            enter = fabEnterTransition,
+            exit = fabExitTransition
         ) {
             FloatingActionButton(
                 onClick = onQueueAddAllClicked,
@@ -504,8 +493,8 @@ private fun GroupScreenView(
         AnimatedVisibility(
             visible = showReleaseNotesButton,
             modifier = Modifier.align(Alignment.BottomCenter),
-            enter = fabEnterAnimation,
-            exit = fabExitAnimation
+            enter = fabEnterTransition,
+            exit = fabExitTransition
         ) {
             FloatingBarButton(
                 onClick = onReleaseNotesClicked,

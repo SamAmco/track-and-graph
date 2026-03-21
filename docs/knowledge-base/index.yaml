@@ -13,6 +13,11 @@ docs:
     description: The standard three-layer composable pattern — ViewModel-binding composable collects state and calls a pure-UI composable; pure-UI composable takes only state/callbacks; @Preview calls the pure-UI composable with hardcoded data.
     keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View]
 
+  - file: fab-and-scroll-patterns.md
+    title: FAB patterns — scroll-hiding, animation constants, and tracker-only guard
+    description: How scroll-hiding FABs work via NestedScrollConnection passed through AppBarConfig.nestedScrollConnection into MainScreen's Scaffold modifier; shared fabEnterTransition/fabExitTransition constants in Animations.kt; tracker-only FAB guard using viewModel.tracker.map { it != null }; FeatureHistoryScreen and GroupScreen as reference implementations.
+    keywords: [FAB, scroll, NestedScrollConnection, AppBarConfig, nestedScrollConnection, fabEnterTransition, fabExitTransition, Animations, AnimatedVisibility, tracker, isTracker, showFab, GroupScreen, FeatureHistoryScreen, GroupTopBar, scroll-hide, MutableState]
+
   - file: architecture.md
     title: Architecture and conventions
     description: MVVM pattern, module structure (app/app UI, app/data data layer), KMP compatibility constraints (no mocking frameworks), Hilt DI, Channel-based UI events, and coding conventions.

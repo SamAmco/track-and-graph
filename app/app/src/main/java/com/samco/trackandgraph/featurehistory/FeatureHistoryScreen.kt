@@ -17,10 +17,6 @@
 package com.samco.trackandgraph.featurehistory
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -47,16 +43,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Velocity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.map
@@ -85,6 +87,8 @@ import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.compose.ui.fabEnterTransition
+import com.samco.trackandgraph.ui.compose.ui.fabExitTransition
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.serialization.Serializable
 import org.threeten.bp.OffsetDateTime
@@ -105,6 +109,9 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     LaunchedEffect(navArgs.featureId) {
         viewModel.initViewModel(navArgs.featureId)
     }
+
+    // Local state for FAB visibility based on scroll behavior
+    val showFab = remember { mutableStateOf(true) }
 
     // Collect all state from ViewModel
     val dateScrollData by viewModel.dateScrollData.observeAsState()
@@ -132,6 +139,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         isTracker = isTracker,
         isMultiSelectMode = isMultiSelectMode,
         selectedCount = selectedDataPoints.size,
+        showFab = showFab,
         onInfoClick = viewModel::onShowFeatureInfo,
         onUpdateClick = viewModel::showUpdateAllDialog,
         onSelectAll = viewModel::selectAllDataPoints,
@@ -146,6 +154,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         isTracker = isTracker,
         isMultiSelectMode = isMultiSelectMode,
         selectedDataPoints = selectedDataPoints,
+        showTrackFab = showFab.value && isTracker && !isMultiSelectMode,
         errorMessage = when {
             error is LuaEngineDisabledException -> stringResource(R.string.lua_engine_disabled)
             error != null -> error?.message ?: ""
@@ -165,7 +174,14 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         onDeleteClick = viewModel::onDeleteClicked,
         onDeleteSelectedClick = viewModel::onDeleteSelectedClicked,
         onCopySelectedClick = viewModel::onCopySelectedClicked,
-        onMoveSelectedClick = viewModel::onMoveSelectedClicked
+        onMoveSelectedClick = viewModel::onMoveSelectedClicked,
+        onTrackClick = {
+            viewModel.tracker.value?.let { tracker ->
+                addDataPointsDialogViewModel.showAddDataPointDialog(
+                    trackerId = tracker.id
+                )
+            }
+        }
     )
 
     // Dialogs
@@ -260,6 +276,7 @@ private fun TopAppBarContent(
     isTracker: Boolean,
     isMultiSelectMode: Boolean,
     selectedCount: Int,
+    showFab: MutableState<Boolean>,
     onInfoClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onSelectAll: () -> Unit,
@@ -268,6 +285,10 @@ private fun TopAppBarContent(
     appBarPinned: Boolean = false,
 ) {
     val topBarController = LocalTopBarController.current
+
+    val nestedScrollConnection = remember(showFab) {
+        createNestedScrollConnection(showFab)
+    }
 
     val subtitle = when {
         isMultiSelectMode -> stringResource(R.string.items_selected, selectedCount)
@@ -330,6 +351,7 @@ private fun TopAppBarContent(
             backNavigationAction = true,
             subtitle = subtitle,
             actions = actions,
+            nestedScrollConnection = nestedScrollConnection,
             appBarPinned = appBarPinned,
         )
     )
@@ -342,6 +364,7 @@ private fun FeatureHistoryView(
     isTracker: Boolean = true,
     isMultiSelectMode: Boolean = false,
     selectedDataPoints: Set<DataPointInfo> = emptySet(),
+    showTrackFab: Boolean = false,
     errorMessage: String? = null,
     offsetDiffHours: Int? = null,
     onDataPointClick: (DataPointInfo) -> Unit = {},
@@ -351,7 +374,8 @@ private fun FeatureHistoryView(
     onDeleteClick: (DataPointInfo) -> Unit = {},
     onDeleteSelectedClick: () -> Unit = {},
     onCopySelectedClick: () -> Unit = {},
-    onMoveSelectedClick: () -> Unit = {}
+    onMoveSelectedClick: () -> Unit = {},
+    onTrackClick: () -> Unit = {}
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -385,10 +409,30 @@ private fun FeatureHistoryView(
         }
 
         AnimatedVisibility(
+            visible = showTrackFab,
+            modifier = Modifier.align(Alignment.BottomEnd),
+            enter = fabEnterTransition,
+            exit = fabExitTransition
+        ) {
+            FloatingActionButton(
+                onClick = onTrackClick,
+                containerColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .then(Modifier.padding(inputSpacingLarge))
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_box),
+                    contentDescription = stringResource(id = R.string.track_feature)
+                )
+            }
+        }
+
+        AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomEnd),
             visible = isMultiSelectMode && selectedDataPoints.isNotEmpty(),
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut(),
+            enter = fabEnterTransition,
+            exit = fabExitTransition,
         ) {
             Column(
                 horizontalAlignment = Alignment.End,
@@ -549,6 +593,28 @@ private fun DataPointCard(
     }
 }
 
+private fun createNestedScrollConnection(showFab: MutableState<Boolean>): NestedScrollConnection {
+    return object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            val dy = available.y
+            when {
+                dy < 0 -> showFab.value = false
+                dy > 0 -> showFab.value = true
+            }
+            return Offset.Zero
+        }
+
+        override suspend fun onPreFling(available: Velocity): Velocity {
+            val vy = available.y
+            when {
+                vy < 0 -> showFab.value = true
+                vy > 0 -> showFab.value = false
+            }
+            return Velocity.Zero
+        }
+    }
+}
+
 // region Previews
 
 private val sampleDataPoints = listOf(
@@ -592,6 +658,7 @@ private val sampleDateScrollData = DateScrollData(
 private fun TrackerHistoryPreview() {
     FeatureHistoryView(
         dateScrollData = sampleDateScrollData,
+        showTrackFab = true,
         offsetDiffHours = 0
     )
 }
