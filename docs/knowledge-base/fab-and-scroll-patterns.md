@@ -160,12 +160,13 @@ showTrackFab = showFab.value && isTracker && !isMultiSelectMode
 
 ## Reference Implementations
 
-| Screen | File | Notes |
-|---|---|---|
-| GroupScreen | `group/GroupScreen.kt` + `group/GroupTopBar.kt` | Original pattern; `showFab.value && groupHasTrackers` guards the FAB |
-| FeatureHistoryScreen | `featurehistory/FeatureHistoryScreen.kt` | Adds tracker-only and multi-select guards; also uses FABs for multi-select actions |
+| Screen | File | Scroll-hiding | Notes |
+|---|---|---|---|
+| GroupScreen | `group/GroupScreen.kt` + `group/GroupTopBar.kt` | Yes | Original pattern; `showFab.value && groupHasTrackers` guards the FAB |
+| FeatureHistoryScreen | `featurehistory/FeatureHistoryScreen.kt` | Yes | Tracker-only and multi-select guards; FABs also used for multi-select actions |
+| FunctionsScreen | `functions/FunctionsScreen.kt` | No | Static `AnimatedVisibility` FABs (delete-edge FAB + two `TopCornerFab` instances); no scroll connection needed as the canvas doesn't scroll in the traditional sense |
 
-Both implementations follow the same shape:
+Screens using the scroll-hiding pattern follow this shape:
 1. `remember { mutableStateOf(true) }` in the ViewModel-binding composable
 2. `createNestedScrollConnection(showFab)` in the top-bar sub-composable
 3. `AppBarConfig(nestedScrollConnection = ...)` to wire it into `MainScreen`
