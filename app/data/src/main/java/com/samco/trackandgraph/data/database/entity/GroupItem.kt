@@ -48,8 +48,7 @@ import androidx.room.PrimaryKey
     ],
     indices = [
         Index(value = ["group_id"]),
-        Index(value = ["child_id", "type"]),
-        Index(value = ["group_id", "child_id", "type"], unique = true)
+        Index(value = ["child_id", "type"])
     ]
 )
 internal data class GroupItem(

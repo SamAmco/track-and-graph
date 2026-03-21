@@ -14,40 +14,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.samco.trackandgraph.data.database.migrations
 
-val allMigrations = arrayOf(
-    MIGRATION_29_30,
-    MIGRATION_30_31,
-    MIGRATION_31_32,
-    MIGRATION_32_33,
-    MIGRATION_33_34,
-    MIGRATION_34_35,
-    MIGRATION_35_36,
-    MIGRATION_36_37,
-    MIGRATION_37_38,
-    MIGRATION_38_39,
-    MIGRATION_39_40,
-    MIGRATION_40_41,
-    MIGRATION_41_42,
-    MIGRATION_42_43,
-    MIGRATION_43_44,
-    MIGRATION_44_45,
-    MIGRATION_45_46,
-    MIGRATION_46_47,
-    MIGRATION_47_48,
-    MIGRATION_48_49,
-    MIGRATION_49_50,
-    MIGRATION_50_51,
-    MIGRATION_51_52,
-    MIGRATION_52_53,
-    MIGRATION_53_54,
-    MIGRATION_54_55,
-    MIGRATION_55_56,
-    MIGRATION_56_57,
-    MIGRATION_57_58,
-    MIGRATION_58_59,
-    MIGRATION_59_60,
-)
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
+/**
+ * Migration 59 to 60: Allow multiple symlinks to the same component in the same group.
+ *
+ * Drops the UNIQUE index on (group_id, child_id, type). No data migration needed.
+ */
+val MIGRATION_59_60 = object : Migration(59, 60) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP INDEX IF EXISTS `index_group_items_table_group_id_child_id_type`")
+    }
+}

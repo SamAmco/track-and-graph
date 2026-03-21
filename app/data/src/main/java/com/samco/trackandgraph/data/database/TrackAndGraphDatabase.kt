@@ -68,7 +68,7 @@ import org.threeten.bp.temporal.TemporalAmount
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-const val TNG_DATABASE_VERSION = 59
+const val TNG_DATABASE_VERSION = 60
 
 @Database(
     entities = [
