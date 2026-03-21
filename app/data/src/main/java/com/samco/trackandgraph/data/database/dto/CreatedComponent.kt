@@ -17,14 +17,16 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-enum class GroupChildType { GROUP, TRACKER, FUNCTION, REMINDER, GRAPH }
-
 /**
- * Represents all relevant view data for child ordering
+ * Returned by all create methods to provide both the component's own ID and its
+ * placement ID in the group_items_table.
+ *
+ * @param componentId The primary key of the created component (tracker ID, function ID,
+ *   graphStatId, group ID, or reminder ID).
+ * @param groupItemId The auto-generated ID of the GroupItem row that places this component
+ *   into its group. Callers need this for [GroupChildDisplayIndex]-based reordering.
  */
-data class GroupChildDisplayIndex(
+data class CreatedComponent(
+    val componentId: Long,
     val groupItemId: Long,
-    val type: GroupChildType,
-    val id: Long,
-    val displayIndex: Int
 )

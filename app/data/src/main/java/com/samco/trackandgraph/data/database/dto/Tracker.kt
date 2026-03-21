@@ -100,14 +100,3 @@ data class TrackerUpdateRequest(
     val durationNumericConversionMode: DurationNumericConversionMode? = null,
 )
 
-/**
- * Request object for deleting a Tracker.
- *
- * @param groupId If specified, the tracker will only be removed from this group.
- *                If null, the tracker will be deleted entirely from all groups.
- * @param trackerId The ID of the tracker to delete.
- */
-data class TrackerDeleteRequest(
-    val trackerId: Long,
-    val groupId: Long? = null,
-)

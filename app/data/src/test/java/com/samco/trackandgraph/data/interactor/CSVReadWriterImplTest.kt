@@ -6,6 +6,7 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.entity.DataPoint
 import com.samco.trackandgraph.data.sampling.DataSampleProperties
@@ -418,7 +419,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
                 suggestionOrder = request.suggestionOrder
             )
             storedTrackers.add(newTracker)
-            return@thenAnswer newId
+            return@thenAnswer CreatedComponent(componentId = newId, groupItemId = newId)
         }
         whenever(trackerHelper.getTrackerById(any())).thenAnswer { inv ->
             val id = inv.arguments[0] as Long

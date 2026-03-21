@@ -20,13 +20,16 @@ package com.samco.trackandgraph.data.interactor
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.GlobalNote
-import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
+import com.samco.trackandgraph.data.database.entity.GroupItem
+import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
-import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
@@ -49,8 +52,10 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.threeten.bp.OffsetDateTime
 
@@ -130,7 +135,7 @@ class DataInteractorImplTest {
             uut.getDataUpdateEvents().collect { count++ }
         }
 
-        whenever(trackerHelper.createTracker(any())).thenReturn(0L)
+        whenever(trackerHelper.createTracker(any())).thenReturn(CreatedComponent(componentId = 0L, groupItemId = 0L))
         whenever(dao.getTrackerById(any())).thenReturn(
             TrackerWithFeature(
                 id = 0L,
@@ -157,16 +162,19 @@ class DataInteractorImplTest {
         )
 
         whenever(groupHelper.deleteGroup(any())).thenReturn(DeletedGroupInfo(emptySet()))
+        whenever(groupItemDao.getGroupItemById(0L)).thenReturn(
+            GroupItem(id = 0L, groupId = 0L, childId = 0L, type = GroupItemType.TRACKER, displayIndex = 0)
+        )
 
         //EXECUTE
 
         //let the async start collecting
         yield()
 
-        uut.deleteGroup(GroupDeleteRequest(groupId = 0L))
+        uut.deleteGroup(ComponentDeleteRequest(groupItemId = 0L))
         uut.createTracker(testCreateRequest) // create tracker emits 2 for tracker and display indices
         uut.updateTracker(testUpdateRequest)
-        uut.deleteTracker(TrackerDeleteRequest(trackerId = 0L))
+        uut.deleteTracker(ComponentDeleteRequest(groupItemId = 0L))
         uut.deleteDataPoint(testDataPoint)
         uut.insertDataPoint(testDataPoint)
         uut.insertDataPoints(listOf(testDataPoint))
@@ -181,5 +189,88 @@ class DataInteractorImplTest {
         collectJob.cancel()
         verify(trackerHelper, times(1)).createTracker(eq(testCreateRequest))
         verify(trackerHelper, times(1)).updateTracker(eq(testUpdateRequest))
+    }
+
+    @Test
+    fun `moveComponent moves tracker to new group`() = runTest {
+        //PREPARE
+        val existingItem = GroupItem(
+            id = 1,
+            groupId = 1L,
+            childId = 100L,
+            type = GroupItemType.TRACKER,
+            displayIndex = 0,
+        )
+        whenever(groupItemDao.getGroupItemById(1L)).thenReturn(existingItem)
+
+        //EXECUTE
+        uut.moveComponent(MoveComponentRequest(groupItemId = 1L, toGroupId = 2L))
+
+        //VERIFY
+        verify(groupItemDao).deleteGroupItem(1L)
+        verify(groupItemDao).shiftDisplayIndexesDown(2L)
+        verify(groupItemDao).insertGroupItem(any())
+    }
+
+    @Test
+    fun `moveComponent does nothing when groupItem does not exist`() = runTest {
+        //PREPARE
+        whenever(groupItemDao.getGroupItemById(999L)).thenReturn(null)
+
+        //EXECUTE
+        uut.moveComponent(MoveComponentRequest(groupItemId = 999L, toGroupId = 2L))
+
+        //VERIFY
+        verify(groupItemDao).getGroupItemById(999L)
+        verify(groupItemDao, never()).deleteGroupItem(any())
+        verify(groupItemDao, never()).shiftDisplayIndexesDown(any())
+        verify(groupItemDao, never()).insertGroupItem(any())
+    }
+
+    @Test
+    fun `moveComponent does nothing when already in target group`() = runTest {
+        //PREPARE
+        val existingItem = GroupItem(
+            id = 1,
+            groupId = 1L,
+            childId = 100L,
+            type = GroupItemType.TRACKER,
+            displayIndex = 0,
+        )
+        whenever(groupItemDao.getGroupItemById(1L)).thenReturn(existingItem)
+
+        //EXECUTE
+        uut.moveComponent(MoveComponentRequest(groupItemId = 1L, toGroupId = 1L))
+
+        //VERIFY
+        verify(groupItemDao, never()).deleteGroupItem(any())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `moveComponent throws when moving group to own descendant`() = runTest {
+        //PREPARE
+        val existingItem = GroupItem(
+            id = 1,
+            groupId = 1L,
+            childId = 10L,
+            type = GroupItemType.GROUP,
+            displayIndex = 0,
+        )
+        whenever(groupItemDao.getGroupItemById(1L)).thenReturn(existingItem)
+        whenever(groupItemDao.getGroupItemsByType(eq(10L), eq(GroupItemType.GROUP)))
+            .thenReturn(
+                listOf(
+                    GroupItem(
+                        id = 2,
+                        groupId = 10L,
+                        childId = 20L,
+                        type = GroupItemType.GROUP,
+                        displayIndex = 0,
+                    )
+                )
+            )
+
+        //EXECUTE
+        uut.moveComponent(MoveComponentRequest(groupItemId = 1L, toGroupId = 20L))
     }
 }

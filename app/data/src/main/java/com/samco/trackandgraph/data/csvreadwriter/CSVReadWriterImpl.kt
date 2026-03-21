@@ -274,8 +274,8 @@ internal class CSVReadWriterImpl @Inject constructor(
             dataType = dataType,
             defaultValue = 1.0
         )
-        val trackerId = trackerHelper.createTracker(request)
-        return trackerHelper.getTrackerById(trackerId)!!
+        val created = trackerHelper.createTracker(request)
+        return trackerHelper.getTrackerById(created.componentId)!!
     }
 
     private data class RecordData(

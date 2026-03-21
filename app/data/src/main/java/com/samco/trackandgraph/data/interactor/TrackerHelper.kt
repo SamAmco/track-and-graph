@@ -21,7 +21,8 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
-import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -47,9 +48,9 @@ interface TrackerHelper {
     )
 
     /**
-     * Creates a new tracker and returns the tracker ID.
+     * Creates a new tracker and returns the created component with its group item placement ID.
      */
-    suspend fun createTracker(request: TrackerCreateRequest): Long
+    suspend fun createTracker(request: TrackerCreateRequest): CreatedComponent
 
     /**
      * Updates an existing tracker. Only non-null fields in the request will be changed.
@@ -61,9 +62,10 @@ interface TrackerHelper {
     suspend fun updateTracker(request: TrackerUpdateRequest)
 
     /**
-     * Deletes a tracker from a specific group.
+     * Deletes a tracker or removes a single placement.
+     * @see [ComponentDeleteRequest] for the semantics of deleteEverywhere.
      */
-    suspend fun deleteTracker(request: TrackerDeleteRequest)
+    suspend fun deleteTracker(request: ComponentDeleteRequest)
 
     suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker>
 

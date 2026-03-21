@@ -22,8 +22,8 @@ import com.samco.trackandgraph.FakeGroupItemDao
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
-import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
@@ -87,7 +87,7 @@ class GroupHelperImplTest {
         )
 
         // EXECUTE
-        val groupId = uut.insertGroup(request)
+        val groupId = uut.insertGroup(request).componentId
 
         // VERIFY
         assertTrue(groupId > 0)
@@ -111,7 +111,7 @@ class GroupHelperImplTest {
         // PREPARE
         val groupId = uut.insertGroup(
             GroupCreateRequest(name = "Original", colorIndex = 1, parentGroupId = 0L)
-        )
+        ).componentId
 
         // EXECUTE
         uut.updateGroup(GroupUpdateRequest(id = groupId, name = "Updated", colorIndex = 5))
@@ -127,7 +127,7 @@ class GroupHelperImplTest {
         // PREPARE
         val groupId = uut.insertGroup(
             GroupCreateRequest(name = "Original", colorIndex = 3, parentGroupId = 0L)
-        )
+        ).componentId
 
         // EXECUTE
         uut.updateGroup(GroupUpdateRequest(id = groupId, name = null, colorIndex = null))
@@ -145,12 +145,12 @@ class GroupHelperImplTest {
     @Test
     fun `deleteGroup removes empty group`() = runTest(dispatcher) {
         // PREPARE
-        val groupId = uut.insertGroup(
+        val (groupId, groupItemId) = uut.insertGroup(
             GroupCreateRequest(name = "Empty Group", colorIndex = 0, parentGroupId = 0L)
         )
 
         // EXECUTE
-        val result = uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+        val result = uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
 
         // VERIFY
         assertNull(fakeGroupDao.getGroupById(groupId))
@@ -164,11 +164,11 @@ class GroupHelperImplTest {
             // PREPARE - Create a group that exists in two parent groups
             val parentGroup1 = uut.insertGroup(
                 GroupCreateRequest(name = "Parent 1", colorIndex = 0, parentGroupId = 0L)
-            )
+            ).componentId
             val parentGroup2 = uut.insertGroup(
                 GroupCreateRequest(name = "Parent 2", colorIndex = 0, parentGroupId = 0L)
-            )
-            val childGroup = uut.insertGroup(
+            ).componentId
+            val (childGroup, childGroupItemInParent1) = uut.insertGroup(
                 GroupCreateRequest(name = "Child", colorIndex = 0, parentGroupId = parentGroup1)
             )
             // Add the child to parent2 as well (symlink)
@@ -184,7 +184,7 @@ class GroupHelperImplTest {
 
             // EXECUTE - Delete from parent1 only
             val result = uut.deleteGroup(
-                GroupDeleteRequest(groupId = childGroup, parentGroupId = parentGroup1)
+                ComponentDeleteRequest(groupItemId = childGroupItemInParent1, deleteEverywhere = false)
             )
 
             // VERIFY - Group still exists, only removed from parent1
@@ -199,7 +199,7 @@ class GroupHelperImplTest {
     @Test
     fun `deleteGroup returns non-existent group gracefully`() = runTest(dispatcher) {
         // EXECUTE
-        val result = uut.deleteGroup(GroupDeleteRequest(groupId = 999L, parentGroupId = null))
+        val result = uut.deleteGroup(ComponentDeleteRequest(groupItemId = 999L, deleteEverywhere = true))
 
         // VERIFY
         assertTrue(result.deletedFeatureIds.isEmpty())
@@ -213,7 +213,7 @@ class GroupHelperImplTest {
     fun `deleteGroup with tracker deletes tracker when only in deleted group`() =
         runTest(dispatcher) {
             // PREPARE
-            val groupId = uut.insertGroup(
+            val (groupId, groupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
             )
             val trackerId = 100L
@@ -231,7 +231,7 @@ class GroupHelperImplTest {
 
             // EXECUTE
             val result =
-                uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+                uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
 
             // VERIFY
             assertNull(fakeGroupDao.getGroupById(groupId))
@@ -243,12 +243,12 @@ class GroupHelperImplTest {
     fun `deleteGroup with tracker preserves tracker when it exists elsewhere`() =
         runTest(dispatcher) {
             // PREPARE
-            val groupToDelete = uut.insertGroup(
+            val (groupToDelete, groupToDeleteItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Delete Me", colorIndex = 0, parentGroupId = 0L)
             )
             val otherGroup = uut.insertGroup(
                 GroupCreateRequest(name = "Keep Me", colorIndex = 0, parentGroupId = 0L)
-            )
+            ).componentId
             val trackerId = 100L
             val featureId = 200L
             fakeGroupDao.addTracker(trackerId, featureId)
@@ -275,7 +275,7 @@ class GroupHelperImplTest {
 
             // EXECUTE
             val result = uut.deleteGroup(
-                GroupDeleteRequest(groupId = groupToDelete, parentGroupId = null)
+                ComponentDeleteRequest(groupItemId = groupToDeleteItemId, deleteEverywhere = true)
             )
 
             // VERIFY - Group deleted but tracker and feature preserved
@@ -298,7 +298,7 @@ class GroupHelperImplTest {
     fun `deleteGroup with function deletes function when only in deleted group`() =
         runTest(dispatcher) {
             // PREPARE
-            val groupId = uut.insertGroup(
+            val (groupId, groupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
             )
             val functionId = 100L
@@ -316,7 +316,7 @@ class GroupHelperImplTest {
 
             // EXECUTE
             val result =
-                uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+                uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
 
             // VERIFY
             assertTrue(featureId in result.deletedFeatureIds)
@@ -331,7 +331,7 @@ class GroupHelperImplTest {
     fun `deleteGroup with graph deletes graph when only in deleted group`() =
         runTest(dispatcher) {
             // PREPARE
-            val groupId = uut.insertGroup(
+            val (groupId, groupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
             )
             val graphId = 100L
@@ -346,7 +346,7 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
 
             // VERIFY
             assertTrue(fakeGroupDao.deletedGraphIds.contains(graphId))
@@ -356,12 +356,12 @@ class GroupHelperImplTest {
     fun `deleteGroup with graph preserves graph when it exists elsewhere`() =
         runTest(dispatcher) {
             // PREPARE
-            val groupToDelete = uut.insertGroup(
+            val (groupToDelete, groupToDeleteItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Delete Me", colorIndex = 0, parentGroupId = 0L)
             )
             val otherGroup = uut.insertGroup(
                 GroupCreateRequest(name = "Keep Me", colorIndex = 0, parentGroupId = 0L)
-            )
+            ).componentId
             val graphId = 100L
 
             fakeGroupItemDao.insertGroupItem(
@@ -384,7 +384,7 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(GroupDeleteRequest(groupId = groupToDelete, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupToDeleteItemId, deleteEverywhere = true))
 
             // VERIFY
             assertTrue(fakeGroupDao.deletedGraphIds.isEmpty())
@@ -401,7 +401,7 @@ class GroupHelperImplTest {
     fun `deleteGroup with reminder deletes reminder when only in deleted group`() =
         runTest(dispatcher) {
             // PREPARE
-            val groupId = uut.insertGroup(
+            val (groupId, groupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
             )
             val reminderId = 100L
@@ -416,7 +416,7 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
 
             // VERIFY
             assertTrue(fakeGroupDao.deletedReminderIds.contains(reminderId))
@@ -426,7 +426,7 @@ class GroupHelperImplTest {
     fun `deleteGroup does not affect reminder with null groupId`() =
         runTest(dispatcher) {
             // PREPARE - Reminder exists only in reminders screen (null groupId)
-            val groupId = uut.insertGroup(
+            val (groupId, groupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
             )
             val reminderId = 100L
@@ -441,7 +441,7 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
 
             // VERIFY - Reminder is not deleted
             assertTrue(fakeGroupDao.deletedReminderIds.isEmpty())
@@ -455,7 +455,7 @@ class GroupHelperImplTest {
     fun `deleteGroup preserves reminder when it also has null groupId entry`() =
         runTest(dispatcher) {
             // PREPARE - Reminder exists in both a group and the reminders screen (null groupId)
-            val groupId = uut.insertGroup(
+            val (groupId, groupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
             )
             val reminderId = 100L
@@ -482,7 +482,7 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(GroupDeleteRequest(groupId = groupId, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
 
             // VERIFY - Reminder preserved, but GroupItem linking to deleted group is removed
             assertTrue(fakeGroupDao.deletedReminderIds.isEmpty())
@@ -499,18 +499,18 @@ class GroupHelperImplTest {
     @Test
     fun `deleteGroup recursively deletes child groups`() = runTest(dispatcher) {
         // PREPARE
-        val parentGroup = uut.insertGroup(
+        val (parentGroup, parentGroupItemId) = uut.insertGroup(
             GroupCreateRequest(name = "Parent", colorIndex = 0, parentGroupId = 0L)
         )
         val childGroup = uut.insertGroup(
             GroupCreateRequest(name = "Child", colorIndex = 0, parentGroupId = parentGroup)
-        )
+        ).componentId
         val grandchildGroup = uut.insertGroup(
             GroupCreateRequest(name = "Grandchild", colorIndex = 0, parentGroupId = childGroup)
-        )
+        ).componentId
 
         // EXECUTE
-        uut.deleteGroup(GroupDeleteRequest(groupId = parentGroup, parentGroupId = null))
+        uut.deleteGroup(ComponentDeleteRequest(groupItemId = parentGroupItemId, deleteEverywhere = true))
 
         // VERIFY - All groups deleted
         assertNull(fakeGroupDao.getGroupById(parentGroup))
@@ -521,12 +521,12 @@ class GroupHelperImplTest {
     @Test
     fun `deleteGroup recursively deletes trackers in child groups`() = runTest(dispatcher) {
         // PREPARE
-        val parentGroup = uut.insertGroup(
+        val (parentGroup, parentGroupItemId) = uut.insertGroup(
             GroupCreateRequest(name = "Parent", colorIndex = 0, parentGroupId = 0L)
         )
         val childGroup = uut.insertGroup(
             GroupCreateRequest(name = "Child", colorIndex = 0, parentGroupId = parentGroup)
-        )
+        ).componentId
 
         val trackerId = 100L
         val featureId = 200L
@@ -543,7 +543,7 @@ class GroupHelperImplTest {
 
         // EXECUTE
         val result =
-            uut.deleteGroup(GroupDeleteRequest(groupId = parentGroup, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = parentGroupItemId, deleteEverywhere = true))
 
         // VERIFY
         assertTrue(featureId in result.deletedFeatureIds)
@@ -554,15 +554,15 @@ class GroupHelperImplTest {
     fun `deleteGroup preserves child group when it exists in undeleted group`() =
         runTest(dispatcher) {
             // PREPARE
-            val parentToDelete = uut.insertGroup(
+            val (parentToDelete, parentToDeleteGroupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Delete Me", colorIndex = 0, parentGroupId = 0L)
             )
             val parentToKeep = uut.insertGroup(
                 GroupCreateRequest(name = "Keep Me", colorIndex = 0, parentGroupId = 0L)
-            )
+            ).componentId
             val childGroup = uut.insertGroup(
                 GroupCreateRequest(name = "Child", colorIndex = 0, parentGroupId = parentToDelete)
-            )
+            ).componentId
             // Also add child to the other parent
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -575,7 +575,7 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(GroupDeleteRequest(groupId = parentToDelete, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = parentToDeleteGroupItemId, deleteEverywhere = true))
 
             // VERIFY - parentToDelete gone, but child and parentToKeep preserved
             assertNull(fakeGroupDao.getGroupById(parentToDelete))
@@ -591,15 +591,15 @@ class GroupHelperImplTest {
     fun `deleteGroup preserves tracker in child group when tracker also in undeleted group`() =
         runTest(dispatcher) {
             // PREPARE
-            val parentToDelete = uut.insertGroup(
+            val (parentToDelete, parentToDeleteGroupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Delete Me", colorIndex = 0, parentGroupId = 0L)
             )
             val parentToKeep = uut.insertGroup(
                 GroupCreateRequest(name = "Keep Me", colorIndex = 0, parentGroupId = 0L)
-            )
+            ).componentId
             val childGroup = uut.insertGroup(
                 GroupCreateRequest(name = "Child", colorIndex = 0, parentGroupId = parentToDelete)
-            )
+            ).componentId
 
             val trackerId = 100L
             val featureId = 200L
@@ -627,7 +627,7 @@ class GroupHelperImplTest {
 
             // EXECUTE
             val result = uut.deleteGroup(
-                GroupDeleteRequest(groupId = parentToDelete, parentGroupId = null)
+                ComponentDeleteRequest(groupItemId = parentToDeleteGroupItemId, deleteEverywhere = true)
             )
 
             // VERIFY - Tracker preserved because it exists in parentToKeep
@@ -658,15 +658,15 @@ class GroupHelperImplTest {
         //     └── Graph 1 (shared)
 
         val root = 0L
-        val groupA = uut.insertGroup(
+        val (groupA, groupAItemId) = uut.insertGroup(
             GroupCreateRequest(name = "Group A", colorIndex = 0, parentGroupId = root)
         )
         val groupB = uut.insertGroup(
             GroupCreateRequest(name = "Group B", colorIndex = 0, parentGroupId = root)
-        )
+        ).componentId
         val groupC = uut.insertGroup(
             GroupCreateRequest(name = "Group C", colorIndex = 0, parentGroupId = groupA)
-        )
+        ).componentId
 
         // Tracker 1 - only in Group A
         val tracker1Id = 101L
@@ -732,7 +732,7 @@ class GroupHelperImplTest {
         )
 
         // EXECUTE
-        val result = uut.deleteGroup(GroupDeleteRequest(groupId = groupA, parentGroupId = null))
+        val result = uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupAItemId, deleteEverywhere = true))
 
         // VERIFY
         // Groups A and C deleted, B preserved
@@ -753,12 +753,12 @@ class GroupHelperImplTest {
     @Test
     fun `deleteGroup handles item existing in multiple deleted groups`() = runTest(dispatcher) {
         // PREPARE - Tracker exists in both parent and child groups (both being deleted)
-        val parentGroup = uut.insertGroup(
+        val (parentGroup, parentGroupItemId) = uut.insertGroup(
             GroupCreateRequest(name = "Parent", colorIndex = 0, parentGroupId = 0L)
         )
         val childGroup = uut.insertGroup(
             GroupCreateRequest(name = "Child", colorIndex = 0, parentGroupId = parentGroup)
-        )
+        ).componentId
 
         val trackerId = 100L
         val featureId = 200L
@@ -786,7 +786,7 @@ class GroupHelperImplTest {
 
         // EXECUTE
         val result =
-            uut.deleteGroup(GroupDeleteRequest(groupId = parentGroup, parentGroupId = null))
+            uut.deleteGroup(ComponentDeleteRequest(groupItemId = parentGroupItemId, deleteEverywhere = true))
 
         // VERIFY - Feature should be deleted (exists only in deleted groups)
         assertEquals(setOf(featureId), result.deletedFeatureIds)
@@ -802,7 +802,7 @@ class GroupHelperImplTest {
         // PREPARE
         val groupId = uut.insertGroup(
             GroupCreateRequest(name = "Test", colorIndex = 3, parentGroupId = 0L)
-        )
+        ).componentId
 
         // EXECUTE
         val group = uut.getGroupById(groupId)
@@ -843,21 +843,21 @@ class GroupHelperImplTest {
         // PREPARE
         val groupId = uut.insertGroup(
             GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
-        )
+        ).componentId
         val trackerId = 10L
         val graphId = 20L
-        fakeGroupItemDao.insertGroupItem(
+        val trackerGroupItemId = fakeGroupItemDao.insertGroupItem(
             GroupItem(groupId = groupId, displayIndex = 0, childId = trackerId, type = GroupItemType.TRACKER)
         )
-        fakeGroupItemDao.insertGroupItem(
+        val graphGroupItemId = fakeGroupItemDao.insertGroupItem(
             GroupItem(groupId = groupId, displayIndex = 1, childId = graphId, type = GroupItemType.GRAPH)
         )
 
         // EXECUTE - swap order
         uut.updateGroupChildOrder(
             groupId, listOf(
-                GroupChildDisplayIndex(GroupChildType.TRACKER, trackerId, 1),
-                GroupChildDisplayIndex(GroupChildType.GRAPH, graphId, 0),
+                GroupChildDisplayIndex(groupItemId = trackerGroupItemId, type = GroupChildType.TRACKER, id = trackerId, displayIndex = 1),
+                GroupChildDisplayIndex(groupItemId = graphGroupItemId, type = GroupChildType.GRAPH, id = graphId, displayIndex = 0),
             )
         )
 
@@ -873,20 +873,20 @@ class GroupHelperImplTest {
         // PREPARE - A TRACKER and a GROUP sharing the same childId
         val groupId = uut.insertGroup(
             GroupCreateRequest(name = "Parent", colorIndex = 0, parentGroupId = 0L)
-        )
+        ).componentId
         val sharedId = 42L
-        fakeGroupItemDao.insertGroupItem(
+        val trackerGroupItemId = fakeGroupItemDao.insertGroupItem(
             GroupItem(groupId = groupId, displayIndex = 0, childId = sharedId, type = GroupItemType.TRACKER)
         )
-        fakeGroupItemDao.insertGroupItem(
+        val graphGroupItemId = fakeGroupItemDao.insertGroupItem(
             GroupItem(groupId = groupId, displayIndex = 1, childId = sharedId, type = GroupItemType.GRAPH)
         )
 
         // EXECUTE - only update the GRAPH's index; TRACKER should remain unchanged
         uut.updateGroupChildOrder(
             groupId, listOf(
-                GroupChildDisplayIndex(GroupChildType.TRACKER, sharedId, 0),
-                GroupChildDisplayIndex(GroupChildType.GRAPH, sharedId, 5),
+                GroupChildDisplayIndex(groupItemId = trackerGroupItemId, type = GroupChildType.TRACKER, id = sharedId, displayIndex = 0),
+                GroupChildDisplayIndex(groupItemId = graphGroupItemId, type = GroupChildType.GRAPH, id = sharedId, displayIndex = 5),
             )
         )
 
@@ -931,7 +931,7 @@ class GroupHelperImplTest {
     @Test
     fun `getAncestorAndSelfGroupIds returns self and direct parent`() = runTest(dispatcher) {
         // PREPARE: root -> groupA
-        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
 
         // EXECUTE
         val result = uut.getAncestorAndSelfGroupIds(groupAId)
@@ -943,9 +943,9 @@ class GroupHelperImplTest {
     @Test
     fun `getAncestorAndSelfGroupIds returns full ancestor chain`() = runTest(dispatcher) {
         // PREPARE: root -> A -> B -> C
-        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
-        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupAId))
-        val groupCId = uut.insertGroup(GroupCreateRequest(name = "C", parentGroupId = groupBId))
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
+        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupAId)).componentId
+        val groupCId = uut.insertGroup(GroupCreateRequest(name = "C", parentGroupId = groupBId)).componentId
 
         // EXECUTE
         val result = uut.getAncestorAndSelfGroupIds(groupCId)
@@ -959,8 +959,8 @@ class GroupHelperImplTest {
         // PREPARE: groupB appears in both groupA and root (symlink scenario)
         // root -> A -> B
         // root -> B (symlink)
-        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
-        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupAId))
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
+        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupAId)).componentId
         // Also place B in root directly (symlink)
         uut.createSymlink(inGroupId = 0L, childId = groupBId, childType = GroupChildType.GROUP)
 
@@ -979,7 +979,7 @@ class GroupHelperImplTest {
     fun `createSymlink adds group item for tracker`() = runTest(dispatcher) {
         // PREPARE
         val trackerId = 100L
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L)).componentId
 
         // EXECUTE
         uut.createSymlink(
@@ -1001,7 +1001,7 @@ class GroupHelperImplTest {
     fun `createSymlink adds group item for graph`() = runTest(dispatcher) {
         // PREPARE
         val graphId = 200L
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L)).componentId
 
         // EXECUTE
         uut.createSymlink(
@@ -1021,7 +1021,7 @@ class GroupHelperImplTest {
     fun `createSymlink adds group item for function`() = runTest(dispatcher) {
         // PREPARE
         val functionId = 300L
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L)).componentId
 
         // EXECUTE
         uut.createSymlink(
@@ -1041,8 +1041,8 @@ class GroupHelperImplTest {
     fun `createSymlink adds group item for group`() = runTest(dispatcher) {
         // PREPARE: root -> A, create symlink of A inside itself is not tested here.
         // Instead: root -> A and root -> B, then symlink A into B.
-        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
-        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = 0L))
+        val groupAId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
+        val groupBId = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = 0L)).componentId
 
         // EXECUTE: symlink A into B
         uut.createSymlink(
@@ -1061,7 +1061,7 @@ class GroupHelperImplTest {
     @Test
     fun `createSymlink throws when symlinking a group into itself`() = runTest(dispatcher) {
         // PREPARE
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
 
         // EXECUTE & VERIFY
         var threw = false
@@ -1076,8 +1076,8 @@ class GroupHelperImplTest {
     @Test
     fun `createSymlink throws when symlinking an ancestor group into a descendant`() = runTest(dispatcher) {
         // PREPARE: root -> A -> B
-        val groupA = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
-        val groupB = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupA))
+        val groupA = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
+        val groupB = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupA)).componentId
 
         // EXECUTE & VERIFY: placing A inside B would create A -> B -> A cycle
         var threw = false
@@ -1092,9 +1092,9 @@ class GroupHelperImplTest {
     @Test
     fun `createSymlink throws when symlinking root ancestor into deep descendant`() = runTest(dispatcher) {
         // PREPARE: root -> A -> B -> C
-        val groupA = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
-        val groupB = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupA))
-        val groupC = uut.insertGroup(GroupCreateRequest(name = "C", parentGroupId = groupB))
+        val groupA = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
+        val groupB = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupA)).componentId
+        val groupC = uut.insertGroup(GroupCreateRequest(name = "C", parentGroupId = groupB)).componentId
 
         // EXECUTE & VERIFY: placing A inside C would create a cycle
         var threw = false
@@ -1107,9 +1107,31 @@ class GroupHelperImplTest {
     }
 
     @Test
+    fun `createSymlink throws when symlinking would create a loop with a symlink indirection`() = runTest(dispatcher) {
+        // PREPARE:
+        // root -> A -> B
+        // root -> C -> D
+        val groupA = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
+        val groupB = uut.insertGroup(GroupCreateRequest(name = "B", parentGroupId = groupA)).componentId
+        val groupC = uut.insertGroup(GroupCreateRequest(name = "C", parentGroupId = 0L)).componentId
+        val groupD = uut.insertGroup(GroupCreateRequest(name = "D", parentGroupId = groupC)).componentId
+
+        //EXECUTE & VERIFY: placing A inside D is fine
+        uut.createSymlink(inGroupId = groupD, childId = groupA, childType = GroupChildType.GROUP)
+        // but if we now try to put C inside B, it should fail
+        var threw = false
+        try {
+            uut.createSymlink(inGroupId = groupB, childId = groupC, childType = GroupChildType.GROUP)
+        } catch (e: IllegalStateException) {
+            threw = true
+        }
+        assertTrue(threw)
+    }
+
+    @Test
     fun `createSymlink does not throw for non-group types even with same id`() = runTest(dispatcher) {
         // PREPARE
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "A", parentGroupId = 0L)).componentId
 
         // EXECUTE & VERIFY: tracker with same id as the group should not trigger cycle check
         uut.createSymlink(inGroupId = groupId, childId = groupId, childType = GroupChildType.TRACKER)
@@ -1121,7 +1143,7 @@ class GroupHelperImplTest {
     @Test
     fun `createSymlink inserts at display index 0 and shifts existing items`() = runTest(dispatcher) {
         // PREPARE: create a group and insert a tracker into it first
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Group", parentGroupId = 0L)).componentId
         // Insert a tracker symlink first so it gets display index 0
         uut.createSymlink(groupId, 100L, GroupChildType.TRACKER)
 
@@ -1165,7 +1187,7 @@ class GroupHelperImplTest {
             val parent2 = 2L
             val groupId = uut.insertGroup(
                 GroupCreateRequest(name = "Shared Group", parentGroupId = parent1)
-            )
+            ).componentId
             // Add symlink to parent2
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -1195,10 +1217,10 @@ class GroupHelperImplTest {
 
             val uniqueGroupId = uut.insertGroup(
                 GroupCreateRequest(name = "Unique Group", parentGroupId = parent1)
-            )
+            ).componentId
             val sharedGroupId = uut.insertGroup(
                 GroupCreateRequest(name = "Shared Group", parentGroupId = parent1)
-            )
+            ).componentId
             // Add symlink for sharedGroup to parent2
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -1223,7 +1245,7 @@ class GroupHelperImplTest {
 
     @Test
     fun `getGroupById returns unique=true when group in only one parent`() = runTest(dispatcher) {
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "Test Group", parentGroupId = 1L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Test Group", parentGroupId = 1L)).componentId
         val result = uut.getGroupById(groupId)
         assertNotNull(result)
         assertEquals(true, result!!.unique)
@@ -1231,7 +1253,7 @@ class GroupHelperImplTest {
 
     @Test
     fun `getGroupById returns unique=false when group in multiple parents`() = runTest(dispatcher) {
-        val groupId = uut.insertGroup(GroupCreateRequest(name = "Test Group", parentGroupId = 1L))
+        val groupId = uut.insertGroup(GroupCreateRequest(name = "Test Group", parentGroupId = 1L)).componentId
         fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 2L, displayIndex = 0, childId = groupId, type = GroupItemType.GROUP, createdAt = 1000L))
         val result = uut.getGroupById(groupId)
         assertNotNull(result)
@@ -1240,8 +1262,8 @@ class GroupHelperImplTest {
 
     @Test
     fun `getAllGroupsSync sets unique correctly`() = runTest(dispatcher) {
-        val uniqueGroupId = uut.insertGroup(GroupCreateRequest(name = "Unique Group", parentGroupId = 1L))
-        val sharedGroupId = uut.insertGroup(GroupCreateRequest(name = "Shared Group", parentGroupId = 1L))
+        val uniqueGroupId = uut.insertGroup(GroupCreateRequest(name = "Unique Group", parentGroupId = 1L)).componentId
+        val sharedGroupId = uut.insertGroup(GroupCreateRequest(name = "Shared Group", parentGroupId = 1L)).componentId
         fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 2L, displayIndex = 0, childId = sharedGroupId, type = GroupItemType.GROUP, createdAt = 1000L))
         val result = uut.getAllGroupsSync()
         val uniqueResult = result.first { it.id == uniqueGroupId }

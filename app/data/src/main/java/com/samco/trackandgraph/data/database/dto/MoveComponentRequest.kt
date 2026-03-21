@@ -18,26 +18,12 @@
 package com.samco.trackandgraph.data.database.dto
 
 /**
- * The type of component being moved between groups.
- */
-enum class ComponentType {
-    TRACKER,
-    FUNCTION,
-    GROUP,
-    GRAPH
-}
-
-/**
  * Request object for moving a component from one group to another.
  *
- * @param type The type of the component being moved.
- * @param id The ID of the component to move (tracker ID, function ID, group ID, or graph ID).
- * @param fromGroupId The source group ID.
+ * @param groupItemId The specific GroupItem placement to move.
  * @param toGroupId The destination group ID.
  */
 data class MoveComponentRequest(
-    val type: ComponentType,
-    val id: Long,
-    val fromGroupId: Long,
+    val groupItemId: Long,
     val toGroupId: Long,
 )

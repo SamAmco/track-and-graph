@@ -1,14 +1,16 @@
 ---
 title: DataInteractor and Helper pattern
-description: DataInteractor public interface, DataInteractorImpl delegation to typed helpers (TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper), focused DAO interfaces, symlink-aware delete pattern, withContext-inside-withTransaction pitfall, and DataUpdateType events.
+description: DataInteractor public interface, DataInteractorImpl delegation to typed helpers, focused DAO interfaces, symlink-aware delete pattern (groupItemId + deleteEverywhere), simplified duplicate/move patterns using groupItemId as placement identity, withContext-inside-withTransaction pitfall, and DataUpdateType events.
 topics:
   - DataInteractor: public interface; UI layer depends only on this
   - Helpers: TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper
   - Focused DAO interfaces injected per helper (enables small in-memory fakes for testing)
-  - Delete pattern: groupId provided + multi-group → remove symlink only; otherwise delete all
+  - Delete pattern: groupItemId + deleteEverywhere boolean; unique component + !deleteEverywhere still deletes component
+  - Duplicate pattern: single entry point dispatches by GroupItemType, then GraphStatType; returns CreatedComponent
+  - Move pattern: MoveComponentRequest carries only groupItemId + toGroupId
   - CRITICAL pitfall: never call withContext inside withTransaction (breaks Room thread confinement)
   - DataUpdateType events: emitted by DataInteractorImpl after every mutation; UI subscribes to filter
-keywords: [DataInteractor, helper, DAO, TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper, delete, symlink, withTransaction, withContext, DataUpdateType, events, testing, fakes, DisplayIndex]
+keywords: [DataInteractor, helper, DAO, TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper, delete, symlink, withTransaction, withContext, DataUpdateType, events, testing, fakes, DisplayIndex, groupItemId, deleteEverywhere, duplicate, move, CreatedComponent, performAtomicUpdate]
 ---
 
 # Helper Classes and DataInteractor
@@ -54,14 +56,41 @@ This design enables small in-memory fakes for unit tests — each fake only need
 
 ## Delete Pattern (Symlink Logic)
 
-All delete operations follow the same pattern for multi-group membership. The request object carries an optional `groupId`:
+All delete operations use a single unified DTO:
 
-- **`groupId` provided AND component in multiple groups** → remove only that GroupItem (symlink); the component itself is preserved
-- **Otherwise** → delete all GroupItems then delete the component
+```kotlin
+data class ComponentDeleteRequest(
+    val groupItemId: Long,
+    val deleteEverywhere: Boolean = false,
+)
+```
 
-This pattern is implemented consistently by all helpers — search for `getGroupItemsForChild` in any `*HelperImpl` to see it. Special cases:
-- **Reminders**: `null` groupId always deletes everywhere (the Reminders screen never passes a groupId)
-- **Groups**: the parameter is named `parentGroupId` in both `GroupDeleteRequest` and `GroupViewModel.onDeleteGroup`
+This replaced the previous per-type delete DTOs (`TrackerDeleteRequest`, `FunctionDeleteRequest`, etc.) — a single request works for all component types because the helper can derive the component's `childId` and `type` from the GroupItem lookup.
+
+Semantics:
+- **`deleteEverywhere = false` AND component has multiple GroupItems** → remove only that one GroupItem (symlink); the component itself is preserved
+- **`deleteEverywhere = false` AND component has only one GroupItem** → deletes the component entirely (not just the GroupItem). The KDoc makes this clear — "unique component + remove from group = delete everywhere".
+- **`deleteEverywhere = true`** → delete all GroupItems then delete the component
+
+Each helper implementation starts with `groupItemDao.getGroupItemById(request.groupItemId)` to derive the component's `childId`, then proceeds with deletion logic. `DataInteractorImpl` overrides for `deleteTracker` and `deleteFunction` also do this lookup first to get the `featureId` for dependency analysis before delegating to the helper.
+
+Search for `getGroupItemsForChild` in any `*HelperImpl` to see the multi-placement logic.
+
+### Duplicate Pattern
+
+All duplicate operations take `groupItemId` as placement identity — callers never need the underlying component ID. The helper methods return `CreatedComponent(componentId, groupItemId)` — the same DTO used by create methods — so `DataInteractorImpl` can emit events using the *newly created* GroupItem rather than redundantly re-fetching the original.
+
+`DataInteractorImpl.duplicateGraphOrStat(groupItemId)` dispatches by `GroupItemType` with an exhaustive `when`:
+- GRAPH → delegates to `GraphHelper.duplicateGraphOrStat(groupItemId)`, which has its own exhaustive `when` on `GraphStatType`
+- FUNCTION → delegates to `FunctionHelper.duplicateFunction(groupItemId)`
+
+Both return `CreatedComponent?`. `DataInteractorImpl` uses the returned `groupItemId` to look up the group for `DisplayIndex` event emission.
+
+`duplicateReminder(groupItemId)` is a separate method on `ReminderHelper` (not dispatched through `duplicateGraphOrStat`). It looks up the GroupItem first, then derives `reminderId = existingGroupItem.childId`. Returns `CreatedComponent(componentId, groupItemId)` like all other duplicate methods.
+
+### Move Pattern
+
+`MoveComponentRequest` carries only `groupItemId` and `toGroupId`. The data layer derives `type`, `childId`, and `fromGroupId` from the GroupItem lookup.
 
 ## Coroutine + Transaction Pitfall
 
@@ -104,7 +133,9 @@ override suspend fun createSymlink(...) = withContext(io) {
 
 **Contract**: The data layer is responsible for emitting ALL relevant events. For example, creating a tracker emits both `TrackerCreated` and `DisplayIndex(groupId)`. Deleting a tracker emits `TrackerDeleted` plus `GraphOrStatDeleted`/`GraphOrStatUpdated` for any affected graphs. Consumers should NOT need to infer secondary effects from primary events.
 
-`DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged.
+`DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, duplicates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged.
+
+**Pitfall — double emission**: Methods that use `performAtomicUpdate` must NOT also emit events inside the lambda, because `performAtomicUpdate` already emits via its `.also` block. For example, `shiftUpGroupChildIndexes` wraps `shiftDisplayIndexesDown` in `performAtomicUpdate(DataUpdateType.DisplayIndex(groupId))` — adding a second `dataUpdateEvents.emit` inside would cause duplicate `DisplayIndex` events.
 
 ### Delegation Pitfall — New Helper Methods Need Event Overrides
 

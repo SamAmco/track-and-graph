@@ -22,7 +22,10 @@ import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.ReminderDao
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
-import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 import com.samco.trackandgraph.data.database.entity.GroupItem
@@ -55,7 +58,7 @@ internal class ReminderHelperImpl @Inject constructor(
         reminderDao.getReminderById(id)?.let { fromEntity(it, unique = isReminderUnique(it.id)) }
     }
 
-    override suspend fun createReminder(request: ReminderCreateRequest): Long = withContext(io) {
+    override suspend fun createReminder(request: ReminderCreateRequest): CreatedComponent = withContext(io) {
         transactionHelper.withTransaction {
             val encodedParams = reminderSerializer.serializeParams(request.params)
                 ?: throw IllegalArgumentException("Failed to serialize reminder params")
@@ -82,9 +85,9 @@ internal class ReminderHelperImpl @Inject constructor(
                 type = GroupItemType.REMINDER,
                 createdAt = System.currentTimeMillis()
             )
-            groupItemDao.insertGroupItem(groupItem)
+            val groupItemId = groupItemDao.insertGroupItem(groupItem)
 
-            reminderId
+            CreatedComponent(componentId = reminderId, groupItemId = groupItemId)
         }
     }
 
@@ -128,38 +131,39 @@ internal class ReminderHelperImpl @Inject constructor(
             }
         }
 
-    override suspend fun deleteReminder(request: ReminderDeleteRequest) = withContext(io) {
+    override suspend fun deleteReminder(request: ComponentDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
+            val groupItem = groupItemDao.getGroupItemById(request.groupItemId)
+                ?: return@withTransaction
+            val reminderId = groupItem.childId
+
             val groupItems = groupItemDao.getGroupItemsForChild(
-                request.reminderId,
+                reminderId,
                 GroupItemType.REMINDER
             )
 
-            if (request.groupId != null && groupItems.size > 1) {
-                // Only remove the symlink from the specified group
-                groupItems
-                    .filter { it.groupId == request.groupId }
-                    .forEach { groupItemDao.deleteGroupItem(it.id) }
+            if (!request.deleteEverywhere && groupItems.size > 1) {
+                groupItemDao.deleteGroupItem(request.groupItemId)
                 return@withTransaction
             }
 
             // Delete all GroupItems and the reminder itself
             groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
-            reminderDao.deleteReminder(request.reminderId)
+            reminderDao.deleteReminder(reminderId)
         }
     }
 
-    override suspend fun duplicateReminder(id: Long): Long = withContext(io) {
+    override suspend fun duplicateReminder(groupItemId: Long): CreatedComponent = withContext(io) {
         transactionHelper.withTransaction {
-            val existing = reminderDao.getReminderById(id)
-                ?: throw IllegalArgumentException("Reminder with id $id not found")
+            val existingGroupItem = groupItemDao.getGroupItemById(groupItemId)
+                ?: throw IllegalArgumentException("GroupItem with id $groupItemId not found")
 
-            // Get the existing GroupItem to find the groupId and displayIndex
-            val existingGroupItem = groupItemDao
-                .getGroupItemsForChild(id, GroupItemType.REMINDER)
-                .firstOrNull()
-            val groupId = existingGroupItem?.groupId
-            val insertAtIndex = (existingGroupItem?.displayIndex ?: -1) + 1
+            val reminderId = existingGroupItem.childId
+            val existing = reminderDao.getReminderById(reminderId)
+                ?: throw IllegalArgumentException("Reminder with id $reminderId not found")
+
+            val groupId = existingGroupItem.groupId
+            val insertAtIndex = existingGroupItem.displayIndex + 1
 
             // Shift items after the original down to make room
             if (groupId != null) {
@@ -179,9 +183,9 @@ internal class ReminderHelperImpl @Inject constructor(
                 type = GroupItemType.REMINDER,
                 createdAt = System.currentTimeMillis()
             )
-            groupItemDao.insertGroupItem(newGroupItem)
+            val newGroupItemId = groupItemDao.insertGroupItem(newGroupItem)
 
-            newReminderId
+            CreatedComponent(componentId = newReminderId, groupItemId = newGroupItemId)
         }
     }
 
@@ -189,11 +193,19 @@ internal class ReminderHelperImpl @Inject constructor(
         reminderDao.hasAnyReminders()
     }
 
-    override suspend fun getDisplayIndicesForRemindersScreen(): Map<Long, Int> = withContext(io) {
-        groupItemDao.getGroupItemsWithNoGroup()
-            .filter { it.type == GroupItemType.REMINDER }
-            .associate { it.childId to it.displayIndex }
-    }
+    override suspend fun getDisplayIndicesForRemindersScreen(): List<GroupChildDisplayIndex> =
+        withContext(io) {
+            groupItemDao.getGroupItemsWithNoGroup()
+                .filter { it.type == GroupItemType.REMINDER }
+                .map {
+                    GroupChildDisplayIndex(
+                        groupItemId = it.id,
+                        type = GroupChildType.REMINDER,
+                        id = it.childId,
+                        displayIndex = it.displayIndex,
+                    )
+                }
+        }
 
     /** Converts a ReminderEntity to a Reminder DTO. */
     private fun fromEntity(

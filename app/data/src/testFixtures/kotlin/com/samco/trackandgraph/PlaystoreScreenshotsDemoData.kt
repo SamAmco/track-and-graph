@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph
 
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
@@ -57,7 +58,7 @@ import org.threeten.bp.Period
 private val json = Json { ignoreUnknownKeys = true }
 
 suspend fun createScreenshotsGroup(dataInteractor: DataInteractor) {
-    val outerGroupId = dataInteractor.insertGroup(createGroup("Screenshots"))
+    val outerGroupId = dataInteractor.insertGroup(createGroup("Screenshots")).componentId
     createGroupListForScreenshots(dataInteractor, outerGroupId)
     val exerciseFeatureId = createDailyGroup(dataInteractor, outerGroupId)
     createExerciseGroup(dataInteractor, outerGroupId)
@@ -140,11 +141,11 @@ private suspend fun createReminders(dataInteractor: DataInteractor, exerciseFeat
 
 private suspend fun createRestDaysGroup(dataInteractor: DataInteractor, parent: Long) {
     val stressTracker = dataInteractor.createTracker(createTrackerRequest("Stress", parent))
-    val stressFeatureId = dataInteractor.getTrackerById(stressTracker)!!.featureId
+    val stressFeatureId = dataInteractor.getTrackerById(stressTracker.componentId)!!.featureId
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = stressTracker,
+        trackerId = stressTracker.componentId,
         sinTransform = SinTransform(3.0, 21.0, -1.0, 8.0),
         randomOffsetScalar = 1.0,
         spacing = Duration.ofDays(1),
@@ -157,7 +158,7 @@ private suspend fun createRestDaysGroup(dataInteractor: DataInteractor, parent: 
     )
 
     val dayOffTracker = dataInteractor.createTracker(createTrackerRequest("Day off", parent))
-    val dayOffFeatureId = dataInteractor.getTrackerById(dayOffTracker)!!.featureId
+    val dayOffFeatureId = dataInteractor.getTrackerById(dayOffTracker.componentId)!!.featureId
 
     dataInteractor.insertDataPoint(
         createDataPoint(
@@ -167,21 +168,21 @@ private suspend fun createRestDaysGroup(dataInteractor: DataInteractor, parent: 
         )
     )
 
-    val restDayStatsGroupId = dataInteractor.insertGroup(
+    val restDayStatsGroup = dataInteractor.insertGroup(
         createGroup(name = "Rest day statistics", parentGroupId = parent)
     )
 
-    val pieChartId = createStressPieChart(dataInteractor, stressFeatureId, restDayStatsGroupId)
-    val timeSinceId = createTimeSinceDayOff(dataInteractor, dayOffFeatureId, restDayStatsGroupId)
-    val histogramId = createStressfulDaysHistogram(dataInteractor, stressFeatureId, restDayStatsGroupId)
+    val pieChart = createStressPieChart(dataInteractor, stressFeatureId, restDayStatsGroup.componentId)
+    val timeSince = createTimeSinceDayOff(dataInteractor, dayOffFeatureId, restDayStatsGroup.componentId)
+    val histogram = createStressfulDaysHistogram(dataInteractor, stressFeatureId, restDayStatsGroup.componentId)
 
     // Reorder graphs to correct order
     dataInteractor.updateGroupChildOrder(
-        restDayStatsGroupId,
+        restDayStatsGroup.componentId,
         listOf(
-            GroupChildDisplayIndex(GroupChildType.GRAPH, pieChartId, 0),
-            GroupChildDisplayIndex(GroupChildType.GRAPH, timeSinceId, 1),
-            GroupChildDisplayIndex(GroupChildType.GRAPH, histogramId, 2),
+            GroupChildDisplayIndex(pieChart.groupItemId, GroupChildType.GRAPH, pieChart.componentId, 0),
+            GroupChildDisplayIndex(timeSince.groupItemId, GroupChildType.GRAPH, timeSince.componentId, 1),
+            GroupChildDisplayIndex(histogram.groupItemId, GroupChildType.GRAPH, histogram.componentId, 2),
         )
     )
 }
@@ -190,7 +191,7 @@ private suspend fun createStressfulDaysHistogram(
     dataInteractor: DataInteractor,
     stressFeatureId: Long,
     parent: Long
-): Long {
+): CreatedComponent {
     return dataInteractor.createTimeHistogram(
         TimeHistogramCreateRequest(
             name = "Most stressful days",
@@ -210,7 +211,7 @@ private suspend fun createTimeSinceDayOff(
     dataInteractor: DataInteractor,
     dayOffFeatureId: Long,
     parent: Long
-): Long {
+): CreatedComponent {
     return dataInteractor.createLastValueStat(
         LastValueStatCreateRequest(
             name = "Time since taking a day off",
@@ -232,7 +233,7 @@ private suspend fun createStressPieChart(
     dataInteractor: DataInteractor,
     stressFeatureId: Long,
     parent: Long
-): Long {
+): CreatedComponent {
     return dataInteractor.createPieChart(
         PieChartCreateRequest(
             name = "Stress pie chart",
@@ -255,75 +256,75 @@ private suspend fun createGroupListForScreenshots(dataInteractor: DataInteractor
         )
     )
 
-    val mealTimeId = dataInteractor.insertGroup(
+    val mealTime = dataInteractor.insertGroup(
         createGroup(
             name = "Meal time tracking",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 11
         )
     )
-    val morningId = dataInteractor.insertGroup(
+    val morning = dataInteractor.insertGroup(
         createGroup(
             name = "Morning tracking",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 6
         )
     )
-    val dailyId = dataInteractor.insertGroup(
+    val daily = dataInteractor.insertGroup(
         createGroup(
             name = "Daily tracking",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 0
         )
     )
-    val weeklyId = dataInteractor.insertGroup(
+    val weekly = dataInteractor.insertGroup(
         createGroup(
             name = "Weekly tracking",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 2
         )
     )
-    val exerciseRoutineId = dataInteractor.insertGroup(
+    val exerciseRoutine = dataInteractor.insertGroup(
         createGroup(
             name = "Exercise routine tracking",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 8
         )
     )
-    val weightLossId = dataInteractor.insertGroup(
+    val weightLoss = dataInteractor.insertGroup(
         createGroup(
             name = "Weight loss graphs",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 7
         )
     )
-    val moodQualityId = dataInteractor.insertGroup(
+    val moodQuality = dataInteractor.insertGroup(
         createGroup(
             name = "Mood quality",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 3
         )
     )
-    val stressRestId = dataInteractor.insertGroup(
+    val stressRest = dataInteractor.insertGroup(
         createGroup(
             name = "Stress and rest statistics",
-            parentGroupId = groupListGroup,
+            parentGroupId = groupListGroup.componentId,
             colorIndex = 4
         )
     )
 
     // Reorder groups to correct order (original displayIndex 1-8)
     dataInteractor.updateGroupChildOrder(
-        groupListGroup,
+        groupListGroup.componentId,
         listOf(
-            GroupChildDisplayIndex(GroupChildType.GROUP, mealTimeId, 1),
-            GroupChildDisplayIndex(GroupChildType.GROUP, morningId, 2),
-            GroupChildDisplayIndex(GroupChildType.GROUP, dailyId, 3),
-            GroupChildDisplayIndex(GroupChildType.GROUP, weeklyId, 4),
-            GroupChildDisplayIndex(GroupChildType.GROUP, exerciseRoutineId, 5),
-            GroupChildDisplayIndex(GroupChildType.GROUP, weightLossId, 6),
-            GroupChildDisplayIndex(GroupChildType.GROUP, moodQualityId, 7),
-            GroupChildDisplayIndex(GroupChildType.GROUP, stressRestId, 8),
+            GroupChildDisplayIndex(mealTime.groupItemId, GroupChildType.GROUP, mealTime.componentId, 1),
+            GroupChildDisplayIndex(morning.groupItemId, GroupChildType.GROUP, morning.componentId, 2),
+            GroupChildDisplayIndex(daily.groupItemId, GroupChildType.GROUP, daily.componentId, 3),
+            GroupChildDisplayIndex(weekly.groupItemId, GroupChildType.GROUP, weekly.componentId, 4),
+            GroupChildDisplayIndex(exerciseRoutine.groupItemId, GroupChildType.GROUP, exerciseRoutine.componentId, 5),
+            GroupChildDisplayIndex(weightLoss.groupItemId, GroupChildType.GROUP, weightLoss.componentId, 6),
+            GroupChildDisplayIndex(moodQuality.groupItemId, GroupChildType.GROUP, moodQuality.componentId, 7),
+            GroupChildDisplayIndex(stressRest.groupItemId, GroupChildType.GROUP, stressRest.componentId, 8),
         )
     )
 }
@@ -332,11 +333,11 @@ private suspend fun createExerciseGroup(dataInteractor: DataInteractor, parent: 
     val exerciseTracker = dataInteractor.createTracker(
         createTrackerRequest(name = "Exercise", groupId = parent)
     )
-    val exerciseFeatureId = dataInteractor.getTrackerById(exerciseTracker)!!.featureId
+    val exerciseFeatureId = dataInteractor.getTrackerById(exerciseTracker.componentId)!!.featureId
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = exerciseTracker,
+        trackerId = exerciseTracker.componentId,
         sinTransform = SinTransform(amplitude = 1.0, wavelength = 5.0, yOffset = -1.0),
         randomOffsetScalar = 1.0,
         roundToInt = true,
@@ -347,11 +348,11 @@ private suspend fun createExerciseGroup(dataInteractor: DataInteractor, parent: 
     val illnessTracker = dataInteractor.createTracker(
         createTrackerRequest(name = "Sick day (weekly)", groupId = parent)
     )
-    val illnessFeatureId = dataInteractor.getTrackerById(illnessTracker)!!.featureId
+    val illnessFeatureId = dataInteractor.getTrackerById(illnessTracker.componentId)!!.featureId
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = illnessTracker,
+        trackerId = illnessTracker.componentId,
         sinTransform = SinTransform(
             amplitude = 3.0,
             wavelength = 160.0,
@@ -364,26 +365,26 @@ private suspend fun createExerciseGroup(dataInteractor: DataInteractor, parent: 
         clampMax = 7.0,
     )
 
-    val exerciseGroupId = dataInteractor.insertGroup(createGroup("Exercise", parentGroupId = parent))
+    val exerciseGroup = dataInteractor.insertGroup(createGroup("Exercise", parentGroupId = parent))
 
-    val graph1Id = createExerciseGraph1(
+    val graph1 = createExerciseGraph1(
         dataInteractor = dataInteractor,
         exerciseFeatureId = exerciseFeatureId,
         illnessFeatureId = illnessFeatureId,
-        parent = exerciseGroupId
+        parent = exerciseGroup.componentId
     )
-    val graph2Id = createExerciseGraph2(
+    val graph2 = createExerciseGraph2(
         dataInteractor = dataInteractor,
         exerciseFeatureId = exerciseFeatureId,
-        parent = exerciseGroupId
+        parent = exerciseGroup.componentId
     )
 
     // Reorder graphs to correct order
     dataInteractor.updateGroupChildOrder(
-        exerciseGroupId,
+        exerciseGroup.componentId,
         listOf(
-            GroupChildDisplayIndex(GroupChildType.GRAPH, graph2Id, 0),
-            GroupChildDisplayIndex(GroupChildType.GRAPH, graph1Id, 1),
+            GroupChildDisplayIndex(graph2.groupItemId, GroupChildType.GRAPH, graph2.componentId, 0),
+            GroupChildDisplayIndex(graph1.groupItemId, GroupChildType.GRAPH, graph1.componentId, 1),
         )
     )
 }
@@ -392,7 +393,7 @@ private suspend fun createExerciseGraph2(
     dataInteractor: DataInteractor,
     exerciseFeatureId: Long,
     parent: Long
-): Long {
+): CreatedComponent {
     return dataInteractor.createLineGraph(
         LineGraphCreateRequest(
             name = "Exercise weekly totals in the last 6 months",
@@ -426,7 +427,7 @@ private suspend fun createExerciseGraph1(
     exerciseFeatureId: Long,
     illnessFeatureId: Long,
     parent: Long
-): Long {
+): CreatedComponent {
     return dataInteractor.createLineGraph(
         LineGraphCreateRequest(
             name = "Exercise Vs illness moving averages in the last 6 months",
@@ -489,37 +490,37 @@ private suspend fun createExerciseGraph1(
 }
 
 private suspend fun createDailyGroup(dataInteractor: DataInteractor, parent: Long): Long {
-    val dailyGroupId = dataInteractor.insertGroup(createGroup("Daily", parentGroupId = parent))
-    val sleepTrackerId = createSleepTracker(dataInteractor, dailyGroupId)
-    val productivityTrackerId = createProductivityTracker(dataInteractor, dailyGroupId)
-    val alcoholTrackerId = createAlcoholTracker(dataInteractor, dailyGroupId)
-    val meditationTrackerId = createMeditationTracker(dataInteractor, dailyGroupId)
-    val workTrackerId = createWorkTracker(dataInteractor, dailyGroupId)
-    val weightTrackerId = createWeightTracker(dataInteractor, dailyGroupId)
-    val exerciseTrackerId = createExerciseTracker(dataInteractor, dailyGroupId)
-    val studyingTrackerId = createStudyingTracker(dataInteractor, dailyGroupId)
-    val stressTrackerId = createStressTracker(dataInteractor, dailyGroupId)
+    val dailyGroupId = dataInteractor.insertGroup(createGroup("Daily", parentGroupId = parent)).componentId
+    val sleepTracker = createSleepTracker(dataInteractor, dailyGroupId)
+    val productivityTracker = createProductivityTracker(dataInteractor, dailyGroupId)
+    val alcoholTracker = createAlcoholTracker(dataInteractor, dailyGroupId)
+    val meditationTracker = createMeditationTracker(dataInteractor, dailyGroupId)
+    val workTracker = createWorkTracker(dataInteractor, dailyGroupId)
+    val weightTracker = createWeightTracker(dataInteractor, dailyGroupId)
+    val exerciseTracker = createExerciseTracker(dataInteractor, dailyGroupId)
+    val studyingTracker = createStudyingTracker(dataInteractor, dailyGroupId)
+    val stressTracker = createStressTracker(dataInteractor, dailyGroupId)
 
     // Reorder trackers to correct order
     dataInteractor.updateGroupChildOrder(
         dailyGroupId,
         listOf(
-            GroupChildDisplayIndex(GroupChildType.TRACKER, sleepTrackerId, 0),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, productivityTrackerId, 1),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, alcoholTrackerId, 2),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, meditationTrackerId, 3),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, workTrackerId, 4),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, weightTrackerId, 5),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, exerciseTrackerId, 6),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, studyingTrackerId, 7),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, stressTrackerId, 8),
+            GroupChildDisplayIndex(sleepTracker.groupItemId, GroupChildType.TRACKER, sleepTracker.componentId, 0),
+            GroupChildDisplayIndex(productivityTracker.groupItemId, GroupChildType.TRACKER, productivityTracker.componentId, 1),
+            GroupChildDisplayIndex(alcoholTracker.groupItemId, GroupChildType.TRACKER, alcoholTracker.componentId, 2),
+            GroupChildDisplayIndex(meditationTracker.groupItemId, GroupChildType.TRACKER, meditationTracker.componentId, 3),
+            GroupChildDisplayIndex(workTracker.groupItemId, GroupChildType.TRACKER, workTracker.componentId, 4),
+            GroupChildDisplayIndex(weightTracker.groupItemId, GroupChildType.TRACKER, weightTracker.componentId, 5),
+            GroupChildDisplayIndex(exerciseTracker.groupItemId, GroupChildType.TRACKER, exerciseTracker.componentId, 6),
+            GroupChildDisplayIndex(studyingTracker.groupItemId, GroupChildType.TRACKER, studyingTracker.componentId, 7),
+            GroupChildDisplayIndex(stressTracker.groupItemId, GroupChildType.TRACKER, stressTracker.componentId, 8),
         )
     )
 
-    return dataInteractor.getTrackerById(exerciseTrackerId)!!.featureId
+    return dataInteractor.getTrackerById(exerciseTracker.componentId)!!.featureId
 }
 
-private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val stressTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Stress",
@@ -530,7 +531,7 @@ private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGro
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = stressTracker,
+        trackerId = stressTracker.componentId,
         sinTransform = SinTransform(3.0, 50.0, -1.0),
         randomOffsetScalar = 0.0,
         spacing = Duration.ofDays(1),
@@ -546,7 +547,7 @@ private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGro
     return stressTracker
 }
 
-private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val studyingTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Studying",
@@ -559,7 +560,7 @@ private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyG
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = studyingTracker,
+        trackerId = studyingTracker.componentId,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         spacing = Duration.ofDays(1),
@@ -571,7 +572,7 @@ private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyG
     return studyingTracker
 }
 
-private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val exerciseTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Exercise",
@@ -585,7 +586,7 @@ private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyG
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = exerciseTracker,
+        trackerId = exerciseTracker.componentId,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         numDataPoints = 1,
@@ -597,7 +598,7 @@ private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyG
     return exerciseTracker
 }
 
-private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val weightTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Weight",
@@ -609,7 +610,7 @@ private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGro
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = weightTracker,
+        trackerId = weightTracker.componentId,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         numDataPoints = 1,
@@ -621,7 +622,7 @@ private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGro
     return weightTracker
 }
 
-private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val workTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Work",
@@ -634,7 +635,7 @@ private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroup
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = workTracker,
+        trackerId = workTracker.componentId,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         spacing = Duration.ofDays(1),
@@ -646,7 +647,7 @@ private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroup
     return workTracker
 }
 
-private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val meditationTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Meditation",
@@ -659,7 +660,7 @@ private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dail
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = meditationTracker,
+        trackerId = meditationTracker.componentId,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         numDataPoints = 1,
@@ -671,7 +672,7 @@ private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dail
     return meditationTracker
 }
 
-private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val alcoholTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Alcohol",
@@ -683,7 +684,7 @@ private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGr
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = alcoholTracker,
+        trackerId = alcoholTracker.componentId,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         numDataPoints = 1,
@@ -695,7 +696,7 @@ private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGr
     return alcoholTracker
 }
 
-private suspend fun createProductivityTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createProductivityTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val productivityTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Productivity",
@@ -707,7 +708,7 @@ private suspend fun createProductivityTracker(dataInteractor: DataInteractor, da
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = productivityTracker,
+        trackerId = productivityTracker.componentId,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         numDataPoints = 1,
@@ -719,7 +720,7 @@ private suspend fun createProductivityTracker(dataInteractor: DataInteractor, da
     return productivityTracker
 }
 
-private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGroupId: Long): Long {
+private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGroupId: Long): CreatedComponent {
     val sleepTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Sleep",
@@ -731,7 +732,7 @@ private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGrou
 
     createWaveData(
         dataInteractor = dataInteractor,
-        trackerId = sleepTracker,
+        trackerId = sleepTracker.componentId,
         sinTransform = SinTransform(SEC_PER_HOUR * 1.5, 50.0, SEC_PER_HOUR * 6.0),
         randomOffsetScalar = 0.5,
         spacingRandomisationHours = 4,
@@ -742,9 +743,9 @@ private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGrou
 }
 
 private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent: Long) {
-    val groupId = dataInteractor.insertGroup(createGroup("Functions", parentGroupId = parent))
+    val groupId = dataInteractor.insertGroup(createGroup("Functions", parentGroupId = parent)).componentId
 
-    val runningTrackerId = dataInteractor.createTracker(
+    val runningTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Running ",
             groupId = groupId,
@@ -754,9 +755,9 @@ private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent:
             suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
         )
     )
-    val runningFeatureId = dataInteractor.getTrackerById(runningTrackerId)!!.featureId
+    val runningFeatureId = dataInteractor.getTrackerById(runningTracker.componentId)!!.featureId
 
-    val cyclingTrackerId = dataInteractor.createTracker(
+    val cyclingTracker = dataInteractor.createTracker(
         createTrackerRequest(
             name = "Cycling ",
             groupId = groupId,
@@ -766,10 +767,10 @@ private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent:
             suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
         )
     )
-    val cyclingFeatureId = dataInteractor.getTrackerById(cyclingTrackerId)!!.featureId
+    val cyclingFeatureId = dataInteractor.getTrackerById(cyclingTracker.componentId)!!.featureId
 
     // Function: Exercise - combines Running and Cycling
-    val exerciseFunctionId = dataInteractor.insertFunction(
+    val exerciseFunction = dataInteractor.insertFunction(
         FunctionCreateRequest(
             name = "Exercise",
             groupId = groupId,
@@ -785,9 +786,9 @@ private suspend fun createFunctionsGroup(dataInteractor: DataInteractor, parent:
     dataInteractor.updateGroupChildOrder(
         groupId,
         listOf(
-            GroupChildDisplayIndex(GroupChildType.FUNCTION, exerciseFunctionId, 0),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, runningTrackerId, 5),
-            GroupChildDisplayIndex(GroupChildType.TRACKER, cyclingTrackerId, 7),
+            GroupChildDisplayIndex(exerciseFunction.groupItemId, GroupChildType.FUNCTION, exerciseFunction.componentId, 0),
+            GroupChildDisplayIndex(runningTracker.groupItemId, GroupChildType.TRACKER, runningTracker.componentId, 5),
+            GroupChildDisplayIndex(cyclingTracker.groupItemId, GroupChildType.TRACKER, cyclingTracker.componentId, 7),
         )
     )
 }

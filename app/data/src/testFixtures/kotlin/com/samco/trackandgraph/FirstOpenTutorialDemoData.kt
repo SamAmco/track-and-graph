@@ -40,7 +40,7 @@ private data class ScreenshotGroupData(
 )
 
 suspend fun createFirstOpenTutorialGroup(dataInteractor: DataInteractor, dataSampler: DataSampler) {
-    val mainGroupId = dataInteractor.insertGroup(createGroup("First open tutorial"))
+    val mainGroupId = dataInteractor.insertGroup(createGroup("First open tutorial")).componentId
 
     // Create the three screenshot groups
     val screenshot1Data = createScreenshot1Group(dataInteractor, mainGroupId)
@@ -57,7 +57,7 @@ private suspend fun createScreenshot1Group(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
         )
-    )
+    ).componentId
 
     // Create Relaxation tracker
     val relaxationTrackerId = dataInteractor.createTracker(
@@ -65,7 +65,7 @@ private suspend fun createScreenshot1Group(
             name = "Relaxation",
             groupId = groupId,
         )
-    )
+    ).componentId
 
     // Create data for Relaxation tracker
     createWaveData(
@@ -89,7 +89,7 @@ private suspend fun createScreenshot1Group(
             description = "Track daily stress level (0-10)",
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
-    )
+    ).componentId
 
     // Create data for Stress tracker - slightly inverse to Relaxation
     createWaveData(
@@ -119,7 +119,7 @@ private suspend fun createScreenshot2Group(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
         )
-    )
+    ).componentId
 
     // Get the trackers from Screenshot 1
     val relaxationTracker = dataInteractor.getTrackerById(screenshot1Data.relaxationTrackerId)!!
@@ -133,7 +133,7 @@ private suspend fun createScreenshot2Group(
             description = relaxationTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
-    )
+    ).componentId
 
     val stressTrackerId = dataInteractor.createTracker(
         createTrackerRequest(
@@ -142,7 +142,7 @@ private suspend fun createScreenshot2Group(
             description = stressTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
-    )
+    ).componentId
 
     // Copy data from original trackers to new ones
     val relaxationFeatureId = dataInteractor.getTrackerById(relaxationTrackerId)!!.featureId
@@ -204,7 +204,7 @@ private suspend fun createScreenshot3Group(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
         )
-    )
+    ).componentId
 
     // Get the trackers from Screenshot 2
     val relaxationTracker = dataInteractor.getTrackerById(screenshot2Data.relaxationTrackerId)!!
@@ -218,7 +218,7 @@ private suspend fun createScreenshot3Group(
             description = relaxationTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
-    )
+    ).componentId
 
     val stressTrackerId = dataInteractor.createTracker(
         createTrackerRequest(
@@ -227,7 +227,7 @@ private suspend fun createScreenshot3Group(
             description = stressTracker.description,
             suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
         )
-    )
+    ).componentId
 
     // Copy data from original trackers to new ones
     val relaxationFeatureId = dataInteractor.getTrackerById(relaxationTrackerId)!!.featureId
@@ -326,5 +326,5 @@ private suspend fun createMonthlyMovingAverageGraph(
                 endDate = GraphEndDate.Latest
             )
         )
-    )
+    ).componentId
 }

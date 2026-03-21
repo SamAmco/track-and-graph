@@ -22,7 +22,8 @@ import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
-import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
 
 /**
@@ -33,11 +34,11 @@ import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
  * It will perform all changes inside a transaction and throw an exception if anything goes wrong.
  */
 interface GroupHelper {
-    suspend fun insertGroup(request: GroupCreateRequest): Long
+    suspend fun insertGroup(request: GroupCreateRequest): CreatedComponent
 
     suspend fun updateGroup(request: GroupUpdateRequest)
 
-    suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo
+    suspend fun deleteGroup(request: ComponentDeleteRequest): DeletedGroupInfo
 
     suspend fun getGroupById(id: Long): Group?
 
@@ -49,6 +50,10 @@ interface GroupHelper {
 
     suspend fun getDisplayIndicesForGroup(groupId: Long): List<GroupChildDisplayIndex>
 
+    /**
+     * Updates the order of children of [groupId] by associating the groupItemId to the
+     * display index. The other fields are ignored for now.
+     */
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>)
 
     /**

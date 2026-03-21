@@ -25,7 +25,8 @@ import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
-import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
@@ -45,7 +46,7 @@ internal class GroupHelperImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher
 ) : GroupHelper {
 
-    override suspend fun insertGroup(request: GroupCreateRequest): Long = withContext(io) {
+    override suspend fun insertGroup(request: GroupCreateRequest): CreatedComponent = withContext(io) {
         transactionHelper.withTransaction {
             val group = com.samco.trackandgraph.data.database.entity.Group(
                 id = 0L,
@@ -63,9 +64,9 @@ internal class GroupHelperImpl @Inject constructor(
                 type = GroupItemType.GROUP,
                 createdAt = timeProvider.epochMilli(),
             )
-            groupItemDao.insertGroupItem(groupItem)
+            val groupItemId = groupItemDao.insertGroupItem(groupItem)
 
-            groupId
+            CreatedComponent(componentId = groupId, groupItemId = groupItemId)
         }
     }
 
@@ -80,10 +81,12 @@ internal class GroupHelperImpl @Inject constructor(
         groupDao.updateGroup(updatedGroup)
     }
 
-    override suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo =
+    override suspend fun deleteGroup(request: ComponentDeleteRequest): DeletedGroupInfo =
         withContext(io) {
             return@withContext transactionHelper.withTransaction {
-                val group = groupDao.getGroupById(request.groupId)
+                val groupItem = groupItemDao.getGroupItemById(request.groupItemId)
+                    ?: return@withTransaction DeletedGroupInfo(emptySet())
+                val group = groupDao.getGroupById(groupItem.childId)
                     ?: return@withTransaction DeletedGroupInfo(emptySet())
 
                 val groupItems = groupItemDao.getGroupItemsForChild(
@@ -91,16 +94,14 @@ internal class GroupHelperImpl @Inject constructor(
                     GroupItemType.GROUP
                 )
 
-                if (request.parentGroupId != null && groupItems.size > 1) {
-                    groupItems
-                        .filter { it.groupId == request.parentGroupId }
-                        .forEach { groupItemDao.deleteGroupItem(it.id) }
+                if (!request.deleteEverywhere && groupItems.size > 1) {
+                    groupItemDao.deleteGroupItem(request.groupItemId)
                     return@withTransaction DeletedGroupInfo(emptySet())
                 }
 
                 // Collect all items to delete recursively
                 val itemsToDelete = CollectedDeletions()
-                collectDeletionsRecursively(request.groupId, itemsToDelete)
+                collectDeletionsRecursively(group.id, itemsToDelete)
 
                 // Perform deletions - delete group item entries first, then entities
                 itemsToDelete.groupItemIds.forEach { groupItemDao.deleteGroupItem(it) }
@@ -279,6 +280,7 @@ internal class GroupHelperImpl @Inject constructor(
                     GroupItemType.REMINDER -> GroupChildType.REMINDER
                 }
                 GroupChildDisplayIndex(
+                    groupItemId = item.id,
                     id = item.childId,
                     type = type,
                     displayIndex = item.displayIndex
@@ -338,17 +340,10 @@ internal class GroupHelperImpl @Inject constructor(
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChildDisplayIndex>) =
         transactionHelper.withTransaction {
             val groupItems = groupItemDao.getGroupItemsForGroup(groupId)
-            val newIndices = children.associateBy { Pair(it.type, it.id) }
+            val newIndices = children.associateBy { it.groupItemId }
 
             val updates = groupItems.mapNotNull { groupItem ->
-                val childType = when (groupItem.type) {
-                    GroupItemType.GROUP -> GroupChildType.GROUP
-                    GroupItemType.GRAPH -> GroupChildType.GRAPH
-                    GroupItemType.TRACKER -> GroupChildType.TRACKER
-                    GroupItemType.FUNCTION -> GroupChildType.FUNCTION
-                    GroupItemType.REMINDER -> GroupChildType.REMINDER
-                }
-                val newDisplayIndex = newIndices[Pair(childType, groupItem.childId)]
+                val newDisplayIndex = newIndices[groupItem.id]
                     ?.displayIndex
                     ?: return@mapNotNull null
                 if (newDisplayIndex >= 0 && newDisplayIndex != groupItem.displayIndex) {

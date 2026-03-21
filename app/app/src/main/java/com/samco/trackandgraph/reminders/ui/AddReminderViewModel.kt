@@ -159,7 +159,7 @@ class AddReminderViewModelImpl @Inject constructor(
 
     private suspend fun createReminder(input: ReminderInput) {
         // Create the new reminder (data layer handles display index shifting)
-        val insertedId = dataInteractor.createReminder(
+        val created = dataInteractor.createReminder(
             ReminderCreateRequest(
                 reminderName = input.reminderName,
                 groupId = createGroupId,
@@ -169,8 +169,8 @@ class AddReminderViewModelImpl @Inject constructor(
         )
 
         // Fetch the created reminder for scheduling
-        val insertedReminder = dataInteractor.getReminderById(insertedId)
-            ?: error("Failed to fetch newly created reminder with id $insertedId")
+        val insertedReminder = dataInteractor.getReminderById(created.componentId)
+            ?: error("Failed to fetch newly created reminder with id ${created.componentId}")
         reminderInteractor.scheduleNext(insertedReminder)
     }
 

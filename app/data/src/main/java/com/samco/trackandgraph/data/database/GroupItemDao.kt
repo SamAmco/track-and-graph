@@ -69,8 +69,8 @@ internal interface GroupItemDao {
     @Query("UPDATE group_items_table SET display_index = display_index + 1 WHERE group_id IS NULL AND display_index > :afterIndex")
     fun shiftDisplayIndexesDownAfterForNullGroup(afterIndex: Int)
 
-    @Query("SELECT * FROM group_items_table WHERE group_id = :groupId AND child_id = :childId AND type = :type LIMIT 1")
-    fun getGroupItem(groupId: Long, childId: Long, type: GroupItemType): GroupItem?
+    @Query("SELECT * FROM group_items_table WHERE id = :groupItemId")
+    fun getGroupItemById(groupItemId: Long): GroupItem?
 
     @Query("SELECT * FROM group_items_table")
     fun getAllGroupItems(): List<GroupItem>

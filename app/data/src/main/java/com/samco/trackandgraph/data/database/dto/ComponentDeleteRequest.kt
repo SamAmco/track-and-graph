@@ -17,14 +17,18 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-enum class GroupChildType { GROUP, TRACKER, FUNCTION, REMINDER, GRAPH }
-
 /**
- * Represents all relevant view data for child ordering
+ * Request object for deleting any component (tracker, function, graph, group, or reminder).
+ *
+ * @param groupItemId The specific GroupItem placement to act on. The component's identity
+ *   (type and ID) is derived from this GroupItem.
+ * @param deleteEverywhere If true, deletes the component and all its placements.
+ *   If false and the component has multiple placements, only the placement identified
+ *   by [groupItemId] is removed. If false and the component is unique (only one placement),
+ *   the component itself is still deleted — there is no distinction between "remove placement"
+ *   and "delete everywhere" when only one placement exists.
  */
-data class GroupChildDisplayIndex(
+data class ComponentDeleteRequest(
     val groupItemId: Long,
-    val type: GroupChildType,
-    val id: Long,
-    val displayIndex: Int
+    val deleteEverywhere: Boolean = false,
 )

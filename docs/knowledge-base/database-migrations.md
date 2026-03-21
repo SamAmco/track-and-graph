@@ -7,7 +7,7 @@ topics:
   - DROP TABLE does NOT trigger ON DELETE CASCADE on child tables
   - child_id must be tracker/function primary key, NOT features_table.id (use JOIN)
   - Migration 58→59: introduced group_items_table, migrated group_id/display_index columns
-keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 58-59]
+keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 58-59, 59-60, unique-constraint]
 ---
 
 # Database Migrations
@@ -70,3 +70,17 @@ JOIN functions_table f ON f.feature_id = ft.id
 ```
 
 Storing `features_table.id` as the child_id would cause trackers to appear in wrong groups and functions to not appear at all, because the helper code looks them up by tracker/function ID.
+
+## Migration 59 → 60 (remove unique constraint on group_items_table)
+
+This migration drops the `(group_id, child_id, type)` unique index entirely (not just makes it non-unique). The index is not recreated — there was no performance justification for keeping it, and removing it allows the same component to appear multiple times in the same group (same-group duplicates/symlinks).
+
+```kotlin
+val MIGRATION_59_60 = object : Migration(59, 60) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP INDEX IF EXISTS `index_group_items_table_group_id_child_id_type`")
+    }
+}
+```
+
+The `GroupItem` entity annotation retains only two indices: `(group_id)` and `(child_id, type)`. The old triple-column index is gone entirely.

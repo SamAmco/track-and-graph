@@ -62,14 +62,3 @@ data class FunctionUpdateRequest(
     val inputFeatureIds: List<Long>? = null,
 )
 
-/**
- * Request object for deleting a Function.
- *
- * @param functionId The ID of the function to delete.
- * @param groupId If specified, the function will only be removed from this group.
- *                If null, the function will be deleted entirely from all groups.
- */
-data class FunctionDeleteRequest(
-    val functionId: Long,
-    val groupId: Long? = null,
-)

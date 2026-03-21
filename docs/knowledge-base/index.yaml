@@ -30,8 +30,8 @@ docs:
 
   - file: component-types.md
     title: Component types — Trackers, Functions, Graphs, Reminders, Groups
-    description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default, must always be computed by querying group_items_table), GroupItemType vs GroupChildType enums, and all three UI behaviors triggered by unique==false (icon, delete dialog, symlinks menu).
-    keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, component, GroupItemType, GroupChildType, unique, symlink, dual-id, SymlinksDialog, context-menu]
+    description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default, must always be computed by querying group_items_table), GroupItemType vs GroupChildType enums, all three UI behaviors triggered by unique==false (icon, delete dialog with deleteEverywhere, symlinks menu).
+    keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, component, GroupItemType, GroupChildType, unique, symlink, dual-id, SymlinksDialog, context-menu, deleteEverywhere]
 
   - file: database-schema.md
     title: Database tables and relationships
@@ -40,8 +40,8 @@ docs:
 
   - file: database-migrations.md
     title: Writing Room database migrations
-    description: How to write Room migrations safely — copy CREATE TABLE SQL from schema JSON (jq), SQLite table-rebuild pattern, DROP TABLE cascade pitfall, and migration 58→59 as a detailed example with child_id pitfall.
-    keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items]
+    description: How to write Room migrations safely — copy CREATE TABLE SQL from schema JSON (jq), SQLite table-rebuild pattern, DROP TABLE cascade pitfall, migration 58→59 (group_items_table introduction), and migration 59→60 (remove unique constraint to allow same-group duplicates).
+    keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 59-60, unique-constraint]
 
   - file: group-hierarchy.md
     title: Group DAG structure and symlinks
@@ -50,13 +50,13 @@ docs:
 
   - file: group-items.md
     title: group_items_table — junction table and display ordering
-    description: The group_items_table schema, composite identity (type + child_id), display_index ordering, unique constraint on (group_id, child_id, type), symlink creation disabled-items pattern (AddSymlinkViewModel), drag-and-drop flow, and null group_id for groupless reminders.
-    keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, unique-constraint, symlink, AddSymlinkViewModel, disabled-items, SelectItemDialog]
+    description: The group_items_table schema, composite identity (type + child_id), groupItemId as placement identity, display_index ordering, multi-group membership (including same-group duplicates, no unique constraint), symlink creation disabled-items pattern (AddSymlinkViewModel), drag-and-drop flow, and null group_id for groupless reminders.
+    keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, symlink, AddSymlinkViewModel, disabled-items, SelectItemDialog, groupItemId, placement-identity]
 
   - file: helper-classes.md
     title: DataInteractor and Helper pattern
-    description: DataInteractor public interface, DataInteractorImpl delegation to typed helpers, focused DAO interfaces, symlink-aware delete pattern, withContext-inside-withTransaction pitfall, and DataUpdateType events.
-    keywords: [DataInteractor, helper, DAO, TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper, delete, symlink, withTransaction, DataUpdateType, events, testing, fakes, DisplayIndex]
+    description: DataInteractor public interface, DataInteractorImpl delegation to typed helpers, focused DAO interfaces, symlink-aware delete pattern (groupItemId + deleteEverywhere), duplicate pattern returning CreatedComponent, move pattern using groupItemId, performAtomicUpdate double-emission pitfall, withContext-inside-withTransaction pitfall, and DataUpdateType events.
+    keywords: [DataInteractor, helper, DAO, TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper, delete, symlink, withTransaction, DataUpdateType, events, testing, fakes, DisplayIndex, groupItemId, deleteEverywhere, duplicate, move, CreatedComponent, performAtomicUpdate]
 
   - file: reminders.md
     title: Reminders — groupless reminders, scheduling, and display ordering

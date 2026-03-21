@@ -87,7 +87,7 @@ class TrackerHelperImplCopyMoveDataPointsTest {
                 suggestionType = TrackerSuggestionType.NONE,
                 suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
             )
-        )
+        ).componentId
     }
 
     private fun makeDataPoint(

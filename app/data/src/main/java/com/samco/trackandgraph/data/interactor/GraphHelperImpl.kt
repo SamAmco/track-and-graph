@@ -26,7 +26,8 @@ import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateReq
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.BarChartUpdateRequest
-import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.LastValueStat
@@ -66,14 +67,14 @@ internal class GraphHelperImpl @Inject constructor(
     // Create methods
     // =========================================================================
 
-    override suspend fun createLineGraph(request: LineGraphCreateRequest): Long = withContext(io) {
+    override suspend fun createLineGraph(request: LineGraphCreateRequest): CreatedComponent = withContext(io) {
         transactionHelper.withTransaction {
-            val graphStatId =
+            val created =
                 insertGraphOrStat(request.name, request.groupId, GraphStatType.LINE_GRAPH)
             val lineGraphId = graphDao.insertLineGraph(
                 com.samco.trackandgraph.data.database.entity.LineGraph(
                     id = 0L,
-                    graphStatId = graphStatId,
+                    graphStatId = created.componentId,
                     sampleSize = request.config.sampleSize,
                     yRangeType = request.config.yRangeType,
                     yFrom = request.config.yFrom,
@@ -97,32 +98,32 @@ internal class GraphHelperImpl @Inject constructor(
                 )
             }
             graphDao.insertLineGraphFeatures(features)
-            graphStatId
+            created
         }
     }
 
-    override suspend fun createPieChart(request: PieChartCreateRequest): Long = withContext(io) {
+    override suspend fun createPieChart(request: PieChartCreateRequest): CreatedComponent = withContext(io) {
         transactionHelper.withTransaction {
-            val graphStatId =
+            val created =
                 insertGraphOrStat(request.name, request.groupId, GraphStatType.PIE_CHART)
             graphDao.insertPieChart(
                 com.samco.trackandgraph.data.database.entity.PieChart(
                     id = 0L,
-                    graphStatId = graphStatId,
+                    graphStatId = created.componentId,
                     featureId = request.config.featureId,
                     sampleSize = request.config.sampleSize,
                     endDate = request.config.endDate,
                     sumByCount = request.config.sumByCount
                 )
             )
-            graphStatId
+            created
         }
     }
 
-    override suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): Long =
+    override suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): CreatedComponent =
         withContext(io) {
             transactionHelper.withTransaction {
-                val graphStatId = insertGraphOrStat(
+                val created = insertGraphOrStat(
                     request.name,
                     request.groupId,
                     GraphStatType.AVERAGE_TIME_BETWEEN
@@ -130,7 +131,7 @@ internal class GraphHelperImpl @Inject constructor(
                 graphDao.insertAverageTimeBetweenStat(
                     com.samco.trackandgraph.data.database.entity.AverageTimeBetweenStat(
                         id = 0L,
-                        graphStatId = graphStatId,
+                        graphStatId = created.componentId,
                         featureId = request.config.featureId,
                         fromValue = request.config.fromValue,
                         toValue = request.config.toValue,
@@ -141,14 +142,14 @@ internal class GraphHelperImpl @Inject constructor(
                         filterByLabels = request.config.filterByLabels
                     )
                 )
-                graphStatId
+                created
             }
         }
 
-    override suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): Long =
+    override suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): CreatedComponent =
         withContext(io) {
             transactionHelper.withTransaction {
-                val graphStatId = insertGraphOrStat(
+                val created = insertGraphOrStat(
                     request.name,
                     request.groupId,
                     GraphStatType.TIME_HISTOGRAM
@@ -156,7 +157,7 @@ internal class GraphHelperImpl @Inject constructor(
                 graphDao.insertTimeHistogram(
                     com.samco.trackandgraph.data.database.entity.TimeHistogram(
                         id = 0L,
-                        graphStatId = graphStatId,
+                        graphStatId = created.componentId,
                         featureId = request.config.featureId,
                         sampleSize = request.config.sampleSize,
                         window = request.config.window,
@@ -164,14 +165,14 @@ internal class GraphHelperImpl @Inject constructor(
                         endDate = request.config.endDate
                     )
                 )
-                graphStatId
+                created
             }
         }
 
-    override suspend fun createLastValueStat(request: LastValueStatCreateRequest): Long =
+    override suspend fun createLastValueStat(request: LastValueStatCreateRequest): CreatedComponent =
         withContext(io) {
             transactionHelper.withTransaction {
-                val graphStatId = insertGraphOrStat(
+                val created = insertGraphOrStat(
                     request.name,
                     request.groupId,
                     GraphStatType.LAST_VALUE
@@ -179,7 +180,7 @@ internal class GraphHelperImpl @Inject constructor(
                 graphDao.insertLastValueStat(
                     com.samco.trackandgraph.data.database.entity.LastValueStat(
                         id = 0L,
-                        graphStatId = graphStatId,
+                        graphStatId = created.componentId,
                         featureId = request.config.featureId,
                         endDate = request.config.endDate,
                         fromValue = request.config.fromValue,
@@ -189,18 +190,18 @@ internal class GraphHelperImpl @Inject constructor(
                         filterByLabels = request.config.filterByLabels
                     )
                 )
-                graphStatId
+                created
             }
         }
 
-    override suspend fun createBarChart(request: BarChartCreateRequest): Long = withContext(io) {
+    override suspend fun createBarChart(request: BarChartCreateRequest): CreatedComponent = withContext(io) {
         transactionHelper.withTransaction {
-            val graphStatId =
+            val created =
                 insertGraphOrStat(request.name, request.groupId, GraphStatType.BAR_CHART)
             graphDao.insertBarChart(
                 com.samco.trackandgraph.data.database.entity.BarChart(
                     id = 0L,
-                    graphStatId = graphStatId,
+                    graphStatId = created.componentId,
                     featureId = request.config.featureId,
                     endDate = request.config.endDate,
                     sampleSize = request.config.sampleSize,
@@ -211,18 +212,18 @@ internal class GraphHelperImpl @Inject constructor(
                     sumByCount = request.config.sumByCount
                 )
             )
-            graphStatId
+            created
         }
     }
 
-    override suspend fun createLuaGraph(request: LuaGraphCreateRequest): Long = withContext(io) {
+    override suspend fun createLuaGraph(request: LuaGraphCreateRequest): CreatedComponent = withContext(io) {
         transactionHelper.withTransaction {
-            val graphStatId =
+            val created =
                 insertGraphOrStat(request.name, request.groupId, GraphStatType.LUA_SCRIPT)
             val luaGraphId = graphDao.insertLuaGraph(
                 com.samco.trackandgraph.data.database.entity.LuaGraph(
                     id = 0L,
-                    graphStatId = graphStatId,
+                    graphStatId = created.componentId,
                     script = request.config.script
                 )
             )
@@ -235,7 +236,7 @@ internal class GraphHelperImpl @Inject constructor(
                 )
             }
             graphDao.insertLuaGraphFeatures(features)
-            graphStatId
+            created
         }
     }
 
@@ -449,22 +450,24 @@ internal class GraphHelperImpl @Inject constructor(
     // Delete method
     // =========================================================================
 
-    override suspend fun deleteGraph(request: GraphDeleteRequest) = withContext(io) {
+    override suspend fun deleteGraph(request: ComponentDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
+            val groupItem = groupItemDao.getGroupItemById(request.groupItemId)
+                ?: return@withTransaction
+            val graphStatId = groupItem.childId
+
             val groupItems = groupItemDao.getGroupItemsForChild(
-                request.graphStatId,
+                graphStatId,
                 GroupItemType.GRAPH
             )
 
-            if (request.groupId != null && groupItems.size > 1) {
-                groupItems
-                    .filter { it.groupId == request.groupId }
-                    .forEach { groupItemDao.deleteGroupItem(it.id) }
+            if (!request.deleteEverywhere && groupItems.size > 1) {
+                groupItemDao.deleteGroupItem(request.groupItemId)
                 return@withTransaction
             }
 
             groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
-            graphDao.deleteGraphOrStat(request.graphStatId)
+            graphDao.deleteGraphOrStat(graphStatId)
         }
     }
 
@@ -472,109 +475,57 @@ internal class GraphHelperImpl @Inject constructor(
     // Duplicate methods
     // =========================================================================
 
-    override suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long? =
+    override suspend fun duplicateGraphOrStat(groupItemId: Long): CreatedComponent? =
         withContext(io) {
             transactionHelper.withTransaction {
+                val originalGroupItem = groupItemDao.getGroupItemById(groupItemId)
+                    ?: return@withTransaction null
+                val graphStatId = originalGroupItem.childId
                 val graphOrStatEntity = graphDao.tryGetGraphStatById(graphStatId)
                     ?: return@withTransaction null
-                val newGraphStatId = duplicateGraphOrStat(graphOrStatEntity, groupId)
-                graphDao.getLineGraphByGraphStatId(graphStatId)?.let {
-                    val copy = graphDao.insertLineGraph(
-                        it.toLineGraph().copy(id = 0L, graphStatId = newGraphStatId)
-                    )
-                    graphDao.insertLineGraphFeatures(it.features.map { f ->
-                        f.copy(id = 0L, lineGraphId = copy)
-                    })
-                }
-                newGraphStatId
-            }
-        }
 
-    override suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            transactionHelper.withTransaction {
-                val graphOrStatEntity = graphDao.tryGetGraphStatById(graphStatId)
-                    ?: return@withTransaction null
-                val newGraphStatId = duplicateGraphOrStat(graphOrStatEntity, groupId)
-                graphDao.getPieChartByGraphStatId(graphStatId)?.let {
-                    graphDao.insertPieChart(it.copy(id = 0L, graphStatId = newGraphStatId))
-                }
-                newGraphStatId
-            }
-        }
+                val created = placeGraphOrStatDuplicate(
+                    graphOrStatEntity, originalGroupItem
+                )
 
-    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            transactionHelper.withTransaction {
-                val graphOrStatEntity = graphDao.tryGetGraphStatById(graphStatId)
-                    ?: return@withTransaction null
-                val newGraphStatId = duplicateGraphOrStat(graphOrStatEntity, groupId)
-                graphDao.getAverageTimeBetweenStatByGraphStatId(graphStatId)?.let {
-                    graphDao.insertAverageTimeBetweenStat(
-                        it.copy(
-                            id = 0L,
-                            graphStatId = newGraphStatId
+                val newGraphStatId = created.componentId
+                when (graphOrStatEntity.type) {
+                    GraphStatType.LINE_GRAPH -> graphDao.getLineGraphByGraphStatId(graphStatId)?.let {
+                        val copy = graphDao.insertLineGraph(
+                            it.toLineGraph().copy(id = 0L, graphStatId = newGraphStatId)
                         )
-                    )
+                        graphDao.insertLineGraphFeatures(it.features.map { f ->
+                            f.copy(id = 0L, lineGraphId = copy)
+                        })
+                    }
+                    GraphStatType.PIE_CHART -> graphDao.getPieChartByGraphStatId(graphStatId)?.let {
+                        graphDao.insertPieChart(it.copy(id = 0L, graphStatId = newGraphStatId))
+                    }
+                    GraphStatType.AVERAGE_TIME_BETWEEN -> graphDao.getAverageTimeBetweenStatByGraphStatId(graphStatId)?.let {
+                        graphDao.insertAverageTimeBetweenStat(
+                            it.copy(id = 0L, graphStatId = newGraphStatId)
+                        )
+                    }
+                    GraphStatType.TIME_HISTOGRAM -> graphDao.getTimeHistogramByGraphStatId(graphStatId)?.let {
+                        graphDao.insertTimeHistogram(it.copy(id = 0L, graphStatId = newGraphStatId))
+                    }
+                    GraphStatType.LAST_VALUE -> graphDao.getLastValueStatByGraphStatId(graphStatId)?.let {
+                        graphDao.insertLastValueStat(it.copy(id = 0L, graphStatId = newGraphStatId))
+                    }
+                    GraphStatType.BAR_CHART -> graphDao.getBarChartByGraphStatId(graphStatId)?.let {
+                        graphDao.insertBarChart(it.copy(id = 0L, graphStatId = newGraphStatId))
+                    }
+                    GraphStatType.LUA_SCRIPT -> graphDao.getLuaGraphByGraphStatId(graphStatId)?.let {
+                        val copy = graphDao.insertLuaGraph(
+                            it.toLuaGraph().copy(id = 0L, graphStatId = newGraphStatId)
+                        )
+                        graphDao.insertLuaGraphFeatures(it.features.map { f ->
+                            f.copy(id = 0L, luaGraphId = copy)
+                        })
+                    }
                 }
-                newGraphStatId
-            }
-        }
 
-    override suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            transactionHelper.withTransaction {
-                val graphOrStatEntity = graphDao.tryGetGraphStatById(graphStatId)
-                    ?: return@withTransaction null
-                val newGraphStatId = duplicateGraphOrStat(graphOrStatEntity, groupId)
-                graphDao.getTimeHistogramByGraphStatId(graphStatId)?.let {
-                    graphDao.insertTimeHistogram(it.copy(id = 0L, graphStatId = newGraphStatId))
-                }
-                newGraphStatId
-            }
-        }
-
-    override suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            transactionHelper.withTransaction {
-                val graphOrStatEntity = graphDao.tryGetGraphStatById(graphStatId)
-                    ?: return@withTransaction null
-                val newGraphStatId = duplicateGraphOrStat(graphOrStatEntity, groupId)
-                graphDao.getLastValueStatByGraphStatId(graphStatId)?.let {
-                    graphDao.insertLastValueStat(it.copy(id = 0L, graphStatId = newGraphStatId))
-                }
-                newGraphStatId
-            }
-        }
-
-    override suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            transactionHelper.withTransaction {
-                val graphOrStatEntity = graphDao.tryGetGraphStatById(graphStatId)
-                    ?: return@withTransaction null
-                val newGraphStatId = duplicateGraphOrStat(graphOrStatEntity, groupId)
-                graphDao.getBarChartByGraphStatId(graphStatId)?.let {
-                    graphDao.insertBarChart(it.copy(id = 0L, graphStatId = newGraphStatId))
-                }
-                newGraphStatId
-            }
-        }
-
-    override suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            transactionHelper.withTransaction {
-                val graphOrStatEntity = graphDao.tryGetGraphStatById(graphStatId)
-                    ?: return@withTransaction null
-                val newGraphStatId = duplicateGraphOrStat(graphOrStatEntity, groupId)
-                graphDao.getLuaGraphByGraphStatId(graphStatId)?.let {
-                    val copy = graphDao.insertLuaGraph(
-                        it.toLuaGraph().copy(id = 0L, graphStatId = newGraphStatId)
-                    )
-                    graphDao.insertLuaGraphFeatures(it.features.map { f ->
-                        f.copy(id = 0L, luaGraphId = copy)
-                    })
-                }
-                newGraphStatId
+                created
             }
         }
 
@@ -641,7 +592,7 @@ internal class GraphHelperImpl @Inject constructor(
     // Private helper methods
     // =========================================================================
 
-    private fun insertGraphOrStat(name: String, groupId: Long, type: GraphStatType): Long {
+    private fun insertGraphOrStat(name: String, groupId: Long, type: GraphStatType): CreatedComponent {
         val graphOrStat = com.samco.trackandgraph.data.database.entity.GraphOrStat(
             id = 0L,
             name = name,
@@ -657,41 +608,30 @@ internal class GraphHelperImpl @Inject constructor(
             type = GroupItemType.GRAPH,
             createdAt = timeProvider.epochMilli(),
         )
-        groupItemDao.insertGroupItem(groupItem)
+        val groupItemId = groupItemDao.insertGroupItem(groupItem)
 
-        return graphStatId
+        return CreatedComponent(componentId = graphStatId, groupItemId = groupItemId)
     }
 
-    private fun duplicateGraphOrStat(
+    private fun placeGraphOrStatDuplicate(
         graphOrStat: com.samco.trackandgraph.data.database.entity.GraphOrStat,
-        groupId: Long
-    ): Long {
+        originalGroupItem: GroupItem,
+    ): CreatedComponent {
         val newGraphOrStat = graphOrStat.copy(id = 0L)
         val graphStatId = graphDao.insertGraphOrStat(newGraphOrStat)
 
-        // Find the original's position in this group to place duplicate after it
-        val originalGroupItem = groupItemDao.getGroupItem(
-            groupId,
-            graphOrStat.id,
-            GroupItemType.GRAPH
-        )
-        val newDisplayIndex = if (originalGroupItem != null) {
-            groupItemDao.shiftDisplayIndexesDownAfter(groupId, originalGroupItem.displayIndex)
-            originalGroupItem.displayIndex + 1
-        } else {
-            groupItemDao.shiftDisplayIndexesDown(groupId)
-            0
-        }
+        val groupId = originalGroupItem.groupId!!
+        groupItemDao.shiftDisplayIndexesDownAfter(groupId, originalGroupItem.displayIndex)
 
         val groupItem = GroupItem(
             groupId = groupId,
-            displayIndex = newDisplayIndex,
+            displayIndex = originalGroupItem.displayIndex + 1,
             childId = graphStatId,
             type = GroupItemType.GRAPH,
             createdAt = timeProvider.epochMilli(),
         )
-        groupItemDao.insertGroupItem(groupItem)
+        val groupItemId = groupItemDao.insertGroupItem(groupItem)
 
-        return graphStatId
+        return CreatedComponent(componentId = graphStatId, groupItemId = groupItemId)
     }
 }

@@ -1,16 +1,17 @@
 ---
 title: group_items_table — junction table and display ordering
-description: The group_items_table schema, composite identity (type + child_id together identify a component), display_index ordering managed by helpers, multi-group membership, unique constraint on (group_id, child_id, type), symlink creation disabled-items pattern, drag-and-drop flow, and null group_id for groupless reminders.
+description: The group_items_table schema, composite identity (type + child_id together identify a component), display_index ordering managed by helpers, multi-group membership (including same-group duplicates), groupItemId as placement identity, symlink creation disabled-items pattern, drag-and-drop flow, and null group_id for groupless reminders.
 topics:
   - Schema: id, group_id (nullable), display_index, child_id, type, created_at
   - Composite identity: (type, child_id) together identify a component — NOT child_id alone
   - child_id is the type-specific entity ID (NOT features_table.id for trackers/functions)
-  - Unique constraint on (group_id, child_id, type) prevents duplicate symlinks in same group
-  - Symlink creation: AddSymlinkViewModel disables ancestors (cycle prevention) and existing items (duplicate prevention)
+  - groupItemId (GroupItem.id) as placement identity: uniquely identifies WHERE a component is placed
+  - Same component can appear multiple times in the same group (no unique constraint)
+  - Symlink creation: AddSymlinkViewModel disables ancestors (cycle prevention) only
   - Display index: managed by helpers; UI combines via GroupViewModel flows (children not pre-sorted)
   - Drag-and-drop: temporary local list for instant UI; DB write on drop; VM waits for dbDisplayIndices alignment
   - null group_id: valid ONLY for reminders (Reminders screen)
-keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, unique-constraint, symlink, AddSymlinkViewModel, disabled-items, SelectItemDialog]
+keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, symlink, AddSymlinkViewModel, disabled-items, SelectItemDialog, groupItemId, placement-identity]
 ---
 
 # Group Items (Junction Table)
@@ -73,17 +74,20 @@ Both Trackers and Functions also have a `featureId` (pointing to `features_table
 
 ### Multi-Group Membership
 
-A component can exist in multiple groups:
+A component can exist in multiple groups, and even multiple times in the **same** group:
 
 ```kotlin
 // Tracker 1 in Group A
-GroupItem(groupId = 1, childId = 100, type = TRACKER, displayIndex = 0)
+GroupItem(id = 1, groupId = 1, childId = 100, type = TRACKER, displayIndex = 0)
 
 // Same Tracker 1 also in Group B
-GroupItem(groupId = 2, childId = 100, type = TRACKER, displayIndex = 3)
+GroupItem(id = 2, groupId = 2, childId = 100, type = TRACKER, displayIndex = 3)
+
+// Same Tracker 1 duplicated within Group A (e.g. at a different position)
+GroupItem(id = 3, groupId = 1, childId = 100, type = TRACKER, displayIndex = 5)
 ```
 
-**Constraint**: The database has a unique constraint on `(group_id, type, child_id)`, preventing the same component from appearing twice in the same group. This was likely a premature design decision — multiple symlinks of the same component in one group could be useful (e.g. a tracker appearing in different positions). However, changing this now would require a database migration, so the constraint stays for now. The UI enforces this by disabling already-present items in the symlink picker (see below).
+There is **no unique constraint** on `(group_id, child_id, type)` — this was removed in migration 59→60 to allow same-group duplicates. Each `GroupItem.id` (the auto-generated PK) uniquely identifies a **placement** of a component within a group. This `groupItemId` is the primary way the data layer identifies which specific symlink to operate on (delete, move, duplicate).
 
 ### Null Group ID
 
@@ -112,13 +116,13 @@ groupItemDao.insertGroupItem(
 ### Move Component Between Groups
 
 ```kotlin
-// 1. Find existing GroupItem
-val existing = groupItemDao.getGroupItem(oldGroupId, childId, type)
+// 1. Look up GroupItem by its placement ID
+val existing = groupItemDao.getGroupItemById(groupItemId)
 
 // 2. Delete old entry
 groupItemDao.deleteGroupItem(existing.id)
 
-// 3. Insert new entry (uses standard insert flow above)
+// 3. Insert new entry in target group (uses standard insert flow above)
 ```
 
 ### Delete Component from Group (Symlink Removal)
@@ -140,24 +144,26 @@ groupItemDao.deleteGroupItemsByChild(childId, type)
 
 ## Symlink Creation — Disabled Items in Picker
 
-When the user opens the "Add Symlink" dialog (`AddSymlinkViewModel`), certain items are disabled (visible but greyed out, not selectable). Two categories of items are disabled:
+When the user opens the "Add Symlink" dialog (`AddSymlinkViewModel`), certain items are disabled (visible but greyed out, not selectable):
 
 1. **Ancestor groups (cycle prevention)**: The current group and all its transitive ancestors are disabled as GROUP targets, since symlinking any of them would create a cycle in the DAG. Computed via `GroupHelper.getAncestorAndSelfGroupIds()`.
 
-2. **Items already in the current group (duplicate prevention)**: All items (of any type) already present in the group are disabled, because the unique constraint on `(group_id, child_id, type)` would cause a crash. Computed via `GroupHelper.getDisplayIndicesForGroup()` and converted to `HiddenItem`s.
+Since there is no unique constraint on `(group_id, child_id, type)`, items already present in the group are **not** disabled — the same component can be symlinked into a group multiple times.
 
-The `SelectItemDialog` supports both `hiddenItems` (completely removed from the tree) and `disabledItems` (visible but not clickable, shown at reduced alpha). The symlink flow uses `disabledItems` so users can see why an item isn't available.
+The `SelectItemDialog` supports both `hiddenItems` (completely removed from the tree) and `disabledItems` (visible but not clickable, shown at reduced alpha). The symlink flow uses `disabledItems` for ancestor groups.
 
 ## Key DAO Methods
 
 ```kotlin
 interface GroupItemDao {
+    fun getGroupItemById(groupItemId: Long): GroupItem?
     fun getGroupItemsForGroup(groupId: Long): List<GroupItem>
     fun getGroupItemsWithNoGroup(): List<GroupItem>
     fun getGroupItemsForChild(childId: Long, type: GroupItemType): List<GroupItem>
-    fun getGroupItem(groupId: Long, childId: Long, type: GroupItemType): GroupItem?
     fun shiftDisplayIndexesDown(groupId: Long)
     fun shiftDisplayIndexesDownForNullGroup()
     fun getAllGroupItems(): List<GroupItem>
 }
 ```
+
+Note: `getGroupItem(groupId, childId, type)` was removed — use `getGroupItemById(groupItemId)` instead. The old method relied on composite lookup which is no longer unique.

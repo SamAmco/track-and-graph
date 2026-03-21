@@ -4,8 +4,8 @@ description: Reminders can exist with null group_id (groupless), appearing only 
 topics:
   - Groupless reminders: group_id = null, appear only in Reminders screen (not group views)
   - ReminderParams types: WeekDayParams, PeriodicParams, MonthDayParams, TimeSinceLastParams
-  - Delete: groupId=null (Reminders screen) always deletes everywhere; groupId provided → symlink removal
-  - Duplicate: inserts AFTER original (not at top); shifts only items below
+  - Delete: uses unified ComponentDeleteRequest (see helper-classes.md); groupless reminders with single placement always delete everywhere
+  - Duplicate: takes groupItemId (consistent with all other ops); inserts AFTER original; shifts only items below; app module alignment pending (Stage C)
   - Scheduling: PlatformScheduler interface isolates Android AlarmManager (KMP pattern)
   - PITFALL: RemindersScreenViewModel dbDisplayIndices MUST react to DataUpdateType.Reminder or new reminders fall to bottom
 keywords: [reminder, groupless, null, ReminderParams, PlatformScheduler, scheduling, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
@@ -80,19 +80,9 @@ sealed class ReminderParams {
 
 ## Delete Behavior
 
-Deletion uses `ReminderDeleteRequest(reminderId, groupId?)` and follows the symlink pattern:
+Deletion uses `ComponentDeleteRequest(groupItemId, deleteEverywhere)` — the same unified DTO used by all component types. See [helper-classes.md](helper-classes.md#delete-pattern-symlink-logic) for the full pattern.
 
-- **`groupId` provided AND reminder in multiple locations** → remove only that group's symlink (GroupItem), reminder survives
-- **Otherwise** → delete all GroupItems and the reminder itself
-
-This means deleting from the Reminders screen (where `groupId` is always null) always deletes the reminder everywhere. A future dialog will warn the user if the reminder also exists in groups.
-
-```kotlin
-data class ReminderDeleteRequest(
-    val reminderId: Long,
-    val groupId: Long? = null,
-)
-```
+The helper derives the `reminderId` from the GroupItem lookup. Deleting from the Reminders screen (where `groupId` is null on the GroupItem) with `deleteEverywhere = false` will still delete the reminder if it has no other placements.
 
 ## Operations
 
@@ -116,6 +106,8 @@ groupItemDao.insertGroupItem(GroupItem(groupId = null, ...))
 
 ### Duplicate Reminder
 
+`duplicateReminder(groupItemId: Long)` takes a `groupItemId` (placement identity), consistent with all other duplicate operations. The implementation looks up the GroupItem first to derive the `reminderId` and placement details.
+
 Inserts the copy immediately **after** the original (not at the top). Only items below the original are shifted:
 
 ```kotlin
@@ -126,6 +118,8 @@ if (groupId != null) groupItemDao.shiftDisplayIndexesDownAfter(groupId, original
 else groupItemDao.shiftDisplayIndexesDownAfterForNullGroup(originalIndex)
 groupItemDao.insertGroupItem(GroupItem(displayIndex = insertAtIndex, ...))
 ```
+
+**App module alignment pending (parameter only)**: `RemindersScreenViewModel` still calls `duplicateReminder` with `reminder.id` (a component ID) instead of a `groupItemId`. The return type is now `CreatedComponent` (aligned). Fixing the parameter requires threading `groupItemId` through `ReminderViewData`, planned for Stage C.
 
 ### Query Groupless Reminders
 

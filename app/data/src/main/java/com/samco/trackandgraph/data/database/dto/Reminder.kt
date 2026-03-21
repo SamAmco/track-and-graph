@@ -62,19 +62,6 @@ data class ReminderUpdateRequest(
 )
 
 /**
- * Request object for deleting a Reminder.
- *
- * @param reminderId The ID of the reminder to delete.
- * @param groupId Optional group ID. If provided and the reminder exists in multiple places,
- *                only the symlink in this group is removed (the reminder itself is preserved).
- *                If null, the reminder and all its symlinks are deleted.
- */
-data class ReminderDeleteRequest(
-    val reminderId: Long,
-    val groupId: Long? = null,
-)
-
-/**
  * Represents display order data for a reminder, used when reordering reminders.
  */
 data class ReminderDisplayOrderData(

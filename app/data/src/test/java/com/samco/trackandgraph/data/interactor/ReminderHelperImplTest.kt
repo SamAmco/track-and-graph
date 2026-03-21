@@ -22,7 +22,7 @@ import com.samco.trackandgraph.FakeReminderDao
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
-import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
@@ -100,7 +100,7 @@ class ReminderHelperImplTest {
         )
 
         // EXECUTE
-        val id = uut.createReminder(request)
+        val id = uut.createReminder(request).componentId
 
         // VERIFY
         assertTrue(id > 0)
@@ -122,7 +122,7 @@ class ReminderHelperImplTest {
         )
 
         // EXECUTE
-        val id = uut.createReminder(request)
+        val id = uut.createReminder(request).componentId
 
         // VERIFY
         val reminder = uut.getReminderById(id)
@@ -141,7 +141,7 @@ class ReminderHelperImplTest {
         )
 
         // EXECUTE
-        val id = uut.createReminder(request)
+        val id = uut.createReminder(request).componentId
 
         // VERIFY
         val reminder = uut.getReminderById(id)
@@ -163,7 +163,7 @@ class ReminderHelperImplTest {
                 featureId = null,
                 params = defaultParams
             )
-        )
+        ).componentId
 
         // EXECUTE
         uut.updateReminder(
@@ -191,7 +191,7 @@ class ReminderHelperImplTest {
                 featureId = null,
                 params = defaultParams
             )
-        )
+        ).componentId
 
         val newParams = ReminderParams.WeekDayParams(
             time = LocalTime.of(18, 30),
@@ -232,7 +232,7 @@ class ReminderHelperImplTest {
                 featureId = null,
                 params = defaultParams
             )
-        )
+        ).componentId
 
         // EXECUTE
         uut.updateReminder(
@@ -259,7 +259,7 @@ class ReminderHelperImplTest {
                 featureId = null,
                 params = defaultParams
             )
-        )
+        ).componentId
 
         // EXECUTE - update name only
         uut.updateReminder(
@@ -299,12 +299,14 @@ class ReminderHelperImplTest {
             // PREPARE
             val id = uut.createReminder(
                 ReminderCreateRequest("To Delete", null, null, defaultParams)
-            )
+            ).componentId
             assertNotNull(uut.getReminderById(id))
-            assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+            val groupItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(1, groupItems.size)
+            val groupItemId = groupItems[0].id
 
             // EXECUTE
-            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+            uut.deleteReminder(ComponentDeleteRequest(groupItemId = groupItemId))
 
             // VERIFY
             assertNull(uut.getReminderById(id))
@@ -317,14 +319,15 @@ class ReminderHelperImplTest {
         val groupId = 5L
         val id = uut.createReminder(
             ReminderCreateRequest("Grouped Reminder", groupId, null, defaultParams)
-        )
+        ).componentId
         assertNotNull(uut.getReminderById(id))
         val groupItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
         assertEquals(1, groupItems.size)
         assertEquals(groupId, groupItems[0].groupId)
+        val groupItemId = groupItems[0].id
 
         // EXECUTE
-        uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+        uut.deleteReminder(ComponentDeleteRequest(groupItemId = groupItemId))
 
         // VERIFY
         assertNull(uut.getReminderById(id))
@@ -343,7 +346,7 @@ class ReminderHelperImplTest {
             val group2 = 2L
             val id = uut.createReminder(
                 ReminderCreateRequest("Multi-group Reminder", group1, null, defaultParams)
-            )
+            ).componentId
             // Add symlink to group2
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -354,10 +357,18 @@ class ReminderHelperImplTest {
                     createdAt = 1000L
                 )
             )
-            assertEquals(2, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+            val allItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(2, allItems.size)
+            // Find the groupItemId for the group1 placement
+            val group1ItemId = allItems.first { it.groupId == group1 }.id
 
-            // EXECUTE - Delete from group1 only
-            uut.deleteReminder(ReminderDeleteRequest(reminderId = id, groupId = group1))
+            // EXECUTE - Delete from group1 only (deleteEverywhere=false, multiple placements)
+            uut.deleteReminder(
+                ComponentDeleteRequest(
+                    groupItemId = group1ItemId,
+                    deleteEverywhere = false
+                )
+            )
 
             // VERIFY - Reminder still exists, only removed from group1
             assertNotNull(uut.getReminderById(id))
@@ -373,7 +384,7 @@ class ReminderHelperImplTest {
             val groupId = 5L
             val id = uut.createReminder(
                 ReminderCreateRequest("Multi-location Reminder", null, null, defaultParams)
-            )
+            ).componentId
             // Add symlink to group
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -384,10 +395,18 @@ class ReminderHelperImplTest {
                     createdAt = 1000L
                 )
             )
-            assertEquals(2, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+            val allItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(2, allItems.size)
+            // Deleting from the reminders screen uses the null-group placement's id
+            val remindersScreenItemId = allItems.first { it.groupId == null }.id
 
-            // EXECUTE - Delete from reminders screen (no groupId = delete everything)
-            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+            // EXECUTE - Delete from reminders screen (deleteEverywhere=true deletes all placements)
+            uut.deleteReminder(
+                ComponentDeleteRequest(
+                    groupItemId = remindersScreenItemId,
+                    deleteEverywhere = true
+                )
+            )
 
             // VERIFY - Reminder and all GroupItems deleted
             assertNull(uut.getReminderById(id))
@@ -401,7 +420,7 @@ class ReminderHelperImplTest {
             val groupId = 5L
             val id = uut.createReminder(
                 ReminderCreateRequest("Multi-location Reminder", groupId, null, defaultParams)
-            )
+            ).componentId
             // Add symlink to reminders screen (null groupId)
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -412,10 +431,18 @@ class ReminderHelperImplTest {
                     createdAt = 1000L
                 )
             )
-            assertEquals(2, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+            val allItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(2, allItems.size)
+            // Find the groupItemId for the group placement
+            val groupItemId = allItems.first { it.groupId == groupId }.id
 
-            // EXECUTE - Delete from group only
-            uut.deleteReminder(ReminderDeleteRequest(reminderId = id, groupId = groupId))
+            // EXECUTE - Delete from group only (deleteEverywhere=false, multiple placements)
+            uut.deleteReminder(
+                ComponentDeleteRequest(
+                    groupItemId = groupItemId,
+                    deleteEverywhere = false
+                )
+            )
 
             // VERIFY - Reminder still exists, only removed from group
             assertNotNull(uut.getReminderById(id))
@@ -432,7 +459,7 @@ class ReminderHelperImplTest {
             val group2 = 2L
             val id = uut.createReminder(
                 ReminderCreateRequest("Multi-group Reminder", group1, null, defaultParams)
-            )
+            ).componentId
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
                     groupId = group2,
@@ -451,10 +478,18 @@ class ReminderHelperImplTest {
                     createdAt = 1000L
                 )
             )
-            assertEquals(3, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+            val allItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(3, allItems.size)
+            // Use any groupItemId; deleteEverywhere=true removes all placements
+            val anyGroupItemId = allItems.first().id
 
-            // EXECUTE - Delete without specifying location
-            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+            // EXECUTE - Delete everywhere regardless of location
+            uut.deleteReminder(
+                ComponentDeleteRequest(
+                    groupItemId = anyGroupItemId,
+                    deleteEverywhere = true
+                )
+            )
 
             // VERIFY - Reminder and all GroupItems deleted
             assertNull(uut.getReminderById(id))
@@ -468,11 +503,19 @@ class ReminderHelperImplTest {
             val groupId = 5L
             val id = uut.createReminder(
                 ReminderCreateRequest("Single Group Reminder", groupId, null, defaultParams)
-            )
-            assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+            ).componentId
+            val groupItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(1, groupItems.size)
+            val groupItemId = groupItems[0].id
 
-            // EXECUTE - Delete from group (but it's the only location)
-            uut.deleteReminder(ReminderDeleteRequest(reminderId = id, groupId = groupId))
+            // EXECUTE - Delete from group (it's the only location; deleteEverywhere=false still
+            // deletes the reminder since only one placement exists)
+            uut.deleteReminder(
+                ComponentDeleteRequest(
+                    groupItemId = groupItemId,
+                    deleteEverywhere = false
+                )
+            )
 
             // VERIFY - Reminder fully deleted since it was only in one location
             assertNull(uut.getReminderById(id))
@@ -485,11 +528,16 @@ class ReminderHelperImplTest {
             // PREPARE
             val id = uut.createReminder(
                 ReminderCreateRequest("Ungrouped Reminder", null, null, defaultParams)
-            )
-            assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER).size)
+            ).componentId
+            val groupItems = fakeGroupItemDao.getGroupItemsForChild(id, GroupItemType.REMINDER)
+            assertEquals(1, groupItems.size)
+            val groupItemId = groupItems[0].id
 
-            // EXECUTE - Delete from reminders screen (no groupId)
-            uut.deleteReminder(ReminderDeleteRequest(reminderId = id))
+            // EXECUTE - Delete from reminders screen (single placement, deleteEverywhere=false
+            // still deletes the reminder since only one placement exists)
+            uut.deleteReminder(
+                ComponentDeleteRequest(groupItemId = groupItemId)
+            )
 
             // VERIFY
             assertNull(uut.getReminderById(id))
@@ -503,7 +551,7 @@ class ReminderHelperImplTest {
     @Test
     fun `duplicateReminder creates copy with new id`() = runTest(dispatcher) {
         // PREPARE
-        val originalId = uut.createReminder(
+        val (originalId, groupItemId) = uut.createReminder(
             ReminderCreateRequest(
                 reminderName = "Original",
                 groupId = 5L,
@@ -513,7 +561,7 @@ class ReminderHelperImplTest {
         )
 
         // EXECUTE
-        val duplicateId = uut.duplicateReminder(originalId)
+        val duplicateId = uut.duplicateReminder(groupItemId).componentId
 
         // VERIFY
         assertNotEquals(originalId, duplicateId)
@@ -530,7 +578,7 @@ class ReminderHelperImplTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `duplicateReminder throws when reminder not found`() = runTest(dispatcher) {
+    fun `duplicateReminder throws when group item not found`() = runTest(dispatcher) {
         // EXECUTE
         uut.duplicateReminder(999L)
     }
@@ -539,9 +587,9 @@ class ReminderHelperImplTest {
     fun `duplicateReminder inserts duplicate immediately after original in null group`() =
         runTest(dispatcher) {
             // PREPARE - create three reminders so we can check indices around the duplicated one
-            val idA = uut.createReminder(ReminderCreateRequest("A", null, null, defaultParams))
-            val idB = uut.createReminder(ReminderCreateRequest("B", null, null, defaultParams))
-            val idC = uut.createReminder(ReminderCreateRequest("C", null, null, defaultParams))
+            val idA = uut.createReminder(ReminderCreateRequest("A", null, null, defaultParams)).componentId
+            val (idB, groupItemIdB) = uut.createReminder(ReminderCreateRequest("B", null, null, defaultParams))
+            val idC = uut.createReminder(ReminderCreateRequest("C", null, null, defaultParams)).componentId
 
             // After 3 creates (each shifts others down then inserts at 0):
             // C=0, B=1, A=2
@@ -554,7 +602,7 @@ class ReminderHelperImplTest {
             assertEquals(2, indexOf(idA))
 
             // EXECUTE - duplicate B (currently at index 1)
-            val idBCopy = uut.duplicateReminder(idB)
+            val idBCopy = uut.duplicateReminder(groupItemIdB).componentId
 
             // VERIFY - B-copy should be at index 2, A shifted to 3, C and B unchanged
             assertEquals(0, indexOf(idC))
@@ -568,8 +616,8 @@ class ReminderHelperImplTest {
         runTest(dispatcher) {
             // PREPARE
             val groupId = 7L
-            val idA = uut.createReminder(ReminderCreateRequest("A", groupId, null, defaultParams))
-            val idB = uut.createReminder(ReminderCreateRequest("B", groupId, null, defaultParams))
+            val (idA, groupItemIdA) = uut.createReminder(ReminderCreateRequest("A", groupId, null, defaultParams))
+            val idB = uut.createReminder(ReminderCreateRequest("B", groupId, null, defaultParams)).componentId
 
             fun indexOf(id: Long) = fakeGroupItemDao
                 .getGroupItemsForChild(id, GroupItemType.REMINDER)
@@ -580,7 +628,7 @@ class ReminderHelperImplTest {
             assertEquals(1, indexOf(idA))
 
             // EXECUTE - duplicate A (at index 1, the last item)
-            val idACopy = uut.duplicateReminder(idA)
+            val idACopy = uut.duplicateReminder(groupItemIdA).componentId
 
             // VERIFY - A-copy at index 2, nothing else shifts
             assertEquals(0, indexOf(idB))
@@ -591,9 +639,9 @@ class ReminderHelperImplTest {
     @Test
     fun `duplicateReminder does not shift items before the original`() = runTest(dispatcher) {
         // PREPARE
-        val idA = uut.createReminder(ReminderCreateRequest("A", null, null, defaultParams))
-        val idB = uut.createReminder(ReminderCreateRequest("B", null, null, defaultParams))
-        val idC = uut.createReminder(ReminderCreateRequest("C", null, null, defaultParams))
+        val idA = uut.createReminder(ReminderCreateRequest("A", null, null, defaultParams)).componentId
+        val idB = uut.createReminder(ReminderCreateRequest("B", null, null, defaultParams)).componentId
+        val (idC, groupItemIdC) = uut.createReminder(ReminderCreateRequest("C", null, null, defaultParams))
 
         // C=0, B=1, A=2
         fun indexOf(id: Long) = fakeGroupItemDao
@@ -601,7 +649,7 @@ class ReminderHelperImplTest {
             .first().displayIndex
 
         // EXECUTE - duplicate C (at index 0)
-        val idCCopy = uut.duplicateReminder(idC)
+        val idCCopy = uut.duplicateReminder(groupItemIdC).componentId
 
         // VERIFY - C stays at 0, C-copy at 1, B and A each shift by 1
         assertEquals(0, indexOf(idC))
@@ -661,7 +709,7 @@ class ReminderHelperImplTest {
             // PREPARE
             val reminderId = uut.createReminder(
                 ReminderCreateRequest("Shared Reminder", null, null, defaultParams)
-            )
+            ).componentId
             // Add a second group item (symlink to a group)
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -688,10 +736,10 @@ class ReminderHelperImplTest {
             // PREPARE - one unique reminder, one with extra group item
             val uniqueId = uut.createReminder(
                 ReminderCreateRequest("Unique Reminder", null, null, defaultParams)
-            )
+            ).componentId
             val sharedId = uut.createReminder(
                 ReminderCreateRequest("Shared Reminder", null, null, defaultParams)
-            )
+            ).componentId
             // Add extra group item for sharedId only
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -716,7 +764,7 @@ class ReminderHelperImplTest {
 
     @Test
     fun `getReminderById returns unique=true when reminder in only one group`() = runTest(dispatcher) {
-        val id = uut.createReminder(ReminderCreateRequest("Test", null, null, defaultParams))
+        val id = uut.createReminder(ReminderCreateRequest("Test", null, null, defaultParams)).componentId
         val result = uut.getReminderById(id)
         assertNotNull(result)
         assertEquals(true, result!!.unique)
@@ -724,7 +772,7 @@ class ReminderHelperImplTest {
 
     @Test
     fun `getReminderById returns unique=false when reminder in multiple groups`() = runTest(dispatcher) {
-        val id = uut.createReminder(ReminderCreateRequest("Test", null, null, defaultParams))
+        val id = uut.createReminder(ReminderCreateRequest("Test", null, null, defaultParams)).componentId
         fakeGroupItemDao.insertGroupItem(GroupItem(groupId = 1L, displayIndex = 0, childId = id, type = GroupItemType.REMINDER, createdAt = 1000L))
         val result = uut.getReminderById(id)
         assertNotNull(result)

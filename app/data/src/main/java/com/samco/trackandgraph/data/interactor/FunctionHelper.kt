@@ -19,7 +19,8 @@ package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
-import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 
 /**
@@ -31,11 +32,11 @@ import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
  * throw an exception if anything goes wrong.
  */
 interface FunctionHelper {
-    suspend fun insertFunction(request: FunctionCreateRequest): Long?
+    suspend fun insertFunction(request: FunctionCreateRequest): CreatedComponent?
 
     suspend fun updateFunction(request: FunctionUpdateRequest)
 
-    suspend fun deleteFunction(request: FunctionDeleteRequest)
+    suspend fun deleteFunction(request: ComponentDeleteRequest)
 
     suspend fun getFunctionById(functionId: Long): Function?
 
@@ -43,7 +44,14 @@ interface FunctionHelper {
 
     suspend fun getFunctionsForGroupSync(groupId: Long): List<Function>
 
-    suspend fun duplicateFunction(function: Function, groupId: Long): Long?
+    /**
+     * Duplicates the function identified by the given GroupItem placement.
+     * The duplicate is placed immediately after the original in the same group.
+     *
+     * @param groupItemId The GroupItem.id of the placement to duplicate.
+     * @return The new component's ID and GroupItem placement, or null if the function was not found.
+     */
+    suspend fun duplicateFunction(groupItemId: Long): CreatedComponent?
 
     suspend fun hasAnyFunctions(): Boolean
 }

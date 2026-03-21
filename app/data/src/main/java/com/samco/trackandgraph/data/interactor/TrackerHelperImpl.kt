@@ -268,7 +268,7 @@ internal class TrackerHelperImpl @Inject constructor(
         return@withContext dao.hasAtLeastOneDataPoint()
     }
 
-    override suspend fun createTracker(request: TrackerCreateRequest): Long = withContext(io) {
+    override suspend fun createTracker(request: TrackerCreateRequest): CreatedComponent = withContext(io) {
         return@withContext transactionHelper.withTransaction {
             val feature = com.samco.trackandgraph.data.database.entity.Feature(
                 id = 0L,
@@ -298,25 +298,25 @@ internal class TrackerHelperImpl @Inject constructor(
                 type = GroupItemType.TRACKER,
                 createdAt = timeProvider.epochMilli(),
             )
-            groupItemDao.insertGroupItem(groupItem)
+            val groupItemId = groupItemDao.insertGroupItem(groupItem)
 
-            trackerId
+            CreatedComponent(componentId = trackerId, groupItemId = groupItemId)
         }
     }
 
-    override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
+    override suspend fun deleteTracker(request: ComponentDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
-            val tracker = dao.getTrackerById(request.trackerId) ?: return@withTransaction
+            val groupItem = groupItemDao.getGroupItemById(request.groupItemId)
+                ?: return@withTransaction
+            val tracker = dao.getTrackerById(groupItem.childId) ?: return@withTransaction
 
             val groupItems = groupItemDao.getGroupItemsForChild(
                 tracker.id,
                 GroupItemType.TRACKER
             )
 
-            if (request.groupId != null && groupItems.size > 1) {
-                groupItems
-                    .filter { it.groupId == request.groupId }
-                    .forEach { groupItemDao.deleteGroupItem(it.id) }
+            if (!request.deleteEverywhere && groupItems.size > 1) {
+                groupItemDao.deleteGroupItem(request.groupItemId)
                 return@withTransaction
             }
 

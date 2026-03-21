@@ -22,7 +22,7 @@ import com.samco.trackandgraph.FakeTrackerDao
 import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
-import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.GroupItem
@@ -97,7 +97,7 @@ class TrackerHelperImplTest {
         )
 
         // EXECUTE
-        val trackerId = uut.createTracker(request)
+        val trackerId = uut.createTracker(request).componentId
 
         // VERIFY
         assertTrue(trackerId > 0)
@@ -129,14 +129,15 @@ class TrackerHelperImplTest {
                 suggestionType = TrackerSuggestionType.NONE,
                 suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
             )
-        )
+        ).componentId
 
         // Verify it exists
         assertNotNull(uut.getTrackerById(trackerId))
         assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER).size)
 
-        // EXECUTE
-        uut.deleteTracker(TrackerDeleteRequest(trackerId = trackerId))
+        // EXECUTE - groupItemId=1 because createTracker inserts the first GroupItem (auto-id=1)
+        val groupItemId = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)[0].id
+        uut.deleteTracker(ComponentDeleteRequest(groupItemId = groupItemId))
 
         // VERIFY
         assertNull(uut.getTrackerById(trackerId))
@@ -145,8 +146,8 @@ class TrackerHelperImplTest {
 
     @Test
     fun `deleteTracker does nothing for non-existent tracker`() = runTest(dispatcher) {
-        // EXECUTE
-        uut.deleteTracker(TrackerDeleteRequest(trackerId = 999L))
+        // EXECUTE - groupItemId is irrelevant; tracker doesn't exist so deleteTracker returns early
+        uut.deleteTracker(ComponentDeleteRequest(groupItemId = 0L))
 
         // VERIFY - no exception thrown, no features deleted
         assertEquals(0, fakeTrackerDao.numTrackers())
@@ -157,7 +158,7 @@ class TrackerHelperImplTest {
     // =========================================================================
 
     @Test
-    fun `deleteTracker with groupId removes only symlink when in multiple groups`() =
+    fun `deleteTracker with groupItemId removes only symlink when in multiple groups`() =
         runTest(dispatcher) {
             // PREPARE - Create tracker in group1, then add symlink to group2
             val group1 = 1L
@@ -174,7 +175,7 @@ class TrackerHelperImplTest {
                     suggestionType = TrackerSuggestionType.NONE,
                     suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
                 )
-            )
+            ).componentId
             // Add symlink to group2
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -187,8 +188,10 @@ class TrackerHelperImplTest {
             )
             assertEquals(2, fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER).size)
 
-            // EXECUTE - Delete from group1 only
-            uut.deleteTracker(TrackerDeleteRequest(trackerId = trackerId, groupId = group1))
+            // EXECUTE - Delete from group1 only (groupItemId for group1 is the first inserted item)
+            val group1ItemId = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)
+                .first { it.groupId == group1 }.id
+            uut.deleteTracker(ComponentDeleteRequest(groupItemId = group1ItemId))
 
             // VERIFY - Tracker still exists, only removed from group1
             assertNotNull(uut.getTrackerById(trackerId))
@@ -199,7 +202,7 @@ class TrackerHelperImplTest {
         }
 
     @Test
-    fun `deleteTracker without groupId deletes tracker and all symlinks`() =
+    fun `deleteTracker with deleteEverywhere=true deletes tracker and all symlinks`() =
         runTest(dispatcher) {
             // PREPARE - Create tracker in multiple groups
             val group1 = 1L
@@ -217,7 +220,7 @@ class TrackerHelperImplTest {
                     suggestionType = TrackerSuggestionType.NONE,
                     suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
                 )
-            )
+            ).componentId
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
                     groupId = group2,
@@ -238,8 +241,10 @@ class TrackerHelperImplTest {
             )
             assertEquals(3, fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER).size)
 
-            // EXECUTE - Delete without specifying group
-            uut.deleteTracker(TrackerDeleteRequest(trackerId = trackerId))
+            // EXECUTE - Delete everywhere (all symlinks); groupItemId is required but ignored when
+            // deleteEverywhere=true since all GroupItems are removed regardless
+            val anyGroupItemId = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)[0].id
+            uut.deleteTracker(ComponentDeleteRequest(groupItemId = anyGroupItemId, deleteEverywhere = true))
 
             // VERIFY - Tracker and all GroupItems deleted
             assertNull(uut.getTrackerById(trackerId))
@@ -247,7 +252,7 @@ class TrackerHelperImplTest {
         }
 
     @Test
-    fun `deleteTracker with groupId deletes tracker when only in that group`() =
+    fun `deleteTracker with groupItemId deletes tracker when only in that group`() =
         runTest(dispatcher) {
             // PREPARE
             val groupId = 5L
@@ -263,11 +268,12 @@ class TrackerHelperImplTest {
                     suggestionType = TrackerSuggestionType.NONE,
                     suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
                 )
-            )
+            ).componentId
             assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER).size)
 
-            // EXECUTE - Delete from group (but it's the only location)
-            uut.deleteTracker(TrackerDeleteRequest(trackerId = trackerId, groupId = groupId))
+            // EXECUTE - Delete from group (but it's the only location); tracker is fully deleted
+            val groupItemId = fakeGroupItemDao.getGroupItemsForChild(trackerId, GroupItemType.TRACKER)[0].id
+            uut.deleteTracker(ComponentDeleteRequest(groupItemId = groupItemId))
 
             // VERIFY - Tracker fully deleted since it was only in one group
             assertNull(uut.getTrackerById(trackerId))
@@ -295,7 +301,7 @@ class TrackerHelperImplTest {
                     suggestionType = TrackerSuggestionType.NONE,
                     suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
                 )
-            )
+            ).componentId
 
             // EXECUTE
             val result = uut.getDisplayTrackersForGroupSync(groupId)
@@ -324,7 +330,7 @@ class TrackerHelperImplTest {
                     suggestionType = TrackerSuggestionType.NONE,
                     suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
                 )
-            )
+            ).componentId
             // Add symlink to group2
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -364,7 +370,7 @@ class TrackerHelperImplTest {
                     suggestionType = TrackerSuggestionType.NONE,
                     suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
                 )
-            )
+            ).componentId
             val sharedTrackerId = uut.createTracker(
                 TrackerCreateRequest(
                     name = "Shared Tracker",
@@ -377,7 +383,7 @@ class TrackerHelperImplTest {
                     suggestionType = TrackerSuggestionType.NONE,
                     suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
                 )
-            )
+            ).componentId
             // Add symlink for sharedTracker to group2
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
@@ -418,7 +424,7 @@ class TrackerHelperImplTest {
                 suggestionType = TrackerSuggestionType.VALUE_AND_LABEL,
                 suggestionOrder = TrackerSuggestionOrder.LATEST
             )
-        )
+        ).componentId
 
         // EXECUTE
         val result = uut.getTrackerById(trackerId)

@@ -23,7 +23,8 @@ import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateReq
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.BarChartUpdateRequest
-import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
@@ -55,39 +56,39 @@ interface GraphHelper {
     // =========================================================================
 
     /**
-     * Creates a new line graph and returns the graphStatId.
+     * Creates a new line graph and returns the created component with its group item placement ID.
      */
-    suspend fun createLineGraph(request: LineGraphCreateRequest): Long
+    suspend fun createLineGraph(request: LineGraphCreateRequest): CreatedComponent
 
     /**
-     * Creates a new pie chart and returns the graphStatId.
+     * Creates a new pie chart and returns the created component with its group item placement ID.
      */
-    suspend fun createPieChart(request: PieChartCreateRequest): Long
+    suspend fun createPieChart(request: PieChartCreateRequest): CreatedComponent
 
     /**
-     * Creates a new average time between stat and returns the graphStatId.
+     * Creates a new average time between stat and returns the created component with its group item placement ID.
      */
-    suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): Long
+    suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): CreatedComponent
 
     /**
-     * Creates a new time histogram and returns the graphStatId.
+     * Creates a new time histogram and returns the created component with its group item placement ID.
      */
-    suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): Long
+    suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): CreatedComponent
 
     /**
-     * Creates a new last value stat and returns the graphStatId.
+     * Creates a new last value stat and returns the created component with its group item placement ID.
      */
-    suspend fun createLastValueStat(request: LastValueStatCreateRequest): Long
+    suspend fun createLastValueStat(request: LastValueStatCreateRequest): CreatedComponent
 
     /**
-     * Creates a new bar chart and returns the graphStatId.
+     * Creates a new bar chart and returns the created component with its group item placement ID.
      */
-    suspend fun createBarChart(request: BarChartCreateRequest): Long
+    suspend fun createBarChart(request: BarChartCreateRequest): CreatedComponent
 
     /**
-     * Creates a new Lua graph and returns the graphStatId.
+     * Creates a new Lua graph and returns the created component with its group item placement ID.
      */
-    suspend fun createLuaGraph(request: LuaGraphCreateRequest): Long
+    suspend fun createLuaGraph(request: LuaGraphCreateRequest): CreatedComponent
 
     // =========================================================================
     // Update methods
@@ -142,46 +143,20 @@ interface GraphHelper {
     /**
      * Deletes a graph or stat.
      */
-    suspend fun deleteGraph(request: GraphDeleteRequest)
+    suspend fun deleteGraph(request: ComponentDeleteRequest)
 
     // =========================================================================
-    // Duplicate methods
+    // Duplicate method
     // =========================================================================
 
     /**
-     * Duplicates an existing line graph into the specified group and returns the new graphStatId.
+     * Duplicates the graph or stat identified by the given GroupItem placement.
+     * The duplicate is placed immediately after the original in the same group.
+     *
+     * @param groupItemId The GroupItem.id of the placement to duplicate.
+     * @return The new component's ID and GroupItem placement, or null if the graph/stat was not found.
      */
-    suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long?
-
-    /**
-     * Duplicates an existing pie chart into the specified group and returns the new graphStatId.
-     */
-    suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long?
-
-    /**
-     * Duplicates an existing average time between stat into the specified group and returns the new graphStatId.
-     */
-    suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long?
-
-    /**
-     * Duplicates an existing time histogram into the specified group and returns the new graphStatId.
-     */
-    suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long?
-
-    /**
-     * Duplicates an existing last value stat into the specified group and returns the new graphStatId.
-     */
-    suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long?
-
-    /**
-     * Duplicates an existing bar chart into the specified group and returns the new graphStatId.
-     */
-    suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long?
-
-    /**
-     * Duplicates an existing Lua graph into the specified group and returns the new graphStatId.
-     */
-    suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long?
+    suspend fun duplicateGraphOrStat(groupItemId: Long): CreatedComponent?
 
     // =========================================================================
     // Get methods

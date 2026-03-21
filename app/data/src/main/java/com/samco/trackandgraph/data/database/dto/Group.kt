@@ -51,16 +51,3 @@ data class GroupUpdateRequest(
     val name: String? = null,
     val colorIndex: Int? = null,
 )
-
-/**
- * Request object for deleting a Group.
- *
- * @param groupId The ID of the group to delete.
- * @param parentGroupId If specified in the future when groups can have multiple parents,
- *                      the group will only be removed from this parent.
- *                      If null, the group will be deleted entirely.
- */
-data class GroupDeleteRequest(
-    val groupId: Long,
-    val parentGroupId: Long? = null,
-)

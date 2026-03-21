@@ -115,10 +115,8 @@ internal class FakeGroupItemDao : GroupItemDao {
             }
     }
 
-    override fun getGroupItem(groupId: Long, childId: Long, type: GroupItemType): GroupItem? {
-        return items.values.find {
-            it.groupId == groupId && it.childId == childId && it.type == type
-        }
+    override fun getGroupItemById(groupItemId: Long): GroupItem? {
+        return items[groupItemId]
     }
 
     override fun getAllGroupItems(): List<GroupItem> = items.values.toList()

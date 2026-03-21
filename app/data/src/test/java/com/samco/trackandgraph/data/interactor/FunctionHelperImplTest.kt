@@ -34,8 +34,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -242,5 +245,187 @@ class FunctionHelperImplTest {
             // VERIFY
             assertNotNull(result)
             assertEquals(false, result!!.unique)
+        }
+
+    // =========================================================================
+    // Delete tests
+    // =========================================================================
+
+    @Test
+    fun `deleteFunction removes function when deleteEverywhere is true`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val group1 = 1L
+            val group2 = 2L
+            val functionId = insertFunctionDirectly(group1)
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = functionId,
+                    type = GroupItemType.FUNCTION,
+                    createdAt = 1000L
+                )
+            )
+            val groupItemId = fakeGroupItemDao.getGroupItemsForChild(
+                functionId, GroupItemType.FUNCTION
+            ).first().id
+
+            // EXECUTE
+            uut.deleteFunction(
+                ComponentDeleteRequest(
+                    groupItemId = groupItemId,
+                    deleteEverywhere = true
+                )
+            )
+
+            // VERIFY
+            assertEquals(0, fakeFunctionDao.numFunctions())
+            assertEquals(
+                0,
+                fakeGroupItemDao.getGroupItemsForChild(functionId, GroupItemType.FUNCTION).size
+            )
+        }
+
+    @Test
+    fun `deleteFunction removes only symlink when deleteEverywhere is false and in multiple groups`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val group1 = 1L
+            val group2 = 2L
+            val functionId = insertFunctionDirectly(group1)
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group2,
+                    displayIndex = 0,
+                    childId = functionId,
+                    type = GroupItemType.FUNCTION,
+                    createdAt = 1000L
+                )
+            )
+            val group2ItemId = fakeGroupItemDao.getGroupItemsForChild(
+                functionId, GroupItemType.FUNCTION
+            ).first { it.groupId == group2 }.id
+
+            // EXECUTE
+            uut.deleteFunction(
+                ComponentDeleteRequest(
+                    groupItemId = group2ItemId,
+                    deleteEverywhere = false
+                )
+            )
+
+            // VERIFY
+            assertEquals(1, fakeFunctionDao.numFunctions())
+            val remainingItems = fakeGroupItemDao.getGroupItemsForChild(
+                functionId, GroupItemType.FUNCTION
+            )
+            assertEquals(1, remainingItems.size)
+            assertEquals(group1, remainingItems[0].groupId)
+        }
+
+    @Test
+    fun `deleteFunction deletes function entirely when deleteEverywhere is false but only in one group`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val groupId = 1L
+            val functionId = insertFunctionDirectly(groupId)
+            val groupItemId = fakeGroupItemDao.getGroupItemsForChild(
+                functionId, GroupItemType.FUNCTION
+            ).first().id
+
+            // EXECUTE
+            uut.deleteFunction(
+                ComponentDeleteRequest(
+                    groupItemId = groupItemId,
+                    deleteEverywhere = false
+                )
+            )
+
+            // VERIFY
+            assertEquals(0, fakeFunctionDao.numFunctions())
+            assertEquals(
+                0,
+                fakeGroupItemDao.getGroupItemsForChild(functionId, GroupItemType.FUNCTION).size
+            )
+        }
+
+    @Test
+    fun `deleteFunction does nothing when function does not exist`() =
+        runTest(dispatcher) {
+            // PREPARE — no function inserted
+
+            // EXECUTE — should not throw
+            uut.deleteFunction(
+                ComponentDeleteRequest(
+                    groupItemId = 999L,
+                    deleteEverywhere = true
+                )
+            )
+
+            // VERIFY — nothing to assert beyond no exception thrown
+        }
+
+    // =========================================================================
+    // Duplicate tests
+    // =========================================================================
+
+    @Test
+    fun `duplicateFunction creates copy with new functionId`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val groupId = 1L
+            val functionId = insertFunctionDirectly(groupId)
+            val groupItemId = fakeGroupItemDao.getGroupItemsForChild(
+                functionId, GroupItemType.FUNCTION
+            ).first().id
+
+            // EXECUTE
+            val duplicateResult = uut.duplicateFunction(groupItemId)
+
+            // VERIFY
+            assertNotNull(duplicateResult)
+            val newFunctionId = duplicateResult!!.componentId
+            assertNotEquals(functionId, newFunctionId)
+            assertEquals(2, fakeFunctionDao.numFunctions())
+            val newGroupItems = fakeGroupItemDao.getGroupItemsForChild(
+                newFunctionId, GroupItemType.FUNCTION
+            )
+            assertEquals(1, newGroupItems.size)
+            assertEquals(groupId, newGroupItems[0].groupId)
+        }
+
+    @Test
+    fun `duplicateFunction returns null when groupItem does not exist`() =
+        runTest(dispatcher) {
+            // PREPARE — no group item with this id
+
+            // EXECUTE
+            val result = uut.duplicateFunction(999L)
+
+            // VERIFY
+            assertNull(result)
+        }
+
+    @Test
+    fun `duplicateFunction places copy immediately after original in display order`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val groupId = 1L
+            val functionId = insertFunctionDirectly(groupId)
+            val originalGroupItem = fakeGroupItemDao.getGroupItemsForChild(
+                functionId, GroupItemType.FUNCTION
+            ).first()
+            assertEquals(0, originalGroupItem.displayIndex)
+
+            // EXECUTE
+            val duplicateResult = uut.duplicateFunction(originalGroupItem.id)
+
+            // VERIFY
+            assertNotNull(duplicateResult)
+            val duplicateGroupItem = fakeGroupItemDao.getGroupItemsForChild(
+                duplicateResult!!.componentId, GroupItemType.FUNCTION
+            ).first()
+            assertEquals(1, duplicateGroupItem.displayIndex)
         }
 }

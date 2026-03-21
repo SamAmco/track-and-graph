@@ -22,9 +22,11 @@ import com.samco.trackandgraph.data.database.FunctionDao
 import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
-import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.database.entity.Feature
+import com.samco.trackandgraph.data.database.entity.Function as FunctionEntity
 import com.samco.trackandgraph.data.database.entity.FunctionInputFeature
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
@@ -48,7 +50,7 @@ internal class FunctionHelperImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher
 ) : FunctionHelper {
 
-    override suspend fun insertFunction(request: FunctionCreateRequest): Long? = withContext(io) {
+    override suspend fun insertFunction(request: FunctionCreateRequest): CreatedComponent? = withContext(io) {
         val function = Function(
             id = 0L,
             featureId = 0L,
@@ -89,7 +91,7 @@ internal class FunctionHelperImpl @Inject constructor(
                 type = GroupItemType.FUNCTION,
                 createdAt = timeProvider.epochMilli()
             )
-            groupItemDao.insertGroupItem(groupItem)
+            val groupItemId = groupItemDao.insertGroupItem(groupItem)
 
             // Now create the FunctionInputFeature entities
             function.inputFeatureIds.forEach { inputFeatureId ->
@@ -102,7 +104,7 @@ internal class FunctionHelperImpl @Inject constructor(
                 )
             }
 
-            functionId
+            CreatedComponent(componentId = functionId, groupItemId = groupItemId)
         }
     }
 
@@ -144,19 +146,19 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteFunction(request: FunctionDeleteRequest) = withContext(io) {
+    override suspend fun deleteFunction(request: ComponentDeleteRequest) = withContext(io) {
         transactionHelper.withTransaction {
-            val function = dao.getFunctionById(request.functionId) ?: return@withTransaction
+            val groupItem = groupItemDao.getGroupItemById(request.groupItemId)
+                ?: return@withTransaction
+            val function = dao.getFunctionById(groupItem.childId) ?: return@withTransaction
 
             val groupItems = groupItemDao.getGroupItemsForChild(
                 function.id,
                 GroupItemType.FUNCTION
             )
 
-            if (request.groupId != null && groupItems.size > 1) {
-                groupItems
-                    .filter { it.groupId == request.groupId }
-                    .forEach { groupItemDao.deleteGroupItem(it.id) }
+            if (!request.deleteEverywhere && groupItems.size > 1) {
+                groupItemDao.deleteGroupItem(request.groupItemId)
                 return@withTransaction
             }
 
@@ -198,58 +200,50 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateFunction(function: Function, groupId: Long): Long? =
+    override suspend fun duplicateFunction(groupItemId: Long): CreatedComponent? =
         withContext(io) {
             transactionHelper.withTransaction {
-                val serializedGraph = functionGraphSerializer.serialize(function.functionGraph)
+                val originalGroupItem = groupItemDao.getGroupItemById(groupItemId)
+                    ?: return@withTransaction null
+                val function = dao.getFunctionById(originalGroupItem.childId)
                     ?: return@withTransaction null
 
-                //Create a copy of the feature
+                // Create a copy of the feature
                 val feature = dao.getFeatureById(function.featureId) ?: return@withTransaction null
                 val newFeatureId = dao.insertFeature(feature.copy(id = 0L))
 
-                // Create a copy of the function with id = 0 to generate new id
-                val duplicatedFunction = function.copy(id = 0L, featureId = newFeatureId)
-                val newFunctionId = dao.insertFunction(duplicatedFunction.toEntity(serializedGraph))
-
-                // Find the original's position in this group to place duplicate after it
-                val originalGroupItem = groupItemDao.getGroupItem(
-                    groupId,
-                    function.id,
-                    GroupItemType.FUNCTION
-                )
-                val newDisplayIndex = if (originalGroupItem != null) {
-                    groupItemDao.shiftDisplayIndexesDownAfter(
-                        groupId,
-                        originalGroupItem.displayIndex
+                // Create a copy of the function (functionGraph is already serialized)
+                val newFunctionId = dao.insertFunction(
+                    FunctionEntity(
+                        id = 0L,
+                        featureId = newFeatureId,
+                        functionGraph = function.functionGraph
                     )
-                    originalGroupItem.displayIndex + 1
-                } else {
-                    groupItemDao.shiftDisplayIndexesDown(groupId)
-                    0
-                }
+                )
 
+                // Place duplicate immediately after the original
+                val groupId = originalGroupItem.groupId!!
+                groupItemDao.shiftDisplayIndexesDownAfter(
+                    groupId,
+                    originalGroupItem.displayIndex
+                )
                 val groupItem = GroupItem(
                     groupId = groupId,
-                    displayIndex = newDisplayIndex,
+                    displayIndex = originalGroupItem.displayIndex + 1,
                     childId = newFunctionId,
                     type = GroupItemType.FUNCTION,
                     createdAt = timeProvider.epochMilli()
                 )
-                groupItemDao.insertGroupItem(groupItem)
+                val newGroupItemId = groupItemDao.insertGroupItem(groupItem)
 
                 // Duplicate input features
-                function.inputFeatureIds.forEach { inputFeature ->
+                dao.getFunctionInputFeaturesSync(function.id).forEach { inputFeature ->
                     dao.insertFunctionInputFeature(
-                        FunctionInputFeature(
-                            id = 0L,
-                            functionId = newFunctionId,
-                            featureId = inputFeature
-                        )
+                        inputFeature.copy(id = 0L, functionId = newFunctionId)
                     )
                 }
 
-                newFunctionId
+                CreatedComponent(componentId = newFunctionId, groupItemId = newGroupItemId)
             }
         }
 

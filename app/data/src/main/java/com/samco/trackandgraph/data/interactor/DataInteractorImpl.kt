@@ -24,22 +24,19 @@ import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatCreateReq
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateRequest
 import com.samco.trackandgraph.data.database.dto.BarChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.BarChartUpdateRequest
-import com.samco.trackandgraph.data.database.dto.ComponentType
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.Feature
-import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
-import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.database.dto.GlobalNote
-import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupCreateRequest
-import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.database.dto.GroupUpdateRequest
@@ -53,13 +50,11 @@ import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
-import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
-import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
@@ -100,14 +95,14 @@ internal class DataInteractorImpl @Inject constructor(
     )
 
     // GroupHelper method overrides with event emission
-    override suspend fun insertGroup(request: GroupCreateRequest): Long = withContext(io) {
+    override suspend fun insertGroup(request: GroupCreateRequest): CreatedComponent = withContext(io) {
         groupHelper.insertGroup(request).also {
             dataUpdateEvents.emit(DataUpdateType.GroupCreated)
             dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.parentGroupId))
         }
     }
 
-    override suspend fun deleteGroup(request: GroupDeleteRequest): DeletedGroupInfo =
+    override suspend fun deleteGroup(request: ComponentDeleteRequest): DeletedGroupInfo =
         withContext(io) {
             val deletedGroupInfo = groupHelper.deleteGroup(request)
 
@@ -200,11 +195,11 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getFeatureById(featureId)?.toDto()
     }
 
-    override suspend fun createTracker(request: TrackerCreateRequest): Long = withContext(io) {
-        val id = trackerHelper.createTracker(request)
+    override suspend fun createTracker(request: TrackerCreateRequest): CreatedComponent = withContext(io) {
+        val created = trackerHelper.createTracker(request)
         dataUpdateEvents.emit(DataUpdateType.TrackerCreated)
         dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.groupId))
-        return@withContext id
+        return@withContext created
     }
 
     override suspend fun updateTracker(request: TrackerUpdateRequest) = withContext(io) {
@@ -212,8 +207,10 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
     }
 
-    override suspend fun deleteTracker(request: TrackerDeleteRequest) = withContext(io) {
-        val tracker = dao.getTrackerById(request.trackerId) ?: return@withContext
+    override suspend fun deleteTracker(request: ComponentDeleteRequest) = withContext(io) {
+        val groupItem = groupItemDao.getGroupItemById(request.groupItemId)
+            ?: return@withContext
+        val tracker = dao.getTrackerById(groupItem.childId) ?: return@withContext
         val featureId = tracker.featureId
 
         val dependentGraphs = dependencyAnalyserProvider.create().getDependentGraphs(featureId)
@@ -290,10 +287,10 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun createReminder(request: ReminderCreateRequest): Long = withContext(io) {
-        val id = reminderHelper.createReminder(request)
+    override suspend fun createReminder(request: ReminderCreateRequest): CreatedComponent = withContext(io) {
+        val created = reminderHelper.createReminder(request)
         dataUpdateEvents.emit(DataUpdateType.Reminder)
-        return@withContext id
+        return@withContext created
     }
 
     override suspend fun updateReminder(request: ReminderUpdateRequest) = withContext(io) {
@@ -307,16 +304,20 @@ internal class DataInteractorImpl @Inject constructor(
             dataUpdateEvents.emit(DataUpdateType.ReminderScreenDisplayOrder)
         }
 
-    override suspend fun deleteReminder(request: ReminderDeleteRequest) = withContext(io) {
+    override suspend fun deleteReminder(request: ComponentDeleteRequest) = withContext(io) {
         reminderHelper.deleteReminder(request)
         dataUpdateEvents.emit(DataUpdateType.Reminder)
     }
 
-    override suspend fun duplicateReminder(id: Long): Long = withContext(io) {
-        val id = reminderHelper.duplicateReminder(id)
-        dataUpdateEvents.emit(DataUpdateType.Reminder)
-        return@withContext id
-    }
+    override suspend fun duplicateReminder(groupItemId: Long): CreatedComponent =
+        withContext(io) {
+            reminderHelper.duplicateReminder(groupItemId).also { created ->
+                dataUpdateEvents.emit(DataUpdateType.Reminder)
+                groupItemDao.getGroupItemById(created.groupItemId)?.groupId?.let {
+                    dataUpdateEvents.emit(DataUpdateType.DisplayIndex(it))
+                }
+            }
+        }
 
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {
         dao.deleteDataPoint(dataPoint.toEntity())
@@ -375,58 +376,58 @@ internal class DataInteractorImpl @Inject constructor(
     // GraphHelper method overrides with event emission
     // =========================================================================
 
-    override suspend fun deleteGraph(request: GraphDeleteRequest) = withContext(io) {
+    override suspend fun deleteGraph(request: ComponentDeleteRequest) = withContext(io) {
         graphHelper.deleteGraph(request)
         dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
     }
 
-    override suspend fun createLineGraph(request: LineGraphCreateRequest): Long =
+    override suspend fun createLineGraph(request: LineGraphCreateRequest): CreatedComponent =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
             graphHelper.createLineGraph(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
-    override suspend fun createPieChart(request: PieChartCreateRequest): Long =
+    override suspend fun createPieChart(request: PieChartCreateRequest): CreatedComponent =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
             graphHelper.createPieChart(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
-    override suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): Long =
+    override suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): CreatedComponent =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
             graphHelper.createAverageTimeBetweenStat(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
-    override suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): Long =
+    override suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): CreatedComponent =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
             graphHelper.createTimeHistogram(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
-    override suspend fun createLastValueStat(request: LastValueStatCreateRequest): Long =
+    override suspend fun createLastValueStat(request: LastValueStatCreateRequest): CreatedComponent =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
             graphHelper.createLastValueStat(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
-    override suspend fun createBarChart(request: BarChartCreateRequest): Long =
+    override suspend fun createBarChart(request: BarChartCreateRequest): CreatedComponent =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
             graphHelper.createBarChart(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
-    override suspend fun createLuaGraph(request: LuaGraphCreateRequest): Long =
+    override suspend fun createLuaGraph(request: LuaGraphCreateRequest): CreatedComponent =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(request.groupId)
             graphHelper.createLuaGraph(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it)) }
+                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun updateLineGraph(request: LineGraphUpdateRequest) = withContext(io) {
@@ -467,59 +468,13 @@ internal class DataInteractorImpl @Inject constructor(
         dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.graphStatId))
     }
 
-    override suspend fun duplicateLineGraph(graphStatId: Long, groupId: Long): Long? =
+    override suspend fun duplicateGraphOrStat(groupItemId: Long): CreatedComponent? =
         withContext(io) {
-            graphHelper.duplicateLineGraph(graphStatId, groupId)?.also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
-            }
-        }
-
-    override suspend fun duplicatePieChart(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            graphHelper.duplicatePieChart(graphStatId, groupId)?.also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
-            }
-        }
-
-    override suspend fun duplicateAverageTimeBetweenStat(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            graphHelper.duplicateAverageTimeBetweenStat(graphStatId, groupId)?.also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
-            }
-        }
-
-    override suspend fun duplicateTimeHistogram(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            graphHelper.duplicateTimeHistogram(graphStatId, groupId)?.also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
-            }
-        }
-
-    override suspend fun duplicateLastValueStat(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            graphHelper.duplicateLastValueStat(graphStatId, groupId)?.also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
-            }
-        }
-
-    override suspend fun duplicateBarChart(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            graphHelper.duplicateBarChart(graphStatId, groupId)?.also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
-            }
-        }
-
-    override suspend fun duplicateLuaGraph(graphStatId: Long, groupId: Long): Long? =
-        withContext(io) {
-            graphHelper.duplicateLuaGraph(graphStatId, groupId)?.also {
-                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
+            graphHelper.duplicateGraphOrStat(groupItemId)?.also { created ->
+                dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(created.componentId))
+                groupItemDao.getGroupItemById(created.groupItemId)?.groupId?.let {
+                    dataUpdateEvents.emit(DataUpdateType.DisplayIndex(it))
+                }
             }
         }
 
@@ -539,7 +494,6 @@ internal class DataInteractorImpl @Inject constructor(
     private suspend fun shiftUpGroupChildIndexes(groupId: Long) =
         performAtomicUpdate(DataUpdateType.DisplayIndex(groupId)) {
             groupItemDao.shiftDisplayIndexesDown(groupId)
-            dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
         }
 
     // =========================================================================
@@ -614,13 +568,13 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     // FunctionHelper method overrides with event emission
-    override suspend fun insertFunction(request: FunctionCreateRequest): Long? = withContext(io) {
-        val id = functionHelper.insertFunction(request)
-        if (id != null) {
-            dataUpdateEvents.emit(DataUpdateType.FunctionCreated(id))
+    override suspend fun insertFunction(request: FunctionCreateRequest): CreatedComponent? = withContext(io) {
+        val created = functionHelper.insertFunction(request)
+        if (created != null) {
+            dataUpdateEvents.emit(DataUpdateType.FunctionCreated(created.componentId))
             dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.groupId))
         }
-        return@withContext id
+        return@withContext created
     }
 
     override suspend fun updateFunction(request: FunctionUpdateRequest) = withContext(io) {
@@ -634,18 +588,20 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateFunction(function: Function, groupId: Long): Long? =
+    override suspend fun duplicateFunction(groupItemId: Long): CreatedComponent? =
         withContext(io) {
-            val newFunctionId = functionHelper.duplicateFunction(function, groupId)
-            if (newFunctionId != null) {
-                dataUpdateEvents.emit(DataUpdateType.FunctionCreated(newFunctionId))
-                dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
+            functionHelper.duplicateFunction(groupItemId)?.also { created ->
+                dataUpdateEvents.emit(DataUpdateType.FunctionCreated(created.componentId))
+                groupItemDao.getGroupItemById(created.groupItemId)?.groupId?.let {
+                    dataUpdateEvents.emit(DataUpdateType.DisplayIndex(it))
+                }
             }
-            return@withContext newFunctionId
         }
 
-    override suspend fun deleteFunction(request: FunctionDeleteRequest) = withContext(io) {
-        val function = dao.getFunctionById(request.functionId) ?: return@withContext
+    override suspend fun deleteFunction(request: ComponentDeleteRequest) = withContext(io) {
+        val groupItem = groupItemDao.getGroupItemById(request.groupItemId)
+            ?: return@withContext
+        val function = dao.getFunctionById(groupItem.childId) ?: return@withContext
         val featureId = function.featureId
 
         val dependentGraphs = dependencyAnalyserProvider.create().getDependentGraphs(featureId)
@@ -665,21 +621,14 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun moveComponent(request: MoveComponentRequest) = withContext(io) {
-        if (request.fromGroupId == request.toGroupId) return@withContext
-
-        val itemType = when (request.type) {
-            ComponentType.TRACKER -> GroupItemType.TRACKER
-            ComponentType.FUNCTION -> GroupItemType.FUNCTION
-            ComponentType.GROUP -> GroupItemType.GROUP
-            ComponentType.GRAPH -> GroupItemType.GRAPH
-        }
-
-        if (request.type == ComponentType.GROUP) {
-            validateGroupNotMovingToDescendant(request.id, request.toGroupId)
-        }
-
-        val existingItem = groupItemDao.getGroupItem(request.fromGroupId, request.id, itemType)
+        val existingItem = groupItemDao.getGroupItemById(request.groupItemId)
             ?: return@withContext
+
+        if (existingItem.groupId == request.toGroupId) return@withContext
+
+        if (existingItem.type == GroupItemType.GROUP) {
+            validateGroupNotMovingToDescendant(existingItem.childId, request.toGroupId)
+        }
 
         groupItemDao.deleteGroupItem(existingItem.id)
         groupItemDao.shiftDisplayIndexesDown(request.toGroupId)
@@ -687,16 +636,17 @@ internal class DataInteractorImpl @Inject constructor(
             GroupItem(
                 groupId = request.toGroupId,
                 displayIndex = 0,
-                childId = request.id,
-                type = itemType,
+                childId = existingItem.childId,
+                type = existingItem.type,
             )
         )
 
-        when (request.type) {
-            ComponentType.TRACKER -> dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
-            ComponentType.FUNCTION -> dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(request.id))
-            ComponentType.GROUP -> dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
-            ComponentType.GRAPH -> dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(request.id))
+        when (existingItem.type) {
+            GroupItemType.TRACKER -> dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+            GroupItemType.FUNCTION -> dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(existingItem.childId))
+            GroupItemType.GROUP -> dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
+            GroupItemType.GRAPH -> dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(existingItem.childId))
+            GroupItemType.REMINDER -> dataUpdateEvents.emit(DataUpdateType.Reminder)
         }
         dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.toGroupId))
     }

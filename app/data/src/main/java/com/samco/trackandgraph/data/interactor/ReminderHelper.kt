@@ -19,7 +19,9 @@ package com.samco.trackandgraph.data.interactor
 
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderCreateRequest
-import com.samco.trackandgraph.data.database.dto.ReminderDeleteRequest
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.CreatedComponent
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 
@@ -36,7 +38,7 @@ interface ReminderHelper {
 
     suspend fun getReminderById(id: Long): Reminder?
 
-    suspend fun createReminder(request: ReminderCreateRequest): Long
+    suspend fun createReminder(request: ReminderCreateRequest): CreatedComponent
 
     suspend fun updateReminder(request: ReminderUpdateRequest)
 
@@ -52,21 +54,19 @@ interface ReminderHelper {
     suspend fun updateReminderScreenDisplayOrder(orders: List<ReminderDisplayOrderData>)
 
     /**
-     * Deletes a reminder or removes it from a specific location.
-     *
-     * If [ReminderDeleteRequest.groupId] is provided
-     * and the reminder exists in multiple locations, only the symlink in that location
-     * is removed. Otherwise, the reminder and all its symlinks are deleted.
+     * Deletes a reminder or removes a single placement.
+     * @see [ComponentDeleteRequest] for the semantics of deleteEverywhere.
      */
-    suspend fun deleteReminder(request: ReminderDeleteRequest)
+    suspend fun deleteReminder(request: ComponentDeleteRequest)
 
-    suspend fun duplicateReminder(id: Long): Long
+    suspend fun duplicateReminder(groupItemId: Long): CreatedComponent
 
     suspend fun hasAnyReminders(): Boolean
 
     /**
      * Returns display indices for all reminders shown on the reminders screen
-     * (i.e. reminders with a null groupId), as a map from reminder ID to display index.
+     * (i.e. reminders with a null groupId), as a list of [GroupChildDisplayIndex] entries
+     * that include the groupItemId needed for delete/duplicate/reorder operations.
      */
-    suspend fun getDisplayIndicesForRemindersScreen(): Map<Long, Int>
+    suspend fun getDisplayIndicesForRemindersScreen(): List<GroupChildDisplayIndex>
 }
