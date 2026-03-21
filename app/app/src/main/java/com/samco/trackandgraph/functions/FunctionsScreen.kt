@@ -70,6 +70,8 @@ import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
+import com.samco.trackandgraph.ui.compose.ui.fabEnterTransition
+import com.samco.trackandgraph.ui.compose.ui.fabExitTransition
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -304,7 +306,9 @@ private fun FunctionsScreenContent(
 
             AnimatedVisibility(
                 modifier = Modifier.align(Alignment.BottomEnd),
-                visible = selectedEdgeState != null
+                visible = selectedEdgeState != null,
+                enter = fabEnterTransition,
+                exit = fabExitTransition
             ) {
                 FloatingActionButton(
                     modifier = Modifier
@@ -373,7 +377,9 @@ private fun TopCornerFab(
 ) {
     AnimatedVisibility(
         modifier = modifier,
-        visible = visible
+        visible = visible,
+        enter = fabEnterTransition,
+        exit = fabExitTransition
     ) {
         FloatingActionButton(
             modifier = Modifier
