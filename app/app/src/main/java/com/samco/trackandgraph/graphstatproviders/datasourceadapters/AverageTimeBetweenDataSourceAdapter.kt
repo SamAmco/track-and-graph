@@ -20,7 +20,6 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStatUpdateRequest
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
 
@@ -62,7 +61,4 @@ class AverageTimeBetweenDataSourceAdapter @Inject constructor(
         return Pair(ats.id, ats)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
-        dataInteractor.duplicateAverageTimeBetweenStat(graphOrStat.id, groupId)
-    }
 }

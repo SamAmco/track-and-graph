@@ -105,6 +105,7 @@ private fun TimeSinceLastReminderDetailsPreview() {
         TimeSinceLastReminderDetails(
             reminderViewData = ReminderViewData.TimeSinceLastReminderViewData(
                 id = 1L,
+                groupItemId = 0L,
                 name = "Exercise Reminder",
                 nextScheduled = LocalDateTime.of(2025, 12, 22, 14, 0),
                 reminderDto = null,
@@ -123,6 +124,7 @@ private fun TimeSinceLastReminderDetailsNoScheduledPreview() {
         TimeSinceLastReminderDetails(
             reminderViewData = ReminderViewData.TimeSinceLastReminderViewData(
                 id = 2L,
+                groupItemId = 0L,
                 name = "No Upcoming",
                 nextScheduled = null,
                 reminderDto = null,

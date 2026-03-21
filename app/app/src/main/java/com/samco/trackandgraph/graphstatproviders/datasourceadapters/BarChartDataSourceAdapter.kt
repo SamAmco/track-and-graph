@@ -3,7 +3,6 @@ package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.BarChartUpdateRequest
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
 
@@ -44,7 +43,4 @@ class BarChartDataSourceAdapter @Inject constructor(
         return Pair(lvs.id, lvs)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
-        dataInteractor.duplicateBarChart(graphOrStat.id, groupId)
-    }
 }

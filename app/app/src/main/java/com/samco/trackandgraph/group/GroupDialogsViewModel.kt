@@ -18,8 +18,6 @@ package com.samco.trackandgraph.group
 
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
-import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,15 +27,15 @@ import javax.inject.Inject
 /**
  * Simple DTO for delete confirmation dialogs containing only the essential data needed.
  *
- * @param unique Whether the item exists in only one group. If false, the user should be asked
- *               whether to delete from this group only or everywhere.
- * @param groupId The current group context, used for "remove from this group" operations.
+ * @param groupItemId the GroupItem placement to act on
+ * @param type determines which confirmation text to show
+ * @param unique whether the item exists in only one group. If false, the user gets the
+ *   option to remove just this placement or delete everywhere.
  */
 data class DeleteItemDto(
-    val id: Long,
+    val groupItemId: Long,
     val type: DeleteType,
     val unique: Boolean = true,
-    val groupId: Long? = null,
 )
 
 /**
@@ -94,39 +92,11 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
     private val _itemForDeletion = MutableStateFlow<DeleteItemDto?>(null)
     val itemForDeletion: StateFlow<DeleteItemDto?> = _itemForDeletion.asStateFlow()
 
-    fun showDeleteGroupDialog(group: Group, parentGroupId: Long) {
+    fun showDeleteDialog(groupItemId: Long, type: DeleteType, unique: Boolean) {
         _itemForDeletion.value = DeleteItemDto(
-            id = group.id,
-            type = DeleteType.GROUP,
-            unique = group.unique,
-            groupId = parentGroupId,
-        )
-    }
-
-    fun showDeleteGraphStatDialog(graphStat: IGraphStatViewData, groupId: Long) {
-        _itemForDeletion.value = DeleteItemDto(
-            id = graphStat.graphOrStat.id,
-            type = DeleteType.GRAPH_STAT,
-            unique = graphStat.graphOrStat.unique,
-            groupId = groupId,
-        )
-    }
-
-    fun showDeleteTrackerDialog(tracker: DisplayTracker, groupId: Long) {
-        _itemForDeletion.value = DeleteItemDto(
-            id = tracker.id,
-            type = DeleteType.TRACKER,
-            unique = tracker.unique,
-            groupId = groupId,
-        )
-    }
-
-    fun showDeleteFunctionDialog(displayFunction: DisplayFunction) {
-        _itemForDeletion.value = DeleteItemDto(
-            id = displayFunction.id,
-            type = DeleteType.FUNCTION,
-            unique = displayFunction.unique,
-            groupId = displayFunction.groupId,
+            groupItemId = groupItemId,
+            type = type,
+            unique = unique,
         )
     }
 

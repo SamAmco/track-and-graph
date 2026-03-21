@@ -37,6 +37,7 @@ import org.threeten.bp.ZoneId
  */
 sealed class ReminderViewData {
     abstract val id: Long
+    abstract val groupItemId: Long
     abstract val name: String
     abstract val reminderDto: Reminder?
     abstract val nextScheduled: LocalDateTime?
@@ -44,6 +45,7 @@ sealed class ReminderViewData {
     /** View data for weekly reminders, mapping to ReminderParams.WeekDayParams */
     data class WeekDayReminderViewData(
         override val id: Long,
+        override val groupItemId: Long,
         override val name: String,
         override val nextScheduled: LocalDateTime?,
         val checkedDays: CheckedDays,
@@ -56,6 +58,7 @@ sealed class ReminderViewData {
      */
     data class PeriodicReminderViewData(
         override val id: Long,
+        override val groupItemId: Long,
         override val name: String,
         override val nextScheduled: LocalDateTime?,
         val starts: LocalDateTime,
@@ -70,6 +73,7 @@ sealed class ReminderViewData {
     /** View data for month day reminders, mapping to ReminderParams.MonthDayParams */
     data class MonthDayReminderViewData(
         override val id: Long,
+        override val groupItemId: Long,
         override val name: String,
         override val nextScheduled: LocalDateTime?,
         val occurrence: MonthDayOccurrence,
@@ -81,6 +85,7 @@ sealed class ReminderViewData {
     /** View data for time since last reminders, mapping to ReminderParams.TimeSinceLastParams */
     data class TimeSinceLastReminderViewData(
         override val id: Long,
+        override val groupItemId: Long,
         override val name: String,
         override val nextScheduled: LocalDateTime?,
         override val reminderDto: Reminder?,
@@ -99,6 +104,7 @@ sealed class ReminderViewData {
          */
         fun fromReminder(
             reminder: Reminder,
+            groupItemId: Long,
             nextScheduled: LocalDateTime?,
             lastTrackedInstant: Instant? = null
         ): ReminderViewData {
@@ -106,6 +112,7 @@ sealed class ReminderViewData {
                 is ReminderParams.WeekDayParams -> {
                     WeekDayReminderViewData(
                         id = reminder.id,
+                        groupItemId = groupItemId,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         checkedDays = params.checkedDays,
@@ -125,6 +132,7 @@ sealed class ReminderViewData {
 
                     PeriodicReminderViewData(
                         id = reminder.id,
+                        groupItemId = groupItemId,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         starts = params.starts,
@@ -140,6 +148,7 @@ sealed class ReminderViewData {
                 is ReminderParams.MonthDayParams -> {
                     MonthDayReminderViewData(
                         id = reminder.id,
+                        groupItemId = groupItemId,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         occurrence = params.occurrence,
@@ -163,6 +172,7 @@ sealed class ReminderViewData {
 
                     TimeSinceLastReminderViewData(
                         id = reminder.id,
+                        groupItemId = groupItemId,
                         name = reminder.reminderName,
                         nextScheduled = nextScheduled,
                         reminderDto = reminder,

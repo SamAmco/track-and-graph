@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
 import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
@@ -63,7 +62,4 @@ class PieChartDataSourceAdapter @Inject constructor(
         return Pair(pieChart.id, pieChart)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
-        dataInteractor.duplicatePieChart(graphOrStat.id, groupId)
-    }
 }

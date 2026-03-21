@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomDialog
@@ -47,40 +48,22 @@ internal fun GroupDeleteDialog(
 
     val onDismiss = { groupDialogsViewModel.hideDeleteDialog() }
 
+    val childType = when (itemForDeletion.type) {
+        DeleteType.TRACKER -> GroupChildType.TRACKER
+        DeleteType.GRAPH_STAT -> GroupChildType.GRAPH
+        DeleteType.GROUP -> GroupChildType.GROUP
+        DeleteType.FUNCTION -> GroupChildType.FUNCTION
+    }
+
     GroupDeleteDialogContent(
         itemForDeletion = itemForDeletion,
         onDismiss = onDismiss,
         onDeleteEverywhere = {
-            when (itemForDeletion.type) {
-                DeleteType.GROUP -> groupViewModel.onDeleteGroup(itemForDeletion.id)
-                DeleteType.GRAPH_STAT -> groupViewModel.onDeleteGraphStat(itemForDeletion.id)
-                DeleteType.TRACKER -> groupViewModel.onDeleteTracker(itemForDeletion.id)
-                DeleteType.FUNCTION -> groupViewModel.onDeleteFunction(itemForDeletion.id)
-            }
+            groupViewModel.onDelete(itemForDeletion.groupItemId, childType, deleteEverywhere = true)
             onDismiss()
         },
         onRemoveFromGroup = {
-            when (itemForDeletion.type) {
-                DeleteType.TRACKER -> groupViewModel.onDeleteTracker(
-                    itemForDeletion.id,
-                    itemForDeletion.groupId,
-                )
-
-                DeleteType.GRAPH_STAT -> groupViewModel.onDeleteGraphStat(
-                    itemForDeletion.id,
-                    itemForDeletion.groupId,
-                )
-
-                DeleteType.GROUP -> groupViewModel.onDeleteGroup(
-                    itemForDeletion.id,
-                    itemForDeletion.groupId,
-                )
-
-                DeleteType.FUNCTION -> groupViewModel.onDeleteFunction(
-                    itemForDeletion.id,
-                    itemForDeletion.groupId,
-                )
-            }
+            groupViewModel.onDelete(itemForDeletion.groupItemId, childType, deleteEverywhere = false)
             onDismiss()
         },
     )
@@ -153,7 +136,7 @@ private fun GroupDeleteDialogUniquePreview() {
     TnGComposeTheme {
         GroupDeleteDialogContent(
             itemForDeletion = DeleteItemDto(
-                id = 1L,
+                groupItemId = 1L,
                 type = DeleteType.TRACKER,
                 unique = true,
             ),
@@ -170,10 +153,9 @@ private fun GroupDeleteDialogMultiGroupPreview() {
     TnGComposeTheme {
         GroupDeleteDialogContent(
             itemForDeletion = DeleteItemDto(
-                id = 1L,
+                groupItemId = 1L,
                 type = DeleteType.TRACKER,
                 unique = false,
-                groupId = 2L,
             ),
             onDismiss = {},
             onDeleteEverywhere = {},

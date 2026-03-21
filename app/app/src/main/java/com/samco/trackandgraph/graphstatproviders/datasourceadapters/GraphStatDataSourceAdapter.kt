@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.interactor.DataInteractor
 
 /**
@@ -58,5 +57,4 @@ abstract class GraphStatDataSourceAdapter<I>(
         updateInDatabase(graphStatId, name, config as I)
     }
 
-    abstract suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long)
 }

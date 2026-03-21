@@ -109,6 +109,7 @@ private fun PeriodicReminderDetailsActivePreview() {
         PeriodicReminderDetails(
             reminderViewData = ReminderViewData.PeriodicReminderViewData(
                 id = 1L,
+                groupItemId = 0L,
                 name = "Daily Exercise",
                 nextScheduled = LocalDateTime.of(2024, 1, 15, 14, 30),
                 starts = LocalDateTime.of(2024, 1, 1, 9, 0),
@@ -130,6 +131,7 @@ private fun PeriodicReminderDetailsStartingPreview() {
         PeriodicReminderDetails(
             reminderViewData = ReminderViewData.PeriodicReminderViewData(
                 id = 2L,
+                groupItemId = 0L,
                 name = "Weekly Workout",
                 nextScheduled = LocalDateTime.of(2024, 1, 20, 10, 0),
                 starts = LocalDateTime.of(2024, 1, 20, 10, 0),
@@ -151,6 +153,7 @@ private fun PeriodicReminderDetailsEndedPreview() {
         PeriodicReminderDetails(
             reminderViewData = ReminderViewData.PeriodicReminderViewData(
                 id = 3L,
+                groupItemId = 0L,
                 name = "Monthly Check-in",
                 nextScheduled = null,
                 starts = LocalDateTime.of(2023, 6, 1, 9, 0),

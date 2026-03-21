@@ -18,16 +18,10 @@ package com.samco.trackandgraph.group
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.data.database.dto.DisplayTracker
-import com.samco.trackandgraph.data.database.dto.ComponentType
-import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.selectitemdialog.HiddenItem
-import com.samco.trackandgraph.selectitemdialog.SelectableItemType
-import com.samco.trackandgraph.timers.TimerServiceInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,58 +30,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class MovableItemType { GROUP, GRAPH, TRACKER, FUNCTION }
-
 data class MoveDialogConfig(
-    val itemId: Long,
-    val itemType: MovableItemType,
-    val fromGroupId: Long,
+    val groupItemId: Long,
     val hiddenItems: Set<HiddenItem>
 )
 
 @HiltViewModel
 class MoveItemViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
-    private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _moveDialogConfig = MutableStateFlow<MoveDialogConfig?>(null)
     val moveDialogConfig: StateFlow<MoveDialogConfig?> = _moveDialogConfig.asStateFlow()
 
-    fun showMoveGroupDialog(fromGroupId: Long, group: Group) {
+    fun showMoveDialog(groupItemId: Long, hiddenItems: Set<HiddenItem> = emptySet()) {
         _moveDialogConfig.value = MoveDialogConfig(
-            itemId = group.id,
-            itemType = MovableItemType.GROUP,
-            fromGroupId = fromGroupId,
-            hiddenItems = setOf(HiddenItem(SelectableItemType.GROUP, group.id))
-        )
-    }
-
-    fun showMoveGraphDialog(fromGroupId: Long, graphOrStat: IGraphStatViewData) {
-        _moveDialogConfig.value = MoveDialogConfig(
-            itemId = graphOrStat.graphOrStat.id,
-            itemType = MovableItemType.GRAPH,
-            fromGroupId = fromGroupId,
-            hiddenItems = emptySet()
-        )
-    }
-
-    fun showMoveTrackerDialog(fromGroupId: Long, tracker: DisplayTracker) {
-        _moveDialogConfig.value = MoveDialogConfig(
-            itemId = tracker.id,
-            itemType = MovableItemType.TRACKER,
-            fromGroupId = fromGroupId,
-            hiddenItems = emptySet()
-        )
-    }
-
-    fun showMoveFunctionDialog(fromGroupId: Long, displayFunction: DisplayFunction) {
-        _moveDialogConfig.value = MoveDialogConfig(
-            itemId = displayFunction.id,
-            itemType = MovableItemType.FUNCTION,
-            fromGroupId = fromGroupId,
-            hiddenItems = emptySet()
+            groupItemId = groupItemId,
+            hiddenItems = hiddenItems,
         )
     }
 
@@ -101,60 +61,13 @@ class MoveItemViewModel @Inject constructor(
         // Dismiss dialog immediately
         _moveDialogConfig.value = null
 
-        // Launch coroutine to move the item
         viewModelScope.launch(io) {
-            try {
-                when (config.itemType) {
-                    MovableItemType.TRACKER -> {
-                        val tracker = dataInteractor.getTrackerById(config.itemId)
-                        tracker?.let {
-                            val request = MoveComponentRequest(
-                                type = ComponentType.TRACKER,
-                                id = it.id,
-                                fromGroupId = config.fromGroupId,
-                                toGroupId = targetGroupId
-                            )
-                            dataInteractor.moveComponent(request)
-                            timerServiceInteractor.requestWidgetUpdatesForFeatureId(it.featureId)
-                        }
-                    }
-
-                    MovableItemType.GRAPH -> {
-                        val request = MoveComponentRequest(
-                            type = ComponentType.GRAPH,
-                            id = config.itemId,
-                            fromGroupId = config.fromGroupId,
-                            toGroupId = targetGroupId
-                        )
-                        dataInteractor.moveComponent(request)
-                    }
-
-                    MovableItemType.GROUP -> {
-                        val request = MoveComponentRequest(
-                            type = ComponentType.GROUP,
-                            id = config.itemId,
-                            fromGroupId = config.fromGroupId,
-                            toGroupId = targetGroupId
-                        )
-                        dataInteractor.moveComponent(request)
-                    }
-
-                    MovableItemType.FUNCTION -> {
-                        val function = dataInteractor.getFunctionById(config.itemId)
-                        function?.let {
-                            val request = MoveComponentRequest(
-                                type = ComponentType.FUNCTION,
-                                id = it.id,
-                                fromGroupId = config.fromGroupId,
-                                toGroupId = targetGroupId
-                            )
-                            dataInteractor.moveComponent(request)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                // On error, do nothing - move operation failed silently
-            }
+            dataInteractor.moveComponent(
+                MoveComponentRequest(
+                    groupItemId = config.groupItemId,
+                    toGroupId = targetGroupId,
+                )
+            )
         }
     }
 }

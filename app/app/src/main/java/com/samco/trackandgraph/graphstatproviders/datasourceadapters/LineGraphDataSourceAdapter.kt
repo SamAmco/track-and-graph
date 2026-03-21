@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
@@ -61,7 +60,4 @@ class LineGraphDataSourceAdapter @Inject constructor(
         return Pair(lineGraph.id, lineGraph)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
-        dataInteractor.duplicateLineGraph(graphOrStat.id, groupId)
-    }
 }

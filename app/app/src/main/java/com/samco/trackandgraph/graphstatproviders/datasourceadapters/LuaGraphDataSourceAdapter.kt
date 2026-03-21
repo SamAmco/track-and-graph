@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
@@ -60,7 +59,4 @@ class LuaGraphDataSourceAdapter @Inject constructor(
         return Pair(luaGraph.id, luaGraph)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
-        dataInteractor.duplicateLuaGraph(graphOrStat.id, groupId)
-    }
 }

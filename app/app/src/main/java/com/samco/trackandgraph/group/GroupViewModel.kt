@@ -22,15 +22,12 @@ package com.samco.trackandgraph.group
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
-import com.samco.trackandgraph.data.database.dto.FunctionDeleteRequest
-import com.samco.trackandgraph.data.database.dto.GraphDeleteRequest
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.GroupChildType
-import com.samco.trackandgraph.data.database.dto.GroupDeleteRequest
-import com.samco.trackandgraph.data.database.dto.TrackerDeleteRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.data.di.DefaultDispatcher
@@ -94,32 +91,17 @@ interface GroupViewModel {
     suspend fun userHasAnyTrackers(): Boolean
     fun getTrackersInGroup(): List<DisplayTracker>
     fun addDefaultTrackerValue(tracker: DisplayTracker)
-    /**
-     * Delete a tracker. If [groupId] is provided and the tracker exists in multiple groups,
-     * only the GroupItem link for that group is removed (symlink removal). If [groupId] is null
-     * or the tracker is unique, the tracker is deleted entirely from all groups.
-     */
-    fun onDeleteTracker(trackerId: Long, groupId: Long? = null)
-    /**
-     * Delete a graph/stat. If [groupId] is provided and the graph exists in multiple groups,
-     * only the GroupItem link for that group is removed. If [groupId] is null or the graph is
-     * unique, it is deleted entirely.
-     */
-    fun onDeleteGraphStat(id: Long, groupId: Long? = null)
-    /**
-     * Delete a group. If [parentGroupId] is provided and the group exists in multiple parent
-     * groups, only the GroupItem link for that parent is removed. If null or unique, it is
-     * deleted entirely along with all contents.
-     */
-    fun onDeleteGroup(id: Long, parentGroupId: Long? = null)
-    /**
-     * Delete a function. If [groupId] is provided and the function exists in multiple groups,
-     * only the GroupItem link for that group is removed. If null or unique, it is deleted entirely.
-     */
-    fun onDeleteFunction(id: Long, groupId: Long? = null)
 
-    fun duplicateFunction(displayFunction: DisplayFunction)
-    fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData)
+    /**
+     * Delete a component by its GroupItem placement.
+     * @param groupItemId identifies which specific placement to act on
+     * @param type the type of child being deleted (for dispatching to the correct data layer method)
+     * @param deleteEverywhere if true, deletes the component from all groups;
+     *   if false, removes only this placement (or deletes entirely if it's the last one)
+     */
+    fun onDelete(groupItemId: Long, type: GroupChildType, deleteEverywhere: Boolean)
+
+    fun onDuplicate(groupItemId: Long)
     fun onConsumedShowDurationInputDialog()
     fun stopTimer(tracker: DisplayTracker)
     fun playTimer(tracker: DisplayTracker)
@@ -159,7 +141,7 @@ class GroupViewModelImpl @Inject constructor(
         ) { groupId, event -> Pair(groupId, event) }
             .shareIn(viewModelScope, SharingStarted.Lazily, 1)
 
-    private val graphChildren: Flow<List<GroupChild>> = channelFlow {
+    private val graphDataMap: Flow<Map<Long, CalculatedGraphViewData>> = channelFlow {
         var currentViewData = emptyList<GraphWithViewData>()
         var innerJob: Job? = null
 
@@ -199,7 +181,7 @@ class GroupViewModelImpl @Inject constructor(
                 innerJob = launch {
                     viewDataFlow.collect { viewData ->
                         currentViewData = viewData
-                        send(graphsToGroupChildren(viewData))
+                        send(graphsToDataMap(viewData))
                     }
                 }
             }
@@ -208,8 +190,8 @@ class GroupViewModelImpl @Inject constructor(
     private suspend fun getGraphObjects(groupId: Long): List<GraphOrStat> = dataInteractor
         .getGraphsAndStatsByGroupIdSync(groupId)
 
-    private fun graphsToGroupChildren(graphs: List<GraphWithViewData>) = graphs
-        .map { GroupChild.ChildGraph(it.graph.id, it.viewData) }
+    private fun graphsToDataMap(graphs: List<GraphWithViewData>): Map<Long, CalculatedGraphViewData> =
+        graphs.associateBy({ it.graph.id }, { it.viewData })
 
     private fun mapNewGraphsToOldViewData(
         viewData: List<GraphWithViewData>,
@@ -271,7 +253,7 @@ class GroupViewModelImpl @Inject constructor(
             Timber.i("Took ${stopwatch.elapsedMillis}ms to generate view data for ${graphs.size} graph(s)")
         }
 
-    private val trackersChildren = onUpdateChildrenForGroup
+    private val trackerDataMap: Flow<Map<Long, DisplayTracker>> = onUpdateChildrenForGroup
         .filter { (_, event) ->
             event is DataUpdateType.Unknown ||
             event is DataUpdateType.SymlinkCreated ||
@@ -281,10 +263,10 @@ class GroupViewModelImpl @Inject constructor(
             event is DataUpdateType.TrackerUpdated
         }
         .debounce(10L)
-        .map { (groupId, _) -> getTrackerChildren(groupId) }
+        .map { (groupId, _) -> getTrackerDataMap(groupId) }
         .flowOn(io)
 
-    private val groupChildren = onUpdateChildrenForGroup
+    private val groupDataMap: Flow<Map<Long, com.samco.trackandgraph.data.database.dto.Group>> = onUpdateChildrenForGroup
         .filter { (_, event) ->
             event is DataUpdateType.Unknown ||
             event is DataUpdateType.SymlinkCreated ||
@@ -293,10 +275,10 @@ class GroupViewModelImpl @Inject constructor(
             event is DataUpdateType.GroupUpdated
         }
         .debounce(10L)
-        .map { (groupId, _) -> getGroupChildren(groupId) }
+        .map { (groupId, _) -> getGroupDataMap(groupId) }
         .flowOn(io)
 
-    private val functionChildren = onUpdateChildrenForGroup
+    private val functionDataMap: Flow<Map<Long, DisplayFunction>> = onUpdateChildrenForGroup
         .filter { (_, event) ->
             event is DataUpdateType.Unknown ||
             event is DataUpdateType.SymlinkCreated ||
@@ -305,14 +287,14 @@ class GroupViewModelImpl @Inject constructor(
             event is DataUpdateType.FunctionUpdated
         }
         .debounce(10L)
-        .map { (groupId, _) -> getFunctionChildren(groupId) }
+        .map { (groupId, _) -> getFunctionDataMap(groupId) }
         .flowOn(io)
 
     /**
-     * A flow of display indices from the database, represented as a map from
-     * (type, childId) to displayIndex for O(1) lookups during sorting.
+     * A flow of display indices from the database, represented as a list of
+     * GroupChildDisplayIndex entries keyed by groupItemId for unique placement identity.
      */
-    private val dbDisplayIndices: StateFlow<Map<Pair<GroupChildType, Long>, Int>?> =
+    private val dbDisplayIndices: StateFlow<List<GroupChildDisplayIndex>?> =
         onUpdateChildrenForGroup
             .filter { (_, event) ->
                 event is DataUpdateType.DisplayIndex ||
@@ -322,21 +304,36 @@ class GroupViewModelImpl @Inject constructor(
             .debounce(10L)
             .map { (groupId, _) ->
                 dataInteractor.getDisplayIndicesForGroup(groupId)
-                    .associate { Pair(it.type, it.id) to it.displayIndex }
             }
             .flowOn(io)
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    // Merging dbDisplayIndices into the same combine and filtering to only items present in
-    // indices prevents the race where dbDisplayIndices updates before allChildren (or vice versa),
-    // which would cause removed items to temporarily sort to Int.MAX_VALUE (visual flicker).
+    // Display indices drive child construction: each GroupChildDisplayIndex entry (with a unique
+    // groupItemId) produces one GroupChild by looking up component data from the per-type data maps.
+    // This correctly handles duplicate placements of the same component in one group.
     private val allChildren: StateFlow<List<GroupChild>> =
         combine(
-            graphChildren, trackersChildren, groupChildren, functionChildren, dbDisplayIndices.filterNotNull()
+            graphDataMap, trackerDataMap, groupDataMap, functionDataMap, dbDisplayIndices.filterNotNull()
         ) { graphs, trackers, groups, functions, indices ->
-            listOf(graphs, trackers, groups, functions).flatten()
-                .filter { child -> indices.containsKey(Pair(child.type, child.id)) }
-                .sortedBy { child -> indices[Pair(child.type, child.id)] }
+            indices
+                .sortedBy { it.displayIndex }
+                .mapNotNull { index ->
+                    when (index.type) {
+                        GroupChildType.TRACKER -> trackers[index.id]?.let {
+                            GroupChild.ChildTracker(index.groupItemId, index.id, it)
+                        }
+                        GroupChildType.GROUP -> groups[index.id]?.let {
+                            GroupChild.ChildGroup(index.groupItemId, index.id, it)
+                        }
+                        GroupChildType.GRAPH -> graphs[index.id]?.let {
+                            GroupChild.ChildGraph(index.groupItemId, index.id, it)
+                        }
+                        GroupChildType.FUNCTION -> functions[index.id]?.let {
+                            GroupChild.ChildFunction(index.groupItemId, index.id, it)
+                        }
+                        GroupChildType.REMINDER -> null
+                    }
+                }
         }
             .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -394,21 +391,19 @@ class GroupViewModelImpl @Inject constructor(
         viewModelScope.launch { this@GroupViewModelImpl.groupId.emit(groupId) }
     }
 
-    private suspend fun getTrackerChildren(groupId: Long): List<GroupChild> {
-        return dataInteractor.getDisplayTrackersForGroupSync(groupId).map {
-            GroupChild.ChildTracker(it.id, it)
-        }
+    private suspend fun getTrackerDataMap(groupId: Long): Map<Long, DisplayTracker> {
+        return dataInteractor.getDisplayTrackersForGroupSync(groupId)
+            .associateBy { it.id }
     }
 
-    private suspend fun getGroupChildren(groupId: Long): List<GroupChild> {
-        return dataInteractor.getGroupsForGroupSync(groupId).map {
-            GroupChild.ChildGroup(it.id, it)
-        }
+    private suspend fun getGroupDataMap(groupId: Long): Map<Long, com.samco.trackandgraph.data.database.dto.Group> {
+        return dataInteractor.getGroupsForGroupSync(groupId)
+            .associateBy { it.id }
     }
 
-    private suspend fun getFunctionChildren(groupId: Long): List<GroupChild> {
-        return dataInteractor.getFunctionsForGroupSync(groupId).map { function ->
-            val displayFunction = DisplayFunction(
+    private suspend fun getFunctionDataMap(groupId: Long): Map<Long, DisplayFunction> {
+        return dataInteractor.getFunctionsForGroupSync(groupId).associate { function ->
+            function.id to DisplayFunction(
                 id = function.id,
                 featureId = function.featureId,
                 groupId = groupId,
@@ -416,7 +411,6 @@ class GroupViewModelImpl @Inject constructor(
                 description = function.description,
                 unique = function.unique,
             )
-            GroupChild.ChildFunction(function.id, displayFunction)
         }
     }
 
@@ -433,50 +427,37 @@ class GroupViewModelImpl @Inject constructor(
         }
     }
 
-    override fun onDeleteTracker(trackerId: Long, groupId: Long?) {
+    override fun onDelete(groupItemId: Long, type: GroupChildType, deleteEverywhere: Boolean) {
         viewModelScope.launch(io) {
-            val tracker = dataInteractor.getTrackerById(trackerId) ?: return@launch
-            dataInteractor.deleteTracker(TrackerDeleteRequest(trackerId = trackerId, groupId = groupId))
-            // Only disable widgets when the tracker is fully deleted (groupId = null means delete everywhere)
-            if (groupId == null) {
-                timerServiceInteractor.requestWidgetsDisabledForFeatureId(tracker.featureId)
+            val request = ComponentDeleteRequest(groupItemId, deleteEverywhere)
+            when (type) {
+                GroupChildType.TRACKER -> {
+                    // Look up featureId before deletion for widget cleanup
+                    val featureId = allChildren.value
+                        .filterIsInstance<GroupChild.ChildTracker>()
+                        .find { it.groupItemId == groupItemId }
+                        ?.displayTracker?.featureId
+                    dataInteractor.deleteTracker(request)
+                    if (deleteEverywhere && featureId != null) {
+                        timerServiceInteractor.requestWidgetsDisabledForFeatureId(featureId)
+                    }
+                }
+                GroupChildType.GRAPH -> dataInteractor.deleteGraph(request)
+                GroupChildType.FUNCTION -> dataInteractor.deleteFunction(request)
+                GroupChildType.GROUP -> {
+                    val deletedInfo = dataInteractor.deleteGroup(request)
+                    deletedInfo.deletedFeatureIds.forEach {
+                        timerServiceInteractor.requestWidgetsDisabledForFeatureId(it)
+                    }
+                }
+                GroupChildType.REMINDER -> dataInteractor.deleteReminder(request)
             }
         }
     }
 
-    override fun onDeleteGraphStat(id: Long, groupId: Long?) {
+    override fun onDuplicate(groupItemId: Long) {
         viewModelScope.launch(io) {
-            dataInteractor.deleteGraph(GraphDeleteRequest(graphStatId = id, groupId = groupId))
-        }
-    }
-
-    override fun onDeleteGroup(id: Long, parentGroupId: Long?) {
-        viewModelScope.launch(io) {
-            val deletedFeatureIds =
-                dataInteractor.deleteGroup(GroupDeleteRequest(groupId = id, parentGroupId = parentGroupId)).deletedFeatureIds
-            deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
-        }
-    }
-
-    override fun onDeleteFunction(id: Long, groupId: Long?) {
-        viewModelScope.launch(io) {
-            dataInteractor.deleteFunction(FunctionDeleteRequest(functionId = id, groupId = groupId))
-        }
-    }
-
-    override fun duplicateFunction(displayFunction: DisplayFunction) {
-        viewModelScope.launch(io) {
-            val currentGroupId = groupId.value ?: return@launch
-            val function = dataInteractor.getFunctionById(displayFunction.id)
-            function?.let { dataInteractor.duplicateFunction(it, currentGroupId) }
-        }
-    }
-
-    override fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
-        viewModelScope.launch(io) {
-            val currentGroupId = groupId.value ?: return@launch
-            val gs = graphOrStatViewData.graphOrStat
-            gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs, currentGroupId)
+            dataInteractor.duplicateGraphOrStat(groupItemId)
         }
     }
 
@@ -530,6 +511,7 @@ class GroupViewModelImpl @Inject constructor(
                 groupId.value ?: return@launch,
                 children.mapIndexed { index, child ->
                     GroupChildDisplayIndex(
+                        groupItemId = child.groupItemId,
                         type = child.type,
                         id = child.id,
                         displayIndex = index
@@ -538,7 +520,7 @@ class GroupViewModelImpl @Inject constructor(
             )
 
             val expectedIndices = children
-                .mapIndexed { index, child -> Pair(child.type, child.id) to index }
+                .mapIndexed { index, child -> child.groupItemId to index }
                 .toMap()
 
             // Wait until dbDisplayIndices reflects the new order before switching back
@@ -546,8 +528,8 @@ class GroupViewModelImpl @Inject constructor(
             try {
                 withTimeout(500) {
                     dbDisplayIndices.filterNotNull().first { indices ->
-                        expectedIndices.all { (key, expectedIndex) ->
-                            indices[key] == expectedIndex
+                        expectedIndices.all { (groupItemId, expectedIndex) ->
+                            indices.any { it.groupItemId == groupItemId && it.displayIndex == expectedIndex }
                         }
                     }
                 }

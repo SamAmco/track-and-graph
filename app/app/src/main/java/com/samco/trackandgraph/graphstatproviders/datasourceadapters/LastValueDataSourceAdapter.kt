@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 import com.samco.trackandgraph.data.database.dto.LastValueStatCreateRequest
 import com.samco.trackandgraph.data.database.dto.LastValueStatUpdateRequest
@@ -60,7 +59,4 @@ class LastValueDataSourceAdapter @Inject constructor(
         return Pair(lvs.id, lvs)
     }
 
-    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat, groupId: Long) {
-        dataInteractor.duplicateLastValueStat(graphOrStat.id, groupId)
-    }
 }
