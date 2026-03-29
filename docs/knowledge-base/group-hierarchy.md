@@ -75,6 +75,8 @@ There are two path provider classes (both in `app/app/.../util/`), each walking 
 
 The separation exists because `FeaturePathProvider` intentionally deduplicates/collapses paths (desirable for selectors) while `ComponentPathProvider` must show every location (the whole point of the symlinks dialog). `FeaturePathProvider` also indexes by featureId (for trackers/functions), while `ComponentPathProvider` indexes by primary key ID (matching `group_items_table.child_id`).
 
+**Path deduplication for same-group duplicates**: Both providers call `.distinct()` on collected paths to handle same-group duplicate placements. Without this, a component placed twice in the same group would produce two identical path entries, causing `FeaturePathProvider` to show a misleading collapsed path (e.g. `/.../Steps` instead of just `/Steps`) and `ComponentPathProvider` to list the same path twice in the symlinks dialog.
+
 **Important**: Group and Feature DTOs do **not** carry hierarchy information (`groupId`, `parentGroupIds`, `displayIndex`). All hierarchy is expressed through `group_items_table` and `GroupGraph`. Do not add hierarchy fields to DTOs.
 
 ## Finding Code

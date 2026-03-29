@@ -45,7 +45,7 @@ docs:
 
   - file: group-hierarchy.md
     title: Group DAG structure and symlinks
-    description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion handles shared membership; GroupGraph, FeaturePathProvider, and ComponentPathProvider resolve display paths; DTOs never carry hierarchy info.
+    description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion handles shared membership; GroupGraph, FeaturePathProvider, and ComponentPathProvider resolve display paths (with .distinct() deduplication for same-group duplicates); DTOs never carry hierarchy info.
     keywords: [group, DAG, symlink, hierarchy, acyclic, parent, child, GroupGraph, FeaturePathProvider, ComponentPathProvider, deletion, path-resolution, SymlinksDialog]
 
   - file: group-items.md
