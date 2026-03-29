@@ -93,8 +93,8 @@ open class FeaturePathProvider(groupGraph: GroupGraph) {
         groupPaths[groupGraph.group.id] = mutableListOf(emptyList())
         walk(groupGraph, emptyList())
 
-        groupPathsById = groupPaths
-        featurePathsById = featurePaths
+        groupPathsById = groupPaths.mapValues { (_, paths) -> paths.distinct() }
+        featurePathsById = featurePaths.mapValues { (_, paths) -> paths.distinct() }
         featureNames = namesById
         features = featuresSet
     }

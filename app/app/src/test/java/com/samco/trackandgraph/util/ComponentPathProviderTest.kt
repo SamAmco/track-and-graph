@@ -585,6 +585,120 @@ class ComponentPathProviderTest {
         assert(graphPaths.contains("/b/shared/g1"))
     }
 
+    // ── Same-group duplicate placements ──
+
+    @Test
+    fun `tracker placed twice in same group produces single deduplicated path`() {
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = testGroup(1, "Health"),
+                        children = listOf(
+                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                        ),
+                    )
+                )
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        val paths = provider.getAllPathsForTracker(10)
+        assertEquals(listOf("/Health/Steps"), paths)
+    }
+
+    @Test
+    fun `group placed twice in same parent produces single deduplicated path`() {
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = testGroup(1, "Sub"),
+                        children = emptyList(),
+                    )
+                ),
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = testGroup(1, "Sub"),
+                        children = emptyList(),
+                    )
+                ),
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        assertEquals(listOf("/Sub"), provider.getAllPathsForGroup(1))
+    }
+
+    @Test
+    fun `function placed twice in same group produces single deduplicated path`() {
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.FunctionNode(testFunction(1, "MyFunc")),
+                GroupGraphItem.FunctionNode(testFunction(1, "MyFunc")),
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        assertEquals(listOf("/MyFunc"), provider.getAllPathsForFunction(1))
+    }
+
+    @Test
+    fun `graph placed twice in same group produces single deduplicated path`() {
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.GraphNode(testGraphOrStat(1, "MyGraph")),
+                GroupGraphItem.GraphNode(testGraphOrStat(1, "MyGraph")),
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        assertEquals(listOf("/MyGraph"), provider.getAllPathsForGraph(1))
+    }
+
+    @Test
+    fun `tracker in two different groups plus duplicated in one still shows only distinct paths`() {
+        // Root
+        // ├── a (1)
+        // │   ├── Steps (10)
+        // │   └── Steps (10) ← same-group duplicate
+        // └── b (2)
+        //     └── Steps (10)
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = testGroup(1, "a"),
+                        children = listOf(
+                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                        ),
+                    )
+                ),
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = testGroup(2, "b"),
+                        children = listOf(
+                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                        ),
+                    )
+                ),
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        val paths = provider.getAllPathsForTracker(10)
+        assertEquals(2, paths.size)
+        assert(paths.contains("/a/Steps")) { "Expected /a/Steps in $paths" }
+        assert(paths.contains("/b/Steps")) { "Expected /b/Steps in $paths" }
+    }
+
     @Test
     fun `large flat group with many children`() {
         val children = (1..20L).map { i ->

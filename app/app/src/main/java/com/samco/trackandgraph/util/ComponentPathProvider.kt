@@ -34,7 +34,7 @@ class ComponentPathProvider(private val groupGraph: GroupGraph) {
         entries.groupBy(
             keySelector = { (type, id, _) -> type to id },
             valueTransform = { (_, _, segments) -> formatPath(segments) }
-        )
+        ).mapValues { (_, paths) -> paths.distinct() }
     }
 
     fun getAllPathsForGroup(groupId: Long): List<String> =

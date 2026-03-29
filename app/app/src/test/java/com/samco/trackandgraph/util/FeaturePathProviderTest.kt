@@ -1,5 +1,12 @@
 package com.samco.trackandgraph.util
 
+import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.database.dto.Group
+import com.samco.trackandgraph.data.database.dto.GroupGraph
+import com.samco.trackandgraph.data.database.dto.GroupGraphItem
+import com.samco.trackandgraph.data.database.dto.Tracker
+import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
+import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -339,6 +346,122 @@ class FeaturePathProviderTest {
         val provider = FeaturePathProvider(buildGroupGraph(groups))
 
         assertEquals(".../b/child", provider.getPathForGroup(4))
+    }
+
+    // ── Same-group duplicate placement tests ──
+
+    @Test
+    fun `feature placed twice in same group produces single path without ellipsis`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("Health", 1, 0),
+        )
+
+        // Same feature placed twice in group 1 via two groupIds entries
+        // buildGroupGraph uses a Set so we construct manually
+        val graph = GroupGraph(
+            group = Group(0, "", 0, unique = true),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = Group(1, "Health", 0, unique = true),
+                        children = listOf(
+                            GroupGraphItem.TrackerNode(
+                                Tracker(
+                                    id = 10, name = "Steps", featureId = 10,
+                                    description = "", dataType = DataType.CONTINUOUS,
+                                    hasDefaultValue = false, defaultValue = 0.0, defaultLabel = "",
+                                    suggestionType = TrackerSuggestionType.VALUE_AND_LABEL,
+                                    suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
+                                )
+                            ),
+                            GroupGraphItem.TrackerNode(
+                                Tracker(
+                                    id = 10, name = "Steps", featureId = 10,
+                                    description = "", dataType = DataType.CONTINUOUS,
+                                    hasDefaultValue = false, defaultValue = 0.0, defaultLabel = "",
+                                    suggestionType = TrackerSuggestionType.VALUE_AND_LABEL,
+                                    suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
+                                )
+                            ),
+                        ),
+                    )
+                )
+            ),
+        )
+
+        val provider = FeaturePathProvider(graph)
+
+        assertEquals("/Health/Steps", provider.getPathForFeature(10))
+    }
+
+    @Test
+    fun `feature in two groups plus duplicated in one still shows collapsed path with only distinct paths`() {
+        // Root
+        // ├── a (1)
+        // │   ├── Steps (featureId=10)
+        // │   └── Steps (featureId=10)  ← same-group duplicate
+        // └── b (2)
+        //     └── Steps (featureId=10)
+        val tracker = Tracker(
+            id = 10, name = "Steps", featureId = 10,
+            description = "", dataType = DataType.CONTINUOUS,
+            hasDefaultValue = false, defaultValue = 0.0, defaultLabel = "",
+            suggestionType = TrackerSuggestionType.VALUE_AND_LABEL,
+            suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
+        )
+        val graph = GroupGraph(
+            group = Group(0, "", 0, unique = true),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = Group(1, "a", 0, unique = true),
+                        children = listOf(
+                            GroupGraphItem.TrackerNode(tracker),
+                            GroupGraphItem.TrackerNode(tracker),
+                        ),
+                    )
+                ),
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = Group(2, "b", 0, unique = true),
+                        children = listOf(
+                            GroupGraphItem.TrackerNode(tracker),
+                        ),
+                    )
+                ),
+            ),
+        )
+
+        val provider = FeaturePathProvider(graph)
+
+        // Should be 2 distinct paths (/a/Steps, /b/Steps), collapsed as ".../Steps"
+        assertEquals(".../Steps", provider.getPathForFeature(10))
+    }
+
+    @Test
+    fun `group placed twice in same parent produces single path`() {
+        val graph = GroupGraph(
+            group = Group(0, "", 0, unique = true),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = Group(1, "Sub", 0, unique = true),
+                        children = emptyList(),
+                    )
+                ),
+                GroupGraphItem.GroupNode(
+                    GroupGraph(
+                        group = Group(1, "Sub", 0, unique = true),
+                        children = emptyList(),
+                    )
+                ),
+            ),
+        )
+
+        val provider = FeaturePathProvider(graph)
+
+        assertEquals("/Sub", provider.getPathForGroup(1))
     }
 
     @Test
