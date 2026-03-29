@@ -449,25 +449,27 @@ private fun FeatureHistoryView(
                         contentDescription = stringResource(id = R.string.copy_selected_content_description)
                     )
                 }
-                Spacer(modifier = Modifier.height(cardMarginSmall))
-                FloatingActionButton(
-                    onClick = onMoveSelectedClick,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.move_item_24px),
-                        contentDescription = stringResource(id = R.string.move_selected_content_description)
-                    )
-                }
-                Spacer(modifier = Modifier.height(cardMarginSmall))
-                FloatingActionButton(
-                    onClick = onDeleteSelectedClick,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.delete_icon),
-                        contentDescription = stringResource(id = R.string.delete_selected_content_description)
-                    )
+                if (isTracker) {
+                    Spacer(modifier = Modifier.height(cardMarginSmall))
+                    FloatingActionButton(
+                        onClick = onMoveSelectedClick,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.move_item_24px),
+                            contentDescription = stringResource(id = R.string.move_selected_content_description)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(cardMarginSmall))
+                    FloatingActionButton(
+                        onClick = onDeleteSelectedClick,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.delete_icon),
+                            contentDescription = stringResource(id = R.string.delete_selected_content_description)
+                        )
+                    }
                 }
             }
         }
@@ -541,7 +543,7 @@ private fun DataPointCard(
                 }
             },
             onLongClick = {
-                if (isTracker && !isMultiSelectMode) {
+                if (!isMultiSelectMode) {
                     onLongClick()
                 }
             }
