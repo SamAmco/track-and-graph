@@ -133,7 +133,7 @@ override suspend fun createSymlink(...) = withContext(io) {
 
 **Contract**: The data layer is responsible for emitting ALL relevant events. For example, creating a tracker emits both `TrackerCreated` and `DisplayIndex(groupId)`. Deleting a tracker emits `TrackerDeleted` plus `GraphOrStatDeleted`/`GraphOrStatUpdated` for any affected graphs. Consumers should NOT need to infer secondary effects from primary events.
 
-`DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, duplicates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged.
+`DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, duplicates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged — but UI flows that track which items are in a group (like `dbDisplayIndices` in `GroupViewModel`) must also listen for the component-deleted events (`TrackerDeleted`, `GraphOrStatDeleted`, `GroupDeleted`, `FunctionDeleted`, `Reminder`) to refresh when a GroupItem is removed.
 
 **Pitfall — double emission**: Methods that use `performAtomicUpdate` must NOT also emit events inside the lambda, because `performAtomicUpdate` already emits via its `.also` block. For example, `shiftUpGroupChildIndexes` wraps `shiftDisplayIndexesDown` in `performAtomicUpdate(DataUpdateType.DisplayIndex(groupId))` — adding a second `dataUpdateEvents.emit` inside would cause duplicate `DisplayIndex` events.
 

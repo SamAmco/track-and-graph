@@ -20,8 +20,8 @@ docs:
 
   - file: architecture.md
     title: Architecture and conventions
-    description: MVVM pattern, module structure (app/app UI, app/data data layer), KMP compatibility constraints (no mocking frameworks), Hilt DI, Channel-based UI events, and coding conventions.
-    keywords: [architecture, MVVM, Hilt, KMP, modules, Room, coroutines, DataInteractor, Channel, conventions, testing]
+    description: MVVM pattern, module structure (app/app UI, app/data data layer), KMP compatibility constraints (no mocking frameworks), Hilt DI, Channel-based UI events, coding conventions, and localization (4 languages — always update all translations).
+    keywords: [architecture, MVVM, Hilt, KMP, modules, Room, coroutines, DataInteractor, Channel, conventions, testing, strings, localization, translations, i18n]
 
   - file: build-commands.md
     title: Build and test commands

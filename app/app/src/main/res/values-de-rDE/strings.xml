@@ -36,8 +36,8 @@
     <string name="no_trackers_functions_hint">Bitte erstellen Sie einen Tracker, bevor Sie Funktionen erstellen.</string>
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
-    <string name="item_in_multiple_groups">Dieses Element existiert in mehreren Gruppen. Sie können es nur aus dieser Gruppe entfernen oder überall löschen.</string>
-    <string name="remove_from_this_group">Aus Gruppe entfernen</string>
+    <string name="item_in_multiple_groups">Dieses Element existiert an mehreren Stellen. Sie können es von hier entfernen oder überall löschen.</string>
+    <string name="remove_from_this_group">Von hier entfernen</string>
     <string name="delete_everywhere">Überall löschen</string>
     <string name="ru_sure_del_function">Sind Sie sicher, dass Sie diese Funktion löschen möchten? Sie können dies nicht rückgängig machen.</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>

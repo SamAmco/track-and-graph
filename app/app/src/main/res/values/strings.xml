@@ -43,8 +43,8 @@
     <string name="ru_sure_del_group">Are you sure you want to delete this group and everything in it? You can not reverse this.</string>
     <string name="ru_sure_del_graph">Are you sure you want to delete this graph? You can not reverse this. You will not lose any tracked data.</string>
     <string name="ru_sure_del_feature">Are you sure you want to delete this tracked data?</string>
-    <string name="item_in_multiple_groups">This item exists in multiple groups. You can remove it from just this group, or delete it everywhere.</string>
-    <string name="remove_from_this_group">Remove from group</string>
+    <string name="item_in_multiple_groups">This item exists in multiple places. You can remove it from here, or delete it everywhere.</string>
+    <string name="remove_from_this_group">Remove from here</string>
     <string name="delete_everywhere">Delete everywhere</string>
     <string name="ru_sure_del_function">Are you sure you want to delete this function? You can not reverse this.</string>
     <string name="ru_sure_del_data_point">Are you sure you want to delete this data point?</string>

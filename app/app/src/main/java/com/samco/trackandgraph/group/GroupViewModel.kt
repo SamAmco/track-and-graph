@@ -299,7 +299,12 @@ class GroupViewModelImpl @Inject constructor(
             .filter { (_, event) ->
                 event is DataUpdateType.DisplayIndex ||
                 event is DataUpdateType.SymlinkCreated ||
-                event is DataUpdateType.Unknown
+                event is DataUpdateType.Unknown ||
+                event is DataUpdateType.TrackerDeleted ||
+                event is DataUpdateType.GraphOrStatDeleted ||
+                event is DataUpdateType.GroupDeleted ||
+                event is DataUpdateType.FunctionDeleted ||
+                event is DataUpdateType.Reminder
             }
             .debounce(10L)
             .map { (groupId, _) ->

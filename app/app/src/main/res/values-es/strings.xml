@@ -36,8 +36,8 @@
     <string name="no_trackers_functions_hint">Cree un rastreador antes de crear cualquier función.</string>
     <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
-    <string name="item_in_multiple_groups">Este elemento existe en varios grupos. Puedes eliminarlo solo de este grupo o eliminarlo en todas partes.</string>
-    <string name="remove_from_this_group">Eliminar del grupo</string>
+    <string name="item_in_multiple_groups">Este elemento existe en varios lugares. Puedes eliminarlo de aquí o eliminarlo en todas partes.</string>
+    <string name="remove_from_this_group">Eliminar de aquí</string>
     <string name="delete_everywhere">Eliminar en todas partes</string>
     <string name="ru_sure_del_function">¿Estás seguro de que quieres eliminar esta función? No puedes revertir esto.</string>
     <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>

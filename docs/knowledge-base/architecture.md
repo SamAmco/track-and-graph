@@ -100,6 +100,10 @@ LaunchedEffect(Unit) {
 - Entities in `app/data/.../database/entity/` (internal)
 - Test fakes in `app/data/src/testFixtures/`
 
+## String Resources and Localization
+
+The app is localized into 4 languages: English (`values/`), French (`values-fr/`), Spanish (`values-es/`), and German (`values-de-rDE/`). When modifying any user-visible string in `strings.xml`, **always update all 4 translations**. Search for the string name across all `strings.xml` files to find every locale.
+
 ## Build Commands
 
 See [build-commands.md](build-commands.md).
