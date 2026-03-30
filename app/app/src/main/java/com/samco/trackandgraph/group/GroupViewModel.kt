@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -86,6 +87,7 @@ interface GroupViewModel {
     val hasAnyReminders: StateFlow<Boolean>
     val loading: StateFlow<Boolean>
     val lazyGridState: LazyGridState
+    val scrollToTopEvents: SharedFlow<Unit>
 
     fun setGroup(groupId: Long)
     suspend fun userHasAnyTrackers(): Boolean
@@ -122,6 +124,9 @@ class GroupViewModelImpl @Inject constructor(
 ) : ViewModel(), GroupViewModel {
 
     override val lazyGridState = LazyGridState()
+
+    // GroupItemIds of items created via duplicate — excluded from scroll-to-top
+    private val duplicatedGroupItemIds = mutableSetOf<Long>()
 
     private val _showDurationInputDialog =
         MutableStateFlow<GroupViewModel.DurationInputDialogData?>(null)
@@ -352,6 +357,23 @@ class GroupViewModelImpl @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    override val scrollToTopEvents: SharedFlow<Unit> = currentChildren
+        .map { children -> children.map { it.groupItemId }.toSet() }
+        .runningFold(Pair(emptySet<Long>(), false)) { (previousIds, _), currentIds ->
+            val newIds = currentIds - previousIds
+            val shouldScroll = if (newIds.isNotEmpty() && previousIds.isNotEmpty()) {
+                val isAllDuplicates = synchronized(duplicatedGroupItemIds) {
+                    duplicatedGroupItemIds.containsAll(newIds).also {
+                        duplicatedGroupItemIds.removeAll(newIds)
+                    }
+                }
+                !isAllDuplicates
+            } else false
+            Pair(currentIds, shouldScroll)
+        }
+        .filter { it.second }
+        .map { }
+        .shareIn(viewModelScope, SharingStarted.Eagerly)
 
     override val groupHasAnyTrackers: StateFlow<Boolean> = allChildren
         .map { children -> children.any { it is GroupChild.ChildTracker } }
@@ -462,10 +484,15 @@ class GroupViewModelImpl @Inject constructor(
 
     override fun onDuplicate(groupItemId: Long, type: GroupChildType) {
         viewModelScope.launch(io) {
-            when (type) {
+            val created = when (type) {
                 GroupChildType.FUNCTION -> dataInteractor.duplicateFunction(groupItemId)
                 GroupChildType.GRAPH -> dataInteractor.duplicateGraphOrStat(groupItemId)
-                else -> {}
+                else -> null
+            }
+            if (created != null) {
+                synchronized(duplicatedGroupItemIds) {
+                    duplicatedGroupItemIds.add(created.groupItemId)
+                }
             }
         }
     }

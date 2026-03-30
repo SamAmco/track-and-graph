@@ -43,7 +43,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -220,6 +219,12 @@ private fun GroupScreenContent(
     val groupHasTrackers = groupViewModel.groupHasAnyTrackers.collectAsStateWithLifecycle().value
     val allChildren = groupViewModel.currentChildren.collectAsStateWithLifecycle().value
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        groupViewModel.scrollToTopEvents.collect {
+            groupViewModel.lazyGridState.animateScrollToItem(0)
+        }
+    }
 
     val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel =
         hiltViewModel<AddDataPointsViewModelImpl>()
@@ -534,13 +539,6 @@ private fun GroupGrid(
         if (reorderableLazyGridState.isAnyItemDragging) onDragStart() else onDragEnd()
     }
 
-    var lastSize by remember { mutableIntStateOf(allChildren.size) }
-    LaunchedEffect(allChildren.size) {
-        if (allChildren.size > lastSize) {
-            lazyGridState.animateScrollToItem(0)
-        }
-        lastSize = allChildren.size
-    }
 
     LazyVerticalGrid(
         modifier = Modifier
