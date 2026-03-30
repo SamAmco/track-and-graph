@@ -101,7 +101,7 @@ interface GroupViewModel {
      */
     fun onDelete(groupItemId: Long, type: GroupChildType, deleteEverywhere: Boolean)
 
-    fun onDuplicate(groupItemId: Long)
+    fun onDuplicate(groupItemId: Long, type: GroupChildType)
     fun onConsumedShowDurationInputDialog()
     fun stopTimer(tracker: DisplayTracker)
     fun playTimer(tracker: DisplayTracker)
@@ -460,9 +460,13 @@ class GroupViewModelImpl @Inject constructor(
         }
     }
 
-    override fun onDuplicate(groupItemId: Long) {
+    override fun onDuplicate(groupItemId: Long, type: GroupChildType) {
         viewModelScope.launch(io) {
-            dataInteractor.duplicateGraphOrStat(groupItemId)
+            when (type) {
+                GroupChildType.FUNCTION -> dataInteractor.duplicateFunction(groupItemId)
+                GroupChildType.GRAPH -> dataInteractor.duplicateGraphOrStat(groupItemId)
+                else -> {}
+            }
         }
     }
 

@@ -297,8 +297,8 @@ private fun GroupScreenContent(
         onMoveItem = { groupItemId, hiddenItems ->
             moveItemViewModel.showMoveDialog(groupItemId, hiddenItems)
         },
-        onDuplicateItem = { groupItemId ->
-            groupViewModel.onDuplicate(groupItemId)
+        onDuplicateItem = { groupItemId, type ->
+            groupViewModel.onDuplicate(groupItemId, type)
         },
         onDragStart = groupViewModel::onDragStart,
         onDragSwap = groupViewModel::onDragSwap,
@@ -426,7 +426,7 @@ private fun GroupScreenView(
     functionClickListeners: FunctionClickListeners? = null,
     onDeleteItem: (groupItemId: Long, type: DeleteType, unique: Boolean) -> Unit = { _, _, _ -> },
     onMoveItem: (groupItemId: Long, hiddenItems: Set<HiddenItem>) -> Unit = { _, _ -> },
-    onDuplicateItem: (groupItemId: Long) -> Unit = {},
+    onDuplicateItem: (groupItemId: Long, type: GroupChildType) -> Unit = { _, _ -> },
     onDragStart: () -> Unit = {},
     onDragSwap: (Int, Int) -> Unit = { _, _ -> },
     onDragEnd: () -> Unit = {},
@@ -518,7 +518,7 @@ private fun GroupGrid(
     functionClickListeners: FunctionClickListeners,
     onDeleteItem: (groupItemId: Long, type: DeleteType, unique: Boolean) -> Unit,
     onMoveItem: (groupItemId: Long, hiddenItems: Set<HiddenItem>) -> Unit,
-    onDuplicateItem: (groupItemId: Long) -> Unit,
+    onDuplicateItem: (groupItemId: Long, type: GroupChildType) -> Unit,
     onDragStart: () -> Unit,
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
@@ -585,7 +585,7 @@ private fun GroupGrid(
                             clickListeners = functionClickListeners,
                             onDelete = { onDeleteItem(item.groupItemId, DeleteType.FUNCTION, it.unique) },
                             onMove = { onMoveItem(item.groupItemId, emptySet()) },
-                            onDuplicate = { onDuplicateItem(item.groupItemId) },
+                            onDuplicate = { onDuplicateItem(item.groupItemId, GroupChildType.FUNCTION) },
                             isElevated = isDragging,
                         )
                     }
@@ -606,7 +606,7 @@ private fun GroupGrid(
                             clickListeners = graphStatClickListeners,
                             onDelete = { onDeleteItem(item.groupItemId, DeleteType.GRAPH_STAT, it.graphOrStat.unique) },
                             onMove = { onMoveItem(item.groupItemId, emptySet()) },
-                            onDuplicate = { onDuplicateItem(item.groupItemId) },
+                            onDuplicate = { onDuplicateItem(item.groupItemId, GroupChildType.GRAPH) },
                             isElevated = isDragging,
                         )
                     }
