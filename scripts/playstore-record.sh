@@ -12,6 +12,16 @@ AVD_NAME="shot-api35-hi"
 
 echo "==> Starting Play Store screenshot recording process"
 
+# Fast-fail prerequisite checks
+if ! command -v avdmanager &>/dev/null && [ ! -x "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" ]; then
+    echo "Error: avdmanager missing. Install Android cmdline-tools."
+    exit 1
+fi
+if ! bundle exec fastlane --version &>/dev/null; then
+    echo "Error: fastlane not available via bundler. Run: bundle install"
+    exit 1
+fi
+
 # Check prerequisites and setup
 check_no_devices
 ensure_avd "$AVD_NAME"

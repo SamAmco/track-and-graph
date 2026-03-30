@@ -131,22 +131,36 @@ class TutorialScreenshots {
         takeDeviceScreenshot("tutorial_1")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
+        // Wait for parent group cards to reload after navigating back
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodes(hasTestTag("groupCard"))
+                .fetchSemanticsNodes().size >= 3
+        }
 
         composeRule.onAllNodes(hasTestTag("groupCard"))[1].performClick()
         composeRule.waitForIdle()
-        composeRule.waitUntilAtLeastOneExists(hasTestTag("graphStatCard"))
-        composeRule.waitForIdle()
-        composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("graphStatCard"), 10_000)
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            composeRule.onAllNodes(hasTestTag("loadingIndicator"))
+                .fetchSemanticsNodes().isEmpty()
+        }
         composeRule.waitForIdle()
         takeDeviceScreenshot("tutorial_2")
         composeRule.onNodeWithTag("backButton", true).performClick()
         composeRule.waitForIdle()
+        // Wait for parent group cards to reload after navigating back
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodes(hasTestTag("groupCard"))
+                .fetchSemanticsNodes().size >= 3
+        }
 
         composeRule.onAllNodes(hasTestTag("groupCard"))[2].performClick()
         composeRule.waitForIdle()
-        composeRule.waitUntilAtLeastOneExists(hasTestTag("graphStatCard"))
-        composeRule.waitForIdle()
-        composeRule.waitUntilDoesNotExist(hasTestTag("loadingIndicator"))
+        composeRule.waitUntilAtLeastOneExists(hasTestTag("graphStatCard"), 10_000)
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            composeRule.onAllNodes(hasTestTag("loadingIndicator"))
+                .fetchSemanticsNodes().isEmpty()
+        }
         composeRule.waitForIdle()
         takeDeviceScreenshot("tutorial_3")
         composeRule.onNodeWithTag("backButton", true).performClick()

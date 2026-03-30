@@ -25,6 +25,8 @@ import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphFeatureConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
+import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -35,6 +37,7 @@ import org.threeten.bp.Period
 
 private data class ScreenshotGroupData(
     val groupId: Long,
+    val groupItemId: Long,
     val relaxationTrackerId: Long,
     val stressTrackerId: Long
 )
@@ -45,19 +48,30 @@ suspend fun createFirstOpenTutorialGroup(dataInteractor: DataInteractor, dataSam
     // Create the three screenshot groups
     val screenshot1Data = createScreenshot1Group(dataInteractor, mainGroupId)
     val screenshot2Data = createScreenshot2Group(dataInteractor, dataSampler, mainGroupId, screenshot1Data)
-    createScreenshot3Group(dataInteractor, dataSampler, mainGroupId, screenshot2Data)
+    val screenshot3Data = createScreenshot3Group(dataInteractor, dataSampler, mainGroupId, screenshot2Data)
+
+    // Reorder so screenshot1 is first (index 0), screenshot2 second, screenshot3 third
+    dataInteractor.updateGroupChildOrder(
+        mainGroupId,
+        listOf(
+            GroupChildDisplayIndex(screenshot1Data.groupItemId, GroupChildType.GROUP, screenshot1Data.groupId, 0),
+            GroupChildDisplayIndex(screenshot2Data.groupItemId, GroupChildType.GROUP, screenshot2Data.groupId, 1),
+            GroupChildDisplayIndex(screenshot3Data.groupItemId, GroupChildType.GROUP, screenshot3Data.groupId, 2),
+        )
+    )
 }
 
 private suspend fun createScreenshot1Group(
     dataInteractor: DataInteractor,
     parentGroupId: Long
 ): ScreenshotGroupData {
-    val groupId = dataInteractor.insertGroup(
+    val group = dataInteractor.insertGroup(
         createGroup(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
         )
-    ).componentId
+    )
+    val groupId = group.componentId
 
     // Create Relaxation tracker
     val relaxationTrackerId = dataInteractor.createTracker(
@@ -105,7 +119,7 @@ private suspend fun createScreenshot1Group(
         roundToInt = false,
     )
 
-    return ScreenshotGroupData(groupId, relaxationTrackerId, stressTrackerId)
+    return ScreenshotGroupData(groupId, group.groupItemId, relaxationTrackerId, stressTrackerId)
 }
 
 private suspend fun createScreenshot2Group(
@@ -114,12 +128,13 @@ private suspend fun createScreenshot2Group(
     parentGroupId: Long,
     screenshot1Data: ScreenshotGroupData
 ): ScreenshotGroupData {
-    val groupId = dataInteractor.insertGroup(
+    val group = dataInteractor.insertGroup(
         createGroup(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
         )
-    ).componentId
+    )
+    val groupId = group.componentId
 
     // Get the trackers from Screenshot 1
     val relaxationTracker = dataInteractor.getTrackerById(screenshot1Data.relaxationTrackerId)!!
@@ -190,7 +205,7 @@ private suspend fun createScreenshot2Group(
         stressFeatureId = stressFeatureId,
     )
 
-    return ScreenshotGroupData(groupId, relaxationTrackerId, stressTrackerId)
+    return ScreenshotGroupData(groupId, group.groupItemId, relaxationTrackerId, stressTrackerId)
 }
 
 private suspend fun createScreenshot3Group(
@@ -199,12 +214,13 @@ private suspend fun createScreenshot3Group(
     parentGroupId: Long,
     screenshot2Data: ScreenshotGroupData
 ): ScreenshotGroupData {
-    val groupId = dataInteractor.insertGroup(
+    val group = dataInteractor.insertGroup(
         createGroup(
             name = "Track & Graph",
             parentGroupId = parentGroupId,
         )
-    ).componentId
+    )
+    val groupId = group.componentId
 
     // Get the trackers from Screenshot 2
     val relaxationTracker = dataInteractor.getTrackerById(screenshot2Data.relaxationTrackerId)!!
@@ -281,7 +297,7 @@ private suspend fun createScreenshot3Group(
         createGroup(name = "Health", parentGroupId = groupId)
     )
 
-    return ScreenshotGroupData(groupId, relaxationTrackerId, stressTrackerId)
+    return ScreenshotGroupData(groupId, group.groupItemId, relaxationTrackerId, stressTrackerId)
 }
 
 private suspend fun createMonthlyMovingAverageGraph(

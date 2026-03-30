@@ -24,9 +24,9 @@ docs:
     keywords: [architecture, MVVM, Hilt, KMP, modules, Room, coroutines, DataInteractor, Channel, conventions, testing, strings, localization, translations, i18n]
 
   - file: build-commands.md
-    title: Build and test commands
-    description: Gradle commands for building and running tests; all run from app/ directory; --tests filtering by class name; test results location.
-    keywords: [build, gradle, test, assembleDebug, commands, gradlew, testDebugUnitTest]
+    title: Build, test, and screenshot commands
+    description: Gradle commands for building and running tests; screenshot test setup (promo build type, prerequisites, Compose test timing pitfalls with AndroidView content); TestDataInteractor raw SQL must match current groups_table schema.
+    keywords: [build, gradle, test, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, promo, playstore, frameit, fastlane, waitUntil, AndroidView, TestDataInteractor, groups_table]
 
   - file: component-types.md
     title: Component types — Trackers, Functions, Graphs, Reminders, Groups

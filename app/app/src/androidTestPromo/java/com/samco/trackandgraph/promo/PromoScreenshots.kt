@@ -118,7 +118,12 @@ class PromoScreenshots {
         composeRule.waitUntilAtLeastOneExists(hasText("Daily"))
         composeRule.onNodeWithText("Daily").performClick()
         composeRule.waitForIdle()
-        composeRule.waitUntilAtLeastOneExists(hasText("Sleep"))
+        // Wait for tracker cards to fully load and render
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            composeRule.onAllNodes(hasTestTag("trackerCard"))
+                .fetchSemanticsNodes().size >= 8
+        }
+        composeRule.waitForIdle()
         takeDeviceScreenshot("1")
         composeRule.activity.onBackPressedDispatcher.onBackPressed()
         composeRule.waitForIdle()
@@ -130,6 +135,15 @@ class PromoScreenshots {
         composeRule.onNode(hasText("Exercise").and(hasTestTag("groupCard"))).performClick()
         composeRule.waitForIdle()
         composeRule.waitUntilAtLeastOneExists(hasText("Exercise weekly totals in the last 6 months"))
+        // Wait for all graphs to finish loading - waitUntil yields to the UI thread
+        // between polls, allowing async graph data computation and rendering to proceed.
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            composeRule.onAllNodes(hasTestTag("loadingIndicator"))
+                .fetchSemanticsNodes().isEmpty()
+                && composeRule.onAllNodes(hasTestTag("graphStatCard"))
+                .fetchSemanticsNodes().size >= 2
+        }
+        composeRule.waitForIdle()
         takeDeviceScreenshot("2")
         composeRule.activity.onBackPressedDispatcher.onBackPressed()
         composeRule.waitForIdle()
@@ -195,6 +209,8 @@ class PromoScreenshots {
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("remindersMenuItem", true).performClick()
         composeRule.waitForIdle()
+        composeRule.waitUntilAtLeastOneExists(hasText("Tracking dailies"), 5000)
+        composeRule.waitForIdle()
         takeDeviceScreenshot("7")
         composeRule.activity.onBackPressedDispatcher.onBackPressed()
         composeRule.waitForIdle()
@@ -218,6 +234,13 @@ class PromoScreenshots {
 
         composeRule.waitUntilAtLeastOneExists(hasText("Output"))
         composeRule.waitUntilAtLeastOneExists(hasText("Data Source"))
+        // Wait for node editor viewport auto-fit layout to complete.
+        // The nodes exist in the tree but need multiple layout passes to position.
+        // waitUntil yields to the UI thread between polls, letting layout proceed.
+        val nodeEditorStart = System.currentTimeMillis()
+        composeRule.waitUntil(timeoutMillis = 3_000) {
+            System.currentTimeMillis() - nodeEditorStart > 2_000
+        }
         composeRule.waitForIdle()
         takeDeviceScreenshot("8")
         //Wait a sec for any files to flush to disk

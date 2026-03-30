@@ -39,6 +39,10 @@ val localProps = Properties().apply {
 android {
     compileSdk = libs.versions.androidSdk.get().toInt()
 
+    if (project.hasProperty("usePromoTests")) {
+        testBuildType = "promo"
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
@@ -138,6 +142,8 @@ android {
             isShrinkResources = false
             // Use debug signing for testing (allows installation on emulator)
             signingConfig = signingConfigs.getByName("debug")
+            // Must be debuggable so Gradle generates connectedPromoAndroidTest task
+            isDebuggable = true
         }
     }
 
