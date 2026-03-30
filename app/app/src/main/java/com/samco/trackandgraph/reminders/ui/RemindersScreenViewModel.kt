@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
-import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.database.dto.ReminderParams
@@ -46,7 +45,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -130,27 +128,6 @@ class RemindersScreenViewModelImpl @Inject constructor(
             }
             .flowOn(io)
             .stateIn(viewModelScope, SharingStarted.Eagerly, LoadingState.Loading)
-
-    /**
-     * A flow of display indices from the database for the reminders screen, represented as a
-     * map from reminder ID to displayIndex for O(1) lookups during sorting.
-     *
-     * Used only by [onDragEnd] to confirm the database has persisted the new order before
-     * switching back from the temporary drag list to the real data.
-     */
-    @OptIn(FlowPreview::class)
-    private val dbDisplayIndices: StateFlow<List<GroupChildDisplayIndex>?> =
-        dataInteractor.getDataUpdateEvents()
-            .filter {
-                it is DataUpdateType.ReminderScreenDisplayOrder ||
-                it is DataUpdateType.Reminder ||
-                it is DataUpdateType.Unknown
-            }
-            .debounce(10L)
-            .onStart { emit(DataUpdateType.ReminderScreenDisplayOrder) }
-            .map { dataInteractor.getDisplayIndicesForRemindersScreen() }
-            .flowOn(io)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     override val currentReminders: StateFlow<List<ReminderViewData>> = isDragging
         .flatMapLatest { dragging ->
@@ -247,22 +224,22 @@ class RemindersScreenViewModelImpl @Inject constructor(
             // Update all display indices in one call (null groupId = reminders screen)
             dataInteractor.updateReminderScreenDisplayOrder(orders = orders)
 
-            // Wait until dbDisplayIndices reflects the new order before switching back
-            // to the real reminders, otherwise the UI could glitch swapping back and forth.
-            val expectedIndices = orders.associate { it.id to it.displayIndex }
+            // Wait until allReminders reflects the new order before switching back
+            // to the real reminders. We must wait on allReminders (not just dbDisplayIndices)
+            // because currentReminders switches to allReminders when isDragging becomes false.
+            // If allReminders still has the old order (due to its 100ms debounce), the UI
+            // would briefly show items in the old positions before snapping to the new ones.
+            val expectedOrder = orders.sortedBy { it.displayIndex }.map { it.id }
             try {
                 withTimeout(500) {
-                    dbDisplayIndices.filterNotNull().first { indices ->
-                        val byReminderId = indices.associate { it.id to it.displayIndex }
-                        expectedIndices.all { (id, expectedIndex) ->
-                            byReminderId[id] == expectedIndex
-                        }
+                    allReminders.filterIsInstance<LoadingState.Loaded>().first { loaded ->
+                        loaded.data.map { it.id } == expectedOrder
                     }
                 }
             } catch (e: TimeoutCancellationException) {
                 Timber.e(
                     e,
-                    "The database did not update the reminder indexes within 500ms. Drag and drop update may have failed."
+                    "The reminder list did not update within 500ms. Drag and drop update may have failed."
                 )
             }
 
