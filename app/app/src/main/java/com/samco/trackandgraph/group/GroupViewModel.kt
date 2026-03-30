@@ -196,7 +196,7 @@ class GroupViewModelImpl @Inject constructor(
         .getGraphsAndStatsByGroupIdSync(groupId)
 
     private fun graphsToDataMap(graphs: List<GraphWithViewData>): Map<Long, CalculatedGraphViewData> =
-        graphs.associateBy({ it.graph.id }, { it.viewData })
+        graphs.associateBy({ it.graph.id }, { it.viewData.copy(unique = it.graph.unique) })
 
     private fun mapNewGraphsToOldViewData(
         viewData: List<GraphWithViewData>,

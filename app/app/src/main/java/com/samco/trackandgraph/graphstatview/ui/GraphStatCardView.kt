@@ -44,6 +44,7 @@ fun GraphStatCardView(
     modifier: Modifier = Modifier,
     isElevated: Boolean = false,
     graphStatViewData: IGraphStatViewData,
+    unique: Boolean = graphStatViewData.graphOrStat.unique,
     clickListener: GraphStatClickListener? = null,
 ) = Box(
     modifier = Modifier
@@ -67,7 +68,7 @@ fun GraphStatCardView(
                     } else it
                 }
         ) {
-            if (!graphStatViewData.graphOrStat.unique) {
+            if (!unique) {
                 SymlinkIcon(modifier = Modifier.align(Alignment.TopStart))
             }
 
@@ -75,7 +76,8 @@ fun GraphStatCardView(
                 MenuSection(
                     modifier = Modifier.align(Alignment.TopEnd),
                     clickListener = clickListener,
-                    graphStatViewData = graphStatViewData
+                    graphStatViewData = graphStatViewData,
+                    unique = unique,
                 )
             }
 
@@ -94,7 +96,8 @@ fun GraphStatCardView(
 private fun MenuSection(
     modifier: Modifier = Modifier,
     clickListener: GraphStatClickListener,
-    graphStatViewData: IGraphStatViewData
+    graphStatViewData: IGraphStatViewData,
+    unique: Boolean,
 ) = Box(modifier = modifier.size(buttonSize)) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -141,7 +144,7 @@ private fun MenuSection(
                 expanded = false
             }
         )
-        if (!graphStatViewData.graphOrStat.unique) {
+        if (!unique) {
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.symlinks)) },
                 onClick = {

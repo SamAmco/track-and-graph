@@ -601,8 +601,9 @@ private fun GroupGrid(
                     is GroupChild.ChildGraph -> {
                         GraphStatItem(
                             graphStat = item.graph.viewData,
+                            unique = item.graph.unique,
                             clickListeners = graphStatClickListeners,
-                            onDelete = { onDeleteItem(item.groupItemId, DeleteType.GRAPH_STAT, it.graphOrStat.unique) },
+                            onDelete = { onDeleteItem(item.groupItemId, DeleteType.GRAPH_STAT, item.graph.unique) },
                             onMove = { onMoveItem(item.groupItemId, emptySet()) },
                             onDuplicate = { onDuplicateItem(item.groupItemId, GroupChildType.GRAPH) },
                             isElevated = isDragging,
@@ -657,6 +658,7 @@ private fun ReorderableCollectionItemScope.GroupItem(
 @Composable
 private fun ReorderableCollectionItemScope.GraphStatItem(
     graphStat: IGraphStatViewData,
+    unique: Boolean,
     clickListeners: GraphStatClickListeners,
     onDelete: (IGraphStatViewData) -> Unit,
     onMove: (IGraphStatViewData) -> Unit,
@@ -666,6 +668,7 @@ private fun ReorderableCollectionItemScope.GraphStatItem(
     modifier = Modifier.longPressDraggableHandle(),
     isElevated = isElevated,
     graphStatViewData = graphStat,
+    unique = unique,
     clickListener = GraphStatClickListener(
         onEdit = { clickListeners.onEdit(it) },
         onDelete = onDelete,
