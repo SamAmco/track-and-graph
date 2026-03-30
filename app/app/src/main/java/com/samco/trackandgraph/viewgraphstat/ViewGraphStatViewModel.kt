@@ -158,9 +158,9 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     override val notes: StateFlow<List<GraphNote>> =
-        combine(dataPointNotes, globalNotes) { dataPointNotes, globalNotes ->
-            val oldestTime = dataPointNotes.minByOrNull { it.timestamp }?.timestamp
-            val newestTime = dataPointNotes.maxByOrNull { it.timestamp }?.timestamp
+        combine(dataPointNotes, globalNotes, dataPoints) { dataPointNotes, globalNotes, dataPoints ->
+            val oldestTime = dataPoints.minByOrNull { it.timestamp }?.timestamp
+            val newestTime = dataPoints.maxByOrNull { it.timestamp }?.timestamp
 
             if (oldestTime == null || newestTime == null) return@combine dataPointNotes
 
