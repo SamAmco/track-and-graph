@@ -52,6 +52,9 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -87,7 +90,7 @@ interface GroupViewModel {
     val hasAnyReminders: StateFlow<Boolean>
     val loading: StateFlow<Boolean>
     val lazyGridState: LazyGridState
-    val scrollToTopEvents: SharedFlow<Unit>
+    val scrollToTopEvents: ReceiveChannel<Unit>
 
     fun setGroup(groupId: Long)
     suspend fun userHasAnyTrackers(): Boolean
@@ -357,23 +360,24 @@ class GroupViewModelImpl @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    override val scrollToTopEvents: SharedFlow<Unit> = currentChildren
-        .map { children -> children.map { it.groupItemId }.toSet() }
-        .runningFold(Pair(emptySet<Long>(), false)) { (previousIds, _), currentIds ->
-            val newIds = currentIds - previousIds
-            val shouldScroll = if (newIds.isNotEmpty() && previousIds.isNotEmpty()) {
-                val isAllDuplicates = synchronized(duplicatedGroupItemIds) {
-                    duplicatedGroupItemIds.containsAll(newIds).also {
-                        duplicatedGroupItemIds.removeAll(newIds)
+    override val scrollToTopEvents = viewModelScope.produce(capacity = Channel.BUFFERED) {
+        currentChildren
+            .map { children -> children.map { it.groupItemId }.toSet() }
+            .runningFold(Pair(emptySet<Long>(), false)) { (previousIds, _), currentIds ->
+                val newIds = currentIds - previousIds
+                val shouldScroll = if (newIds.isNotEmpty() && previousIds.isNotEmpty()) {
+                    val isAllDuplicates = synchronized(duplicatedGroupItemIds) {
+                        duplicatedGroupItemIds.containsAll(newIds).also {
+                            duplicatedGroupItemIds.removeAll(newIds)
+                        }
                     }
-                }
-                !isAllDuplicates
-            } else false
-            Pair(currentIds, shouldScroll)
-        }
-        .filter { it.second }
-        .map { }
-        .shareIn(viewModelScope, SharingStarted.Eagerly)
+                    !isAllDuplicates
+                } else false
+                Pair(currentIds, shouldScroll)
+            }
+            .filter { it.second }
+            .collect { send(Unit) }
+    }
 
     override val groupHasAnyTrackers: StateFlow<Boolean> = allChildren
         .map { children -> children.any { it is GroupChild.ChildTracker } }

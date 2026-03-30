@@ -93,6 +93,7 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.utils.plus
 import com.samco.trackandgraph.util.performTrackVibrate
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.serialization.Serializable
 import sh.calvin.reorderable.ReorderableCollectionItemScope
@@ -221,7 +222,7 @@ private fun GroupScreenContent(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        groupViewModel.scrollToTopEvents.collect {
+        groupViewModel.scrollToTopEvents.receiveAsFlow().collect {
             groupViewModel.lazyGridState.animateScrollToItem(0)
         }
     }
