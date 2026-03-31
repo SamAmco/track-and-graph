@@ -123,6 +123,10 @@ changelog:
 
 .PHONY: commit-version
 commit-version:
+	@python3 scripts/commit_version_bump_jj.py
+
+.PHONY: commit-version-git
+commit-version-git:
 	@python3 scripts/commit_version_bump.py
 
 .PHONY: github-release
