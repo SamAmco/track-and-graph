@@ -131,4 +131,8 @@ commit-version-git:
 
 .PHONY: github-release
 github-release:
+	@python3 scripts/create_release_jj.py
+
+.PHONY: github-release-git
+github-release-git:
 	@python3 scripts/create_release.py

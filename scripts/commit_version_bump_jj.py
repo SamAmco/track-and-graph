@@ -35,7 +35,7 @@ def get_version_from_gradle():
 
 def check_has_changes():
     """Check if there are any changes in the working copy"""
-    result = run_command(["jj", "diff", "--stat"])
+    result = run_command(["jj", "diff"])
     return bool(result.stdout.strip())
 
 
