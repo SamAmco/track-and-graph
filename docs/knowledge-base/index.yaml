@@ -88,6 +88,11 @@ docs:
     description: How external URLs are managed via remote config and opened from the app — UrlNavigator pattern, adding new URLs, and the multi-file update checklist.
     keywords: [RemoteConfiguration, UrlNavigator, Endpoints, remote-config, URL, navigate, triggerNavigation, browser, InfoDisplay]
 
+  - file: release-changelogs.md
+    title: Release changelogs — workflow, structure, and Play Store limits
+    description: Dual changelog system (public markdown for in-app/website, fastlane .txt for Play Store), the make changelog lua workflow, Play Store 500-character limit, 4-language localization requirement, and index.json maintenance.
+    keywords: [changelog, release, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
+
 plans:
   - file: plans/group-view-model-testing-plan.md
     title: GroupViewModel testing plan (3 phases)
