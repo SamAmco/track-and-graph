@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 --[[
 Create a new changelog file for the current release version.
-Extracts version from app/build.gradle.kts, creates a changelog file
+Extracts version from app/app/build.gradle.kts, creates a changelog file
 in fastlane/metadata/android/en-GB/changelogs/, populates it with
 git log since the last release, and opens it in neovim.
 ]]
@@ -20,7 +20,7 @@ git log since the last release, and opens it in neovim.
 --]]
 
 local function get_versions_from_gradle()
-	local gradle_file = "app/build.gradle.kts"
+	local gradle_file = "app/app/build.gradle.kts"
 	local file = io.open(gradle_file, "r")
 	if not file then
 		print("Error: Could not open " .. gradle_file)
@@ -31,7 +31,7 @@ local function get_versions_from_gradle()
 
 	local version_code = content:match("versionCode%s*=%s*(%d+)")
 	if not version_code then
-		print("Error: Could not find versionCode in app/build.gradle.kts")
+		print("Error: Could not find versionCode in app/app/build.gradle.kts")
 		os.exit(1)
 	end
 
@@ -284,7 +284,7 @@ local function main()
 	print("Checking dependencies...")
 	check_jsonschema_cli()
 	
-	print("\nExtracting version code from app/build.gradle.kts...")
+	print("\nExtracting version code from app/app/build.gradle.kts...")
 	local version_code, version_name = get_versions_from_gradle()
 	print("Current version code: " .. version_code .. ", version name: " .. version_name)
 
