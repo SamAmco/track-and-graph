@@ -2,6 +2,8 @@
 
 **La version 10.0.0** introduit les Liens symboliques. Les Liens symboliques vous permettent d'avoir le même traqueur, graphique, fonction ou même groupe dans plusieurs groupes. Ce n'est pas un doublon ni une copie, c'est une référence vers le même composant. Toute modification apportée à l'un sera répercutée sur tous les autres. Pour commencer avec les Liens symboliques, appuyez simplement sur le bouton + en haut à droite de n'importe quel groupe et sélectionnez « Lien symbolique ».
 
+---
+
 ## Nouvelles actions sur les points de données ! 📝
 
 Vous pouvez désormais ajouter des points de données à un traqueur directement depuis l'écran d'historique (celui qui s'ouvre lorsque vous appuyez sur la carte du traqueur). Vous trouverez le nouveau bouton d'action flottant en bas à droite de l'écran.
@@ -10,6 +12,8 @@ Vous pouvez désormais ajouter des points de données à un traqueur directement
 
 Il existe également un nouveau mode de sélection multiple dans l'écran d'historique qui vous permet de déplacer, copier ou supprimer plusieurs points de données à la fois. Vous pouvez même copier des points de données d'une fonction vers un traqueur ! Activez le mode de sélection multiple en appuyant longuement sur un point de données, sélectionnez ceux que vous souhaitez et cherchez les nouveaux boutons d'action en bas à droite de l'écran.
 
+---
+
 ## Suivi verrouillé ! 🔒
 
 Une nouvelle fonctionnalité dans la boîte de dialogue d'ajout de point de données vous permet d'ajouter plusieurs points de données pour un traqueur à la suite. Cherchez la nouvelle icône de cadenas à la fin des champs de saisie :
@@ -17,6 +21,8 @@ Une nouvelle fonctionnalité dans la boîte de dialogue d'ajout de point de donn
 ![Suivi verrouillé](https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/changelogs/10.0.0/locked_tracking.jpg)
 
 Lorsqu'un cadenas est activé, la boîte de dialogue restera ouverte après l'ajout d'un point de données, et les champs verrouillés seront pré-remplis avec la même valeur que le point de données précédent.
+
+---
 
 ## Corrections de bugs et améliorations
 

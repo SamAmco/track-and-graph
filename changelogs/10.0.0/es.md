@@ -2,6 +2,8 @@
 
 **La versión 10.0.0** introduce los Enlaces simbólicos. Los Enlaces simbólicos te permiten tener el mismo rastreador, gráfico, función o incluso grupo en múltiples grupos. No es un duplicado ni una copia, es una referencia al mismo componente. Cualquier cambio que hagas en uno se reflejará en todos los demás. Para empezar con los Enlaces simbólicos, simplemente toca el botón + en la esquina superior derecha de cualquier grupo y selecciona "Enlace simbólico".
 
+---
+
 ## ¡Nuevas acciones para puntos de datos! 📝
 
 Ahora puedes añadir puntos de datos a un rastreador directamente desde la pantalla de historial (la que se abre al tocar la tarjeta del rastreador). Encontrarás el nuevo botón de acción flotante en la esquina inferior derecha de la pantalla.
@@ -10,6 +12,8 @@ Ahora puedes añadir puntos de datos a un rastreador directamente desde la panta
 
 También hay un nuevo modo de selección múltiple en la pantalla de historial que te permite mover, copiar o eliminar varios puntos de datos a la vez. ¡Incluso puedes copiar puntos de datos de una función a un rastreador! Activa el modo de selección múltiple manteniendo pulsado un punto de datos, selecciona los que quieras y busca los nuevos botones de acción en la esquina inferior derecha de la pantalla.
 
+---
+
 ## ¡Registro bloqueado! 🔒
 
 Hay una nueva función en el diálogo de añadir punto de datos que te permite añadir varios puntos de datos para un rastreador de forma consecutiva. Busca el nuevo icono de candado al final de los campos de entrada:
@@ -17,6 +21,8 @@ Hay una nueva función en el diálogo de añadir punto de datos que te permite a
 ![Registro bloqueado](https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/changelogs/10.0.0/locked_tracking.jpg)
 
 Cuando se activa un candado, el diálogo permanecerá abierto después de añadir un punto de datos, y los campos bloqueados se rellenarán automáticamente con el mismo valor del punto de datos anterior.
+
+---
 
 ## Correcciones de errores y mejoras
 
