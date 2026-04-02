@@ -1669,6 +1669,10 @@
 <span class="nv">categories</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;_filter&quot;</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="c1">-- Also uses shared translations</span>
 </code></pre></div>
 <p>This is especially useful for enum options where the same values (like days of the week, aggregation types, etc.) appear in multiple functions. Check the shared translations file for available keys before adding new inline translations.</p>
+<div class="admonition warning">
+<p class="admonition-title">Translation keys are for the catalog only</p>
+<p>The <code>_</code> prefixed keys only resolve correctly when a function is loaded through the catalog, where the shared-translations table is available. If you copy a community function script and paste it into a custom Lua Script node, any <code>_</code> keys will appear as-is (e.g. <code>_period</code>, <code>_days</code>) rather than their translated names. This is expected — custom scripts should use plain strings for names and enum options instead.</p>
+</div>
 <h3 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">#</a></h3>
 <p>Functions must include tests. Test files live alongside your function in the same directory with names prefixed with <code>test_</code>.</p>
 <h4 id="the-testing-approach">The Testing Approach<a class="headerlink" href="#the-testing-approach" title="Permanent link">#</a></h4>

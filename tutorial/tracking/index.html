@@ -311,18 +311,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#creating-a-tracker" class="md-nav__link">
+  <a href="#data-point-structure" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating a Tracker
+      Data Point Structure
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#data-point-structure" class="md-nav__link">
+  <a href="#quick-tracking-in-groups" class="md-nav__link">
     <span class="md-ellipsis">
-      Data Point Structure
+      Quick Tracking in Groups
     </span>
   </a>
   
@@ -338,54 +338,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using Groups
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-tracking-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      Quick Tracking Groups
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reordering-group-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      Reordering Group Items
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#managing-data-points" class="md-nav__link">
-    <span class="md-ellipsis">
-      Managing Data Points
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#bulk-editing-data-points" class="md-nav__link">
     <span class="md-ellipsis">
       Bulk Editing Data Points
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#advanced-tracker-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advanced tracker options
     </span>
   </a>
   
@@ -873,18 +828,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#creating-a-tracker" class="md-nav__link">
+  <a href="#data-point-structure" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating a Tracker
+      Data Point Structure
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#data-point-structure" class="md-nav__link">
+  <a href="#quick-tracking-in-groups" class="md-nav__link">
     <span class="md-ellipsis">
-      Data Point Structure
+      Quick Tracking in Groups
     </span>
   </a>
   
@@ -900,54 +855,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using Groups
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-tracking-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      Quick Tracking Groups
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reordering-group-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      Reordering Group Items
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#managing-data-points" class="md-nav__link">
-    <span class="md-ellipsis">
-      Managing Data Points
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#bulk-editing-data-points" class="md-nav__link">
     <span class="md-ellipsis">
       Bulk Editing Data Points
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#advanced-tracker-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advanced tracker options
     </span>
   </a>
   
@@ -970,49 +880,28 @@
 
 
 <h1 id="get-started-with-tracking">Get started with tracking<a class="headerlink" href="#get-started-with-tracking" title="Permanent link">#</a></h1>
-<p>To begin tracking you will need to create a Tracker.</p>
-<p><img alt="&quot;faq_1_1&quot;" src="../images/faq_1_1.jpg" width="300" /></p>
-<h3 id="creating-a-tracker">Creating a Tracker<a class="headerlink" href="#creating-a-tracker" title="Permanent link">#</a></h3>
-<p>As a minimum you will need to give your tracker a name. You can also optionally add a longer description. The description can later be seen via the context menu of the tracker.</p>
-<p><img alt="&quot;faq_1_1&quot;" src="../images/faq_1_1.gif" width="300" /></p>
+<p>To begin tracking you will need to create a Tracker. As a minimum all you will need to give your tracker is a name. You can also optionally add a longer description. </p>
 <h3 id="data-point-structure">Data Point Structure<a class="headerlink" href="#data-point-structure" title="Permanent link">#</a></h3>
 <p>A Tracker holds a list of data points ordered by time. Each data point has the following information:</p>
 <ul>
-<li>A timestamp</li>
-<li>A value </li>
-<li>An optional label</li>
-<li>An optional note</li>
+<li>Timestamp</li>
+<li>Value </li>
+<li>Label (optional)</li>
+<li>Note (optional)</li>
 </ul>
-<p>The value is usually just a number, but it can also be a time or duration. If you check the box "This is a time or duration" you will be asked for values in hours, minutes and seconds and you will be able to start a timer using that tracker. Internally this information is still stored as a number (specifically the total number of seconds tracked).</p>
-<p>Labels and notes are both text inputs. Labels are useful for categorising data. For example if you wanted to track calories for breakfast, lunch, and dinner, you could track the calories in the value field and the word "breakfast", "lunch" or "dinner" in the label field. Use the note field to add more contextual information like "Today was my birthday so I ate lots of cake."</p>
-<p><img alt="&quot;faq_1_2&quot;" src="../images/faq_1_2.png" width="300" /></p>
+<p>The value is usually just a number, but it can also be a time or duration. If you check the box "This is a time or duration" when setting up the tracker you will be asked for values in hours, minutes and seconds and you will be able to start a timer using that tracker. Internally this information is still stored as a number (specifically the total number of seconds tracked).</p>
+<p>Labels and notes are both text inputs. Labels are useful for categorising data. For example if you wanted to track calories for breakfast, lunch, and dinner, you could track the calories in the value field and the word "breakfast", "lunch" or "dinner" in the label field. Use the note field to add more contextual information like "Today was my birthday so I ate lots of cake." Labels are often crucial data for building a graph, notes are added in a list at the bottom underneath when you view the graph. </p>
+<h3 id="quick-tracking-in-groups">Quick Tracking in Groups<a class="headerlink" href="#quick-tracking-in-groups" title="Permanent link">#</a></h3>
+<p>Use groups to organise your trackers. You can move a tracker to a group using the trackers context menu. You can reorder items in a group by holding down and dragging them. When you have multiple trackers in a group you can use the quick track button to quickly track them all at once.</p>
+<p>If you are tracking data points for multiple trackers in a group and you change the date/time on one of them, the selected date/time will persist for all subsequent trackers in the group. Data points are added to the trackers as soon as you click add, so cancelling out of the dialog won't lose any data points you have already input. If you swipe back to a previous tracker and change the input data, it will overwrite the data point you added for that tracker unless you change the date/time first. </p>
+<p>Tapping the lock icon at the end of any input field allows you to track multiple data points at once. Any locked fields will not be cleared after tracking each data point. </p>
 <h3 id="label-suggestions">Label Suggestions<a class="headerlink" href="#label-suggestions" title="Permanent link">#</a></h3>
-<p>Any previous labels you have tracked will later appear as buttons on the tracker input dialog. If you press the button the label field is filled with the selected label. If you long press the button a data point is added immediately with that label. Under the advanced tracker settings you can change the behaviour of suggested values slightly. This is explained in more detail further down.</p>
-<p><img alt="&quot;faq_1_3&quot;" src="../images/faq_1_3.png" width="300" /></p>
-<h3 id="using-groups">Using Groups<a class="headerlink" href="#using-groups" title="Permanent link">#</a></h3>
-<p>Use groups to organise your trackers. You can move a tracker to a group using the trackers context menu:</p>
-<p><img alt="&quot;faq_1_2&quot;" src="../images/faq_1_2.gif" width="300" /></p>
-<h3 id="quick-tracking-groups">Quick Tracking Groups<a class="headerlink" href="#quick-tracking-groups" title="Permanent link">#</a></h3>
-<p>When you have multiple trackers in a group you can use the quick track button to quickly track them all at once:</p>
-<p><img alt="&quot;faq_1_3&quot;" src="../images/faq_1_3.gif" width="300" /></p>
-<h3 id="reordering-group-items">Reordering Group Items<a class="headerlink" href="#reordering-group-items" title="Permanent link">#</a></h3>
-<p>You can also reorder items in a group by holding down and dragging them: </p>
-<p><img alt="&quot;faq_1_4&quot;" src="../images/faq_1_4.gif" width="300" /></p>
-<h3 id="managing-data-points">Managing Data Points<a class="headerlink" href="#managing-data-points" title="Permanent link">#</a></h3>
-<p>To view, edit and delete your data points tap on the center of a tracker:</p>
-<p><img alt="&quot;faq_1_5&quot;" src="../images/faq_1_5.gif" width="300" /></p>
+<p>By default any previous labels you have tracked will later appear as suggestions on the tracker input dialog. If you press the label button the label field is filled with the selected label. If you long press the button a data point is added immediately with that label. You can change the behaviour of the suggestions in the tracker settings under the advanced options. If you are using "Value and Label" or "Value only" then long pressing the button will fill out the fields without tracking immediately. If you are using "Label only" then long pressing will track the label immediately with a value of 1.</p>
+<p>Also in the advanced options you can set a "default value" for a tracker. If you do this you will not be asked for a value when you tap the + button. Instead the default value will immediately be tracked at the current time. You can still track a custom value by long pressing the + button on the tracker.</p>
 <h3 id="bulk-editing-data-points">Bulk Editing Data Points<a class="headerlink" href="#bulk-editing-data-points" title="Permanent link">#</a></h3>
-<p>You can edit all the data points for a tracker at once using the edit button in the top right. </p>
+<p>To view, edit and delete your data points tap on the center of the tracker card. You can edit all the data points for a tracker at once using the edit button in the top right. </p>
 <p><strong>WARNING: It is recommended that you back up your data before doing so as this will change all your data points at once and can not be undone.</strong></p>
 <p>The "Where" section allows you to specify which data points you want to update. Any data points that match any of the input data will be updated. For example if you check value and input 56, then any data point that has a value of 56 will be updated. If you check label and input "Small" then any data point with the label "Small" will be updated (this is case sensitive so "Small" will not match "small"). If you check both value and label, then only data points with both the given value and the given label will be updated. </p>
-<p><img alt="&quot;faq_1_6&quot;" src="../images/faq_1_6.gif" width="300" /></p>
-<h3 id="advanced-tracker-options">Advanced tracker options<a class="headerlink" href="#advanced-tracker-options" title="Permanent link">#</a></h3>
-<p>When creating a tracker you can set a "default value" for that tracker. If you do this you will not be asked for a value when you tap the + button. Instead the default value will immediately be tracked at the current time. You can still track a custom value by long pressing the + button on the tracker.</p>
-<p><img alt="&quot;faq_1_7&quot;" src="../images/faq_1_7.gif" width="300" /></p>
-<p>If you want to change the behaviour of the suggested values you can do so using the suggestions type and order settings. When you tap a suggested value the value and label fields are filled out and the data point is tracked immediately provided you are using the "Value only" or "Value and Label" suggestion type. Otherwise the dialog will simply fill the label field and allow you to input a value.</p>
-<p>If you are using "Value and Label" or "Value only" then long pressing the button will fill out the fields without tracking immediately. If you are using "Label only" then long pressing will track the label immediately with a value of 1.</p>
-<p>By default only previously tracked labels are used to create suggestions and the suggested labels are sorted alphabetically.</p>
-<p><img alt="&quot;faq_1_8&quot;" src="../images/faq_1_8.png" width="300" /></p>
 
 
 
