@@ -1,0 +1,2 @@
+- Fixed a crash on startup due to a bad database migration
+			

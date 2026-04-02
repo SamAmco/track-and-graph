@@ -1,0 +1,2 @@
+- Se corrigió un fallo que causaba el cierre de la aplicación al iniciar debido a una migración incorrecta de la base de datos
+			
