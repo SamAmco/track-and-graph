@@ -131,9 +131,9 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 super.onCreate(db)
                 db.execSQL(
                     """
-                    INSERT OR REPLACE INTO 
-                    groups_table(id, name, display_index, parent_group_id, color_index) 
-                    VALUES(0, '', 0, NULL, 0)
+                    INSERT OR REPLACE INTO
+                    groups_table(id, name, color_index)
+                    VALUES(0, '', 0)
                     """.trimMargin()
                 )
             }
