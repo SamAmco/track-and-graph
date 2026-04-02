@@ -65,8 +65,8 @@ docs:
 
   - file: lua-architecture.md
     title: Lua functions — app architecture and data model
-    description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), 8 configuration value types, serialization pipeline, and LuaEngine execution flow with 4 modes.
-    keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer]
+    description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), 8 configuration value types, serialization pipeline, LuaEngine execution flow with 4 modes, and the translation-key mechanism for catalog functions (how _-prefixed keys resolve, how usedTranslations are stored/restored, catalog-mode showEditTools behaviour).
+    keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, translations, LocalizationsTable, usedTranslations, catalog-mode, showEditTools, LuaFunctionMetadataAdapter, TranslatedStringParser]
 
   - file: lua-community-functions.md
     title: Writing Lua function scripts and contributing to the community catalog

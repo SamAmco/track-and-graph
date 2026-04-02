@@ -361,6 +361,9 @@ categories = { "_filter" },  -- Also uses shared translations
 
 This is especially useful for enum options where the same values (like days of the week, aggregation types, etc.) appear in multiple functions. Check the shared translations file for available keys before adding new inline translations.
 
+!!! warning "Translation keys are for the catalog only"
+    The `_` prefixed keys only resolve correctly when a function is loaded through the catalog, where the shared-translations table is available. If you copy a community function script and paste it into a custom Lua Script node, any `_` keys will appear as-is (e.g. `_period`, `_days`) rather than their translated names. This is expected — custom scripts should use plain strings for names and enum options instead.
+
 ### Testing
 
 Functions must include tests. Test files live alongside your function in the same directory with names prefixed with `test_`.

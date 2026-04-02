@@ -221,6 +221,26 @@ data class Connector(val nodeId: Int, val type: ConnectorType, val connectorInde
 | Builder | `app/app/.../functions/node_editor/viewmodel/FunctionGraphBuilder.kt` |
 | Decoder | `app/app/.../functions/node_editor/viewmodel/FunctionGraphDecoder.kt` |
 
+## Translation Keys in Catalog Functions
+
+Community catalog functions use `_`-prefixed strings as shared translation keys (e.g. `name = "_period"`, `options = { "_days", "_weeks" }`). These are resolved by `LuaFunctionMetadataAdapter` via a `LocalizationsTable` passed to `runLuaFunction`.
+
+### How translations flow
+
+1. **Catalog → node**: when a function is added from the catalog, the engine resolves all `_` keys against `shared-translations.lua`. The resolved `usedTranslations` are stored in `LuaScriptNode.translations` (serialized to JSON in the DB).
+2. **Load existing node**: `FunctionGraphDecoder` reads `graphNode.translations`, deserializes it, and passes it back to `runLuaFunction` — so translations still resolve correctly after save/reload.
+3. **Custom paste (no translations)**: if a user pastes a catalog script into a custom Lua Script node, `translations` is null. `_`-prefixed config names display as raw keys (e.g. `_period`). Enum options that are bare `_` strings must still be added as `EnumOption(key, TranslatedString.Simple(key))` — the adapter used to silently drop them, which is a bug.
+
+### `version` field and catalog mode
+
+If a script sets `version`, `LuaScriptNodeProvider` sets `showEditTools = false`, hiding the script editor. This is intentional for catalog functions (users interact via config UI only), but means a pasted catalog script also hides its own editor.
+
+### Key files
+
+- `LuaFunctionMetadataAdapter` — parses script metadata; handles translation lookup and fallback
+- `TranslatedStringParser.parseWithLookup` — resolves a string against the translations table, falls back to `TranslatedString.Simple` if not found
+- `LuaScriptNode.translations` (DTO field) — serialized snapshot of `usedTranslations`; passed back on decode to keep catalog nodes rendering correctly
+
 ## Tests
 
 - `LuaScriptConfigurationEncoderTest` - All 8 config types

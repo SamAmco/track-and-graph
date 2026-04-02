@@ -261,6 +261,10 @@ internal class LuaFunctionMetadataAdapter @Inject constructor(
                             // Track that this translation was used
                             usedTranslations?.put(optionKey, displayName)
                             enumOptions.add(EnumOption(optionKey, displayName))
+                        } else {
+                            // No translation found (e.g. script pasted without catalog context),
+                            // fall back to the raw key so the option is still present
+                            enumOptions.add(EnumOption(optionKey, TranslatedString.Simple(optionKey)))
                         }
                     }
                 }
