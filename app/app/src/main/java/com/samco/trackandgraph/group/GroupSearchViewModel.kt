@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.group
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +28,7 @@ import javax.inject.Inject
 
 interface GroupSearchViewModel {
     val isSearchVisible: StateFlow<Boolean>
+    val searchQuery: TextFieldState
     fun showSearch()
     fun hideSearch()
 }
@@ -36,11 +39,14 @@ class GroupSearchViewModelImpl @Inject constructor() : ViewModel(), GroupSearchV
     private val _isSearchVisible = MutableStateFlow(false)
     override val isSearchVisible: StateFlow<Boolean> = _isSearchVisible.asStateFlow()
 
+    override val searchQuery: TextFieldState = TextFieldState()
+
     override fun showSearch() {
         _isSearchVisible.value = true
     }
 
     override fun hideSearch() {
         _isSearchVisible.value = false
+        searchQuery.clearText()
     }
 }

@@ -20,29 +20,29 @@ package com.samco.trackandgraph.group
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.appbar.SearchBarState
 
 @Composable
 fun SearchScreen(
     navArgs: GroupNavKey,
+    searchViewModel: GroupSearchViewModel,
     onBack: () -> Unit,
 ) {
     // Handle back press
     BackHandler(onBack = onBack)
 
-    // Set up the top bar with search title and back navigation
     SearchTopBarContent(
         navArgs = navArgs,
-        onBack = onBack
+        searchViewModel = searchViewModel,
+        onBack = onBack,
     )
 
     SearchScreenContent()
@@ -51,35 +51,27 @@ fun SearchScreen(
 @Composable
 private fun SearchTopBarContent(
     navArgs: GroupNavKey,
+    searchViewModel: GroupSearchViewModel,
     onBack: () -> Unit,
 ) {
     val topBarController = LocalTopBarController.current
-    val title = stringResource(R.string.search)
+    val placeholder = stringResource(R.string.search)
 
     topBarController.Set(
         destination = navArgs,
         newConfig = AppBarConfig(
-            title = title,
             backNavigationAction = true,
+            appBarPinned = true,
             overrideBackNavigationAction = onBack,
-        )
+            searchBar = SearchBarState(
+                query = searchViewModel.searchQuery,
+                placeholder = placeholder,
+            ),
+        ),
     )
 }
 
 @Composable
 private fun SearchScreenContent() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = stringResource(R.string.search))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchScreenContentPreview() {
-    TnGComposeTheme {
-        SearchScreenContent()
-    }
+    Box(modifier = Modifier.fillMaxSize())
 }

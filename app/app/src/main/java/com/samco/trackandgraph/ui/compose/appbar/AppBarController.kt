@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.ui.compose.appbar
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +29,17 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+
+/**
+ * State for the in-app-bar search text field. When set on [AppBarConfig.searchBar], the
+ * top bar renders a focused search text field in place of its title and animates the
+ * transition.
+ */
+@Immutable
+data class SearchBarState(
+    val query: TextFieldState,
+    val placeholder: String = "",
+)
 
 /**
  * Configuration for the top app bar
@@ -42,6 +54,7 @@ data class AppBarConfig(
     val visible: Boolean = true,
     val nestedScrollConnection: NestedScrollConnection? = null,
     val appBarPinned: Boolean = false,
+    val searchBar: SearchBarState? = null,
 )
 
 /**

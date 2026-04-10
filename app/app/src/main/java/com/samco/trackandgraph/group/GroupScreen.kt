@@ -139,6 +139,7 @@ fun GroupScreen(
     if (isSearchVisible) {
         SearchScreen(
             navArgs = navArgs,
+            searchViewModel = searchViewModel,
             onBack = { searchViewModel.hideSearch() }
         )
     } else {
