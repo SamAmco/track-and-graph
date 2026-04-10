@@ -18,8 +18,13 @@ package com.samco.trackandgraph.main
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +41,8 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -270,83 +273,56 @@ fun AppBar(
         expandedHeight = totalHeight,
         scrollBehavior = scrollBehavior,
 
-        // All three slots animate in lock-step when entering/leaving search mode: they share
-        // the same contentKey (searchBar != null), so AnimatedContent triggers simultaneous
-        // transitions on each slot and leaves them untouched for all other config changes.
         navigationIcon = {
-            AnimatedContent(
-                targetState = config.searchBar,
-                contentKey = { it != null },
-                label = "topBarNavSearch",
+            Box(
                 modifier = slotInset,
-            ) { searchBar ->
-                val isBack = searchBar != null || config.backNavigationAction
-                Box(
-                    modifier = Modifier.fillMaxHeight(),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    NavigationIcon(
-                        navButtonStyle = if (isBack) NavButtonStyle.UP else NavButtonStyle.MENU,
-                        onClick = {
-                            when {
-                                config.overrideBackNavigationAction != null -> config.overrideBackNavigationAction.invoke()
-                                config.backNavigationAction && backStack.size > 1 -> backStack.removeLastOrNull()
-                                else -> scope.launch { drawerState.open() }
-                            }
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                NavigationIcon(
+                    navButtonStyle = if (config.backNavigationAction) NavButtonStyle.UP else NavButtonStyle.MENU,
+                    onClick = {
+                        when {
+                            config.overrideBackNavigationAction != null -> config.overrideBackNavigationAction.invoke()
+                            config.backNavigationAction && backStack.size > 1 -> backStack.removeLastOrNull()
+                            else -> scope.launch { drawerState.open() }
                         }
-                    )
-                }
+                    }
+                )
             }
         },
 
         title = {
             AnimatedContent(
-                targetState = config.searchBar,
+                targetState = config.searchBarText,
+                transitionSpec = {
+                    fadeIn(tween(220, delayMillis = 90)) togetherWith
+                            fadeOut(tween(90)) using SizeTransform(false)
+                },
                 // Only animate when entering/leaving search mode, not on every keystroke.
                 contentKey = { it != null },
                 label = "topBarTitleSearch",
-                modifier = slotInset,
-            ) { searchBar ->
-                if (searchBar != null) {
+            ) { searchBarText ->
+                if (searchBarText != null) {
                     AppBarSearchField(
-                        textFieldState = searchBar.query,
-                        placeholder = searchBar.placeholder,
-                        modifier = Modifier.fillMaxSize(),
+                        textFieldState = searchBarText,
+                        modifier = slotInset,
                     )
                 } else {
                     HeaderTitle(
                         title = config.title,
                         subtitle = config.subtitle,
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = slotInset,
                     )
                 }
             }
         },
 
         actions = {
-            AnimatedContent(
-                targetState = config.searchBar,
-                contentKey = { it != null },
-                label = "topBarActionsSearch",
-                modifier = slotInset,
-            ) { searchBar ->
-                Row(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (searchBar != null) {
-                        if (searchBar.query.text.isNotEmpty()) {
-                            IconButton(onClick = { searchBar.query.clearText() }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Close,
-                                    contentDescription = null,
-                                )
-                            }
-                        }
-                    } else {
-                        config.actions(this)
-                    }
-                }
+            Row(
+                modifier = slotInset.animateContentSize(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                config.actions(this)
             }
         }
     )

@@ -38,10 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
@@ -62,7 +64,6 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 @Composable
 fun AppBarSearchField(
     textFieldState: TextFieldState,
-    placeholder: String,
     modifier: Modifier = Modifier,
     autoFocus: Boolean = true,
 ) {
@@ -76,7 +77,7 @@ fun AppBarSearchField(
         state = textFieldState,
         placeholder = {
             Text(
-                text = placeholder,
+                text = stringResource(R.string.search),
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -110,7 +111,6 @@ private fun AppBarSearchFieldEmptyPreview() {
         ) {
             AppBarSearchField(
                 textFieldState = TextFieldState(),
-                placeholder = "Search",
                 autoFocus = false,
             )
         }
@@ -121,7 +121,6 @@ private fun AppBarSearchFieldEmptyPreview() {
 @Composable
 private fun AppBarSearchFieldWithQueryPreview() {
     TnGComposeTheme {
-        var query by remember { mutableStateOf("weight") }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -129,8 +128,7 @@ private fun AppBarSearchFieldWithQueryPreview() {
                 .background(MaterialTheme.tngColors.toolbarBackgroundColor),
         ) {
             AppBarSearchField(
-                textFieldState = TextFieldState(),
-                placeholder = "Search",
+                textFieldState = remember { TextFieldState("weight") },
                 autoFocus = false,
             )
         }

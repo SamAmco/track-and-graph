@@ -94,9 +94,9 @@ docs:
     keywords: [changelog, release, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
 
   - file: search-feature.md
-    title: Search feature — in-place screen swap pattern
-    description: GroupSearchViewModel visibility toggle, SearchScreen composable, in-place swap inside GroupScreen (if/else replaces top bar + content), overrideBackNavigationAction for back handling, and current stub status.
-    keywords: [search, GroupSearchViewModel, SearchScreen, isSearchVisible, in-place, screen-swap, overrideBackNavigationAction, BackHandler, AppBarConfig, GroupScreen, GroupTopBar, onSearchClick]
+    title: Search feature — animated top-app-bar field, TextFieldState threading, and in-place screen swap
+    description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel (cursor-position bug with String+callback); AnimatedContent contentKey trick that animates only on enter/exit of search mode; actions slot animateContentSize trade-off; appBarPinned and fillMaxSize pitfalls; AppBarSearchField component in ui/compose/ui; still-stub results.
+    keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, fillMaxSize, titleMedium]
 
 plans:
   - file: plans/group-view-model-testing-plan.md

@@ -20,15 +20,15 @@ package com.samco.trackandgraph.group
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
-import com.samco.trackandgraph.ui.compose.appbar.SearchBarState
 
 @Composable
 fun SearchScreen(
@@ -55,7 +55,6 @@ private fun SearchTopBarContent(
     onBack: () -> Unit,
 ) {
     val topBarController = LocalTopBarController.current
-    val placeholder = stringResource(R.string.search)
 
     topBarController.Set(
         destination = navArgs,
@@ -63,10 +62,17 @@ private fun SearchTopBarContent(
             backNavigationAction = true,
             appBarPinned = true,
             overrideBackNavigationAction = onBack,
-            searchBar = SearchBarState(
-                query = searchViewModel.searchQuery,
-                placeholder = placeholder,
-            ),
+            searchBarText = searchViewModel.searchQuery,
+            actions = {
+                if (searchViewModel.searchQuery.text.isNotEmpty()) {
+                    IconButton(onClick = { searchViewModel.searchQuery.clearText() }) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            }
         ),
     )
 }
