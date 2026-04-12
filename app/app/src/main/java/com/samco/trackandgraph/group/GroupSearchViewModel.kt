@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -71,23 +72,36 @@ class GroupSearchViewModelImpl @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel(), GroupSearchViewModel {
 
+    // All strings and display data pre-fetched once when search opens.
+    // displayTracker is non-null only for TrackerNode items.
+    private data class SearchableItem(
+        val groupItemId: Long,
+        val item: GroupGraphItem,
+        val name: String,
+        val description: String?,
+        val typeBonus: Double,
+        val displayTracker: DisplayTracker?,
+    )
+
     private val _isSearchVisible = MutableStateFlow(false)
     override val isSearchVisible: StateFlow<Boolean> = _isSearchVisible.asStateFlow()
 
     override val searchQuery: TextFieldState = TextFieldState()
 
     private var groupId = 0L
-    private val groupGraph = MutableStateFlow<GroupGraph?>(null)
+
+    // Populated once when search opens (graph is stable for the duration of a session).
+    // Cleared when search closes.
+    private val searchableItems = MutableStateFlow<List<SearchableItem>>(emptyList())
 
     private val queryText = snapshotFlow { searchQuery.text }
         .debounce(150)
 
-    private val searchResults = combine(queryText, groupGraph) { query, graph ->
+    private val searchResults = combine(queryText, searchableItems) { query, items ->
         val text = query.toString()
-        if (text.isBlank() || graph == null) return@combine emptyList()
-        val results = mutableListOf<SearchResult>()
-        collectMatches(graph, text, results)
-        results.sortedByDescending { it.score }
+        if (text.isBlank() || items.isEmpty()) return@combine emptyList()
+        items.mapNotNull { scoreItem(text, it) }
+            .sortedByDescending { it.score }
     }
 
     // Cache for computed graph view data, keyed by GraphOrStat.id.
@@ -108,15 +122,76 @@ class GroupSearchViewModelImpl @Inject constructor(
     override fun showSearch() {
         _isSearchVisible.value = true
         viewModelScope.launch {
-            groupGraph.value = dataInteractor.getGroupGraphSync(groupId)
+            val graph = dataInteractor.getGroupGraphSync(groupId)
+            searchableItems.value = buildSearchableItems(graph)
         }
     }
 
     override fun hideSearch() {
         _isSearchVisible.value = false
         searchQuery.clearText()
-        groupGraph.value = null
+        searchableItems.value = emptyList()
         graphViewDataCache.value = emptyMap()
+    }
+
+    private fun scoreItem(query: String, item: SearchableItem): SearchResult? {
+        val nameScore = FuzzyMatcher.score(query, item.name)
+        val descScore = item.description
+            ?.let { FuzzyMatcher.score(query, it) }
+            ?.times(DESCRIPTION_SCORE_MULTIPLIER)
+        val baseScore = listOfNotNull(nameScore, descScore).maxOrNull() ?: return null
+        return SearchResult(item.groupItemId, item.item, baseScore + item.typeBonus)
+    }
+
+    private suspend fun buildSearchableItems(graph: GroupGraph): List<SearchableItem> {
+        val items = mutableListOf<SearchableItem>()
+        collectSearchableItems(graph, items)
+        return items
+    }
+
+    private suspend fun collectSearchableItems(
+        graph: GroupGraph,
+        items: MutableList<SearchableItem>,
+    ) {
+        for (child in graph.children) {
+            when (child) {
+                is GroupGraphItem.GroupNode -> {
+                    items.add(SearchableItem(
+                        groupItemId = child.groupItemId,
+                        item = child,
+                        name = child.groupGraph.group.name,
+                        description = null,
+                        typeBonus = 0.0,
+                        displayTracker = null,
+                    ))
+                    collectSearchableItems(child.groupGraph, items)
+                }
+                is GroupGraphItem.TrackerNode -> items.add(SearchableItem(
+                    groupItemId = child.groupItemId,
+                    item = child,
+                    name = child.tracker.name,
+                    description = child.tracker.description,
+                    typeBonus = TYPE_BONUS_TRACKER,
+                    displayTracker = dataInteractor.tryGetTrackerByFeatureId(child.tracker.featureId),
+                ))
+                is GroupGraphItem.GraphNode -> items.add(SearchableItem(
+                    groupItemId = child.groupItemId,
+                    item = child,
+                    name = child.graph.name,
+                    description = null,
+                    typeBonus = 0.0,
+                    displayTracker = null,
+                ))
+                is GroupGraphItem.FunctionNode -> items.add(SearchableItem(
+                    groupItemId = child.groupItemId,
+                    item = child,
+                    name = child.function.name,
+                    description = child.function.description,
+                    typeBonus = 0.0,
+                    displayTracker = null,
+                ))
+            }
+        }
     }
 
     private suspend fun mapResultsToGroupChildren(
@@ -125,9 +200,12 @@ class GroupSearchViewModelImpl @Inject constructor(
     ): List<GroupChild> = withContext(io) {
         val graphsToCalculate = mutableListOf<GroupGraphItem.GraphNode>()
 
+        // Build a lookup so mapTracker can find pre-fetched display data without a DB call.
+        val itemLookup = searchableItems.value.associateBy { it.groupItemId }
+
         val children = results.mapNotNull { result ->
             when (val item = result.item) {
-                is GroupGraphItem.TrackerNode -> mapTracker(result.groupItemId, item)
+                is GroupGraphItem.TrackerNode -> mapTracker(result.groupItemId, item, itemLookup)
                 is GroupGraphItem.GroupNode -> mapGroup(result.groupItemId, item)
                 is GroupGraphItem.FunctionNode -> mapFunction(result.groupItemId, item)
                 is GroupGraphItem.GraphNode -> mapGraph(
@@ -147,18 +225,18 @@ class GroupSearchViewModelImpl @Inject constructor(
         children
     }
 
-    private suspend fun mapTracker(
+    private fun mapTracker(
         groupItemId: Long,
         item: GroupGraphItem.TrackerNode,
-    ): GroupChild.ChildTracker? = dataInteractor
-        .tryGetTrackerByFeatureId(item.tracker.featureId)
-        ?.let {
-            GroupChild.ChildTracker(
-                groupItemId = groupItemId,
-                id = item.tracker.id,
-                displayTracker = it
-            )
-        }
+        itemLookup: Map<Long, SearchableItem>,
+    ): GroupChild.ChildTracker? {
+        val displayTracker = itemLookup[groupItemId]?.displayTracker ?: return null
+        return GroupChild.ChildTracker(
+            groupItemId = groupItemId,
+            id = item.tracker.id,
+            displayTracker = displayTracker,
+        )
+    }
 
     private fun mapGroup(
         groupItemId: Long,
@@ -227,72 +305,6 @@ class GroupSearchViewModelImpl @Inject constructor(
                 graphViewDataCache.value += results.toMap()
             }
         }
-    }
-
-    private fun collectMatches(
-        graph: GroupGraph,
-        query: String,
-        results: MutableList<SearchResult>,
-    ) {
-        for (child in graph.children) {
-            when (child) {
-                is GroupGraphItem.GroupNode -> matchGroup(child, query, results)
-                is GroupGraphItem.TrackerNode -> matchTracker(child, query, results)
-                is GroupGraphItem.GraphNode -> matchGraph(child, query, results)
-                is GroupGraphItem.FunctionNode -> matchFunction(child, query, results)
-            }
-        }
-    }
-
-    private fun matchGroup(
-        child: GroupGraphItem.GroupNode,
-        query: String,
-        results: MutableList<SearchResult>,
-    ) {
-        FuzzyMatcher.score(query, child.groupGraph.group.name)?.let { score ->
-            results.add(SearchResult(groupItemId = child.groupItemId, item = child, score = score))
-        }
-        collectMatches(child.groupGraph, query, results)
-    }
-
-    private fun matchTracker(
-        child: GroupGraphItem.TrackerNode,
-        query: String,
-        results: MutableList<SearchResult>,
-    ) {
-        val titleScore = FuzzyMatcher.score(query, child.tracker.name)
-        val descScore = FuzzyMatcher.score(query, child.tracker.description)?.times(DESCRIPTION_SCORE_MULTIPLIER)
-        val baseScore = listOfNotNull(titleScore, descScore).maxOrNull() ?: return
-        results.add(SearchResult(
-            groupItemId = child.groupItemId,
-            item = child,
-            score = baseScore + TYPE_BONUS_TRACKER,
-        ))
-    }
-
-    private fun matchGraph(
-        child: GroupGraphItem.GraphNode,
-        query: String,
-        results: MutableList<SearchResult>,
-    ) {
-        FuzzyMatcher.score(query, child.graph.name)?.let { score ->
-            results.add(SearchResult(groupItemId = child.groupItemId, item = child, score = score))
-        }
-    }
-
-    private fun matchFunction(
-        child: GroupGraphItem.FunctionNode,
-        query: String,
-        results: MutableList<SearchResult>,
-    ) {
-        val titleScore = FuzzyMatcher.score(query, child.function.name)
-        val descScore = FuzzyMatcher.score(query, child.function.description)?.times(DESCRIPTION_SCORE_MULTIPLIER)
-        val baseScore = listOfNotNull(titleScore, descScore).maxOrNull() ?: return
-        results.add(SearchResult(
-            groupItemId = child.groupItemId,
-            item = child,
-            score = baseScore,
-        ))
     }
 
     companion object {

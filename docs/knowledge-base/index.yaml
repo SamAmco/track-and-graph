@@ -94,9 +94,9 @@ docs:
     keywords: [changelog, release, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
 
   - file: search-feature.md
-    title: Search feature — animated top-app-bar field, TextFieldState threading, and in-place screen swap
-    description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel (cursor-position bug with String+callback); AnimatedContent contentKey trick; lazy GroupGraph fetch on search open; debounced text matching against subtree; SearchResult uses groupItemId for unique identity.
-    keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, fillMaxSize, titleMedium, GroupGraph, groupItemId, debounce, collectMatches]
+    title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, and fuzzy search
+    description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel (cursor-position bug with String+callback); AnimatedContent contentKey trick; flat SearchableItem list built once on showSearch() with tracker DisplayTracker pre-fetched; ranked fuzzy matching via FuzzyMatcher (DP alignment, consecutive/boundary/prefix bonuses, multi-field scoring, type bonus); SearchResult carries score and uses groupItemId for identity.
+    keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, score, fuzzy, ranked, subsequence, DP, displayTracker, collectSearchableItems, scoreItem, TYPE_BONUS_TRACKER, DESCRIPTION_SCORE_MULTIPLIER]
 
 plans:
   - file: plans/group-view-model-testing-plan.md

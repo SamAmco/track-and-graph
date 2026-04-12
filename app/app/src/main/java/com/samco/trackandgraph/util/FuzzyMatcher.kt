@@ -52,31 +52,31 @@ object FuzzyMatcher {
         if (query.isEmpty()) return 0.0
         if (target.isEmpty()) return null
 
-        val q = query.lowercase()
-        val t = target.lowercase()
-        val n = t.length
-        val m = q.length
+        val queryLow = query.lowercase()
+        val targetLow = target.lowercase()
+        val tLen = targetLow.length
+        val qLen = queryLow.length
 
-        if (m > n) return null
+        if (qLen > tLen) return null
 
         val negInf = Double.NEGATIVE_INFINITY
         // dp[i][j] = best total score for matching q[0..j] with q[j] aligned to t[i]
-        val dp = Array(n) { DoubleArray(m) { negInf } }
+        val dp = Array(tLen) { DoubleArray(qLen) { negInf } }
 
         // Base case: first query character
-        for (i in 0 until n) {
-            if (t[i] != q[0]) continue
-            var s = SCORE_CHAR_MATCH
-            if (i == 0) s += BONUS_PREFIX
-            if (isWordBoundary(target, i)) s += BONUS_WORD_BOUNDARY
-            dp[i][0] = s
+        for (i in 0 until tLen) {
+            if (targetLow[i] != queryLow[0]) continue
+            var score = SCORE_CHAR_MATCH
+            if (i == 0) score += BONUS_PREFIX
+            if (isWordBoundary(target, i)) score += BONUS_WORD_BOUNDARY
+            dp[i][0] = score
         }
 
         // Fill DP for remaining query characters
-        for (j in 1 until m) {
+        for (j in 1 until qLen) {
             // i must be at least j so there is room for j characters before it
-            for (i in j until n) {
-                if (t[i] != q[j]) continue
+            for (i in j until tLen) {
+                if (targetLow[i] != queryLow[j]) continue
 
                 var charScore = SCORE_CHAR_MATCH
                 if (isWordBoundary(target, i)) charScore += BONUS_WORD_BOUNDARY
@@ -96,14 +96,14 @@ object FuzzyMatcher {
 
         // Best total score over all valid complete alignments
         var best = negInf
-        for (i in (m - 1) until n) {
-            if (dp[i][m - 1] > best) best = dp[i][m - 1]
+        for (i in (qLen - 1) until tLen) {
+            if (dp[i][qLen - 1] > best) best = dp[i][qLen - 1]
         }
 
         if (best == negInf) return null
 
         // Post-alignment bonuses
-        if (t.trim() == q.trim()) best += BONUS_EXACT_MATCH
+        if (targetLow.trim() == queryLow.trim()) best += BONUS_EXACT_MATCH
         if (target.contains(query)) best += BONUS_CASE_EXACT
 
         return best

@@ -1,6 +1,6 @@
 ---
-title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, and search data flow
-description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy GroupGraph fetch on search open; debounced text matching against subtree; SearchResult uses groupItemId for unique identity.
+title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, and fuzzy search
+description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy flat-list build on search open; ranked fuzzy matching via FuzzyMatcher; SearchResult carries a score and uses groupItemId for identity.
 topics:
   - GroupSearchViewModel owning a TextFieldState (not a StateFlow<String>)
   - AppBarConfig.searchBarText drives an animated top-bar title swap
@@ -9,24 +9,66 @@ topics:
   - actions slot uses animateContentSize instead of AnimatedContent
   - In-place screen swap in GroupScreen (if/else replaces top bar + content)
   - Why SearchScreen publishes its own clear-button action
-  - Lazy GroupGraph fetch on showSearch(), re-fetched each time, nulled on hide
+  - SearchableItem flat list built once on showSearch(); tracker DisplayTracker pre-fetched to avoid per-keystroke DB calls
+  - FuzzyMatcher — ranked subsequence matching with DP alignment
   - SearchResult uses groupItemId for unique identity (not entity IDs)
-keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, collectMatches]
+keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, score, fuzzy, ranked, subsequence, DP, displayTracker, collectSearchableItems, scoreItem]
 ---
 
 # Search Feature
 
-## Status
-
-Search results are functional: `SearchScreen` displays a text list of matched components from the current group's subtree. Still TODO: improved search ordering (e.g. rank by match quality, prefix matches first) and rendering real component views instead of plain text items.
-
 ## Search Data Flow
 
-`GroupSearchViewModelImpl` fetches the `GroupGraph` for the current group lazily — only when `showSearch()` is called, not when the group screen opens. The graph is re-fetched each time search is opened (the VM has the same lifecycle as the group screen, so the graph could be stale from edits made between search sessions). On `hideSearch()` the graph is nulled out.
+`GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings and (for tracker nodes) a pre-fetched `DisplayTracker`. On `hideSearch()` the list is cleared.
 
-Search text is observed via `snapshotFlow { searchQuery.text }` with 150ms debounce, then combined with the graph flow. The `collectMatches()` function recursively walks the subtree doing case-insensitive matching on name and description (where available — groups and graphs have no description field).
+Search text is observed via `snapshotFlow { searchQuery.text }` with 150ms debounce, then combined with the `searchableItems` flow. On each emission, every item is scored via `FuzzyMatcher.score()`; non-matching items (null score) are filtered out and the rest are sorted descending by score.
 
 Each `SearchResult` carries `groupItemId` from `GroupGraphItem.groupItemId` as its unique identity — used as the `LazyColumn` item key. See [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys.
+
+## Why a Flat List (not re-traversing the tree)
+
+The group graph tree structure is only needed once (to build the flat list). Re-traversing the tree on every debounced keystroke is wasted work — flattening up-front means each keystroke is a simple linear scan of the list.
+
+## Tracker DisplayTracker Pre-fetch
+
+`mapResultsToGroupChildren` used to call `dataInteractor.tryGetTrackerByFeatureId()` for every tracker in the result set on every debounced keystroke — N DB round-trips per keystroke. Now `collectSearchableItems` calls it once per tracker at search-open time and stores the result in `SearchableItem.displayTracker`. `mapTracker` just reads from `searchableItems.value.associateBy { it.groupItemId }` — no DB calls in the hot path.
+
+## FuzzyMatcher
+
+`FuzzyMatcher.score(query, target)` in `util/FuzzyMatcher.kt` returns `Double?` — null means no match, non-null is the match quality score (higher = better). Matching is case-insensitive subsequence: all query characters must appear in the target in order, with any characters between them.
+
+### Scoring
+
+Uses dynamic programming to find the **best-scoring alignment** of query characters into the target (not the first valid alignment). This matters: "abc" in "aXbXcXabc" should prefer the trailing consecutive run. Score components (all additive):
+
+- +10 per matched character (base)
+- +15 consecutive run bonus (each char that immediately follows the previous match)
+- +10 word-boundary bonus (match lands at start-of-string, after space/dash/underscore, or at a camelCase lowercase→uppercase transition)
+- +20 prefix bonus (first query char lands at position 0)
+- +50 exact match bonus (query equals target, case-insensitive, trimmed)
+- +10 case-exact bonus (target contains query with original casing)
+
+### Multi-field Scoring
+
+Items with both a name and description (Tracker, Function) are scored twice and the higher score wins, with a 0.8 multiplier applied to the description score:
+
+```
+val nameScore = FuzzyMatcher.score(query, item.name)
+val descScore = item.description?.let { FuzzyMatcher.score(query, it) }?.times(0.8)
+val baseScore = listOfNotNull(nameScore, descScore).maxOrNull() ?: return null  // null if neither matches
+```
+
+Groups and Graphs only have names — single call, no multiplier.
+
+### Type Bonus
+
+Trackers receive a small additive bonus (`TYPE_BONUS_TRACKER = 5.0`) applied after the best-of-fields score. Additive (not multiplicative) so a perfect graph match can still beat a mediocre tracker match. The intent is to tip the tie when match quality is otherwise equal.
+
+### What Was Considered and Rejected
+
+**`FuzzyMatchTarget` pre-processing** (pre-compute lowercase string + word-boundary boolean array per candidate): the idea was to avoid re-lowercasing strings and re-computing boundaries on every keystroke. Rejected as premature — for typical string lengths and item counts the DP is negligible and the debounce already throttles it. Profile with Perfetto before adding this complexity.
+
+**`groupItemId → GroupChild` result cache** (avoid re-mapping display data on every query change): would skip re-processing items that appear in both the previous and current result set. Not implemented — not obviously the bottleneck. The next obvious optimization target after profiling.
 
 ## TextFieldState, not String
 
