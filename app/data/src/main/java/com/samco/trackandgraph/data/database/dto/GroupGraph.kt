@@ -7,10 +7,12 @@ data class GroupGraph(
 
 
 sealed class GroupGraphItem {
+    abstract val groupItemId: Long
+
     interface FeatureNode
 
-    data class GroupNode(val groupGraph: GroupGraph) : GroupGraphItem()
-    data class GraphNode(val graph: GraphOrStat) : GroupGraphItem()
-    data class TrackerNode(val tracker: Tracker) : GroupGraphItem(), FeatureNode
-    data class FunctionNode(val function: Function) : GroupGraphItem(), FeatureNode
+    data class GroupNode(override val groupItemId: Long, val groupGraph: GroupGraph) : GroupGraphItem()
+    data class GraphNode(override val groupItemId: Long, val graph: GraphOrStat) : GroupGraphItem()
+    data class TrackerNode(override val groupItemId: Long, val tracker: Tracker) : GroupGraphItem(), FeatureNode
+    data class FunctionNode(override val groupItemId: Long, val function: Function) : GroupGraphItem(), FeatureNode
 }

@@ -37,6 +37,9 @@ class ComponentPathProviderTest {
 
     // ── Helper functions ──
 
+    private var groupItemIdCounter = 1000L
+    private fun giid() = groupItemIdCounter++
+
     private fun testGroup(id: Long, name: String) = Group(id, name, 0, unique = true)
 
     private fun testTracker(id: Long, name: String) = Tracker(
@@ -101,7 +104,7 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.TrackerNode(testTracker(1, "Steps"))
+                GroupGraphItem.TrackerNode(giid(), testTracker(1, "Steps"))
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -114,7 +117,7 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.FunctionNode(testFunction(1, "MyFunc"))
+                GroupGraphItem.FunctionNode(giid(), testFunction(1, "MyFunc"))
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -127,7 +130,7 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GraphNode(testGraphOrStat(1, "MyGraph"))
+                GroupGraphItem.GraphNode(giid(), testGraphOrStat(1, "MyGraph"))
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -142,15 +145,15 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "Health"),
                         children = listOf(
-                            GroupGraphItem.GroupNode(
+                            GroupGraphItem.GroupNode(giid(), 
                                 GroupGraph(
                                     group = testGroup(2, "Exercise"),
                                     children = listOf(
-                                        GroupGraphItem.TrackerNode(testTracker(10, "Steps"))
+                                        GroupGraphItem.TrackerNode(giid(), testTracker(10, "Steps"))
                                     ),
                                 )
                             )
@@ -314,13 +317,13 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "Sub"),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(testTracker(10, "MyTracker")),
-                            GroupGraphItem.FunctionNode(testFunction(20, "MyFunc")),
-                            GroupGraphItem.GraphNode(testGraphOrStat(30, "MyGraph")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(10, "MyTracker")),
+                            GroupGraphItem.FunctionNode(giid(), testFunction(20, "MyFunc")),
+                            GroupGraphItem.GraphNode(giid(), testGraphOrStat(30, "MyGraph")),
                         ),
                     )
                 )
@@ -374,12 +377,12 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.TrackerNode(testTracker(1, "Weight (kg)")),
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.TrackerNode(giid(), testTracker(1, "Weight (kg)")),
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(2, "My/Folder"),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(testTracker(3, "A & B")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(3, "A & B")),
                         ),
                     )
                 ),
@@ -396,7 +399,7 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.TrackerNode(testTracker(1, ""))
+                GroupGraphItem.TrackerNode(giid(), testTracker(1, ""))
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -409,13 +412,13 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "Health"),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
-                            GroupGraphItem.TrackerNode(testTracker(11, "Weight")),
-                            GroupGraphItem.TrackerNode(testTracker(12, "Sleep")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(11, "Weight")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(12, "Sleep")),
                         ),
                     )
                 )
@@ -432,23 +435,23 @@ class ComponentPathProviderTest {
     fun `deeply nested hierarchy produces correct full paths`() {
         val d = GroupGraph(
             group = testGroup(4, "d"),
-            children = listOf(GroupGraphItem.TrackerNode(testTracker(10, "deep"))),
+            children = listOf(GroupGraphItem.TrackerNode(giid(), testTracker(10, "deep"))),
         )
         val c = GroupGraph(
             group = testGroup(3, "c"),
-            children = listOf(GroupGraphItem.GroupNode(d)),
+            children = listOf(GroupGraphItem.GroupNode(giid(), d)),
         )
         val b = GroupGraph(
             group = testGroup(2, "b"),
-            children = listOf(GroupGraphItem.GroupNode(c)),
+            children = listOf(GroupGraphItem.GroupNode(giid(), c)),
         )
         val a = GroupGraph(
             group = testGroup(1, "a"),
-            children = listOf(GroupGraphItem.GroupNode(b)),
+            children = listOf(GroupGraphItem.GroupNode(giid(), b)),
         )
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
-            children = listOf(GroupGraphItem.GroupNode(a)),
+            children = listOf(GroupGraphItem.GroupNode(giid(), a)),
         )
         val provider = ComponentPathProvider(graph)
 
@@ -462,13 +465,13 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "same"),
                         children = emptyList(),
                     )
                 ),
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(2, "same"),
                         children = emptyList(),
@@ -487,8 +490,8 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.FunctionNode(testFunction(1, "Func")),
-                GroupGraphItem.GraphNode(testGraphOrStat(1, "Graph")),
+                GroupGraphItem.FunctionNode(giid(), testFunction(1, "Func")),
+                GroupGraphItem.GraphNode(giid(), testGraphOrStat(1, "Graph")),
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -502,8 +505,8 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.TrackerNode(testTracker(1, "Tracker")),
-                GroupGraphItem.FunctionNode(testFunction(1, "Func")),
+                GroupGraphItem.TrackerNode(giid(), testTracker(1, "Tracker")),
+                GroupGraphItem.FunctionNode(giid(), testFunction(1, "Func")),
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -531,34 +534,34 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "a"),
                         children = listOf(
-                            GroupGraphItem.GroupNode(
+                            GroupGraphItem.GroupNode(giid(), 
                                 GroupGraph(
                                     group = testGroup(3, "shared"),
                                     children = listOf(
-                                        GroupGraphItem.TrackerNode(testTracker(10, "t1")),
-                                        GroupGraphItem.FunctionNode(testFunction(20, "f1")),
-                                        GroupGraphItem.GraphNode(testGraphOrStat(30, "g1")),
+                                        GroupGraphItem.TrackerNode(giid(), testTracker(10, "t1")),
+                                        GroupGraphItem.FunctionNode(giid(), testFunction(20, "f1")),
+                                        GroupGraphItem.GraphNode(giid(), testGraphOrStat(30, "g1")),
                                     ),
                                 )
                             )
                         ),
                     )
                 ),
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(2, "b"),
                         children = listOf(
-                            GroupGraphItem.GroupNode(
+                            GroupGraphItem.GroupNode(giid(), 
                                 GroupGraph(
                                     group = testGroup(3, "shared"),
                                     children = listOf(
-                                        GroupGraphItem.TrackerNode(testTracker(10, "t1")),
-                                        GroupGraphItem.FunctionNode(testFunction(20, "f1")),
-                                        GroupGraphItem.GraphNode(testGraphOrStat(30, "g1")),
+                                        GroupGraphItem.TrackerNode(giid(), testTracker(10, "t1")),
+                                        GroupGraphItem.FunctionNode(giid(), testFunction(20, "f1")),
+                                        GroupGraphItem.GraphNode(giid(), testGraphOrStat(30, "g1")),
                                     ),
                                 )
                             )
@@ -592,12 +595,12 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "Health"),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
-                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(10, "Steps")),
                         ),
                     )
                 )
@@ -614,13 +617,13 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "Sub"),
                         children = emptyList(),
                     )
                 ),
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "Sub"),
                         children = emptyList(),
@@ -638,8 +641,8 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.FunctionNode(testFunction(1, "MyFunc")),
-                GroupGraphItem.FunctionNode(testFunction(1, "MyFunc")),
+                GroupGraphItem.FunctionNode(giid(), testFunction(1, "MyFunc")),
+                GroupGraphItem.FunctionNode(giid(), testFunction(1, "MyFunc")),
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -652,8 +655,8 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GraphNode(testGraphOrStat(1, "MyGraph")),
-                GroupGraphItem.GraphNode(testGraphOrStat(1, "MyGraph")),
+                GroupGraphItem.GraphNode(giid(), testGraphOrStat(1, "MyGraph")),
+                GroupGraphItem.GraphNode(giid(), testGraphOrStat(1, "MyGraph")),
             ),
         )
         val provider = ComponentPathProvider(graph)
@@ -672,20 +675,20 @@ class ComponentPathProviderTest {
         val graph = GroupGraph(
             group = testGroup(0, "Root"),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(1, "a"),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
-                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(10, "Steps")),
                         ),
                     )
                 ),
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(), 
                     GroupGraph(
                         group = testGroup(2, "b"),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(testTracker(10, "Steps")),
+                            GroupGraphItem.TrackerNode(giid(), testTracker(10, "Steps")),
                         ),
                     )
                 ),
@@ -702,7 +705,7 @@ class ComponentPathProviderTest {
     @Test
     fun `large flat group with many children`() {
         val children = (1..20L).map { i ->
-            GroupGraphItem.TrackerNode(testTracker(i, "tracker$i"))
+            GroupGraphItem.TrackerNode(giid(), testTracker(i, "tracker$i"))
         }
         val graph = GroupGraph(
             group = testGroup(0, "Root"),

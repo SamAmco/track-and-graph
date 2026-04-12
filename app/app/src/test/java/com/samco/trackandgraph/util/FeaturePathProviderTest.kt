@@ -12,6 +12,9 @@ import org.junit.Test
 
 class FeaturePathProviderTest {
 
+    private var groupItemIdCounter = 1000L
+    private fun giid() = groupItemIdCounter++
+
     // ── Feature path tests ──
 
     @Test
@@ -362,11 +365,11 @@ class FeaturePathProviderTest {
         val graph = GroupGraph(
             group = Group(0, "", 0, unique = true),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(),
                     GroupGraph(
                         group = Group(1, "Health", 0, unique = true),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(
+                            GroupGraphItem.TrackerNode(giid(),
                                 Tracker(
                                     id = 10, name = "Steps", featureId = 10,
                                     description = "", dataType = DataType.CONTINUOUS,
@@ -375,7 +378,7 @@ class FeaturePathProviderTest {
                                     suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
                                 )
                             ),
-                            GroupGraphItem.TrackerNode(
+                            GroupGraphItem.TrackerNode(giid(),
                                 Tracker(
                                     id = 10, name = "Steps", featureId = 10,
                                     description = "", dataType = DataType.CONTINUOUS,
@@ -413,20 +416,20 @@ class FeaturePathProviderTest {
         val graph = GroupGraph(
             group = Group(0, "", 0, unique = true),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(),
                     GroupGraph(
                         group = Group(1, "a", 0, unique = true),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(tracker),
-                            GroupGraphItem.TrackerNode(tracker),
+                            GroupGraphItem.TrackerNode(giid(), tracker),
+                            GroupGraphItem.TrackerNode(giid(), tracker),
                         ),
                     )
                 ),
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(),
                     GroupGraph(
                         group = Group(2, "b", 0, unique = true),
                         children = listOf(
-                            GroupGraphItem.TrackerNode(tracker),
+                            GroupGraphItem.TrackerNode(giid(), tracker),
                         ),
                     )
                 ),
@@ -444,13 +447,13 @@ class FeaturePathProviderTest {
         val graph = GroupGraph(
             group = Group(0, "", 0, unique = true),
             children = listOf(
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(),
                     GroupGraph(
                         group = Group(1, "Sub", 0, unique = true),
                         children = emptyList(),
                     )
                 ),
-                GroupGraphItem.GroupNode(
+                GroupGraphItem.GroupNode(giid(),
                     GroupGraph(
                         group = Group(1, "Sub", 0, unique = true),
                         children = emptyList(),

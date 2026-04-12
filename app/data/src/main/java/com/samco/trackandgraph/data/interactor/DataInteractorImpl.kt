@@ -148,40 +148,32 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     private suspend fun buildGroupGraph(group: Group): GroupGraph {
-        val children = mutableListOf<GroupGraphItem>()
+        // Batch-fetch entities by type and index by entity ID (unique within each type)
+        val groupsById = dao.getGroupsForGroupSync(group.id)
+            .associate { it.id to it.toDto(unique = isGroupUnique(it.id)) }
+        val trackersById = getTrackersForGroupSync(group.id).associateBy { it.id }
+        val graphsById = dao.getGraphsAndStatsByGroupIdSync(group.id)
+            .associate { it.id to it.toDto(unique = isGraphUnique(it.id)) }
+        val functionsById = getFunctionsForGroupSync(group.id).associateBy { it.id }
 
-        // Get child groups for this specific group
-        val childGroups = dao.getGroupsForGroupSync(group.id)
-            .map { it.toDto(unique = isGroupUnique(it.id)) }
-
-        // Get trackers for this specific group using TrackerHelper
-        val trackers = getTrackersForGroupSync(group.id)
-
-        // Get graphs for this specific group
-        val graphs = dao.getGraphsAndStatsByGroupIdSync(group.id)
-            .map { it.toDto(unique = isGraphUnique(it.id)) }
-
-        // Get functions for this specific group using FunctionHelper
-        val functions = getFunctionsForGroupSync(group.id)
-
-        // Add child groups recursively
-        for (childGroup in childGroups) {
-            children.add(GroupGraphItem.GroupNode(buildGroupGraph(childGroup)))
-        }
-
-        // Add trackers
-        for (tracker in trackers) {
-            children.add(GroupGraphItem.TrackerNode(tracker))
-        }
-
-        // Add graphs
-        for (graph in graphs) {
-            children.add(GroupGraphItem.GraphNode(graph))
-        }
-
-        // Add functions
-        for (function in functions) {
-            children.add(GroupGraphItem.FunctionNode(function))
+        // Iterate group items so each placement gets its own node with its unique groupItemId.
+        // A component can appear multiple times in the same group (same-group duplicates).
+        val children = groupItemDao.getGroupItemsForGroup(group.id).mapNotNull { item ->
+            when (item.type) {
+                GroupItemType.GROUP -> groupsById[item.childId]?.let {
+                    GroupGraphItem.GroupNode(item.id, buildGroupGraph(it))
+                }
+                GroupItemType.TRACKER -> trackersById[item.childId]?.let {
+                    GroupGraphItem.TrackerNode(item.id, it)
+                }
+                GroupItemType.GRAPH -> graphsById[item.childId]?.let {
+                    GroupGraphItem.GraphNode(item.id, it)
+                }
+                GroupItemType.FUNCTION -> functionsById[item.childId]?.let {
+                    GroupGraphItem.FunctionNode(item.id, it)
+                }
+                GroupItemType.REMINDER -> null
+            }
         }
 
         return GroupGraph(group, children)

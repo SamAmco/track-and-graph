@@ -19,14 +19,26 @@ package com.samco.trackandgraph.group
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 
@@ -36,7 +48,6 @@ fun SearchScreen(
     searchViewModel: GroupSearchViewModel,
     onBack: () -> Unit,
 ) {
-    // Handle back press
     BackHandler(onBack = onBack)
 
     SearchTopBarContent(
@@ -45,7 +56,7 @@ fun SearchScreen(
         onBack = onBack,
     )
 
-    SearchScreenContent()
+    SearchScreenContent(searchViewModel = searchViewModel)
 }
 
 @Composable
@@ -78,6 +89,30 @@ private fun SearchTopBarContent(
 }
 
 @Composable
-private fun SearchScreenContent() {
-    Box(modifier = Modifier.fillMaxSize())
+private fun SearchScreenContent(searchViewModel: GroupSearchViewModel) {
+    val results by searchViewModel.searchResults.collectAsStateWithLifecycle()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 4.dp),
+        ) {
+            items(results, key = { it.groupItemId }) { result ->
+                ListItem(
+                    headlineContent = { Text(result.name) },
+                    supportingContent = if (result.description.isNotBlank()) {
+                        { Text(result.description, maxLines = 1) }
+                    } else null,
+                    overlineContent = {
+                        Text(
+                            text = result.type.name.lowercase()
+                                .replaceFirstChar { it.uppercase() },
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    },
+                )
+                HorizontalDivider()
+            }
+        }
+    }
 }

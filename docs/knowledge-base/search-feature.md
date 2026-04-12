@@ -1,6 +1,6 @@
 ---
-title: Search feature — animated top-app-bar field, TextFieldState threading, and in-place screen swap
-description: How search entry animates the top app bar into a text field, why the query is a TextFieldState threaded from the ViewModel, the AnimatedContent contentKey trick that prevents per-keystroke retriggering, and the GroupScreen in-place screen swap that underlies it all.
+title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, and search data flow
+description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy GroupGraph fetch on search open; debounced text matching against subtree; SearchResult uses groupItemId for unique identity.
 topics:
   - GroupSearchViewModel owning a TextFieldState (not a StateFlow<String>)
   - AppBarConfig.searchBarText drives an animated top-bar title swap
@@ -9,14 +9,24 @@ topics:
   - actions slot uses animateContentSize instead of AnimatedContent
   - In-place screen swap in GroupScreen (if/else replaces top bar + content)
   - Why SearchScreen publishes its own clear-button action
-keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position]
+  - Lazy GroupGraph fetch on showSearch(), re-fetched each time, nulled on hide
+  - SearchResult uses groupItemId for unique identity (not entity IDs)
+keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, collectMatches]
 ---
 
 # Search Feature
 
 ## Status
 
-The search feature is still a **stub** for results — `SearchScreen` renders an empty `Box`. What is fully implemented is the UI affordance: the group top app bar animates into a search field, tracks input, and animates back on dismiss. All the pieces needed to wire real results into the empty `Box` are in place.
+Search results are functional: `SearchScreen` displays a text list of matched components from the current group's subtree. Still TODO: improved search ordering (e.g. rank by match quality, prefix matches first) and rendering real component views instead of plain text items.
+
+## Search Data Flow
+
+`GroupSearchViewModelImpl` fetches the `GroupGraph` for the current group lazily — only when `showSearch()` is called, not when the group screen opens. The graph is re-fetched each time search is opened (the VM has the same lifecycle as the group screen, so the graph could be stale from edits made between search sessions). On `hideSearch()` the graph is nulled out.
+
+Search text is observed via `snapshotFlow { searchQuery.text }` with 150ms debounce, then combined with the graph flow. The `collectMatches()` function recursively walks the subtree doing case-insensitive matching on name and description (where available — groups and graphs have no description field).
+
+Each `SearchResult` carries `groupItemId` from `GroupGraphItem.groupItemId` as its unique identity — used as the `LazyColumn` item key. See [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys.
 
 ## TextFieldState, not String
 

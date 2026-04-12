@@ -59,6 +59,16 @@ See `GroupHelperImpl.deleteGroup()` for the implementation:
 
 `GroupGraph` is a tree built from the DAG by `DataInteractorImpl.buildGroupGraph()`. Since a group/feature can have multiple parents, the same node may appear at multiple positions in the tree.
 
+### GroupGraphItem carries groupItemId
+
+Each `GroupGraphItem` node carries a `groupItemId` — the globally unique placement ID from `group_items_table`. This is critical because:
+
+- Entity IDs (tracker.id, graph.id, etc.) are only unique within their own type's table, so a tracker and a graph can share the same numeric ID.
+- Even `(childId, type)` pairs are **not unique within a single group** — the same component can be placed in the same group multiple times (same-group duplicates, see [group-items.md](group-items.md)).
+- `groupItemId` is the only universally unique identifier for a specific placement of a component.
+
+`buildGroupGraph()` fetches `groupItemDao.getGroupItemsForGroup()` at each level to resolve these IDs. When iterating `GroupGraphItem` children, always use `child.groupItemId` for identity (e.g. as list keys), never entity IDs.
+
 There are two path provider classes (both in `app/app/.../util/`), each walking the `GroupGraph` but serving different purposes:
 
 **`FeaturePathProvider`** — for display in dropdowns and selectors where a single string per item is needed:

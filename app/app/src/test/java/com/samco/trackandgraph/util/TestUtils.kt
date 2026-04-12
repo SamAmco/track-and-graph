@@ -87,6 +87,8 @@ fun buildGroupGraph(
         }
     }
 
+    var nextGroupItemId = 1000L
+
     fun buildNode(groupId: Long, visited: MutableSet<Long>): GroupGraph {
         val g = groupsById[groupId]!!
         val children = mutableListOf<GroupGraphItem>()
@@ -99,14 +101,15 @@ fun buildGroupGraph(
 
         // Add child groups
         for (childId in childGroupsByParent[groupId] ?: emptyList()) {
-            children.add(GroupGraphItem.GroupNode(buildNode(childId, visited.toMutableSet())))
+            children.add(GroupGraphItem.GroupNode(nextGroupItemId++, buildNode(childId, visited.toMutableSet())))
         }
 
         // Add features as trackers
         for (f in featuresByGroup[groupId] ?: emptyList()) {
             children.add(
                 GroupGraphItem.TrackerNode(
-                    Tracker(
+                    groupItemId = nextGroupItemId++,
+                    tracker = Tracker(
                         id = f.featureId,
                         name = f.name,
                         featureId = f.featureId,

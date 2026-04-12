@@ -45,8 +45,8 @@ docs:
 
   - file: group-hierarchy.md
     title: Group DAG structure and symlinks
-    description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion handles shared membership; GroupGraph, FeaturePathProvider, and ComponentPathProvider resolve display paths (with .distinct() deduplication for same-group duplicates); DTOs never carry hierarchy info.
-    keywords: [group, DAG, symlink, hierarchy, acyclic, parent, child, GroupGraph, FeaturePathProvider, ComponentPathProvider, deletion, path-resolution, SymlinksDialog]
+    description: Groups form a DAG (not a tree) — a group can appear in multiple parent groups via symlinks; deletion handles shared membership; GroupGraph (with groupItemId on each node), FeaturePathProvider, and ComponentPathProvider resolve display paths (with .distinct() deduplication for same-group duplicates); DTOs never carry hierarchy info.
+    keywords: [group, DAG, symlink, hierarchy, acyclic, parent, child, GroupGraph, GroupGraphItem, groupItemId, FeaturePathProvider, ComponentPathProvider, deletion, path-resolution, SymlinksDialog]
 
   - file: group-items.md
     title: group_items_table — junction table and display ordering
@@ -95,8 +95,8 @@ docs:
 
   - file: search-feature.md
     title: Search feature — animated top-app-bar field, TextFieldState threading, and in-place screen swap
-    description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel (cursor-position bug with String+callback); AnimatedContent contentKey trick that animates only on enter/exit of search mode; actions slot animateContentSize trade-off; appBarPinned and fillMaxSize pitfalls; AppBarSearchField component in ui/compose/ui; still-stub results.
-    keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, fillMaxSize, titleMedium]
+    description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel (cursor-position bug with String+callback); AnimatedContent contentKey trick; lazy GroupGraph fetch on search open; debounced text matching against subtree; SearchResult uses groupItemId for unique identity.
+    keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, fillMaxSize, titleMedium, GroupGraph, groupItemId, debounce, collectMatches]
 
 plans:
   - file: plans/group-view-model-testing-plan.md

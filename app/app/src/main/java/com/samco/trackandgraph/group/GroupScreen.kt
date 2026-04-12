@@ -131,6 +131,7 @@ fun GroupScreen(
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)
+        searchViewModel.setGroupId(navArgs.groupId)
     }
 
     // Local state for FAB visibility based on scroll behavior
