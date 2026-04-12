@@ -534,8 +534,7 @@ private fun GroupGrid(
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
 ) = BoxWithConstraints(modifier = modifier) {
-    // Calculate column count based on maxWidth with minimum 100.dp per cell
-    val columnCount = (maxWidth / 180.dp).toInt().coerceAtLeast(2)
+    val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
 
     val reorderableLazyGridState = rememberReorderableLazyGridState(lazyGridState) { from, to ->
         onDragSwap(from.index, to.index)
@@ -704,6 +703,8 @@ private fun ReorderableCollectionItemScope.FunctionItem(
     onDuplicate = { onDuplicate(displayFunction) },
     onSymlinks = { clickListeners.onSymlinks(displayFunction) }
 )
+
+internal val minColumnWidth = 180.dp
 
 @Preview(showBackground = true)
 @Composable

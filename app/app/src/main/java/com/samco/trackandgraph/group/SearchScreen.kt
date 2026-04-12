@@ -18,29 +18,32 @@
 package com.samco.trackandgraph.group
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
+import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.compose.utils.plus
 
 @Composable
 fun SearchScreen(
@@ -90,28 +93,68 @@ private fun SearchTopBarContent(
 
 @Composable
 private fun SearchScreenContent(searchViewModel: GroupSearchViewModel) {
-    val results by searchViewModel.searchResults.collectAsStateWithLifecycle()
+    val children by searchViewModel.displayResults.collectAsStateWithLifecycle()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
+
+        LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 4.dp),
+            columns = GridCells.Fixed(columnCount),
+            contentPadding = WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+                .asPaddingValues() + PaddingValues(vertical = cardMarginSmall),
         ) {
-            items(results, key = { it.groupItemId }) { result ->
-                ListItem(
-                    headlineContent = { Text(result.name) },
-                    supportingContent = if (result.description.isNotBlank()) {
-                        { Text(result.description, maxLines = 1) }
-                    } else null,
-                    overlineContent = {
-                        Text(
-                            text = result.type.name.lowercase()
-                                .replaceFirstChar { it.uppercase() },
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                    },
-                )
-                HorizontalDivider()
+            items(
+                items = children,
+                key = { it.groupItemId },
+                span = { item ->
+                    when (item) {
+                        is GroupChild.ChildTracker -> GridItemSpan(1)
+                        is GroupChild.ChildFunction -> GridItemSpan(1)
+                        is GroupChild.ChildGroup -> GridItemSpan(2)
+                        is GroupChild.ChildGraph -> GridItemSpan(columnCount)
+                    }
+                }
+            ) { child ->
+                when (child) {
+                    is GroupChild.ChildTracker -> Tracker(
+                        tracker = child.displayTracker,
+                        onEdit = {},
+                        onDelete = {},
+                        onMoveTo = {},
+                        onDescription = {},
+                        onSymlinks = {},
+                        onAdd = { _, _ -> },
+                        onHistory = {},
+                        onPlayTimer = {},
+                        onStopTimer = {},
+                    )
+
+                    is GroupChild.ChildGroup -> Group(
+                        group = child.group,
+                        onEdit = {},
+                        onDelete = {},
+                        onMoveTo = {},
+                        onSymlinks = {},
+                        onClick = {},
+                    )
+
+                    is GroupChild.ChildFunction -> Function(
+                        displayFunction = child.displayFunction,
+                        onEdit = {},
+                        onDelete = {},
+                        onMoveTo = {},
+                        onDuplicate = {},
+                        onSymlinks = {},
+                        onClick = {},
+                    )
+
+                    is GroupChild.ChildGraph -> GraphStatCardView(
+                        graphStatViewData = child.graph.viewData,
+                        unique = child.graph.unique,
+                    )
+                }
             }
         }
     }
