@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.DefaultDispatcher
+import com.samco.trackandgraph.util.FuzzyMatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +41,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,6 +50,7 @@ import javax.inject.Inject
 data class SearchResult(
     val groupItemId: Long,
     val item: GroupGraphItem,
+    val score: Double,
 )
 
 interface GroupSearchViewModel {
@@ -86,7 +87,7 @@ class GroupSearchViewModelImpl @Inject constructor(
         if (text.isBlank() || graph == null) return@combine emptyList()
         val results = mutableListOf<SearchResult>()
         collectMatches(graph, text, results)
-        results
+        results.sortedByDescending { it.score }
     }
 
     // Cache for computed graph view data, keyed by GraphOrStat.id.
@@ -228,7 +229,6 @@ class GroupSearchViewModelImpl @Inject constructor(
         }
     }
 
-    // TODO: Improve search ordering
     private fun collectMatches(
         graph: GroupGraph,
         query: String,
@@ -249,8 +249,8 @@ class GroupSearchViewModelImpl @Inject constructor(
         query: String,
         results: MutableList<SearchResult>,
     ) {
-        if (child.groupGraph.group.name.contains(query, ignoreCase = true)) {
-            results.add(SearchResult(groupItemId = child.groupItemId, item = child))
+        FuzzyMatcher.score(query, child.groupGraph.group.name)?.let { score ->
+            results.add(SearchResult(groupItemId = child.groupItemId, item = child, score = score))
         }
         collectMatches(child.groupGraph, query, results)
     }
@@ -260,11 +260,14 @@ class GroupSearchViewModelImpl @Inject constructor(
         query: String,
         results: MutableList<SearchResult>,
     ) {
-        if (child.tracker.name.contains(query, ignoreCase = true) ||
-            child.tracker.description.contains(query, ignoreCase = true)
-        ) {
-            results.add(SearchResult(groupItemId = child.groupItemId, item = child))
-        }
+        val titleScore = FuzzyMatcher.score(query, child.tracker.name)
+        val descScore = FuzzyMatcher.score(query, child.tracker.description)?.times(DESCRIPTION_SCORE_MULTIPLIER)
+        val baseScore = listOfNotNull(titleScore, descScore).maxOrNull() ?: return
+        results.add(SearchResult(
+            groupItemId = child.groupItemId,
+            item = child,
+            score = baseScore + TYPE_BONUS_TRACKER,
+        ))
     }
 
     private fun matchGraph(
@@ -272,8 +275,8 @@ class GroupSearchViewModelImpl @Inject constructor(
         query: String,
         results: MutableList<SearchResult>,
     ) {
-        if (child.graph.name.contains(query, ignoreCase = true)) {
-            results.add(SearchResult(groupItemId = child.groupItemId, item = child))
+        FuzzyMatcher.score(query, child.graph.name)?.let { score ->
+            results.add(SearchResult(groupItemId = child.groupItemId, item = child, score = score))
         }
     }
 
@@ -282,10 +285,18 @@ class GroupSearchViewModelImpl @Inject constructor(
         query: String,
         results: MutableList<SearchResult>,
     ) {
-        if (child.function.name.contains(query, ignoreCase = true) ||
-            child.function.description.contains(query, ignoreCase = true)
-        ) {
-            results.add(SearchResult(groupItemId = child.groupItemId, item = child))
-        }
+        val titleScore = FuzzyMatcher.score(query, child.function.name)
+        val descScore = FuzzyMatcher.score(query, child.function.description)?.times(DESCRIPTION_SCORE_MULTIPLIER)
+        val baseScore = listOfNotNull(titleScore, descScore).maxOrNull() ?: return
+        results.add(SearchResult(
+            groupItemId = child.groupItemId,
+            item = child,
+            score = baseScore,
+        ))
+    }
+
+    companion object {
+        private const val DESCRIPTION_SCORE_MULTIPLIER = 0.8
+        private const val TYPE_BONUS_TRACKER = 5.0
     }
 }
