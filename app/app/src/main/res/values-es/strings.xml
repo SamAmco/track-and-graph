@@ -55,6 +55,8 @@
     <string name="importButton">Importar</string>
     <string name="import_export">Importar/Exportar</string>
     <string name="search">Buscar</string>
+    <string name="type_to_search">Escribe para buscar</string>
+    <string name="no_results">Sin resultados</string>
     <string name="export_to">Exportar datos de seguimiento en este grupo a CSV:</string>
     <string name="export_error_message">Exportación falló: %1$s</string>
     <string name="import_from">Importe datos de seguimiento a este grupo desde CSV:</string>

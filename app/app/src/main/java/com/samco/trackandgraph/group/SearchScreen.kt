@@ -18,12 +18,14 @@
 package com.samco.trackandgraph.group
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -33,12 +35,18 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
@@ -93,8 +101,52 @@ private fun SearchTopBarContent(
 
 @Composable
 private fun SearchScreenContent(searchViewModel: GroupSearchViewModel) {
-    val children by searchViewModel.displayResults.collectAsStateWithLifecycle()
+    val state by searchViewModel.displayResults.collectAsStateWithLifecycle()
 
+    when (val displayState = state) {
+        SearchDisplayState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding(),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        SearchDisplayState.Empty -> {
+            CenteredMessage(text = stringResource(R.string.type_to_search))
+        }
+
+        is SearchDisplayState.Results -> {
+            if (displayState.children.isEmpty()) {
+                CenteredMessage(text = stringResource(R.string.no_results))
+            } else {
+                SearchResultsGrid(children = displayState.children)
+            }
+        }
+    }
+}
+
+@Composable
+private fun CenteredMessage(text: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun SearchResultsGrid(children: List<GroupChild>) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
 

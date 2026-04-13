@@ -33,15 +33,21 @@ import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,16 +60,25 @@ data class SearchResult(
     val score: Double,
 )
 
+sealed interface SearchDisplayState {
+    /** Search is open but the query is empty — show "type to search". */
+    data object Empty : SearchDisplayState
+    /** A non-empty query is being processed — show a spinner. */
+    data object Loading : SearchDisplayState
+    /** Search completed. [children] may be empty — show "no results". */
+    data class Results(val children: List<GroupChild>) : SearchDisplayState
+}
+
 interface GroupSearchViewModel {
     val isSearchVisible: StateFlow<Boolean>
     val searchQuery: TextFieldState
-    val displayResults: StateFlow<List<GroupChild>>
+    val displayResults: StateFlow<SearchDisplayState>
     fun setGroupId(groupId: Long)
     fun showSearch()
     fun hideSearch()
 }
 
-@OptIn(FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class GroupSearchViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
@@ -90,30 +105,74 @@ class GroupSearchViewModelImpl @Inject constructor(
 
     private var groupId = 0L
 
+    private sealed interface SearchState {
+        data object Loading : SearchState
+        data class Ready(val items: List<SearchableItem>) : SearchState
+    }
+
     // Populated once when search opens (graph is stable for the duration of a session).
     // Cleared when search closes.
-    private val searchableItems = MutableStateFlow<List<SearchableItem>>(emptyList())
+    private val searchState = MutableStateFlow<SearchState>(SearchState.Loading)
 
-    private val queryText = snapshotFlow { searchQuery.text }
-        .debounce(150)
-
-    private val searchResults = combine(queryText, searchableItems) { query, items ->
-        val text = query.toString()
-        if (text.isBlank() || items.isEmpty()) return@combine emptyList()
-        items.mapNotNull { scoreItem(text, it) }
-            .sortedByDescending { it.score }
+    // Intermediate state between raw query and fully-rendered children.
+    // `Done` here still needs to be combined with `graphViewDataCache` before
+    // it can be shown, whereas `Empty` / `Loading` pass straight through.
+    private sealed interface ScoredResults {
+        data object Empty : ScoredResults
+        data object Loading : ScoredResults
+        data class Done(val results: List<SearchResult>) : ScoredResults
     }
+
+    private val queryText: Flow<CharSequence> = snapshotFlow { searchQuery.text }
+
+    // For each query: empty → Empty; non-empty → Loading immediately, wait for
+    // the graph to be ready, debounce, score, emit Done. flatMapLatest cancels
+    // the in-flight computation when the query changes (the RxJava switchMap
+    // equivalent) so stale scoring never reaches the UI.
+    private val searchResults: Flow<ScoredResults> = queryText
+        .flatMapLatest { query ->
+            val text = query.toString()
+            if (text.isBlank()) {
+                flowOf<ScoredResults>(ScoredResults.Empty)
+            } else {
+                flow<ScoredResults> {
+                    emit(ScoredResults.Loading)
+                    // Debounce inside the flow so flatMapLatest's cancellation
+                    // gives us proper "only the latest query runs" semantics.
+                    delay(DEBOUNCE_MS)
+                    val items = searchState
+                        .filterIsInstance<SearchState.Ready>()
+                        .first()
+                        .items
+                    val scored = withContext(defaultDispatcher) {
+                        items.mapNotNull { scoreItem(text, it) }
+                            .sortedByDescending { it.score }
+                    }
+                    emit(ScoredResults.Done(scored))
+                }
+            }
+        }
 
     // Cache for computed graph view data, keyed by GraphOrStat.id.
     // Cleared when search is hidden.
     private val graphViewDataCache =
         MutableStateFlow<Map<Long, CalculatedGraphViewData>>(emptyMap())
 
-    override val displayResults: StateFlow<List<GroupChild>> =
-        combine(searchResults, graphViewDataCache) { results, cache ->
-            if (results.isEmpty()) return@combine emptyList()
-            mapResultsToGroupChildren(results, cache)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), emptyList())
+    // Empty/Loading pass through; Done is combined with the graph-view-data
+    // cache so placeholder graphs get replaced as background calculations
+    // complete. The upstream flatMapLatest already guarantees only the latest
+    // query's Done reaches here, so a plain combine is sufficient — no
+    // cancellation semantics needed at this stage.
+    override val displayResults: StateFlow<SearchDisplayState> =
+        combine(searchResults, graphViewDataCache) { state, cache ->
+            when (state) {
+                is ScoredResults.Empty -> SearchDisplayState.Empty
+                is ScoredResults.Loading -> SearchDisplayState.Loading
+                is ScoredResults.Done -> SearchDisplayState.Results(
+                    mapResultsToGroupChildren(state.results, cache)
+                )
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), SearchDisplayState.Empty)
 
     override fun setGroupId(groupId: Long) {
         this.groupId = groupId
@@ -121,16 +180,17 @@ class GroupSearchViewModelImpl @Inject constructor(
 
     override fun showSearch() {
         _isSearchVisible.value = true
+        searchState.value = SearchState.Loading
         viewModelScope.launch {
             val graph = dataInteractor.getGroupGraphSync(groupId)
-            searchableItems.value = buildSearchableItems(graph)
+            searchState.value = SearchState.Ready(buildSearchableItems(graph))
         }
     }
 
     override fun hideSearch() {
         _isSearchVisible.value = false
         searchQuery.clearText()
-        searchableItems.value = emptyList()
+        searchState.value = SearchState.Loading
         graphViewDataCache.value = emptyMap()
     }
 
@@ -218,7 +278,8 @@ class GroupSearchViewModelImpl @Inject constructor(
         val graphsToCalculate = mutableListOf<GroupGraphItem.GraphNode>()
 
         // Build a lookup so mapTracker can find pre-fetched display data without a DB call.
-        val itemLookup = searchableItems.value.associateBy { it.groupItemId }
+        val itemLookup = (searchState.value as? SearchState.Ready)?.items
+            .orEmpty().associateBy { it.groupItemId }
 
         val children = results.mapNotNull { result ->
             when (val item = result.item) {
@@ -327,5 +388,6 @@ class GroupSearchViewModelImpl @Inject constructor(
     companion object {
         private const val DESCRIPTION_SCORE_MULTIPLIER = 0.8
         private const val TYPE_BONUS_TRACKER = 5.0
+        private const val DEBOUNCE_MS = 150L
     }
 }

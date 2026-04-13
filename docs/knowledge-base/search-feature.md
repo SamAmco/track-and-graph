@@ -21,9 +21,41 @@ keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText
 
 `GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings and (for tracker nodes) a pre-fetched `DisplayTracker`. On `hideSearch()` the list is cleared.
 
-Search text is observed via `snapshotFlow { searchQuery.text }` with 150ms debounce, then combined with the `searchableItems` flow. On each emission, every item is scored via `FuzzyMatcher.score()`; non-matching items (null score) are filtered out and the rest are sorted descending by score.
-
 Each `SearchResult` carries `groupItemId` from `GroupGraphItem.groupItemId` as its unique identity — used as the `LazyColumn` item key. See [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys.
+
+### Display state is a sealed class, not a list + boolean pair
+
+`displayResults` is a `StateFlow<SearchDisplayState>` with three variants: `Empty` (blank query — show "type to search"), `Loading` (work in flight — show spinner), `Results(children)` (done — show grid, or "no results" if the list is empty). The UI does a single `when` and there is no way to end up in an ambiguous state like "not loading, empty list, empty query".
+
+Earlier versions had a separate `isSearchLoading: StateFlow<Boolean>` and a `displayResults: StateFlow<List<GroupChild>>`. That produced visibly wrong sequencing: opening search flashed a spinner (graph still loading) → empty list (graph loaded but no query) → no-results text (query typed, scoring not complete). The correct sequence is "type to search" on open, spinner only while a non-empty query is being scored, then results.
+
+### flatMapLatest for scoring, combine for cache merge
+
+```
+queryText (snapshotFlow of searchQuery.text)
+  └─ flatMapLatest { query ->         // RxJava switchMap equivalent
+       if (query.isBlank()) flowOf(ScoredResults.Empty)
+       else flow {
+         emit(ScoredResults.Loading)   // immediate — before the debounce
+         delay(150)                     // debounce inside the flow
+         val items = searchState.filterIsInstance<Ready>().first().items
+         emit(ScoredResults.Done(score + sort))
+       }
+     }
+
+displayResults = combine(searchResults, graphViewDataCache) { state, cache ->
+  when (state) {
+    Empty, Loading -> matching SearchDisplayState
+    is Done        -> SearchDisplayState.Results(mapResultsToGroupChildren(…, cache))
+  }
+}.stateIn(…, initial = SearchDisplayState.Empty)
+```
+
+**Why flatMapLatest upstream:** a new query must cancel the in-flight scoring+debounce for the previous query, so only the latest query's result can ever reach the UI. Debouncing is done with `delay(150)` inside the flow (not an upstream `.debounce()`) because we want `Loading` to be emitted *before* the delay — the UI flips to the spinner on the first keystroke without waiting 150 ms.
+
+**Why plain `combine` for the cache merge (and not a second flatMapLatest):** once a `ScoredResults.Done` reaches this stage it's already the latest by construction (upstream flatMapLatest guarantees it). The only reason to re-evaluate is `graphViewDataCache` updating as background graph calculations complete. There's no suspending or cancellable work inside the merge that benefits from switchMap-style cancellation — `mapResultsToGroupChildren` is a plain function. An earlier revision used `flatMapLatest { state -> graphViewDataCache.map { … } }` for symmetry, but that added complexity without changing observable behavior.
+
+The intermediate `ScoredResults` sealed type (Empty/Loading/Done) is internal to the ViewModel. The public `SearchDisplayState` only has what the UI needs. Keeping them separate means the "still needs cache-merging" step is visible in the types.
 
 ## Why a Flat List (not re-traversing the tree)
 
