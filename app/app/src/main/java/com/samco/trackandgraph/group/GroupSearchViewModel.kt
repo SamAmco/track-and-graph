@@ -143,6 +143,8 @@ class GroupSearchViewModelImpl @Inject constructor(
         return SearchResult(item.groupItemId, item.item, baseScore + item.typeBonus)
     }
 
+    private enum class EntityType { GROUP, TRACKER, GRAPH, FUNCTION }
+
     private suspend fun buildSearchableItems(graph: GroupGraph): List<SearchableItem> {
         val items = mutableListOf<SearchableItem>()
         collectSearchableItems(graph, items)
@@ -152,44 +154,59 @@ class GroupSearchViewModelImpl @Inject constructor(
     private suspend fun collectSearchableItems(
         graph: GroupGraph,
         items: MutableList<SearchableItem>,
+        seen: MutableSet<Pair<EntityType, Long>> = mutableSetOf(),
     ) {
         for (child in graph.children) {
             when (child) {
                 is GroupGraphItem.GroupNode -> {
-                    items.add(SearchableItem(
-                        groupItemId = child.groupItemId,
-                        item = child,
-                        name = child.groupGraph.group.name,
-                        description = null,
-                        typeBonus = 0.0,
-                        displayTracker = null,
-                    ))
-                    collectSearchableItems(child.groupGraph, items)
+                    if (seen.add(Pair(EntityType.GROUP, child.groupGraph.group.id))) {
+                        items.add(SearchableItem(
+                            groupItemId = child.groupItemId,
+                            item = child,
+                            name = child.groupGraph.group.name,
+                            description = null,
+                            typeBonus = 0.0,
+                            displayTracker = null,
+                        ))
+                        collectSearchableItems(child.groupGraph, items, seen)
+                    }
                 }
-                is GroupGraphItem.TrackerNode -> items.add(SearchableItem(
-                    groupItemId = child.groupItemId,
-                    item = child,
-                    name = child.tracker.name,
-                    description = child.tracker.description,
-                    typeBonus = TYPE_BONUS_TRACKER,
-                    displayTracker = dataInteractor.tryGetTrackerByFeatureId(child.tracker.featureId),
-                ))
-                is GroupGraphItem.GraphNode -> items.add(SearchableItem(
-                    groupItemId = child.groupItemId,
-                    item = child,
-                    name = child.graph.name,
-                    description = null,
-                    typeBonus = 0.0,
-                    displayTracker = null,
-                ))
-                is GroupGraphItem.FunctionNode -> items.add(SearchableItem(
-                    groupItemId = child.groupItemId,
-                    item = child,
-                    name = child.function.name,
-                    description = child.function.description,
-                    typeBonus = 0.0,
-                    displayTracker = null,
-                ))
+                is GroupGraphItem.TrackerNode -> {
+                    if (seen.add(Pair(EntityType.TRACKER, child.tracker.id))) {
+                        items.add(SearchableItem(
+                            groupItemId = child.groupItemId,
+                            item = child,
+                            name = child.tracker.name,
+                            description = child.tracker.description,
+                            typeBonus = TYPE_BONUS_TRACKER,
+                            displayTracker = dataInteractor.tryGetTrackerByFeatureId(child.tracker.featureId),
+                        ))
+                    }
+                }
+                is GroupGraphItem.GraphNode -> {
+                    if (seen.add(Pair(EntityType.GRAPH, child.graph.id))) {
+                        items.add(SearchableItem(
+                            groupItemId = child.groupItemId,
+                            item = child,
+                            name = child.graph.name,
+                            description = null,
+                            typeBonus = 0.0,
+                            displayTracker = null,
+                        ))
+                    }
+                }
+                is GroupGraphItem.FunctionNode -> {
+                    if (seen.add(Pair(EntityType.FUNCTION, child.function.id))) {
+                        items.add(SearchableItem(
+                            groupItemId = child.groupItemId,
+                            item = child,
+                            name = child.function.name,
+                            description = child.function.description,
+                            typeBonus = 0.0,
+                            displayTracker = null,
+                        ))
+                    }
+                }
             }
         }
     }
