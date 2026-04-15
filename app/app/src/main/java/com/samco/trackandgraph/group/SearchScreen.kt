@@ -42,12 +42,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
+import com.samco.trackandgraph.navigation.DeepLink
+import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
@@ -102,6 +107,24 @@ private fun SearchTopBarContent(
 @Composable
 private fun SearchScreenContent(searchViewModel: GroupSearchViewModel) {
     val state by searchViewModel.displayResults.collectAsStateWithLifecycle()
+    val navigator = LocalDeepLinkNavigator.current
+
+    var disambiguation by remember { mutableStateOf<SearchResultItem?>(null) }
+
+    val onPathSelected: (ResolvedPath) -> Unit = { resolved ->
+        // Close search before navigating so that popping back from the deep-link destination
+        // lands on the group view, not back inside the search screen.
+        searchViewModel.hideSearch()
+        navigator.navigate(DeepLink.ToGroupItem(resolved.descent))
+    }
+
+    val onResultClick: (SearchResultItem) -> Unit = { item ->
+        when (item.paths.size) {
+            0 -> Unit // Nothing to navigate to — shouldn't occur in practice.
+            1 -> onPathSelected(item.paths.first())
+            else -> disambiguation = item
+        }
+    }
 
     when (val displayState = state) {
         SearchDisplayState.Loading -> {
@@ -120,14 +143,39 @@ private fun SearchScreenContent(searchViewModel: GroupSearchViewModel) {
         }
 
         is SearchDisplayState.Results -> {
-            if (displayState.children.isEmpty()) {
+            if (displayState.items.isEmpty()) {
                 CenteredMessage(text = stringResource(R.string.no_results))
             } else {
-                SearchResultsGrid(children = displayState.children)
+                SearchResultsGrid(
+                    items = displayState.items,
+                    onResultClick = onResultClick,
+                )
             }
         }
     }
+
+    disambiguation?.let { item ->
+        SymlinksDialogContent(
+            data = SymlinksDialogData(
+                componentName = item.child.displayName,
+                paths = item.paths.map { it.displayString },
+            ),
+            onDismiss = { disambiguation = null },
+            onPathClick = { index ->
+                disambiguation = null
+                onPathSelected(item.paths[index])
+            },
+        )
+    }
 }
+
+private val GroupChild.displayName: String
+    get() = when (this) {
+        is GroupChild.ChildGroup -> group.name
+        is GroupChild.ChildTracker -> displayTracker.name
+        is GroupChild.ChildFunction -> displayFunction.name
+        is GroupChild.ChildGraph -> graph.viewData.graphOrStat.name
+    }
 
 @Composable
 private fun CenteredMessage(text: String) {
@@ -146,7 +194,10 @@ private fun CenteredMessage(text: String) {
 }
 
 @Composable
-private fun SearchResultsGrid(children: List<GroupChild>) {
+private fun SearchResultsGrid(
+    items: List<SearchResultItem>,
+    onResultClick: (SearchResultItem) -> Unit,
+) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
 
@@ -158,18 +209,18 @@ private fun SearchResultsGrid(children: List<GroupChild>) {
                 .asPaddingValues() + PaddingValues(vertical = cardMarginSmall),
         ) {
             items(
-                items = children,
-                key = { it.groupItemId },
+                items = items,
+                key = { it.child.groupItemId },
                 span = { item ->
-                    when (item) {
+                    when (item.child) {
                         is GroupChild.ChildTracker -> GridItemSpan(1)
                         is GroupChild.ChildFunction -> GridItemSpan(1)
                         is GroupChild.ChildGroup -> GridItemSpan(2)
                         is GroupChild.ChildGraph -> GridItemSpan(columnCount)
                     }
                 }
-            ) { child ->
-                when (child) {
+            ) { item ->
+                when (val child = item.child) {
                     is GroupChild.ChildTracker -> Tracker(
                         tracker = child.displayTracker,
                         onEdit = {},
@@ -178,7 +229,7 @@ private fun SearchResultsGrid(children: List<GroupChild>) {
                         onDescription = {},
                         onSymlinks = {},
                         onAdd = { _, _ -> },
-                        onHistory = {},
+                        onHistory = { onResultClick(item) },
                         onPlayTimer = {},
                         onStopTimer = {},
                     )
@@ -189,7 +240,7 @@ private fun SearchResultsGrid(children: List<GroupChild>) {
                         onDelete = {},
                         onMoveTo = {},
                         onSymlinks = {},
-                        onClick = {},
+                        onClick = { onResultClick(item) },
                     )
 
                     is GroupChild.ChildFunction -> Function(
@@ -199,7 +250,7 @@ private fun SearchResultsGrid(children: List<GroupChild>) {
                         onMoveTo = {},
                         onDuplicate = {},
                         onSymlinks = {},
-                        onClick = {},
+                        onClick = { onResultClick(item) },
                     )
 
                     is GroupChild.ChildGraph -> GraphStatCardView(

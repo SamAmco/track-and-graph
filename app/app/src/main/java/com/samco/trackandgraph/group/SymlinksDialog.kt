@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.group
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,10 +51,16 @@ internal fun SymlinksDialog(
     )
 }
 
+/**
+ * @param onPathClick When non-null, each row is tappable and forwards its index; the dialog
+ * is intended to dismiss itself via [onDismiss] from the caller's click handler. When null,
+ * the dialog is information-only.
+ */
 @Composable
-private fun SymlinksDialogContent(
+internal fun SymlinksDialogContent(
     data: SymlinksDialogData,
     onDismiss: () -> Unit,
+    onPathClick: ((Int) -> Unit)? = null,
 ) {
     CustomDialog(
         onDismissRequest = onDismiss,
@@ -72,13 +79,15 @@ private fun SymlinksDialogContent(
         DialogInputSpacing()
         Column(modifier = Modifier.fillMaxWidth()) {
             data.paths.forEachIndexed { index, path ->
+                val rowModifier = Modifier
+                    .fillMaxWidth()
+                    .let { if (onPathClick != null) it.clickable { onPathClick(index) } else it }
+                    .padding(vertical = halfDialogInputSpacing)
                 Text(
                     text = path,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = halfDialogInputSpacing),
+                    modifier = rowModifier,
                 )
                 if (index < data.paths.size - 1) {
                     HorizontalDivider()
