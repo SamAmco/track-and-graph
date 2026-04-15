@@ -45,7 +45,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -91,7 +93,9 @@ import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
 import com.samco.trackandgraph.ui.compose.utils.plus
 import com.samco.trackandgraph.util.performTrackVibrate
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.serialization.Serializable
@@ -102,7 +106,13 @@ import sh.calvin.reorderable.rememberReorderableLazyGridState
 @Serializable
 data class GroupNavKey(
     val groupId: Long = 0L,
-    val groupName: String? = null
+    val groupName: String? = null,
+    /**
+     * Set by deep-link navigation. When non-null, [GroupViewModel] scrolls the grid to the
+     * placement with this id once children load. Consumed once by the ViewModel — subsequent
+     * recompositions do not re-trigger the scroll.
+     */
+    val scrollToGroupItemId: Long? = null,
 ) : NavKey
 
 @Composable
@@ -166,6 +176,7 @@ fun GroupScreen(
             symlinksDialogViewModel = symlinksDialogViewModel,
             groupId = navArgs.groupId,
             groupName = navArgs.groupName,
+            scrollToGroupItemId = navArgs.scrollToGroupItemId,
             onTrackerEdit = onTrackerEdit,
             onGraphStatEdit = onGraphStatEdit,
             onGraphStatClick = onGraphStatClick,
@@ -218,6 +229,7 @@ private fun GroupScreenContent(
     symlinksDialogViewModel: SymlinksDialogViewModel,
     groupId: Long,
     groupName: String?,
+    scrollToGroupItemId: Long? = null,
     onTrackerEdit: (DisplayTracker) -> Unit = {},
     onGraphStatEdit: (IGraphStatViewData) -> Unit = {},
     onGraphStatClick: (IGraphStatViewData) -> Unit = {},
@@ -238,6 +250,12 @@ private fun GroupScreenContent(
             groupViewModel.lazyGridState.animateScrollToItem(0)
         }
     }
+
+    ScrollToGroupItemEffect(
+        targetGroupItemId = scrollToGroupItemId,
+        lazyGridState = groupViewModel.lazyGridState,
+        children = groupViewModel.currentChildren,
+    )
 
     val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel =
         hiltViewModel<AddDataPointsViewModelImpl>()
@@ -703,6 +721,37 @@ private fun ReorderableCollectionItemScope.FunctionItem(
     onDuplicate = { onDuplicate(displayFunction) },
     onSymlinks = { clickListeners.onSymlinks(displayFunction) }
 )
+
+/**
+ * Deep-link scroll: when [targetGroupItemId] is non-null, wait for the corresponding placement
+ * to appear in [children] and for the grid to lay out, then animate-scroll to it once.
+ *
+ * The consumed flag is `rememberSaveable`-keyed on the target id so recomposition and
+ * process-death restore do not re-scroll after the user has moved on; a new target id
+ * (from a subsequent deep link) starts fresh.
+ */
+@Composable
+private fun ScrollToGroupItemEffect(
+    targetGroupItemId: Long?,
+    lazyGridState: LazyGridState,
+    children: kotlinx.coroutines.flow.StateFlow<List<GroupChild>>,
+) {
+    if (targetGroupItemId == null) return
+    var scrollConsumed by rememberSaveable(targetGroupItemId) { mutableStateOf(false) }
+    LaunchedEffect(targetGroupItemId, scrollConsumed) {
+        if (scrollConsumed) return@LaunchedEffect
+        val list = children.first { it.any { c -> c.groupItemId == targetGroupItemId } }
+        val index = list.indexOfFirst { it.groupItemId == targetGroupItemId }
+        if (index < 0) return@LaunchedEffect
+        // Wait for the grid to actually lay out enough items before scrolling.
+        snapshotFlow { lazyGridState.layoutInfo.totalItemsCount }.first { it >= index + 1 }
+        // Let the grid settle — without this the first frames of the animation are dropped
+        // and the scroll looks instant.
+        delay(200)
+        lazyGridState.animateScrollToItem(index)
+        scrollConsumed = true
+    }
+}
 
 internal val minColumnWidth = 180.dp
 

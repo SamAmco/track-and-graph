@@ -93,6 +93,7 @@ interface GroupViewModel {
     val scrollToTopEvents: ReceiveChannel<Unit>
 
     fun setGroup(groupId: Long)
+
     suspend fun userHasAnyTrackers(): Boolean
     fun getTrackersInGroup(): List<DisplayTracker>
     fun addDefaultTrackerValue(tracker: DisplayTracker)
