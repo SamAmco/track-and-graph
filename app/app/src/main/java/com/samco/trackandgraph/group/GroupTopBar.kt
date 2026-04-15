@@ -40,6 +40,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 
 /**
@@ -61,7 +62,11 @@ internal fun GroupTopBarContent(
     val topBarController = LocalTopBarController.current
 
     val isRootGroup = navArgs.groupId == 0L
-    val title = if (isRootGroup) stringResource(R.string.app_name) else navArgs.groupName ?: ""
+    val vmGroupName by groupViewModel.groupName.collectAsStateWithLifecycle()
+    val title = when {
+        isRootGroup -> stringResource(R.string.app_name)
+        else -> navArgs.groupName ?: vmGroupName ?: ""
+    }
 
     // Memoize the nested scroll connection to avoid recreating on every recomposition
     val nestedScrollConnection = remember(showFab) {

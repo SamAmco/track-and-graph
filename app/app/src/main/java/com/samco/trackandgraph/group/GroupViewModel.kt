@@ -89,6 +89,12 @@ interface GroupViewModel {
     val showEmptyGroupText: StateFlow<Boolean>
     val hasAnyReminders: StateFlow<Boolean>
     val loading: StateFlow<Boolean>
+    /**
+     * The display name of the group set via [setGroup]. Null until the first emission lands.
+     * Callers that already know the name (e.g. the nav key from a group-list tap) should prefer
+     * that; this is the fallback for entries that arrive without one (e.g. deep links).
+     */
+    val groupName: StateFlow<String?>
     val lazyGridState: LazyGridState
     val scrollToTopEvents: ReceiveChannel<Unit>
 
@@ -140,6 +146,11 @@ class GroupViewModelImpl @Inject constructor(
     override suspend fun userHasAnyTrackers() = dataInteractor.hasAtLeastOneTracker()
 
     private val groupId = MutableStateFlow<Long?>(null)
+
+    override val groupName: StateFlow<String?> = groupId
+        .filterNotNull()
+        .map { dataInteractor.getGroupById(it)?.name }
+        .stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val onUpdateChildrenForGroup: SharedFlow<Pair<Long, DataUpdateType>> =
         combine(

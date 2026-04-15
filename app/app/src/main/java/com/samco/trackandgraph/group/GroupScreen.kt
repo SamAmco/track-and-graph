@@ -358,9 +358,10 @@ private fun GroupScreenContent(
     )
 
     if (groupDialogsViewModel.showImportExportDialog.collectAsStateWithLifecycle().value) {
+        val vmGroupName = groupViewModel.groupName.collectAsStateWithLifecycle().value
         ImportExportDialog(
             trackGroupId = groupId,
-            trackGroupName = groupName,
+            trackGroupName = groupName ?: vmGroupName,
             onDismissRequest = { groupDialogsViewModel.hideImportExportDialog() }
         )
     }

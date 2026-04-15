@@ -84,6 +84,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.group.GroupNavKey
+import com.samco.trackandgraph.navigation.DeepLinkNavigatorImpl
+import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.animation.NAV_ANIM_DURATION_MILLIS
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
@@ -114,7 +116,12 @@ fun MainScreen(
     val topBarController =
         remember(backStack, title) { TopBarController(backStack, AppBarConfig(title)) }
 
-    CompositionLocalProvider(LocalTopBarController provides topBarController) {
+    val deepLinkNavigator = remember(backStack) { DeepLinkNavigatorImpl(backStack) }
+
+    CompositionLocalProvider(
+        LocalTopBarController provides topBarController,
+        LocalDeepLinkNavigator provides deepLinkNavigator,
+    ) {
         MainView(
             topBarController = topBarController,
             drawerState = drawerState,
