@@ -69,7 +69,9 @@ Each `GroupGraphItem` node carries a `groupItemId` — the globally unique place
 
 `buildGroupGraph()` fetches `groupItemDao.getGroupItemsForGroup()` at each level to resolve these IDs. When iterating `GroupGraphItem` children, always use `child.groupItemId` for identity (e.g. as list keys), never entity IDs.
 
-There are two path provider classes (both in `app/app/.../util/`), each walking the `GroupGraph` but serving different purposes:
+For **deep-link navigation** (tapping a search result, an entry in the symlinks dialog, etc.), paths are resolved **client-side** by walking the `GroupGraph` in the caller's context, then handed to `DeepLinkNavigator` as a `GroupDescentPath` (anchored at the caller's current group, not at root). See [deep-link-navigation.md](deep-link-navigation.md) for why this is not a data-layer call.
+
+For **display-path strings** (dropdowns, selectors, symlinks dialog), there are two path provider classes (both in `app/app/.../util/`), each walking the `GroupGraph` but serving different purposes:
 
 **`FeaturePathProvider`** — for display in dropdowns and selectors where a single string per item is needed:
 - Collects all paths for each group ID and feature ID (trackers/functions only, not graphs)

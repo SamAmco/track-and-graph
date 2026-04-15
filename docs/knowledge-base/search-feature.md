@@ -1,6 +1,6 @@
 ---
-title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, and fuzzy search
-description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy flat-list build on search open; ranked fuzzy matching via FuzzyMatcher; SearchResult carries a score and uses groupItemId for identity.
+title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, fuzzy search, and multi-path disambiguation
+description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy flat-list build on search open; ranked fuzzy matching via FuzzyMatcher; each SearchResultItem carries every ResolvedPath to its component so multi-path (symlinked) results open a disambiguation dialog on tap.
 topics:
   - GroupSearchViewModel owning a TextFieldState (not a StateFlow<String>)
   - AppBarConfig.searchBarText drives an animated top-bar title swap
@@ -11,21 +11,29 @@ topics:
   - Why SearchScreen publishes its own clear-button action
   - SearchableItem flat list built once on showSearch(); tracker DisplayTracker pre-fetched to avoid per-keystroke DB calls
   - FuzzyMatcher — ranked subsequence matching with DP alignment
-  - SearchResult uses groupItemId for unique identity (not entity IDs)
-keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, score, fuzzy, ranked, subsequence, DP, displayTracker, collectSearchableItems, scoreItem]
+  - SearchResultItem pairs a rendered GroupChild with every ResolvedPath (one per placement when ancestors are symlinked)
+  - Tap handler branches on paths.size — 1 navigates directly, >1 opens SymlinksDialogContent in tap-to-navigate mode
+  - SymlinksDialogContent has optional onPathClick — dual-mode dialog (info vs tap-to-navigate)
+keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, SearchResultItem, ResolvedPath, score, fuzzy, ranked, subsequence, DP, displayTracker, collectSearchableItems, scoreItem, buildResolvedPaths, walkPaths, ComponentKey, SymlinksDialog, SymlinksDialogContent, onPathClick, disambiguation]
 ---
 
 # Search Feature
 
 ## Search Data Flow
 
-`GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings and (for tracker nodes) a pre-fetched `DisplayTracker`. On `hideSearch()` the list is cleared.
+`GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings, a pre-computed `List<ResolvedPath>` (see below), and (for tracker nodes) a pre-fetched `DisplayTracker`. On `hideSearch()` the list is cleared.
 
-Each `SearchResult` carries `groupItemId` from `GroupGraphItem.groupItemId` as its unique identity — used as the `LazyColumn` item key. See [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys.
+The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<ResolvedPath>)`. `child.groupItemId` is the list key (see [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys). `paths` is consumed by the tap handler — see "Tapping a result" below.
+
+## Paths are resolved once, per-component, and are multi-valued
+
+A single component can be reachable by more than one path through the group DAG — not only when the component itself is symlinked, but also when any of its **ancestors** are. `buildResolvedPaths` does one DFS of the `GroupGraph` at search-open time and records every placement it sees under a `ComponentKey(type, id)`. `walkPaths` uses a `visitedGroupIds` set scoped to the **current descent**, not a global seen-set, so a symlinked group is still walked once per parent — that's the whole point.
+
+Each `ResolvedPath` bundles a `GroupDescentPath` (the navigable value — see [deep-link-navigation.md](deep-link-navigation.md)) with a slash-formatted `displayString` for the disambiguation dialog. The display string is **descent-relative** — anchored at the user's current group, not at root — so a direct child of the current group renders as `/Leaf`, a nested match as `/SubGroup/Leaf`. This matches the navigable path exactly (no implicit root prefix the user can't see), and the dialog becomes a "pick which descent" picker in multi-path cases.
 
 ### Display state is a sealed class, not a list + boolean pair
 
-`displayResults` is a `StateFlow<SearchDisplayState>` with three variants: `Empty` (blank query — show "type to search"), `Loading` (work in flight — show spinner), `Results(children)` (done — show grid, or "no results" if the list is empty). The UI does a single `when` and there is no way to end up in an ambiguous state like "not loading, empty list, empty query".
+`displayResults` is a `StateFlow<SearchDisplayState>` with three variants: `Empty` (blank query — show "type to search"), `Loading` (work in flight — show spinner), `Results(items)` (done — show grid, or "no results" if the list is empty). The UI does a single `when` and there is no way to end up in an ambiguous state like "not loading, empty list, empty query".
 
 Earlier versions had a separate `isSearchLoading: StateFlow<Boolean>` and a `displayResults: StateFlow<List<GroupChild>>`. That produced visibly wrong sequencing: opening search flashed a spinner (graph still loading) → empty list (graph loaded but no query) → no-results text (query typed, scoring not complete). The correct sequence is "type to search" on open, spinner only while a non-empty query is being scored, then results.
 
@@ -46,7 +54,7 @@ queryText (snapshotFlow of searchQuery.text)
 displayResults = combine(searchResults, graphViewDataCache) { state, cache ->
   when (state) {
     Empty, Loading -> matching SearchDisplayState
-    is Done        -> SearchDisplayState.Results(mapResultsToGroupChildren(…, cache))
+    is Done        -> SearchDisplayState.Results(mapResultsToSearchItems(…, cache))
   }
 }.stateIn(…, initial = SearchDisplayState.Empty)
 ```
@@ -63,7 +71,7 @@ The group graph tree structure is only needed once (to build the flat list). Re-
 
 ## Tracker DisplayTracker Pre-fetch
 
-`mapResultsToGroupChildren` used to call `dataInteractor.tryGetTrackerByFeatureId()` for every tracker in the result set on every debounced keystroke — N DB round-trips per keystroke. Now `collectSearchableItems` calls it once per tracker at search-open time and stores the result in `SearchableItem.displayTracker`. `mapTracker` just reads from `searchableItems.value.associateBy { it.groupItemId }` — no DB calls in the hot path.
+`mapResultsToSearchItems` used to call `dataInteractor.tryGetTrackerByFeatureId()` for every tracker in the result set on every debounced keystroke — N DB round-trips per keystroke. Now `collectSearchableItems` calls it once per tracker at search-open time and stores the result in `SearchableItem.displayTracker`. `mapTracker` just reads from the per-query `associateBy { it.groupItemId }` lookup — no DB calls in the hot path.
 
 ## FuzzyMatcher
 
@@ -187,6 +195,18 @@ Two things worth understanding:
 2. **Reading `searchQuery.text.isNotEmpty()` inside the `actions` lambda is efficient.** The snapshot read happens *when the lambda is invoked*, which is inside `AppBar`'s `Row` trailing lambda. Only that Row resubscribes to the text, not the whole `SearchTopBarContent`. On keystrokes the `Row` recomposes, `animateContentSize` animates the width change, and the `AppBarSearchField` (which is a sibling slot with a stable `TextFieldState` identity) does not even recompose.
 
 3. `appBarPinned = true` switches `MainScreen` to the pinned scroll behavior for the duration of the search, so the bar doesn't collapse away while you're looking at results.
+
+## Tapping a result — deep-link navigation with disambiguation
+
+Each card in `SearchResultsGrid` invokes `onResultClick(item)` where `item: SearchResultItem`. The handler lives in `SearchScreen`:
+
+- `item.paths.size == 1` — call the navigator directly with the single `ResolvedPath.descent`.
+- `item.paths.size > 1` — set a `disambiguation: SearchResultItem?` state to the item. `SymlinksDialogContent` then renders with `onPathClick = { i -> navigate(item.paths[i].descent) }` — the dialog doubles as a "pick which placement" picker.
+- `item.paths.size == 0` — no-op. Shouldn't happen in practice (every indexed component was reached by the graph walk) but we're defensive rather than crashing.
+
+The navigator is read from `LocalDeepLinkNavigator.current`. No navigation callback is threaded through `GroupScreen`. See [deep-link-navigation.md](deep-link-navigation.md) for the full pipeline.
+
+`SymlinksDialogContent` is `internal` and takes an optional `onPathClick: ((Int) -> Unit)?`. When null the rows are static text (the existing symlinks-info use case from group context menus); when non-null each row is `clickable`. This is the one piece of shared UI between the two features — keep the dual-mode API rather than forking the composable.
 
 ## In-place screen swap (unchanged from before)
 
