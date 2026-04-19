@@ -92,7 +92,7 @@ fun Tracker(
     onDescription: (DisplayTracker) -> Unit,
     onSymlinks: (DisplayTracker) -> Unit,
     onAdd: (DisplayTracker, useDefault: Boolean) -> Unit,
-    onHistory: (DisplayTracker) -> Unit,
+    onClick: (DisplayTracker) -> Unit,
     onPlayTimer: (DisplayTracker) -> Unit,
     onStopTimer: (DisplayTracker) -> Unit,
 ) = Box(modifier = modifier.fillMaxWidth()) {
@@ -148,7 +148,7 @@ fun Tracker(
         shape = MaterialTheme.shapes.medium,
     ) {
         BoxWithConstraints(
-            modifier = Modifier.clickable { onHistory(tracker) }
+            modifier = Modifier.clickable { onClick(tracker) }
         ) {
             // Calculate ripple radius to fill entire card
             val rippleRadius = remember(maxWidth, maxHeight) {
@@ -434,7 +434,7 @@ fun TrackerPreview() {
                 onDescription = {},
                 onSymlinks = {},
                 onAdd = { _, _ -> },
-                onHistory = {},
+                onClick = {},
                 onPlayTimer = {},
                 onStopTimer = {}
             )
@@ -460,7 +460,7 @@ fun TrackerPreview() {
                 onDescription = {},
                 onSymlinks = {},
                 onAdd = { _, _ -> },
-                onHistory = {},
+                onClick = {},
                 onPlayTimer = {},
                 onStopTimer = {}
             )
@@ -486,7 +486,7 @@ fun TrackerPreview() {
                 onDescription = {},
                 onSymlinks = {},
                 onAdd = { _, _ -> },
-                onHistory = {},
+                onClick = {},
                 onPlayTimer = {},
                 onStopTimer = {}
             )
@@ -512,7 +512,7 @@ fun TrackerPreview() {
                 onDescription = {},
                 onSymlinks = {},
                 onAdd = { _, _ -> },
-                onHistory = {},
+                onClick = {},
                 onPlayTimer = {},
                 onStopTimer = {}
             )

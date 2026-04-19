@@ -656,7 +656,7 @@ private fun ReorderableCollectionItemScope.TrackerItem(
     onDescription = { clickListeners.onDescription(it) },
     onSymlinks = { clickListeners.onSymlinks(it) },
     onAdd = { t, useDefault -> clickListeners.onAdd(t, useDefault) },
-    onHistory = { clickListeners.onHistory(it) },
+    onClick = { clickListeners.onHistory(it) },
     onPlayTimer = { clickListeners.onPlayTimer(it) },
     onStopTimer = { clickListeners.onStopTimer(it) }
 )

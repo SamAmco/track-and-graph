@@ -169,7 +169,7 @@ private fun PreviewCardButtonPreviewHero() {
                     onDescription = {},
                     onSymlinks = {},
                     onAdd = { _, _ -> },
-                    onHistory = {},
+                    onClick = {},
                     onPlayTimer = {},
                     onStopTimer = {},
                 )

@@ -229,7 +229,7 @@ private fun SearchResultsGrid(
                         onDescription = {},
                         onSymlinks = {},
                         onAdd = { _, _ -> },
-                        onHistory = { onResultClick(item) },
+                        onClick = { onResultClick(item) },
                         onPlayTimer = {},
                         onStopTimer = {},
                     )
