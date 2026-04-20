@@ -46,7 +46,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,20 +73,21 @@ data class DisplayFunction(
     val unique: Boolean,
 )
 
-/**
- * Composable that displays a function item card with context menu and click handling.
- */
+data class FunctionContextMenuCallbacks(
+    val onEdit: (DisplayFunction) -> Unit = {},
+    val onDelete: (DisplayFunction) -> Unit = {},
+    val onMoveTo: (DisplayFunction) -> Unit = {},
+    val onDuplicate: (DisplayFunction) -> Unit = {},
+    val onSymlinks: (DisplayFunction) -> Unit = {},
+)
+
 @Composable
 fun Function(
     modifier: Modifier = Modifier,
     isElevated: Boolean = false,
     displayFunction: DisplayFunction,
-    onEdit: (DisplayFunction) -> Unit,
-    onDelete: (DisplayFunction) -> Unit,
-    onMoveTo: (DisplayFunction) -> Unit,
-    onDuplicate: (DisplayFunction) -> Unit,
-    onSymlinks: (DisplayFunction) -> Unit,
-    onClick: (DisplayFunction) -> Unit,
+    onClick: ((DisplayFunction) -> Unit)? = null,
+    contextMenuCallbacks: FunctionContextMenuCallbacks? = null,
 ) = Box(modifier = modifier.fillMaxWidth()) {
     var showContextMenu by remember { mutableStateOf(false) }
 
@@ -112,7 +112,7 @@ fun Function(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = minTrackerCardHeight)
-                .clickable { onClick(displayFunction) }
+                .let { if (onClick != null) it.clickable { onClick(displayFunction) } else it }
         ) {
             Card(
                 modifier = Modifier
@@ -132,18 +132,17 @@ fun Function(
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        // Menu button in top end
-                        FunctionMenuButton(
-                            modifier = Modifier.align(Alignment.End),
-                            showContextMenu = showContextMenu,
-                            onShowContextMenu = { showContextMenu = it },
-                            displayFunction = displayFunction,
-                            onEdit = onEdit,
-                            onDelete = onDelete,
-                            onMoveTo = onMoveTo,
-                            onDuplicate = onDuplicate,
-                            onSymlinks = onSymlinks,
-                        )
+                        if (contextMenuCallbacks != null) {
+                            FunctionMenuButton(
+                                modifier = Modifier.align(Alignment.End),
+                                showContextMenu = showContextMenu,
+                                onShowContextMenu = { showContextMenu = it },
+                                displayFunction = displayFunction,
+                                callbacks = contextMenuCallbacks,
+                            )
+                        } else {
+                            Box(modifier = Modifier.size(buttonSize))
+                        }
                         // Function name
                         FunctionNameText(functionName = displayFunction.name)
                         InputSpacingLarge()
@@ -167,11 +166,7 @@ private fun FunctionMenuButton(
     showContextMenu: Boolean,
     onShowContextMenu: (Boolean) -> Unit,
     displayFunction: DisplayFunction,
-    onEdit: (DisplayFunction) -> Unit,
-    onDelete: (DisplayFunction) -> Unit,
-    onMoveTo: (DisplayFunction) -> Unit,
-    onDuplicate: (DisplayFunction) -> Unit,
-    onSymlinks: (DisplayFunction) -> Unit,
+    callbacks: FunctionContextMenuCallbacks,
 ) {
     Box(modifier = modifier) {
         IconButton(
@@ -196,28 +191,28 @@ private fun FunctionMenuButton(
                 text = { Text(stringResource(R.string.edit)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onEdit(displayFunction)
+                    callbacks.onEdit(displayFunction)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.delete)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onDelete(displayFunction)
+                    callbacks.onDelete(displayFunction)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.move_to)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onMoveTo(displayFunction)
+                    callbacks.onMoveTo(displayFunction)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.duplicate)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onDuplicate(displayFunction)
+                    callbacks.onDuplicate(displayFunction)
                 }
             )
             if (!displayFunction.unique) {
@@ -225,7 +220,7 @@ private fun FunctionMenuButton(
                     text = { Text(stringResource(R.string.symlinks)) },
                     onClick = {
                         onShowContextMenu(false)
-                        onSymlinks(displayFunction)
+                        callbacks.onSymlinks(displayFunction)
                     }
                 )
             }
@@ -266,12 +261,8 @@ fun FunctionPreview() {
                     description = "Calculates the average of selected data points",
                     unique = false,
                 ),
-                onEdit = {},
-                onDelete = {},
-                onMoveTo = {},
-                onDuplicate = {},
-                onSymlinks = {},
-                onClick = {}
+                onClick = {},
+                contextMenuCallbacks = FunctionContextMenuCallbacks(),
             )
 
             Function(
@@ -283,12 +274,8 @@ fun FunctionPreview() {
                     description = "Generates a comprehensive weekly summary with trends and insights",
                     unique = true,
                 ),
-                onEdit = {},
-                onDelete = {},
-                onMoveTo = {},
-                onDuplicate = {},
-                onSymlinks = {},
-                onClick = {}
+                onClick = {},
+                contextMenuCallbacks = FunctionContextMenuCallbacks(),
             )
         }
     }

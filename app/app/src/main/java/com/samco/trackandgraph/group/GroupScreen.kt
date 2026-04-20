@@ -70,7 +70,7 @@ import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
-import com.samco.trackandgraph.graphstatview.ui.GraphStatClickListener
+import com.samco.trackandgraph.graphstatview.ui.GraphStatContextMenuCallbacks
 import com.samco.trackandgraph.importexport.ImportExportDialog
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
@@ -650,15 +650,17 @@ private fun ReorderableCollectionItemScope.TrackerItem(
     modifier = Modifier.longPressDraggableHandle(),
     isElevated = isElevated,
     tracker = tracker,
-    onEdit = { clickListeners.onEdit(it) },
-    onDelete = onDelete,
-    onMoveTo = onMoveTo,
-    onDescription = { clickListeners.onDescription(it) },
-    onSymlinks = { clickListeners.onSymlinks(it) },
-    onAdd = { t, useDefault -> clickListeners.onAdd(t, useDefault) },
     onClick = { clickListeners.onHistory(it) },
+    onAdd = { t, useDefault -> clickListeners.onAdd(t, useDefault) },
     onPlayTimer = { clickListeners.onPlayTimer(it) },
-    onStopTimer = { clickListeners.onStopTimer(it) }
+    onStopTimer = { clickListeners.onStopTimer(it) },
+    contextMenuCallbacks = TrackerContextMenuCallbacks(
+        onEdit = { clickListeners.onEdit(it) },
+        onDelete = onDelete,
+        onMoveTo = onMoveTo,
+        onDescription = { clickListeners.onDescription(it) },
+        onSymlinks = { clickListeners.onSymlinks(it) },
+    ),
 )
 
 @Composable
@@ -672,11 +674,13 @@ private fun ReorderableCollectionItemScope.GroupItem(
     modifier = Modifier.longPressDraggableHandle(),
     isElevated = isElevated,
     group = group,
-    onEdit = { clickListeners.onEdit(it) },
-    onDelete = onDelete,
-    onMoveTo = onMove,
-    onSymlinks = { clickListeners.onSymlinks(it) },
-    onClick = { clickListeners.onClick(it) }
+    onClick = { clickListeners.onClick(it) },
+    contextMenuCallbacks = GroupContextMenuCallbacks(
+        onEdit = { clickListeners.onEdit(it) },
+        onDelete = onDelete,
+        onMoveTo = onMove,
+        onSymlinks = { clickListeners.onSymlinks(it) },
+    ),
 )
 
 @Composable
@@ -693,14 +697,14 @@ private fun ReorderableCollectionItemScope.GraphStatItem(
     isElevated = isElevated,
     graphStatViewData = graphStat,
     unique = unique,
-    clickListener = GraphStatClickListener(
+    onClick = { clickListeners.onClick(it) },
+    contextMenuCallbacks = GraphStatContextMenuCallbacks(
         onEdit = { clickListeners.onEdit(it) },
         onDelete = onDelete,
-        onClick = { clickListeners.onClick(it) },
         onMove = onMove,
         onDuplicate = onDuplicate,
         onSymlinks = { clickListeners.onSymlinks(it) },
-    )
+    ),
 )
 
 @Composable
@@ -716,11 +720,13 @@ private fun ReorderableCollectionItemScope.FunctionItem(
     displayFunction = displayFunction,
     isElevated = isElevated,
     onClick = { clickListeners.onClick(displayFunction) },
-    onEdit = { clickListeners.onEdit(displayFunction) },
-    onDelete = { onDelete(displayFunction) },
-    onMoveTo = { onMove(displayFunction) },
-    onDuplicate = { onDuplicate(displayFunction) },
-    onSymlinks = { clickListeners.onSymlinks(displayFunction) }
+    contextMenuCallbacks = FunctionContextMenuCallbacks(
+        onEdit = { clickListeners.onEdit(displayFunction) },
+        onDelete = { onDelete(displayFunction) },
+        onMoveTo = { onMove(displayFunction) },
+        onDuplicate = { onDuplicate(displayFunction) },
+        onSymlinks = { clickListeners.onSymlinks(displayFunction) },
+    ),
 )
 
 /**

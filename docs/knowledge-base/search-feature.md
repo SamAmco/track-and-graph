@@ -198,7 +198,9 @@ Two things worth understanding:
 
 ## Tapping a result — deep-link navigation with disambiguation
 
-Each card in `SearchResultsGrid` invokes `onResultClick(item)` where `item: SearchResultItem`. The handler lives in `SearchScreen`:
+Each card in `SearchResultsGrid` is rendered with **only** `onClick = { onResultClick(item) }` — context-menu callbacks are null (no menu icon) and, for trackers, the per-action callbacks (`onAdd`, `onPlayTimer`, `onStopTimer`) are also null (no add/timer buttons). See [card-composables.md](card-composables.md) for the shared card API and why the tracker-action slots are deliberately outside the context-menu object so they can be re-enabled in search later without also surfacing the menu.
+
+The handler lives in `SearchScreen`:
 
 - `item.paths.size == 1` — call the navigator directly with the single `ResolvedPath.descent`.
 - `item.paths.size > 1` — set a `disambiguation: SearchResultItem?` state to the item. `SymlinksDialogContent` then renders with `onPathClick = { i -> navigate(item.paths[i].descent) }` — the dialog doubles as a "pick which placement" picker.

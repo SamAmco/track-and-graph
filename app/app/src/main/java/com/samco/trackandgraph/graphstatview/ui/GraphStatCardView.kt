@@ -30,10 +30,9 @@ import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
-class GraphStatClickListener(
+data class GraphStatContextMenuCallbacks(
     val onDelete: (graphStat: IGraphStatViewData) -> Unit,
     val onEdit: (graphStat: IGraphStatViewData) -> Unit,
-    val onClick: (graphStat: IGraphStatViewData) -> Unit,
     val onMove: (graphStat: IGraphStatViewData) -> Unit,
     val onDuplicate: (graphStat: IGraphStatViewData) -> Unit,
     val onSymlinks: (graphStat: IGraphStatViewData) -> Unit = {},
@@ -45,7 +44,8 @@ fun GraphStatCardView(
     isElevated: Boolean = false,
     graphStatViewData: IGraphStatViewData,
     unique: Boolean = graphStatViewData.graphOrStat.unique,
-    clickListener: GraphStatClickListener? = null,
+    onClick: ((IGraphStatViewData) -> Unit)? = null,
+    contextMenuCallbacks: GraphStatContextMenuCallbacks? = null,
 ) = Box(
     modifier = Modifier
         .padding(cardMarginSmall)
@@ -63,19 +63,17 @@ fun GraphStatCardView(
             modifier = Modifier
                 .fillMaxWidth()
                 .let {
-                    if (clickListener != null) {
-                        it.clickable { clickListener.onClick(graphStatViewData) }
-                    } else it
+                    if (onClick != null) it.clickable { onClick(graphStatViewData) } else it
                 }
         ) {
             if (!unique) {
                 SymlinkIcon(modifier = Modifier.align(Alignment.TopStart))
             }
 
-            if (clickListener != null) {
+            if (contextMenuCallbacks != null) {
                 MenuSection(
                     modifier = Modifier.align(Alignment.TopEnd),
-                    clickListener = clickListener,
+                    callbacks = contextMenuCallbacks,
                     graphStatViewData = graphStatViewData,
                     unique = unique,
                 )
@@ -95,7 +93,7 @@ fun GraphStatCardView(
 @Composable
 private fun MenuSection(
     modifier: Modifier = Modifier,
-    clickListener: GraphStatClickListener,
+    callbacks: GraphStatContextMenuCallbacks,
     graphStatViewData: IGraphStatViewData,
     unique: Boolean,
 ) = Box(modifier = modifier.size(buttonSize)) {
@@ -119,28 +117,28 @@ private fun MenuSection(
         DropdownMenuItem(
             text = { Text(stringResource(id = R.string.delete)) },
             onClick = {
-                clickListener.onDelete(graphStatViewData)
+                callbacks.onDelete(graphStatViewData)
                 expanded = false
             }
         )
         DropdownMenuItem(
             text = { Text(stringResource(id = R.string.edit)) },
             onClick = {
-                clickListener.onEdit(graphStatViewData)
+                callbacks.onEdit(graphStatViewData)
                 expanded = false
             }
         )
         DropdownMenuItem(
             text = { Text(stringResource(id = R.string.move_to)) },
             onClick = {
-                clickListener.onMove(graphStatViewData)
+                callbacks.onMove(graphStatViewData)
                 expanded = false
             }
         )
         DropdownMenuItem(
             text = { Text(stringResource(id = R.string.duplicate)) },
             onClick = {
-                clickListener.onDuplicate(graphStatViewData)
+                callbacks.onDuplicate(graphStatViewData)
                 expanded = false
             }
         )
@@ -148,7 +146,7 @@ private fun MenuSection(
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.symlinks)) },
                 onClick = {
-                    clickListener.onSymlinks(graphStatViewData)
+                    callbacks.onSymlinks(graphStatViewData)
                     expanded = false
                 }
             )
