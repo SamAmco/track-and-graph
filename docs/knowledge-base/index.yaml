@@ -13,6 +13,11 @@ docs:
     description: The standard three-layer composable pattern — ViewModel-binding composable collects state and calls a pure-UI composable; pure-UI composable takes only state/callbacks; @Preview calls the pure-UI composable with hardcoded data.
     keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View]
 
+  - file: card-composables.md
+    title: Card composables — Tracker, Group, Function, GraphStatCardView API shape
+    description: Shared nullable-`onClick` + nullable-`contextMenuCallbacks` pattern for the four group-screen cards — null callbacks hide the context-menu icon; null onClick makes the card non-clickable; Tracker keeps onAdd/onPlayTimer/onStopTimer as separate top-level nullable params so search results can enable them independently of the context menu.
+    keywords: [Tracker, Group, Function, GraphStatCardView, TrackerContextMenuCallbacks, GroupContextMenuCallbacks, FunctionContextMenuCallbacks, GraphStatContextMenuCallbacks, context-menu, onClick, onPlayTimer, onStopTimer, onAdd, card, SearchScreen, GroupScreen, ClickListeners]
+
   - file: fab-and-scroll-patterns.md
     title: FAB patterns — scroll-hiding, animation constants, and tracker-only guard
     description: How scroll-hiding FABs work via NestedScrollConnection passed through AppBarConfig.nestedScrollConnection into MainScreen's Scaffold modifier; shared fabEnterTransition/fabExitTransition constants in Animations.kt; tracker-only FAB guard using viewModel.tracker.map { it != null }; FeatureHistoryScreen and GroupScreen as reference implementations.

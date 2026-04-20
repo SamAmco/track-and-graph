@@ -58,20 +58,20 @@ import com.samco.trackandgraph.ui.dataVisColorList
 private val cornerImageSize = 140.dp to 70.dp
 private val minHeight = 80.dp
 
-/**
- * Composable that displays a group item card with context menu
- * and click handling for navigation.
- */
+data class GroupContextMenuCallbacks(
+    val onEdit: (Group) -> Unit,
+    val onDelete: (Group) -> Unit,
+    val onMoveTo: (Group) -> Unit,
+    val onSymlinks: (Group) -> Unit,
+)
+
 @Composable
 fun Group(
     modifier: Modifier = Modifier,
     isElevated: Boolean = false,
     group: Group,
-    onEdit: (Group) -> Unit,
-    onDelete: (Group) -> Unit,
-    onMoveTo: (Group) -> Unit,
-    onSymlinks: (Group) -> Unit,
-    onClick: (Group) -> Unit,
+    onClick: ((Group) -> Unit)? = null,
+    contextMenuCallbacks: GroupContextMenuCallbacks? = null,
 ) = Box(modifier = modifier.fillMaxWidth()) {
     var showContextMenu by remember { mutableStateOf(false) }
 
@@ -88,7 +88,7 @@ fun Group(
                 .testTag("groupCard")
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = minHeight)
-                .clickable { onClick(group) }
+                .let { if (onClick != null) it.clickable { onClick(group) } else it }
         ) {
             // Corner decoration image
             Image(
@@ -106,17 +106,15 @@ fun Group(
                 SymlinkIcon(modifier = Modifier.align(Alignment.TopStart))
             }
 
-            // Menu button
-            GroupMenuButton(
-                modifier = Modifier.align(Alignment.TopEnd),
-                showContextMenu = showContextMenu,
-                onShowContextMenu = { showContextMenu = it },
-                group = group,
-                onEdit = onEdit,
-                onDelete = onDelete,
-                onMoveTo = onMoveTo,
-                onSymlinks = onSymlinks,
-            )
+            if (contextMenuCallbacks != null) {
+                GroupMenuButton(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    showContextMenu = showContextMenu,
+                    onShowContextMenu = { showContextMenu = it },
+                    group = group,
+                    callbacks = contextMenuCallbacks,
+                )
+            }
 
             // Group name text
             Text(
@@ -138,10 +136,7 @@ private fun GroupMenuButton(
     showContextMenu: Boolean,
     onShowContextMenu: (Boolean) -> Unit,
     group: Group,
-    onEdit: (Group) -> Unit,
-    onDelete: (Group) -> Unit,
-    onMoveTo: (Group) -> Unit,
-    onSymlinks: (Group) -> Unit,
+    callbacks: GroupContextMenuCallbacks,
 ) {
     Box(
         modifier = modifier.size(buttonSize)
@@ -166,21 +161,21 @@ private fun GroupMenuButton(
                 text = { Text(stringResource(R.string.edit)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onEdit(group)
+                    callbacks.onEdit(group)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.delete)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onDelete(group)
+                    callbacks.onDelete(group)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.move_to)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onMoveTo(group)
+                    callbacks.onMoveTo(group)
                 }
             )
             if (!group.unique) {
@@ -188,7 +183,7 @@ private fun GroupMenuButton(
                     text = { Text(stringResource(R.string.symlinks)) },
                     onClick = {
                         onShowContextMenu(false)
-                        onSymlinks(group)
+                        callbacks.onSymlinks(group)
                     }
                 )
             }
@@ -207,11 +202,13 @@ private fun GroupPreview() {
                 colorIndex = 2,
                 unique = true,
             ),
-            onEdit = {},
-            onDelete = {},
-            onMoveTo = {},
-            onSymlinks = {},
-            onClick = {}
+            onClick = {},
+            contextMenuCallbacks = GroupContextMenuCallbacks(
+                onEdit = {},
+                onDelete = {},
+                onMoveTo = {},
+                onSymlinks = {},
+            ),
         )
     }
 }
@@ -228,11 +225,13 @@ private fun GroupElevatedPreview() {
                 colorIndex = 5,
                 unique = true,
             ),
-            onEdit = {},
-            onDelete = {},
-            onMoveTo = {},
-            onSymlinks = {},
-            onClick = {}
+            onClick = {},
+            contextMenuCallbacks = GroupContextMenuCallbacks(
+                onEdit = {},
+                onDelete = {},
+                onMoveTo = {},
+                onSymlinks = {},
+            ),
         )
     }
 }

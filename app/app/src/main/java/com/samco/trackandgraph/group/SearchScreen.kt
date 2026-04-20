@@ -223,39 +223,23 @@ private fun SearchResultsGrid(
                 when (val child = item.child) {
                     is GroupChild.ChildTracker -> Tracker(
                         tracker = child.displayTracker,
-                        onEdit = {},
-                        onDelete = {},
-                        onMoveTo = {},
-                        onDescription = {},
-                        onSymlinks = {},
-                        onAdd = { _, _ -> },
                         onClick = { onResultClick(item) },
-                        onPlayTimer = {},
-                        onStopTimer = {},
                     )
 
                     is GroupChild.ChildGroup -> Group(
                         group = child.group,
-                        onEdit = {},
-                        onDelete = {},
-                        onMoveTo = {},
-                        onSymlinks = {},
                         onClick = { onResultClick(item) },
                     )
 
                     is GroupChild.ChildFunction -> Function(
                         displayFunction = child.displayFunction,
-                        onEdit = {},
-                        onDelete = {},
-                        onMoveTo = {},
-                        onDuplicate = {},
-                        onSymlinks = {},
                         onClick = { onResultClick(item) },
                     )
 
                     is GroupChild.ChildGraph -> GraphStatCardView(
                         graphStatViewData = child.graph.viewData,
                         unique = child.graph.unique,
+                        onClick = { onResultClick(item) },
                     )
                 }
             }

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.group.Tracker
+import com.samco.trackandgraph.group.TrackerContextMenuCallbacks
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
@@ -163,15 +164,17 @@ private fun PreviewCardButtonPreviewHero() {
                         timerStartInstant = null,
                         unique = true,
                     ),
-                    onEdit = {},
-                    onDelete = {},
-                    onMoveTo = {},
-                    onDescription = {},
-                    onSymlinks = {},
-                    onAdd = { _, _ -> },
                     onClick = {},
+                    onAdd = { _, _ -> },
                     onPlayTimer = {},
                     onStopTimer = {},
+                    contextMenuCallbacks = TrackerContextMenuCallbacks(
+                        onEdit = {},
+                        onDelete = {},
+                        onMoveTo = {},
+                        onDescription = {},
+                        onSymlinks = {},
+                    ),
                 )
 
             }

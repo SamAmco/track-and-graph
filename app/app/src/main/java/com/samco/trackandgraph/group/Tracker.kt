@@ -77,24 +77,24 @@ import kotlin.math.hypot
 
 internal val minTrackerCardHeight = 160.dp
 
-/**
- * Composable that displays a tracker item card with timer functionality,
- * context menu, and click handling for add/history actions.
- */
+data class TrackerContextMenuCallbacks(
+    val onEdit: (DisplayTracker) -> Unit,
+    val onDelete: (DisplayTracker) -> Unit,
+    val onMoveTo: (DisplayTracker) -> Unit,
+    val onDescription: (DisplayTracker) -> Unit,
+    val onSymlinks: (DisplayTracker) -> Unit,
+)
+
 @Composable
 fun Tracker(
     modifier: Modifier = Modifier,
     isElevated: Boolean = false,
     tracker: DisplayTracker,
-    onEdit: (DisplayTracker) -> Unit,
-    onDelete: (DisplayTracker) -> Unit,
-    onMoveTo: (DisplayTracker) -> Unit,
-    onDescription: (DisplayTracker) -> Unit,
-    onSymlinks: (DisplayTracker) -> Unit,
-    onAdd: (DisplayTracker, useDefault: Boolean) -> Unit,
-    onClick: (DisplayTracker) -> Unit,
-    onPlayTimer: (DisplayTracker) -> Unit,
-    onStopTimer: (DisplayTracker) -> Unit,
+    onClick: ((DisplayTracker) -> Unit)? = null,
+    onAdd: ((DisplayTracker, useDefault: Boolean) -> Unit)? = null,
+    onPlayTimer: ((DisplayTracker) -> Unit)? = null,
+    onStopTimer: ((DisplayTracker) -> Unit)? = null,
+    contextMenuCallbacks: TrackerContextMenuCallbacks? = null,
 ) = Box(modifier = modifier.fillMaxWidth()) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -148,7 +148,9 @@ fun Tracker(
         shape = MaterialTheme.shapes.medium,
     ) {
         BoxWithConstraints(
-            modifier = Modifier.clickable { onClick(tracker) }
+            modifier = Modifier.let {
+                if (onClick != null) it.clickable { onClick(tracker) } else it
+            }
         ) {
             // Calculate ripple radius to fill entire card
             val rippleRadius = remember(maxWidth, maxHeight) {
@@ -170,17 +172,17 @@ fun Tracker(
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    TrackerMenuButton(
-                        modifier = Modifier.align(Alignment.End),
-                        showContextMenu = showContextMenu,
-                        onShowContextMenu = { showContextMenu = it },
-                        tracker = tracker,
-                        onEdit = onEdit,
-                        onDelete = onDelete,
-                        onMoveTo = onMoveTo,
-                        onDescription = onDescription,
-                        onSymlinks = onSymlinks,
-                    )
+                    if (contextMenuCallbacks != null) {
+                        TrackerMenuButton(
+                            modifier = Modifier.align(Alignment.End),
+                            showContextMenu = showContextMenu,
+                            onShowContextMenu = { showContextMenu = it },
+                            tracker = tracker,
+                            callbacks = contextMenuCallbacks,
+                        )
+                    } else {
+                        Box(modifier = Modifier.size(buttonSize))
+                    }
 
                     TrackerNameText(trackerName = tracker.name)
 
@@ -209,11 +211,7 @@ private fun TrackerMenuButton(
     showContextMenu: Boolean,
     onShowContextMenu: (Boolean) -> Unit,
     tracker: DisplayTracker,
-    onEdit: (DisplayTracker) -> Unit,
-    onDelete: (DisplayTracker) -> Unit,
-    onMoveTo: (DisplayTracker) -> Unit,
-    onDescription: (DisplayTracker) -> Unit,
-    onSymlinks: (DisplayTracker) -> Unit,
+    callbacks: TrackerContextMenuCallbacks,
 ) {
     Box(
         modifier = modifier.size(buttonSize)
@@ -238,28 +236,28 @@ private fun TrackerMenuButton(
                 text = { Text(stringResource(R.string.edit)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onEdit(tracker)
+                    callbacks.onEdit(tracker)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.delete)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onDelete(tracker)
+                    callbacks.onDelete(tracker)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.move_to)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onMoveTo(tracker)
+                    callbacks.onMoveTo(tracker)
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.description)) },
                 onClick = {
                     onShowContextMenu(false)
-                    onDescription(tracker)
+                    callbacks.onDescription(tracker)
                 }
             )
             if (!tracker.unique) {
@@ -267,7 +265,7 @@ private fun TrackerMenuButton(
                     text = { Text(stringResource(R.string.symlinks)) },
                     onClick = {
                         onShowContextMenu(false)
-                        onSymlinks(tracker)
+                        callbacks.onSymlinks(tracker)
                     }
                 )
             }
@@ -330,9 +328,9 @@ private fun TrackerDateTimeArea(
 private fun TrackerButtonsArea(
     tracker: DisplayTracker,
     rippleRadius: Dp,
-    onPlayTimer: (DisplayTracker) -> Unit,
-    onStopTimer: (DisplayTracker) -> Unit,
-    onAdd: (DisplayTracker, Boolean) -> Unit
+    onPlayTimer: ((DisplayTracker) -> Unit)?,
+    onStopTimer: ((DisplayTracker) -> Unit)?,
+    onAdd: ((DisplayTracker, Boolean) -> Unit)?,
 ) {
     Box(
         modifier = Modifier
@@ -340,18 +338,15 @@ private fun TrackerButtonsArea(
             .height(buttonSize)
     ) {
         // Timer control buttons (for DURATION trackers)
-        if (tracker.dataType == DataType.DURATION) {
+        val isRunning = tracker.timerStartInstant != null
+        val timerClick = if (isRunning) onStopTimer else onPlayTimer
+        if (tracker.dataType == DataType.DURATION && timerClick != null) {
             IconButton(
                 modifier = Modifier
                     .size(buttonSize)
                     .align(Alignment.BottomCenter),
-                onClick = if (tracker.timerStartInstant == null) {
-                    { onPlayTimer(tracker) }
-                } else {
-                    { onStopTimer(tracker) }
-                },
+                onClick = { timerClick(tracker) },
             ) {
-                val isRunning = tracker.timerStartInstant != null
                 Icon(
                     painter =
                         if (isRunning) painterResource(R.drawable.ic_stop_timer)
@@ -362,28 +357,30 @@ private fun TrackerButtonsArea(
             }
         }
 
-        // Add button with unbounded ripple that fills the card
-        val rippleIndication = remember(rippleRadius) {
-            ripple(
-                bounded = false,
-                radius = rippleRadius
+        if (onAdd != null) {
+            // Add button with unbounded ripple that fills the card
+            val rippleIndication = remember(rippleRadius) {
+                ripple(
+                    bounded = false,
+                    radius = rippleRadius
+                )
+            }
+
+            Icon(
+                painterResource(R.drawable.ic_add_record),
+                contentDescription = stringResource(R.string.add_data_point_button_content_description),
+                modifier = Modifier
+                    .size(buttonSize)
+                    .align(Alignment.BottomEnd)
+                    .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rippleIndication,
+                        onClick = { onAdd(tracker, tracker.hasDefaultValue) },
+                        onLongClick = { onAdd(tracker, false) }
+                    ),
+                tint = if (tracker.hasDefaultValue) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
             )
         }
-
-        Icon(
-            painterResource(R.drawable.ic_add_record),
-            contentDescription = stringResource(R.string.add_data_point_button_content_description),
-            modifier = Modifier
-                .size(buttonSize)
-                .align(Alignment.BottomEnd)
-                .combinedClickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rippleIndication,
-                    onClick = { onAdd(tracker, tracker.hasDefaultValue) },
-                    onLongClick = { onAdd(tracker, false) }
-                ),
-            tint = if (tracker.hasDefaultValue) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
-        )
     }
 }
 
@@ -428,15 +425,17 @@ fun TrackerPreview() {
                     timerStartInstant = null,
                     unique = true,
                 ),
-                onEdit = {},
-                onDelete = {},
-                onMoveTo = {},
-                onDescription = {},
-                onSymlinks = {},
-                onAdd = { _, _ -> },
                 onClick = {},
+                onAdd = { _, _ -> },
                 onPlayTimer = {},
-                onStopTimer = {}
+                onStopTimer = {},
+                contextMenuCallbacks = TrackerContextMenuCallbacks(
+                    onEdit = {},
+                    onDelete = {},
+                    onMoveTo = {},
+                    onDescription = {},
+                    onSymlinks = {},
+                ),
             )
 
             // Regular tracker with data
@@ -454,15 +453,17 @@ fun TrackerPreview() {
                     timerStartInstant = null,
                     unique = true,
                 ),
-                onEdit = {},
-                onDelete = {},
-                onMoveTo = {},
-                onDescription = {},
-                onSymlinks = {},
-                onAdd = { _, _ -> },
                 onClick = {},
+                onAdd = { _, _ -> },
                 onPlayTimer = {},
-                onStopTimer = {}
+                onStopTimer = {},
+                contextMenuCallbacks = TrackerContextMenuCallbacks(
+                    onEdit = {},
+                    onDelete = {},
+                    onMoveTo = {},
+                    onDescription = {},
+                    onSymlinks = {},
+                ),
             )
 
             // Duration tracker with running timer
@@ -480,15 +481,17 @@ fun TrackerPreview() {
                     timerStartInstant = Instant.parse("2025-07-15T10:30:00.00Z").minusSeconds(125),
                     unique = true,
                 ),
-                onEdit = {},
-                onDelete = {},
-                onMoveTo = {},
-                onDescription = {},
-                onSymlinks = {},
-                onAdd = { _, _ -> },
                 onClick = {},
+                onAdd = { _, _ -> },
                 onPlayTimer = {},
-                onStopTimer = {}
+                onStopTimer = {},
+                contextMenuCallbacks = TrackerContextMenuCallbacks(
+                    onEdit = {},
+                    onDelete = {},
+                    onMoveTo = {},
+                    onDescription = {},
+                    onSymlinks = {},
+                ),
             )
 
             // Duration tracker with stopped timer
@@ -506,15 +509,17 @@ fun TrackerPreview() {
                     timerStartInstant = null,
                     unique = true,
                 ),
-                onEdit = {},
-                onDelete = {},
-                onMoveTo = {},
-                onDescription = {},
-                onSymlinks = {},
-                onAdd = { _, _ -> },
                 onClick = {},
+                onAdd = { _, _ -> },
                 onPlayTimer = {},
-                onStopTimer = {}
+                onStopTimer = {},
+                contextMenuCallbacks = TrackerContextMenuCallbacks(
+                    onEdit = {},
+                    onDelete = {},
+                    onMoveTo = {},
+                    onDescription = {},
+                    onSymlinks = {},
+                ),
             )
 
         }
