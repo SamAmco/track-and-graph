@@ -136,8 +136,12 @@ fun GroupScreen(
     val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel<ReleaseNotesViewModelImpl>()
     val symlinksDialogViewModel: SymlinksDialogViewModel = hiltViewModel()
     val searchViewModel: GroupSearchViewModel = hiltViewModel<GroupSearchViewModelImpl>()
+    val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel =
+        hiltViewModel<AddDataPointsViewModelImpl>()
 
     val isSearchVisible by searchViewModel.isSearchVisible.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val requestNotificationPermission = rememberNotificationPermissionRequester()
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)
@@ -147,11 +151,28 @@ fun GroupScreen(
     // Local state for FAB visibility based on scroll behavior
     val showFab = remember { mutableStateOf(true) }
 
+    val onTrackerAdd: (DisplayTracker, Boolean) -> Unit = { tracker, useDefault ->
+        if (tracker.hasDefaultValue && useDefault) {
+            context.performTrackVibrate()
+            groupViewModel.addDefaultTrackerValue(tracker)
+        } else {
+            addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)
+        }
+    }
+    val onTrackerPlayTimer: (DisplayTracker) -> Unit = { tracker ->
+        groupViewModel.playTimer(tracker)
+        requestNotificationPermission()
+    }
+    val onTrackerStopTimer: (DisplayTracker) -> Unit = { groupViewModel.stopTimer(it) }
+
     if (isSearchVisible) {
         SearchScreen(
             navArgs = navArgs,
             searchViewModel = searchViewModel,
-            onBack = { searchViewModel.hideSearch() }
+            onBack = { searchViewModel.hideSearch() },
+            onTrackerAdd = onTrackerAdd,
+            onTrackerPlayTimer = onTrackerPlayTimer,
+            onTrackerStopTimer = onTrackerStopTimer,
         )
     } else {
         GroupTopBarContent(
@@ -174,6 +195,7 @@ fun GroupScreen(
             addSymlinkViewModel = addSymlinkViewModel,
             releaseNotesViewModel = releaseNotesViewModel,
             symlinksDialogViewModel = symlinksDialogViewModel,
+            addDataPointsDialogViewModel = addDataPointsDialogViewModel,
             groupId = navArgs.groupId,
             groupName = navArgs.groupName,
             scrollToGroupItemId = navArgs.scrollToGroupItemId,
@@ -184,9 +206,20 @@ fun GroupScreen(
             onTrackerHistory = onTrackerHistory,
             onFunctionEdit = onFunctionEdit,
             onFunctionClick = onFunctionClick,
+            onTrackerAdd = onTrackerAdd,
+            onTrackerPlayTimer = onTrackerPlayTimer,
+            onTrackerStopTimer = onTrackerStopTimer,
             showFab = showFab,
         )
     }
+
+    // Rendered at the outer level so the dialog persists across search open/close
+    // — the underlying ViewModel state drives visibility, but the composable must
+    // be in composition in both branches to react to state changes.
+    AddDataPointsDialog(
+        addDataPointsDialogViewModel,
+        onDismissRequest = { addDataPointsDialogViewModel.reset() }
+    )
 }
 
 /** Data classes for click listeners with default empty lambda values */
@@ -227,6 +260,7 @@ private fun GroupScreenContent(
     addSymlinkViewModel: AddSymlinkViewModel,
     releaseNotesViewModel: ReleaseNotesViewModel,
     symlinksDialogViewModel: SymlinksDialogViewModel,
+    addDataPointsDialogViewModel: AddDataPointsNavigationViewModel,
     groupId: Long,
     groupName: String?,
     scrollToGroupItemId: Long? = null,
@@ -237,13 +271,15 @@ private fun GroupScreenContent(
     onTrackerHistory: (DisplayTracker) -> Unit = {},
     onFunctionEdit: (DisplayFunction) -> Unit = {},
     onFunctionClick: (DisplayFunction) -> Unit = {},
+    onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
+    onTrackerPlayTimer: (DisplayTracker) -> Unit,
+    onTrackerStopTimer: (DisplayTracker) -> Unit,
     showFab: State<Boolean>,
 ) {
     val isLoading = groupViewModel.loading.collectAsStateWithLifecycle().value
     val showEmptyText = groupViewModel.showEmptyGroupText.collectAsStateWithLifecycle().value
     val groupHasTrackers = groupViewModel.groupHasAnyTrackers.collectAsStateWithLifecycle().value
     val allChildren = groupViewModel.currentChildren.collectAsStateWithLifecycle().value
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         groupViewModel.scrollToTopEvents.receiveAsFlow().collect {
@@ -257,12 +293,9 @@ private fun GroupScreenContent(
         children = groupViewModel.currentChildren,
     )
 
-    val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel =
-        hiltViewModel<AddDataPointsViewModelImpl>()
     val moveItemViewModel: MoveItemViewModel = hiltViewModel()
 
     // Permission handling
-    val requestNotificationPermission = rememberNotificationPermissionRequester()
     val requestAlarmAndNotificationPermission = rememberAlarmAndNotificationPermissionRequester()
     LaunchedEffect(groupViewModel.hasAnyReminders) {
         groupViewModel.hasAnyReminders
@@ -295,20 +328,10 @@ private fun GroupScreenContent(
             onEdit = onTrackerEdit,
             onDescription = { groupDialogsViewModel.showFeatureDescriptionDialog(it) },
             onSymlinks = { symlinksDialogViewModel.showSymlinks(it.id, GroupChildType.TRACKER, it.name) },
-            onAdd = { tracker, useDefault ->
-                if (tracker.hasDefaultValue && useDefault) {
-                    context.performTrackVibrate()
-                    groupViewModel.addDefaultTrackerValue(tracker)
-                } else {
-                    addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)
-                }
-            },
+            onAdd = onTrackerAdd,
             onHistory = onTrackerHistory,
-            onPlayTimer = { tracker ->
-                groupViewModel.playTimer(tracker)
-                requestNotificationPermission()
-            },
-            onStopTimer = { groupViewModel.stopTimer(it) }
+            onPlayTimer = onTrackerPlayTimer,
+            onStopTimer = onTrackerStopTimer,
         ),
         graphStatClickListeners = GraphStatClickListeners(
             onEdit = onGraphStatEdit,
@@ -342,11 +365,6 @@ private fun GroupScreenContent(
     )
 
     // Dialogs
-    AddDataPointsDialog(
-        addDataPointsDialogViewModel,
-        onDismissRequest = { addDataPointsDialogViewModel.reset() }
-    )
-
     AddGroupDialog(
         viewModel = addGroupDialogViewModel,
         onDismissRequest = { addGroupDialogViewModel.hide() }

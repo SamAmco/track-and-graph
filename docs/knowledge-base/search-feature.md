@@ -198,7 +198,7 @@ Two things worth understanding:
 
 ## Tapping a result — deep-link navigation with disambiguation
 
-Each card in `SearchResultsGrid` is rendered with **only** `onClick = { onResultClick(item) }` — context-menu callbacks are null (no menu icon) and, for trackers, the per-action callbacks (`onAdd`, `onPlayTimer`, `onStopTimer`) are also null (no add/timer buttons). See [card-composables.md](card-composables.md) for the shared card API and why the tracker-action slots are deliberately outside the context-menu object so they can be re-enabled in search later without also surfacing the menu.
+Each card in `SearchResultsGrid` is rendered with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon on search result cards). Tracker cards additionally get `onAdd` / `onPlayTimer` / `onStopTimer` wired through from `SearchScreen`'s params — the same lambdas `GroupScreen` uses, hoisted to the outer level so the `AddDataPointsDialog` persists across search open/close. See [card-composables.md](card-composables.md) for the shared card API and why the tracker-action slots sit outside the context-menu object.
 
 The handler lives in `SearchScreen`:
 

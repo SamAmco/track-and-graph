@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.navigation.DeepLink
 import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
@@ -63,6 +64,9 @@ fun SearchScreen(
     navArgs: GroupNavKey,
     searchViewModel: GroupSearchViewModel,
     onBack: () -> Unit,
+    onTrackerAdd: (DisplayTracker, useDefault: Boolean) -> Unit,
+    onTrackerPlayTimer: (DisplayTracker) -> Unit,
+    onTrackerStopTimer: (DisplayTracker) -> Unit,
 ) {
     BackHandler(onBack = onBack)
 
@@ -72,7 +76,12 @@ fun SearchScreen(
         onBack = onBack,
     )
 
-    SearchScreenContent(searchViewModel = searchViewModel)
+    SearchScreenContent(
+        searchViewModel = searchViewModel,
+        onTrackerAdd = onTrackerAdd,
+        onTrackerPlayTimer = onTrackerPlayTimer,
+        onTrackerStopTimer = onTrackerStopTimer,
+    )
 }
 
 @Composable
@@ -105,7 +114,12 @@ private fun SearchTopBarContent(
 }
 
 @Composable
-private fun SearchScreenContent(searchViewModel: GroupSearchViewModel) {
+private fun SearchScreenContent(
+    searchViewModel: GroupSearchViewModel,
+    onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
+    onTrackerPlayTimer: (DisplayTracker) -> Unit,
+    onTrackerStopTimer: (DisplayTracker) -> Unit,
+) {
     val state by searchViewModel.displayResults.collectAsStateWithLifecycle()
     val navigator = LocalDeepLinkNavigator.current
 
@@ -149,6 +163,9 @@ private fun SearchScreenContent(searchViewModel: GroupSearchViewModel) {
                 SearchResultsGrid(
                     items = displayState.items,
                     onResultClick = onResultClick,
+                    onTrackerAdd = onTrackerAdd,
+                    onTrackerPlayTimer = onTrackerPlayTimer,
+                    onTrackerStopTimer = onTrackerStopTimer,
                 )
             }
         }
@@ -197,6 +214,9 @@ private fun CenteredMessage(text: String) {
 private fun SearchResultsGrid(
     items: List<SearchResultItem>,
     onResultClick: (SearchResultItem) -> Unit,
+    onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
+    onTrackerPlayTimer: (DisplayTracker) -> Unit,
+    onTrackerStopTimer: (DisplayTracker) -> Unit,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
@@ -224,6 +244,9 @@ private fun SearchResultsGrid(
                     is GroupChild.ChildTracker -> Tracker(
                         tracker = child.displayTracker,
                         onClick = { onResultClick(item) },
+                        onAdd = onTrackerAdd,
+                        onPlayTimer = onTrackerPlayTimer,
+                        onStopTimer = onTrackerStopTimer,
                     )
 
                     is GroupChild.ChildGroup -> Group(

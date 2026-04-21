@@ -1,12 +1,12 @@
 ---
 title: Card composables — Tracker, Group, Function, GraphStatCardView API shape
-description: Shared opt-in pattern for the four group-screen card composables — `onClick` and a `ContextMenuCallbacks` data class are both nullable top-level params; a null `contextMenuCallbacks` hides the context-menu icon and a null `onClick` makes the card non-clickable. For `Tracker`, `onAdd`/`onPlayTimer`/`onStopTimer` are deliberately kept outside the context-menu object so search results (and future consumers) can enable them independently.
+description: Shared opt-in pattern for the four group-screen card composables — `onClick` and a `ContextMenuCallbacks` data class are both nullable top-level params; a null `contextMenuCallbacks` hides the context-menu icon and a null `onClick` makes the card non-clickable. For `Tracker`, `onAdd`/`onPlayTimer`/`onStopTimer` are deliberately kept outside the context-menu object so callers can enable them independently — search currently uses this to provide tap + add + play/stop-timer without surfacing a context menu.
 topics:
   - Two-slot API: `onClick` for the card body tap, `contextMenuCallbacks` for the dropdown
   - Each `XContextMenuCallbacks` data class lives alongside its composable (e.g. `TrackerContextMenuCallbacks` in `Tracker.kt`)
   - Null context-menu callbacks → no menu icon renders; null `onClick` → no `clickable` modifier
   - Tracker-specific nullable extras: `onAdd`, `onPlayTimer`, `onStopTimer` — top-level, not in context menu
-  - Why search results get null context menus and null tracker-action callbacks
+  - Why search results get null context menus but non-null tracker-action callbacks
 keywords: [Tracker, Group, Function, GraphStatCardView, TrackerContextMenuCallbacks, GroupContextMenuCallbacks, FunctionContextMenuCallbacks, GraphStatContextMenuCallbacks, context-menu, card-onClick, onPlayTimer, onStopTimer, onAdd, SearchScreen, search, GroupScreen, TrackerClickListeners, GraphStatClickListeners, GroupClickListeners, FunctionClickListeners]
 ---
 
@@ -32,7 +32,7 @@ Earlier, the click-through to open a tracker's history / graph's detail view was
 
 `Tracker` exposes `onAdd`, `onPlayTimer`, `onStopTimer` as individual nullable top-level params, **not** as fields on `TrackerContextMenuCallbacks`. Each button renders only if its callback is non-null.
 
-This is deliberate: in the search results grid we want the card tap (`onClick`) to deep-link to the component, and initially nothing else. Later we want to re-enable the add-data-point and start/stop-timer buttons on search-result tracker cards without also re-enabling the context menu. Keeping these callbacks out of the context-menu bundle keeps those two decisions independent.
+This is deliberate: the search results grid wants the card tap (`onClick`) to deep-link to the component **and** the add-data-point / start/stop-timer buttons enabled, but no context menu. Keeping these three callbacks out of the context-menu bundle lets those two decisions be made independently.
 
 `onDescription` stays inside `TrackerContextMenuCallbacks` because it only makes sense from the dropdown menu.
 
@@ -42,12 +42,21 @@ This is deliberate: in the search results grid we want the card tap (`onClick`) 
 
 Don't try to unify `GraphStatClickListeners` and `GraphStatContextMenuCallbacks` — they live at different layers. The screen-level aggregate carries `onClick` because the screen wires that up; the card-level data class intentionally does not, because per-card `onClick` is a card-level concern.
 
+### Hoisted tracker actions + dialog
+
+The three tracker action lambdas (`onTrackerAdd`, `onTrackerPlayTimer`, `onTrackerStopTimer`) and the `AddDataPointsDialog` render are declared at the outer `GroupScreen` level, above the `if (isSearchVisible)` branch. The same lambdas are passed into both `SearchScreen` and `GroupScreenContent`. Rationale:
+
+- **Shared "use default vs. open dialog" logic.** `onTrackerAdd` branches on `tracker.hasDefaultValue && useDefault` → `groupViewModel.addDefaultTrackerValue(tracker)` vs. `addDataPointsDialogViewModel.showAddDataPointDialog(...)`. Defining it once avoids duplicating that branch in two places.
+- **Dialog persists across search open/close.** `AddDataPointsDialog` is rendered once at the outer level, outside the if/else, so opening or closing search doesn't tear down and re-create the dialog state. The dialog's ViewModel (`AddDataPointsViewModelImpl` obtained via `hiltViewModel<...>()`) is stable across the in-place screen swap for the same reason.
+- Notification-permission requester is hoisted alongside because `onTrackerPlayTimer` calls it.
+
 ## SearchScreen wiring
 
-Each card in `SearchResultsGrid` is constructed with only `onClick = { onResultClick(item) }`. Context menu callbacks are null (no menu icon on search result cards) and the tracker action callbacks are null (no add / timer buttons on tracker cards in search). See [search-feature.md](search-feature.md) for the tap-handling logic.
+Cards in `SearchResultsGrid` are built with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon). Tracker cards additionally get `onAdd`, `onPlayTimer`, `onStopTimer` wired to the hoisted lambdas from `GroupScreen`. See [search-feature.md](search-feature.md) for the tap-handling logic.
 
 ## Where bugs are likely
 
 - **Card looks actionable but does nothing**: a wrapper is passing `contextMenuCallbacks = SomeCallbacks(onEdit = {}, onDelete = {}, ...)` with no-op lambdas instead of `null`. The menu icon renders but every item is a no-op. Pass `null` instead.
-- **Tracker card shows add button in search**: `onAdd` was accidentally wired up. Search must pass only `onClick`.
+- **Tracker add / timer button does nothing in search**: the three tracker action lambdas are hoisted in the outer `GroupScreen` and passed to `SearchScreen`. If they aren't threaded through `SearchScreenContent` → `SearchResultsGrid` → the `Tracker(...)` call, the buttons still render (non-null) but closure state is wrong. Check the param chain.
+- **Add-data-point dialog disappears when you open/close search**: the dialog must be rendered at the outer `GroupScreen` level, not inside `GroupScreenContent` (otherwise it gets torn down when the if/else swaps branches).
 - **Minimum card height changes** when context menu is hidden: `Tracker` and `Function` reserve a `buttonSize` box when `contextMenuCallbacks == null` so name/date layout doesn't shift. If you remove that spacer, cards in search will jump vertically relative to the grid cards.
