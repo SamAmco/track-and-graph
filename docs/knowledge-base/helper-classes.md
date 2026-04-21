@@ -133,6 +133,19 @@ override suspend fun createSymlink(...) = withContext(io) {
 
 **Contract**: The data layer is responsible for emitting ALL relevant events. For example, creating a tracker emits both `TrackerCreated` and `DisplayIndex(groupId)`. Deleting a tracker emits `TrackerDeleted` plus `GraphOrStatDeleted`/`GraphOrStatUpdated` for any affected graphs. Consumers should NOT need to infer secondary effects from primary events.
 
+### Data-point writes fan out to `GraphOrStatUpdated` via `DependencyAnalyser`
+
+Non-obvious but important: every data-point mutation (`insertDataPoint`, `deleteDataPoint`, `updateDataPoints`, etc. in `DataInteractorImpl`) emits **both**:
+
+1. `DataUpdateType.DataPoint(featureId)` — one event for the feature whose data changed.
+2. `DataUpdateType.GraphOrStatUpdated(graphStatId)` — one event **per graph that transitively depends on that feature**, as reported by `DependencyAnalyser.getDependentGraphs(featureId)`.
+
+`DependencyAnalyser` is `internal` to the data module and walks the feature-graph dependency DAG (features → functions → graphs). Consumers never touch it directly — they only see the fan-out on the event flow.
+
+The practical consequence for UI layers: **you do not need to listen for `DataPoint` events to refresh graphs.** `GroupViewModel.graphDataMap` deliberately filters `DataPoint` out — it only listens for `GraphOrStatUpdated` (and the graph-lifecycle events). When a data point is added or deleted, the data layer has already computed the affected graphs and re-emits targeted `GraphOrStatUpdated(id)` events, which `mapNewGraphsToOldViewData` threads into its `forceUpdateIds` set to recompute only those graphs.
+
+This is the recommended pattern for anywhere that renders graphs reactively: filter on `GraphOrStatUpdated`, use its `graphStatId` for targeted invalidation, and trust the data layer's dependency fan-out rather than rebuilding the graph dependency map in the UI.
+
 `DisplayIndex(groupId)` is emitted by any operation that modifies display indices in a group (creates, duplicates, moves, reordering). Deletes do NOT emit `DisplayIndex` since remaining items' indices are unchanged — but UI flows that track which items are in a group (like `dbDisplayIndices` in `GroupViewModel`) must also listen for the component-deleted events (`TrackerDeleted`, `GraphOrStatDeleted`, `GroupDeleted`, `FunctionDeleted`, `Reminder`) to refresh when a GroupItem is removed.
 
 **Pitfall — double emission**: Methods that use `performAtomicUpdate` must NOT also emit events inside the lambda, because `performAtomicUpdate` already emits via its `.also` block. For example, `shiftUpGroupChildIndexes` wraps `shiftDisplayIndexesDown` in `performAtomicUpdate(DataUpdateType.DisplayIndex(groupId))` — adding a second `dataUpdateEvents.emit` inside would cause duplicate `DisplayIndex` events.

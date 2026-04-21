@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.navigation.GroupDescentPath
@@ -35,6 +36,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
@@ -50,6 +52,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -71,12 +74,6 @@ data class ResolvedPath(
 data class SearchResultItem(
     val child: GroupChild,
     val paths: List<ResolvedPath>,
-)
-
-internal data class SearchResult(
-    val groupItemId: Long,
-    val item: GroupGraphItem,
-    val score: Double,
 )
 
 sealed interface SearchDisplayState {
@@ -110,8 +107,10 @@ class GroupSearchViewModelImpl @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel(), GroupSearchViewModel {
 
-    // All strings and display data pre-fetched once when search opens.
-    // displayTracker is non-null only for TrackerNode items.
+    // Structural snapshot of a searchable component, taken once when search opens. Strings
+    // and paths are captured here; live display state (DisplayTracker, graph view data) is
+    // held in separate flows and merged in via `displayResults`'s combine. `featureId` is
+    // non-null only for TrackerNode items — it's the correlation key for DataPoint events.
     // paths contains every route from the current group to this component — one entry per placement
     // (or more when any ancestor group is itself symlinked). At least one entry is always
     // present; size > 1 drives symlink disambiguation on tap.
@@ -121,8 +120,14 @@ class GroupSearchViewModelImpl @Inject constructor(
         val name: String,
         val description: String?,
         val typeBonus: Double,
-        val displayTracker: DisplayTracker?,
+        val featureId: Long?,
         val paths: List<ResolvedPath>,
+    )
+
+    private data class SearchResult(
+        val groupItemId: Long,
+        val item: GroupGraphItem,
+        val score: Double,
     )
 
     private val _isSearchVisible = MutableStateFlow(false)
@@ -185,18 +190,29 @@ class GroupSearchViewModelImpl @Inject constructor(
     private val graphViewDataCache =
         MutableStateFlow<Map<Long, CalculatedGraphViewData>>(emptyMap())
 
+    // Live per-tracker DisplayTracker, keyed by featureId (the correlation key on
+    // DataPoint events). Seeded once when search opens, then refreshed targetedly on
+    // DataUpdateType.DataPoint events for the duration of the open session. Cleared
+    // when search closes.
+    private val trackerDataMap = MutableStateFlow<Map<Long, DisplayTracker>>(emptyMap())
+
+    // Event-subscription jobs active only while search is open.
+    private var trackerEventsJob: Job? = null
+    private var graphEventsJob: Job? = null
+
     // Empty/Loading pass through; Done is combined with the graph-view-data
-    // cache so placeholder graphs get replaced as background calculations
-    // complete. The upstream flatMapLatest already guarantees only the latest
-    // query's Done reaches here, so a plain combine is sufficient — no
+    // cache and the live tracker-display map so placeholder graphs get replaced
+    // as background calculations complete and tracker cards reflect new
+    // data-point writes. The upstream flatMapLatest already guarantees only the
+    // latest query's Done reaches here, so a plain combine is sufficient — no
     // cancellation semantics needed at this stage.
     override val displayResults: StateFlow<SearchDisplayState> =
-        combine(searchResults, graphViewDataCache) { state, cache ->
+        combine(searchResults, graphViewDataCache, trackerDataMap) { state, cache, trackers ->
             when (state) {
                 is ScoredResults.Empty -> SearchDisplayState.Empty
                 is ScoredResults.Loading -> SearchDisplayState.Loading
                 is ScoredResults.Done -> SearchDisplayState.Results(
-                    mapResultsToSearchItems(state.results, cache)
+                    mapResultsToSearchItems(state.results, cache, trackers)
                 )
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), SearchDisplayState.Empty)
@@ -208,9 +224,31 @@ class GroupSearchViewModelImpl @Inject constructor(
     override fun showSearch() {
         _isSearchVisible.value = true
         searchState.value = SearchState.Loading
+        // Cancel any lingering subscriptions from a previous session before re-seeding.
+        trackerEventsJob?.cancel()
+        graphEventsJob?.cancel()
+        trackerEventsJob = null
+        graphEventsJob = null
         viewModelScope.launch {
             val graph = dataInteractor.getGroupGraphSync(groupId)
-            searchState.value = SearchState.Ready(buildSearchableItems(graph))
+            val items = buildSearchableItems(graph)
+            // Seed trackerDataMap before flipping searchState to Ready so mapTracker
+            // never sees Ready + empty trackers — that would produce tracker-less
+            // results for the first frame.
+            val seedEntries = items
+                .mapNotNull { item ->
+                    if (item.item !is GroupGraphItem.TrackerNode) return@mapNotNull null
+                    item.featureId
+                }
+                .map { featureId ->
+                    async { dataInteractor.tryGetTrackerByFeatureId(featureId)?.let { featureId to it } }
+                }
+                .awaitAll()
+                .filterNotNull()
+            trackerDataMap.value = seedEntries.toMap()
+            searchState.value = SearchState.Ready(items)
+            startTrackerEventsJob()
+            startGraphEventsJob()
         }
     }
 
@@ -219,6 +257,41 @@ class GroupSearchViewModelImpl @Inject constructor(
         searchQuery.clearText()
         searchState.value = SearchState.Loading
         graphViewDataCache.value = emptyMap()
+        trackerEventsJob?.cancel()
+        graphEventsJob?.cancel()
+        trackerEventsJob = null
+        graphEventsJob = null
+        trackerDataMap.value = emptyMap()
+    }
+
+    private fun startTrackerEventsJob() {
+        trackerEventsJob = viewModelScope.launch {
+            dataInteractor.getDataUpdateEvents()
+                .collect { event ->
+                    val featureId = when (event) {
+                        is DataUpdateType.DataPoint -> event.featureId
+                        is DataUpdateType.TrackerUpdated -> event.featureId
+                        else -> return@collect
+                    }
+                    if (featureId !in trackerDataMap.value) return@collect
+                    val refreshed = dataInteractor.tryGetTrackerByFeatureId(featureId)
+                        ?: return@collect
+                    trackerDataMap.update { it + (featureId to refreshed) }
+                }
+        }
+    }
+
+    private fun startGraphEventsJob() {
+        graphEventsJob = viewModelScope.launch {
+            dataInteractor.getDataUpdateEvents()
+                .filterIsInstance<DataUpdateType.GraphOrStatUpdated>()
+                .collect { event ->
+                    // Drop the stale entry; the resulting cache-miss in mapGraph will
+                    // surface the loading placeholder and re-enqueue the calculation.
+                    if (event.graphStatId !in graphViewDataCache.value) return@collect
+                    graphViewDataCache.value -= event.graphStatId
+                }
+        }
     }
 
     private fun scoreItem(query: String, item: SearchableItem): SearchResult? {
@@ -328,7 +401,7 @@ class GroupSearchViewModelImpl @Inject constructor(
                             name = child.groupGraph.group.name,
                             description = null,
                             typeBonus = 0.0,
-                            displayTracker = null,
+                            featureId = null,
                             paths = pathsByComponent[key].orEmpty(),
                         ))
                         collectSearchableItems(child.groupGraph, pathsByComponent, items, seen)
@@ -343,7 +416,7 @@ class GroupSearchViewModelImpl @Inject constructor(
                             name = child.tracker.name,
                             description = child.tracker.description,
                             typeBonus = TYPE_BONUS_TRACKER,
-                            displayTracker = dataInteractor.tryGetTrackerByFeatureId(child.tracker.featureId),
+                            featureId = child.tracker.featureId,
                             paths = pathsByComponent[key].orEmpty(),
                         ))
                     }
@@ -357,7 +430,7 @@ class GroupSearchViewModelImpl @Inject constructor(
                             name = child.graph.name,
                             description = null,
                             typeBonus = 0.0,
-                            displayTracker = null,
+                            featureId = null,
                             paths = pathsByComponent[key].orEmpty(),
                         ))
                     }
@@ -371,7 +444,7 @@ class GroupSearchViewModelImpl @Inject constructor(
                             name = child.function.name,
                             description = child.function.description,
                             typeBonus = 0.0,
-                            displayTracker = null,
+                            featureId = null,
                             paths = pathsByComponent[key].orEmpty(),
                         ))
                     }
@@ -383,26 +456,27 @@ class GroupSearchViewModelImpl @Inject constructor(
     private suspend fun mapResultsToSearchItems(
         results: List<SearchResult>,
         cache: Map<Long, CalculatedGraphViewData>,
+        trackers: Map<Long, DisplayTracker>,
     ): List<SearchResultItem> = withContext(io) {
         val graphsToCalculate = mutableListOf<GroupGraphItem.GraphNode>()
 
         // Build a lookup so the mapper functions can find the pre-fetched searchable
-        // (including paths + display tracker) without another DB round-trip.
+        // (including paths) without another DB round-trip.
         val itemLookup = (searchState.value as? SearchState.Ready)?.items
             .orEmpty().associateBy { it.groupItemId }
 
         val searchItems = results.mapNotNull { result ->
             val searchable = itemLookup[result.groupItemId] ?: return@mapNotNull null
             val child: GroupChild = when (val item = result.item) {
-                is GroupGraphItem.TrackerNode -> mapTracker(result.groupItemId, item, searchable)
+                is GroupGraphItem.TrackerNode -> mapTracker(result.groupItemId, item, trackers)
                     ?: return@mapNotNull null
                 is GroupGraphItem.GroupNode -> mapGroup(result.groupItemId, item)
                 is GroupGraphItem.FunctionNode -> mapFunction(result.groupItemId, item)
                 is GroupGraphItem.GraphNode -> mapGraph(
-                    result.groupItemId,
-                    item,
-                    cache,
-                    graphsToCalculate
+                    groupItemId = result.groupItemId,
+                    item = item,
+                    cache = cache,
+                    graphsToCalculate = graphsToCalculate
                 )
             }
             SearchResultItem(child = child, paths = searchable.paths)
@@ -419,9 +493,9 @@ class GroupSearchViewModelImpl @Inject constructor(
     private fun mapTracker(
         groupItemId: Long,
         item: GroupGraphItem.TrackerNode,
-        searchable: SearchableItem,
+        trackers: Map<Long, DisplayTracker>,
     ): GroupChild.ChildTracker? {
-        val displayTracker = searchable.displayTracker ?: return null
+        val displayTracker = trackers[item.tracker.featureId] ?: return null
         return GroupChild.ChildTracker(
             groupItemId = groupItemId,
             id = item.tracker.id,

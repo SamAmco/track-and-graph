@@ -54,6 +54,8 @@ The three tracker action lambdas (`onTrackerAdd`, `onTrackerPlayTimer`, `onTrack
 
 Cards in `SearchResultsGrid` are built with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon). Tracker cards additionally get `onAdd`, `onPlayTimer`, `onStopTimer` wired to the hoisted lambdas from `GroupScreen`. See [search-feature.md](search-feature.md) for the tap-handling logic.
 
+Tracker card state in search results is **live** — `GroupSearchViewModelImpl.trackerDataMap` is a `MutableStateFlow<Map<Long, DisplayTracker>>` that's plumbed into the `displayResults` combine and refreshed targetedly on `DataUpdateType.DataPoint` events while search is open. So tapping `+` (or play / stop on a timer) updates the card's last-value / timestamp / timer display in place, the same way the group-screen cards do. Graph cards in the result set also recompute via `DataUpdateType.GraphOrStatUpdated`. Structural changes (renames, new/deleted components, new symlinks) are NOT reflected — close and reopen search to pick those up. See [search-feature.md](search-feature.md#live-updates-to-tracker-and-graph-display-data).
+
 ## Where bugs are likely
 
 - **Card looks actionable but does nothing**: a wrapper is passing `contextMenuCallbacks = SomeCallbacks(onEdit = {}, onDelete = {}, ...)` with no-op lambdas instead of `null`. The menu icon renders but every item is a no-op. Pass `null` instead.

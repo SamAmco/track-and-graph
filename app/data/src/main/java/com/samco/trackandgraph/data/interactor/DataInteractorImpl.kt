@@ -189,14 +189,16 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun createTracker(request: TrackerCreateRequest): CreatedComponent = withContext(io) {
         val created = trackerHelper.createTracker(request)
-        dataUpdateEvents.emit(DataUpdateType.TrackerCreated)
+        val featureId = dao.getTrackerById(created.componentId)!!.featureId
+        dataUpdateEvents.emit(DataUpdateType.TrackerCreated(trackerId = created.componentId, featureId = featureId))
         dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.groupId))
         return@withContext created
     }
 
     override suspend fun updateTracker(request: TrackerUpdateRequest) = withContext(io) {
         trackerHelper.updateTracker(request)
-        dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+        val featureId = dao.getTrackerById(request.id)?.featureId ?: return@withContext
+        dataUpdateEvents.emit(DataUpdateType.TrackerUpdated(trackerId = request.id, featureId = featureId))
     }
 
     override suspend fun deleteTracker(request: ComponentDeleteRequest) = withContext(io) {
@@ -209,7 +211,7 @@ internal class DataInteractorImpl @Inject constructor(
 
         trackerHelper.deleteTracker(request)
 
-        dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
+        dataUpdateEvents.emit(DataUpdateType.TrackerDeleted(trackerId = tracker.id, featureId = featureId))
         handleOrphanedAndDependentGraphsForFeatureDelete(dependentGraphs.graphStatIds)
     }
 
@@ -545,15 +547,19 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun playTimerForTracker(trackerId: Long): Long? {
-        return trackerHelper.playTimerForTracker(trackerId)?.also {
-            dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+        return trackerHelper.playTimerForTracker(trackerId)?.also { featureId ->
+            dataUpdateEvents.emit(DataUpdateType.TrackerUpdated(trackerId = trackerId, featureId = featureId))
         }
     }
 
-    override suspend fun stopTimerForTracker(trackerId: Long): Duration? =
-        trackerHelper.stopTimerForTracker(trackerId).also {
-            dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+    override suspend fun stopTimerForTracker(trackerId: Long): Duration? {
+        val result = trackerHelper.stopTimerForTracker(trackerId)
+        val featureId = withContext(io) { dao.getTrackerById(trackerId)?.featureId }
+        if (featureId != null) {
+            dataUpdateEvents.emit(DataUpdateType.TrackerUpdated(trackerId = trackerId, featureId = featureId))
         }
+        return result
+    }
 
     override suspend fun getAllFeaturesSync(): List<Feature> = withContext(io) {
         dao.getAllFeaturesSync().map { it.toDto() }
@@ -634,7 +640,12 @@ internal class DataInteractorImpl @Inject constructor(
         )
 
         when (existingItem.type) {
-            GroupItemType.TRACKER -> dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
+            GroupItemType.TRACKER -> {
+                val featureId = dao.getTrackerById(existingItem.childId)?.featureId
+                if (featureId != null) {
+                    dataUpdateEvents.emit(DataUpdateType.TrackerUpdated(trackerId = existingItem.childId, featureId = featureId))
+                }
+            }
             GroupItemType.FUNCTION -> dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(existingItem.childId))
             GroupItemType.GROUP -> dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
             GroupItemType.GRAPH -> dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(existingItem.childId))

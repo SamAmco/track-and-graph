@@ -220,6 +220,21 @@ fun GroupScreen(
         addDataPointsDialogViewModel,
         onDismissRequest = { addDataPointsDialogViewModel.reset() }
     )
+
+    // Bridge: stopping a timer sets showDurationInputDialog on groupViewModel; we
+    // forward that into addDataPointsDialogViewModel so the duration dialog opens.
+    // Hoisted out of GroupScreenContent so it stays in composition while search is
+    // open — otherwise stop-timer taps from search cards would never open the dialog.
+    val showDurationInputDialog =
+        groupViewModel.showDurationInputDialog.collectAsStateWithLifecycle().value
+    LaunchedEffect(showDurationInputDialog) {
+        if (showDurationInputDialog == null) return@LaunchedEffect
+        addDataPointsDialogViewModel.showAddDataPointDialog(
+            trackerId = showDurationInputDialog.trackerId,
+            customInitialValue = showDurationInputDialog.duration.seconds.toDouble()
+        )
+        groupViewModel.onConsumedShowDurationInputDialog()
+    }
 }
 
 /** Data classes for click listeners with default empty lambda values */
@@ -429,18 +444,6 @@ private fun GroupScreenContent(
             onDismissRequest = { groupDialogsViewModel.hideNoTrackersFunctionsDialog() },
             continueText = R.string.ok
         )
-    }
-
-    val showDurationInputDialog =
-        groupViewModel.showDurationInputDialog.collectAsStateWithLifecycle().value
-    LaunchedEffect(showDurationInputDialog) {
-        if (showDurationInputDialog == null) return@LaunchedEffect
-
-        addDataPointsDialogViewModel.showAddDataPointDialog(
-            trackerId = showDurationInputDialog.trackerId,
-            customInitialValue = showDurationInputDialog.duration.seconds.toDouble()
-        )
-        groupViewModel.onConsumedShowDurationInputDialog()
     }
 
     // Release notes dialog

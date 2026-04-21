@@ -32,9 +32,9 @@ sealed class DataUpdateType {
         val featureId: Long
     }
 
-    data object TrackerCreated : DataUpdateType()
-    data object TrackerUpdated : DataUpdateType()
-    data object TrackerDeleted : DataUpdateType()
+    data class TrackerCreated(val trackerId: Long, val featureId: Long) : DataUpdateType()
+    data class TrackerUpdated(val trackerId: Long, val featureId: Long) : DataUpdateType()
+    data class TrackerDeleted(val trackerId: Long, val featureId: Long) : DataUpdateType()
 
     data class GraphOrStatCreated(val graphStatId: Long) : DataUpdateType()
     data class GraphOrStatUpdated(val graphStatId: Long) : DataUpdateType()
