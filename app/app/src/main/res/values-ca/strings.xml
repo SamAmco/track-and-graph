@@ -1,1 +1,511 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This file is part of Track & Graph
+  ~ 
+  ~ Track & Graph is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ Track & Graph is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+    <string name="home">Inici</string>
+    <string name="symlink">Enllaç simbòlic</string>
+    <string name="symlinks">Enllaços simbòlics</string>
+    <string name="symlink_locations_title">Ubicacions de \"%1$s\"</string>
+    <string name="add_tracker">Afegir rastrejador:</string>
+    <string name="add">Afegir</string>
+    <string name="group_name">Per exemple, les activitats diàries</string>
+    <string name="delete">Esborrar</string>
+    <string name="edit">Editar</string>
+    <string name="update">Actualitzar</string>
+    <string name="graph_or_stat_name">Nom del gràfic: </string>
+    <string name="tracker_name">Què li agradaria rastrejar?</string>
+    <string name="this_is_a_time_or_duration">Això és un temps o durada</string>
+    <string name="yes">Sí</string>
+    <string name="cancel">Cancel·lar</string>
+    <string name="select_file">Seleccionar fitxer</string>
+    <string name="empty_group_hint">Benvingut a Track &amp; Graph!\n\nToqueu + a la part superior dreta i seleccioneu Rastreador per començar. </string>
+    <string name="no_trackers_graph_stats_hint">Creeu un rastreador abans de crear cap gràfic.</string>
+    <string name="no_trackers_functions_hint">Creeu un rastreador abans de crear cap funció.</string>
+    <string name="ru_sure_del_group">Esteu segur que voleu esborrar aquest grup i tot el que conté? Aquest procés no és reversible.</string>
+    <string name="ru_sure_del_feature">Esteu segur que voleu esborrar aquestes dades de traça?</string>
+    <string name="item_in_multiple_groups">Aquest element existeix en diversos llocs. Podeu eliminar-lo d\'aquí o eliminar-lo a tot arreu.</string>
+    <string name="remove_from_this_group">Eliminar d\'aquí</string>
+    <string name="delete_everywhere">Eliminar a tot arreu</string>
+    <string name="ru_sure_del_function">Esteu segur que voleu eliminar aquesta funció? No podeu revertir això.</string>
+    <string name="ru_sure_del_data_point">Esteu segur de voler eliminar aquest punt de dades?</string>
+    <string name="feature_name_cannot_be_null">Si us plau, afegiu un nom</string>
+    <string name="tracker_with_that_name_exists">Ja esteu registrant alguna cosa amb aquest nom</string>
+    <string name="data_points">%1$d Punts de Dades</string>
+    <string name="items_selected">%1$d Seleccionats</string>
+    <string name="ru_sure_del_data_points">Esteu segur que voleu eliminar aquests punts de dades?</string>
+    <string name="delete_selected_content_description">Eliminar elements seleccionats</string>
+    <string name="copy_selected_content_description">Copiar elements seleccionats</string>
+    <string name="move_selected_content_description">Moure elements seleccionats</string>
+    <string name="no_data">Sense dades</string>
+    <string name="skip">Ometre</string>
+    <string name="exportButton">Exportar</string>
+    <string name="importButton">Importar</string>
+    <string name="export_to">Exportar dades de seguiment d\'aquest grup a CSV:</string>
+    <string name="export_error_message">L\'exportació ha fallat: %1$s</string>
+    <string name="import_from">Importeu dades de seguiment a aquest grup des de CSV:</string>
+    <string name="import_warning">Advertiment: la importació és irreversible. Track &amp; Graph intentarà fusionar les dades importades amb les dades existents en aquest grup per nom.</string>
+    <string name="add_a_graph_or_stat">Afegir un gràfic o estadística</string>
+    <string name="graph_type_label">Tipus de gràfic:</string>
+    <string name="sample_size">Mida de la mostra:</string>
+    <string name="select_a_discrete_feature">Seleccioneu un conjunt de dades amb etiquetes:</string>
+    <string name="no_labels">Aquest conjunt de dades no té etiquetes</string>
+    <string name="select_a_feature">Seleccioneu un conjunt de dades:</string>
+    <string name="select_a_tracker">Seleccionar un rastreador</string>
+    <string name="offset">Desplaçament:</string>
+    <string name="scale">Escala:</string>
+    <string name="from">Des de:</string>
+    <string name="to">Fins a:</string>
+    <string name="day">Dia</string>
 
+    <string-array name="time_histogram_windows">
+        <item>Hora</item>
+        <item>Diari</item>
+        <item>Setmanal</item>
+        <item>Mensual</item>
+        <item>Quadrimestral</item>
+        <item>Semestral</item>
+        <item>Anual</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Estalvi de bateria</item>
+        <item>Clar</item>
+        <item>Fosc</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Sistema per defecte</item>
+        <item>Clar</item>
+        <item>Fosc</item>
+    </string-array>
+    <string name="graph_type_line_graph">Gràfic de línies</string>
+    <string name="graph_type_pie_chart">Gràfic de pastís</string>
+    <string name="graph_type_average_time_between">Temps mitjà entre</string>
+    <string name="graph_type_time_since">Temps des de</string>
+    <string name="graph_type_time_histogram">Histograma de temps</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Sense mitjana</item>
+        <item>Mitjana mòbil diària</item>
+        <item>Mitjana mòbil de tres dies</item>
+        <item>Mitjana mòbil setmanal</item>
+        <item>Mitjana mòbil mensual</item>
+        <item>Mitjana mòbil trimestral</item>
+        <item>Mitjana mòbil semestral</item>
+        <item>Mitjana mòbil anual</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Generar quan es fa un registre</item>
+        <item>Generar totals per hora</item>
+        <item>Generar totals diaris</item>
+        <item>Generar totals setmanals</item>
+        <item>Generar totals mensuals</item>
+        <item>Generar els totals anuals</item>
+    </string-array>
+    <string name="graph_type_last_value">Últim seguiment/Temps des de</string>
+    <string name="graph_time_durations_all_data">Totes les dades</string>
+    <string name="graph_time_durations_a_day">Un dia</string>
+    <string name="graph_time_durations_a_week">Una setmana</string>
+    <string name="graph_time_durations_a_month">Un mes</string>
+    <string name="graph_time_durations_three_months">Tres mesos</string>
+    <string name="graph_time_durations_six_months">Sis mesos</string>
+    <string name="graph_time_durations_a_year">Un any</string>
+    <string-array name="y_range_styles">
+        <item>Dinàmic</item>
+        <item>Fix</item>
+    </string-array>
+
+    <string name="custom">Personalitzat</string>
+    <string name="ending_at_latest">Últim punt de dades</string>
+    <string name="ending_at_now">Ara</string>
+    <string name="ending_at_custom_date">Data personalitzada…</string>
+
+    <string name="hours_and_minutes_ago">%1$d h %2$d min fa</string>
+
+    <string name="import_exception_unknown">Error d\'importació: S\'ha produït un error desconegut</string>
+    <string name="import_exception_bad_headers">Error d\'importació: Les capçaleres no coincideixen amb les esperades: %1$s</string>
+    <string name="import_exception_inconsistent_record">Error d\'importació: La traça de la línia %1$s no és consistent amb les capçaleres requerides</string>
+    <string name="import_exception_bad_timestamp">Error d\'importació: No s\'ha pogut interpretar la marca de temps per a la traça a la línia: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Error d\'importació: S\'ha rebut un tipus de dades inconsistent a la línia: %1$s</string>
+
+    <string name="unknown_error_occurred">S\'ha produït un error desconegut</string>
+    <string name="graph_stat_validation_no_name">Si us plau, proporcioneu un nom</string>
+    <string name="graph_stat_validation_no_line_graph_features">Si us plau, afegiu aquest detall al gràfic</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Assegureu-vos que \"Des de\" sigui menor o igual que \"Fins a\"</string>
+    <string name="graph_stat_validation_unrecognised_color">Assegureu-vos que tots els conjunts de dades tenen un color</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">S\'ha detectat un conjunt invàlid de dades de gràfic de línies</string>
+    <string name="graph_stat_validation_bad_fixed_range">Assegureu-vos que \"Des de\" tingui un valor menor que \"Fins a\"</string>
+
+    <string name="graph_stat_view_not_found">S\'ha produït un error en trobar aquest gràfic</string>
+    <string name="graph_stat_view_not_enough_data_stat">Aquesta estadística es mostrarà quan s\'hagin registrat prou dades per generar-la.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Aquest gràfic es mostrarà quan s\'hagin registrat prou dades per generar-lo.</string>
+    <string name="finish">Finalitzar</string>
+    <string name="about_description"><![CDATA[Track & Graph és un programari lliure i de codi obert sota la llicència GPL 3.0.]]></string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="about_libraries_message">S\'han utilitzat les següents biblioteques de codi obert:</string>
+    <string name="about">Quant a</string>
+    <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
+
+    <string name="faq">PMF</string>
+    <string name="tutorial_text_1">Utilitzeu traçar per rastrejar les vostres dades.</string>
+    <string name="tutorial_text_2">Utilitzeu gràfics i estadístiques per visualitzar dades.</string>
+    <string name="tutorial_text_3">Utilitzeu grups per organitzar els vostres rastrejadors, gràfics i estadístiques.</string>
+    <string name="got_it">Entesos!</string>
+    <string name="move_to_colon">Moure a:</string>
+    <string name="move_to">Moure a</string>
+    <string name="copy_to">Copiar a</string>
+
+    <string name="ru_sure_update_data">Aquesta actualització pot modificar irreversiblement les dades que ja heu traçat. Es recomana encaridament fer una còpia de seguretat de les dades existents abans de continuar. Voleu continuar?</string>
+    <string name="ok">D\'acord</string>
+
+    <string name="rate_the_app">Valoreu l\'aplicació</string>
+    <string name="reminders">Recordatoris</string>
+    <string name="no_reminders_hint">Toqueu la icona + per crear una nova notificació de recordatori de traça.</string>
+    <string name="mon">Dl</string>
+    <string name="tue">Dt</string>
+    <string name="wed">Dc</string>
+    <string name="thu">Dj</string>
+    <string name="fri">Dv</string>
+    <string name="sat">Ds</string>
+    <string name="sun">Dg</string>
+    <string name="reminders_notifications_channel_name">Recordatoris</string>
+    <string name="reminders_notifications_channel_description">Notificacions creades per l\'usuari per recordar-vos quan heu de traçar</string>
+    <string name="default_reminder_name">Hora de fer la traça!</string>
+    <string name="range_style">Estil de rang:</string>
+
+    <string name="track_widget_configure_no_data_error">Primer, feu un seguiment d\'algunes dades.</string>
+    <string name="track_widget_configure_no_data_selected_error">Heu de seleccionar un grup de dades vàlid per crear un giny de traça.</string>
+    <string name="create">Crear</string>
+    <string name="use_default_value">Establiu un valor per defecte</string>
+    <string name="backup_and_restore">Còpia de seguretat i restauració</string>
+    <string name="backup_hint_text">La còpia de seguretat desa totes les dades de la vostra aplicació, incloses totes les dades traçades, els gràfics i els recordatoris. Hauríeu de fer una còpia de seguretat de les vostres dades en un dispositiu extern o en un emmagatzematge al núvol amb regularitat en cas que el vostre dispositiu es perdi o es trenqui.</string>
+    <string name="restore_data">Restaurar dades</string>
+    <string name="backup_successful">Còpia de seguretat feta amb èxit!</string>
+    <string name="backup_error_could_not_write_to_file">No s\'ha pogut trobar o escriure al fitxer seleccionat.</string>
+    <string name="backup_error_could_not_find_database_file">No s\'ha pogut trobar o llegir el fitxer de la base de dades.</string>
+    <string name="backup_error_failed_to_copy_database">Alguna cosa ha anat malament mentre es copiava el fitxer de la base de dades.</string>
+    <string name="restore_failed">Ha fallat la restauració. %1$s</string>
+    <string name="add_a_longer_description_optional">Afegir una descripció més llarga (opcional)</string>
+    <string name="no_data_points_history_fragment_hint">El vostre historial es mostrarà aquí quan tingueu alguns punts de dades.</string>
+    <string name="data_resolution_error">S\'ha produït un error en intentar resoldre aquestes dades:\n\n%1$s</string>
+    <string name="info">Info</string>
+    <string name="no_description">Sense descripció</string>
+    <string name="description">Descripció</string>
+    <string name="note_input_hint">Notes…</string>
+    <string name="add_a_note">Afegir una nota</string>
+    <string name="notes">Notes</string>
+    <string name="delete_reminder_content_description">Esborrar recordatori</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Format de data:</string>
+    <string name="add_data_point_button_content_description">Afegir un botó de punt de dades</string>
+    <string name="tracked_data_menu_button_content_description">Botó de menú de dades traçades</string>
+    <string name="tracked_data_history_button_content_description">Botó d\'historial de dades rastrejades</string>
+    <string name="delete_line_button_content_description">Botó per esborrar línia</string>
+    <string name="delete_input_button_content_description">Botó d\'eliminació d\'entrada</string>
+    <string name="delete_data_point_button_content_description">Botó per esborrar punt de dades</string>
+    <string name="edit_data_point_button_content_description">Botó per editar punt de dades</string>
+    <string name="add_multiple_choice_answer_button_content_description">Afegir botó de resposta d\'opció múltiple</string>
+    <string name="ending_at_colon">Finalitza a:</string>
+    <string name="duplicate">Duplicar</string>
+    <string name="no_notes_hint_text">Les notes afegides durant la traça apareixeran aquí. També podeu afegir notes globals fent servir el botó +.</string>
+    <string name="add_a_global_note">Afegir una nota global:</string>
+    <string name="duration">Durada</string>
+    <string name="weeks">Setmanes</string>
+    <string name="months">Mesos</string>
+    <string name="days">Dies</string>
+    <string name="hours">Hores</string>
+    <string name="minutes">Minuts</string>
+    <string name="seconds">Segons</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">min</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Els valors traçats anteriorment representen:</string>
+    <string name="duration_to_numeric_mode_header">Els valors traçats anteriorment s\'han de convertir en:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">No podeu barrejar durades de temps amb altres tipus de dades. Considereu la possibilitat de traçar hores, minuts o segons</string>
+    <string name="sum_by_count_checkbox_label">Marqueu aquí per comptar el nombre de punts de dades traçats en lloc del total dels seus valors.</string>
+    <string name="time_window_size">Mida de la finestra de temps:</string>
+    <string name="hold_to_preview">Vista prèvia</string>
+    <string name="add_group">Afegir grup:</string>
+    <string name="edit_group">Editar grup:</string>
+    <string name="group">Grup</string>
+    <string name="tracker">Rastrejador</string>
+    <string name="function">Funció</string>
+    <string name="graph_or_stat">Gràfic o estadística</string>
+    <string name="ru_sure_del_graph">Esteu segur que voleu eliminar aquest gràfic? No podeu revertir això. No perdreu cap dada rastrejada.</string>
+    <string name="open">Oberta</string>
+    <string name="close">Tanca</string>
+    <string name="save_changes">Desar canvis</string>
+    <string name="filter_by_label">Filtrar per etiqueta</string>
+    <string name="filter_by_value">Filtrar per valor</string>
+    <string name="timer_notification_channel_name">Temporitzadors</string>
+    <string name="stop">Atureu-vos</string>
+
+    <string name="name_your_function">Anomeneu la vostra funció:</string>
+    <string name="add_some_data_sources">Afegir algunes fonts de dades</string>
+    <string name="value">Valor</string>
+    <string name="label">Etiqueta</string>
+    <string name="continue_word">Continuar</string>
+    <string name="update_all_data_points">Actualitzar tots els punts de dades:</string>
+    <string name="where_colon">On:</string>
+    <string name="to_colon">A:</string>
+    <string name="value_equals">Valor =</string>
+    <string name="label_equals">Etiqueta =</string>
+    <string name="adding_your_first_data_point">Un tutorial ràpid sobre com afegir punts de dades:</string>
+    <string name="next">Següent</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Cada punt de dades té una marca de temps i un valor:</string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">També pot tenir opcionalment una etiqueta i una nota:</string>
+    <string name="data_point_tutorial_page_2_description">El valor és un número perquè pugueu veure com canvien les vostres dades amb el temps.</string>
+    <string name="data_point_tutorial_page_2_hint">(Suggeriment: si no us importa el valor, simplement useu el valor predeterminat d\'1)</string>
+    <string name="data_point_tutorial_page_3_description">Utilitzeu etiquetes si voleu agrupar els punts de dades</string>
+    <string name="data_point_tutorial_page_3_hint">(Suggeriment: si voleu afegir més context o descripció, useu la nota en lloc del camp d\'etiqueta)</string>
+    <string name="help">Ajuda</string>
+
+    <string name="advanced_options">Opcions avançades</string>
+    <string name="type_colon">\"Escriu: \"</string>
+    <string name="order_colon">\"Ordena: \"</string>
+    <string name="value_and_label">Valor i etiqueta</string>
+    <string name="value_only">Només valor</string>
+    <string name="label_only">Només etiqueta</string>
+    <string name="none">Cap</string>
+    <string name="value_ascending">Valor ascendent</string>
+    <string name="value_descending">Valor descendent</string>
+    <string name="label_ascending">Etiqueta ascendent</string>
+    <string name="label_descending">Etiqueta descendent</string>
+    <string name="latest">Últim</string>
+    <string name="oldest">Més antic</string>
+    <string name="track_all">Seguiment de tot</string>
+    <string name="more_details">Més detalls</string>
+    <string name="suggestions">Suggeriments</string>
+    <string name="no_label">Sense etiqueta</string>
+    <string name="confirm_cancel_notes_will_be_lost">Esteu segur que voleu tancar? Totes les notes es perdran.</string>
+    <string name="add_a_label">Afegir una etiqueta</string>
+    <string name="graph_type_bar_chart">Gràfic de barres</string>
+    <string name="bar_interval">Interval de barra:</string>
+    <string name="y_range_max">Rang Y màx.</string>
+    <string name="total_formatted">Total: %s</string>
+    <string name="from_formatted">Des de: %s</string>
+    <string name="to_formatted">Fins a: %s</string>
+    <string name="seconds_generic">Segon(s)</string>
+    <string name="minutes_generic">Minut(s)</string>
+    <string name="hours_generic">Hora(es)</string>
+    <string name="days_generic">Dia(es)</string>
+    <string name="weeks_generic">Setmana(es)</string>
+    <string name="months_generic">Mes(os)</string>
+    <string name="years_generic">Any(s)</string>
+
+    <plurals name="seconds">
+        <item quantity="one">%d segon</item>
+        <item quantity="other">%d segons</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%d minut</item>
+        <item quantity="other">%d minuts</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d hores</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">%d dia</item>
+        <item quantity="other">%d dies</item>
+    </plurals>
+
+    <plurals name="weeks">
+        <item quantity="one">%d setmana</item>
+        <item quantity="other">%d setmanes</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="one">%d mes</item>
+        <item quantity="other">%d mesos</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="one">%d any</item>
+        <item quantity="other">%d anys</item>
+    </plurals>
+
+    <plurals name="every_x_minutes">
+        <item quantity="one">Cada minut</item>
+        <item quantity="other">Cada %d minuts</item>
+    </plurals>
+
+    <plurals name="every_x_hours">
+        <item quantity="one">Cada hora</item>
+        <item quantity="other">Cada %d hores</item>
+    </plurals>
+
+    <plurals name="every_x_days">
+        <item quantity="one">Cada dia</item>
+        <item quantity="other">Cada %d dies</item>
+    </plurals>
+
+    <plurals name="every_x_weeks">
+        <item quantity="one">Cada setmana</item>
+        <item quantity="other">Cada %d setmanes</item>
+    </plurals>
+
+    <plurals name="every_x_months">
+        <item quantity="one">Cada mes</item>
+        <item quantity="other">Cada %d mesos</item>
+    </plurals>
+
+    <plurals name="every_x_years">
+        <item quantity="one">Cada any</item>
+        <item quantity="other">Cada %d anys</item>
+    </plurals>
+
+    <plurals name="after_x_minutes">
+        <item quantity="one">Després d\'1 minut</item>
+        <item quantity="other">Després de %d minuts</item>
+    </plurals>
+
+    <plurals name="after_x_hours">
+        <item quantity="one">Després d\'1 hora</item>
+        <item quantity="other">Després de %d hores</item>
+    </plurals>
+
+    <plurals name="after_x_days">
+        <item quantity="one">Després d\'1 dia</item>
+        <item quantity="other">Després de %d dies</item>
+    </plurals>
+
+    <plurals name="after_x_weeks">
+        <item quantity="one">Després d\'1 setmana</item>
+        <item quantity="other">Després de %d setmanes</item>
+    </plurals>
+
+    <plurals name="after_x_months">
+        <item quantity="one">Després d\'1 mes</item>
+        <item quantity="other">Després de %d mesos</item>
+    </plurals>
+
+    <plurals name="after_x_years">
+        <item quantity="one">Després d\'1 any</item>
+        <item quantity="other">Després de %d anys</item>
+    </plurals>
+
+    <string name="backup_now">Copia ara</string>
+    <string name="restore_error_could_not_write_to_database">La restauració ha fallat! No s\'ha pogut trobar ni escriure a la base de dades.</string>
+    <string name="restore_error_could_not_read_from_database_file">La restauració ha fallat! No s\'ha pogut trobar ni llegir el fitxer de base de dades seleccionat.</string>
+    <string name="restore_error_failed_to_copy_database">La restauració ha fallat! Alguna cosa ha anat malament en restaurar la base de dades.</string>
+    <string name="select_location">Seleccioneu Ubicació…</string>
+    <string name="restore_successful">La restauració ha tingut èxit! Track &amp; Graph s\'ha de reiniciar.</string>
+    <string name="restore_error_invalid_database_file">La restauració ha fallat! El fitxer seleccionat no semblava ser una còpia de seguretat vàlida.</string>
+    <string name="auto_backup">Còpia de seguretat automàtica</string>
+    <string name="apply">Aplicar</string>
+    <string name="backup_every">Còpia de seguretat cada:</string>
+    <string name="next_backup_at">Propera còpia de seguretat a:</string>
+    <string name="backup_notification_channel_name">Notificacions de còpia de seguretat automàtica</string>
+    <string name="backup_notification_channel_description">Us informarem quan s\'estigui fent una còpia de seguretat automàtica i si ha fallat.</string>
+    <string name="backup_notification_title">Còpia de seguretat en procés…</string>
+    <string name="backup_failed_notification_title">Error en la còpia de seguretat automàtica</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph no ha pogut trobar ni obtenir accés a la vostra ubicació de còpia de seguretat.</string>
+    <string name="backup_failed_notification_could_not_copy">Alguna cosa ha anat malament en fer la còpia de seguretat de les vostres dades. La vostra còpia de seguretat pot estar corrupta o incompleta.</string>
+    <string name="select_new_location">Seleccionar nova ubicació</string>
+    <string name="backup_location">Ubicació de la còpia de seguretat</string>
+    <string name="enable_auto_backup">Habilitar còpia de seguretat automàtica</string>
+    <string name="last_successful_backup">Última còpia de seguretat amb èxit</string>
+    <string name="next_scheduled_backup">Següent còpia de seguretat programada</string>
+    <string name="notification_permission_prompt">Heu d\'habilitar les notificacions per a Track &amp; Graph per rebre notificacions si la còpia de seguretat automàtica falla per algun motiu.</string>
+    <string name="restore_hint_text">ADVERTÈNCIA: La restauració des d\'una còpia de seguretat esborrarà totes les dades i la configuració actual de l\'aplicació. Primer heu de fer una còpia de seguretat de les vostres dades!</string>
+    <string name="default_auto_backup_file_name">CopiaSeguretatTrackYGraph.db</string>
+
+    <string name="lua_script_empty">Si us plau, afegiu un script Lua</string>
+    <string name="function_name_empty">El nom de la funció no pot estar buit</string>
+    <string name="function_name">Nom de funció</string>
+    <string name="add_at_least_one_input">Si us plau, afegiu almenys una entrada</string>
+    <string name="output">Sortida</string>
+    <string name="data_source">Font de Dades</string>
+    <string name="data_source_description">Un node de Font de Dades us permet seleccionar un rastrejador o funció per utilitzar com a entrada.</string>
+    <string name="lua_script">Script Lua</string>
+
+    <string name="lua_script_input_hint">Introduïu un script Lua…</string>
+    <string name="select_node_type">Seleccionar Tipus de Node</string>
+    <string name="file">Fitxer</string>
+    <string name="lua_feature_names_not_unique">Les entrades del script han de tenir noms únics</string>
+    <string name="graph_stat_type_lua_graph">Script Lua</string>
+    <string name="launch_lua_disabled">Llançament de Lua deshabilitat</string>
+    <string name="no_lua">Sense Lua</string>
+    <string name="lua_engine_disabled">Motor Lua deshabilitat</string>
+    <string name="lua_graph_first_time_user_title">Gràfics i estadístiques d\'scripts Lua</string>
+    <string name="lua_graph_first_time_user_message">Els scripts Lua són una funció avançada que us permet crear gràfics i estadístiques personalitzats amb el llenguatge de programació Lua. \n\nPodeu carregar el vostre propi, o triar-ne un de la col·lecció de GitHub. Instal·lar un script des de GitHub us retornarà a l\'aplicació amb l\'script llest per utilitzar.</string>
+    <string name="functions_first_time_user_title">Benvingut a Funcions</string>
+    <string name="functions_first_time_user_message">Les funcions són una característica avançada que us permet combinar, agregar i transformar les vostres dades en noves fonts de dades derivades.</string>    <string name="learn_more">Apreneu més aquí</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Enganxar</string>
+    <string name="failed_to_download_file">Error en descarregar el fitxer: %s</string>
+    <string name="confirm_deep_link">Heu rebut un enllaç a un script d\'una font desconeguda. Només instal·leu scripts de fonts en què confieu. Voleu instal·lar aquest script?</string>
+    <string name="graph_stat_info_button_description">Tutorials de gràfics i estadístiques</string>
+    <string name="network_generic_error">S\'ha produït un error en intentar accedir a la xarxa. Si us plau, comproveu la vostra connexió i torneu-ho a intentar.</string>
+    <string name="function_verification_failure">Error en verificar les signatures de les funcions. Si us plau, assegureu-vos de tenir una connexió segura i que Track &amp; Graph estigui actualitzat</string>
+    <string name="function_network_failure">Error en carregar les funcions. Si us plau, assegureu-vos d\'estar connectat a internet. Si el problema persisteix, assegureu-vos que l\'aplicació estigui actualitzada.</string>
+    <string name="functions_landscape_hint">Consell: Les funcions funcionen millor en mode horitzontal</string>
+    <string name="functions_start_hint">Comenceu aquí: pulsació llarga i seleccionar Font de dades</string>
+    <string name="see_whats_new">Veure Novetats</string>
+    <string name="release_notes_support_text">El vostre suport ajuda a mantenir Track &amp; Graph viu i creixent 🌱</string>
+    <string name="release_notes_maybe_later">Potser més tard</string>
+    <string name="release_notes_support_development">Donar per Donar Suport al Desenvolupament</string>
+    <string name="release_notes_thank_you"><![CDATA[Gràcies! ❤️\n\nCada suport ajuda a que Track & Graph sigui millor per a tothom 🌱]]></string>
+    <string name="missed_reminders_notifications_channel_name">Recordatoris Perduts</string>
+    <string name="missed_reminders_notifications_channel_description">Notificacions per a recordatoris que s\'han perdut</string>
+    <string name="missed_reminder_single_content">Recordatori de les %1$s</string>
+    <string name="missed_reminders_multiple_content">Heu perdut %1$d recordatoris</string>
+    <string name="next_reminder_format">Proper Recordatori: %1$s</string>
+    <string name="no_upcoming_reminders">No Hi Ha Recordatoris Propers</string>
+
+    <!-- Reminder type selection -->
+    <string name="select_reminder_type">Seleccionar tipus de recordatori</string>
+    <string name="week_day_reminder">Recordatori setmanal</string>
+    <string name="week_day_reminder_description">Dies específics com dilluns, dimecres, divendres</string>
+    <string name="periodic_reminder">Recordatori periòdic</string>
+    <string name="periodic_reminder_description">Intervals regulars com cada 3 dies</string>
+    <string name="month_day_reminder">Recordatori mensual</string>
+    <string name="month_day_reminder_description">Patrons mensuals com el primer dilluns</string>
+    <string name="time_since_last_reminder">Temps des de l\'últim registre</string>
+    <string name="time_since_last_reminder_description">Quan no heu registrat alguna cosa durant un temps</string>
+
+    <!-- Reminder configuration -->
+    <string name="reminder_name">Nom del recordatori</string>
+    <string name="repeat_every">Repetir cada</string>
+    <string name="at_time">A les</string>
+    <string name="ending_at">Acaba el</string>
+    <string name="starting_from">Començant des de</string>
+    <string name="repeat_on_week_days">Repetir en dies de la setmana</string>
+    <string name="track_feature">Seleccionar rastrejador</string>
+    <string name="select_tracker_placeholder">Seleccionar un rastrejador</string>
+    <string name="remind_after">Recordar després de</string>
+    <string name="then_remind_every">Després recordar cada</string>
+    <string name="every_colon">Cada:</string>
+    <string name="ended_at_format">Va acabar el: %1$s</string>
+    <string name="starting_at_format">Comença el: %1$s</string>
+
+    <!-- Month day occurrence -->
+    <string name="occurrence_first">Primer</string>
+    <string name="occurrence_second">Segon</string>
+    <string name="occurrence_third">Tercer</string>
+    <string name="occurrence_fourth">Quart</string>
+    <string name="occurrence_last">Últim</string>
+
+    <!-- Full day names -->
+    <string name="monday">Dilluns</string>
+    <string name="tuesday">Dimarts</string>
+    <string name="wednesday">Dimecres</string>
+    <string name="thursday">Dijous</string>
+    <string name="friday">Divendres</string>
+    <string name="saturday">Dissabte</string>
+    <string name="sunday">Diumenge</string>
+</resources>
