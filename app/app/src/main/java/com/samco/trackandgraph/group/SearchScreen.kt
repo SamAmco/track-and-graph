@@ -190,6 +190,7 @@ private val GroupChild.displayName: String
     get() = when (this) {
         is GroupChild.ChildGroup -> group.name
         is GroupChild.ChildTracker -> displayTracker.name
+        is GroupChild.ChildTrackerLoading -> name
         is GroupChild.ChildFunction -> displayFunction.name
         is GroupChild.ChildGraph -> graph.viewData.graphOrStat.name
     }
@@ -234,6 +235,7 @@ private fun SearchResultsGrid(
                 span = { item ->
                     when (item.child) {
                         is GroupChild.ChildTracker -> GridItemSpan(1)
+                        is GroupChild.ChildTrackerLoading -> GridItemSpan(1)
                         is GroupChild.ChildFunction -> GridItemSpan(1)
                         is GroupChild.ChildGroup -> GridItemSpan(2)
                         is GroupChild.ChildGraph -> GridItemSpan(columnCount)
@@ -248,6 +250,8 @@ private fun SearchResultsGrid(
                         onPlayTimer = onTrackerPlayTimer,
                         onStopTimer = onTrackerStopTimer,
                     )
+
+                    is GroupChild.ChildTrackerLoading -> LoadingTracker(name = child.name)
 
                     is GroupChild.ChildGroup -> Group(
                         group = child.group,

@@ -601,6 +601,7 @@ private fun GroupGrid(
             span = { item ->
                 when (item) {
                     is GroupChild.ChildTracker -> GridItemSpan(1)
+                    is GroupChild.ChildTrackerLoading -> GridItemSpan(1)
                     is GroupChild.ChildFunction -> GridItemSpan(1)
                     is GroupChild.ChildGroup -> GridItemSpan(2)
                     is GroupChild.ChildGraph -> GridItemSpan(columnCount)
@@ -620,6 +621,12 @@ private fun GroupGrid(
                             onMoveTo = { onMoveItem(item.groupItemId, emptySet()) },
                             isElevated = isDragging,
                         )
+                    }
+
+                    is GroupChild.ChildTrackerLoading -> {
+                        // Group screen doesn't lazy-load trackers; this branch only exists
+                        // for exhaustiveness (the loading variant is search-only).
+                        LoadingTracker(name = item.name)
                     }
 
                     is GroupChild.ChildFunction -> {

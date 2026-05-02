@@ -32,6 +32,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Surface
 import androidx.compose.material3.DropdownMenuItem
@@ -200,6 +203,41 @@ fun Tracker(
                     onStopTimer = onStopTimer,
                     onAdd = onAdd
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun LoadingTracker(
+    modifier: Modifier = Modifier,
+    name: String,
+) = Box(modifier = modifier.fillMaxWidth()) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(cardMarginSmall),
+        shadowElevation = cardElevation,
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.medium,
+    ) {
+        Column(
+            modifier = Modifier
+                .requiredHeightIn(min = minTrackerCardHeight)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.size(buttonSize))
+                TrackerNameText(trackerName = name)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(buttonSize),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(buttonSize / 2))
             }
         }
     }
@@ -401,7 +439,7 @@ private fun formatRelativeTimeSpan(
     } else DateUtils.getRelativeTimeSpanString(dateTime.toInstant().toEpochMilli()).toString()
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, heightDp = 1000)
 @Composable
 fun TrackerPreview() {
     TnGComposeTheme {
@@ -496,6 +534,10 @@ fun TrackerPreview() {
                 onPlayTimer = {},
                 onStopTimer = {},
                 contextMenuCallbacks = TrackerContextMenuCallbacks(),
+            )
+
+            LoadingTracker(
+                name = "Loading Tracker"
             )
 
         }

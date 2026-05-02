@@ -23,6 +23,13 @@ sealed class GroupChild {
         override val type: GroupChildType = GroupChildType.TRACKER
     ) : GroupChild()
 
+    class ChildTrackerLoading(
+        override val groupItemId: Long,
+        override val id: Long,
+        val name: String,
+        override val type: GroupChildType = GroupChildType.TRACKER
+    ) : GroupChild()
+
     class ChildGraph(
         override val groupItemId: Long,
         override val id: Long,

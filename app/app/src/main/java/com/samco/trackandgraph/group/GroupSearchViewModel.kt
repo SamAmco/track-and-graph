@@ -34,12 +34,12 @@ import com.samco.trackandgraph.util.FuzzyMatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -190,11 +190,28 @@ class GroupSearchViewModelImpl @Inject constructor(
     private val graphViewDataCache =
         MutableStateFlow<Map<Long, CalculatedGraphViewData>>(emptyMap())
 
+    // In-flight graph calculations keyed by graph.id. Same reconcile-against-desired
+    // pattern as trackerFetchJobs: query changes cancel calculations no longer needed
+    // by the result set. graphEventsJob also cancels + removes here when the
+    // underlying data changes — without that, an in-flight calculation would
+    // eventually write stale data to the cache.
+    private val graphCalcJobs = mutableMapOf<Long, Job>()
+    private val graphCalcJobsLock = Any()
+
     // Live per-tracker DisplayTracker, keyed by featureId (the correlation key on
-    // DataPoint events). Seeded once when search opens, then refreshed targetedly on
-    // DataUpdateType.DataPoint events for the duration of the open session. Cleared
-    // when search closes.
+    // DataPoint events). Populated lazily as trackers appear in result sets and
+    // refreshed targetedly on DataUpdateType.DataPoint events for the duration of
+    // the open session. Cleared when search closes.
     private val trackerDataMap = MutableStateFlow<Map<Long, DisplayTracker>>(emptyMap())
+
+    // In-flight lazy fetches keyed by featureId. We track per-featureId jobs (not a
+    // single shared job) so that a query change can cancel only the now-irrelevant
+    // fetches while leaving still-relevant ones running. Reconciled in
+    // launchTrackerFetches against the desired set produced by mapResultsToSearchItems.
+    // Mutated from the combine path (via withContext(io)) and from the launched
+    // fetch coroutines themselves (on completion), so all access goes through the lock.
+    private val trackerFetchJobs = mutableMapOf<Long, Job>()
+    private val trackerFetchJobsLock = Any()
 
     // Event-subscription jobs active only while search is open.
     private var trackerEventsJob: Job? = null
@@ -224,7 +241,6 @@ class GroupSearchViewModelImpl @Inject constructor(
     override fun showSearch() {
         _isSearchVisible.value = true
         searchState.value = SearchState.Loading
-        // Cancel any lingering subscriptions from a previous session before re-seeding.
         trackerEventsJob?.cancel()
         graphEventsJob?.cancel()
         trackerEventsJob = null
@@ -232,20 +248,10 @@ class GroupSearchViewModelImpl @Inject constructor(
         viewModelScope.launch {
             val graph = dataInteractor.getGroupGraphSync(groupId)
             val items = buildSearchableItems(graph)
-            // Seed trackerDataMap before flipping searchState to Ready so mapTracker
-            // never sees Ready + empty trackers — that would produce tracker-less
-            // results for the first frame.
-            val seedEntries = items
-                .mapNotNull { item ->
-                    if (item.item !is GroupGraphItem.TrackerNode) return@mapNotNull null
-                    item.featureId
-                }
-                .map { featureId ->
-                    async { dataInteractor.tryGetTrackerByFeatureId(featureId)?.let { featureId to it } }
-                }
-                .awaitAll()
-                .filterNotNull()
-            trackerDataMap.value = seedEntries.toMap()
+            // trackerDataMap stays empty — DisplayTrackers are fetched lazily by
+            // mapTracker the first time a tracker appears in the result set, exactly
+            // like the graph-view-data cache works for ChildGraph. Seeding all 100s
+            // of trackers up-front blocked search startup for several seconds.
             searchState.value = SearchState.Ready(items)
             startTrackerEventsJob()
             startGraphEventsJob()
@@ -262,6 +268,14 @@ class GroupSearchViewModelImpl @Inject constructor(
         trackerEventsJob = null
         graphEventsJob = null
         trackerDataMap.value = emptyMap()
+        synchronized(trackerFetchJobsLock) {
+            trackerFetchJobs.values.forEach { it.cancel() }
+            trackerFetchJobs.clear()
+        }
+        synchronized(graphCalcJobsLock) {
+            graphCalcJobs.values.forEach { it.cancel() }
+            graphCalcJobs.clear()
+        }
     }
 
     private fun startTrackerEventsJob() {
@@ -286,10 +300,18 @@ class GroupSearchViewModelImpl @Inject constructor(
             dataInteractor.getDataUpdateEvents()
                 .filterIsInstance<DataUpdateType.GraphOrStatUpdated>()
                 .collect { event ->
-                    // Drop the stale entry; the resulting cache-miss in mapGraph will
-                    // surface the loading placeholder and re-enqueue the calculation.
-                    if (event.graphStatId !in graphViewDataCache.value) return@collect
-                    graphViewDataCache.value -= event.graphStatId
+                    val graphId = event.graphStatId
+                    // Cancel any in-flight calculation for this graph — its inputs
+                    // are now stale, and without this its eventual write would
+                    // overwrite the fresh value we're about to recalculate.
+                    val cancelled = synchronized(graphCalcJobsLock) {
+                        graphCalcJobs.remove(graphId)?.also { it.cancel() } != null
+                    }
+                    val wasCached = graphId in graphViewDataCache.value
+                    if (!cancelled && !wasCached) return@collect
+                    if (wasCached) graphViewDataCache.value -= graphId
+                    // Cache change re-fires the combine; mapGraph re-queues the
+                    // graph and launchGraphCalculations starts a fresh job.
                 }
         }
     }
@@ -462,6 +484,7 @@ class GroupSearchViewModelImpl @Inject constructor(
         trackers: Map<Long, DisplayTracker>,
     ): List<SearchResultItem> = withContext(io) {
         val graphsToCalculate = mutableListOf<GroupGraphItem.GraphNode>()
+        val trackersToFetch = mutableListOf<Long>()
 
         // Build a lookup so the mapper functions can find the pre-fetched searchable
         // (including paths) without another DB round-trip.
@@ -471,8 +494,12 @@ class GroupSearchViewModelImpl @Inject constructor(
         val searchItems = results.mapNotNull { result ->
             val searchable = itemLookup[result.groupItemId] ?: return@mapNotNull null
             val child: GroupChild = when (val item = result.item) {
-                is GroupGraphItem.TrackerNode -> mapTracker(result.groupItemId, item, trackers)
-                    ?: return@mapNotNull null
+                is GroupGraphItem.TrackerNode -> mapTracker(
+                    groupItemId = result.groupItemId,
+                    item = item,
+                    trackers = trackers,
+                    trackersToFetch = trackersToFetch,
+                )
                 is GroupGraphItem.GroupNode -> mapGroup(result.groupItemId, item)
                 is GroupGraphItem.FunctionNode -> mapFunction(result.groupItemId, item)
                 is GroupGraphItem.GraphNode -> mapGraph(
@@ -485,9 +512,11 @@ class GroupSearchViewModelImpl @Inject constructor(
             SearchResultItem(child = child, paths = searchable.paths)
         }
 
-        // Launch async graph calculations for uncached graphs
         if (graphsToCalculate.isNotEmpty()) {
             launchGraphCalculations(graphsToCalculate)
+        }
+        if (trackersToFetch.isNotEmpty()) {
+            launchTrackerFetches(trackersToFetch)
         }
 
         searchItems
@@ -497,8 +526,17 @@ class GroupSearchViewModelImpl @Inject constructor(
         groupItemId: Long,
         item: GroupGraphItem.TrackerNode,
         trackers: Map<Long, DisplayTracker>,
-    ): GroupChild.ChildTracker? {
-        val displayTracker = trackers[item.tracker.featureId] ?: return null
+        trackersToFetch: MutableList<Long>,
+    ): GroupChild {
+        val displayTracker = trackers[item.tracker.featureId]
+        if (displayTracker == null) {
+            trackersToFetch.add(item.tracker.featureId)
+            return GroupChild.ChildTrackerLoading(
+                groupItemId = groupItemId,
+                id = item.tracker.id,
+                name = item.tracker.name,
+            )
+        }
         return GroupChild.ChildTracker(
             groupItemId = groupItemId,
             id = item.tracker.id,
@@ -551,26 +589,98 @@ class GroupSearchViewModelImpl @Inject constructor(
         )
     }
 
-    private fun launchGraphCalculations(graphs: List<GroupGraphItem.GraphNode>) {
-        viewModelScope.launch(defaultDispatcher) {
-            val results = graphs.map { node ->
-                async {
+    /**
+     * Reconcile in-flight fetches against [desired] (the featureIds the current
+     * result set wants displayed). Jobs for featureIds no longer desired are
+     * cancelled; jobs already running for desired featureIds are left alone; new
+     * jobs are launched for desired featureIds with no current job.
+     */
+    private fun launchTrackerFetches(desired: List<Long>) {
+        synchronized(trackerFetchJobsLock) {
+            val desiredSet = desired.toSet()
+            val iter = trackerFetchJobs.entries.iterator()
+            while (iter.hasNext()) {
+                val (featureId, job) = iter.next()
+                if (featureId !in desiredSet) {
+                    job.cancel()
+                    iter.remove()
+                }
+            }
+            for (featureId in desired) {
+                if (featureId in trackerFetchJobs) continue
+                trackerFetchJobs[featureId] = viewModelScope.launch {
+                    try {
+                        dataInteractor.tryGetTrackerByFeatureId(featureId)?.let {
+                            trackerDataMap.update { map -> map + (featureId to it) }
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to fetch tracker for featureId=$featureId")
+                    } finally {
+                        synchronized(trackerFetchJobsLock) {
+                            // Only remove if we're still the current job — a newer
+                            // launch may have replaced us between cancellation and
+                            // this finally running.
+                            if (trackerFetchJobs[featureId] === coroutineContext[Job]) {
+                                trackerFetchJobs.remove(featureId)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Reconcile in-flight graph calculations against [desired] (the graphs the
+     * current result set wants displayed). Mirrors [launchTrackerFetches] — calcs
+     * for graphs no longer desired are cancelled, in-flight calcs for desired
+     * graphs are left alone, and new calcs are launched for desired graphs not
+     * already running.
+     */
+    private fun launchGraphCalculations(desired: List<GroupGraphItem.GraphNode>) {
+        synchronized(graphCalcJobsLock) {
+            val desiredById = desired.associateBy { it.graph.id }
+            val iter = graphCalcJobs.entries.iterator()
+            while (iter.hasNext()) {
+                val (graphId, job) = iter.next()
+                if (graphId !in desiredById) {
+                    job.cancel()
+                    iter.remove()
+                }
+            }
+            for ((graphId, node) in desiredById) {
+                if (graphId in graphCalcJobs) continue
+                graphCalcJobs[graphId] = viewModelScope.launch(defaultDispatcher) {
                     try {
                         val viewData = gsiProvider.getDataFactory(node.graph.type)
                             .getViewData(node.graph)
-                        node.graph.id to CalculatedGraphViewData(
-                            time = System.nanoTime() + 1,
-                            viewData = viewData,
-                        )
+                        // Re-check before writing — if cancellation happened after
+                        // getViewData returned but before we get here, the cache
+                        // change would otherwise re-introduce stale data.
+                        ensureActive()
+                        graphViewDataCache.update {
+                            it + (graphId to CalculatedGraphViewData(
+                                time = System.nanoTime() + 1,
+                                viewData = viewData,
+                            ))
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
                     } catch (e: Exception) {
-                        Timber.e(e, "Failed to calculate graph view data for ${node.graph.id}")
-                        null
+                        Timber.e(e, "Failed to calculate graph view data for $graphId")
+                    } finally {
+                        synchronized(graphCalcJobsLock) {
+                            // Only remove if the map still holds this exact job —
+                            // a newer job may have replaced us via the events
+                            // path, and we mustn't disturb that entry.
+                            if (graphCalcJobs[graphId] === coroutineContext[Job]) {
+                                graphCalcJobs.remove(graphId)
+                            }
+                        }
                     }
                 }
-            }.awaitAll().filterNotNull()
-
-            if (results.isNotEmpty()) {
-                graphViewDataCache.value += results.toMap()
             }
         }
     }
