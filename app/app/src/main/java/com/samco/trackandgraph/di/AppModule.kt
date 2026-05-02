@@ -149,6 +149,7 @@ class AppModule {
     @Provides
     internal fun getReleaseNotesRepository(impl: ReleaseNotesRepositoryImpl): ReleaseNotesRepository = impl
 
+    @Singleton
     @Provides
     internal fun getPropertiesPersistenceProvider(impl: PrefsPersistenceProviderImpl): PrefsPersistenceProvider = impl
 

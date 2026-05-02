@@ -23,20 +23,26 @@ import androidx.datastore.preferences.core.Preferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okio.Path.Companion.toOkioPath
 import javax.inject.Inject
+import javax.inject.Singleton
 
 interface PrefsPersistenceProvider {
     fun getDataStore(path: String): DataStore<Preferences>
 }
 
+@Singleton
 class PrefsPersistenceProviderImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : PrefsPersistenceProvider {
 
-    override fun getDataStore(path: String): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.createWithPath(
-            produceFile = {
-                context.filesDir.resolve("$path.preferences_pb").absoluteFile.toOkioPath()
-            }
-        )
+    private val dataStores = mutableMapOf<String, DataStore<Preferences>>()
+
+    override fun getDataStore(path: String): DataStore<Preferences> = synchronized(dataStores) {
+        dataStores.getOrPut(path) {
+            PreferenceDataStoreFactory.createWithPath(
+                produceFile = {
+                    context.filesDir.resolve("$path.preferences_pb").absoluteFile.toOkioPath()
+                }
+            )
+        }
     }
 }
