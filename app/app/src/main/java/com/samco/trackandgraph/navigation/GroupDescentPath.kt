@@ -17,15 +17,15 @@
 package com.samco.trackandgraph.navigation
 
 /**
- * A descent from the user's current `GroupScreen` to a specific placement of a component
- * nested below it.
+ * A descent from the user's current `GroupScreen` down to a destination group.
  *
- * [groupIds] lists the groups to open in order, each nested inside the previous. Both the
- * current location (the anchor) and the final component are excluded — the component is
- * identified by [groupItemId]. Empty [groupIds] means the target is a direct child of the
- * current group.
+ * [groupIds] lists the groups to open in order, each nested inside the previous. The current
+ * location (the anchor) is excluded; the innermost id is the group the user lands in.
+ *
+ * If [groupItemId] is non-null, the destination group will scroll to the placement with
+ * that id once it loads.
  */
 data class GroupDescentPath(
     val groupIds: List<Long>,
-    val groupItemId: Long,
+    val groupItemId: Long?,
 )

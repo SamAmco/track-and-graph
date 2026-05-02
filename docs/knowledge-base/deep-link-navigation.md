@@ -1,6 +1,6 @@
 ---
 title: Deep-link navigation — DeepLink, descent-relative paths, navigator, back-stack append
-description: How in-app deep-link navigation works — the DeepLink sealed type carries a pre-resolved GroupDescentPath (a chain from the user's current GroupScreen to the destination); callers compute paths client-side because a component can have multiple placements when ancestors are symlinked; DeepLinkNavigator is provided via LocalDeepLinkNavigator CompositionLocal; applyGroupDescentPath appends onto the current back stack.
+description: How in-app deep-link navigation works — the DeepLink sealed type carries a pre-resolved GroupDescentPath (a chain from the user's current GroupScreen to the destination); callers compute paths client-side because a component can have multiple placements when ancestors are symlinked; groupItemId is nullable — non-null scrolls to a placement in the innermost group, null lands the user inside that group with no scroll (used for tapping a group in search); DeepLinkNavigator is provided via LocalDeepLinkNavigator CompositionLocal; applyGroupDescentPath appends onto the current back stack.
 topics:
   - DeepLink is a narrow in-app data type; only ToGroupItem(descent) exists today
   - Paths are descent-relative — anchored at the user's current GroupScreen, not at root
@@ -11,8 +11,9 @@ topics:
   - SearchResultItem.paths.size drives UI branching — 1 navigates directly, >1 opens SymlinksDialog in tap-to-navigate mode
   - DeepLinkNavigator is provided via LocalDeepLinkNavigator CompositionLocal (matches LocalTopBarController precedent)
   - DeepLinkNavigatorImpl is not @Singleton — it captures the NavBackStack which is per-composition
-  - applyGroupDescentPath APPENDS onto the current back stack — pushes one GroupNavKey per id; last entry carries scrollToGroupItemId
-  - Empty groupIds → top entry is replaced with a copy carrying the scroll hint, no nav transition
+  - applyGroupDescentPath APPENDS onto the current back stack — pushes one GroupNavKey per id; last entry carries scrollToGroupItemId (null when navigating to the group itself)
+  - Empty groupIds → top entry is replaced with a copy carrying the scroll hint, no nav transition; empty groupIds + null groupItemId is a no-op
+  - GroupNode placements get descent = (groupIds + childGroupId, groupItemId = null) so tapping a group in search navigates INTO it instead of scrolling to it in its parent
   - Pressing back returns the user to their original location, not to root — a direct consequence of append semantics
   - GroupNavKey.scrollToGroupItemId is consumed once by GroupScreen via a rememberSaveable flag keyed on the target id
   - Scroll must run in composition scope — lazyGridState.animateScrollToItem needs a MonotonicFrameClock that viewModelScope does not provide
@@ -26,7 +27,9 @@ End-to-end pipeline: UI tap → caller resolves a `GroupDescentPath` from the da
 
 ## Paths are descent-relative, anchored at the user's current location
 
-`GroupDescentPath.groupIds` is the chain from the user's *current* `GroupScreen` down to the destination's parent group; it excludes both the anchor and the final component (identified by `groupItemId`). An empty `groupIds` means the target lives directly in the current group.
+`GroupDescentPath.groupIds` is the chain from the user's *current* `GroupScreen` down to the destination group; it excludes the anchor. The innermost id is the group the user lands in. `groupItemId` is nullable: when non-null, the destination group scrolls to that placement once it loads; when null, the user simply lands inside the innermost group with no scroll. An empty `groupIds` with non-null `groupItemId` means the target placement lives directly in the current group; empty `groupIds` with null `groupItemId` is a no-op (already there, nothing to scroll to).
+
+Tracker / Graph / Function placements always carry a non-null `groupItemId` (their `groupIds` excludes the final component). Group placements carry the destination group as the last id in `groupIds` and a null `groupItemId` — tapping a group in search navigates into the group rather than scrolling to its placement in the parent, which feels more intuitive to users.
 
 An earlier design had the path go root-to-component. That's fragile when the user is inside a group that itself has multiple parents via symlinks — there's no single correct prefix from root to reconstruct. A descent path sidesteps the problem entirely: we never need to know how the user got to where they are, we just append onto whatever stack they built. A useful side effect: pressing back returns them to the original location rather than jumping to root.
 

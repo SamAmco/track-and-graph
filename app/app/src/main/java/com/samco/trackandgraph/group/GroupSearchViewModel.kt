@@ -341,7 +341,10 @@ class GroupSearchViewModelImpl @Inject constructor(
                     val childName = child.groupGraph.group.name
                     result.getOrPut(ComponentKey(ComponentType.GROUP, childGroupId)) { mutableListOf() }
                         .add(ResolvedPath(
-                            descent = GroupDescentPath(groupIds = groupIds, groupItemId = child.groupItemId),
+                            descent = GroupDescentPath(
+                                groupIds = groupIds + childGroupId,
+                                groupItemId = null,
+                            ),
                             displayString = formatDisplay(groupNames + childName),
                         ))
                     if (visitedGroupIds.add(childGroupId)) {

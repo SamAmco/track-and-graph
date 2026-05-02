@@ -55,17 +55,20 @@ class DeepLinkNavigatorImpl(
 /**
  * Appends a [GroupDescentPath] onto the current back stack. Pushes one [GroupNavKey] per id
  * in [GroupDescentPath.groupIds] (outer-to-inner); the last entry carries
- * [GroupDescentPath.groupItemId] so the destination scrolls to the placement.
+ * [GroupDescentPath.groupItemId] so the destination scrolls to that placement (no-op when
+ * null).
  *
- * An empty [GroupDescentPath.groupIds] means the target lives directly in the current group —
- * the top entry is replaced with a copy carrying the scroll hint, triggering a scroll on the
- * existing screen without a nav transition.
+ * Empty [GroupDescentPath.groupIds] means the destination is the current group — when
+ * [GroupDescentPath.groupItemId] is non-null the top entry is replaced with a copy carrying
+ * the scroll hint, triggering a scroll on the existing screen without a nav transition; a
+ * null [GroupDescentPath.groupItemId] in that case is a no-op (already on the destination).
  *
  * Nav keys pushed here carry `groupName = null`; [com.samco.trackandgraph.group.GroupViewModel]
  * resolves the name for the top app bar once the screen mounts.
  */
 internal fun NavBackStack<NavKey>.applyGroupDescentPath(descent: GroupDescentPath) {
     if (descent.groupIds.isEmpty()) {
+        if (descent.groupItemId == null) return
         val top = lastOrNull() as? GroupNavKey ?: return
         removeLastOrNull()
         add(top.copy(scrollToGroupItemId = descent.groupItemId))
