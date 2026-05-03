@@ -20,10 +20,7 @@ package com.samco.trackandgraph.group
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
-import com.samco.trackandgraph.data.di.DefaultDispatcher
-import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
-import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -40,7 +37,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
-import javax.inject.Inject
 
 /**
  * One ranked search hit handed to the processor — minimum surface needed to
@@ -94,10 +90,11 @@ private data class GraphResult(
  * cache; partially-fetched items are simply re-fetched on the next process()
  * call. [dispose] clears the cache (called from hideSearch).
  */
-class SearchResultProcessor @Inject constructor(
-    private val dataInteractor: DataInteractor,
-    private val gsiProvider: GraphStatInteractorProvider,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+class SearchResultProcessor(
+    private val getDataUpdateEvents: () -> Flow<DataUpdateType>,
+    private val tryGetTrackerByFeatureId: suspend (Long) -> DisplayTracker?,
+    private val getGraphViewData: suspend (GraphOrStat) -> IGraphStatViewData,
+    private val graphDispatcher: CoroutineDispatcher,
 ) {
 
     private val cache = SearchResultCache()
@@ -173,7 +170,7 @@ class SearchResultProcessor @Inject constructor(
                 val featureId = node.tracker.featureId
                 val version = cache.trackerVersion(featureId)
                 val tracker = try {
-                    dataInteractor.tryGetTrackerByFeatureId(featureId)
+                    tryGetTrackerByFeatureId(featureId)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -189,12 +186,12 @@ class SearchResultProcessor @Inject constructor(
         work: List<RankedItem>,
     ): List<GraphResult> = coroutineScope {
         work.map { ranked ->
-            async(defaultDispatcher) {
+            async(graphDispatcher) {
                 val node = ranked.item as GroupGraphItem.GraphNode
                 val graphId = node.graph.id
                 val version = cache.graphVersion(graphId)
                 val viewData = try {
-                    gsiProvider.getDataFactory(node.graph.type).getViewData(node.graph)
+                    getGraphViewData(node.graph)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -249,7 +246,7 @@ class SearchResultProcessor @Inject constructor(
             }
             .toMap()
 
-        dataInteractor.getDataUpdateEvents().collect { event ->
+        getDataUpdateEvents().collect { event ->
             val featureId: Long? = when (event) {
                 is DataUpdateType.DataPoint -> event.featureId
                 is DataUpdateType.TrackerUpdated -> event.featureId
@@ -283,8 +280,8 @@ class SearchResultProcessor @Inject constructor(
                 }
                 if (placeholderList != null) send(placeholderList)
                 val viewData = try {
-                    withContext(defaultDispatcher) {
-                        gsiProvider.getDataFactory(node.graph.type).getViewData(node.graph)
+                    withContext(graphDispatcher) {
+                        getGraphViewData(node.graph)
                     }
                 } catch (e: CancellationException) {
                     throw e
@@ -309,7 +306,7 @@ class SearchResultProcessor @Inject constructor(
         featureId: Long,
     ): DisplayTracker? =
         try {
-            dataInteractor.tryGetTrackerByFeatureId(featureId)
+            tryGetTrackerByFeatureId(featureId)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.navigation.GroupDescentPath
 import com.samco.trackandgraph.util.FuzzyMatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -93,9 +94,18 @@ private data class ComponentKey(val type: ComponentType, val id: Long)
 @HiltViewModel
 class GroupSearchViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
-    private val processor: SearchResultProcessor,
+    private val gsiProvider: GraphStatInteractorProvider,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel(), GroupSearchViewModel {
+
+    private val processor = SearchResultProcessor(
+        getDataUpdateEvents = dataInteractor::getDataUpdateEvents,
+        tryGetTrackerByFeatureId = dataInteractor::tryGetTrackerByFeatureId,
+        getGraphViewData = { graph ->
+            gsiProvider.getDataFactory(graph.type).getViewData(graph)
+        },
+        graphDispatcher = defaultDispatcher,
+    )
 
     // Structural snapshot of a searchable component, taken once when search opens.
     // `name` and `description` feed FuzzyMatcher; `typeBonus` tilts the score at

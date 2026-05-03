@@ -17,13 +17,10 @@
 
 package com.samco.trackandgraph.util
 
-import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
-import com.samco.trackandgraph.data.database.dto.Tracker
-import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
-import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
+import com.samco.trackandgraph.fixtures.testTracker
 
 data class TestGroup(
     val name: String,
@@ -109,17 +106,11 @@ fun buildGroupGraph(
             children.add(
                 GroupGraphItem.TrackerNode(
                     groupItemId = nextGroupItemId++,
-                    tracker = Tracker(
+                    tracker = testTracker(
                         id = f.featureId,
                         name = f.name,
                         featureId = f.featureId,
                         description = "",
-                        dataType = DataType.CONTINUOUS,
-                        hasDefaultValue = false,
-                        defaultValue = 0.0,
-                        defaultLabel = "",
-                        suggestionType = TrackerSuggestionType.VALUE_AND_LABEL,
-                        suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING,
                     )
                 )
             )
