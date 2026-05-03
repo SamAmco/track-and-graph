@@ -12,13 +12,14 @@ topics:
   - SearchableItem flat list built once on showSearch() — structural snapshot only (paths, names, GroupGraphItem)
   - SearchResultProcessor owns per-session tracker/graph display-data cache and streams Flow<List<SearchResultItem>>
   - Processor emits placeholders immediately, then populates trackers/graphs in rank-order batches with trackers first
+  - Query switching depends on cooperative cancellation in graph view-data calculation
   - Processor starts DataUpdateType listening immediately; versioned cache writes stop stale initial batch results overwriting fresher event refreshes
   - Structural changes (new/deleted/renamed components, new symlinks) are intentionally ignored during an open search session
   - FuzzyMatcher — ranked subsequence matching with DP alignment
   - SearchResultItem pairs a rendered GroupChild with every ResolvedPath (one per placement when ancestors are symlinked)
   - Tap handler branches on paths.size — 1 navigates directly, >1 opens SymlinksDialogContent in tap-to-navigate mode
   - SymlinksDialogContent has optional onPathClick — dual-mode dialog (info vs tap-to-navigate)
-keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCache, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, SearchResultItem, RankedItem, ResolvedPath, score, fuzzy, ranked, subsequence, DP, displayTracker, reactive, live-updates, DataUpdateType, DataPoint, GraphOrStatUpdated, tryGetTrackerByFeatureId, featureId, collectSearchableItems, scoreItem, buildResolvedPaths, walkPaths, ComponentKey, SymlinksDialog, SymlinksDialogContent, onPathClick, disambiguation]
+keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCache, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, SearchResultItem, RankedItem, ResolvedPath, score, fuzzy, ranked, subsequence, DP, displayTracker, reactive, live-updates, DataUpdateType, DataPoint, GraphOrStatUpdated, tryGetTrackerByFeatureId, featureId, collectSearchableItems, scoreItem, buildResolvedPaths, walkPaths, ComponentKey, SymlinksDialog, SymlinksDialogContent, onPathClick, disambiguation, cancellation, cooperative-cancellation, LineGraphDataFactory, BarChartDataFactory, LuaFunctionDataSourceAdapter]
 ---
 
 # Search Feature
@@ -61,6 +62,18 @@ queryText (snapshotFlow of searchQuery.text)
 
 `SearchResultProcessor.process(ranked)` also runs inside the `flatMapLatest` body. It returns a `Flow<List<SearchResultItem>>`, so a new query cancels both the previous query's scoring and its in-flight result population/listener work. The public `SearchDisplayState` only has what the UI needs: `Empty`, `Loading`, or `Results(items)`.
 
+### Query switching waits for cancellation to complete
+
+`flatMapLatest` starts the new query branch only after the previous inner flow has cancelled. That means the UI can still look stale after a new query has been observed if the old `SearchResultProcessor` flow is stuck in a slow non-cooperative graph calculation. This can be misread as slow scoring, but the symptom is different: logs show the new query arriving, then a gap before the previous branch completes and the new branch emits `Loading`.
+
+The processor intentionally limits concurrent graph work to the current batch, so the expected cancellation cost is "cancel the active graph calculations", not "cancel hundreds of jobs". If stale results linger, inspect graph view-data calculation first:
+
+- `LineGraphDataFactory` and `BarChartDataFactory` should rethrow `CancellationException` from broad `catch (Throwable)` blocks.
+- Long synchronous loops in graph calculators should check `currentCoroutineContext().ensureActive()` periodically.
+- A remaining hard case is a single `DataSample.iterator().next()` call that performs substantial function/Lua work before returning. Cancellation checks around the iterator boundary cannot interrupt work inside Lua's generator call or data-source helper loops; target the function/Lua data-source pipeline if logs show delays concentrated there.
+
+During the search responsiveness work, the useful diagnostic shape was: query-observed timestamp, branch start/completion, processor finish/cancel, graph batch start, and per-graph start/cancel/finally with graph id/type/name. The important measurement is the time from "new query observed" to "old branch completed"; that is the user-visible delay before the new query can show its `Loading` state.
+
 ## Why a Flat List (not re-traversing the tree)
 
 The group graph tree structure is only needed once (to build the flat list). Re-traversing the tree on every debounced keystroke is wasted work — flattening up-front means each keystroke is a simple linear scan of the list. The flat list is also the snapshot that supports the "no structural changes while open" behaviour described under "Live updates" below — paths, set of items, and names are frozen at `showSearch()` time.
@@ -72,6 +85,8 @@ The group graph tree structure is only needed once (to build the flat list). Re-
 `SearchResultProcessor` owns the per-session display-data cache. The first processor emission renders the full ranked list immediately, using cache hits where available and loading placeholders for missing trackers/graphs. It then processes missing data in rank-order batches (`BATCH_SIZE = 12`): trackers in the batch are fetched first and emitted, then graphs are calculated and emitted. This keeps the first visible results ahead of lower-ranked work and avoids a slow graph blocking tracker cards in the same batch.
 
 On `hideSearch()`, `processor.dispose()` clears this cache. Repeated queries during the same open search can reuse completed tracker/graph data, but closing search releases that memory.
+
+Because batches are sequential, a graph calculation that never completes in batch N blocks all later batches, including trackers in batch N+1. If search results show both graph cards and display trackers stuck on loading, inspect the active graph batch first rather than assuming tracker fetches are failing. Function-backed graphs are a common stress case because rapid query changes can cancel many `FunctionGraphDataSample` constructions; see [lua-architecture.md](lua-architecture.md#lua-vm-lease-ownership) for the VM lease ownership rule.
 
 ## Live updates to tracker and graph display data
 
