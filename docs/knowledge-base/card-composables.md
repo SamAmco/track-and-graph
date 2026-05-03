@@ -36,6 +36,8 @@ This is deliberate: the search results grid wants the card tap (`onClick`) to de
 
 `onDescription` stays inside `TrackerContextMenuCallbacks` because it only makes sense from the dropdown menu.
 
+`LoadingTracker` also accepts a nullable `onClick: (() -> Unit)?` so search can deep-link from tracker placeholders before the `DisplayTracker` has loaded. It deliberately does not expose add/timer/context-menu actions, because those require the full `DisplayTracker`.
+
 ## GroupScreen wiring
 
 `GroupScreen.kt` has per-type `*ClickListeners` aggregate data classes (`TrackerClickListeners`, `GraphStatClickListeners`, `GroupClickListeners`, `FunctionClickListeners`). These live at the screen level — they pre-date this split and collect all the actions the screen knows how to perform. The per-item wrapper composables (`TrackerItem`, `GroupItem`, `GraphStatItem`, `FunctionItem` — all in `GroupScreen.kt`) are the thin adapter layer that assembles a per-item `XContextMenuCallbacks` from the aggregate listeners + per-item closures (like the `onDelete` closure that needs the `groupItemId`) and passes `onClick` / the tracker-action lambdas as top-level params.
@@ -52,7 +54,7 @@ The three tracker action lambdas (`onTrackerAdd`, `onTrackerPlayTimer`, `onTrack
 
 ## SearchScreen wiring
 
-Cards in `SearchResultsGrid` are built with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon). Tracker cards additionally get `onAdd`, `onPlayTimer`, `onStopTimer` wired to the hoisted lambdas from `GroupScreen`. See [search-feature.md](search-feature.md) for the tap-handling logic.
+Cards in `SearchResultsGrid` are built with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon). Tracker loading placeholders get the same tap-to-navigate handler, but not add/timer actions. Loaded tracker cards additionally get `onAdd`, `onPlayTimer`, `onStopTimer` wired to the hoisted lambdas from `GroupScreen`. See [search-feature.md](search-feature.md) for the tap-handling logic.
 
 Tracker card state in search results is **live** — `GroupSearchViewModelImpl.trackerDataMap` is a `MutableStateFlow<Map<Long, DisplayTracker>>` that's plumbed into the `displayResults` combine and refreshed targetedly on `DataUpdateType.DataPoint` events while search is open. So tapping `+` (or play / stop on a timer) updates the card's last-value / timestamp / timer display in place, the same way the group-screen cards do. Graph cards in the result set also recompute via `DataUpdateType.GraphOrStatUpdated`. Structural changes (renames, new/deleted components, new symlinks) are NOT reflected — close and reopen search to pick those up. See [search-feature.md](search-feature.md#live-updates-to-tracker-and-graph-display-data).
 

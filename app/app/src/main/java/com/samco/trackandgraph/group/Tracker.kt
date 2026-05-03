@@ -212,6 +212,7 @@ fun Tracker(
 fun LoadingTracker(
     modifier: Modifier = Modifier,
     name: String,
+    onClick: (() -> Unit)? = null,
 ) = Box(modifier = modifier.fillMaxWidth()) {
     Surface(
         modifier = Modifier
@@ -222,7 +223,9 @@ fun LoadingTracker(
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(
-            modifier = Modifier
+            modifier = Modifier.let {
+                if (onClick != null) it.clickable { onClick() } else it
+            }
                 .requiredHeightIn(min = minTrackerCardHeight)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.SpaceBetween,

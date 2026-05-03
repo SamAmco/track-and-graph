@@ -251,7 +251,10 @@ private fun SearchResultsGrid(
                         onStopTimer = onTrackerStopTimer,
                     )
 
-                    is GroupChild.ChildTrackerLoading -> LoadingTracker(name = child.name)
+                    is GroupChild.ChildTrackerLoading -> LoadingTracker(
+                        name = child.name,
+                        onClick = { onResultClick(item) },
+                    )
 
                     is GroupChild.ChildGroup -> Group(
                         group = child.group,

@@ -229,7 +229,7 @@ Two things worth understanding:
 
 ## Tapping a result — deep-link navigation with disambiguation
 
-Each card in `SearchResultsGrid` is rendered with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon on search result cards). Tracker cards additionally get `onAdd` / `onPlayTimer` / `onStopTimer` wired through from `SearchScreen`'s params — the same lambdas `GroupScreen` uses, hoisted to the outer level so the `AddDataPointsDialog` persists across search open/close. See [card-composables.md](card-composables.md) for the shared card API and why the tracker-action slots sit outside the context-menu object.
+Each card in `SearchResultsGrid` is rendered with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon on search result cards). Tracker loading placeholders also get the tap-to-navigate handler because `SearchResultItem.paths` is available before the `DisplayTracker` is fetched. Loaded tracker cards additionally get `onAdd` / `onPlayTimer` / `onStopTimer` wired through from `SearchScreen`'s params — the same lambdas `GroupScreen` uses, hoisted to the outer level so the `AddDataPointsDialog` persists across search open/close. See [card-composables.md](card-composables.md) for the shared card API and why the tracker-action slots sit outside the context-menu object.
 
 The handler lives in `SearchScreen`:
 
