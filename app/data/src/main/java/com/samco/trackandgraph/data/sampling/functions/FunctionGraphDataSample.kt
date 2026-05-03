@@ -80,26 +80,30 @@ internal class FunctionGraphDataSample(
             dataSampler: DataSampler,
             luaEngine: LuaEngine
         ): FunctionGraphDataSample {
+            val ownsLock = vmLock == null
             val lock = vmLock ?: luaEngine.acquireVM()
+            val dataSources = mutableMapOf<Long, RawDataSample?>()
 
-            val dataSources = function.inputFeatureIds
-                .associateWith { dataSampler.getRawDataSampleForFeatureId(it, lock) }
+            try {
+                function.inputFeatureIds.forEach { featureId ->
+                    dataSources[featureId] = dataSampler.getRawDataSampleForFeatureId(featureId, lock)
+                }
 
-            if (vmLock == null) {
                 return FunctionGraphDataSample(
                     vmLock = lock,
                     function = function,
                     dataSources = dataSources,
                     luaEngine = luaEngine,
-                    disposeVM = { luaEngine.releaseVM(lock) }
+                    disposeVM = if (ownsLock) {
+                        { luaEngine.releaseVM(lock) }
+                    } else {
+                        null
+                    }
                 )
-            } else {
-                return FunctionGraphDataSample(
-                    vmLock = lock,
-                    function = function,
-                    dataSources = dataSources,
-                    luaEngine = luaEngine,
-                )
+            } catch (throwable: Throwable) {
+                dataSources.values.forEach { it?.dispose() }
+                if (ownsLock) luaEngine.releaseVM(lock)
+                throw throwable
             }
         }
     }

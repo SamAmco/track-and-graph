@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.group
 
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -198,11 +199,11 @@ class SearchResultProcessor @Inject constructor(
                     throw e
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to calculate graph view data for ${node.graph.id}")
-                    null
+                    errorViewData(node.graph, e)
                 }
-                viewData?.let { GraphResult(ranked, graphId, version, it) }
+                GraphResult(ranked, graphId, version, viewData)
             }
-        }.awaitAll().filterNotNull()
+        }.awaitAll()
     }
 
     private fun applyTrackerResults(
@@ -289,7 +290,7 @@ class SearchResultProcessor @Inject constructor(
                     throw e
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to recalculate graph view data for ${event.graphStatId}")
-                    return@collect
+                    errorViewData(node.graph, e)
                 }
                 val nextList = listMutex.withLock {
                     if (!cache.putGraphIfVersion(event.graphStatId, version, viewData)) {
@@ -382,6 +383,13 @@ class SearchResultProcessor @Inject constructor(
             paths = ranked.paths,
         )
     }
+
+    private fun errorViewData(graph: GraphOrStat, error: Throwable) =
+        object : IGraphStatViewData {
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graph
+            override val error = error
+        }
 
     private fun groupItem(ranked: RankedItem, node: GroupGraphItem.GroupNode) =
         SearchResultItem(

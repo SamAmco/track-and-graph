@@ -40,12 +40,14 @@ import com.samco.trackandgraph.util.Stopwatch
 import com.samco.trackandgraph.util.debounceBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -252,25 +254,42 @@ class GroupViewModelImpl @Inject constructor(
 
             emit(graphs.map { it.asLoading() })
 
-            val batch = mutableListOf<Deferred<GraphWithViewData>>()
-            for (graph in graphs) {
-                val viewData = viewModelScope.async(defaultDispatcher) {
-                    val calculatedData = gsiProvider.getDataFactory(graph.type).getViewData(graph)
-                    GraphWithViewData(
-                        graph,
-                        //Shouldn't really need to add one here, but it just forces the times to be different
-                        // There was a bug previously where the loading and ready states had the same time using
-                        // Instant.now() which caused ready states to be missed and infinite loading to be shown
-                        CalculatedGraphViewData(System.nanoTime() + 1, calculatedData)
-                    )
+            val graphData = coroutineScope {
+                val batch = mutableListOf<Deferred<GraphWithViewData>>()
+                for (graph in graphs) {
+                    val viewData = async(defaultDispatcher) {
+                        val calculatedData = try {
+                            gsiProvider.getDataFactory(graph.type).getViewData(graph)
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            Timber.e(e, "Failed to calculate graph view data for ${graph.id}")
+                            errorViewData(graph, e)
+                        }
+                        GraphWithViewData(
+                            graph,
+                            //Shouldn't really need to add one here, but it just forces the times to be different
+                            // There was a bug previously where the loading and ready states had the same time using
+                            // Instant.now() which caused ready states to be missed and infinite loading to be shown
+                            CalculatedGraphViewData(System.nanoTime() + 1, calculatedData)
+                        )
+                    }
+                    batch.add(viewData)
                 }
-                batch.add(viewData)
+                batch.awaitAll()
             }
 
-            emit(batch.awaitAll())
+            emit(graphData)
 
             stopwatch.stop()
             Timber.i("Took ${stopwatch.elapsedMillis}ms to generate view data for ${graphs.size} graph(s)")
+        }
+
+    private fun errorViewData(graph: GraphOrStat, error: Throwable) =
+        object : IGraphStatViewData {
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graph
+            override val error = error
         }
 
     private val trackerDataMap: Flow<Map<Long, DisplayTracker>> = onUpdateChildrenForGroup

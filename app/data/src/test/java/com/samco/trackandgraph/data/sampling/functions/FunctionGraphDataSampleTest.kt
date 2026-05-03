@@ -30,8 +30,10 @@ import com.samco.trackandgraph.data.sampling.RawDataSample
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -536,5 +538,74 @@ class FunctionGraphDataSampleTest {
             // If we get an exception, it means the VM lock was already disposed incorrectly
             assertTrue("External VM lock should still be valid after FunctionGraphDataSample disposal", false)
         }
+    }
+
+    @Test
+    fun `create releases owned vm lock when input sample creation fails`() = runTest {
+        val featureId1 = 1L
+        val featureId2 = 2L
+        var firstSampleDisposed = false
+
+        val rawDataSample = RawDataSample.fromSequence(
+            data = emptySequence(),
+            getRawDataPoints = { emptyList() },
+            onDispose = { firstSampleDisposed = true }
+        )
+
+        val featureNode1 = FunctionGraphNode.FeatureNode(
+            x = 100f,
+            y = 100f,
+            id = 1,
+            featureId = featureId1
+        )
+        val featureNode2 = FunctionGraphNode.FeatureNode(
+            x = 100f,
+            y = 200f,
+            id = 2,
+            featureId = featureId2
+        )
+        val outputNode = FunctionGraphNode.OutputNode(
+            x = 200f,
+            y = 100f,
+            id = 3,
+            dependencies = listOf(NodeDependency(connectorIndex = 0, nodeId = 1))
+        )
+        val function = Function(
+            id = 1L,
+            featureId = 3L,
+            name = "Failing Function",
+            description = "Test VM lock cleanup during construction failure",
+            functionGraph = FunctionGraph(
+                nodes = listOf(featureNode1, featureNode2, outputNode),
+                outputNode = outputNode,
+                isDuration = false
+            ),
+            inputFeatureIds = listOf(featureId1, featureId2),
+            unique = true,
+        )
+
+        val mockDataSampler = mock<DataSampler>()
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId1), any()))
+            .thenReturn(rawDataSample)
+        whenever(mockDataSampler.getRawDataSampleForFeatureId(eq(featureId2), any()))
+            .thenThrow(IllegalStateException("boom"))
+
+        repeat(10) {
+            try {
+                withTimeout(1000) {
+                    FunctionGraphDataSample.create(null, function, mockDataSampler, luaEngine)
+                }
+                fail("Expected input sample creation to fail")
+            } catch (e: IllegalStateException) {
+                assertEquals("boom", e.message)
+            }
+        }
+
+        assertTrue("Partially-created input samples should be disposed", firstSampleDisposed)
+
+        val locks = withTimeout(1000) {
+            List(8) { luaEngine.acquireVM() }
+        }
+        locks.forEach { luaEngine.releaseVM(it) }
     }
 }
