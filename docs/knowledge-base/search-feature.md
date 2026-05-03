@@ -1,6 +1,6 @@
 ---
 title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, fuzzy search, and multi-path disambiguation
-description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy flat-list build on search open; ranked fuzzy matching via FuzzyMatcher; each SearchResultItem carries every ResolvedPath to its component so multi-path (symlinked) results open a disambiguation dialog on tap.
+description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy flat-list build on search open; ranked fuzzy matching via FuzzyMatcher; SearchResultProcessor streams progressively populated results and listens for live data updates; each SearchResultItem carries every ResolvedPath to its component so multi-path (symlinked) results open a disambiguation dialog on tap.
 topics:
   - GroupSearchViewModel owning a TextFieldState (not a StateFlow<String>)
   - AppBarConfig.searchBarText drives an animated top-bar title swap
@@ -9,23 +9,23 @@ topics:
   - actions slot uses animateContentSize instead of AnimatedContent
   - In-place screen swap in GroupScreen (if/else replaces top bar + content)
   - Why SearchScreen publishes its own clear-button action
-  - SearchableItem flat list built once on showSearch() — structural snapshot only (paths, names, featureId)
-  - trackerDataMap StateFlow seeded on open and updated targetedly on DataUpdateType.DataPoint while search is open
-  - graphViewDataCache invalidation on DataUpdateType.GraphOrStatUpdated — re-enqueue via launchGraphCalculations
-  - Three-way combine(searchResults, graphViewDataCache, trackerDataMap) so cards re-render when any source changes
+  - SearchableItem flat list built once on showSearch() — structural snapshot only (paths, names, GroupGraphItem)
+  - SearchResultProcessor owns per-session tracker/graph display-data cache and streams Flow<List<SearchResultItem>>
+  - Processor emits placeholders immediately, then populates trackers/graphs in rank-order batches with trackers first
+  - Processor starts DataUpdateType listening immediately; versioned cache writes stop stale initial batch results overwriting fresher event refreshes
   - Structural changes (new/deleted/renamed components, new symlinks) are intentionally ignored during an open search session
   - FuzzyMatcher — ranked subsequence matching with DP alignment
   - SearchResultItem pairs a rendered GroupChild with every ResolvedPath (one per placement when ancestors are symlinked)
   - Tap handler branches on paths.size — 1 navigates directly, >1 opens SymlinksDialogContent in tap-to-navigate mode
   - SymlinksDialogContent has optional onPathClick — dual-mode dialog (info vs tap-to-navigate)
-keywords: [search, GroupSearchViewModel, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, SearchResultItem, ResolvedPath, score, fuzzy, ranked, subsequence, DP, displayTracker, trackerDataMap, reactive, live-updates, DataUpdateType, DataPoint, GraphOrStatUpdated, tryGetTrackerByFeatureId, featureId, collectSearchableItems, scoreItem, buildResolvedPaths, walkPaths, ComponentKey, SymlinksDialog, SymlinksDialogContent, onPathClick, disambiguation]
+keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCache, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, SearchResultItem, RankedItem, ResolvedPath, score, fuzzy, ranked, subsequence, DP, displayTracker, reactive, live-updates, DataUpdateType, DataPoint, GraphOrStatUpdated, tryGetTrackerByFeatureId, featureId, collectSearchableItems, scoreItem, buildResolvedPaths, walkPaths, ComponentKey, SymlinksDialog, SymlinksDialogContent, onPathClick, disambiguation]
 ---
 
 # Search Feature
 
 ## Search Data Flow
 
-`GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings, a pre-computed `List<ResolvedPath>` (see below), and (for tracker nodes) a pre-fetched `DisplayTracker`. On `hideSearch()` the list is cleared.
+`GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings, a pre-computed `List<ResolvedPath>` (see below), and the `GroupGraphItem` needed for rendering/fetching display data later. On `hideSearch()` the list is cleared and the processor cache is disposed.
 
 The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<ResolvedPath>)`. `child.groupItemId` is the list key (see [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys). `paths` is consumed by the tap handler — see "Tapping a result" below.
 
@@ -41,68 +41,53 @@ Each `ResolvedPath` bundles a `GroupDescentPath` (the navigable value — see [d
 
 Earlier versions had a separate `isSearchLoading: StateFlow<Boolean>` and a `displayResults: StateFlow<List<GroupChild>>`. That produced visibly wrong sequencing: opening search flashed a spinner (graph still loading) → empty list (graph loaded but no query) → no-results text (query typed, scoring not complete). The correct sequence is "type to search" on open, spinner only while a non-empty query is being scored, then results.
 
-### flatMapLatest for scoring, combine for cache merge
+### flatMapLatest for scoring and progressive result processing
 
 ```
 queryText (snapshotFlow of searchQuery.text)
   └─ flatMapLatest { query ->         // RxJava switchMap equivalent
-       if (query.isBlank()) flowOf(ScoredResults.Empty)
+       if (query.isBlank()) flowOf(SearchDisplayState.Empty)
        else flow {
-         emit(ScoredResults.Loading)   // immediate — before the debounce
+         emit(SearchDisplayState.Loading)  // immediate — before the debounce
          delay(150)                     // debounce inside the flow
          val items = searchState.filterIsInstance<Ready>().first().items
-         emit(ScoredResults.Done(score + sort))
+         val ranked = score + sort
+         emitAll(processor.process(ranked).map { SearchDisplayState.Results(it) })
        }
      }
-
-displayResults = combine(searchResults, graphViewDataCache) { state, cache ->
-  when (state) {
-    Empty, Loading -> matching SearchDisplayState
-    is Done        -> SearchDisplayState.Results(mapResultsToSearchItems(…, cache))
-  }
-}.stateIn(…, initial = SearchDisplayState.Empty)
 ```
 
 **Why flatMapLatest upstream:** a new query must cancel the in-flight scoring+debounce for the previous query, so only the latest query's result can ever reach the UI. Debouncing is done with `delay(150)` inside the flow (not an upstream `.debounce()`) because we want `Loading` to be emitted *before* the delay — the UI flips to the spinner on the first keystroke without waiting 150 ms.
 
-**Why plain `combine` for the cache merge (and not a second flatMapLatest):** once a `ScoredResults.Done` reaches this stage it's already the latest by construction (upstream flatMapLatest guarantees it). The only reason to re-evaluate is `graphViewDataCache` updating as background graph calculations complete. There's no suspending or cancellable work inside the merge that benefits from switchMap-style cancellation — `mapResultsToGroupChildren` is a plain function. An earlier revision used `flatMapLatest { state -> graphViewDataCache.map { … } }` for symmetry, but that added complexity without changing observable behavior.
-
-The intermediate `ScoredResults` sealed type (Empty/Loading/Done) is internal to the ViewModel. The public `SearchDisplayState` only has what the UI needs. Keeping them separate means the "still needs cache-merging" step is visible in the types.
+`SearchResultProcessor.process(ranked)` also runs inside the `flatMapLatest` body. It returns a `Flow<List<SearchResultItem>>`, so a new query cancels both the previous query's scoring and its in-flight result population/listener work. The public `SearchDisplayState` only has what the UI needs: `Empty`, `Loading`, or `Results(items)`.
 
 ## Why a Flat List (not re-traversing the tree)
 
 The group graph tree structure is only needed once (to build the flat list). Re-traversing the tree on every debounced keystroke is wasted work — flattening up-front means each keystroke is a simple linear scan of the list. The flat list is also the snapshot that supports the "no structural changes while open" behaviour described under "Live updates" below — paths, set of items, and names are frozen at `showSearch()` time.
 
-## Tracker display state — seed once, refresh targetedly
+## Tracker and graph display state — processor-owned cache
 
-`SearchableItem` is a structural snapshot — it carries the component's `name`, `description`, `paths`, `typeBonus`, and (for tracker nodes) the tracker's `featureId`. It does NOT carry a `DisplayTracker`; that lives in a separate `MutableStateFlow<Map<Long, DisplayTracker>> trackerDataMap` keyed by `tracker.id`, plumbed into the `displayResults` combine alongside `searchResults` and `graphViewDataCache`.
+`SearchableItem` is a structural snapshot — it carries the component's `name`, `description`, `paths`, `typeBonus`, and `GroupGraphItem`. It does NOT carry a `DisplayTracker` or calculated graph view data. After scoring, each hit is converted into a `RankedItem` and handed to `SearchResultProcessor`.
 
-On `showSearch()`:
+`SearchResultProcessor` owns the per-session display-data cache. The first processor emission renders the full ranked list immediately, using cache hits where available and loading placeholders for missing trackers/graphs. It then processes missing data in rank-order batches (`BATCH_SIZE = 12`): trackers in the batch are fetched first and emitted, then graphs are calculated and emitted. This keeps the first visible results ahead of lower-ranked work and avoids a slow graph blocking tracker cards in the same batch.
 
-1. The `GroupGraph` is fetched once and walked to build the flat `SearchableItem` list (paths + structure).
-2. A `featureId → tracker.id` map is precomputed from the items so the event handler doesn't have to scan on every event.
-3. `trackerDataMap` is seeded by issuing one `dataInteractor.tryGetTrackerByFeatureId(featureId)` per tracker concurrently and awaiting them all. Seeding happens BEFORE `searchState` flips to `Ready`, so `mapTracker` never sees a Ready scored result with an empty tracker map (which would emit tracker-less results for one frame).
-4. Two long-lived subscription jobs start (see next section).
-
-On `hideSearch()`: both jobs are cancelled, `trackerDataMap` and the precomputed map are cleared, and `graphViewDataCache` is reset.
+On `hideSearch()`, `processor.dispose()` clears this cache. Repeated queries during the same open search can reuse completed tracker/graph data, but closing search releases that memory.
 
 ## Live updates to tracker and graph display data
 
-While search is open, two jobs subscribe to `dataInteractor.getDataUpdateEvents()`:
+While the processor flow for a non-empty query is active, it subscribes to `dataInteractor.getDataUpdateEvents()` immediately after emitting the initial placeholder list. This listener runs concurrently with the initial rank-order batch population:
 
-- **`trackerEventsJob`** filters `DataUpdateType.DataPoint`. On each event, the precomputed `featureId → trackerId` map is consulted. If the featureId belongs to a searchable tracker, `tryGetTrackerByFeatureId` is called once and the single entry is `update`-merged into `trackerDataMap`. Other items are untouched. The `combine` then re-fires and `mapTracker` sees the fresh `DisplayTracker` — the tracker card's last-value/timestamp/timer state updates in place.
+- `DataUpdateType.DataPoint` and `DataUpdateType.TrackerUpdated` refresh the matching tracker by `featureId`, update the processor cache, replace that one list item, and re-emit the current list.
 
-- **`graphEventsJob`** filters `DataUpdateType.GraphOrStatUpdated`. On each event, the matching `GraphNode` is found in the snapshot list; the cache entry for `event.graphStatId` is removed from `graphViewDataCache.value` and `launchGraphCalculations(listOf(node))` is invoked directly. The combine re-fires from the cache change; `mapGraph` finds the entry missing and renders the loading placeholder until the calculation completes and writes the new entry.
+- `DataUpdateType.GraphOrStatUpdated` invalidates the matching graph cache entry, emits the graph loading placeholder for that item, recalculates its view data, then replaces that one list item and re-emits.
 
 The graph job deliberately does NOT listen for `DataPoint`. The data layer already fans data-point writes out to one `GraphOrStatUpdated(graphStatId)` per dependent graph via `DependencyAnalyser`, so subscribing to `DataPoint` here would duplicate work. See [helper-classes.md](helper-classes.md#data-point-writes-fan-out-to-graphorstatupdated-via-dependencyanalyser) for the fan-out contract.
 
+Because event listening overlaps with initial batch work, the cache tracks a simple version per tracker/graph. Initial batch work captures the version before it starts; event invalidation increments the version. A completed batch result is only applied if the version is still current, preventing stale work from overwriting a fresher event-triggered refresh.
+
 ### Structural changes are intentionally ignored while search is open
 
-New / deleted / renamed components, new symlinks, group renames — none of these are observed during an open session. The `SearchableItem` list (paths, names, item set) is a snapshot taken at `showSearch()` time. The user closes and re-opens search to pick up structural changes. This keeps the implementation small (no path-rebuilding, no fuzzy-score re-ranking on structural events) and matches the "search is a transient overlay" interaction model. `TrackerUpdated` events (rename / unit change) carry no id so they cannot be applied targetedly with the current event shape — they are ignored along with the rest.
-
-### Why the trackerDataMap must be a flow into the combine, not a `.value` read
-
-The combine has three sources: `searchResults`, `graphViewDataCache`, `trackerDataMap`. If `mapTracker` instead read `trackerDataMap.value` inside the closure of a two-source `combine(searchResults, graphViewDataCache)`, the combine would not re-fire when only the tracker map changed, and the tracker card would not update on a `+` tap. Three-way `combine` is the correct shape; it was the original design mistake of the previous iteration to leave the tracker data inside `SearchableItem`.
+New / deleted / renamed components, new symlinks, group renames — none of these are observed during an open session. The `SearchableItem` list (paths, names, item set) is a snapshot taken at `showSearch()` time. The user closes and re-opens search to pick up structural changes. This keeps the implementation small (no path-rebuilding, no fuzzy-score re-ranking on structural events) and matches the "search is a transient overlay" interaction model. `TrackerUpdated` is targeted by `featureId` when available; other structural updates still require closing and reopening search.
 
 ## FuzzyMatcher
 
