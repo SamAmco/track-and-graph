@@ -40,7 +40,10 @@ import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
 import org.threeten.bp.Duration
@@ -60,6 +63,7 @@ class BarChartDataFactory @Inject constructor(
 ) : ViewDataFactory<BarChart, IBarChartViewData>(dataInteractor, dataSampler, ioDispatcher) {
 
     companion object {
+        private const val CANCELLATION_CHECK_INTERVAL = 128
 
         @VisibleForTesting
         data class BarData(
@@ -107,12 +111,14 @@ class BarChartDataFactory @Inject constructor(
             sumByCount: Boolean,
             yRangeType: YRangeType,
             yTo: Double,
-            scale: Double
+            scale: Double,
+            checkCancellation: () -> Unit = {},
         ): BarData {
             val barDates = mutableListOf<ZonedDateTime>()
             val barValuesByLabel = mutableMapOf<String, MutableList<Double>>()
             val iterator = dataSample.iterator()
             val barPeriod = barSize.asTemporalAmount()
+            var dataPointCount = 0
 
             //Some variables we will calculate as soon as we have the first data point
             // and use to iterate backwards from the end time grouping the data points into bars
@@ -123,8 +129,10 @@ class BarChartDataFactory @Inject constructor(
 
             //Then count backwards from the last end time to the start time of the duration
             while (iterator.hasNext()) {
+                if (dataPointCount % CANCELLATION_CHECK_INTERVAL == 0) checkCancellation()
                 //Grab the next data point to be placed
                 val next = iterator.next()
+                dataPointCount++
                 val timestamp = timeHelper.toZonedDateTime(next.timestamp)
 
                 //If we were passed a null end time find the end time of the first data point
@@ -145,6 +153,7 @@ class BarChartDataFactory @Inject constructor(
                 if (endTimeMinusDuration != null && timestamp.isBefore(endTimeMinusDuration)) break
 
                 while (timestamp.isBefore(currentBarStartTime)) {
+                    checkCancellation()
                     //we have reached the end of the current bar, so we need to move to the next one
                     currentBarEndTime = currentBarEndTime!!.minus(barPeriod)
                     currentBarStartTime = timeHelper.findBeginningOfTemporal(currentBarEndTime, barPeriod)
@@ -164,6 +173,7 @@ class BarChartDataFactory @Inject constructor(
                 //Add the value to the double in the list
                 values[values.size - 1] += if (sumByCount) 1.0 else next.value
             }
+            checkCancellation()
 
             //Multiply all values by scale
             barValuesByLabel.forEach { (_, u) ->
@@ -236,12 +246,13 @@ class BarChartDataFactory @Inject constructor(
         val yAxisSubdivides: Int,
     )
 
-    private fun getBarDataWithYAxisParams(
+    private suspend fun getBarDataWithYAxisParams(
         timeHelper: TimeHelper,
         dataSample: DataSample,
         endTime: ZonedDateTime?,
         config: BarChart
     ): BarDataWithYAxisParams {
+        val coroutineContext = currentCoroutineContext()
 
         val barData = getBarData(
             timeHelper = timeHelper,
@@ -252,7 +263,8 @@ class BarChartDataFactory @Inject constructor(
             sumByCount = config.sumByCount,
             yRangeType = config.yRangeType,
             yTo = config.yTo,
-            scale = config.scale
+            scale = config.scale,
+            checkCancellation = { coroutineContext.ensureActive() },
         )
 
         val yAxisParameters = dataDisplayIntervalHelper.getYParameters(
@@ -315,6 +327,7 @@ class BarChartDataFactory @Inject constructor(
                 override val barPeriod = config.barPeriod.asTemporalAmount()
             }
         } catch (t: Throwable) {
+            if (t is CancellationException) throw t
             Timber.d(t, "Error creating bar chart data")
             return object : IBarChartViewData {
                 override val state = IGraphStatViewData.State.ERROR

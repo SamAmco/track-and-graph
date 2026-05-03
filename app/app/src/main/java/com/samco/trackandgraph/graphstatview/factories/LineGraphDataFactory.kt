@@ -54,7 +54,10 @@ import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.movingAverageDurations
 import com.samco.trackandgraph.plottingModePeriods
 import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -122,6 +125,7 @@ class LineGraphDataFactory @Inject constructor(
                 override val yAxisSubdivides = yAxisParameters
             }
         } catch (throwable: Throwable) {
+            if (throwable is CancellationException) throw throwable
             throwable.printStackTrace()
             return@withContext object : ILineGraphViewData {
                 override val state = IGraphStatViewData.State.ERROR
@@ -170,14 +174,16 @@ class LineGraphDataFactory @Inject constructor(
         ?: OffsetDateTime.now()
 
         //Generate the actual plotting data for each sample.
+        val coroutineContext = currentCoroutineContext()
         val features = dataSamples.map { pair ->
+            coroutineContext.ensureActive()
             val feature = pair.first
             val clippedSample = DataClippingFunction(endTime, lineGraph.sampleSize)
                 .mapSample(pair.second)
 
             //Calling toList on the data sample evaluates it and causes the whole pipeline
             // to be processed
-            val dataPoints = clippedSample.toList().asReversed()
+            val dataPoints = clippedSample.toListCancellable().asReversed()
 
             val series = if (dataPoints.size >= 2) {
                 getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
@@ -191,9 +197,10 @@ class LineGraphDataFactory @Inject constructor(
             )
         }
 
-        val rawDataPoints = dataSamples
-            .map { it.second.getRawDataPoints() }
-            .flatten()
+        val rawDataPoints = dataSamples.flatMap {
+            coroutineContext.ensureActive()
+            it.second.getRawDataPoints()
+        }
 
         onDataSampled(rawDataPoints)
 
@@ -238,7 +245,7 @@ class LineGraphDataFactory @Inject constructor(
         else dataPeekIterator.next().timestamp
     }
 
-    private fun getXYSeriesFromDataPoints(
+    private suspend fun getXYSeriesFromDataPoints(
         dataSample: List<IDataPoint>,
         endTime: OffsetDateTime,
         lineGraphFeature: LineGraphFeature
@@ -251,12 +258,15 @@ class LineGraphDataFactory @Inject constructor(
             else -> 1.0
         }
 
-        val yValues = dataSample.map { dp ->
-            (dp.value * scale / durationDivisor) + offset
+        val coroutineContext = currentCoroutineContext()
+        val yValues = ArrayList<Number>(dataSample.size)
+        val xValues = ArrayList<Number>(dataSample.size)
+        dataSample.forEachIndexed { index, dp ->
+            if (index % CANCELLATION_CHECK_INTERVAL == 0) coroutineContext.ensureActive()
+            yValues.add((dp.value * scale / durationDivisor) + offset)
+            xValues.add(Duration.between(endTime, dp.timestamp).toMillis())
         }
-        val xValues = dataSample.map { dp ->
-            Duration.between(endTime, dp.timestamp).toMillis()
-        }
+        coroutineContext.ensureActive()
 
         return androidPlotSeriesHelper.getFastXYSeries(
             name = lineGraphFeature.name,
@@ -293,5 +303,23 @@ class LineGraphDataFactory @Inject constructor(
         bounds.maxY = parameters.boundsMax
 
         return YAxisParams(bounds, parameters.subdivides)
+    }
+
+    private suspend fun DataSample.toListCancellable(): List<IDataPoint> {
+        val coroutineContext = currentCoroutineContext()
+        val result = mutableListOf<IDataPoint>()
+        val iterator = iterator()
+        var index = 0
+        while (iterator.hasNext()) {
+            if (index % CANCELLATION_CHECK_INTERVAL == 0) coroutineContext.ensureActive()
+            result.add(iterator.next())
+            index++
+        }
+        coroutineContext.ensureActive()
+        return result
+    }
+
+    companion object {
+        private const val CANCELLATION_CHECK_INTERVAL = 128
     }
 }
