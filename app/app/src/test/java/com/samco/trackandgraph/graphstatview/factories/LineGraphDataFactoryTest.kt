@@ -30,8 +30,10 @@ import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
+import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.data.sampling.DataSampler
+import com.samco.trackandgraph.fixtures.testLineGraphFeature
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import junit.framework.TestCase.assertEquals
@@ -43,6 +45,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.threeten.bp.DayOfWeek
@@ -151,6 +154,45 @@ class LineGraphDataFactoryTest {
         assertEquals(expectedEnd, lineGraphViewData.endTime)
         
         verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
+    fun `line graph still renders non-lua data when lua is disabled`() = runTest {
+        val now = OffsetDateTime.now()
+        val graphOrStat = GraphOrStat(
+            id = 1L,
+            name = "Graph",
+            type = GraphStatType.LINE_GRAPH,
+            unique = true,
+        )
+        val lineGraphWithFeatures = LineGraphWithFeatures(
+            id = 1L,
+            graphStatId = 1L,
+            features = listOf(testLineGraphFeature(featureId = 1L)),
+            sampleSize = null,
+            yRangeType = YRangeType.DYNAMIC,
+            yFrom = 0.0,
+            yTo = 100.0,
+            endDate = GraphEndDate.Latest,
+        )
+
+        whenever(luaEngine.acquireVM()).thenAnswer { throw LuaEngineDisabledException() }
+        whenever(dataInteractor.getLineGraphByGraphStatId(1L))
+            .thenReturn(lineGraphWithFeatures)
+        whenever(dataSampler.getDataSampleForFeatureId(1L, null))
+            .thenReturn(
+                DataSample.fromSequence(
+                    onDispose = {},
+                    data = sequenceOf(1, 2, 3).map { dpDaysAgo(it, now) }
+                )
+            )
+
+        val lineGraphViewData = uut().getViewData(graphOrStat)
+
+        assertEquals(1, lineGraphViewData.lines.size)
+        assertEquals(3, lineGraphViewData.lines[0].line?.size())
+        verify(dataSampler).getDataSampleForFeatureId(1L, null)
+        verify(luaEngine, never()).releaseVM(any())
     }
 
     private fun dpDaysAgo(

@@ -87,7 +87,7 @@ class LineGraphDataFactory @Inject constructor(
         val disposables = Collections.synchronizedList(mutableListOf<DataSample>())
         var vmLock: LuaVMLock? = null
         try {
-            vmLock = luaEngine.acquireVM()
+            vmLock = acquireLuaVMIfAvailable()
             val dataSamples = config.features.map { lgf ->
                 val dataSample = dataSampler.getDataSampleForFeatureId(
                     featureId = lgf.featureId,
@@ -139,6 +139,14 @@ class LineGraphDataFactory @Inject constructor(
         } finally {
             disposables.forEach { it.dispose() }
             vmLock?.let { luaEngine.releaseVM(it) }
+        }
+    }
+
+    private suspend fun acquireLuaVMIfAvailable(): LuaVMLock? {
+        return try {
+            luaEngine.acquireVM()
+        } catch (throwable: LuaEngineDisabledException) {
+            null
         }
     }
 
