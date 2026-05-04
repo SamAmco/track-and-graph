@@ -16,9 +16,11 @@
  */
 package com.samco.trackandgraph.featurehistory
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,10 +31,13 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -121,6 +126,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     val dataPointInfo by viewModel.showDataPointInfo.observeAsState()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val isMultiSelectMode by viewModel.isMultiSelectMode.collectAsStateWithLifecycle()
+    val isSearchVisible by viewModel.isSearchVisible.collectAsStateWithLifecycle()
     val selectedDataPoints by viewModel.selectedDataPoints.collectAsStateWithLifecycle()
     val showDeleteConfirmDialog by viewModel.showDeleteConfirmDialog.observeAsState(false)
     val showDeleteSelectedConfirmDialog by viewModel.showDeleteSelectedConfirmDialog.collectAsStateWithLifecycle()
@@ -132,6 +138,11 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
 
     val dataPointsCount = dateScrollData?.items?.size ?: 0
     val hasLoadedHistory = dateScrollData != null
+    val hasActiveSearchQuery = isSearchVisible && viewModel.searchQuery.text.isNotBlank()
+
+    if (isSearchVisible) {
+        BackHandler(onBack = viewModel::hideSearch)
+    }
 
     TopAppBarContent(
         navArgs = navArgs,
@@ -139,9 +150,12 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         dataPointsCount = dataPointsCount,
         isTracker = isTracker,
         isMultiSelectMode = isMultiSelectMode,
+        isSearchVisible = isSearchVisible,
         selectedCount = selectedDataPoints.size,
         showFab = showFab,
+        viewModel = viewModel,
         onInfoClick = viewModel::onShowFeatureInfo,
+        onSearchClick = viewModel::showSearch,
         onUpdateClick = viewModel::showUpdateAllDialog,
         onSelectAll = viewModel::selectAllDataPoints,
         onDeselectAll = viewModel::deselectAllDataPoints,
@@ -155,14 +169,19 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         isTracker = isTracker,
         isMultiSelectMode = isMultiSelectMode,
         selectedDataPoints = selectedDataPoints,
-        showTrackFab = showFab.value && isTracker && !isMultiSelectMode,
+        showTrackFab = showFab.value && isTracker && !isMultiSelectMode && !isSearchVisible,
+        isSearchResult = hasActiveSearchQuery,
         errorMessage = when {
             error is LuaEngineDisabledException -> stringResource(R.string.lua_engine_disabled)
             error != null -> error?.message ?: ""
             else -> null
         },
         onDataPointClick = viewModel::onDataPointClicked,
-        onDataPointLongPress = viewModel::onDataPointLongPressed,
+        onDataPointLongPress = if (isSearchVisible) {
+            { _ -> }
+        } else {
+            viewModel::onDataPointLongPressed
+        },
         onDataPointSelected = viewModel::onDataPointSelected,
         onEditClick = { dataPoint ->
             viewModel.tracker.value?.let { tracker ->
@@ -276,9 +295,12 @@ private fun TopAppBarContent(
     dataPointsCount: Int,
     isTracker: Boolean,
     isMultiSelectMode: Boolean,
+    isSearchVisible: Boolean,
     selectedCount: Int,
     showFab: MutableState<Boolean>,
+    viewModel: FeatureHistoryViewModel,
     onInfoClick: () -> Unit,
+    onSearchClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onSelectAll: () -> Unit,
     onDeselectAll: () -> Unit,
@@ -300,7 +322,10 @@ private fun TopAppBarContent(
     val actions: @Composable RowScope.() -> Unit = remember(
         isTracker,
         isMultiSelectMode,
+        isSearchVisible,
+        viewModel,
         onInfoClick,
+        onSearchClick,
         onUpdateClick,
         onSelectAll,
         onDeselectAll,
@@ -326,11 +351,26 @@ private fun TopAppBarContent(
                         contentDescription = stringResource(id = R.string.cancel)
                     )
                 }
+            } else if (isSearchVisible) {
+                if (viewModel.searchQuery.text.isNotEmpty()) {
+                    IconButton(onClick = { viewModel.searchQuery.clearText() }) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = null,
+                        )
+                    }
+                }
             } else {
                 IconButton(onClick = onInfoClick) {
                     Icon(
                         painter = painterResource(id = R.drawable.about_icon),
                         contentDescription = stringResource(id = R.string.info)
+                    )
+                }
+                IconButton(onClick = onSearchClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.search_icon),
+                        contentDescription = stringResource(id = R.string.search)
                     )
                 }
                 if (isTracker) {
@@ -353,7 +393,9 @@ private fun TopAppBarContent(
             subtitle = subtitle,
             actions = actions,
             nestedScrollConnection = nestedScrollConnection,
-            appBarPinned = appBarPinned,
+            appBarPinned = appBarPinned || isSearchVisible,
+            searchBarText = if (isSearchVisible) viewModel.searchQuery else null,
+            overrideBackNavigationAction = if (isSearchVisible) viewModel::hideSearch else null,
         )
     )
 }
@@ -366,6 +408,7 @@ private fun FeatureHistoryView(
     isMultiSelectMode: Boolean = false,
     selectedDataPoints: Set<DataPointInfo> = emptySet(),
     showTrackFab: Boolean = false,
+    isSearchResult: Boolean = false,
     errorMessage: String? = null,
     offsetDiffHours: Int? = null,
     onDataPointClick: (DataPointInfo) -> Unit = {},
@@ -381,7 +424,19 @@ private fun FeatureHistoryView(
     Box(modifier = Modifier.fillMaxSize()) {
         when {
             dateScrollData != null && dateScrollData.items.isEmpty() -> {
-                EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                ) {
+                    EmptyScreenText(
+                        textId = if (isSearchResult) {
+                            R.string.no_results
+                        } else {
+                            R.string.no_data_points_history_fragment_hint
+                        }
+                    )
+                }
             }
 
             dateScrollData != null -> {

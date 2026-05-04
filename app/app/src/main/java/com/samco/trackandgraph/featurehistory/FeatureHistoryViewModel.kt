@@ -18,6 +18,9 @@
 
 package com.samco.trackandgraph.featurehistory
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
@@ -30,6 +33,7 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.sampling.RawDataSample
+import com.samco.trackandgraph.helpers.getDisplayValue
 import com.samco.trackandgraph.ui.compose.ui.Datable
 import com.samco.trackandgraph.ui.compose.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.compose.ui.DateScrollData
@@ -81,6 +85,8 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     val showDeleteConfirmDialog: LiveData<Boolean>
     val showUpdateDialog: LiveData<Boolean>
     val error: StateFlow<Exception?>
+    val isSearchVisible: StateFlow<Boolean>
+    val searchQuery: TextFieldState
 
     // Multi-select state
     val isMultiSelectMode: StateFlow<Boolean>
@@ -97,6 +103,8 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
     fun onDismissDataPoint()
     fun onShowFeatureInfo()
     fun onHideFeatureInfo()
+    fun showSearch()
+    fun hideSearch()
 
     // Multi-select functions
     fun onDataPointLongPressed(dataPoint: DataPointInfo)
@@ -125,15 +133,22 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     FeatureHistoryViewModel {
     private val featureIdFlow = MutableSharedFlow<Long>(replay = 1, extraBufferCapacity = 1)
 
+    private val _isSearchVisible = MutableStateFlow(false)
+    override val isSearchVisible: StateFlow<Boolean> = _isSearchVisible
+    override val searchQuery = TextFieldState()
+    private val queryText = snapshotFlow { searchQuery.text.toString() }
+
     private val dataUpdates = dataInteractor
         .getDataUpdateEvents()
         .map { }
         .debounce(10)
         .onStart { emit(Unit) }
 
-    override val isDuration: LiveData<Boolean> = featureIdFlow
+    private val isDurationFlow = featureIdFlow
         .map { dataSampler.getDataSamplePropertiesForFeatureId(it)?.isDuration ?: false }
         .flowOn(io)
+
+    override val isDuration: LiveData<Boolean> = isDurationFlow
         .asLiveData(viewModelScope.coroutineContext)
 
     private sealed class GetDataPointsResult {
@@ -165,12 +180,20 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         .map { it.exception }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> = getDataPointsResult
+    override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> = combine(
+        getDataPointsResult
             .flowOn(io)
-            .filterIsInstance<GetDataPointsResult.Success>()
-            .map { it.dataPoints }
-            .map { toDateScrollData(it) }
-            .asLiveData(viewModelScope.coroutineContext)
+            .filterIsInstance<GetDataPointsResult.Success>(),
+        isDurationFlow,
+        queryText,
+    ) { result, isDuration, query ->
+        val dataPoints = if (query.isBlank()) {
+            result.dataPoints
+        } else {
+            result.dataPoints.filter { it.matchesSearchQuery(query, isDuration) }
+        }
+        toDateScrollData(dataPoints)
+    }.asLiveData(viewModelScope.coroutineContext)
 
     private val showFeatureInfoFlow = MutableStateFlow(false)
 
@@ -254,6 +277,15 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     override fun onHideFeatureInfo() {
         showFeatureInfoFlow.value = false
+    }
+
+    override fun showSearch() {
+        _isSearchVisible.value = true
+    }
+
+    override fun hideSearch() {
+        _isSearchVisible.value = false
+        searchQuery.clearText()
     }
 
     // Multi-select functions
@@ -393,4 +425,24 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         label = dp.label,
         note = dp.note,
     )
+
+    private fun DataPointInfo.matchesSearchQuery(query: String, isDuration: Boolean): Boolean {
+        val dataPoint = toDataPoint()
+        return searchTargets(dataPoint, isDuration).any { it.contains(query, ignoreCase = true) }
+    }
+
+    private fun searchTargets(dataPoint: DataPoint, isDuration: Boolean): List<String> {
+        val displayValue = dataPoint.getDisplayValue(isDuration)
+        return buildList {
+            add(displayValue)
+            addAll(decimalSeparatorVariants(displayValue))
+            add(dataPoint.label)
+            add(dataPoint.note)
+        }
+    }
+
+    private fun decimalSeparatorVariants(value: String): List<String> = buildList {
+        if (',' in value) add(value.replace(',', '.'))
+        if ('.' in value) add(value.replace('.', ','))
+    }
 }
