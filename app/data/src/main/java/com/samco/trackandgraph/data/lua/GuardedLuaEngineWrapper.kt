@@ -38,8 +38,7 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
     }
 
     override fun releaseVM(vmLock: LuaVMLock) {
-        if (luaEngineSwitch.enabled) return luaEngine.releaseVM(vmLock)
-        throw LuaEngineDisabledException()
+        luaEngine.releaseVM(vmLock)
     }
 
     override fun runLuaGraph(
