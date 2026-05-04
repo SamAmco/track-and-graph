@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
@@ -58,38 +59,42 @@ private fun TimeBasedRangeInputs(
     viewModel: YRangeConfigBehaviour,
     fromEnabled: Boolean,
     toText: String
-) = Column(
-    modifier = Modifier
-        .padding(horizontal = cardPadding)
-        .fillMaxWidth(),
-    horizontalAlignment = Alignment.CenterHorizontally
 ) {
+    val focusManager = LocalFocusManager.current
 
-    if (fromEnabled) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = cardPadding)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        if (fromEnabled) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(id = R.string.from),
+                    style = MaterialTheme.typography.titleSmall
+                )
+
+                Spacer(modifier = Modifier.width(dialogInputSpacing))
+
+                DurationInput(
+                    viewModel = viewModel.yRangeFromDurationViewModel,
+                    onNextOverride = { focusManager.moveFocus(FocusDirection.Down) },
+                )
+            }
+        }
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = stringResource(id = R.string.from),
+                text = toText,
                 style = MaterialTheme.typography.titleSmall
             )
 
             Spacer(modifier = Modifier.width(dialogInputSpacing))
 
-            DurationInput(
-                viewModel = viewModel.yRangeFromDurationViewModel,
-                nextFocusDirection = FocusDirection.Down,
-            )
+            DurationInput(viewModel = viewModel.yRangeToDurationViewModel)
         }
-    }
-
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = toText,
-            style = MaterialTheme.typography.titleSmall
-        )
-
-        Spacer(modifier = Modifier.width(dialogInputSpacing))
-
-        DurationInput(viewModel = viewModel.yRangeToDurationViewModel)
     }
 }
 

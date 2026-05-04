@@ -347,7 +347,10 @@ internal fun TrackerPageView(
                         onMinutesChanged = callbacks::onMinutesChanged,
                         onSecondsChanged = callbacks::onSecondsChanged,
                         focusManager = focusManager,
-                        nextFocusDirection = FocusDirection.Down,
+                        onNextOverride = {
+                            if (labelFieldAdded || noteFieldAdded) focusManager.moveFocus(FocusDirection.Down)
+                            else callbacks.onAddDataPoint()
+                        },
                         focusRequester = if (shouldFocusValue) valueFocusRequester else null
                     )
                     if (!state.isUpdateMode) {

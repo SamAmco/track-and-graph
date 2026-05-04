@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -59,7 +58,7 @@ fun DurationInput(
     modifier: Modifier = Modifier,
     viewModel: DurationInputViewModel,
     focusManager: FocusManager = LocalFocusManager.current,
-    nextFocusDirection: FocusDirection? = null,
+    onNextOverride: (() -> Unit)? = null,
     focusRequester: FocusRequester? = null
 ) = DurationInputView(
     modifier = modifier,
@@ -70,7 +69,7 @@ fun DurationInput(
     onMinutesChanged = { viewModel.setMinutesText(it) },
     onSecondsChanged = { viewModel.setSecondsText(it) },
     focusManager = focusManager,
-    nextFocusDirection = nextFocusDirection,
+    onNextOverride = onNextOverride,
     focusRequester = focusRequester
 )
 
@@ -85,7 +84,7 @@ fun DurationInputView(
     onMinutesChanged: (TextFieldValue) -> Unit,
     onSecondsChanged: (TextFieldValue) -> Unit,
     focusManager: FocusManager = LocalFocusManager.current,
-    nextFocusDirection: FocusDirection? = null,
+    onNextOverride: (() -> Unit)? = null,
     focusRequester: FocusRequester? = null
 ) = Row(
     modifier = modifier
@@ -130,7 +129,7 @@ fun DurationInputView(
         suffix = stringResource(id = R.string.seconds_suffix),
         charLimit = 3,
         focusManager = focusManager,
-        overrideFocusDirection = nextFocusDirection
+        onNextOverride = onNextOverride
     )
 }
 
@@ -143,7 +142,7 @@ private fun RowScope.DurationInputComponent(
     suffix: String,
     charLimit: Int,
     focusManager: FocusManager,
-    overrideFocusDirection: FocusDirection? = null,
+    onNextOverride: (() -> Unit)? = null,
     focusRequester: FocusRequester? = null
 ) {
     MiniNumericTextField(
@@ -154,7 +153,7 @@ private fun RowScope.DurationInputComponent(
         onValueChange = onValueChange,
         charLimit = charLimit,
         focusManager = focusManager,
-        overrideFocusDirection = overrideFocusDirection,
+        onNextOverride = onNextOverride,
         focusRequester = focusRequester
     )
 
@@ -166,4 +165,3 @@ private fun RowScope.DurationInputComponent(
             .alignByBaseline()
     )
 }
-

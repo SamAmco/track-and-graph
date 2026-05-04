@@ -60,7 +60,7 @@ fun MiniNumericTextField(
     charLimit: Int? = null,
     textAlign: TextAlign = TextAlign.End,
     focusManager: FocusManager = LocalFocusManager.current,
-    overrideFocusDirection: FocusDirection? = null,
+    onNextOverride: (() -> Unit)? = null,
     focusRequester: FocusRequester? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     focusUpdateScope: CoroutineScope = rememberCoroutineScope(),
@@ -81,9 +81,11 @@ fun MiniNumericTextField(
         interactionSource = interactionSource,
         keyboardActions = KeyboardActions(
             onNext = {
-                focusManager.moveFocus(
-                    overrideFocusDirection ?: FocusDirection.Right
-                )
+                if (onNextOverride != null) {
+                    onNextOverride()
+                } else {
+                    focusManager.moveFocus(FocusDirection.Right)
+                }
             }
         ),
         singleLine = true,
