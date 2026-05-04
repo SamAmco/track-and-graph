@@ -24,13 +24,17 @@ import com.samco.trackandgraph.data.database.dto.CreatedComponent
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
+import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.LineGraphConfig
+import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
 import com.samco.trackandgraph.data.database.dto.TrackerUpdateRequest
+import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
@@ -211,6 +215,48 @@ class DataInteractorImplTest {
         verify(groupItemDao).shiftDisplayIndexesDown(2L)
         verify(groupItemDao).insertGroupItem(any())
     }
+
+    @Test
+    fun `createLineGraph emits graph created then display index after helper creates placement`() =
+        runTest {
+            //PREPARE
+            val request = LineGraphCreateRequest(
+                name = "New graph",
+                groupId = 7L,
+                config = LineGraphConfig(
+                    features = emptyList(),
+                    sampleSize = null,
+                    yRangeType = YRangeType.DYNAMIC,
+                    yFrom = 0.0,
+                    yTo = 0.0,
+                    endDate = GraphEndDate.Latest,
+                )
+            )
+            val created = CreatedComponent(componentId = 42L, groupItemId = 99L)
+            val events = mutableListOf<DataUpdateType>()
+            val collectJob = launch(testDispatcher) {
+                uut.getDataUpdateEvents().collect { events.add(it) }
+            }
+
+            whenever(graphHelper.createLineGraph(eq(request))).thenReturn(created)
+            yield()
+
+            //EXECUTE
+            val result = uut.createLineGraph(request)
+
+            //VERIFY
+            assertEquals(created, result)
+            assertEquals(
+                listOf(
+                    DataUpdateType.GraphOrStatCreated(42L),
+                    DataUpdateType.DisplayIndex(7L),
+                ),
+                events
+            )
+            verify(graphHelper).createLineGraph(eq(request))
+            verify(groupItemDao, never()).shiftDisplayIndexesDown(any())
+            collectJob.cancel()
+        }
 
     @Test
     fun `moveComponent does nothing when groupItem does not exist`() = runTest {

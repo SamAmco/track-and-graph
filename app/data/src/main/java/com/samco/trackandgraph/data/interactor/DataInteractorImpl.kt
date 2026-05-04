@@ -376,52 +376,38 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun createLineGraph(request: LineGraphCreateRequest): CreatedComponent =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(request.groupId)
+        emitGraphCreatedAndDisplayIndex(request.groupId) {
             graphHelper.createLineGraph(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun createPieChart(request: PieChartCreateRequest): CreatedComponent =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(request.groupId)
+        emitGraphCreatedAndDisplayIndex(request.groupId) {
             graphHelper.createPieChart(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun createAverageTimeBetweenStat(request: AverageTimeBetweenStatCreateRequest): CreatedComponent =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(request.groupId)
+        emitGraphCreatedAndDisplayIndex(request.groupId) {
             graphHelper.createAverageTimeBetweenStat(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun createTimeHistogram(request: TimeHistogramCreateRequest): CreatedComponent =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(request.groupId)
+        emitGraphCreatedAndDisplayIndex(request.groupId) {
             graphHelper.createTimeHistogram(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun createLastValueStat(request: LastValueStatCreateRequest): CreatedComponent =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(request.groupId)
+        emitGraphCreatedAndDisplayIndex(request.groupId) {
             graphHelper.createLastValueStat(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun createBarChart(request: BarChartCreateRequest): CreatedComponent =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(request.groupId)
+        emitGraphCreatedAndDisplayIndex(request.groupId) {
             graphHelper.createBarChart(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun createLuaGraph(request: LuaGraphCreateRequest): CreatedComponent =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(request.groupId)
+        emitGraphCreatedAndDisplayIndex(request.groupId) {
             graphHelper.createLuaGraph(request)
-                .also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId)) }
         }
 
     override suspend fun updateLineGraph(request: LineGraphUpdateRequest) = withContext(io) {
@@ -485,10 +471,15 @@ internal class DataInteractorImpl @Inject constructor(
             .also { updateType?.let { dataUpdateEvents.emit(it) } }
     }
 
-    private suspend fun shiftUpGroupChildIndexes(groupId: Long) =
-        performAtomicUpdate(DataUpdateType.DisplayIndex(groupId)) {
-            groupItemDao.shiftDisplayIndexesDown(groupId)
+    private suspend fun emitGraphCreatedAndDisplayIndex(
+        groupId: Long,
+        create: suspend () -> CreatedComponent
+    ): CreatedComponent = withContext(io) {
+        create().also {
+            dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(it.componentId))
+            dataUpdateEvents.emit(DataUpdateType.DisplayIndex(groupId))
         }
+    }
 
     // =========================================================================
     // Other DataInteractor methods
