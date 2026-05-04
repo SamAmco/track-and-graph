@@ -117,14 +117,19 @@ fun <T : Datable> DateScrollLazyColumn(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     data: DateScrollData<T>,
+    topContent: (@Composable LazyItemScope.() -> Unit)? = null,
     content: @Composable LazyItemScope.(item: T) -> Unit
 ) = Box(modifier = modifier) {
     val scrollState = rememberLazyListState()
+    val topItemCount = if (topContent == null) 0 else 1
 
     LazyColumn(
         contentPadding = contentPadding,
         state = scrollState
-    ) { items(data.items) { content(it) } }
+    ) {
+        topContent?.let { item { it() } }
+        items(data.items) { content(it) }
+    }
 
     val minItemsMet = remember(data.items) { data.items.size >= 50 }
     val isDragging = remember { mutableStateOf(false) }
@@ -144,7 +149,7 @@ fun <T : Datable> DateScrollLazyColumn(
         snapshotFlow { scrollToIndex.intValue }
             .filter { isDragging.value }
             .debounce(100)
-            .collect { scrollState.scrollToItem(it) }
+            .collect { scrollState.scrollToItem(it + topItemCount) }
     }
 
     val localInspectionMode = LocalInspectionMode.current
@@ -214,6 +219,7 @@ fun <T : Datable> DateScrollLazyColumn(
         ScrollBarCanvas(
             data = data,
             scrollState = scrollState,
+            topItemCount = topItemCount,
             isDragging = isDragging,
             scrollToIndex = scrollToIndex
         )
@@ -224,6 +230,7 @@ fun <T : Datable> DateScrollLazyColumn(
 private fun <T : Datable> ScrollBarCanvas(
     data: DateScrollData<T>,
     scrollState: LazyListState,
+    topItemCount: Int,
     isDragging: MutableState<Boolean>,
     scrollToIndex: MutableState<Int>
 ) {
@@ -278,13 +285,13 @@ private fun <T : Datable> ScrollBarCanvas(
                 onDragEnd = {
                     //Fixes a small glitch where the scroll bar pings back to the old position
                     // before the scroll to item gets chance to run, as it is throttled
-                    coroutineScope.launch { scrollState.scrollToItem(scrollToIndex.value) }
+                    coroutineScope.launch { scrollState.scrollToItem(scrollToIndex.value + topItemCount) }
                     isDragging.value = false
                 },
                 onDragCancel = {
                     //Fixes a small glitch where the scroll bar pings back to the old position
                     // before the scroll to item gets chance to run, as it is throttled
-                    coroutineScope.launch { scrollState.scrollToItem(scrollToIndex.value) }
+                    coroutineScope.launch { scrollState.scrollToItem(scrollToIndex.value + topItemCount) }
                     isDragging.value = false
                 }
             )
@@ -312,7 +319,7 @@ private fun <T : Datable> ScrollBarCanvas(
     }
 
     val firstVisibleItem by remember {
-        derivedStateOf { scrollState.firstVisibleItemIndex }
+        derivedStateOf { (scrollState.firstVisibleItemIndex - topItemCount).coerceAtLeast(0) }
     }
 
     val visibleItemCount by remember {

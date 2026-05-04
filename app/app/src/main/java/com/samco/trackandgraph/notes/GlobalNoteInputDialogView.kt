@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,6 +34,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.mockSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
@@ -50,9 +50,9 @@ import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
-    val updateMode by viewModel.updateMode.observeAsState(false)
-    val addButtonEnabled by viewModel.addButtonEnabled.observeAsState(false)
-    val selectedDateTime by viewModel.dateTime.observeAsState(OffsetDateTime.now())
+    val updateMode by viewModel.updateMode.collectAsStateWithLifecycle()
+    val addButtonEnabled by viewModel.addButtonEnabled.collectAsStateWithLifecycle()
+    val selectedDateTime by viewModel.dateTime.collectAsStateWithLifecycle()
 
     GlobalNoteInputDialog(
         note = viewModel.note,
@@ -65,7 +65,7 @@ fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
         onConfirm = viewModel::onAddClicked
     )
 
-    if (viewModel.showConfirmCancelDialog.observeAsState(false).value) {
+    if (viewModel.showConfirmCancelDialog.collectAsStateWithLifecycle().value) {
         ContinueCancelDialog(
             onDismissRequest = viewModel::onCancelDismissed,
             onConfirm = viewModel::onCancelConfirmed,

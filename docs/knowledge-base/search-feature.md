@@ -1,6 +1,6 @@
 ---
 title: Search feature — animated top-app-bar field, TextFieldState threading, in-place screen swap, fuzzy search, and multi-path disambiguation
-description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy flat-list build on search open; ranked fuzzy matching via FuzzyMatcher; SearchResultProcessor streams progressively populated results and listens for live data updates; each SearchResultItem carries every ResolvedPath to its component so multi-path (symlinked) results open a disambiguation dialog on tap.
+description: How search entry animates the top app bar into a text field; why the query is a TextFieldState threaded from the ViewModel; the AnimatedContent contentKey trick; lazy flat-list build on search open; ranked fuzzy matching via FuzzyMatcher; SearchResultProcessor streams progressively populated results and listens for live data updates; each SearchResultItem carries every ResolvedPath to its component so multi-path (symlinked) results open a disambiguation dialog on tap; FeatureHistoryScreen uses the same top-bar search affordance but filters chronologically with the boolean matcher.
 topics:
   - GroupSearchViewModel owning a TextFieldState (not a StateFlow<String>)
   - AppBarConfig.searchBarText drives an animated top-bar title swap
@@ -19,7 +19,7 @@ topics:
   - SearchResultItem pairs a rendered GroupChild with every ResolvedPath (one per placement when ancestors are symlinked)
   - Tap handler branches on paths.size — 1 navigates directly, >1 opens SymlinksDialogContent in tap-to-navigate mode
   - SymlinksDialogContent has optional onPathClick — dual-mode dialog (info vs tap-to-navigate)
-keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCache, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, SearchableItem, SearchResultItem, RankedItem, ResolvedPath, score, fuzzy, ranked, subsequence, DP, displayTracker, reactive, live-updates, DataUpdateType, DataPoint, GraphOrStatUpdated, tryGetTrackerByFeatureId, featureId, collectSearchableItems, scoreItem, buildResolvedPaths, walkPaths, ComponentKey, SymlinksDialog, SymlinksDialogContent, onPathClick, disambiguation, cancellation, cooperative-cancellation, LineGraphDataFactory, BarChartDataFactory, LuaFunctionDataSourceAdapter]
+keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCache, SearchScreen, TextFieldState, clearText, AppBarConfig, searchBarText, AppBarSearchField, AnimatedContent, contentKey, animateContentSize, SizeTransform, appBarPinned, in-place, screen-swap, overrideBackNavigationAction, BackHandler, GroupScreen, GroupTopBar, FeatureHistoryScreen, onSearchClick, cursor-position, GroupGraph, groupItemId, debounce, FuzzyMatcher, matches, SearchableItem, SearchResultItem, RankedItem, ResolvedPath, score, fuzzy, ranked, chronological, filter, subsequence, decimal, DataPoint, getDisplayValue, DP, displayTracker, reactive, live-updates, DataUpdateType, GraphOrStatUpdated, tryGetTrackerByFeatureId, featureId, collectSearchableItems, scoreItem, buildResolvedPaths, walkPaths, ComponentKey, SymlinksDialog, SymlinksDialogContent, onPathClick, disambiguation, cancellation, cooperative-cancellation, LineGraphDataFactory, BarChartDataFactory, LuaFunctionDataSourceAdapter]
 ---
 
 # Search Feature
@@ -29,6 +29,19 @@ keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCach
 `GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings, a pre-computed `List<ResolvedPath>` (see below), and the `GroupGraphItem` needed for rendering/fetching display data later. On `hideSearch()` the list is cleared and the processor cache is disposed.
 
 The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<ResolvedPath>)`. `child.groupItemId` is the list key (see [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys). `paths` is consumed by the tap handler — see "Tapping a result" below.
+
+## Feature History Search
+
+`FeatureHistoryScreen` reuses the same app-bar search affordance (`AppBarConfig.searchBarText`, `TextFieldState`, clear action, pinned app bar, back override), but intentionally does **not** reuse the group search result model. History search is a chronological filter, not relevance-ranked navigation:
+
+- Blank query leaves the normal history list visible.
+- Non-blank query filters the existing `DateScrollData.items` in their current order; it does not sort by fuzzy score.
+- Empty filtered results show the existing `no_results` message, while genuinely empty history keeps the normal empty-history message.
+- Search is only available outside multi-select mode. While search is open, long-press multi-select entry is suppressed so the top bar cannot enter both modes at once.
+
+The fields searched are the displayed value, label, and note. The displayed value should come from the same formatting used by the card/dialog (`DataPoint.getDisplayValue(isDuration)`) so duration values and labels match what the user sees. Feature history also adds decimal-separator variants of the displayed value (`.` and `,`) so users can find numeric values regardless of regional decimal notation.
+
+Because the result order is chronological and no score is displayed, use `FuzzyMatcher.matches(query, target)` rather than `score()`. `matches()` is the fast subsequence predicate: it returns as soon as every query character has been found in order and avoids the DP ranking work.
 
 ## Paths are resolved once, per-component, and are multi-valued
 
@@ -107,6 +120,8 @@ New / deleted / renamed components, new symlinks, group renames — none of thes
 ## FuzzyMatcher
 
 `FuzzyMatcher.score(query, target)` in `util/FuzzyMatcher.kt` returns `Double?` — null means no match, non-null is the match quality score (higher = better). Matching is case-insensitive subsequence: all query characters must appear in the target in order, with any characters between them.
+
+`FuzzyMatcher.matches(query, target)` is the boolean fast path for callers that need filtering but not ranking. It uses the same case-insensitive subsequence definition and should stay behaviorally aligned with `score()` for match/no-match results.
 
 ### Scoring
 

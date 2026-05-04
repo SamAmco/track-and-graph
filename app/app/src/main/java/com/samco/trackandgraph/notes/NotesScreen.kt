@@ -17,13 +17,16 @@
 package com.samco.trackandgraph.notes
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -36,9 +39,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
@@ -71,9 +73,11 @@ import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLin
 import com.samco.trackandgraph.ui.compose.ui.EmptyScreenText
 import com.samco.trackandgraph.ui.compose.ui.GlobalNoteDescriptionDialog
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.TextChip
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import kotlinx.serialization.Serializable
 import org.threeten.bp.OffsetDateTime
 
@@ -86,14 +90,20 @@ fun NotesScreen(navArgs: NotesNavKey) {
     val addDataPointsDialogViewModel: AddDataPointsNavigationViewModel = hiltViewModel<AddDataPointsViewModelImpl>()
     val globalNoteDialogViewModel: GlobalNoteInputViewModel = hiltViewModel<GlobalNoteInputViewModelImpl>()
 
-    val dateScrollData = notesViewModel.dateScrollData.observeAsState().value
-    val showGlobalNoteDialog = globalNoteDialogViewModel.show.observeAsState(false).value
-    val selectedNoteForDialog by notesViewModel.selectedNoteForDialog.collectAsState()
+    val dateScrollData by notesViewModel.dateScrollData.collectAsStateWithLifecycle()
+    val showGlobalNotes by notesViewModel.showGlobalNotes.collectAsStateWithLifecycle()
+    val showDataPointNotes by notesViewModel.showDataPointNotes.collectAsStateWithLifecycle()
+    val showGlobalNoteDialog by globalNoteDialogViewModel.show.collectAsStateWithLifecycle()
+    val selectedNoteForDialog by notesViewModel.selectedNoteForDialog.collectAsStateWithLifecycle()
 
     TopAppBarContent(navArgs)
 
     NotesView(
         dateScrollData = dateScrollData,
+        showGlobalNotes = showGlobalNotes,
+        showDataPointNotes = showDataPointNotes,
+        onToggleShowGlobalNotes = notesViewModel::toggleShowGlobalNotes,
+        onToggleShowDataPointNotes = notesViewModel::toggleShowDataPointNotes,
         onNoteClick = { note -> notesViewModel.onNoteClicked(note) },
         onEditClick = { note ->
             if (note.trackerId != null) {
@@ -168,11 +178,15 @@ private fun TopAppBarContent(navArgs: NotesNavKey) {
 @Composable
 private fun NotesView(
     dateScrollData: DateScrollData<NoteInfo>?,
+    showGlobalNotes: Boolean,
+    showDataPointNotes: Boolean,
+    onToggleShowGlobalNotes: () -> Unit,
+    onToggleShowDataPointNotes: () -> Unit,
     onNoteClick: (NoteInfo) -> Unit,
     onEditClick: (NoteInfo) -> Unit,
     onDeleteClick: (NoteInfo) -> Unit
 ) = TnGComposeTheme {
-    if (dateScrollData == null || dateScrollData.items.isEmpty()) {
+    if (dateScrollData == null) {
         EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
     } else {
         DateScrollLazyColumn(
@@ -180,7 +194,15 @@ private fun NotesView(
             contentPadding = WindowInsets.safeDrawing
                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
                 .asPaddingValues(),
-            data = dateScrollData
+            data = dateScrollData,
+            topContent = {
+                NoteFilters(
+                    showGlobalNotes = showGlobalNotes,
+                    showDataPointNotes = showDataPointNotes,
+                    onToggleShowGlobalNotes = onToggleShowGlobalNotes,
+                    onToggleShowDataPointNotes = onToggleShowDataPointNotes
+                )
+            }
         ) { note ->
             Note(
                 noteInfo = note,
@@ -189,6 +211,36 @@ private fun NotesView(
                 onDeleteClick = { onDeleteClick(note) }
             )
         }
+    }
+}
+
+@Composable
+private fun NoteFilters(
+    showGlobalNotes: Boolean,
+    showDataPointNotes: Boolean,
+    onToggleShowGlobalNotes: () -> Unit,
+    onToggleShowDataPointNotes: () -> Unit,
+) {
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(cardMarginSmall),
+        horizontalArrangement = Arrangement.spacedBy(
+            dialogInputSpacing,
+            Alignment.CenterHorizontally
+        ),
+        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
+    ) {
+        TextChip(
+            text = stringResource(R.string.show_global_notes),
+            isSelected = showGlobalNotes,
+            onClick = onToggleShowGlobalNotes
+        )
+        TextChip(
+            text = stringResource(R.string.show_data_point_notes),
+            isSelected = showDataPointNotes,
+            onClick = onToggleShowDataPointNotes
+        )
     }
 }
 
@@ -312,6 +364,10 @@ private fun NotesViewPreview() {
                 dateDisplayResolution = DateDisplayResolution.MONTH_DAY,
                 items = notes.reversed()
             ),
+            showGlobalNotes = true,
+            showDataPointNotes = true,
+            onToggleShowGlobalNotes = {},
+            onToggleShowDataPointNotes = {},
             onNoteClick = {},
             onEditClick = {},
             onDeleteClick = {}

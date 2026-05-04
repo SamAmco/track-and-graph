@@ -7,7 +7,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -107,7 +106,6 @@ fun TngChip(
     content: @Composable RowScope.() -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val buttonDown by interactionSource.collectIsPressedAsState()
 
     Surface(
         modifier = modifier
@@ -122,11 +120,11 @@ fun TngChip(
             }
             .widthIn(min = chipMinWidth),
         color =
-            if (isSelected || (isEnabled && buttonDown)) MaterialTheme.tngColors.primary
+            if (isSelected) MaterialTheme.tngColors.primary
             else MaterialTheme.tngColors.surface,
         border = BorderStroke(
             chipBorderWidth,
-            if (isSelected || (isEnabled && buttonDown)) SolidColor(MaterialTheme.tngColors.primary)
+            if (isSelected) SolidColor(MaterialTheme.tngColors.primary)
             else SolidColor(MaterialTheme.tngColors.selectorButtonColor)
         ),
         shape = shape,

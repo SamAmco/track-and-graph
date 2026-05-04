@@ -23,10 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -35,20 +32,24 @@ import com.samco.trackandgraph.data.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 interface GlobalNoteInputViewModel {
-    val show: LiveData<Boolean>
+    val show: StateFlow<Boolean>
     val note: TextFieldValue
-    val dateTime: LiveData<OffsetDateTime>
-    val updateMode: LiveData<Boolean>
-    val addButtonEnabled: LiveData<Boolean>
-    val showConfirmCancelDialog: LiveData<Boolean>
+    val dateTime: StateFlow<OffsetDateTime>
+    val updateMode: StateFlow<Boolean>
+    val addButtonEnabled: StateFlow<Boolean>
+    val showConfirmCancelDialog: StateFlow<Boolean>
 
     fun openDialog(timestamp: OffsetDateTime?)
     fun updateNoteText(text: TextFieldValue)
@@ -71,15 +72,15 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
     private var foundNote: GlobalNote? = null
 
     override var note by mutableStateOf(TextFieldValue())
-    override val dateTime = MutableLiveData<OffsetDateTime>()
+    override val dateTime = MutableStateFlow(OffsetDateTime.now())
 
-    override val updateMode = MutableLiveData(false)
+    override val updateMode = MutableStateFlow(false)
 
     override val addButtonEnabled = snapshotFlow { note }
         .map { it.text.isNotBlank() }
-        .asLiveData(viewModelScope.coroutineContext)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    override val showConfirmCancelDialog = MutableLiveData(false)
+    override val showConfirmCancelDialog = MutableStateFlow(false)
 
     private val addCompleteEvents = MutableSharedFlow<Unit>()
     private val showEvents = MutableSharedFlow<Unit>()
@@ -87,7 +88,7 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
     override val show = merge(
         showEvents.map { true },
         merge(onCancelConfirmedEvents, addCompleteEvents).map { false }
-    ).asLiveData(viewModelScope.coroutineContext)
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     override fun openDialog(timestamp: OffsetDateTime?) {
         viewModelScope.launch(io) {
@@ -131,7 +132,7 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
             dataInteractor.insertGlobalNote(
                 GlobalNote(
                     note = note.text,
-                    timestamp = dateTime.value ?: OffsetDateTime.now()
+                    timestamp = dateTime.value
                 )
             )
 

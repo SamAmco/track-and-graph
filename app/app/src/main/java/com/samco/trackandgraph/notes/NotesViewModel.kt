@@ -16,14 +16,15 @@
  */
 package com.samco.trackandgraph.notes
 
-import androidx.lifecycle.LiveData
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.storage.PrefsPersistenceProvider
 import com.samco.trackandgraph.ui.compose.ui.Datable
 import com.samco.trackandgraph.ui.compose.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.compose.ui.DateScrollData
@@ -36,10 +37,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -58,10 +60,21 @@ data class NoteInfo(
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
+    prefsPersistenceProvider: PrefsPersistenceProvider,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
     private val _selectedNoteForDialog = MutableStateFlow<NoteInfo?>(null)
     val selectedNoteForDialog: StateFlow<NoteInfo?> = _selectedNoteForDialog.asStateFlow()
+
+    private val dataStore = prefsPersistenceProvider.getDataStore(DATA_STORE_NAME)
+
+    val showGlobalNotes: StateFlow<Boolean> = dataStore.data
+        .map { preferences -> preferences[SHOW_GLOBAL_NOTES_KEY] ?: true }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
+    val showDataPointNotes: StateFlow<Boolean> = dataStore.data
+        .map { preferences -> preferences[SHOW_DATA_POINT_NOTES_KEY] ?: true }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
     private val notesFlow = dataInteractor.getAllDisplayNotes()
         .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
@@ -70,24 +83,34 @@ class NotesViewModel @Inject constructor(
         emit(FeaturePathProvider(dataInteractor.getGroupGraphSync()))
     }.flowOn(io)
 
-    val dateScrollData: LiveData<DateScrollData<NoteInfo>> = notesFlow
-        .filter { it.isNotEmpty() }
-        .combine(featureNameProvider) { list, featurePathProvider ->
-            val range = Duration
-                .between(list.last().timestamp, list.first().timestamp)
-                .abs()
+    val dateScrollData: StateFlow<DateScrollData<NoteInfo>?> = combine(
+        notesFlow,
+        featureNameProvider,
+        showGlobalNotes,
+        showDataPointNotes
+    ) { list, featurePathProvider, showGlobalNotes, showDataPointNotes ->
+        if (list.isEmpty()) return@combine null
 
-            val dateDisplayResolution = when {
-                range.toDays() > 365 -> DateDisplayResolution.MONTH_YEAR
-                else -> DateDisplayResolution.MONTH_DAY
+        val filteredList = list.filter { note ->
+            when {
+                note.trackerId == null -> showGlobalNotes
+                else -> showDataPointNotes
             }
-
-            return@combine DateScrollData(
-                items = list.map { it.asNoteInfo(featurePathProvider) },
-                dateDisplayResolution = dateDisplayResolution
-            )
         }
-        .asLiveData(viewModelScope.coroutineContext)
+
+        val range = Duration.between(list.last().timestamp, list.first().timestamp).abs()
+
+        val dateDisplayResolution = when {
+            range.toDays() > 365 -> DateDisplayResolution.MONTH_YEAR
+            else -> DateDisplayResolution.MONTH_DAY
+        }
+
+        DateScrollData(
+            items = filteredList.map { it.asNoteInfo(featurePathProvider) },
+            dateDisplayResolution = dateDisplayResolution
+        )
+    }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     fun onNoteClicked(note: NoteInfo) {
         _selectedNoteForDialog.value = note
@@ -95,6 +118,22 @@ class NotesViewModel @Inject constructor(
 
     fun onDialogDismissed() {
         _selectedNoteForDialog.value = null
+    }
+
+    fun toggleShowGlobalNotes() {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[SHOW_GLOBAL_NOTES_KEY] = !showGlobalNotes.value
+            }
+        }
+    }
+
+    fun toggleShowDataPointNotes() {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[SHOW_DATA_POINT_NOTES_KEY] = !showDataPointNotes.value
+            }
+        }
     }
 
     fun deleteNote(note: NoteInfo) = viewModelScope.launch(io) {
@@ -118,4 +157,10 @@ class NotesViewModel @Inject constructor(
             ?: "",
         note = note
     )
+
+    companion object {
+        private const val DATA_STORE_NAME = "notes_screen"
+        private val SHOW_GLOBAL_NOTES_KEY = booleanPreferencesKey("show_global_notes")
+        private val SHOW_DATA_POINT_NOTES_KEY = booleanPreferencesKey("show_data_point_notes")
+    }
 }

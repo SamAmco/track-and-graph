@@ -282,6 +282,8 @@
     <string name="note_input_hint">Notes…</string>
     <string name="add_a_note">Add a note</string>
     <string name="notes">Notes</string>
+    <string name="show_global_notes">Global</string>
+    <string name="show_data_point_notes">Data points</string>
     <string name="delete_reminder_content_description">Delete Reminder</string>
     <string name="theme_colon">Theme:</string>
     <string name="date_format_colon">Date format:</string>

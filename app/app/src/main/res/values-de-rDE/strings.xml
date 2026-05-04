@@ -209,6 +209,8 @@
     <string name="note_input_hint">Notizen…</string>
     <string name="add_a_note">Notiz hinzufügen</string>
     <string name="notes">Notizen</string>
+    <string name="show_global_notes">Global</string>
+    <string name="show_data_point_notes">Datenpunkte</string>
     <string name="delete_reminder_content_description">Erinnerung löschen</string>
     <string name="theme_colon">Thema:</string>
     <string name="date_format_colon">Datumsformat:</string>

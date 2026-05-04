@@ -210,6 +210,8 @@
     <string name="note_input_hint">Notes…</string>
     <string name="add_a_note">Ajouter une note</string>
     <string name="notes">Notes</string>
+    <string name="show_global_notes">Globales</string>
+    <string name="show_data_point_notes">Points de données</string>
     <string name="delete_reminder_content_description">Supprimer le rappel</string>
     <string name="theme_colon">Thème : </string>
     <string name="date_format_colon">Format de la date : </string>
