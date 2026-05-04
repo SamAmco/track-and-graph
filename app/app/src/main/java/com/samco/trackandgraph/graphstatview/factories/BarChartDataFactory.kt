@@ -148,6 +148,8 @@ class BarChartDataFactory @Inject constructor(
                     barDates.add(roundedEndTime)
                 }
 
+                if (timestamp.isAfter(currentBarEndTime)) continue
+
                 //If the next data point is before the start of the duration we are interested in, we
                 // can stop
                 if (endTimeMinusDuration != null && timestamp.isBefore(endTimeMinusDuration)) break

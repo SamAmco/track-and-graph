@@ -329,6 +329,58 @@ class BarChartDataFactoryTest {
     }
 
     @Test
+    fun `test bar chart ignores data points after configured end time`() {
+        //PREPARE
+        val zone = ZoneId.of("UTC")
+        val end = ZonedDateTime.of(2026, 2, 1, 12, 0, 0, 0, zone)
+
+        val dataSample = DataSample.fromSequence(
+            listOf(
+                dp(time = end.plusDays(10), value = 100.0),
+                dp(time = end.plusDays(1), value = 10.0),
+                dp(time = end, value = 1.0),
+                dp(time = end.minusDays(1), value = 2.0),
+                dp(time = end.minusDays(30), value = 3.0),
+                dp(time = end.minusDays(31), value = 4.0),
+            ).asSequence()
+        ) {}
+
+        val timeHelper = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay: Duration = Duration.ZERO
+            },
+            zone
+        )
+
+        //EXECUTE
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = timeHelper,
+            dataSample = dataSample,
+            endTime = end,
+            barSize = BarChartBarPeriod.DAY,
+            sampleSize = Duration.ofDays(31),
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
+        )
+
+        //VERIFY
+        val values = barData.segmentSeries[0].segmentSeries.getyVals()
+        val endOfDay = ZonedDateTime.of(2026, 2, 1, 23, 59, 59, 999999999, zone)
+
+        assertEquals(31, barData.dates.size)
+        assertEquals(endOfDay.minusDays(30), barData.dates.first())
+        assertEquals(endOfDay, barData.dates.last())
+        assertEquals(31, values.size)
+        assertEquals(3.0, values.first().toDouble(), 0.0001)
+        assertEquals(2.0, values[29].toDouble(), 0.0001)
+        assertEquals(1.0, values.last().toDouble(), 0.0001)
+        assertEquals(3.0, barData.bounds.maxY.toDouble(), 0.0001)
+    }
+
+    @Test
     fun `test bar chart over daylight savings with different start of day`() {
         //PREPARE
         val timeHelper = TimeHelper(
