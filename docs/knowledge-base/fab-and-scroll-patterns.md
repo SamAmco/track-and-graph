@@ -3,10 +3,11 @@ title: FAB patterns — scroll-hiding, animation constants, and tracker-only gua
 description: How scroll-hiding FABs work via NestedScrollConnection passed through AppBarConfig, shared FAB animation constants in Animations.kt, the tracker-only guard pattern, and the FeatureHistoryScreen implementation.
 topics:
   - Scroll-hiding FAB via NestedScrollConnection + AppBarConfig.nestedScrollConnection
+  - FeatureHistoryScreen keeps the app bar unpinned while loading so forward-navigation reveal can run
   - Shared FAB animation constants (fabEnterTransition, fabExitTransition) in Animations.kt
   - Tracker-only FAB guard: isTracker derived from viewModel.tracker.map { it != null }
   - FeatureHistoryScreen and GroupScreen as reference implementations
-keywords: [FAB, scroll, NestedScrollConnection, AppBarConfig, nestedScrollConnection, fabEnterTransition, fabExitTransition, Animations, AnimatedVisibility, tracker, isTracker, showFab, GroupScreen, FeatureHistoryScreen, GroupTopBar]
+keywords: [FAB, scroll, NestedScrollConnection, AppBarConfig, nestedScrollConnection, fabEnterTransition, fabExitTransition, Animations, AnimatedVisibility, tracker, isTracker, showFab, GroupScreen, FeatureHistoryScreen, GroupTopBar, app-bar-reveal, appBarPinned, loading]
 ---
 
 # FAB and Scroll Patterns
@@ -95,6 +96,12 @@ Modifier
 ```
 
 This means the connection intercepts scroll events for the entire scaffold content area, not just a specific list.
+
+### Forward-navigation app-bar reveal
+
+`MainScreen` also animates the top app bar back in after forward navigation when the active `AppBarConfig` is visible and not pinned.
+
+This matters for `FeatureHistoryScreen`: `dateScrollData == null` means history is still loading, even though the derived `dataPointsCount` is `0`. During that loading state, keep `appBarPinned = false` so MainScreen's existing forward-navigation reveal can run after the destination transition. Only publish `appBarPinned = true` once loading has completed and the history is genuinely empty.
 
 ### 4. Rendering the FAB with AnimatedVisibility
 

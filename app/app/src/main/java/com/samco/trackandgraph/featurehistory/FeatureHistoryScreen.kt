@@ -131,6 +131,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     val isUpdating by viewModel.isUpdating.observeAsState(false)
 
     val dataPointsCount = dateScrollData?.items?.size ?: 0
+    val hasLoadedHistory = dateScrollData != null
 
     TopAppBarContent(
         navArgs = navArgs,
@@ -145,7 +146,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         onSelectAll = viewModel::selectAllDataPoints,
         onDeselectAll = viewModel::deselectAllDataPoints,
         onExitMultiSelect = viewModel::exitMultiSelectMode,
-        appBarPinned = dataPointsCount == 0,
+        appBarPinned = hasLoadedHistory && dataPointsCount == 0,
     )
 
     FeatureHistoryView(

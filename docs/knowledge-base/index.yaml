@@ -20,8 +20,8 @@ docs:
 
   - file: fab-and-scroll-patterns.md
     title: FAB patterns — scroll-hiding, animation constants, and tracker-only guard
-    description: How scroll-hiding FABs work via NestedScrollConnection passed through AppBarConfig.nestedScrollConnection into MainScreen's Scaffold modifier; shared fabEnterTransition/fabExitTransition constants in Animations.kt; tracker-only FAB guard using viewModel.tracker.map { it != null }; FeatureHistoryScreen and GroupScreen as reference implementations.
-    keywords: [FAB, scroll, NestedScrollConnection, AppBarConfig, nestedScrollConnection, fabEnterTransition, fabExitTransition, Animations, AnimatedVisibility, tracker, isTracker, showFab, GroupScreen, FeatureHistoryScreen, GroupTopBar, scroll-hide, MutableState]
+    description: How scroll-hiding FABs work via NestedScrollConnection passed through AppBarConfig.nestedScrollConnection into MainScreen's Scaffold modifier; MainScreen forward-navigation app-bar reveal and why FeatureHistoryScreen stays unpinned while history data is loading; shared fabEnterTransition/fabExitTransition constants in Animations.kt; tracker-only FAB guard using viewModel.tracker.map { it != null }; FeatureHistoryScreen and GroupScreen as reference implementations.
+    keywords: [FAB, scroll, NestedScrollConnection, AppBarConfig, nestedScrollConnection, fabEnterTransition, fabExitTransition, Animations, AnimatedVisibility, tracker, isTracker, showFab, GroupScreen, FeatureHistoryScreen, GroupTopBar, scroll-hide, MutableState, app-bar-reveal, appBarPinned, loading]
 
   - file: architecture.md
     title: Architecture and conventions
