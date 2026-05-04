@@ -9,7 +9,7 @@ topics:
   - LuaEngine: 4 modes — runLuaFunction, runLuaFunctionGenerator, runLuaGraph, runLuaCatalogue
   - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
   - Lua VM lease ownership and cancellation cleanup
-keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMLock, VMLease, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease]
+keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMLock, VMLease, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
 ---
 
 # Lua Functions Architecture
@@ -196,6 +196,8 @@ Return: Iterator function yielding data points until nil.
 Lua VM access is guarded by `LuaVMLock` / `VMLease`, acquired through `LuaEngine.acquireVM()` and released with `LuaEngine.releaseVM(lock)`. Function and graph execution can be recursive: a Lua function can read a function-backed data source, which may execute more Lua. To avoid deadlocks and excess VM consumption, top-level graph/function work should normally acquire one VM lease and pass that same lock down through `DataSampler.getRawDataSampleForFeatureId(..., vmLock)` / `getDataSampleForFeatureId(..., vmLock)`.
 
 If `DataSampler` is called with `vmLock = null` for a function-backed feature, `FunctionGraphDataSample.create()` owns the acquired lease and releases it from `dispose()`. That ownership starts before the sample object is returned, so construction must be cancellation-safe: if building nested input samples throws or is cancelled, any partially-created input samples must be disposed and the owned VM lease must be released in the construction catch path. This matters most in search and graph previews, where many function-backed graph calculations may be started and cancelled in quick succession.
+
+`LuaEngineSwitch` / `GuardedLuaEngineWrapper` block new Lua work when Lua is disabled, but `releaseVM(lock)` is cleanup for an already-acquired lease and must still release unconditionally. Do not guard release on the enabled flag: if the flag is flipped after acquisition but before a `finally` block runs, throwing from release would leave the underlying VM mutex locked.
 
 `LuaVMProvider` currently waits on a specific round-robin VM when the pool is at capacity. A leaked or never-released lease can therefore do more than reduce parallelism: a waiter may suspend behind the leaked VM even if another VM becomes free later. Do not rely on "some VM is still available" as proof that lease leaks are harmless; repeated cancellation can still cause graph batches to stall.
 
