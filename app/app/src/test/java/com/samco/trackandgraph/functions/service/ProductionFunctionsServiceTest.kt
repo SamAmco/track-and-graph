@@ -23,6 +23,7 @@ import com.samco.trackandgraph.remoteconfig.testEndpoints
 import com.samco.trackandgraph.remoteconfig.testRemoteConfig
 import com.samco.trackandgraph.storage.FileCache
 import com.samco.trackandgraph.storage.CachedFile
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -132,6 +133,51 @@ class ProductionFunctionsServiceTest {
         verify(fileCache).getFile("function_signature")
 
         verifyNoMoreInteractions(remoteConfigProvider, fileDownloader, fileCache)
+    }
+
+    @Test
+    fun `fetchFunctionsCatalog - hanging online fetch times out and uses cached files`() = runTest {
+        // Given
+        val hangingDownloader = object : FileDownloader {
+            override suspend fun downloadFileToString(url: URI): String? = null
+
+            override suspend fun downloadFileToBytes(url: URI): ByteArray? =
+                error("Signature should not be downloaded when catalogue fetch hangs")
+
+            override suspend fun downloadFileWithETag(
+                url: URI,
+                ifNoneMatch: String?
+            ): DownloadResult? = awaitCancellation()
+        }
+        service = ProductionFunctionsService(
+            remoteConfigProvider = remoteConfigProvider,
+            fileDownloader = hangingDownloader,
+            fileCache = fileCache,
+            json = json
+        )
+        whenever(remoteConfigProvider.getRemoteConfiguration()).thenReturn(remoteConfig)
+        whenever(fileCache.getETag("function_catalogue")).thenReturn("cached-etag")
+        whenever(fileCache.getFile("function_catalogue"))
+            .thenReturn(CachedFile(testLuaScript, "cached-etag"))
+        whenever(fileCache.getFile("function_signature"))
+            .thenReturn(CachedFile(testSignatureBytes, null))
+
+        // When
+        val result = service.fetchFunctionsCatalog()
+
+        // Then
+        assertEquals(testLuaScript, result.luaScriptBytes)
+        assertEquals(testKeyId, result.signatureData.keyId)
+        assertEquals("ECDSA-P256-SHA256", result.signatureData.algorithm)
+        assertEquals(testSignature, result.signatureData.signature)
+
+        verify(remoteConfigProvider).getRemoteConfiguration()
+        verify(fileCache).getETag("function_catalogue")
+        verify(fileCache).getFile("function_catalogue")
+        verify(fileCache).getFile("function_signature")
+
+        verifyNoMoreInteractions(remoteConfigProvider, fileCache)
+        verifyNoInteractions(fileDownloader)
     }
 
     @Test

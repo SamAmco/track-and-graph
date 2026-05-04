@@ -23,6 +23,7 @@ import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URI
+import java.net.URLConnection
 import javax.inject.Inject
 
 class FileDownloaderImpl @Inject constructor(
@@ -30,7 +31,7 @@ class FileDownloaderImpl @Inject constructor(
 ) : FileDownloader {
     override suspend fun downloadFileToString(url: URI): String? = withContext(ioDispatcher) {
         try {
-            val connection = url.toURL().openConnection()
+            val connection = url.openTimedConnection()
             BufferedReader(InputStreamReader(connection.getInputStream())).use { reader ->
                 reader.readText()
             }
@@ -42,7 +43,7 @@ class FileDownloaderImpl @Inject constructor(
 
     override suspend fun downloadFileToBytes(url: URI): ByteArray? = withContext(ioDispatcher) {
         try {
-            val connection = url.toURL().openConnection()
+            val connection = url.openTimedConnection()
             connection.getInputStream().use { inputStream ->
                 inputStream.readBytes()
             }
@@ -55,7 +56,7 @@ class FileDownloaderImpl @Inject constructor(
     override suspend fun downloadFileWithETag(url: URI, ifNoneMatch: String?): DownloadResult? =
         withContext(ioDispatcher) {
             try {
-                val connection = url.toURL().openConnection()
+                val connection = url.openTimedConnection()
 
                 // Set If-None-Match header for conditional request
                 if (ifNoneMatch != null) {
@@ -90,4 +91,15 @@ class FileDownloaderImpl @Inject constructor(
                 null
             }
         }
+
+    private fun URI.openTimedConnection(): URLConnection =
+        toURL().openConnection().apply {
+            connectTimeout = CONNECT_TIMEOUT_MS
+            readTimeout = READ_TIMEOUT_MS
+        }
+
+    private companion object {
+        const val CONNECT_TIMEOUT_MS = 5_000
+        const val READ_TIMEOUT_MS = 10_000
+    }
 }

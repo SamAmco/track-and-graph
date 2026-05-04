@@ -20,6 +20,8 @@ import com.samco.trackandgraph.downloader.DownloadResult
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.storage.FileCache
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.net.URI
@@ -36,7 +38,9 @@ class ProductionFunctionsService @Inject constructor(
 ) : FunctionsService {
 
     override suspend fun fetchFunctionsCatalog(): FunctionsCatalogData {
-        return tryFetchOnline() ?: tryFetchFromCache()
+        return withTimeoutOrNull(ONLINE_FETCH_TIMEOUT_MS) {
+            tryFetchOnline()
+        } ?: tryFetchFromCache()
     }
 
     private suspend fun tryFetchOnline(): FunctionsCatalogData? {
@@ -48,6 +52,8 @@ class ProductionFunctionsService @Inject constructor(
             Timber.d("Attempting to fetch catalogue from: $catalogueUrl")
             
             fetchCatalogueWithCaching(catalogueUrl, signatureUrl)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Timber.w(e, "Online fetch failed")
             null
@@ -105,6 +111,7 @@ class ProductionFunctionsService @Inject constructor(
     companion object {
         private const val CATALOGUE_CACHE_KEY = "function_catalogue"
         private const val SIGNATURE_CACHE_KEY = "function_signature"
+        private const val ONLINE_FETCH_TIMEOUT_MS = 15_000L
     }
 
 }
