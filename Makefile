@@ -57,11 +57,11 @@ lua-pack-functions:
 	cd lua && lua tools/pack-functions.lua
 
 .PHONY: lua-publish-debug
-lua-publish-debug:
+lua-publish-debug: lua-pack-functions
 	cd lua && lua tools/publish-functions-debug.lua
 
 .PHONY: lua-publish-prod
-lua-publish-prod:
+lua-publish-prod: lua-pack-functions
 	cd lua && lua tools/publish-functions-prod.lua
 
 .PHONY: lua-print-catalog
