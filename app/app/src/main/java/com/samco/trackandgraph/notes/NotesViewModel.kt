@@ -16,6 +16,9 @@
  */
 package com.samco.trackandgraph.notes
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.runtime.snapshotFlow
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
@@ -68,6 +71,11 @@ class NotesViewModel @Inject constructor(
 
     private val dataStore = prefsPersistenceProvider.getDataStore(DATA_STORE_NAME)
 
+    private val _isSearchVisible = MutableStateFlow(false)
+    val isSearchVisible: StateFlow<Boolean> = _isSearchVisible.asStateFlow()
+    val searchQuery = TextFieldState()
+    private val queryText = snapshotFlow { searchQuery.text.toString() }
+
     val showGlobalNotes: StateFlow<Boolean> = dataStore.data
         .map { preferences -> preferences[SHOW_GLOBAL_NOTES_KEY] ?: true }
         .stateIn(viewModelScope, SharingStarted.Eagerly, true)
@@ -87,8 +95,9 @@ class NotesViewModel @Inject constructor(
         notesFlow,
         featureNameProvider,
         showGlobalNotes,
-        showDataPointNotes
-    ) { list, featurePathProvider, showGlobalNotes, showDataPointNotes ->
+        showDataPointNotes,
+        queryText
+    ) { list, featurePathProvider, showGlobalNotes, showDataPointNotes, query ->
         if (list.isEmpty()) return@combine null
 
         val filteredList = list.filter { note ->
@@ -96,7 +105,8 @@ class NotesViewModel @Inject constructor(
                 note.trackerId == null -> showGlobalNotes
                 else -> showDataPointNotes
             }
-        }
+        }.map { it.asNoteInfo(featurePathProvider) }
+            .filter { note -> query.isBlank() || note.matchesSearchQuery(query) }
 
         val range = Duration.between(list.last().timestamp, list.first().timestamp).abs()
 
@@ -106,11 +116,20 @@ class NotesViewModel @Inject constructor(
         }
 
         DateScrollData(
-            items = filteredList.map { it.asNoteInfo(featurePathProvider) },
+            items = filteredList,
             dateDisplayResolution = dateDisplayResolution
         )
     }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    fun showSearch() {
+        _isSearchVisible.value = true
+    }
+
+    fun hideSearch() {
+        _isSearchVisible.value = false
+        searchQuery.clearText()
+    }
 
     fun onNoteClicked(note: NoteInfo) {
         _selectedNoteForDialog.value = note
@@ -156,6 +175,15 @@ class NotesViewModel @Inject constructor(
             ?: featureName
             ?: "",
         note = note
+    )
+
+    private fun NoteInfo.matchesSearchQuery(query: String): Boolean =
+        searchTargets().any { it.contains(query, ignoreCase = true) }
+
+    private fun NoteInfo.searchTargets(): List<String> = listOfNotNull(
+        note,
+        featureName,
+        featurePath,
     )
 
     companion object {

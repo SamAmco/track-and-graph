@@ -16,7 +16,9 @@
  */
 package com.samco.trackandgraph.notes
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,9 +29,12 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -93,15 +98,26 @@ fun NotesScreen(navArgs: NotesNavKey) {
     val dateScrollData by notesViewModel.dateScrollData.collectAsStateWithLifecycle()
     val showGlobalNotes by notesViewModel.showGlobalNotes.collectAsStateWithLifecycle()
     val showDataPointNotes by notesViewModel.showDataPointNotes.collectAsStateWithLifecycle()
+    val isSearchVisible by notesViewModel.isSearchVisible.collectAsStateWithLifecycle()
     val showGlobalNoteDialog by globalNoteDialogViewModel.show.collectAsStateWithLifecycle()
     val selectedNoteForDialog by notesViewModel.selectedNoteForDialog.collectAsStateWithLifecycle()
+    val isSearchResult = isSearchVisible && notesViewModel.searchQuery.text.isNotBlank()
 
-    TopAppBarContent(navArgs)
+    if (isSearchVisible) {
+        BackHandler(onBack = notesViewModel::hideSearch)
+    }
+
+    TopAppBarContent(
+        navArgs = navArgs,
+        notesViewModel = notesViewModel,
+        isSearchVisible = isSearchVisible,
+    )
 
     NotesView(
         dateScrollData = dateScrollData,
         showGlobalNotes = showGlobalNotes,
         showDataPointNotes = showDataPointNotes,
+        isSearchResult = isSearchResult,
         onToggleShowGlobalNotes = notesViewModel::toggleShowGlobalNotes,
         onToggleShowDataPointNotes = notesViewModel::toggleShowDataPointNotes,
         onNoteClick = { note -> notesViewModel.onNoteClicked(note) },
@@ -149,19 +165,45 @@ fun NotesScreen(navArgs: NotesNavKey) {
 }
 
 @Composable
-private fun TopAppBarContent(navArgs: NotesNavKey) {
+private fun TopAppBarContent(
+    navArgs: NotesNavKey,
+    notesViewModel: NotesViewModel,
+    isSearchVisible: Boolean,
+) {
     val globalNoteDialogViewModel: GlobalNoteInputViewModel = hiltViewModel<GlobalNoteInputViewModelImpl>()
     val topBarController = LocalTopBarController.current
     val title = stringResource(R.string.notes)
 
-    val actions: @Composable RowScope.() -> Unit = remember(globalNoteDialogViewModel) {
+    val actions: @Composable RowScope.() -> Unit = remember(
+        globalNoteDialogViewModel,
+        notesViewModel,
+        isSearchVisible,
+    ) {
         {
-            IconButton(onClick = { globalNoteDialogViewModel.openDialog(null) }) {
-                Icon(
-                    painter = painterResource(R.drawable.add_icon),
-                    contentDescription = null,
-                    tint = MaterialTheme.tngColors.onSurface
-                )
+            if (isSearchVisible) {
+                if (notesViewModel.searchQuery.text.isNotEmpty()) {
+                    IconButton(onClick = { notesViewModel.searchQuery.clearText() }) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            } else {
+                IconButton(onClick = notesViewModel::showSearch) {
+                    Icon(
+                        painter = painterResource(R.drawable.search_icon),
+                        contentDescription = stringResource(R.string.search),
+                        tint = MaterialTheme.tngColors.onSurface
+                    )
+                }
+                IconButton(onClick = { globalNoteDialogViewModel.openDialog(null) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.add_icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.tngColors.onSurface
+                    )
+                }
             }
         }
     }
@@ -170,7 +212,11 @@ private fun TopAppBarContent(navArgs: NotesNavKey) {
         navArgs,
         AppBarConfig(
             title = title,
-            actions = actions
+            backNavigationAction = isSearchVisible,
+            actions = actions,
+            appBarPinned = isSearchVisible,
+            searchBarText = if (isSearchVisible) notesViewModel.searchQuery else null,
+            overrideBackNavigationAction = if (isSearchVisible) notesViewModel::hideSearch else null,
         )
     )
 }
@@ -180,6 +226,7 @@ private fun NotesView(
     dateScrollData: DateScrollData<NoteInfo>?,
     showGlobalNotes: Boolean,
     showDataPointNotes: Boolean,
+    isSearchResult: Boolean = false,
     onToggleShowGlobalNotes: () -> Unit,
     onToggleShowDataPointNotes: () -> Unit,
     onNoteClick: (NoteInfo) -> Unit,
@@ -188,29 +235,72 @@ private fun NotesView(
 ) = TnGComposeTheme {
     if (dateScrollData == null) {
         EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
-    } else {
-        DateScrollLazyColumn(
-            modifier = Modifier.padding(cardMarginSmall),
-            contentPadding = WindowInsets.safeDrawing
-                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
-                .asPaddingValues(),
-            data = dateScrollData,
-            topContent = {
-                NoteFilters(
-                    showGlobalNotes = showGlobalNotes,
-                    showDataPointNotes = showDataPointNotes,
-                    onToggleShowGlobalNotes = onToggleShowGlobalNotes,
-                    onToggleShowDataPointNotes = onToggleShowDataPointNotes
-                )
+    } else if (isSearchResult && dateScrollData.items.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            NotesList(
+                dateScrollData = dateScrollData,
+                showGlobalNotes = showGlobalNotes,
+                showDataPointNotes = showDataPointNotes,
+                onToggleShowGlobalNotes = onToggleShowGlobalNotes,
+                onToggleShowDataPointNotes = onToggleShowDataPointNotes,
+                onNoteClick = onNoteClick,
+                onEditClick = onEditClick,
+                onDeleteClick = onDeleteClick
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding()
+            ) {
+                EmptyScreenText(textId = R.string.no_results)
             }
-        ) { note ->
-            Note(
-                noteInfo = note,
-                onNoteClick = { onNoteClick(note) },
-                onEditClick = { onEditClick(note) },
-                onDeleteClick = { onDeleteClick(note) }
+        }
+    } else {
+        NotesList(
+            dateScrollData = dateScrollData,
+            showGlobalNotes = showGlobalNotes,
+            showDataPointNotes = showDataPointNotes,
+            onToggleShowGlobalNotes = onToggleShowGlobalNotes,
+            onToggleShowDataPointNotes = onToggleShowDataPointNotes,
+            onNoteClick = onNoteClick,
+            onEditClick = onEditClick,
+            onDeleteClick = onDeleteClick
+        )
+    }
+}
+
+@Composable
+private fun NotesList(
+    dateScrollData: DateScrollData<NoteInfo>,
+    showGlobalNotes: Boolean,
+    showDataPointNotes: Boolean,
+    onToggleShowGlobalNotes: () -> Unit,
+    onToggleShowDataPointNotes: () -> Unit,
+    onNoteClick: (NoteInfo) -> Unit,
+    onEditClick: (NoteInfo) -> Unit,
+    onDeleteClick: (NoteInfo) -> Unit
+) {
+    DateScrollLazyColumn(
+        modifier = Modifier.padding(cardMarginSmall),
+        contentPadding = WindowInsets.safeDrawing
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+            .asPaddingValues(),
+        data = dateScrollData,
+        topContent = {
+            NoteFilters(
+                showGlobalNotes = showGlobalNotes,
+                showDataPointNotes = showDataPointNotes,
+                onToggleShowGlobalNotes = onToggleShowGlobalNotes,
+                onToggleShowDataPointNotes = onToggleShowDataPointNotes
             )
         }
+    ) { note ->
+        Note(
+            noteInfo = note,
+            onNoteClick = { onNoteClick(note) },
+            onEditClick = { onEditClick(note) },
+            onDeleteClick = { onDeleteClick(note) }
+        )
     }
 }
 
@@ -366,6 +456,7 @@ private fun NotesViewPreview() {
             ),
             showGlobalNotes = true,
             showDataPointNotes = true,
+            isSearchResult = false,
             onToggleShowGlobalNotes = {},
             onToggleShowDataPointNotes = {},
             onNoteClick = {},
