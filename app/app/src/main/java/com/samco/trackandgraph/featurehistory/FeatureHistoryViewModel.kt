@@ -46,11 +46,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,12 +78,12 @@ data class DataPointInfo(
 interface FeatureHistoryViewModel : UpdateDialogViewModel {
     fun initViewModel(featureId: Long)
 
-    val tracker: LiveData<Tracker?>
-    val dateScrollData: LiveData<DateScrollData<DataPointInfo>>
-    val showFeatureInfo: LiveData<Feature?>
-    val showDataPointInfo: LiveData<DataPointInfo?>
-    val showDeleteConfirmDialog: LiveData<Boolean>
-    val showUpdateDialog: LiveData<Boolean>
+    val tracker: StateFlow<Tracker?>
+    val dateScrollData: StateFlow<DateScrollData<DataPointInfo>?>
+    val showFeatureInfo: StateFlow<Feature?>
+    val showDataPointInfo: StateFlow<DataPointInfo?>
+    val showDeleteConfirmDialog: StateFlow<Boolean>
+    val showUpdateDialog: StateFlow<Boolean>
     val error: StateFlow<Exception?>
     val isSearchVisible: StateFlow<Boolean>
     val searchQuery: TextFieldState
@@ -174,15 +174,15 @@ class FeatureHistoryViewModelImpl @Inject constructor(
             }
         }
         .flowOn(io)
+        .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     override val error: StateFlow<Exception?> = getDataPointsResult
         .filterIsInstance<GetDataPointsResult.Error>()
         .map { it.exception }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    override val dateScrollData: LiveData<DateScrollData<DataPointInfo>> = combine(
+    override val dateScrollData: StateFlow<DateScrollData<DataPointInfo>?> = combine(
         getDataPointsResult
-            .flowOn(io)
             .filterIsInstance<GetDataPointsResult.Success>(),
         isDurationFlow,
         queryText,
@@ -193,25 +193,25 @@ class FeatureHistoryViewModelImpl @Inject constructor(
             result.dataPoints.filter { it.matchesSearchQuery(query, isDuration) }
         }
         toDateScrollData(dataPoints)
-    }.asLiveData(viewModelScope.coroutineContext)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val showFeatureInfoFlow = MutableStateFlow(false)
 
-    override val showFeatureInfo: LiveData<Feature?> = combine(
+    override val showFeatureInfo: StateFlow<Feature?> = combine(
         showFeatureInfoFlow,
         featureIdFlow.map { dataInteractor.getFeatureById(it) }) { show, feature ->
         if (show) feature else null
-    }.asLiveData(viewModelScope.coroutineContext)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    override val showDataPointInfo = MutableLiveData<DataPointInfo?>(null)
+    override val showDataPointInfo = MutableStateFlow<DataPointInfo?>(null)
 
     private val confirmDeleteDataPoint = MutableStateFlow<DataPointInfo?>(null)
 
-    override val showDeleteConfirmDialog = confirmDeleteDataPoint
+    override val showDeleteConfirmDialog: StateFlow<Boolean> = confirmDeleteDataPoint
         .map { it != null }
-        .asLiveData(viewModelScope.coroutineContext)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    override val showUpdateDialog = MutableLiveData(false)
+    override val showUpdateDialog = MutableStateFlow(false)
 
     // Multi-select state
     private val _isMultiSelectMode = MutableStateFlow(false)
@@ -233,8 +233,7 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         .map { dataInteractor.getTrackerByFeatureId(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    override val tracker: LiveData<Tracker?> = trackerFlow
-        .asLiveData(viewModelScope.coroutineContext)
+    override val tracker: StateFlow<Tracker?> = trackerFlow
 
     private var featureId: Long? = null
 

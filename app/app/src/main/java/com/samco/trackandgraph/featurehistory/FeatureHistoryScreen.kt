@@ -66,7 +66,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.map
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
@@ -119,20 +118,21 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
     val showFab = remember { mutableStateOf(true) }
 
     // Collect all state from ViewModel
-    val dateScrollData by viewModel.dateScrollData.observeAsState()
+    val dateScrollData by viewModel.dateScrollData.collectAsStateWithLifecycle()
     val isDuration by viewModel.isDuration.observeAsState(false)
-    val isTracker by viewModel.tracker.map { it != null }.observeAsState(false)
-    val featureInfo by viewModel.showFeatureInfo.observeAsState()
-    val dataPointInfo by viewModel.showDataPointInfo.observeAsState()
+    val tracker by viewModel.tracker.collectAsStateWithLifecycle()
+    val isTracker = tracker != null
+    val featureInfo by viewModel.showFeatureInfo.collectAsStateWithLifecycle()
+    val dataPointInfo by viewModel.showDataPointInfo.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val isMultiSelectMode by viewModel.isMultiSelectMode.collectAsStateWithLifecycle()
     val isSearchVisible by viewModel.isSearchVisible.collectAsStateWithLifecycle()
     val selectedDataPoints by viewModel.selectedDataPoints.collectAsStateWithLifecycle()
-    val showDeleteConfirmDialog by viewModel.showDeleteConfirmDialog.observeAsState(false)
+    val showDeleteConfirmDialog by viewModel.showDeleteConfirmDialog.collectAsStateWithLifecycle()
     val showDeleteSelectedConfirmDialog by viewModel.showDeleteSelectedConfirmDialog.collectAsStateWithLifecycle()
     val showCopyToDialog by viewModel.showCopyToDialog.collectAsStateWithLifecycle()
     val showMoveToDialog by viewModel.showMoveToDialog.collectAsStateWithLifecycle()
-    val showUpdateDialog by viewModel.showUpdateDialog.observeAsState(false)
+    val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
     val showUpdateWarning by viewModel.showUpdateWarning.observeAsState(false)
     val isUpdating by viewModel.isUpdating.observeAsState(false)
 
