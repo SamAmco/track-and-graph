@@ -1,0 +1,5 @@
+- Suche für Komponenten, Verlaufsdatenpunkte und Notizen hinzugefügt.
+- Komponentensuche nutzt Fuzzy-Suche und Beschreibungen.
+- Import/Export ist jetzt ein gemeinsamer Dialog mit Tabs.
+- Notizen können globale und Datenpunkt-Notizen filtern.
+- Fehler bei Lua, Graphen, Verlauf, Balkendiagrammen, Dauer-Eingabe und Enum-Optionen behoben.

@@ -1,0 +1,5 @@
+- Añadida búsqueda de componentes, datos del historial y notas.
+- La búsqueda de componentes usa coincidencia aproximada y descripciones.
+- Importar/exportar ahora está en un único diálogo con pestañas.
+- Las notas pueden filtrar notas globales y de datos.
+- Corregidos errores de Lua, gráficos, historial, barras, duración y opciones enum.

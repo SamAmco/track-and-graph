@@ -1,0 +1,5 @@
+- Ajout de la recherche pour composants, historique et notes.
+- La recherche de composants utilise la correspondance approximative et les descriptions.
+- Import/export est maintenant un seul dialogue à onglets.
+- Les notes peuvent filtrer notes globales et de points de données.
+- Corrections Lua, graphes, historique, barres, durée et options enum.

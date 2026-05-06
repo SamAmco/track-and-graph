@@ -1,0 +1,5 @@
+- Added search for components, history datapoints, and notes.
+- Component search supports fuzzy matching and descriptions.
+- Import/export now shares one tabbed dialog.
+- Notes can filter global vs datapoint notes.
+- Fixed Lua, graph, history, bar chart, duration input, and enum option issues.
