@@ -29,6 +29,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -60,7 +62,15 @@ fun FadingScrollColumn(
             content = content
         )
 
-        if (scrollState.value > threshold) {
+        val showTopSpacer = remember(scrollState) {
+            derivedStateOf { scrollState.value > threshold }
+        }
+
+        val showBottomSpacer = remember(scrollState) {
+            derivedStateOf { scrollState.value < scrollState.maxValue - threshold }
+        }
+
+        if (showTopSpacer.value) {
             Spacer(
                 Modifier
                     .align(Alignment.TopCenter)
@@ -70,7 +80,7 @@ fun FadingScrollColumn(
             )
         }
 
-        if (scrollState.value < scrollState.maxValue - threshold) {
+        if (showBottomSpacer.value) {
             Spacer(
                 Modifier
                     .align(Alignment.BottomCenter)
