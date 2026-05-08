@@ -260,7 +260,8 @@ fun AppBar(
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     val density = LocalDensity.current
-    val statusBarDp = with(density) { WindowInsets.statusBars.getTop(density).toDp() }
+    val statusBarDp = config.statusBarHeightOverride
+        ?: with(density) { WindowInsets.statusBars.getTop(density).toDp() }
 
     // Make the app bar container taller by the status bar height so that area scrolls away too
     val totalHeight = TopAppBarDefaults.TopAppBarExpandedHeight + statusBarDp
@@ -268,7 +269,13 @@ fun AppBar(
     // We'll apply the status-bar inset INSIDE each slot
     val slotInset = Modifier
         .height(totalHeight)
-        .windowInsetsPadding(WindowInsets.statusBars.only(WindowInsetsSides.Top))
+        .then(
+            if (config.statusBarHeightOverride != null) {
+                Modifier.padding(top = statusBarDp)
+            } else {
+                Modifier.windowInsetsPadding(WindowInsets.statusBars.only(WindowInsetsSides.Top))
+            }
+        )
 
     TopAppBar(
         // No external insets -> nothing "pinned" behind status bar

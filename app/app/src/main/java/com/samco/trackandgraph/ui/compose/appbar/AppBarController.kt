@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
@@ -45,6 +46,7 @@ data class AppBarConfig(
     val nestedScrollConnection: NestedScrollConnection? = null,
     val appBarPinned: Boolean = false,
     val searchBarText: TextFieldState? = null,
+    val statusBarHeightOverride: Dp? = null,
 )
 
 /**

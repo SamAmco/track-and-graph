@@ -19,10 +19,10 @@ package com.samco.trackandgraph.functions
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -174,7 +174,7 @@ private val OffsetSaver = listSaver(
 )
 
 @Composable
-private fun FunctionsScreenContent(
+internal fun FunctionsScreenContent(
     onPopBack: () -> Unit,
     nodes: StateFlow<List<Node>>,
     hints: StateFlow<List<Hint>>,
@@ -200,8 +200,10 @@ private fun FunctionsScreenContent(
     showFirstTimeUserDialog: Boolean,
     onDismissFirstTimeUserDialog: () -> Unit,
     onOpenFunctionsTutorial: () -> Unit,
+    overlayPadding: PaddingValues? = null,
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
+        val resolvedOverlayPadding = overlayPadding ?: WindowInsets.safeDrawing.asPaddingValues()
 
         var clearOverlayUi by rememberSaveable { mutableStateOf(false) }
         var showNodeSelectionDialog by rememberSaveable { mutableStateOf(false) }
@@ -312,7 +314,7 @@ private fun FunctionsScreenContent(
             ) {
                 FloatingActionButton(
                     modifier = Modifier
-                        .padding(WindowInsets.navigationBars.asPaddingValues())
+                        .padding(resolvedOverlayPadding)
                         .then(Modifier.padding(inputSpacingLarge)),
                     onClick = onDeleteSelectedEdge,
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -327,7 +329,8 @@ private fun FunctionsScreenContent(
             TopCornerFab(
                 modifier = Modifier.align(Alignment.TopStart),
                 onClick = { onPopBack() },
-                visible = !clearOverlayUi
+                visible = !clearOverlayUi,
+                overlayPadding = resolvedOverlayPadding,
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -338,7 +341,8 @@ private fun FunctionsScreenContent(
             TopCornerFab(
                 modifier = Modifier.align(Alignment.TopEnd),
                 onClick = onOpenFunctionsTutorial,
-                visible = !clearOverlayUi
+                visible = !clearOverlayUi,
+                overlayPadding = resolvedOverlayPadding,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.faq_icon),
@@ -373,6 +377,7 @@ private fun TopCornerFab(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     visible: Boolean,
+    overlayPadding: PaddingValues,
     content: @Composable () -> Unit,
 ) {
     AnimatedVisibility(
@@ -383,7 +388,7 @@ private fun TopCornerFab(
     ) {
         FloatingActionButton(
             modifier = Modifier
-                .padding(WindowInsets.safeDrawing.asPaddingValues())
+                .padding(overlayPadding)
                 .then(Modifier.padding(inputSpacingLarge))
                 .size(buttonSize),
             onClick = onClick,

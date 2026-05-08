@@ -319,6 +319,7 @@ private fun BarChartBodyView(
 
     val context = LocalContext.current
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
+    val containerColor = MaterialTheme.colorScheme.surface.toArgb()
 
     val hasLegend = bars.size > 1
 
@@ -329,7 +330,8 @@ private fun BarChartBodyView(
         update = {
             xyPlotSetup(
                 xyPlot = xyPlot,
-                onSurfaceColor = onSurfaceColor
+                onSurfaceColor = onSurfaceColor,
+                containerColor = containerColor,
             )
             xyPlot.clear()
 

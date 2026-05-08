@@ -44,6 +44,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -80,6 +81,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -99,7 +101,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @Composable
-fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () -> Unit = {}) {
+fun AddDataPointsDialog(
+    viewModel: AddDataPointsViewModel,
+    onDismissRequest: () -> Unit = {},
+    dialogWidth: Dp? = null,
+    scrollInputContent: Boolean = true,
+) {
 
     val hidden by viewModel.hidden.observeAsState(true)
 
@@ -110,45 +117,65 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
         // but here we need custom behaviour for layout height animation
         // performance. Otherwise the entire window animates in height and
         // we drop a lot of frames.
-        DialogTheme {
-            Dialog(
-                onDismissRequest = onDismissRequest,
-                properties = DialogProperties(
-                    decorFitsSystemWindows = false,
-                    dismissOnClickOutside = false,
-                    usePlatformDefaultWidth = true,
-                )
+        AddDataPointsDialogContent(
+            onDismissRequest = onDismissRequest,
+            dialogWidth = dialogWidth,
+            onBack = {
+                if (viewModel.showCancelConfirmDialog.value == true) {
+                    viewModel.onConfirmCancelDismissed()
+                } else viewModel.onCancelClicked()
+            }
+        ) {
+            AddDataPointsScreen(
+                viewModel = viewModel,
+                scrollInputContent = scrollInputContent,
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AddDataPointsDialogContent(
+    onDismissRequest: () -> Unit = {},
+    dialogWidth: Dp? = null,
+    onBack: () -> Unit = {},
+    content: @Composable () -> Unit,
+) {
+    DialogTheme {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                decorFitsSystemWindows = false,
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = true,
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
+                Surface(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .let { if (dialogWidth != null) it.width(dialogWidth) else it }
+                        .systemBarsPadding()
+                        .imePadding(),
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surface,
                 ) {
-                    Surface(
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .systemBarsPadding()
-                            .imePadding(),
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.surface,
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(
-                                paddingValues = PaddingValues(
-                                    vertical = halfDialogInputSpacing,
-                                    horizontal = inputSpacingLarge,
-                                )
+                    Column(
+                        modifier = Modifier.padding(
+                            paddingValues = PaddingValues(
+                                vertical = halfDialogInputSpacing,
+                                horizontal = inputSpacingLarge,
                             )
-                        ) {
-                            AddDataPointsScreen(viewModel = viewModel)
-                        }
+                        )
+                    ) {
+                        content()
                     }
                 }
-                BackHandler {
-                    if (viewModel.showCancelConfirmDialog.value == true) {
-                        viewModel.onConfirmCancelDismissed()
-                    } else viewModel.onCancelClicked()
-                }
             }
+            BackHandler(onBack = onBack)
         }
     }
 }
@@ -182,7 +209,8 @@ private interface AddDataPointsCallbacks {
 
 @Composable
 private fun AddDataPointsScreen(
-    viewModel: AddDataPointsViewModel
+    viewModel: AddDataPointsViewModel,
+    scrollInputContent: Boolean = true,
 ) {
     val showTutorial by viewModel.showTutorial.observeAsState(false)
     val showCancelConfirmDialog by viewModel.showCancelConfirmDialog.observeAsState(false)
@@ -227,7 +255,8 @@ private fun AddDataPointsScreen(
         DataPointInputView(
             state = inputState,
             trackerPages = trackerPages,
-            callbacks = callbacks
+            callbacks = callbacks,
+            scrollInputContent = scrollInputContent,
         )
     }
 
@@ -244,7 +273,8 @@ private fun AddDataPointsScreen(
 private fun DataPointInputView(
     state: DataPointInputViewState,
     trackerPages: List<AddDataPointViewModel>,
-    callbacks: AddDataPointsCallbacks
+    callbacks: AddDataPointsCallbacks,
+    scrollInputContent: Boolean = true,
 ) = BoxWithConstraints {
     Column(modifier = Modifier.heightIn(max = maxHeight)) {
         HintHeader(
@@ -255,7 +285,13 @@ private fun DataPointInputView(
         )
 
         Box(modifier = Modifier.weight(1f, fill = false)) {
-            FadingScrollColumn {
+            if (scrollInputContent) FadingScrollColumn {
+                TrackerPager(
+                    currentPageIndex = state.currentPageIndex,
+                    trackerPages = trackerPages,
+                    onPageChanged = callbacks::onPageChanged
+                )
+            } else {
                 TrackerPager(
                     currentPageIndex = state.currentPageIndex,
                     trackerPages = trackerPages,
@@ -603,4 +639,3 @@ fun AddDataPointsViewPreview() {
         }
     }
 }
-

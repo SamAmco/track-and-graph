@@ -96,6 +96,7 @@ fun LineGraphBodyView(
     val errorColor = MaterialTheme.colorScheme.error.toArgb()
     val textColorPrimary = MaterialTheme.colorScheme.onSurface.toArgb()
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
+    val containerColor = MaterialTheme.colorScheme.surface.toArgb()
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
@@ -109,6 +110,7 @@ fun LineGraphBodyView(
         xyPlotSetup(
             xyPlot = xyPlot,
             onSurfaceColor = onSurfaceColor,
+            containerColor = containerColor,
         )
         xyPlot.clear()
 
@@ -197,7 +199,7 @@ private fun setLineGraphPaddingFromBounds(
     context: Context,
     binding: GraphXyPlotBinding,
     bounds: RectRegion,
-    endTime: OffsetDateTime
+    endTime: OffsetDateTime,
 ) {
     //Set up Y padding
     val minY = bounds.minY.toDouble()
@@ -226,7 +228,7 @@ private fun setLineGraphPaddingFromBounds(
 private fun setUpLineGraphXAxis(
     context: Context,
     binding: GraphXyPlotBinding,
-    endTime: OffsetDateTime
+    endTime: OffsetDateTime,
 ) {
     binding.xyPlot.domainTitle.text = ""
     binding.xyPlot.setDomainStep(StepMode.SUBDIVIDE, 11.0)
@@ -244,7 +246,7 @@ private fun setUpLineGraphXAxis(
                     context,
                     binding,
                     duration,
-                    endTime
+                    endTime,
                 )
                 return toAppendTo.append(formattedTimestamp)
             }
@@ -257,7 +259,7 @@ private fun getDateTimeFormattedForDuration(
     context: Context,
     binding: GraphXyPlotBinding,
     duration: Duration = Duration.ZERO,
-    endTime: OffsetDateTime
+    endTime: OffsetDateTime,
 ): String {
     val timestamp = endTime
         .atZoneSameInstant(ZoneId.systemDefault())

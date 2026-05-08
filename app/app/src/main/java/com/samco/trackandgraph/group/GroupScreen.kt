@@ -342,7 +342,13 @@ private fun GroupScreenContent(
         trackerClickListeners = TrackerClickListeners(
             onEdit = onTrackerEdit,
             onDescription = { groupDialogsViewModel.showFeatureDescriptionDialog(it) },
-            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.id, GroupChildType.TRACKER, it.name) },
+            onSymlinks = {
+                symlinksDialogViewModel.showSymlinks(
+                    it.id,
+                    GroupChildType.TRACKER,
+                    it.name
+                )
+            },
             onAdd = onTrackerAdd,
             onHistory = onTrackerHistory,
             onPlayTimer = onTrackerPlayTimer,
@@ -351,19 +357,37 @@ private fun GroupScreenContent(
         graphStatClickListeners = GraphStatClickListeners(
             onEdit = onGraphStatEdit,
             onClick = onGraphStatClick,
-            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.graphOrStat.id, GroupChildType.GRAPH, it.graphOrStat.name) },
+            onSymlinks = {
+                symlinksDialogViewModel.showSymlinks(
+                    it.graphOrStat.id,
+                    GroupChildType.GRAPH,
+                    it.graphOrStat.name
+                )
+            },
         ),
         groupClickListeners = GroupClickListeners(
             onClick = onGroupClick,
             onEdit = { group ->
                 addGroupDialogViewModel.showForEdit(groupId = group.id)
             },
-            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.id, GroupChildType.GROUP, it.name) },
+            onSymlinks = {
+                symlinksDialogViewModel.showSymlinks(
+                    it.id,
+                    GroupChildType.GROUP,
+                    it.name
+                )
+            },
         ),
         functionClickListeners = FunctionClickListeners(
             onClick = onFunctionClick,
             onEdit = onFunctionEdit,
-            onSymlinks = { symlinksDialogViewModel.showSymlinks(it.id, GroupChildType.FUNCTION, it.name) },
+            onSymlinks = {
+                symlinksDialogViewModel.showSymlinks(
+                    it.id,
+                    GroupChildType.FUNCTION,
+                    it.name
+                )
+            },
         ),
         onDeleteItem = { groupItemId, type, unique ->
             groupDialogsViewModel.showDeleteDialog(groupItemId, type, unique)
@@ -457,12 +481,8 @@ private fun GroupScreenContent(
     }
 }
 
-/**
- * Pure UI component for GroupScreen that can be previewed without
- * ViewModel dependencies.
- */
 @Composable
-private fun GroupScreenView(
+fun GroupScreenView(
     lazyGridState: LazyGridState,
     isLoading: Boolean,
     showEmptyText: Boolean,
@@ -481,7 +501,11 @@ private fun GroupScreenView(
     onDragStart: () -> Unit = {},
     onDragSwap: (Int, Int) -> Unit = { _, _ -> },
     onDragEnd: () -> Unit = {},
+    fabInsetPaddingOverride: PaddingValues? = null,
 ) {
+    val resolvedFabInsetPadding = fabInsetPaddingOverride
+        ?: WindowInsets.navigationBars.asPaddingValues()
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Group grid with items
         GroupGrid(
@@ -524,7 +548,7 @@ private fun GroupScreenView(
                 containerColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .testTag("trackAllFab")
-                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .padding(resolvedFabInsetPadding)
                     .then(Modifier.padding(inputSpacingLarge))
             ) {
                 Icon(
@@ -547,7 +571,7 @@ private fun GroupScreenView(
                 icon = R.drawable.deployed_code_update_24px,
                 modifier = Modifier
                     .testTag("releaseNotesButton")
-                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .padding(resolvedFabInsetPadding)
                     .widthIn(max = 300.dp)
                     .then(Modifier.padding(inputSpacingLarge))
             )
@@ -617,7 +641,13 @@ private fun GroupGrid(
                         TrackerItem(
                             tracker = item.displayTracker,
                             clickListeners = trackerClickListeners,
-                            onDelete = { onDeleteItem(item.groupItemId, DeleteType.TRACKER, it.unique) },
+                            onDelete = {
+                                onDeleteItem(
+                                    item.groupItemId,
+                                    DeleteType.TRACKER,
+                                    it.unique
+                                )
+                            },
                             onMoveTo = { onMoveItem(item.groupItemId, emptySet()) },
                             isElevated = isDragging,
                         )
@@ -633,9 +663,20 @@ private fun GroupGrid(
                         FunctionItem(
                             displayFunction = item.displayFunction,
                             clickListeners = functionClickListeners,
-                            onDelete = { onDeleteItem(item.groupItemId, DeleteType.FUNCTION, it.unique) },
+                            onDelete = {
+                                onDeleteItem(
+                                    item.groupItemId,
+                                    DeleteType.FUNCTION,
+                                    it.unique
+                                )
+                            },
                             onMove = { onMoveItem(item.groupItemId, emptySet()) },
-                            onDuplicate = { onDuplicateItem(item.groupItemId, GroupChildType.FUNCTION) },
+                            onDuplicate = {
+                                onDuplicateItem(
+                                    item.groupItemId,
+                                    GroupChildType.FUNCTION
+                                )
+                            },
                             isElevated = isDragging,
                         )
                     }
@@ -644,8 +685,19 @@ private fun GroupGrid(
                         GroupItem(
                             group = item.group,
                             clickListeners = groupClickListeners,
-                            onDelete = { onDeleteItem(item.groupItemId, DeleteType.GROUP, it.unique) },
-                            onMove = { onMoveItem(item.groupItemId, setOf(HiddenItem(SelectableItemType.GROUP, it.id))) },
+                            onDelete = {
+                                onDeleteItem(
+                                    item.groupItemId,
+                                    DeleteType.GROUP,
+                                    it.unique
+                                )
+                            },
+                            onMove = {
+                                onMoveItem(
+                                    item.groupItemId,
+                                    setOf(HiddenItem(SelectableItemType.GROUP, it.id))
+                                )
+                            },
                             isElevated = isDragging,
                         )
                     }
@@ -655,9 +707,20 @@ private fun GroupGrid(
                             graphStat = item.graph.viewData,
                             unique = item.graph.unique,
                             clickListeners = graphStatClickListeners,
-                            onDelete = { onDeleteItem(item.groupItemId, DeleteType.GRAPH_STAT, item.graph.unique) },
+                            onDelete = {
+                                onDeleteItem(
+                                    item.groupItemId,
+                                    DeleteType.GRAPH_STAT,
+                                    item.graph.unique
+                                )
+                            },
                             onMove = { onMoveItem(item.groupItemId, emptySet()) },
-                            onDuplicate = { onDuplicateItem(item.groupItemId, GroupChildType.GRAPH) },
+                            onDuplicate = {
+                                onDuplicateItem(
+                                    item.groupItemId,
+                                    GroupChildType.GRAPH
+                                )
+                            },
                             isElevated = isDragging,
                         )
                     }

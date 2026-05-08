@@ -88,12 +88,18 @@ private fun LastValueStatViewBody(
 ) {
     val context = LocalContext.current
     val weekdayNames = getWeekDayNames(context)
-    var durationText by remember { mutableStateOf("") }
+    fun getDurationText(): String {
+        val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
+        return formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
+    }
+
+    var durationText by remember(dataPoint.timestamp, context) {
+        mutableStateOf(getDurationText())
+    }
 
     LaunchedEffect(dataPoint.timestamp, context) {
         while (isActive) {
-            val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
-            durationText = formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
+            durationText = getDurationText()
             delay(1.seconds)
         }
     }

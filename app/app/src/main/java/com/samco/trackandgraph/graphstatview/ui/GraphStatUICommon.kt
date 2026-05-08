@@ -61,11 +61,11 @@ import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
 import kotlin.math.roundToLong
-import android.graphics.Color as GColor
 
 fun xyPlotSetup(
     xyPlot: XYPlot,
-    @ColorInt onSurfaceColor: Int
+    @ColorInt onSurfaceColor: Int,
+    @ColorInt containerColor: Int,
 ) {
     xyPlot.layoutManager.remove(xyPlot.legend)
     xyPlot.layoutManager.remove(xyPlot.rangeTitle)
@@ -103,9 +103,9 @@ fun xyPlotSetup(
     // I discovered it here: https://groups.google.com/g/androidplot/c/5QnJXD0uIIU
     xyPlot.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
 
-    xyPlot.graph.gridBackgroundPaint.color = GColor.TRANSPARENT
-    xyPlot.backgroundPaint.color = GColor.TRANSPARENT
-    xyPlot.graph.backgroundPaint.color = GColor.TRANSPARENT
+    xyPlot.graph.gridBackgroundPaint.color = containerColor
+    xyPlot.backgroundPaint.color = containerColor
+    xyPlot.graph.backgroundPaint.color = containerColor
 
     xyPlot.graph.paddingLeft = 0f
     xyPlot.graph.paddingBottom = 0f

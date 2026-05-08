@@ -84,6 +84,7 @@ private fun TimeHistogramBodyView(
 
     val context = LocalContext.current
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
+    val containerColor = MaterialTheme.colorScheme.surface.toArgb()
 
     val hasLegend = barValues.size > 1
 
@@ -94,7 +95,8 @@ private fun TimeHistogramBodyView(
         update = {
             xyPlotSetup(
                 xyPlot = xyPlot,
-                onSurfaceColor = onSurfaceColor
+                onSurfaceColor = onSurfaceColor,
+                containerColor = containerColor,
             )
             xyPlot.clear()
 

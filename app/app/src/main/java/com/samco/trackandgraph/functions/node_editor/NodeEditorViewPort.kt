@@ -105,12 +105,12 @@ class ViewportState(
     fun localBoundingBoxOf(layoutCoordinates: LayoutCoordinates): Rect? =
         _viewPortCoordinates.value?.localBoundingBoxOf(layoutCoordinates)
 
-    internal fun fitViewportToWorldRect(entries: List<Entry>) {
+    internal fun fitViewportToWorldRect(
+        entries: List<Entry>,
+        viewportWidth: Float,
+        viewportHeight: Float,
+    ) {
         if (!autoFitContent.value) return
-
-        val viewportCoords = _viewPortCoordinates.value ?: return
-        val viewportWidth = viewportCoords.size.width.toFloat()
-        val viewportHeight = viewportCoords.size.height.toFloat()
         if (viewportWidth <= 0f || viewportHeight <= 0f) return
         if (entries.isEmpty()) return
 
@@ -245,13 +245,17 @@ fun WorldLayout(
             Entry(p, d)
         }
 
-        if (viewportState != null && entries.isNotEmpty()) {
-            viewportState.fitViewportToWorldRect(entries)
-        }
-
         // This layout fills the available area; the camera (graphicsLayer) handles transform.
         val width = constraints.maxWidth
         val height = constraints.maxHeight
+
+        if (viewportState != null && entries.isNotEmpty()) {
+            viewportState.fitViewportToWorldRect(
+                entries = entries,
+                viewportWidth = width.toFloat(),
+                viewportHeight = height.toFloat(),
+            )
+        }
 
         layout(width, height) {
             entries.forEach { (placeable, pos) ->
