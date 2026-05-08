@@ -24,6 +24,7 @@ multiplatformMarkdownRenderer = "0.39.2"
 coil = "3.4.0"
 room = "2.8.4"
 shot = "6.1.0"
+screenshot = "0.0.1-alpha14"
 test-runner = "1.7.0"
 threetenabp = "1.4.9"
 threetenbp = "1.7.2"
@@ -60,6 +61,7 @@ com-android-application = { id = "com.android.application", version.ref = "andro
 com-google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android-gradle-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroidGradlePlugin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization"}
+screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }
@@ -109,6 +111,7 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 runner = { module = "androidx.test:runner", version.ref = "test-runner" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 shot = { module = "com.karumi:shot", version.ref = "shot" }
+screenshot-validation-api = { group = "com.android.tools.screenshot", name = "screenshot-validation-api", version.ref = "screenshot" }
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 threetenbp = { module = "org.threeten:threetenbp", version.ref = "threetenbp" }
 junit = { module = "junit:junit", version.ref = "junit" }

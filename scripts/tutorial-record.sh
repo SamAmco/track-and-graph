@@ -1,65 +1,63 @@
 #!/bin/bash
 
-# Record tutorial images for app with ImageMagick processing
+# Record tutorial images from Compose preview screenshot tests.
 
 set -e
 
-# Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/emulator-common.sh"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REFERENCE_DIR="$ROOT_DIR/app/app/src/screenshotTestDebug/reference"
 
-AVD_NAME="shot-api35-hi"
+cd "$ROOT_DIR"
+
+cleanup() {
+    rm -rf "$REFERENCE_DIR"
+}
+trap cleanup EXIT
 
 echo "==> Starting tutorial screenshot recording process"
 
-# Check prerequisites and setup
-check_no_devices
-ensure_avd "$AVD_NAME"
-boot_and_prep "$AVD_NAME"
+if ! command -v magick &>/dev/null; then
+    echo "Error: ImageMagick 'magick' command not found"
+    exit 1
+fi
 
-# Set high-res display for tutorial capture (1080x2340 @ 420dpi)
-set_display 1080 2340 420
+echo "==> Rendering Compose tutorial previews"
+rm -rf "$REFERENCE_DIR"
+(cd "$ROOT_DIR/app" && ./gradlew :app:updateDebugScreenshotTest --rerun-tasks)
 
-# Clean up any old tutorial screenshots
-cleanup_device_screenshots "/sdcard/Pictures/TutorialScreenshots/"
-
-echo "==> Running tutorial captures"
-(cd app && ./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.tutorial.TutorialScreenshots)
-
-# Wait for files to be written
-wait_for_files
-
-echo "==> Pulling tutorial screenshots from device and processing with ImageMagick"
-rm -rf tmp/tutorial_screenshots
-mkdir -p tmp/tutorial_screenshots
+echo "==> Converting rendered tutorial screenshots to density buckets"
 mkdir -p app/app/src/main/res/drawable-mdpi
 mkdir -p app/app/src/main/res/drawable-hdpi
 mkdir -p app/app/src/main/res/drawable-xhdpi
 mkdir -p app/app/src/main/res/drawable-xxhdpi
 mkdir -p app/app/src/main/res/drawable-xxxhdpi
 
-# Pull screenshots from device
-adb pull /sdcard/Pictures/TutorialScreenshots tmp/tutorial_screenshots/
-
-echo "==> Converting screenshots to optimal sizes for each density bucket"
-
 # Function to process a single tutorial image
 process_tutorial_image() {
     local image_num="$1"
-    local source_path="tmp/tutorial_screenshots/TutorialScreenshots/tutorial_${image_num}.png"
+    local screenshot_number
+    screenshot_number="$(printf "%02d" "$image_num")"
+    local source_path
+    source_path="$(find "$REFERENCE_DIR" -type f -name "*TutorialScreenshot${screenshot_number}_*.png" | sort | head -n 1)"
+
+    if [ -z "$source_path" ]; then
+        echo "ERROR: Could not find rendered tutorial screenshot $image_num in $REFERENCE_DIR"
+        exit 1
+    fi
     
     echo "Processing tutorial_${image_num}.png..."
     
-    # Source: 1080x2340 emulator capture - optimized for API 24 memory constraints
-    # mdpi (25% of emulator): ~270x585 pixels, 0.6MB memory - safe for low-end devices
+    # Source: 1080x2340 Compose preview - optimized for API 24 memory constraints
+    # mdpi (25% of source): ~270x585 pixels, 0.6MB memory - safe for low-end devices
     magick "$source_path" -resize 25% "app/app/src/main/res/drawable-mdpi/tutorial_image_${image_num}.png"
-    # hdpi (35% of emulator): ~378x819 pixels, 1.2MB memory - balanced size/quality
+    # hdpi (35% of source): ~378x819 pixels, 1.2MB memory - balanced size/quality
     magick "$source_path" -resize 35% "app/app/src/main/res/drawable-hdpi/tutorial_image_${image_num}.png"
-    # xhdpi (50% of emulator): ~540x1170 pixels, 2.5MB memory - good quality, API 24 safe
+    # xhdpi (50% of source): ~540x1170 pixels, 2.5MB memory - good quality, API 24 safe
     magick "$source_path" -resize 50% "app/app/src/main/res/drawable-xhdpi/tutorial_image_${image_num}.png"
-    # xxhdpi (75% of emulator): ~810x1755 pixels, 5.7MB memory - high-end devices
+    # xxhdpi (75% of source): ~810x1755 pixels, 5.7MB memory - high-end devices
     magick "$source_path" -resize 75% "app/app/src/main/res/drawable-xxhdpi/tutorial_image_${image_num}.png"
-    # xxxhdpi (100% of emulator): 1080x2340 pixels, 10.1MB memory - flagship devices with lots of RAM
+    # xxxhdpi (100% of source): 1080x2340 pixels, 10.1MB memory - flagship devices with lots of RAM
     cp "$source_path" "app/app/src/main/res/drawable-xxxhdpi/tutorial_image_${image_num}.png"
 }
 
@@ -69,8 +67,5 @@ process_tutorial_image 2
 process_tutorial_image 3
 
 echo "==> Tutorial images generated successfully"
-
-# Cleanup
-kill_emulator
 
 echo "==> Tutorial screenshot recording completed successfully"

@@ -25,6 +25,7 @@ plugins {
     id("shot")
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.screenshot)
 }
 
 // Load local.properties if it exists
@@ -36,6 +37,8 @@ val localProps = Properties().apply {
 }
 
 android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+
     if (project.hasProperty("usePromoTests")) {
         testBuildType = "promo"
     }
@@ -269,4 +272,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(testFixtures(project(":data")))
+
+    screenshotTestImplementation(libs.screenshot.validation.api)
+    screenshotTestImplementation(libs.compose.ui.tooling)
 }

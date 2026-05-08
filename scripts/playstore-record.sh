@@ -1,46 +1,31 @@
 #!/bin/bash
 
-# Record high-res Play Store screenshots
+# Record high-res Play Store screenshots from Compose preview screenshot tests.
 
 set -e
 
-# Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/emulator-common.sh"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REFERENCE_DIR="$ROOT_DIR/app/app/src/screenshotTestDebug/reference"
 
-AVD_NAME="shot-api35-hi"
+cd "$ROOT_DIR"
+
+cleanup() {
+    rm -rf "$REFERENCE_DIR"
+}
+trap cleanup EXIT
 
 echo "==> Starting Play Store screenshot recording process"
 
 # Fast-fail prerequisite checks
-if ! command -v avdmanager &>/dev/null && [ ! -x "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" ]; then
-    echo "Error: avdmanager missing. Install Android cmdline-tools."
-    exit 1
-fi
 if ! bundle exec fastlane --version &>/dev/null; then
     echo "Error: fastlane not available via bundler. Run: bundle install"
     exit 1
 fi
 
-# Check prerequisites and setup
-check_no_devices
-ensure_avd "$AVD_NAME"
-boot_and_prep "$AVD_NAME"
-
-# Set high-res display for Play Store (1080x2340 @ 420dpi)
-set_display 1080 2340 420
-
-# Clean up any old screenshots
-cleanup_device_screenshots "/sdcard/Pictures/TrackAndGraphScreenshots/"
-
-echo "==> Running promo captures"
-(cd app && ./gradlew :app:connectedPromoAndroidTest -PusePromoTests=true -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.promo.PromoScreenshots)
-
-# Wait for files to be written
-wait_for_files
-
-echo "==> Pulling screenshots from device and processing with frameit"
-mkdir -p tmp/device_screenshots
+echo "==> Rendering Compose previews"
+rm -rf "$REFERENCE_DIR"
+(cd "$ROOT_DIR/app" && ./gradlew :app:updateDebugScreenshotTest --rerun-tasks)
 
 # Define supported languages
 LANGUAGES=("en-GB" "es-ES" "de-DE" "fr-FR")
@@ -51,17 +36,19 @@ for lang in "${LANGUAGES[@]}"; do
     mkdir -p "fastlane/metadata/android/$lang/images/phoneScreenshots"
 done
 
-# Pull screenshots from device
-adb pull /sdcard/Pictures/TrackAndGraphScreenshots/ tmp/device_screenshots/
-
-# Cleanup
-kill_emulator
-
 # Copy raw screenshots to frameit directories for all languages
 for lang in "${LANGUAGES[@]}"; do
     echo "Copying screenshots for language: $lang"
     for i in {1..8}; do
-        cp "tmp/device_screenshots/TrackAndGraphScreenshots/$i.png" "fastlane/frameit/screenshots/$lang/$i.png"
+        screenshot_number="$(printf "%02d" "$i")"
+        source_file="$(find "$REFERENCE_DIR" -type f -name "*PlayStoreScreenshot${screenshot_number}_*.png" | sort | head -n 1)"
+
+        if [ -z "$source_file" ]; then
+            echo "ERROR: Could not find rendered screenshot $i in $REFERENCE_DIR"
+            exit 1
+        fi
+
+        cp "$source_file" "fastlane/frameit/screenshots/$lang/$i.png"
     done
 done
 
