@@ -56,9 +56,9 @@ import androidx.glance.text.TextStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.service.StartTimerAction
 import com.samco.trackandgraph.base.service.StartTimerAction.Companion.FeatureIdKey
-import com.samco.trackandgraph.ui.compose.theming.DarkColorScheme
-import com.samco.trackandgraph.ui.compose.theming.LightColorScheme
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
+import com.samco.trackandgraph.ui.theming.DarkColorScheme
+import com.samco.trackandgraph.ui.theming.LightColorScheme
+import com.samco.trackandgraph.ui.ui.buttonSize
 
 class TrackWidgetGlance : GlanceAppWidget() {
 

@@ -1,4 +1,6 @@
 pluginManagement {
+    includeBuild("build-logic")
+
     repositories {
         gradlePluginPortal()
         google()
@@ -19,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "track-and-graph"
 include(":app")
+include(":changelog-viewer")
 include(":data")
+include(":ui")

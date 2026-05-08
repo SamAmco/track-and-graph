@@ -27,10 +27,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
+import com.samco.trackandgraph.ui.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.smallIconSize
 
 @Composable
 fun SymlinkIcon(modifier: Modifier = Modifier) {

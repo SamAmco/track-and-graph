@@ -42,7 +42,7 @@ import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint

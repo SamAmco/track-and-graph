@@ -47,13 +47,13 @@ import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import com.samco.trackandgraph.selectitemdialog.HiddenItem
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.SelectorButton
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.SelectorButton
+import com.samco.trackandgraph.ui.ui.buttonSize
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.smallIconSize
 
 @Composable
 internal fun DataSourceNode(

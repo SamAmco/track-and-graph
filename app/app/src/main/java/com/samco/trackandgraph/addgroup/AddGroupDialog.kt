@@ -36,10 +36,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.ColorSpinner
-import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.ColorSpinner
+import com.samco.trackandgraph.ui.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
 
 @Composable
 fun AddGroupDialog(viewModel: AddGroupDialogViewModel, onDismissRequest: () -> Unit = {}) {

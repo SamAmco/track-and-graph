@@ -82,10 +82,10 @@ import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.helpers.getDayMonthFormatter
 import com.samco.trackandgraph.helpers.getMonthYearFormatter
-import com.samco.trackandgraph.ui.compose.ui.ColorCircle
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.ColorCircle
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.cardPadding
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZonedDateTime

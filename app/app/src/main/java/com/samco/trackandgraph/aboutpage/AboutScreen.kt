@@ -51,14 +51,14 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingXLarge
-import com.samco.trackandgraph.ui.compose.ui.TextBody1
-import com.samco.trackandgraph.ui.compose.ui.TextLink
-import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.InputSpacingXLarge
+import com.samco.trackandgraph.ui.ui.TextBody1
+import com.samco.trackandgraph.ui.ui.TextLink
+import com.samco.trackandgraph.ui.ui.TextSubtitle2
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import timber.log.Timber
@@ -126,18 +126,18 @@ fun AboutPageView(
                 .asPaddingValues()
         )
         .fillMaxSize()
-        .then(Modifier.padding(dialogInputSpacing)),
+        .then(Modifier.padding(_root_ide_package_.com.samco.trackandgraph.ui.ui.dialogInputSpacing)),
 ) {
     VersionText(versionText)
-    InputSpacingXLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingXLarge()
     TnGIcon(modifier = Modifier.align(Alignment.CenterHorizontally))
-    InputSpacingXLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingXLarge()
     Headline()
-    HalfDialogInputSpacing()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing()
     RepoLink(onLinkClicked = onRepoLinkClicked)
-    InputSpacingXLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingXLarge()
     AboutLibraries()
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
     LibraryTable()
 }
 
@@ -244,7 +244,7 @@ private fun VersionText(versionText: String) = Box(
 @Preview(showBackground = true)
 @Composable
 fun AboutPageViewPreview() {
-    TnGComposeTheme {
+    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
         AboutPageView("v1.0.0")
     }
 }

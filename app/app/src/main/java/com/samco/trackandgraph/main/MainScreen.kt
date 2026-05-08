@@ -91,9 +91,9 @@ import com.samco.trackandgraph.ui.compose.animation.NAV_ANIM_DURATION_MILLIS
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.compose.appbar.TopBarController
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.AppBarSearchField
-import com.samco.trackandgraph.ui.compose.theming.tngColors
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.AppBarSearchField
+import com.samco.trackandgraph.ui.theming.tngColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter

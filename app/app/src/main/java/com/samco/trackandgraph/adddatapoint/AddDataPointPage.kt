@@ -60,21 +60,22 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.mockSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.AddChipButton
-import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.DurationInputView
-import com.samco.trackandgraph.ui.compose.ui.FadingLazyRow
-import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
-import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
-import com.samco.trackandgraph.ui.compose.ui.TextChip
-import com.samco.trackandgraph.ui.compose.ui.TrackerNameHeadline
-import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.AddChipButton
+import com.samco.trackandgraph.ui.ui.DateTimeButtonRow
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.DurationInputView
+import com.samco.trackandgraph.ui.ui.FadingLazyRow
+import com.samco.trackandgraph.ui.ui.FullWidthTextField
+import com.samco.trackandgraph.ui.ui.LabelInputTextField
+import com.samco.trackandgraph.ui.ui.TextChip
+import com.samco.trackandgraph.ui.ui.TrackerNameHeadline
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.ValueInputTextField
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import org.threeten.bp.OffsetDateTime
@@ -267,7 +268,7 @@ internal fun TrackerPageView(
     ) {
         TrackerNameHeadline(name = state.name)
 
-        DialogInputSpacing()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
 
         if (state.timestamp != null) {
             DateTimeButtonRow(
@@ -277,7 +278,7 @@ internal fun TrackerPageView(
             )
         }
 
-        DialogInputSpacing()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
 
         if (state.suggestedValues?.isNotEmpty() == true) {
             SuggestedValues(
@@ -286,7 +287,7 @@ internal fun TrackerPageView(
                 onSuggestedValueSelected = callbacks::onSuggestedValueSelected,
                 onSuggestedValueLongPress = callbacks::onSuggestedValueLongPress
             )
-            DialogInputSpacing()
+            _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
         }
 
         // Track whether user has explicitly added label/note fields (separate from content)
@@ -308,10 +309,10 @@ internal fun TrackerPageView(
 
         when (state.trackerType) {
             TrackerType.NUMERICAL -> {
-                ValueInputTextField(
+                _root_ide_package_.com.samco.trackandgraph.ui.ui.ValueInputTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = inputSpacingLarge),
+                        .padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
                     textFieldValue = state.value,
                     onValueChange = callbacks::onValueChanged,
                     focusManager = focusManager,
@@ -335,7 +336,7 @@ internal fun TrackerPageView(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = inputSpacingLarge),
+                        .padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     DurationInputView(
@@ -428,16 +429,16 @@ private fun LabelAndNoteInputsView(
         }
     }
 
-    DialogInputSpacing()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
 
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
     if (labelAdded) {
-        LabelInputTextField(
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.LabelInputTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .bringIntoViewRequester(bringIntoViewRequester)
-                .padding(horizontal = inputSpacingLarge)
+                .padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge)
                 .onFocusEvent { state ->
                     if (state.isFocused) {
                         coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
@@ -463,7 +464,7 @@ private fun LabelAndNoteInputsView(
     }
 
     if (noteAdded) {
-        if (labelAdded) DialogInputSpacing()
+        if (labelAdded) _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
         
         // Track focus state for the note field
         var noteFieldFocused by remember { mutableStateOf(false) }
@@ -476,13 +477,16 @@ private fun LabelAndNoteInputsView(
                 bringIntoViewRequester.bringIntoView()
             }
         }
-        
-        FullWidthTextField(
+
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.FullWidthTextField(
             modifier = Modifier
                 .testTag("notesInput")
-                .heightIn(min = inputSpacingLarge, max = 200.dp)
+                .heightIn(
+                    min = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge,
+                    max = 200.dp
+                )
                 .bringIntoViewRequester(bringIntoViewRequester)
-                .padding(horizontal = inputSpacingLarge)
+                .padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge)
                 .onFocusEvent { focusState ->
                     noteFieldFocused = focusState.isFocused
                 },
@@ -502,24 +506,25 @@ private fun LabelAndNoteInputsView(
         )
     }
 
-    if (labelAdded xor noteAdded) DialogInputSpacing()
+    if (labelAdded xor noteAdded) _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
 
     FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = cardPadding),
+            .padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.cardPadding),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         if (!labelAdded) {
-            AddChipButton(text = stringResource(id = R.string.add_a_label)) {
+            _root_ide_package_.com.samco.trackandgraph.ui.ui.AddChipButton(text = stringResource(id = R.string.add_a_label)) {
                 onLabelAdded()
                 pendingFocus = PendingFocus.Label
             }
         }
         if (!noteAdded) {
-            AddChipButton(
+            _root_ide_package_.com.samco.trackandgraph.ui.ui.AddChipButton(
                 modifier = Modifier.testTag("addNoteChip"),
-                text = stringResource(id = R.string.add_a_note)) {
+                text = stringResource(id = R.string.add_a_note)
+            ) {
                 onNoteAdded()
                 pendingFocus = PendingFocus.Note
             }
@@ -559,9 +564,9 @@ private fun SuggestedValues(
         }
     }
 
-    FadingLazyRow(
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.FadingLazyRow(
         horizontalArrangement = Arrangement.spacedBy(
-            dialogInputSpacing,
+            _root_ide_package_.com.samco.trackandgraph.ui.ui.dialogInputSpacing,
             Alignment.CenterHorizontally
         )
     ) {
@@ -569,7 +574,7 @@ private fun SuggestedValues(
             items = stableItems,
             key = { it.key }
         ) { item ->
-            TextChip(
+            _root_ide_package_.com.samco.trackandgraph.ui.ui.TextChip(
                 text = item.displayText,
                 isSelected = item.data == selectedItem,
                 onClick = {
@@ -594,7 +599,7 @@ private data class SuggestedValueItem(
 @Preview(showBackground = true)
 @Composable
 fun TrackerPageViewPreview() {
-    TnGComposeTheme {
+    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
         CompositionLocalProvider(LocalSettings provides mockSettings) {
             val sampleState = TrackerPageState(
                 name = "Weight",
@@ -638,7 +643,7 @@ fun TrackerPageViewPreview() {
 @Preview(showBackground = true)
 @Composable
 fun TrackerPageViewPreviewWithChips() {
-    TnGComposeTheme {
+    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
         CompositionLocalProvider(LocalSettings provides mockSettings) {
             val sampleState = TrackerPageState(
                 name = "Weight",

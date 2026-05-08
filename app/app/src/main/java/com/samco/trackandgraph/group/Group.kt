@@ -47,12 +47,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Group
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.cardElevation
-import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.buttonSize
+import com.samco.trackandgraph.ui.ui.cardElevation
+import com.samco.trackandgraph.ui.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.dataVisColorList
 
 private val cornerImageSize = 140.dp to 70.dp

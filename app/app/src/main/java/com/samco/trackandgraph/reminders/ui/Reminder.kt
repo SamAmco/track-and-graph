@@ -53,12 +53,12 @@ import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Period
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.cardElevation
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.buttonSize
+import com.samco.trackandgraph.ui.ui.cardElevation
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
 import org.threeten.bp.LocalDateTime
 
 @Composable

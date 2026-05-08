@@ -38,13 +38,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.mockSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.ContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.DateTimeButtonRow
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.FullWidthTextField
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
 import kotlinx.coroutines.delay
 import org.threeten.bp.OffsetDateTime
 

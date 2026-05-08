@@ -15,11 +15,10 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
+    id("tng.android.application")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
@@ -37,21 +36,12 @@ val localProps = Properties().apply {
 }
 
 android {
-    compileSdk = libs.versions.androidSdk.get().toInt()
-
     if (project.hasProperty("usePromoTests")) {
         testBuildType = "promo"
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
-    }
-
     defaultConfig {
         applicationId = "com.samco.trackandgraph"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
         versionCode = 800017
         versionName = "10.1.0"
@@ -170,12 +160,8 @@ android {
 }
 
 kotlin {
-    jvmToolchain(libs.versions.buildJdk.get().toInt())
-
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
         optIn.add("kotlin.RequiresOptIn")
-        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
@@ -183,6 +169,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation(project(":data"))
+    implementation(project(":ui"))
 
     //Date and time
     implementation(libs.threetenabp)

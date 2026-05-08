@@ -25,14 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.DurationInput
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
-import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
+import com.samco.trackandgraph.ui.ui.CheckboxLabeledExpandingSection
+import com.samco.trackandgraph.ui.ui.ContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.DurationInput
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.LabelInputTextField
+import com.samco.trackandgraph.ui.ui.ValueInputTextField
 
 @Composable
 internal fun UpdateDialog(

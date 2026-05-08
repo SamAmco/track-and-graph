@@ -86,15 +86,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.DialogTheme
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
-import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
+import com.samco.trackandgraph.ui.theming.DialogTheme
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.ContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.FadingScrollColumn
+import com.samco.trackandgraph.ui.ui.SmallTextButton
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.ui.smallIconSize
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 

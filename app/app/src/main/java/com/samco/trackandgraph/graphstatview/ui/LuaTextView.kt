@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 
 @Composable
 fun LuaTextView(

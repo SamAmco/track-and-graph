@@ -53,13 +53,13 @@ import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
-import com.samco.trackandgraph.ui.compose.ui.SelectorButton
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.RowCheckbox
+import com.samco.trackandgraph.ui.ui.SelectorButton
 
 @Composable
 fun TimeSinceLastReminderConfigurationScreen(

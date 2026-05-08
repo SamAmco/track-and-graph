@@ -1,0 +1,11 @@
+<resources>
+    <string name="add">Ajouter</string>
+    <string name="add_a_note">Ajouter une note</string>
+    <string name="cancel">Annuler</string>
+    <string name="continue_word">Continuer</string>
+    <string name="create">Créer</string>
+    <string name="label">Étiquette</string>
+    <string name="search">Rechercher</string>
+    <string name="update">Mettre à jour</string>
+    <string name="value">Valeur</string>
+</resources>

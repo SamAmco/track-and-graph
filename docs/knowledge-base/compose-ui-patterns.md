@@ -4,6 +4,7 @@ description: The standard three-layer composable pattern used throughout the app
 topics:
   - ViewModel-binding layer collects state and calls the pure-UI composable
   - Pure-UI composable takes only state values and callbacks — no ViewModels
+  - New or migrated UI should generally include @Preview functions
   - @Preview functions call the pure-UI composable with hardcoded data
   - Naming conventions for each layer
   - TextChip/TngChip selected styling versus pressed-state feedback
@@ -11,6 +12,14 @@ keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, p
 ---
 
 # Compose UI Patterns
+
+## Shared UI Module Boundary
+
+Generic, reusable UI components live in `app/ui`. The app is fully Compose, so package names there do not need an extra `compose` segment; shared components are organized under packages such as `ui`, `theming`, and `utils`.
+
+Move components into `app/ui` when they are UI-only and can be used without depending on app feature packages, ViewModels, `DataInteractor`, or data DTOs. Keep components in `app/app` when they still import app helpers, settings, feature callbacks, or data-layer DTOs. Prefer parameterizing copy/callbacks/resources for reusable components instead of moving feature-specific strings into `app/ui`.
+
+When adding or migrating shared UI, add preview functions in the same file unless there is a specific blocker. Older shared UI files are not perfectly consistent yet, but the expected direction is that reusable UI has previews so changes can be inspected without wiring a feature screen.
 
 ## Three-Layer Composable Pattern
 
@@ -64,6 +73,7 @@ private fun GroupDeleteDialogContent(
 - Calls the **pure-UI composable** directly with hardcoded values
 - No context, no Hilt, no coroutines
 - Provide multiple previews for different states (e.g. unique vs non-unique)
+- For shared UI in `app/ui`, include previews for new components and for components migrated out of `app/app` unless a dependency makes previewing impractical
 
 ```kotlin
 @Preview

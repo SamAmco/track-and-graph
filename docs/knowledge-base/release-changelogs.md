@@ -1,13 +1,14 @@
 ---
 title: Release changelogs — workflow, structure, and Play Store limits
-description: Dual changelog system (public markdown for in-app/website, fastlane .txt for Play Store), the make changelog lua workflow, Play Store 500-character limit, 4-language localization requirement, and index.json maintenance.
+description: Dual changelog system (public markdown for in-app/website, fastlane .txt for Play Store), changelog viewer app, the make changelog lua workflow, Play Store 500-character limit, 4-language localization requirement, and index.json maintenance.
 topics:
   - make changelog: lua script creates temp file, opens in nvim, processes output
   - Public changelogs: changelogs/{versionName}/{locale}.md with index.json
   - Fastlane changelogs: fastlane/metadata/android/{regional-locale}/changelogs/{versionCode}.txt
   - Play Store limit: 500 characters per language for "What's new" text
+  - Changelog viewer app: paste markdown and preview the shared in-app dialog
   - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
-keywords: [changelog, release, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
+keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
 ---
 
 # Release Changelogs
@@ -36,6 +37,12 @@ Runs `scripts/new_changelog.lua` which:
 6. Validates `index.json` against `changelogs/index.schema.json` using `jsonschema-cli`
 
 The lua template has entries for all 4 locales with `regional` (e.g. `en-GB`) and `general` (e.g. `en`) locale codes. Regional codes are used for fastlane directory paths, general codes for public changelog filenames.
+
+## Previewing In-App Markdown
+
+Use the `changelog-viewer` Android module to preview public changelog markdown before publishing it. The viewer lets you paste or clear markdown text and opens the same shared changelog dialog content used by the production app.
+
+The dialog UI lives in the shared UI module and is parameterized by text/callbacks, so release-note feature copy remains owned by the consuming module while dialog layout, theme, and markdown rendering stay reusable.
 
 ## Locales
 

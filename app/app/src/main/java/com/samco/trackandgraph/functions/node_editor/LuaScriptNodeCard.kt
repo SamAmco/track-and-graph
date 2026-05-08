@@ -64,21 +64,21 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.LuaScriptConfigurationInput
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngTypography
-import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.IconTextButton
-import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
-import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingXLarge
-import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.resolve
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngTypography
+import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.buttonSize
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.IconTextButton
+import com.samco.trackandgraph.ui.ui.luaCodeVisualTransformation
+import com.samco.trackandgraph.ui.ui.slimOutlinedTextField
+import com.samco.trackandgraph.ui.ui.InputSpacingXLarge
+import com.samco.trackandgraph.ui.ui.LuaScriptEditDialog
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.ui.resolve
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.smallIconSize
 import io.github.z4kn4fein.semver.toVersion
 
 @Composable

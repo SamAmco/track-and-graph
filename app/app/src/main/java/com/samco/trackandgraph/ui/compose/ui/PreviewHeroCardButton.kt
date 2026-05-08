@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.ui.compose.ui
+package com.samco.trackandgraph.ui.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -41,8 +41,8 @@ import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.group.Tracker
 import com.samco.trackandgraph.group.TrackerContextMenuCallbacks
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
 
 private const val DEFAULT_PREVIEW_SCALE = 0.6f
 private val DEFAULT_PREVIEW_MEASURED_WIDTH = 220.dp

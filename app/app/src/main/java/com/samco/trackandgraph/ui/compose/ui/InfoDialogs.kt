@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.ui.compose.ui
+package com.samco.trackandgraph.ui.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.helpers.getDisplayValue
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import org.threeten.bp.OffsetDateTime
 
 @Composable

@@ -39,7 +39,7 @@ import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import org.threeten.bp.DayOfWeek

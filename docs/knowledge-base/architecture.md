@@ -1,13 +1,13 @@
 ---
 title: Architecture and conventions
-description: MVVM pattern, module structure (app/app UI, app/data data layer), KMP compatibility constraints, Hilt DI, Channel-based UI events, and coding conventions.
+description: MVVM pattern, module structure (app shell/features, shared UI, data layer, developer tooling), KMP compatibility constraints, Hilt DI, Channel-based UI events, build logic, and coding conventions.
 topics:
-  - Module structure: app/app (Compose/ViewModels) and app/data (Room/DAOs/DTOs)
+  - Module structure: app/app (app shell/features), app/ui (shared Compose UI), app/data (Room/DAOs/DTOs), and changelog-viewer tooling
   - KMP compatibility: no mocking frameworks without user approval; prefer testFixtures fakes
   - DataInteractor: single entry point for all data operations from UI layer
   - ViewModel UI events: Channel<T> pattern (not SharedFlow)
   - Conventions: DTOs in dto/, entities in entity/, fakes in testFixtures/
-keywords: [architecture, MVVM, Hilt, KMP, modules, Room, coroutines, DataInteractor, Channel, conventions, testing]
+keywords: [architecture, MVVM, Hilt, KMP, modules, ui, shared-ui, build-logic, changelog-viewer, Room, coroutines, DataInteractor, Channel, conventions, testing]
 ---
 
 # Architecture
@@ -34,10 +34,13 @@ When writing code or tests in the data layer, ask: "would this work in a KMP sha
 
 ## Module Structure
 
-Currently there are only two Gradle modules:
+The main Gradle modules are:
 
-- **`app/app`** — UI layer: Compose, ViewModels, navigation, reminders, widgets, DI
+- **`app/app`** — app shell and feature UI: Compose screens, ViewModels, navigation, reminders, widgets, DI
+- **`app/ui`** — shared Compose UI components, theming, markdown/dialog primitives, data-visualization color constants, and the UI resources those components own
 - **`app/data`** — Data layer: Room, DAOs, DTOs, DataInteractor and helpers
+- **`app/changelog-viewer`** — developer-only Android app for pasting release-note markdown and previewing the in-app changelog dialog
+- **`app/build-logic`** — included Gradle build containing Android application/library convention plugins
 
 The intent is to split into feature modules eventually. To make that easier, the top-level package structure of `app/app` already mirrors the intended feature module boundaries — each package should be treated as if it were a future module, meaning cross-package dependencies should be kept deliberate and minimal. The current top-level packages are:
 
@@ -61,9 +64,20 @@ The intent is to split into feature modules eventually. To make that easier, the
 | `viewgraphstat` | `:feature:viewgraphstat` |
 | `widgets` | `:feature:widgets` |
 | `di`, `main`, `navigation` | `:app` (shell/wiring) |
-| `helpers`, `ui`, `util` | `:core:ui` or similar shared module |
+| `helpers`, `util` | `:core` or similar shared module |
+
+Shared UI belongs in `app/ui` when it is reusable and does not depend on app feature packages, ViewModels, `DataInteractor`, or data DTOs. Keep feature-coupled components in `app/app` until they can be parameterized cleanly. Generic buttons, dialogs, markdown rendering, chips, spinners, text fields, theme, and UI-only resources belong in `app/ui`; app-specific dialogs or previews that import data DTOs, helpers, settings, or feature callbacks should stay in `app/app`.
 
 When adding new code, place it in the most appropriate existing package and avoid creating imports that would form circular dependencies between packages.
+
+## Build Logic
+
+`app/build-logic` provides convention plugins for common Android defaults:
+
+- `tng.android.application`
+- `tng.android.library`
+
+These plugins apply the Android plugin and centralize compile SDK, min/target SDK, Java compatibility, Kotlin toolchain, JVM target, and shared compiler flags. Keep Compose, Hilt, KSP, Room, signing, build types, and module-specific dependencies in module build files unless a pattern repeats broadly enough to justify a dedicated convention plugin.
 
 ## ViewModel → UI Events (one-shot)
 

@@ -31,8 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Period
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
 import org.threeten.bp.LocalDateTime
 
 @Composable

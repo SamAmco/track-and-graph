@@ -16,12 +16,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.FilterableFeatureConfigBehaviour
-import com.samco.trackandgraph.ui.compose.ui.CardPadding
-import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.FadingLazyRow
-import com.samco.trackandgraph.ui.compose.ui.TextChip
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.CardPadding
+import com.samco.trackandgraph.ui.ui.CheckboxLabeledExpandingSection
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.FadingLazyRow
+import com.samco.trackandgraph.ui.ui.TextChip
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 
 @Composable
 fun FilterByLabelSection(viewModel: FilterableFeatureConfigBehaviour) {

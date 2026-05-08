@@ -1,7 +1,7 @@
 ---
 title: Project map — directory structure
-description: Top-level directory layout of the Track & Graph repository, with notes on each module and folder's purpose.
-topics: [project-structure, modules, directories]
+description: Top-level directory layout of the Track & Graph repository, with notes on each module, build logic, and folder's purpose.
+topics: [project-structure, modules, directories, build-logic]
 ---
 
 # Project Map
@@ -14,13 +14,18 @@ app/                            # Gradle multi-module project root
 │       ├── test/               # Unit tests
 │       ├── androidTest/        # Instrumented tests
 │       └── debug/
-└── data/                       # Data layer (Room, DTOs, business logic)
+├── build-logic/                # Included Gradle build with convention plugins
+├── changelog-viewer/           # Developer app for previewing changelog markdown
+├── data/                       # Data layer (Room, DTOs, business logic)
     ├── schemas/                # Room migration schemas (JSON, one per DB version)
     └── src/
         ├── main/               # database/, dto/, interactor/, algorithms/, lua/, etc.
         ├── test/               # Unit tests
         ├── testFixtures/       # Fake implementations for testing
         └── androidTest/
+└── ui/                         # Shared Compose UI components, theming, and UI resources
+    └── src/
+        └── main/
 changelogs/                     # Release changelogs (per version)
 configuration/                  # Python venv / tooling config
 database-extract/               # Extracted DB snapshots (dev tooling)

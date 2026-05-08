@@ -61,16 +61,16 @@ import androidx.compose.ui.unit.times
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.TngColors
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.TngColors
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.LoadingOverlay
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.smallIconSize
 import kotlinx.coroutines.delay
 
 @Composable

@@ -60,9 +60,9 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.FadingScrollColumn
+import com.samco.trackandgraph.ui.ui.smallIconSize
 import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import org.threeten.bp.OffsetDateTime
 

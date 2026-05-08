@@ -44,11 +44,11 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewDat
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.helpers.formatTimeToDaysHoursMinutesSeconds
 import com.samco.trackandgraph.helpers.getWeekDayNames
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.DataPointValueAndDescription
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.cardPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import org.threeten.bp.Duration

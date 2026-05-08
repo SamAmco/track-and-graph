@@ -56,10 +56,10 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
-import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.EmptyPageHintText
+import com.samco.trackandgraph.ui.ui.LoadingOverlay
+import com.samco.trackandgraph.ui.ui.inputSpacingXLarge
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
 import sh.calvin.reorderable.ReorderableItem

@@ -61,113 +61,115 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.mockSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.AddChipButton
-import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
-import com.samco.trackandgraph.ui.compose.ui.WideButton
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.AddChipButton
+import com.samco.trackandgraph.ui.ui.DateTimeButtonRow
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.FadingScrollColumn
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.ValueInputTextField
+import com.samco.trackandgraph.ui.ui.WideButton
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
 @Composable
-fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = FadingScrollColumn {
-    val currentPage by viewModel.currentPage.observeAsState(0)
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentPage)
+fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) =
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.FadingScrollColumn {
+        val currentPage by viewModel.currentPage.observeAsState(0)
+        val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentPage)
 
-    // Snap layout info for center snapping
-    val snapInfo = remember(listState) {
-        SnapLayoutInfoProvider(
-            lazyListState = listState,
-            snapPosition = SnapPosition.Center
-        )
-    }
+        // Snap layout info for center snapping
+        val snapInfo = remember(listState) {
+            SnapLayoutInfoProvider(
+                lazyListState = listState,
+                snapPosition = SnapPosition.Center
+            )
+        }
 
-    // Heavy fling behavior for better snapping
-    val heavyFling = remember(snapInfo) {
-        val heavyDecay = exponentialDecay<Float>(
-            frictionMultiplier = 2.5f
-        )
-        val firmSnap = spring<Float>(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessHigh
-        )
+        // Heavy fling behavior for better snapping
+        val heavyFling = remember(snapInfo) {
+            val heavyDecay = exponentialDecay<Float>(
+                frictionMultiplier = 2.5f
+            )
+            val firmSnap = spring<Float>(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessHigh
+            )
 
-        snapFlingBehavior(
-            snapLayoutInfoProvider = snapInfo,
-            decayAnimationSpec = heavyDecay,
-            snapAnimationSpec = firmSnap
-        )
-    }
+            snapFlingBehavior(
+                snapLayoutInfoProvider = snapInfo,
+                decayAnimationSpec = heavyDecay,
+                snapAnimationSpec = firmSnap
+            )
+        }
 
-    LazyRow(
-        state = listState,
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .animateContentSize(), // Smooth height transitions
-        flingBehavior = heavyFling
-    ) {
-        items(3) { page ->
-            Box(
-                modifier = Modifier.fillParentMaxWidth()
-            ) {
-                when (page) {
-                    0 -> TutorialPage0()
-                    1 -> TutorialPage1()
-                    2 -> TutorialPage2 { viewModel.onNavigateToFaqClicked() }
+        LazyRow(
+            state = listState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .animateContentSize(), // Smooth height transitions
+            flingBehavior = heavyFling
+        ) {
+            items(3) { page ->
+                Box(
+                    modifier = Modifier.fillParentMaxWidth()
+                ) {
+                    when (page) {
+                        0 -> TutorialPage0()
+                        1 -> TutorialPage1()
+                        2 -> TutorialPage2 { viewModel.onNavigateToFaqClicked() }
+                    }
                 }
             }
         }
-    }
 
-    val buttonText =
-        if (currentPage == 2) stringResource(R.string.got_it)
-        else stringResource(R.string.next)
+        val buttonText =
+            if (currentPage == 2) stringResource(R.string.got_it)
+            else stringResource(R.string.next)
 
-    //Next button
-    WideButton(
-        text = buttonText,
-        onClick = viewModel::onButtonClicked
-    )
+        //Next button
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.WideButton(
+            text = buttonText,
+            onClick = viewModel::onButtonClicked
+        )
 
-    // Bidirectional synchronization between ViewModel and LazyRow
+        // Bidirectional synchronization between ViewModel and LazyRow
 
-    // LazyRow scroll position -> ViewModel
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.firstVisibleItemIndex }
-            .distinctUntilChanged()
-            .collect { page ->
-                viewModel.onSwipeToPage(page)
+        // LazyRow scroll position -> ViewModel
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.firstVisibleItemIndex }
+                .distinctUntilChanged()
+                .collect { page ->
+                    viewModel.onSwipeToPage(page)
+                }
+        }
+
+        // ViewModel currentPage -> LazyRow scroll position
+        LaunchedEffect(currentPage) {
+            if (currentPage != listState.firstVisibleItemIndex) {
+                listState.animateScrollToItem(currentPage)
             }
-    }
-
-    // ViewModel currentPage -> LazyRow scroll position
-    LaunchedEffect(currentPage) {
-        if (currentPage != listState.firstVisibleItemIndex) {
-            listState.animateScrollToItem(currentPage)
         }
     }
-}
 
 @Composable
 private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_3_description),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.titleMedium
     )
 
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
     //A vector drawing of a graph
     Icon(
@@ -179,10 +181,10 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
         tint = Color.Unspecified
     )
 
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_3_hint),
         textAlign = TextAlign.Center,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -192,8 +194,8 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
     Text(
         modifier = Modifier
             .padding(
-                horizontal = inputSpacingLarge,
-                vertical = cardPadding
+                horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge,
+                vertical = _root_ide_package_.com.samco.trackandgraph.ui.ui.cardPadding
             )
             .fillMaxWidth()
             .clickable { onFaqClicked() },
@@ -205,23 +207,23 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
         fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
 
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 }
 
 @Composable
 private fun TutorialPage1() = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_2_description),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.titleMedium
     )
 
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
     //A vector drawing of a graph
     Icon(
@@ -233,17 +235,17 @@ private fun TutorialPage1() = Column(
         contentDescription = null
     )
 
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_2_hint),
         textAlign = TextAlign.Center,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
         fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
 
-    InputSpacingLarge()
+    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 }
 
 @Composable
@@ -253,25 +255,25 @@ private fun TutorialPage0(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        DialogInputSpacing()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
 
         Text(
-            modifier = Modifier.padding(horizontal = inputSpacingLarge),
+            modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
             text = stringResource(R.string.adding_your_first_data_point),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge,
         )
 
-        InputSpacingLarge()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
         Text(
-            modifier = Modifier.padding(horizontal = inputSpacingLarge),
+            modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
             text = stringResource(R.string.each_data_point_has_a_timestamp_and_value),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleMedium,
         )
 
-        InputSpacingLarge()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
         Box(
             modifier = Modifier
@@ -285,9 +287,9 @@ private fun TutorialPage0(
                     onDateTimeSelected = {}
                 )
 
-                DialogInputSpacing()
+                _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
 
-                ValueInputTextField(
+                _root_ide_package_.com.samco.trackandgraph.ui.ui.ValueInputTextField(
                     textFieldValue = TextFieldValue(""),
                     onValueChange = {}
                 )
@@ -302,16 +304,16 @@ private fun TutorialPage0(
             )
         }
 
-        InputSpacingLarge()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
 
         Text(
-            modifier = Modifier.padding(horizontal = inputSpacingLarge),
+            modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
             text = stringResource(R.string.it_can_also_optionally_have_a_label_and_a_note),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleMedium,
         )
 
-        DialogInputSpacing()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
 
         Box(
             modifier = Modifier.scale(0.8f)
@@ -319,11 +321,19 @@ private fun TutorialPage0(
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = inputSpacingLarge),
+                    .padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                AddChipButton(text = stringResource(id = R.string.add_a_label)) { }
-                AddChipButton(text = stringResource(id = R.string.add_a_note)) {}
+                _root_ide_package_.com.samco.trackandgraph.ui.ui.AddChipButton(
+                    text = stringResource(
+                        id = R.string.add_a_label
+                    )
+                ) { }
+                _root_ide_package_.com.samco.trackandgraph.ui.ui.AddChipButton(
+                    text = stringResource(
+                        id = R.string.add_a_note
+                    )
+                ) {}
             }
 
             //An overlay that fills the parent with a semi transparent background that consumes all click events
@@ -335,14 +345,14 @@ private fun TutorialPage0(
             )
         }
 
-        InputSpacingLarge()
+        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun TutorialPage0Preview() {
-    TnGComposeTheme {
+    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
         CompositionLocalProvider(LocalSettings provides mockSettings) {
             TutorialPage0(
                 OffsetDateTime.of(
@@ -363,7 +373,7 @@ private fun TutorialPage0Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun TutorialPage1Preview() {
-    TnGComposeTheme {
+    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
         TutorialPage1()
     }
 }
@@ -371,7 +381,7 @@ private fun TutorialPage1Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun TutorialPage2Preview() {
-    TnGComposeTheme {
+    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
         TutorialPage2(onFaqClicked = {})
     }
 }

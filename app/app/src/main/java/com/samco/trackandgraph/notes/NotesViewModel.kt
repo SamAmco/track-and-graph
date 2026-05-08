@@ -28,9 +28,9 @@ import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.storage.PrefsPersistenceProvider
-import com.samco.trackandgraph.ui.compose.ui.Datable
-import com.samco.trackandgraph.ui.compose.ui.DateDisplayResolution
-import com.samco.trackandgraph.ui.compose.ui.DateScrollData
+import com.samco.trackandgraph.ui.ui.Datable
+import com.samco.trackandgraph.ui.ui.DateDisplayResolution
+import com.samco.trackandgraph.ui.ui.DateScrollData
 import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

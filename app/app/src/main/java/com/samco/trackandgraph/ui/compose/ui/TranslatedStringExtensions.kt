@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.ui.compose.ui
+package com.samco.trackandgraph.ui.ui
 
 import android.os.LocaleList
 import androidx.compose.runtime.Composable

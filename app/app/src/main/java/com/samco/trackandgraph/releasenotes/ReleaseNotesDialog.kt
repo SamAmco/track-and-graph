@@ -20,9 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,21 +37,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.samco.trackandgraph.ui.compose.ui.TnGMarkdown
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.localisation.TranslatedString
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.ButtonLocation
-import com.samco.trackandgraph.ui.compose.ui.CustomDialog
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
-import com.samco.trackandgraph.ui.compose.ui.FullWidthIconTextButton
-import com.samco.trackandgraph.ui.compose.ui.SelectorButton
-import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.resolve
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.ChangelogDialogContent
+import com.samco.trackandgraph.ui.ui.ChangelogReleaseNote
+import com.samco.trackandgraph.ui.ui.CustomDialog
+import com.samco.trackandgraph.ui.ui.SmallTextButton
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.ui.resolve
 
 @Composable
 fun ReleaseNotesDialog(
@@ -131,81 +123,20 @@ private fun ReleaseNotesDialogContent(
     onDonateClicked: () -> Unit = {},
     onSkipDonationClicked: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
-) = CustomDialog(
+) = ChangelogDialogContent(
+    releaseNotes = releaseNotes.map {
+        ChangelogReleaseNote(
+            version = it.version,
+            markdown = it.text.resolve() ?: "Failed to resolve release note text.. Sorry :/",
+        )
+    },
+    supportText = stringResource(R.string.release_notes_support_text),
+    maybeLaterText = stringResource(R.string.release_notes_maybe_later),
+    donateText = stringResource(R.string.release_notes_support_development),
+    onDonateClicked = onDonateClicked,
     onDismissRequest = onDismissRequest,
-    dismissOnClickOutside = false,
-    scrollContent = false,
-    dismissOnBackPress = false,
-) {
-    FadingScrollColumn(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
-    ) {
-        // Release notes content
-        releaseNotes.forEach { releaseNote ->
-            ReleaseNoteItem(
-                version = releaseNote.version,
-                text = releaseNote.text
-            )
-        }
-
-        DialogInputSpacing()
-
-        HorizontalDivider()
-
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.release_notes_support_text),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-        )
-
-        // Donation buttons
-        SelectorButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onSkipDonationClicked,
-            text = stringResource(R.string.release_notes_maybe_later),
-        )
-
-        FullWidthIconTextButton(
-            modifier = Modifier.fillMaxWidth(),
-            buttonColors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.tngColors.primary,
-            ),
-            iconSize = 28.dp,
-            onClick = onDonateClicked,
-            icon = R.drawable.bmc_logo,
-            textAlign = TextAlign.Center,
-            buttonLocation = ButtonLocation.End,
-            text = stringResource(R.string.release_notes_support_development)
-        )
-    }
-}
-
-@Composable
-private fun ReleaseNoteItem(
-    version: String,
-    text: TranslatedString
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // Version title
-        Text(
-            text = version,
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = dialogInputSpacing)
-        )
-
-        // Release note content using markdown viewer
-        TnGMarkdown(
-            content = text.resolve() ?: "Failed to resolve release note text.. Sorry :/",
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
+    onSkipDonationClicked = onSkipDonationClicked,
+)
 
 @Preview(locale = "en")
 @Composable

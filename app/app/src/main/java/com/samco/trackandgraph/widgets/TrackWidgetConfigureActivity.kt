@@ -29,7 +29,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.widgets.TrackWidgetState.WIDGET_PREFS_NAME
 import com.samco.trackandgraph.widgets.TrackWidgetState.getFeatureIdPref
 import dagger.hilt.android.AndroidEntryPoint

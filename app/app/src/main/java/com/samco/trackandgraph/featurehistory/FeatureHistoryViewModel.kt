@@ -34,9 +34,9 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.helpers.getDisplayValue
-import com.samco.trackandgraph.ui.compose.ui.Datable
-import com.samco.trackandgraph.ui.compose.ui.DateDisplayResolution
-import com.samco.trackandgraph.ui.compose.ui.DateScrollData
+import com.samco.trackandgraph.ui.ui.Datable
+import com.samco.trackandgraph.ui.ui.DateDisplayResolution
+import com.samco.trackandgraph.ui.ui.DateScrollData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview

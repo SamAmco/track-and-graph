@@ -56,17 +56,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.csvreadwriter.ImportFeaturesException
 import com.samco.trackandgraph.importexport.ImportExportFeatureUtils.getFileNameFromUri
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
-import com.samco.trackandgraph.ui.compose.ui.CustomDialog
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
-import com.samco.trackandgraph.ui.compose.ui.SelectorButton
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
+import com.samco.trackandgraph.ui.ui.CustomDialog
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.LoadingOverlay
+import com.samco.trackandgraph.ui.ui.SelectorButton
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 
 @Composable
 fun ImportExportDialog(

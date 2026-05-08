@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.ui.compose.ui
+package com.samco.trackandgraph.ui.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.helpers.formatDayMonthYear
 import com.samco.trackandgraph.helpers.formatHourMinute
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime

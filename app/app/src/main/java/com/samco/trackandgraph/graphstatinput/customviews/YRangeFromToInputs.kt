@@ -36,10 +36,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.YRangeConfigBehaviour
-import com.samco.trackandgraph.ui.compose.ui.DurationInput
-import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.DurationInput
+import com.samco.trackandgraph.ui.ui.MiniNumericTextField
+import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 
 @Composable
 fun YRangeFromToInputs(

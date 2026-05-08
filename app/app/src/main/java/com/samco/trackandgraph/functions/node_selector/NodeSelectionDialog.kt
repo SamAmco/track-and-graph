@@ -48,11 +48,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.localisation.TranslatedString
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.CustomDialog
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.Divider
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.CustomDialog
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.Divider
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 import androidx.compose.ui.unit.dp
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -65,12 +65,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.samco.trackandgraph.functions.node_editor.viewmodel.AddNodeData
-import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.resolve
-import com.samco.trackandgraph.ui.compose.ui.smallIconSize
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.FadingScrollColumn
+import com.samco.trackandgraph.ui.ui.buttonSize
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.ui.resolve
+import com.samco.trackandgraph.ui.ui.smallIconSize
+import com.samco.trackandgraph.ui.ui.cardPadding
 import com.samco.trackandgraph.functions.node_editor.InfoDisplay
 import com.samco.trackandgraph.functions.node_editor.NodeDescriptionDialog
 

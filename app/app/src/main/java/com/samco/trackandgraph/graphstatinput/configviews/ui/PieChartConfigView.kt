@@ -38,11 +38,11 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
-import com.samco.trackandgraph.ui.compose.ui.SelectorButton
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.RowCheckbox
+import com.samco.trackandgraph.ui.ui.SelectorButton
+import com.samco.trackandgraph.ui.ui.cardPadding
 
 @Composable
 fun PieChartConfigView(

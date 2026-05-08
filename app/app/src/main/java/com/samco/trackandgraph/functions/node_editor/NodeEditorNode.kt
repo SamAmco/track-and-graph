@@ -41,9 +41,9 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.functions.node_editor.viewmodel.ConnectorType
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.cardElevation
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.cardElevation
+import com.samco.trackandgraph.ui.ui.cardPadding
 import io.github.z4kn4fein.semver.toVersion
 import kotlin.Int
 

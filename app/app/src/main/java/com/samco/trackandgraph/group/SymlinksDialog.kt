@@ -32,12 +32,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.CustomDialog
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.CustomDialog
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.SmallTextButton
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 
 @Composable
 internal fun SymlinksDialog(

@@ -56,15 +56,15 @@ import com.samco.trackandgraph.backupandrestore.BackupAndRestoreNavKey
 import com.samco.trackandgraph.group.GroupNavKey
 import com.samco.trackandgraph.notes.NotesNavKey
 import com.samco.trackandgraph.reminders.ui.RemindersNavKey
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.Divider
-import com.samco.trackandgraph.ui.compose.ui.GradientDivider
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.Divider
+import com.samco.trackandgraph.ui.ui.GradientDivider
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 
 enum class DrawerMenuBrowserLocation {
     FAQ,

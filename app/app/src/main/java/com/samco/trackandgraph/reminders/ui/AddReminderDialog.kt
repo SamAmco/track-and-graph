@@ -30,9 +30,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
-import com.samco.trackandgraph.ui.compose.ui.CustomDialog
-import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.ui.CustomDialog
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 
 @Composable
 fun AddReminderDialog(

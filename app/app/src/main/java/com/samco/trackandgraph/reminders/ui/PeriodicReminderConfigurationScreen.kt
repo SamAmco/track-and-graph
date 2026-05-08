@@ -43,13 +43,13 @@ import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelButtons
-import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
+import com.samco.trackandgraph.ui.ui.DateTimeButtonRow
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.RowCheckbox
 import org.threeten.bp.OffsetDateTime
 
 @Composable

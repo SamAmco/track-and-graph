@@ -56,8 +56,8 @@ import com.samco.trackandgraph.navigation.DeepLink
 import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
-import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
-import com.samco.trackandgraph.ui.compose.utils.plus
+import com.samco.trackandgraph.ui.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.utils.plus
 
 @Composable
 fun SearchScreen(

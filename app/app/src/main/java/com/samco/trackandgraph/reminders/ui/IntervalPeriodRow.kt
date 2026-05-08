@@ -30,8 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Period
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 
 @Composable
 fun IntervalPeriodRow(

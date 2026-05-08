@@ -4,12 +4,13 @@ description: Gradle commands for building and running tests; screenshot test set
 topics:
   - Build: cd app && ./gradlew assembleDebug
   - Test: cd app && ./gradlew :data:testDebugUnitTest
+  - build-logic convention plugins tng.android.application and tng.android.library
   - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
   - Screenshots: make playstore-record, make snapshots-record, make tutorial-record
   - Promo build type: -PusePromoTests=true switches testBuildType to "promo"
   - Compose test timing: Thread.sleep blocks UI; use waitUntil with conditions instead
-keywords: [build, gradle, test, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, promo, playstore, frameit, fastlane, waitUntil, AndroidView, TestDataInteractor, groups_table]
+keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, promo, playstore, frameit, fastlane, waitUntil, AndroidView, TestDataInteractor, groups_table]
 ---
 
 # Build Commands
@@ -27,6 +28,15 @@ cd app && ./gradlew :data:testDebugUnitTest --tests "com.samco.trackandgraph.dat
 ```
 
 Test results XML: `data/build/test-results/testDebugUnitTest/`
+
+## Build Logic
+
+Shared Android build defaults live in the included build `app/build-logic`, not in `buildSrc`. It currently provides:
+
+- `tng.android.application`
+- `tng.android.library`
+
+Use these for Android app/library modules so SDK versions, Java compatibility, Kotlin toolchain, JVM target, and common Kotlin compiler flags stay centralized. Keep module-specific behavior in the module build file: application IDs, versioning, signing, build types, Compose/Hilt/KSP/Room plugins, and dependencies.
 
 ## Screenshot Tests
 

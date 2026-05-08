@@ -52,9 +52,9 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.helpers.formatTimeDuration
-import com.samco.trackandgraph.ui.compose.ui.ColorCircle
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.ui.ColorCircle
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.dataVisColorList
 import java.text.DecimalFormat
 import java.text.FieldPosition

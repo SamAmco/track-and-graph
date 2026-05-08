@@ -68,11 +68,11 @@ import com.samco.trackandgraph.functions.node_editor.viewmodel.FunctionsScreenVi
 import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.fabEnterTransition
-import com.samco.trackandgraph.ui.compose.ui.fabExitTransition
-import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.buttonSize
+import com.samco.trackandgraph.ui.ui.fabEnterTransition
+import com.samco.trackandgraph.ui.ui.fabExitTransition
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.Serializable
@@ -87,9 +87,9 @@ import com.samco.trackandgraph.functions.node_editor.viewmodel.Hint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.ui.tooling.preview.Preview
-import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.TextLink
+import com.samco.trackandgraph.ui.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.TextLink
 
 @Serializable
 data class FunctionsNavKey(

@@ -35,8 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.cardPadding
 import org.threeten.bp.LocalDateTime
 
 @Composable

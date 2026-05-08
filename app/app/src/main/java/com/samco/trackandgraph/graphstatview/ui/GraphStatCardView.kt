@@ -25,10 +25,10 @@ import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.group.SymlinkIcon
-import com.samco.trackandgraph.ui.compose.ui.buttonSize
-import com.samco.trackandgraph.ui.compose.ui.cardElevation
-import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.buttonSize
+import com.samco.trackandgraph.ui.ui.cardElevation
+import com.samco.trackandgraph.ui.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.ui.cardPadding
 
 data class GraphStatContextMenuCallbacks(
     val onDelete: (graphStat: IGraphStatViewData) -> Unit,

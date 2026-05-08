@@ -29,8 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.ui.ScaledStaticChip
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.ScaledStaticChip
+import com.samco.trackandgraph.ui.ui.cardPadding
 
 @Composable
 fun WeekDayReminderDetails(

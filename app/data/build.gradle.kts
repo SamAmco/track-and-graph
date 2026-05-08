@@ -15,10 +15,8 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    id("com.android.library")
+    id("tng.android.library")
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     alias(libs.plugins.jetbrains.kotlin.serialization)
@@ -27,11 +25,7 @@ plugins {
 apply(from = "gradle/lua-tasks.gradle.kts")
 
 android {
-    compileSdk = libs.versions.androidSdk.get().toInt()
-
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 javaCompileOptions {
             annotationProcessorOptions {
@@ -72,18 +66,9 @@ javaCompileOptions {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
-    }
-
     kotlin {
-        jvmToolchain(libs.versions.buildJdk.get().toInt())
-
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
             optIn.add("kotlin.RequiresOptIn")
-            freeCompilerArgs.add("-Xannotation-default-target=param-property")
         }
     }
 
