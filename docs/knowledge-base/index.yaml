@@ -30,8 +30,8 @@ docs:
 
   - file: build-commands.md
     title: Build, test, and screenshot commands
-    description: Gradle commands for building and running tests; build-logic convention plugins; screenshot test setup; Compose test timing pitfalls with AndroidView content; TestDataInteractor raw SQL schema note.
-    keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, promo, playstore, frameit, fastlane, waitUntil, AndroidView, TestDataInteractor, groups_table]
+    description: Gradle commands for building and running tests; build-logic convention plugins; Compose Play Store screenshots; Compose tutorial image capture.
+    keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, status-bar, showSystemUi]
 
   - file: component-types.md
     title: Component types — Trackers, Functions, Graphs, Reminders, Groups

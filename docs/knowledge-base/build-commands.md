@@ -1,16 +1,16 @@
 ---
 title: Build, test, and screenshot commands
-description: Gradle commands for building and running tests; screenshot test setup (promo build type, prerequisites, Compose test timing pitfalls with AndroidView content); TestDataInteractor raw SQL must match current groups_table schema.
+description: Gradle commands for building and running tests; Compose screenshot-test setup for Play Store and tutorial image capture.
 topics:
   - Build: cd app && ./gradlew assembleDebug
   - Test: cd app && ./gradlew :data:testDebugUnitTest
   - build-logic convention plugins tng.android.application and tng.android.library
   - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
-  - Screenshots: make playstore-record, make snapshots-record, make tutorial-record
-  - Promo build type: -PusePromoTests=true switches testBuildType to "promo"
-  - Compose test timing: Thread.sleep blocks UI; use waitUntil with conditions instead
-keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, promo, playstore, frameit, fastlane, waitUntil, AndroidView, TestDataInteractor, groups_table]
+  - Screenshots: make playstore-record, make tutorial-record
+  - Play Store screenshots: Compose screenshot test previews, no emulator, fake status bar
+  - Tutorial screenshots: Compose screenshot test previews, no emulator
+keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, status-bar, showSystemUi]
 ---
 
 # Build Commands
@@ -38,33 +38,37 @@ Shared Android build defaults live in the included build `app/build-logic`, not 
 
 Use these for Android app/library modules so SDK versions, Java compatibility, Kotlin toolchain, JVM target, and common Kotlin compiler flags stay centralized. Keep module-specific behavior in the module build file: application IDs, versioning, signing, build types, Compose/Hilt/KSP/Room plugins, and dependencies.
 
-## Screenshot Tests
+## Play Store Screenshots
 
-Play Store screenshots and snapshot tests use Makefile targets that delegate to scripts in `scripts/`:
+Play Store screenshots use Compose preview screenshot tests plus frameit:
 
 ```bash
-make playstore-record    # High-res Play Store screenshots (scripts/playstore-record.sh)
-make snapshots-record    # Low-res snapshot baselines (scripts/snapshots-record.sh)
-make snapshots-verify    # Verify snapshots against baselines
-make tutorial-record     # Tutorial images for in-app use
+make playstore-record    # Render Compose screenshot previews and process them through frameit
+make tutorial-record     # Render Compose tutorial previews and resize app tutorial images
 ```
 
 ### Prerequisites
-- Android cmdline-tools installed (`avdmanager`, `sdkmanager`)
 - Ruby + bundler + fastlane (`bundle install` from project root)
-- No other emulators/devices running
 
-### Promo Build Type
-The `promo` build type (`app/app/build.gradle.kts`) is used for Play Store screenshot tests. AGP only generates `connectedXxxAndroidTest` tasks for the configured `testBuildType` (default: `debug`). The `-PusePromoTests=true` Gradle property switches `testBuildType` to `"promo"`, enabling `connectedPromoAndroidTest`. This flag is passed automatically by `scripts/playstore-record.sh`.
+The Play Store path does not use an emulator or Shot. `make playstore-record` renders Compose previews via the `screenshotTest` source set, copies the generated reference PNGs into `fastlane/frameit/screenshots/`, then runs frameit. The screenshot content and fixtures live in `app/app/src/main/java/com/samco/trackandgraph/playstore/` so Android Studio previews can render them. Thin `@PreviewTest` wrappers live in `app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/playstore/`.
 
-### Compose Test Timing with AndroidView Content
-Graphs use `AndroidViewBinding` (MPAndroidChart) which renders outside Compose's layout system. Key pitfalls:
-- **`Thread.sleep` blocks UI rendering**: Compose test framework synchronizes the test thread with the main thread, so `Thread.sleep` prevents AndroidView content from rendering during the wait.
-- **`waitForIdle` returns too early**: Compose considers itself idle before AndroidView content finishes rendering.
-- **`waitUntilDoesNotExist` race condition**: If checked before loading indicators are composed (e.g. in a lazy list), it passes immediately because the nodes don't exist yet.
-- **Working pattern**: Use `composeRule.waitUntil(timeoutMillis) { condition }` which polls with yields between checks, allowing the UI thread to render. Combine positive checks (e.g. expected card count) with negative checks (no loading indicators) for reliability.
+Keep screenshot-only app data in the playstore package rather than reusing old emulator demo-data generators. The screenshot fixtures are deterministic and can call the real production composables directly, including graph cards and other `AndroidView`-backed content, as long as the fixture provides the state that a ViewModel would normally load from the database.
 
-### Test Demo Data
-Demo data for screenshots is in `data/src/testFixtures/` (shared between promo and snapshot tests). `TestDataInteractor` creates the Room database with a raw SQL insert for the root group — this must match the current `groups_table` schema (currently: `id`, `name`, `color_index` only — no `display_index` or `parent_group_id`, which moved to `group_items_table`).
+### Play Store System UI
 
-**Display order pitfall**: `insertGroup` always inserts at display_index 0, shifting existing items down. Sequential inserts end up in reverse order. If tests navigate by index (e.g. `onAllNodes(hasTestTag("groupCard"))[1]`), call `updateGroupChildOrder` after creation to set explicit ordering — see `PlaystoreScreenshotsDemoData.kt` and `FirstOpenTutorialDemoData.kt` for examples.
+Do not rely on `@Preview(showSystemUi = true)` for Play Store screenshot PNGs. Android Studio can show system UI for interactive previews, but the Compose screenshot-test renderer does not include the Android status bar in generated images. The Play Store frame therefore draws a small fake status bar in Compose and lays out content as if status/navigation bars exist.
+
+Relevant implementation points:
+
+- `PlayStorePreviewEnvironment` draws the fake status bar over the screenshot.
+- App bars use an explicit status-bar height override so they draw behind the fake status bar while their content is padded down.
+- Screens with top overlays/FABs pass explicit top padding instead of depending on `WindowInsets.systemBars`, which can be zero in the screenshot renderer.
+- Group-screen screenshots pass explicit bottom inset padding so the track-all FAB respects the fake navigation area while scrollable content can still draw behind it.
+
+If Play Store screenshots have a missing or misaligned status bar, adjust the playstore screenshot frame helpers/constants first. Avoid moving this behavior into frameit unless there is a strong reason; frameit only frames the already-rendered PNGs and cannot fix app content that was laid out without the expected insets.
+
+## Tutorial Screenshots
+
+Tutorial image capture also uses Compose screenshot tests now. The main-source tutorial screenshot content lives in `app/app/src/main/java/com/samco/trackandgraph/tutorial/TutorialScreenshotContent.kt`, with thin wrappers in `app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/tutorial/`.
+
+`scripts/tutorial-record.sh` renders the screenshot-test previews, finds `TutorialScreenshot01..03`, and resizes those 1080x2340 PNGs into all `drawable-*dpi/tutorial_image_*.png` buckets with ImageMagick. These tutorial images intentionally skip the fake Play Store status bar.
