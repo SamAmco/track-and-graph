@@ -22,7 +22,6 @@ plugins {
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
-    id("shot")
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.screenshot)
@@ -39,16 +38,11 @@ val localProps = Properties().apply {
 android {
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
-    if (project.hasProperty("usePromoTests")) {
-        testBuildType = "promo"
-    }
-
     defaultConfig {
         applicationId = "com.samco.trackandgraph"
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
         versionCode = 800017
         versionName = "10.1.0"
-        testInstrumentationRunner = "com.samco.trackandgraph.screenshots.HiltTestRunner"
         // Default manifest placeholder for RecreateAlarms receiver
         manifestPlaceholders["recreateAlarmsEnabled"] = "true"
 
@@ -108,35 +102,6 @@ android {
             manifestPlaceholders["NETWORK_SECURITY_CONFIG"] =
                 "@xml/production_network_security_config"
             manifestPlaceholders["recreateAlarmsEnabled"] = "true"
-        }
-        create("screenshots") {
-            initWith(getByName("release"))
-            // Let “screenshots” resolve any debug-only deps
-            matchingFallbacks += listOf("debug")
-            // Flip the receiver OFF just for screenshots
-            // because it runs before hilt has had a chance to inject
-            // and crashes the tests
-            manifestPlaceholders["recreateAlarmsEnabled"] = "false"
-            // Disable minification to keep symbols/ids stable for tests
-            isMinifyEnabled = false
-            isShrinkResources = false
-            // Use debug signing for testing (allows installation on emulator)
-            signingConfig = signingConfigs.getByName("debug")
-        }
-        create("promo") {
-            initWith(getByName("release"))
-            matchingFallbacks += listOf("release")
-            // Flip the receiver OFF just for screenshots
-            // because it runs before hilt has had a chance to inject
-            // and crashes the tests
-            manifestPlaceholders["recreateAlarmsEnabled"] = "false"
-            // Disable minification to keep symbols/ids stable for tests
-            isMinifyEnabled = false
-            isShrinkResources = false
-            // Use debug signing for testing (allows installation on emulator)
-            signingConfig = signingConfigs.getByName("debug")
-            // Must be debuggable so Gradle generates connectedPromoAndroidTest task
-            isDebuggable = true
         }
     }
 
@@ -259,19 +224,6 @@ dependencies {
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.turbine)
     testImplementation(testFixtures(project(":data")))
-
-    // Instrumented tests
-    androidTestImplementation(libs.shot.android)
-    androidTestImplementation(libs.hilt.android.testing)
-    kspAndroidTest(libs.hilt.compiler)
-    androidTestImplementation(libs.runner)
-    androidTestImplementation(libs.junit.ktx)
-    androidTestImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockito.android)
-    androidTestImplementation(libs.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.test.rules)
-    androidTestImplementation(libs.androidx.uiautomator)
-    androidTestImplementation(testFixtures(project(":data")))
 
     screenshotTestImplementation(libs.screenshot.validation.api)
     screenshotTestImplementation(libs.compose.ui.tooling)

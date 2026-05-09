@@ -71,8 +71,6 @@ class DemoDBGenerator {
 
     @Test
     fun generateDemoDB(): Unit = runBlocking {
-        println("creating screenshot data")
-        createScreenshotsGroup(dataInteractor)
         println("creating faq1 data")
         createFaq1Group(dataInteractor)
         println("creating first open tutorial data")

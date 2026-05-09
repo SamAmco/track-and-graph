@@ -92,27 +92,11 @@ bundle-release:
 assemble-bundle-release:
 	cd app && ./gradlew :app:clean :app:assembleRelease :app:bundleRelease
 
-# ---------- 1) RECORD LOW-RES SNAPSHOT BASELINES ----------
-.PHONY: snapshots-record
-snapshots-record:
-	@./scripts/snapshots-record.sh
-
-# ---------- 2) VERIFY LOW-RES SNAPSHOTS ----------
-.PHONY: snapshots-verify
-snapshots-verify:
-	@./scripts/snapshots-verify.sh
-
-# ---------- 3) RECORD HIGH-RES PLAY STORE SHOTS ----------
+# ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
 .PHONY: playstore-record
 playstore-record:
 	@./scripts/playstore-record.sh
 
-.PHONY: reframe
-reframe:
-	@echo "Processing existing screenshots with frameit for all languages..."
-	@./scripts/frameit-process.sh
-
-# ---------- 4) RECORD TUTORIAL IMAGES FOR APP ----------
 .PHONY: tutorial-record
 tutorial-record:
 	@./scripts/tutorial-record.sh

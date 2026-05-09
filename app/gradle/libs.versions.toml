@@ -23,7 +23,6 @@ mockitoKotlinVersion = "6.2.3"
 multiplatformMarkdownRenderer = "0.39.2"
 coil = "3.4.0"
 room = "2.8.4"
-shot = "6.1.0"
 screenshot = "0.0.1-alpha14"
 test-runner = "1.7.0"
 threetenabp = "1.4.9"
@@ -50,8 +49,6 @@ jdk = "17"
 androidSdk = "36"
 minSdk = "24"
 targetSdk = "36"
-rules = "1.7.0"
-uiautomator = "2.3.0"
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -78,7 +75,6 @@ compose-ui-viewbinding = { module = "androidx.compose.ui:ui-viewbinding", versio
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
 compose-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
@@ -99,7 +95,6 @@ luak-jvm = { module = "com.soywiz.korlibs.luak:luak-android", version.ref = "lua
 material = { module = "com.google.android.material:material", version.ref = "material" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
-mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoCore" }
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "multiplatformMarkdownRenderer" }
@@ -110,7 +105,6 @@ room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 runner = { module = "androidx.test:runner", version.ref = "test-runner" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
-shot = { module = "com.karumi:shot", version.ref = "shot" }
 screenshot-validation-api = { group = "com.android.tools.screenshot", name = "screenshot-validation-api", version.ref = "screenshot" }
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 threetenbp = { module = "org.threeten:threetenbp", version.ref = "threetenbp" }
@@ -126,8 +120,5 @@ androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", vers
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewModelNavigation3" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }
-shot-android = { module = "com.karumi:shot-android", version.ref = "shot" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
-androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
-androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
