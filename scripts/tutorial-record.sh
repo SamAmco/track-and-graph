@@ -48,16 +48,16 @@ process_tutorial_image() {
     
     echo "Processing tutorial_${image_num}.png..."
     
-    # Source: 1080x2340 Compose preview - optimized for API 24 memory constraints
-    # mdpi (25% of source): ~270x585 pixels, 0.6MB memory - safe for low-end devices
+    # Source: 1080x1920 Compose preview - optimized for API 24 memory constraints
+    # mdpi (25% of source): ~270x480 pixels, 0.5MB memory - safe for low-end devices
     magick "$source_path" -resize 25% "app/app/src/main/res/drawable-mdpi/tutorial_image_${image_num}.png"
-    # hdpi (35% of source): ~378x819 pixels, 1.2MB memory - balanced size/quality
+    # hdpi (35% of source): ~378x672 pixels, 1.0MB memory - balanced size/quality
     magick "$source_path" -resize 35% "app/app/src/main/res/drawable-hdpi/tutorial_image_${image_num}.png"
-    # xhdpi (50% of source): ~540x1170 pixels, 2.5MB memory - good quality, API 24 safe
+    # xhdpi (50% of source): ~540x960 pixels, 2.0MB memory - good quality, API 24 safe
     magick "$source_path" -resize 50% "app/app/src/main/res/drawable-xhdpi/tutorial_image_${image_num}.png"
-    # xxhdpi (75% of source): ~810x1755 pixels, 5.7MB memory - high-end devices
+    # xxhdpi (75% of source): ~810x1440 pixels, 4.7MB memory - high-end devices
     magick "$source_path" -resize 75% "app/app/src/main/res/drawable-xxhdpi/tutorial_image_${image_num}.png"
-    # xxxhdpi (100% of source): 1080x2340 pixels, 10.1MB memory - flagship devices with lots of RAM
+    # xxxhdpi (100% of source): 1080x1920 pixels, 7.9MB memory - flagship devices with lots of RAM
     cp "$source_path" "app/app/src/main/res/drawable-xxxhdpi/tutorial_image_${image_num}.png"
 }
 

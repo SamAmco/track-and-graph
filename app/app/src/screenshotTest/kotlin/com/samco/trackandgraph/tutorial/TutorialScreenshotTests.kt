@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 
-private const val TUTORIAL_SCREENSHOT_DEVICE = "spec:width=1080px,height=2340px,dpi=420"
+private const val TUTORIAL_SCREENSHOT_DEVICE = "spec:width=1080px,height=1920px,dpi=420"
 
 @PreviewTest
 @Preview(name = "Tutorial Screenshot 1", device = TUTORIAL_SCREENSHOT_DEVICE)

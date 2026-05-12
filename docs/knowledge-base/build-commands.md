@@ -71,4 +71,4 @@ If Play Store screenshots have a missing or misaligned status bar, adjust the pl
 
 Tutorial image capture also uses Compose screenshot tests now. The main-source tutorial screenshot content lives in `app/app/src/main/java/com/samco/trackandgraph/tutorial/TutorialScreenshotContent.kt`, with thin wrappers in `app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/tutorial/`.
 
-`scripts/tutorial-record.sh` renders the screenshot-test previews, finds `TutorialScreenshot01..03`, and resizes those 1080x2340 PNGs into all `drawable-*dpi/tutorial_image_*.png` buckets with ImageMagick. These tutorial images intentionally skip the fake Play Store status bar.
+`scripts/tutorial-record.sh` renders the screenshot-test previews, finds `TutorialScreenshot01..03`, and resizes those 1080x1920 PNGs into all `drawable-*dpi/tutorial_image_*.png` buckets with ImageMagick. These tutorial images intentionally skip the fake Play Store status bar.

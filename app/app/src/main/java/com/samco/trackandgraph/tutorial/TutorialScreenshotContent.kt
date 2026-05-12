@@ -64,7 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import org.threeten.bp.Duration
 import java.util.TimeZone
 
-private const val TUTORIAL_SCREENSHOT_DEVICE = "spec:width=1080px,height=2340px,dpi=420"
+private const val TUTORIAL_SCREENSHOT_DEVICE = "spec:width=1080px,height=1920px,dpi=420"
 
 @Preview(name = "Tutorial Screenshot 1", device = TUTORIAL_SCREENSHOT_DEVICE)
 @Composable
