@@ -577,9 +577,12 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateFunction(groupItemId: Long): CreatedComponent? =
+    override suspend fun duplicateFunction(
+        groupItemId: Long,
+        newName: String,
+    ): CreatedComponent? =
         withContext(io) {
-            functionHelper.duplicateFunction(groupItemId)?.also { created ->
+            functionHelper.duplicateFunction(groupItemId, newName)?.also { created ->
                 dataUpdateEvents.emit(DataUpdateType.FunctionCreated(created.componentId))
                 groupItemDao.getGroupItemById(created.groupItemId)?.groupId?.let {
                     dataUpdateEvents.emit(DataUpdateType.DisplayIndex(it))

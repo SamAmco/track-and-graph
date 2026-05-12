@@ -49,9 +49,10 @@ interface FunctionHelper {
      * The duplicate is placed immediately after the original in the same group.
      *
      * @param groupItemId The GroupItem.id of the placement to duplicate.
+     * @param newName The display name to assign to the duplicate.
      * @return The new component's ID and GroupItem placement, or null if the function was not found.
      */
-    suspend fun duplicateFunction(groupItemId: Long): CreatedComponent?
+    suspend fun duplicateFunction(groupItemId: Long, newName: String): CreatedComponent?
 
     suspend fun hasAnyFunctions(): Boolean
 }

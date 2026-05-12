@@ -200,7 +200,10 @@ internal class FunctionHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun duplicateFunction(groupItemId: Long): CreatedComponent? =
+    override suspend fun duplicateFunction(
+        groupItemId: Long,
+        newName: String,
+    ): CreatedComponent? =
         withContext(io) {
             transactionHelper.withTransaction {
                 val originalGroupItem = groupItemDao.getGroupItemById(groupItemId)
@@ -210,7 +213,12 @@ internal class FunctionHelperImpl @Inject constructor(
 
                 // Create a copy of the feature
                 val feature = dao.getFeatureById(function.featureId) ?: return@withTransaction null
-                val newFeatureId = dao.insertFeature(feature.copy(id = 0L))
+                val newFeatureId = dao.insertFeature(
+                    feature.copy(
+                        id = 0L,
+                        name = newName,
+                    )
+                )
 
                 // Create a copy of the function (functionGraph is already serialized)
                 val newFunctionId = dao.insertFunction(

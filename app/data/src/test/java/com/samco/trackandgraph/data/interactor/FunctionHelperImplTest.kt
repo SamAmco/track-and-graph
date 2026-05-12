@@ -381,12 +381,13 @@ class FunctionHelperImplTest {
             ).first().id
 
             // EXECUTE
-            val duplicateResult = uut.duplicateFunction(groupItemId)
+            val duplicateResult = uut.duplicateFunction(groupItemId, "Test Function (1)")
 
             // VERIFY
             assertNotNull(duplicateResult)
             val newFunctionId = duplicateResult!!.componentId
             assertNotEquals(functionId, newFunctionId)
+            assertEquals("Test Function (1)", uut.getFunctionById(newFunctionId)!!.name)
             assertEquals(2, fakeFunctionDao.numFunctions())
             val newGroupItems = fakeGroupItemDao.getGroupItemsForChild(
                 newFunctionId, GroupItemType.FUNCTION
@@ -401,7 +402,7 @@ class FunctionHelperImplTest {
             // PREPARE — no group item with this id
 
             // EXECUTE
-            val result = uut.duplicateFunction(999L)
+            val result = uut.duplicateFunction(999L, "Test Function (1)")
 
             // VERIFY
             assertNull(result)
@@ -419,7 +420,7 @@ class FunctionHelperImplTest {
             assertEquals(0, originalGroupItem.displayIndex)
 
             // EXECUTE
-            val duplicateResult = uut.duplicateFunction(originalGroupItem.id)
+            val duplicateResult = uut.duplicateFunction(originalGroupItem.id, "Test Function (1)")
 
             // VERIFY
             assertNotNull(duplicateResult)

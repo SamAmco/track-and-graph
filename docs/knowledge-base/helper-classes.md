@@ -82,7 +82,7 @@ All duplicate operations take `groupItemId` as placement identity — callers ne
 
 `DataInteractorImpl.duplicateGraphOrStat(groupItemId)` dispatches by `GroupItemType` with an exhaustive `when`:
 - GRAPH → delegates to `GraphHelper.duplicateGraphOrStat(groupItemId)`, which has its own exhaustive `when` on `GraphStatType`
-- FUNCTION → delegates to `FunctionHelper.duplicateFunction(groupItemId)`
+- FUNCTION → delegates to `FunctionHelper.duplicateFunction(groupItemId, newName)`; the UI supplies the duplicate name from app resources so the data layer does not invent user-facing text.
 
 Both return `CreatedComponent?`. `DataInteractorImpl` uses the returned `groupItemId` to look up the group for `DisplayIndex` event emission.
 

@@ -102,6 +102,7 @@ import kotlinx.serialization.Serializable
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
+import java.util.Locale
 
 @Serializable
 data class GroupNavKey(
@@ -397,9 +398,8 @@ private fun GroupScreenContent(
         onMoveItem = { groupItemId, hiddenItems ->
             moveItemViewModel.showMoveDialog(groupItemId, hiddenItems)
         },
-        onDuplicateItem = { groupItemId, type ->
-            groupViewModel.onDuplicate(groupItemId, type)
-        },
+        onDuplicateGraph = groupViewModel::onDuplicateGraphOrStat,
+        onDuplicateFunction = groupViewModel::onDuplicateFunction,
         onDragStart = groupViewModel::onDragStart,
         onDragSwap = groupViewModel::onDragSwap,
         onDragEnd = groupViewModel::onDragEnd,
@@ -509,7 +509,8 @@ fun GroupScreenView(
     functionClickListeners: FunctionClickListeners? = null,
     onDeleteItem: (groupItemId: Long, type: DeleteType, unique: Boolean) -> Unit = { _, _, _ -> },
     onMoveItem: (groupItemId: Long, hiddenItems: Set<HiddenItem>) -> Unit = { _, _ -> },
-    onDuplicateItem: (groupItemId: Long, type: GroupChildType) -> Unit = { _, _ -> },
+    onDuplicateGraph: (groupItemId: Long) -> Unit = {},
+    onDuplicateFunction: (groupItemId: Long, newName: String) -> Unit = { _, _ -> },
     onDragStart: () -> Unit = {},
     onDragSwap: (Int, Int) -> Unit = { _, _ -> },
     onDragEnd: () -> Unit = {},
@@ -532,7 +533,8 @@ fun GroupScreenView(
             functionClickListeners = functionClickListeners ?: FunctionClickListeners(),
             onDeleteItem = onDeleteItem,
             onMoveItem = onMoveItem,
-            onDuplicateItem = onDuplicateItem,
+            onDuplicateGraph = onDuplicateGraph,
+            onDuplicateFunction = onDuplicateFunction,
             onDragStart = onDragStart,
             onDragSwap = onDragSwap,
             onDragEnd = onDragEnd,
@@ -605,12 +607,20 @@ private fun GroupGrid(
     functionClickListeners: FunctionClickListeners,
     onDeleteItem: (groupItemId: Long, type: DeleteType, unique: Boolean) -> Unit,
     onMoveItem: (groupItemId: Long, hiddenItems: Set<HiddenItem>) -> Unit,
-    onDuplicateItem: (groupItemId: Long, type: GroupChildType) -> Unit,
+    onDuplicateGraph: (groupItemId: Long) -> Unit,
+    onDuplicateFunction: (groupItemId: Long, newName: String) -> Unit,
     onDragStart: () -> Unit,
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
 ) = BoxWithConstraints(modifier = modifier) {
     val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
+    val duplicateNameFormat = stringResource(R.string.duplicate_name_format)
+    val functionNames = remember(allChildren) {
+        allChildren
+            .filterIsInstance<GroupChild.ChildFunction>()
+            .map { it.displayFunction.name }
+            .toSet()
+    }
 
     val reorderableLazyGridState = rememberReorderableLazyGridState(lazyGridState) { from, to ->
         onDragSwap(from.index, to.index)
@@ -619,7 +629,6 @@ private fun GroupGrid(
     LaunchedEffect(reorderableLazyGridState.isAnyItemDragging) {
         if (reorderableLazyGridState.isAnyItemDragging) onDragStart() else onDragEnd()
     }
-
 
     LazyVerticalGrid(
         modifier = Modifier
@@ -672,6 +681,24 @@ private fun GroupGrid(
                     }
 
                     is GroupChild.ChildFunction -> {
+                        val duplicateName = remember(
+                            item.displayFunction.name,
+                            functionNames,
+                            duplicateNameFormat,
+                        ) {
+                            nextDuplicateName(
+                                originalName = item.displayFunction.name,
+                                existingNames = functionNames,
+                                formatName = { baseName, suffix ->
+                                    String.format(
+                                        Locale.ROOT,
+                                        duplicateNameFormat,
+                                        baseName,
+                                        suffix,
+                                    )
+                                },
+                            )
+                        }
                         FunctionItem(
                             displayFunction = item.displayFunction,
                             clickListeners = functionClickListeners,
@@ -684,10 +711,7 @@ private fun GroupGrid(
                             },
                             onMove = { onMoveItem(item.groupItemId, emptySet()) },
                             onDuplicate = {
-                                onDuplicateItem(
-                                    item.groupItemId,
-                                    GroupChildType.FUNCTION
-                                )
+                                onDuplicateFunction(item.groupItemId, duplicateName)
                             },
                             isElevated = isDragging,
                         )
@@ -728,10 +752,7 @@ private fun GroupGrid(
                             },
                             onMove = { onMoveItem(item.groupItemId, emptySet()) },
                             onDuplicate = {
-                                onDuplicateItem(
-                                    item.groupItemId,
-                                    GroupChildType.GRAPH
-                                )
+                                onDuplicateGraph(item.groupItemId)
                             },
                             isElevated = isDragging,
                         )
