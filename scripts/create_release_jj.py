@@ -57,15 +57,25 @@ def check_tag_exists(tag):
     return bool(result.stdout.strip())
 
 
-def get_changelog_file(version_name):
-    """Get the public English markdown changelog file for this version"""
-    changelog_file = Path(__file__).parent.parent / "changelogs" / version_name / "en.md"
+def get_changelog_file(version_name, version_code):
+    """Get release notes, preferring public markdown and falling back to Fastlane text."""
+    root_dir = Path(__file__).parent.parent
+    public_changelog_file = root_dir / "changelogs" / version_name / "en.md"
 
-    if not changelog_file.exists():
-        print(f"Error: Changelog file not found: {changelog_file}")
-        sys.exit(1)
+    if public_changelog_file.exists():
+        print("✓ Using public markdown changelog for GitHub release")
+        return public_changelog_file
 
-    return changelog_file
+    fastlane_changelog_file = root_dir / "fastlane" / "metadata" / \
+        "android" / "en-GB" / "changelogs" / f"{version_code}.txt"
+
+    if fastlane_changelog_file.exists():
+        print("✓ Public markdown changelog not found; using Fastlane changelog for GitHub release")
+        return fastlane_changelog_file
+
+    print(f"Error: Changelog file not found: {public_changelog_file}")
+    print(f"Error: Fallback changelog file not found: {fastlane_changelog_file}")
+    sys.exit(1)
 
 
 def get_current_bookmark():
@@ -141,7 +151,7 @@ def main():
     print(f"✓ Tag '{tag}' does not exist")
 
     # Get changelog
-    changelog_file = get_changelog_file(version_name)
+    changelog_file = get_changelog_file(version_name, version_code)
     print(f"✓ Found changelog: {changelog_file}")
 
     # Find APK

@@ -4,9 +4,10 @@ description: Dual changelog system (public markdown for in-app/website, fastlane
 topics:
   - make changelog: lua script creates temp file, opens in nvim, processes output
   - Public changelogs: changelogs/{versionName}/{locale}.md with index.json
+  - publish flag: controls whether public markdown and changelogs/index.json are created for in-app release dialog visibility
   - Fastlane changelogs: fastlane/metadata/android/{regional-locale}/changelogs/{versionCode}.txt
   - Play Store limit: 500 characters per language for "What's new" text
-  - GitHub releases: use public English markdown via gh --notes-file, not Fastlane text
+  - GitHub releases: prefer public English markdown via gh --notes-file, fall back to English Fastlane text for patches
   - Changelog viewer app: paste markdown and preview the shared in-app dialog
   - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
   - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
@@ -25,7 +26,7 @@ There are two separate changelog outputs for each release:
 
 **Play Store limit: 500 characters per language.** Fastlane changelogs must stay under this. Use `wc -m` (not `wc -c`) to count characters accurately for multi-byte/emoji content. The full public changelogs are typically 2500-3000+ characters, so fastlane versions need to be heavily condensed summaries.
 
-GitHub releases should use the public English markdown changelog, not the Fastlane text. The release scripts pass `changelogs/{versionName}/en.md` to `gh release create` with `--notes-file`, so headings, links, images, and other markdown render in the GitHub release.
+GitHub releases prefer the public English markdown changelog and fall back to the English Fastlane changelog when public markdown was not published. The release scripts pass whichever file exists to `gh release create` with `--notes-file`, so feature releases can render rich markdown while patch releases can reuse the short bullet list written for Play Store.
 
 ## Workflow: `make changelog`
 
@@ -37,10 +38,12 @@ Runs `scripts/new_changelog.lua` which:
 4. Opens the file in neovim for editing
 5. On save, processes the lua structure to write:
    - Fastlane changelogs (always)
-   - Public changelogs + index.json update (only if `publish = true`)
-6. Validates `index.json` against `changelogs/index.schema.json` using `jsonschema-cli`
+   - Public changelogs + `changelogs/index.json` update (only if `publish = true`)
+6. Validates `index.json` against `changelogs/index.schema.json` when public changelogs are published
 
 The lua template has entries for all 4 locales with `regional` (e.g. `en-GB`) and `general` (e.g. `en`) locale codes. Regional codes are used for fastlane directory paths, general codes for public changelog filenames.
+
+The `publish` flag controls whether full public markdown is created and listed in `changelogs/index.json`, which is what makes the full-screen in-app release notes available to users after update. Patch releases can use `publish = false` to avoid the in-app dialog and reuse the short English Fastlane changelog for GitHub.
 
 ## Previewing In-App Markdown
 
@@ -67,4 +70,4 @@ When translating changelogs, check string resources for official translations of
 
 ## index.json
 
-Located at `changelogs/index.json`, maps version names to locale-specific markdown paths. Updated automatically by the lua script when `publish = true`. Validated against `changelogs/index.schema.json`.
+Located at `changelogs/index.json`, maps version names to locale-specific markdown paths for in-app release notes. Updated automatically by the lua script when `publish = true`. Validated against `changelogs/index.schema.json`.
