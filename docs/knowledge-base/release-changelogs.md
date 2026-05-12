@@ -8,6 +8,7 @@ topics:
   - Play Store limit: 500 characters per language for "What's new" text
   - Changelog viewer app: paste markdown and preview the shared in-app dialog
   - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
+  - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
 keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
 ---
 
@@ -43,6 +44,12 @@ The lua template has entries for all 4 locales with `regional` (e.g. `en-GB`) an
 Use the `changelog-viewer` Android module to preview public changelog markdown before publishing it. The viewer lets you paste or clear markdown text and opens the same shared changelog dialog content used by the production app.
 
 The dialog UI lives in the shared UI module and is parameterized by text/callbacks, so release-note feature copy remains owned by the consuming module while dialog layout, theme, and markdown rendering stay reusable.
+
+## Copy Editing and Translation
+
+When iterating on public changelog copy, treat the English markdown as the source text. Finalize wording there before translating the other locale files; this avoids doing the same copy edits four times. Locale files may exist as placeholders before translation.
+
+When translating, check string resources for official UI terms before choosing feature names or labels. This matters for both old features and newly released UI, not only for terms called out in this document.
 
 ## Locales
 
