@@ -6,6 +6,7 @@ topics:
   - Public changelogs: changelogs/{versionName}/{locale}.md with index.json
   - Fastlane changelogs: fastlane/metadata/android/{regional-locale}/changelogs/{versionCode}.txt
   - Play Store limit: 500 characters per language for "What's new" text
+  - GitHub releases: use public English markdown via gh --notes-file, not Fastlane text
   - Changelog viewer app: paste markdown and preview the shared in-app dialog
   - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
   - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
@@ -23,6 +24,8 @@ There are two separate changelog outputs for each release:
 2. **Fastlane changelogs** — short plain text in `fastlane/metadata/android/{regional-locale}/changelogs/{versionCode}.txt` (e.g. `fastlane/metadata/android/en-GB/changelogs/800010.txt`). These are uploaded to the Google Play Store's "What's new" section.
 
 **Play Store limit: 500 characters per language.** Fastlane changelogs must stay under this. Use `wc -m` (not `wc -c`) to count characters accurately for multi-byte/emoji content. The full public changelogs are typically 2500-3000+ characters, so fastlane versions need to be heavily condensed summaries.
+
+GitHub releases should use the public English markdown changelog, not the Fastlane text. The release scripts pass `changelogs/{versionName}/en.md` to `gh release create` with `--notes-file`, so headings, links, images, and other markdown render in the GitHub release.
 
 ## Workflow: `make changelog`
 

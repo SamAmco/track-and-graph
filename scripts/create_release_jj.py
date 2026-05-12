@@ -57,17 +57,15 @@ def check_tag_exists(tag):
     return bool(result.stdout.strip())
 
 
-def get_changelog_content(version_code):
-    """Read the changelog file for this version"""
-    changelog_file = Path(__file__).parent.parent / "fastlane" / "metadata" / \
-        "android" / "en-GB" / "changelogs" / f"{version_code}.txt"
+def get_changelog_file(version_name):
+    """Get the public English markdown changelog file for this version"""
+    changelog_file = Path(__file__).parent.parent / "changelogs" / version_name / "en.md"
 
     if not changelog_file.exists():
         print(f"Error: Changelog file not found: {changelog_file}")
         sys.exit(1)
 
-    with open(changelog_file) as f:
-        return f.read().strip()
+    return changelog_file
 
 
 def get_current_bookmark():
@@ -143,8 +141,8 @@ def main():
     print(f"✓ Tag '{tag}' does not exist")
 
     # Get changelog
-    changelog = get_changelog_content(version_code)
-    print(f"✓ Found changelog ({len(changelog)} chars)")
+    changelog_file = get_changelog_file(version_name)
+    print(f"✓ Found changelog: {changelog_file}")
 
     # Find APK
     apk_path = find_apk()
@@ -189,7 +187,7 @@ def main():
         "gh", "release", "create", tag,
         str(apk_path),
         "--title", tag,
-        "--notes", changelog
+        "--notes-file", str(changelog_file)
     ]
 
     if is_prerelease:
