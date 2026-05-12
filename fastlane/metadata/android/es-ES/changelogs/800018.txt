@@ -1,0 +1,4 @@
+- Actualizar capturas de pantalla del tutorial
+- Añadir sufijo de desambiguación para funciones duplicadas
+- Añadir opción de menú contextual de descripción para Funciones
+      

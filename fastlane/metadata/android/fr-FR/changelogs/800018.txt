@@ -1,0 +1,4 @@
+- Mettre à jour les captures d'écran du tutoriel
+- Ajouter un suffixe de désambiguïsation pour les fonctions dupliquées
+- Ajouter une option de menu contextuel de description pour les Fonctions
+      

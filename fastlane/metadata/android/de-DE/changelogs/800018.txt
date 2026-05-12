@@ -1,0 +1,4 @@
+- Tutorial-Screenshots aktualisieren
+- Eindeutigkeitssuffix für duplizierte Funktionen hinzufügen
+- Beschreibungsoption im Kontextmenü für Funktionen hinzufügen
+      
