@@ -78,6 +78,7 @@ data class FunctionContextMenuCallbacks(
     val onDelete: (DisplayFunction) -> Unit = {},
     val onMoveTo: (DisplayFunction) -> Unit = {},
     val onDuplicate: (DisplayFunction) -> Unit = {},
+    val onDescription: (DisplayFunction) -> Unit = {},
     val onSymlinks: (DisplayFunction) -> Unit = {},
 )
 
@@ -213,6 +214,13 @@ private fun FunctionMenuButton(
                 onClick = {
                     onShowContextMenu(false)
                     callbacks.onDuplicate(displayFunction)
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.description)) },
+                onClick = {
+                    onShowContextMenu(false)
+                    callbacks.onDescription(displayFunction)
                 }
             )
             if (!displayFunction.unique) {

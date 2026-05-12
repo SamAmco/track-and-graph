@@ -68,12 +68,24 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
     private val _featureForDescriptionDialog = MutableStateFlow<DisplayTracker?>(null)
     val featureForDescriptionDialog: StateFlow<DisplayTracker?> = _featureForDescriptionDialog.asStateFlow()
 
+    private val _functionForDescriptionDialog = MutableStateFlow<DisplayFunction?>(null)
+    val functionForDescriptionDialog: StateFlow<DisplayFunction?> =
+        _functionForDescriptionDialog.asStateFlow()
+
     fun showFeatureDescriptionDialog(feature: DisplayTracker) {
         _featureForDescriptionDialog.value = feature
     }
 
     fun hideFeatureDescriptionDialog() {
         _featureForDescriptionDialog.value = null
+    }
+
+    fun showFunctionDescriptionDialog(function: DisplayFunction) {
+        _functionForDescriptionDialog.value = function
+    }
+
+    fun hideFunctionDescriptionDialog() {
+        _functionForDescriptionDialog.value = null
     }
 
     // Delete Confirmation Dialog - unified for all delete operations

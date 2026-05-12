@@ -263,6 +263,7 @@ data class GroupClickListeners(
 data class FunctionClickListeners(
     val onClick: (DisplayFunction) -> Unit = {},
     val onEdit: (DisplayFunction) -> Unit = {},
+    val onDescription: (DisplayFunction) -> Unit = {},
     val onSymlinks: (DisplayFunction) -> Unit = {},
 )
 
@@ -381,6 +382,7 @@ private fun GroupScreenContent(
         functionClickListeners = FunctionClickListeners(
             onClick = onFunctionClick,
             onEdit = onFunctionEdit,
+            onDescription = { groupDialogsViewModel.showFunctionDescriptionDialog(it) },
             onSymlinks = {
                 symlinksDialogViewModel.showSymlinks(
                     it.id,
@@ -430,6 +432,16 @@ private fun GroupScreenContent(
             featureName = displayTracker.name,
             featureDescription = displayTracker.description,
             onDismissRequest = { groupDialogsViewModel.hideFeatureDescriptionDialog() }
+        )
+    }
+
+    val displayFunction =
+        groupDialogsViewModel.functionForDescriptionDialog.collectAsStateWithLifecycle().value
+    if (displayFunction != null) {
+        FeatureInfoDialog(
+            featureName = displayFunction.name,
+            featureDescription = displayFunction.description,
+            onDismissRequest = { groupDialogsViewModel.hideFunctionDescriptionDialog() }
         )
     }
 
@@ -816,6 +828,7 @@ private fun ReorderableCollectionItemScope.FunctionItem(
         onDelete = { onDelete(displayFunction) },
         onMoveTo = { onMove(displayFunction) },
         onDuplicate = { onDuplicate(displayFunction) },
+        onDescription = { clickListeners.onDescription(displayFunction) },
         onSymlinks = { clickListeners.onSymlinks(displayFunction) },
     ),
 )
