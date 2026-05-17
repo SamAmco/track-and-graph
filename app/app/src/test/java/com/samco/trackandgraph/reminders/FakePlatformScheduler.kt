@@ -20,15 +20,14 @@ package com.samco.trackandgraph.reminders
 internal class FakePlatformScheduler : PlatformScheduler {
     val setNotifications = mutableListOf<Pair<Long, ReminderNotificationParams>>()
     val cancelledNotifications = mutableListOf<ReminderNotificationParams>()
-    val cancelledStoredAlarms = mutableListOf<StoredAlarmInfo>()
+    val cancelledLegacyAlarms = mutableListOf<LegacyReminderAlarmInfo>()
 
     override fun set(triggerAtMillis: Long, reminderNotificationParams: ReminderNotificationParams) {
         setNotifications.add(triggerAtMillis to reminderNotificationParams)
     }
 
-    @Deprecated("This remains only for users of 9.x who still have persisted alarms to cancel them on first sync")
-    override fun cancel(storedAlarmInfo: StoredAlarmInfo) {
-        cancelledStoredAlarms.add(storedAlarmInfo)
+    override fun cancelLegacyAlarm(legacyAlarmInfo: LegacyReminderAlarmInfo) {
+        cancelledLegacyAlarms.add(legacyAlarmInfo)
     }
 
     override fun cancel(reminderNotificationParams: ReminderNotificationParams) {
@@ -43,6 +42,6 @@ internal class FakePlatformScheduler : PlatformScheduler {
     fun reset() {
         setNotifications.clear()
         cancelledNotifications.clear()
-        cancelledStoredAlarms.clear()
+        cancelledLegacyAlarms.clear()
     }
 }

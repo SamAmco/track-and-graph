@@ -44,8 +44,8 @@ import com.samco.trackandgraph.storage.FileCache
 import com.samco.trackandgraph.storage.FileCacheImpl
 import com.samco.trackandgraph.reminders.PlatformScheduler
 import com.samco.trackandgraph.reminders.androidplatform.AndroidPlatformScheduler
-import com.samco.trackandgraph.reminders.ReminderPrefWrapper
-import com.samco.trackandgraph.reminders.ReminderPrefWrapperImpl
+import com.samco.trackandgraph.reminders.LegacyReminderPrefs
+import com.samco.trackandgraph.reminders.LegacyReminderPrefsImpl
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
 import com.samco.trackandgraph.functions.repository.FunctionsRepository
@@ -132,7 +132,7 @@ class AppModule {
 
     @Singleton
     @Provides
-    internal fun getReminderPref(impl: ReminderPrefWrapperImpl): ReminderPrefWrapper = impl
+    internal fun getLegacyReminderPrefs(impl: LegacyReminderPrefsImpl): LegacyReminderPrefs = impl
 
     @Provides
     @Singleton

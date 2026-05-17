@@ -43,14 +43,14 @@ internal class ReminderInteractorImplTest {
 
     // Test dependencies
     private val dataInteractor: DataInteractor = mock()
-    private val reminderPref = FakeReminderPrefWrapper()
+    private val legacyReminderPrefs = FakeLegacyReminderPrefs()
     private val platformScheduler = FakePlatformScheduler()
     private val reminderScheduler = FakeReminderScheduler()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val json = Json { ignoreUnknownKeys = true }
 
     private val uut = ReminderInteractorImpl(
-        reminderPref = reminderPref,
+        legacyReminderPrefs = legacyReminderPrefs,
         platformScheduler = platformScheduler,
         dataInteractor = dataInteractor,
         reminderScheduler = reminderScheduler,
@@ -112,7 +112,7 @@ internal class ReminderInteractorImplTest {
                 {"reminderId":456,"reminderName":"Evening Meditation","pendingIntentId":888}
             ]
         """.trimIndent()
-            reminderPref.encodedIntents = legacyNotifications
+            legacyReminderPrefs.encodedIntents = legacyNotifications
 
             val reminders = listOf(
                 reminderFixture.copy(
@@ -143,9 +143,9 @@ internal class ReminderInteractorImplTest {
 
             // VERIFY
             // Legacy notifications should be cancelled
-            assertEquals(2, platformScheduler.cancelledStoredAlarms.size)
-            assertTrue(platformScheduler.cancelledStoredAlarms.any { it.pendingIntentId == 999 && it.reminderId == 123L })
-            assertTrue(platformScheduler.cancelledStoredAlarms.any { it.pendingIntentId == 888 && it.reminderId == 456L })
+            assertEquals(2, platformScheduler.cancelledLegacyAlarms.size)
+            assertTrue(platformScheduler.cancelledLegacyAlarms.any { it.pendingIntentId == 999 && it.reminderId == 123L })
+            assertTrue(platformScheduler.cancelledLegacyAlarms.any { it.pendingIntentId == 888 && it.reminderId == 456L })
 
             // New notifications should be scheduled for the same reminders
             assertEquals(2, platformScheduler.setNotifications.size)
@@ -183,7 +183,7 @@ internal class ReminderInteractorImplTest {
             )
 
             // Legacy storage should be cleared
-            assertEquals(null, reminderPref.getStoredIntents())
+            assertEquals(null, legacyReminderPrefs.getEncodedLegacyAlarms())
         }
 
     @Test

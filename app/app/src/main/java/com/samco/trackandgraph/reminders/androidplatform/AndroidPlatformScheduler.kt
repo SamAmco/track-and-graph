@@ -12,7 +12,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.samco.trackandgraph.reminders.PlatformScheduler
 import com.samco.trackandgraph.reminders.ReminderNotificationParams
-import com.samco.trackandgraph.reminders.StoredAlarmInfo
+import com.samco.trackandgraph.reminders.LegacyReminderAlarmInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.threeten.bp.Instant
 import timber.log.Timber
@@ -74,12 +74,11 @@ internal class AndroidPlatformScheduler @Inject constructor(
         }
     }
 
-    @Deprecated("See AlarmManagerWrapper interface")
-    override fun cancel(storedAlarmInfo: StoredAlarmInfo) = alarmManager.cancel(
+    override fun cancelLegacyAlarm(legacyAlarmInfo: LegacyReminderAlarmInfo) = alarmManager.cancel(
         createPendingIntent(
-            requestCode = storedAlarmInfo.pendingIntentId,
-            reminderId = storedAlarmInfo.reminderId,
-            reminderName = storedAlarmInfo.reminderName,
+            requestCode = legacyAlarmInfo.pendingIntentId,
+            reminderId = legacyAlarmInfo.reminderId,
+            reminderName = legacyAlarmInfo.reminderName,
         )
     )
 

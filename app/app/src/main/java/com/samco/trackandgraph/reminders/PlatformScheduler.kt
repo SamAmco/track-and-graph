@@ -20,8 +20,7 @@ package com.samco.trackandgraph.reminders
 import kotlinx.serialization.Serializable
 
 @Serializable
-@Deprecated("Alarm information should no longer be persisted, use [AlarmInfo]")
-internal data class StoredAlarmInfo(
+internal data class LegacyReminderAlarmInfo(
     val reminderId: Long,
     val reminderName: String,
     val pendingIntentId: Int
@@ -61,8 +60,8 @@ internal interface PlatformScheduler {
      */
     suspend fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long?
 
-    @Deprecated("This remains only for users of 9.x who still have persisted alarms to cancel them on first sync")
-    fun cancel(storedAlarmInfo: StoredAlarmInfo)
+    /** Cancels an AlarmManager alarm persisted by the pre-10.x reminder scheduler. */
+    fun cancelLegacyAlarm(legacyAlarmInfo: LegacyReminderAlarmInfo)
 
     /** Cancels the notification for the specified reminder. */
     fun cancel(reminderNotificationParams: ReminderNotificationParams)

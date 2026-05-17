@@ -135,7 +135,7 @@ sealed interface NextScheduled {
 @OptIn(FlowPreview::class)
 @Singleton
 internal class ReminderInteractorImpl @Inject constructor(
-    private val reminderPref: ReminderPrefWrapper,
+    private val legacyReminderPrefs: LegacyReminderPrefs,
     private val platformScheduler: PlatformScheduler,
     private val dataInteractor: DataInteractor,
     private val reminderScheduler: ReminderScheduler,
@@ -156,7 +156,7 @@ internal class ReminderInteractorImpl @Inject constructor(
 
     override suspend fun ensureReminderNotifications() = mutex.withLock {
         withContext(io) {
-            clearLegacyReminders()
+            clearLegacyReminderPrefs()
             val reminders = dataInteractor.getAllRemindersSync()
             for (reminder in reminders) {
                 val params = reminder.toReminderNotificationParams()
@@ -280,19 +280,19 @@ internal class ReminderInteractorImpl @Inject constructor(
         }
     }
 
-    private fun clearLegacyReminders() {
-        val storedIntentsEncoded = reminderPref.getStoredIntents()
-        val storedIntents = try {
-            storedIntentsEncoded?.let {
-                json.decodeFromString<List<StoredAlarmInfo>>(it)
+    private fun clearLegacyReminderPrefs() {
+        val encodedLegacyAlarms = legacyReminderPrefs.getEncodedLegacyAlarms()
+        val legacyAlarms = try {
+            encodedLegacyAlarms?.let {
+                json.decodeFromString<List<LegacyReminderAlarmInfo>>(it)
             } ?: emptyList()
         } catch (t: Throwable) {
-            Timber.e(t, "Could not parse stored intents string: $storedIntentsEncoded")
+            Timber.e(t, "Could not parse legacy reminder alarm prefs: $encodedLegacyAlarms")
             emptyList()
         }
 
-        storedIntents.forEach { platformScheduler.cancel(it) }
-        reminderPref.clear()
+        legacyAlarms.forEach { platformScheduler.cancelLegacyAlarm(it) }
+        legacyReminderPrefs.clear()
     }
 
     private suspend fun clearNotificationsInternal() {

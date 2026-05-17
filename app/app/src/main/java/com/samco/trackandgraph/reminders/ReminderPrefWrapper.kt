@@ -22,19 +22,17 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
- * This interface is now legacy and will be removed in a future release. It exists here only so
- * that apps with prefs still stored can run a migration to delete any alarms stored in prefs.
+ * Reads and clears reminder scheduler prefs written by the pre-10.x reminder implementation.
+ * New reminder scheduling state must not be added here.
  */
-@Deprecated("This interface is now legacy and will be removed in a future release")
-internal interface ReminderPrefWrapper {
-    fun getStoredIntents(): String?
+internal interface LegacyReminderPrefs {
+    fun getEncodedLegacyAlarms(): String?
     fun clear()
 }
 
-@Deprecated("This interface is now legacy and will be removed in a future release")
-internal class ReminderPrefWrapperImpl @Inject constructor(
+internal class LegacyReminderPrefsImpl @Inject constructor(
     @ApplicationContext private val context: Context
-) : ReminderPrefWrapper {
+) : LegacyReminderPrefs {
     companion object {
         private const val PREFS_NAME = "REMINDERS_PREFS"
         private const val STORED_INTENTS_KEY = "STORED_ALARMS_KEY"
@@ -42,7 +40,7 @@ internal class ReminderPrefWrapperImpl @Inject constructor(
 
     private val sharedPrefs get() = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    override fun getStoredIntents() = sharedPrefs.getString(STORED_INTENTS_KEY, null)
+    override fun getEncodedLegacyAlarms() = sharedPrefs.getString(STORED_INTENTS_KEY, null)
 
     override fun clear() {
         context.deleteSharedPreferences(PREFS_NAME)
