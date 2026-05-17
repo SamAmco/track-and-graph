@@ -55,7 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -428,12 +428,19 @@ private fun Buttons(
     horizontalArrangement = Arrangement.SpaceEvenly,
 ) {
 
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
     IconTextButton(
         onClick = {
-            val text = clipboardManager.getText()?.text
-                ?: return@IconTextButton
-            onUpdateScriptFromClipboard(text)
+            coroutineScope.launch {
+                val text = clipboard.getClipEntry()
+                    ?.clipData
+                    ?.getItemAt(0)
+                    ?.text
+                    ?.toString()
+                    ?: return@launch
+                onUpdateScriptFromClipboard(text)
+            }
         },
         icon = R.drawable.content_paste,
         text = stringResource(R.string.paste)

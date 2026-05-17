@@ -41,7 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,6 +54,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -73,6 +74,7 @@ import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.ui.IconTextButton
 import com.samco.trackandgraph.ui.ui.luaCodeVisualTransformation
 import com.samco.trackandgraph.ui.ui.slimOutlinedTextField
+import kotlinx.coroutines.launch
 import com.samco.trackandgraph.ui.ui.InputSpacingXLarge
 import com.samco.trackandgraph.ui.ui.LuaScriptEditDialog
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
@@ -318,12 +320,19 @@ private fun Buttons(
     horizontalArrangement = Arrangement.Center,
 ) {
 
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
     IconTextButton(
         onClick = {
-            val text = clipboardManager.getText()?.text
-                ?: return@IconTextButton
-            onUpdateScriptFromClipboard(text)
+            coroutineScope.launch {
+                val text = clipboard.getClipEntry()
+                    ?.clipData
+                    ?.getItemAt(0)
+                    ?.text
+                    ?.toString()
+                    ?: return@launch
+                onUpdateScriptFromClipboard(text)
+            }
         },
         icon = R.drawable.content_paste,
         text = stringResource(R.string.paste)
