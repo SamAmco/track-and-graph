@@ -215,13 +215,13 @@ internal class Converters {
         value?.let { stringFromOdt(it) } ?: ""
 
     @TypeConverter
-    fun temporalAmountToString(value: TemporalAmount?): String =
-        value?.let { value.toString() } ?: ""
+    fun temporalAmountToString(value: TemporalAmount?): String? =
+        value?.toString()
 
     @TypeConverter
-    fun stringToTemporalAmount(value: String): TemporalAmount? = when {
-        value.startsWith("PT") -> Duration.parse(value)
-        value.startsWith("P") -> Period.parse(value)
+    fun stringToTemporalAmount(value: String?): TemporalAmount? = when {
+        value?.startsWith("PT") == true -> Duration.parse(value)
+        value?.startsWith("P") == true -> Period.parse(value)
         else -> null
     }
 
