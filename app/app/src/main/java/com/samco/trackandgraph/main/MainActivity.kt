@@ -38,6 +38,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.data.lua.LuaEngineSwitch
@@ -184,6 +185,7 @@ class MainActivity : AppCompatActivity() {
 class MainActivityViewModel @Inject constructor(
     private val reminderInteractor: ReminderInteractor,
     private val timerServiceInteractor: TimerServiceInteractor,
+    private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -204,6 +206,10 @@ class MainActivityViewModel @Inject constructor(
     }
 
     private fun recoverTimerServiceIfNecessary() {
-        timerServiceInteractor.startTimerNotificationService()
+        viewModelScope.launch(io) {
+            if (dataInteractor.getAllActiveTimerTrackers().isNotEmpty()) {
+                timerServiceInteractor.startTimerNotificationService()
+            }
+        }
     }
 }
