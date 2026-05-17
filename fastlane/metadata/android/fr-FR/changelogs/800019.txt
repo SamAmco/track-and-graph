@@ -1,0 +1,3 @@
+- Mise à jour de toutes les versions des dépendances
+- Correction d'un plantage lié au délai d'arrêt du service de premier plan du minuteur
+			

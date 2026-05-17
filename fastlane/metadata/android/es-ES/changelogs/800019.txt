@@ -1,0 +1,3 @@
+- Actualización de todas las versiones de dependencias
+- Corrección de un bloqueo por tiempo de espera del servicio en primer plano del temporizador
+			
