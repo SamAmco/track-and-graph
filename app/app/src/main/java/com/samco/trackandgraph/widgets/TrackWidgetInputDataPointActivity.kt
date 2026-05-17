@@ -20,6 +20,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
@@ -67,6 +68,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
     lateinit var tngSettings: TngSettings
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val featureId = intent.extras?.getLong(EXTRA_FEATURE_ID) ?: run {

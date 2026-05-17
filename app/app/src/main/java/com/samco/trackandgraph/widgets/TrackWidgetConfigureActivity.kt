@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.edit
@@ -39,6 +40,7 @@ class TrackWidgetConfigureActivity : AppCompatActivity() {
     private var appWidgetId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         appWidgetId = intent?.extras
