@@ -101,7 +101,12 @@ internal class CSVReadWriterImpl @Inject constructor(
         writeFeatureData: List<WriteFeatureData>,
         writer: OutputStreamWriter
     ) {
-        val csvWriter = CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(Headers::class.java))
+        val csvWriter = CSVPrinter(
+            writer,
+            CSVFormat.DEFAULT.builder()
+                .setHeader(Headers::class.java)
+                .get()
+        )
         try {
             for (wfd in writeFeatureData) {
                 writeDataPointsToCSV(
@@ -153,8 +158,10 @@ internal class CSVReadWriterImpl @Inject constructor(
         inputStreamReader: InputStreamReader
     ) = runCatching {
         try {
-            val records = CSVFormat.DEFAULT
-                .withFirstRecordAsHeader()
+            val records = CSVFormat.DEFAULT.builder()
+                .setHeader()
+                .setSkipHeaderRecord(true)
+                .get()
                 .parse(inputStreamReader)
             val headerMap = records.headerMap
             validateHeaderMap(headerMap)

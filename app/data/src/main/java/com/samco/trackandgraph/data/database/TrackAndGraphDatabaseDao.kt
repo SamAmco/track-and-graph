@@ -225,7 +225,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     fun insertDataPoint(dataPoint: DataPoint): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override fun insertDataPoints(dataPoint: List<DataPoint>)
+    override fun insertDataPoints(dataPoints: List<DataPoint>)
 
     @Update
     override fun updateDataPoints(dataPoint: List<DataPoint>)

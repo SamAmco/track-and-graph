@@ -121,7 +121,7 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 "trackandgraph_database"//This name is also in backup_rules.xml
             )
                 .addMigrations(*allMigrations)
-                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigration(dropAllTables = true)
                 .addCallback(databaseCallback())
                 .build()
         }
@@ -315,4 +315,3 @@ fun odtFromString(value: String): OffsetDateTime? =
     else databaseFormatter.parse(value, OffsetDateTime::from)
 
 fun stringFromOdt(value: OffsetDateTime): String = databaseFormatter.format(value)
-

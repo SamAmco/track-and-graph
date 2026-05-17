@@ -183,6 +183,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
         }
     }
 
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     private fun setupWorkManager(backupConfig: BackupConfig) {
         val unit = when (backupConfig.units) {
             ChronoUnit.HOURS -> TimeUnit.HOURS

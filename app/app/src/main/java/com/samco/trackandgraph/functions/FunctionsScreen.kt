@@ -459,9 +459,9 @@ fun BackgroundGrid(
 
         // Find the first grid line to the left and above the visible area
         val firstGridX =
-            (kotlin.math.floor(topLeftWorld.x / worldGridStep) * worldGridStep).toFloat()
+            kotlin.math.floor(topLeftWorld.x / worldGridStep) * worldGridStep
         val firstGridY =
-            (kotlin.math.floor(topLeftWorld.y / worldGridStep) * worldGridStep).toFloat()
+            kotlin.math.floor(topLeftWorld.y / worldGridStep) * worldGridStep
 
         // Convert first grid positions to screen coordinates
         val firstScreenX = viewport.worldToScreen(Offset(firstGridX, 0f)).x

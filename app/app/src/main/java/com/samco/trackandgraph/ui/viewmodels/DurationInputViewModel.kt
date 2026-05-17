@@ -28,7 +28,7 @@ open class DurationInputViewModelImpl : DurationInputViewModel {
 
     private var onChange: ((Double) -> Unit)? = null
 
-    private fun TextFieldValue.getDouble() = getDoubleFromTextOrNull(this.text ?: "") ?: 0.0
+    private fun TextFieldValue.getDouble() = getDoubleFromTextOrNull(text) ?: 0.0
 
     fun setOnChangeListener(onChange: (Double) -> Unit) {
         this.onChange = onChange
