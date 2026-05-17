@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!--dataExtractionRules is only used for android 12 and up, otherwise fullBackupContent will be used-->
@@ -154,8 +155,13 @@
         <service
             android:name=".timers.TimerNotificationService"
             android:enabled="true"
-            android:foregroundServiceType="dataSync"
-            />
+            android:foregroundServiceType="specialUse"
+            >
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Shows user-started tracker timer notifications with continuously updating elapsed time."
+                />
+        </service>
     </application>
 
 </manifest>

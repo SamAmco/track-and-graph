@@ -22,7 +22,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -194,8 +194,8 @@ class TimerNotificationService : Service() {
     }
 
     private fun startForegroundService(id: Int, notification: Notification) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(id, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(id, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
         } else {
             startForeground(id, notification)
         }
@@ -231,6 +231,15 @@ class TimerNotificationService : Service() {
     private fun stopService() {
         stopForeground()
         stopSelf()
+    }
+
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        Timber.w(
+            "Timer notification foreground service timed out, stopping. startId=%d fgsType=%d",
+            startId,
+            fgsType
+        )
+        stopSelf(startId)
     }
 
     override fun onDestroy() {
