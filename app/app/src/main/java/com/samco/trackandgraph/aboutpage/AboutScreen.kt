@@ -126,18 +126,18 @@ fun AboutPageView(
                 .asPaddingValues()
         )
         .fillMaxSize()
-        .then(Modifier.padding(_root_ide_package_.com.samco.trackandgraph.ui.ui.dialogInputSpacing)),
+        .then(Modifier.padding(dialogInputSpacing)),
 ) {
     VersionText(versionText)
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingXLarge()
+    InputSpacingXLarge()
     TnGIcon(modifier = Modifier.align(Alignment.CenterHorizontally))
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingXLarge()
+    InputSpacingXLarge()
     Headline()
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing()
+    HalfDialogInputSpacing()
     RepoLink(onLinkClicked = onRepoLinkClicked)
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingXLarge()
+    InputSpacingXLarge()
     AboutLibraries()
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
     LibraryTable()
 }
 
@@ -244,7 +244,7 @@ private fun VersionText(versionText: String) = Box(
 @Preview(showBackground = true)
 @Composable
 fun AboutPageViewPreview() {
-    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
+    TnGComposeTheme {
         AboutPageView("v1.0.0")
     }
 }

@@ -65,7 +65,6 @@ import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.ui.AddChipButton
 import com.samco.trackandgraph.ui.ui.DateTimeButtonRow
-import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.ui.InputSpacingLarge
@@ -79,7 +78,7 @@ import org.threeten.bp.ZoneOffset
 
 @Composable
 fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) =
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.FadingScrollColumn {
+    FadingScrollColumn {
         val currentPage by viewModel.currentPage.observeAsState(0)
         val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentPage)
 
@@ -134,7 +133,7 @@ fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) =
             else stringResource(R.string.next)
 
         //Next button
-        _root_ide_package_.com.samco.trackandgraph.ui.ui.WideButton(
+        WideButton(
             text = buttonText,
             onClick = viewModel::onButtonClicked
         )
@@ -160,16 +159,16 @@ fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) =
 
 @Composable
 private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_3_description),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.titleMedium
     )
 
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 
     //A vector drawing of a graph
     Icon(
@@ -181,10 +180,10 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
         tint = Color.Unspecified
     )
 
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_3_hint),
         textAlign = TextAlign.Center,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -194,8 +193,8 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
     Text(
         modifier = Modifier
             .padding(
-                horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge,
-                vertical = _root_ide_package_.com.samco.trackandgraph.ui.ui.cardPadding
+                horizontal = inputSpacingLarge,
+                vertical = cardPadding
             )
             .fillMaxWidth()
             .clickable { onFaqClicked() },
@@ -207,23 +206,23 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
         fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
 
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 }
 
 @Composable
 private fun TutorialPage1() = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_2_description),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.titleMedium
     )
 
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 
     //A vector drawing of a graph
     Icon(
@@ -235,17 +234,17 @@ private fun TutorialPage1() = Column(
         contentDescription = null
     )
 
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_2_hint),
         textAlign = TextAlign.Center,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
         fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
 
-    _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+    InputSpacingLarge()
 }
 
 @Composable
@@ -255,25 +254,25 @@ private fun TutorialPage0(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
+        DialogInputSpacing()
 
         Text(
-            modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+            modifier = Modifier.padding(horizontal = inputSpacingLarge),
             text = stringResource(R.string.adding_your_first_data_point),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge,
         )
 
-        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+        InputSpacingLarge()
 
         Text(
-            modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+            modifier = Modifier.padding(horizontal = inputSpacingLarge),
             text = stringResource(R.string.each_data_point_has_a_timestamp_and_value),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleMedium,
         )
 
-        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+        InputSpacingLarge()
 
         Box(
             modifier = Modifier
@@ -287,9 +286,9 @@ private fun TutorialPage0(
                     onDateTimeSelected = {}
                 )
 
-                _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
+                DialogInputSpacing()
 
-                _root_ide_package_.com.samco.trackandgraph.ui.ui.ValueInputTextField(
+                ValueInputTextField(
                     textFieldValue = TextFieldValue(""),
                     onValueChange = {}
                 )
@@ -304,16 +303,16 @@ private fun TutorialPage0(
             )
         }
 
-        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+        InputSpacingLarge()
 
         Text(
-            modifier = Modifier.padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+            modifier = Modifier.padding(horizontal = inputSpacingLarge),
             text = stringResource(R.string.it_can_also_optionally_have_a_label_and_a_note),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleMedium,
         )
 
-        _root_ide_package_.com.samco.trackandgraph.ui.ui.DialogInputSpacing()
+        DialogInputSpacing()
 
         Box(
             modifier = Modifier.scale(0.8f)
@@ -321,15 +320,15 @@ private fun TutorialPage0(
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = _root_ide_package_.com.samco.trackandgraph.ui.ui.inputSpacingLarge),
+                    .padding(horizontal = inputSpacingLarge),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                _root_ide_package_.com.samco.trackandgraph.ui.ui.AddChipButton(
+                AddChipButton(
                     text = stringResource(
                         id = R.string.add_a_label
                     )
                 ) { }
-                _root_ide_package_.com.samco.trackandgraph.ui.ui.AddChipButton(
+                AddChipButton(
                     text = stringResource(
                         id = R.string.add_a_note
                     )
@@ -345,14 +344,14 @@ private fun TutorialPage0(
             )
         }
 
-        _root_ide_package_.com.samco.trackandgraph.ui.ui.InputSpacingLarge()
+        InputSpacingLarge()
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun TutorialPage0Preview() {
-    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
+    TnGComposeTheme {
         CompositionLocalProvider(LocalSettings provides mockSettings) {
             TutorialPage0(
                 OffsetDateTime.of(
@@ -373,7 +372,7 @@ private fun TutorialPage0Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun TutorialPage1Preview() {
-    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
+    TnGComposeTheme {
         TutorialPage1()
     }
 }
@@ -381,7 +380,7 @@ private fun TutorialPage1Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun TutorialPage2Preview() {
-    _root_ide_package_.com.samco.trackandgraph.ui.theming.TnGComposeTheme {
+    TnGComposeTheme {
         TutorialPage2(onFaqClicked = {})
     }
 }
