@@ -487,8 +487,6 @@
     <string name="release_notes_maybe_later">Peut-être plus tard</string>
     <string name="release_notes_support_development">Faire un Don pour Soutenir le Développement</string>
     <string name="release_notes_thank_you"><![CDATA[Merci ! ❤️\n\nChaque contribution aide à rendre Track & Graph meilleur pour tout le monde 🌱]]></string>
-    <string name="missed_reminders_notifications_channel_name">Rappels Manqués</string>
-    <string name="missed_reminders_notifications_channel_description">Notifications pour les rappels qui ont été manqués</string>
     <string name="missed_reminder_single_content">Rappel de %1$s</string>
     <string name="missed_reminders_multiple_content">Vous avez manqué %1$d rappels</string>
     <string name="next_reminder_format">Prochain Rappel : %1$s</string>

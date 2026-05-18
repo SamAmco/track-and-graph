@@ -17,10 +17,8 @@
 
 package com.samco.trackandgraph.reminders.androidplatform
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -90,7 +88,6 @@ class ReminderFallbackWorker @AssistedInject constructor(
     companion object {
         const val REMINDER_ID_KEY = "REMINDER_ID_KEY"
         const val EXPECTED_TRIGGER_TIME_KEY = "EXPECTED_TRIGGER_TIME_KEY"
-        private const val MISSED_REMINDERS_CHANNEL_ID = "missed_reminder_notifications_channel"
 
         fun getUniqueWorkName(reminderId: Long): String {
             return "reminder_fallback_$reminderId"
@@ -176,7 +173,7 @@ class ReminderFallbackWorker @AssistedInject constructor(
     }
 
     private fun showMissedReminderNotification(reminderName: String, missedTimes: List<Instant>) {
-        createMissedReminderNotificationChannel()
+        createReminderNotificationChannel(applicationContext)
 
         val context = applicationContext
         val notificationManager =
@@ -186,7 +183,7 @@ class ReminderFallbackWorker @AssistedInject constructor(
 
         val notificationContent = createNotificationContent(reminderName, missedTimes)
 
-        val notification = NotificationCompat.Builder(context, MISSED_REMINDERS_CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
             .setContentTitle(notificationContent.title)
             .setContentText(notificationContent.message)
             .setSmallIcon(R.drawable.notification_icon)
@@ -231,23 +228,6 @@ class ReminderFallbackWorker @AssistedInject constructor(
                     missedTimes.size,
                 )
             )
-        }
-    }
-
-    private fun createMissedReminderNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            val context = applicationContext
-            val name = context.getString(R.string.missed_reminders_notifications_channel_name)
-            val descriptionText =
-                context.getString(R.string.missed_reminders_notifications_channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(MISSED_REMINDERS_CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-
-            val notificationManager: NotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
         }
     }
 }

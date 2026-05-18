@@ -467,8 +467,6 @@
     <string name="release_notes_maybe_later">Vielleicht später</string>
     <string name="release_notes_support_development">Spenden zur Entwicklungsunterstützung</string>
     <string name="release_notes_thank_you"><![CDATA[Vielen Dank! ❤️\n\nJede Unterstützung trägt dazu bei, Track & Graph für alle zu verbessern 🌱]]></string>
-    <string name="missed_reminders_notifications_channel_name">Verpasste Erinnerungen</string>
-    <string name="missed_reminders_notifications_channel_description">Benachrichtigungen für verpasste Erinnerungen</string>
     <string name="missed_reminder_single_content">Erinnerung von %1$s</string>
     <string name="missed_reminders_multiple_content">Sie haben %1$d Erinnerungen verpasst</string>
     <string name="next_reminder_format">Nächste Erinnerung: %1$s</string>
