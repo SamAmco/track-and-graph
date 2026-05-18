@@ -50,7 +50,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -92,7 +93,6 @@ import com.samco.trackandgraph.ui.ui.fabExitTransition
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.ui.inputSpacingXLarge
 import com.samco.trackandgraph.ui.utils.plus
-import com.samco.trackandgraph.util.performTrackVibrate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -141,7 +141,7 @@ fun GroupScreen(
         hiltViewModel<AddDataPointsViewModelImpl>()
 
     val isSearchVisible by searchViewModel.isSearchVisible.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val hapticFeedback = LocalHapticFeedback.current
     val requestNotificationPermission = rememberNotificationPermissionRequester()
 
     LaunchedEffect(navArgs.groupId) {
@@ -154,7 +154,7 @@ fun GroupScreen(
 
     val onTrackerAdd: (DisplayTracker, Boolean) -> Unit = { tracker, useDefault ->
         if (tracker.hasDefaultValue && useDefault) {
-            context.performTrackVibrate()
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
             groupViewModel.addDefaultTrackerValue(tracker)
         } else {
             addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)

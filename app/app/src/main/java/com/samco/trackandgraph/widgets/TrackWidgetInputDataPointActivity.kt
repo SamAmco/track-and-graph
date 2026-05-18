@@ -19,7 +19,9 @@ package com.samco.trackandgraph.widgets
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -45,7 +47,6 @@ import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -110,7 +111,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                     when {
                         tracker.hasDefaultValue && data.customInitialValue == null -> {
                             viewModel.addDefaultDataPoint()
-                            performTrackVibrate()
+                            performTrackHapticFeedback()
                             finish()
                         }
 
@@ -124,6 +125,15 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                 }
             }
         }
+
+    private fun performTrackHapticFeedback() {
+        val feedbackConstant = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            HapticFeedbackConstants.CONFIRM
+        } else {
+            HapticFeedbackConstants.VIRTUAL_KEY
+        }
+        window.decorView.performHapticFeedback(feedbackConstant)
+    }
 
     override fun onDestroy() {
         super.onDestroy()

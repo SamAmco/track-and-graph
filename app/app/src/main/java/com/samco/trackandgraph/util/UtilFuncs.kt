@@ -18,14 +18,9 @@
 package com.samco.trackandgraph.util
 
 import android.content.Context
-import android.os.Build
 import android.os.IBinder
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 
 /**
  * Return a number given a string by attempting to parse it as a double
@@ -64,20 +59,4 @@ fun getDoubleFromTextOrNull(text: String): Double? {
 fun Window.hideKeyboard(windowToken: IBinder? = null, flags: Int = 0) {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(windowToken ?: decorView.windowToken, flags)
-}
-
-@Suppress("DEPRECATION")
-fun Context.performTrackVibrate() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val vibratorManager =
-            getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-        val vibrator = vibratorManager.defaultVibrator
-        vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val vibrator = getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
-        vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-    } else {
-        val vibrator = getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
-        vibrator.vibrate(100)
-    }
 }
