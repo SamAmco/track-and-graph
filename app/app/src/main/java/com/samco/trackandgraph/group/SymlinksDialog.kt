@@ -96,7 +96,7 @@ internal fun SymlinksDialogContent(
         }
         DialogInputSpacing()
         SmallTextButton(
-            stringRes = R.string.ok,
+            stringRes = R.string.cancel,
             onClick = onDismiss,
             modifier = Modifier.align(Alignment.End),
             colors = ButtonDefaults.textButtonColors(
