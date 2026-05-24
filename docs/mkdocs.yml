@@ -38,6 +38,7 @@ nav:
   - Tutorial:
     - tutorial/tracking.md
     - tutorial/import-export.md
+    - tutorial/app-lock.md
     - 'Creating graphs':
       - tutorial/graphs/line.md
       - tutorial/graphs/pie.md
@@ -54,4 +55,3 @@ nav:
       - lua/developer-guide/intro.md
       - lua/developer-guide/writing-graph-scripts.md
       - lua/developer-guide/writing-custom-functions.md
-

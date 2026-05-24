@@ -207,6 +207,33 @@
     <string name="info">Info</string>
     <string name="no_description">Aucune description</string>
     <string name="description">Description</string>
+
+    <!-- App lock -->
+    <string name="app_lock_title">Verrouillage de l’appli</string>
+    <string name="app_lock_locked_title">Track &amp; Graph est verrouillé</string>
+    <string name="app_lock_password_label">Mot de passe</string>
+    <string name="app_lock_confirm_password_label">Confirmer le mot de passe</string>
+    <string name="app_lock_unlock">Déverrouiller</string>
+    <string name="app_lock_use_biometrics">Utiliser la biométrie</string>
+    <string name="app_lock_enable">Activer le verrouillage de l’appli</string>
+    <string name="app_lock_enabled">Le verrouillage de l’appli est activé</string>
+    <string name="app_lock_enable_biometric_unlock">Activer le déverrouillage biométrique</string>
+    <string name="app_lock_no_strong_biometric_available">Aucun déverrouillage biométrique fort n’est disponible sur cet appareil.</string>
+    <string name="app_lock_lock_after_background_minutes">Verrouiller après ce nombre de minutes en arrière-plan</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Utilisez 0 pour verrouiller dès que l’appli quitte le premier plan.</string>
+    <string name="app_lock_change_password">Changer le mot de passe</string>
+    <string name="app_lock_password_changed">Mot de passe changé</string>
+    <string name="app_lock_disable">Désactiver le verrouillage de l’appli</string>
+    <string name="app_lock_unlock_biometric_title">Déverrouiller Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Utilisez la biométrie de votre appareil pour continuer</string>
+    <string name="app_lock_use_password">Utiliser le mot de passe</string>
+    <string name="app_lock_biometric_not_recognized">L’authentification biométrique n’a pas été reconnue.</string>
+    <string name="app_lock_error_missing_password">Il manque le mot de passe du verrouillage de l’appli. Désactivez puis réactivez le verrouillage de l’appli.</string>
+    <string name="app_lock_error_incorrect_password">Mot de passe incorrect</string>
+    <string name="app_lock_error_password_hashing_unavailable">La vérification du mot de passe du verrouillage de l’appli n’est pas disponible sur cet appareil.</string>
+    <string name="app_lock_error_enter_password">Saisissez un mot de passe.</string>
+    <string name="app_lock_error_passwords_do_not_match">Les mots de passe ne correspondent pas.</string>
+
     <string name="note_input_hint">Notes…</string>
     <string name="add_a_note">Ajouter une note</string>
     <string name="notes">Notes</string>

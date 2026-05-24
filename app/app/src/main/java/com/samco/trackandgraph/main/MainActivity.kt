@@ -17,7 +17,10 @@
 package com.samco.trackandgraph.main
 
 import android.app.UiModeManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -30,13 +33,17 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
+import com.samco.trackandgraph.applock.AppLockGate
+import com.samco.trackandgraph.applock.AppLockSession
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
@@ -95,10 +102,20 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var tngSettings: TngSettings
 
+    @Inject
+    lateinit var appLockSession: AppLockSession
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     private val currentTheme: MutableState<ThemeSelection> by lazy { mutableStateOf(getThemeValue()) }
-    private val currentDateFormat: MutableState<Int> by lazy { mutableStateOf(prefHelper.getDateFormatValue()) }
+    private val currentDateFormat: MutableState<Int> by lazy { mutableIntStateOf(prefHelper.getDateFormatValue()) }
+    private var screenOffReceiverRegistered = false
+
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_SCREEN_OFF) appLockSession.lock()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -111,28 +128,51 @@ class MainActivity : AppCompatActivity() {
             consumeWindowInsets = false
             setContent {
                 CompositionLocalProvider(LocalSettings provides tngSettings) {
-                    var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
-                    AnimatedContent(showTutorial) { show ->
-                        if (show) {
-                            TutorialScreen {
-                                showTutorial = false
-                                prefHelper.setFirstRun(false)
+                    AppLockGate {
+                        var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
+                        AnimatedContent(showTutorial) { show ->
+                            if (show) {
+                                TutorialScreen {
+                                    showTutorial = false
+                                    prefHelper.setFirstRun(false)
+                                }
+                            } else {
+                                MainScreen(
+                                    urlNavigator = urlNavigator,
+                                    onNavigateToBrowser = ::onNavigateToBrowser,
+                                    currentTheme = currentTheme,
+                                    onThemeSelected = ::onThemeSelected,
+                                    currentDateFormat = currentDateFormat,
+                                    onDateFormatSelected = ::onDateFormatSelected,
+                                )
                             }
-                        } else {
-                            MainScreen(
-                                urlNavigator = urlNavigator,
-                                onNavigateToBrowser = ::onNavigateToBrowser,
-                                currentTheme = currentTheme,
-                                onThemeSelected = ::onThemeSelected,
-                                currentDateFormat = currentDateFormat,
-                                onDateFormatSelected = ::onDateFormatSelected,
-                            )
                         }
                     }
                 }
             }
         }
         setContentView(content)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ContextCompat.registerReceiver(
+            this,
+            screenOffReceiver,
+            IntentFilter(Intent.ACTION_SCREEN_OFF),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        screenOffReceiverRegistered = true
+        appLockSession.onAppForegrounded()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (screenOffReceiverRegistered) {
+            unregisterReceiver(screenOffReceiver)
+            screenOffReceiverRegistered = false
+        }
+        appLockSession.onAppBackgrounded()
     }
 
     private fun onNavigateToBrowser(location: DrawerMenuBrowserLocation) {

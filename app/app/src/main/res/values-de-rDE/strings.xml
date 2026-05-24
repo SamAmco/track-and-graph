@@ -206,6 +206,33 @@
     <string name="info">Info</string>
     <string name="no_description">Keine Beschreibung</string>
     <string name="description">Beschreibung</string>
+
+    <!-- App lock -->
+    <string name="app_lock_title">App-Sperre</string>
+    <string name="app_lock_locked_title">Track &amp; Graph ist gesperrt</string>
+    <string name="app_lock_password_label">Passwort</string>
+    <string name="app_lock_confirm_password_label">Passwort bestätigen</string>
+    <string name="app_lock_unlock">Entsperren</string>
+    <string name="app_lock_use_biometrics">Biometrie verwenden</string>
+    <string name="app_lock_enable">App-Sperre aktivieren</string>
+    <string name="app_lock_enabled">App-Sperre ist aktiviert</string>
+    <string name="app_lock_enable_biometric_unlock">Biometrisches Entsperren aktivieren</string>
+    <string name="app_lock_no_strong_biometric_available">Auf diesem Gerät ist kein starkes biometrisches Entsperren verfügbar.</string>
+    <string name="app_lock_lock_after_background_minutes">Nach Minuten im Hintergrund sperren</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Verwenden Sie 0, um zu sperren, sobald die App nicht mehr im Vordergrund ist.</string>
+    <string name="app_lock_change_password">Passwort ändern</string>
+    <string name="app_lock_password_changed">Passwort geändert</string>
+    <string name="app_lock_disable">App-Sperre deaktivieren</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph entsperren</string>
+    <string name="app_lock_unlock_biometric_subtitle">Verwenden Sie die Biometrie Ihres Geräts, um fortzufahren</string>
+    <string name="app_lock_use_password">Passwort verwenden</string>
+    <string name="app_lock_biometric_not_recognized">Biometrische Authentifizierung wurde nicht erkannt.</string>
+    <string name="app_lock_error_missing_password">Der App-Sperre fehlt ihr Passwort. Deaktivieren Sie die App-Sperre und aktivieren Sie sie erneut.</string>
+    <string name="app_lock_error_incorrect_password">Falsches Passwort</string>
+    <string name="app_lock_error_password_hashing_unavailable">Die Passwortprüfung für die App-Sperre ist auf diesem Gerät nicht verfügbar.</string>
+    <string name="app_lock_error_enter_password">Geben Sie ein Passwort ein.</string>
+    <string name="app_lock_error_passwords_do_not_match">Die Passwörter stimmen nicht überein.</string>
+
     <string name="note_input_hint">Notizen…</string>
     <string name="add_a_note">Notiz hinzufügen</string>
     <string name="notes">Notizen</string>

@@ -277,6 +277,33 @@
     <string name="info">Info</string>
     <string name="no_description">No description</string>
     <string name="description">Description</string>
+
+    <!-- App lock -->
+    <string name="app_lock_title">App Lock</string>
+    <string name="app_lock_locked_title">Track &amp; Graph is locked</string>
+    <string name="app_lock_password_label">Password</string>
+    <string name="app_lock_confirm_password_label">Confirm password</string>
+    <string name="app_lock_unlock">Unlock</string>
+    <string name="app_lock_use_biometrics">Use biometrics</string>
+    <string name="app_lock_enable">Enable app lock</string>
+    <string name="app_lock_enabled">App lock is enabled</string>
+    <string name="app_lock_enable_biometric_unlock">Enable biometric unlock</string>
+    <string name="app_lock_no_strong_biometric_available">No strong biometric unlock is available on this device.</string>
+    <string name="app_lock_lock_after_background_minutes">Lock after background minutes</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Use 0 to lock as soon as the app leaves the foreground.</string>
+    <string name="app_lock_change_password">Change password</string>
+    <string name="app_lock_password_changed">Password changed</string>
+    <string name="app_lock_disable">Disable app lock</string>
+    <string name="app_lock_unlock_biometric_title">Unlock Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Use your device biometrics to continue</string>
+    <string name="app_lock_use_password">Use password</string>
+    <string name="app_lock_biometric_not_recognized">Biometric authentication was not recognized.</string>
+    <string name="app_lock_error_missing_password">App lock is missing its password. Disable and re-enable app lock.</string>
+    <string name="app_lock_error_incorrect_password">Incorrect password</string>
+    <string name="app_lock_error_password_hashing_unavailable">App lock password verification is not available on this device.</string>
+    <string name="app_lock_error_enter_password">Enter a password.</string>
+    <string name="app_lock_error_passwords_do_not_match">Passwords do not match.</string>
+
     <string name="duplicate_name_format" translatable="false">%1$s (%2$d)</string>
     <string name="note_input_hint">Notes…</string>
     <string name="add_a_note">Add a note</string>

@@ -54,6 +54,8 @@ data class Endpoints(
     val functionsDocs: String,
     @SerialName("lua-custom-functions-docs")
     val luaCustomFunctionsDocs: String,
+    @SerialName("app-lock-docs")
+    val appLockDocs: String,
     @SerialName("donate-url")
     val donateUrl: String
 )

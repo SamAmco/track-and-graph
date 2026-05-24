@@ -36,6 +36,8 @@ import com.samco.trackandgraph.aboutpage.AboutNavKey
 import com.samco.trackandgraph.aboutpage.AboutScreen
 import com.samco.trackandgraph.addtracker.AddTrackerNavKey
 import com.samco.trackandgraph.addtracker.AddTrackerScreen
+import com.samco.trackandgraph.applock.AppLockNavKey
+import com.samco.trackandgraph.applock.AppLockScreen
 import com.samco.trackandgraph.backupandrestore.BackupAndRestoreNavKey
 import com.samco.trackandgraph.backupandrestore.BackupAndRestoreScreen
 import com.samco.trackandgraph.featurehistory.FeatureHistoryNavKey
@@ -131,6 +133,10 @@ fun NavigationHost(
 
             is BackupAndRestoreNavKey -> NavEntry(destination) {
                 BackupAndRestoreScreen(destination)
+            }
+
+            is AppLockNavKey -> NavEntry(destination) {
+                AppLockScreen(destination, urlNavigator)
             }
 
             is ViewGraphStatNavKey -> NavEntry(destination) {

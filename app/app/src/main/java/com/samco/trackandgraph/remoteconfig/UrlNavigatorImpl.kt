@@ -72,6 +72,7 @@ class UrlNavigatorImpl @Inject constructor(
             UrlNavigator.Location.PLAY_STORE_PAGE -> config.endpoints.playStorePage
             UrlNavigator.Location.FUNCTIONS_DOCS -> config.endpoints.functionsDocs
             UrlNavigator.Location.LUA_CUSTOM_FUNCTIONS_DOCS -> config.endpoints.luaCustomFunctionsDocs
+            UrlNavigator.Location.APP_LOCK_DOCS -> config.endpoints.appLockDocs
             UrlNavigator.Location.DONATE -> config.endpoints.donateUrl
         }
     }

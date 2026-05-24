@@ -28,6 +28,7 @@ val testEndpoints = Endpoints(
     functionCatalogueSignature = "https://functions.com/signature",
     functionsDocs = "https://functions.com/docs",
     luaCustomFunctionsDocs = "https://functions.com/custom-docs",
+    appLockDocs = "https://tutorial.com/app-lock",
     donateUrl = "https://buymeacoffee.com/trackandgraph",
     tutorialFunctionsReminders = "https://tutorial.com/functions/reminders"
 )

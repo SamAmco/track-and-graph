@@ -9,9 +9,14 @@ docs:
     keywords: [project-map, directory, structure, modules, app, data, ui, shared-ui, build-logic, changelog-viewer, docs, lua, schemas, layout]
 
   - file: compose-ui-patterns.md
-    title: Compose UI patterns — ViewModel binding, pure UI, previews, and chip state
-    description: Shared UI module boundary, standard three-layer composable pattern, previews, and selectable TextChip styling driven by committed selected state.
-    keywords: [compose, composable, shared-ui, ui-module, preview, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState, flicker]
+    title: Compose UI patterns — ViewModel binding, pure UI, preview defaults, and chip state
+    description: Shared UI module boundary, standard three-layer composable pattern, previews by default for new screens and UI components, app/ui reusable control guidance, and selectable TextChip styling driven by committed selected state.
+    keywords: [compose, composable, shared-ui, ui-module, app-ui, reusable-controls, buttons, TextButton, SmallTextButton, RowCheckbox, PasswordTextField, Divider, spacing, preview, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState, flicker]
+
+  - file: app-lock.md
+    title: App lock — security boundary, persistence, and UI shell
+    description: App lock is a presentation/access barrier, not database encryption; configuration uses PrefsPersistenceProvider, unlock state is in-memory, and the main activity gates only app UI while widgets/background work remain usable.
+    keywords: [app-lock, lock, biometric, password, PrefsPersistenceProvider, DataStore, MainActivity, AppLockGate, AppLockSession, backup, widget, reminder, notification, encryption, security]
 
   - file: card-composables.md
     title: Card composables — Tracker, Group, Function, GraphStatCardView API shape

@@ -19,9 +19,12 @@ package com.samco.trackandgraph.di
 
 import android.content.ContentResolver
 import android.content.Context
+import androidx.biometric.BiometricManager
 import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelper
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelperImpl
+import com.samco.trackandgraph.applock.AppLockRepository
+import com.samco.trackandgraph.applock.AppLockRepositoryImpl
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractor
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractorImpl
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
@@ -75,6 +78,14 @@ class AppModule {
     @Provides
     fun getContentResolver(@ApplicationContext context: Context): ContentResolver =
         context.contentResolver
+
+    @Provides
+    fun provideBiometricManager(@ApplicationContext context: Context): BiometricManager =
+        BiometricManager.from(context)
+
+    @Provides
+    @Singleton
+    fun provideAppLockRepository(impl: AppLockRepositoryImpl): AppLockRepository = impl
 
     @Provides
     fun getPendingIntentProvider(impl: PendingIntentProviderImpl): PendingIntentProvider = impl

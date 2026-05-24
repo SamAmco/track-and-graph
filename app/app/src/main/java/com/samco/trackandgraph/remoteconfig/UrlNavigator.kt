@@ -30,6 +30,7 @@ interface UrlNavigator {
         PLAY_STORE_PAGE,
         FUNCTIONS_DOCS,
         LUA_CUSTOM_FUNCTIONS_DOCS,
+        APP_LOCK_DOCS,
         DONATE
     }
 
@@ -37,4 +38,3 @@ interface UrlNavigator {
 
     fun triggerNavigation(context: Context, location: Location)
 }
-

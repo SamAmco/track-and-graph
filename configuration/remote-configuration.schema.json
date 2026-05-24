@@ -21,6 +21,7 @@
         "function-catalogue-signature",
         "functions-docs",
         "lua-custom-functions-docs",
+        "app-lock-docs",
         "donate-url"
       ],
       "properties": {
@@ -76,6 +77,11 @@
           "type": "string",
           "format": "uri",
           "description": "URL to documentation for writing custom Lua function nodes"
+        },
+        "app-lock-docs": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to app lock documentation"
         },
         "donate-url": {
           "type": "string",

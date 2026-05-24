@@ -152,6 +152,7 @@ dependencies {
 
     //AppCompat (enables dark theme on  API <= 29)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.biometric)
     implementation(libs.core.ktx)
 
     //UI

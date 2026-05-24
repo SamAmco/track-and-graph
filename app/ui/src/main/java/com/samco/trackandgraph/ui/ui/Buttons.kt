@@ -24,6 +24,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -158,21 +160,34 @@ fun TextButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true,
+    loading: Boolean = false,
     text: String,
     textAlign: TextAlign = TextAlign.Start,
 ) = Button(
     modifier = modifier,
     onClick = onClick,
-    enabled = enabled,
+    enabled = enabled && !loading,
     shape = MaterialTheme.shapes.medium,
     contentPadding = PaddingValues(vertical = cardPadding, horizontal = inputSpacingLarge)
 ) {
-    Text(
-        text = text,
-        textAlign = textAlign,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onPrimary
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(MaterialTheme.typography.titleSmall.fontSize.value.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                strokeWidth = 2.dp,
+            )
+            HalfDialogInputSpacing()
+        }
+        Text(
+            text = text,
+            textAlign = textAlign,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+    }
 }
 
 enum class ButtonLocation { Start, End }
@@ -324,6 +339,11 @@ fun ButtonPreview() = TnGComposeTheme(
         )
         TextButton(
             text = "Text Button",
+            onClick = {}
+        )
+        TextButton(
+            text = "Loading Button",
+            loading = true,
             onClick = {}
         )
         IconTextButton(

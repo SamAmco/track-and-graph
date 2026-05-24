@@ -1,14 +1,15 @@
 ---
 title: Compose UI patterns — ViewModel binding, pure UI, previews, and chip state
-description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, @Preview calls the pure-UI composable; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
+description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, new screens and UI components include @Preview by default; reusable controls live in app/ui; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
 topics:
   - ViewModel-binding layer collects state and calls the pure-UI composable
   - Pure-UI composable takes only state values and callbacks — no ViewModels
-  - New or migrated UI should generally include @Preview functions
+  - New screens and UI components should include @Preview functions by default
   - @Preview functions call the pure-UI composable with hardcoded data
+  - Reuse shared app/ui controls before defining local Material wrappers
   - Naming conventions for each layer
   - TextChip/TngChip selected styling versus pressed-state feedback
-keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
+keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, TextButton, SmallTextButton, RowCheckbox, Divider, spacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
 ---
 
 # Compose UI Patterns
@@ -20,6 +21,10 @@ Generic, reusable UI components live in `app/ui`. The app is fully Compose, so p
 Move components into `app/ui` when they are UI-only and can be used without depending on app feature packages, ViewModels, `DataInteractor`, or data DTOs. Keep components in `app/app` when they still import app helpers, settings, feature callbacks, or data-layer DTOs. Prefer parameterizing copy/callbacks/resources for reusable components instead of moving feature-specific strings into `app/ui`.
 
 When adding or migrating shared UI, add preview functions in the same file unless there is a specific blocker. Older shared UI files are not perfectly consistent yet, but the expected direction is that reusable UI has previews so changes can be inspected without wiring a feature screen.
+
+Previews are the default for new screens, dialogs, and UI components. Skip them only when there is a concrete blocker such as an AndroidView/runtime dependency that cannot reasonably be faked; otherwise split the UI so a pure composable can be previewed with hardcoded state.
+
+Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), text fields (`FullWidthTextField`, `PasswordTextField`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`). If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
 
 ## Three-Layer Composable Pattern
 
@@ -74,6 +79,7 @@ private fun GroupDeleteDialogContent(
 - No context, no Hilt, no coroutines
 - Provide multiple previews for different states (e.g. unique vs non-unique)
 - For shared UI in `app/ui`, include previews for new components and for components migrated out of `app/app` unless a dependency makes previewing impractical
+- For new screens, dialogs, and reusable controls, add previews in the initial change rather than as a later cleanup
 
 ```kotlin
 @Preview

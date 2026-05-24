@@ -17,7 +17,9 @@
 package com.samco.trackandgraph.ui.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LocalTextStyle
@@ -34,6 +36,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 
+enum class RowCheckboxPosition {
+    Start,
+    End,
+}
+
 @Composable
 fun RowCheckbox(
     modifier: Modifier = Modifier,
@@ -41,20 +48,40 @@ fun RowCheckbox(
     onCheckedChange: ((Boolean) -> Unit)?,
     text: String,
     textStyle: TextStyle = LocalTextStyle.current,
+    checkboxPosition: RowCheckboxPosition = RowCheckboxPosition.Start,
 ) = Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier
-        .clickable { onCheckedChange?.invoke(!checked) }
-        .padding(end = 14.dp)
+        .clickable(enabled = onCheckedChange != null) { onCheckedChange?.invoke(!checked) }
+        .padding(end = if (checkboxPosition == RowCheckboxPosition.Start) 14.dp else 0.dp)
 ) {
-    Checkbox(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-    )
-    Text(
-        text = text,
-        style = textStyle,
-    )
+    when (checkboxPosition) {
+        RowCheckboxPosition.Start -> {
+            Checkbox(
+                checked = checked,
+                enabled = onCheckedChange != null,
+                onCheckedChange = onCheckedChange,
+            )
+            Text(
+                text = text,
+                style = textStyle,
+            )
+        }
+
+        RowCheckboxPosition.End -> {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = text,
+                style = textStyle,
+            )
+            InputSpacingLarge()
+            Checkbox(
+                checked = checked,
+                enabled = onCheckedChange != null,
+                onCheckedChange = onCheckedChange,
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -62,11 +89,39 @@ fun RowCheckbox(
 private fun RowCheckboxPreview() {
     TnGComposeTheme {
         var checked by remember { mutableStateOf(true) }
-        
-        RowCheckbox(
-            checked = checked,
-            onCheckedChange = { checked = it },
-            text = "Sample checkbox option"
-        )
+
+        Column {
+            RowCheckbox(
+                checked = checked,
+                onCheckedChange = { checked = it },
+                text = "Start checkbox option"
+            )
+
+            DialogInputSpacing()
+
+            RowCheckbox(
+                modifier = Modifier.fillMaxWidth(),
+                checked = checked,
+                onCheckedChange = { checked = it },
+                text = "End checkbox option",
+                checkboxPosition = RowCheckboxPosition.End,
+            )
+
+            DialogInputSpacing()
+
+            RowCheckbox(
+                checked = false,
+                onCheckedChange = {},
+                text = "Unchecked checkbox option"
+            )
+
+            DialogInputSpacing()
+
+            RowCheckbox(
+                checked = true,
+                onCheckedChange = null,
+                text = "Disabled checkbox option"
+            )
+        }
     }
 }
