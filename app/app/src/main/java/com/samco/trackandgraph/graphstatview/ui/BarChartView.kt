@@ -122,6 +122,7 @@ fun BarChartView(
     listMode: Boolean,
     timeMarker: OffsetDateTime? = null,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
 ) = Box(modifier = modifier) {
     if (viewData.xDates.isEmpty() || viewData.bars.isEmpty()) {
         GraphErrorView(
@@ -147,7 +148,8 @@ fun BarChartView(
             yAxisSubdivides = viewData.yAxisSubdivides,
             listMode = listMode,
             barMarkerStore = barMarkerStore,
-            graphViewMode = graphViewMode
+            graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
 
         if (!listMode) barMarkerStore.highlightedIndex?.let {
@@ -315,11 +317,12 @@ private fun BarChartBodyView(
     listMode: Boolean,
     barMarkerStore: BarMarkerStore,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
-    val containerColor = MaterialTheme.colorScheme.surface.toArgb()
+    val containerColor = graphBackgroundColor.toArgb()
 
     val hasLegend = bars.size > 1
 

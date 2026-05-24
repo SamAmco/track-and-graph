@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
@@ -56,6 +57,7 @@ fun TimeHistogramView(
     modifier: Modifier = Modifier,
     viewData: ITimeHistogramViewData,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
 ) {
     if (viewData.barValues.isNullOrEmpty()) {
         GraphErrorView(
@@ -69,6 +71,7 @@ fun TimeHistogramView(
             barValues = viewData.barValues!!,
             maxDisplayHeight = viewData.maxDisplayHeight,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
     }
 }
@@ -80,11 +83,12 @@ private fun TimeHistogramBodyView(
     barValues: List<ITimeHistogramViewData.BarValue>,
     maxDisplayHeight: Double,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
-    val containerColor = MaterialTheme.colorScheme.surface.toArgb()
+    val containerColor = graphBackgroundColor.toArgb()
 
     val hasLegend = barValues.size > 1
 

@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,7 +36,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
-import com.samco.trackandgraph.ui.theming.tngColors
 import android.graphics.Color as GColor
 
 private data class SegmentInfo(
@@ -51,6 +49,7 @@ fun PieChartView(
     modifier: Modifier = Modifier,
     viewData: IPieChartViewData,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
 ) {
     val segments = viewData.segments
     if (segments.isNullOrEmpty()) {
@@ -112,6 +111,7 @@ fun PieChartView(
             modifier = modifier,
             segments = segmentInfos,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
     }
 }
@@ -121,10 +121,11 @@ private fun PieChartViewBody(
     modifier: Modifier = Modifier,
     segments: List<SegmentInfo>,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
-    val containerColor = MaterialTheme.tngColors.surface.toArgb()
+    val containerColor = graphBackgroundColor.toArgb()
 
     val smallLabelSize = with(LocalDensity.current) {
         dimensionResource(R.dimen.small_label_size).toPx()

@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,6 +74,7 @@ fun FullScreenGraphStatView(
     timeMarker: OffsetDateTime? = null,
 ) = BoxWithConstraints(modifier = modifier) {
     val maxHeight = constraints.maxHeight
+    val graphBackgroundColor = MaterialTheme.colorScheme.background
     FadingScrollColumn(
         modifier = Modifier
             .padding(WindowInsets.safeDrawing.asPaddingValues())
@@ -85,6 +87,7 @@ fun FullScreenGraphStatView(
                 modifier = Modifier.fillMaxWidth(),
                 graphStatViewData = graphStatViewData,
                 graphViewMode = GraphViewMode.FullScreenMode(maxHeight),
+                graphBackgroundColor = graphBackgroundColor,
                 timeMarker = timeMarker,
             )
             DialogInputSpacing()
@@ -100,10 +103,12 @@ fun ListItemGraphStatView(
     modifier = modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally,
     content = {
+        val graphBackgroundColor = MaterialTheme.colorScheme.surface
         GraphStatViewContent(
             modifier = Modifier.fillMaxWidth(),
             graphStatViewData = graphStatViewData,
             graphViewMode = GraphViewMode.ListMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
     }
 )
@@ -120,6 +125,7 @@ private fun GraphStatViewContent(
     modifier: Modifier = Modifier,
     graphStatViewData: IGraphStatViewData,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
     timeMarker: OffsetDateTime? = null,
 ) {
     GraphHeading(graphStatViewData)
@@ -142,6 +148,7 @@ private fun GraphStatViewContent(
             modifier = modifier,
             graphStatViewData = graphStatViewData,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
             timeMarker = timeMarker,
         )
     }
@@ -240,6 +247,7 @@ private fun GraphStatInnerViewOrLuaGraph(
     modifier: Modifier,
     graphStatViewData: IGraphStatViewData,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
     timeMarker: OffsetDateTime? = null,
 ) {
     if (graphStatViewData is ILuaGraphViewData) {
@@ -247,6 +255,7 @@ private fun GraphStatInnerViewOrLuaGraph(
             modifier = modifier,
             graphStatViewData = graphStatViewData,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
             timeMarker = timeMarker,
         )
     } else {
@@ -254,6 +263,7 @@ private fun GraphStatInnerViewOrLuaGraph(
             modifier = modifier,
             graphStatViewData = graphStatViewData,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
             timeMarker = timeMarker,
         )
     }
@@ -264,6 +274,7 @@ private fun UnwrappedLuaGraphView(
     modifier: Modifier,
     graphStatViewData: ILuaGraphViewData,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
     timeMarker: OffsetDateTime? = null,
 ) {
     if (!graphStatViewData.hasData) {
@@ -282,6 +293,7 @@ private fun UnwrappedLuaGraphView(
         GraphStatInnerView(
             graphStatViewData = unwrapped,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
             timeMarker = timeMarker,
         )
     }
@@ -292,6 +304,7 @@ private fun GraphStatInnerView(
     modifier: Modifier = Modifier,
     graphStatViewData: IGraphStatViewData,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
     timeMarker: OffsetDateTime? = null,
 ) = when (graphStatViewData.graphOrStat.type) {
     GraphStatType.LINE_GRAPH ->
@@ -300,6 +313,7 @@ private fun GraphStatInnerView(
             viewData = graphStatViewData as ILineGraphViewData,
             timeMarker = timeMarker,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
 
     GraphStatType.PIE_CHART ->
@@ -307,6 +321,7 @@ private fun GraphStatInnerView(
             modifier = modifier,
             viewData = graphStatViewData as IPieChartViewData,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
 
     GraphStatType.AVERAGE_TIME_BETWEEN ->
@@ -327,6 +342,7 @@ private fun GraphStatInnerView(
             modifier = modifier,
             viewData = graphStatViewData as ITimeHistogramViewData,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
 
     GraphStatType.BAR_CHART ->
@@ -336,6 +352,7 @@ private fun GraphStatInnerView(
             timeMarker = timeMarker,
             listMode = graphViewMode is GraphViewMode.ListMode,
             graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
 
     GraphStatType.LUA_SCRIPT -> {

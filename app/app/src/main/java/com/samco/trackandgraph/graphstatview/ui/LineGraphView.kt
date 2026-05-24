@@ -66,6 +66,7 @@ fun LineGraphView(
     modifier: Modifier = Modifier,
     viewData: ILineGraphViewData,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
     timeMarker: OffsetDateTime? = null,
 ) {
     if (!viewData.hasPlottableData) {
@@ -78,7 +79,8 @@ fun LineGraphView(
             modifier = modifier,
             viewData = viewData,
             timeMarker = timeMarker,
-            graphViewMode = graphViewMode
+            graphViewMode = graphViewMode,
+            graphBackgroundColor = graphBackgroundColor,
         )
     }
 }
@@ -89,6 +91,7 @@ fun LineGraphBodyView(
     viewData: ILineGraphViewData,
     timeMarker: OffsetDateTime? = null,
     graphViewMode: GraphViewMode,
+    graphBackgroundColor: Color,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
@@ -96,7 +99,7 @@ fun LineGraphBodyView(
     val errorColor = MaterialTheme.colorScheme.error.toArgb()
     val textColorPrimary = MaterialTheme.colorScheme.onSurface.toArgb()
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
-    val containerColor = MaterialTheme.colorScheme.surface.toArgb()
+    val containerColor = graphBackgroundColor.toArgb()
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
