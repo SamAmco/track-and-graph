@@ -1,0 +1,5 @@
+- Corregir el texto del botón de cancelación en el diálogo de desambiguación de enlaces simbólicos
+- Corregir los colores de fondo de los gráficos
+- Usar un único canal de notificaciones audibles para los recordatorios
+- Usar la respuesta háptica de la plataforma para la confirmación de rastreadores
+      

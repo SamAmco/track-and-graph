@@ -1,0 +1,5 @@
+- Correct symlink disambiguation dialog cancel action button text
+- Fix graph background colours
+- Use one audible reminder notification channel
+- Use platform haptics for tracker confirmation
+      

@@ -1,0 +1,5 @@
+- Corriger le texte du bouton d’annulation dans la boîte de dialogue de désambiguïsation des liens symboliques
+- Corriger les couleurs d’arrière-plan des graphiques
+- Utiliser un seul canal de notification audible pour les rappels
+- Utiliser le retour haptique de la plateforme pour la confirmation des traceurs
+      

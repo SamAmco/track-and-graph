@@ -1,0 +1,5 @@
+- Text der Abbrechen-Schaltfläche im Dialog zur Unterscheidung symbolischer Links korrigieren
+- Hintergrundfarben der Diagramme korrigieren
+- Einen einzigen hörbaren Benachrichtigungskanal für Erinnerungen verwenden
+- Plattform-Haptik für die Tracker-Bestätigung verwenden
+      
