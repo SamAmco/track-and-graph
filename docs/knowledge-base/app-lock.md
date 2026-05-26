@@ -32,6 +32,8 @@ The app is single-activity for normal UI, so app lock belongs in the app shell r
 
 Unlock state should be in-memory only. That gives the expected behavior that a killed process starts locked again. Relock is based on app lifecycle/device lock events rather than database access.
 
+Device lock should force app lock immediately, regardless of the configured background timeout. In `MainActivity`, keep the screen/user-present receiver registered for the Activity lifetime rather than only between `onStart`/`onStop`; screen-off broadcast delivery can otherwise race `onStop` unregistering the receiver. Also check `KeyguardManager.isKeyguardLocked` in `onStop` and call `AppLockSession.lock()` instead of starting the background timeout when the stop is caused by device locking.
+
 ## Persistence
 
 Use `PrefsPersistenceProvider` for app-lock settings, not direct `SharedPreferences`. The app-lock config is app-layer state and should follow the DataStore-backed persistence pattern used by other app features.

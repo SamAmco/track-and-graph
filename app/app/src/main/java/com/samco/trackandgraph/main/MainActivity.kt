@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.main
 
+import android.app.KeyguardManager
 import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -86,6 +87,9 @@ class MainActivity : AppCompatActivity() {
     private val themeMap = ThemeSelection.entries.associateBy { it.appCompatMode }
 
     private val uiModeManager by lazy { getSystemService(UI_MODE_SERVICE) as UiModeManager }
+    private val keyguardManager by lazy {
+        getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+    }
 
     @Inject
     lateinit var prefHelper: PrefHelper
@@ -113,7 +117,10 @@ class MainActivity : AppCompatActivity() {
 
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == Intent.ACTION_SCREEN_OFF) appLockSession.lock()
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF,
+                Intent.ACTION_USER_PRESENT -> appLockSession.lock()
+            }
         }
     }
 
@@ -124,6 +131,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.init()
         intent?.data?.let { handleDeepLink(it) }
         onThemeSelected(currentTheme.value)
+        registerScreenOffReceiver()
         val content = ComposeView(this).apply {
             consumeWindowInsets = false
             setContent {
@@ -156,23 +164,38 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        ContextCompat.registerReceiver(
-            this,
-            screenOffReceiver,
-            IntentFilter(Intent.ACTION_SCREEN_OFF),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-        screenOffReceiverRegistered = true
         appLockSession.onAppForegrounded()
     }
 
     override fun onStop() {
         super.onStop()
+        if (keyguardManager.isKeyguardLocked) {
+            appLockSession.lock()
+        } else {
+            appLockSession.onAppBackgrounded()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         if (screenOffReceiverRegistered) {
             unregisterReceiver(screenOffReceiver)
             screenOffReceiverRegistered = false
         }
-        appLockSession.onAppBackgrounded()
+    }
+
+    private fun registerScreenOffReceiver() {
+        if (screenOffReceiverRegistered) return
+        ContextCompat.registerReceiver(
+            this,
+            screenOffReceiver,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_USER_PRESENT)
+            },
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        screenOffReceiverRegistered = true
     }
 
     private fun onNavigateToBrowser(location: DrawerMenuBrowserLocation) {
