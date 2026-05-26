@@ -18,6 +18,7 @@ package com.samco.trackandgraph.applock
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -41,9 +42,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -60,6 +63,7 @@ import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.Divider
 import com.samco.trackandgraph.ui.ui.InputSpacingLarge
@@ -81,7 +85,7 @@ fun AppLockScreen(navArgs: AppLockNavKey, urlNavigator: UrlNavigator) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val passwordChangedText = stringResource(R.string.app_lock_password_changed)
-    var passwordChangedEventCount by rememberSaveable { mutableStateOf(0) }
+    var passwordChangedEventCount by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(context, viewModel) {
         viewModel.passwordChangedEvents.receiveAsFlow().collect {
@@ -256,6 +260,7 @@ private fun AppLockContent(
                 .verticalScroll(rememberScrollState())
                 .padding(cardPadding),
         ) {
+            InputSpacingLarge()
             if (state.enabled) {
                 EnabledContent(
                     state = state,
@@ -335,12 +340,21 @@ private fun EnabledContent(
         }
     }
 
-    Text(
-        text = stringResource(R.string.app_lock_enabled),
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-    )
-
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.check_circle_24px),
+            contentDescription = stringResource(R.string.app_lock_enabled),
+            tint = MaterialTheme.tngColors.goodColor,
+        )
+        DialogInputSpacing()
+        Text(
+            text = stringResource(R.string.app_lock_enabled),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+    }
 
     if (state.canAuthenticateWithBiometrics) {
         DialogInputSpacing()

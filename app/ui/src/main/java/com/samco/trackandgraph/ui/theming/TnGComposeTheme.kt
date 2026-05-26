@@ -65,6 +65,7 @@ data class TngColors(
     val textColorSecondary: Color,
     val toolbarBackgroundColor: Color,
     val hyperlinkColor: Color,
+    val goodColor: Color,
 ) {
     // Convenience accessors for Material 3 ColorScheme
     val primary get() = colorScheme.primary
@@ -204,6 +205,7 @@ private val LightTngColors = TngColors(
     textColorSecondary = darkGray,
     toolbarBackgroundColor = blueWhitePastel,
     hyperlinkColor = darkBlue, // Using dark_blue from colorSecondaryVariant
+    goodColor = fadedGreen,
 )
 
 private val DarkTngColors = TngColors(
@@ -213,6 +215,7 @@ private val DarkTngColors = TngColors(
     textColorSecondary = midGray,
     toolbarBackgroundColor = midCharcoal,
     hyperlinkColor = fadedDarkBlue, // Using faded_dark_blue from colorSecondaryVariant
+    goodColor = fadedGreen,
 )
 
 @Composable
