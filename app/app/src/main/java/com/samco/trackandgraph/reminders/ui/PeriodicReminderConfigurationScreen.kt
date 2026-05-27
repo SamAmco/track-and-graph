@@ -62,6 +62,7 @@ fun PeriodicReminderConfigurationScreen(
     viewModel: PeriodicReminderConfigurationViewModel = hiltViewModel<PeriodicReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
+    val enabled by viewModel.enabled.collectAsState()
     val startsOffset by viewModel.starts.collectAsState()
     val endsOffset by viewModel.ends.collectAsState()
     val hasEndDate by viewModel.hasEndDate.collectAsState()
@@ -79,6 +80,8 @@ fun PeriodicReminderConfigurationScreen(
     PeriodicReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
+        enabled = enabled,
+        onEnabledChanged = viewModel::updateEnabled,
         startsOffset = startsOffset,
         onStartsOffsetChanged = viewModel::updateStarts,
         endsOffset = endsOffset,
@@ -101,6 +104,8 @@ fun PeriodicReminderConfigurationScreen(
 private fun PeriodicReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
     startsOffset: OffsetDateTime,
     onStartsOffsetChanged: (OffsetDateTime) -> Unit,
     endsOffset: OffsetDateTime,
@@ -137,6 +142,12 @@ private fun PeriodicReminderConfigurationContent(
                 .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true
+        )
+
+        InputSpacingLarge()
+        ReminderEnabledCheckbox(
+            enabled = enabled,
+            onEnabledChanged = onEnabledChanged
         )
 
         InputSpacingLarge()
@@ -217,6 +228,8 @@ fun PeriodicReminderConfigurationContentPreview() {
         PeriodicReminderConfigurationContent(
             reminderName = "Daily Exercise",
             onReminderNameChanged = {},
+            enabled = true,
+            onEnabledChanged = {},
             startsOffset = OffsetDateTime.parse("2025-12-23T14:30:00+00:00"),
             onStartsOffsetChanged = {},
             endsOffset = OffsetDateTime.parse("2026-12-23T14:30:00+00:00"),

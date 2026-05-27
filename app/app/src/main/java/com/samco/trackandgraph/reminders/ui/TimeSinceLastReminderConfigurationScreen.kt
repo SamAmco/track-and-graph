@@ -71,6 +71,7 @@ fun TimeSinceLastReminderConfigurationScreen(
     viewModel: TimeSinceLastReminderConfigurationViewModel = hiltViewModel<TimeSinceLastReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
+    val enabled by viewModel.enabled.collectAsState()
     val firstInterval by viewModel.firstInterval.collectAsState()
     val firstPeriod by viewModel.firstPeriod.collectAsState()
     val secondInterval by viewModel.secondInterval.collectAsState()
@@ -91,6 +92,8 @@ fun TimeSinceLastReminderConfigurationScreen(
     TimeSinceLastReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
+        enabled = enabled,
+        onEnabledChanged = viewModel::updateEnabled,
         firstInterval = firstInterval,
         onFirstIntervalChanged = viewModel::updateFirstInterval,
         firstPeriod = firstPeriod,
@@ -117,6 +120,8 @@ fun TimeSinceLastReminderConfigurationScreen(
 fun TimeSinceLastReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
     firstInterval: String,
     onFirstIntervalChanged: (String) -> Unit,
     firstPeriod: Period,
@@ -158,6 +163,12 @@ fun TimeSinceLastReminderConfigurationContent(
                 .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true
+        )
+
+        InputSpacingLarge()
+        ReminderEnabledCheckbox(
+            enabled = enabled,
+            onEnabledChanged = onEnabledChanged
         )
 
         InputSpacingLarge()
@@ -272,6 +283,8 @@ fun TimeSinceLastReminderConfigurationContentPreview() {
         TimeSinceLastReminderConfigurationContent(
             reminderName = "Exercise Reminder",
             onReminderNameChanged = {},
+            enabled = true,
+            onEnabledChanged = {},
             firstInterval = "3",
             onFirstIntervalChanged = {},
             firstPeriod = Period.DAYS,

@@ -33,6 +33,7 @@ import javax.inject.Inject
 
 interface PeriodicReminderConfigurationViewModel {
     val reminderName: StateFlow<String>
+    val enabled: StateFlow<Boolean>
     val starts: StateFlow<OffsetDateTime>
     val ends: StateFlow<OffsetDateTime>
     val interval: StateFlow<String>
@@ -41,6 +42,7 @@ interface PeriodicReminderConfigurationViewModel {
 
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.PeriodicParams?)
     fun updateReminderName(name: String)
+    fun updateEnabled(enabled: Boolean)
     fun updateStarts(starts: OffsetDateTime)
     fun updateEnds(ends: OffsetDateTime)
     fun updateHasEndDate(hasEndDate: Boolean)
@@ -55,6 +57,9 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
 
     private val _reminderName = MutableStateFlow("")
     override val reminderName: StateFlow<String> = _reminderName.asStateFlow()
+
+    private val _enabled = MutableStateFlow(true)
+    override val enabled: StateFlow<Boolean> = _enabled.asStateFlow()
 
     private val _intervalText = MutableStateFlow("1")
     override val interval: StateFlow<String> = _intervalText.asStateFlow()
@@ -82,6 +87,10 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
 
     override fun updateReminderName(name: String) {
         _reminderName.value = name
+    }
+
+    override fun updateEnabled(enabled: Boolean) {
+        _enabled.value = enabled
     }
 
     override fun updateStarts(starts: OffsetDateTime) {
@@ -114,6 +123,7 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
             _hasEndDate.value = params.ends != null
             _intervalText.value = params.interval.toString()
             _period.value = params.period
+            _enabled.value = params.enabled
         }
     }
 
@@ -126,13 +136,15 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
                 ends = if (_hasEndDate.value) offsetDateTimeToLocal(_ends.value) else null,
                 // If the user enters a decimal floor it to the nearest int
                 interval = (_intervalText.value.toDoubleOrNull()?.toInt() ?: 1).coerceAtLeast(1),
-                period = _period.value
+                period = _period.value,
+                enabled = _enabled.value
             )
         )
     }
 
     override fun reset() {
         _reminderName.value = ""
+        _enabled.value = true
         val defaultStart = LocalDateTime.now()
         val defaultEnd = LocalDateTime.now()
         _starts.value = localDateTimeToOffset(defaultStart)

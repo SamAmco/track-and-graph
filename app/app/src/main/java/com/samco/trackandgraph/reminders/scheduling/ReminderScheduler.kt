@@ -59,6 +59,8 @@ internal class ReminderSchedulerImpl @Inject constructor(
     }
 
     override suspend fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant? {
+        if (!reminder.params.enabled) return null
+
         return when (val params = reminder.params) {
             is ReminderParams.WeekDayParams -> weekDayScheduler.scheduleNext(params, afterTime)
             is ReminderParams.PeriodicParams -> periodicScheduler.scheduleNext(params, afterTime)

@@ -72,6 +72,7 @@ fun MonthDayReminderConfigurationScreen(
     viewModel: MonthDayReminderConfigurationViewModel = hiltViewModel<MonthDayReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
+    val enabled by viewModel.enabled.collectAsState()
     val selectedTime by viewModel.selectedTime.collectAsState()
     val occurrence by viewModel.occurrence.collectAsState()
     val dayType by viewModel.dayType.collectAsState()
@@ -89,6 +90,8 @@ fun MonthDayReminderConfigurationScreen(
     MonthDayReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
+        enabled = enabled,
+        onEnabledChanged = viewModel::updateEnabled,
         selectedTime = selectedTime,
         onTimeSelected = viewModel::updateSelectedTime,
         occurrence = occurrence,
@@ -111,6 +114,8 @@ fun MonthDayReminderConfigurationScreen(
 fun MonthDayReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
     selectedTime: LocalTime,
     onTimeSelected: (LocalTime) -> Unit,
     occurrence: MonthDayOccurrence,
@@ -147,6 +152,12 @@ fun MonthDayReminderConfigurationContent(
             .focusRequester(focusRequester),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         singleLine = true
+    )
+
+    InputSpacingLarge()
+    ReminderEnabledCheckbox(
+        enabled = enabled,
+        onEnabledChanged = onEnabledChanged
     )
 
     InputSpacingLarge()
@@ -257,6 +268,8 @@ fun MonthDayReminderConfigurationContentPreview() {
         MonthDayReminderConfigurationContent(
             reminderName = "Monthly Report",
             onReminderNameChanged = {},
+            enabled = true,
+            onEnabledChanged = {},
             selectedTime = LocalTime.of(9, 0),
             onTimeSelected = {},
             occurrence = MonthDayOccurrence.FIRST,

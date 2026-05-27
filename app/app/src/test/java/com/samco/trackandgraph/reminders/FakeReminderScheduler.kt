@@ -29,10 +29,14 @@ internal class FakeReminderScheduler : ReminderScheduler {
     }
 
     override suspend fun scheduleNext(reminder: Reminder): Instant? {
+        if (!reminder.params.enabled) return null
+
         return scheduledTimes[reminder.id]
     }
 
     override suspend fun scheduleNext(reminder: Reminder, afterTime: Instant): Instant? {
+        if (!reminder.params.enabled) return null
+
         return scheduledTimes[reminder.id]
     }
 }

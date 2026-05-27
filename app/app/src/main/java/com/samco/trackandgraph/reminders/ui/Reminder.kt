@@ -20,6 +20,7 @@
 package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,7 @@ import com.samco.trackandgraph.data.database.dto.MonthDayOccurrence
 import com.samco.trackandgraph.data.database.dto.MonthDayType
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.buttonSize
 import com.samco.trackandgraph.ui.ui.cardElevation
@@ -101,11 +103,15 @@ fun Reminder(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    text = formatNextScheduled(reminderViewData.nextScheduled),
+                    text = if (reminderViewData.enabled) {
+                        formatNextScheduled(reminderViewData.nextScheduled)
+                    } else {
+                        stringResource(R.string.reminder_disabled)
+                    },
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -115,19 +121,34 @@ fun Reminder(
                         DialogInputSpacing()
                         WeekDayReminderDetails(reminderViewData)
                     }
+
                     is ReminderViewData.PeriodicReminderViewData -> {
                         PeriodicReminderDetails(reminderViewData)
                     }
+
                     is ReminderViewData.MonthDayReminderViewData -> {
                         DialogInputSpacing()
                         MonthDayReminderDetails(reminderViewData)
                     }
+
                     is ReminderViewData.TimeSinceLastReminderViewData -> {
                         DialogInputSpacing()
                         TimeSinceLastReminderDetails(reminderViewData)
                     }
                 }
             }
+        }
+
+        if (!reminderViewData.enabled) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        MaterialTheme.tngColors.surface.copy(
+                            alpha = 1f - MaterialTheme.tngColors.disabledAlpha
+                        )
+                    )
+            )
         }
 
         if (onEditClick != null || onDeleteClick != null || onDuplicateClick != null) {
@@ -209,6 +230,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 id = 1L,
                 groupItemId = 0L,
                 name = "Morning Workout",
+                enabled = true,
                 nextScheduled = LocalDateTime.of(2025, 12, 16, 7, 30),
                 checkedDays = CheckedDays(
                     monday = true,
@@ -229,6 +251,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 id = 2L,
                 groupItemId = 0L,
                 name = "Evening Meditation",
+                enabled = true,
                 nextScheduled = LocalDateTime.of(2025, 12, 16, 21, 0),
                 checkedDays = CheckedDays.all(),
                 reminderDto = null,
@@ -241,6 +264,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 id = 2L,
                 groupItemId = 0L,
                 name = "Evening Meditation",
+                enabled = false,
                 nextScheduled = null,
                 checkedDays = CheckedDays.none(),
                 reminderDto = null,
@@ -253,6 +277,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 id = 3L,
                 groupItemId = 0L,
                 name = "Daily Exercise",
+                enabled = true,
                 nextScheduled = LocalDateTime.of(2025, 12, 17, 14, 30),
                 starts = LocalDateTime.of(2025, 12, 1, 14, 30),
                 ends = LocalDateTime.of(2026, 3, 1, 14, 30),
@@ -270,6 +295,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 id = 4L,
                 groupItemId = 0L,
                 name = "Weekly Review",
+                enabled = true,
                 nextScheduled = LocalDateTime.of(2025, 12, 30, 9, 0),
                 starts = LocalDateTime.of(2025, 12, 30, 9, 0),
                 ends = null,
@@ -287,6 +313,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 id = 5L,
                 groupItemId = 0L,
                 name = "Monthly Goals",
+                enabled = true,
                 nextScheduled = null,
                 starts = LocalDateTime.of(2025, 6, 1, 10, 0),
                 ends = LocalDateTime.of(2025, 11, 30, 10, 0),
@@ -303,6 +330,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 id = 4L,
                 groupItemId = 0L,
                 name = "Monthly Reminder",
+                enabled = true,
                 nextScheduled = LocalDateTime.of(2025, 6, 1, 10, 0),
                 occurrence = MonthDayOccurrence.LAST,
                 dayType = MonthDayType.DAY,

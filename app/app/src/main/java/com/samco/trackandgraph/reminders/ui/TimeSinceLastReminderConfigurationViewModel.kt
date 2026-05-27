@@ -42,6 +42,7 @@ import javax.inject.Inject
 
 interface TimeSinceLastReminderConfigurationViewModel {
     val reminderName: StateFlow<String>
+    val enabled: StateFlow<Boolean>
     val firstInterval: StateFlow<String>
     val firstPeriod: StateFlow<Period>
     val secondInterval: StateFlow<String>
@@ -51,6 +52,7 @@ interface TimeSinceLastReminderConfigurationViewModel {
     val continueEnabled: StateFlow<Boolean>
 
     fun updateReminderName(name: String)
+    fun updateEnabled(enabled: Boolean)
     fun updateFirstInterval(interval: String)
     fun updateFirstPeriod(period: Period)
     fun updateSecondInterval(interval: String)
@@ -71,6 +73,9 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
 
     private val _reminderName = MutableStateFlow("")
     override val reminderName: StateFlow<String> = _reminderName.asStateFlow()
+
+    private val _enabled = MutableStateFlow(true)
+    override val enabled: StateFlow<Boolean> = _enabled.asStateFlow()
 
     private val _firstInterval = MutableStateFlow("1")
     override val firstInterval: StateFlow<String> = _firstInterval.asStateFlow()
@@ -107,6 +112,10 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
 
     override fun updateReminderName(name: String) {
         _reminderName.value = name
+    }
+
+    override fun updateEnabled(enabled: Boolean) {
+        _enabled.value = enabled
     }
 
     override fun updateFirstInterval(interval: String) {
@@ -152,7 +161,8 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
                 firstInterval = IntervalPeriodPair(interval = firstIntervalInt, period = _firstPeriod.value),
                 secondInterval = if (_hasSecondInterval.value) {
                     IntervalPeriodPair(interval = secondIntervalInt, period = _secondPeriod.value)
-                } else null
+                } else null,
+                enabled = _enabled.value
             )
         )
     }
@@ -171,6 +181,7 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
             }
         }
         if (params != null) {
+            _enabled.value = params.enabled
             _firstInterval.value = params.firstInterval.interval.toString()
             _firstPeriod.value = params.firstInterval.period
             _hasSecondInterval.value = params.secondInterval != null
@@ -183,6 +194,7 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
 
     override fun reset() {
         _reminderName.value = ""
+        _enabled.value = true
         _firstInterval.value = "1"
         _firstPeriod.value = Period.DAYS
         _secondInterval.value = "1"

@@ -31,10 +31,12 @@ import javax.inject.Inject
 
 interface WeekDayReminderConfigurationViewModel {
     val reminderName: StateFlow<String>
+    val enabled: StateFlow<Boolean>
     val selectedTime: StateFlow<LocalTime>
     val checkedDays: StateFlow<CheckedDays>
 
     fun updateReminderName(name: String)
+    fun updateEnabled(enabled: Boolean)
     fun updateSelectedTime(time: LocalTime)
     fun updateCheckedDays(days: CheckedDays)
     fun getReminderInput(): ReminderInput
@@ -49,6 +51,9 @@ class WeekDayReminderConfigurationViewModelImpl @Inject constructor() :
     private val _reminderName = MutableStateFlow("")
     override val reminderName: StateFlow<String> = _reminderName.asStateFlow()
 
+    private val _enabled = MutableStateFlow(true)
+    override val enabled: StateFlow<Boolean> = _enabled.asStateFlow()
+
     private val _selectedTime = MutableStateFlow(LocalTime.of(9, 0))
     override val selectedTime: StateFlow<LocalTime> = _selectedTime.asStateFlow()
 
@@ -57,6 +62,10 @@ class WeekDayReminderConfigurationViewModelImpl @Inject constructor() :
 
     override fun updateReminderName(name: String) {
         _reminderName.value = name
+    }
+
+    override fun updateEnabled(enabled: Boolean) {
+        _enabled.value = enabled
     }
 
     override fun updateSelectedTime(time: LocalTime) {
@@ -73,7 +82,8 @@ class WeekDayReminderConfigurationViewModelImpl @Inject constructor() :
             featureId = null,
             params = ReminderParams.WeekDayParams(
                 time = _selectedTime.value,
-                checkedDays = _checkedDays.value
+                checkedDays = _checkedDays.value,
+                enabled = _enabled.value
             )
         )
     }
@@ -88,11 +98,13 @@ class WeekDayReminderConfigurationViewModelImpl @Inject constructor() :
         if (params != null) {
             _selectedTime.value = params.time
             _checkedDays.value = params.checkedDays
+            _enabled.value = params.enabled
         }
     }
 
     override fun reset() {
         _reminderName.value = ""
+        _enabled.value = true
         _selectedTime.value = LocalTime.of(9, 0)
         _checkedDays.value = CheckedDays.all()
     }

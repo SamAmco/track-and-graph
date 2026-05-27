@@ -68,6 +68,7 @@ fun WeekDayReminderConfigurationScreen(
     viewModel: WeekDayReminderConfigurationViewModel = hiltViewModel<WeekDayReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
+    val enabled by viewModel.enabled.collectAsState()
     val selectedTime by viewModel.selectedTime.collectAsState()
     val checkedDays by viewModel.checkedDays.collectAsState()
 
@@ -82,6 +83,8 @@ fun WeekDayReminderConfigurationScreen(
     WeekDayReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
+        enabled = enabled,
+        onEnabledChanged = viewModel::updateEnabled,
         selectedTime = selectedTime,
         onTimeSelected = viewModel::updateSelectedTime,
         checkedDays = checkedDays,
@@ -98,6 +101,8 @@ fun WeekDayReminderConfigurationScreen(
 fun WeekDayReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
     selectedTime: LocalTime,
     onTimeSelected: (LocalTime) -> Unit,
     checkedDays: CheckedDays,
@@ -128,6 +133,12 @@ fun WeekDayReminderConfigurationContent(
                 .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true
+        )
+
+        InputSpacingLarge()
+        ReminderEnabledCheckbox(
+            enabled = enabled,
+            onEnabledChanged = onEnabledChanged
         )
 
         InputSpacingLarge()
@@ -221,6 +232,8 @@ fun WeekDayReminderConfigurationContentPreview() {
         WeekDayReminderConfigurationContent(
             reminderName = "Morning Exercise",
             onReminderNameChanged = {},
+            enabled = true,
+            onEnabledChanged = {},
             selectedTime = LocalTime.of(9, 0),
             onTimeSelected = {},
             checkedDays = CheckedDays.all().copy(

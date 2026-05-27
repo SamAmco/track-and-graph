@@ -33,6 +33,7 @@ import javax.inject.Inject
 
 interface MonthDayReminderConfigurationViewModel {
     val reminderName: StateFlow<String>
+    val enabled: StateFlow<Boolean>
     val selectedTime: StateFlow<LocalTime>
     val occurrence: StateFlow<MonthDayOccurrence>
     val dayType: StateFlow<MonthDayType>
@@ -40,6 +41,7 @@ interface MonthDayReminderConfigurationViewModel {
     val ends: StateFlow<LocalDateTime>
 
     fun updateReminderName(name: String)
+    fun updateEnabled(enabled: Boolean)
     fun updateSelectedTime(time: LocalTime)
     fun updateOccurrence(occurrence: MonthDayOccurrence)
     fun updateDayType(dayType: MonthDayType)
@@ -56,6 +58,9 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
 
     private val _reminderName = MutableStateFlow("")
     override val reminderName: StateFlow<String> = _reminderName.asStateFlow()
+
+    private val _enabled = MutableStateFlow(true)
+    override val enabled: StateFlow<Boolean> = _enabled.asStateFlow()
 
     private val _selectedTime = MutableStateFlow(LocalTime.of(9, 0))
     override val selectedTime: StateFlow<LocalTime> = _selectedTime.asStateFlow()
@@ -74,6 +79,10 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
 
     override fun updateReminderName(name: String) {
         _reminderName.value = name
+    }
+
+    override fun updateEnabled(enabled: Boolean) {
+        _enabled.value = enabled
     }
 
     override fun updateSelectedTime(time: LocalTime) {
@@ -104,7 +113,8 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
                 time = _selectedTime.value,
                 occurrence = _occurrence.value,
                 dayType = _dayType.value,
-                ends = if (endsEnabled.value) _ends.value else null
+                ends = if (endsEnabled.value) _ends.value else null,
+                enabled = _enabled.value
             )
         )
     }
@@ -122,11 +132,13 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
             _dayType.value = params.dayType
             _endsEnabled.value = params.ends != null
             _ends.value = params.ends ?: LocalDateTime.now()
+            _enabled.value = params.enabled
         }
     }
 
     override fun reset() {
         _reminderName.value = ""
+        _enabled.value = true
         _selectedTime.value = LocalTime.of(9, 0)
         _occurrence.value = MonthDayOccurrence.FIRST
         _endsEnabled.value = false

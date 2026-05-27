@@ -228,6 +228,8 @@
 
     <!-- Reminder configuration -->
     <string name="reminder_name">Reminder Name</string>
+    <string name="reminder_enabled">Reminder enabled</string>
+    <string name="reminder_disabled">Reminder disabled</string>
     <string name="repeat_every">Repeat Every</string>
     <string name="at_time">At Time</string>
     <string name="ending_at">Ending at</string>
