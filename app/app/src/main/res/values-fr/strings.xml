@@ -532,6 +532,7 @@
 
     <!-- Reminder configuration -->
     <string name="reminder_name">Nom du rappel</string>
+    <string name="reminder_disabled">Rappel désactivé</string>
     <string name="repeat_every">Répéter tous les</string>
     <string name="at_time">À</string>
     <string name="ending_at">Se termine le</string>

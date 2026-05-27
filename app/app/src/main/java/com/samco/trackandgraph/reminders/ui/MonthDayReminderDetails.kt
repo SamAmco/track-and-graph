@@ -103,6 +103,7 @@ fun MonthDayReminderDetailsPreview() {
                 id = 1L,
                 groupItemId = 0L,
                 name = "Monthly Report",
+                enabled = true,
                 nextScheduled = LocalDateTime.of(2025, 1, 6, 9, 0),
                 occurrence = MonthDayOccurrence.FIRST,
                 dayType = MonthDayType.MONDAY,

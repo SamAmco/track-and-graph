@@ -512,6 +512,7 @@
 
     <!-- Reminder configuration -->
     <string name="reminder_name">Erinnerungsname</string>
+    <string name="reminder_disabled">Erinnerung deaktiviert</string>
     <string name="repeat_every">Wiederholen alle</string>
     <string name="at_time">Um</string>
     <string name="ending_at">Endet am</string>

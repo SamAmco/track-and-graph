@@ -21,12 +21,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.samco.trackandgraph.R
@@ -71,6 +68,7 @@ fun TimeSinceLastReminderConfigurationScreen(
     viewModel: TimeSinceLastReminderConfigurationViewModel = hiltViewModel<TimeSinceLastReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
+    val enabled by viewModel.enabled.collectAsState()
     val firstInterval by viewModel.firstInterval.collectAsState()
     val firstPeriod by viewModel.firstPeriod.collectAsState()
     val secondInterval by viewModel.secondInterval.collectAsState()
@@ -91,6 +89,8 @@ fun TimeSinceLastReminderConfigurationScreen(
     TimeSinceLastReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
+        enabled = enabled,
+        onEnabledChanged = viewModel::updateEnabled,
         firstInterval = firstInterval,
         onFirstIntervalChanged = viewModel::updateFirstInterval,
         firstPeriod = firstPeriod,
@@ -117,6 +117,8 @@ fun TimeSinceLastReminderConfigurationScreen(
 fun TimeSinceLastReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
     firstInterval: String,
     onFirstIntervalChanged: (String) -> Unit,
     firstPeriod: Period,
@@ -148,16 +150,14 @@ fun TimeSinceLastReminderConfigurationContent(
     ) {
         DialogInputSpacing()
 
-        // Name field
-        OutlinedTextField(
-            value = reminderName,
-            onValueChange = onReminderNameChanged,
-            label = { Text(stringResource(R.string.reminder_name)) },
+        ReminderNameTextField(
+            reminderName = reminderName,
+            onReminderNameChanged = onReminderNameChanged,
+            enabled = enabled,
+            onEnabledChanged = onEnabledChanged,
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true
+                .focusRequester(focusRequester)
         )
 
         InputSpacingLarge()
@@ -272,6 +272,8 @@ fun TimeSinceLastReminderConfigurationContentPreview() {
         TimeSinceLastReminderConfigurationContent(
             reminderName = "Exercise Reminder",
             onReminderNameChanged = {},
+            enabled = true,
+            onEnabledChanged = {},
             firstInterval = "3",
             onFirstIntervalChanged = {},
             firstPeriod = Period.DAYS,

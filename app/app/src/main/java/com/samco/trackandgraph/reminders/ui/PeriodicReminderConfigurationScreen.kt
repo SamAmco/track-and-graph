@@ -20,10 +20,8 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +33,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.samco.trackandgraph.R
@@ -62,6 +59,7 @@ fun PeriodicReminderConfigurationScreen(
     viewModel: PeriodicReminderConfigurationViewModel = hiltViewModel<PeriodicReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
+    val enabled by viewModel.enabled.collectAsState()
     val startsOffset by viewModel.starts.collectAsState()
     val endsOffset by viewModel.ends.collectAsState()
     val hasEndDate by viewModel.hasEndDate.collectAsState()
@@ -79,6 +77,8 @@ fun PeriodicReminderConfigurationScreen(
     PeriodicReminderConfigurationContent(
         reminderName = reminderName,
         onReminderNameChanged = viewModel::updateReminderName,
+        enabled = enabled,
+        onEnabledChanged = viewModel::updateEnabled,
         startsOffset = startsOffset,
         onStartsOffsetChanged = viewModel::updateStarts,
         endsOffset = endsOffset,
@@ -101,6 +101,8 @@ fun PeriodicReminderConfigurationScreen(
 private fun PeriodicReminderConfigurationContent(
     reminderName: String,
     onReminderNameChanged: (String) -> Unit,
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
     startsOffset: OffsetDateTime,
     onStartsOffsetChanged: (OffsetDateTime) -> Unit,
     endsOffset: OffsetDateTime,
@@ -127,16 +129,14 @@ private fun PeriodicReminderConfigurationContent(
     ) {
         DialogInputSpacing()
 
-        // Name field
-        OutlinedTextField(
-            value = reminderName,
-            onValueChange = onReminderNameChanged,
-            label = { Text(stringResource(R.string.reminder_name)) },
+        ReminderNameTextField(
+            reminderName = reminderName,
+            onReminderNameChanged = onReminderNameChanged,
+            enabled = enabled,
+            onEnabledChanged = onEnabledChanged,
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true
+                .focusRequester(focusRequester)
         )
 
         InputSpacingLarge()
@@ -217,6 +217,8 @@ fun PeriodicReminderConfigurationContentPreview() {
         PeriodicReminderConfigurationContent(
             reminderName = "Daily Exercise",
             onReminderNameChanged = {},
+            enabled = true,
+            onEnabledChanged = {},
             startsOffset = OffsetDateTime.parse("2025-12-23T14:30:00+00:00"),
             onStartsOffsetChanged = {},
             endsOffset = OffsetDateTime.parse("2026-12-23T14:30:00+00:00"),

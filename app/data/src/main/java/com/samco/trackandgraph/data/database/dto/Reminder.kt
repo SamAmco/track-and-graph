@@ -81,12 +81,15 @@ data class ReminderInput(
 
 @Serializable
 sealed class ReminderParams {
+    abstract val enabled: Boolean
+
     @Serializable
     @SerialName("weekday")
     data class WeekDayParams(
         @Serializable(with = LocalTimeSerializer::class)
         val time: LocalTime,
-        val checkedDays: CheckedDays
+        val checkedDays: CheckedDays,
+        override val enabled: Boolean = true
     ) : ReminderParams()
 
     @Serializable
@@ -97,7 +100,8 @@ sealed class ReminderParams {
         @Serializable(with = LocalDateTimeSerializer::class)
         val ends: LocalDateTime?,
         val interval: Int,
-        val period: Period
+        val period: Period,
+        override val enabled: Boolean = true
     ) : ReminderParams()
 
     @Serializable
@@ -108,14 +112,16 @@ sealed class ReminderParams {
         val occurrence: MonthDayOccurrence,
         val dayType: MonthDayType,
         @Serializable(with = LocalDateTimeSerializer::class)
-        val ends: LocalDateTime?
+        val ends: LocalDateTime?,
+        override val enabled: Boolean = true
     ) : ReminderParams()
 
     @Serializable
     @SerialName("timesincelast")
     data class TimeSinceLastParams(
         val firstInterval: IntervalPeriodPair,
-        val secondInterval: IntervalPeriodPair?
+        val secondInterval: IntervalPeriodPair?,
+        override val enabled: Boolean = true
     ) : ReminderParams()
 }
 

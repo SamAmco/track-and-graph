@@ -176,4 +176,27 @@ internal class ReminderSchedulerImplTest {
         assertEquals(false, monthDaySchedulerCalled)
         assertEquals(true, timeSinceLastSchedulerCalled)
     }
+
+    @Test
+    fun `disabled reminders do not delegate to type scheduler`() = runTest {
+        // PREPARE
+        timeProvider.currentTime = ZonedDateTime.of(2024, 1, 10, 10, 0, 0, 0, ZoneId.of("UTC"))
+        val reminder = reminderFixture.copy(
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(14, 0),
+                checkedDays = CheckedDays.all(),
+                enabled = false
+            )
+        )
+
+        // EXECUTE
+        val result = uut.scheduleNext(reminder)
+
+        // VERIFY
+        assertEquals(null, result)
+        assertEquals(false, weekDaySchedulerCalled)
+        assertEquals(false, periodicSchedulerCalled)
+        assertEquals(false, monthDaySchedulerCalled)
+        assertEquals(false, timeSinceLastSchedulerCalled)
+    }
 }

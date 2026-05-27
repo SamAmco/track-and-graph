@@ -103,6 +103,29 @@ internal class ReminderInteractorImplTest {
     }
 
     @Test
+    fun `schedule next for disabled reminder cancels notification`() = runTest(testDispatcher) {
+        // PREPARE
+        val disabledReminder = reminderFixture.copy(
+            id = 1L,
+            reminderName = "Disabled Reminder",
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.of(8, 0),
+                checkedDays = CheckedDays.all(),
+                enabled = false
+            ),
+        )
+        reminderScheduler.setNextNotificationTime(1L, Instant.ofEpochMilli(1000000L))
+
+        // EXECUTE
+        uut.scheduleNext(disabledReminder)
+
+        // VERIFY
+        assertEquals(0, platformScheduler.setNotifications.size)
+        assertEquals(1, platformScheduler.cancelledNotifications.size)
+        assertEquals(1L, platformScheduler.cancelledNotifications.single().reminderId)
+    }
+
+    @Test
     fun `sync notifications with legacy reminders clears legacy and schedules new`() =
         runTest(testDispatcher) {
             // PREPARE - Realistic scenario: same reminders exist in database as were stored in legacy JSON

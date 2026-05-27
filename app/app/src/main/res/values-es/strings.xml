@@ -511,6 +511,7 @@
 
     <!-- Reminder configuration -->
     <string name="reminder_name">Nombre del recordatorio</string>
+    <string name="reminder_disabled">Recordatorio desactivado</string>
     <string name="repeat_every">Repetir cada</string>
     <string name="at_time">A las</string>
     <string name="ending_at">Termina el</string>

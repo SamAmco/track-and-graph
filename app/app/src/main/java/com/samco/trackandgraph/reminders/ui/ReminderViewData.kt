@@ -39,6 +39,7 @@ sealed class ReminderViewData {
     abstract val id: Long
     abstract val groupItemId: Long
     abstract val name: String
+    abstract val enabled: Boolean
     abstract val reminderDto: Reminder?
     abstract val nextScheduled: LocalDateTime?
 
@@ -47,6 +48,7 @@ sealed class ReminderViewData {
         override val id: Long,
         override val groupItemId: Long,
         override val name: String,
+        override val enabled: Boolean,
         override val nextScheduled: LocalDateTime?,
         val checkedDays: CheckedDays,
         override val reminderDto: Reminder?,
@@ -60,6 +62,7 @@ sealed class ReminderViewData {
         override val id: Long,
         override val groupItemId: Long,
         override val name: String,
+        override val enabled: Boolean,
         override val nextScheduled: LocalDateTime?,
         val starts: LocalDateTime,
         val ends: LocalDateTime?,
@@ -75,6 +78,7 @@ sealed class ReminderViewData {
         override val id: Long,
         override val groupItemId: Long,
         override val name: String,
+        override val enabled: Boolean,
         override val nextScheduled: LocalDateTime?,
         val occurrence: MonthDayOccurrence,
         val dayType: MonthDayType,
@@ -87,6 +91,7 @@ sealed class ReminderViewData {
         override val id: Long,
         override val groupItemId: Long,
         override val name: String,
+        override val enabled: Boolean,
         override val nextScheduled: LocalDateTime?,
         override val reminderDto: Reminder?,
         val progressToNextReminder: Float,
@@ -114,6 +119,7 @@ sealed class ReminderViewData {
                         id = reminder.id,
                         groupItemId = groupItemId,
                         name = reminder.reminderName,
+                        enabled = params.enabled,
                         nextScheduled = nextScheduled,
                         checkedDays = params.checkedDays,
                         reminderDto = reminder,
@@ -134,6 +140,7 @@ sealed class ReminderViewData {
                         id = reminder.id,
                         groupItemId = groupItemId,
                         name = reminder.reminderName,
+                        enabled = params.enabled,
                         nextScheduled = nextScheduled,
                         starts = params.starts,
                         ends = params.ends,
@@ -150,6 +157,7 @@ sealed class ReminderViewData {
                         id = reminder.id,
                         groupItemId = groupItemId,
                         name = reminder.reminderName,
+                        enabled = params.enabled,
                         nextScheduled = nextScheduled,
                         occurrence = params.occurrence,
                         dayType = params.dayType,
@@ -174,6 +182,7 @@ sealed class ReminderViewData {
                         id = reminder.id,
                         groupItemId = groupItemId,
                         name = reminder.reminderName,
+                        enabled = params.enabled,
                         nextScheduled = nextScheduled,
                         reminderDto = reminder,
                         progressToNextReminder = progress,

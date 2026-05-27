@@ -69,9 +69,9 @@ docs:
     keywords: [DataInteractor, helper, DAO, TrackerHelper, FunctionHelper, GraphHelper, GroupHelper, ReminderHelper, delete, symlink, withTransaction, DataUpdateType, events, testing, fakes, DisplayIndex, groupItemId, deleteEverywhere, duplicate, move, CreatedComponent, performAtomicUpdate, DependencyAnalyser, getDependentGraphs, DataPoint, GraphOrStatUpdated, fan-out, dependency-analyser, graph-reactivity, featureId]
 
   - file: reminders.md
-    title: Reminders — groupless reminders, scheduling, and display ordering
-    description: Reminders can exist with null group_id (groupless), appearing only in the Reminders screen. Covers ReminderParams types, delete/duplicate behavior, KMP-compatible PlatformScheduler pattern, and RemindersScreenViewModel display ordering pitfall.
-    keywords: [reminder, groupless, null, ReminderParams, PlatformScheduler, scheduling, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType]
+    title: Reminders — lifecycle, scheduling, and display ordering
+    description: Reminder data and lifecycle, including groupless placement, serialized enable/disable state, scheduling behavior, delete/duplicate operations, and RemindersScreenViewModel display ordering.
+    keywords: [reminder, groupless, null, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType]
 
   - file: lua-architecture.md
     title: Lua functions — app architecture and data model

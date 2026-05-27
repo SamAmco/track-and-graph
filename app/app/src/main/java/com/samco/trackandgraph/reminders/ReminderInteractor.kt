@@ -160,6 +160,10 @@ internal class ReminderInteractorImpl @Inject constructor(
             val reminders = dataInteractor.getAllRemindersSync()
             for (reminder in reminders) {
                 val params = reminder.toReminderNotificationParams()
+                if (!reminder.params.enabled) {
+                    platformScheduler.cancel(params)
+                    continue
+                }
                 if (platformScheduler.getNextScheduledMillis(params) == null) {
                     createNextNotification(reminder)
                 }
@@ -252,7 +256,10 @@ internal class ReminderInteractorImpl @Inject constructor(
 
     private suspend fun fetchTimeSinceLastReminders(): Map<Long, List<Reminder>> {
         val reminders = dataInteractor.getAllRemindersSync()
-            .filter { it.params is ReminderParams.TimeSinceLastParams && it.featureId != null }
+            .filter {
+                it.params is ReminderParams.TimeSinceLastParams &&
+                    it.featureId != null
+            }
 
         // Build a map where each reminder is indexed by its feature AND all features
         // that could affect it (its dependencies). This way, when any dependency is

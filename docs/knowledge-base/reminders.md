@@ -1,14 +1,15 @@
 ---
-title: Reminders — groupless reminders, scheduling, and display ordering
-description: Reminders can exist with null group_id (groupless), appearing only in the Reminders screen. Covers ReminderParams types, delete/duplicate behavior, KMP-compatible PlatformScheduler pattern, and RemindersScreenViewModel display ordering pitfall.
+title: Reminders — lifecycle, scheduling, and display ordering
+description: Reminder data and lifecycle, including groupless placement, serialized enable/disable state, scheduling behavior, delete/duplicate operations, and RemindersScreenViewModel display ordering.
 topics:
   - Groupless reminders: group_id = null, appear only in Reminders screen (not group views)
-  - ReminderParams types: WeekDayParams, PeriodicParams, MonthDayParams, TimeSinceLastParams
+  - ReminderParams types and serialized enabled state; missing enabled values default to true
+  - Disabled reminders remain stored and visible but cancel/skip notification scheduling
   - Delete: uses unified ComponentDeleteRequest (see helper-classes.md); groupless reminders with single placement always delete everywhere
   - Duplicate: takes groupItemId (consistent with all other ops); inserts AFTER original; shifts only items below; app module alignment pending (Stage C)
   - Scheduling: PlatformScheduler interface isolates Android AlarmManager (KMP pattern)
   - PITFALL: RemindersScreenViewModel dbDisplayIndices MUST react to DataUpdateType.Reminder or new reminders fall to bottom
-keywords: [reminder, groupless, null, ReminderParams, PlatformScheduler, scheduling, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
+keywords: [reminder, groupless, null, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
 ---
 
 # Reminders
@@ -71,12 +72,26 @@ Note: `groupId` and `displayIndex` are NOT on the DTO. They're managed via Group
 
 ```kotlin
 sealed class ReminderParams {
+    abstract val enabled: Boolean
+
     data class WeekDayParams(...)    // Specific days of the week
     data class PeriodicParams(...)   // Every N hours/days/weeks
     data class MonthDayParams(...)   // Specific day of month
     data class TimeSinceLastParams(...) // After duration since last entry
 }
 ```
+
+## Enable and Disable Behavior
+
+Enablement belongs to each serialized `ReminderParams` subtype rather than the reminder database entity. Every subtype declares `enabled: Boolean = true`; the default is required for backward-compatible deserialization of reminders saved before this field existed.
+
+A disabled reminder is retained as normal data and remains visible and editable. It differs only in presentation and scheduling:
+
+- `ReminderScheduler` returns no next instant without delegating to a type-specific scheduler.
+- The notification reconciliation path cancels any existing platform alarm for the reminder.
+- The reminders screen presents it as disabled instead of showing a next scheduled time.
+
+Configuration screens thread the same state through each reminder-type ViewModel. New/reset configurations default to enabled, while editing restores the serialized value. The enable checkbox is colocated with the reminder-name field; the animated disabled label is presentation-only and must not become the source of truth.
 
 ## Delete Behavior
 
