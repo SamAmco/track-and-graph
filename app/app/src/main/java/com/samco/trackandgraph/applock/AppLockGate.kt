@@ -35,7 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +53,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -134,29 +137,49 @@ private fun AppUnlockScreen(
     viewModel: AppLockGateViewModel,
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val passwordError by viewModel.passwordError.collectAsStateWithLifecycle()
     var password by rememberSaveable { mutableStateOf("") }
     var biometricError by remember { mutableStateOf<String?>(null) }
-    var biometricPromptShown by rememberSaveable { mutableStateOf(false) }
+    var biometricPromptActive by rememberSaveable { mutableStateOf(false) }
+    var userChosePassword by rememberSaveable { mutableStateOf(false) }
 
-    fun showBiometricPrompt() {
+    val showBiometricUnlock = state.biometricEnabled && state.canAuthenticateWithBiometrics
+
+    fun showBiometricPrompt(): Boolean {
+        if (!showBiometricUnlock || biometricPromptActive || userChosePassword) return false
+
         biometricError = null
-        val activity = context.findFragmentActivity() ?: return
+        val activity = context.findFragmentActivity() ?: return false
+        biometricPromptActive = true
         activity.showAppLockBiometricPrompt(
             onSuccess = viewModel::unlockAfterBiometric,
-            onError = { biometricError = it },
-            onUsePassword = {},
+            onError = {
+                biometricPromptActive = false
+                biometricError = it
+            },
+            onUsePassword = {
+                biometricPromptActive = false
+                userChosePassword = true
+            },
+            onCanceled = {
+                biometricPromptActive = false
+            },
         )
+        return true
     }
 
-    LaunchedEffect(state.biometricEnabled, state.canAuthenticateWithBiometrics) {
-        if (state.biometricEnabled &&
-            state.canAuthenticateWithBiometrics &&
-            !biometricPromptShown
-        ) {
-            biometricPromptShown = true
-            showBiometricPrompt()
+    DisposableEffect(lifecycleOwner, showBiometricUnlock, userChosePassword) {
+        showBiometricPrompt()
+
+        val observer = object : DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+                showBiometricPrompt()
+            }
         }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     AppUnlockContent(
@@ -167,11 +190,11 @@ private fun AppUnlockScreen(
         },
         passwordError = passwordError,
         biometricError = biometricError,
-        showBiometricUnlock = state.biometricEnabled && state.canAuthenticateWithBiometrics,
+        showBiometricUnlock = showBiometricUnlock,
         isWorking = state.isWorking,
         onUnlock = { viewModel.unlockWithPassword(password) },
         onBiometricUnlock = {
-            biometricPromptShown = true
+            userChosePassword = false
             showBiometricPrompt()
         },
     )

@@ -30,7 +30,7 @@ This boundary is deliberate so app lock can ship separately from any future encr
 
 The app is single-activity for normal UI, so app lock belongs in the app shell rather than around data-layer calls. Gate the main UI in `MainActivity`/the app-lock package and keep `DataInteractor`/Room unaware of the lock. Background work, alarms, timers, and widgets should continue to operate unless the product decision changes.
 
-`AppLockGate` should keep the unlocked app content composed and draw the unlock screen as a full-screen overlay when the app relocks. Do not replace the navigation host with the lock screen after initialization: doing so disposes Navigation 3 back stacks and in-place dialogs such as the add-data-point dialog, so returning from app lock can jump back to the root screen.
+`AppLockGate` should keep the unlocked app content composed and present the unlock screen above it when the app relocks. Do not replace the navigation host with the lock screen after initialization: doing so disposes Navigation 3 back stacks and in-place state such as the add-data-point flow, so returning from app lock can jump back to the root screen. Because Compose `Dialog` content is rendered in a separate window, the unlock screen also needs to be a full-screen dialog rather than only an in-content `Box` overlay; otherwise an already-open app dialog can draw above the lock screen.
 
 Unlock state should be in-memory only. That gives the expected behavior that a killed process starts locked again. Relock is based on app lifecycle/device lock events rather than database access.
 
@@ -42,7 +42,7 @@ When app lock is enabled, `MainActivity` should set `WindowManager.LayoutParams.
 
 Use `PrefsPersistenceProvider` for app-lock settings, not direct `SharedPreferences`. The app-lock config is app-layer state and should follow the DataStore-backed persistence pattern used by other app features.
 
-Repository reads/writes should stay suspend-based; do not wrap DataStore access in `runBlocking`. ViewModels own UI operations via `viewModelScope`, while `AppLockSession` keeps a cached copy of the config from the repository flow so activity lifecycle callbacks can make synchronous lock/unlock decisions without blocking.
+Repository reads/writes should stay suspend-based; do not wrap DataStore access in `runBlocking`. ViewModels own UI operations via `viewModelScope`, while `AppLockSession` keeps a cached copy of the config from the repository flow so activity lifecycle callbacks can make synchronous lock/unlock decisions without blocking. The cached config must start as unknown/null, not as default disabled config; otherwise `MainActivity.onStart()` can run before DataStore emits, treat app lock as disabled, set the session unlocked, and race an enabled config emission on cold start.
 
 Do not store plaintext passwords. Store a salted verifier/hash only. This verifier is not a database-encryption key; if an attacker can read it directly from app storage, they can also read the unencrypted database. Its purpose is only to validate app-lock password entry.
 
@@ -50,7 +50,7 @@ The app-lock password verifier stores its PBKDF2 iteration count and algorithm i
 
 ## UI Notes
 
-The unlock screen should have one stable visual state. If biometric unlock is enabled, `BiometricPrompt` can appear automatically over the same password screen; dismissing the prompt should not swap the underlying screen to a different layout. User-facing copy should use "biometric" language because `BIOMETRIC_STRONG` can cover any strong biometric modality available on the device.
+The unlock screen should have one stable visual state. If biometric unlock is enabled, `BiometricPrompt` can appear automatically over the same password screen; dismissing the prompt should not swap the underlying screen to a different layout. If the prompt is cancelled because the app backgrounds, the lock screen should be able to show it again on resume; if the user taps the prompt's negative "use password" action, suppress automatic re-prompting for that lock screen instance while still letting the explicit "use biometrics" button clear that suppression and show the prompt. User-facing copy should use "biometric" language because `BIOMETRIC_STRONG` can cover any strong biometric modality available on the device.
 
 For app-lock settings UI, reuse shared controls from `app/ui` first: shared buttons, text fields, dividers, spacing, and row controls keep the screen aligned with the rest of the app. See [Compose UI patterns](compose-ui-patterns.md) for the broader shared-UI guidance.
 

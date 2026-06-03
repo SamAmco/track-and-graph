@@ -33,6 +33,7 @@ fun FragmentActivity.showAppLockBiometricPrompt(
     onSuccess: () -> Unit,
     onError: (String) -> Unit,
     onUsePassword: () -> Unit,
+    onCanceled: () -> Unit,
 ) {
     val prompt = BiometricPrompt(
         this,
@@ -43,12 +44,11 @@ fun FragmentActivity.showAppLockBiometricPrompt(
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                if (errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON &&
-                    errorCode != BiometricPrompt.ERROR_USER_CANCELED
-                ) {
-                    onError(errString.toString())
-                } else {
-                    onUsePassword()
+                when (errorCode) {
+                    BiometricPrompt.ERROR_NEGATIVE_BUTTON -> onUsePassword()
+                    BiometricPrompt.ERROR_USER_CANCELED,
+                    BiometricPrompt.ERROR_CANCELED -> onCanceled()
+                    else -> onError(errString.toString())
                 }
             }
 

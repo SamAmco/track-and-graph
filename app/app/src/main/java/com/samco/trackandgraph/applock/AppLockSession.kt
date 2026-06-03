@@ -39,7 +39,7 @@ class AppLockSession @Inject constructor(
     val unlocked: StateFlow<Boolean> = _unlocked
 
     @Volatile
-    private var currentConfig = AppLockConfig()
+    private var currentConfig: AppLockConfig? = null
 
     @Volatile
     private var backgroundedAtMillis: Long? = null
@@ -62,16 +62,16 @@ class AppLockSession @Inject constructor(
     }
 
     fun lock() {
-        if (currentConfig.enabled) _unlocked.value = false
+        if (currentConfig?.enabled == true) _unlocked.value = false
     }
 
     fun onAppBackgrounded() {
-        if (!currentConfig.enabled) return
+        if (currentConfig?.enabled != true) return
         backgroundedAtMillis = SystemClock.elapsedRealtime()
     }
 
     fun onAppForegrounded() {
-        val config = currentConfig
+        val config = currentConfig ?: return
         if (!config.enabled) {
             _unlocked.value = true
             backgroundedAtMillis = null
