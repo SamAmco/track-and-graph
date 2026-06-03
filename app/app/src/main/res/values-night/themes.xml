@@ -17,6 +17,8 @@
 <resources>
 
     <style name="AppTheme" parent="AppThemeBase">
+        <item name="colorPrimary">@color/dark_charcoal</item>
+        <item name="colorPrimaryDark">@color/dark_charcoal</item>
         <item name="colorAccent">@color/faded_orange</item>
         <item name="colorSecondary">@color/faded_light_blue</item>
         <item name="colorOnSurface">@color/light_gray</item>
@@ -25,5 +27,9 @@
         <item name="android:textColorPrimary">@color/blue_white_pastel</item>
         <item name="android:windowBackground">@color/dark_charcoal</item>
         <item name="android:colorBackground">@color/dark_charcoal</item>
+        <item name="android:statusBarColor">@color/dark_charcoal</item>
+        <item name="android:navigationBarColor">@color/dark_charcoal</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>

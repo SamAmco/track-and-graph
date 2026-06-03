@@ -25,6 +25,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -41,9 +42,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
 import com.samco.trackandgraph.applock.AppLockGate
+import com.samco.trackandgraph.applock.AppLockRepository
 import com.samco.trackandgraph.applock.AppLockSession
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -59,6 +62,8 @@ import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -109,6 +114,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var appLockSession: AppLockSession
 
+    @Inject
+    lateinit var appLockRepository: AppLockRepository
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     private val currentTheme: MutableState<ThemeSelection> by lazy { mutableStateOf(getThemeValue()) }
@@ -132,6 +140,7 @@ class MainActivity : AppCompatActivity() {
         intent?.data?.let { handleDeepLink(it) }
         onThemeSelected(currentTheme.value)
         registerScreenOffReceiver()
+        observeAppLockSecureWindowFlag()
         val content = ComposeView(this).apply {
             consumeWindowInsets = false
             setContent {
@@ -169,7 +178,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (keyguardManager.isKeyguardLocked) {
+        if (!isChangingConfigurations && keyguardManager.isKeyguardLocked) {
             appLockSession.lock()
         } else {
             appLockSession.onAppBackgrounded()
@@ -196,6 +205,21 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
         screenOffReceiverRegistered = true
+    }
+
+    private fun observeAppLockSecureWindowFlag() {
+        lifecycleScope.launch {
+            appLockRepository.config
+                .map { it.enabled }
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    if (enabled) {
+                        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    } else {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    }
+                }
+        }
     }
 
     private fun onNavigateToBrowser(location: DrawerMenuBrowserLocation) {

@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.applock
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,12 +43,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
@@ -69,12 +73,14 @@ fun AppLockGate(
     TnGComposeTheme {
         when {
             !state.initialized -> AppLockGateLoading()
-            !state.enabled || state.unlocked -> content()
             else -> {
-                AppUnlockScreen(
-                    state = state,
-                    viewModel = viewModel,
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    content()
+
+                    if (state.enabled && !state.unlocked) {
+                        AppUnlockDialog(state = state, viewModel = viewModel)
+                    }
+                }
             }
         }
     }
@@ -98,6 +104,27 @@ private fun AppLockGateLoading() {
 private fun AppLockGateLoadingPreview() {
     TnGComposeTheme {
         AppLockGateLoading()
+    }
+}
+
+@Composable
+private fun AppUnlockDialog(
+    state: AppLockGateState,
+    viewModel: AppLockGateViewModel,
+) {
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            decorFitsSystemWindows = false,
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = false,
+        ),
+    ) {
+        AppUnlockScreen(
+            state = state,
+            viewModel = viewModel,
+        )
     }
 }
 
@@ -164,6 +191,7 @@ private fun AppUnlockContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .consumePointerInput()
             .background(MaterialTheme.colorScheme.background)
             .padding(WindowInsets.safeDrawing.asPaddingValues())
     ) {
@@ -238,6 +266,15 @@ private fun AppUnlockContent(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+        }
+    }
+}
+
+private fun Modifier.consumePointerInput() = pointerInput(Unit) {
+    awaitEachGesture {
+        while (true) {
+            val event = awaitPointerEvent()
+            event.changes.forEach { it.consume() }
         }
     }
 }

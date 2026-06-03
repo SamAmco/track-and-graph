@@ -23,6 +23,8 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="AppThemeBase">
+        <item name="colorPrimary">@color/chalky_white</item>
+        <item name="colorPrimaryDark">@color/chalky_white</item>
         <item name="colorAccent">@color/orange</item>
         <item name="colorSecondary">@color/light_blue</item>
         <item name="colorOnSurface">@color/black</item>
@@ -31,6 +33,10 @@
         <item name="android:textColorPrimary">@color/blue_black</item>
         <item name="android:windowBackground">@color/chalky_white</item>
         <item name="android:colorBackground">@color/chalky_white</item>
+        <item name="android:statusBarColor">@color/chalky_white</item>
+        <item name="android:navigationBarColor">@color/chalky_white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <style name="TransparentTheme" parent="AppTheme">

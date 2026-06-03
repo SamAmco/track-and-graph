@@ -30,9 +30,13 @@ This boundary is deliberate so app lock can ship separately from any future encr
 
 The app is single-activity for normal UI, so app lock belongs in the app shell rather than around data-layer calls. Gate the main UI in `MainActivity`/the app-lock package and keep `DataInteractor`/Room unaware of the lock. Background work, alarms, timers, and widgets should continue to operate unless the product decision changes.
 
+`AppLockGate` should keep the unlocked app content composed and draw the unlock screen as a full-screen overlay when the app relocks. Do not replace the navigation host with the lock screen after initialization: doing so disposes Navigation 3 back stacks and in-place dialogs such as the add-data-point dialog, so returning from app lock can jump back to the root screen.
+
 Unlock state should be in-memory only. That gives the expected behavior that a killed process starts locked again. Relock is based on app lifecycle/device lock events rather than database access.
 
-Device lock should force app lock immediately, regardless of the configured background timeout. In `MainActivity`, keep the screen/user-present receiver registered for the Activity lifetime rather than only between `onStart`/`onStop`; screen-off broadcast delivery can otherwise race `onStop` unregistering the receiver. Also check `KeyguardManager.isKeyguardLocked` in `onStop` and call `AppLockSession.lock()` instead of starting the background timeout when the stop is caused by device locking.
+Device lock should force app lock immediately, regardless of the configured background timeout. In `MainActivity`, keep the screen/user-present receiver registered for the Activity lifetime rather than only between `onStart`/`onStop`; screen-off broadcast delivery can otherwise race `onStop` unregistering the receiver. Also check `KeyguardManager.isKeyguardLocked` in `onStop` and call `AppLockSession.lock()` instead of starting the background timeout when the stop is caused by device locking. Ignore `onStop` background timeout bookkeeping while `Activity.isChangingConfigurations` is true so rotation does not relock the app.
+
+When app lock is enabled, `MainActivity` should set `WindowManager.LayoutParams.FLAG_SECURE` for the main activity window for the entire Activity lifetime, not only while the unlock overlay is showing. This hides app content from the Android recents/app-switcher snapshot whenever the user has app lock configured, with the platform tradeoff that screenshots/screen recording are also blocked for that window.
 
 ## Persistence
 
