@@ -511,7 +511,11 @@ private fun LabelAndNoteInputsView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = cardPadding),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.spacedBy(
+            space = dialogInputSpacing,
+            alignment = Alignment.CenterHorizontally,
+        ),
+        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing),
     ) {
         if (!labelAdded) {
             AddChipButton(text = stringResource(id = R.string.add_a_label)) {
