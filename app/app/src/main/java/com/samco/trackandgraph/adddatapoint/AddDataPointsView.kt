@@ -71,6 +71,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -78,6 +79,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -109,8 +111,14 @@ fun AddDataPointsDialog(
 ) {
 
     val hidden by viewModel.hidden.observeAsState(true)
+    val hapticFeedback = LocalHapticFeedback.current
 
     LaunchedEffect(Unit) { viewModel.dismissEvents.collect { onDismissRequest() } }
+    LaunchedEffect(viewModel) {
+        viewModel.dataPointAddedEvent.collect {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+        }
+    }
 
     if (!hidden) {
         // Basically everywhere we should use CustomDialog for consistency,
