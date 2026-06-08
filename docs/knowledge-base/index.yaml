@@ -13,6 +13,11 @@ docs:
     description: Shared UI module boundary, standard three-layer composable pattern, previews by default for new screens and UI components, app/ui reusable control guidance, and selectable TextChip styling driven by committed selected state.
     keywords: [compose, composable, shared-ui, ui-module, app-ui, reusable-controls, buttons, TextButton, SmallTextButton, RowCheckbox, PasswordTextField, Divider, spacing, preview, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState, flicker]
 
+  - file: graph-rendering.md
+    title: Graph rendering — renderer-neutral view data and Vico bar charts
+    description: Incremental AndroidPlot migration architecture; bar-chart factories emit plain Kotlin series and bounds, while the Compose UI owns Vico models, styling, axes, zoom, and marker interactions.
+    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, zoom, pan, Lua, migration]
+
   - file: app-lock.md
     title: App lock — security boundary, persistence, and UI shell
     description: App lock is a presentation/access barrier, not database encryption; configuration uses PrefsPersistenceProvider, unlock state is in-memory, and the main activity gates only app UI while widgets/background work remain usable.

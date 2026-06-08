@@ -8,29 +8,26 @@
  *
  * Track & Graph is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ * along with Track & Graph. If not, see <https://www.gnu.org/licenses/>.
  */
 package com.samco.trackandgraph.graphstatview.ui
 
-import android.annotation.SuppressLint
-import androidx.annotation.ColorInt
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import android.util.TypedValue
-import android.view.MotionEvent
-import android.view.View
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +35,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,8 +46,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,27 +55,39 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidViewBinding
-import com.androidplot.ui.VerticalPosition
-import com.androidplot.ui.VerticalPositioning
-import com.androidplot.util.PixelUtils
-import com.androidplot.xy.BarFormatter
-import com.androidplot.xy.BarRenderer
-import com.androidplot.xy.BoundaryMode
-import com.androidplot.xy.PanZoom
-import com.androidplot.xy.RectRegion
-import com.androidplot.xy.StepMode
-import com.androidplot.xy.XValueMarker
-import com.androidplot.xy.XYGraphWidget
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
+import com.patrykandpatrick.vico.compose.cartesian.Zoom
+import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.compose.cartesian.data.columnModel
+import com.patrykandpatrick.vico.compose.cartesian.decoration.Decoration
+import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarker
+import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarkerController
+import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarkerVisibilityListener
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.databinding.GraphXyPlotBinding
+import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.helpers.getDayMonthFormatter
@@ -85,35 +95,23 @@ import com.samco.trackandgraph.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.ui.ui.ColorCircle
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.cardElevation
 import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAmount
-import java.text.FieldPosition
-import java.text.Format
-import java.text.ParsePosition
-import kotlin.math.abs
-import kotlin.math.log10
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private class BarMarkerStore {
-    var highlightedIndex by mutableStateOf(null as Int?)
-        private set
-
-    private val lock = Any()
-
-    fun setHighlightedIndex(index: Int) = synchronized(lock) {
-        highlightedIndex = index
-    }
-
-    fun clearHighlightedIndex() = synchronized(lock) {
-        highlightedIndex = null
-    }
-}
+private val barThickness = 16.dp
 
 @Composable
 fun BarChartView(
@@ -125,47 +123,66 @@ fun BarChartView(
     graphBackgroundColor: Color,
 ) = Box(modifier = modifier) {
     if (viewData.xDates.isEmpty() || viewData.bars.isEmpty()) {
-        GraphErrorView(
-            error = R.string.graph_stat_view_not_enough_data_graph
-        )
-    } else {
-        val barMarkerStore = remember(timeMarker) {
-            val barMarkerStore = BarMarkerStore()
-            timeMarker?.let { marker ->
-                val zonedMarker = marker.atZoneSameInstant(viewData.endTime.zone)
-                val index = viewData.xDates.indexOfLast { zonedMarker.isAfter(it) } + 1
-                if (index in viewData.xDates.indices) barMarkerStore.setHighlightedIndex(index)
+        GraphErrorView(error = R.string.graph_stat_view_not_enough_data_graph)
+        return@Box
+    }
+
+    var highlightedIndex by remember(timeMarker, viewData.xDates, viewData.endTime) {
+        mutableStateOf(timeMarker?.toBarIndex(viewData.xDates, viewData.endTime))
+    }
+
+    BarChartBodyView(
+        xDates = viewData.xDates,
+        bars = viewData.bars,
+        durationBasedRange = viewData.durationBasedRange,
+        yMin = viewData.yMin,
+        yMax = viewData.yMax,
+        yAxisSubdivides = viewData.yAxisSubdivides,
+        listMode = listMode,
+        highlightedIndex = highlightedIndex,
+        onHighlightedIndexChanged = { highlightedIndex = it },
+        graphViewMode = graphViewMode,
+        graphBackgroundColor = graphBackgroundColor,
+    )
+
+    if (!listMode) {
+        AnimatedContent(
+            targetState = highlightedIndex,
+            modifier = Modifier
+                .wrapContentHeight(Alignment.Top)
+                .align(Alignment.TopEnd)
+                .padding(top = cardElevation, end = cardElevation),
+            transitionSpec = {
+                (
+                    fadeIn() + scaleIn(transformOrigin = TransformOrigin(1f, 0f))
+                    ) togetherWith (
+                    fadeOut() + scaleOut(transformOrigin = TransformOrigin(1f, 0f))
+                    ) using SizeTransform(clip = false)
+            },
+            contentKey = { it != null },
+            label = "barChartDataOverlay",
+        ) { index ->
+            index?.let {
+                BarChartDataOverlay(
+                    context = LocalContext.current,
+                    highlightedIndex = it,
+                    xDates = viewData.xDates,
+                    bars = viewData.bars,
+                    barPeriod = viewData.barPeriod,
+                    durationBasedRange = viewData.durationBasedRange,
+                )
             }
-            barMarkerStore
-        }
-
-        BarChartBodyView(
-            xDates = viewData.xDates,
-            bars = viewData.bars,
-            durationBasedRange = viewData.durationBasedRange,
-            endTime = viewData.endTime,
-            bounds = viewData.bounds,
-            yAxisSubdivides = viewData.yAxisSubdivides,
-            listMode = listMode,
-            barMarkerStore = barMarkerStore,
-            graphViewMode = graphViewMode,
-            graphBackgroundColor = graphBackgroundColor,
-        )
-
-        if (!listMode) barMarkerStore.highlightedIndex?.let {
-            BarChartDataOverlay(
-                modifier = Modifier
-                    .wrapContentHeight(Alignment.Top)
-                    .align(Alignment.TopEnd),
-                context = LocalContext.current,
-                highlightedIndex = it,
-                xDates = viewData.xDates,
-                bars = viewData.bars,
-                barPeriod = viewData.barPeriod,
-                viewData.durationBasedRange
-            )
         }
     }
+}
+
+private fun OffsetDateTime.toBarIndex(
+    xDates: List<ZonedDateTime>,
+    endTime: ZonedDateTime,
+): Int? {
+    val zonedMarker = atZoneSameInstant(endTime.zone)
+    val index = xDates.indexOfLast { zonedMarker.isAfter(it) } + 1
+    return index.takeIf { it in xDates.indices }
 }
 
 private fun doubleToString(value: Double, maxPlaces: Int = 3): String {
@@ -179,93 +196,80 @@ private fun BarChartDataOverlay(
     context: Context,
     highlightedIndex: Int,
     xDates: List<ZonedDateTime>,
-    bars: List<TimeBarSegmentSeries>,
+    bars: List<BarChartSeries>,
     barPeriod: TemporalAmount,
-    durationBasedRange: Boolean
+    durationBasedRange: Boolean,
 ) = Surface(
     modifier = modifier
-        .width(IntrinsicSize.Max)
-        .animateContentSize()
+        .width(IntrinsicSize.Max),
+    shape = MaterialTheme.shapes.small,
+    shadowElevation = cardElevation,
 ) {
-
-    val total = remember(highlightedIndex, bars) {
-        val totalVal = bars.sumOf { it.segmentSeries.getyVals()[highlightedIndex].toDouble() }
-        if (durationBasedRange) formatTimeDuration(totalVal.toLong())
-        else doubleToString(totalVal)
+    val total = remember(highlightedIndex, bars, durationBasedRange) {
+        val totalValue = bars.sumOf { it.values[highlightedIndex] }
+        if (durationBasedRange) formatTimeDuration(totalValue.toLong())
+        else doubleToString(totalValue)
     }
-
-    val fromText = remember(highlightedIndex, xDates) {
-        val from = xDates[highlightedIndex].minus(barPeriod)
-        formatDayMonthYearHourMinute(context, from)
+    val fromText = remember(highlightedIndex, xDates, barPeriod) {
+        formatDayMonthYearHourMinute(context, xDates[highlightedIndex].minus(barPeriod))
     }
-
     val toText = remember(highlightedIndex, xDates) {
         formatDayMonthYearHourMinute(context, xDates[highlightedIndex])
     }
-
-    //a list of label: value (percentage) strings for each label for the current bar
-    val extraDetails = remember(highlightedIndex, xDates, bars) {
-        val values = bars.associate {
-            it.segmentSeries.title to it.segmentSeries.getyVals()[highlightedIndex].toDouble()
-        }
-        val sum = values.values.sum()
-
-        if (sum < 1e-6) emptyList()
-        else bars.map {
-            val value = values[it.segmentSeries.title] ?: 0.0
-            val percentage = (value / sum) * 100.0
-            val percentageStr = doubleToString(percentage, 1)
-            val str =
-                if (durationBasedRange) formatTimeDuration(value.toLong())
-                else doubleToString(value)
-            return@map ExtraDetails(
-                color = it.color,
-                label = "${it.segmentSeries.title}: $str ($percentageStr%)"
-            )
+    val extraDetails = remember(highlightedIndex, bars, durationBasedRange) {
+        val sum = bars.sumOf { it.values[highlightedIndex] }
+        if (sum < 1e-6) {
+            emptyList()
+        } else {
+            bars.map { series ->
+                val value = series.values[highlightedIndex]
+                val percentage = (value / sum) * 100.0
+                val displayedValue = if (durationBasedRange) {
+                    formatTimeDuration(value.toLong())
+                } else {
+                    doubleToString(value)
+                }
+                ExtraDetails(
+                    color = series.color,
+                    label = "${series.label}: $displayedValue (${doubleToString(percentage, 1)}%)"
+                )
+            }
         }
     }
 
-    Column(
-        modifier = Modifier.padding(cardPadding)
-    ) {
+    Column(modifier = Modifier.padding(cardPadding)) {
         Text(
             text = stringResource(id = R.string.from_formatted, fromText),
             style = MaterialTheme.typography.bodyLarge,
         )
-
         Text(
             text = stringResource(id = R.string.to_formatted, toText),
             style = MaterialTheme.typography.bodyLarge,
         )
-
         Text(
             text = stringResource(id = R.string.total_formatted, total),
             style = MaterialTheme.typography.bodyLarge,
         )
-
         if (extraDetails.isNotEmpty()) BarChartDataOverlayExtraDetails(extraDetails)
     }
 }
 
 private data class ExtraDetails(
     val color: ColorSpec,
-    val label: String
+    val label: String,
 )
 
 @Composable
-private fun BarChartDataOverlayExtraDetails(
-    extraDetails: List<ExtraDetails>
-) {
+private fun BarChartDataOverlayExtraDetails(extraDetails: List<ExtraDetails>) {
     var expanded by remember { mutableStateOf(false) }
 
     DialogInputSpacing()
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = !expanded },
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = stringResource(id = R.string.info),
@@ -275,30 +279,28 @@ private fun BarChartDataOverlayExtraDetails(
             imageVector = Icons.Default.ArrowDropDown,
             contentDescription = null,
             modifier = Modifier
-                .size(24.dp)
-                .rotate(if (expanded) 180f else 0f)
+                .size(inputSpacingLarge)
+                .rotate(if (expanded) 180f else 0f),
         )
     }
-
-
     DialogInputSpacing()
 
-    extraDetails.forEachIndexed { _, labelInfo ->
+    extraDetails.forEach { labelInfo ->
         AnimatedVisibility(
             visible = expanded,
             enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
+            exit = fadeOut() + shrinkVertically(),
         ) {
             Row {
                 ColorCircle(
                     color = Color(getColorInt(labelInfo.color)),
-                    size = 16.dp
+                    size = graphLegendCircleSize,
                 )
                 HalfDialogInputSpacing()
                 Text(
                     text = labelInfo.label,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = cardPadding),
                 )
             }
         }
@@ -309,272 +311,231 @@ private fun BarChartDataOverlayExtraDetails(
 private fun BarChartBodyView(
     modifier: Modifier = Modifier,
     xDates: List<ZonedDateTime>,
-    bars: List<TimeBarSegmentSeries>,
+    bars: List<BarChartSeries>,
     durationBasedRange: Boolean,
-    endTime: ZonedDateTime,
-    bounds: RectRegion,
+    yMin: Double,
+    yMax: Double,
     yAxisSubdivides: Int,
     listMode: Boolean,
-    barMarkerStore: BarMarkerStore,
+    highlightedIndex: Int?,
+    onHighlightedIndexChanged: (Int?) -> Unit,
     graphViewMode: GraphViewMode,
     graphBackgroundColor: Color,
-) = Column(modifier = modifier) {
-
-    val context = LocalContext.current
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
-    val containerColor = graphBackgroundColor.toArgb()
-
-    val hasLegend = bars.size > 1
-
-    AndroidViewBinding(
-        factory = { inflater, parent, attachToParent ->
-            return@AndroidViewBinding GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
-        },
-        update = {
-            xyPlotSetup(
-                xyPlot = xyPlot,
-                onSurfaceColor = onSurfaceColor,
-                containerColor = containerColor,
-            )
-            xyPlot.clear()
-
-            setBarChartBounds(
-                binding = this,
-                bounds = bounds,
-            )
-
-            val xAxisFormatter = getXAxisFormatter(
-                context = context,
-                xDates = xDates,
-            )
-
-            setXAxisFormatter(
-                binding = this,
-                xDates = xDates,
-                xAxisFormatter = xAxisFormatter
-            )
-
-            setBarChartPaddingFromBounds(
-                context = context,
-                binding = this,
-                bounds = bounds,
-                endTime = endTime,
-                xAxisFormatter = xAxisFormatter
-            )
-
-            setUpXYPlotYAxis(
-                binding = this,
-                yAxisSubdivides = yAxisSubdivides,
-                durationBasedRange = durationBasedRange,
-            )
-            drawBars(
-                binding = this,
-                bars = bars,
-                onSurfaceColor = onSurfaceColor
-            )
-
-            setXAxisLabelSpacingAndOrigin(binding = this)
-
-            if (!listMode) {
-                attachPanZoomClickListener(
-                    binding = this,
-                    barMarkerStore = barMarkerStore,
-                    barIndexRange = xDates.indices,
-                    onSurfaceColor = onSurfaceColor
-                )
-                redrawMarkers(
-                    binding = this,
-                    barMarkerStore = barMarkerStore,
-                    onSurfaceColor = onSurfaceColor
-                )
-            }
-
-            setGraphHeight(
-                graphView = this.xyPlot,
-                graphViewMode = graphViewMode,
-                hasLegend = hasLegend
-            )
-            xyPlot.requestLayout()
-            xyPlot.redraw()
-        })
-
-    DialogInputSpacing()
-
-    if (hasLegend) {
-        GraphLegend(
-            items = bars.mapIndexed { i, bar ->
-                val label = bar.segmentSeries.title
-                    .ifEmpty { context.getString(R.string.no_label) }
-                GraphLegendItem(
-                    color = getColor(bar.color),
-                    label = label
-                )
-            }
-        )
-    }
-}
-
-@SuppressLint("ClickableViewAccessibility")
-private fun attachPanZoomClickListener(
-    binding: GraphXyPlotBinding,
-    barMarkerStore: BarMarkerStore,
-    barIndexRange: IntRange,
-    @ColorInt onSurfaceColor: Int
 ) {
-    val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
+    ProvideGraphVicoTheme {
+        Column(modifier = modifier) {
+            val context = LocalContext.current
+            val hasLegend = bars.size > 1
+            val modelProducer = remember { CartesianChartModelProducer() }
 
-    binding.xyPlot.setOnTouchListener(object : PanZoom(
-        binding.xyPlot,
-        Pan.HORIZONTAL,
-        Zoom.STRETCH_HORIZONTAL
-    ) {
-
-        private var down = false
-        private var pointerX = 0f
-        private var pointerY = 0f
-
-        override fun zoom(motionEvent: MotionEvent?) {
-            super.zoom(motionEvent)
-            redrawMarkers(binding, barMarkerStore, onSurfaceColor)
-            setXAxisLabelSpacingAndOrigin(binding)
-        }
-
-        override fun pan(motionEvent: MotionEvent?) {
-            super.pan(motionEvent)
-            redrawMarkers(binding, barMarkerStore, onSurfaceColor)
-            setXAxisLabelSpacingAndOrigin(binding)
-        }
-
-        override fun onTouch(view: View, event: MotionEvent): Boolean {
-            //Detect a click from a single pointer, otherwise call super
-            if (event.pointerCount == 1) {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        down = true
-                        pointerX = event.x
-                        pointerY = event.y
-                        return super.onTouch(view, event)
-                    }
-
-                    MotionEvent.ACTION_UP -> {
-                        val smallX = abs(event.x - pointerX) < 10
-                        val smallY = abs(event.y - pointerY) < 10
-                        if (down && smallX && smallY) onBarClick(event, view)
-                        down = false
-                    }
-
-                    else -> {
-                        down = false
-                        return super.onTouch(view, event)
+            LaunchedEffect(modelProducer, bars) {
+                modelProducer.runTransaction {
+                    columnModel {
+                        bars.forEach { series(it.values) }
                     }
                 }
+            }
+
+            val borderFill = if (xDates.size < 60) {
+                Fill(MaterialTheme.colorScheme.onSurface)
             } else {
-                down = false
-                return super.onTouch(view, event)
+                Fill.Transparent
             }
-            return super.onTouch(view, event)
-        }
-
-        private fun onBarClick(event: MotionEvent, view: View) {
-            val rounded = renderer.plot.screenToSeriesX(event.x).toDouble().roundToInt()
-            if (rounded in barIndexRange) {
-                toggleBarMarker(
-                    binding = binding,
-                    barMarkerStore = barMarkerStore,
-                    index = rounded,
-                    onSurfaceColor = onSurfaceColor
+            val columns = bars.map { series ->
+                rememberLineComponent(
+                    fill = Fill(Color(getColorInt(series.color))),
+                    thickness = barThickness,
+                    strokeFill = borderFill,
+                    strokeThickness = 0.5.dp,
                 )
-                view.performClick()
+            }
+            val columnLayer = rememberColumnCartesianLayer(
+                columnProvider = ColumnCartesianLayer.ColumnProvider.series(columns),
+                columnCollectionSpacing = 0.dp,
+                mergeMode = { ColumnCartesianLayer.MergeMode.Stacked },
+                rangeProvider = CartesianLayerRangeProvider.fixed(
+                    minX = -0.5,
+                    maxX = xDates.lastIndex + 0.5,
+                    minY = yMin,
+                    maxY = yMax,
+                ),
+            )
+
+            val xAxisFormatter = remember(context, xDates) { getXAxisFormatter(context, xDates) }
+            val gridLine = rememberLineComponent(
+                fill = Fill(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)),
+                thickness = 0.5.dp,
+            )
+            val bottomAxis = HorizontalAxis.rememberBottom(
+                line = gridLine,
+                valueFormatter = CartesianValueFormatter { _, value, _ ->
+                    xDates[value.roundToInt().coerceIn(xDates.indices)].format(xAxisFormatter)
+                },
+                tick = gridLine,
+                guideline = gridLine,
+                itemPlacer = remember(xDates.size) {
+                    AdaptiveHorizontalAxisItemPlacer(xDates.size)
+                },
+            )
+            val startAxis = VerticalAxis.rememberStart(
+                line = gridLine,
+                valueFormatter = CartesianValueFormatter { _, value, _ ->
+                    if (durationBasedRange) formatTimeDuration(value.toLong())
+                    else doubleToString(value)
+                },
+                tick = gridLine,
+                guideline = gridLine,
+                itemPlacer = VerticalAxis.ItemPlacer.count(
+                    count = { yAxisSubdivides.coerceAtLeast(1) },
+                ),
+            )
+
+            val interactionMarker = remember { object : CartesianMarker {} }
+            val highlightDecoration = rememberHighlightDecoration(
+                color = MaterialTheme.colorScheme.onSurface,
+                barThickness = barThickness,
+                highlightedIndex = highlightedIndex,
+            )
+            val markerVisibilityListener = remember(onHighlightedIndexChanged, xDates) {
+                object : CartesianMarkerVisibilityListener {
+                    override fun onShown(marker: CartesianMarker, targets: List<CartesianMarker.Target>) {
+                        onHighlightedIndexChanged(targets.firstOrNull()?.x?.roundToInt()?.takeIf {
+                            it in xDates.indices
+                        })
+                    }
+
+                    override fun onUpdated(marker: CartesianMarker, targets: List<CartesianMarker.Target>) {
+                        onShown(marker, targets)
+                    }
+
+                    override fun onHidden(marker: CartesianMarker) {
+                        onHighlightedIndexChanged(null)
+                    }
+                }
+            }
+
+            val chart = rememberCartesianChart(
+                columnLayer,
+                startAxis = startAxis,
+                bottomAxis = bottomAxis,
+                marker = if (listMode) null else interactionMarker,
+                markerVisibilityListener = markerVisibilityListener,
+                decorations = listOf(highlightDecoration),
+                markerController = CartesianMarkerController.rememberToggleOnTap(),
+                getXStep = { _, _, _ -> 1.0 },
+            )
+            val scrollState = rememberVicoScrollState(scrollEnabled = !listMode)
+            val zoomState = rememberVicoZoomState(
+                zoomEnabled = !listMode,
+                initialZoom = Zoom.Content,
+            )
+            val graphHeight = graphHeightFor(graphViewMode, hasLegend)
+
+            CartesianChartHost(
+                chart = chart,
+                modelProducer = modelProducer,
+                scrollState = scrollState,
+                zoomState = zoomState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(graphHeight)
+                    .background(graphBackgroundColor),
+            )
+
+            DialogInputSpacing()
+            if (hasLegend) {
+                GraphLegend(
+                    items = bars.map { bar ->
+                        GraphLegendItem(
+                            color = getColor(bar.color),
+                            label = bar.label.ifEmpty { context.getString(R.string.no_label) },
+                        )
+                    }
+                )
             }
         }
-    })
-}
-
-fun setXAxisFormatter(
-    binding: GraphXyPlotBinding,
-    xDates: List<ZonedDateTime>,
-    xAxisFormatter: DateTimeFormatter
-) {
-    binding.xyPlot.graph.domainOriginLinePaint.strokeWidth = binding.xyPlot.graph.domainGridLinePaint.strokeWidth
-    binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
-        object : Format() {
-            override fun format(
-                obj: Any,
-                toAppendTo: StringBuffer,
-                pos: FieldPosition
-            ): StringBuffer {
-                //We minus a tiny amount to favour labelling the previous bar if we're right on the
-                // border between two
-                val number = (obj as Number).toDouble() - 0.0001
-                val rounded = number.roundToInt()
-                //Shouldn't ever happen that we get a date outside of the range, but just in case
-                val date =
-                    if (rounded in xDates.indices) xDates[rounded]
-                    else if (rounded < 0) xDates.first()
-                    else xDates.last()
-
-                return toAppendTo.append(date.format(xAxisFormatter))
-            }
-
-            override fun parseObject(source: String, pos: ParsePosition) = null
-        }
-}
-
-private fun setXAxisLabelSpacingAndOrigin(binding: GraphXyPlotBinding) {
-    val range = binding.xyPlot.bounds.maxX.toDouble() - binding.xyPlot.bounds.minX.toDouble()
-    var step = 1
-    val maxLabels = 10
-    while (range / step > maxLabels) {
-        step *= 2
     }
-
-    binding.xyPlot.setDomainStep(StepMode.INCREMENT_BY_VAL, step.toDouble())
-    binding.xyPlot.graph.domainOriginLinePaint
-    binding.xyPlot.setUserDomainOrigin((range / 2.0).toInt())
 }
 
-private fun setBarChartBounds(binding: GraphXyPlotBinding, bounds: RectRegion) {
-    binding.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
-    binding.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
-    binding.xyPlot.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+@Composable
+private fun rememberHighlightDecoration(
+    color: Color,
+    barThickness: Dp,
+    highlightedIndex: Int?,
+): Decoration = remember(color, barThickness, highlightedIndex) {
+    object : Decoration {
+        private val paint = Paint().apply { this.color = color.copy(alpha = 0.2f) }
+
+        override fun drawOverLayers(
+            context: CartesianDrawingContext,
+        ) {
+            val selectedX = highlightedIndex?.toDouble() ?: return
+            val xSpacing = context.layerDimensions.xSpacing
+            if (xSpacing == 0f) return
+            val xStep = context.ranges.xStep
+            val fullRangeStart = context.ranges.minX -
+                context.layerDimensions.startPadding / xSpacing * xStep
+            val visibleRangeStart = fullRangeStart +
+                context.layoutDirectionMultiplier * context.scroll / xSpacing * xStep
+            val xOffset = (
+                (selectedX - visibleRangeStart) /
+                    xStep *
+                    xSpacing
+                ).toFloat()
+            val centerX = if (context.isLtr) {
+                context.layerBounds.left + xOffset
+            } else {
+                context.layerBounds.right - xOffset
+            }
+            val width = with(context) { barThickness.pixels } * context.zoom
+            val left = max(centerX - width / 2f, context.layerBounds.left)
+            val right = min(centerX + width / 2f, context.layerBounds.right)
+            if (left >= right) return
+            context.canvas.drawRect(
+                Rect(
+                    left = left,
+                    top = context.layerBounds.top,
+                    right = right,
+                    bottom = context.layerBounds.bottom,
+                ),
+                paint,
+            )
+        }
+    }
 }
 
-private fun setBarChartPaddingFromBounds(
-    context: Context,
-    binding: GraphXyPlotBinding,
-    bounds: RectRegion,
-    endTime: ZonedDateTime,
-    xAxisFormatter: DateTimeFormatter
+private fun calculateLabelSpacing(barCount: Int): Int {
+    var spacing = 1
+    while (barCount.toDouble() / spacing > 10.0) spacing *= 2
+    return spacing
+}
+
+private class AdaptiveHorizontalAxisItemPlacer(
+    barCount: Int,
+) : HorizontalAxis.ItemPlacer by HorizontalAxis.ItemPlacer.aligned(
+    spacing = { calculateLabelSpacing(barCount) },
+    addExtremeLabelPadding = true,
 ) {
-    //Set up Y padding
-    val minY = bounds.minY.toDouble()
-    val maxY = bounds.maxY.toDouble()
-    val maxBound = max(abs(minY), abs(maxY))
-    val numDigits = log10(maxBound).toFloat() + 3
-
-    binding.xyPlot.graph.paddingLeft = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP,
-        (numDigits - 1) * 3.5f,
-        context.resources.displayMetrics
-    )
-
-    //Set up X padding
-    val formattedTimestamp = xAxisFormatter.format(endTime)
-    binding.xyPlot.graph.paddingBottom = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP,
-        formattedTimestamp.length * 1f,
-        context.resources.displayMetrics
-    )
+    override fun getLabelValues(
+        context: CartesianDrawingContext,
+        visibleXRange: ClosedFloatingPointRange<Double>,
+        fullXRange: ClosedFloatingPointRange<Double>,
+        maxLabelWidth: Float,
+    ): List<Double> {
+        val visibleBarCount = ceil(visibleXRange.endInclusive - visibleXRange.start).toInt() + 1
+        val spacing = calculateLabelSpacing(visibleBarCount)
+        val first = ceil(visibleXRange.start / spacing).toInt() * spacing
+        val last = floor(visibleXRange.endInclusive / spacing).toInt() * spacing
+        if (first > last) return emptyList()
+        return (first..last step spacing).map(Int::toDouble)
+    }
 }
 
 private fun getXAxisFormatter(
     context: Context,
-    xDates: List<ZonedDateTime>
+    xDates: List<ZonedDateTime>,
 ): DateTimeFormatter {
-    val minX = xDates.firstOrNull()
-    val maxX = xDates.lastOrNull()
-    if (minX == null || maxX == null) return getDayMonthFormatter(context)
-    val durationRange = Duration.between(minX, maxX)
+    val durationRange = Duration.between(xDates.first(), xDates.last())
     return when {
         durationRange.toMinutes() < 5L -> DateTimeFormatter.ofPattern("HH:mm:ss")
         durationRange.toDays() >= 304 -> getMonthYearFormatter(context)
@@ -583,76 +544,34 @@ private fun getXAxisFormatter(
     }
 }
 
-private fun drawBars(
-    binding: GraphXyPlotBinding,
-    bars: List<TimeBarSegmentSeries>,
-    @ColorInt onSurfaceColor: Int
-) {
-    // if there are more than 60 bars, we don't want to draw the borders
-    // I chose 60 simply because it's the first round number after the number of weeks in a year
-    val xfermode =
-        if (bars.isNotEmpty() && bars[0].segmentSeries.getyVals().size < 60) null
-        else PorterDuffXfermode(PorterDuff.Mode.DST)
-
-    bars.forEachIndexed { i, bv ->
-        val color = getColorInt(bv.color)
-        val seriesFormatter = BarFormatter(color, onSurfaceColor)
-        seriesFormatter.borderPaint.xfermode = xfermode
-        binding.xyPlot.addSeries(bv.segmentSeries, seriesFormatter)
-    }
-
-    val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
-    renderer.setBarGroupWidth(BarRenderer.BarGroupWidthMode.FIXED_GAP, PixelUtils.dpToPix(0f))
-    renderer.barOrientation = BarRenderer.BarOrientation.STACKED
-}
-
-private fun getMarkerPaint(
-    binding: GraphXyPlotBinding,
-    @ColorInt onSurfaceColor: Int
-): Paint {
-    //Calculate the marker width
-    val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
-    //If the gridRect is null it will throw an exception, this can happen if the graph hasn't been
-    // laid out yet
-    if (binding.xyPlot.graph.gridRect == null) return Paint()
-    val width = abs(renderer.plot.seriesToScreenX(1) - renderer.plot.seriesToScreenX(0))
-
-    val paint = Paint()
-    paint.color = onSurfaceColor
-    paint.alpha = (0.2f * 255f).toInt()
-    paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
-    paint.strokeWidth = width
-    return paint
-}
-
-private fun toggleBarMarker(
-    binding: GraphXyPlotBinding,
-    barMarkerStore: BarMarkerStore,
-    index: Int,
-    @ColorInt onSurfaceColor: Int
-) {
-    if (barMarkerStore.highlightedIndex == index) barMarkerStore.clearHighlightedIndex()
-    else barMarkerStore.setHighlightedIndex(index)
-    redrawMarkers(binding, barMarkerStore, onSurfaceColor)
-}
-
-private fun redrawMarkers(
-    binding: GraphXyPlotBinding,
-    barMarkerStore: BarMarkerStore,
-    @ColorInt onSurfaceColor: Int
-) {
-    binding.xyPlot.removeMarkers()
-    val markerPaint = getMarkerPaint(binding, onSurfaceColor)
-    barMarkerStore.highlightedIndex?.let {
-        binding.xyPlot.addMarker(
-            XValueMarker(
-                it,
-                null,
-                VerticalPosition(0f, VerticalPositioning.ABSOLUTE_FROM_TOP),
-                markerPaint,
-                null
-            )
+@Preview(showBackground = true)
+@Composable
+private fun BarChartBodyViewPreview() {
+    val end = ZonedDateTime.of(2026, 6, 8, 23, 59, 59, 0, ZoneOffset.UTC)
+    TnGComposeTheme {
+        BarChartBodyView(
+            xDates = List(7) { index -> end.minusDays((6 - index).toLong()) },
+            bars = listOf(
+                BarChartSeries(
+                    label = "Work",
+                    values = listOf(2.0, 3.0, 4.0, 2.0, 5.0, 3.0, 4.0),
+                    color = ColorSpec.ColorIndex(0),
+                ),
+                BarChartSeries(
+                    label = "Personal",
+                    values = listOf(1.0, 2.0, 1.0, 3.0, 2.0, 4.0, 2.0),
+                    color = ColorSpec.ColorIndex(4),
+                ),
+            ),
+            durationBasedRange = false,
+            yMin = 0.0,
+            yMax = 8.0,
+            yAxisSubdivides = 9,
+            listMode = true,
+            highlightedIndex = null,
+            onHighlightedIndexChanged = {},
+            graphViewMode = GraphViewMode.ListMode,
+            graphBackgroundColor = MaterialTheme.colorScheme.surface,
         )
     }
-    binding.xyPlot.redraw()
 }

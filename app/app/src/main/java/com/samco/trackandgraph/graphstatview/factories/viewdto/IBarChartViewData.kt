@@ -16,30 +16,28 @@
  */
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.androidplot.xy.RectRegion
-import com.androidplot.xy.SimpleXYSeries
 import org.threeten.bp.Period
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
-data class TimeBarSegmentSeries(
-    val segmentSeries: SimpleXYSeries,
+data class BarChartSeries(
+    val label: String,
+    val values: List<Double>,
     val color: ColorSpec,
 )
 
 interface IBarChartViewData : IGraphStatViewData {
     /**
      * One x date for every bar in the list. Sorted from oldest to newest. You don't necessarily draw all of them on the x axis.
-     * Should be the same length as the bars list.
+     * Each series in [bars] should contain the same number of values.
      */
     val xDates: List<ZonedDateTime>
         get() = emptyList()
 
     /**
-     * One bar list for each label in the data set. The x value of the SimpleXYSeries is the 0 based index in the xDates list.
-     * The xDates list should be of the same length.
+     * One series for each label in the data set. Each series contains one value per xDates entry.
      */
-    val bars: List<TimeBarSegmentSeries>
+    val bars: List<BarChartSeries>
         get() = emptyList()
 
     /**
@@ -54,15 +52,12 @@ interface IBarChartViewData : IGraphStatViewData {
     val endTime: ZonedDateTime
         get() = ZonedDateTime.now()
 
-    /**
-     * The bounds of the graph in x and y
-     */
-    val bounds: RectRegion
-        get() = RectRegion()
+    val yMin: Double
+        get() = 0.0
 
-    /**
-     * The y axis range parameters used by android plot library
-     */
+    val yMax: Double
+        get() = 1.0
+
     val yAxisSubdivides: Int
         get() = 11
 

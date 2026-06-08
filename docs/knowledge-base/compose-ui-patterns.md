@@ -80,6 +80,7 @@ private fun GroupDeleteDialogContent(
 - Provide multiple previews for different states (e.g. unique vs non-unique)
 - For shared UI in `app/ui`, include previews for new components and for components migrated out of `app/app` unless a dependency makes previewing impractical
 - For new screens, dialogs, and reusable controls, add previews in the initial change rather than as a later cleanup
+- ThreeTenABP timezone data is not initialized in the Compose preview renderer. Preview fixtures must use a fixed `ZoneOffset` such as `ZoneOffset.UTC`; do not call `ZoneId.systemDefault()` or construct named region zones in a preview.
 
 ```kotlin
 @Preview

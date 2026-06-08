@@ -110,7 +110,7 @@ class BarChartDataFactoryTest {
 
         //VERIFY
         assertEquals(1, viewData.bars.size)
-        assertEquals(1.5, viewData.bounds.maxY.toDouble(), 0.0001)
+        assertEquals(1.5, viewData.yMax.toDouble(), 0.0001)
         assertEquals(true, dataSampledCalled)
     }
 
@@ -144,14 +144,12 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(1, barData.segmentSeries.size)
+        assertEquals(1, barData.series.size)
         assertEquals(listOf(endOfDay), barData.dates)
-        assertEquals(listOf(0.0), barData.segmentSeries[0].segmentSeries.getyVals())
+        assertEquals(listOf(0.0), barData.series[0].values)
 
-        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
-        assertEquals(0.5, barData.bounds.maxX.toDouble(), 0.1)
-        assertEquals(0, barData.bounds.minY.toInt())
-        assertEquals(1, barData.bounds.maxY.toInt())
+        assertEquals(0, barData.yMin.toInt())
+        assertEquals(1, barData.yMax.toInt())
     }
 
     @Test
@@ -191,13 +189,11 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(1, barData.segmentSeries.size)
-        assertEquals(listOf(3.0, 1.0, 2.0), barData.segmentSeries[0].segmentSeries.getyVals())
+        assertEquals(1, barData.series.size)
+        assertEquals(listOf(3.0, 1.0, 2.0), barData.series[0].values)
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
-        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
-        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
-        assertEquals(0, barData.bounds.minY.toInt())
-        assertEquals(3, barData.bounds.maxY.toInt())
+        assertEquals(0, barData.yMin.toInt())
+        assertEquals(3, barData.yMax.toInt())
     }
 
     @Test
@@ -240,17 +236,15 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(2, barData.segmentSeries.size)
+        assertEquals(2, barData.series.size)
 
         //b comes first because the sum of all b values is larger than the sum of all a values
-        assertEquals(listOf(0.0, 1.0, 2.0), barData.segmentSeries[1].segmentSeries.getyVals())
-        assertEquals(listOf(5.0, 1.0, 4.0), barData.segmentSeries[0].segmentSeries.getyVals())
+        assertEquals(listOf(0.0, 1.0, 2.0), barData.series[1].values)
+        assertEquals(listOf(5.0, 1.0, 4.0), barData.series[0].values)
 
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
-        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
-        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
-        assertEquals(0, barData.bounds.minY.toInt())
-        assertEquals(6, barData.bounds.maxY.toInt())
+        assertEquals(0, barData.yMin.toInt())
+        assertEquals(6, barData.yMax.toInt())
     }
 
     @Test
@@ -302,14 +296,14 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(2, barData.segmentSeries.size)
+        assertEquals(2, barData.series.size)
         assertEquals(
             listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
-            barData.segmentSeries.first { it.segmentSeries.title == "a" }.segmentSeries.getyVals()
+            barData.series.first { it.label == "a" }.values
         )
         assertEquals(
             listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
-            barData.segmentSeries.first { it.segmentSeries.title == "b" }.segmentSeries.getyVals()
+            barData.series.first { it.label == "b" }.values
         )
         assertEquals(
             listOf(
@@ -322,10 +316,8 @@ class BarChartDataFactoryTest {
                 endOfDay
             ), barData.dates
         )
-        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
-        assertEquals(6.5, barData.bounds.maxX.toDouble(), 0.1)
-        assertEquals(0, barData.bounds.minY.toInt())
-        assertEquals(2, barData.bounds.maxY.toInt())
+        assertEquals(0, barData.yMin.toInt())
+        assertEquals(2, barData.yMax.toInt())
     }
 
     @Test
@@ -367,7 +359,7 @@ class BarChartDataFactoryTest {
         )
 
         //VERIFY
-        val values = barData.segmentSeries[0].segmentSeries.getyVals()
+        val values = barData.series[0].values
         val endOfDay = ZonedDateTime.of(2026, 2, 1, 23, 59, 59, 999999999, zone)
 
         assertEquals(31, barData.dates.size)
@@ -377,7 +369,7 @@ class BarChartDataFactoryTest {
         assertEquals(3.0, values.first().toDouble(), 0.0001)
         assertEquals(2.0, values[29].toDouble(), 0.0001)
         assertEquals(1.0, values.last().toDouble(), 0.0001)
-        assertEquals(3.0, barData.bounds.maxY.toDouble(), 0.0001)
+        assertEquals(3.0, barData.yMax.toDouble(), 0.0001)
     }
 
     @Test
@@ -416,8 +408,8 @@ class BarChartDataFactoryTest {
         )
 
         //VERIFY
-        assertEquals(1, barData.segmentSeries.size)
-        assertEquals(listOf(1.0, 1.0), barData.segmentSeries[0].segmentSeries.getyVals())
+        assertEquals(1, barData.series.size)
+        assertEquals(listOf(1.0, 1.0), barData.series[0].values)
         assertEquals(
             listOf(
                 ZonedDateTime.parse("2023-03-25T14:59:59.999999999Z[Europe/London]"),
@@ -425,10 +417,8 @@ class BarChartDataFactoryTest {
             ),
             barData.dates
         )
-        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
-        assertEquals(1.5, barData.bounds.maxX.toDouble(), 0.1)
-        assertEquals(0, barData.bounds.minY.toInt())
-        assertEquals(1, barData.bounds.maxY.toInt())
+        assertEquals(0, barData.yMin.toInt())
+        assertEquals(1, barData.yMax.toInt())
 
     }
 
@@ -462,12 +452,10 @@ class BarChartDataFactoryTest {
         )
 
         //VERIFY
-        assertEquals(1, barData.segmentSeries.size)
-        assertEquals(listOf(3.0, 1.0, 2.0), barData.segmentSeries[0].segmentSeries.getyVals())
-        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
-        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
-        assertEquals(0, barData.bounds.minY.toInt())
-        assertEquals(80, barData.bounds.maxY.toInt())
+        assertEquals(1, barData.series.size)
+        assertEquals(listOf(3.0, 1.0, 2.0), barData.series[0].values)
+        assertEquals(0, barData.yMin.toInt())
+        assertEquals(80, barData.yMax.toInt())
     }
 
     @Test
@@ -503,15 +491,13 @@ class BarChartDataFactoryTest {
         )
 
         //VERIFY
-        assertEquals(2, barData.segmentSeries.size)
+        assertEquals(2, barData.series.size)
 
         //b comes first because the sum of all b values is larger than the sum of all a values
-        assertEquals(listOf(0.0, 3.0, 6.0), barData.segmentSeries[1].segmentSeries.getyVals())
-        assertEquals(listOf(15.0, 3.0, 12.0), barData.segmentSeries[0].segmentSeries.getyVals())
-        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
-        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
-        assertEquals(0, barData.bounds.minY.toInt())
-        assertEquals(18, barData.bounds.maxY.toInt())
+        assertEquals(listOf(0.0, 3.0, 6.0), barData.series[1].values)
+        assertEquals(listOf(15.0, 3.0, 12.0), barData.series[0].values)
+        assertEquals(0, barData.yMin.toInt())
+        assertEquals(18, barData.yMax.toInt())
     }
 
     @Test
@@ -550,8 +536,8 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(1, barData.segmentSeries.size)
-        assertEquals(listOf(3.0, 1.0, 1.0), barData.segmentSeries[0].segmentSeries.getyVals())
+        assertEquals(1, barData.series.size)
+        assertEquals(listOf(3.0, 1.0, 1.0), barData.series[0].values)
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
     }
 
@@ -619,7 +605,7 @@ class BarChartDataFactoryTest {
         // We should have 12 bars, one for each month
         // If the bug exists, some months will be merged because bar boundaries
         // are calculated incorrectly using end-period instead of beginning-of-period
-        val values = barData.segmentSeries[0].segmentSeries.getyVals()
+        val values = barData.series[0].values
 
         // Build a description of what we got for the error message
         val barSummary = barData.dates.mapIndexed { i, date ->

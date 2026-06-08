@@ -358,21 +358,19 @@ class LuaGraphDataFactoryTest {
 
         assertEquals(endTime, barChart.endTime)
         assertEquals(2, barChart.bars.size)
-        assertEquals(2, barChart.bars[0].segmentSeries.size())
-        assertEquals("A", barChart.bars[0].segmentSeries.title)
-        assertEquals(2.0, barChart.bars[0].segmentSeries.getY(0))
-        assertEquals(0.0, barChart.bars[0].segmentSeries.getY(1))
+        assertEquals(2, barChart.bars[0].values.size)
+        assertEquals("A", barChart.bars[0].label)
+        assertEquals(2.0, barChart.bars[0].values[0])
+        assertEquals(0.0, barChart.bars[0].values[1])
         assertEquals(ViewColorSpec.ColorValue(Color.Red.toArgb()), barChart.bars[0].color)
-        assertEquals(2, barChart.bars[1].segmentSeries.size())
-        assertEquals("", barChart.bars[1].segmentSeries.title)
-        assertEquals(0.0, barChart.bars[1].segmentSeries.getY(0))
-        assertEquals(1.0, barChart.bars[1].segmentSeries.getY(1))
+        assertEquals(2, barChart.bars[1].values.size)
+        assertEquals("", barChart.bars[1].label)
+        assertEquals(0.0, barChart.bars[1].values[0])
+        assertEquals(1.0, barChart.bars[1].values[1])
         assertEquals(ViewColorSpec.ColorIndex(7), barChart.bars[1].color)
         assertEquals(2, barChart.xDates.size)
-        assertEquals(-0.5, barChart.bounds.minX.toDouble())
-        assertEquals(1.5, barChart.bounds.maxX.toDouble())
-        assertEquals(0.0, barChart.bounds.minY.toDouble())
-        assertEquals(10.0, barChart.bounds.maxY.toDouble())
+        assertEquals(0.0, barChart.yMin.toDouble())
+        assertEquals(10.0, barChart.yMax.toDouble())
         assertEquals(6, barChart.yAxisSubdivides)
         assertEquals(Period.ofDays(2), barChart.barPeriod)
         assertEquals(false, barChart.durationBasedRange)
@@ -414,19 +412,19 @@ class LuaGraphDataFactoryTest {
         assert(barChart.graphOrStat.type == GraphStatType.BAR_CHART)
 
         assertEquals(5, barChart.bars.size)
-        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[0].segmentSeries.getxVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[1].segmentSeries.getxVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[2].segmentSeries.getxVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[3].segmentSeries.getxVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[4].segmentSeries.getxVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[0].values.indices.map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[1].values.indices.map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[2].values.indices.map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[3].values.indices.map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[4].values.indices.map { it.toDouble() })
 
-        assertEquals(listOf(5.0, 0.0, 0.0, 0.0, 0.0), barChart.bars[0].segmentSeries.getyVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 4.0, 0.0, 0.0, 0.0), barChart.bars[1].segmentSeries.getyVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 0.0, 3.0, 0.0, 0.0), barChart.bars[2].segmentSeries.getyVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 0.0, 0.0, 2.0, 0.0), barChart.bars[3].segmentSeries.getyVals().map { it.toDouble() })
-        assertEquals(listOf(0.0, 0.0, 0.0, 0.0, 1.0), barChart.bars[4].segmentSeries.getyVals().map { it.toDouble() })
+        assertEquals(listOf(5.0, 0.0, 0.0, 0.0, 0.0), barChart.bars[0].values.map { it.toDouble() })
+        assertEquals(listOf(0.0, 4.0, 0.0, 0.0, 0.0), barChart.bars[1].values.map { it.toDouble() })
+        assertEquals(listOf(0.0, 0.0, 3.0, 0.0, 0.0), barChart.bars[2].values.map { it.toDouble() })
+        assertEquals(listOf(0.0, 0.0, 0.0, 2.0, 0.0), barChart.bars[3].values.map { it.toDouble() })
+        assertEquals(listOf(0.0, 0.0, 0.0, 0.0, 1.0), barChart.bars[4].values.map { it.toDouble() })
 
-        assertEquals(listOf("C", "C", "B", "A", ""), barChart.bars.map { it.segmentSeries.title })
+        assertEquals(listOf("C", "C", "B", "A", ""), barChart.bars.map { it.label })
 
         assertEquals(
             listOf(
@@ -480,7 +478,7 @@ class LuaGraphDataFactoryTest {
         // be respected. If you jumble the orders behaviour is un-defined but deterministic.
         assertEquals(
             listOf("B", "A"),
-            listOf(barChart.bars[0].segmentSeries.title, barChart.bars[1].segmentSeries.title),
+            listOf(barChart.bars[0].label, barChart.bars[1].label),
         )
         verify(luaEngine).releaseVM(testVmLock)
     }

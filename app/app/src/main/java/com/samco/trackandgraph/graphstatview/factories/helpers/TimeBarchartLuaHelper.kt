@@ -16,15 +16,12 @@
  */
 package com.samco.trackandgraph.graphstatview.factories.helpers
 
-import com.androidplot.util.SeriesUtils
-import com.androidplot.xy.RectRegion
-import com.androidplot.xy.SimpleXYSeries
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
+import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
 import com.samco.trackandgraph.data.lua.dto.ColorSpec
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.TimeBar
@@ -58,17 +55,14 @@ class TimeBarchartLuaHelper @Inject constructor(
             fixedBounds = lineGraphData.yMax != null
         )
 
-        val xRegion = SeriesUtils.minMax(listOf(-0.5, (lineGraphData.bars.size - 1) + 0.5))
-        val yRegion = SeriesUtils.minMax(listOf(yAxisParameters.boundsMin, yAxisParameters.boundsMax))
-        val bounds = RectRegion(xRegion.min, xRegion.max, yRegion.min, lineGraphData.yMax ?: yRegion.max)
-
         return object : ILuaGraphViewData {
             override val wrapped: IGraphStatViewData = object : IBarChartViewData {
                 override val durationBasedRange: Boolean = lineGraphData.durationBasedRange
                 override val xDates: List<ZonedDateTime> = xDates
-                override val bars: List<TimeBarSegmentSeries> = barViewData
+                override val bars: List<BarChartSeries> = barViewData
                 override val endTime: ZonedDateTime = endTime
-                override val bounds: RectRegion = bounds
+                override val yMin: Double = yAxisParameters.boundsMin
+                override val yMax: Double = lineGraphData.yMax ?: yAxisParameters.boundsMax
                 override val yAxisSubdivides: Int = yAxisParameters.subdivides
                 override val barPeriod: TemporalAmount = lineGraphData.barDuration
                 override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
@@ -99,12 +93,6 @@ class TimeBarchartLuaHelper @Inject constructor(
 
     private data class ColorLabel(val color: ColorSpec?, val label: String?)
 
-    private fun blankXYSeries(size: Int, label: String) = SimpleXYSeries(
-        List(size) { 0.0 },
-        SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,
-        label
-    )
-
     /**
      * The list of TimeBars is sorted from latest to oldest. Each time bar is a list of bar segments.
      * What we want is to get a list of series. Each series is a list with the same length as the number
@@ -114,26 +102,25 @@ class TimeBarchartLuaHelper @Inject constructor(
      * preserve the order of the segments in the bars. If the segments in each bar have different order, then
      * the behaviour is un-defined.
      */
-    private fun getBarViewData(bars: List<TimeBar>): List<TimeBarSegmentSeries> {
-        val colorLabelsToXYSeries = mutableMapOf<ColorLabel, SimpleXYSeries>()
+    private fun getBarViewData(bars: List<TimeBar>): List<BarChartSeries> {
+        val valuesByColorLabel = mutableMapOf<ColorLabel, MutableList<Double>>()
 
         val timeAscendingBars = bars.asReversed()
         for (idx in timeAscendingBars.indices) {
             val bar = timeAscendingBars[idx]
             for (segment in bar.segments) {
                 val colorLabel = ColorLabel(segment.color, segment.label)
-                var xySeries = colorLabelsToXYSeries[colorLabel]
-                if (xySeries == null) {
-                    xySeries = blankXYSeries(bars.size, segment.label ?: "")
-                    colorLabelsToXYSeries[colorLabel] = xySeries
+                val values = valuesByColorLabel.getOrPut(colorLabel) {
+                    MutableList(bars.size) { 0.0 }
                 }
-                xySeries.setY(segment.value, idx)
+                values[idx] = segment.value
             }
         }
 
-        return colorLabelsToXYSeries.entries.mapIndexed { idx, (colorLabel, series) ->
-            TimeBarSegmentSeries(
-                segmentSeries = series,
+        return valuesByColorLabel.entries.mapIndexed { idx, (colorLabel, values) ->
+            BarChartSeries(
+                label = colorLabel.label ?: "",
+                values = values,
                 color = (colorLabel.color ?: indexColorSpec(idx)).toColorSpec(),
             )
         }

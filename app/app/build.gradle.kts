@@ -196,6 +196,7 @@ dependencies {
 
     //Graph drawing
     implementation(libs.androidplot.core)
+    implementation(libs.vico.compose.m3)
 
     //Work manager
     implementation(libs.hilt.work)

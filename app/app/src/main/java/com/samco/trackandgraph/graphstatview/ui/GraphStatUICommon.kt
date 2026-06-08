@@ -37,8 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.androidplot.Plot
 import com.androidplot.ui.Anchor
@@ -48,6 +50,8 @@ import com.androidplot.xy.BoundaryMode
 import com.androidplot.xy.StepMode
 import com.androidplot.xy.XYGraphWidget
 import com.androidplot.xy.XYPlot
+import com.patrykandpatrick.vico.compose.common.ProvideVicoTheme
+import com.patrykandpatrick.vico.compose.m3.common.rememberM3VicoTheme
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
@@ -61,6 +65,18 @@ import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
 import kotlin.math.roundToLong
+
+private const val GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER = 0.8f
+private const val GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER = 0.9f
+
+@Composable
+fun ProvideGraphVicoTheme(content: @Composable () -> Unit) {
+    val theme = rememberM3VicoTheme(
+        lineColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        textColor = MaterialTheme.colorScheme.onSurface,
+    )
+    ProvideVicoTheme(theme, content)
+}
 
 fun xyPlotSetup(
     xyPlot: XYPlot,
@@ -146,12 +162,30 @@ fun setGraphHeight(
     hasLegend: Boolean,
 ) {
     if (graphViewMode is GraphViewMode.FullScreenMode) {
-        val multiplier = if (hasLegend) 0.8 else 0.9
+        val multiplier = graphHeightMultiplier(hasLegend)
         graphView.layoutParams.height = (graphViewMode.availableHeight * multiplier).toInt()
     } else {
         graphView.layoutParams.height = graphView.context.resources.getDimensionPixelSize(R.dimen.graph_height)
     }
 }
+
+@Composable
+fun graphHeightFor(
+    graphViewMode: GraphViewMode,
+    hasLegend: Boolean,
+): Dp = when (graphViewMode) {
+    GraphViewMode.ListMode -> dimensionResource(R.dimen.graph_height)
+    is GraphViewMode.FullScreenMode -> with(LocalDensity.current) {
+        (graphViewMode.availableHeight * graphHeightMultiplier(hasLegend)).toDp()
+    }
+}
+
+private fun graphHeightMultiplier(hasLegend: Boolean) =
+    if (hasLegend) {
+        GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER
+    } else {
+        GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER
+    }
 
 @Composable
 fun GraphErrorView(
@@ -191,7 +225,7 @@ fun getColorInt(
 
 fun getColor(colorSpec: ColorSpec) = Color(getColorInt(colorSpec))
 
-private val graphLegendCircleSize = 20.dp
+internal val graphLegendCircleSize = 20.dp
 private val graphLegendTextStyle @Composable get() = MaterialTheme.typography.bodyMedium
 
 @Composable

@@ -16,9 +16,6 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.androidplot.util.SeriesUtils
-import com.androidplot.xy.RectRegion
-import com.androidplot.xy.SimpleXYSeries
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
@@ -35,7 +32,7 @@ import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayInterv
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
+import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -67,9 +64,10 @@ class BarChartDataFactory @Inject constructor(
 
         @VisibleForTesting
         data class BarData(
-            val segmentSeries: List<TimeBarSegmentSeries>,
+            val series: List<BarChartSeries>,
             val dates: List<ZonedDateTime>,
-            val bounds: RectRegion
+            val yMin: Double,
+            val yMax: Double,
         )
 
         private fun BarChartBarPeriod.asTemporalAmount(): TemporalAmount = when (this) {
@@ -85,19 +83,19 @@ class BarChartDataFactory @Inject constructor(
         /**
          * Calculates the bar data for a bar chart. The output is:
          *
-         * - A list of SimpleXYSeries. Each SimpleXYSeries represents all the bars for a given label.
+         * - A list of series. Each series represents all the bars for a given label.
          *  the series are sorted by the sum of their values, in descending order.
          *
          * - A list of ZonedDateTimes. Each ZonedDateTime represents the end of a bar. The dates
          *  should ascend in order spaced by barSize. The list of bars and dates should always be the
          *  same size.
          *
-         * - A RectRegion representing the bounds of the data. The x bounds will be 0 to the number of
-         * bars. The y bounds will be 0 to the max stacked value of any bar or [yTo] if [yRangeType] is [YRangeType.FIXED].
+         * - The y bounds, from 0 to the max stacked value of any bar, or [yTo] if [yRangeType]
+         * is [YRangeType.FIXED].
          *
          * There should be one bar per [barSize] between [endTime] and [endTime] - [sampleSize].
          *
-         * All values in every SimpleXYSeries will be multiplied by [scale]. If you use [sumByCount],
+         * All values in every series will be multiplied by [scale]. If you use [sumByCount],
          * the value multiplied will be the number of data points for a bar rather than the sum of
          * their values.
          */
@@ -189,23 +187,17 @@ class BarChartDataFactory @Inject constructor(
                 .toList()
                 .sortedByDescending { (_, value) -> value }
 
-            val bars = barValuesByLabel
+            val series = barValuesByLabel
                 .map { (label, values) ->
-                    //Reverse the order because the values are added from newest to
-                    // oldest but should be displayed from oldest to newest
-                    SimpleXYSeries(
-                        values.asReversed(),
-                        SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,
-                        label
-                    )
+                    label to values.asReversed()
                 }
                 //Sort the layers from largest to smallest so the label with the largest total of
                 // values is on the bottom
-                .sortedBy { series -> barSumsByLabel.indexOfFirst { it.first == series.title } }
-                .mapIndexed { i, series ->
+                .sortedBy { (label) -> barSumsByLabel.indexOfFirst { it.first == label } }
+                .mapIndexed { i, (label, values) ->
                     val color =
                         ColorSpec.ColorIndex((i * dataVisColorGenerator) % dataVisColorList.size)
-                    TimeBarSegmentSeries(series, color)
+                    BarChartSeries(label, values, color)
                 }
 
             // reverse the order because the values are added from newest to
@@ -219,14 +211,8 @@ class BarChartDataFactory @Inject constructor(
             //If maxY is 0, we want to show a range of 0 to 1
             val maxYForRange = if (abs(maxY) < 0.0000001) 1.0 else maxY
 
-            val xRegion = SeriesUtils.minMax(listOf(-0.5, (barDates.size - 1) + 0.5))
-            val yRegion = SeriesUtils.minMax(
-                if (yRangeType == YRangeType.FIXED) listOf(0.0, yTo)
-                else listOf(0.0, maxYForRange)
-            )
-            val bounds = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
-
-            return BarData(bars, dates, bounds)
+            val yMax = if (yRangeType == YRangeType.FIXED) yTo else maxYForRange
+            return BarData(series, dates, 0.0, yMax)
         }
     }
 
@@ -242,9 +228,10 @@ class BarChartDataFactory @Inject constructor(
     }
 
     private data class BarDataWithYAxisParams(
-        val bars: List<TimeBarSegmentSeries>,
+        val bars: List<BarChartSeries>,
         val dates: List<ZonedDateTime>,
-        val bounds: RectRegion,
+        val yMin: Double,
+        val yMax: Double,
         val yAxisSubdivides: Int,
     )
 
@@ -270,19 +257,21 @@ class BarChartDataFactory @Inject constructor(
         )
 
         val yAxisParameters = dataDisplayIntervalHelper.getYParameters(
-            barData.bounds.minY.toDouble(),
-            barData.bounds.maxY.toDouble(),
+            barData.yMin,
+            barData.yMax,
             dataSample.dataSampleProperties.isDuration,
             config.yRangeType == YRangeType.FIXED
         )
 
-        barData.bounds.union(0, yAxisParameters.boundsMin)
-        barData.bounds.union(0, yAxisParameters.boundsMax)
-
         return BarDataWithYAxisParams(
-            bars = barData.segmentSeries,
+            bars = barData.series,
             dates = barData.dates,
-            bounds = barData.bounds,
+            yMin = yAxisParameters.boundsMin,
+            yMax = if (config.yRangeType == YRangeType.FIXED) {
+                barData.yMax
+            } else {
+                yAxisParameters.boundsMax
+            },
             yAxisSubdivides = yAxisParameters.subdivides,
         )
     }
@@ -322,7 +311,8 @@ class BarChartDataFactory @Inject constructor(
                 override val bars = barData.bars
                 override val durationBasedRange = dataSample.dataSampleProperties.isDuration
                 override val endTime = endTime ?: barData.dates.last()
-                override val bounds = barData.bounds
+                override val yMin = barData.yMin
+                override val yMax = barData.yMax
                 override val yAxisSubdivides = barData.yAxisSubdivides
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
