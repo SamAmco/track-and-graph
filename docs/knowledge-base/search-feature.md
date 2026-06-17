@@ -39,9 +39,9 @@ The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<Resolve
 - Empty filtered results show the existing `no_results` message, while genuinely empty history keeps the normal empty-history message.
 - On feature history, search is only available outside multi-select mode. While search is open, long-press multi-select entry is suppressed so the top bar cannot enter both modes at once.
 
-Feature history searches the displayed value, label, and note. The displayed value should come from the same formatting used by the card/dialog (`DataPoint.getDisplayValue(isDuration)`) so duration values and labels match what the user sees. Feature history also adds decimal-separator variants of the displayed value (`.` and `,`) so users can find numeric values regardless of regional decimal notation.
+Feature history searches the displayed date/time text, displayed value, label, and note. The displayed value should come from the same formatting used by the card/dialog (`DataPoint.getDisplayValue(isDuration)`) so duration values and labels match what the user sees. Feature history also adds decimal-separator variants of the displayed value (`.` and `,`) so users can find numeric values regardless of regional decimal notation.
 
-Notes search must respect the global-note/data-point-note toggles before applying the query filter. It searches note text, feature name, and feature path.
+Notes search must respect the global-note/data-point-note toggles before applying the query filter. It searches displayed date/time text, note text, feature name, and feature path.
 
 Because the result order is chronological and no score is displayed, use case-insensitive substring matching (`target.contains(query, ignoreCase = true)`) rather than fuzzy subsequence matching. Fuzzy matching works well when weak matches can be pushed down by relevance ranking; in chronological filters, weak fuzzy matches stay in date order and tend to add noise.
 

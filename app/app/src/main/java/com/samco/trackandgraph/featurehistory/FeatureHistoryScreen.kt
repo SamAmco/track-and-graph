@@ -58,7 +58,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -72,8 +71,6 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.data.lua.dto.LuaEngineDisabledException
-import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
-import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -410,7 +407,6 @@ private fun FeatureHistoryView(
     showTrackFab: Boolean = false,
     isSearchResult: Boolean = false,
     errorMessage: String? = null,
-    offsetDiffHours: Int? = null,
     onDataPointClick: (DataPointInfo) -> Unit = {},
     onDataPointLongPress: (DataPointInfo) -> Unit = {},
     onDataPointSelected: (DataPointInfo, Boolean) -> Unit = { _, _ -> },
@@ -446,7 +442,6 @@ private fun FeatureHistoryView(
                     isTracker = isTracker,
                     isMultiSelectMode = isMultiSelectMode,
                     selectedDataPoints = selectedDataPoints,
-                    offsetDiffHours = offsetDiffHours,
                     onDataPointClick = onDataPointClick,
                     onDataPointLongPress = onDataPointLongPress,
                     onDataPointSelected = onDataPointSelected,
@@ -539,15 +534,12 @@ private fun DataPointList(
     isTracker: Boolean,
     isMultiSelectMode: Boolean,
     selectedDataPoints: Set<DataPointInfo>,
-    offsetDiffHours: Int?,
     onDataPointClick: (DataPointInfo) -> Unit,
     onDataPointLongPress: (DataPointInfo) -> Unit,
     onDataPointSelected: (DataPointInfo, Boolean) -> Unit,
     onEditClick: (DataPointInfo) -> Unit,
     onDeleteClick: (DataPointInfo) -> Unit
 ) {
-    val weekdayNames = getWeekDayNames(LocalContext.current)
-
     DateScrollLazyColumn(
         modifier = Modifier.padding(cardMarginSmall),
         contentPadding = WindowInsets.safeDrawing
@@ -557,12 +549,10 @@ private fun DataPointList(
     ) { dataPoint ->
         DataPointCard(
             dataPoint = dataPoint,
-            weekdayNames = weekdayNames,
             isDuration = isDuration,
             isTracker = isTracker,
             isMultiSelectMode = isMultiSelectMode,
             isSelected = dataPoint in selectedDataPoints,
-            offsetDiffHours = offsetDiffHours,
             onClick = { onDataPointClick(dataPoint) },
             onLongClick = { onDataPointLongPress(dataPoint) },
             onSelectedChange = { selected -> onDataPointSelected(dataPoint, selected) },
@@ -577,12 +567,10 @@ private fun DataPointList(
 @Composable
 private fun DataPointCard(
     dataPoint: DataPointInfo,
-    weekdayNames: List<String>,
     isDuration: Boolean,
     isTracker: Boolean,
     isMultiSelectMode: Boolean,
     isSelected: Boolean,
-    offsetDiffHours: Int?,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onSelectedChange: (Boolean) -> Unit,
@@ -612,12 +600,7 @@ private fun DataPointCard(
         modifier = Modifier.padding(cardMarginSmall)
     ) {
         Text(
-            text = formatDayMonthYearHourMinuteWeekDayTwoLines(
-                LocalContext.current,
-                weekdayNames,
-                dataPoint.date,
-                offsetDiffHours
-            ),
+            text = dataPoint.displayDateTime,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -681,28 +664,32 @@ private val sampleDataPoints = listOf(
         featureId = 1L,
         value = 75.5,
         label = "Morning",
-        note = "Feeling good today"
+        note = "Feeling good today",
+        displayDateTime = "15/01/24 (Mon)\n10:30",
     ),
     DataPointInfo(
         date = OffsetDateTime.parse("2024-01-14T18:45:00Z"),
         featureId = 1L,
         value = 82.0,
         label = "Evening",
-        note = ""
+        note = "",
+        displayDateTime = "14/01/24 (Sun)\n18:45",
     ),
     DataPointInfo(
         date = OffsetDateTime.parse("2024-01-13T09:00:00Z"),
         featureId = 1L,
         value = 70.0,
         label = "",
-        note = "After workout"
+        note = "After workout",
+        displayDateTime = "13/01/24 (Sat)\n09:00",
     ),
     DataPointInfo(
         date = OffsetDateTime.parse("2024-01-12T14:20:00Z"),
         featureId = 1L,
         value = 78.5,
         label = "Afternoon",
-        note = ""
+        note = "",
+        displayDateTime = "12/01/24 (Fri)\n14:20",
     ),
 )
 
@@ -716,8 +703,7 @@ private val sampleDateScrollData = DateScrollData(
 private fun TrackerHistoryPreview() {
     FeatureHistoryView(
         dateScrollData = sampleDateScrollData,
-        showTrackFab = true,
-        offsetDiffHours = 0
+        showTrackFab = true
     )
 }
 
@@ -727,8 +713,7 @@ private fun TrackerHistoryMultiSelectPreview() {
     FeatureHistoryView(
         dateScrollData = sampleDateScrollData,
         isMultiSelectMode = true,
-        selectedDataPoints = setOf(sampleDataPoints[0], sampleDataPoints[2]),
-        offsetDiffHours = 0
+        selectedDataPoints = setOf(sampleDataPoints[0], sampleDataPoints[2])
     )
 }
 
@@ -737,8 +722,7 @@ private fun TrackerHistoryMultiSelectPreview() {
 private fun FunctionHistoryPreview() {
     FeatureHistoryView(
         dateScrollData = sampleDateScrollData,
-        isTracker = false,
-        offsetDiffHours = 0
+        isTracker = false
     )
 }
 
@@ -749,8 +733,7 @@ private fun EmptyHistoryPreview() {
         dateScrollData = DateScrollData(
             dateDisplayResolution = DateDisplayResolution.MONTH_DAY,
             items = emptyList()
-        ),
-        offsetDiffHours = 0
+        )
     )
 }
 

@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.notes
 
+import android.content.Context
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
@@ -27,11 +28,14 @@ import com.samco.trackandgraph.data.database.dto.DisplayNote
 import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
+import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.storage.PrefsPersistenceProvider
 import com.samco.trackandgraph.ui.ui.Datable
 import com.samco.trackandgraph.ui.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.ui.DateScrollData
 import com.samco.trackandgraph.util.FeaturePathProvider
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,16 +60,19 @@ data class NoteInfo(
     val featureId: Long?,
     val featureName: String?,
     val featurePath: String,
-    val note: String
+    val note: String,
+    val displayDateTime: String,
 ) : Datable
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NotesViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val dataInteractor: DataInteractor,
     prefsPersistenceProvider: PrefsPersistenceProvider,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
+    private val weekDayNames = getWeekDayNames(context)
     private val _selectedNoteForDialog = MutableStateFlow<NoteInfo?>(null)
     val selectedNoteForDialog: StateFlow<NoteInfo?> = _selectedNoteForDialog.asStateFlow()
 
@@ -174,13 +181,15 @@ class NotesViewModel @Inject constructor(
             ?.let { featurePathProvider.getPathForFeature(it) }
             ?: featureName
             ?: "",
-        note = note
+        note = note,
+        displayDateTime = formatDayMonthYearHourMinuteWeekDayOneLine(context, weekDayNames, timestamp),
     )
 
     private fun NoteInfo.matchesSearchQuery(query: String): Boolean =
         searchTargets().any { it.contains(query, ignoreCase = true) }
 
     private fun NoteInfo.searchTargets(): List<String> = listOfNotNull(
+        displayDateTime,
         note,
         featureName,
         featurePath,

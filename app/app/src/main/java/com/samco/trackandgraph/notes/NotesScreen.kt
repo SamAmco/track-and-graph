@@ -74,7 +74,6 @@ import com.samco.trackandgraph.ui.ui.DataPointNoteDescriptionDialog
 import com.samco.trackandgraph.ui.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.ui.DateScrollData
 import com.samco.trackandgraph.ui.ui.DateScrollLazyColumn
-import com.samco.trackandgraph.ui.ui.DayMonthYearHourMinuteWeekDayOneLineText
 import com.samco.trackandgraph.ui.ui.EmptyScreenText
 import com.samco.trackandgraph.ui.ui.GlobalNoteDescriptionDialog
 import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
@@ -396,8 +395,8 @@ private fun Note(
                 .fillMaxSize()
                 .padding(cardPadding)
         ) {
-            DayMonthYearHourMinuteWeekDayOneLineText(
-                dateTime = noteInfo.date,
+            Text(
+                text = noteInfo.displayDateTime,
                 style = MaterialTheme.typography.titleSmall,
             )
             HalfDialogInputSpacing()
@@ -429,6 +428,7 @@ private fun NotesViewPreview() {
             featureId = null,
             featureName = null,
             trackerId = null,
+            displayDateTime = "01/01/23 (Sun)  10:00",
         ),
         NoteInfo(
             date = OffsetDateTime.parse("2023-01-02T12:30:00Z"),
@@ -437,6 +437,7 @@ private fun NotesViewPreview() {
             trackerId = 1,
             featureId = 2,
             featureName = "Systolic",
+            displayDateTime = "02/01/23 (Mon)  12:30",
         ),
         NoteInfo(
             date = OffsetDateTime.parse("2023-01-02T18:45:00Z"),
@@ -445,6 +446,7 @@ private fun NotesViewPreview() {
             trackerId = 2,
             featureId = null,
             featureName = null,
+            displayDateTime = "02/01/23 (Mon)  18:45",
         ),
     )
 

@@ -18,6 +18,7 @@
 
 package com.samco.trackandgraph.featurehistory
 
+import android.content.Context
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
@@ -33,10 +34,13 @@ import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.sampling.RawDataSample
+import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.helpers.getDisplayValue
+import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.ui.Datable
 import com.samco.trackandgraph.ui.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.ui.DateScrollData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
@@ -65,6 +69,7 @@ data class DataPointInfo(
     val value: Double,
     val label: String,
     val note: String,
+    val displayDateTime: String,
 ) : Datable {
     fun toDataPoint() = DataPoint(
         timestamp = date,
@@ -125,12 +130,14 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
 
 @HiltViewModel
 class FeatureHistoryViewModelImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val dataInteractor: DataInteractor,
     private val dataSampler: DataSampler,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : UpdateDialogViewModelImpl(),
     FeatureHistoryViewModel {
+    private val weekDayNames = getWeekDayNames(context)
     private val featureIdFlow = MutableSharedFlow<Long>(replay = 1, extraBufferCapacity = 1)
 
     private val _isSearchVisible = MutableStateFlow(false)
@@ -423,16 +430,17 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         value = dp.value,
         label = dp.label,
         note = dp.note,
+        displayDateTime = formatDayMonthYearHourMinuteWeekDayTwoLines(context, weekDayNames, dp.timestamp),
     )
 
     private fun DataPointInfo.matchesSearchQuery(query: String, isDuration: Boolean): Boolean {
-        val dataPoint = toDataPoint()
-        return searchTargets(dataPoint, isDuration).any { it.contains(query, ignoreCase = true) }
+        return searchTargets(this, isDuration).any { it.contains(query, ignoreCase = true) }
     }
 
-    private fun searchTargets(dataPoint: DataPoint, isDuration: Boolean): List<String> {
-        val displayValue = dataPoint.getDisplayValue(isDuration)
+    private fun searchTargets(dataPoint: DataPointInfo, isDuration: Boolean): List<String> {
+        val displayValue = dataPoint.toDataPoint().getDisplayValue(isDuration)
         return buildList {
+            add(dataPoint.displayDateTime)
             add(displayValue)
             addAll(decimalSeparatorVariants(displayValue))
             add(dataPoint.label)
