@@ -59,6 +59,16 @@ class FuzzyMatcherTest {
         assertNotNull(score("ABC", "abc"))
     }
 
+    @Test
+    fun `case insensitive matching handles unicode lowercase expansion`() {
+        assertNotNull(score("i", "İ"))
+    }
+
+    @Test
+    fun `unicode lowercase expansion does not desynchronise word boundary indexes`() {
+        assertNotNull(score("x", "İİİx"))
+    }
+
     // ── Ranking: exact > prefix > consecutive > boundary > scattered ──────────
 
     @Test

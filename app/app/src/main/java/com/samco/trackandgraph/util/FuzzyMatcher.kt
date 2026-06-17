@@ -52,10 +52,10 @@ object FuzzyMatcher {
         if (query.isEmpty()) return 0.0
         if (target.isEmpty()) return null
 
-        val queryLow = query.lowercase()
-        val targetLow = target.lowercase()
-        val tLen = targetLow.length
-        val qLen = queryLow.length
+        val queryChars = query.map { it.lowercaseChar() }
+        val targetChars = target.map { it.lowercaseChar() }
+        val tLen = targetChars.size
+        val qLen = queryChars.size
 
         if (qLen > tLen) return null
 
@@ -65,7 +65,7 @@ object FuzzyMatcher {
 
         // Base case: first query character
         for (i in 0 until tLen) {
-            if (targetLow[i] != queryLow[0]) continue
+            if (targetChars[i] != queryChars[0]) continue
             var score = SCORE_CHAR_MATCH
             if (i == 0) score += BONUS_PREFIX
             if (isWordBoundary(target, i)) score += BONUS_WORD_BOUNDARY
@@ -76,7 +76,7 @@ object FuzzyMatcher {
         for (j in 1 until qLen) {
             // i must be at least j so there is room for j characters before it
             for (i in j until tLen) {
-                if (targetLow[i] != queryLow[j]) continue
+                if (targetChars[i] != queryChars[j]) continue
 
                 var charScore = SCORE_CHAR_MATCH
                 if (isWordBoundary(target, i)) charScore += BONUS_WORD_BOUNDARY
@@ -103,7 +103,7 @@ object FuzzyMatcher {
         if (best == negInf) return null
 
         // Post-alignment bonuses
-        if (targetLow.trim() == queryLow.trim()) best += BONUS_EXACT_MATCH
+        if (target.trim().equals(query.trim(), ignoreCase = true)) best += BONUS_EXACT_MATCH
         if (target.contains(query)) best += BONUS_CASE_EXACT
 
         return best
