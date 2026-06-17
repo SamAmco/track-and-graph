@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../tracking/">
+        <link rel="prev" href="../import-export/">
       
       
-        <link rel="next" href="../app-lock/">
+        <link rel="next" href="../graphs/line/">
       
       
       <link rel="icon" href="../../img/logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Importing and exporting - Track & Graph</title>
+        <title>App Lock - Track & Graph</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#importing-and-exporting" class="md-skip">
+        <a href="#app-lock" class="md-skip">
           Skip to content
         </a>
       
@@ -109,7 +109,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Importing and exporting
+              App Lock
             
           </span>
         </div>
@@ -284,6 +284,28 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../import-export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Importing and exporting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -296,79 +318,7 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Importing and exporting
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  <span class="md-ellipsis">
-    Importing and exporting
-    
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#csv-import-export" class="md-nav__link">
-    <span class="md-ellipsis">
-      CSV Import &amp; Export
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#backup-restore" class="md-nav__link">
-    <span class="md-ellipsis">
-      Backup &amp; Restore
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../app-lock/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -378,6 +328,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -827,32 +778,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#csv-import-export" class="md-nav__link">
-    <span class="md-ellipsis">
-      CSV Import &amp; Export
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#backup-restore" class="md-nav__link">
-    <span class="md-ellipsis">
-      Backup &amp; Restore
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -867,18 +792,18 @@
 
 
 
-<h1 id="importing-and-exporting">Importing and exporting<a class="headerlink" href="#importing-and-exporting" title="Permanent link">#</a></h1>
-<h3 id="csv-import-export">CSV Import &amp; Export<a class="headerlink" href="#csv-import-export" title="Permanent link">#</a></h3>
-<p>To import/export only the tracked data in a group to a CSV use the menu buttons at the top:</p>
-<p><img alt="&quot;faq_2_1&quot;" src="../images/faq_2_1.png" width="300" /></p>
-<p><img alt="&quot;faq_2_2&quot;" src="../images/faq_2_2.png" /></p>
-<p>Use this button to import a csv into this group.</p>
-<p><img alt="&quot;faq_2_3&quot;" src="../images/faq_2_3.png" /></p>
-<p>Use this button to export this groups tracked data to a csv.</p>
-<h3 id="backup-restore">Backup &amp; Restore<a class="headerlink" href="#backup-restore" title="Permanent link">#</a></h3>
-<p>The Backup &amp; Restore option in the menu is slightly different. This will export and restore the entire database file containing all tracked data, graphs, reminders and notes. </p>
-<p><strong>It is recommended that you backup your data regularly or configure the auto-backup option.</strong></p>
-<p>The backup file is an un-encrypted Sqlite3 database file which can also be opened and modified using freely available software. However this is not recommended for non-technical users as you could break the integrity of the database.</p>
+<h1 id="app-lock">App Lock<a class="headerlink" href="#app-lock" title="Permanent link">#</a></h1>
+<p>App lock is a privacy barrier for casual access to Track &amp; Graph when someone already has your unlocked device.</p>
+<p>It can require your Track &amp; Graph password when the app is opened after being in the background, after the app process is killed, or after the device is locked. If your device supports strong biometric authentication, you can also enable biometric unlock.</p>
+<p>App lock does not encrypt your data. In particular, it does not:</p>
+<ul>
+<li>Encrypt your database, backups, or Android cloud backup.</li>
+<li>Prevent access to widgets.</li>
+<li>Hide reminder notifications.</li>
+<li>Prevent Track &amp; Graph from being uninstalled.</li>
+</ul>
+<p>There is no password recovery mechanism. If you forget your app lock password and cannot unlock with biometrics, the only recovery route is to uninstall Track &amp; Graph, reinstall it, and restore your data from a backup.</p>
+<p>Use app lock when you want to reduce casual snooping in the app UI. Continue to protect your device account, device lock screen, cloud account, and backups as the real security boundary for your data.</p>
 
 
 
