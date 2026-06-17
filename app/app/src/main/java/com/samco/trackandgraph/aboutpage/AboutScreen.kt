@@ -154,6 +154,7 @@ fun LibraryTable() = Row {
 fun LibraryNames() = Column {
     val libraries = listOf(
         R.string.androidplot,
+        R.string.vico,
         R.string.apache_commons_csv,
         R.string.three_ten_android_backport,
         R.string.timber,
@@ -175,6 +176,7 @@ fun LibraryVersions() = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
 ) {
     val versions = listOf(
+        R.string.apache_2_0,
         R.string.apache_2_0,
         R.string.apache_2_0,
         R.string.apache_2_0,

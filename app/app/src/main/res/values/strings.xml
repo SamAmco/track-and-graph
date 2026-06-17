@@ -178,6 +178,7 @@
     <string name="about_description"><![CDATA[Track & Graph is free and open source software under the GPL 3.0 License.]]></string>
     <string name="about_libraries_message">The following open source libraries were used:</string>
     <string name="androidplot" translatable="false">Androidplot</string>
+    <string name="vico" translatable="false">Vico</string>
     <string name="apache_2_0" translatable="false">Apache 2.0</string>
     <string name="apache_commons_csv" translatable="false">Apache Commons CSV</string>
     <string name="three_ten_android_backport" translatable="false">Three Ten Android Backport</string>
