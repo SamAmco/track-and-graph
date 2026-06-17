@@ -1,0 +1,9 @@
+La version 10.2.0 ajoute le verrouillage de l’application pour protéger Track & Graph avec un écran de verrouillage quand une autre personne a accès à votre appareil.
+
+Nouveautés :
+- Activer ou désactiver les rappels sans les supprimer
+- Meilleur zoom et surbrillance des graphiques à barres
+- Animations plus fluides des notes et points de données
+- Retour haptique à l’ajout de points
+- Recherche par dates et heures
+- Correction d’un plantage de recherche Unicode

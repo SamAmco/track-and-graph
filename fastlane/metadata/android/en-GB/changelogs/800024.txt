@@ -1,0 +1,9 @@
+Version 10.2.0 adds App Lock, so you can protect Track & Graph with a lock screen when someone else has access to your device.
+
+Also new:
+- Enable or disable reminders without deleting them
+- Better bar chart zooming and highlighting
+- Smoother note and data point row animations
+- Haptic feedback when adding data points
+- Search now matches dates and times
+- Fixed a Unicode fuzzy-search crash

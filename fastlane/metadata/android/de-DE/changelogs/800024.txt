@@ -1,0 +1,9 @@
+Version 10.2.0 fügt die App-Sperre hinzu. So kannst du Track & Graph mit einem Sperrbildschirm schützen, wenn jemand anderes Zugriff auf dein Gerät hat.
+
+Außerdem neu:
+- Erinnerungen aktivieren oder deaktivieren, ohne sie zu löschen
+- Besseres Zoomen und Hervorheben in Balkendiagrammen
+- Flüssigere Animationen für Notizen und Datenpunkte
+- Haptisches Feedback beim Hinzufügen von Punkten
+- Suche findet Datums- und Zeitangaben
+- Unicode-Absturz in der unscharfen Suche behoben

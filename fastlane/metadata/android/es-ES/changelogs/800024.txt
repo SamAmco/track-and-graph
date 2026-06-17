@@ -1,0 +1,9 @@
+La versión 10.2.0 añade bloqueo de la app para proteger Track & Graph con una pantalla de bloqueo cuando otra persona tenga acceso a tu dispositivo.
+
+También incluye:
+- Activar o desactivar recordatorios sin eliminarlos
+- Mejor zoom y resaltado en gráficos de barras
+- Animaciones más fluidas en notas y puntos de datos
+- Respuesta háptica al añadir puntos
+- La búsqueda encuentra fechas y horas
+- Corrección de un fallo en búsqueda Unicode
