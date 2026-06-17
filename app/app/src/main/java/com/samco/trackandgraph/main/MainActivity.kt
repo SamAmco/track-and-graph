@@ -178,7 +178,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (!isChangingConfigurations && keyguardManager.isKeyguardLocked) {
+        if (isChangingConfigurations) return
+
+        if (keyguardManager.isKeyguardLocked) {
             appLockSession.lock()
         } else {
             appLockSession.onAppBackgrounded()
