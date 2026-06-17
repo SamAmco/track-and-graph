@@ -26,6 +26,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -118,17 +120,42 @@ fun <T : Datable> DateScrollLazyColumn(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     data: DateScrollData<T>,
     topContent: (@Composable LazyItemScope.() -> Unit)? = null,
+    itemKey: ((item: T) -> Any)? = null,
+    animateItems: Boolean = false,
+    scrollToTopRequest: Any? = null,
     content: @Composable LazyItemScope.(item: T) -> Unit
 ) = Box(modifier = modifier) {
     val scrollState = rememberLazyListState()
     val topItemCount = if (topContent == null) 0 else 1
+    var lastHandledScrollToTopRequest by remember { mutableStateOf<Any?>(null) }
 
     LazyColumn(
         contentPadding = contentPadding,
         state = scrollState
     ) {
         topContent?.let { item { it() } }
-        items(data.items) { content(it) }
+        items(
+            items = data.items,
+            key = itemKey,
+        ) { item ->
+            Column(
+                modifier = if (animateItems) {
+                    Modifier.animateItem(fadeInSpec = null)
+                } else {
+                    Modifier
+                }
+            ) {
+                content(item)
+            }
+        }
+    }
+
+    LaunchedEffect(scrollToTopRequest) {
+        if (scrollToTopRequest != null && scrollToTopRequest != lastHandledScrollToTopRequest) {
+            withFrameNanos { }
+            scrollState.animateScrollToItem(topItemCount)
+            lastHandledScrollToTopRequest = scrollToTopRequest
+        }
     }
 
     val minItemsMet = remember(data.items) { data.items.size >= 50 }

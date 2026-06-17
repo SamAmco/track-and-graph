@@ -51,6 +51,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -113,6 +114,13 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
 
     // Local state for FAB visibility based on scroll behavior
     val showFab = remember { mutableStateOf(true) }
+    val scrollToTopRequest = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(addDataPointsDialogViewModel) {
+        addDataPointsDialogViewModel.dataPointAddedEvent.collect {
+            scrollToTopRequest.intValue++
+        }
+    }
 
     // Collect all state from ViewModel
     val dateScrollData by viewModel.dateScrollData.collectAsStateWithLifecycle()
@@ -166,6 +174,7 @@ fun FeatureHistoryScreen(navArgs: FeatureHistoryNavKey) {
         isTracker = isTracker,
         isMultiSelectMode = isMultiSelectMode,
         selectedDataPoints = selectedDataPoints,
+        scrollToTopRequest = scrollToTopRequest.intValue.takeIf { it > 0 },
         showTrackFab = showFab.value && isTracker && !isMultiSelectMode && !isSearchVisible,
         isSearchResult = hasActiveSearchQuery,
         errorMessage = when {
@@ -404,6 +413,7 @@ private fun FeatureHistoryView(
     isTracker: Boolean = true,
     isMultiSelectMode: Boolean = false,
     selectedDataPoints: Set<DataPointInfo> = emptySet(),
+    scrollToTopRequest: Int? = null,
     showTrackFab: Boolean = false,
     isSearchResult: Boolean = false,
     errorMessage: String? = null,
@@ -442,6 +452,7 @@ private fun FeatureHistoryView(
                     isTracker = isTracker,
                     isMultiSelectMode = isMultiSelectMode,
                     selectedDataPoints = selectedDataPoints,
+                    scrollToTopRequest = scrollToTopRequest,
                     onDataPointClick = onDataPointClick,
                     onDataPointLongPress = onDataPointLongPress,
                     onDataPointSelected = onDataPointSelected,
@@ -534,6 +545,7 @@ private fun DataPointList(
     isTracker: Boolean,
     isMultiSelectMode: Boolean,
     selectedDataPoints: Set<DataPointInfo>,
+    scrollToTopRequest: Int?,
     onDataPointClick: (DataPointInfo) -> Unit,
     onDataPointLongPress: (DataPointInfo) -> Unit,
     onDataPointSelected: (DataPointInfo, Boolean) -> Unit,
@@ -545,7 +557,10 @@ private fun DataPointList(
         contentPadding = WindowInsets.safeDrawing
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
             .asPaddingValues(),
-        data = dateScrollData
+        data = dateScrollData,
+        itemKey = { dataPoint -> "${dataPoint.featureId}:${dataPoint.date}" },
+        animateItems = true,
+        scrollToTopRequest = scrollToTopRequest,
     ) { dataPoint ->
         DataPointCard(
             dataPoint = dataPoint,
