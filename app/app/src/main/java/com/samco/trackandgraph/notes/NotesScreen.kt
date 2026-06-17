@@ -292,7 +292,9 @@ private fun NotesList(
                 onToggleShowGlobalNotes = onToggleShowGlobalNotes,
                 onToggleShowDataPointNotes = onToggleShowDataPointNotes
             )
-        }
+        },
+        itemKey = { note -> "${note.trackerId ?: "global"}:${note.featureId}:${note.date}" },
+        animateItems = true,
     ) { note ->
         Note(
             noteInfo = note,
