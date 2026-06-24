@@ -1,15 +1,16 @@
 ---
-title: Compose UI patterns — ViewModel binding, pure UI, previews, and chip state
-description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, new screens and UI components include @Preview by default; reusable controls live in app/ui; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
+title: Compose UI patterns — ViewModel binding, pure UI, previews, spacing, and chip state
+description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, new screens and UI components include @Preview by default; reusable controls and spacing tokens live in app/ui; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
 topics:
   - ViewModel-binding layer collects state and calls the pure-UI composable
   - Pure-UI composable takes only state values and callbacks — no ViewModels
   - New screens and UI components should include @Preview functions by default
   - @Preview functions call the pure-UI composable with hardcoded data
   - Reuse shared app/ui controls before defining local Material wrappers
+  - Use shared spacing tokens/helpers before introducing hard-coded dimensions
   - Naming conventions for each layer
   - TextChip/TngChip selected styling versus pressed-state feedback
-keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, TextButton, SmallTextButton, RowCheckbox, Divider, spacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
+keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, TextButton, SmallTextButton, RowCheckbox, Divider, spacing, dimensions, hard-coded, dialogInputSpacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
 ---
 
 # Compose UI Patterns
@@ -25,6 +26,8 @@ When adding or migrating shared UI, add preview functions in the same file unles
 Previews are the default for new screens, dialogs, and UI components. Skip them only when there is a concrete blocker such as an AndroidView/runtime dependency that cannot reasonably be faked; otherwise split the UI so a pure composable can be previewed with hardcoded state.
 
 Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), text fields (`FullWidthTextField`, `PasswordTextField`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`). If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
+
+Before introducing a new hard-coded dimension in Compose UI, check the shared spacing and shape tokens in `app/ui`. For dialog/content gaps, prefer `dialogInputSpacing` or its helper composable over repeating the equivalent `.dp` value inline. Add a new named token only when the existing tokens do not describe the intended spacing.
 
 ## Three-Layer Composable Pattern
 

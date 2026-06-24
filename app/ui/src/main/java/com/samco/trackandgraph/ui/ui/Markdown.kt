@@ -16,6 +16,8 @@
  */
 package com.samco.trackandgraph.ui.ui
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,7 +26,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
+import com.mikepenz.markdown.compose.components.markdownComponents
+import com.mikepenz.markdown.compose.elements.MarkdownDivider
 import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.elements.MarkdownCheckBox
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -64,6 +69,18 @@ fun TnGMarkdown(
             ordered = MaterialTheme.typography.bodyMedium,
             bullet = MaterialTheme.typography.bodyMedium,
             list = MaterialTheme.typography.bodyMedium,
+        ),
+        components = markdownComponents(
+            horizontalRule = {
+                MarkdownDivider(
+                    modifier = Modifier
+                        .padding(vertical = dialogInputSpacing)
+                        .fillMaxWidth()
+                )
+            },
+            checkbox = {
+                MarkdownCheckBox(it.content, it.node, it.typography.text)
+            }
         )
     )
 }
@@ -83,6 +100,10 @@ private fun TnGMarkdownPreview() {
                 - Bullet point 1
                 - Bullet point 2
                 - Bullet point 3
+
+                ---
+
+                Text after a horizontal rule should have enough breathing room.
                 
                 ### Code Examples
                 
