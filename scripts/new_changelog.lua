@@ -107,27 +107,39 @@ local function ensure_dir(dir)
 	os.execute("mkdir -p " .. dir)
 end
 
+local jsonschema_cli = nil
+
 -- Check if jsonschema-cli is installed
 local function check_jsonschema_cli()
-    -- Run `command -v` to check if jsonschema-cli exists
-    local ok, _, code = os.execute("command -v jsonschema-cli >/dev/null 2>&1")
+	local handle = io.popen("command -v jsonschema-cli 2>/dev/null")
+	if handle then
+		jsonschema_cli = handle:read("*l")
+		handle:close()
+	end
 
-    -- Handle both Lua 5.1 and 5.2+ return styles
-    local success = (ok == true or ok == 0) and (code == nil or code == 0)
+	if not jsonschema_cli or jsonschema_cli == "" then
+		local cargo_bin = os.getenv("HOME") .. "/.cargo/bin/jsonschema-cli"
+		local file = io.open(cargo_bin, "r")
+		if file then
+			file:close()
+			jsonschema_cli = cargo_bin
+		end
+	end
 
-    if not success then
-        print("Error: jsonschema-cli is not installed")
-        print("Please install it with: cargo install jsonschema-cli")
-        os.exit(1)
-    end
+	if not jsonschema_cli or jsonschema_cli == "" then
+		print("Error: jsonschema-cli is not installed or is not on PATH")
+		print("Please install it with: cargo install jsonschema-cli")
+		print("If it is already installed, add ~/.cargo/bin to PATH")
+		os.exit(1)
+	end
 
-    print("✓ jsonschema-cli found")
+	print("✓ jsonschema-cli found: " .. jsonschema_cli)
 end
 
 -- Validate JSON file against schema
 local function validate_json_schema(json_file, schema_file)
 	print("\nValidating " .. json_file .. " against schema...")
-	local cmd = string.format("jsonschema-cli -i %s %s", json_file, schema_file)
+	local cmd = string.format("%s validate %s -i %s", jsonschema_cli, schema_file, json_file)
 	local ok, _, code = os.execute(cmd)
 
     -- Handle both Lua 5.1 and 5.2+ return styles
