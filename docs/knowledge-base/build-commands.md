@@ -4,13 +4,14 @@ description: Gradle commands for building and running tests; Compose screenshot-
 topics:
   - Build: cd app && ./gradlew assembleDebug
   - Test: cd app && ./gradlew :data:testDebugUnitTest
+  - Validation: make validate runs Lua checks, remote config checks, community tests, and Android release resource verification
   - build-logic convention plugins tng.android.application and tng.android.library
   - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
   - Screenshots: make playstore-record, make tutorial-record
   - Play Store screenshots: Compose screenshot test previews, no emulator, fake status bar
   - Tutorial screenshots: Compose screenshot test previews, no emulator
-keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, status-bar, showSystemUi]
+keywords: [build, gradle, test, validate, validate-all, verifyReleaseResources, changelog-viewer, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, status-bar, showSystemUi]
 ---
 
 # Build Commands
@@ -21,6 +22,22 @@ All commands run from `app/` directory (`gradlew` is at `app/gradlew`, not the p
 cd app && ./gradlew assembleDebug              # Build debug APK
 cd app && ./gradlew :data:testDebugUnitTest    # Run data unit tests
 ```
+
+## Validation
+
+Run repository validation from the project root:
+
+```bash
+make validate
+```
+
+`make validate` aliases `make validate-all`. Alongside Lua, remote-config, and community function checks, it runs:
+
+```bash
+cd app && ./gradlew :ui:verifyReleaseResources :changelog-viewer:assembleRelease
+```
+
+This catches standalone Android library release-resource failures, including invalid references from `app/ui` resources to attributes that are only defined by the main app theme.
 
 Use `--tests` to filter by fully qualified class name:
 ```bash

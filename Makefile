@@ -21,6 +21,10 @@ endif
 validate-remote-config:
 	@./scripts/validate-remote-config.sh
 
+.PHONY: android-validate-release-resources
+android-validate-release-resources:
+	cd app && ./gradlew :ui:verifyReleaseResources :changelog-viewer:assembleRelease
+
 .PHONY: run-community-tests
 run-community-tests: run-community-functions-tests run-community-graph-tests
 
@@ -76,8 +80,11 @@ lua-test-api:
 lua-test-tools:
 	cd lua && lua tools/test/test_all.lua
 
+.PHONY: validate
+validate: validate-all
+
 .PHONY: validate-all
-validate-all: lua-test-api validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
+validate-all: lua-test-api validate-remote-config android-validate-release-resources run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
 	@echo "All validations passed."
 
 .PHONY: assemble-release
