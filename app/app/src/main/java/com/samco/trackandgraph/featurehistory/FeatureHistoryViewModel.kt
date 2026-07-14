@@ -64,6 +64,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 data class DataPointInfo(
+    val duplicateKeyOrdinal: Int,
     override val date: OffsetDateTime,
     val featureId: Long,
     val value: Double,
@@ -169,8 +170,7 @@ class FeatureHistoryViewModelImpl @Inject constructor(
             try {
                 rawDataSample = dataSampler.getRawDataSampleForFeatureId(it)
                 val list = rawDataSample
-                    ?.map(::toDataPointInfo)
-                    ?.toList()
+                    ?.toDataPointInfoList()
                     ?: emptyList()
                 GetDataPointsResult.Success(list)
             } catch (e: Exception) {
@@ -424,7 +424,23 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         )
     }
 
-    private fun toDataPointInfo(dp: DataPoint) = DataPointInfo(
+    private data class DataPointDuplicateGroupKey(
+        val featureId: Long,
+        val date: OffsetDateTime,
+    )
+
+    private fun RawDataSample.toDataPointInfoList(): List<DataPointInfo> {
+        val duplicateGroupOccurrences = mutableMapOf<DataPointDuplicateGroupKey, Int>()
+        return mapTo(mutableListOf()) { dataPoint ->
+            val key = DataPointDuplicateGroupKey(dataPoint.featureId, dataPoint.timestamp)
+            val ordinal = duplicateGroupOccurrences.getOrDefault(key, 0)
+            duplicateGroupOccurrences[key] = ordinal + 1
+            toDataPointInfo(ordinal, dataPoint)
+        }
+    }
+
+    private fun toDataPointInfo(duplicateKeyOrdinal: Int, dp: DataPoint) = DataPointInfo(
+        duplicateKeyOrdinal = duplicateKeyOrdinal,
         date = dp.timestamp,
         featureId = dp.featureId,
         value = dp.value,

@@ -558,7 +558,9 @@ private fun DataPointList(
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
             .asPaddingValues(),
         data = dateScrollData,
-        itemKey = { dataPoint -> "${dataPoint.featureId}:${dataPoint.date}" },
+        itemKey = { dataPoint ->
+            "${dataPoint.featureId}:${dataPoint.date}:${dataPoint.duplicateKeyOrdinal}"
+        },
         animateItems = true,
         scrollToTopRequest = scrollToTopRequest,
     ) { dataPoint ->
@@ -675,6 +677,7 @@ private fun createNestedScrollConnection(showFab: MutableState<Boolean>): Nested
 
 private val sampleDataPoints = listOf(
     DataPointInfo(
+        duplicateKeyOrdinal = 0,
         date = OffsetDateTime.parse("2024-01-15T10:30:00Z"),
         featureId = 1L,
         value = 75.5,
@@ -683,6 +686,7 @@ private val sampleDataPoints = listOf(
         displayDateTime = "15/01/24 (Mon)\n10:30",
     ),
     DataPointInfo(
+        duplicateKeyOrdinal = 0,
         date = OffsetDateTime.parse("2024-01-14T18:45:00Z"),
         featureId = 1L,
         value = 82.0,
@@ -691,6 +695,7 @@ private val sampleDataPoints = listOf(
         displayDateTime = "14/01/24 (Sun)\n18:45",
     ),
     DataPointInfo(
+        duplicateKeyOrdinal = 0,
         date = OffsetDateTime.parse("2024-01-13T09:00:00Z"),
         featureId = 1L,
         value = 70.0,
@@ -699,6 +704,7 @@ private val sampleDataPoints = listOf(
         displayDateTime = "13/01/24 (Sat)\n09:00",
     ),
     DataPointInfo(
+        duplicateKeyOrdinal = 0,
         date = OffsetDateTime.parse("2024-01-12T14:20:00Z"),
         featureId = 1L,
         value = 78.5,
