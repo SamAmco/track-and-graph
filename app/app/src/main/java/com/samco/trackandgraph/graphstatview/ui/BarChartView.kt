@@ -185,8 +185,10 @@ private fun OffsetDateTime.toBarIndex(
     return index.takeIf { it in xDates.indices }
 }
 
-private fun doubleToString(value: Double, maxPlaces: Int = 3): String {
-    val scale = min(maxPlaces, value.toBigDecimal().scale())
+internal fun doubleToString(value: Double, maxPlaces: Int = 3): String {
+    if (!value.isFinite()) return value.toString()
+
+    val scale = value.toBigDecimal().scale().coerceIn(0, maxPlaces.coerceAtLeast(0))
     return String.format("%.${scale}f", value)
 }
 
