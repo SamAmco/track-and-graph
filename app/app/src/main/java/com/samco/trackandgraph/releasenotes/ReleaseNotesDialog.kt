@@ -16,36 +16,12 @@
  */
 package com.samco.trackandgraph.releasenotes
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.ui.ChangelogDialogContent
 import com.samco.trackandgraph.ui.ui.ChangelogReleaseNote
-import com.samco.trackandgraph.ui.ui.CustomDialog
-import com.samco.trackandgraph.ui.ui.SmallTextButton
-import com.samco.trackandgraph.ui.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.ui.resolve
 
 @Composable
@@ -55,66 +31,12 @@ fun ReleaseNotesDialog(
     onDonateClicked: () -> Unit = {},
     onSkipDonationClicked: () -> Unit = {}
 ) {
-    var wasDonationLaunched by remember { mutableStateOf(false) }
-    var showThankYou by remember { mutableStateOf(false) }
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onResume(owner: LifecycleOwner) {
-                if (wasDonationLaunched) {
-                    showThankYou = true
-                    wasDonationLaunched = false
-                }
-            }
-        })
-    }
-
-    if (showThankYou) {
-        ThankYouDialogContent(onDismissRequest = onDismissRequest)
-    } else {
-        ReleaseNotesDialogContent(
-            releaseNotes = releaseNotes,
-            onDonateClicked = {
-                wasDonationLaunched = true
-                onDonateClicked()
-            },
-            onDismissRequest = onDismissRequest,
-            onSkipDonationClicked = onSkipDonationClicked
-        )
-    }
-}
-
-@Composable
-private fun ThankYouDialogContent(
-    onDismissRequest: () -> Unit = {}
-) = CustomDialog(
-    onDismissRequest = onDismissRequest,
-    paddingValues = PaddingValues(
-        top = inputSpacingLarge,
-        start = inputSpacingLarge,
-        end = inputSpacingLarge,
-        bottom = 0.dp,
+    ReleaseNotesDialogContent(
+        releaseNotes = releaseNotes,
+        onDonateClicked = onDonateClicked,
+        onDismissRequest = onDismissRequest,
+        onSkipDonationClicked = onSkipDonationClicked
     )
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing),
-        horizontalAlignment = Alignment.End
-    ) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.release_notes_thank_you),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-        )
-
-        SmallTextButton(
-            onClick = onDismissRequest,
-            stringRes = R.string.close,
-        )
-    }
 }
 
 @Composable
@@ -130,12 +52,14 @@ private fun ReleaseNotesDialogContent(
             markdown = it.text.resolve() ?: "Failed to resolve release note text.. Sorry :/",
         )
     },
-    supportText = stringResource(R.string.release_notes_support_text),
-    maybeLaterText = stringResource(R.string.release_notes_maybe_later),
-    donateText = stringResource(R.string.release_notes_support_development),
-    onDonateClicked = onDonateClicked,
     onDismissRequest = onDismissRequest,
-    onSkipDonationClicked = onSkipDonationClicked,
+    dismissOnClickOutside = releaseNotesDismissOnClickOutside(),
+    dismissOnBackPress = releaseNotesDismissOnBackPress(),
+    supportContent = releaseNotesSupportContent(
+        onDonateClicked = onDonateClicked,
+        onSkipDonationClicked = onSkipDonationClicked,
+        onDismissRequest = onDismissRequest,
+    ),
 )
 
 @Preview(locale = "en")
@@ -162,8 +86,9 @@ private fun ReleaseNotesDialogPreview() {
 @Composable
 private fun ThankYouDialogContentPreview() {
     TnGComposeTheme {
-        ThankYouDialogContent(
-            onDismissRequest = {}
+        ReleaseNotesDialogContent(
+            releaseNotes = emptyList(),
+            onDismissRequest = {},
         )
     }
 }

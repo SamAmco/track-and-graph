@@ -139,10 +139,7 @@ fun MenuDrawerContent(
             icon = painterResource(R.drawable.rate_icon)
         ) { onNavigateToBrowser(DrawerMenuBrowserLocation.RATE_APP) }
 
-        MenuItem(
-            title = stringResource(R.string.release_notes_support_development),
-            icon = painterResource(R.drawable.bmc_logo)
-        ) { onNavigateToBrowser(DrawerMenuBrowserLocation.SUPPORT_PROJECT) }
+        SupportProjectMenuItem(onNavigateToBrowser = onNavigateToBrowser)
 
         MenuItem(
             title = stringResource(R.string.about),
@@ -240,7 +237,7 @@ private fun DateFormatSpinner(
 }
 
 @Composable
-private fun MenuItem(
+internal fun MenuItem(
     modifier: Modifier = Modifier,
     icon: Painter,
     title: String,

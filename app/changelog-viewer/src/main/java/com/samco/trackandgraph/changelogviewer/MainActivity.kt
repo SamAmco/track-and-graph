@@ -106,12 +106,9 @@ private fun ChangelogViewerApp() {
                         markdown = markdown,
                     )
                 ),
-                supportText = "Your support helps keep Track & Graph alive and growing 🌱",
-                maybeLaterText = "Maybe Later",
-                donateText = "Donate to Support Development",
                 onDismissRequest = { showPreview = false },
-                onSkipDonationClicked = { showPreview = false },
-                onDonateClicked = { showPreview = false },
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true,
             )
         }
     }

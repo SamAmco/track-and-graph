@@ -76,7 +76,7 @@ class ReleaseNotesViewModelImpl @Inject constructor(
         combine(
             releaseNotes.map { it.isNotEmpty() },
             hasDonateLink,
-        ) { hasNotes, hasLink -> hasNotes && hasLink },
+        ) { hasNotes, hasLink -> shouldShowReleaseNotesButton(hasNotes, hasLink) },
         showReleaseNotesDialog.filter { it }.map { false }
     ).stateIn(viewModelScope, SharingStarted.Eagerly, false)
 

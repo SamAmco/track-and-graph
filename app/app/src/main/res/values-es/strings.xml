@@ -489,10 +489,6 @@
     <string name="functions_landscape_hint">Consejo: Las funciones funcionan mejor en modo horizontal</string>
     <string name="functions_start_hint">Empieza aquí: Pulsación larga y seleccionar Fuente de datos</string>
     <string name="see_whats_new">Ver Novedades</string>
-    <string name="release_notes_support_text">Tu apoyo ayuda a mantener Track &amp; Graph vivo y creciendo 🌱</string>
-    <string name="release_notes_maybe_later">Quizás más tarde</string>
-    <string name="release_notes_support_development">Donar para Apoyar el Desarrollo</string>
-    <string name="release_notes_thank_you"><![CDATA[¡Gracias! ❤️\n\nCada apoyo ayuda a que Track & Graph sea mejor para todos 🌱]]></string>
     <string name="missed_reminder_single_content">Recordatorio de las %1$s</string>
     <string name="missed_reminders_multiple_content">Perdiste %1$d recordatorios</string>
     <string name="next_reminder_format">Próximo Recordatorio: %1$s</string>

@@ -83,14 +83,14 @@ def get_current_branch():
 
 
 def find_apk():
-    """Find the release APK file"""
+    """Find the FOSS release APK file for GitHub"""
     apk_dir = Path(__file__).parent.parent / "app" / "app" / \
-        "build" / "outputs" / "apk" / "release"
+        "build" / "outputs" / "apk" / "foss" / "release"
     apk_files = list(apk_dir.glob("*.apk"))
 
     if not apk_files:
         print(f"Error: No APK found in {apk_dir}")
-        print("Run 'make assemble-release' first")
+        print("Run 'make assemble-foss-release' first")
         sys.exit(1)
 
     # Return the first APK found

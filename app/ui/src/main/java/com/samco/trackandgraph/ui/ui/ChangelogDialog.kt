@@ -4,18 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.samco.trackandgraph.ui.R
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.theming.tngColors
 
 data class ChangelogReleaseNote(
     val version: String,
@@ -25,17 +20,15 @@ data class ChangelogReleaseNote(
 @Composable
 fun ChangelogDialogContent(
     releaseNotes: List<ChangelogReleaseNote>,
-    supportText: String,
-    maybeLaterText: String,
-    donateText: String,
-    onDonateClicked: () -> Unit = {},
-    onSkipDonationClicked: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
+    dismissOnClickOutside: Boolean = false,
+    dismissOnBackPress: Boolean = false,
+    supportContent: (@Composable () -> Unit)? = null,
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
-    dismissOnClickOutside = false,
+    dismissOnClickOutside = dismissOnClickOutside,
+    dismissOnBackPress = dismissOnBackPress,
     scrollContent = false,
-    dismissOnBackPress = false,
 ) {
     FadingScrollColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -50,34 +43,10 @@ fun ChangelogDialogContent(
 
         DialogInputSpacing()
 
-        HorizontalDivider()
-
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = supportText,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-        )
-
-        SelectorButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onSkipDonationClicked,
-            text = maybeLaterText,
-        )
-
-        FullWidthIconTextButton(
-            modifier = Modifier.fillMaxWidth(),
-            buttonColors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.tngColors.primary,
-            ),
-            iconSize = 28.dp,
-            onClick = onDonateClicked,
-            icon = R.drawable.bmc_logo,
-            textAlign = TextAlign.Center,
-            buttonLocation = ButtonLocation.End,
-            text = donateText,
-        )
+        supportContent?.let {
+            HorizontalDivider()
+            it()
+        }
     }
 }
 
@@ -131,9 +100,6 @@ private fun ChangelogDialogContentPreview() {
                     """.trimIndent(),
                 ),
             ),
-            supportText = "If you find Track & Graph useful, you can support future development.",
-            maybeLaterText = "Maybe later",
-            donateText = "Buy me a coffee",
         )
     }
 }

@@ -1,16 +1,18 @@
 ---
 title: Build, test, and screenshot commands
-description: Gradle commands for building and running tests; Compose screenshot-test setup for Play Store and tutorial image capture.
+description: Gradle commands for building and running tests; Play Store vs FOSS release flavor intent; Compose screenshot-test setup for Play Store and tutorial image capture.
 topics:
   - Build: cd app && ./gradlew assembleDebug
   - Test: cd app && ./gradlew :data:testDebugUnitTest
+  - Release flavors: playStore excludes donation/support UI/resources; foss keeps them for F-Droid/GitHub
+  - F-Droid metadata should build the foss flavor explicitly, not a flavorless release
   - build-logic convention plugins tng.android.application and tng.android.library
   - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
   - Screenshots: make playstore-record, make tutorial-record
   - Play Store screenshots: Compose screenshot test previews, no emulator, fake status bar
   - Tutorial screenshots: Compose screenshot test previews, no emulator
-keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, status-bar, showSystemUi]
+keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, status-bar, showSystemUi]
 ---
 
 # Build Commands
@@ -21,6 +23,29 @@ All commands run from `app/` directory (`gradlew` is at `app/gradlew`, not the p
 cd app && ./gradlew assembleDebug              # Build debug APK
 cd app && ./gradlew :data:testDebugUnitTest    # Run data unit tests
 ```
+
+Release distribution variants:
+
+```bash
+cd app && ./gradlew :app:bundlePlayStoreRelease    # Google Play AAB, no donation UI/resources
+cd app && ./gradlew :app:assembleFossRelease       # F-Droid/GitHub APK, keeps donation UI/resources
+cd app && ./gradlew :app:bundleFossRelease         # F-Droid/GitHub AAB if needed
+```
+
+## Release Distribution Flavors
+
+The app has a `distribution` flavor dimension with `playStore` and `foss` flavors. The split exists for store-policy compliance: Play Store builds must not compile in the donation/support entry points, related strings, or BMC logo assets; F-Droid/GitHub builds keep that UI.
+
+Keep distribution-specific UI behind flavor source-set hooks in the app module. Shared UI such as the changelog/release-notes dialog should stay reusable and parameterized; the app flavor decides whether to provide support content and whether the dialog is dismissible by outside click/back press.
+
+F-Droid's metadata should request the FOSS flavor explicitly for future releases:
+
+```yaml
+gradle:
+  - foss
+```
+
+Do not rely on a generic/flavorless release build for F-Droid. Google Play release artifacts should continue to use the explicit Play Store tasks.
 
 Use `--tests` to filter by fully qualified class name:
 ```bash

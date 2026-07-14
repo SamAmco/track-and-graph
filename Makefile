@@ -81,16 +81,30 @@ validate-all: lua-test-api validate-remote-config run-community-tests lua-verify
 	@echo "All validations passed."
 
 .PHONY: assemble-release
-assemble-release:
-	cd app && ./gradlew :app:clean :app:assembleRelease
+assemble-release: assemble-playstore-release
+
+.PHONY: assemble-playstore-release
+assemble-playstore-release:
+	cd app && ./gradlew :app:clean :app:assemblePlayStoreRelease
+
+.PHONY: assemble-foss-release
+assemble-foss-release:
+	cd app && ./gradlew :app:clean :app:assembleFossRelease
 
 .PHONY: bundle-release
-bundle-release:
-	cd app && ./gradlew :app:clean :app:bundleRelease
+bundle-release: bundle-playstore-release
+
+.PHONY: bundle-playstore-release
+bundle-playstore-release:
+	cd app && ./gradlew :app:clean :app:bundlePlayStoreRelease
+
+.PHONY: bundle-foss-release
+bundle-foss-release:
+	cd app && ./gradlew :app:clean :app:bundleFossRelease
 
 .PHONY: assemble-bundle-release
 assemble-bundle-release:
-	cd app && ./gradlew :app:clean :app:assembleRelease :app:bundleRelease
+	cd app && ./gradlew :app:clean :app:assemblePlayStoreRelease :app:bundlePlayStoreRelease
 
 # ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
 .PHONY: playstore-record
