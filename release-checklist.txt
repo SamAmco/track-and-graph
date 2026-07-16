@@ -10,15 +10,9 @@
 
 - Run `make assemble-bundle-release` to generate the Play Store release APK/AAB
 
-- Run `make assemble-foss-release` to generate the F-Droid/GitHub release APK
-
 - Run the Play Store release build on a device to sanity check it:
 
 adb install app/app/build/outputs/apk/playStore/release/app-playStore-release.apk
-
-- Optionally sanity check the F-Droid/GitHub release build:
-
-adb install app/app/build/outputs/apk/foss/release/app-foss-release.apk
 
 - Use fastlane to upload the new aab to the play store e.g. for alpha:
 
@@ -32,9 +26,10 @@ or for release:
 
 bundle exec fastlane supply --aab app/app/build/outputs/bundle/playStoreRelease/app-playStore-release.aab --rollout 0.5
 
+- Run `make assemble-foss-release` to generate the F-Droid/GitHub release APK
+
+- Optionally sanity check the F-Droid/GitHub release build:
+
+adb install app/app/build/outputs/apk/foss/release/app-foss-release.apk
+
 - run `make github-release` to create a new github release with the changelog and apk attached
-
-- For the first release containing the Play Store/FOSS flavor split, open an F-Droid fdroiddata merge request or issue asking them to build the `foss` flavor:
-
-gradle:
-  - foss
