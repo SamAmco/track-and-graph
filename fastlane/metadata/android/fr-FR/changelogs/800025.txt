@@ -1,0 +1,4 @@
+- Correction d'un plantage de l'écran d'historique avec des points de données ayant des horodatages exactement identiques
+- Correction d'un plantage du formatage des valeurs du diagramme à barres
+- Suppression du lien Buy Me a Coffee des builds Play Store
+      

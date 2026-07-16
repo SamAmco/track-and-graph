@@ -1,0 +1,4 @@
+- Fix history screen crash on data points with exact matching timestamps
+- Fix bar chart value formatting crash
+- Remove buy me a coffee link from playstore builds
+      

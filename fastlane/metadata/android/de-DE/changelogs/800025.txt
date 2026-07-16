@@ -1,0 +1,4 @@
+- Absturz des Verlaufsbildschirms bei Datenpunkten mit exakt gleichen Zeitstempeln behoben
+- Absturz bei der Werteformatierung im Balkendiagramm behoben
+- Buy-Me-a-Coffee-Link aus Play-Store-Builds entfernt
+      

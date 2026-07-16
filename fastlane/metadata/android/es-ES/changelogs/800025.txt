@@ -1,0 +1,4 @@
+- Corregir un fallo de la pantalla de historial con puntos de datos que tienen marcas de tiempo exactamente iguales
+- Corregir un fallo de formato de valores en el gráfico de barras
+- Eliminar el enlace de Buy Me a Coffee de las compilaciones de Play Store
+      
