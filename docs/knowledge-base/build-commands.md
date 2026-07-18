@@ -6,6 +6,8 @@ topics:
   - Test: cd app && ./gradlew :data:testDebugUnitTest
   - Release flavors: playStore excludes donation/support UI/resources; foss keeps them for F-Droid/GitHub
   - F-Droid metadata should build the foss flavor explicitly, not a flavorless release
+  - Release builds should run root Gradle clean, not only :app:clean, so dependent-module generated outputs cannot leak into APK/AAB artifacts
+  - Release APKs keep native debug symbols in packaged .so files to avoid NDK stripping reproducibility differences
   - build-logic convention plugins tng.android.application and tng.android.library
   - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
@@ -27,9 +29,9 @@ cd app && ./gradlew :data:testDebugUnitTest    # Run data unit tests
 Release distribution variants:
 
 ```bash
-cd app && ./gradlew :app:bundlePlayStoreRelease    # Google Play AAB, no donation UI/resources
-cd app && ./gradlew :app:assembleFossRelease       # F-Droid/GitHub APK, keeps donation UI/resources
-cd app && ./gradlew :app:bundleFossRelease         # F-Droid/GitHub AAB if needed
+cd app && ./gradlew clean :app:bundlePlayStoreRelease    # Google Play AAB, no donation UI/resources
+cd app && ./gradlew clean :app:assembleFossRelease       # F-Droid/GitHub APK, keeps donation UI/resources
+cd app && ./gradlew clean :app:bundleFossRelease         # F-Droid/GitHub AAB if needed
 ```
 
 ## Release Distribution Flavors
@@ -46,6 +48,10 @@ gradle:
 ```
 
 Do not rely on a generic/flavorless release build for F-Droid. Google Play release artifacts should continue to use the explicit Play Store tasks.
+
+Release Make/Fastlane targets intentionally run root `clean` rather than `:app:clean`. The app depends on generated and compiled outputs from other modules, including `:data` and `:ui`; a root clean avoids stale module artifacts causing non-reproducible APK bytecode.
+
+Release builds also keep native debug symbols in packaged JNI libraries via `packaging { jniLibs.keepDebugSymbols.add("**/*.so") }`. This trades a small APK size increase for avoiding differences caused by local NDK stripping behavior in reproducible-build verification.
 
 Use `--tests` to filter by fully qualified class name:
 ```bash

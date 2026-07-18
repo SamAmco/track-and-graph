@@ -8,7 +8,7 @@
 
 - Run `make commit-version` to commit the version bump and changelog (before release to ensure reproducible builds)
 
-- Run `make assemble-bundle-release` to generate the Play Store release APK/AAB
+- Run `make assemble-bundle-release` to generate the Play Store release APK/AAB from a full clean
 
 - Run the Play Store release build on a device to sanity check it:
 
@@ -26,7 +26,7 @@ or for release:
 
 bundle exec fastlane supply --aab app/app/build/outputs/bundle/playStoreRelease/app-playStore-release.aab --rollout 0.5
 
-- Run `make assemble-foss-release` to generate the F-Droid/GitHub release APK
+- Run `make assemble-foss-release` to generate the F-Droid/GitHub release APK from a full clean
 
 - Optionally sanity check the F-Droid/GitHub release build:
 

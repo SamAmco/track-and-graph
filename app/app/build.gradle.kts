@@ -132,6 +132,10 @@ android {
         includeInBundle = true
     }
 
+    packaging {
+        jniLibs.keepDebugSymbols.add("**/*.so")
+    }
+
     namespace = "com.samco.trackandgraph"
 }
 

@@ -85,26 +85,26 @@ assemble-release: assemble-playstore-release
 
 .PHONY: assemble-playstore-release
 assemble-playstore-release:
-	cd app && ./gradlew :app:clean :app:assemblePlayStoreRelease
+	cd app && ./gradlew clean :app:assemblePlayStoreRelease
 
 .PHONY: assemble-foss-release
 assemble-foss-release:
-	cd app && ./gradlew :app:clean :app:assembleFossRelease
+	cd app && ./gradlew clean :app:assembleFossRelease
 
 .PHONY: bundle-release
 bundle-release: bundle-playstore-release
 
 .PHONY: bundle-playstore-release
 bundle-playstore-release:
-	cd app && ./gradlew :app:clean :app:bundlePlayStoreRelease
+	cd app && ./gradlew clean :app:bundlePlayStoreRelease
 
 .PHONY: bundle-foss-release
 bundle-foss-release:
-	cd app && ./gradlew :app:clean :app:bundleFossRelease
+	cd app && ./gradlew clean :app:bundleFossRelease
 
 .PHONY: assemble-bundle-release
 assemble-bundle-release:
-	cd app && ./gradlew :app:clean :app:assemblePlayStoreRelease :app:bundlePlayStoreRelease
+	cd app && ./gradlew clean :app:assemblePlayStoreRelease :app:bundlePlayStoreRelease
 
 # ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
 .PHONY: playstore-record
