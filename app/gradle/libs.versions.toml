@@ -33,7 +33,7 @@ junit = "4.13.2"
 timber = "5.0.1"
 workRuntimeKtx = "2.11.2"
 kotlin = "2.3.21"
-android = "9.0.1"
+android = "9.1.1"
 ksp = "2.3.5"
 hiltAndroidGradlePlugin = "2.59.2"
 reorderable = "3.1.0"
@@ -48,9 +48,9 @@ turbine = "1.2.1"
 # Gradle script versions
 buildJdk = "21"
 jdk = "17"
-androidSdk = "36"
+androidSdk = "37"
 minSdk = "24"
-targetSdk = "36"
+targetSdk = "37"
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
