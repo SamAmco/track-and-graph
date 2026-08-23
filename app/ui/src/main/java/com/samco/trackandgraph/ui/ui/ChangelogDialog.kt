@@ -29,15 +29,34 @@ fun ChangelogDialogContent(
     supportContent: (@Composable () -> Unit)? = null,
     alternateContent: (@Composable () -> Unit)? = null,
     showAlternateContent: Boolean = false,
-) = CustomDialog(
-    onDismissRequest = onDismissRequest,
-    dismissOnClickOutside = dismissOnClickOutside,
-    dismissOnBackPress = dismissOnBackPress,
-    scrollContent = false,
-    supportSmoothHeightAnimation = alternateContent != null,
+) {
+    CustomDialog(
+        onDismissRequest = onDismissRequest,
+        dismissOnClickOutside = dismissOnClickOutside,
+        dismissOnBackPress = dismissOnBackPress,
+        scrollContent = false,
+        supportSmoothHeightAnimation = alternateContent != null,
+    ) {
+        ChangelogDialogBody(
+            releaseNotes = releaseNotes,
+            supportContent = supportContent,
+            alternateContent = alternateContent,
+            showAlternateContent = showAlternateContent,
+        )
+    }
+}
+
+/** Pure dialog body, exposed separately so previews do not need to render a Dialog window. */
+@Composable
+fun ChangelogDialogBody(
+    releaseNotes: List<ChangelogReleaseNote>,
+    modifier: Modifier = Modifier,
+    supportContent: (@Composable () -> Unit)? = null,
+    alternateContent: (@Composable () -> Unit)? = null,
+    showAlternateContent: Boolean = false,
 ) {
     AnimatedContent(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         targetState = showAlternateContent && alternateContent != null,
         transitionSpec = {
             val direction = if (targetState) {

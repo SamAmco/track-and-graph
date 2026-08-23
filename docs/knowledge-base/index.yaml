@@ -110,7 +110,7 @@ docs:
 
   - file: release-changelogs.md
     title: Release changelogs — workflow, structure, and Play Store limits
-    description: Dual changelog system (public markdown for in-app/website, fastlane .txt for Play Store), changelog viewer with mock Play support flow, make changelog workflow, Play Store 500-character limit, localization, and index.json maintenance.
+    description: Dual changelog system (public markdown for in-app/website, fastlane .txt for Play Store), changelog viewer with FOSS and mock Play support flows, make changelog workflow, Play Store 500-character limit, localization, and index.json maintenance.
     keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, mock-support, billing, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
 
   - file: deep-link-navigation.md

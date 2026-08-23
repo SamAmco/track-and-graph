@@ -5,6 +5,11 @@
     <string name="continue_word">Continuer</string>
     <string name="create">Créer</string>
     <string name="label">Étiquette</string>
+    <string name="release_notes_support_text">Votre soutien aide à maintenir Track &amp; Graph vivant et en croissance 🌱</string>
+    <string name="release_notes_maybe_later">Peut-être plus tard</string>
+    <string name="release_notes_support_development">Faire un Don pour Soutenir le Développement</string>
+    <string name="release_notes_thank_you"><![CDATA[Merci ! ❤️\n\nChaque contribution aide à rendre Track & Graph meilleur pour tout le monde 🌱]]></string>
+    <string name="support_close">Fermer</string>
     <string name="search">Rechercher</string>
     <string name="update">Mettre à jour</string>
     <string name="value">Valeur</string>

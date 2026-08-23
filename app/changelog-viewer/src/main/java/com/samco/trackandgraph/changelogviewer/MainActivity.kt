@@ -26,15 +26,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.ui.R as UiR
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.ui.ChangelogDialogContent
 import com.samco.trackandgraph.ui.ui.ChangelogReleaseNote
 import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
-import com.samco.trackandgraph.ui.ui.SelectorButton
+import com.samco.trackandgraph.ui.ui.ReleaseNotesSupportAction
+import com.samco.trackandgraph.ui.ui.ReleaseNotesSupportPrompt
 import com.samco.trackandgraph.ui.ui.SupportOptionViewData
 import com.samco.trackandgraph.ui.ui.SupportOptionsContent
+import com.samco.trackandgraph.ui.ui.SupportThankYouContent
 import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 
 class MainActivity : ComponentActivity() {
@@ -131,26 +135,29 @@ private fun ChangelogViewerApp() {
                 dismissOnClickOutside = true,
                 dismissOnBackPress = true,
                 supportContent = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "If Track & Graph is useful to you, consider supporting its development.",
-                        style = MaterialTheme.typography.labelLarge,
-                        textAlign = TextAlign.Center,
+                    ReleaseNotesSupportPrompt(
+                        supportText = stringResource(UiR.string.release_notes_support_text),
+                        maybeLaterText = stringResource(UiR.string.release_notes_maybe_later),
+                        supportActions = listOf(
+                            ReleaseNotesSupportAction(
+                                text = stringResource(UiR.string.release_notes_support_development),
+                                icon = UiR.drawable.bmc_logo,
+                                onClick = {
+                                    mockPurchaseComplete = true
+                                    showSupportScreen = true
+                                },
+                            ),
+                            ReleaseNotesSupportAction(
+                                text = stringResource(UiR.string.release_notes_support_development),
+                                icon = UiR.drawable.support_developer_icon,
+                                onClick = {
+                                    mockPurchaseComplete = false
+                                    showSupportScreen = true
+                                },
+                            ),
+                        ),
+                        onMaybeLaterClicked = { showPreview = false },
                     )
-                    SelectorButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Maybe later",
-                        onClick = { showPreview = false },
-                    )
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            mockPurchaseComplete = false
-                            showSupportScreen = true
-                        },
-                    ) {
-                        Text("Support development")
-                    }
                 },
                 alternateContent = {
                     MockSupportScreen(
@@ -180,11 +187,10 @@ private fun MockSupportScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (purchaseComplete) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Thank you for supporting Track & Graph!",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
+            SupportThankYouContent(
+                message = stringResource(UiR.string.release_notes_thank_you),
+                closeText = stringResource(UiR.string.support_close),
+                onClose = onBack,
             )
         } else {
             SupportOptionsContent(
@@ -197,13 +203,12 @@ private fun MockSupportScreen(
                 purchaseInProgress = false,
                 onOptionClicked = onOptionClicked,
             )
+            ContinueCancelButtons(
+                cancelVisible = true,
+                continueVisible = false,
+                onCancel = onBack,
+            )
         }
-
-        ContinueCancelButtons(
-            cancelVisible = true,
-            continueVisible = false,
-            onCancel = onBack,
-        )
     }
 }
 

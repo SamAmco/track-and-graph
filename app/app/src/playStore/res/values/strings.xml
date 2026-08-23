@@ -4,8 +4,4 @@
     <string name="support_unavailable">No support options are currently available.</string>
     <string name="support_payment_failed">Payment failed. Please try again.</string>
     <string name="support_payment_pending">Payment is pending. Google Play will complete it after the payment is confirmed.</string>
-    <string name="support_thank_you">Thank you for supporting Track &amp; Graph!</string>
-    <string name="release_notes_support_text">Track &amp; Graph is free and open source. If you find it useful, you can optionally support its continued development.</string>
-    <string name="release_notes_maybe_later">Maybe later</string>
-    <string name="release_notes_support_development">Support the developer</string>
 </resources>

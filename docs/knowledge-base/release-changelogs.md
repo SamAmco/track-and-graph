@@ -8,7 +8,7 @@ topics:
   - Fastlane changelogs: fastlane/metadata/android/{regional-locale}/changelogs/{versionCode}.txt
   - Play Store limit: 500 characters per language for "What's new" text
   - GitHub releases: prefer public English markdown via gh --notes-file, fall back to English Fastlane text for patches
-  - Changelog viewer app: paste markdown and preview the shared dialog plus mock Play support flow
+  - Changelog viewer app: paste markdown and preview the shared dialog plus FOSS and mock Play support flows
   - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
   - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
 keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
@@ -47,9 +47,9 @@ The `publish` flag controls whether full public markdown is created and listed i
 
 ## Previewing In-App Markdown
 
-Use the `changelog-viewer` Android module to preview public changelog markdown before publishing it. The viewer lets you paste or clear markdown text and opens the same shared changelog dialog content used by the production app. Its preview also includes a mock Play Store support journey: support footer, animated price-options screen, back navigation, and a simulated thank-you result. It does not include or call the Billing SDK.
+Use the `changelog-viewer` Android module to preview public changelog markdown before publishing it. The viewer lets you paste or clear markdown text and opens the same shared changelog dialog content used by the production app. Its support footer displays both distribution variants together: the Buy Me a Coffee action opens the shared thank-you state directly, while the Play action exercises the animated mock price-options flow, back navigation, and simulated purchase result. It does not open an external support link or include the Billing SDK.
 
-The dialog UI and price-options body live in the shared UI module and are parameterized by text, view data, and callbacks. The real Play app and viewer therefore render the same price list, description placement, recommendation border, and adaptive scrolling; only the viewer's product data and purchase result are fake.
+The footer layout, localized support copy, support assets, thank-you content, dialog UI, and price-options body live in the shared UI module. Each production flavor supplies only its own support action; the viewer supplies both actions to the same footer component. Only the viewer's Play product data and purchase result are fake.
 
 ## Copy Editing and Translation
 

@@ -5,6 +5,11 @@
     <string name="continue_word">Continue</string>
     <string name="create">Create</string>
     <string name="label">Label</string>
+    <string name="release_notes_support_text">Your support helps keep Track &amp; Graph alive and growing 🌱</string>
+    <string name="release_notes_maybe_later">Maybe Later</string>
+    <string name="release_notes_support_development">Donate to Support Development</string>
+    <string name="release_notes_thank_you"><![CDATA[Thank You! ❤️\n\nEvery bit of support goes toward making Track & Graph better for everyone 🌱]]></string>
+    <string name="support_close">Close</string>
     <string name="search">Search</string>
     <string name="update">Update</string>
     <string name="value">Value</string>

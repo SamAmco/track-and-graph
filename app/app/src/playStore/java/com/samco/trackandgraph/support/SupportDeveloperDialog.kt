@@ -32,10 +32,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.R as UiR
 import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.SupportOptionViewData
 import com.samco.trackandgraph.ui.ui.SupportOptionsContent
+import com.samco.trackandgraph.ui.ui.SupportThankYouContent
 import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.ui.inputSpacingXLarge
@@ -101,11 +103,10 @@ internal fun SupportDeveloperDialogContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (state.showThankYou) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.support_thank_you),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
+            SupportThankYouContent(
+                message = stringResource(UiR.string.release_notes_thank_you),
+                closeText = stringResource(UiR.string.support_close),
+                onClose = onBack,
             )
         } else {
             when (val products = state.products) {
@@ -152,14 +153,13 @@ internal fun SupportDeveloperDialogContent(
                     textAlign = TextAlign.Center,
                 )
             }
+            ContinueCancelButtons(
+                cancelVisible = true,
+                continueVisible = false,
+                cancelText = R.string.cancel,
+                onCancel = onBack,
+            )
         }
-
-        ContinueCancelButtons(
-            cancelVisible = true,
-            continueVisible = false,
-            cancelText = R.string.cancel,
-            onCancel = onBack,
-        )
     }
 }
 

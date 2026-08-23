@@ -3,7 +3,7 @@ package com.samco.trackandgraph.main
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.R
 
 @Composable
 internal fun SupportProjectMenuItem(
