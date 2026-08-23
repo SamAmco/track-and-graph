@@ -12,7 +12,7 @@ internal fun shouldShowReleaseNotesButton(
     hasSupportLink: Boolean,
 ) = hasNotes
 
-internal fun releaseNotesDismissOnClickOutside() = true
+internal fun releaseNotesDismissOnClickOutside() = false
 
 internal fun releaseNotesDismissOnBackPress() = true
 
