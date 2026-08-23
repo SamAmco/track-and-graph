@@ -38,3 +38,5 @@ Billing calls start only when the support dialog opens. Both the drawer item and
 Play retains non-consumed purchases, so consumption recovery deliberately uses `queryPurchasesAsync()` rather than app preferences. If consumption fails after a successful charge, do not report “payment failed”: the charge may be real, and the retained purchase will be retried on a later dialog load. Actual purchase-flow failures show an inline message; selecting any option again is the retry action. User cancellation is silent.
 
 The release-notes dialog animates between changelog and support content inside the same dialog. Returning from the Google Play purchase sheet reveals the support content; backing out of that content returns to the changelog.
+
+The pure price-options content is shared from the `ui` module. The `changelog-viewer` uses it with fake prices and callbacks to exercise the complete dialog transition without depending on or calling Google Play Billing.

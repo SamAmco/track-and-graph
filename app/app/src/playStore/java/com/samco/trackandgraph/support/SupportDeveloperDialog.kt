@@ -12,16 +12,13 @@ package com.samco.trackandgraph.support
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,13 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.ui.CustomDialog
-import com.samco.trackandgraph.ui.ui.SelectorButton
+import com.samco.trackandgraph.ui.ui.SupportOptionViewData
+import com.samco.trackandgraph.ui.ui.SupportOptionsContent
 import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.ui.inputSpacingXLarge
@@ -131,7 +128,6 @@ internal fun SupportDeveloperDialogContent(
                 }
 
                 is SupportProductsState.Available -> AvailableProductsContent(
-                    modifier = Modifier.weight(1f, fill = false),
                     products = products,
                     purchaseInProgress = state.purchaseInProgress,
                     onOptionClicked = onOptionClicked,
@@ -180,42 +176,23 @@ private fun LoadingContent() {
 }
 
 @Composable
-private fun AvailableProductsContent(
-    modifier: Modifier = Modifier,
+private fun ColumnScope.AvailableProductsContent(
     products: SupportProductsState.Available,
     purchaseInProgress: Boolean,
     onOptionClicked: (String) -> Unit,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(dialogInputSpacing),
-        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing),
-    ) {
-        products.options.forEach { option ->
-            SelectorButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = option.formattedPrice,
-                border = if (option.highlighted) {
-                    BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-                } else null,
-                enabled = !purchaseInProgress,
-                onClick = { onOptionClicked(option.id) },
+    SupportOptionsContent(
+        description = products.description,
+        options = products.options.map {
+            SupportOptionViewData(
+                id = it.id,
+                formattedPrice = it.formattedPrice,
+                highlighted = it.highlighted,
             )
-        }
-    }
-    if (products.description.isNotBlank()) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = products.description,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
-    }
-    if (purchaseInProgress) {
-        CircularProgressIndicator()
-    }
+        },
+        purchaseInProgress = purchaseInProgress,
+        onOptionClicked = onOptionClicked,
+    )
 }
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
