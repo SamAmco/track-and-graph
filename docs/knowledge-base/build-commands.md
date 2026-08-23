@@ -14,7 +14,8 @@ topics:
   - Screenshots: make playstore-record, make tutorial-record
   - Play Store screenshots: Compose screenshot test previews, no emulator, fake status bar
   - Tutorial screenshots: Compose screenshot test previews, no emulator
-keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, status-bar, showSystemUi]
+  - AGP 9.3 fixes screenshot-test manifest generation that failed under AGP 9.1
+keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
 ---
 
 # Build Commands
@@ -82,6 +83,8 @@ make tutorial-record     # Render Compose tutorial previews and resize app tutor
 - Ruby + bundler + fastlane (`bundle install` from project root)
 
 The Play Store path does not use an emulator or Shot. `make playstore-record` renders Compose previews via the `screenshotTest` source set, copies the generated reference PNGs into `fastlane/frameit/screenshots/`, then runs frameit. The screenshot content and fixtures live in `app/app/src/main/java/com/samco/trackandgraph/playstore/` so Android Studio previews can render them. Thin `@PreviewTest` wrappers live in `app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/playstore/`.
+
+Use AGP 9.3.1 or newer with Gradle 9.5.0 or newer for screenshot tests. AGP 9.1.1 created `GenerateTestConfig` without configuring its required merged-manifest input unless Android resources were manually enabled through the incubating host-test API. AGP 9.3.1 generates and processes the screenshot-test manifest correctly without that workaround. When changing this setup, verify both `generateFossDebugScreenshotTestConfig` and `generatePlayStoreDebugScreenshotTestConfig` because the tasks are flavor-specific.
 
 Keep screenshot-only app data in the playstore package rather than reusing old emulator demo-data generators. The screenshot fixtures are deterministic and can call the real production composables directly, including graph cards and other `AndroidView`-backed content, as long as the fixture provides the state that a ViewModel would normally load from the database.
 
