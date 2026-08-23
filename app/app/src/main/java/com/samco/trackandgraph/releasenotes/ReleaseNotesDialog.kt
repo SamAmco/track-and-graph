@@ -17,6 +17,10 @@
 package com.samco.trackandgraph.releasenotes
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -45,22 +49,34 @@ private fun ReleaseNotesDialogContent(
     onDonateClicked: () -> Unit = {},
     onSkipDonationClicked: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
-) = ChangelogDialogContent(
-    releaseNotes = releaseNotes.map {
-        ChangelogReleaseNote(
-            version = it.version,
-            markdown = it.text.resolve() ?: "Failed to resolve release note text.. Sorry :/",
-        )
-    },
-    onDismissRequest = onDismissRequest,
-    dismissOnClickOutside = releaseNotesDismissOnClickOutside(),
-    dismissOnBackPress = releaseNotesDismissOnBackPress(),
-    supportContent = releaseNotesSupportContent(
-        onDonateClicked = onDonateClicked,
-        onSkipDonationClicked = onSkipDonationClicked,
-        onDismissRequest = onDismissRequest,
-    ),
-)
+) {
+    var showSupportScreen by remember { mutableStateOf(false) }
+    val handleDismiss = {
+        if (showSupportScreen) showSupportScreen = false else onDismissRequest()
+    }
+
+    ChangelogDialogContent(
+        releaseNotes = releaseNotes.map {
+            ChangelogReleaseNote(
+                version = it.version,
+                markdown = it.text.resolve() ?: "Failed to resolve release note text.. Sorry :/",
+            )
+        },
+        onDismissRequest = handleDismiss,
+        dismissOnClickOutside = releaseNotesDismissOnClickOutside(),
+        dismissOnBackPress = releaseNotesDismissOnBackPress(),
+        supportContent = releaseNotesSupportContent(
+            onDonateClicked = onDonateClicked,
+            onSkipDonationClicked = onSkipDonationClicked,
+            onDismissRequest = onDismissRequest,
+            onSupportClicked = { showSupportScreen = true },
+        ),
+        alternateContent = releaseNotesSupportScreen(
+            onBack = { showSupportScreen = false },
+        ),
+        showAlternateContent = showSupportScreen,
+    )
+}
 
 @Preview(locale = "en")
 @Composable

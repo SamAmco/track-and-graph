@@ -6,6 +6,7 @@ topics:
   - Pure-UI composable takes only state values and callbacks — no ViewModels
   - New screens and UI components should include @Preview functions by default
   - @Preview functions call the pure-UI composable with hardcoded data
+  - Flavor-only previews belong in a concrete debug-variant source set
   - Reuse shared app/ui controls before defining local Material wrappers
   - Use shared spacing tokens/helpers before introducing hard-coded dimensions
   - Naming conventions for each layer
@@ -84,6 +85,7 @@ private fun GroupDeleteDialogContent(
 - For shared UI in `app/ui`, include previews for new components and for components migrated out of `app/app` unless a dependency makes previewing impractical
 - For new screens, dialogs, and reusable controls, add previews in the initial change rather than as a later cleanup
 - ThreeTenABP timezone data is not initialized in the Compose preview renderer. Preview fixtures must use a fixed `ZoneOffset` such as `ZoneOffset.UTC`; do not call `ZoneId.systemDefault()` or construct named region zones in a preview.
+- Put previews for flavor-only code in the concrete `<flavor>Debug` source set rather than the broad `<flavor>` source set. Android Studio can model the latter as an ambiguous holder module and fall back to the app's `main` module when rendering, producing `NoClassDefFoundError` for classes from project dependencies even though Gradle builds successfully. Keep the previewed content `internal` so the debug-variant preview file can call it.
 
 ```kotlin
 @Preview

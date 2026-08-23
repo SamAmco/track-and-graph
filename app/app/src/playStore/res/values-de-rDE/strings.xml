@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="support_developer">Entwickler unterstützen</string>
+    <string name="support_unavailable">Derzeit sind keine Unterstützungsoptionen verfügbar.</string>
+    <string name="support_payment_failed">Die Zahlung ist fehlgeschlagen. Bitte versuche es erneut.</string>
+    <string name="support_payment_pending">Die Zahlung ist ausstehend. Google Play schließt sie nach der Bestätigung ab.</string>
+    <string name="support_thank_you">Vielen Dank für deine Unterstützung von Track &amp; Graph!</string>
+    <string name="release_notes_support_text">Track &amp; Graph ist kostenlos und Open Source. Wenn du die App nützlich findest, kannst du ihre Weiterentwicklung freiwillig unterstützen.</string>
+    <string name="release_notes_maybe_later">Vielleicht später</string>
+    <string name="release_notes_support_development">Entwickler unterstützen</string>
+</resources>

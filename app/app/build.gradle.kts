@@ -151,6 +151,9 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":ui"))
 
+    // Google Play Billing is deliberately absent from FOSS builds.
+    add("playStoreImplementation", libs.play.billing)
+
     //Date and time
     implementation(libs.threetenabp)
 

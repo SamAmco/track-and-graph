@@ -113,6 +113,7 @@ fun SelectorButton(
     text: String,
     enabled: Boolean = true,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
+    border: BorderStroke? = null,
     overflow: TextOverflow = TextOverflow.StartEllipsis,
     maxLines: Int = 1,
     onClick: () -> Unit
@@ -121,6 +122,7 @@ fun SelectorButton(
     onClick = onClick,
     shape = MaterialTheme.shapes.medium,
     enabled = enabled,
+    border = border,
     contentPadding = PaddingValues(
         horizontal = 8.dp,
         vertical = 6.dp

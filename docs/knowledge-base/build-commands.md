@@ -1,10 +1,10 @@
 ---
 title: Build, test, and screenshot commands
-description: Gradle commands for building and running tests; Play Store vs FOSS release flavor intent; Compose screenshot-test setup for Play Store and tutorial image capture.
+description: Gradle commands for building and running tests; Play Store vs FOSS release flavor intent, including distribution-specific support payments; Compose screenshot-test setup for Play Store and tutorial image capture.
 topics:
   - Build: cd app && ./gradlew assembleDebug
   - Test: cd app && ./gradlew :data:testDebugUnitTest
-  - Release flavors: playStore excludes donation/support UI/resources; foss keeps them for F-Droid/GitHub
+  - Release flavors: playStore uses Google Play Billing support; foss uses external Buy Me a Coffee support
   - F-Droid metadata should build the foss flavor explicitly, not a flavorless release
   - Release builds should run root Gradle clean, not only :app:clean, so dependent-module generated outputs cannot leak into APK/AAB artifacts
   - Release APKs keep native debug symbols in packaged .so files to avoid NDK stripping reproducibility differences
@@ -29,14 +29,14 @@ cd app && ./gradlew :data:testDebugUnitTest    # Run data unit tests
 Release distribution variants:
 
 ```bash
-cd app && ./gradlew clean :app:bundlePlayStoreRelease    # Google Play AAB, no donation UI/resources
+cd app && ./gradlew clean :app:bundlePlayStoreRelease    # Google Play AAB, with Play Billing support
 cd app && ./gradlew clean :app:assembleFossRelease       # F-Droid/GitHub APK, keeps donation UI/resources
 cd app && ./gradlew clean :app:bundleFossRelease         # F-Droid/GitHub AAB if needed
 ```
 
 ## Release Distribution Flavors
 
-The app has a `distribution` flavor dimension with `playStore` and `foss` flavors. The split exists for store-policy compliance: Play Store builds must not compile in the donation/support entry points, related strings, or BMC logo assets; F-Droid/GitHub builds keep that UI.
+The app has a `distribution` flavor dimension with `playStore` and `foss` flavors. The split exists for store-policy compliance: Play Store builds use Google Play Billing for voluntary support and must not compile in external payment links or Buy Me a Coffee assets. F-Droid/GitHub builds retain the external Buy Me a Coffee flow and do not include the Play Billing dependency or permission. See `play-billing.md` for the Play-specific lifecycle and Console setup.
 
 Keep distribution-specific UI behind flavor source-set hooks in the app module. Shared UI such as the changelog/release-notes dialog should stay reusable and parameterized; the app flavor decides whether to provide support content and whether the dialog is dismissible by outside click/back press.
 

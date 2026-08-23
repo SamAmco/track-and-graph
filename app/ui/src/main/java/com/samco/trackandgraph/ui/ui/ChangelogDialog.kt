@@ -1,5 +1,8 @@
 package com.samco.trackandgraph.ui.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,28 +27,49 @@ fun ChangelogDialogContent(
     dismissOnClickOutside: Boolean = false,
     dismissOnBackPress: Boolean = false,
     supportContent: (@Composable () -> Unit)? = null,
+    alternateContent: (@Composable () -> Unit)? = null,
+    showAlternateContent: Boolean = false,
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
     dismissOnClickOutside = dismissOnClickOutside,
     dismissOnBackPress = dismissOnBackPress,
     scrollContent = false,
+    supportSmoothHeightAnimation = alternateContent != null,
 ) {
-    FadingScrollColumn(
+    AnimatedContent(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing),
-    ) {
-        releaseNotes.forEach { releaseNote ->
-            ReleaseNoteItem(
-                version = releaseNote.version,
-                markdown = releaseNote.markdown,
-            )
-        }
+        targetState = showAlternateContent && alternateContent != null,
+        transitionSpec = {
+            val direction = if (targetState) {
+                AnimatedContentTransitionScope.SlideDirection.Left
+            } else {
+                AnimatedContentTransitionScope.SlideDirection.Right
+            }
+            slideIntoContainer(direction) togetherWith slideOutOfContainer(direction)
+        },
+        label = "changelogAlternateContent",
+    ) { showAlternate ->
+        if (showAlternate) {
+            alternateContent?.invoke()
+        } else {
+            FadingScrollColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(dialogInputSpacing),
+            ) {
+                releaseNotes.forEach { releaseNote ->
+                    ReleaseNoteItem(
+                        version = releaseNote.version,
+                        markdown = releaseNote.markdown,
+                    )
+                }
 
-        DialogInputSpacing()
+                DialogInputSpacing()
 
-        supportContent?.let {
-            HorizontalDivider()
-            it()
+                supportContent?.let {
+                    HorizontalDivider()
+                    it()
+                }
+            }
         }
     }
 }

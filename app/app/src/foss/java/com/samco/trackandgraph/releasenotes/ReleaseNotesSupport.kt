@@ -45,6 +45,7 @@ internal fun releaseNotesSupportContent(
     onDonateClicked: () -> Unit,
     onSkipDonationClicked: () -> Unit,
     onDismissRequest: () -> Unit,
+    onSupportClicked: () -> Unit,
 ): (@Composable () -> Unit)? {
     var wasDonationLaunched by remember { mutableStateOf(false) }
     var showThankYou by remember { mutableStateOf(false) }
@@ -97,6 +98,11 @@ internal fun releaseNotesSupportContent(
         )
     }
 }
+
+@Composable
+internal fun releaseNotesSupportScreen(
+    onBack: () -> Unit,
+): (@Composable () -> Unit)? = null
 
 @Composable
 private fun ThankYouDialogContent(

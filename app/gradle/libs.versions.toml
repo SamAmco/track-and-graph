@@ -44,6 +44,7 @@ kotlinxSerializationCore = "1.11.0"
 kotlinSerialization = "2.3.21"
 semver = "3.1.0"
 turbine = "1.2.1"
+playBilling = "9.1.0"
 
 # Gradle script versions
 buildJdk = "21"
@@ -126,3 +127,4 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+play-billing = { module = "com.android.billingclient:billing", version.ref = "playBilling" }
