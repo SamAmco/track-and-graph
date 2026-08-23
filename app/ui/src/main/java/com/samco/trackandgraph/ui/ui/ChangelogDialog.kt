@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -30,18 +31,30 @@ fun ChangelogDialogContent(
     alternateContent: (@Composable () -> Unit)? = null,
     showAlternateContent: Boolean = false,
 ) {
+    val showingAlternateContent = showAlternateContent && alternateContent != null
+
     CustomDialog(
         onDismissRequest = onDismissRequest,
         dismissOnClickOutside = dismissOnClickOutside,
         dismissOnBackPress = dismissOnBackPress,
         scrollContent = false,
         supportSmoothHeightAnimation = alternateContent != null,
+        paddingValues = PaddingValues(
+            start = inputSpacingLarge,
+            end = inputSpacingLarge,
+            top = inputSpacingLarge,
+            bottom = if (showingAlternateContent) {
+                halfDialogInputSpacing
+            } else {
+                inputSpacingLarge
+            },
+        ),
     ) {
         ChangelogDialogBody(
             releaseNotes = releaseNotes,
             supportContent = supportContent,
             alternateContent = alternateContent,
-            showAlternateContent = showAlternateContent,
+            showAlternateContent = showingAlternateContent,
         )
     }
 }

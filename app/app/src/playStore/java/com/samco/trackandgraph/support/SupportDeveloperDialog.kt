@@ -39,6 +39,7 @@ import com.samco.trackandgraph.ui.ui.SupportOptionViewData
 import com.samco.trackandgraph.ui.ui.SupportOptionsContent
 import com.samco.trackandgraph.ui.ui.SupportThankYouContent
 import com.samco.trackandgraph.ui.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.ui.inputSpacingXLarge
 
@@ -54,7 +55,12 @@ internal fun SupportDeveloperDialog(
         },
         scrollContent = false,
         supportSmoothHeightAnimation = true,
-        paddingValues = PaddingValues(inputSpacingLarge),
+        paddingValues = PaddingValues(
+            start = inputSpacingLarge,
+            end = inputSpacingLarge,
+            top = inputSpacingLarge,
+            bottom = halfDialogInputSpacing,
+        ),
     ) {
         SupportDeveloperScreen(
             onBack = {
