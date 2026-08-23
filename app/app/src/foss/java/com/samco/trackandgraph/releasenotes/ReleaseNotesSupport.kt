@@ -87,6 +87,7 @@ internal fun ReleaseNotesSupportPromptContent(
 @Composable
 internal fun releaseNotesSupportScreen(
     onBack: () -> Unit,
+    onThankYouClose: () -> Unit,
 ): (@Composable () -> Unit)? = null
 
 @Composable

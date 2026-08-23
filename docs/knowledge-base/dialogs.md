@@ -33,7 +33,7 @@ Do not give dialog content a fixed height merely to make scrolling work. Let the
 
 ## Dialog navigation
 
-Content-only screens embedded in an animated dialog host should not create another `Dialog`. They render their body and footer into the existing host and use callbacks for back navigation. A standalone entry point can wrap that same content-only screen in `CustomDialog`; both hosts must honor the footer padding contract.
+Content-only screens embedded in an animated dialog host should not create another `Dialog`. They render their body and footer into the existing host. Keep non-terminal navigation and terminal completion callbacks distinct: Back or Cancel may return to the previous screen inside the host, while an explicit Close after completing the journey should dismiss the host dialog. A standalone entry point can wrap that same content-only screen in `CustomDialog`; both hosts must honor the footer padding contract.
 
 ## Previews
 

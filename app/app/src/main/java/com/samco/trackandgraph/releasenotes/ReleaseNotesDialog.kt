@@ -73,6 +73,7 @@ private fun ReleaseNotesDialogContent(
         ),
         alternateContent = releaseNotesSupportScreen(
             onBack = { showSupportScreen = false },
+            onThankYouClose = onDismissRequest,
         ),
         showAlternateContent = showSupportScreen,
     )

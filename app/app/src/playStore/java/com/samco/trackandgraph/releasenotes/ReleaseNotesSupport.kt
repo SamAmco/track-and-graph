@@ -40,6 +40,10 @@ internal fun releaseNotesSupportContent(
 @Composable
 internal fun releaseNotesSupportScreen(
     onBack: () -> Unit,
+    onThankYouClose: () -> Unit,
 ): (@Composable () -> Unit)? = {
-    SupportDeveloperScreen(onBack = onBack)
+    SupportDeveloperScreen(
+        onBack = onBack,
+        onThankYouClose = onThankYouClose,
+    )
 }

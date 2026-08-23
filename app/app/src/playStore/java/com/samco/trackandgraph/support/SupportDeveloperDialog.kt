@@ -67,6 +67,10 @@ internal fun SupportDeveloperDialog(
                 viewModel.clearTransientState()
                 onDismissRequest()
             },
+            onThankYouClose = {
+                viewModel.clearTransientState()
+                onDismissRequest()
+            },
             viewModel = viewModel,
         )
     }
@@ -76,6 +80,7 @@ internal fun SupportDeveloperDialog(
 @Composable
 internal fun SupportDeveloperScreen(
     onBack: () -> Unit,
+    onThankYouClose: () -> Unit,
     viewModel: SupportBillingViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -94,6 +99,10 @@ internal fun SupportDeveloperScreen(
             viewModel.clearTransientState()
             onBack()
         },
+        onThankYouClose = {
+            viewModel.clearTransientState()
+            onThankYouClose()
+        },
     )
 }
 
@@ -102,6 +111,7 @@ internal fun SupportDeveloperDialogContent(
     state: SupportBillingState,
     onOptionClicked: (String) -> Unit = {},
     onBack: () -> Unit = {},
+    onThankYouClose: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -112,7 +122,7 @@ internal fun SupportDeveloperDialogContent(
             SupportThankYouContent(
                 message = stringResource(UiR.string.release_notes_thank_you),
                 closeText = stringResource(UiR.string.support_close),
-                onClose = onBack,
+                onClose = onThankYouClose,
             )
         } else {
             when (val products = state.products) {

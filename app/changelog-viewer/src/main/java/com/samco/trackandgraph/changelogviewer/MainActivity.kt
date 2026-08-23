@@ -167,6 +167,11 @@ private fun ChangelogViewerApp() {
                             mockPurchaseComplete = false
                             showSupportScreen = false
                         },
+                        onThankYouClose = {
+                            mockPurchaseComplete = false
+                            showSupportScreen = false
+                            showPreview = false
+                        },
                     )
                 },
                 showAlternateContent = showSupportScreen,
@@ -180,6 +185,7 @@ private fun MockSupportScreen(
     purchaseComplete: Boolean,
     onOptionClicked: (String) -> Unit,
     onBack: () -> Unit,
+    onThankYouClose: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -190,7 +196,7 @@ private fun MockSupportScreen(
             SupportThankYouContent(
                 message = stringResource(UiR.string.release_notes_thank_you),
                 closeText = stringResource(UiR.string.support_close),
-                onClose = onBack,
+                onClose = onThankYouClose,
             )
         } else {
             SupportOptionsContent(
