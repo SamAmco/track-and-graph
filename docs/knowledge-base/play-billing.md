@@ -6,8 +6,9 @@ topics:
   - Play Console product and purchase-option contract
   - Lazy loading and support-dialog state
   - Consumption and recovery of completed purchases
+  - Callback serialization and dialog-session invalidation
   - Release-notes dialog navigation
-keywords: [billing, Google Play Billing, playStore, support, tip, consumable, one-time product, purchase option, offer token, highlighted, queryPurchasesAsync, consumeAsync, developer_support, release notes, drawer]
+keywords: [billing, Google Play Billing, BillingClient, playStore, support, tip, consumable, one-time product, purchase option, offer token, highlighted, callback, race, session, queryPurchasesAsync, consumeAsync, developer_support, release notes, drawer]
 ---
 
 # Play Store developer support billing
@@ -36,6 +37,16 @@ Billing calls start only when the support dialog opens. Both the drawer item and
 6. Consume a `PURCHASED` result; show thanks only after consumption succeeds.
 
 Play retains non-consumed purchases, so consumption recovery deliberately uses `queryPurchasesAsync()` rather than app preferences. If consumption fails after a successful charge, do not report “payment failed”: the charge may be real, and the retained purchase will be retried on a later dialog load. Actual purchase-flow failures show an inline message; selecting any option again is the retry action. User cancellation is silent.
+
+## Billing boundary and callback safety
+
+The manager depends on a Play-only, logic-free `SupportBillingClient` facade rather than constructing or calling `BillingClient` directly. Its production implementation delegates to the SDK and is bound with Hilt; tests use a callback-controllable fake. Keep policy, state transitions, recovery, and callback-ordering decisions in the manager, not the facade.
+
+Billing callbacks may arrive late or concurrently. The manager therefore serializes all mutable billing state, assigns a generation to each dialog load, and ignores UI updates from older or dismissed generations. Connection attempts have a separate generation so an old disconnect cannot fail a newer load. A purchase can still be consumed after its dialog closes, but it must not open a late thank-you state.
+
+Consumption is coalesced by Play purchase token. This matters when recovery queries overlap or Play delivers the same completed purchase more than once: only one `consumeAsync()` call is made, while every waiting recovery continuation is completed. The purchase-in-progress flag also guards against rapid repeated taps launching multiple Billing flows.
+
+The Play-flavor unit tests drive SDK callbacks explicitly and cover stale, overlapping, duplicate, and concurrent callback orders. Add regression cases there whenever callback sequencing changes.
 
 The release-notes dialog animates between changelog and support content inside the same dialog. Returning from the Google Play purchase sheet reveals the support content. Back or Cancel from the purchase-options screen returns to the changelog, but Close from the successful thank-you state dismisses the entire release-notes dialog so the user does not have to dismiss the support prompt again.
 

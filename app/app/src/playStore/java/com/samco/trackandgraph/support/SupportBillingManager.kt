@@ -10,20 +10,17 @@
 package com.samco.trackandgraph.support
 
 import android.app.Activity
-import android.content.Context
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
-import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -65,45 +62,57 @@ private data class PurchasableOption(
     val offerDetails: ProductDetails.OneTimePurchaseOfferDetails,
 )
 
+private data class ConsumeRequest(
+    val thankYouSession: Long?,
+    val onComplete: () -> Unit,
+)
+
 @Singleton
 internal class SupportBillingManager @Inject constructor(
-    @ApplicationContext context: Context,
+    private val billingClient: SupportBillingClient,
 ) : PurchasesUpdatedListener {
 
+    private val lock = Any()
     private val _state = MutableStateFlow(SupportBillingState())
     val state: StateFlow<SupportBillingState> = _state.asStateFlow()
 
+    /** All fields below are read and written only while [lock] is held. */
     private val purchasableOptions = mutableMapOf<String, PurchasableOption>()
+    private val consumeRequests = mutableMapOf<String, MutableList<ConsumeRequest>>()
     private var connectionInProgress = false
+    private var connectionSession: Long? = null
+    private var connectionAttempt = 0L
+    private var currentSession = 0L
+    private var sessionActive = false
+    private var activePurchaseSession: Long? = null
 
-    private val billingClient = BillingClient.newBuilder(context)
-        .setListener(this)
-        .enablePendingPurchases(
-            PendingPurchasesParams.newBuilder()
-                .enableOneTimeProducts()
-                .build()
-        )
-        .enableAutoServiceReconnection()
-        .build()
+    init {
+        billingClient.setPurchasesUpdatedListener(this)
+    }
 
     /** Starts all Play calls lazily when the support dialog is opened. */
-    fun load() {
+    fun load() = serialized {
+        val session = startSession()
         _state.value = SupportBillingState(products = SupportProductsState.Loading)
         purchasableOptions.clear()
 
         if (billingClient.isReady) {
-            recoverOutstandingPurchases(::queryProductDetails)
+            recoverOutstandingPurchases(session) { queryProductDetails(session) }
         } else {
-            connect()
+            connect(session)
         }
     }
 
-    fun purchase(activity: Activity, optionId: String) {
+    fun purchase(activity: Activity, optionId: String) = serialized {
+        val session = currentSession.takeIf { isCurrentSession(it) } ?: return@serialized
+        if (_state.value.purchaseInProgress) return@serialized
+
         val option = purchasableOptions[optionId] ?: run {
-            showPaymentFailure()
-            return
+            showPaymentFailure(session)
+            return@serialized
         }
 
+        activePurchaseSession = session
         _state.value = _state.value.copy(
             purchaseInProgress = true,
             message = null,
@@ -112,7 +121,7 @@ internal class SupportBillingManager @Inject constructor(
 
         val productParams = BillingFlowParams.ProductDetailsParams.newBuilder()
             .setProductDetails(option.productDetails)
-            .setOfferToken(optionId)
+            .setOfferToken(option.offerDetails.offerToken ?: optionId)
             .build()
         val result = billingClient.launchBillingFlow(
             activity,
@@ -121,110 +130,189 @@ internal class SupportBillingManager @Inject constructor(
                 .build()
         )
 
-        if (result.responseCode != BillingResponseCode.OK) {
+        if (
+            result.responseCode != BillingResponseCode.OK &&
+            activePurchaseSession == session
+        ) {
             Timber.w("Unable to launch support purchase: %s", result.debugMessage)
-            showPaymentFailure()
+            activePurchaseSession = null
+            showPaymentFailure(session)
         }
     }
 
-    fun clearTransientState() {
-        _state.value = _state.value.copy(message = null, showThankYou = false)
+    /** Invalidates callbacks belonging to the dialog session that just closed. */
+    fun clearTransientState() = serialized {
+        currentSession += 1
+        sessionActive = false
+        activePurchaseSession = null
+        purchasableOptions.clear()
+        _state.value = _state.value.copy(
+            purchaseInProgress = false,
+            message = null,
+            showThankYou = false,
+        )
     }
 
     override fun onPurchasesUpdated(
         billingResult: BillingResult,
         purchases: List<Purchase>?,
-    ) {
+    ) = serialized {
+        val purchaseSession = activePurchaseSession?.takeIf(::isCurrentSession)
+
         when (billingResult.responseCode) {
             BillingResponseCode.OK -> {
                 val purchase = purchases.orEmpty()
                     .firstOrNull { SUPPORT_PRODUCT_ID in it.products }
                 when (purchase?.purchaseState) {
-                    Purchase.PurchaseState.PURCHASED -> consume(purchase, showThankYou = true)
+                    Purchase.PurchaseState.PURCHASED -> consume(
+                        purchase = purchase,
+                        thankYouSession = purchaseSession,
+                    )
+
                     Purchase.PurchaseState.PENDING -> {
-                        _state.value = _state.value.copy(
-                            purchaseInProgress = false,
-                            message = SupportBillingMessage.PaymentPending,
-                        )
+                        activePurchaseSession = null
+                        if (purchaseSession != null) {
+                            _state.value = _state.value.copy(
+                                purchaseInProgress = false,
+                                message = SupportBillingMessage.PaymentPending,
+                            )
+                        }
                     }
-                    else -> showPaymentFailure()
+
+                    else -> finishPurchaseWithFailure(purchaseSession)
                 }
             }
+
             BillingResponseCode.USER_CANCELED -> {
-                _state.value = _state.value.copy(purchaseInProgress = false, message = null)
-            }
-            BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                recoverOutstandingPurchases {
-                    _state.value = _state.value.copy(purchaseInProgress = false)
-                    queryProductDetails()
+                activePurchaseSession = null
+                if (purchaseSession != null) {
+                    _state.value = _state.value.copy(
+                        purchaseInProgress = false,
+                        message = null,
+                    )
                 }
             }
+
+            BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                activePurchaseSession = null
+                val session = purchaseSession ?: currentSession.takeIf(::isCurrentSession)
+                if (session != null) {
+                    recoverOutstandingPurchases(session) {
+                        if (isCurrentSession(session)) {
+                            _state.value = _state.value.copy(purchaseInProgress = false)
+                            queryProductDetails(session)
+                        }
+                    }
+                }
+            }
+
             else -> {
                 Timber.w("Support purchase failed: %s", billingResult.debugMessage)
-                showPaymentFailure()
+                finishPurchaseWithFailure(purchaseSession)
             }
         }
     }
 
-    private fun connect() {
+    private fun connect(session: Long) {
+        connectionSession = session
         if (connectionInProgress) return
+
         connectionInProgress = true
+        val attempt = ++connectionAttempt
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
-                connectionInProgress = false
-                if (billingResult.responseCode == BillingResponseCode.OK) {
-                    recoverOutstandingPurchases(::queryProductDetails)
-                } else {
-                    Timber.w("Billing setup failed: %s", billingResult.debugMessage)
-                    showProductsUnavailable()
+                serialized {
+                    if (attempt != connectionAttempt) return@serialized
+                    connectionInProgress = false
+                    val requestedSession = connectionSession
+                    if (billingResult.responseCode == BillingResponseCode.OK) {
+                        if (requestedSession != null && isCurrentSession(requestedSession)) {
+                            recoverOutstandingPurchases(requestedSession) {
+                                queryProductDetails(requestedSession)
+                            }
+                        }
+                    } else {
+                        Timber.w("Billing setup failed: %s", billingResult.debugMessage)
+                        requestedSession?.let(::showProductsUnavailable)
+                    }
                 }
             }
 
             override fun onBillingServiceDisconnected() {
-                connectionInProgress = false
+                serialized {
+                    if (attempt != connectionAttempt) return@serialized
+                    connectionInProgress = false
+                    val requestedSession = connectionSession
+                    if (
+                        requestedSession != null &&
+                        isCurrentSession(requestedSession) &&
+                        _state.value.products == SupportProductsState.Loading
+                    ) {
+                        showProductsUnavailable(requestedSession)
+                    }
+                }
             }
         })
     }
 
     /** Play retains non-consumed purchases, so failed consumes need no local persistence. */
-    private fun recoverOutstandingPurchases(onComplete: () -> Unit) {
+    private fun recoverOutstandingPurchases(
+        session: Long,
+        onComplete: () -> Unit,
+    ) {
         billingClient.queryPurchasesAsync(
             QueryPurchasesParams.newBuilder()
                 .setProductType(BillingClient.ProductType.INAPP)
                 .build()
         ) { result, purchases ->
-            if (result.responseCode != BillingResponseCode.OK) {
-                Timber.w("Unable to query outstanding purchases: %s", result.debugMessage)
-                onComplete()
-                return@queryPurchasesAsync
-            }
+            serialized {
+                if (result.responseCode != BillingResponseCode.OK) {
+                    Timber.w(
+                        "Unable to query outstanding purchases: %s",
+                        result.debugMessage,
+                    )
+                    if (isCurrentSession(session)) onComplete()
+                    return@serialized
+                }
 
-            val completedPurchases = purchases.filter {
-                SUPPORT_PRODUCT_ID in it.products &&
-                    it.purchaseState == Purchase.PurchaseState.PURCHASED
-            }
-            if (purchases.any {
-                    SUPPORT_PRODUCT_ID in it.products &&
-                        it.purchaseState == Purchase.PurchaseState.PENDING
-                }) {
-                _state.value = _state.value.copy(message = SupportBillingMessage.PaymentPending)
-            }
-            if (completedPurchases.isEmpty()) {
-                onComplete()
-                return@queryPurchasesAsync
-            }
+                if (
+                    isCurrentSession(session) &&
+                    purchases.any {
+                        SUPPORT_PRODUCT_ID in it.products &&
+                            it.purchaseState == Purchase.PurchaseState.PENDING
+                    }
+                ) {
+                    _state.value = _state.value.copy(
+                        message = SupportBillingMessage.PaymentPending,
+                    )
+                }
 
-            var remaining = completedPurchases.size
-            completedPurchases.forEach { purchase ->
-                consume(purchase, showThankYou = false) {
-                    remaining -= 1
-                    if (remaining == 0) onComplete()
+                val completedPurchases = purchases
+                    .filter {
+                        SUPPORT_PRODUCT_ID in it.products &&
+                            it.purchaseState == Purchase.PurchaseState.PURCHASED
+                    }
+                    .distinctBy(Purchase::getPurchaseToken)
+
+                if (completedPurchases.isEmpty()) {
+                    if (isCurrentSession(session)) onComplete()
+                    return@serialized
+                }
+
+                var remaining = completedPurchases.size
+                completedPurchases.forEach { purchase ->
+                    consume(purchase, thankYouSession = null) {
+                        remaining -= 1
+                        if (remaining == 0 && isCurrentSession(session)) onComplete()
+                    }
                 }
             }
         }
     }
 
-    private fun queryProductDetails() {
+    private fun queryProductDetails(session: Long) {
+        if (!isCurrentSession(session)) return
+
         val product = QueryProductDetailsParams.Product.newBuilder()
             .setProductId(SUPPORT_PRODUCT_ID)
             .setProductType(BillingClient.ProductType.INAPP)
@@ -234,83 +322,121 @@ internal class SupportBillingManager @Inject constructor(
                 .setProductList(listOf(product))
                 .build()
         ) { result, detailsResult ->
-            if (result.responseCode != BillingResponseCode.OK) {
-                Timber.w("Unable to query support product: %s", result.debugMessage)
-                showProductsUnavailable()
-                return@queryProductDetailsAsync
-            }
+            serialized {
+                if (!isCurrentSession(session)) return@serialized
 
-            val details = detailsResult.productDetailsList
-                .firstOrNull { it.productId == SUPPORT_PRODUCT_ID }
-            if (details == null) {
-                showProductsUnavailable()
-                return@queryProductDetailsAsync
-            }
+                if (result.responseCode != BillingResponseCode.OK) {
+                    Timber.w("Unable to query support product: %s", result.debugMessage)
+                    showProductsUnavailable(session)
+                    return@serialized
+                }
 
-            val offers = details.oneTimePurchaseOfferDetailsList
-                .orEmpty()
-                .ifEmpty { listOfNotNull(details.oneTimePurchaseOfferDetails) }
-                .filter { it.rentalDetails == null && it.preorderDetails == null }
-                .sortedBy { it.priceAmountMicros }
-                .mapNotNull { offer -> offer.offerToken?.let { token -> token to offer } }
+                val details = detailsResult.productDetailsList
+                    .firstOrNull { it.productId == SUPPORT_PRODUCT_ID }
+                if (details == null) {
+                    showProductsUnavailable(session)
+                    return@serialized
+                }
 
-            purchasableOptions.clear()
-            offers.forEach { (token, offer) ->
-                purchasableOptions[token] = PurchasableOption(details, offer)
-            }
-            if (offers.isEmpty()) {
-                showProductsUnavailable()
-            } else {
-                _state.value = _state.value.copy(
-                    products = SupportProductsState.Available(
-                        description = details.description,
-                        options = offers.map { (token, offer) ->
-                            SupportPurchaseOption(
-                                id = token,
-                                formattedPrice = offer.formattedPrice,
-                                priceMicros = offer.priceAmountMicros,
-                                highlighted = HIGHLIGHTED_TAG in offer.offerTags.orEmpty(),
-                            )
-                        },
-                    ),
-                    purchaseInProgress = false,
-                    showThankYou = false,
-                )
-            }
-        }
-    }
+                val offers = details.oneTimePurchaseOfferDetailsList
+                    .orEmpty()
+                    .ifEmpty { listOfNotNull(details.oneTimePurchaseOfferDetails) }
+                    .filter { it.rentalDetails == null && it.preorderDetails == null }
+                    .sortedBy { it.priceAmountMicros }
+                    .mapNotNull { offer -> offer.offerToken?.let { token -> token to offer } }
 
-    private fun consume(
-        purchase: Purchase,
-        showThankYou: Boolean,
-        onComplete: () -> Unit = {},
-    ) {
-        billingClient.consumeAsync(
-            ConsumeParams.newBuilder()
-                .setPurchaseToken(purchase.purchaseToken)
-                .build()
-        ) { result, _ ->
-            if (result.responseCode == BillingResponseCode.OK) {
-                if (showThankYou) {
+                purchasableOptions.clear()
+                offers.forEach { (token, offer) ->
+                    purchasableOptions[token] = PurchasableOption(details, offer)
+                }
+                if (offers.isEmpty()) {
+                    showProductsUnavailable(session)
+                } else {
                     _state.value = _state.value.copy(
+                        products = SupportProductsState.Available(
+                            description = details.description,
+                            options = offers.map { (token, offer) ->
+                                SupportPurchaseOption(
+                                    id = token,
+                                    formattedPrice = offer.formattedPrice,
+                                    priceMicros = offer.priceAmountMicros,
+                                    highlighted = HIGHLIGHTED_TAG in offer.offerTags.orEmpty(),
+                                )
+                            },
+                        ),
                         purchaseInProgress = false,
-                        message = null,
-                        showThankYou = true,
+                        showThankYou = false,
                     )
                 }
-            } else {
-                Timber.w("Unable to consume support purchase: %s", result.debugMessage)
-                if (showThankYou) {
-                    // The payment itself succeeded. Play retains this purchase so a later dialog
-                    // load can retry consumption; don't misleadingly report a payment failure.
-                    _state.value = _state.value.copy(purchaseInProgress = false)
-                }
             }
-            onComplete()
         }
     }
 
-    private fun showProductsUnavailable() {
+    /** Coalesces duplicate consume attempts for the same Play purchase token. */
+    private fun consume(
+        purchase: Purchase,
+        thankYouSession: Long?,
+        onComplete: () -> Unit = {},
+    ) {
+        val token = purchase.purchaseToken
+        val request = ConsumeRequest(thankYouSession, onComplete)
+        consumeRequests[token]?.let {
+            it += request
+            return
+        }
+        consumeRequests[token] = mutableListOf(request)
+
+        billingClient.consumeAsync(
+            ConsumeParams.newBuilder()
+                .setPurchaseToken(token)
+                .build()
+        ) { result, _ ->
+            serialized {
+                val completedRequests = consumeRequests.remove(token).orEmpty()
+                val currentThankYouSession = completedRequests
+                    .mapNotNull(ConsumeRequest::thankYouSession)
+                    .firstOrNull(::isCurrentSession)
+
+                completedRequests
+                    .mapNotNull(ConsumeRequest::thankYouSession)
+                    .firstOrNull { it == activePurchaseSession }
+                    ?.let { activePurchaseSession = null }
+
+                if (result.responseCode == BillingResponseCode.OK) {
+                    if (currentThankYouSession != null) {
+                        _state.value = _state.value.copy(
+                            purchaseInProgress = false,
+                            message = null,
+                            showThankYou = true,
+                        )
+                    }
+                } else {
+                    Timber.w("Unable to consume support purchase: %s", result.debugMessage)
+                    if (currentThankYouSession != null) {
+                        // The payment itself succeeded. Play retains this purchase so a later
+                        // dialog load can retry consumption; don't report a payment failure.
+                        _state.value = _state.value.copy(purchaseInProgress = false)
+                    }
+                }
+
+                completedRequests.forEach { it.onComplete() }
+            }
+        }
+    }
+
+    private fun startSession(): Long {
+        currentSession += 1
+        sessionActive = true
+        activePurchaseSession = null
+        connectionSession = currentSession
+        return currentSession
+    }
+
+    private fun isCurrentSession(session: Long): Boolean =
+        sessionActive && session == currentSession
+
+    private fun showProductsUnavailable(session: Long) {
+        if (!isCurrentSession(session)) return
         purchasableOptions.clear()
         _state.value = _state.value.copy(
             products = SupportProductsState.Unavailable,
@@ -319,12 +445,20 @@ internal class SupportBillingManager @Inject constructor(
         )
     }
 
-    private fun showPaymentFailure() {
+    private fun finishPurchaseWithFailure(session: Long?) {
+        activePurchaseSession = null
+        session?.let(::showPaymentFailure)
+    }
+
+    private fun showPaymentFailure(session: Long) {
+        if (!isCurrentSession(session)) return
         _state.value = _state.value.copy(
             purchaseInProgress = false,
             message = SupportBillingMessage.PaymentFailed,
         )
     }
+
+    private inline fun <T> serialized(block: () -> T): T = synchronized(lock, block)
 
     private companion object {
         const val SUPPORT_PRODUCT_ID = "developer_support"
