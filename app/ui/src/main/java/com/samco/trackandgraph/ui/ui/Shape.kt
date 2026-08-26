@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 val smallIconSize = 20.dp
+val largeIconSize = 28.dp
 
 val buttonSize = 45.dp
 

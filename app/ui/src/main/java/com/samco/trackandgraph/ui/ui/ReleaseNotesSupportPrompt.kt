@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.R
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.theming.tngColors
@@ -45,7 +44,7 @@ fun ReleaseNotesSupportPrompt(
             buttonColors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.tngColors.primary,
             ),
-            iconSize = 28.dp,
+            iconSize = largeIconSize,
             onClick = action.onClick,
             icon = action.icon,
             textAlign = TextAlign.Center,
