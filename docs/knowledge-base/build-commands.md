@@ -41,6 +41,8 @@ The app has a `distribution` flavor dimension with `playStore` and `foss` flavor
 
 Keep distribution-specific UI behind flavor source-set hooks in the app module. Shared UI such as the changelog/release-notes dialog should stay reusable and parameterized; the app flavor decides whether to provide support content and whether the dialog is dismissible by outside click/back press.
 
+Buy Me a Coffee drawables belong in the app's `foss` resources, never `ui/main`: every app flavor depends on the shared UI module. The standalone changelog viewer may explicitly include the FOSS resource directory to preview that action without making the asset reachable from Play builds.
+
 F-Droid's metadata should request the FOSS flavor explicitly for future releases:
 
 ```yaml

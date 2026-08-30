@@ -6,7 +6,7 @@ topics:
   - Play Console product and purchase-option contract
   - Lazy loading and support-dialog state
   - Consumption and recovery of completed purchases
-  - Callback serialization and dialog-session invalidation
+  - Billing boundaries, callback serialization, and coroutine cancellation
   - Release-notes dialog navigation
 keywords: [billing, Google Play Billing, BillingClient, playStore, support, tip, consumable, one-time product, purchase option, offer token, highlighted, callback, race, session, queryPurchasesAsync, consumeAsync, developer_support, release notes, drawer]
 ---
@@ -27,11 +27,11 @@ Draft or inactive purchase options are not returned. Each intended option needs 
 
 ## Lazy dialog lifecycle
 
-Billing calls start only when the support dialog opens. Both the drawer item and release-notes support action use the same Play-only billing manager and previewable UI:
+Billing calls start only when the support dialog opens. Both the drawer item and release-notes support action use the same Play-only coordinator and previewable UI:
 
 1. Connect to Billing and show a spinner-only loading UI.
 2. Query `INAPP` owned purchases and silently retry consumption of completed purchases.
-3. Leave pending purchases unconsumed and show their pending status.
+3. Leave pending purchases unconsumed, show their pending status, and disable further support purchases until Play reports a terminal state.
 4. Query `developer_support` and render every eligible Buy purchase option.
 5. Launch Play's flow immediately when an option is selected.
 6. Consume a `PURCHASED` result; show thanks only after consumption succeeds.
@@ -40,13 +40,25 @@ Play retains non-consumed purchases, so consumption recovery deliberately uses `
 
 ## Billing boundary and callback safety
 
-The manager depends on a Play-only, logic-free `SupportBillingClient` facade rather than constructing or calling `BillingClient` directly. Its production implementation delegates to the SDK and is bound with Hilt; tests use a callback-controllable fake. Keep policy, state transitions, recovery, and callback-ordering decisions in the manager, not the facade.
+The implementation has three deliberately narrow layers:
 
-Billing callbacks may arrive late or concurrently. The manager therefore serializes all mutable billing state, assigns a generation to each dialog load, and ignores UI updates from older or dismissed generations. Connection attempts have a separate generation so an old disconnect cannot fail a newer load. A purchase can still be consumed after its dialog closes, but it must not open a late thank-you state.
+1. The process-scoped `SupportBillingGateway` owns the real `BillingClient`, translates SDK objects and response codes into app-owned values, and retains the SDK offer objects required to launch purchases. It contains no support-flow policy.
+2. The process-scoped `SupportBillingCoordinator` owns the long-lived connection, purchase settlement, recovery, consume coalescing, and callback ordering. Its public operations are suspending functions returning app-owned results; it does not expose callbacks or UI state.
+3. `SupportBillingViewModel` owns the dialog's sealed loading/available/unavailable/thank-you state and maps coordinator results to presentation decisions.
 
-Consumption is coalesced by Play purchase token. This matters when recovery queries overlap or Play delivers the same completed purchase more than once: only one `consumeAsync()` call is made, while every waiting recovery continuation is completed. The purchase-in-progress flag also guards against rapid repeated taps launching multiple Billing flows.
+This is called a coordinator, not an Android service or a data interactor: its role is coordinating an asynchronous platform protocol. Only infrastructure that may need to settle a purchase after the dialog disappears is singleton-scoped. Never put dialog sessions, messages, or thank-you visibility back into that singleton.
 
-The Play-flavor unit tests drive SDK callbacks explicitly and cover stale, overlapping, duplicate, and concurrent callback orders. Add regression cases there whenever callback sequencing changes.
+Keep the single SDK gateway callback-shaped because it mirrors BillingClient. Convert callbacks to suspension at the coordinator boundary; the ViewModel should only launch and cancel jobs. Do not add another pass-through wrapper or a parallel custom request/cancellation abstraction.
+
+Billing callbacks may arrive late or concurrently. The coordinator serializes its mutable protocol state, coalesces connection waiters, and assigns generations to connection attempts so an old disconnect cannot fail a newer attempt. The gateway separately assigns generations to product queries before mutating its SDK-offer cache: a superseded query must never clear or replace offers returned by a newer query. The ViewModel cancels its previous coroutine when reloading or dismissing, so late results cannot mutate a new or closed screen. Canceling presentation delivery does not cancel settlement: a completed purchase is still consumed after its dialog closes, but it cannot open a late thank-you state.
+
+Purchase launch reconnects if Play disconnected after products were loaded. Once a launch is reserved, another launch is rejected until the existing flow reaches a terminal callback; this prevents an old Play callback being attributed to a newer request. An immediate `ITEM_ALREADY_OWNED` response follows the same recovery path as the asynchronous response.
+
+If `ITEM_ALREADY_OWNED` recovery finds a pending purchase, preserve the pending result rather than treating recovery as idle. Both the ViewModel and the rendered purchase options guard against a second checkout while pending; keep both checks so non-UI callers and future UI changes cannot bypass the rule.
+
+Consumption is coalesced by Play purchase token. This matters when recovery queries overlap or Play delivers the same completed purchase more than once: only one `consumeAsync()` call is made, while every waiting recovery continuation is completed. The ViewModel also guards against rapid repeated taps while checkout is in progress.
+
+The Play-flavor coordinator tests use a callback-controllable platform fake and cover stale, overlapping, duplicate, canceled, and concurrent callback orders without mocking final SDK objects. Separate ViewModel tests cover all presentation transitions and dismissal/reload invalidation. Add regression cases at the layer that owns the behavior whenever sequencing changes.
 
 The release-notes dialog animates between changelog and support content inside the same dialog. Returning from the Google Play purchase sheet reveals the support content. Back or Cancel from the purchase-options screen returns to the changelog, but Close from the successful thank-you state dismisses the entire release-notes dialog so the user does not have to dismiss the support prompt again.
 

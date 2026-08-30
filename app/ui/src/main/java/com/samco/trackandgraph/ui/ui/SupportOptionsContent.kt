@@ -37,6 +37,7 @@ fun ColumnScope.SupportOptionsContent(
     description: String,
     options: List<SupportOptionViewData>,
     purchaseInProgress: Boolean,
+    optionsEnabled: Boolean = !purchaseInProgress,
     onOptionClicked: (String) -> Unit,
 ) {
     Column(
@@ -54,7 +55,7 @@ fun ColumnScope.SupportOptionsContent(
                 border = if (option.highlighted) {
                     BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
                 } else null,
-                enabled = !purchaseInProgress,
+                enabled = optionsEnabled,
                 onClick = { onOptionClicked(option.id) },
             )
         }

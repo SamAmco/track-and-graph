@@ -50,7 +50,7 @@ internal fun SupportDeveloperDialog(
 ) {
     CustomDialog(
         onDismissRequest = {
-            viewModel.clearTransientState()
+            viewModel.dismiss()
             onDismissRequest()
         },
         scrollContent = false,
@@ -63,14 +63,8 @@ internal fun SupportDeveloperDialog(
         ),
     ) {
         SupportDeveloperScreen(
-            onBack = {
-                viewModel.clearTransientState()
-                onDismissRequest()
-            },
-            onThankYouClose = {
-                viewModel.clearTransientState()
-                onDismissRequest()
-            },
+            onBack = onDismissRequest,
+            onThankYouClose = onDismissRequest,
             viewModel = viewModel,
         )
     }
@@ -93,14 +87,16 @@ internal fun SupportDeveloperScreen(
     SupportDeveloperDialogContent(
         state = state,
         onOptionClicked = { optionId ->
-            if (activity != null) viewModel.purchase(activity, optionId)
+            if (activity != null) {
+                viewModel.purchase(activity.asSupportBillingFlowHost(), optionId)
+            }
         },
         onBack = {
-            viewModel.clearTransientState()
+            viewModel.dismiss()
             onBack()
         },
         onThankYouClose = {
-            viewModel.clearTransientState()
+            viewModel.dismiss()
             onThankYouClose()
         },
     )
@@ -118,18 +114,18 @@ internal fun SupportDeveloperDialogContent(
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (state.showThankYou) {
-            SupportThankYouContent(
-                message = stringResource(UiR.string.release_notes_thank_you),
-                closeText = stringResource(UiR.string.support_close),
-                onClose = onThankYouClose,
-            )
-        } else {
-            when (val products = state.products) {
-                SupportProductsState.NotLoaded,
-                SupportProductsState.Loading -> LoadingContent()
+        when (state) {
+            SupportBillingState.Loading -> {
+                LoadingContent()
+                CancelButton(onBack)
+            }
 
-                SupportProductsState.Unavailable -> {
+            is SupportBillingState.Unavailable -> {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(dialogInputSpacing),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(R.string.support_developer),
@@ -142,41 +138,60 @@ internal fun SupportDeveloperDialogContent(
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
+                    if (state.hasPendingPurchase) {
+                        BillingMessage(SupportCheckoutState.PaymentPending)
+                    }
                 }
+                CancelButton(onBack)
+            }
 
-                is SupportProductsState.Available -> AvailableProductsContent(
-                    products = products,
-                    purchaseInProgress = state.purchaseInProgress,
+            is SupportBillingState.Available -> {
+                AvailableProductsContent(
+                    state = state,
                     onOptionClicked = onOptionClicked,
                 )
+                BillingMessage(state.checkoutState)
+                CancelButton(onBack)
             }
 
-            state.message?.let { message ->
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(
-                        when (message) {
-                            SupportBillingMessage.PaymentFailed -> R.string.support_payment_failed
-                            SupportBillingMessage.PaymentPending -> R.string.support_payment_pending
-                        }
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (message == SupportBillingMessage.PaymentFailed) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    textAlign = TextAlign.Center,
-                )
-            }
-            ContinueCancelButtons(
-                cancelVisible = true,
-                continueVisible = false,
-                cancelText = R.string.cancel,
-                onCancel = onBack,
+            SupportBillingState.ThankYou -> SupportThankYouContent(
+                message = stringResource(UiR.string.release_notes_thank_you),
+                closeText = stringResource(UiR.string.support_close),
+                onClose = onThankYouClose,
             )
         }
     }
+}
+
+@Composable
+private fun BillingMessage(checkoutState: SupportCheckoutState) {
+    val message = when (checkoutState) {
+        SupportCheckoutState.PaymentFailed -> R.string.support_payment_failed
+        SupportCheckoutState.PaymentPending -> R.string.support_payment_pending
+        SupportCheckoutState.Idle,
+        SupportCheckoutState.InProgress -> return
+    }
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = stringResource(message),
+        style = MaterialTheme.typography.bodyMedium,
+        color = if (checkoutState == SupportCheckoutState.PaymentFailed) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+private fun CancelButton(onBack: () -> Unit) {
+    ContinueCancelButtons(
+        cancelVisible = true,
+        continueVisible = false,
+        cancelText = R.string.cancel,
+        onCancel = onBack,
+    )
 }
 
 @Composable
@@ -193,20 +208,21 @@ private fun LoadingContent() {
 
 @Composable
 private fun ColumnScope.AvailableProductsContent(
-    products: SupportProductsState.Available,
-    purchaseInProgress: Boolean,
+    state: SupportBillingState.Available,
     onOptionClicked: (String) -> Unit,
 ) {
     SupportOptionsContent(
-        description = products.description,
-        options = products.options.map {
+        description = state.description,
+        options = state.options.map {
             SupportOptionViewData(
                 id = it.id,
                 formattedPrice = it.formattedPrice,
                 highlighted = it.highlighted,
             )
         },
-        purchaseInProgress = purchaseInProgress,
+        purchaseInProgress = state.checkoutState == SupportCheckoutState.InProgress,
+        optionsEnabled = state.checkoutState != SupportCheckoutState.InProgress &&
+            state.checkoutState != SupportCheckoutState.PaymentPending,
         onOptionClicked = onOptionClicked,
     )
 }

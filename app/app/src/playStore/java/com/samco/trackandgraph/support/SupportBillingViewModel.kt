@@ -9,23 +9,118 @@
 
 package com.samco.trackandgraph.support
 
-import android.app.Activity
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+internal enum class SupportCheckoutState {
+    Idle,
+    InProgress,
+    PaymentFailed,
+    PaymentPending,
+}
+
+internal sealed interface SupportBillingState {
+    data object Loading : SupportBillingState
+
+    data class Unavailable(
+        val hasPendingPurchase: Boolean = false,
+    ) : SupportBillingState
+
+    data class Available(
+        val description: String,
+        val options: List<SupportPurchaseOption>,
+        val checkoutState: SupportCheckoutState = SupportCheckoutState.Idle,
+    ) : SupportBillingState
+
+    data object ThankYou : SupportBillingState
+}
 
 @HiltViewModel
 internal class SupportBillingViewModel @Inject constructor(
-    private val billingManager: SupportBillingManager,
+    private val billingCoordinator: SupportBillingCoordinator,
 ) : ViewModel() {
-    val state: StateFlow<SupportBillingState> = billingManager.state
+    private val _state = MutableStateFlow<SupportBillingState>(SupportBillingState.Loading)
+    val state: StateFlow<SupportBillingState> = _state.asStateFlow()
 
-    fun load() = billingManager.load()
+    private var loadJob: Job? = null
+    private var purchaseJob: Job? = null
 
-    fun purchase(activity: Activity, optionId: String) {
-        billingManager.purchase(activity, optionId)
+    fun load() {
+        loadJob?.cancel()
+        purchaseJob?.cancel()
+        _state.value = SupportBillingState.Loading
+        loadJob = viewModelScope.launch {
+            val result = billingCoordinator.load()
+            _state.value = when (result) {
+                is SupportLoadResult.Available -> SupportBillingState.Available(
+                    description = result.description,
+                    options = result.options,
+                    checkoutState = if (result.hasPendingPurchase) {
+                        SupportCheckoutState.PaymentPending
+                    } else {
+                        SupportCheckoutState.Idle
+                    },
+                )
+
+                is SupportLoadResult.Unavailable -> SupportBillingState.Unavailable(
+                    hasPendingPurchase = result.hasPendingPurchase,
+                )
+            }
+        }
     }
 
-    fun clearTransientState() = billingManager.clearTransientState()
+    fun purchase(host: SupportBillingFlowHost, optionId: String) {
+        val available = _state.value as? SupportBillingState.Available ?: return
+        if (
+            available.checkoutState == SupportCheckoutState.InProgress ||
+            available.checkoutState == SupportCheckoutState.PaymentPending
+        ) return
+        if (available.options.none { it.id == optionId }) {
+            _state.value = available.copy(checkoutState = SupportCheckoutState.PaymentFailed)
+            return
+        }
+
+        purchaseJob?.cancel()
+        _state.value = available.copy(checkoutState = SupportCheckoutState.InProgress)
+        purchaseJob = viewModelScope.launch {
+            val result = billingCoordinator.purchase(host, optionId)
+            val current = _state.value as? SupportBillingState.Available ?: return@launch
+            _state.value = when (result) {
+                SupportPurchaseResult.Completed -> SupportBillingState.ThankYou
+                SupportPurchaseResult.Pending -> current.copy(
+                    checkoutState = SupportCheckoutState.PaymentPending,
+                )
+
+                SupportPurchaseResult.Failed -> current.copy(
+                    checkoutState = SupportCheckoutState.PaymentFailed,
+                )
+
+                SupportPurchaseResult.Canceled,
+                SupportPurchaseResult.ConsumptionDeferred,
+                SupportPurchaseResult.Recovered -> current.copy(
+                    checkoutState = SupportCheckoutState.Idle,
+                )
+            }
+        }
+    }
+
+    fun dismiss() {
+        loadJob?.cancel()
+        purchaseJob?.cancel()
+        loadJob = null
+        purchaseJob = null
+        _state.value = SupportBillingState.Loading
+    }
+
+    override fun onCleared() {
+        loadJob?.cancel()
+        purchaseJob?.cancel()
+    }
 }

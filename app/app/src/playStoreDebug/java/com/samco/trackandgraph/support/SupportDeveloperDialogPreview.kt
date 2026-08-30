@@ -18,15 +18,13 @@ import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 private fun SupportDeveloperDialogAvailablePreview() {
     TnGComposeTheme {
         SupportDeveloperDialogContent(
-            state = SupportBillingState(
-                products = SupportProductsState.Available(
-                    description = "Support is voluntary and does not unlock any features.",
-                    options = listOf(
-                        SupportPurchaseOption("small", "£1.99", 1_990_000, false),
-                        SupportPurchaseOption("medium", "£4.99", 4_990_000, true),
-                        SupportPurchaseOption("large", "£9.99", 9_990_000, false),
-                    ),
-                )
+            state = SupportBillingState.Available(
+                description = "Support is voluntary and does not unlock any features.",
+                options = listOf(
+                    SupportPurchaseOption("small", "£1.99", 1_990_000, false),
+                    SupportPurchaseOption("medium", "£4.99", 4_990_000, true),
+                    SupportPurchaseOption("large", "£9.99", 9_990_000, false),
+                ),
             )
         )
     }
@@ -37,7 +35,7 @@ private fun SupportDeveloperDialogAvailablePreview() {
 private fun SupportDeveloperDialogLoadingPreview() {
     TnGComposeTheme {
         SupportDeveloperDialogContent(
-            state = SupportBillingState(products = SupportProductsState.Loading)
+            state = SupportBillingState.Loading
         )
     }
 }
@@ -47,14 +45,12 @@ private fun SupportDeveloperDialogLoadingPreview() {
 private fun SupportDeveloperDialogErrorPreview() {
     TnGComposeTheme {
         SupportDeveloperDialogContent(
-            state = SupportBillingState(
-                products = SupportProductsState.Available(
-                    description = "Support is voluntary and does not unlock any features.",
-                    options = listOf(
-                        SupportPurchaseOption("medium", "£4.99", 4_990_000, true),
-                    ),
+            state = SupportBillingState.Available(
+                description = "Support is voluntary and does not unlock any features.",
+                options = listOf(
+                    SupportPurchaseOption("medium", "£4.99", 4_990_000, true),
                 ),
-                message = SupportBillingMessage.PaymentFailed,
+                checkoutState = SupportCheckoutState.PaymentFailed,
             )
         )
     }

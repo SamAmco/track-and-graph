@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    sourceSets.getByName("main").res.directories.add("../app/src/foss/res")
+
     defaultConfig {
         applicationId = "com.samco.trackandgraph.changelogviewer"
         versionCode = 1

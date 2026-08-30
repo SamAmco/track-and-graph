@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.R as UiR
 import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.ReleaseNotesSupportAction
@@ -76,7 +77,7 @@ internal fun ReleaseNotesSupportPromptContent(
         supportActions = listOf(
             ReleaseNotesSupportAction(
                 text = stringResource(UiR.string.release_notes_support_development),
-                icon = UiR.drawable.bmc_logo,
+                icon = R.drawable.bmc_logo,
                 onClick = onDonateClicked,
             )
         ),

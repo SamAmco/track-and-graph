@@ -141,7 +141,7 @@ private fun ChangelogViewerApp() {
                         supportActions = listOf(
                             ReleaseNotesSupportAction(
                                 text = stringResource(UiR.string.release_notes_support_development),
-                                icon = UiR.drawable.bmc_logo,
+                                icon = R.drawable.bmc_logo,
                                 onClick = {
                                     mockPurchaseComplete = true
                                     showSupportScreen = true
