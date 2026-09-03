@@ -9,49 +9,18 @@
 
 package com.samco.trackandgraph.support
 
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 
-internal data class SupportPurchaseOption(
-    val id: String,
-    val formattedPrice: String,
-    val priceMicros: Long,
-    val highlighted: Boolean,
-)
-
-internal sealed interface SupportLoadResult {
-    val hasPendingPurchase: Boolean
-
-    data class Available(
-        val description: String,
-        val options: List<SupportPurchaseOption>,
-        override val hasPendingPurchase: Boolean,
-    ) : SupportLoadResult
-
-    data class Unavailable(
-        override val hasPendingPurchase: Boolean,
-    ) : SupportLoadResult
-}
-
-internal enum class SupportPurchaseResult {
-    Completed,
-    Pending,
-    Canceled,
-    Failed,
-    ConsumptionDeferred,
-    Recovered,
-}
-
 internal interface SupportBillingCoordinator {
     suspend fun load(): SupportLoadResult
+
+    suspend fun reconcileIfNeeded()
 
     suspend fun purchase(
         host: SupportBillingFlowHost,
@@ -69,6 +38,12 @@ private class PurchaseContinuation(
     }
 }
 
+private enum class OutstandingPurchaseRecovery {
+    Settled,
+    Pending,
+    Deferred,
+}
+
 /**
  * Process-scoped billing orchestration. It owns Play connection and settlement mechanics, but no
  * screen state or presentation decisions.
@@ -76,12 +51,14 @@ private class PurchaseContinuation(
 @Singleton
 internal class SupportBillingCoordinatorImpl @Inject constructor(
     private val gateway: SupportBillingGateway,
+    private val recoveryStore: SupportBillingRecoveryStore,
 ) : SupportBillingCoordinator {
     private val lock = Any()
     private val connectionWaiters = mutableListOf<(Boolean) -> Unit>()
     private val consumeWaiters = mutableMapOf<String, MutableList<(Boolean) -> Unit>>()
     private var connectionInProgress = false
     private var connectionAttempt = 0L
+    private var purchaseStarting = false
     private var activePurchase: PurchaseContinuation? = null
 
     init {
@@ -109,11 +86,39 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
     override suspend fun purchase(
         host: SupportBillingFlowHost,
         optionId: String,
+    ): SupportPurchaseResult {
+        val reserved = serialized {
+            if (purchaseStarting || activePurchase != null) {
+                false
+            } else {
+                purchaseStarting = true
+                true
+            }
+        }
+        if (!reserved) return SupportPurchaseResult.Failed
+
+        try {
+            recoveryStore.markReconciliationNeeded()
+        } catch (cancellation: CancellationException) {
+            serialized { purchaseStarting = false }
+            throw cancellation
+        } catch (throwable: Throwable) {
+            serialized { purchaseStarting = false }
+            Timber.w(throwable, "Unable to persist support purchase recovery marker")
+            return SupportPurchaseResult.Failed
+        }
+
+        return purchaseReserved(host, optionId)
+    }
+
+    private suspend fun purchaseReserved(
+        host: SupportBillingFlowHost,
+        optionId: String,
     ): SupportPurchaseResult = suspendCancellableCoroutine { continuation ->
         val request = PurchaseContinuation(continuation)
         serialized {
-            if (activePurchase != null) {
-                request.complete(SupportPurchaseResult.Failed)
+            purchaseStarting = false
+            if (!request.isActive) {
                 return@serialized
             }
 
@@ -134,11 +139,10 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
                 when (result.response) {
                     PlatformBillingResponse.Ok -> Unit
                     PlatformBillingResponse.ItemAlreadyOwned -> {
-                        recoverOutstandingPurchases { hasPendingPurchase ->
+                        recoverOutstandingPurchases { recovery ->
                             if (activePurchase === request) activePurchase = null
                             request.complete(
-                                if (hasPendingPurchase) SupportPurchaseResult.Pending
-                                else SupportPurchaseResult.Recovered
+                                recovery.toPurchaseResult()
                             )
                         }
                     }
@@ -155,6 +159,17 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    override suspend fun reconcileIfNeeded() {
+        val generation = recoveryStore.reconciliationGeneration() ?: return
+        val purchaseIsActive = serialized { purchaseStarting || activePurchase != null }
+        if (purchaseIsActive) return
+
+        val outcome = recoverOutstandingPurchasesWithConnection()
+        if (outcome == OutstandingPurchaseRecovery.Settled) {
+            recoveryStore.clearReconciliationNeeded(generation)
         }
     }
 
@@ -220,7 +235,7 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
                     }
                     .distinctBy(PlatformPurchase::token)
 
-                consumeAll(completedPurchases) {
+                consumeAll(completedPurchases) { _ ->
                     if (isActive()) queryProduct(onResult, hasPendingPurchase)
                 }
             }
@@ -304,11 +319,10 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
             }
 
             PlatformBillingResponse.ItemAlreadyOwned -> {
-                recoverOutstandingPurchases { hasPendingPurchase ->
+                recoverOutstandingPurchases { recovery ->
                     if (activePurchase === purchaseRequest) activePurchase = null
                     purchaseRequest?.complete(
-                        if (hasPendingPurchase) SupportPurchaseResult.Pending
-                        else SupportPurchaseResult.Recovered
+                        recovery.toPurchaseResult()
                     )
                 }
             }
@@ -321,12 +335,30 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
         }
     }
 
-    private fun recoverOutstandingPurchases(onComplete: (Boolean) -> Unit) {
+    private suspend fun recoverOutstandingPurchasesWithConnection(): OutstandingPurchaseRecovery =
+        suspendCancellableCoroutine { continuation ->
+            serialized {
+                withConnection { connected ->
+                    if (!continuation.isActive) return@withConnection
+                    if (!connected) {
+                        continuation.resume(OutstandingPurchaseRecovery.Deferred)
+                        return@withConnection
+                    }
+                    recoverOutstandingPurchases { recovery ->
+                        if (continuation.isActive) continuation.resume(recovery)
+                    }
+                }
+            }
+        }
+
+    private fun recoverOutstandingPurchases(
+        onComplete: (OutstandingPurchaseRecovery) -> Unit,
+    ) {
         gateway.queryPurchases { result, purchases ->
             serialized {
                 if (result.response != PlatformBillingResponse.Ok) {
                     Timber.w("Unable to query outstanding purchases: %s", result.debugMessage)
-                    onComplete(false)
+                    onComplete(OutstandingPurchaseRecovery.Deferred)
                     return@serialized
                 }
                 val hasPendingPurchase = purchases.any {
@@ -340,27 +372,43 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
                                 it.state == PlatformPurchaseState.Purchased
                         }
                         .distinctBy(PlatformPurchase::token),
-                ) { onComplete(hasPendingPurchase) }
+                ) { allConsumed ->
+                    onComplete(
+                        when {
+                            hasPendingPurchase -> OutstandingPurchaseRecovery.Pending
+                            allConsumed -> OutstandingPurchaseRecovery.Settled
+                            else -> OutstandingPurchaseRecovery.Deferred
+                        }
+                    )
+                }
             }
         }
     }
 
     private fun consumeAll(
         purchases: List<PlatformPurchase>,
-        onComplete: () -> Unit,
+        onComplete: (allConsumed: Boolean) -> Unit,
     ) {
         if (purchases.isEmpty()) {
-            onComplete()
+            onComplete(true)
             return
         }
 
         var remaining = purchases.size
+        var allConsumed = true
         purchases.forEach { purchase ->
-            consume(purchase.token) {
+            consume(purchase.token) { consumed ->
+                allConsumed = allConsumed && consumed
                 remaining -= 1
-                if (remaining == 0) onComplete()
+                if (remaining == 0) onComplete(allConsumed)
             }
         }
+    }
+
+    private fun OutstandingPurchaseRecovery.toPurchaseResult(): SupportPurchaseResult = when (this) {
+        OutstandingPurchaseRecovery.Settled -> SupportPurchaseResult.Recovered
+        OutstandingPurchaseRecovery.Pending -> SupportPurchaseResult.Pending
+        OutstandingPurchaseRecovery.Deferred -> SupportPurchaseResult.ConsumptionDeferred
     }
 
     /** Coalesces duplicate consume attempts for the same Play purchase token. */
@@ -392,13 +440,4 @@ internal class SupportBillingCoordinatorImpl @Inject constructor(
         const val SUPPORT_PRODUCT_ID = "developer_support"
         const val HIGHLIGHTED_TAG = "highlighted"
     }
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-internal abstract class SupportBillingCoordinatorModule {
-    @Binds
-    abstract fun bindSupportBillingCoordinator(
-        implementation: SupportBillingCoordinatorImpl,
-    ): SupportBillingCoordinator
 }

@@ -21,6 +21,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.samco.trackandgraph.reminders.ReminderInteractor
+import com.samco.trackandgraph.support.SupportBillingRecovery
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,11 +35,15 @@ class TrackAndGraphApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var reminderInteractor: ReminderInteractor
 
+    @Inject
+    lateinit var supportBillingRecovery: SupportBillingRecovery
+
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
         AndroidThreeTen.init(this)
         reminderInteractor.startObservingDataChanges()
+        supportBillingRecovery.start(this)
     }
 
     override val workManagerConfiguration: Configuration by lazy {

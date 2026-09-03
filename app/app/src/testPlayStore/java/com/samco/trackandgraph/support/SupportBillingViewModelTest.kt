@@ -9,10 +9,8 @@
 
 package com.samco.trackandgraph.support
 
-import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -22,7 +20,6 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import kotlin.coroutines.resume
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SupportBillingViewModelTest {
@@ -254,44 +251,3 @@ class SupportBillingViewModelTest {
         val OPTION = SupportPurchaseOption(OPTION_ID, "£1.00", 1_000_000, false)
     }
 }
-
-private class FakeSupportBillingCoordinator : SupportBillingCoordinator {
-    val loadCalls = mutableListOf<FakeRequest<SupportLoadResult>>()
-    val purchaseCalls = mutableListOf<FakePurchaseCall>()
-
-    override suspend fun load(): SupportLoadResult = suspendCancellableCoroutine { continuation ->
-        loadCalls += FakeRequest(continuation)
-    }
-
-    override suspend fun purchase(
-        host: SupportBillingFlowHost,
-        optionId: String,
-    ): SupportPurchaseResult = suspendCancellableCoroutine { continuation ->
-        val request = FakeRequest(continuation)
-        purchaseCalls += FakePurchaseCall(host, optionId, request)
-    }
-
-    fun completeLoad(result: SupportLoadResult, index: Int = 0) {
-        loadCalls[index].complete(result)
-    }
-
-    fun completePurchase(result: SupportPurchaseResult, index: Int = 0) {
-        purchaseCalls[index].request.complete(result)
-    }
-}
-
-private class FakeRequest<T>(
-    private val continuation: CancellableContinuation<T>,
-) {
-    val canceled: Boolean get() = continuation.isCancelled
-
-    fun complete(result: T) {
-        if (continuation.isActive) continuation.resume(result)
-    }
-}
-
-private data class FakePurchaseCall(
-    val host: SupportBillingFlowHost,
-    val optionId: String,
-    val request: FakeRequest<SupportPurchaseResult>,
-)

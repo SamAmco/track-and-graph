@@ -25,6 +25,7 @@ import org.junit.Test
 
 class SupportBillingCoordinatorTest {
     private lateinit var platform: FakeSupportBillingGateway
+    private lateinit var recoveryStore: FakeSupportBillingRecoveryStore
     private lateinit var coordinator: SupportBillingCoordinator
     private val host = object : SupportBillingFlowHost {}
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
@@ -32,7 +33,8 @@ class SupportBillingCoordinatorTest {
     @Before
     fun setUp() {
         platform = FakeSupportBillingGateway()
-        coordinator = SupportBillingCoordinatorImpl(platform)
+        recoveryStore = FakeSupportBillingRecoveryStore()
+        coordinator = SupportBillingCoordinatorImpl(platform, recoveryStore)
     }
 
     @After
@@ -225,7 +227,7 @@ class SupportBillingCoordinatorTest {
             )
         )
 
-        assertEquals(listOf("one", "two"), platform.consumeCalls.map(ConsumeCall::token))
+        assertEquals(listOf("one", "two"), platform.consumeCalls.map { it.token })
         assertTrue(platform.productQueries.isEmpty())
         platform.completeConsume("one")
         assertTrue(platform.productQueries.isEmpty())
@@ -279,7 +281,7 @@ class SupportBillingCoordinatorTest {
             purchases = listOf(purchase("paid", PlatformPurchaseState.Purchased))
         )
 
-        assertEquals(listOf("paid"), platform.consumeCalls.map(ConsumeCall::token))
+        assertEquals(listOf("paid"), platform.consumeCalls.map { it.token })
         platform.completeConsume("paid")
         assertTrue(platform.productQueries.isEmpty())
     }
@@ -290,8 +292,20 @@ class SupportBillingCoordinatorTest {
 
         coordinator.purchase(host, "small", results::add)
 
-        assertEquals(listOf("small"), platform.launchCalls.map(LaunchCall::offerId))
+        assertEquals(listOf("small"), platform.launchCalls.map { it.offerId })
         assertTrue(results.isEmpty())
+        assertEquals(1L, recoveryStore.generation)
+    }
+
+    @Test
+    fun `purchase does not launch when recovery marker cannot be persisted`() {
+        recoveryStore.failMark = true
+        val results = mutableListOf<SupportPurchaseResult>()
+
+        coordinator.purchase(host, "small", results::add)
+
+        assertTrue(platform.launchCalls.isEmpty())
+        assertEquals(listOf(SupportPurchaseResult.Failed), results)
     }
 
     @Test
@@ -303,7 +317,7 @@ class SupportBillingCoordinatorTest {
         assertEquals(1, platform.connections.size)
         assertTrue(platform.launchCalls.isEmpty())
         platform.finishConnection()
-        assertEquals(listOf("small"), platform.launchCalls.map(LaunchCall::offerId))
+        assertEquals(listOf("small"), platform.launchCalls.map { it.offerId })
     }
 
     @Test
@@ -357,7 +371,7 @@ class SupportBillingCoordinatorTest {
 
     @Test
     fun `immediate launch failure reports failure`() {
-        platform.launchResult = result(PlatformBillingResponse.Error)
+        platform.launchResult = billingResult(PlatformBillingResponse.Error)
         val results = mutableListOf<SupportPurchaseResult>()
 
         coordinator.purchase(host, "small", results::add)
@@ -367,7 +381,7 @@ class SupportBillingCoordinatorTest {
 
     @Test
     fun `immediate already owned response recovers retained purchases`() {
-        platform.launchResult = result(PlatformBillingResponse.ItemAlreadyOwned)
+        platform.launchResult = billingResult(PlatformBillingResponse.ItemAlreadyOwned)
         val results = mutableListOf<SupportPurchaseResult>()
 
         coordinator.purchase(host, "small", results::add)
@@ -387,6 +401,7 @@ class SupportBillingCoordinatorTest {
         platform.updatePurchases(PlatformBillingResponse.UserCanceled)
 
         assertEquals(listOf(SupportPurchaseResult.Canceled), results)
+        assertEquals(1L, recoveryStore.generation)
     }
 
     @Test
@@ -423,6 +438,7 @@ class SupportBillingCoordinatorTest {
         platform.completeConsume("paid")
 
         assertEquals(listOf(SupportPurchaseResult.Completed), results)
+        assertEquals(1L, recoveryStore.generation)
     }
 
     @Test
@@ -493,7 +509,7 @@ class SupportBillingCoordinatorTest {
             purchases = listOf(purchase("retained", PlatformPurchaseState.Purchased))
         )
 
-        assertEquals(listOf("retained"), platform.consumeCalls.map(ConsumeCall::token))
+        assertEquals(listOf("retained"), platform.consumeCalls.map { it.token })
     }
 
     @Test
@@ -543,6 +559,129 @@ class SupportBillingCoordinatorTest {
         assertTrue(platform.consumeCalls.isEmpty())
     }
 
+    @Test
+    fun `already owned query failure defers settlement`() {
+        val results = mutableListOf<SupportPurchaseResult>()
+        coordinator.purchase(host, "small", results::add)
+
+        platform.updatePurchases(PlatformBillingResponse.ItemAlreadyOwned)
+        platform.completePurchaseQuery(PlatformBillingResponse.Error)
+
+        assertEquals(listOf(SupportPurchaseResult.ConsumptionDeferred), results)
+        assertEquals(1L, recoveryStore.generation)
+    }
+
+    @Test
+    fun `foreground reconciliation does nothing without a marker`() {
+        val request = coordinator.reconcile()
+
+        assertTrue(request.isCompleted)
+        assertTrue(platform.purchaseQueries.isEmpty())
+    }
+
+    @Test
+    fun `foreground reconciliation clears marker when Play reports nothing outstanding`() {
+        recoveryStore.generation = 4L
+        val request = coordinator.reconcile()
+
+        platform.completePurchaseQuery()
+
+        assertTrue(request.isCompleted)
+        assertEquals(null, recoveryStore.generation)
+    }
+
+    @Test
+    fun `foreground reconciliation retains marker for pending purchase`() {
+        recoveryStore.generation = 4L
+        val request = coordinator.reconcile()
+
+        platform.completePurchaseQuery(
+            purchases = listOf(purchase("pending", PlatformPurchaseState.Pending))
+        )
+
+        assertTrue(request.isCompleted)
+        assertEquals(4L, recoveryStore.generation)
+        assertTrue(platform.consumeCalls.isEmpty())
+    }
+
+    @Test
+    fun `foreground reconciliation consumes completed purchase before clearing marker`() {
+        recoveryStore.generation = 4L
+        val request = coordinator.reconcile()
+        platform.completePurchaseQuery(
+            purchases = listOf(purchase("paid", PlatformPurchaseState.Purchased))
+        )
+
+        assertEquals(4L, recoveryStore.generation)
+        assertTrue(!request.isCompleted)
+        platform.completeConsume("paid")
+
+        assertTrue(request.isCompleted)
+        assertEquals(null, recoveryStore.generation)
+    }
+
+    @Test
+    fun `foreground reconciliation retains marker when consumption fails`() {
+        recoveryStore.generation = 4L
+        val request = coordinator.reconcile()
+        platform.completePurchaseQuery(
+            purchases = listOf(purchase("paid", PlatformPurchaseState.Purchased))
+        )
+
+        platform.completeConsume("paid", PlatformBillingResponse.Error)
+
+        assertTrue(request.isCompleted)
+        assertEquals(4L, recoveryStore.generation)
+    }
+
+    @Test
+    fun `foreground reconciliation retains marker when query fails`() {
+        recoveryStore.generation = 4L
+        val request = coordinator.reconcile()
+
+        platform.completePurchaseQuery(PlatformBillingResponse.Error)
+
+        assertTrue(request.isCompleted)
+        assertEquals(4L, recoveryStore.generation)
+    }
+
+    @Test
+    fun `foreground reconciliation retains marker when connection fails`() {
+        recoveryStore.generation = 4L
+        platform.isReady = false
+        val request = coordinator.reconcile()
+
+        platform.finishConnection(PlatformBillingResponse.Error)
+
+        assertTrue(request.isCompleted)
+        assertEquals(4L, recoveryStore.generation)
+        assertTrue(platform.purchaseQueries.isEmpty())
+    }
+
+    @Test
+    fun `stale reconciliation cannot clear marker for newer checkout`() {
+        recoveryStore.generation = 4L
+        val reconciliation = coordinator.reconcile()
+
+        coordinator.purchase(host, "small") {}
+        assertEquals(5L, recoveryStore.generation)
+        platform.completePurchaseQuery()
+
+        assertTrue(reconciliation.isCompleted)
+        assertEquals(5L, recoveryStore.generation)
+    }
+
+    @Test
+    fun `foreground reconciliation does not query while checkout is active`() {
+        coordinator.purchase(host, "small") {}
+
+        val reconciliation = coordinator.reconcile()
+
+        assertTrue(reconciliation.isCompleted)
+        assertTrue(platform.purchaseQueries.isEmpty())
+        assertEquals(1L, recoveryStore.generation)
+    }
+
     private fun product(vararg offers: PlatformOffer) = PlatformProduct(
         productId = "developer_support",
         description = "Support development",
@@ -578,125 +717,9 @@ class SupportBillingCoordinatorTest {
         onResult(purchase(host, optionId))
     }
 
-    private class FakeSupportBillingGateway : SupportBillingGateway {
-        override var isReady = true
-        private lateinit var purchaseUpdateListener:
-            (PlatformBillingResult, List<PlatformPurchase>?) -> Unit
-        val purchaseUpdateListenerInitialized: Boolean
-            get() = ::purchaseUpdateListener.isInitialized
-        val connections = mutableListOf<ConnectionCall>()
-        val purchaseQueries = mutableListOf<PurchaseQueryCall>()
-        val productQueries = mutableListOf<ProductQueryCall>()
-        val launchCalls = mutableListOf<LaunchCall>()
-        val consumeCalls = mutableListOf<ConsumeCall>()
-        var launchResult = result()
-
-        override fun setPurchaseUpdateListener(
-            listener: (PlatformBillingResult, List<PlatformPurchase>?) -> Unit,
-        ) {
-            purchaseUpdateListener = listener
+    private fun SupportBillingCoordinator.reconcile(): Job =
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            reconcileIfNeeded()
         }
 
-        override fun startConnection(
-            onFinished: (PlatformBillingResult) -> Unit,
-            onDisconnected: () -> Unit,
-        ) {
-            connections += ConnectionCall(onFinished, onDisconnected)
-        }
-
-        override fun queryPurchases(
-            callback: (PlatformBillingResult, List<PlatformPurchase>) -> Unit,
-        ) {
-            purchaseQueries += PurchaseQueryCall(callback)
-        }
-
-        override fun queryProduct(
-            productId: String,
-            callback: (PlatformBillingResult, PlatformProduct?) -> Unit,
-        ) {
-            productQueries += ProductQueryCall(productId, callback)
-        }
-
-        override fun launchBillingFlow(
-            host: SupportBillingFlowHost,
-            offerId: String,
-        ): PlatformBillingResult {
-            launchCalls += LaunchCall(host, offerId)
-            return launchResult
-        }
-
-        override fun consume(
-            purchaseToken: String,
-            callback: (PlatformBillingResult) -> Unit,
-        ) {
-            consumeCalls += ConsumeCall(purchaseToken, callback)
-        }
-
-        fun finishConnection(
-            response: PlatformBillingResponse = PlatformBillingResponse.Ok,
-            index: Int = 0,
-        ) {
-            isReady = response == PlatformBillingResponse.Ok
-            connections[index].onFinished(result(response))
-        }
-
-        fun disconnect(index: Int = 0) {
-            connections[index].onDisconnected()
-        }
-
-        fun completePurchaseQuery(
-            response: PlatformBillingResponse = PlatformBillingResponse.Ok,
-            index: Int = 0,
-            purchases: List<PlatformPurchase> = emptyList(),
-        ) {
-            purchaseQueries[index].callback(result(response), purchases)
-        }
-
-        fun completeProductQuery(product: PlatformProduct?, index: Int = 0) {
-            productQueries[index].callback(result(), product)
-        }
-
-        fun updatePurchases(
-            response: PlatformBillingResponse = PlatformBillingResponse.Ok,
-            purchases: List<PlatformPurchase>? = null,
-        ) {
-            purchaseUpdateListener(result(response), purchases)
-        }
-
-        fun completeConsume(
-            token: String,
-            response: PlatformBillingResponse = PlatformBillingResponse.Ok,
-        ) {
-            consumeCalls.single { it.token == token }.callback(result(response))
-        }
-    }
-
-    private companion object {
-        fun result(response: PlatformBillingResponse = PlatformBillingResponse.Ok) =
-            PlatformBillingResult(response, "test")
-    }
 }
-
-private data class ConnectionCall(
-    val onFinished: (PlatformBillingResult) -> Unit,
-    val onDisconnected: () -> Unit,
-)
-
-private data class PurchaseQueryCall(
-    val callback: (PlatformBillingResult, List<PlatformPurchase>) -> Unit,
-)
-
-private data class ProductQueryCall(
-    val productId: String,
-    val callback: (PlatformBillingResult, PlatformProduct?) -> Unit,
-)
-
-private data class LaunchCall(
-    val host: SupportBillingFlowHost,
-    val offerId: String,
-)
-
-private data class ConsumeCall(
-    val token: String,
-    val callback: (PlatformBillingResult) -> Unit,
-)

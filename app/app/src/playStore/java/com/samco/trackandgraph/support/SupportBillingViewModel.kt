@@ -19,29 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal enum class SupportCheckoutState {
-    Idle,
-    InProgress,
-    PaymentFailed,
-    PaymentPending,
-}
-
-internal sealed interface SupportBillingState {
-    data object Loading : SupportBillingState
-
-    data class Unavailable(
-        val hasPendingPurchase: Boolean = false,
-    ) : SupportBillingState
-
-    data class Available(
-        val description: String,
-        val options: List<SupportPurchaseOption>,
-        val checkoutState: SupportCheckoutState = SupportCheckoutState.Idle,
-    ) : SupportBillingState
-
-    data object ThankYou : SupportBillingState
-}
-
 @HiltViewModel
 internal class SupportBillingViewModel @Inject constructor(
     private val billingCoordinator: SupportBillingCoordinator,

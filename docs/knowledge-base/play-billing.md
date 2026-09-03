@@ -27,7 +27,7 @@ Draft or inactive purchase options are not returned. Each intended option needs 
 
 ## Lazy dialog lifecycle
 
-Billing calls start only when the support dialog opens. Both the drawer item and release-notes support action use the same Play-only coordinator and previewable UI:
+In the normal unmarked state, Billing calls start only when the support dialog opens. The only background-to-dialog exception is the targeted foreground recovery described below. Both the drawer item and release-notes support action use the same Play-only coordinator and previewable UI:
 
 1. Connect to Billing and show a spinner-only loading UI.
 2. Query `INAPP` owned purchases and silently retry consumption of completed purchases.
@@ -36,9 +36,9 @@ Billing calls start only when the support dialog opens. Both the drawer item and
 5. Launch Play's flow immediately when an option is selected.
 6. Consume a `PURCHASED` result; show thanks only after consumption succeeds.
 
-Play retains non-consumed purchases, so consumption recovery deliberately uses `queryPurchasesAsync()` rather than app preferences. If consumption fails after a successful charge, do not report “payment failed”: the charge may be real, and the retained purchase will be retried on a later dialog load. Actual purchase-flow failures show an inline message; selecting any option again is the retry action. User cancellation is silent.
+Play retains non-consumed purchases, so Play remains the source of truth for recovery: reconciliation uses `queryPurchasesAsync()` and never persists purchase details or assumes that a locally recorded checkout was paid. If consumption fails after a successful charge, do not report “payment failed”: the charge may be real, and the retained purchase will be retried. Actual purchase-flow failures show an inline message; selecting any option again is the retry action. User cancellation is silent.
 
-The current recovery trigger is opening the support dialog. Before production rollout, add targeted foreground reconciliation for a purchase that was launched, remained pending, or failed consumption; otherwise a purchase that becomes `PURCHASED` while the app is away may never be consumed if the user does not reopen this dialog. See `play-billing-testing.md`.
+Before starting checkout, the Play flavor persists only a reconciliation-needed generation in `PrefsPersistenceProvider`. Whenever `MainActivity` resumes, it reads that marker; Billing is contacted only when the marker exists. Reconciliation consumes completed purchases, retains the marker for pending purchases and query/consume failures, and clears it only when Play successfully reports no pending or unconsumed support purchases. Clearing is conditional on the generation observed at the start of the query, so a late query cannot erase the marker for a newer checkout. Opening the support dialog still performs the same recovery before loading offers. The FOSS lifecycle hook is a no-op and contains no Billing dependency.
 
 ## Billing boundary and callback safety
 
@@ -59,6 +59,8 @@ Purchase launch reconnects if Play disconnected after products were loaded. Once
 If `ITEM_ALREADY_OWNED` recovery finds a pending purchase, preserve the pending result rather than treating recovery as idle. Both the ViewModel and the rendered purchase options guard against a second checkout while pending; keep both checks so non-UI callers and future UI changes cannot bypass the rule.
 
 Consumption is coalesced by Play purchase token. This matters when recovery queries overlap or Play delivers the same completed purchase more than once: only one `consumeAsync()` call is made, while every waiting recovery continuation is completed. The ViewModel also guards against rapid repeated taps while checkout is in progress.
+
+Do not remove the persistent foreground marker just because immediate settlement normally succeeds. It covers process death during the Play sheet, a pending payment changing state while the app is absent, and failed consumption. The marker may intentionally survive a canceled or already-settled checkout until the next foreground query proves that nothing remains; that harmless extra query is preferable to clearing based only on an app-side callback.
 
 The Play-flavor coordinator tests use a callback-controllable gateway fake and cover stale, overlapping, duplicate, canceled, and concurrent callback orders without mocking final SDK objects. Separate ViewModel tests cover all presentation transitions and dismissal/reload invalidation. Add regression cases at the layer that owns the behavior whenever sequencing changes.
 

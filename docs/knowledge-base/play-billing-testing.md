@@ -21,7 +21,7 @@ Use this after changes to the developer-support purchase flow and before its fir
 - `developer_support` is the only hard-coded product ID.
 - Completed purchases are consumed, not merely acknowledged, so the product can be purchased repeatedly.
 - Pending purchases are neither consumed nor treated as successful.
-- Before production, implement targeted foreground reconciliation for purchases that were launched, remain pending, or failed consumption. Opening the support dialog is not a sufficient recovery trigger if the user never opens it again.
+- A checkout attempt persists a targeted recovery marker before Play's purchase flow starts. Resuming the app reconciles only while that marker exists; opening the support dialog also performs recovery.
 
 ## Publish a Billing-enabled internal release
 
@@ -111,15 +111,15 @@ License testers see test payment instruments and are not charged. A tester who i
 1. Use **Slow test card, declines after a few minutes**.
 2. Confirm the purchase initially remains pending with options disabled.
 3. Confirm there is no thank-you content.
-4. After Play cancels the transaction, reconcile or reopen support and confirm options return to idle.
+4. After Play cancels the transaction, foreground the app or reopen support and confirm options return to idle.
 
 ### Process death and failed consumption
 
 1. Complete an approved purchase and terminate the app immediately as Google's sheet closes.
-2. Relaunch and trigger reconciliation.
+2. Relaunch the app; foreground reconciliation should run automatically.
 3. Confirm the retained completed purchase is consumed.
 4. Confirm the same option can be purchased again.
-5. Repeat with connectivity unavailable during reconciliation, then restore connectivity and retry.
+5. Repeat with connectivity unavailable during reconciliation, then restore connectivity and background/foreground the app to retry.
 
 ### Dialog and concurrency behavior
 
