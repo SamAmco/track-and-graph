@@ -52,9 +52,24 @@ local get_period = function(config)
   end
 end
 
+local get_placement_time = function(config, window_start, window_end)
+  local placement = config.placement or "_window_end"
+
+  if placement == "_window_start" then
+    return window_start
+  elseif placement == "_window_midpoint" then
+    local half_window = math.floor((window_end.timestamp - window_start.timestamp) / 2)
+    return core.shift(window_start, half_window)
+  elseif placement == "_window_end" then
+    return core.shift(window_end, -1)
+  else
+    error("Unknown placement: " .. tostring(placement))
+  end
+end
+
 return {
   id = "periodic-aggregation-v4",
-  version = "4.0.2",
+  version = "4.0.3",
   inputCount = 1,
   title = {
     ["en"] = "Periodic Aggregation",
@@ -83,9 +98,9 @@ For example, with a daily period and average aggregation, all measurements from 
   - Standard Deviation: Statistical standard deviation
 
 - **Placement**: Where in the time window to place each output data point:
-  - Window End: At the most recent data point in the window (default)
-  - Window Midpoint: At the temporal center of the window
-  - Window Start: At the oldest data point in the window
+  - Window End: At the end of the calendar period (default)
+  - Window Midpoint: At the temporal center of the calendar period
+  - Window Start: At the start of the calendar period
     ]],
     ["de"] = [[
 Aggregiert Datenpunkte in feste Kalenderperioden (Tage, Wochen, Monate oder Jahre). Jede Periode erzeugt einen aggregierten Wert, der alle Datenpunkte enthält, die innerhalb der Grenzen dieser Periode liegen.
@@ -106,9 +121,9 @@ Zum Beispiel, mit einer täglichen Periode und Durchschnittsaggregation werden a
   - Standardabweichung: Statistische Standardabweichung
 
 - **Platzierung**: Wo im Zeitfenster jeder Ausgabedatenpunkt platziert wird:
-  - Fensterende: Am neuesten Datenpunkt im Fenster (Standard)
-  - Fenstermitte: In der zeitlichen Mitte des Fensters
-  - Fensteranfang: Am ältesten Datenpunkt im Fenster
+  - Fensterende: Am Ende des Kalenderzeitraums (Standard)
+  - Fenstermitte: In der zeitlichen Mitte des Kalenderzeitraums
+  - Fensteranfang: Am Anfang des Kalenderzeitraums
     ]],
     ["es"] = [[
 Agrega puntos de datos en períodos de calendario fijos (días, semanas, meses o años). Cada período produce un valor agregado que contiene todos los puntos de datos que caen dentro de los límites de ese período.
@@ -129,9 +144,9 @@ Por ejemplo, con un período diario y agregación promedio, todas las mediciones
   - Desviación Estándar: Desviación estándar estadística
 
 - **Colocación**: Dónde en la ventana de tiempo colocar cada punto de datos de salida:
-  - Fin de Ventana: En el punto de datos más reciente en la ventana (predeterminado)
-  - Punto Medio de Ventana: En el centro temporal de la ventana
-  - Inicio de Ventana: En el punto de datos más antiguo en la ventana
+  - Fin de Ventana: Al final del período de calendario (predeterminado)
+  - Punto Medio de Ventana: En el centro temporal del período de calendario
+  - Inicio de Ventana: Al inicio del período de calendario
 
     ]],
     ["fr"] = [[
@@ -153,9 +168,9 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
   - Écart-Type: Écart-type statistique
 
 - **Placement**: Où dans la fenêtre de temps placer chaque point de données de sortie:
-  - Fin de Fenêtre: Au point de données le plus récent dans la fenêtre (par défaut)
-  - Point Médian de Fenêtre: Au centre temporel de la fenêtre
-  - Début de Fenêtre: Au point de données le plus ancien dans la fenêtre
+  - Fin de Fenêtre: À la fin de la période calendaire (par défaut)
+  - Point Médian de Fenêtre: Au centre temporel de la période calendaire
+  - Début de Fenêtre: Au début de la période calendaire
     ]]
   },
   config = {
@@ -187,7 +202,7 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
     local current_window_end
 
     if carry ~= nil then
-      current_window_end = core.get_end_of_period(period, carry)
+      current_window_end = core.time(core.get_end_of_period(period, carry))
       current_window_start = core.shift(current_window_end, period, -1)
     end
 
@@ -198,11 +213,12 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
 
       if carry.timestamp < current_window_start.timestamp then
         -- No data points in this window, return empty aggregation
+        local placement_time = get_placement_time(config, current_window_start, current_window_end)
         current_window_end = current_window_start
         current_window_start = core.shift(current_window_start, period, -1)
         return {
-          timestamp = current_window_end.timestamp - 1,
-          offset = current_window_end.offset,
+          timestamp = placement_time.timestamp,
+          offset = placement_time.offset,
           value = 0,
         }
       end
@@ -216,6 +232,8 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
         aggregator:push(dp)
       end
 
+      local placement_time = get_placement_time(config, current_window_start, current_window_end)
+
       current_window_end = current_window_start
       current_window_start = core.shift(current_window_start, period, -1)
 
@@ -224,8 +242,8 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
       local aggregate = aggregator:run()
 
       return {
-        timestamp = aggregate.timestamp,
-        offset = aggregate.offset,
+        timestamp = placement_time.timestamp,
+        offset = placement_time.offset,
         value = aggregate.value,
         label = aggregate.label,
         note = aggregate.note
