@@ -86,6 +86,60 @@ M["test daily period aggregates multiple points in same day"] = {
   end
 }
 
+local placement_sources = function()
+  local day_end = core.get_end_of_period(PDAY, fixed_date)
+  local day_start = shift(day_end, PDAY, -1)
+  return {
+    {
+      { timestamp = day_start.timestamp + 10000, offset = 0, value = 3 },
+      { timestamp = day_start.timestamp + 5000,  offset = 0, value = 2 },
+      { timestamp = day_start.timestamp + 1000,  offset = 0, value = 1 },
+    }
+  }
+end
+
+M["test window end placement uses newest data point"] = {
+  config = {
+    aggregation_type = "_count",
+    period = "_days",
+    placement = "_window_end"
+  },
+  sources = placement_sources,
+  assertions = function(result)
+    local day_end = core.get_end_of_period(PDAY, fixed_date)
+    local day_start = shift(day_end, PDAY, -1)
+    test.assertEquals(day_start.timestamp + 10000, result[1].timestamp)
+  end
+}
+
+M["test window midpoint placement uses temporal midpoint"] = {
+  config = {
+    aggregation_type = "_count",
+    period = "_days",
+    placement = "_window_midpoint"
+  },
+  sources = placement_sources,
+  assertions = function(result)
+    local day_end = core.get_end_of_period(PDAY, fixed_date)
+    local day_start = shift(day_end, PDAY, -1)
+    test.assertEquals(day_start.timestamp + 5500, result[1].timestamp)
+  end
+}
+
+M["test window start placement uses oldest data point"] = {
+  config = {
+    aggregation_type = "_count",
+    period = "_days",
+    placement = "_window_start"
+  },
+  sources = placement_sources,
+  assertions = function(result)
+    local day_end = core.get_end_of_period(PDAY, fixed_date)
+    local day_start = shift(day_end, PDAY, -1)
+    test.assertEquals(day_start.timestamp + 1000, result[1].timestamp)
+  end
+}
+
 M["test weekly period groups by calendar week"] = {
   config = {
     aggregation_type = "_count",

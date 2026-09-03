@@ -54,7 +54,7 @@ end
 
 return {
   id = "periodic-aggregation-v4",
-  version = "4.0.1",
+  version = "4.0.2",
   inputCount = 1,
   title = {
     ["en"] = "Periodic Aggregation",
@@ -224,9 +224,8 @@ Par exemple, avec une période quotidienne et une agrégation moyenne, toutes le
       local aggregate = aggregator:run()
 
       return {
-        -- Subtract 1 millisecond to ensure the timestamp falls within the period
-        timestamp = current_window_end.timestamp - 1,
-        offset = current_window_end.offset,
+        timestamp = aggregate.timestamp,
+        offset = aggregate.offset,
         value = aggregate.value,
         label = aggregate.label,
         note = aggregate.note
