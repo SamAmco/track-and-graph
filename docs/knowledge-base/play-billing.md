@@ -38,6 +38,8 @@ Billing calls start only when the support dialog opens. Both the drawer item and
 
 Play retains non-consumed purchases, so consumption recovery deliberately uses `queryPurchasesAsync()` rather than app preferences. If consumption fails after a successful charge, do not report “payment failed”: the charge may be real, and the retained purchase will be retried on a later dialog load. Actual purchase-flow failures show an inline message; selecting any option again is the retry action. User cancellation is silent.
 
+The current recovery trigger is opening the support dialog. Before production rollout, add targeted foreground reconciliation for a purchase that was launched, remained pending, or failed consumption; otherwise a purchase that becomes `PURCHASED` while the app is away may never be consumed if the user does not reopen this dialog. See `play-billing-testing.md`.
+
 ## Billing boundary and callback safety
 
 The implementation has three deliberately narrow layers:
@@ -58,7 +60,7 @@ If `ITEM_ALREADY_OWNED` recovery finds a pending purchase, preserve the pending 
 
 Consumption is coalesced by Play purchase token. This matters when recovery queries overlap or Play delivers the same completed purchase more than once: only one `consumeAsync()` call is made, while every waiting recovery continuation is completed. The ViewModel also guards against rapid repeated taps while checkout is in progress.
 
-The Play-flavor coordinator tests use a callback-controllable platform fake and cover stale, overlapping, duplicate, canceled, and concurrent callback orders without mocking final SDK objects. Separate ViewModel tests cover all presentation transitions and dismissal/reload invalidation. Add regression cases at the layer that owns the behavior whenever sequencing changes.
+The Play-flavor coordinator tests use a callback-controllable gateway fake and cover stale, overlapping, duplicate, canceled, and concurrent callback orders without mocking final SDK objects. Separate ViewModel tests cover all presentation transitions and dismissal/reload invalidation. Add regression cases at the layer that owns the behavior whenever sequencing changes.
 
 The release-notes dialog animates between changelog and support content inside the same dialog. Returning from the Google Play purchase sheet reveals the support content. Back or Cancel from the purchase-options screen returns to the changelog, but Close from the successful thank-you state dismisses the entire release-notes dialog so the user does not have to dismiss the support prompt again.
 

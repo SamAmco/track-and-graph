@@ -52,6 +52,11 @@ docs:
     description: Play-only Google Play Billing architecture and Console contract: one product with multiple purchase options, lazy dialog loading, consumable recovery, offer-tag highlighting, and flavor isolation.
     keywords: [billing, Google Play Billing, playStore, support, tip, consumable, one-time product, purchase option, offer token, highlighted, queryPurchasesAsync, consumeAsync, developer_support, release notes, drawer]
 
+  - file: play-billing-testing.md
+    title: Play Billing setup and manual test script
+    description: Console, internal-track, license-tester, and device test procedure for repeatable developer-support purchases, including success, decline, pending, recovery, regional, and artifact-isolation checks.
+    keywords: [billing, Google Play Billing, testing, Play Console, internal testing, license tester, Play Billing Lab, consumable, pending, slow test card, developer_support, purchase recovery, test script]
+
   - file: component-types.md
     title: Component types — Trackers, Functions, Graphs, Reminders, Groups
     description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default, must always be computed by querying group_items_table), GroupItemType vs GroupChildType enums, all three UI behaviors triggered by unique==false (icon, delete dialog with deleteEverywhere, symlinks menu).
