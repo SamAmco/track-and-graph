@@ -1,0 +1,2 @@
+Ajout de la prise en charge de Google Play Billing pour la variante Play Store
+      

@@ -1,0 +1,2 @@
+Added Google Play Billing support for PlayStore variant
+      

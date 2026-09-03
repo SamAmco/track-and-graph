@@ -1,0 +1,2 @@
+Se ha añadido compatibilidad con Google Play Billing para la variante de Play Store
+      

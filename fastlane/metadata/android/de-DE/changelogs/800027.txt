@@ -1,0 +1,2 @@
+Unterstützung für Google Play Billing zur Play-Store-Variante hinzugefügt
+      
