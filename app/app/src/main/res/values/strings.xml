@@ -24,6 +24,14 @@
     <string name="graph_or_stat">Graph or Statistic</string>
     <string name="symlink">Symlink</string>
     <string name="symlinks">Symlinks</string>
+    <string name="reminder">Reminder</string>
+    <string name="add_component">Add a Component</string>
+    <string name="add_tracker_description">Record values, choices, times, or durations</string>
+    <string name="add_graph_or_stat_description">Visualise or summarise your tracked data</string>
+    <string name="add_group_description">Organise components inside another group</string>
+    <string name="add_function_description">Create a derived data source</string>
+    <string name="add_reminder_description">Get notified when it is time to track</string>
+    <string name="add_symlink_description">Add an existing component to this group</string>
     <string name="symlink_locations_title">Locations of \"%1$s\"</string>
     <string name="add_tracker">Track something:</string>
     <string name="add">Add</string>

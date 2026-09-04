@@ -102,7 +102,6 @@ interface GroupViewModel {
 
     fun setGroup(groupId: Long)
 
-    suspend fun userHasAnyTrackers(): Boolean
     fun getTrackersInGroup(): List<DisplayTracker>
     fun addDefaultTrackerValue(tracker: DisplayTracker)
 
@@ -145,8 +144,6 @@ class GroupViewModelImpl @Inject constructor(
         MutableStateFlow<GroupViewModel.DurationInputDialogData?>(null)
     override val showDurationInputDialog: StateFlow<GroupViewModel.DurationInputDialogData?> =
         _showDurationInputDialog
-
-    override suspend fun userHasAnyTrackers() = dataInteractor.hasAtLeastOneTracker()
 
     private val groupId = MutableStateFlow<Long?>(null)
 

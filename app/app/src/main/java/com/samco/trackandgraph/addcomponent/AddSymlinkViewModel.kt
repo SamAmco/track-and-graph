@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.group
+package com.samco.trackandgraph.addcomponent
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,57 +35,67 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface AddSymlinkViewModel {
-    /** The group ID for which the symlink dialog is currently shown, or null if hidden. */
-    val showDialogForGroupId: StateFlow<Long?>
-
-    /**
-     * The set of items that should be disabled (visible but not selectable) in the SelectItemDialog.
-     * Only ancestor groups are disabled (cycle prevention). Other items — including those already
-     * in the current group — are selectable, since same-group duplicates are allowed.
-     */
+    /** Ancestor groups are disabled because selecting one would create a cycle. */
     val disabledItems: StateFlow<Set<HiddenItem>>
+    val saving: StateFlow<Boolean>
 
-    fun show(groupId: Long)
-    fun hide()
-    fun createSymlink(inGroupId: Long, childId: Long, childType: GroupChildType)
+    fun initialize(groupId: Long)
+
+    fun createSymlink(
+        inGroupId: Long,
+        childId: Long,
+        childType: GroupChildType,
+        onComplete: () -> Unit,
+    )
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AddSymlinkViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
-    @IODispatcher private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher,
 ) : ViewModel(), AddSymlinkViewModel {
 
-    private val _showDialogForGroupId = MutableStateFlow<Long?>(null)
-    override val showDialogForGroupId: StateFlow<Long?> = _showDialogForGroupId.asStateFlow()
+    private val groupId = MutableStateFlow<Long?>(null)
+    private val _saving = MutableStateFlow(false)
+    override val saving: StateFlow<Boolean> = _saving.asStateFlow()
 
-    override val disabledItems: StateFlow<Set<HiddenItem>> = _showDialogForGroupId
+    override val disabledItems: StateFlow<Set<HiddenItem>> = groupId
         .filterNotNull()
-        .map { groupId ->
+        .map { id ->
             dataInteractor
-                .getAncestorAndSelfGroupIds(groupId)
+                .getAncestorAndSelfGroupIds(id)
                 .map { HiddenItem(SelectableItemType.GROUP, it) }
                 .toSet()
         }
         .flowOn(io)
         .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
 
-    override fun show(groupId: Long) {
-        _showDialogForGroupId.value = groupId
+    override fun initialize(groupId: Long) {
+        this.groupId.value = groupId
     }
 
-    override fun hide() {
-        _showDialogForGroupId.value = null
-    }
-
-    override fun createSymlink(inGroupId: Long, childId: Long, childType: GroupChildType) {
-        hide()
-        viewModelScope.launch(io) {
-            dataInteractor.createSymlink(inGroupId, childId, childType)
+    override fun createSymlink(
+        inGroupId: Long,
+        childId: Long,
+        childType: GroupChildType,
+        onComplete: () -> Unit,
+    ) {
+        if (_saving.value) return
+        _saving.value = true
+        viewModelScope.launch {
+            try {
+                withContext(io) {
+                    dataInteractor.createSymlink(inGroupId, childId, childType)
+                }
+            } finally {
+                _saving.value = false
+            }
+            onComplete()
         }
     }
 }

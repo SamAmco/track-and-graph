@@ -64,7 +64,9 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
+import com.samco.trackandgraph.addcomponent.AddComponentDialog
 import com.samco.trackandgraph.addgroup.AddGroupDialog
+import com.samco.trackandgraph.addgroup.AddGroupDialogViewModel
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Group
@@ -82,7 +84,6 @@ import com.samco.trackandgraph.selectitemdialog.HiddenItem
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.ui.ContinueDialog
 import com.samco.trackandgraph.ui.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.ui.FeatureInfoDialog
 import com.samco.trackandgraph.ui.ui.FloatingBarButton
@@ -132,8 +133,7 @@ fun GroupScreen(
 ) {
     val groupViewModel: GroupViewModel = hiltViewModel<GroupViewModelImpl>()
     val groupDialogsViewModel: GroupDialogsViewModel = hiltViewModel()
-    val addGroupDialogViewModel: AddGroupDialogViewModelImpl = hiltViewModel()
-    val addSymlinkViewModel: AddSymlinkViewModel = hiltViewModel<AddSymlinkViewModelImpl>()
+    val addGroupDialogViewModel: AddGroupDialogViewModel = hiltViewModel<AddGroupDialogViewModelImpl>()
     val releaseNotesViewModel: ReleaseNotesViewModel = hiltViewModel<ReleaseNotesViewModelImpl>()
     val symlinksDialogViewModel: SymlinksDialogViewModel = hiltViewModel()
     val searchViewModel: GroupSearchViewModel = hiltViewModel<GroupSearchViewModelImpl>()
@@ -143,6 +143,7 @@ fun GroupScreen(
     val isSearchVisible by searchViewModel.isSearchVisible.collectAsStateWithLifecycle()
     val hapticFeedback = LocalHapticFeedback.current
     val requestNotificationPermission = rememberNotificationPermissionRequester()
+    var showAddComponentDialog by rememberSaveable(navArgs) { mutableStateOf(false) }
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)
@@ -180,11 +181,7 @@ fun GroupScreen(
             navArgs = navArgs,
             groupViewModel = groupViewModel,
             groupDialogsViewModel = groupDialogsViewModel,
-            addGroupDialogViewModel = addGroupDialogViewModel,
-            onAddTracker = onAddTracker,
-            onAddGraphStat = onAddGraphStat,
-            onAddFunction = onAddFunction,
-            onAddSymlink = { addSymlinkViewModel.show(it) },
+            onAddComponent = { showAddComponentDialog = true },
             showFab = showFab,
             onSearchClick = { searchViewModel.showSearch() },
         )
@@ -193,7 +190,6 @@ fun GroupScreen(
             groupViewModel = groupViewModel,
             groupDialogsViewModel = groupDialogsViewModel,
             addGroupDialogViewModel = addGroupDialogViewModel,
-            addSymlinkViewModel = addSymlinkViewModel,
             releaseNotesViewModel = releaseNotesViewModel,
             symlinksDialogViewModel = symlinksDialogViewModel,
             addDataPointsDialogViewModel = addDataPointsDialogViewModel,
@@ -213,6 +209,15 @@ fun GroupScreen(
             showFab = showFab,
         )
     }
+
+    AddComponentDialog(
+        visible = showAddComponentDialog,
+        groupId = navArgs.groupId,
+        onDismiss = { showAddComponentDialog = false },
+        onAddTracker = onAddTracker,
+        onAddGraphOrStat = onAddGraphStat,
+        onAddFunction = onAddFunction,
+    )
 
     // Rendered at the outer level so the dialog persists across search open/close
     // — the underlying ViewModel state drives visibility, but the composable must
@@ -273,8 +278,7 @@ data class FunctionClickListeners(
 private fun GroupScreenContent(
     groupViewModel: GroupViewModel,
     groupDialogsViewModel: GroupDialogsViewModel,
-    addGroupDialogViewModel: AddGroupDialogViewModelImpl,
-    addSymlinkViewModel: AddSymlinkViewModel,
+    addGroupDialogViewModel: AddGroupDialogViewModel,
     releaseNotesViewModel: ReleaseNotesViewModel,
     symlinksDialogViewModel: SymlinksDialogViewModel,
     addDataPointsDialogViewModel: AddDataPointsNavigationViewModel,
@@ -406,15 +410,12 @@ private fun GroupScreenContent(
     )
 
     // Dialogs
-    AddGroupDialog(
-        viewModel = addGroupDialogViewModel,
-        onDismissRequest = { addGroupDialogViewModel.hide() }
-    )
-
-    AddSymlinkDialog(
-        viewModel = addSymlinkViewModel,
-        onDismissRequest = { addSymlinkViewModel.hide() }
-    )
+    if (addGroupDialogViewModel.updateMode.collectAsStateWithLifecycle().value) {
+        AddGroupDialog(
+            viewModel = addGroupDialogViewModel,
+            onDismissRequest = { addGroupDialogViewModel.hide() }
+        )
+    }
 
     if (groupDialogsViewModel.showImportExportDialog.collectAsStateWithLifecycle().value) {
         val vmGroupName = groupViewModel.groupName.collectAsStateWithLifecycle().value
@@ -463,24 +464,6 @@ private fun GroupScreenContent(
 
     // Confirmation dialogs
     GroupDeleteDialog(groupDialogsViewModel, groupViewModel)
-
-    if (groupDialogsViewModel.showNoTrackersDialog.collectAsStateWithLifecycle().value) {
-        ContinueDialog(
-            body = R.string.no_trackers_graph_stats_hint,
-            onConfirm = { groupDialogsViewModel.hideNoTrackersDialog() },
-            onDismissRequest = { groupDialogsViewModel.hideNoTrackersDialog() },
-            continueText = R.string.ok
-        )
-    }
-
-    if (groupDialogsViewModel.showNoTrackersFunctionsDialog.collectAsStateWithLifecycle().value) {
-        ContinueDialog(
-            body = R.string.no_trackers_functions_hint,
-            onConfirm = { groupDialogsViewModel.hideNoTrackersFunctionsDialog() },
-            onDismissRequest = { groupDialogsViewModel.hideNoTrackersFunctionsDialog() },
-            continueText = R.string.ok
-        )
-    }
 
     // Release notes dialog
     if (showReleaseNotesDialog) {

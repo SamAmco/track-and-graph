@@ -20,113 +20,158 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
+import kotlinx.serialization.Serializable
+
+private sealed class AddReminderSessionNavKey : NavKey {
+    @Serializable
+    data class Session(val editReminderId: Long?) : AddReminderSessionNavKey()
+}
 
 @Composable
 fun AddReminderDialog(
+    visible: Boolean,
     editReminderId: Long?,
     onDismiss: () -> Unit
 ) {
-    val viewModel: AddReminderViewModel = hiltViewModel<AddReminderViewModelImpl>()
+    val navBackStack = rememberNavBackStack()
+    val sessionKey = AddReminderSessionNavKey.Session(editReminderId)
+
+    LaunchedEffect(visible, sessionKey) {
+        when {
+            visible && navBackStack.lastOrNull() != sessionKey -> {
+                navBackStack.clear()
+                navBackStack.add(sessionKey)
+            }
+            !visible && navBackStack.isNotEmpty() -> navBackStack.clear()
+        }
+    }
+
+    val dismiss = {
+        navBackStack.clear()
+        onDismiss()
+    }
+
+    val entries = rememberDecoratedNavEntries(
+        backStack = navBackStack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
+        entryProvider = { navKey -> addReminderSessionEntry(navKey, dismiss) },
+    )
+
+    if (visible && entries.isNotEmpty()) {
+        CustomDialog(
+            onDismissRequest = dismiss,
+            supportSmoothHeightAnimation = true,
+            paddingValues = PaddingValues(
+                start = inputSpacingLarge,
+                end = inputSpacingLarge,
+                bottom = halfDialogInputSpacing,
+                top = inputSpacingLarge,
+            )
+        ) {
+            NavDisplay(
+                entries = entries,
+                onBack = dismiss,
+            )
+        }
+    }
+}
+
+private fun addReminderSessionEntry(
+    navKey: NavKey,
+    onDismiss: () -> Unit,
+): NavEntry<NavKey> = when (navKey) {
+    is AddReminderSessionNavKey.Session -> NavEntry(navKey) {
+        AddReminderSessionDestination(
+            editReminderId = navKey.editReminderId,
+            onDismiss = onDismiss,
+        )
+    }
+    else -> error("Unknown navKey: $navKey")
+}
+
+@Composable
+private fun AddReminderSessionDestination(
+    editReminderId: Long?,
+    onDismiss: () -> Unit,
+) {
+    val viewModel = hiltViewModel<AddReminderViewModelImpl>()
 
     LaunchedEffect(editReminderId) {
         viewModel.loadStateForReminder(editReminderId)
     }
-
     LaunchedEffect(viewModel.onComplete) {
         for (event in viewModel.onComplete) onDismiss()
     }
 
-    val editingReminder = viewModel.editingReminder.collectAsStateWithLifecycle().value
-    val editMode = viewModel.editMode.collectAsStateWithLifecycle().value
-    val hasAnyFeatures = viewModel.hasAnyFeatures.collectAsStateWithLifecycle().value
-
-    AddReminderDialog(
+    AddReminderDialogBody(
         onConfirm = viewModel::saveReminder,
         onDismiss = onDismiss,
-        editMode = editMode,
-        editingReminder = editingReminder,
-        hasAnyFeatures = hasAnyFeatures
+        editMode = viewModel.editMode.collectAsStateWithLifecycle().value,
+        editingReminder = viewModel.editingReminder.collectAsStateWithLifecycle().value,
+        hasAnyFeatures = viewModel.hasAnyFeatures.collectAsStateWithLifecycle().value,
     )
 }
 
 @Composable
-private fun AddReminderDialog(
+private fun AddReminderDialogBody(
     onConfirm: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     editMode: Boolean,
     editingReminder: Reminder? = null,
     hasAnyFeatures: Boolean = false,
 ) {
-    var onCleanup by remember { mutableStateOf<() -> Unit>({}) }
-
-    val wrappedDismiss = {
-        onCleanup()
-        onDismiss()
-    }
-
-    CustomDialog(
-        onDismissRequest = wrappedDismiss,
-        supportSmoothHeightAnimation = true,
-        paddingValues = PaddingValues(
-            start = inputSpacingLarge,
-            end = inputSpacingLarge,
-            bottom = halfDialogInputSpacing,
-            top = inputSpacingLarge,
-        )
-    ) {
-        if (editMode && editingReminder != null) {
-            when (val params = editingReminder.params) {
-                is ReminderParams.WeekDayParams -> WeekDayReminderConfigurationScreen(
-                    editReminder = editingReminder,
-                    editParams = params,
-                    onUpsertReminder = onConfirm,
-                    onDismiss = wrappedDismiss,
-                    onSetCleanup = { onCleanup = it }
-                )
-                is ReminderParams.PeriodicParams -> PeriodicReminderConfigurationScreen(
-                    editReminder = editingReminder,
-                    editParams = params,
-                    onUpsertReminder = onConfirm,
-                    onDismiss = wrappedDismiss,
-                    onSetCleanup = { onCleanup = it }
-                )
-                is ReminderParams.MonthDayParams -> MonthDayReminderConfigurationScreen(
-                    editReminder = editingReminder,
-                    editParams = params,
-                    onUpsertReminder = onConfirm,
-                    onDismiss = wrappedDismiss,
-                    onSetCleanup = { onCleanup = it }
-                )
-                is ReminderParams.TimeSinceLastParams -> TimeSinceLastReminderConfigurationScreen(
-                    editReminder = editingReminder,
-                    editParams = params,
-                    onUpsertReminder = onConfirm,
-                    onDismiss = wrappedDismiss,
-                    onSetCleanup = { onCleanup = it }
-                )
-            }
-        } else {
-            // Add mode: show navigation flow
-            AddReminderDialogContent(
-                onConfirm = onConfirm,
-                onDismiss = wrappedDismiss,
-                onSetCleanup = { onCleanup = it },
-                hasAnyFeatures = hasAnyFeatures
+    if (editMode && editingReminder != null) {
+        when (val params = editingReminder.params) {
+            is ReminderParams.WeekDayParams -> WeekDayReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss,
+            )
+            is ReminderParams.PeriodicParams -> PeriodicReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss,
+            )
+            is ReminderParams.MonthDayParams -> MonthDayReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss,
+            )
+            is ReminderParams.TimeSinceLastParams -> TimeSinceLastReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss,
             )
         }
+    } else {
+        AddReminderDialogContent(
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+            hasAnyFeatures = hasAnyFeatures,
+        )
     }
 }
 
@@ -134,7 +179,7 @@ private fun AddReminderDialog(
 @Preview
 @Composable
 private fun AddReminderDialogPreview() {
-    AddReminderDialog(
+    AddReminderDialogBody(
         onConfirm = {},
         onDismiss = {},
         editMode = false,

@@ -17,16 +17,20 @@
 
 package com.samco.trackandgraph.reminders.ui
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.ui.compose.animation.popTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.predictivePopTransitionSpec
+import com.samco.trackandgraph.ui.compose.animation.navSizeTransform
 import com.samco.trackandgraph.ui.compose.animation.transitionSpec
 import kotlinx.serialization.Serializable
 
@@ -48,68 +52,107 @@ fun AddReminderDialogContent(
     modifier: Modifier = Modifier,
     onConfirm: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
-    onSetCleanup: (() -> Unit) -> Unit = {},
+    onNavigateBackFromTypeSelection: () -> Unit = onDismiss,
     hasAnyFeatures: Boolean = false,
 ) {
     val navBackStack = rememberNavBackStack(ReminderDialogNavKey.ReminderTypeSelection)
 
-    NavDisplay(
-        modifier = modifier.animateContentSize(),
+    val entries = rememberDecoratedNavEntries(
         backStack = navBackStack,
-        onBack = { navBackStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
+        entryProvider = { navKey ->
+            reminderDialogEntry(
+                navKey = navKey,
+                onConfirm = onConfirm,
+                onDismiss = onDismiss,
+                onNavigate = navBackStack::add,
+                hasAnyFeatures = hasAnyFeatures,
+            )
+        },
+    )
+
+    NavDisplay(
+        modifier = modifier,
+        entries = entries,
+        contentAlignment = Alignment.Center,
+        onBack = {
+            if (navBackStack.size > 1) {
+                navBackStack.removeLastOrNull()
+            } else {
+                onNavigateBackFromTypeSelection()
+            }
+        },
+        sizeTransform = navSizeTransform(),
         transitionSpec = transitionSpec(),
         popTransitionSpec = popTransitionSpec(),
         predictivePopTransitionSpec = predictivePopTransitionSpec(),
-        entryProvider = { navKey ->
-            when (navKey) {
-                is ReminderDialogNavKey.ReminderTypeSelection -> NavEntry(navKey) {
-                    ReminderTypeSelectionScreen(
-                        onWeekDayReminderSelected = {
-                            navBackStack.add(ReminderDialogNavKey.WeekDayReminderConfiguration)
-                        },
-                        onPeriodicReminderSelected = {
-                            navBackStack.add(ReminderDialogNavKey.PeriodicReminderConfiguration)
-                        },
-                        onMonthDayReminderSelected = {
-                            navBackStack.add(ReminderDialogNavKey.MonthDayReminderConfiguration)
-                        },
-                        onTimeSinceLastReminderSelected = {
-                            navBackStack.add(ReminderDialogNavKey.TimeSinceLastReminderConfiguration)
-                        },
-                        onDismiss = onDismiss,
-                        hasAnyFeatures = hasAnyFeatures
-                    )
-                }
-                is ReminderDialogNavKey.WeekDayReminderConfiguration -> NavEntry(navKey) {
-                    WeekDayReminderConfigurationScreen(
-                        onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss,
-                        onSetCleanup = onSetCleanup
-                    )
-                }
-                is ReminderDialogNavKey.PeriodicReminderConfiguration -> NavEntry(navKey) {
-                    PeriodicReminderConfigurationScreen(
-                        onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss,
-                        onSetCleanup = onSetCleanup
-                    )
-                }
-                is ReminderDialogNavKey.MonthDayReminderConfiguration -> NavEntry(navKey) {
-                    MonthDayReminderConfigurationScreen(
-                        onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss,
-                        onSetCleanup = onSetCleanup
-                    )
-                }
-                is ReminderDialogNavKey.TimeSinceLastReminderConfiguration -> NavEntry(navKey) {
-                    TimeSinceLastReminderConfigurationScreen(
-                        onUpsertReminder = onConfirm,
-                        onDismiss = onDismiss,
-                        onSetCleanup = onSetCleanup
-                    )
-                }
-                else -> error("Unknown navKey: $navKey")
-            }
-        }
+    )
+}
+
+private fun reminderDialogEntry(
+    navKey: NavKey,
+    onConfirm: (ReminderInput) -> Unit,
+    onDismiss: () -> Unit,
+    onNavigate: (ReminderDialogNavKey) -> Unit,
+    hasAnyFeatures: Boolean,
+): NavEntry<NavKey> = when (navKey) {
+    is ReminderDialogNavKey.ReminderTypeSelection -> NavEntry(navKey) {
+        ReminderTypeSelectionDestination(
+            onNavigate = onNavigate,
+            onDismiss = onDismiss,
+            hasAnyFeatures = hasAnyFeatures,
+        )
+    }
+    is ReminderDialogNavKey.WeekDayReminderConfiguration -> NavEntry(navKey) {
+        WeekDayReminderConfigurationScreen(
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+    }
+    is ReminderDialogNavKey.PeriodicReminderConfiguration -> NavEntry(navKey) {
+        PeriodicReminderConfigurationScreen(
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+    }
+    is ReminderDialogNavKey.MonthDayReminderConfiguration -> NavEntry(navKey) {
+        MonthDayReminderConfigurationScreen(
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+    }
+    is ReminderDialogNavKey.TimeSinceLastReminderConfiguration -> NavEntry(navKey) {
+        TimeSinceLastReminderConfigurationScreen(
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+    }
+    else -> error("Unknown navKey: $navKey")
+}
+
+@Composable
+private fun ReminderTypeSelectionDestination(
+    onNavigate: (ReminderDialogNavKey) -> Unit,
+    onDismiss: () -> Unit,
+    hasAnyFeatures: Boolean,
+) {
+    ReminderTypeSelectionScreen(
+        onWeekDayReminderSelected = {
+            onNavigate(ReminderDialogNavKey.WeekDayReminderConfiguration)
+        },
+        onPeriodicReminderSelected = {
+            onNavigate(ReminderDialogNavKey.PeriodicReminderConfiguration)
+        },
+        onMonthDayReminderSelected = {
+            onNavigate(ReminderDialogNavKey.MonthDayReminderConfiguration)
+        },
+        onTimeSinceLastReminderSelected = {
+            onNavigate(ReminderDialogNavKey.TimeSinceLastReminderConfiguration)
+        },
+        onDismiss = onDismiss,
+        hasAnyFeatures = hasAnyFeatures,
     )
 }

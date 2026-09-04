@@ -1,13 +1,14 @@
 ---
 title: Compose dialog wrappers, footer padding, scrolling, and previews
-description: How to choose the shared dialog wrapper, avoid doubled space below action buttons, structure adaptive content, and make dialog previews render reliably.
+description: How to choose the shared dialog wrapper, avoid doubled space below action buttons, structure adaptive content, scope Navigation 3 ViewModels, and make dialog previews render reliably.
 topics:
   - Choosing CustomDialog versus CustomContinueCancelDialog
   - Bottom padding for text-button action rows
   - Content-only dialog screens embedded in animated hosts
+  - Dialog-scoped Navigation 3 ViewModels and configuration changes
   - Adaptive scrolling and height
   - Previewing dialog bodies without a Dialog window
-keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, bottom padding, halfDialogInputSpacing, scrolling, adaptive height, preview, Dialog window]
+keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, bottom padding, halfDialogInputSpacing, scrolling, adaptive height, preview, Dialog window, Navigation 3, ViewModelStore, hiltViewModel, configuration-change, onPop]
 ---
 
 # Compose dialogs
@@ -34,6 +35,25 @@ Do not give dialog content a fixed height merely to make scrolling work. Let the
 ## Dialog navigation
 
 Content-only screens embedded in an animated dialog host should not create another `Dialog`. They render their body and footer into the existing host. Keep non-terminal navigation and terminal completion callbacks distinct: Back or Cancel may return to the previous screen inside the host, while an explicit Close after completing the journey should dismiss the host dialog. A standalone entry point can wrap that same content-only screen in `CustomDialog`; both hosts must honor the footer padding contract.
+
+Reusable picker dialogs should expose both a standalone wrapper and a content-only form. For example, `SelectItemDialog` owns the modal window for ordinary callers, while `SelectItemDialogContent` allows a navigation destination to reuse the same selection state, list, and action footer inside an existing dialog window.
+
+## Dialog-scoped ViewModels with Navigation 3
+
+Calling `hiltViewModel()` inside a conditionally composed `Dialog` does not make the ViewModel dialog-scoped. It uses the nearest `ViewModelStoreOwner`, normally the enclosing screen's navigation entry, so removing only the dialog from composition leaves that ViewModel alive.
+
+For a multi-destination dialog that should retain in-progress state across configuration changes but release it when the user closes the dialog:
+
+- Keep its `rememberNavBackStack`, `rememberDecoratedNavEntries`, saveable-state decorator, and ViewModel-store decorator in a host that remains composed while the screen exists.
+- Render the actual `Dialog` window only while the workflow is visible and the decorated entries are non-empty.
+- On close, clear or pop the dialog back stack before hiding the window. The decorators then observe real pops and clear the destination ViewModels through `onPop`.
+- Do not create a local `ViewModelStoreOwner` with `remember` and clear it in `DisposableEffect`; that also clears during configuration recreation and loses in-progress form state.
+
+Apply the same decorators to nested navigation flows whose individual forms own ViewModels. Popping a nested form entry should destroy that form's ViewModel, so returning to the selector and choosing the same form starts fresh. Closing the outer session destroys the nested stores as part of its ownership tree. A standalone dialog entry point needs the same always-composed host pattern; otherwise its `hiltViewModel()` calls fall back to the enclosing screen owner.
+
+Do not compensate for screen-owned form ViewModels by registering child `reset()` callbacks with the dialog host. That approach is manual lifecycle emulation, is easy to miss on a Back path, and makes the host aware of child implementation details. Scope each form to the navigation entry that represents its lifetime instead.
+
+Any terminal persistence launched in a destination's `viewModelScope` must complete before that destination is popped. Signal completion from the ViewModel and dismiss afterward; dismissing immediately can cancel the write when the scoped ViewModel is cleared.
 
 ## Previews
 

@@ -18,18 +18,12 @@
 package com.samco.trackandgraph.group
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -37,11 +31,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Velocity
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 
 /**
  * Top app bar content for the Group screen with proper memoization to avoid unnecessary recompositions
@@ -51,12 +43,8 @@ internal fun GroupTopBarContent(
     navArgs: GroupNavKey,
     groupViewModel: GroupViewModel,
     groupDialogsViewModel: GroupDialogsViewModel,
-    addGroupDialogViewModel: AddGroupDialogViewModelImpl,
-    onAddTracker: (Long) -> Unit,
-    onAddGraphStat: (Long) -> Unit,
+    onAddComponent: () -> Unit,
     showFab: MutableState<Boolean>,
-    onAddFunction: (Long) -> Unit,
-    onAddSymlink: (Long) -> Unit,
     onSearchClick: () -> Unit,
 ) {
     val topBarController = LocalTopBarController.current
@@ -76,23 +64,13 @@ internal fun GroupTopBarContent(
     // Memoize the actions composable to avoid recreating on every recomposition
     val actions = remember(
         groupDialogsViewModel,
-        addGroupDialogViewModel,
-        groupViewModel,
-        onAddTracker,
-        onAddGraphStat,
+        onAddComponent,
         onSearchClick,
-        navArgs.groupId
     ) {
         createTopBarActions(
             groupDialogsViewModel = groupDialogsViewModel,
-            addGroupDialogViewModel = addGroupDialogViewModel,
-            groupViewModel = groupViewModel,
-            onAddTracker = onAddTracker,
-            onAddGraphStat = onAddGraphStat,
-            onAddFunction = onAddFunction,
-            onAddSymlink = onAddSymlink,
+            onAddComponent = onAddComponent,
             onSearchClick = onSearchClick,
-            groupId = navArgs.groupId
         )
     }
 
@@ -137,14 +115,8 @@ private fun createNestedScrollConnection(showFab: MutableState<Boolean>): Nested
  */
 private fun createTopBarActions(
     groupDialogsViewModel: GroupDialogsViewModel,
-    addGroupDialogViewModel: AddGroupDialogViewModelImpl,
-    groupViewModel: GroupViewModel,
-    onAddTracker: (Long) -> Unit,
-    onAddGraphStat: (Long) -> Unit,
-    onAddFunction: (Long) -> Unit,
-    onAddSymlink: (Long) -> Unit,
+    onAddComponent: () -> Unit,
     onSearchClick: () -> Unit,
-    groupId: Long
 ): @Composable RowScope.() -> Unit {
     return {
         // Import/Export action
@@ -155,96 +127,8 @@ private fun createTopBarActions(
         IconButton(onClick = onSearchClick) {
             Icon(painterResource(R.drawable.search_icon), stringResource(R.string.search))
         }
-        // Add dropdown menu
-        GroupAddDropdownMenu(
-            groupViewModel = groupViewModel,
-            groupDialogsViewModel = groupDialogsViewModel,
-            addGroupDialogViewModel = addGroupDialogViewModel,
-            onAddTracker = onAddTracker,
-            onAddGraphStat = onAddGraphStat,
-            onAddFunction = onAddFunction,
-            onAddSymlink = onAddSymlink,
-            groupId = groupId
-        )
-    }
-}
-
-/**
- * Dropdown menu for adding new items (tracker, graph/stat, group)
- */
-@Composable
-private fun GroupAddDropdownMenu(
-    groupViewModel: GroupViewModel,
-    groupDialogsViewModel: GroupDialogsViewModel,
-    addGroupDialogViewModel: AddGroupDialogViewModelImpl,
-    onAddTracker: (Long) -> Unit,
-    onAddGraphStat: (Long) -> Unit,
-    onAddFunction: (Long) -> Unit,
-    onAddSymlink: (Long) -> Unit,
-    groupId: Long
-) {
-    var showAddMenu by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-
-    IconButton(onClick = { showAddMenu = true }) {
-        Icon(painterResource(R.drawable.add_icon), stringResource(R.string.add))
-        DropdownMenu(
-            expanded = showAddMenu,
-            onDismissRequest = { showAddMenu = false }
-        ) {
-            // Add Tracker
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.tracker)) },
-                onClick = {
-                    showAddMenu = false
-                    onAddTracker(groupId)
-                }
-            )
-            // Add Graph/Stat
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.graph_or_stat)) },
-                onClick = {
-                    showAddMenu = false
-                    scope.launch {
-                        // Check if user has trackers before navigating
-                        if (groupViewModel.userHasAnyTrackers()) {
-                            onAddGraphStat(groupId)
-                        } else {
-                            groupDialogsViewModel.showNoTrackersDialog()
-                        }
-                    }
-                }
-            )
-            // Add Group
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.group)) },
-                onClick = {
-                    showAddMenu = false
-                    addGroupDialogViewModel.showForCreate(parentGroupId = groupId)
-                }
-            )
-            // Add Function
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.function)) },
-                onClick = {
-                    showAddMenu = false
-                    scope.launch {
-                        if (groupViewModel.userHasAnyTrackers()) {
-                            onAddFunction(groupId)
-                        } else {
-                            groupDialogsViewModel.showNoTrackersFunctionsDialog()
-                        }
-                    }
-                }
-            )
-            // Add Symlink
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.symlink)) },
-                onClick = {
-                    showAddMenu = false
-                    onAddSymlink(groupId)
-                }
-            )
+        IconButton(onClick = onAddComponent) {
+            Icon(painterResource(R.drawable.add_icon), stringResource(R.string.add))
         }
     }
 }

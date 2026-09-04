@@ -207,13 +207,12 @@ fun RemindersScreen(
             }
         }
 
-        // Add reminder dialog
-        if (showAddReminderDialog) {
-            AddReminderDialog(
-                editReminderId = editReminderId,
-                onDismiss = onHideAddReminderDialog
-            )
-        }
+        // Keep the host composed so destination ViewModels are released by real back-stack pops.
+        AddReminderDialog(
+            visible = showAddReminderDialog,
+            editReminderId = editReminderId,
+            onDismiss = onHideAddReminderDialog,
+        )
 
         // Loading overlay
         if (isLoading) LoadingOverlay()

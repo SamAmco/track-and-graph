@@ -65,7 +65,6 @@ fun MonthDayReminderConfigurationScreen(
     editParams: ReminderParams.MonthDayParams? = null,
     onUpsertReminder: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
-    onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: MonthDayReminderConfigurationViewModel = hiltViewModel<MonthDayReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
@@ -78,10 +77,6 @@ fun MonthDayReminderConfigurationScreen(
 
     LaunchedEffect(editReminder, editParams) {
         viewModel.initializeFromReminder(editReminder, editParams)
-    }
-
-    LaunchedEffect(viewModel) {
-        onSetCleanup { viewModel.reset() }
     }
 
     MonthDayReminderConfigurationContent(

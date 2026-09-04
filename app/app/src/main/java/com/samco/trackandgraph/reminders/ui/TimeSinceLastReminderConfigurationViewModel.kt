@@ -61,7 +61,6 @@ interface TimeSinceLastReminderConfigurationViewModel {
     fun updateFeatureId(id: Long?)
     fun getReminderInput(): ReminderInput
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.TimeSinceLastParams?)
-    fun reset()
     fun onOpenFunctionsRemindersInfo(context: Context)
 }
 
@@ -190,18 +189,6 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
                 _secondPeriod.value = it.period
             }
         }
-    }
-
-    override fun reset() {
-        _reminderName.value = ""
-        _enabled.value = true
-        _firstInterval.value = "1"
-        _firstPeriod.value = Period.DAYS
-        _secondInterval.value = "1"
-        _secondPeriod.value = Period.DAYS
-        _hasSecondInterval.value = false
-        _featureId.value = null
-        _featureName.value = ""
     }
 
     override fun onOpenFunctionsRemindersInfo(context: Context) {

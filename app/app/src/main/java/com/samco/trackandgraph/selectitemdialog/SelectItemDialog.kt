@@ -24,6 +24,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,12 +65,14 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.theming.TngColors
 import com.samco.trackandgraph.ui.theming.tngColors
-import com.samco.trackandgraph.ui.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.ContinueCancelDialogContent
+import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.ui.cardPadding
 import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.ui.smallIconSize
 import kotlinx.coroutines.delay
 
@@ -88,7 +91,53 @@ fun SelectItemDialog(
     resetOnClose: Boolean = false,
 ) {
     val viewModel: SelectItemDialogViewModel = hiltViewModel<SelectItemDialogViewModelImpl>()
+    val dismiss = {
+        onDismissRequest()
+        if (resetOnClose) viewModel.reset()
+    }
 
+    CustomDialog(
+        onDismissRequest = dismiss,
+        scrollContent = false,
+        paddingValues = PaddingValues(
+            start = inputSpacingLarge,
+            end = inputSpacingLarge,
+            bottom = halfDialogInputSpacing,
+            top = inputSpacingLarge,
+        ),
+    ) {
+        SelectItemDialogContent(
+            title = title,
+            selectableTypes = selectableTypes,
+            hiddenItems = hiddenItems,
+            disabledItems = disabledItems,
+            onGroupSelected = onGroupSelected,
+            onTrackerSelected = onTrackerSelected,
+            onFeatureSelected = onFeatureSelected,
+            onGraphSelected = onGraphSelected,
+            onFunctionSelected = onFunctionSelected,
+            onDismissRequest = dismiss,
+            viewModel = viewModel,
+        )
+    }
+}
+
+@Composable
+fun SelectItemDialogContent(
+    title: String,
+    selectableTypes: Set<SelectableItemType>,
+    hiddenItems: Set<HiddenItem> = emptySet(),
+    disabledItems: Set<HiddenItem> = emptySet(),
+    onGroupSelected: ((Long) -> Unit)? = null,
+    onTrackerSelected: ((Long) -> Unit)? = null,
+    onFeatureSelected: ((Long) -> Unit)? = null,
+    onGraphSelected: ((Long) -> Unit)? = null,
+    onFunctionSelected: ((Long) -> Unit)? = null,
+    onDismissRequest: () -> Unit,
+    dismissAfterSelection: Boolean = true,
+    selectionEnabled: Boolean = true,
+    viewModel: SelectItemDialogViewModel = hiltViewModel<SelectItemDialogViewModelImpl>(),
+) {
     LaunchedEffect(selectableTypes, hiddenItems, disabledItems) {
         viewModel.init(selectableTypes, hiddenItems, disabledItems)
     }
@@ -97,20 +146,11 @@ fun SelectItemDialog(
     val groupTree by viewModel.groupTree.collectAsStateWithLifecycle()
     val selectedItem by viewModel.selectedItem.collectAsStateWithLifecycle()
 
-
-    SelectItemDialogContent(
-        state = state,
-        title = title,
-        groupTree = groupTree,
-        selectedItem = selectedItem,
-        lazyListState = viewModel.lazyListState,
-        horizontalScrollState = viewModel.horizontalScrollState,
-        onDismissRequest = {
-            onDismissRequest()
-            if (resetOnClose) viewModel.reset()
-        },
-        onItemSelected = viewModel::onItemClicked,
-        onContinue = {
+    ContinueCancelDialogContent(
+        continueEnabled = selectedItem != null && selectionEnabled,
+        scrollContent = false,
+        onDismissRequest = onDismissRequest,
+        onConfirm = {
             selectedItem?.let { item ->
                 when (item) {
                     is GraphNode.Group -> onGroupSelected?.invoke(item.id)
@@ -118,23 +158,30 @@ fun SelectItemDialog(
                         onTrackerSelected?.invoke(item.trackerId)
                         onFeatureSelected?.invoke(item.featureId)
                     }
-
                     is GraphNode.Graph -> onGraphSelected?.invoke(item.id)
                     is GraphNode.Function -> {
                         onFunctionSelected?.invoke(item.functionId)
                         onFeatureSelected?.invoke(item.featureId)
                     }
                 }
-                onDismissRequest()
-                if (resetOnClose) viewModel.reset()
+                if (dismissAfterSelection) onDismissRequest()
             }
         },
-        continueEnabled = selectedItem != null,
-    )
+    ) {
+        SelectItemPickerContent(
+            state = state,
+            title = title,
+            groupTree = groupTree,
+            selectedItem = selectedItem,
+            lazyListState = viewModel.lazyListState,
+            horizontalScrollState = viewModel.horizontalScrollState,
+            onItemSelected = viewModel::onItemClicked,
+        )
+    }
 }
 
 @Composable
-private fun SelectItemDialogContent(
+private fun SelectItemPickerContent(
     state: SelectItemDialogState,
     title: String,
     groupTree: GraphNode?,
@@ -142,14 +189,6 @@ private fun SelectItemDialogContent(
     lazyListState: LazyListState = LazyListState(),
     horizontalScrollState: ScrollState = ScrollState(0),
     onItemSelected: (GraphNode) -> Unit = {},
-    onDismissRequest: () -> Unit = {},
-    onContinue: () -> Unit = {},
-    continueEnabled: Boolean,
-) = CustomContinueCancelDialog(
-    scrollContent = false,
-    continueEnabled = continueEnabled,
-    onDismissRequest = onDismissRequest,
-    onConfirm = onContinue,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -435,12 +474,11 @@ private fun GroupItemRow(
 @Composable
 private fun SelectItemDialogContentLoadingPreview() {
     TnGComposeTheme {
-        SelectItemDialogContent(
+        SelectItemPickerContent(
             state = SelectItemDialogState.LOADING,
             title = "Select Group",
             groupTree = null,
             selectedItem = null,
-            continueEnabled = false
         )
     }
 }
@@ -449,14 +487,13 @@ private fun SelectItemDialogContentLoadingPreview() {
 @Composable
 private fun SelectItemDialogContentPreview() {
     TnGComposeTheme {
-        SelectItemDialogContent(
+        SelectItemPickerContent(
             state = SelectItemDialogState.READY,
             title = "Move To",
             selectedItem = GraphNode.Graph(
                 id = 21L,
                 name = "Stress Level Trends Analysis"
             ),
-            continueEnabled = true,
             groupTree = GraphNode.Group(
                 id = 1L,
                 name = "Health & Wellness Tracking",
@@ -534,12 +571,11 @@ private fun SelectItemDialogContentPreview() {
 @Composable
 private fun SelectItemDialogContentEmptyPreview() {
     TnGComposeTheme {
-        SelectItemDialogContent(
+        SelectItemPickerContent(
             state = SelectItemDialogState.READY,
             title = "Select Group",
             groupTree = null,
             selectedItem = null,
-            continueEnabled = false
         )
     }
 }

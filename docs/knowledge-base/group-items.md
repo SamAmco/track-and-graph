@@ -7,7 +7,7 @@ topics:
   - child_id is the type-specific entity ID (NOT features_table.id for trackers/functions)
   - groupItemId (GroupItem.id) as placement identity: uniquely identifies WHERE a component is placed
   - Same component can appear multiple times in the same group (no unique constraint)
-  - Symlink creation: AddSymlinkViewModel disables ancestors (cycle prevention) only
+  - Symlink creation: Add Component destination ownership and ancestor cycle prevention
   - Display index: managed by helpers; UI combines via GroupViewModel flows (children not pre-sorted)
   - Drag-and-drop: temporary local list for instant UI; DB write on drop; VM waits for dbDisplayIndices alignment
   - null group_id: valid ONLY for reminders (Reminders screen)
@@ -144,13 +144,15 @@ groupItemDao.deleteGroupItemsByChild(childId, type)
 
 ## Symlink Creation — Disabled Items in Picker
 
-When the user opens the "Add Symlink" dialog (`AddSymlinkViewModel`), certain items are disabled (visible but greyed out, not selectable):
+"Add Symlink" is a destination in the Add Component dialog. Its destination-scoped `AddSymlinkViewModel` computes which items are disabled (visible but greyed out, not selectable):
 
 1. **Ancestor groups (cycle prevention)**: The current group and all its transitive ancestors are disabled as GROUP targets, since symlinking any of them would create a cycle in the DAG. Computed via `GroupHelper.getAncestorAndSelfGroupIds()`.
 
 Since there is no unique constraint on `(group_id, child_id, type)`, items already present in the group are **not** disabled — the same component can be symlinked into a group multiple times.
 
 The `SelectItemDialog` supports both `hiddenItems` (completely removed from the tree) and `disabledItems` (visible but not clickable, shown at reduced alpha). The symlink flow uses `disabledItems` for ancestor groups.
+
+The destination embeds the selector's content-only API rather than opening a second dialog. `GroupScreen` owns only Add Component visibility; it does not own symlink visibility or an Add Symlink ViewModel. After selection, the destination remains alive until `createSymlink` completes, then the Add Component dialog closes. Popping earlier would clear the destination ViewModel and cancel its `viewModelScope` write.
 
 ## Key DAO Methods
 

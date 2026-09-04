@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,9 +48,9 @@ interface AddGroupDialogViewModel {
     val updateMode: StateFlow<Boolean>
     val addEnabled: StateFlow<Boolean>
 
-    fun showForCreate(parentGroupId: Long)
+    fun initializeForCreate(parentGroupId: Long)
     fun showForEdit(groupId: Long)
-    fun addOrUpdateGroup()
+    fun addOrUpdateGroup(onComplete: () -> Unit = {})
     fun hide()
     fun updateColorIndex(index: Int)
     fun updateName(name: TextFieldValue)
@@ -74,6 +74,7 @@ class AddGroupDialogViewModelImpl @Inject constructor(
 
     private var parentGroupId: Long? = null
     private var currentGroup = MutableStateFlow<Group?>(null)
+    private val _updateMode = MutableStateFlow(false)
 
     override val addEnabled: StateFlow<Boolean> = combine(
         snapshotFlow { colorIndex },
@@ -82,15 +83,14 @@ class AddGroupDialogViewModelImpl @Inject constructor(
         colorIndex in dataVisColorList.indices && name.text.isNotBlank()
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    override val updateMode: StateFlow<Boolean> = currentGroup
-        .map { it != null }
-        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+    override val updateMode: StateFlow<Boolean> = _updateMode.asStateFlow()
 
-    override fun showForCreate(parentGroupId: Long) {
+    override fun initializeForCreate(parentGroupId: Long) {
         colorIndex = 0
         name = TextFieldValue()
         this.parentGroupId = parentGroupId
         this.currentGroup.value = null
+        _updateMode.value = false
         loading = false
         hidden = false
     }
@@ -99,6 +99,8 @@ class AddGroupDialogViewModelImpl @Inject constructor(
         colorIndex = 0
         name = TextFieldValue()
         this.parentGroupId = null
+        this.currentGroup.value = null
+        _updateMode.value = true
         loading = false
         hidden = false
         viewModelScope.launch {
@@ -111,7 +113,7 @@ class AddGroupDialogViewModelImpl @Inject constructor(
         }
     }
 
-    override fun addOrUpdateGroup() {
+    override fun addOrUpdateGroup(onComplete: () -> Unit) {
         if (colorIndex !in dataVisColorList.indices || name.text.isBlank()) return
         val name = name.text
         val colorIndex = colorIndex
@@ -138,6 +140,7 @@ class AddGroupDialogViewModelImpl @Inject constructor(
             }
 
             hide()
+            onComplete()
         }
     }
 

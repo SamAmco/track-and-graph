@@ -18,6 +18,7 @@ package com.samco.trackandgraph.ui.compose.animation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -29,6 +30,10 @@ import androidx.navigation3.scene.Scene
 import androidx.navigationevent.NavigationEvent
 
 const val NAV_ANIM_DURATION_MILLIS = 280
+
+fun navSizeTransform() = SizeTransform(clip = false) { _, _ ->
+    tween(NAV_ANIM_DURATION_MILLIS, easing = FastOutSlowInEasing)
+}
 
 fun <T : Any> popTransitionSpec(): AnimatedContentTransitionScope<Scene<T>>.() -> ContentTransform {
     return {

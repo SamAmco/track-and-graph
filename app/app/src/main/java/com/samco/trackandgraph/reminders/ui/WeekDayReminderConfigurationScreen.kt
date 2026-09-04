@@ -61,7 +61,6 @@ fun WeekDayReminderConfigurationScreen(
     editParams: ReminderParams.WeekDayParams? = null,
     onUpsertReminder: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
-    onSetCleanup: (() -> Unit) -> Unit = {},
     viewModel: WeekDayReminderConfigurationViewModel = hiltViewModel<WeekDayReminderConfigurationViewModelImpl>()
 ) {
     val reminderName by viewModel.reminderName.collectAsState()
@@ -71,10 +70,6 @@ fun WeekDayReminderConfigurationScreen(
 
     LaunchedEffect(editReminder, editParams) {
         viewModel.initializeFromReminder(editReminder, editParams)
-    }
-
-    LaunchedEffect(viewModel) {
-        onSetCleanup { viewModel.reset() }
     }
 
     WeekDayReminderConfigurationContent(

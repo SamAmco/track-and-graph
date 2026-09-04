@@ -39,6 +39,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.ui.ColorSpinner
 import com.samco.trackandgraph.ui.ui.CustomContinueCancelDialog
+import com.samco.trackandgraph.ui.ui.ContinueCancelDialogContent
 import com.samco.trackandgraph.ui.ui.InputSpacingLarge
 
 @Composable
@@ -50,10 +51,33 @@ fun AddGroupDialog(viewModel: AddGroupDialogViewModel, onDismissRequest: () -> U
 
     CustomContinueCancelDialog(
         onDismissRequest = { onDismissRequest() },
-        onConfirm = {
-            viewModel.addOrUpdateGroup()
-            onDismissRequest()
-        },
+        onConfirm = { viewModel.addOrUpdateGroup(onComplete = onDismissRequest) },
+        continueText = if (updateMode) R.string.update else R.string.add,
+        cancelText = R.string.cancel,
+        continueEnabled = addEnabled,
+    ) {
+        AddGroupView(
+            modifier = Modifier.fillMaxWidth(),
+            colorIndex = viewModel.colorIndex,
+            name = viewModel.name,
+            onColorIndexChange = viewModel::updateColorIndex,
+            onNameChange = viewModel::updateName
+        )
+    }
+}
+
+@Composable
+fun AddGroupDialogContent(
+    viewModel: AddGroupDialogViewModel,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit = { viewModel.addOrUpdateGroup(onComplete = onDismissRequest) },
+) {
+    val addEnabled by viewModel.addEnabled.collectAsStateWithLifecycle()
+    val updateMode by viewModel.updateMode.collectAsStateWithLifecycle()
+
+    ContinueCancelDialogContent(
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm,
         continueText = if (updateMode) R.string.update else R.string.add,
         cancelText = R.string.cancel,
         continueEnabled = addEnabled,

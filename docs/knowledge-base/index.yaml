@@ -14,8 +14,8 @@ docs:
     keywords: [compose, composable, shared-ui, ui-module, app-ui, reusable-controls, buttons, TextButton, SmallTextButton, RowCheckbox, PasswordTextField, Divider, spacing, preview, flavor, build-variant, holder-module, NoClassDefFoundError, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState, flicker]
   - file: dialogs.md
     title: Compose dialog wrappers, footer padding, scrolling, and previews
-    description: Choosing shared dialog wrappers, avoiding doubled action-footer padding, structuring adaptive scrolling, animated content-only screens, and reliable previews.
-    keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, bottom padding, halfDialogInputSpacing, scrolling, adaptive height, preview, Dialog window]
+    description: Choosing shared dialog wrappers, avoiding doubled action-footer padding, structuring adaptive scrolling, animated content-only screens, nested dialog-scoped Navigation 3 ViewModels, and reliable previews.
+    keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, scrolling, adaptive height, preview, Dialog window, Navigation 3, ViewModelStore, hiltViewModel, configuration-change, nested-navigation, reset-callback, onPop]
 
   - file: graph-rendering.md
     title: Graph rendering — renderer-neutral view data and Vico bar charts
@@ -79,8 +79,8 @@ docs:
 
   - file: group-items.md
     title: group_items_table — junction table and display ordering
-    description: The group_items_table schema, composite identity (type + child_id), groupItemId as placement identity, display_index ordering, multi-group membership (including same-group duplicates, no unique constraint), symlink creation disabled-items pattern (AddSymlinkViewModel), drag-and-drop flow, and null group_id for groupless reminders.
-    keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, symlink, AddSymlinkViewModel, disabled-items, SelectItemDialog, groupItemId, placement-identity]
+    description: The group_items_table schema, composite identity (type + child_id), groupItemId as placement identity, display_index ordering, multi-group membership (including same-group duplicates, no unique constraint), destination-scoped symlink creation and disabled items, drag-and-drop flow, and null group_id for groupless reminders.
+    keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, symlink, AddSymlinkViewModel, AddComponentDialog, destination, disabled-items, SelectItemDialog, groupItemId, placement-identity]
 
   - file: helper-classes.md
     title: DataInteractor and Helper pattern

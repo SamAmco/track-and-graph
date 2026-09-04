@@ -49,7 +49,6 @@ interface MonthDayReminderConfigurationViewModel {
     fun updateEnds(ends: LocalDateTime)
     fun getReminderInput(): ReminderInput
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.MonthDayParams?)
-    fun reset()
 }
 
 @HiltViewModel
@@ -136,13 +135,4 @@ class MonthDayReminderConfigurationViewModelImpl @Inject constructor() :
         }
     }
 
-    override fun reset() {
-        _reminderName.value = ""
-        _enabled.value = true
-        _selectedTime.value = LocalTime.of(9, 0)
-        _occurrence.value = MonthDayOccurrence.FIRST
-        _endsEnabled.value = false
-        _dayType.value = MonthDayType.MONDAY
-        _ends.value = LocalDateTime.now()
-    }
 }

@@ -49,7 +49,6 @@ interface PeriodicReminderConfigurationViewModel {
     fun updateInterval(interval: String)
     fun updatePeriod(period: Period)
     fun getReminderInput(): ReminderInput
-    fun reset()
 }
 
 @HiltViewModel
@@ -142,15 +141,4 @@ class PeriodicReminderConfigurationViewModelImpl @Inject constructor() : ViewMod
         )
     }
 
-    override fun reset() {
-        _reminderName.value = ""
-        _enabled.value = true
-        val defaultStart = LocalDateTime.now()
-        val defaultEnd = LocalDateTime.now()
-        _starts.value = localDateTimeToOffset(defaultStart)
-        _ends.value = localDateTimeToOffset(defaultEnd)
-        _hasEndDate.value = false
-        _intervalText.value = "1"
-        _period.value = Period.DAYS
-    }
 }
