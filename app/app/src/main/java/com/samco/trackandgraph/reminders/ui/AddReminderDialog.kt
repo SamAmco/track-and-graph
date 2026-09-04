@@ -19,29 +19,19 @@ package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberDecoratedNavEntries
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreOwner
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
-import kotlinx.serialization.Serializable
-
-private sealed class AddReminderSessionNavKey : NavKey {
-    @Serializable
-    data class Session(val editReminderId: Long?) : AddReminderSessionNavKey()
-}
 
 @Composable
 fun AddReminderDialog(
@@ -49,36 +39,13 @@ fun AddReminderDialog(
     editReminderId: Long?,
     onDismiss: () -> Unit
 ) {
-    val navBackStack = rememberNavBackStack()
-    val sessionKey = AddReminderSessionNavKey.Session(editReminderId)
+    if (!visible) return
 
-    LaunchedEffect(visible, sessionKey) {
-        when {
-            visible && navBackStack.lastOrNull() != sessionKey -> {
-                navBackStack.clear()
-                navBackStack.add(sessionKey)
-            }
-            !visible && navBackStack.isNotEmpty() -> navBackStack.clear()
-        }
-    }
+    val dialogOwner = rememberViewModelStoreOwner()
 
-    val dismiss = {
-        navBackStack.clear()
-        onDismiss()
-    }
-
-    val entries = rememberDecoratedNavEntries(
-        backStack = navBackStack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
-        entryProvider = { navKey -> addReminderSessionEntry(navKey, dismiss) },
-    )
-
-    if (visible && entries.isNotEmpty()) {
+    CompositionLocalProvider(LocalViewModelStoreOwner provides dialogOwner) {
         CustomDialog(
-            onDismissRequest = dismiss,
+            onDismissRequest = onDismiss,
             supportSmoothHeightAnimation = true,
             paddingValues = PaddingValues(
                 start = inputSpacingLarge,
@@ -87,25 +54,12 @@ fun AddReminderDialog(
                 top = inputSpacingLarge,
             )
         ) {
-            NavDisplay(
-                entries = entries,
-                onBack = dismiss,
+            AddReminderSessionDestination(
+                editReminderId = editReminderId,
+                onDismiss = onDismiss,
             )
         }
     }
-}
-
-private fun addReminderSessionEntry(
-    navKey: NavKey,
-    onDismiss: () -> Unit,
-): NavEntry<NavKey> = when (navKey) {
-    is AddReminderSessionNavKey.Session -> NavEntry(navKey) {
-        AddReminderSessionDestination(
-            editReminderId = navKey.editReminderId,
-            onDismiss = onDismiss,
-        )
-    }
-    else -> error("Unknown navKey: $navKey")
 }
 
 @Composable

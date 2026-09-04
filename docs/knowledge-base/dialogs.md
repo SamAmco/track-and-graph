@@ -6,9 +6,10 @@ topics:
   - Bottom padding for text-button action rows
   - Content-only dialog screens embedded in animated hosts
   - Dialog-scoped Navigation 3 ViewModels and configuration changes
+  - Non-navigation dialog scopes with rememberViewModelStoreOwner
   - Adaptive scrolling and height
   - Previewing dialog bodies without a Dialog window
-keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, bottom padding, halfDialogInputSpacing, scrolling, adaptive height, preview, Dialog window, Navigation 3, ViewModelStore, hiltViewModel, configuration-change, onPop]
+keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelButtons, padding, halfDialogInputSpacing, scrolling, adaptive height, preview, Navigation 3, ViewModelStore, rememberViewModelStoreOwner, hiltViewModel, configuration-change, onPop]
 ---
 
 # Compose dialogs
@@ -47,9 +48,11 @@ For a multi-destination dialog that should retain in-progress state across confi
 - Keep its `rememberNavBackStack`, `rememberDecoratedNavEntries`, saveable-state decorator, and ViewModel-store decorator in a host that remains composed while the screen exists.
 - Render the actual `Dialog` window only while the workflow is visible and the decorated entries are non-empty.
 - On close, clear or pop the dialog back stack before hiding the window. The decorators then observe real pops and clear the destination ViewModels through `onPop`.
-- Do not create a local `ViewModelStoreOwner` with `remember` and clear it in `DisposableEffect`; that also clears during configuration recreation and loses in-progress form state.
+- Do not manually create a `ViewModelStoreOwner` with `remember` and clear it in `DisposableEffect`; that also clears during configuration recreation and loses in-progress form state.
 
-Apply the same decorators to nested navigation flows whose individual forms own ViewModels. Popping a nested form entry should destroy that form's ViewModel, so returning to the selector and choosing the same form starts fresh. Closing the outer session destroys the nested stores as part of its ownership tree. A standalone dialog entry point needs the same always-composed host pattern; otherwise its `hiltViewModel()` calls fall back to the enclosing screen owner.
+Apply the same decorators to nested navigation flows whose individual forms own ViewModels. Popping a nested form entry should destroy that form's ViewModel, so returning to the selector and choosing the same form starts fresh. Closing the outer session destroys the nested stores as part of its ownership tree.
+
+If a standalone dialog needs one ViewModel scope but has no actual navigation, do not invent a one-entry `NavDisplay`. With Lifecycle 2.11+, conditionally compose `rememberViewModelStoreOwner()` at the dialog boundary and provide it through `LocalViewModelStoreOwner`. This purpose-built owner survives configuration changes, inherits the parent's ViewModel factory/creation extras for Hilt, and clears automatically when the visible dialog branch permanently leaves composition. Real nested navigation inside that dialog should still use navigation-entry decorators for its individual form lifetimes.
 
 Do not compensate for screen-owned form ViewModels by registering child `reset()` callbacks with the dialog host. That approach is manual lifecycle emulation, is easy to miss on a Back path, and makes the host aware of child implementation details. Scope each form to the navigation entry that represents its lifetime instead.
 

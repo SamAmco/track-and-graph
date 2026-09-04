@@ -14,8 +14,8 @@ docs:
     keywords: [compose, composable, shared-ui, ui-module, app-ui, reusable-controls, buttons, TextButton, SmallTextButton, RowCheckbox, PasswordTextField, Divider, spacing, preview, flavor, build-variant, holder-module, NoClassDefFoundError, ViewModel, pure UI, state, callbacks, pattern, split, dialog, screen, Content, View, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState, flicker]
   - file: dialogs.md
     title: Compose dialog wrappers, footer padding, scrolling, and previews
-    description: Choosing shared dialog wrappers, avoiding doubled action-footer padding, structuring adaptive scrolling, animated content-only screens, nested dialog-scoped Navigation 3 ViewModels, and reliable previews.
-    keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, scrolling, adaptive height, preview, Dialog window, Navigation 3, ViewModelStore, hiltViewModel, configuration-change, nested-navigation, reset-callback, onPop]
+    description: Choosing shared dialog wrappers, adaptive content, content-only screens, Navigation 3 destination ViewModels, standalone dialog ViewModel scopes, and reliable previews.
+    keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, scrolling, adaptive height, preview, Navigation 3, ViewModelStore, rememberViewModelStoreOwner, hiltViewModel, configuration-change, nested-navigation, reset-callback, onPop]
 
   - file: graph-rendering.md
     title: Graph rendering — renderer-neutral view data and Vico bar charts
