@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,7 +61,9 @@ import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.buttonSize
 import com.samco.trackandgraph.ui.ui.cardElevation
 import com.samco.trackandgraph.ui.ui.cardPadding
+import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import org.threeten.bp.LocalDateTime
 
 @Composable
@@ -159,6 +162,39 @@ fun Reminder(
                 onDuplicateClick = onDuplicateClick ?: {},
             )
         }
+    }
+}
+
+@Composable
+fun LoadingReminder(
+    name: String,
+    modifier: Modifier = Modifier,
+) = Surface(
+    modifier = modifier
+        .fillMaxWidth()
+        .padding(halfDialogInputSpacing),
+    shadowElevation = cardElevation,
+    shape = MaterialTheme.shapes.medium,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(cardPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            text = name,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Medium,
+        )
+        CircularProgressIndicator(
+            modifier = Modifier
+                .padding(vertical = inputSpacingLarge)
+                .size(buttonSize / 2),
+        )
     }
 }
 
@@ -339,4 +375,10 @@ private fun ReminderPreview() = TnGComposeTheme {
             )
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingReminderPreview() = TnGComposeTheme {
+    LoadingReminder(name = "Morning Workout")
 }

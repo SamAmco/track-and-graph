@@ -28,7 +28,7 @@ Previews are the default for new screens, dialogs, and UI components. Skip them 
 
 Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), text fields (`FullWidthTextField`, `PasswordTextField`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`). If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
 
-Before introducing a new hard-coded dimension in Compose UI, check the shared spacing and shape tokens in `app/ui`. For dialog/content gaps, prefer `dialogInputSpacing` or its helper composable over repeating the equivalent `.dp` value inline. Add a new named token only when the existing tokens do not describe the intended spacing.
+Do not introduce ad-hoc hard-coded dimensions in Compose UI. In particular, do not add literal fixed or minimum heights just to make content look balanced; let content determine its intrinsic size and use the shared spacing tokens in `app/ui` for padding and gaps. For dialog/content gaps, prefer `dialogInputSpacing` or its helper composable over repeating the equivalent `.dp` value inline. If a genuinely new reusable dimension is required and no existing token describes it, add a named token rather than embedding the value in a feature composable.
 
 ## Three-Layer Composable Pattern
 

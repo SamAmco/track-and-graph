@@ -10,8 +10,8 @@ topics:
   - In-place screen swap in GroupScreen (if/else replaces top bar + content)
   - Why SearchScreen publishes its own clear-button action
   - SearchableItem flat list built once on showSearch() — structural snapshot only (paths, names, GroupGraphItem)
-  - SearchResultProcessor owns per-session tracker/graph display-data cache and streams Flow<List<SearchResultItem>>
-  - Processor emits placeholders immediately, then populates trackers/graphs in rank-order batches with trackers first
+  - SearchResultProcessor owns per-session tracker/graph/reminder display-data cache and streams Flow<List<SearchResultItem>>
+  - Processor emits placeholders immediately, then populates trackers/reminders/graphs in rank-order batches
   - Query switching depends on cooperative cancellation in graph view-data calculation
   - Processor starts DataUpdateType listening immediately; versioned cache writes stop stale initial batch results overwriting fresher event refreshes
   - Structural changes (new/deleted/renamed components, new symlinks) are intentionally ignored during an open search session
@@ -26,9 +26,9 @@ keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCach
 
 ## Search Data Flow
 
-`GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings, a pre-computed `List<ResolvedPath>` (see below), and the `GroupGraphItem` needed for rendering/fetching display data later. On `hideSearch()` the list is cleared and the processor cache is disposed.
+`GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings, a pre-computed `List<ResolvedPath>` (see below), and the `GroupGraphItem` needed for rendering/fetching display data later. This structural pass is synchronous once the graph has been fetched: it must not calculate tracker, graph, or reminder card data. On `hideSearch()` the list is cleared and the processor cache is disposed.
 
-The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<ResolvedPath>)`. `child.groupItemId` is the list key (see [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys). `paths` is consumed by the tap handler — see "Tapping a result" below.
+The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<ResolvedPath>)`. `child.groupItemId` is the list key (see [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys). `paths` is consumed by the tap handler for navigable component types — see "Tapping a result" below. Reminder results use an empty path list because their tap action opens the editor instead.
 
 ## Chronological Filter Search
 
@@ -93,17 +93,17 @@ During the search responsiveness work, the useful diagnostic shape was: query-ob
 
 The group graph tree structure is only needed once (to build the flat list). Re-traversing the tree on every debounced keystroke is wasted work — flattening up-front means each keystroke is a simple linear scan of the list. The flat list is also the snapshot that supports the "no structural changes while open" behaviour described under "Live updates" below — paths, set of items, and names are frozen at `showSearch()` time.
 
-## Tracker and graph display state — processor-owned cache
+## Tracker, graph, and reminder display state — processor-owned cache
 
-`SearchableItem` is a structural snapshot — it carries the component's `name`, `description`, `paths`, `typeBonus`, and `GroupGraphItem`. It does NOT carry a `DisplayTracker` or calculated graph view data. After scoring, each hit is converted into a `RankedItem` and handed to `SearchResultProcessor`.
+`SearchableItem` is a structural snapshot — it carries the component's `name`, `description`, `paths`, `typeBonus`, and `GroupGraphItem`. It does not carry a `DisplayTracker`, calculated graph view data, or `ReminderViewData`. After scoring, each hit is converted into a `RankedItem` and handed to `SearchResultProcessor`. Keeping reminder enrichment out of the snapshot matters because time-since-last reminders may read a data sample; eagerly enriching every reminder would delay search opening and perform work for reminders that never match.
 
-`SearchResultProcessor` owns the per-session display-data cache. The first processor emission renders the full ranked list immediately, using cache hits where available and loading placeholders for missing trackers/graphs. It then processes missing data in rank-order batches (`BATCH_SIZE = 12`): trackers in the batch are fetched first and emitted, then graphs are calculated and emitted. This keeps the first visible results ahead of lower-ranked work and avoids a slow graph blocking tracker cards in the same batch.
+`SearchResultProcessor` owns the per-session display-data cache. The first processor emission renders the full ranked list immediately, using cache hits where available and loading placeholders for missing trackers, reminders, and graphs. It then processes missing data in rank-order batches (`BATCH_SIZE = 12`): trackers in the batch are fetched and emitted first, reminders are enriched and emitted next, then graphs are calculated and emitted. This keeps the first visible results ahead of lower-ranked work and avoids a slow graph blocking cheaper tracker/reminder cards in the same batch. Reminder cache keys use `groupItemId`, not reminder ID, because `ReminderViewData` contains the placement ID.
 
-On `hideSearch()`, `processor.dispose()` clears this cache. Repeated queries during the same open search can reuse completed tracker/graph data, but closing search releases that memory.
+On `hideSearch()`, `processor.dispose()` clears this cache. Repeated queries during the same open search can reuse completed tracker/graph/reminder data, but closing search releases that memory.
 
 Because batches are sequential, a graph calculation that never completes in batch N blocks all later batches, including trackers in batch N+1. If search results show both graph cards and display trackers stuck on loading, inspect the active graph batch first rather than assuming tracker fetches are failing. Function-backed graphs are a common stress case because rapid query changes can cancel many `FunctionGraphDataSample` constructions; see [lua-architecture.md](lua-architecture.md#lua-vm-lease-ownership) for the VM lease ownership rule.
 
-## Live updates to tracker and graph display data
+## Live updates to tracker, graph, and reminder display data
 
 While the processor flow for a non-empty query is active, it subscribes to `dataInteractor.getDataUpdateEvents()` immediately after emitting the initial placeholder list. This listener runs concurrently with the initial rank-order batch population:
 
@@ -111,9 +111,11 @@ While the processor flow for a non-empty query is active, it subscribes to `data
 
 - `DataUpdateType.GraphOrStatUpdated` invalidates the matching graph cache entry, emits the graph loading placeholder for that item, recalculates its view data, then replaces that one list item and re-emits.
 
+- `DataUpdateType.Reminder(reminderId)` looks up only the matching reminder result, invalidates that cache entry, reloads its current DTO, rebuilds its `ReminderViewData`, and re-emits. Unrelated reminder results are left untouched. Reloading the DTO is required for edits made by the overlaid reminder dialog to appear in the card. This updates rendered card data only; names used for fuzzy scoring remain part of the structural search snapshot until search is reopened.
+
 The graph job deliberately does NOT listen for `DataPoint`. The data layer already fans data-point writes out to one `GraphOrStatUpdated(graphStatId)` per dependent graph via `DependencyAnalyser`, so subscribing to `DataPoint` here would duplicate work. See [helper-classes.md](helper-classes.md#data-point-writes-fan-out-to-graphorstatupdated-via-dependencyanalyser) for the fan-out contract.
 
-Because event listening overlaps with initial batch work, the cache tracks a simple version per tracker/graph. Initial batch work captures the version before it starts; event invalidation increments the version. A completed batch result is only applied if the version is still current, preventing stale work from overwriting a fresher event-triggered refresh.
+Because event listening overlaps with initial batch work, the cache tracks a simple version per tracker/graph/reminder entry. Initial batch work captures the version before it starts; event invalidation increments the version. A completed batch result is only applied if the version is still current, preventing stale work from overwriting a fresher event-triggered refresh.
 
 ### Structural changes are intentionally ignored while search is open
 
@@ -251,6 +253,13 @@ The handler lives in `SearchScreen`:
 - `item.paths.size == 1` — call the navigator directly with the single `ResolvedPath.descent`.
 - `item.paths.size > 1` — set a `disambiguation: SearchResultItem?` state to the item. `SymlinksDialogContent` then renders with `onPathClick = { i -> navigate(item.paths[i].descent) }` — the dialog doubles as a "pick which placement" picker.
 - `item.paths.size == 0` — no-op. Shouldn't happen in practice (every indexed component was reached by the graph walk) but we're defensive rather than crashing.
+
+Reminder cards do not use the path-navigation handler. Tapping one opens the outer
+`AddReminderDialog` without closing search, so dismissing the editor returns to the same query and
+results. They are therefore excluded from `buildResolvedPaths`; resolving path display names would
+be unused work, and reminders cannot require symlink disambiguation. The dialog remains outside the
+search/content branch so it can overlay either the normal group content or search results without
+changing either screen's state.
 
 The navigator is read from `LocalDeepLinkNavigator.current`. No navigation callback is threaded through `GroupScreen`. See [deep-link-navigation.md](deep-link-navigation.md) for the full pipeline.
 

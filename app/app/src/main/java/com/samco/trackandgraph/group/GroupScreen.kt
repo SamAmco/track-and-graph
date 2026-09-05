@@ -78,6 +78,7 @@ import com.samco.trackandgraph.importexport.ImportExportDialog
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
 import com.samco.trackandgraph.reminders.ui.AddReminderDialog
+import com.samco.trackandgraph.reminders.ui.LoadingReminder
 import com.samco.trackandgraph.reminders.ui.Reminder
 import com.samco.trackandgraph.reminders.ui.ReminderViewData
 import com.samco.trackandgraph.releasenotes.ReleaseNotesDialog
@@ -179,6 +180,7 @@ fun GroupScreen(
             onTrackerAdd = onTrackerAdd,
             onTrackerPlayTimer = onTrackerPlayTimer,
             onTrackerStopTimer = onTrackerStopTimer,
+            onReminderEdit = { editReminderId = it },
         )
     } else {
         GroupTopBarContent(
@@ -668,6 +670,7 @@ private fun GroupGrid(
                     is GroupChild.ChildGroup -> GridItemSpan(2)
                     is GroupChild.ChildGraph -> GridItemSpan(columnCount)
                     is GroupChild.ChildReminder -> GridItemSpan(2)
+                    is GroupChild.ChildReminderLoading -> GridItemSpan(2)
                 }
             }
         ) { item ->
@@ -787,6 +790,8 @@ private fun GroupGrid(
                             isElevated = isDragging,
                         )
                     }
+
+                    is GroupChild.ChildReminderLoading -> LoadingReminder(name = item.name)
                 }
             }
         }

@@ -80,8 +80,8 @@ For **display-path strings** (dropdowns, selectors, symlinks dialog), there are 
 - Results are lazily cached per ID
 - Used by: graph config screens, function editor, notes, select-item dialogs
 
-**`ComponentPathProvider`** — for listing all locations of a symlinked component:
-- Collects all paths for all component types including graphs (by primary key ID, not featureId)
+**`ComponentPathProvider`** — for listing component locations:
+- Collects all paths for all component types including graphs and reminders (by primary key ID, not featureId)
 - Returns every path individually as a `List<String>` — no collapsing
 - Used by: `SymlinksDialogViewModel` to show the symlinks dialog from context menus
 

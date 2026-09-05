@@ -55,6 +55,7 @@ import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.navigation.DeepLink
 import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
 import com.samco.trackandgraph.reminders.ui.Reminder
+import com.samco.trackandgraph.reminders.ui.LoadingReminder
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.ui.cardMarginSmall
@@ -68,6 +69,7 @@ fun SearchScreen(
     onTrackerAdd: (DisplayTracker, useDefault: Boolean) -> Unit,
     onTrackerPlayTimer: (DisplayTracker) -> Unit,
     onTrackerStopTimer: (DisplayTracker) -> Unit,
+    onReminderEdit: (Long) -> Unit,
 ) {
     BackHandler(onBack = onBack)
 
@@ -82,6 +84,7 @@ fun SearchScreen(
         onTrackerAdd = onTrackerAdd,
         onTrackerPlayTimer = onTrackerPlayTimer,
         onTrackerStopTimer = onTrackerStopTimer,
+        onReminderEdit = onReminderEdit,
     )
 }
 
@@ -120,6 +123,7 @@ private fun SearchScreenContent(
     onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
     onTrackerPlayTimer: (DisplayTracker) -> Unit,
     onTrackerStopTimer: (DisplayTracker) -> Unit,
+    onReminderEdit: (Long) -> Unit,
 ) {
     val state by searchViewModel.displayResults.collectAsStateWithLifecycle()
     val navigator = LocalDeepLinkNavigator.current
@@ -167,6 +171,7 @@ private fun SearchScreenContent(
                     onTrackerAdd = onTrackerAdd,
                     onTrackerPlayTimer = onTrackerPlayTimer,
                     onTrackerStopTimer = onTrackerStopTimer,
+                    onReminderEdit = onReminderEdit,
                 )
             }
         }
@@ -195,6 +200,7 @@ private val GroupChild.displayName: String
         is GroupChild.ChildFunction -> displayFunction.name
         is GroupChild.ChildGraph -> graph.viewData.graphOrStat.name
         is GroupChild.ChildReminder -> reminder.name
+        is GroupChild.ChildReminderLoading -> name
     }
 
 @Composable
@@ -220,6 +226,7 @@ private fun SearchResultsGrid(
     onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
     onTrackerPlayTimer: (DisplayTracker) -> Unit,
     onTrackerStopTimer: (DisplayTracker) -> Unit,
+    onReminderEdit: (Long) -> Unit,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
@@ -242,6 +249,7 @@ private fun SearchResultsGrid(
                         is GroupChild.ChildGroup -> GridItemSpan(2)
                         is GroupChild.ChildGraph -> GridItemSpan(columnCount)
                         is GroupChild.ChildReminder -> GridItemSpan(2)
+                        is GroupChild.ChildReminderLoading -> GridItemSpan(2)
                     }
                 }
             ) { item ->
@@ -277,8 +285,10 @@ private fun SearchResultsGrid(
 
                     is GroupChild.ChildReminder -> Reminder(
                         reminderViewData = child.reminder,
-                        onEditClick = { onResultClick(item) },
+                        onEditClick = { onReminderEdit(child.id) },
                     )
+
+                    is GroupChild.ChildReminderLoading -> LoadingReminder(name = child.name)
                 }
             }
         }

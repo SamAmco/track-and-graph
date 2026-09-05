@@ -621,7 +621,7 @@ internal class ReminderInteractorImplTest {
             reminderScheduler.setNextNotificationTime(90L, Instant.ofEpochMilli(9000000L))
 
             // Emit reminder update to refresh the inner flow via flatMapLatest
-            dataUpdateEvents.emit(DataUpdateType.Reminder)
+            dataUpdateEvents.emit(DataUpdateType.Reminder(90L))
             advanceUntilIdle()
 
             // Now emit data point event - should trigger reschedule

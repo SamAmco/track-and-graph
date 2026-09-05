@@ -137,6 +137,12 @@ override suspend fun createSymlink(...) = withContext(io) {
 
 **Contract**: The data layer is responsible for emitting ALL relevant events. For example, creating a tracker emits both `TrackerCreated` and `DisplayIndex(groupId)`. Deleting a tracker emits `TrackerDeleted` plus `GraphOrStatDeleted`/`GraphOrStatUpdated` for any affected graphs. Consumers should NOT need to infer secondary effects from primary events.
 
+Events should carry the affected entity ID whenever the producer can identify it. For example,
+`DataUpdateType.Reminder(reminderId)` is emitted with the created, updated, duplicated, moved, or
+deleted reminder ID; recursive group deletion emits one event for each deleted reminder. Do not
+replace a known ID with a broad invalidation event, since targeted consumers use it to avoid
+recalculating unrelated component view data.
+
 ### Data-point writes fan out to `GraphOrStatUpdated` via `DependencyAnalyser`
 
 Non-obvious but important: every data-point mutation (`insertDataPoint`, `deleteDataPoint`, `updateDataPoints`, etc. in `DataInteractorImpl`) emits **both**:

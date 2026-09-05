@@ -28,6 +28,7 @@ import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.navigation.GroupDescentPath
+import com.samco.trackandgraph.reminders.ui.ReminderViewDataFactory
 import com.samco.trackandgraph.util.FuzzyMatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -86,7 +87,7 @@ interface GroupSearchViewModel {
     fun hideSearch()
 }
 
-private enum class ComponentType { GROUP, TRACKER, GRAPH, FUNCTION }
+private enum class ComponentType { GROUP, TRACKER, GRAPH, FUNCTION, REMINDER }
 
 private data class ComponentKey(val type: ComponentType, val id: Long)
 
@@ -95,6 +96,7 @@ private data class ComponentKey(val type: ComponentType, val id: Long)
 class GroupSearchViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val gsiProvider: GraphStatInteractorProvider,
+    private val reminderViewDataFactory: ReminderViewDataFactory,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel(), GroupSearchViewModel {
 
@@ -104,6 +106,8 @@ class GroupSearchViewModelImpl @Inject constructor(
         getGraphViewData = { graph ->
             gsiProvider.getDataFactory(graph.type).getViewData(graph)
         },
+        getReminderById = dataInteractor::getReminderById,
+        getReminderViewData = reminderViewDataFactory::create,
         graphDispatcher = defaultDispatcher,
     )
 
@@ -285,6 +289,7 @@ class GroupSearchViewModelImpl @Inject constructor(
                             displayString = formatDisplay(groupNames + child.function.name),
                         ))
                 }
+                is GroupGraphItem.ReminderNode -> Unit
             }
         }
     }
@@ -351,6 +356,19 @@ class GroupSearchViewModelImpl @Inject constructor(
                             description = child.function.description,
                             typeBonus = 0.0,
                             paths = pathsByComponent[key].orEmpty(),
+                        ))
+                    }
+                }
+                is GroupGraphItem.ReminderNode -> {
+                    val key = ComponentKey(ComponentType.REMINDER, child.reminder.id)
+                    if (seen.add(key)) {
+                        items.add(SearchableItem(
+                            groupItemId = child.groupItemId,
+                            item = child,
+                            name = child.reminder.reminderName,
+                            description = null,
+                            typeBonus = 0.0,
+                            paths = emptyList(),
                         ))
                     }
                 }

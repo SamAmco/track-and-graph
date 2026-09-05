@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.database.DatabaseTransactionHelper
 import com.samco.trackandgraph.data.database.GroupItemDao
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.CreatedComponent
+import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.DeletedGroupInfo
@@ -29,7 +30,11 @@ import com.samco.trackandgraph.data.database.dto.GlobalNote
 import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
+import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.database.dto.MoveComponentRequest
+import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.database.dto.TrackerCreateRequest
@@ -62,6 +67,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.LocalTime
+import com.samco.trackandgraph.data.database.entity.Group as GroupEntity
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DataInteractorImplTest {
@@ -98,6 +105,70 @@ class DataInteractorImplTest {
             graphHelper = graphHelper,
             dependencyAnalyserProvider = dependencyAnalyserProvider,
         )
+    }
+
+    @Test
+    fun `getGroupGraphSync includes grouped reminders`() = runTest {
+        val reminder = Reminder(
+            id = 7L,
+            reminderName = "Morning reminder",
+            featureId = null,
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.NOON,
+                checkedDays = CheckedDays(
+                    monday = true,
+                    tuesday = false,
+                    wednesday = false,
+                    thursday = false,
+                    friday = false,
+                    saturday = false,
+                    sunday = false,
+                ),
+            ),
+            unique = true,
+        )
+        whenever(dao.getRootGroupSync()).thenReturn(GroupEntity(0L, "Root", 0))
+        whenever(groupItemDao.getGroupItemsForChild(0L, GroupItemType.GROUP))
+            .thenReturn(emptyList())
+        whenever(dao.getGroupsForGroupSync(0L)).thenReturn(emptyList())
+        whenever(trackerHelper.getTrackersForGroupSync(0L)).thenReturn(emptyList())
+        whenever(dao.getGraphsAndStatsByGroupIdSync(0L)).thenReturn(emptyList())
+        whenever(functionHelper.getFunctionsForGroupSync(0L)).thenReturn(emptyList())
+        whenever(reminderHelper.getRemindersForGroupSync(0L)).thenReturn(listOf(reminder))
+        whenever(groupItemDao.getGroupItemsForGroup(0L)).thenReturn(
+            listOf(
+                GroupItem(
+                    id = 11L,
+                    groupId = 0L,
+                    childId = reminder.id,
+                    type = GroupItemType.REMINDER,
+                    displayIndex = 0,
+                )
+            )
+        )
+
+        val child = uut.getGroupGraphSync().children.single() as GroupGraphItem.ReminderNode
+
+        assertEquals(11L, child.groupItemId)
+        assertEquals(reminder, child.reminder)
+        verify(reminderHelper).getRemindersForGroupSync(0L)
+        verify(reminderHelper, never()).getAllRemindersSync()
+    }
+
+    @Test
+    fun `updateReminder emits the affected reminder id`() = runTest {
+        val events = mutableListOf<DataUpdateType>()
+        val collectJob = launch(testDispatcher) {
+            uut.getDataUpdateEvents().collect { events.add(it) }
+        }
+        val request = ReminderUpdateRequest(id = 42L, reminderName = "Updated")
+        yield()
+
+        uut.updateReminder(request)
+
+        assertEquals(listOf(DataUpdateType.Reminder(42L)), events)
+        verify(reminderHelper).updateReminder(request)
+        collectJob.cancel()
     }
 
     @Test

@@ -30,6 +30,7 @@ fun GroupGraph.allFeatureIds(): List<Long> {
                 is GroupGraphItem.TrackerNode -> result.add(child.tracker.featureId)
                 is GroupGraphItem.FunctionNode -> result.add(child.function.featureId)
                 is GroupGraphItem.GraphNode -> Unit
+                is GroupGraphItem.ReminderNode -> Unit
             }
         }
     }
@@ -85,6 +86,7 @@ open class FeaturePathProvider(groupGraph: GroupGraph) {
                             .add(currentPath + f.name)
                     }
                     is GroupGraphItem.GraphNode -> Unit
+                    is GroupGraphItem.ReminderNode -> Unit
                 }
             }
         }

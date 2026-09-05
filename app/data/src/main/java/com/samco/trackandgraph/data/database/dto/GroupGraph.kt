@@ -15,4 +15,5 @@ sealed class GroupGraphItem {
     data class GraphNode(override val groupItemId: Long, val graph: GraphOrStat) : GroupGraphItem()
     data class TrackerNode(override val groupItemId: Long, val tracker: Tracker) : GroupGraphItem(), FeatureNode
     data class FunctionNode(override val groupItemId: Long, val function: Function) : GroupGraphItem(), FeatureNode
+    data class ReminderNode(override val groupItemId: Long, val reminder: Reminder) : GroupGraphItem()
 }

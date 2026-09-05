@@ -20,8 +20,10 @@ package com.samco.trackandgraph.group
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
+import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.reminders.ui.ReminderViewData
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
@@ -40,7 +42,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 /**
  * One ranked search hit handed to the processor — minimum surface needed to
- * render the card and (for trackers/graphs) fetch the live data. Carries the
+ * render the card and (for trackers/graphs/reminders) fetch the live data. Carries the
  * navigable paths so [SearchResultProcessor] can build [SearchResultItem]s
  * without re-walking the group graph.
  */
@@ -64,8 +66,15 @@ private data class GraphResult(
     val viewData: IGraphStatViewData,
 )
 
+private data class ReminderResult(
+    val ranked: RankedItem,
+    val groupItemId: Long,
+    val cacheVersion: Long,
+    val viewData: ReminderViewData,
+)
+
 /**
- * Owns the per-session cache of fetched [DisplayTracker]s and computed graph
+ * Owns the per-session cache of fetched [DisplayTracker]s and computed graph/reminder
  * view data, and turns a ranked list of [RankedItem]s into an evolving
  * [Flow]<[List]<[SearchResultItem]>>.
  *
@@ -74,11 +83,10 @@ private data class GraphResult(
  *   misses rendered as loading placeholders, so the grid renders immediately
  *   in rank order.
  * - The remaining work is processed in rank-order batches of [BATCH_SIZE].
- *   Within each batch, trackers are fetched in parallel first,
- *   then graphs in parallel. The list is re-emitted twice per batch —
- *   once after the trackers, once after the graphs — so the user
- *   sees populated cards as soon as their data lands
- *   and a slow graph never holds up cheap tracker cards.
+ *   Within each batch, trackers are fetched in parallel first, reminders next,
+ *   then graphs in parallel. The list is re-emitted after each populated type,
+ *   so the user sees populated cards as soon as their data lands and a slow graph
+ *   never holds up cheaper tracker/reminder cards.
  * - Data-update listening starts as soon as the initial placeholder list is
  *   emitted, not after the initial fill. This is what makes a `+` tap on a
  *   tracker card update its last-value/timestamp in place even while lower
@@ -94,6 +102,8 @@ class SearchResultProcessor(
     private val getDataUpdateEvents: () -> Flow<DataUpdateType>,
     private val tryGetTrackerByFeatureId: suspend (Long) -> DisplayTracker?,
     private val getGraphViewData: suspend (GraphOrStat) -> IGraphStatViewData,
+    private val getReminderById: suspend (Long) -> Reminder?,
+    private val getReminderViewData: suspend (Reminder, Long) -> ReminderViewData,
     private val graphDispatcher: CoroutineDispatcher,
 ) {
 
@@ -117,8 +127,8 @@ class SearchResultProcessor(
             listenForUpdates(items, currentList, indexByGroupItemId, listMutex)
         }
 
-        // Process the missing data in rank-order batches, trackers-first
-        // within each batch.
+        // Process the missing data in rank-order batches: trackers first,
+        // reminders next, and graphs last within each batch.
         items.chunked(BATCH_SIZE).forEach { batch ->
             ensureActive()
 
@@ -132,6 +142,21 @@ class SearchResultProcessor(
                 val resolved = fetchTrackers(trackerWork)
                 val nextList = listMutex.withLock {
                     applyTrackerResults(resolved, currentList, indexByGroupItemId)
+                    currentList.toList()
+                }
+                send(nextList)
+            }
+
+            val reminderSnapshot = cache.snapshot()
+            val reminderWork = batch.mapNotNull { ranked ->
+                if (ranked.item !is GroupGraphItem.ReminderNode) return@mapNotNull null
+                if (ranked.groupItemId in reminderSnapshot.reminders) return@mapNotNull null
+                ranked
+            }
+            if (reminderWork.isNotEmpty()) {
+                val resolved = fetchReminders(reminderWork)
+                val nextList = listMutex.withLock {
+                    applyReminderResults(resolved, currentList, indexByGroupItemId)
                     currentList.toList()
                 }
                 send(nextList)
@@ -203,6 +228,33 @@ class SearchResultProcessor(
         }.awaitAll()
     }
 
+    private suspend fun fetchReminders(
+        work: List<RankedItem>,
+    ): List<ReminderResult> = coroutineScope {
+        work.map { ranked ->
+            async {
+                val node = ranked.item as GroupGraphItem.ReminderNode
+                createReminderResult(ranked, node.reminder)
+            }
+        }.awaitAll().filterNotNull()
+    }
+
+    private suspend fun createReminderResult(
+        ranked: RankedItem,
+        reminder: Reminder,
+    ): ReminderResult? {
+        val version = cache.reminderVersion(ranked.groupItemId)
+        val viewData = try {
+            getReminderViewData(reminder, ranked.groupItemId)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to create reminder view data for ${reminder.id}")
+            return null
+        }
+        return ReminderResult(ranked, ranked.groupItemId, version, viewData)
+    }
+
     private fun applyTrackerResults(
         resolved: List<TrackerResult>,
         list: MutableList<SearchResultItem>,
@@ -227,6 +279,18 @@ class SearchResultProcessor(
         }
     }
 
+    private fun applyReminderResults(
+        resolved: List<ReminderResult>,
+        list: MutableList<SearchResultItem>,
+        index: Map<Long, Int>,
+    ) {
+        for ((ranked, groupItemId, version, viewData) in resolved) {
+            if (!cache.putReminderIfVersion(groupItemId, version, viewData)) continue
+            val idx = index[groupItemId] ?: continue
+            list[idx] = reminderItem(ranked, viewData)
+        }
+    }
+
     private suspend fun ProducerScope<List<SearchResultItem>>.listenForUpdates(
         items: List<RankedItem>,
         currentList: MutableList<SearchResultItem>,
@@ -245,6 +309,9 @@ class SearchResultProcessor(
                 node.graph.id to ranked
             }
             .toMap()
+        val remindersById = items
+            .filter { it.item is GroupGraphItem.ReminderNode }
+            .associateBy { (it.item as GroupGraphItem.ReminderNode).reminder.id }
 
         getDataUpdateEvents().collect { event ->
             val featureId: Long? = when (event) {
@@ -298,9 +365,40 @@ class SearchResultProcessor(
                     currentList.toList()
                 }
                 if (nextList != null) send(nextList)
+                return@collect
+            }
+            if (event is DataUpdateType.Reminder) {
+                val ranked = remindersById[event.reminderId] ?: return@collect
+                refreshReminder(ranked, currentList, index, listMutex)?.let { send(it) }
             }
         }
     }
+
+    private suspend fun refreshReminder(
+        ranked: RankedItem,
+        currentList: MutableList<SearchResultItem>,
+        index: Map<Long, Int>,
+        listMutex: Mutex,
+    ): List<SearchResultItem>? {
+        val node = ranked.item as GroupGraphItem.ReminderNode
+        cache.invalidateReminder(ranked.groupItemId)
+        val reminder = fetchReminderForEvent(node.reminder.id) ?: return null
+        val refreshed = createReminderResult(ranked, reminder) ?: return null
+        return listMutex.withLock {
+            applyReminderResults(listOf(refreshed), currentList, index)
+            currentList.toList()
+        }
+    }
+
+    private suspend fun fetchReminderForEvent(reminderId: Long): Reminder? =
+        try {
+            getReminderById(reminderId)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to refresh reminder id=$reminderId")
+            null
+        }
 
     private suspend fun fetchTrackerForEvent(
         featureId: Long,
@@ -316,8 +414,8 @@ class SearchResultProcessor(
 
     // ===== Item rendering =====
 
-    private fun renderItem(ranked: RankedItem, snapshot: SearchResultCache.Snapshot): SearchResultItem =
-        when (val node = ranked.item) {
+    private fun renderItem(ranked: RankedItem, snapshot: SearchResultCache.Snapshot): SearchResultItem {
+        return when (val node = ranked.item) {
             is GroupGraphItem.TrackerNode -> {
                 val cached = snapshot.trackers[node.tracker.featureId]
                 if (cached != null) trackerItem(ranked, cached) else trackerPlaceholder(ranked)
@@ -328,7 +426,12 @@ class SearchResultProcessor(
             }
             is GroupGraphItem.GroupNode -> groupItem(ranked, node)
             is GroupGraphItem.FunctionNode -> functionItem(ranked, node)
+            is GroupGraphItem.ReminderNode -> {
+                val cached = snapshot.reminders[ranked.groupItemId]
+                if (cached != null) reminderItem(ranked, cached) else reminderPlaceholder(ranked, node)
+            }
         }
+    }
 
     private fun trackerItem(ranked: RankedItem, tracker: DisplayTracker): SearchResultItem {
         val node = ranked.item as GroupGraphItem.TrackerNode
@@ -381,6 +484,28 @@ class SearchResultProcessor(
         )
     }
 
+    private fun reminderItem(ranked: RankedItem, viewData: ReminderViewData) =
+        SearchResultItem(
+            child = GroupChild.ChildReminder(
+                groupItemId = ranked.groupItemId,
+                id = viewData.id,
+                reminder = viewData,
+            ),
+            paths = ranked.paths,
+        )
+
+    private fun reminderPlaceholder(
+        ranked: RankedItem,
+        node: GroupGraphItem.ReminderNode,
+    ) = SearchResultItem(
+        child = GroupChild.ChildReminderLoading(
+            groupItemId = ranked.groupItemId,
+            id = node.reminder.id,
+            name = node.reminder.reminderName,
+        ),
+        paths = ranked.paths,
+    )
+
     private fun errorViewData(graph: GraphOrStat, error: Throwable) =
         object : IGraphStatViewData {
             override val state = IGraphStatViewData.State.ERROR
@@ -424,7 +549,7 @@ class SearchResultProcessor(
 }
 
 /**
- * Thread-safe per-session cache of fetched tracker / computed graph data.
+ * Thread-safe per-session cache of fetched tracker / computed graph and reminder data.
  * Reads are lock-free snapshots; writes are atomic CAS over the whole
  * snapshot, so concurrent batches and the events listener never produce a
  * torn read. Per-item versions let event invalidations reject older batch
@@ -434,11 +559,20 @@ private class SearchResultCache {
     data class Snapshot(
         val trackers: Map<Long, DisplayTracker>,
         val graphs: Map<Long, IGraphStatViewData>,
+        val reminders: Map<Long, ReminderViewData>,
         val trackerVersions: Map<Long, Long>,
         val graphVersions: Map<Long, Long>,
+        val reminderVersions: Map<Long, Long>,
     ) {
         companion object {
-            val EMPTY = Snapshot(emptyMap(), emptyMap(), emptyMap(), emptyMap())
+            val EMPTY = Snapshot(
+                trackers = emptyMap(),
+                graphs = emptyMap(),
+                reminders = emptyMap(),
+                trackerVersions = emptyMap(),
+                graphVersions = emptyMap(),
+                reminderVersions = emptyMap(),
+            )
         }
     }
 
@@ -451,6 +585,9 @@ private class SearchResultCache {
 
     fun graphVersion(graphId: Long): Long =
         ref.get().graphVersions[graphId] ?: 0L
+
+    fun reminderVersion(groupItemId: Long): Long =
+        ref.get().reminderVersions[groupItemId] ?: 0L
 
     fun putTrackerIfVersion(
         featureId: Long,
@@ -472,6 +609,16 @@ private class SearchResultCache {
         expectedVersion = version,
     )
 
+    fun putReminderIfVersion(
+        groupItemId: Long,
+        version: Long,
+        viewData: ReminderViewData,
+    ): Boolean = updateIfVersion(
+        versionOf = { it.reminderVersions[groupItemId] ?: 0L },
+        transform = { it.copy(reminders = it.reminders + (groupItemId to viewData)) },
+        expectedVersion = version,
+    )
+
     fun invalidateTracker(featureId: Long) {
         update {
             it.copy(
@@ -489,6 +636,17 @@ private class SearchResultCache {
                 graphs = it.graphs - graphId,
                 graphVersions = it.graphVersions + (
                     graphId to ((it.graphVersions[graphId] ?: 0L) + 1L)
+                ),
+            )
+        }
+    }
+
+    fun invalidateReminder(groupItemId: Long) {
+        update {
+            it.copy(
+                reminders = it.reminders - groupItemId,
+                reminderVersions = it.reminderVersions + (
+                    groupItemId to ((it.reminderVersions[groupItemId] ?: 0L) + 1L)
                 ),
             )
         }

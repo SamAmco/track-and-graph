@@ -276,6 +276,8 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                         isDisabled = HiddenItem(SelectableItemType.FUNCTION, child.function.id) in disabledItems
                     )
                 }
+
+                is ModelGroupGraphItem.ReminderNode -> null
             }
         }
 

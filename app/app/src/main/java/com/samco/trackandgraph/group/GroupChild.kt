@@ -51,4 +51,11 @@ sealed class GroupChild {
         val reminder: ReminderViewData,
         override val type: GroupChildType = GroupChildType.REMINDER,
     ) : GroupChild()
+
+    class ChildReminderLoading(
+        override val groupItemId: Long,
+        override val id: Long,
+        val name: String,
+        override val type: GroupChildType = GroupChildType.REMINDER,
+    ) : GroupChild()
 }

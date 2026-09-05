@@ -41,7 +41,7 @@ sealed class DataUpdateType {
     data object GraphOrStatDeleted : DataUpdateType()
 
     /**A reminder was created/updated/deleted **/
-    data object Reminder : DataUpdateType()
+    data class Reminder(val reminderId: Long) : DataUpdateType()
     data object ReminderScreenDisplayOrder : DataUpdateType()
 
     /**A global note was created/updated/deleted **/

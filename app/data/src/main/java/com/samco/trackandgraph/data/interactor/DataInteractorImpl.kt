@@ -114,8 +114,8 @@ internal class DataInteractorImpl @Inject constructor(
             }
 
             dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
-            if (deletedGroupInfo.deletedReminderIds.isNotEmpty()) {
-                dataUpdateEvents.emit(DataUpdateType.Reminder)
+            for (reminderId in deletedGroupInfo.deletedReminderIds) {
+                dataUpdateEvents.emit(DataUpdateType.Reminder(reminderId))
             }
             return@withContext deletedGroupInfo
         }
@@ -158,6 +158,7 @@ internal class DataInteractorImpl @Inject constructor(
         val graphsById = dao.getGraphsAndStatsByGroupIdSync(group.id)
             .associate { it.id to it.toDto(unique = isGraphUnique(it.id)) }
         val functionsById = getFunctionsForGroupSync(group.id).associateBy { it.id }
+        val remindersById = getRemindersForGroupSync(group.id).associateBy { it.id }
 
         // Iterate group items so each placement gets its own node with its unique groupItemId.
         // A component can appear multiple times in the same group (same-group duplicates).
@@ -175,7 +176,9 @@ internal class DataInteractorImpl @Inject constructor(
                 GroupItemType.FUNCTION -> functionsById[item.childId]?.let {
                     GroupGraphItem.FunctionNode(item.id, it)
                 }
-                GroupItemType.REMINDER -> null
+                GroupItemType.REMINDER -> remindersById[item.childId]?.let {
+                    GroupGraphItem.ReminderNode(item.id, it)
+                }
             }
         }
 
@@ -286,13 +289,13 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun createReminder(request: ReminderCreateRequest): CreatedComponent = withContext(io) {
         val created = reminderHelper.createReminder(request)
-        dataUpdateEvents.emit(DataUpdateType.Reminder)
+        dataUpdateEvents.emit(DataUpdateType.Reminder(created.componentId))
         return@withContext created
     }
 
     override suspend fun updateReminder(request: ReminderUpdateRequest) = withContext(io) {
         reminderHelper.updateReminder(request)
-        dataUpdateEvents.emit(DataUpdateType.Reminder)
+        dataUpdateEvents.emit(DataUpdateType.Reminder(request.id))
     }
 
     override suspend fun updateReminderScreenDisplayOrder(orders: List<ReminderDisplayOrderData>) =
@@ -302,14 +305,17 @@ internal class DataInteractorImpl @Inject constructor(
         }
 
     override suspend fun deleteReminder(request: ComponentDeleteRequest) = withContext(io) {
+        val reminderId = groupItemDao.getGroupItemById(request.groupItemId)?.childId
         reminderHelper.deleteReminder(request)
-        dataUpdateEvents.emit(DataUpdateType.Reminder)
+        if (reminderId != null) {
+            dataUpdateEvents.emit(DataUpdateType.Reminder(reminderId))
+        }
     }
 
     override suspend fun duplicateReminder(groupItemId: Long): CreatedComponent =
         withContext(io) {
             reminderHelper.duplicateReminder(groupItemId).also { created ->
-                dataUpdateEvents.emit(DataUpdateType.Reminder)
+                dataUpdateEvents.emit(DataUpdateType.Reminder(created.componentId))
                 groupItemDao.getGroupItemById(created.groupItemId)?.groupId?.let {
                     dataUpdateEvents.emit(DataUpdateType.DisplayIndex(it))
                 }
@@ -646,7 +652,9 @@ internal class DataInteractorImpl @Inject constructor(
             GroupItemType.FUNCTION -> dataUpdateEvents.emit(DataUpdateType.FunctionUpdated(existingItem.childId))
             GroupItemType.GROUP -> dataUpdateEvents.emit(DataUpdateType.GroupUpdated)
             GroupItemType.GRAPH -> dataUpdateEvents.emit(DataUpdateType.GraphOrStatUpdated(existingItem.childId))
-            GroupItemType.REMINDER -> dataUpdateEvents.emit(DataUpdateType.Reminder)
+            GroupItemType.REMINDER -> {
+                dataUpdateEvents.emit(DataUpdateType.Reminder(existingItem.childId))
+            }
         }
         dataUpdateEvents.emit(DataUpdateType.DisplayIndex(request.toGroupId))
     }

@@ -94,7 +94,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
         merge(
             dataInteractor.getDataUpdateEvents()
                 .filter {
-                    it == DataUpdateType.Reminder ||
+                    it is DataUpdateType.Reminder ||
                     it is DataUpdateType.ReminderScreenDisplayOrder ||
                     it is DataUpdateType.Unknown
                 }

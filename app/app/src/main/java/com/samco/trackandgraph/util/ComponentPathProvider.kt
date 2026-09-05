@@ -22,7 +22,7 @@ import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 
 class ComponentPathProvider(private val groupGraph: GroupGraph) {
 
-    private enum class ComponentType { GROUP, TRACKER, FUNCTION, GRAPH }
+    private enum class ComponentType { GROUP, TRACKER, FUNCTION, GRAPH, REMINDER }
 
     private val separator = "/"
 
@@ -49,6 +49,9 @@ class ComponentPathProvider(private val groupGraph: GroupGraph) {
     fun getAllPathsForGraph(graphId: Long): List<String> =
         pathsByKey[ComponentType.GRAPH to graphId] ?: emptyList()
 
+    fun getAllPathsForReminder(reminderId: Long): List<String> =
+        pathsByKey[ComponentType.REMINDER to reminderId] ?: emptyList()
+
     private fun walk(
         graph: GroupGraph,
         currentPath: List<String>
@@ -66,6 +69,8 @@ class ComponentPathProvider(private val groupGraph: GroupGraph) {
                     listOf(Triple(ComponentType.FUNCTION, child.function.id, currentPath + child.function.name))
                 is GroupGraphItem.GraphNode ->
                     listOf(Triple(ComponentType.GRAPH, child.graph.id, currentPath + child.graph.name))
+                is GroupGraphItem.ReminderNode ->
+                    listOf(Triple(ComponentType.REMINDER, child.reminder.id, currentPath + child.reminder.reminderName))
             }
         }
 

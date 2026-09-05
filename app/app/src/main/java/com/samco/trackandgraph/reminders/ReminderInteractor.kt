@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -221,9 +222,10 @@ internal class ReminderInteractorImpl @Inject constructor(
         // Observe reminder changes to refresh the TimeSinceLast reminders cache.
         scope.launch {
             dataInteractor.getDataUpdateEvents()
-                .filter { it == DataUpdateType.Reminder }
+                .filter { it is DataUpdateType.Reminder }
+                .map { Unit }
                 .debounce(10)
-                .onStart { emit(DataUpdateType.Reminder) } // Initial load
+                .onStart { emit(Unit) } // Initial load
                 .flatMapLatest { getRescheduleTimeSinceLastReminderEvents() }
                 .collect { handleDataPointChange(it) }
         }

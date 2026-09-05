@@ -23,6 +23,9 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
+import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.fixtures.TestGraphViewData
 import com.samco.trackandgraph.fixtures.testDisplayTracker
@@ -31,6 +34,7 @@ import com.samco.trackandgraph.fixtures.testGraphOrStat
 import com.samco.trackandgraph.fixtures.testGraphViewData
 import com.samco.trackandgraph.fixtures.testTracker
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.reminders.ui.ReminderViewData
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +47,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.threeten.bp.LocalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchResultProcessorTest {
@@ -61,7 +66,7 @@ class SearchResultProcessorTest {
     }
 
     @Test
-    fun `initial emission preserves ranked order and uses placeholders for uncached trackers and graphs`() =
+    fun `initial emission preserves ranked order and uses placeholders for async component data`() =
         runTest {
             val fixture = fixture()
             val items = listOf(
@@ -69,20 +74,67 @@ class SearchResultProcessorTest {
                 rankedGraph(groupItemId = 11L, graphId = 2L),
                 rankedTracker(groupItemId = 12L, trackerId = 3L, featureId = 30L),
                 rankedFunction(groupItemId = 13L, functionId = 4L, featureId = 40L),
+                rankedReminder(groupItemId = 14L, reminder = reminder(5L, "reminder 5")),
             )
 
             fixture.processor.process(items).test {
                 val initial = awaitItem()
 
-                assertEquals(listOf(10L, 11L, 12L, 13L), initial.map { it.child.groupItemId })
+                assertEquals(listOf(10L, 11L, 12L, 13L, 14L), initial.map { it.child.groupItemId })
                 assertTrue(initial[0].child is GroupChild.ChildGroup)
                 assertGraphState(initial[1], IGraphStatViewData.State.LOADING)
                 assertTrue(initial[2].child is GroupChild.ChildTrackerLoading)
                 assertTrue(initial[3].child is GroupChild.ChildFunction)
+                assertTrue(initial[4].child is GroupChild.ChildReminderLoading)
 
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `reminder emits loading placeholder before progressively loaded view data`() = runTest {
+        val fixture = fixture()
+        val reminder = reminder(id = 4L, name = "Morning reminder")
+        val item = rankedReminder(groupItemId = 13L, reminder = reminder)
+
+        fixture.processor.process(listOf(item)).test {
+            val loading = awaitItem().single().child as GroupChild.ChildReminderLoading
+            assertEquals(13L, loading.groupItemId)
+            assertEquals("Morning reminder", loading.name)
+
+            val child = awaitItem().single().child as GroupChild.ChildReminder
+            assertEquals(13L, child.groupItemId)
+            assertEquals("Morning reminder", child.reminder.name)
+            assertEquals(listOf(4L to 13L), fixture.reminderViewDataCalls)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `reminder cache is reused across queries and cleared by dispose`() = runTest {
+        val fixture = fixture()
+        val item = rankedReminder(13L, reminder(4L, "Morning reminder"))
+
+        fixture.processor.process(listOf(item)).test {
+            assertTrue(awaitItem().single().child is GroupChild.ChildReminderLoading)
+            assertTrue(awaitItem().single().child is GroupChild.ChildReminder)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        fixture.processor.process(listOf(item)).test {
+            assertTrue(awaitItem().single().child is GroupChild.ChildReminder)
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertEquals(1, fixture.reminderViewDataCalls.size)
+
+        fixture.processor.dispose()
+        fixture.processor.process(listOf(item)).test {
+            assertTrue(awaitItem().single().child is GroupChild.ChildReminderLoading)
+            assertTrue(awaitItem().single().child is GroupChild.ChildReminder)
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertEquals(2, fixture.reminderViewDataCalls.size)
+    }
 
     @Test
     fun `trackers in a batch are emitted before graph results from the same batch`() = runTest {
@@ -277,6 +329,62 @@ class SearchResultProcessorTest {
     }
 
     @Test
+    fun `reminder update event refreshes only its matching result`() = runTest {
+        val fixture = fixture()
+        val original = reminder(4L, "Morning reminder")
+        val other = reminder(5L, "Other reminder")
+        fixture.reminders[4L] = original
+        fixture.reminders[5L] = other
+
+        fixture.processor.process(
+            listOf(
+                rankedReminder(13L, original),
+                rankedReminder(14L, other),
+            )
+        ).test {
+            assertTrue(awaitItem().all { it.child is GroupChild.ChildReminderLoading })
+            val initial = awaitItem()
+            assertReminderName(initial[0], "Morning reminder")
+            assertReminderName(initial[1], "Other reminder")
+
+            fixture.reminders[4L] = reminder(4L, "Updated reminder")
+            fixture.events.emit(DataUpdateType.Reminder(4L))
+
+            val refreshed = awaitItem()
+            assertReminderName(refreshed[0], "Updated reminder")
+            assertReminderName(refreshed[1], "Other reminder")
+            assertEquals(listOf(4L), fixture.reminderLookupCalls)
+            assertEquals(2, fixture.reminderViewDataCalls.count { it.first == 4L })
+            assertEquals(1, fixture.reminderViewDataCalls.count { it.first == 5L })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `stale initial reminder result cannot overwrite event refresh result`() = runTest {
+        val fixture = fixture()
+        val original = reminder(4L, "Original reminder")
+        val initialResult = CompletableDeferred<ReminderViewData>()
+        fixture.reminders[4L] = reminder(4L, "Updated reminder")
+        fixture.reminderViewDataHandler = { current, groupItemId, callIndex ->
+            if (callIndex == 1) initialResult.await()
+            else reminderViewData(current, groupItemId)
+        }
+
+        fixture.processor.process(listOf(rankedReminder(13L, original))).test {
+            assertTrue(awaitItem().single().child is GroupChild.ChildReminderLoading)
+            advanceUntilIdle()
+
+            fixture.events.emit(DataUpdateType.Reminder(4L))
+            assertReminderName(awaitItem().single(), "Updated reminder")
+
+            initialResult.complete(reminderViewData(original, 13L))
+            assertReminderName(awaitItem().single(), "Updated reminder")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `stale initial graph result cannot overwrite fresher event refresh result`() = runTest {
         val fixture = fixture()
         val graph = testGraphOrStat(2L)
@@ -315,8 +423,13 @@ class SearchResultProcessorTest {
         val trackers = mutableMapOf<Long, DisplayTracker?>()
         val trackerCalls = mutableListOf<Long>()
         val graphCalls = mutableListOf<Long>()
+        val reminders = mutableMapOf<Long, Reminder?>()
+        val reminderLookupCalls = mutableListOf<Long>()
+        val reminderViewDataCalls = mutableListOf<Pair<Long, Long>>()
         var graphHandler: suspend (GraphOrStat, Int) -> IGraphStatViewData =
             { graph, _ -> readyGraph(graph, label = "graph ${graph.id}") }
+        var reminderViewDataHandler: suspend (Reminder, Long, Int) -> ReminderViewData =
+            { reminder, groupItemId, _ -> reminderViewData(reminder, groupItemId) }
 
         val processor = SearchResultProcessor(
             getDataUpdateEvents = { events },
@@ -327,6 +440,18 @@ class SearchResultProcessorTest {
             getGraphViewData = { graph ->
                 graphCalls += graph.id
                 graphHandler(graph, graphCalls.count { it == graph.id })
+            },
+            getReminderById = { reminderId ->
+                reminderLookupCalls += reminderId
+                reminders[reminderId]
+            },
+            getReminderViewData = { reminder, groupItemId ->
+                reminderViewDataCalls += reminder.id to groupItemId
+                reminderViewDataHandler(
+                    reminder,
+                    groupItemId,
+                    reminderViewDataCalls.count { it.first == reminder.id },
+                )
             },
             graphDispatcher = graphDispatcher,
         )
@@ -362,6 +487,15 @@ class SearchResultProcessorTest {
                 groupItemId = groupItemId,
                 graph = testGraphOrStat(id = graphId, name = name),
             ),
+            paths = emptyList(),
+        )
+
+        private fun rankedReminder(
+            groupItemId: Long,
+            reminder: Reminder,
+        ) = RankedItem(
+            groupItemId = groupItemId,
+            item = GroupGraphItem.ReminderNode(groupItemId, reminder),
             paths = emptyList(),
         )
 
@@ -404,6 +538,36 @@ class SearchResultProcessorTest {
             graph: GraphOrStat,
             label: String,
         ) = testGraphViewData(graphOrStat = graph, label = label)
+
+        private fun reminder(id: Long, name: String) = Reminder(
+            id = id,
+            reminderName = name,
+            featureId = null,
+            params = ReminderParams.WeekDayParams(
+                time = LocalTime.NOON,
+                checkedDays = CheckedDays(
+                    monday = true,
+                    tuesday = false,
+                    wednesday = false,
+                    thursday = false,
+                    friday = false,
+                    saturday = false,
+                    sunday = false,
+                ),
+            ),
+            unique = true,
+        )
+
+        private fun reminderViewData(reminder: Reminder, groupItemId: Long) =
+            ReminderViewData.fromReminder(
+                reminder = reminder,
+                groupItemId = groupItemId,
+                nextScheduled = null,
+            )
+
+        private fun assertReminderName(item: SearchResultItem, name: String) {
+            assertEquals(name, (item.child as GroupChild.ChildReminder).reminder.name)
+        }
 
         private fun assertTrackerName(
             item: SearchResultItem,

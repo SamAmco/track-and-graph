@@ -191,6 +191,19 @@ drag order, and support edit, duplicate, and delete. They do not offer move or s
 including next-scheduled calculation and the time-since-last data sample. Both screen ViewModels use
 it so scheduling presentation stays identical.
 
+Grouped reminders are included as `GroupGraphItem.ReminderNode` values, so group search indexes
+their names. Reminder search entries deliberately have no `ResolvedPath`: tapping a reminder edits
+it in place rather than navigating, and reminders cannot be symlinked, so neither direct navigation
+nor path disambiguation consumes one. Search keeps the node structural until it has ranked a query,
+then progressively builds and caches `ReminderViewData` through the same factory. It renders the
+normal reminder card without context-menu actions; tapping the card opens the shared reminder
+editor over the search screen, preserving the active query and results.
+
+`DataUpdateType.Reminder(reminderId)` identifies the affected entity. All reminder mutation paths
+must emit the real ID, including one event per reminder removed by recursive group deletion. This
+lets targeted consumers such as search refresh only the matching card; broad list consumers may
+still reload their full projection when any reminder event arrives.
+
 ## Key Files
 
 - `ReminderHelperImpl.kt` - CRUD operations
