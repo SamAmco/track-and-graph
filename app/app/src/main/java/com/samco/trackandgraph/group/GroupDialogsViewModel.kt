@@ -42,7 +42,7 @@ data class DeleteItemDto(
  * Type of item being deleted to determine which delete operation to perform.
  */
 enum class DeleteType {
-    GROUP, GRAPH_STAT, TRACKER, FUNCTION
+    GROUP, GRAPH_STAT, TRACKER, FUNCTION, REMINDER
 }
 
 /**

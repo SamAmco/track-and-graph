@@ -72,6 +72,10 @@ Semantics:
 - **`deleteEverywhere = false` AND component has only one GroupItem** → deletes the component entirely (not just the GroupItem). The KDoc makes this clear — "unique component + remove from group = delete everywhere".
 - **`deleteEverywhere = true`** → delete all GroupItems then delete the component
 
+Reminders are the exception to these symlink semantics. They cannot be symlinked and may have two
+legitimate placements (global plus one group), so `ReminderHelper.deleteReminder` always deletes
+the entity and all placements regardless of `deleteEverywhere`.
+
 Each helper implementation starts with `groupItemDao.getGroupItemById(request.groupItemId)` to derive the component's `childId`, then proceeds with deletion logic. `DataInteractorImpl` overrides for `deleteTracker` and `deleteFunction` also do this lookup first to get the `featureId` for dependency analysis before delegating to the helper.
 
 Search for `getGroupItemsForChild` in any `*HelperImpl` to see the multi-placement logic.

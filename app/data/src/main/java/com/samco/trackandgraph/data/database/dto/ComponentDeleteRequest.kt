@@ -26,7 +26,8 @@ package com.samco.trackandgraph.data.database.dto
  *   If false and the component has multiple placements, only the placement identified
  *   by [groupItemId] is removed. If false and the component is unique (only one placement),
  *   the component itself is still deleted — there is no distinction between "remove placement"
- *   and "delete everywhere" when only one placement exists.
+ *   and "delete everywhere" when only one placement exists. Reminders are an exception: they
+ *   always delete the entity and all placements regardless of this value.
  */
 data class ComponentDeleteRequest(
     val groupItemId: Long,

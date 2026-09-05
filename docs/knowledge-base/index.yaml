@@ -59,7 +59,7 @@ docs:
 
   - file: component-types.md
     title: Component types — Trackers, Functions, Graphs, Reminders, Groups
-    description: The 5 component types, their dual-ID pattern (primary key vs featureId), the unique field on DTOs for symlink detection (no default, must always be computed by querying group_items_table), GroupItemType vs GroupChildType enums, all three UI behaviors triggered by unique==false (icon, delete dialog with deleteEverywhere, symlinks menu).
+    description: The 5 component types, their dual-ID pattern, GroupItemType vs GroupChildType, symlink behavior, and the reminder exception (global plus optional single-group placements, never symlinked).
     keywords: [tracker, function, graph, reminder, group, featureId, primaryKey, component, GroupItemType, GroupChildType, unique, symlink, dual-id, SymlinksDialog, context-menu, deleteEverywhere]
 
   - file: database-schema.md
@@ -79,7 +79,7 @@ docs:
 
   - file: group-items.md
     title: group_items_table — junction table and display ordering
-    description: The group_items_table schema, composite identity (type + child_id), groupItemId as placement identity, display_index ordering, multi-group membership (including same-group duplicates, no unique constraint), destination-scoped symlink creation and disabled items, drag-and-drop flow, and null group_id for groupless reminders.
+    description: The group_items_table schema, composite identity, placement identity, display ordering, multi-group membership, reminder global/group placements, symlink creation, drag-and-drop, and null group_id.
     keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, symlink, AddSymlinkViewModel, AddComponentDialog, destination, disabled-items, SelectItemDialog, groupItemId, placement-identity]
 
   - file: helper-classes.md
@@ -89,7 +89,7 @@ docs:
 
   - file: reminders.md
     title: Reminders — lifecycle, scheduling, and display ordering
-    description: Reminder data and lifecycle, including groupless placement, serialized enable/disable state, scheduling behavior, delete/duplicate operations, and RemindersScreenViewModel display ordering.
+    description: Reminder data and lifecycle, including independent global and optional group placements, always-delete-everywhere behavior, no symlinks, duplication, scheduling, and display ordering.
     keywords: [reminder, groupless, null, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType]
 
   - file: lua-architecture.md

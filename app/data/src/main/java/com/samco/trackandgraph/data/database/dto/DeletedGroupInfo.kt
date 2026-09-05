@@ -19,4 +19,5 @@ package com.samco.trackandgraph.data.database.dto
 
 data class DeletedGroupInfo(
     val deletedFeatureIds: Set<Long>,
+    val deletedReminderIds: Set<Long> = emptySet(),
 )

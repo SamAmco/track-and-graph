@@ -119,6 +119,9 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     @Query("SELECT r.* FROM reminders_table r")
     override fun getAllRemindersSync(): List<Reminder>
 
+    @Query("SELECT r.* FROM reminders_table r WHERE r.id IN (:ids)")
+    override fun getRemindersByIdsSync(ids: List<Long>): List<Reminder>
+
     @Query("SELECT * FROM reminders_table WHERE id = :id")
     override fun getReminderById(id: Long): Reminder?
 

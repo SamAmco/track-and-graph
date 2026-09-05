@@ -35,6 +35,9 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.reminders.ReminderInteractor
+import com.samco.trackandgraph.reminders.ui.ReminderViewData
+import com.samco.trackandgraph.reminders.ui.ReminderViewDataFactory
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.util.Stopwatch
 import com.samco.trackandgraph.util.debounceBuffer
@@ -67,6 +70,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.shareIn
@@ -116,6 +120,7 @@ interface GroupViewModel {
 
     fun onDuplicateGraphOrStat(groupItemId: Long)
     fun onDuplicateFunction(groupItemId: Long, newName: String)
+    fun onDuplicateReminder(groupItemId: Long)
     fun onConsumedShowDurationInputDialog()
     fun stopTimer(tracker: DisplayTracker)
     fun playTimer(tracker: DisplayTracker)
@@ -130,6 +135,8 @@ class GroupViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val gsiProvider: GraphStatInteractorProvider,
     private val timerServiceInteractor: TimerServiceInteractor,
+    private val reminderInteractor: ReminderInteractor,
+    private val reminderViewDataFactory: ReminderViewDataFactory,
     @IODispatcher private val io: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
@@ -327,6 +334,45 @@ class GroupViewModelImpl @Inject constructor(
         .map { (groupId, _) -> getFunctionDataMap(groupId) }
         .flowOn(io)
 
+    private val reminderDataMap: Flow<Map<Long, ReminderViewData>> = merge(
+        onUpdateChildrenForGroup
+            .filter { (_, event) ->
+                event is DataUpdateType.Unknown || event is DataUpdateType.Reminder
+            }
+            .map { it.first },
+        combine(
+            groupId.filterNotNull(),
+            reminderInteractor.schedulingEvents,
+        ) { currentGroupId, _ -> currentGroupId },
+    )
+        .debounce(10L)
+        .map { currentGroupId -> getReminderDataMap(currentGroupId) }
+        .flowOn(io)
+
+    private data class ComponentDataSnapshot(
+        val graphs: Map<Long, CalculatedGraphViewData>,
+        val trackers: Map<Long, DisplayTracker>,
+        val groups: Map<Long, com.samco.trackandgraph.data.database.dto.Group>,
+        val functions: Map<Long, DisplayFunction>,
+        val reminders: Map<Long, ReminderViewData>,
+    )
+
+    private val componentDataSnapshot: Flow<ComponentDataSnapshot> = combine(
+        graphDataMap,
+        trackerDataMap,
+        groupDataMap,
+        functionDataMap,
+        reminderDataMap,
+    ) { graphs, trackers, groups, functions, reminders ->
+        ComponentDataSnapshot(
+            graphs = graphs,
+            trackers = trackers,
+            groups = groups,
+            functions = functions,
+            reminders = reminders,
+        )
+    }
+
     /**
      * A flow of display indices from the database, represented as a list of
      * GroupChildDisplayIndex entries keyed by groupItemId for unique placement identity.
@@ -355,25 +401,28 @@ class GroupViewModelImpl @Inject constructor(
     // This correctly handles duplicate placements of the same component in one group.
     private val allChildren: StateFlow<List<GroupChild>> =
         combine(
-            graphDataMap, trackerDataMap, groupDataMap, functionDataMap, dbDisplayIndices.filterNotNull()
-        ) { graphs, trackers, groups, functions, indices ->
+            componentDataSnapshot,
+            dbDisplayIndices.filterNotNull(),
+        ) { data, indices ->
             indices
                 .sortedBy { it.displayIndex }
                 .mapNotNull { index ->
                     when (index.type) {
-                        GroupChildType.TRACKER -> trackers[index.id]?.let {
+                        GroupChildType.TRACKER -> data.trackers[index.id]?.let {
                             GroupChild.ChildTracker(index.groupItemId, index.id, it)
                         }
-                        GroupChildType.GROUP -> groups[index.id]?.let {
+                        GroupChildType.GROUP -> data.groups[index.id]?.let {
                             GroupChild.ChildGroup(index.groupItemId, index.id, it)
                         }
-                        GroupChildType.GRAPH -> graphs[index.id]?.let {
+                        GroupChildType.GRAPH -> data.graphs[index.id]?.let {
                             GroupChild.ChildGraph(index.groupItemId, index.id, it)
                         }
-                        GroupChildType.FUNCTION -> functions[index.id]?.let {
+                        GroupChildType.FUNCTION -> data.functions[index.id]?.let {
                             GroupChild.ChildFunction(index.groupItemId, index.id, it)
                         }
-                        GroupChildType.REMINDER -> null
+                        GroupChildType.REMINDER -> data.reminders[index.id]?.let {
+                            GroupChild.ChildReminder(index.groupItemId, index.id, it)
+                        }
                     }
                 }
         }
@@ -421,14 +470,17 @@ class GroupViewModelImpl @Inject constructor(
                 dataInteractor.hasAnyGraphs(),
                 dataInteractor.hasAnyGroups(),
                 dataInteractor.hasAnyFunctions(),
+                dataInteractor.hasAnyReminders(),
             ).none { it }
         }
         .flowOn(io)
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    override val hasAnyReminders: StateFlow<Boolean> = flow {
-        emit(dataInteractor.hasAnyReminders())
-    }
+    override val hasAnyReminders: StateFlow<Boolean> = onUpdateChildrenForGroup
+        .filter { (_, event) ->
+            event is DataUpdateType.Unknown || event is DataUpdateType.Reminder
+        }
+        .map { dataInteractor.hasAnyReminders() }
         .flowOn(io)
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
@@ -474,6 +526,21 @@ class GroupViewModelImpl @Inject constructor(
         }
     }
 
+    private suspend fun getReminderDataMap(groupId: Long): Map<Long, ReminderViewData> {
+        val groupItemIds = dataInteractor.getDisplayIndicesForGroup(groupId)
+            .filter { it.type == GroupChildType.REMINDER }
+            .associate { it.id to it.groupItemId }
+        return dataInteractor.getRemindersForGroupSync(groupId)
+            .associate { reminder ->
+                reminder.id to reminderViewDataFactory.create(
+                    reminder,
+                    checkNotNull(groupItemIds[reminder.id]) {
+                        "Reminder ${reminder.id} has no GroupItem placement"
+                    },
+                )
+            }
+    }
+
     override fun addDefaultTrackerValue(tracker: DisplayTracker) {
         viewModelScope.launch(io) {
             val newDataPoint = DataPoint(
@@ -510,7 +577,14 @@ class GroupViewModelImpl @Inject constructor(
                         timerServiceInteractor.requestWidgetsDisabledForFeatureId(it)
                     }
                 }
-                GroupChildType.REMINDER -> dataInteractor.deleteReminder(request)
+                GroupChildType.REMINDER -> {
+                    allChildren.value
+                        .filterIsInstance<GroupChild.ChildReminder>()
+                        .find { it.groupItemId == groupItemId }
+                        ?.reminder?.reminderDto
+                        ?.let { reminderInteractor.cancelReminderNotifications(it) }
+                    dataInteractor.deleteReminder(request)
+                }
             }
         }
     }
@@ -533,6 +607,18 @@ class GroupViewModelImpl @Inject constructor(
                 synchronized(duplicatedGroupItemIds) {
                     duplicatedGroupItemIds.add(created.groupItemId)
                 }
+            }
+        }
+    }
+
+    override fun onDuplicateReminder(groupItemId: Long) {
+        viewModelScope.launch(io) {
+            val created = dataInteractor.duplicateReminder(groupItemId)
+            synchronized(duplicatedGroupItemIds) {
+                duplicatedGroupItemIds.add(created.groupItemId)
+            }
+            dataInteractor.getReminderById(created.componentId)?.let {
+                reminderInteractor.scheduleNext(it)
             }
         }
     }

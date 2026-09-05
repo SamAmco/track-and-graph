@@ -1,6 +1,6 @@
 ---
 title: group_items_table — junction table and display ordering
-description: The group_items_table schema, composite identity (type + child_id together identify a component), display_index ordering managed by helpers, multi-group membership (including same-group duplicates), groupItemId as placement identity, symlink creation disabled-items pattern, drag-and-drop flow, and null group_id for groupless reminders.
+description: The group_items_table schema, composite identity (type + child_id together identify a component), display_index ordering managed by helpers, multi-group membership, reminder global/group placements, symlink creation, and drag-and-drop.
 topics:
   - Schema: id, group_id (nullable), display_index, child_id, type, created_at
   - Composite identity: (type, child_id) together identify a component — NOT child_id alone
@@ -10,7 +10,7 @@ topics:
   - Symlink creation: Add Component destination ownership and ancestor cycle prevention
   - Display index: managed by helpers; UI combines via GroupViewModel flows (children not pre-sorted)
   - Drag-and-drop: temporary local list for instant UI; DB write on drop; VM waits for dbDisplayIndices alignment
-  - null group_id: valid ONLY for reminders (Reminders screen)
+  - Every reminder has one null-group placement and may have one additional non-null group placement
 keywords: [group_items, junction, display_index, ordering, null, groupless, child_id, composite-identity, drag-and-drop, DAO, multi-group, symlink, AddSymlinkViewModel, disabled-items, SelectItemDialog, groupItemId, placement-identity]
 ---
 
@@ -74,7 +74,10 @@ Both Trackers and Functions also have a `featureId` (pointing to `features_table
 
 ### Multi-Group Membership
 
-A component can exist in multiple groups, and even multiple times in the **same** group:
+A symlink-capable component can exist in multiple groups, and even multiple times in the **same**
+group. Reminders are the exception: every reminder has a required null-group placement for global
+ordering and may have one non-null placement for membership in a single group. Those two rows are
+different UI contexts, not symlinks.
 
 ```kotlin
 // Tracker 1 in Group A
@@ -91,7 +94,9 @@ There is **no unique constraint** on `(group_id, child_id, type)` — this was r
 
 ### Null Group ID
 
-Only valid for **reminders**. A reminder with `groupId = null` appears in the dedicated Reminders screen but not in any group.
+Only valid for **reminders**. Every reminder has exactly one `groupId = null` row representing its
+position in the dedicated Reminders screen. A reminder may additionally have one non-null row
+representing its independently ordered position in a group.
 
 ## Common Operations
 
@@ -145,6 +150,8 @@ groupItemDao.deleteGroupItemsByChild(childId, type)
 ## Symlink Creation — Disabled Items in Picker
 
 "Add Symlink" is a destination in the Add Component dialog. Its destination-scoped `AddSymlinkViewModel` computes which items are disabled (visible but greyed out, not selectable):
+
+The picker does not offer reminders, and the data layer also rejects reminder symlink creation.
 
 1. **Ancestor groups (cycle prevention)**: The current group and all its transitive ancestors are disabled as GROUP targets, since symlinking any of them would create a cycle in the DAG. Computed via `GroupHelper.getAncestorAndSelfGroupIds()`.
 

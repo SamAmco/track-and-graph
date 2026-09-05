@@ -55,6 +55,7 @@
     <string name="remove_from_this_group">Remove from here</string>
     <string name="delete_everywhere">Delete everywhere</string>
     <string name="ru_sure_del_function">Are you sure you want to delete this function? You can not reverse this.</string>
+    <string name="ru_sure_del_reminder">Are you sure you want to delete this reminder? You can not reverse this.</string>
     <string name="ru_sure_del_data_point">Are you sure you want to delete this data point?</string>
     <string name="export_file_name_suffix" translatable="false">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
     <string name="export_file_name_null_group_suffix" translatable="false">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.csv</string>

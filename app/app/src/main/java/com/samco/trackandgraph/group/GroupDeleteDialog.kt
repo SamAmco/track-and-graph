@@ -53,6 +53,7 @@ internal fun GroupDeleteDialog(
         DeleteType.GRAPH_STAT -> GroupChildType.GRAPH
         DeleteType.GROUP -> GroupChildType.GROUP
         DeleteType.FUNCTION -> GroupChildType.FUNCTION
+        DeleteType.REMINDER -> GroupChildType.REMINDER
     }
 
     GroupDeleteDialogContent(
@@ -82,6 +83,7 @@ private fun GroupDeleteDialogContent(
             DeleteType.GRAPH_STAT -> R.string.ru_sure_del_graph
             DeleteType.TRACKER -> R.string.ru_sure_del_feature
             DeleteType.FUNCTION -> R.string.ru_sure_del_function
+            DeleteType.REMINDER -> R.string.ru_sure_del_reminder
         }
         ContinueCancelDialog(
             body = bodyRes,

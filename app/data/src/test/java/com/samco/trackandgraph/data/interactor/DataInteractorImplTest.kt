@@ -165,7 +165,10 @@ class DataInteractorImplTest {
             )
         )
 
-        whenever(groupHelper.deleteGroup(any())).thenReturn(DeletedGroupInfo(emptySet()))
+        whenever(groupHelper.deleteGroup(any())).thenReturn(
+            DeletedGroupInfo(emptySet()),
+            DeletedGroupInfo(emptySet(), deletedReminderIds = setOf(42L)),
+        )
         whenever(groupItemDao.getGroupItemById(0L)).thenReturn(
             GroupItem(id = 0L, groupId = 0L, childId = 0L, type = GroupItemType.TRACKER, displayIndex = 0)
         )
@@ -175,6 +178,7 @@ class DataInteractorImplTest {
         //let the async start collecting
         yield()
 
+        uut.deleteGroup(ComponentDeleteRequest(groupItemId = 0L))
         uut.deleteGroup(ComponentDeleteRequest(groupItemId = 0L))
         uut.createTracker(testCreateRequest) // create tracker emits 2 for tracker and display indices
         uut.updateTracker(testUpdateRequest)
@@ -189,7 +193,8 @@ class DataInteractorImplTest {
         uut.insertGlobalNote(testGlobalNote)
 
         //VERIFY
-        assertEquals(11, count)
+        // The first group deletion emits only GroupDeleted; the second also emits Reminder.
+        assertEquals(13, count)
         collectJob.cancel()
         verify(trackerHelper, times(1)).createTracker(eq(testCreateRequest))
         verify(trackerHelper, times(1)).updateTracker(eq(testUpdateRequest))

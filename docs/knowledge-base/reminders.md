@@ -1,12 +1,13 @@
 ---
 title: Reminders — lifecycle, scheduling, and display ordering
-description: Reminder data and lifecycle, including groupless placement, serialized enable/disable state, scheduling behavior, delete/duplicate operations, and RemindersScreenViewModel display ordering.
+description: Reminder data and lifecycle, including global and grouped placement, serialized enable/disable state, scheduling behavior, delete/duplicate operations, and reminder view-data construction.
 topics:
-  - Groupless reminders: group_id = null, appear only in Reminders screen (not group views)
+  - Every reminder has one null-group Reminders-screen placement and may have one additional group placement
+  - Reminders can belong to at most one group and cannot be symlinked
   - ReminderParams types and serialized enabled state; missing enabled values default to true
   - Disabled reminders remain stored and visible but cancel/skip notification scheduling
-  - Delete: uses unified ComponentDeleteRequest (see helper-classes.md); groupless reminders with single placement always delete everywhere
-  - Duplicate: takes groupItemId (consistent with all other ops); inserts AFTER original; shifts only items below; app module alignment pending (Stage C)
+  - Delete: always deletes the reminder and every placement, regardless of deleteEverywhere
+  - Duplicate: reproduces both placements and inserts after the original independently in each list
   - Scheduling: PlatformScheduler interface isolates Android AlarmManager (KMP pattern)
   - PITFALL: RemindersScreenViewModel dbDisplayIndices MUST react to DataUpdateType.Reminder or new reminders fall to bottom
 keywords: [reminder, groupless, null, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
@@ -18,7 +19,7 @@ Reminders have special handling compared to other components.
 
 ## Unique Behavior
 
-### Groupless Reminders
+### Global and Grouped Reminders
 
 Unlike trackers, functions, and graphs, reminders can exist **outside of any group**:
 
@@ -31,13 +32,24 @@ GroupItem(
 )
 ```
 
-These "groupless" reminders appear only in the dedicated **Reminders screen**, not in any group view.
+Every reminder has exactly one null-group `GroupItem`, which represents its position in the
+dedicated **Reminders screen**. A grouped reminder has one additional non-null `GroupItem`, which
+independently represents its position in that group's component grid. It may not have a second
+non-null placement.
+
+Unlike other component types, reminders cannot be symlinked. The Add Symlink picker excludes them,
+and `GroupHelperImpl.createSymlink` rejects `GroupChildType.REMINDER` as a data-layer invariant.
+The generic GroupItem schema does not enforce the cardinality itself; reminder creation and
+duplication maintain it, while the symlink entry point provides the defensive rejection.
+
+No migration is required for reminders created before grouped reminders were introduced: they
+already have the required null-group placement and simply remain global-only reminders.
 
 ### Why This Exists
 
 Reminders serve a different purpose than other components:
 - They're about notifications, not data visualization
-- Users may want reminders for trackers across multiple groups
+- Users may want reminders for trackers throughout the app
 - A central reminders view makes sense for managing notification schedules
 
 ## Reminder Structure
@@ -62,11 +74,13 @@ data class Reminder(
     val id: Long,
     val reminderName: String,
     val featureId: Long?,
-    val params: ReminderParams       // Deserialized schedule
+    val params: ReminderParams,      // Deserialized schedule
+    val unique: Boolean
 )
 ```
 
-Note: `groupId` and `displayIndex` are NOT on the DTO. They're managed via GroupItem.
+Note: `groupId` and `displayIndex` are NOT on the DTO. They're managed via GroupItem. Reminder DTOs
+always report `unique = true`: the required global and optional group rows are not symlinks.
 
 ## Reminder Types (ReminderParams)
 
@@ -95,18 +109,24 @@ Configuration screens thread the same state through each reminder-type ViewModel
 
 ## Delete Behavior
 
-Deletion uses `ComponentDeleteRequest(groupItemId, deleteEverywhere)` — the same unified DTO used by all component types. See [helper-classes.md](helper-classes.md#delete-pattern-symlink-logic) for the full pattern.
-
-The helper derives the `reminderId` from the GroupItem lookup. Deleting from the Reminders screen (where `groupId` is null on the GroupItem) with `deleteEverywhere = false` will still delete the reminder if it has no other placements.
+Deletion accepts `ComponentDeleteRequest` for API consistency, but reminders do not use its
+symlink-oriented `deleteEverywhere` distinction. The helper derives the reminder ID from the
+selected placement, then always deletes the reminder entity and all of its GroupItems. This is true
+whether deletion starts from the Reminders screen, its group, or recursive group deletion.
+When recursive group deletion reports deleted reminder IDs, `DataInteractorImpl.deleteGroup` also
+emits a reminder update so notification reconciliation and the global Reminders screen observe the
+removal. It does not emit that event when the deleted group contained no reminders.
 
 ## Operations
 
 ### Create Reminder in Group
 
 ```kotlin
-// Standard flow - shift and insert GroupItem
+// Insert independent placements at the top of both lists.
+groupItemDao.shiftDisplayIndexesDownForNullGroup()
 groupItemDao.shiftDisplayIndexesDown(groupId)
 val reminderId = reminderDao.insertReminder(entity)
+groupItemDao.insertGroupItem(GroupItem(groupId = null, ...))
 groupItemDao.insertGroupItem(GroupItem(groupId = groupId, ...))
 ```
 
@@ -121,22 +141,22 @@ groupItemDao.insertGroupItem(GroupItem(groupId = null, ...))
 
 ### Duplicate Reminder
 
-`duplicateReminder(groupItemId: Long)` takes a `groupItemId` (placement identity), consistent with all other duplicate operations. The implementation looks up the GroupItem first to derive the `reminderId` and placement details.
-
-Inserts the copy immediately **after** the original (not at the top). Only items below the original are shifted:
+`duplicateReminder(groupItemId: Long)` looks up every placement for that reminder and reproduces
+them for the copy. The copy is inserted immediately after the original independently in the global
+list and, when present, the group list. The returned `CreatedComponent.groupItemId` corresponds to
+the same context as the placement passed by the caller.
 
 ```kotlin
-val originalIndex = existingGroupItem.displayIndex
-val insertAtIndex = originalIndex + 1
-// Shift only items after the original
-if (groupId != null) groupItemDao.shiftDisplayIndexesDownAfter(groupId, originalIndex)
-else groupItemDao.shiftDisplayIndexesDownAfterForNullGroup(originalIndex)
-groupItemDao.insertGroupItem(GroupItem(displayIndex = insertAtIndex, ...))
+for (placement in existingPlacements) {
+    shiftItemsAfter(placement.groupId, placement.displayIndex)
+    insertPlacement(
+        groupId = placement.groupId,
+        displayIndex = placement.displayIndex + 1,
+    )
+}
 ```
 
-**App module alignment pending (parameter only)**: `RemindersScreenViewModel` still calls `duplicateReminder` with `reminder.id` (a component ID) instead of a `groupItemId`. The return type is now `CreatedComponent` (aligned). Fixing the parameter requires threading `groupItemId` through `ReminderViewData`, planned for Stage C.
-
-### Query Groupless Reminders
+### Query Reminders-screen Placements
 
 ```kotlin
 groupItemDao.getGroupItemsWithNoGroup()
@@ -152,14 +172,24 @@ The reminder scheduler deliberately isolates Android platform code behind an int
 - **`ReminderScheduler` / `*ReminderScheduler`** — pure Kotlin scheduling logic, depend only on `PlatformScheduler`
 - **`FakePlatformScheduler`** — used in tests instead of mocking
 
-## RemindersScreenViewModel — Display Ordering
+## UI projection and display ordering
 
-The screen combines two independent flows:
+`RemindersScreenViewModel` queries all reminder entities and pairs each with its required null-group
+placement from `getDisplayIndicesForRemindersScreen()`. That placement supplies both the
+`groupItemId` used by delete/duplicate and the global display index. A grouped reminder's non-null
+placement is consumed separately by `GroupViewModel`, so dragging in either screen changes only
+that screen's order.
 
-- `allReminders` — reacts to `DataUpdateType.Reminder`; holds the list of `ReminderViewData`
-- `dbDisplayIndices` — reacts to `DataUpdateType.ReminderScreenDisplayOrder` **and** `DataUpdateType.Reminder`; holds a `Map<reminderId, displayIndex>`
+`GroupViewModel` combines `getDisplayIndicesForGroup(groupId)` with reminder view data and emits
+`GroupChild.ChildReminder`, just like its other component branches. It obtains the reminder DTOs
+through `getRemindersForGroupSync(groupId)`, which reads the typed reminder placements and fetches
+only those reminder entities; do not load every global reminder and filter them in the ViewModel.
+Reminder cards span two grid columns in group and search results, participate in the group's shared
+drag order, and support edit, duplicate, and delete. They do not offer move or symlink actions.
 
-Both flows **must** react to `DataUpdateType.Reminder`. If `dbDisplayIndices` only listens for `ReminderScreenDisplayOrder`, a newly created reminder won't appear in the index map and will fall to the bottom of the list (sorted with `Int.MAX_VALUE` as the fallback).
+`ReminderViewDataFactory` owns the shared conversion from the stored DTO to `ReminderViewData`,
+including next-scheduled calculation and the time-since-last data sample. Both screen ViewModels use
+it so scheduling presentation stays identical.
 
 ## Key Files
 

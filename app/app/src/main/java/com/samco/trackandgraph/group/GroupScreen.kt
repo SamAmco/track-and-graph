@@ -77,6 +77,9 @@ import com.samco.trackandgraph.graphstatview.ui.GraphStatContextMenuCallbacks
 import com.samco.trackandgraph.importexport.ImportExportDialog
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
+import com.samco.trackandgraph.reminders.ui.AddReminderDialog
+import com.samco.trackandgraph.reminders.ui.Reminder
+import com.samco.trackandgraph.reminders.ui.ReminderViewData
 import com.samco.trackandgraph.releasenotes.ReleaseNotesDialog
 import com.samco.trackandgraph.releasenotes.ReleaseNotesViewModel
 import com.samco.trackandgraph.releasenotes.ReleaseNotesViewModelImpl
@@ -144,6 +147,7 @@ fun GroupScreen(
     val hapticFeedback = LocalHapticFeedback.current
     val requestNotificationPermission = rememberNotificationPermissionRequester()
     var showAddComponentDialog by rememberSaveable(navArgs) { mutableStateOf(false) }
+    var editReminderId by rememberSaveable(navArgs) { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(navArgs.groupId) {
         groupViewModel.setGroup(navArgs.groupId)
@@ -203,20 +207,23 @@ fun GroupScreen(
             onTrackerHistory = onTrackerHistory,
             onFunctionEdit = onFunctionEdit,
             onFunctionClick = onFunctionClick,
+            onReminderEdit = { editReminderId = it },
             onTrackerAdd = onTrackerAdd,
             onTrackerPlayTimer = onTrackerPlayTimer,
             onTrackerStopTimer = onTrackerStopTimer,
             showFab = showFab,
+            showAddComponentDialog = showAddComponentDialog,
+            onDismissAddComponentDialog = { showAddComponentDialog = false },
+            onAddTracker = onAddTracker,
+            onAddGraphStat = onAddGraphStat,
+            onAddFunction = onAddFunction,
         )
     }
 
-    AddComponentDialog(
-        visible = showAddComponentDialog,
-        groupId = navArgs.groupId,
-        onDismiss = { showAddComponentDialog = false },
-        onAddTracker = onAddTracker,
-        onAddGraphOrStat = onAddGraphStat,
-        onAddFunction = onAddFunction,
+    AddReminderDialog(
+        visible = editReminderId != null,
+        editReminderId = editReminderId,
+        onDismiss = { editReminderId = null },
     )
 
     // Rendered at the outer level so the dialog persists across search open/close
@@ -273,6 +280,10 @@ data class FunctionClickListeners(
     val onSymlinks: (DisplayFunction) -> Unit = {},
 )
 
+data class ReminderClickListeners(
+    val onEdit: (Long) -> Unit = {},
+)
+
 /** Content component for GroupScreen with navigation callbacks */
 @Composable
 private fun GroupScreenContent(
@@ -292,10 +303,16 @@ private fun GroupScreenContent(
     onTrackerHistory: (DisplayTracker) -> Unit = {},
     onFunctionEdit: (DisplayFunction) -> Unit = {},
     onFunctionClick: (DisplayFunction) -> Unit = {},
+    onReminderEdit: (Long) -> Unit = {},
     onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
     onTrackerPlayTimer: (DisplayTracker) -> Unit,
     onTrackerStopTimer: (DisplayTracker) -> Unit,
     showFab: State<Boolean>,
+    showAddComponentDialog: Boolean,
+    onDismissAddComponentDialog: () -> Unit,
+    onAddTracker: (Long) -> Unit,
+    onAddGraphStat: (Long) -> Unit,
+    onAddFunction: (Long) -> Unit,
 ) {
     val isLoading = groupViewModel.loading.collectAsStateWithLifecycle().value
     val showEmptyText = groupViewModel.showEmptyGroupText.collectAsStateWithLifecycle().value
@@ -396,6 +413,7 @@ private fun GroupScreenContent(
                 )
             },
         ),
+        reminderClickListeners = ReminderClickListeners(onEdit = onReminderEdit),
         onDeleteItem = { groupItemId, type, unique ->
             groupDialogsViewModel.showDeleteDialog(groupItemId, type, unique)
         },
@@ -404,12 +422,22 @@ private fun GroupScreenContent(
         },
         onDuplicateGraph = groupViewModel::onDuplicateGraphOrStat,
         onDuplicateFunction = groupViewModel::onDuplicateFunction,
+        onDuplicateReminder = groupViewModel::onDuplicateReminder,
         onDragStart = groupViewModel::onDragStart,
         onDragSwap = groupViewModel::onDragSwap,
         onDragEnd = groupViewModel::onDragEnd,
     )
 
     // Dialogs
+    AddComponentDialog(
+        visible = showAddComponentDialog,
+        groupId = groupId,
+        onDismiss = onDismissAddComponentDialog,
+        onAddTracker = onAddTracker,
+        onAddGraphOrStat = onAddGraphStat,
+        onAddFunction = onAddFunction,
+    )
+
     if (addGroupDialogViewModel.updateMode.collectAsStateWithLifecycle().value) {
         AddGroupDialog(
             viewModel = addGroupDialogViewModel,
@@ -490,10 +518,12 @@ fun GroupScreenView(
     graphStatClickListeners: GraphStatClickListeners? = null,
     groupClickListeners: GroupClickListeners? = null,
     functionClickListeners: FunctionClickListeners? = null,
+    reminderClickListeners: ReminderClickListeners? = null,
     onDeleteItem: (groupItemId: Long, type: DeleteType, unique: Boolean) -> Unit = { _, _, _ -> },
     onMoveItem: (groupItemId: Long, hiddenItems: Set<HiddenItem>) -> Unit = { _, _ -> },
     onDuplicateGraph: (groupItemId: Long) -> Unit = {},
     onDuplicateFunction: (groupItemId: Long, newName: String) -> Unit = { _, _ -> },
+    onDuplicateReminder: (groupItemId: Long) -> Unit = {},
     onDragStart: () -> Unit = {},
     onDragSwap: (Int, Int) -> Unit = { _, _ -> },
     onDragEnd: () -> Unit = {},
@@ -514,10 +544,12 @@ fun GroupScreenView(
             graphStatClickListeners = graphStatClickListeners ?: GraphStatClickListeners(),
             groupClickListeners = groupClickListeners ?: GroupClickListeners(),
             functionClickListeners = functionClickListeners ?: FunctionClickListeners(),
+            reminderClickListeners = reminderClickListeners ?: ReminderClickListeners(),
             onDeleteItem = onDeleteItem,
             onMoveItem = onMoveItem,
             onDuplicateGraph = onDuplicateGraph,
             onDuplicateFunction = onDuplicateFunction,
+            onDuplicateReminder = onDuplicateReminder,
             onDragStart = onDragStart,
             onDragSwap = onDragSwap,
             onDragEnd = onDragEnd,
@@ -588,10 +620,12 @@ private fun GroupGrid(
     graphStatClickListeners: GraphStatClickListeners,
     groupClickListeners: GroupClickListeners,
     functionClickListeners: FunctionClickListeners,
+    reminderClickListeners: ReminderClickListeners,
     onDeleteItem: (groupItemId: Long, type: DeleteType, unique: Boolean) -> Unit,
     onMoveItem: (groupItemId: Long, hiddenItems: Set<HiddenItem>) -> Unit,
     onDuplicateGraph: (groupItemId: Long) -> Unit,
     onDuplicateFunction: (groupItemId: Long, newName: String) -> Unit,
+    onDuplicateReminder: (groupItemId: Long) -> Unit,
     onDragStart: () -> Unit,
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
@@ -633,6 +667,7 @@ private fun GroupGrid(
                     is GroupChild.ChildFunction -> GridItemSpan(1)
                     is GroupChild.ChildGroup -> GridItemSpan(2)
                     is GroupChild.ChildGraph -> GridItemSpan(columnCount)
+                    is GroupChild.ChildReminder -> GridItemSpan(2)
                 }
             }
         ) { item ->
@@ -740,11 +775,39 @@ private fun GroupGrid(
                             isElevated = isDragging,
                         )
                     }
+
+                    is GroupChild.ChildReminder -> {
+                        ReminderItem(
+                            reminder = item.reminder,
+                            onEdit = { reminderClickListeners.onEdit(item.id) },
+                            onDelete = {
+                                onDeleteItem(item.groupItemId, DeleteType.REMINDER, true)
+                            },
+                            onDuplicate = { onDuplicateReminder(item.groupItemId) },
+                            isElevated = isDragging,
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+@Composable
+private fun ReorderableCollectionItemScope.ReminderItem(
+    reminder: ReminderViewData,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onDuplicate: () -> Unit,
+    isElevated: Boolean,
+) = Reminder(
+    modifier = Modifier.longPressDraggableHandle(),
+    isElevated = isElevated,
+    reminderViewData = reminder,
+    onEditClick = onEdit,
+    onDeleteClick = onDelete,
+    onDuplicateClick = onDuplicate,
+)
 
 @Composable
 private fun ReorderableCollectionItemScope.TrackerItem(

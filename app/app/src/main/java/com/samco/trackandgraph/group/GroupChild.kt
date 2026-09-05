@@ -3,6 +3,7 @@ package com.samco.trackandgraph.group
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupChildType
+import com.samco.trackandgraph.reminders.ui.ReminderViewData
 
 sealed class GroupChild {
     abstract val groupItemId: Long
@@ -42,5 +43,12 @@ sealed class GroupChild {
         override val id: Long,
         val displayFunction: DisplayFunction,
         override val type: GroupChildType = GroupChildType.FUNCTION
+    ) : GroupChild()
+
+    class ChildReminder(
+        override val groupItemId: Long,
+        override val id: Long,
+        val reminder: ReminderViewData,
+        override val type: GroupChildType = GroupChildType.REMINDER,
     ) : GroupChild()
 }

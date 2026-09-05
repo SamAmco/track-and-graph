@@ -54,6 +54,7 @@ import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.navigation.DeepLink
 import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
+import com.samco.trackandgraph.reminders.ui.Reminder
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.ui.cardMarginSmall
@@ -193,6 +194,7 @@ private val GroupChild.displayName: String
         is GroupChild.ChildTrackerLoading -> name
         is GroupChild.ChildFunction -> displayFunction.name
         is GroupChild.ChildGraph -> graph.viewData.graphOrStat.name
+        is GroupChild.ChildReminder -> reminder.name
     }
 
 @Composable
@@ -239,6 +241,7 @@ private fun SearchResultsGrid(
                         is GroupChild.ChildFunction -> GridItemSpan(1)
                         is GroupChild.ChildGroup -> GridItemSpan(2)
                         is GroupChild.ChildGraph -> GridItemSpan(columnCount)
+                        is GroupChild.ChildReminder -> GridItemSpan(2)
                     }
                 }
             ) { item ->
@@ -270,6 +273,11 @@ private fun SearchResultsGrid(
                         graphStatViewData = child.graph.viewData,
                         unique = child.graph.unique,
                         onClick = { onResultClick(item) },
+                    )
+
+                    is GroupChild.ChildReminder -> Reminder(
+                        reminderViewData = child.reminder,
+                        onEditClick = { onResultClick(item) },
                     )
                 }
             }

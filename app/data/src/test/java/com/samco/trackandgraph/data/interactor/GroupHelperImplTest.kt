@@ -346,7 +346,9 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
+            uut.deleteGroup(
+                ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true)
+            )
 
             // VERIFY
             assertTrue(fakeGroupDao.deletedGraphIds.contains(graphId))
@@ -452,15 +454,14 @@ class GroupHelperImplTest {
         }
 
     @Test
-    fun `deleteGroup preserves reminder when it also has null groupId entry`() =
+    fun `deleteGroup deletes reminder and its reminders-screen placement`() =
         runTest(dispatcher) {
-            // PREPARE - Reminder exists in both a group and the reminders screen (null groupId)
+            // PREPARE - A grouped reminder also has its required reminders-screen placement.
             val (groupId, groupItemId) = uut.insertGroup(
                 GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
             )
             val reminderId = 100L
 
-            // Reminder in the group being deleted
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
                     groupId = groupId,
@@ -470,7 +471,6 @@ class GroupHelperImplTest {
                     createdAt = 1000L
                 )
             )
-            // Reminder also in reminders screen (null groupId)
             fakeGroupItemDao.insertGroupItem(
                 GroupItem(
                     groupId = null,
@@ -482,14 +482,16 @@ class GroupHelperImplTest {
             )
 
             // EXECUTE
-            uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
+            val result = uut.deleteGroup(
+                ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true)
+            )
 
-            // VERIFY - Reminder preserved, but GroupItem linking to deleted group is removed
-            assertTrue(fakeGroupDao.deletedReminderIds.isEmpty())
+            // VERIFY - deleting a reminder always removes it everywhere.
+            assertTrue(fakeGroupDao.deletedReminderIds.contains(reminderId))
+            assertEquals(setOf(reminderId), result.deletedReminderIds)
             val remainingItems =
                 fakeGroupItemDao.getGroupItemsForChild(reminderId, GroupItemType.REMINDER)
-            assertEquals(1, remainingItems.size)
-            assertNull(remainingItems[0].groupId)
+            assertTrue(remainingItems.isEmpty())
         }
 
     // =========================================================================
@@ -1138,6 +1140,19 @@ class GroupHelperImplTest {
 
         val items = fakeGroupItemDao.getGroupItemsForGroup(groupId)
         assertNotNull(items.find { it.childId == groupId && it.type == GroupItemType.TRACKER })
+    }
+
+    @Test
+    fun `createSymlink rejects reminders`() = runTest(dispatcher) {
+        var threw = false
+        try {
+            uut.createSymlink(inGroupId = 1L, childId = 2L, childType = GroupChildType.REMINDER)
+        } catch (e: IllegalArgumentException) {
+            threw = true
+        }
+
+        assertTrue(threw)
+        assertTrue(fakeGroupItemDao.getAllGroupItems().isEmpty())
     }
 
     @Test

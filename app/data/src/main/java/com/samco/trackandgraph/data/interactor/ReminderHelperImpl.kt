@@ -45,17 +45,26 @@ internal class ReminderHelperImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
 ) : ReminderHelper {
 
-    private fun isReminderUnique(reminderId: Long) =
-        groupItemDao.getGroupItemsForChild(reminderId, GroupItemType.REMINDER).size == 1
-
     override suspend fun getAllRemindersSync(): List<Reminder> = withContext(io) {
         reminderDao.getAllRemindersSync().mapNotNull { entity ->
-            fromEntity(entity, unique = isReminderUnique(entity.id))
+            fromEntity(entity)
         }
     }
 
+    override suspend fun getRemindersForGroupSync(groupId: Long): List<Reminder> =
+        withContext(io) {
+            val reminderIds = groupItemDao
+                .getGroupItemsByType(groupId, GroupItemType.REMINDER)
+                .map(GroupItem::childId)
+            if (reminderIds.isEmpty()) return@withContext emptyList()
+
+            reminderDao.getRemindersByIdsSync(reminderIds).mapNotNull { entity ->
+                fromEntity(entity)
+            }
+        }
+
     override suspend fun getReminderById(id: Long): Reminder? = withContext(io) {
-        reminderDao.getReminderById(id)?.let { fromEntity(it, unique = isReminderUnique(it.id)) }
+        reminderDao.getReminderById(id)?.let(::fromEntity)
     }
 
     override suspend fun createReminder(request: ReminderCreateRequest): CreatedComponent = withContext(io) {
@@ -63,12 +72,8 @@ internal class ReminderHelperImpl @Inject constructor(
             val encodedParams = reminderSerializer.serializeParams(request.params)
                 ?: throw IllegalArgumentException("Failed to serialize reminder params")
 
-            // Shift existing reminders via GroupItem
-            if (request.groupId != null) {
-                groupItemDao.shiftDisplayIndexesDown(request.groupId)
-            } else {
-                groupItemDao.shiftDisplayIndexesDownForNullGroup()
-            }
+            groupItemDao.shiftDisplayIndexesDownForNullGroup()
+            request.groupId?.let(groupItemDao::shiftDisplayIndexesDown)
 
             val entity = ReminderEntity(
                 id = 0L,
@@ -78,16 +83,31 @@ internal class ReminderHelperImpl @Inject constructor(
             )
             val reminderId = reminderDao.insertReminder(entity)
 
-            val groupItem = GroupItem(
-                groupId = request.groupId,
-                displayIndex = 0,
-                childId = reminderId,
-                type = GroupItemType.REMINDER,
-                createdAt = System.currentTimeMillis()
+            val globalGroupItemId = groupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = null,
+                    displayIndex = 0,
+                    childId = reminderId,
+                    type = GroupItemType.REMINDER,
+                    createdAt = System.currentTimeMillis()
+                )
             )
-            val groupItemId = groupItemDao.insertGroupItem(groupItem)
+            val createdGroupItemId = request.groupId?.let { groupId ->
+                groupItemDao.insertGroupItem(
+                    GroupItem(
+                        groupId = groupId,
+                        displayIndex = 0,
+                        childId = reminderId,
+                        type = GroupItemType.REMINDER,
+                        createdAt = System.currentTimeMillis()
+                    )
+                )
+            }
 
-            CreatedComponent(componentId = reminderId, groupItemId = groupItemId)
+            CreatedComponent(
+                componentId = reminderId,
+                groupItemId = createdGroupItemId ?: globalGroupItemId,
+            )
         }
     }
 
@@ -142,12 +162,6 @@ internal class ReminderHelperImpl @Inject constructor(
                 GroupItemType.REMINDER
             )
 
-            if (!request.deleteEverywhere && groupItems.size > 1) {
-                groupItemDao.deleteGroupItem(request.groupItemId)
-                return@withTransaction
-            }
-
-            // Delete all GroupItems and the reminder itself
             groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
             reminderDao.deleteReminder(reminderId)
         }
@@ -162,28 +176,38 @@ internal class ReminderHelperImpl @Inject constructor(
             val existing = reminderDao.getReminderById(reminderId)
                 ?: throw IllegalArgumentException("Reminder with id $reminderId not found")
 
-            val groupId = existingGroupItem.groupId
-            val insertAtIndex = existingGroupItem.displayIndex + 1
+            val existingPlacements = groupItemDao
+                .getGroupItemsForChild(reminderId, GroupItemType.REMINDER)
+            require(existingPlacements.count { it.groupId == null } == 1) {
+                "Reminder $reminderId must have exactly one reminders-screen placement"
+            }
+            require(existingPlacements.count { it.groupId != null } <= 1) {
+                "Reminder $reminderId cannot belong to more than one group"
+            }
 
-            // Shift items after the original down to make room
-            if (groupId != null) {
-                groupItemDao.shiftDisplayIndexesDownAfter(groupId, insertAtIndex - 1)
-            } else {
-                groupItemDao.shiftDisplayIndexesDownAfterForNullGroup(insertAtIndex - 1)
+            existingPlacements.forEach { placement ->
+                if (placement.groupId == null) {
+                    groupItemDao.shiftDisplayIndexesDownAfterForNullGroup(placement.displayIndex)
+                } else {
+                    groupItemDao.shiftDisplayIndexesDownAfter(placement.groupId, placement.displayIndex)
+                }
             }
 
             val newEntity = existing.copy(id = 0L)
             val newReminderId = reminderDao.insertReminder(newEntity)
 
-            // Create GroupItem for the new reminder, right after the original
-            val newGroupItem = GroupItem(
-                groupId = groupId,
-                displayIndex = insertAtIndex,
-                childId = newReminderId,
-                type = GroupItemType.REMINDER,
-                createdAt = System.currentTimeMillis()
-            )
-            val newGroupItemId = groupItemDao.insertGroupItem(newGroupItem)
+            val newPlacementIds = existingPlacements.associate { placement ->
+                placement.groupId to groupItemDao.insertGroupItem(
+                    GroupItem(
+                        groupId = placement.groupId,
+                        displayIndex = placement.displayIndex + 1,
+                        childId = newReminderId,
+                        type = GroupItemType.REMINDER,
+                        createdAt = System.currentTimeMillis()
+                    )
+                )
+            }
+            val newGroupItemId = checkNotNull(newPlacementIds[existingGroupItem.groupId])
 
             CreatedComponent(componentId = newReminderId, groupItemId = newGroupItemId)
         }
@@ -208,10 +232,7 @@ internal class ReminderHelperImpl @Inject constructor(
         }
 
     /** Converts a ReminderEntity to a Reminder DTO. */
-    private fun fromEntity(
-        entity: ReminderEntity,
-        unique: Boolean,
-    ): Reminder? {
+    private fun fromEntity(entity: ReminderEntity): Reminder? {
         val params = reminderSerializer.deserializeParams(entity.encodedReminderParams)
             ?: return null
 
@@ -220,7 +241,7 @@ internal class ReminderHelperImpl @Inject constructor(
             reminderName = entity.alarmName,
             featureId = entity.featureId,
             params = params,
-            unique = unique,
+            unique = true,
         )
     }
 }

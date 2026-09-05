@@ -114,6 +114,9 @@ internal class DataInteractorImpl @Inject constructor(
             }
 
             dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
+            if (deletedGroupInfo.deletedReminderIds.isNotEmpty()) {
+                dataUpdateEvents.emit(DataUpdateType.Reminder)
+            }
             return@withContext deletedGroupInfo
         }
 

@@ -33,6 +33,10 @@ internal class FakeReminderDao : ReminderDao {
         return reminders.values.toList()
     }
 
+    override fun getRemindersByIdsSync(ids: List<Long>): List<Reminder> {
+        return ids.mapNotNull(reminders::get)
+    }
+
     override fun getReminderById(id: Long): Reminder? {
         return reminders[id]
     }

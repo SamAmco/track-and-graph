@@ -110,7 +110,10 @@ internal class GroupHelperImpl @Inject constructor(
                 itemsToDelete.featureIds.forEach { groupDao.deleteFeature(it) }
                 itemsToDelete.groupIds.forEach { groupDao.deleteGroup(it) }
 
-                return@withTransaction DeletedGroupInfo(itemsToDelete.featureIds)
+                return@withTransaction DeletedGroupInfo(
+                    deletedFeatureIds = itemsToDelete.featureIds,
+                    deletedReminderIds = itemsToDelete.reminderIds,
+                )
             }
         }
 
@@ -180,10 +183,13 @@ internal class GroupHelperImpl @Inject constructor(
                     }
 
                     GroupItemType.REMINDER -> {
-                        if (shouldDeleteChild(item.childId, item.type, hierarchy, collected.groupIds)) {
-                            collected.reminderIds.add(item.childId)
-                            collectAllGroupItemsForChild(item.childId, item.type, hierarchy, collected.groupItemIds)
-                        }
+                        collected.reminderIds.add(item.childId)
+                        collectAllGroupItemsForChild(
+                            item.childId,
+                            item.type,
+                            hierarchy,
+                            collected.groupItemIds,
+                        )
                     }
 
                     GroupItemType.GROUP -> {
@@ -309,6 +315,9 @@ internal class GroupHelperImpl @Inject constructor(
 
     override suspend fun createSymlink(inGroupId: Long, childId: Long, childType: GroupChildType) =
         withContext(io) {
+            require(childType != GroupChildType.REMINDER) {
+                "Reminders can only belong to their original group and cannot be symlinked"
+            }
             if (childType == GroupChildType.GROUP) {
                 val ancestors = getAncestorAndSelfGroupIds(inGroupId)
                 if (childId in ancestors) {

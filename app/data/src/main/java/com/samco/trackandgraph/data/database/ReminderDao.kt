@@ -28,6 +28,8 @@ internal interface ReminderDao {
 
     fun getAllRemindersSync(): List<Reminder>
 
+    fun getRemindersByIdsSync(ids: List<Long>): List<Reminder>
+
     fun getReminderById(id: Long): Reminder?
 
     fun insertReminder(reminder: Reminder): Long

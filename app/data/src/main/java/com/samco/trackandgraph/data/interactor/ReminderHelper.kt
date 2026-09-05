@@ -36,6 +36,8 @@ import com.samco.trackandgraph.data.database.dto.ReminderUpdateRequest
 interface ReminderHelper {
     suspend fun getAllRemindersSync(): List<Reminder>
 
+    suspend fun getRemindersForGroupSync(groupId: Long): List<Reminder>
+
     suspend fun getReminderById(id: Long): Reminder?
 
     suspend fun createReminder(request: ReminderCreateRequest): CreatedComponent
@@ -53,10 +55,7 @@ interface ReminderHelper {
      */
     suspend fun updateReminderScreenDisplayOrder(orders: List<ReminderDisplayOrderData>)
 
-    /**
-     * Deletes a reminder or removes a single placement.
-     * @see [ComponentDeleteRequest] for the semantics of deleteEverywhere.
-     */
+    /** Deletes a reminder and all of its placements, regardless of `deleteEverywhere`. */
     suspend fun deleteReminder(request: ComponentDeleteRequest)
 
     suspend fun duplicateReminder(groupItemId: Long): CreatedComponent
@@ -69,4 +68,5 @@ interface ReminderHelper {
      * that include the groupItemId needed for delete/duplicate/reorder operations.
      */
     suspend fun getDisplayIndicesForRemindersScreen(): List<GroupChildDisplayIndex>
+
 }

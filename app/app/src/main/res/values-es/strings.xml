@@ -40,6 +40,7 @@
     <string name="remove_from_this_group">Eliminar de aquí</string>
     <string name="delete_everywhere">Eliminar en todas partes</string>
     <string name="ru_sure_del_function">¿Estás seguro de que quieres eliminar esta función? No puedes revertir esto.</string>
+    <string name="ru_sure_del_reminder">¿Estás seguro de que quieres eliminar este recordatorio? No puedes revertir esto.</string>
     <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>
     <string name="feature_name_cannot_be_null">Por favor, añade un nombre</string>
     <string name="tracker_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
