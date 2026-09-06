@@ -15,7 +15,8 @@ topics:
   - Play Store screenshots: Compose screenshot test previews, no emulator, fake status bar
   - Tutorial screenshots: Compose screenshot test previews, no emulator
   - AGP 9.3 fixes screenshot-test manifest generation that failed under AGP 9.1
-keywords: [build, gradle, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
+  - Kotlin and Kotlin Gradle plugin versions stay aligned; Kotlin 2.4 + AGP 9.3 requires explicit build and screenshot verification
+keywords: [build, gradle, dependency, version-catalog, Kotlin, KGP, AGP, compatibility, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
 ---
 
 # Build Commands
@@ -71,6 +72,21 @@ Shared Android build defaults live in the included build `app/build-logic`, not 
 - `tng.android.library`
 
 Use these for Android app/library modules so SDK versions, Java compatibility, Kotlin toolchain, JVM target, and common Kotlin compiler flags stay centralized. Keep module-specific behavior in the module build file: application IDs, versioning, signing, build types, Compose/Hilt/KSP/Room plugins, and dependencies.
+
+## Dependency Upgrade Verification
+
+Keep the `kotlin`, `kotlinSerialization`, and `kotlinGradlePlugin` catalog versions aligned. The last one is easy to miss because it is used as a `compileOnly` dependency by the included build logic rather than as an application dependency.
+
+Kotlin 2.4.10 documents full support through Gradle 9.5 but only through AGP 9.1. This project needs AGP 9.3.1 or newer for working Compose screenshot-test manifest generation, so the Kotlin 2.4 + AGP 9.3 pairing is intentionally ahead of Kotlin's fully tested AGP range. When either changes, verify at minimum:
+
+```bash
+cd app && ./gradlew clean assembleDebug --warning-mode all
+cd app && ./gradlew :app:testFossDebugUnitTest :app:testPlayStoreDebugUnitTest --warning-mode all
+cd app && ./gradlew :data:testDebugUnitTest --warning-mode all
+cd app && ./gradlew :app:generateFossDebugScreenshotTestConfig :app:generatePlayStoreDebugScreenshotTestConfig --warning-mode all
+```
+
+The screenshot config tasks are the compatibility check for the AGP/plugin integration. `validateScreenshotTest` additionally requires checked-in reference images and can fail with `ScreenshotImageNotFoundException` when those baselines are absent even though configuration generation works.
 
 ## Play Store Screenshots
 

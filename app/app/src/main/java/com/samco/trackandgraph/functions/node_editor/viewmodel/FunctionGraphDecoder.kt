@@ -102,7 +102,7 @@ internal class FunctionGraphDecoder @Inject constructor(
         val edges = buildEdgesFromDependencies(functionGraph, filteredNodeIds)
 
         return DecodedFunctionGraph(
-            nodes = persistentListOf<Node>().addAll(decodedNodes),
+            nodes = persistentListOf<Node>().addingAll(decodedNodes),
             edges = edges,
             nodePositions = nodePositions,
             isDuration = functionGraph.isDuration

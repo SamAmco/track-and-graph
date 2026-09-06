@@ -18,9 +18,9 @@
 package com.samco.trackandgraph.graphstatview
 
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.round
 import kotlin.random.Random
@@ -329,12 +329,12 @@ private fun printExampleNumerical(start:Double, end: Double) {
         val boundsRange = parameters.boundsMax - parameters.boundsMin
         val interval = boundsRange / (parameters.subdivides - 1)
         println("----------------------------")
-        for (i in 0 until parameters.subdivides.toInt()) {
+        for (i in 0 until parameters.subdivides) {
             val label = parameters.boundsMax - i * interval
             println("$label")
         }
         print("Data range: [$start -> $end] ")
-        print("interval: ${interval} x ${parameters.subdivides.toInt() - 1} | ")
+        print("interval: ${interval} x ${parameters.subdivides - 1} | ")
         println("range used = %.1f".format(100 * (end - start) / boundsRange))
         //return interval
     }
@@ -352,13 +352,13 @@ private fun printExampleNumerical(start:Double, end: Double) {
         val boundsRange = parameters.boundsMax - parameters.boundsMin
         val interval = boundsRange / (parameters.subdivides - 1)
         println("----------------------------")
-        for (i in 0 until parameters.subdivides.toInt()) {
+        for (i in 0 until parameters.subdivides) {
             val label_seconds = parameters.boundsMax - i * interval
             val label = duration2string(label_seconds.seconds)
             println(label)
         }
         print("Data range: [${duration2string(start.seconds)} -> ${duration2string(end.seconds)}] ")
-        print("interval: ${duration2string(interval.seconds)} x ${parameters.subdivides.toInt() - 1} | ")
+        print("interval: ${duration2string(interval.seconds)} x ${parameters.subdivides - 1} | ")
         println("range used = ${round(100 * (end - start) / boundsRange)}%")
         return parameters
     }

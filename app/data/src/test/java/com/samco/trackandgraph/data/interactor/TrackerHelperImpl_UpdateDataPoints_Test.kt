@@ -315,7 +315,7 @@ class TrackerHelperImpl_UpdateDataPoints_Test {
             return@thenAnswer db.drop(offset).take(limit).dataPoints()
         }
         whenever(dao.updateDataPoints(any())).thenAnswer {
-            receivedUpdate.addAll(it.arguments[0] as List<DataPoint>)
+            receivedUpdate.addAll(it.getArgument(0))
         }
 
         uut.updateDataPoints(

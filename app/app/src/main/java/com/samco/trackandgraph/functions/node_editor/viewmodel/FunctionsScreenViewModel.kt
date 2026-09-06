@@ -307,7 +307,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     override fun onUpsertConnector(connector: Connector, worldPosition: Offset) {
         if (connector.nodeId !in nodes.value.map { it.id }) return
         connectorPositions[connector] = worldPosition
-        _connectors.value = _connectors.value.add(connector)
+        _connectors.value = _connectors.value.adding(connector)
         val isDraggingOutput =
             _draggingConnector.value != null && connector.type == ConnectorType.OUTPUT
         val isInput = connector.type == ConnectorType.INPUT
@@ -324,7 +324,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     override fun onDropConnector(connector: Connector?) {
         val from = _draggingConnector.value
         if (from != null && connector != null && validConnection(from, connector)) {
-            _edges.value = _edges.value.add(Edge(from, connector))
+            _edges.value = _edges.value.adding(Edge(from, connector))
         }
         _draggingConnector.value = null
 
@@ -394,7 +394,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             nodeId = id,
             configuration = emptyList(),
         )
-        _nodes.value = _nodes.value.add(node)
+        _nodes.value = _nodes.value.adding(node)
         return true
     }
 
@@ -405,7 +405,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             featurePathMap = featurePathMap,
             dependentFeatureIds = dependentFeatureIds
         )
-        _nodes.value = _nodes.value.add(newNode)
+        _nodes.value = _nodes.value.adding(newNode)
 
         return true
     }
@@ -417,7 +417,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             script = "",
             configuration = emptyMap()
         )
-        _nodes.value = _nodes.value.add(newNode)
+        _nodes.value = _nodes.value.adding(newNode)
 
         return true
     }
@@ -428,15 +428,15 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     override fun onDeleteNode(node: Node) {
-        _nodes.value = _nodes.value.removeAll { it.id == node.id }
+        _nodes.value = _nodes.value.removingAll { it.id == node.id }
         val removedConnectors = mutableSetOf<Connector>()
-        _connectors.value = _connectors.value.removeAll { connector ->
+        _connectors.value = _connectors.value.removingAll { connector ->
             (connector.nodeId == node.id).also { if (it) removedConnectors.add(connector) }
         }
         _edges.value =
-            _edges.value.removeAll { it.from in removedConnectors || it.to in removedConnectors }
+            _edges.value.removingAll { it.from in removedConnectors || it.to in removedConnectors }
         // Also remove the node bounds
-        _nodeBounds.value = _nodeBounds.value.removeAll { it.nodeId == node.id }
+        _nodeBounds.value = _nodeBounds.value.removingAll { it.nodeId == node.id }
     }
 
     override fun getWorldPosition(node: Node): Offset? {
@@ -459,7 +459,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     override fun onDeleteSelectedEdge() {
         val selected = _selectedEdge.value
         if (selected != null) {
-            _edges.value = _edges.value.remove(selected)
+            _edges.value = _edges.value.removing(selected)
             _selectedEdge.value = null
         }
     }

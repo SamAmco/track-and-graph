@@ -110,7 +110,7 @@ class BarChartDataFactoryTest {
 
         //VERIFY
         assertEquals(1, viewData.bars.size)
-        assertEquals(1.5, viewData.yMax.toDouble(), 0.0001)
+        assertEquals(1.5, viewData.yMax, 0.0001)
         assertEquals(true, dataSampledCalled)
     }
 
@@ -366,10 +366,10 @@ class BarChartDataFactoryTest {
         assertEquals(endOfDay.minusDays(30), barData.dates.first())
         assertEquals(endOfDay, barData.dates.last())
         assertEquals(31, values.size)
-        assertEquals(3.0, values.first().toDouble(), 0.0001)
-        assertEquals(2.0, values[29].toDouble(), 0.0001)
-        assertEquals(1.0, values.last().toDouble(), 0.0001)
-        assertEquals(3.0, barData.yMax.toDouble(), 0.0001)
+        assertEquals(3.0, values.first(), 0.0001)
+        assertEquals(2.0, values[29], 0.0001)
+        assertEquals(1.0, values.last(), 0.0001)
+        assertEquals(3.0, barData.yMax, 0.0001)
     }
 
     @Test
@@ -630,7 +630,7 @@ class BarChartDataFactoryTest {
             assertEquals(
                 "Bar at index $index (date: ${barData.dates[index]}) should have value 1.0",
                 1.0,
-                value.toDouble(),
+                value,
                 0.0001
             )
         }

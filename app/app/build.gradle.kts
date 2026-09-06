@@ -235,6 +235,7 @@ dependencies {
     //Testing
     testImplementation(libs.threetenbp)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlin.reflect)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)

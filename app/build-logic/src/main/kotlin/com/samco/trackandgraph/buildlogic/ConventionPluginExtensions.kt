@@ -14,7 +14,6 @@ internal fun Project.configureCommonKotlin() {
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
-            freeCompilerArgs.add("-Xannotation-default-target=param-property")
         }
     }
 }

@@ -426,7 +426,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
             storedTrackers.first { it.id == id }
         }
         whenever(dao.insertDataPoints(any())).thenAnswer {
-            allInsertedDataPoints.addAll(it.arguments[0] as List<DataPoint>)
+            allInsertedDataPoints.addAll(it.getArgument(0))
         }
 
         //EXECUTE

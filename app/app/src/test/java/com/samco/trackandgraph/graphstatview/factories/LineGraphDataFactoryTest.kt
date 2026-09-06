@@ -138,13 +138,14 @@ class LineGraphDataFactoryTest {
 
         assertEquals(1, lineGraphViewData.lines.size)
         val line = lineGraphViewData.lines[0]
-        assertEquals(10, line.line?.size())
+        val series = requireNotNull(line.line)
+        assertEquals(10, series.size())
 
         val startEpochMilli = now.minusDays(109L).toInstant().toEpochMilli()
         val end = now.minusDays(100L)
         val endEpochMilli = end.toInstant().toEpochMilli()
         val expected = endEpochMilli - startEpochMilli
-        val actual = line.line!!.getX(9).toLong() - line.line!!.getX(0).toLong()
+        val actual = series.getX(9).toLong() - series.getX(0).toLong()
 
         assertEquals(expected, actual)
 

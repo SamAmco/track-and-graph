@@ -369,8 +369,8 @@ class LuaGraphDataFactoryTest {
         assertEquals(1.0, barChart.bars[1].values[1])
         assertEquals(ViewColorSpec.ColorIndex(7), barChart.bars[1].color)
         assertEquals(2, barChart.xDates.size)
-        assertEquals(0.0, barChart.yMin.toDouble())
-        assertEquals(10.0, barChart.yMax.toDouble())
+        assertEquals(0.0, barChart.yMin)
+        assertEquals(10.0, barChart.yMax)
         assertEquals(6, barChart.yAxisSubdivides)
         assertEquals(Period.ofDays(2), barChart.barPeriod)
         assertEquals(false, barChart.durationBasedRange)
@@ -460,11 +460,11 @@ class LuaGraphDataFactoryTest {
         assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[3].values.indices.map { it.toDouble() })
         assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[4].values.indices.map { it.toDouble() })
 
-        assertEquals(listOf(5.0, 0.0, 0.0, 0.0, 0.0), barChart.bars[0].values.map { it.toDouble() })
-        assertEquals(listOf(0.0, 4.0, 0.0, 0.0, 0.0), barChart.bars[1].values.map { it.toDouble() })
-        assertEquals(listOf(0.0, 0.0, 3.0, 0.0, 0.0), barChart.bars[2].values.map { it.toDouble() })
-        assertEquals(listOf(0.0, 0.0, 0.0, 2.0, 0.0), barChart.bars[3].values.map { it.toDouble() })
-        assertEquals(listOf(0.0, 0.0, 0.0, 0.0, 1.0), barChart.bars[4].values.map { it.toDouble() })
+        assertEquals(listOf(5.0, 0.0, 0.0, 0.0, 0.0), barChart.bars[0].values)
+        assertEquals(listOf(0.0, 4.0, 0.0, 0.0, 0.0), barChart.bars[1].values)
+        assertEquals(listOf(0.0, 0.0, 3.0, 0.0, 0.0), barChart.bars[2].values)
+        assertEquals(listOf(0.0, 0.0, 0.0, 2.0, 0.0), barChart.bars[3].values)
+        assertEquals(listOf(0.0, 0.0, 0.0, 0.0, 1.0), barChart.bars[4].values)
 
         assertEquals(listOf("C", "C", "B", "A", ""), barChart.bars.map { it.label })
 
