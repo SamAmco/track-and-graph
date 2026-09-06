@@ -194,6 +194,7 @@ fun Reminder(
 fun LoadingReminder(
     name: String,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) = Surface(
     modifier = modifier
         .fillMaxWidth()
@@ -204,6 +205,9 @@ fun LoadingReminder(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .let {
+                if (onClick != null) it.clickable(onClick = onClick) else it
+            }
             .padding(cardPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,

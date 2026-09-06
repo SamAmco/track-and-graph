@@ -223,12 +223,12 @@ including next-scheduled calculation and the time-since-last data sample. Both s
 it so scheduling presentation stays identical.
 
 Grouped reminders are included as `GroupGraphItem.ReminderNode` values, so group search indexes
-their names. Reminder search entries deliberately have no `ResolvedPath`: tapping a reminder edits
-it in place rather than navigating, and reminders cannot be symlinked, so neither direct navigation
-nor path disambiguation consumes one. Search keeps the node structural until it has ranked a query,
-then progressively builds and caches `ReminderViewData` through the same factory. It renders the
-normal reminder card without context-menu actions; tapping the card opens the shared reminder
-editor over the search screen, preserving the active query and results.
+their names and resolves every descent to their grouped placement. Tapping a reminder navigates to
+it in the group hierarchy just like other search results. A reminder cannot itself be symlinked,
+but symlinked ancestor groups can still produce multiple paths and the normal disambiguation dialog
+handles that case. Search keeps the node structural until it has ranked a query, then progressively
+builds and caches `ReminderViewData` through the same factory. Both the loading placeholder and the
+loaded reminder card can navigate because their paths are available before enrichment completes.
 
 `DataUpdateType.Reminder(reminderId)` identifies the affected entity. All reminder mutation paths
 must emit the real ID, including one event per reminder removed by recursive group deletion. This

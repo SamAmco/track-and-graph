@@ -28,7 +28,7 @@ keywords: [search, GroupSearchViewModel, SearchResultProcessor, SearchResultCach
 
 `GroupSearchViewModelImpl` builds a flat `List<SearchableItem>` lazily — only when `showSearch()` is called. The group graph is fetched from the DB, the tree is walked once, and each node becomes a `SearchableItem` with pre-extracted name/description strings, a pre-computed `List<ResolvedPath>` (see below), and the `GroupGraphItem` needed for rendering/fetching display data later. This structural pass is synchronous once the graph has been fetched: it must not calculate tracker, graph, or reminder card data. On `hideSearch()` the list is cleared and the processor cache is disposed.
 
-The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<ResolvedPath>)`. `child.groupItemId` is the list key (see [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys). `paths` is consumed by the tap handler for navigable component types — see "Tapping a result" below. Reminder results use an empty path list because their tap action opens the editor instead.
+The UI-facing output is `SearchResultItem(child: GroupChild, paths: List<ResolvedPath>)`. `child.groupItemId` is the list key (see [group-hierarchy.md](group-hierarchy.md) for why entity IDs cannot be used as unique keys). `paths` is consumed by the common tap handler for every component type, including reminders — see "Tapping a result" below.
 
 ## Chronological Filter Search
 
@@ -246,7 +246,7 @@ Two things worth understanding:
 
 ## Tapping a result — deep-link navigation with disambiguation
 
-Each card in `SearchResultsGrid` is rendered with `onClick = { onResultClick(item) }` and `contextMenuCallbacks = null` (no menu icon on search result cards). Tracker loading placeholders also get the tap-to-navigate handler because `SearchResultItem.paths` is available before the `DisplayTracker` is fetched. Loaded tracker cards additionally get `onAdd` / `onPlayTimer` / `onStopTimer` wired through from `SearchScreen`'s params — the same lambdas `GroupScreen` uses, hoisted to the outer level so the `AddDataPointsDialog` persists across search open/close. See [card-composables.md](card-composables.md) for the shared card API and why the tracker-action slots sit outside the context-menu object.
+Each card in `SearchResultsGrid` is rendered with `onClick = { onResultClick(item) }` and no context-menu actions. Tracker and reminder loading placeholders also get the tap-to-navigate handler because `SearchResultItem.paths` is available before their display data is fetched. Loaded tracker cards additionally get `onAdd` / `onPlayTimer` / `onStopTimer` wired through from `SearchScreen`'s params — the same lambdas `GroupScreen` uses, hoisted to the outer level so the `AddDataPointsDialog` persists across search open/close. See [card-composables.md](card-composables.md) for the shared card API and why the tracker-action slots sit outside the context-menu object.
 
 The handler lives in `SearchScreen`:
 
@@ -254,12 +254,11 @@ The handler lives in `SearchScreen`:
 - `item.paths.size > 1` — set a `disambiguation: SearchResultItem?` state to the item. `SymlinksDialogContent` then renders with `onPathClick = { i -> navigate(item.paths[i].descent) }` — the dialog doubles as a "pick which placement" picker.
 - `item.paths.size == 0` — no-op. Shouldn't happen in practice (every indexed component was reached by the graph walk) but we're defensive rather than crashing.
 
-Reminder cards do not use the path-navigation handler. Tapping one opens the outer
-`AddReminderDialog` without closing search, so dismissing the editor returns to the same query and
-results. They are therefore excluded from `buildResolvedPaths`; resolving path display names would
-be unused work, and reminders cannot require symlink disambiguation. The dialog remains outside the
-search/content branch so it can overlay either the normal group content or search results without
-changing either screen's state.
+Reminder cards use the same path-navigation handler as other component cards. Although a reminder
+has only one grouped placement, its owning group may be symlinked beneath multiple ancestors, so a
+reminder can still have multiple resolved descents and require the same disambiguation dialog. Both
+loaded reminder cards and their loading placeholders are navigable; the path is structural data and
+does not depend on reminder display-data enrichment finishing.
 
 The navigator is read from `LocalDeepLinkNavigator.current`. No navigation callback is threaded through `GroupScreen`. See [deep-link-navigation.md](deep-link-navigation.md) for the full pipeline.
 

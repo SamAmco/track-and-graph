@@ -180,7 +180,6 @@ fun GroupScreen(
             onTrackerAdd = onTrackerAdd,
             onTrackerPlayTimer = onTrackerPlayTimer,
             onTrackerStopTimer = onTrackerStopTimer,
-            onReminderEdit = { editReminderId = it },
         )
     } else {
         GroupTopBarContent(

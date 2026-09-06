@@ -87,9 +87,9 @@ interface GroupSearchViewModel {
     fun hideSearch()
 }
 
-private enum class ComponentType { GROUP, TRACKER, GRAPH, FUNCTION, REMINDER }
+internal enum class ComponentType { GROUP, TRACKER, GRAPH, FUNCTION, REMINDER }
 
-private data class ComponentKey(val type: ComponentType, val id: Long)
+internal data class ComponentKey(val type: ComponentType, val id: Long)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -231,7 +231,7 @@ class GroupSearchViewModelImpl @Inject constructor(
      * component. Paths are descent-relative: the current group is the anchor and is not
      * included in [ResolvedPath.descent] or [ResolvedPath.displayString].
      */
-    private fun buildResolvedPaths(graph: GroupGraph): Map<ComponentKey, List<ResolvedPath>> {
+    internal fun buildResolvedPaths(graph: GroupGraph): Map<ComponentKey, List<ResolvedPath>> {
         val result = mutableMapOf<ComponentKey, MutableList<ResolvedPath>>()
         walkPaths(graph, emptyList(), emptyList(), result)
         return result.mapValues { (_, list) -> list.toList() }
@@ -289,7 +289,13 @@ class GroupSearchViewModelImpl @Inject constructor(
                             displayString = formatDisplay(groupNames + child.function.name),
                         ))
                 }
-                is GroupGraphItem.ReminderNode -> Unit
+                is GroupGraphItem.ReminderNode -> {
+                    result.getOrPut(ComponentKey(ComponentType.REMINDER, child.reminder.id)) { mutableListOf() }
+                        .add(ResolvedPath(
+                            descent = GroupDescentPath(groupIds = groupIds, groupItemId = child.groupItemId),
+                            displayString = formatDisplay(groupNames + child.reminder.reminderName),
+                        ))
+                }
             }
         }
     }
@@ -368,7 +374,7 @@ class GroupSearchViewModelImpl @Inject constructor(
                             name = child.reminder.reminderName,
                             description = null,
                             typeBonus = 0.0,
-                            paths = emptyList(),
+                            paths = pathsByComponent[key].orEmpty(),
                         ))
                     }
                 }

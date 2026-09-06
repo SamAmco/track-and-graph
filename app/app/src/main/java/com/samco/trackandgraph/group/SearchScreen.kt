@@ -69,7 +69,6 @@ fun SearchScreen(
     onTrackerAdd: (DisplayTracker, useDefault: Boolean) -> Unit,
     onTrackerPlayTimer: (DisplayTracker) -> Unit,
     onTrackerStopTimer: (DisplayTracker) -> Unit,
-    onReminderEdit: (Long) -> Unit,
 ) {
     BackHandler(onBack = onBack)
 
@@ -84,7 +83,6 @@ fun SearchScreen(
         onTrackerAdd = onTrackerAdd,
         onTrackerPlayTimer = onTrackerPlayTimer,
         onTrackerStopTimer = onTrackerStopTimer,
-        onReminderEdit = onReminderEdit,
     )
 }
 
@@ -123,7 +121,6 @@ private fun SearchScreenContent(
     onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
     onTrackerPlayTimer: (DisplayTracker) -> Unit,
     onTrackerStopTimer: (DisplayTracker) -> Unit,
-    onReminderEdit: (Long) -> Unit,
 ) {
     val state by searchViewModel.displayResults.collectAsStateWithLifecycle()
     val navigator = LocalDeepLinkNavigator.current
@@ -171,7 +168,6 @@ private fun SearchScreenContent(
                     onTrackerAdd = onTrackerAdd,
                     onTrackerPlayTimer = onTrackerPlayTimer,
                     onTrackerStopTimer = onTrackerStopTimer,
-                    onReminderEdit = onReminderEdit,
                 )
             }
         }
@@ -226,7 +222,6 @@ private fun SearchResultsGrid(
     onTrackerAdd: (DisplayTracker, Boolean) -> Unit,
     onTrackerPlayTimer: (DisplayTracker) -> Unit,
     onTrackerStopTimer: (DisplayTracker) -> Unit,
-    onReminderEdit: (Long) -> Unit,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val columnCount = (maxWidth / minColumnWidth).toInt().coerceAtLeast(2)
@@ -285,10 +280,13 @@ private fun SearchResultsGrid(
 
                     is GroupChild.ChildReminder -> Reminder(
                         reminderViewData = child.reminder,
-                        onEditClick = { onReminderEdit(child.id) },
+                        onEditClick = { onResultClick(item) },
                     )
 
-                    is GroupChild.ChildReminderLoading -> LoadingReminder(name = child.name)
+                    is GroupChild.ChildReminderLoading -> LoadingReminder(
+                        name = child.name,
+                        onClick = { onResultClick(item) },
+                    )
                 }
             }
         }
