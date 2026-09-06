@@ -200,11 +200,17 @@ The reminder scheduler deliberately isolates Android platform code behind an int
 
 ## UI projection and display ordering
 
-`RemindersScreenViewModel` queries all reminder entities and pairs each with its required null-group
-placement from `getDisplayIndicesForRemindersScreen()`. That placement supplies both the
-`groupItemId` used by delete/duplicate and the global display index. A grouped reminder's non-null
-placement is consumed separately by `GroupViewModel`, so dragging in either screen changes only
-that screen's order.
+`RemindersScreenViewModel` queries all reminder entities and pairs each with its null-group
+placement from `getDisplayIndicesForRemindersScreen()`. The placement list is authoritative for
+the screen: it supplies both the `groupItemId` used by delete/duplicate and the global display
+index. If the two separate reads observe inconsistent or malformed data, unmatched reminder
+entities and dangling placements are omitted instead of crashing the UI; a subsequent data update
+reloads the projection. Normal create and duplicate writes must still maintain the one-null-row
+invariant. Do not add a database migration solely to repair data produced by an unreleased
+development build.
+
+A grouped reminder's non-null placement is consumed separately by `GroupViewModel`, so dragging
+in either screen changes only that screen's order.
 
 The Reminders screen also resolves the current root `GroupGraph` and puts the first full component
 path on `ReminderViewData` for grouped reminders (for example,

@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
+import com.samco.trackandgraph.data.database.dto.GroupChildDisplayIndex
+import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderDisplayOrderData
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -68,6 +70,28 @@ interface RemindersScreenViewModel {
     fun onDragEnd()
 }
 
+internal data class ReminderScreenItem(
+    val reminder: Reminder,
+    val groupItemId: Long,
+)
+
+internal fun buildReminderScreenItems(
+    reminders: List<Reminder>,
+    globalIndices: List<GroupChildDisplayIndex>,
+): List<ReminderScreenItem> {
+    val placementByReminderId = globalIndices.associateBy { it.id }
+    return reminders.mapNotNull { reminder ->
+        placementByReminderId[reminder.id]?.let { placement ->
+            ReminderScreenItem(
+                reminder = reminder,
+                groupItemId = placement.groupItemId,
+            ) to placement.displayIndex
+        }
+    }
+        .sortedBy { (_, displayIndex) -> displayIndex }
+        .map { (item, _) -> item }
+}
+
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class RemindersScreenViewModelImpl @Inject constructor(
@@ -88,8 +112,6 @@ class RemindersScreenViewModelImpl @Inject constructor(
     private val temporaryReminders = MutableStateFlow<List<ReminderViewData>>(emptyList())
 
     // Observable pattern: listen for reminder updates and reload data.
-    // Display indices are fetched in the same flatMapLatest block as the reminder list so that
-    // the sorted result is always consistent — there is no race between two separate flows.
     @OptIn(FlowPreview::class)
     private val allReminders: StateFlow<LoadingState> =
         merge(
@@ -112,20 +134,16 @@ class RemindersScreenViewModelImpl @Inject constructor(
                     val reminders = dataInteractor.getAllRemindersSync()
                     val globalIndices = dataInteractor.getDisplayIndicesForRemindersScreen()
                     val pathProvider = ComponentPathProvider(dataInteractor.getGroupGraphSync())
-                    val groupItemIdByReminderId = globalIndices.associate { it.id to it.groupItemId }
-                    val displayIndexByReminderId = globalIndices.associate { it.id to it.displayIndex }
-                    val viewData = reminders.map { reminder ->
+                    val viewData = buildReminderScreenItems(reminders, globalIndices).map { item ->
                         reminderViewDataFactory.create(
-                            reminder,
-                            checkNotNull(groupItemIdByReminderId[reminder.id]) {
-                                "Reminder ${reminder.id} has no GroupItem placement"
-                            },
+                            item.reminder,
+                            item.groupItemId,
                             path = pathProvider
-                                .getAllPathsForReminder(reminder.id)
+                                .getAllPathsForReminder(item.reminder.id)
                                 .firstOrNull(),
                         )
                     }
-                    emit(LoadingState.Loaded(viewData.sortedBy { displayIndexByReminderId[it.id] ?: Int.MAX_VALUE }))
+                    emit(LoadingState.Loaded(viewData))
                 }
             }
             .flowOn(io)
