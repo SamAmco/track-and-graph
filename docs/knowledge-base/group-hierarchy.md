@@ -71,6 +71,12 @@ Each `GroupGraphItem` node carries a `groupItemId` — the globally unique place
 
 For **deep-link navigation** (tapping a search result, an entry in the symlinks dialog, etc.), paths are resolved **client-side** by walking the `GroupGraph` in the caller's context, then handed to `DeepLinkNavigator` as a `GroupDescentPath` (anchored at the caller's current group, not at root). See [deep-link-navigation.md](deep-link-navigation.md) for why this is not a data-layer call.
 
+A reminder is never symlinked directly and has at most one non-null `GroupItem`, but it can still
+have multiple resolved paths because its owning group may have multiple parent placements. Every
+such path lands in the same owning group; choosing a path changes only the descent/back stack used
+to reach it. A reminder notification deep link may therefore select the first valid path rather
+than presenting component-location disambiguation.
+
 For **display-path strings** (dropdowns, selectors, symlinks dialog), there are two path provider classes (both in `app/app/.../util/`), each walking the `GroupGraph` but serving different purposes:
 
 **`FeaturePathProvider`** — for display in dropdowns and selectors where a single string per item is needed:

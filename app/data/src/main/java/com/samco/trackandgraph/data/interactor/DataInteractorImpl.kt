@@ -625,6 +625,12 @@ internal class DataInteractorImpl @Inject constructor(
         val existingItem = groupItemDao.getGroupItemById(request.groupItemId)
             ?: return@withContext
 
+        if (existingItem.type == GroupItemType.REMINDER) {
+            requireNotNull(existingItem.groupId) {
+                "The global reminder placement cannot be moved"
+            }
+        }
+
         if (existingItem.groupId == request.toGroupId) return@withContext
 
         if (existingItem.type == GroupItemType.GROUP) {

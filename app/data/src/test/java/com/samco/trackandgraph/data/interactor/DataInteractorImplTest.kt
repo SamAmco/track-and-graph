@@ -293,6 +293,68 @@ class DataInteractorImplTest {
     }
 
     @Test
+    fun `moveComponent moves only grouped reminder placement`() = runTest {
+        //PREPARE
+        val groupedPlacement = GroupItem(
+            id = 7L,
+            groupId = 1L,
+            childId = 100L,
+            type = GroupItemType.REMINDER,
+            displayIndex = 3,
+        )
+        whenever(groupItemDao.getGroupItemById(groupedPlacement.id))
+            .thenReturn(groupedPlacement)
+
+        //EXECUTE
+        uut.moveComponent(
+            MoveComponentRequest(
+                groupItemId = groupedPlacement.id,
+                toGroupId = 2L,
+            )
+        )
+
+        //VERIFY
+        verify(groupItemDao).deleteGroupItem(groupedPlacement.id)
+        verify(groupItemDao).shiftDisplayIndexesDown(2L)
+        verify(groupItemDao).insertGroupItem(
+            eq(
+                GroupItem(
+                    groupId = 2L,
+                    displayIndex = 0,
+                    childId = groupedPlacement.childId,
+                    type = GroupItemType.REMINDER,
+                )
+            )
+        )
+        verify(groupItemDao, never()).getGroupItemsForChild(
+            groupedPlacement.childId,
+            GroupItemType.REMINDER,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `moveComponent rejects moving global reminder placement`() = runTest {
+        //PREPARE
+        val globalPlacement = GroupItem(
+            id = 7L,
+            groupId = null,
+            childId = 100L,
+            type = GroupItemType.REMINDER,
+            displayIndex = 3,
+        )
+        whenever(groupItemDao.getGroupItemById(globalPlacement.id))
+            .thenReturn(globalPlacement)
+
+        //EXECUTE
+        uut.moveComponent(
+            MoveComponentRequest(
+                groupItemId = globalPlacement.id,
+                toGroupId = 2L,
+            )
+        )
+    }
+
+    @Test
     fun `createLineGraph emits graph created then display index after helper creates placement`() =
         runTest {
             //PREPARE

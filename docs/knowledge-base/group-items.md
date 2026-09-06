@@ -130,6 +130,10 @@ groupItemDao.deleteGroupItem(existing.id)
 // 3. Insert new entry in target group (uses standard insert flow above)
 ```
 
+For reminders, only the optional non-null placement may be moved. Moving it changes the reminder's
+single owning group while leaving its required null-group Reminders-screen placement and display
+index untouched. `DataInteractorImpl.moveComponent` rejects attempts to move the null placement.
+
 ### Delete Component from Group (Symlink Removal)
 
 ```kotlin

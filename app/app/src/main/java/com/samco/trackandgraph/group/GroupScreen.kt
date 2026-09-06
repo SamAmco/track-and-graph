@@ -787,6 +787,7 @@ private fun GroupGrid(
                                 onDeleteItem(item.groupItemId, DeleteType.REMINDER, true)
                             },
                             onDuplicate = { onDuplicateReminder(item.groupItemId) },
+                            onMove = { onMoveItem(item.groupItemId, emptySet()) },
                             isElevated = isDragging,
                         )
                     }
@@ -804,6 +805,7 @@ private fun ReorderableCollectionItemScope.ReminderItem(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onDuplicate: () -> Unit,
+    onMove: () -> Unit,
     isElevated: Boolean,
 ) = Reminder(
     modifier = Modifier.longPressDraggableHandle(),
@@ -812,6 +814,7 @@ private fun ReorderableCollectionItemScope.ReminderItem(
     onEditClick = onEdit,
     onDeleteClick = onDelete,
     onDuplicateClick = onDuplicate,
+    onMoveClick = onMove,
 )
 
 @Composable

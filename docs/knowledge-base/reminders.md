@@ -37,6 +37,11 @@ dedicated **Reminders screen**. A grouped reminder has one additional non-null `
 independently represents its position in that group's component grid. It may not have a second
 non-null placement.
 
+This single non-null placement identifies one owning group, but it does not guarantee that the
+reminder has only one path through the overall hierarchy. The owning group itself may appear below
+multiple parents, so path-based navigation can discover multiple descents to the same reminder.
+See [group-hierarchy.md](group-hierarchy.md#groupgraph-and-path-resolution).
+
 Unlike other component types, reminders cannot be symlinked. The Add Symlink picker excludes them,
 and `GroupHelperImpl.createSymlink` rejects `GroupChildType.REMINDER` as a data-layer invariant.
 The generic GroupItem schema does not enforce the cardinality itself; reminder creation and
@@ -185,7 +190,9 @@ that screen's order.
 through `getRemindersForGroupSync(groupId)`, which reads the typed reminder placements and fetches
 only those reminder entities; do not load every global reminder and filter them in the ViewModel.
 Reminder cards span two grid columns in group and search results, participate in the group's shared
-drag order, and support edit, duplicate, and delete. They do not offer move or symlink actions.
+drag order, and support edit, duplicate, delete, and moving their grouped placement to another
+group. The Reminders-screen card does not offer moving because its required null-group placement
+cannot be moved. Reminder cards never offer symlink actions.
 
 `ReminderViewDataFactory` owns the shared conversion from the stored DTO to `ReminderViewData`,
 including next-scheduled calculation and the time-since-last data sample. Both screen ViewModels use

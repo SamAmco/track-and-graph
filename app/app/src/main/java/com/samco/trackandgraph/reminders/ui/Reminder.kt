@@ -74,6 +74,7 @@ fun Reminder(
     onEditClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
     onDuplicateClick: (() -> Unit)? = null,
+    onMoveClick: (() -> Unit)? = null,
 ) = Surface(
     modifier = modifier
         .fillMaxWidth()
@@ -154,12 +155,18 @@ fun Reminder(
             )
         }
 
-        if (onEditClick != null || onDeleteClick != null || onDuplicateClick != null) {
+        if (
+            onEditClick != null ||
+            onDeleteClick != null ||
+            onDuplicateClick != null ||
+            onMoveClick != null
+        ) {
             ReminderMenuButton(
                 modifier = Modifier.align(Alignment.TopEnd),
                 onEditClick = onEditClick ?: {},
                 onDeleteClick = onDeleteClick ?: {},
                 onDuplicateClick = onDuplicateClick ?: {},
+                onMoveClick = onMoveClick,
             )
         }
     }
@@ -204,6 +211,7 @@ private fun ReminderMenuButton(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDuplicateClick: () -> Unit,
+    onMoveClick: (() -> Unit)?,
 ) {
     var showContextMenu by remember { mutableStateOf(false) }
 
@@ -240,6 +248,15 @@ private fun ReminderMenuButton(
                     onDuplicateClick()
                 }
             )
+            if (onMoveClick != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.move_to)) },
+                    onClick = {
+                        showContextMenu = false
+                        onMoveClick()
+                    }
+                )
+            }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.delete)) },
                 onClick = {
