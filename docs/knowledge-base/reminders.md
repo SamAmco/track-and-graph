@@ -117,6 +117,13 @@ A disabled reminder is retained as normal data and remains visible and editable.
 
 Configuration screens thread the same state through each reminder-type ViewModel. New/reset configurations default to enabled, while editing restores the serialized value. The enable checkbox is colocated with the reminder-name field; the animated disabled label is presentation-only and must not become the source of truth.
 
+The create-flow type selector initially omits Time Since Last while `hasAnyFeatures()` runs in the
+background, then adds the tile when the result becomes true. Functions and trackers are both valid
+features for this reminder type, so the eligibility check is intentionally broader than
+`hasAtLeastOneTracker()`. Because the selector is a retained Navigation 3 entry, its async boolean
+must cross the entry-provider boundary as observable Compose state; see
+[dialogs.md](dialogs.md#dialog-navigation).
+
 ## Delete Behavior
 
 Deletion accepts `ComponentDeleteRequest` for API consistency, but reminders do not use its

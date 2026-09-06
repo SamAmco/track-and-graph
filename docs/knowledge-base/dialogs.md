@@ -52,6 +52,14 @@ For a multi-destination dialog that should retain in-progress state across confi
 
 Apply the same decorators to nested navigation flows whose individual forms own ViewModels. Popping a nested form entry should destroy that form's ViewModel, so returning to the selector and choosing the same form starts fresh. Closing the outer session destroys the nested stores as part of its ownership tree.
 
+Navigation entries may retain the content lambda created by `entryProvider`; recomposing the host
+with a new plain parameter does not guarantee that an already-decorated entry receives the new
+captured value. For asynchronous state that must update an existing destination, create a stable
+`State` with `rememberUpdatedState` outside the entry provider, capture that state in the entry, and
+read `.value` inside the destination's composition. The Add Reminder type selector uses this for
+the background `hasAnyFeatures()` result; passing the initial boolean directly leaves the Time
+Since Last tile permanently hidden when the entry was first built with `false`.
+
 If a standalone dialog needs one ViewModel scope but has no actual navigation, do not invent a one-entry `NavDisplay`. With Lifecycle 2.11+, conditionally compose `rememberViewModelStoreOwner()` at the dialog boundary and provide it through `LocalViewModelStoreOwner`. This purpose-built owner survives configuration changes, inherits the parent's ViewModel factory/creation extras for Hilt, and clears automatically when the visible dialog branch permanently leaves composition. Real nested navigation inside that dialog should still use navigation-entry decorators for its individual form lifetimes.
 
 Do not compensate for screen-owned form ViewModels by registering child `reset()` callbacks with the dialog host. That approach is manual lifecycle emulation, is easy to miss on a Back path, and makes the host aware of child implementation details. Scope each form to the navigation entry that represents its lifetime instead.

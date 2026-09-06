@@ -18,6 +18,8 @@
 package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -56,6 +58,7 @@ fun AddReminderDialogContent(
     hasAnyFeatures: Boolean = false,
 ) {
     val navBackStack = rememberNavBackStack(ReminderDialogNavKey.ReminderTypeSelection)
+    val currentHasAnyFeatures = rememberUpdatedState(hasAnyFeatures)
 
     val entries = rememberDecoratedNavEntries(
         backStack = navBackStack,
@@ -69,7 +72,7 @@ fun AddReminderDialogContent(
                 onConfirm = onConfirm,
                 onDismiss = onDismiss,
                 onNavigate = navBackStack::add,
-                hasAnyFeatures = hasAnyFeatures,
+                hasAnyFeatures = currentHasAnyFeatures,
             )
         },
     )
@@ -97,7 +100,7 @@ private fun reminderDialogEntry(
     onConfirm: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
     onNavigate: (ReminderDialogNavKey) -> Unit,
-    hasAnyFeatures: Boolean,
+    hasAnyFeatures: State<Boolean>,
 ): NavEntry<NavKey> = when (navKey) {
     is ReminderDialogNavKey.ReminderTypeSelection -> NavEntry(navKey) {
         ReminderTypeSelectionDestination(
@@ -137,7 +140,7 @@ private fun reminderDialogEntry(
 private fun ReminderTypeSelectionDestination(
     onNavigate: (ReminderDialogNavKey) -> Unit,
     onDismiss: () -> Unit,
-    hasAnyFeatures: Boolean,
+    hasAnyFeatures: State<Boolean>,
 ) {
     ReminderTypeSelectionScreen(
         onWeekDayReminderSelected = {
@@ -153,6 +156,6 @@ private fun ReminderTypeSelectionDestination(
             onNavigate(ReminderDialogNavKey.TimeSinceLastReminderConfiguration)
         },
         onDismiss = onDismiss,
-        hasAnyFeatures = hasAnyFeatures,
+        hasAnyFeatures = hasAnyFeatures.value,
     )
 }
