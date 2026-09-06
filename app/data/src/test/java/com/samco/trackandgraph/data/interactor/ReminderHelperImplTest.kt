@@ -572,6 +572,92 @@ class ReminderHelperImplTest {
         }
 
     @Test
+    fun `moveReminderToGroup adds a grouped placement to a global reminder`() =
+        runTest(dispatcher) {
+            val created = uut.createReminder(
+                ReminderCreateRequest("Global", null, null, defaultParams)
+            )
+
+            uut.moveReminderToGroup(created.componentId, toGroupId = 42L)
+
+            val placements = fakeGroupItemDao.getGroupItemsForChild(
+                created.componentId,
+                GroupItemType.REMINDER,
+            )
+            assertEquals(2, placements.size)
+            assertEquals(1, placements.count { it.groupId == null })
+            assertEquals(1, placements.count { it.groupId == 42L })
+        }
+
+    @Test
+    fun `moveReminderToGroup relocates the grouped placement and preserves the global placement`() =
+        runTest(dispatcher) {
+            val created = uut.createReminder(
+                ReminderCreateRequest("Grouped", 41L, null, defaultParams)
+            )
+            val globalPlacementId = fakeGroupItemDao
+                .getGroupItemsForChild(created.componentId, GroupItemType.REMINDER)
+                .single { it.groupId == null }
+                .id
+
+            uut.moveReminderToGroup(created.componentId, toGroupId = 42L)
+
+            val placements = fakeGroupItemDao.getGroupItemsForChild(
+                created.componentId,
+                GroupItemType.REMINDER,
+            )
+            assertEquals(2, placements.size)
+            assertEquals(globalPlacementId, placements.single { it.groupId == null }.id)
+            assertEquals(1, placements.count { it.groupId == 42L })
+            assertTrue(placements.none { it.groupId == 41L })
+        }
+
+    @Test
+    fun `moveReminderToGroup does not require a global placement`() = runTest(dispatcher) {
+        val reminderId = 7L
+        fakeGroupItemDao.insertGroupItem(
+            GroupItem(
+                groupId = 41L,
+                displayIndex = 0,
+                childId = reminderId,
+                type = GroupItemType.REMINDER,
+            )
+        )
+
+        uut.moveReminderToGroup(reminderId, toGroupId = 42L)
+
+        val placements = fakeGroupItemDao.getGroupItemsForChild(
+            reminderId,
+            GroupItemType.REMINDER,
+        )
+        assertEquals(1, placements.size)
+        assertEquals(42L, placements.single().groupId)
+    }
+
+    @Test
+    fun `moveReminderToGroup repairs multiple grouped placements`() = runTest(dispatcher) {
+        val reminderId = 7L
+        listOf(41L, 43L).forEach { groupId ->
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = groupId,
+                    displayIndex = 0,
+                    childId = reminderId,
+                    type = GroupItemType.REMINDER,
+                )
+            )
+        }
+
+        uut.moveReminderToGroup(reminderId, toGroupId = 42L)
+
+        val groupedPlacements = fakeGroupItemDao
+            .getGroupItemsForChild(reminderId, GroupItemType.REMINDER)
+            .filter { it.groupId != null }
+        assertEquals(1, groupedPlacements.size)
+        assertEquals(42L, groupedPlacements.single().groupId)
+    }
+
+    @Test
     fun `getRemindersForGroupSync returns only reminders in requested group`() =
         runTest(dispatcher) {
             uut.createReminder(ReminderCreateRequest("Global", null, null, defaultParams))

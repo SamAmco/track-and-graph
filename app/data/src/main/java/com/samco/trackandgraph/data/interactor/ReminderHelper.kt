@@ -60,6 +60,9 @@ interface ReminderHelper {
 
     suspend fun duplicateReminder(groupItemId: Long): CreatedComponent
 
+    /** Creates or relocates the reminder's optional grouped placement. */
+    suspend fun moveReminderToGroup(reminderId: Long, toGroupId: Long)
+
     suspend fun hasAnyReminders(): Boolean
 
     /**

@@ -132,7 +132,10 @@ groupItemDao.deleteGroupItem(existing.id)
 
 For reminders, only the optional non-null placement may be moved. Moving it changes the reminder's
 single owning group while leaving its required null-group Reminders-screen placement and display
-index untouched. `DataInteractorImpl.moveComponent` rejects attempts to move the null placement.
+index untouched. The generic `moveComponent` operation still rejects attempts to move the null
+placement. A move initiated from the global Reminders screen is a distinct reminder-specific
+operation: it uses the reminder ID to create or relocate the optional grouped placement and never
+changes the null row.
 
 ### Delete Component from Group (Symlink Removal)
 

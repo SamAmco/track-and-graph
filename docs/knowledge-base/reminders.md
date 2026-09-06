@@ -8,10 +8,11 @@ topics:
   - Disabled reminders remain stored and visible but cancel/skip notification scheduling
   - Delete: always deletes the reminder and every placement, regardless of deleteEverywhere
   - Duplicate: reproduces both placements and inserts after the original independently in each list
+  - Move from global: creates or relocates the optional grouped placement without moving the global row
   - Reminders-screen cards show the first resolved component path when grouped
   - Scheduling: PlatformScheduler interface isolates Android AlarmManager (KMP pattern)
   - PITFALL: RemindersScreenViewModel dbDisplayIndices MUST react to DataUpdateType.Reminder or new reminders fall to bottom
-keywords: [reminder, groupless, null, component-path, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
+keywords: [reminder, groupless, null, component-path, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, move, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
 ---
 
 # Reminders
@@ -180,6 +181,18 @@ for (placement in existingPlacements) {
 }
 ```
 
+### Move Reminder to Group
+
+The global Reminders-screen card offers **Move to** even though its null-group placement is never
+moved. `moveReminderToGroup(reminderId, toGroupId)` instead creates the reminder's optional grouped
+placement when it has none, or relocates the existing grouped placement. This lets reminders that
+predate grouped reminders be assigned to a group while preserving their independent global order.
+The operation does not require the unrelated null placement to exist. If malformed data contains
+multiple grouped placements, it replaces them with one destination placement, restoring the
+single-group invariant rather than throwing because the invariant was already broken.
+Group-screen cards continue to move their concrete non-null placement through the generic
+`moveComponent` operation.
+
 ### Query Reminders-screen Placements
 
 ```kotlin
@@ -228,8 +241,9 @@ through `getRemindersForGroupSync(groupId)`, which reads the typed reminder plac
 only those reminder entities; do not load every global reminder and filter them in the ViewModel.
 Reminder cards span two grid columns in group and search results, participate in the group's shared
 drag order, and support edit, duplicate, delete, and moving their grouped placement to another
-group. The Reminders-screen card does not offer moving because its required null-group placement
-cannot be moved. Reminder cards never offer symlink actions.
+group. The Reminders-screen card also offers moving, but uses the reminder-specific operation that
+creates or relocates the optional grouped placement without touching the required null placement.
+Reminder cards never offer symlink actions.
 
 `ReminderViewDataFactory` owns the shared conversion from the stored DTO to `ReminderViewData`,
 including next-scheduled calculation and the time-since-last data sample. Both screen ViewModels use

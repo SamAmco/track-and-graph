@@ -80,6 +80,14 @@ Each helper implementation starts with `groupItemDao.getGroupItemById(request.gr
 
 Search for `getGroupItemsForChild` in any `*HelperImpl` to see the multi-placement logic.
 
+### Invariant Enforcement
+
+Fail before performing a write when continuing would create or compound invalid database state.
+Do not crash merely because a read or mutation encounters an invariant that is already broken. If
+the operation can safely omit malformed data or restore the invariant unambiguously, do that
+instead. In other words, assertions guard the database from corruption; they are not a substitute
+for handling corruption that already exists.
+
 ### Duplicate Pattern
 
 All duplicate operations take `groupItemId` as placement identity — callers never need the underlying component ID. The helper methods return `CreatedComponent(componentId, groupItemId)` — the same DTO used by create methods — so `DataInteractorImpl` can emit events using the *newly created* GroupItem rather than redundantly re-fetching the original.

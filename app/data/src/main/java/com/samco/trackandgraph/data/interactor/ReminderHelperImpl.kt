@@ -213,6 +213,31 @@ internal class ReminderHelperImpl @Inject constructor(
         }
     }
 
+    override suspend fun moveReminderToGroup(reminderId: Long, toGroupId: Long) = withContext(io) {
+        transactionHelper.withTransaction {
+            val placements = groupItemDao.getGroupItemsForChild(
+                reminderId,
+                GroupItemType.REMINDER,
+            )
+            val groupedPlacements = placements.filter { it.groupId != null }
+            if (groupedPlacements.size == 1 && groupedPlacements.single().groupId == toGroupId) {
+                return@withTransaction
+            }
+
+            groupedPlacements.forEach { groupItemDao.deleteGroupItem(it.id) }
+            groupItemDao.shiftDisplayIndexesDown(toGroupId)
+            groupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = toGroupId,
+                    displayIndex = 0,
+                    childId = reminderId,
+                    type = GroupItemType.REMINDER,
+                    createdAt = System.currentTimeMillis(),
+                )
+            )
+        }
+    }
+
     override suspend fun hasAnyReminders(): Boolean = withContext(io) {
         reminderDao.hasAnyReminders()
     }

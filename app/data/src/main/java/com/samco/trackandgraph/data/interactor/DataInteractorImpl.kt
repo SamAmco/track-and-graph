@@ -322,6 +322,12 @@ internal class DataInteractorImpl @Inject constructor(
             }
         }
 
+    override suspend fun moveReminderToGroup(reminderId: Long, toGroupId: Long) = withContext(io) {
+        reminderHelper.moveReminderToGroup(reminderId, toGroupId)
+        dataUpdateEvents.emit(DataUpdateType.Reminder(reminderId))
+        dataUpdateEvents.emit(DataUpdateType.DisplayIndex(toGroupId))
+    }
+
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {
         dao.deleteDataPoint(dataPoint.toEntity())
         dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoint.featureId))

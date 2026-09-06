@@ -54,6 +54,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
 import com.samco.trackandgraph.ui.compose.appbar.LocalTopBarController
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -76,6 +78,7 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
     val isLoading by viewModel.loading.collectAsState()
     var showAddReminderDialog by rememberSaveable(navArgs) { mutableStateOf(false) }
     var editReminderId by rememberSaveable(navArgs) { mutableStateOf<Long?>(null) }
+    var moveReminderId by rememberSaveable(navArgs) { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.scrollToTopEvents.receiveAsFlow().collect {
@@ -93,6 +96,7 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
         isLoading = isLoading,
         showAddReminderDialog = showAddReminderDialog,
         editReminderId = editReminderId,
+        moveReminderId = moveReminderId,
         lazyListState = viewModel.lazyListState,
         onEditReminder = {
             editReminderId = it
@@ -101,6 +105,12 @@ fun RemindersScreen(navArgs: RemindersNavKey) {
         onHideAddReminderDialog = { showAddReminderDialog = false },
         onDeleteReminder = viewModel::deleteReminder,
         onDuplicateReminder = viewModel::duplicateReminder,
+        onMoveReminder = { moveReminderId = it },
+        onMoveReminderToGroup = { reminderId, groupId ->
+            moveReminderId = null
+            viewModel.moveReminderToGroup(reminderId, groupId)
+        },
+        onDismissMoveReminder = { moveReminderId = null },
         onDragStart = viewModel::onDragStart,
         onDragSwap = viewModel::onDragSwap,
         onDragEnd = viewModel::onDragEnd,
@@ -145,11 +155,15 @@ fun RemindersScreen(
     isLoading: Boolean,
     showAddReminderDialog: Boolean,
     editReminderId: Long?,
+    moveReminderId: Long?,
     lazyListState: LazyListState,
     onEditReminder: (Long) -> Unit,
     onHideAddReminderDialog: () -> Unit,
     onDeleteReminder: (ReminderViewData) -> Unit,
     onDuplicateReminder: (ReminderViewData) -> Unit,
+    onMoveReminder: (Long) -> Unit,
+    onMoveReminderToGroup: (Long, Long) -> Unit,
+    onDismissMoveReminder: () -> Unit,
     onDragStart: () -> Unit,
     onDragSwap: (Int, Int) -> Unit,
     onDragEnd: () -> Unit,
@@ -199,7 +213,8 @@ fun RemindersScreen(
                             reminderViewData = reminder,
                             onDeleteClick = { onDeleteReminder(reminder) },
                             onEditClick = { onEditReminder(reminder.id) },
-                            onDuplicateClick = { onDuplicateReminder(reminder) }
+                            onDuplicateClick = { onDuplicateReminder(reminder) },
+                            onMoveClick = { onMoveReminder(reminder.id) },
                         )
                     }
                 }
@@ -213,6 +228,17 @@ fun RemindersScreen(
             editReminderId = editReminderId,
             onDismiss = onHideAddReminderDialog,
         )
+
+        moveReminderId?.let { reminderId ->
+            SelectItemDialog(
+                title = stringResource(R.string.move_to),
+                selectableTypes = setOf(SelectableItemType.GROUP),
+                onGroupSelected = { groupId ->
+                    onMoveReminderToGroup(reminderId, groupId)
+                },
+                onDismissRequest = onDismissMoveReminder,
+            )
+        }
 
         // Loading overlay
         if (isLoading) LoadingOverlay()
@@ -230,10 +256,14 @@ private fun RemindersScreenPreview() {
                 isLoading = false,
                 showAddReminderDialog = false,
                 editReminderId = null,
+                moveReminderId = null,
                 lazyListState = LazyListState(),
                 onHideAddReminderDialog = {},
                 onDeleteReminder = {},
                 onDuplicateReminder = {},
+                onMoveReminder = {},
+                onMoveReminderToGroup = { _, _ -> },
+                onDismissMoveReminder = {},
                 onDragStart = {},
                 onDragSwap = { _, _ -> },
                 onDragEnd = {},

@@ -63,6 +63,7 @@ interface RemindersScreenViewModel {
 
     fun deleteReminder(reminderViewData: ReminderViewData)
     fun duplicateReminder(reminderViewData: ReminderViewData)
+    fun moveReminderToGroup(reminderId: Long, groupId: Long)
     fun moveItem(from: Int, to: Int)
 
     fun onDragStart()
@@ -202,6 +203,12 @@ class RemindersScreenViewModelImpl @Inject constructor(
             if (newReminder != null) {
                 reminderInteractor.scheduleNext(newReminder)
             }
+        }
+    }
+
+    override fun moveReminderToGroup(reminderId: Long, groupId: Long) {
+        viewModelScope.launch(io) {
+            dataInteractor.moveReminderToGroup(reminderId, groupId)
         }
     }
 
