@@ -378,6 +378,48 @@ class LuaGraphDataFactoryTest {
     }
 
     @Test
+    fun `all-zero bar chart gets nonzero y range`() = runTest {
+        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TimeBarChartData(
+                    barDuration = Period.ofDays(1),
+                    endTime = ZonedDateTime.now(),
+                    durationBasedRange = false,
+                    bars = listOf(TimeBar(listOf(TimeBarSegment(0.0)))),
+                    yMax = null,
+                )
+            )
+        )
+
+        val barChart = callGetViewData().wrapped as IBarChartViewData
+
+        assertEquals(0.0, barChart.yMin)
+        assertEquals(1.0, barChart.yMax)
+        verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
+    fun `explicit zero bar chart maximum gets nonzero y range`() = runTest {
+        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TimeBarChartData(
+                    barDuration = Period.ofDays(1),
+                    endTime = ZonedDateTime.now(),
+                    durationBasedRange = false,
+                    bars = listOf(TimeBar(listOf(TimeBarSegment(0.0)))),
+                    yMax = 0.0,
+                )
+            )
+        )
+
+        val barChart = callGetViewData().wrapped as IBarChartViewData
+
+        assertEquals(0.0, barChart.yMin)
+        assertEquals(1.0, barChart.yMax)
+        verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
     fun `bar chart with non-unique labels`() = runTest {
         whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
             LuaGraphResult(

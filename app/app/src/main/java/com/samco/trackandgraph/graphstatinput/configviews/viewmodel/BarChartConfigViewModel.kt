@@ -142,9 +142,14 @@ class BarChartConfigViewModel @Inject constructor(
     }
 
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
-        return if (singleFeatureConfigBehaviour.featureId == null || singleFeatureConfigBehaviour.featureId == -1L) {
-            GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        } else null
+        return when {
+            singleFeatureConfigBehaviour.featureId == null ||
+                singleFeatureConfigBehaviour.featureId == -1L ->
+                GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+            !isValidBarChartYRange(yRangeType, getYTo()) ->
+                GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_bad_fixed_range)
+            else -> null
+        }
     }
 
     override fun onDataLoaded(config: Any?) {
@@ -183,3 +188,6 @@ class BarChartConfigViewModel @Inject constructor(
         }
     }
 }
+
+internal fun isValidBarChartYRange(yRangeType: YRangeType, yTo: Double): Boolean =
+    yRangeType != YRangeType.FIXED || yTo.isFinite() && yTo > 0.0

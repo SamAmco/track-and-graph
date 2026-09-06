@@ -6,7 +6,7 @@ topics:
   - Vico stacked bar-chart rendering
   - Shared contract for database and Lua time-bar graphs
   - Selection, time markers, pan, zoom, axes, and performance
-keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, zoom, pan, Lua, migration]
+keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, zoom, pan, Lua, migration, NaN, zero-range, finite]
 ---
 
 # Graph Rendering
@@ -37,6 +37,8 @@ Do not implement the persistent highlight as a Vico persistent marker. Vico only
 X-axis label spacing adapts to the visible range and uses powers of two, preserving the previous approximate ten-label limit during zoom. Date formatting still depends on the total graph duration. Y-axis labels use duration formatting when requested.
 
 Bars retain borders for fewer than 60 time buckets; borders are suppressed for denser charts. Series remain ordered largest-total first so stacked colors and legends stay consistent with the previous renderer.
+
+Vico requires finite chart values and a nonzero Y range. A range such as `0..0` makes its vertical-axis coordinate calculation produce `NaN`, which Compose rejects while drawing a rectangular guideline. The bar-chart UI is the final defensive boundary: it rejects non-finite values, inconsistent series lengths, inverted bounds, and expands equal finite bounds. Producers should still emit valid ranges; both database and Lua all-zero bar charts use `0..1`. Fixed database bar-chart maxima must be finite and positive.
 
 The bar-chart axes, ticks, and plot-area guidelines use `onSurface` at 70% opacity with a `0.5.dp` thickness. The shared Vico theme uses the same subdued line color. This is intentionally a visual match for the legacy AndroidPlot graphs rather than an attempt to duplicate AndroidPlot's physical-pixel rendering.
 

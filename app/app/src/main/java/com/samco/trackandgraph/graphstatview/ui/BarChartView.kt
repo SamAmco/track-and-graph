@@ -122,7 +122,15 @@ fun BarChartView(
     graphViewMode: GraphViewMode,
     graphBackgroundColor: Color,
 ) = Box(modifier = modifier) {
-    if (viewData.xDates.isEmpty() || viewData.bars.isEmpty()) {
+    val yRange = getRenderableBarChartYRange(viewData.yMin, viewData.yMax)
+    if (
+        viewData.xDates.isEmpty() ||
+        viewData.bars.isEmpty() ||
+        yRange == null ||
+        viewData.bars.any { series ->
+            series.values.size != viewData.xDates.size || series.values.any { !it.isFinite() }
+        }
+    ) {
         GraphErrorView(error = R.string.graph_stat_view_not_enough_data_graph)
         return@Box
     }
@@ -135,8 +143,8 @@ fun BarChartView(
         xDates = viewData.xDates,
         bars = viewData.bars,
         durationBasedRange = viewData.durationBasedRange,
-        yMin = viewData.yMin,
-        yMax = viewData.yMax,
+        yMin = yRange.first,
+        yMax = yRange.second,
         yAxisSubdivides = viewData.yAxisSubdivides,
         listMode = listMode,
         highlightedIndex = highlightedIndex,
@@ -174,6 +182,21 @@ fun BarChartView(
             }
         }
     }
+}
+
+/**
+ * Returns bounds that Vico can safely use for coordinate calculations.
+ *
+ * A zero-length range makes Vico divide by zero while positioning axis guidelines, producing a
+ * NaN rectangle that Compose refuses to draw. Equal finite bounds are expanded for compatibility
+ * with existing saved graphs; inverted and non-finite bounds are rejected.
+ */
+internal fun getRenderableBarChartYRange(yMin: Double, yMax: Double): Pair<Double, Double>? {
+    if (!yMin.isFinite() || !yMax.isFinite() || yMax < yMin) return null
+    if (yMax > yMin) return yMin to yMax
+
+    val expandedMax = yMin + max(1.0, kotlin.math.abs(yMin) * 0.1)
+    return expandedMax.takeIf(Double::isFinite)?.let { yMin to it }
 }
 
 private fun OffsetDateTime.toBarIndex(

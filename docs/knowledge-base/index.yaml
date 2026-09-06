@@ -20,7 +20,7 @@ docs:
   - file: graph-rendering.md
     title: Graph rendering — renderer-neutral view data and Vico bar charts
     description: Incremental AndroidPlot migration architecture; bar-chart factories emit plain Kotlin series and bounds, while the Compose UI owns Vico models, styling, axes, zoom, and marker interactions.
-    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, zoom, pan, Lua, migration]
+    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, zoom, pan, Lua, migration, NaN, zero-range, finite]
 
   - file: app-lock.md
     title: App lock — security boundary, persistence, and UI shell

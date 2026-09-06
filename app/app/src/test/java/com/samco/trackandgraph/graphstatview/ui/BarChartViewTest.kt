@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class BarChartViewTest {
@@ -37,5 +38,17 @@ class BarChartViewTest {
     fun doubleToStringHandlesNonFiniteValues() {
         assertEquals("NaN", doubleToString(Double.NaN))
         assertEquals("Infinity", doubleToString(Double.POSITIVE_INFINITY))
+    }
+
+    @Test
+    fun zeroLengthYRangeIsExpanded() {
+        assertEquals(0.0 to 1.0, getRenderableBarChartYRange(0.0, 0.0))
+    }
+
+    @Test
+    fun invalidYRangesAreRejected() {
+        assertNull(getRenderableBarChartYRange(Double.NaN, 1.0))
+        assertNull(getRenderableBarChartYRange(0.0, Double.POSITIVE_INFINITY))
+        assertNull(getRenderableBarChartYRange(1.0, 0.0))
     }
 }

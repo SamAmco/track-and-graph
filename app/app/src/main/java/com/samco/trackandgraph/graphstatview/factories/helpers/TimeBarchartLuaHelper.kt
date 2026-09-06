@@ -48,9 +48,15 @@ class TimeBarchartLuaHelper @Inject constructor(
 
         val xDates = getXDates(endTime, lineGraphData.barDuration, bars.size)
 
+        val requestedYMax = lineGraphData.yMax
+            ?: lineGraphData.bars.maxOf { bar -> bar.segments.sumOf { it.value } }
+        // Vico cannot render a zero-length range. Match the regular bar-chart path by giving
+        // all-zero Lua charts a useful default range.
+        val yMaxForRange = if (requestedYMax == 0.0) 1.0 else requestedYMax
+
         val yAxisParameters = dataDisplayIntervalHelper.getYParameters(
             yMin = 0.0,
-            yMax = lineGraphData.yMax ?: lineGraphData.bars.maxOf { bar -> bar.segments.sumOf { it.value } },
+            yMax = yMaxForRange,
             isDurationBasedRange = lineGraphData.durationBasedRange,
             fixedBounds = lineGraphData.yMax != null
         )
@@ -62,7 +68,11 @@ class TimeBarchartLuaHelper @Inject constructor(
                 override val bars: List<BarChartSeries> = barViewData
                 override val endTime: ZonedDateTime = endTime
                 override val yMin: Double = yAxisParameters.boundsMin
-                override val yMax: Double = lineGraphData.yMax ?: yAxisParameters.boundsMax
+                override val yMax: Double = if (lineGraphData.yMax != null) {
+                    yMaxForRange
+                } else {
+                    yAxisParameters.boundsMax
+                }
                 override val yAxisSubdivides: Int = yAxisParameters.subdivides
                 override val barPeriod: TemporalAmount = lineGraphData.barDuration
                 override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
