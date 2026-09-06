@@ -100,9 +100,9 @@ local placement_sources = function()
   local day_start = placement_window()
   return {
     {
-      { timestamp = day_start.timestamp + 10000, offset = 0, value = 3 },
-      { timestamp = day_start.timestamp + 5000,  offset = 0, value = 2 },
-      { timestamp = day_start.timestamp + 1000,  offset = 0, value = 1 },
+        { timestamp = day_start.timestamp + 10000, offset = day_start.offset, value = 3 },
+        { timestamp = day_start.timestamp + 5000,  offset = day_start.offset, value = 2 },
+        { timestamp = day_start.timestamp + 1000,  offset = day_start.offset, value = 1 },
     }
   }
 end
