@@ -11,8 +11,10 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.samco.trackandgraph.reminders.PlatformScheduler
+import com.samco.trackandgraph.reminders.ReminderNotificationIdentity
 import com.samco.trackandgraph.reminders.ReminderNotificationParams
 import com.samco.trackandgraph.reminders.LegacyReminderAlarmInfo
+import com.samco.trackandgraph.reminders.toIdentity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.threeten.bp.Instant
 import timber.log.Timber
@@ -36,7 +38,7 @@ internal class AndroidPlatformScheduler @Inject constructor(
         reminderNotificationParams: ReminderNotificationParams
     ) {
         // Cancel any existing alarms and work for this reminder first
-        cancel(reminderNotificationParams)
+        cancel(reminderNotificationParams.toIdentity())
 
         // Schedule the AlarmManager alarm
         val operation = createPendingIntent(
@@ -82,18 +84,14 @@ internal class AndroidPlatformScheduler @Inject constructor(
         )
     )
 
-    override fun cancel(reminderNotificationParams: ReminderNotificationParams) {
+    override fun cancel(reminderNotificationIdentity: ReminderNotificationIdentity) {
         // Cancel the AlarmManager alarm
         alarmManager.cancel(
-            createPendingIntent(
-                requestCode = reminderNotificationParams.alarmId,
-                reminderId = reminderNotificationParams.reminderId,
-                reminderName = reminderNotificationParams.reminderName,
-            )
+            createPendingIntent(requestCode = reminderNotificationIdentity.alarmId)
         )
 
         // Cancel the WorkManager fallback
-        cancelWorkManagerFallback(reminderNotificationParams)
+        cancelWorkManagerFallback(reminderNotificationIdentity.reminderId)
     }
 
     private fun canScheduleExactAlarms(): Boolean {
@@ -141,11 +139,13 @@ internal class AndroidPlatformScheduler @Inject constructor(
         )
     }
 
-    private fun cancelWorkManagerFallback(reminderNotificationParams: ReminderNotificationParams) {
-        val tag = ReminderFallbackWorker.getWorkManagerTag(reminderNotificationParams.reminderId)
+    private fun cancelWorkManagerFallback(reminderId: Long) {
+        val tag = ReminderFallbackWorker.getWorkManagerTag(reminderId)
         // Cancel by tag for backwards compatibility with old work scheduled before unique work names
         WorkManager.getInstance(context).cancelAllWorkByTag(tag)
-        WorkManager.getInstance(context).cancelUniqueWork(ReminderFallbackWorker.getUniqueWorkName(reminderNotificationParams.reminderId))
+        WorkManager.getInstance(context).cancelUniqueWork(
+            ReminderFallbackWorker.getUniqueWorkName(reminderId)
+        )
     }
 
     private fun createPendingIntent(
@@ -159,6 +159,15 @@ internal class AndroidPlatformScheduler @Inject constructor(
             Intent(context, ReminderBroadcastReceiver::class.java)
                 .putExtra(ReminderBroadcastReceiver.ALARM_MESSAGE_KEY, reminderName)
                 .putExtra(ReminderBroadcastReceiver.ALARM_REMINDER_ID_KEY, reminderId),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private fun createPendingIntent(requestCode: Int): PendingIntent {
+        return PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            Intent(context, ReminderBroadcastReceiver::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }

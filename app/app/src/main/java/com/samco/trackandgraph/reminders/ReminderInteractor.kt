@@ -95,10 +95,11 @@ interface ReminderInteractor {
     suspend fun getNextScheduled(reminder: Reminder): NextScheduled
 
     /**
-     * This should be called when the given reminder is being deleted to cancel
-     * any upcoming notifications for that reminder.
+     * Cancels upcoming notifications for [reminderId]. This operation derives the platform
+     * notification identity directly from the ID and never queries reminder data, so it remains
+     * safe to call after the reminder has been deleted from the database.
      */
-    suspend fun cancelReminderNotifications(reminder: Reminder)
+    suspend fun cancelReminderNotifications(reminderId: Long)
 
     /**
      * This should be called for example when the user is about to restore a
@@ -162,7 +163,7 @@ internal class ReminderInteractorImpl @Inject constructor(
             for (reminder in reminders) {
                 val params = reminder.toReminderNotificationParams()
                 if (!reminder.params.enabled) {
-                    platformScheduler.cancel(params)
+                    platformScheduler.cancel(params.toIdentity())
                     continue
                 }
                 if (platformScheduler.getNextScheduledMillis(params) == null) {
@@ -187,19 +188,18 @@ internal class ReminderInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun cancelReminderNotifications(reminder: Reminder): Unit = mutex.withLock {
+    override suspend fun cancelReminderNotifications(reminderId: Long): Unit = mutex.withLock {
         withContext(io) {
-            val reminderNotificationParams = ReminderNotificationParams(
-                alarmId = reminder.id.toAlarmId(),
-                reminderId = reminder.id,
-                reminderName = reminder.reminderName
+            val reminderNotificationIdentity = ReminderNotificationIdentity(
+                alarmId = reminderId.toAlarmId(),
+                reminderId = reminderId,
             )
-            platformScheduler.cancel(reminderNotificationParams)
+            platformScheduler.cancel(reminderNotificationIdentity)
 
             // Emit cancellation event
             _schedulingEvents.emit(
                 ReminderSchedulingEvent(
-                    reminderId = reminder.id,
+                    reminderId = reminderId,
                     eventType = SchedulingEventType.CANCELLED
                 )
             )
@@ -309,7 +309,7 @@ internal class ReminderInteractorImpl @Inject constructor(
         val reminderNotificationParams = reminders.map { it.toReminderNotificationParams() }
 
         for (params in reminderNotificationParams) {
-            platformScheduler.cancel(params)
+            platformScheduler.cancel(params.toIdentity())
         }
 
         // Emit cancellation events for all cleared reminders
@@ -342,7 +342,7 @@ internal class ReminderInteractorImpl @Inject constructor(
             )
         } else {
             // Cancel any existing scheduled notification when next is null
-            platformScheduler.cancel(reminder.toReminderNotificationParams())
+            platformScheduler.cancel(reminder.toReminderNotificationParams().toIdentity())
 
             // Emit cancellation event
             _schedulingEvents.emit(

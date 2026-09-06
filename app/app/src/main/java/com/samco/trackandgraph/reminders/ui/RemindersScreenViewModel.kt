@@ -157,7 +157,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
     override fun deleteReminder(reminderViewData: ReminderViewData) {
         viewModelScope.launch(io) {
             reminderViewData.reminderDto?.let { reminder ->
-                reminderInteractor.cancelReminderNotifications(reminder)
+                reminderInteractor.cancelReminderNotifications(reminder.id)
                 dataInteractor.deleteReminder(
                     ComponentDeleteRequest(
                         groupItemId = reminderViewData.groupItemId,

@@ -19,7 +19,7 @@ package com.samco.trackandgraph.reminders
 
 internal class FakePlatformScheduler : PlatformScheduler {
     val setNotifications = mutableListOf<Pair<Long, ReminderNotificationParams>>()
-    val cancelledNotifications = mutableListOf<ReminderNotificationParams>()
+    val cancelledNotifications = mutableListOf<ReminderNotificationIdentity>()
     val cancelledLegacyAlarms = mutableListOf<LegacyReminderAlarmInfo>()
 
     override fun set(triggerAtMillis: Long, reminderNotificationParams: ReminderNotificationParams) {
@@ -30,8 +30,8 @@ internal class FakePlatformScheduler : PlatformScheduler {
         cancelledLegacyAlarms.add(legacyAlarmInfo)
     }
 
-    override fun cancel(reminderNotificationParams: ReminderNotificationParams) {
-        cancelledNotifications.add(reminderNotificationParams)
+    override fun cancel(reminderNotificationIdentity: ReminderNotificationIdentity) {
+        cancelledNotifications.add(reminderNotificationIdentity)
     }
 
     override suspend fun getNextScheduledMillis(reminderNotificationParams: ReminderNotificationParams): Long? {

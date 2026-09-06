@@ -46,6 +46,16 @@ internal data class ReminderNotificationParams(
     val reminderName: String,
 )
 
+internal data class ReminderNotificationIdentity(
+    val alarmId: Int,
+    val reminderId: Long,
+)
+
+internal fun ReminderNotificationParams.toIdentity() = ReminderNotificationIdentity(
+    alarmId = alarmId,
+    reminderId = reminderId,
+)
+
 internal interface PlatformScheduler {
     /**
      * Cancels any notification currently scheduled for the given
@@ -63,6 +73,6 @@ internal interface PlatformScheduler {
     /** Cancels an AlarmManager alarm persisted by the pre-10.x reminder scheduler. */
     fun cancelLegacyAlarm(legacyAlarmInfo: LegacyReminderAlarmInfo)
 
-    /** Cancels the notification for the specified reminder. */
-    fun cancel(reminderNotificationParams: ReminderNotificationParams)
+    /** Cancels the notification identified by its AlarmManager and WorkManager IDs. */
+    fun cancel(reminderNotificationIdentity: ReminderNotificationIdentity)
 }

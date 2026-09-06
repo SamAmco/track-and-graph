@@ -34,6 +34,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalTime
@@ -281,7 +282,6 @@ internal class ReminderInteractorImplTest {
             
             val cancelledNotification = platformScheduler.cancelledNotifications[0]
             assertEquals(7L, cancelledNotification.reminderId)
-            assertEquals("Cancel Existing Reminder", cancelledNotification.reminderName)
         }
 
     @Test
@@ -312,26 +312,17 @@ internal class ReminderInteractorImplTest {
     }
 
     @Test
-    fun `cancel notifications cancels notification for reminder`() = runTest(testDispatcher) {
-        // PREPARE
-        val reminder = reminderFixture.copy(
-            id = 10L,
-            reminderName = "Delete Me",
-            params = ReminderParams.WeekDayParams(
-                time = LocalTime.of(11, 0),
-                checkedDays = CheckedDays.none().copy(saturday = true)
-            ),
-        )
+    fun `cancel notifications derives identity from id without reading reminder data`() =
+        runTest(testDispatcher) {
+            // EXECUTE
+            uut.cancelReminderNotifications(10L)
 
-        // EXECUTE
-        uut.cancelReminderNotifications(reminder)
-
-        // VERIFY
-        assertEquals(1, platformScheduler.cancelledNotifications.size)
-        val cancelledNotification = platformScheduler.cancelledNotifications[0]
-        assertEquals(10L, cancelledNotification.reminderId)
-        assertEquals("Delete Me", cancelledNotification.reminderName)
-    }
+            // VERIFY
+            assertEquals(1, platformScheduler.cancelledNotifications.size)
+            val cancelledNotification = platformScheduler.cancelledNotifications[0]
+            assertEquals(10L, cancelledNotification.reminderId)
+            verifyNoInteractions(dataInteractor)
+        }
 
     @Test
     fun `schedule next emits SCHEDULED event`() = runTest(testDispatcher) {
@@ -363,19 +354,9 @@ internal class ReminderInteractorImplTest {
 
     @Test
     fun `cancel notifications emits CANCELLED event`() = runTest(testDispatcher) {
-        // PREPARE
-        val reminder = reminderFixture.copy(
-            id = 10L,
-            reminderName = "Cancel Test Reminder",
-            params = ReminderParams.WeekDayParams(
-                time = LocalTime.of(11, 0),
-                checkedDays = CheckedDays.none().copy(saturday = true)
-            ),
-        )
-
         // EXECUTE and VERIFY
         uut.schedulingEvents.test {
-            uut.cancelReminderNotifications(reminder)
+            uut.cancelReminderNotifications(10L)
             
             val event = awaitItem()
             assertEquals(10L, event.reminderId)
@@ -464,9 +445,6 @@ internal class ReminderInteractorImplTest {
         assertTrue(cancelledIds.contains(20L))
         assertTrue(cancelledIds.contains(21L))
 
-        val cancelledNames = platformScheduler.cancelledNotifications.map { it.reminderName }
-        assertTrue(cancelledNames.contains("Clear Me 1"))
-        assertTrue(cancelledNames.contains("Clear Me 2"))
     }
 
     @Test

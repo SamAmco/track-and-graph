@@ -573,6 +573,9 @@ class GroupViewModelImpl @Inject constructor(
                 GroupChildType.FUNCTION -> dataInteractor.deleteFunction(request)
                 GroupChildType.GROUP -> {
                     val deletedInfo = dataInteractor.deleteGroup(request)
+                    deletedInfo.deletedReminderIds.forEach {
+                        reminderInteractor.cancelReminderNotifications(it)
+                    }
                     deletedInfo.deletedFeatureIds.forEach {
                         timerServiceInteractor.requestWidgetsDisabledForFeatureId(it)
                     }
@@ -582,7 +585,7 @@ class GroupViewModelImpl @Inject constructor(
                         .filterIsInstance<GroupChild.ChildReminder>()
                         .find { it.groupItemId == groupItemId }
                         ?.reminder?.reminderDto
-                        ?.let { reminderInteractor.cancelReminderNotifications(it) }
+                        ?.let { reminderInteractor.cancelReminderNotifications(it.id) }
                     dataInteractor.deleteReminder(request)
                 }
             }

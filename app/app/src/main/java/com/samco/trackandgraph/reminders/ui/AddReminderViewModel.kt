@@ -153,7 +153,7 @@ class AddReminderViewModelImpl @Inject constructor(
             )
         } catch (t: Throwable) {
             Timber.e(t)
-            reminderInteractor.cancelReminderNotifications(updatedReminder)
+            reminderInteractor.cancelReminderNotifications(updatedReminder.id)
         }
     }
 

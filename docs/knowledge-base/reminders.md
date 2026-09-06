@@ -122,6 +122,13 @@ When recursive group deletion reports deleted reminder IDs, `DataInteractorImpl.
 emits a reminder update so notification reconciliation and the global Reminders screen observe the
 removal. It does not emit that event when the deleted group contained no reminders.
 
+The group screen cancels scheduled notifications for the exact `deletedReminderIds` returned after
+recursive deletion commits. `ReminderInteractor.cancelReminderNotifications(reminderId)` derives
+the AlarmManager and WorkManager identity from the ID without reading the reminder row, so it is
+safe after deletion. Do not pre-query all nested reminders: groups form a DAG, and a nested group
+may survive through a parent outside the deletion set. The helper's returned IDs reflect its actual
+DAG-aware deletion decision.
+
 ## Operations
 
 ### Create Reminder in Group
@@ -172,7 +179,9 @@ groupItemDao.getGroupItemsWithNoGroup()
 
 The reminder scheduler deliberately isolates Android platform code behind an interface — this is an intentional KMP-compatibility pattern (see [architecture.md](architecture.md)):
 
-- **`PlatformScheduler`** — pure Kotlin interface: `set(triggerAtMillis, params)`, `cancel(params)`, `getNextScheduledMillis(params)`
+- **`PlatformScheduler`** — pure Kotlin interface: scheduling/query operations take notification
+  params, while cancellation takes only `ReminderNotificationIdentity` (`alarmId` plus
+  `reminderId`); reminder display content is not part of cancellation identity
 - **`AndroidPlatformScheduler`** — Android implementation using `AlarmManager`; lives in `androidplatform/` subpackage
 - **`ReminderScheduler` / `*ReminderScheduler`** — pure Kotlin scheduling logic, depend only on `PlatformScheduler`
 - **`FakePlatformScheduler`** — used in tests instead of mocking
