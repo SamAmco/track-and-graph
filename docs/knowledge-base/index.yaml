@@ -89,8 +89,8 @@ docs:
 
   - file: reminders.md
     title: Reminders — lifecycle, scheduling, and display ordering
-    description: Reminder data and lifecycle, including independent global and optional group placements, always-delete-everywhere behavior, no symlinks, duplication, scheduling, and display ordering.
-    keywords: [reminder, groupless, null, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType]
+    description: Reminder data and lifecycle, including independent global and optional group placements, component-path display, always-delete-everywhere behavior, no symlinks, duplication, scheduling, and display ordering.
+    keywords: [reminder, groupless, null, component-path, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType]
 
   - file: lua-architecture.md
     title: Lua functions — app architecture and data model

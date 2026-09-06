@@ -42,6 +42,7 @@ sealed class ReminderViewData {
     abstract val enabled: Boolean
     abstract val reminderDto: Reminder?
     abstract val nextScheduled: LocalDateTime?
+    abstract val path: String?
 
     /** View data for weekly reminders, mapping to ReminderParams.WeekDayParams */
     data class WeekDayReminderViewData(
@@ -52,6 +53,7 @@ sealed class ReminderViewData {
         override val nextScheduled: LocalDateTime?,
         val checkedDays: CheckedDays,
         override val reminderDto: Reminder?,
+        override val path: String? = null,
     ) : ReminderViewData()
 
     /**
@@ -71,6 +73,7 @@ sealed class ReminderViewData {
         override val reminderDto: Reminder?,
         val progressToNextReminder: Float,
         val isBeforeStartTime: Boolean,
+        override val path: String? = null,
     ) : ReminderViewData()
 
     /** View data for month day reminders, mapping to ReminderParams.MonthDayParams */
@@ -84,6 +87,7 @@ sealed class ReminderViewData {
         val dayType: MonthDayType,
         val ends: LocalDateTime?,
         override val reminderDto: Reminder?,
+        override val path: String? = null,
     ) : ReminderViewData()
 
     /** View data for time since last reminders, mapping to ReminderParams.TimeSinceLastParams */
@@ -97,6 +101,7 @@ sealed class ReminderViewData {
         val progressToNextReminder: Float,
         val currentInterval: Int?,
         val currentPeriod: Period?,
+        override val path: String? = null,
     ) : ReminderViewData()
 
     companion object {
@@ -111,7 +116,8 @@ sealed class ReminderViewData {
             reminder: Reminder,
             groupItemId: Long,
             nextScheduled: LocalDateTime?,
-            lastTrackedInstant: Instant? = null
+            lastTrackedInstant: Instant? = null,
+            path: String? = null,
         ): ReminderViewData {
             return when (val params = reminder.params) {
                 is ReminderParams.WeekDayParams -> {
@@ -123,6 +129,7 @@ sealed class ReminderViewData {
                         nextScheduled = nextScheduled,
                         checkedDays = params.checkedDays,
                         reminderDto = reminder,
+                        path = path,
                     )
                 }
 
@@ -149,6 +156,7 @@ sealed class ReminderViewData {
                         reminderDto = reminder,
                         progressToNextReminder = progress,
                         isBeforeStartTime = isBeforeStart,
+                        path = path,
                     )
                 }
 
@@ -163,6 +171,7 @@ sealed class ReminderViewData {
                         dayType = params.dayType,
                         ends = params.ends,
                         reminderDto = reminder,
+                        path = path,
                     )
                 }
 
@@ -188,6 +197,7 @@ sealed class ReminderViewData {
                         progressToNextReminder = progress,
                         currentInterval = currentIntervalPair?.interval,
                         currentPeriod = currentIntervalPair?.period,
+                        path = path,
                     )
                 }
             }

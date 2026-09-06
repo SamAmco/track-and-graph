@@ -26,6 +26,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.interactor.DataUpdateType
 import com.samco.trackandgraph.reminders.ReminderInteractor
+import com.samco.trackandgraph.util.ComponentPathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -96,6 +97,9 @@ class RemindersScreenViewModelImpl @Inject constructor(
                 .filter {
                     it is DataUpdateType.Reminder ||
                     it is DataUpdateType.ReminderScreenDisplayOrder ||
+                    it is DataUpdateType.GroupUpdated ||
+                    it is DataUpdateType.GroupDeleted ||
+                    it is DataUpdateType.SymlinkCreated ||
                     it is DataUpdateType.Unknown
                 }
                 .map { },
@@ -107,6 +111,7 @@ class RemindersScreenViewModelImpl @Inject constructor(
                 flow {
                     val reminders = dataInteractor.getAllRemindersSync()
                     val globalIndices = dataInteractor.getDisplayIndicesForRemindersScreen()
+                    val pathProvider = ComponentPathProvider(dataInteractor.getGroupGraphSync())
                     val groupItemIdByReminderId = globalIndices.associate { it.id to it.groupItemId }
                     val displayIndexByReminderId = globalIndices.associate { it.id to it.displayIndex }
                     val viewData = reminders.map { reminder ->
@@ -115,6 +120,9 @@ class RemindersScreenViewModelImpl @Inject constructor(
                             checkNotNull(groupItemIdByReminderId[reminder.id]) {
                                 "Reminder ${reminder.id} has no GroupItem placement"
                             },
+                            path = pathProvider
+                                .getAllPathsForReminder(reminder.id)
+                                .firstOrNull(),
                         )
                     }
                     emit(LoadingState.Loaded(viewData.sortedBy { displayIndexByReminderId[it.id] ?: Int.MAX_VALUE }))

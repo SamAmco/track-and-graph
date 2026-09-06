@@ -23,7 +23,11 @@ class ReminderViewDataFactory @Inject constructor(
     private val timeProvider: TimeProvider,
     private val dataSampler: DataSampler,
 ) {
-    suspend fun create(reminder: Reminder, groupItemId: Long): ReminderViewData {
+    suspend fun create(
+        reminder: Reminder,
+        groupItemId: Long,
+        path: String? = null,
+    ): ReminderViewData {
         val nextScheduled = when (val scheduled = reminderInteractor.getNextScheduled(reminder)) {
             is NextScheduled.AtInstant -> LocalDateTime.ofInstant(
                 scheduled.instant,
@@ -37,6 +41,7 @@ class ReminderViewDataFactory @Inject constructor(
             groupItemId = groupItemId,
             nextScheduled = nextScheduled,
             lastTrackedInstant = getLastTrackedInstant(reminder),
+            path = path,
         )
     }
 

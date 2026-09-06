@@ -1,6 +1,6 @@
 ---
 title: Reminders — lifecycle, scheduling, and display ordering
-description: Reminder data and lifecycle, including global and grouped placement, serialized enable/disable state, scheduling behavior, delete/duplicate operations, and reminder view-data construction.
+description: Reminder data and lifecycle, including global and grouped placement, path display, serialized enable/disable state, scheduling behavior, delete/duplicate operations, and reminder view-data construction.
 topics:
   - Every reminder has one null-group Reminders-screen placement and may have one additional group placement
   - Reminders can belong to at most one group and cannot be symlinked
@@ -8,9 +8,10 @@ topics:
   - Disabled reminders remain stored and visible but cancel/skip notification scheduling
   - Delete: always deletes the reminder and every placement, regardless of deleteEverywhere
   - Duplicate: reproduces both placements and inserts after the original independently in each list
+  - Reminders-screen cards show the first resolved component path when grouped
   - Scheduling: PlatformScheduler interface isolates Android AlarmManager (KMP pattern)
   - PITFALL: RemindersScreenViewModel dbDisplayIndices MUST react to DataUpdateType.Reminder or new reminders fall to bottom
-keywords: [reminder, groupless, null, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
+keywords: [reminder, groupless, null, component-path, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
 ---
 
 # Reminders
@@ -197,6 +198,16 @@ placement from `getDisplayIndicesForRemindersScreen()`. That placement supplies 
 `groupItemId` used by delete/duplicate and the global display index. A grouped reminder's non-null
 placement is consumed separately by `GroupViewModel`, so dragging in either screen changes only
 that screen's order.
+
+The Reminders screen also resolves the current root `GroupGraph` and puts the first full component
+path on `ReminderViewData` for grouped reminders (for example,
+`/Health/Medication/Take tablet`). It uses the same `ComponentPathProvider` reminder lookup as
+other path consumers; there is no separate reminder-only definition of a group path. A group can
+have multiple parent placements, so this is deliberately a representative path rather than a
+claim of uniqueness. The shared reminder card renders this optional value under its title on one
+line with leading ellipsis; group and search callers leave it null, so the path appears only in the
+global list. Group hierarchy updates must therefore refresh the Reminders-screen projection as
+well as reminder updates.
 
 `GroupViewModel` combines `getDisplayIndicesForGroup(groupId)` with reminder view data and emits
 `GroupChild.ChildReminder`, just like its other component branches. It obtains the reminder DTOs

@@ -46,8 +46,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
@@ -107,6 +109,22 @@ fun Reminder(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium
                 )
+
+                reminderViewData.path?.let { path ->
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = cardPadding),
+                        text = path,
+                        textAlign = TextAlign.Center,
+                        fontStyle = FontStyle.Italic,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.tngColors.onSurfaceVariant,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.StartEllipsis,
+                    )
+                }
 
                 Text(
                     modifier = Modifier.fillMaxWidth(),
@@ -295,6 +313,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                     sunday = false
                 ),
                 reminderDto = null,
+                path = "/Health & Fitness/Exercise/Morning Workout",
             ),
         )
 
@@ -308,6 +327,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 nextScheduled = LocalDateTime.of(2025, 12, 16, 21, 0),
                 checkedDays = CheckedDays.all(),
                 reminderDto = null,
+                path = "/Health & Fitness/Mindfulness/Evening Meditation",
             ),
         )
 
@@ -321,6 +341,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 nextScheduled = null,
                 checkedDays = CheckedDays.none(),
                 reminderDto = null,
+                path = "/Health & Fitness/Mindfulness/Evening Meditation",
             ),
         )
 
@@ -337,6 +358,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 interval = 1,
                 period = Period.DAYS,
                 reminderDto = null,
+                path = "/Health & Fitness/Exercise/Daily Exercise",
                 progressToNextReminder = 0.6f,
                 isBeforeStartTime = false,
             ),
@@ -355,6 +377,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 interval = 1,
                 period = Period.WEEKS,
                 reminderDto = null,
+                path = "/Work/Planning/Long-term Projects/Weekly Review",
                 progressToNextReminder = 0f,
                 isBeforeStartTime = true,
             ),
@@ -373,6 +396,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 interval = 1,
                 period = Period.MONTHS,
                 reminderDto = null,
+                path = "/Planning/Goals/Monthly Goals",
                 progressToNextReminder = 0f,
                 isBeforeStartTime = false,
             ),
@@ -389,6 +413,7 @@ private fun ReminderPreview() = TnGComposeTheme {
                 dayType = MonthDayType.DAY,
                 ends = null,
                 reminderDto = null,
+                path = "/Planning/Monthly Reminder",
             )
         )
     }

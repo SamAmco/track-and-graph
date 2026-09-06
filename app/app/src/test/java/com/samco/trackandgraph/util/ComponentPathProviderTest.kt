@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.util
 
+import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionGraph
@@ -27,11 +28,14 @@ import com.samco.trackandgraph.data.database.dto.Group
 import com.samco.trackandgraph.data.database.dto.GroupGraph
 import com.samco.trackandgraph.data.database.dto.GroupGraphItem
 import com.samco.trackandgraph.data.database.dto.NodeDependency
+import com.samco.trackandgraph.data.database.dto.Reminder
+import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionOrder
 import com.samco.trackandgraph.data.database.dto.TrackerSuggestionType
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.threeten.bp.LocalTime
 
 class ComponentPathProviderTest {
 
@@ -73,6 +77,17 @@ class ComponentPathProviderTest {
         id = id,
         name = name,
         type = GraphStatType.LINE_GRAPH,
+        unique = true,
+    )
+
+    private fun testReminder(id: Long, name: String) = Reminder(
+        id = id,
+        reminderName = name,
+        featureId = null,
+        params = ReminderParams.WeekDayParams(
+            time = LocalTime.NOON,
+            checkedDays = CheckedDays.none(),
+        ),
         unique = true,
     )
 
@@ -138,6 +153,19 @@ class ComponentPathProviderTest {
         assertEquals(listOf("/MyGraph"), provider.getAllPathsForGraph(1))
     }
 
+    @Test
+    fun `reminder in root group`() {
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.ReminderNode(giid(), testReminder(1, "Drink water"))
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        assertEquals(listOf("/Drink water"), provider.getAllPathsForReminder(1))
+    }
+
     // ── Nested hierarchy ──
 
     @Test
@@ -167,6 +195,41 @@ class ComponentPathProviderTest {
         assertEquals(listOf("/Health/Exercise/Steps"), provider.getAllPathsForTracker(10))
         assertEquals(listOf("/Health/Exercise"), provider.getAllPathsForGroup(2))
         assertEquals(listOf("/Health"), provider.getAllPathsForGroup(1))
+    }
+
+    @Test
+    fun `reminder in nested group`() {
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    giid(),
+                    GroupGraph(
+                        group = testGroup(1, "Health"),
+                        children = listOf(
+                            GroupGraphItem.GroupNode(
+                                giid(),
+                                GroupGraph(
+                                    group = testGroup(2, "Medication"),
+                                    children = listOf(
+                                        GroupGraphItem.ReminderNode(
+                                            giid(),
+                                            testReminder(10, "Take tablet"),
+                                        )
+                                    ),
+                                )
+                            )
+                        ),
+                    )
+                )
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        assertEquals(
+            listOf("/Health/Medication/Take tablet"),
+            provider.getAllPathsForReminder(10),
+        )
     }
 
     @Test
@@ -238,6 +301,41 @@ class ComponentPathProviderTest {
         assertEquals(2, paths.size)
         assert(paths.contains("/a/shared/tracker")) { "Expected /a/shared/tracker in $paths" }
         assert(paths.contains("/b/shared/tracker")) { "Expected /b/shared/tracker in $paths" }
+    }
+
+    @Test
+    fun `reminder in group with two parents returns both paths`() {
+        val sharedGroup = GroupGraph(
+            group = testGroup(3, "shared"),
+            children = listOf(
+                GroupGraphItem.ReminderNode(giid(), testReminder(10, "Reminder"))
+            ),
+        )
+        val graph = GroupGraph(
+            group = testGroup(0, "Root"),
+            children = listOf(
+                GroupGraphItem.GroupNode(
+                    giid(),
+                    GroupGraph(
+                        group = testGroup(1, "a"),
+                        children = listOf(GroupGraphItem.GroupNode(giid(), sharedGroup)),
+                    ),
+                ),
+                GroupGraphItem.GroupNode(
+                    giid(),
+                    GroupGraph(
+                        group = testGroup(2, "b"),
+                        children = listOf(GroupGraphItem.GroupNode(giid(), sharedGroup)),
+                    ),
+                ),
+            ),
+        )
+        val provider = ComponentPathProvider(graph)
+
+        assertEquals(
+            listOf("/a/shared/Reminder", "/b/shared/Reminder"),
+            provider.getAllPathsForReminder(10),
+        )
     }
 
     @Test
