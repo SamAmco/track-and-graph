@@ -1,17 +1,17 @@
 ---
 title: Compose UI patterns — ViewModel binding, pure UI, previews, spacing, and chip state
-description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, new screens and UI components include @Preview by default; reusable controls and spacing tokens live in app/ui; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
+description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, new screens and UI components include @Preview by default; reusable controls, hero cards, and spacing tokens live in app/ui; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
 topics:
   - ViewModel-binding layer collects state and calls the pure-UI composable
   - Pure-UI composable takes only state values and callbacks — no ViewModels
   - New screens and UI components should include @Preview functions by default
   - @Preview functions call the pure-UI composable with hardcoded data
   - Flavor-only previews belong in a concrete debug-variant source set
-  - Reuse shared app/ui controls before defining local Material wrappers
+  - Reuse shared app/ui controls, including HeroCardButton variants, before defining local Material wrappers
   - Use shared spacing tokens/helpers before introducing hard-coded dimensions
   - Naming conventions for each layer
   - TextChip/TngChip selected styling versus pressed-state feedback
-keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, TextButton, SmallTextButton, RowCheckbox, Divider, spacing, dimensions, hard-coded, dialogInputSpacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
+keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, HeroCardButton, IconHeroCardButton, Painter, TextButton, SmallTextButton, RowCheckbox, Divider, spacing, dimensions, hard-coded, dialogInputSpacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
 ---
 
 # Compose UI Patterns
@@ -26,7 +26,7 @@ When adding or migrating shared UI, add preview functions in the same file unles
 
 Previews are the default for new screens, dialogs, and UI components. Skip them only when there is a concrete blocker such as an AndroidView/runtime dependency that cannot reasonably be faked; otherwise split the UI so a pure composable can be previewed with hardcoded state.
 
-Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), text fields (`FullWidthTextField`, `PasswordTextField`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`). If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
+Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), hero cards (`HeroCardButton`, `IconHeroCardButton`), text fields (`FullWidthTextField`, `PasswordTextField`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`). `IconHeroCardButton` accepts a `Painter` rather than an app drawable resource ID so it remains reusable from the dependency-lower UI module; the feature caller resolves its own drawable and localized title. If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
 
 Do not introduce ad-hoc hard-coded dimensions in Compose UI. In particular, do not add literal fixed or minimum heights just to make content look balanced; let content determine its intrinsic size and use the shared spacing tokens in `app/ui` for padding and gaps. For dialog/content gaps, prefer `dialogInputSpacing` or its helper composable over repeating the equivalent `.dp` value inline. If a genuinely new reusable dimension is required and no existing token describes it, add a named token rather than embedding the value in a feature composable.
 

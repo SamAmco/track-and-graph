@@ -8,6 +8,8 @@
  */
 package com.samco.trackandgraph.addcomponent
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +23,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -43,22 +47,31 @@ import com.samco.trackandgraph.ui.compose.animation.popTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.predictivePopTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.navSizeTransform
 import com.samco.trackandgraph.ui.compose.animation.transitionSpec
+import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.ui.ContinueDialog
 import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.ui.HeroCardButton
 import com.samco.trackandgraph.ui.ui.cardElevation
 import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.IconHeroCardButton
+import com.samco.trackandgraph.ui.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import kotlinx.serialization.Serializable
 
 private sealed class AddComponentDialogNavKey : NavKey {
-    @Serializable data object ComponentTypeSelection : AddComponentDialogNavKey()
-    @Serializable data object AddGroup : AddComponentDialogNavKey()
-    @Serializable data object AddReminder : AddComponentDialogNavKey()
-    @Serializable data object AddSymlink : AddComponentDialogNavKey()
+    @Serializable
+    data object ComponentTypeSelection : AddComponentDialogNavKey()
+
+    @Serializable
+    data object AddGroup : AddComponentDialogNavKey()
+
+    @Serializable
+    data object AddReminder : AddComponentDialogNavKey()
+
+    @Serializable
+    data object AddSymlink : AddComponentDialogNavKey()
 }
 
 @Composable
@@ -77,6 +90,7 @@ fun AddComponentDialog(
             visible && navBackStack.isEmpty() -> {
                 navBackStack.add(AddComponentDialogNavKey.ComponentTypeSelection)
             }
+
             !visible && navBackStack.isNotEmpty() -> navBackStack.clear()
         }
     }
@@ -92,10 +106,12 @@ fun AddComponentDialog(
             dismiss()
         }
     }
+
     fun finishAdding(onAdd: (Long) -> Unit): (Long) -> Unit = { targetGroupId ->
         dismiss()
         onAdd(targetGroupId)
     }
+
     val destinationActions = AddComponentDestinationActions(
         onAddTracker = finishAdding(onAddTracker),
         onAddGraphOrStat = finishAdding(onAddGraphOrStat),
@@ -173,9 +189,11 @@ private fun addComponentDialogEntry(
             onDismiss = actions.onDismiss,
         )
     }
+
     AddComponentDialogNavKey.AddGroup -> NavEntry(navKey) {
         AddGroupDestination(groupId = groupId, onDismiss = actions.onDismiss)
     }
+
     AddComponentDialogNavKey.AddReminder -> NavEntry(navKey) {
         AddReminderDestination(
             groupId = groupId,
@@ -183,9 +201,11 @@ private fun addComponentDialogEntry(
             onNavigateBackFromTypeSelection = actions.onNavigateBack,
         )
     }
+
     AddComponentDialogNavKey.AddSymlink -> NavEntry(navKey) {
         AddSymlinkDestination(groupId = groupId, onDismiss = actions.onDismiss)
     }
+
     else -> error("Unknown navKey: $navKey")
 }
 
@@ -321,18 +341,18 @@ private fun ComponentTypeSelectionScreen(
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.tngColors.onSurface,
         )
+        InputSpacingLarge()
+        ComponentHeroCard(R.string.tracker, R.drawable.add_box, onAddTracker)
         DialogInputSpacing()
-        ComponentHeroCard(R.string.tracker, R.string.add_tracker_description, onAddTracker)
+        ComponentHeroCard(R.string.graph_or_stat, R.drawable.chart_data, onAddGraphOrStat)
         DialogInputSpacing()
-        ComponentHeroCard(R.string.graph_or_stat, R.string.add_graph_or_stat_description, onAddGraphOrStat)
+        ComponentHeroCard(R.string.group, R.drawable.folder_24px, onAddGroup)
         DialogInputSpacing()
-        ComponentHeroCard(R.string.group, R.string.add_group_description, onAddGroup)
+        ComponentHeroCard(R.string.function, R.drawable.function, onAddFunction)
         DialogInputSpacing()
-        ComponentHeroCard(R.string.function, R.string.add_function_description, onAddFunction)
+        ComponentHeroCard(R.string.reminder, R.drawable.reminders_icon, onAddReminder)
         DialogInputSpacing()
-        ComponentHeroCard(R.string.reminder, R.string.add_reminder_description, onAddReminder)
-        DialogInputSpacing()
-        ComponentHeroCard(R.string.symlink, R.string.add_symlink_description, onAddSymlink)
+        ComponentHeroCard(R.string.symlink, R.drawable.link_2_24px, onAddSymlink)
         DialogInputSpacing()
         ContinueCancelButtons(
             cancelVisible = true,
@@ -344,11 +364,31 @@ private fun ComponentTypeSelectionScreen(
 }
 
 @Composable
-private fun ComponentHeroCard(title: Int, description: Int, onClick: () -> Unit) {
-    HeroCardButton(
+private fun ComponentHeroCard(
+    @StringRes titleRes: Int,
+    @DrawableRes iconRes: Int,
+    onClick: () -> Unit,
+) {
+    IconHeroCardButton(
         modifier = Modifier.fillMaxWidth(),
-        title = stringResource(title),
-        description = stringResource(description),
+        title = stringResource(titleRes),
+        icon = painterResource(iconRes),
         onClick = onClick,
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ComponentTypeSelectionScreenPreview() {
+    TnGComposeTheme {
+        ComponentTypeSelectionScreen(
+            onAddTracker = {},
+            onAddGraphOrStat = {},
+            onAddGroup = {},
+            onAddFunction = {},
+            onAddReminder = {},
+            onAddSymlink = {},
+            onDismiss = {},
+        )
+    }
 }
