@@ -21,10 +21,17 @@ import android.app.PendingIntent
 import android.content.Intent
 
 interface PendingIntentProvider {
+    companion object {
+        const val REMINDER_ID_EXTRA = "ReminderNotificationReminderId"
+    }
+
     /**
      * Get a pending intent that will start the main activity of the app
      */
     fun getMainActivityPendingIntent(clearTask: Boolean = true): PendingIntent
+
+    /** Opens the app and identifies the reminder whose notification was tapped. */
+    fun getReminderNotificationPendingIntent(reminderId: Long): PendingIntent
 
     /**
      * Get a pending intent that will start the duration input activity

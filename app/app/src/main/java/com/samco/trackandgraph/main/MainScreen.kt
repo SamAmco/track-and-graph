@@ -84,6 +84,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.group.GroupNavKey
+import com.samco.trackandgraph.navigation.DeepLink
 import com.samco.trackandgraph.navigation.DeepLinkNavigatorImpl
 import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
@@ -107,6 +108,8 @@ fun MainScreen(
     onThemeSelected: (ThemeSelection) -> Unit,
     currentDateFormat: State<Int>,
     onDateFormatSelected: (Int) -> Unit,
+    pendingDeepLink: DeepLink? = null,
+    onDeepLinkConsumed: (DeepLink) -> Unit = {},
 ) = TnGComposeTheme {
 
     val backStack = rememberNavBackStack(GroupNavKey())
@@ -117,6 +120,13 @@ fun MainScreen(
         remember(backStack, title) { TopBarController(backStack, AppBarConfig(title)) }
 
     val deepLinkNavigator = remember(backStack) { DeepLinkNavigatorImpl(backStack) }
+
+    LaunchedEffect(pendingDeepLink, deepLinkNavigator) {
+        pendingDeepLink?.let {
+            deepLinkNavigator.navigate(it)
+            onDeepLinkConsumed(it)
+        }
+    }
 
     CompositionLocalProvider(
         LocalTopBarController provides topBarController,

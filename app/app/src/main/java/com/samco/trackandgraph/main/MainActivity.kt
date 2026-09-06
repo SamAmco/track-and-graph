@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
@@ -53,6 +54,9 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.data.lua.LuaEngineSwitch
+import com.samco.trackandgraph.navigation.DeepLink
+import com.samco.trackandgraph.navigation.PendingIntentProvider
+import com.samco.trackandgraph.navigation.findFirstDescentToReminder
 import com.samco.trackandgraph.reminders.ReminderInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.settings.TngSettings
@@ -62,9 +66,13 @@ import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 enum class ThemeSelection(
@@ -137,13 +145,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         checkDisableLuaEngine()
         viewModel.init()
-        intent?.data?.let { handleDeepLink(it) }
+        handleIntent(intent)
         onThemeSelected(currentTheme.value)
         registerScreenOffReceiver()
         observeAppLockSecureWindowFlag()
         val content = ComposeView(this).apply {
             consumeWindowInsets = false
             setContent {
+                val pendingDeepLink by viewModel.pendingDeepLink.collectAsStateWithLifecycle()
                 CompositionLocalProvider(LocalSettings provides tngSettings) {
                     AppLockGate {
                         var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
@@ -161,6 +170,8 @@ class MainActivity : AppCompatActivity() {
                                     onThemeSelected = ::onThemeSelected,
                                     currentDateFormat = currentDateFormat,
                                     onDateFormatSelected = ::onDateFormatSelected,
+                                    pendingDeepLink = pendingDeepLink,
+                                    onDeepLinkConsumed = viewModel::consumePendingDeepLink,
                                 )
                             }
                         }
@@ -264,7 +275,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        intent ?: return
         intent.data?.let { handleDeepLink(it) }
+        if (intent.hasExtra(PendingIntentProvider.REMINDER_ID_EXTRA)) {
+            val reminderId = intent.getLongExtra(PendingIntentProvider.REMINDER_ID_EXTRA, -1L)
+            intent.removeExtra(PendingIntentProvider.REMINDER_ID_EXTRA)
+            if (reminderId >= 0L) viewModel.openReminderNotification(reminderId)
+        }
     }
 
     private fun handleDeepLink(uri: Uri) = deepLinkHandler.handleUri(uri.toString())
@@ -280,12 +302,33 @@ class MainActivityViewModel @Inject constructor(
 
     private var hasInitialized = false
 
+    private val _pendingDeepLink = MutableStateFlow<DeepLink?>(null)
+    val pendingDeepLink = _pendingDeepLink.asStateFlow()
+
     fun init() {
         if (hasInitialized) return
         hasInitialized = true
 
         syncAlarms()
         recoverTimerServiceIfNecessary()
+    }
+
+    fun openReminderNotification(reminderId: Long) {
+        viewModelScope.launch(io) {
+            val descent = try {
+                dataInteractor.getGroupGraphSync().findFirstDescentToReminder(reminderId)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                Timber.e(t, "Failed to resolve reminder notification deep link")
+                null
+            } ?: return@launch
+            _pendingDeepLink.value = DeepLink.ToGroupItem(descent)
+        }
+    }
+
+    fun consumePendingDeepLink(deepLink: DeepLink) {
+        _pendingDeepLink.compareAndSet(deepLink, null)
     }
 
     private fun syncAlarms() {

@@ -133,7 +133,11 @@ class ReminderFallbackWorker @AssistedInject constructor(
 
             // Show notification for missed reminders
             if (missedReminders.isNotEmpty()) {
-                showMissedReminderNotification(reminder.reminderName, missedReminders)
+                showMissedReminderNotification(
+                    reminderId = reminder.id,
+                    reminderName = reminder.reminderName,
+                    missedTimes = missedReminders,
+                )
             }
 
             // Schedule the next reminder as normal
@@ -172,14 +176,18 @@ class ReminderFallbackWorker @AssistedInject constructor(
         return missedReminders
     }
 
-    private fun showMissedReminderNotification(reminderName: String, missedTimes: List<Instant>) {
+    private fun showMissedReminderNotification(
+        reminderId: Long,
+        reminderName: String,
+        missedTimes: List<Instant>,
+    ) {
         createReminderNotificationChannel(applicationContext)
 
         val context = applicationContext
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val pendingIntent = pendingIntentProvider.getMainActivityPendingIntent()
+        val pendingIntent = pendingIntentProvider.getReminderNotificationPendingIntent(reminderId)
 
         val notificationContent = createNotificationContent(reminderName, missedTimes)
 

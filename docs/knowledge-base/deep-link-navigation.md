@@ -1,6 +1,6 @@
 ---
 title: Deep-link navigation — DeepLink, descent-relative paths, navigator, back-stack append
-description: How in-app deep-link navigation works — the DeepLink sealed type carries a pre-resolved GroupDescentPath (a chain from the user's current GroupScreen to the destination); callers compute paths client-side because a component can have multiple placements when ancestors are symlinked; groupItemId is nullable — non-null scrolls to a placement in the innermost group, null lands the user inside that group with no scroll (used for tapping a group in search); DeepLinkNavigator is provided via LocalDeepLinkNavigator CompositionLocal; applyGroupDescentPath appends onto the current back stack.
+description: How deep-link navigation works for in-app actions and reminder notifications — path resolution, notification launch hand-off, first-path selection, navigator composition, back-stack append, and scroll targeting.
 topics:
   - DeepLink is a narrow in-app data type; only ToGroupItem(descent) exists today
   - Paths are descent-relative — anchored at the user's current GroupScreen, not at root
@@ -18,6 +18,8 @@ topics:
   - GroupNavKey.scrollToGroupItemId is consumed once by GroupScreen via a rememberSaveable flag keyed on the target id
   - Scroll must run in composition scope — lazyGridState.animateScrollToItem needs a MonotonicFrameClock that viewModelScope does not provide
   - Search must hide before navigating — the nav back-stack only covers nav3 destinations, not the in-place search overlay
+  - Reminder notifications carry reminderId rather than groupItemId so moving a reminder does not stale the payload
+  - MainActivity resolves the reminder's current first path from the root GroupGraph; missing/global-only reminders fall back to a normal app launch
 keywords: [deep-link, DeepLink, DeepLinkNavigator, DeepLinkNavigatorImpl, LocalDeepLinkNavigator, GroupDescentPath, ResolvedPath, SearchResultItem, applyGroupDescentPath, descent-relative, append-semantics, scrollToGroupItemId, GroupNavKey, NavBackStack, CompositionLocal, staticCompositionLocalOf, navigation3, symlink, disambiguation, SymlinksDialog, SymlinksDialogContent, onPathClick, search, SearchScreen, ComponentKey, buildResolvedPaths, walkPaths, rememberSaveable, MonotonicFrameClock, animateScrollToItem, LaunchedEffect, hideSearch]
 ---
 
@@ -49,7 +51,7 @@ The downside is the O(paths) walk instead of O(depth), but paths are computed on
 
 ## DeepLink surface
 
-- **`DeepLink` (data, `navigation/DeepLink.kt`)** — sealed interface. Only `ToGroupItem(descent: GroupDescentPath)` exists. External entry points (notifications, widgets, URI schemes) will add variants here. Keep this narrow — one funnel for all "navigate to thing" intents.
+- **`DeepLink` (data, `navigation/DeepLink.kt`)** — sealed interface. Only `ToGroupItem(descent: GroupDescentPath)` exists. Reminder notifications resolve their external payload into this existing variant; future entry points should reuse an existing semantic destination when possible and add variants only when necessary. Keep this narrow — one funnel for all "navigate to thing" intents.
 - **`GroupDescentPath` (data, `navigation/GroupDescentPath.kt`)** — `(groupIds: List<Long>, groupItemId: Long)`. Carries only ids so any caller can construct one with minimal information — no `Group` DTOs needed. Semantically a descent chain; see the section above.
 - **`DeepLinkNavigator` (`navigation/DeepLinkNavigator.kt`)** — interface + CompositionLocal + impl. The impl is *not* `@Singleton` because it holds a reference to the `NavBackStack`, which is created per `MainScreen` composition via `rememberNavBackStack`.
 - **`applyGroupDescentPath` (extension on `NavBackStack<NavKey>`)** — imperative glue. Lives next to the rest of the back-stack wiring conceptually (same module, same file as the navigator). Pushes one `GroupNavKey` per id (outer-to-inner); the last entry carries `scrollToGroupItemId`. Empty `groupIds` replaces the top entry with a `copy(scrollToGroupItemId = …)` so the current screen scrolls without a nav transition.
@@ -59,6 +61,30 @@ The downside is the O(paths) walk instead of O(depth), but paths are computed on
 Navigation is genuinely ambient — any screen, any depth may want to fire a deep-link. Threading callbacks through `GroupScreen` → `SearchScreen` (and whatever comes next — breadcrumbs, notification landing screens) bloats every screen signature and leaks nav concerns. The app already uses this pattern for `LocalTopBarController` at the `MainScreen` level; `LocalDeepLinkNavigator` mirrors it exactly and is provided in the same `CompositionLocalProvider` call.
 
 The navigator is constructed via `remember(backStack) { DeepLinkNavigatorImpl(backStack) }` so it rebuilds only if the back stack identity changes.
+
+## Reminder notification entry point
+
+Reminder notification content intents carry the reminder entity ID, not its grouped
+`groupItemId`. A move deletes and recreates the grouped placement, so persisting that placement ID
+would make an already-scheduled notification stale. The reminder ID remains stable across moves.
+
+`MainActivityViewModel` loads the current root `GroupGraph` and walks it in display order for the
+first `ReminderNode` with that reminder ID. This single walk both discovers the reminder's current
+group-item placement and constructs a root-relative `GroupDescentPath`. If the reminder was deleted,
+is global-only, or is no longer reachable, no navigation event is produced and the notification tap
+behaves as a normal app launch. If symlinked ancestor groups produce multiple paths, the first path
+in graph/display order is used; every path lands in the same owning group.
+
+The notification PendingIntent clears the existing task, so `MainScreen` starts with its root
+`GroupNavKey` and the root-relative descent is valid for the existing append-based
+`DeepLinkNavigator`. The pending `DeepLink` is retained in `MainActivityViewModel` until
+`MainScreen` is actually composed and consumes it. This lets app-lock and first-run UI delay
+navigation without losing the request. The consumed Intent extra is removed immediately so an
+activity recreation does not enqueue the same navigation again.
+
+Each reminder content PendingIntent uses a reminder-derived request code plus
+`FLAG_UPDATE_CURRENT`. Intent extras do not distinguish PendingIntents, so using the shared main
+activity request code would cause different reminder notifications to share one payload.
 
 ## Symlink disambiguation — dialog in tap-to-navigate mode
 

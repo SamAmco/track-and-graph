@@ -54,7 +54,13 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
         val message = intent?.extras?.getString(ALARM_MESSAGE_KEY) ?: return
 
-        val pendingIntent = pendingIntentProvider.getMainActivityPendingIntent()
+        val reminderId = intent
+            .takeIf { it.hasExtra(ALARM_REMINDER_ID_KEY) }
+            ?.getLongExtra(ALARM_REMINDER_ID_KEY, -1L)
+            ?.takeIf { it >= 0L }
+        val pendingIntent = reminderId?.let {
+            pendingIntentProvider.getReminderNotificationPendingIntent(it)
+        } ?: pendingIntentProvider.getMainActivityPendingIntent()
 
         val notification = NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
             .setContentTitle(message)
@@ -74,7 +80,6 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
 
         //Schedule the next notification for this specific reminder using WorkManager
-        val reminderId = intent.extras?.getLong(ALARM_REMINDER_ID_KEY)
         if (reminderId != null) {
             // Cancel the fallback WorkManager task since the alarm fired successfully
             // Cancel by tag for backwards compatibility with old work scheduled before unique work names

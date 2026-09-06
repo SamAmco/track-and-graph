@@ -16,6 +16,9 @@
  */
 package com.samco.trackandgraph.navigation
 
+import com.samco.trackandgraph.data.database.dto.GroupGraph
+import com.samco.trackandgraph.data.database.dto.GroupGraphItem
+
 /**
  * A descent from the user's current `GroupScreen` down to a destination group.
  *
@@ -29,3 +32,37 @@ data class GroupDescentPath(
     val groupIds: List<Long>,
     val groupItemId: Long?,
 )
+
+/** Finds the first root-relative descent to a grouped reminder in display order. */
+internal fun GroupGraph.findFirstDescentToReminder(reminderId: Long): GroupDescentPath? =
+    findFirstDescentToReminder(
+        reminderId = reminderId,
+        groupIds = emptyList(),
+        visitedGroupIds = mutableSetOf(group.id),
+    )
+
+private fun GroupGraph.findFirstDescentToReminder(
+    reminderId: Long,
+    groupIds: List<Long>,
+    visitedGroupIds: MutableSet<Long>,
+): GroupDescentPath? {
+    for (child in children) {
+        if (child is GroupGraphItem.ReminderNode && child.reminder.id == reminderId) {
+            return GroupDescentPath(groupIds = groupIds, groupItemId = child.groupItemId)
+        }
+
+        if (child is GroupGraphItem.GroupNode) {
+            val childGroupId = child.groupGraph.group.id
+            if (visitedGroupIds.add(childGroupId)) {
+                val result = child.groupGraph.findFirstDescentToReminder(
+                    reminderId = reminderId,
+                    groupIds = groupIds + childGroupId,
+                    visitedGroupIds = visitedGroupIds,
+                )
+                visitedGroupIds.remove(childGroupId)
+                if (result != null) return result
+            }
+        }
+    }
+    return null
+}

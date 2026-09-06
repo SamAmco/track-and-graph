@@ -22,6 +22,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
+import com.samco.trackandgraph.data.algorithms.murmurHash3
 import com.samco.trackandgraph.main.MainActivity
 import com.samco.trackandgraph.widgets.TrackWidgetInputDataPointActivity
 import com.samco.trackandgraph.widgets.TrackWidgetState.DELETE_FEATURE_ID
@@ -40,6 +41,18 @@ class PendingIntentProviderImpl @Inject constructor(
             else -> context.packageManager.getLaunchIntentForPackage(context.packageName)
         }
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    override fun getReminderNotificationPendingIntent(reminderId: Long): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            .putExtra(PendingIntentProvider.REMINDER_ID_EXTRA, reminderId)
+        return PendingIntent.getActivity(
+            context,
+            reminderId.murmurHash3(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     private fun getDurationInputActivityIntent(featureId: Long): Intent {

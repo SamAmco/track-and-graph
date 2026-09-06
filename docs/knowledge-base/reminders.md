@@ -42,6 +42,10 @@ reminder has only one path through the overall hierarchy. The owning group itsel
 multiple parents, so path-based navigation can discover multiple descents to the same reminder.
 See [group-hierarchy.md](group-hierarchy.md#groupgraph-and-path-resolution).
 
+Notification taps carry the stable reminder ID and resolve its current grouped placement only when
+the app opens; they do not persist the movable group-item ID. See
+[deep-link-navigation.md](deep-link-navigation.md#reminder-notification-entry-point).
+
 Unlike other component types, reminders cannot be symlinked. The Add Symlink picker excludes them,
 and `GroupHelperImpl.createSymlink` rejects `GroupChildType.REMINDER` as a data-layer invariant.
 The generic GroupItem schema does not enforce the cardinality itself; reminder creation and
