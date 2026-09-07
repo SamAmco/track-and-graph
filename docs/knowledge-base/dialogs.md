@@ -1,6 +1,6 @@
 ---
 title: Compose dialog wrappers, footer padding, scrolling, and previews
-description: How to choose the shared dialog wrapper, avoid doubled space below action buttons, structure adaptive content, scope Navigation 3 ViewModels, and make dialog previews render reliably.
+description: How to choose the shared dialog wrapper, avoid doubled space below action buttons, structure adaptive content, coordinate asynchronous input focus, scope Navigation 3 ViewModels, and make dialog previews render reliably.
 topics:
   - Choosing CustomDialog versus CustomContinueCancelDialog
   - Bottom padding for text-button action rows
@@ -8,8 +8,9 @@ topics:
   - Dialog-scoped Navigation 3 ViewModels and configuration changes
   - Non-navigation dialog scopes with rememberViewModelStoreOwner
   - Adaptive scrolling and height
+  - Waiting for asynchronous input policy before requesting focus
   - Previewing dialog bodies without a Dialog window
-keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelButtons, padding, halfDialogInputSpacing, scrolling, adaptive height, preview, Navigation 3, ViewModelStore, rememberViewModelStoreOwner, hiltViewModel, configuration-change, onPop]
+keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelButtons, padding, halfDialogInputSpacing, scrolling, adaptive height, keyboard, focus, FocusRequester, asynchronous, loading-state, preview, Navigation 3, ViewModelStore, rememberViewModelStoreOwner, hiltViewModel, configuration-change, onPop]
 ---
 
 # Compose dialogs
@@ -32,6 +33,12 @@ Using `inputSpacingLarge` below the action row creates the recurring “double p
 ## Scrolling and adaptive height
 
 Do not give dialog content a fixed height merely to make scrolling work. Let the dialog wrap content until constrained by the window. For a screen with a scrollable middle and fixed actions, use `CustomDialog(scrollContent = false)`, constrain the middle content with `weight(fill = false)`, and keep the action row outside that scrolling region. The shared continue/cancel wrapper already follows this pattern.
+
+## Focus after asynchronous loading
+
+When an asynchronous result decides whether a dialog should auto-focus an input, represent completion separately from the current result. An accumulated flow may emit an initial empty collection before emitting real items; treating that empty collection as the final answer creates a timing-dependent keyboard flash or leaves the field focused after later items arrive. Request focus only after loading completes and the final result says text entry is appropriate.
+
+The add-data-point dialog applies this rule to suggested values. It may display progressively accumulated suggestion chips, but it does not decide whether to focus the value field until suggestion sampling finishes. Its pager tracks eligibility per page so a completed adjacent page cannot trigger focus on a still-loading current page.
 
 ## Dialog navigation
 

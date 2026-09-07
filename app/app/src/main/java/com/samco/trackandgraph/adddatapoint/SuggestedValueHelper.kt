@@ -67,7 +67,6 @@ class SuggestedValueHelperImpl @Inject constructor(
     override fun getSuggestedValues(tracker: Tracker): Flow<List<SuggestedValue>> =
         getDataPoints(tracker)
             .take(MAX_VALUES)
-            .onCompletion { }
             .map { SuggestedValue(it.value, it.label.ifEmpty { null }) }
             .scan(emptyList<SuggestedValue>()) { acc, value -> acc + value }
             .buffer(1, onBufferOverflow = BufferOverflow.DROP_OLDEST)

@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -77,6 +78,11 @@ data class SuggestedValueViewData(
     val label: String?
 ) : Parcelable
 
+data class SuggestedValuesViewState(
+    val values: List<SuggestedValueViewData>? = null,
+    val isLoaded: Boolean = false,
+)
+
 data class FieldLockState(
     val valueLocked: Boolean = false,
     val labelLocked: Boolean = false,
@@ -90,11 +96,9 @@ sealed interface AddDataPointViewModel {
     val timestamp: LiveData<OffsetDateTime>
     val label: TextFieldValue
     val note: TextFieldValue
-    val suggestedValues: LiveData<List<SuggestedValueViewData>?>
+    val suggestedValues: LiveData<SuggestedValuesViewState>
     val currentValueAsSuggestion: LiveData<SuggestedValueViewData?>
     val lockState: FieldLockState
-
-    val focusOnValueEvent: Flow<Unit>
 
     val oldDataPoint: DataPoint?
 
@@ -261,8 +265,6 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override val oldDataPoint = config.oldDataPoint
         override val name = MutableLiveData(config.tracker.name)
 
-        override val focusOnValueEvent = MutableSharedFlow<Unit>()
-
         override var lockState by mutableStateOf(FieldLockState())
             protected set
 
@@ -298,19 +300,22 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override var label by mutableStateOf(TextFieldValue(config.label ?: ""))
         override var note by mutableStateOf(TextFieldValue(config.note ?: ""))
 
-        override val suggestedValues: LiveData<List<SuggestedValueViewData>?> = suggestedValueHelper
-            .getSuggestedValues(config.tracker)
-            .map { list ->
-                list.map {
+        override val suggestedValues: LiveData<SuggestedValuesViewState> = flow {
+            var latestValues = emptyList<SuggestedValueViewData>()
+            suggestedValueHelper.getSuggestedValues(config.tracker).collect { list ->
+                latestValues = list.map {
                     SuggestedValueViewData(
-                        it.value,
-                        getValueString(it.value, config.tracker.dataType.isDuration()),
-                        it.label
+                        value = it.value,
+                        valueStr = getValueString(it.value, config.tracker.dataType.isDuration()),
+                        label = it.label,
                     )
                 }
+                emit(SuggestedValuesViewState(values = latestValues))
             }
+            emit(SuggestedValuesViewState(values = latestValues, isLoaded = true))
+        }
             .flowOn(io)
-            .stateIn(viewModelScope, SharingStarted.Lazily, null)
+            .stateIn(viewModelScope, SharingStarted.Lazily, SuggestedValuesViewState())
             .asLiveData(viewModelScope.coroutineContext)
 
         protected val onUpdateCurrentSuggestion = MutableSharedFlow<Unit>()
@@ -376,14 +381,12 @@ class AddDataPointsViewModelImpl @Inject constructor(
             setLabelFromSuggestedValue(suggestedValue)
             viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
             if (suggestedValue.value == null) onAddClicked()
-            else viewModelScope.launch { focusOnValueEvent.emit(Unit) }
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
             setLabelFromSuggestedValue(suggestedValue)
             viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
             if (suggestedValue.value != null) onAddClicked()
-            else viewModelScope.launch { focusOnValueEvent.emit(Unit) }
         }
 
         private fun setLabelFromSuggestedValue(suggestedValue: SuggestedValueViewData) {

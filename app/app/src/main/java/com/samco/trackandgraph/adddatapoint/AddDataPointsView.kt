@@ -433,7 +433,7 @@ private fun TrackerPager(
     }
 
     val pageFocusRequester = remember { FocusRequester() }
-    val pageAvailable = remember { mutableStateOf(false) }
+    var autoFocusPages by remember { mutableStateOf(emptySet<Int>()) }
 
     LazyRow(
         state = listState,
@@ -443,31 +443,35 @@ private fun TrackerPager(
         flingBehavior = heavyFling,
     ) {
         itemsIndexed(trackerPages, key = { idx, _ -> idx }) { index, viewModel ->
-            val suggestedValues by viewModel.suggestedValues.observeAsState(null)
+            val suggestedValuesState by viewModel.suggestedValues.observeAsState(
+                SuggestedValuesViewState()
+            )
             TrackerPage(
                 modifier = Modifier
                     .blockDescendantHandoff()
                     .fillParentMaxWidth(),
                 viewModel = viewModel,
                 currentPage = index == currentPageIndex,
-                suggestedValues = suggestedValues,
+                suggestedValuesState = suggestedValuesState,
                 valueFocusRequester = if (index == currentPageIndex) pageFocusRequester else null
             )
-            // The page will ignore the focus request if the suggested
-            // values are null because it's still waiting to know if it should use
-            // quick track buttons with value and label or just labels etc
-            LaunchedEffect(suggestedValues) {
-                if (suggestedValues != null) {
-                    pageAvailable.value = true
+            LaunchedEffect(suggestedValuesState) {
+                if (suggestedValuesState.isLoaded) {
+                    val shouldAutoFocus = suggestedValuesState.values?.all { it.value == null } == true
+                    autoFocusPages = if (shouldAutoFocus) {
+                        autoFocusPages + index
+                    } else {
+                        autoFocusPages - index
+                    }
                 }
             }
         }
     }
 
-    //Don't bother requesting focus until the first page is fully available
-    // or it might be ignored
-    LaunchedEffect(listState.isScrollInProgress, pageAvailable.value) {
-        if (pageAvailable.value && !listState.isScrollInProgress) {
+    // Only request focus once the current page's complete suggestion set proves
+    // there are no quick-track values that should keep the keyboard hidden.
+    LaunchedEffect(listState.isScrollInProgress, currentPageIndex, autoFocusPages) {
+        if (currentPageIndex in autoFocusPages && !listState.isScrollInProgress) {
             pageFocusRequester.requestFocus()
         }
     }

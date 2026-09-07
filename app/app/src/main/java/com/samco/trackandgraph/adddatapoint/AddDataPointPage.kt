@@ -85,6 +85,7 @@ internal data class TrackerPageState(
     val name: String = "",
     val timestamp: OffsetDateTime? = null,
     val suggestedValues: List<SuggestedValueViewData>? = null,
+    val suggestedValuesLoaded: Boolean = false,
     val currentValueAsSuggestion: SuggestedValueViewData? = null,
     val label: TextFieldValue = TextFieldValue(),
     val note: TextFieldValue = TextFieldValue(),
@@ -148,7 +149,7 @@ internal fun TrackerPage(
     modifier: Modifier,
     viewModel: AddDataPointViewModel,
     currentPage: Boolean,
-    suggestedValues: List<SuggestedValueViewData>?,
+    suggestedValuesState: SuggestedValuesViewState,
     valueFocusRequester: FocusRequester? = null,
 ) {
     // Extract state from ViewModel
@@ -225,7 +226,8 @@ internal fun TrackerPage(
     val state = TrackerPageState(
         name = name,
         timestamp = timestamp,
-        suggestedValues = suggestedValues,
+        suggestedValues = suggestedValuesState.values,
+        suggestedValuesLoaded = suggestedValuesState.isLoaded,
         currentValueAsSuggestion = selectedSuggestedValue,
         label = label,
         note = note,
@@ -257,8 +259,10 @@ internal fun TrackerPageView(
 ) {
     val focusManager = LocalFocusManager.current
 
-    val shouldFocusValue = remember(state.suggestedValues) {
-        state.suggestedValues != null && state.suggestedValues.all { it.value == null }
+    val shouldFocusValue = remember(state.suggestedValues, state.suggestedValuesLoaded) {
+        state.suggestedValuesLoaded &&
+            state.suggestedValues != null &&
+            state.suggestedValues.all { it.value == null }
     }
 
     Column(

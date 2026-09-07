@@ -28,6 +28,7 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModel
 import com.samco.trackandgraph.adddatapoint.FieldLockState
 import com.samco.trackandgraph.adddatapoint.SuggestedValueViewData
+import com.samco.trackandgraph.adddatapoint.SuggestedValuesViewState
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Tracker
@@ -91,10 +92,11 @@ internal class PlayStoreAddDataPointViewModel(
     override val timestamp: LiveData<OffsetDateTime> = MutableLiveData(PREVIEW_END_TIME)
     override var label: TextFieldValue = TextFieldValue()
     override var note: TextFieldValue = TextFieldValue()
-    override val suggestedValues: LiveData<List<SuggestedValueViewData>?> = MutableLiveData(suggestedValues)
+    override val suggestedValues: LiveData<SuggestedValuesViewState> = MutableLiveData(
+        SuggestedValuesViewState(values = suggestedValues, isLoaded = true)
+    )
     override val currentValueAsSuggestion: LiveData<SuggestedValueViewData?> = MutableLiveData(null)
     override val lockState: FieldLockState = FieldLockState()
-    override val focusOnValueEvent: Flow<Unit> = emptyFlow()
     override val oldDataPoint: DataPoint? = null
     override var value: TextFieldValue = TextFieldValue()
 
