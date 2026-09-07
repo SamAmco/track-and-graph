@@ -1,0 +1,6 @@
+- Erinnerungen können jetzt in Gruppen platziert werden
+- Neuer Dialog zum Hinzufügen von Komponenten
+- Fehlerhafte Wertebereiche bei Balkendiagrammen behoben
+- Fehler behoben, durch den der Dialog zum Hinzufügen von Datenpunkten manchmal fälschlicherweise die Tastatur einblendete
+- Fehlende Übersetzungen ergänzt
+      

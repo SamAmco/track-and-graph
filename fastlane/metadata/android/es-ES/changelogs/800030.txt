@@ -1,0 +1,6 @@
+- Los recordatorios ahora pueden estar en grupos
+- Nuevo diálogo para añadir componentes
+- Se corrigieron rangos no válidos enviados a gráficos de barras
+- Se corrigió un problema que hacía que el diálogo para añadir puntos de datos mostrara a veces el teclado cuando no debía
+- Se añadieron las traducciones que faltaban
+      

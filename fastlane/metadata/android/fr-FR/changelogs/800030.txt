@@ -1,0 +1,6 @@
+- Les rappels peuvent désormais être placés dans des groupes
+- Nouvelle boîte de dialogue d’ajout de composants
+- Correction de plages invalides transmises aux graphiques à barres
+- Correction d’un problème où la boîte de dialogue d’ajout de point de données affichait parfois le clavier à tort
+- Ajout des traductions manquantes
+      

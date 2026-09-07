@@ -1,0 +1,6 @@
+- Reminders can now live in groups
+- New Add Component dialog
+- Fixed invalid ranges being passed to bar charts
+- Fixed the add data point dialog sometimes showing the keyboard when it shouldn't
+- Fixed missing translations
+      
