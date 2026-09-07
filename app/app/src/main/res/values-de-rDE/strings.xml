@@ -18,6 +18,8 @@
     <string name="home">Startseite</string>
     <string name="symlink">Symlink</string>
     <string name="symlinks">Symlinks</string>
+    <string name="reminder">Erinnerung</string>
+    <string name="add_component">Komponente hinzufügen</string>
     <string name="symlink_locations_title">Standorte von \"%1$s\"</string>
     <string name="add_tracker">Etwas tracken:</string>
     <string name="add">Hinzufügen</string>
@@ -46,6 +48,8 @@
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
     <string name="data_points">%1$d Datenpunkte</string>
     <string name="items_selected">%1$d Ausgewählt</string>
+    <string name="select_all">Alle auswählen</string>
+    <string name="deselect_all">Alle abwählen</string>
     <string name="ru_sure_del_data_points">Sind Sie sicher, dass Sie diese Datenpunkte löschen möchten?</string>
     <string name="delete_selected_content_description">Ausgewählte Einträge löschen</string>
     <string name="copy_selected_content_description">Ausgewählte Einträge kopieren</string>
