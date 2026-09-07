@@ -65,6 +65,7 @@ fun CustomDialog(
     usePlatformDefaultWidth: Boolean = true,
     decorFitsSystemWindows: Boolean? = null,
     supportSmoothHeightAnimation: Boolean = false,
+    modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) = DialogTheme {
     Dialog(
@@ -100,7 +101,7 @@ fun CustomDialog(
             }
 
             Surface(
-                modifier = Modifier,
+                modifier = modifier,
                 shape = MaterialTheme.shapes.large,
                 color = backgroundColor,
             ) {

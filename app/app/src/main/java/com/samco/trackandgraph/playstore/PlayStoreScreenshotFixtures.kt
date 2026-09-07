@@ -149,31 +149,88 @@ internal fun playStoreExerciseChildren(): List<GroupChild> =
         )
     }
 
-internal fun playStoreGroupsListChildren(): List<GroupChild> {
-    val groupSpecs = listOf(
-        GroupSpec("Meal time tracking", 11),
-        GroupSpec("Morning tracking", 6),
-        GroupSpec("Daily tracking", 0),
-        GroupSpec("Weekly tracking", 2),
-        GroupSpec("Exercise routine tracking", 8),
-        GroupSpec("Weight loss graphs", 7),
-        GroupSpec("Mood quality", 3),
-        GroupSpec("Stress and rest statistics", 4),
+internal fun playStoreWorkoutChildren(): List<GroupChild> {
+    val trackedAt = OffsetDateTime.of(2026, 5, 8, 8, 30, 0, 0, ZoneOffset.UTC)
+
+    fun tracker(id: Long, name: String, defaultValue: Double) = GroupChild.ChildTracker(
+        groupItemId = id,
+        id = id,
+        displayTracker = DisplayTracker(
+            id = id,
+            featureId = 300L + id,
+            name = name,
+            dataType = DataType.CONTINUOUS,
+            hasDefaultValue = true,
+            defaultValue = defaultValue,
+            defaultLabel = "reps",
+            timestamp = trackedAt.minusDays(2),
+            description = "Workout repetitions",
+            timerStartInstant = null,
+            unique = true,
+        )
     )
 
-    return groupSpecs.mapIndexed { index, spec ->
-        val id = index + 1L
+    fun group(id: Long, name: String, colorIndex: Int) =
         GroupChild.ChildGroup(
             groupItemId = id,
             id = id,
             group = DisplayGroup(
                 id = id,
-                name = spec.name,
-                colorIndex = spec.colorIndex,
+                name = name,
+                colorIndex = colorIndex,
                 unique = true,
             )
         )
-    }
+
+    return listOf(
+        tracker(id = 2L, name = "Push-ups", defaultValue = 20.0),
+        tracker(id = 3L, name = "Pull-ups", defaultValue = 8.0),
+        graphChild(
+            id = 4L,
+            viewData = lineGraphViewData(
+                id = 4L,
+                name = "Push / pull progress",
+                lines = listOf(
+                    PreviewLine(
+                        name = "Push-ups",
+                        colorIndex = 0,
+                        pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
+                        values = listOf(12.0, 14.0, 15.0, 17.0, 16.0, 19.0, 20.0),
+                    ),
+                    PreviewLine(
+                        name = "Pull-ups",
+                        colorIndex = 7,
+                        pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
+                        values = listOf(4.0, 5.0, 5.0, 6.0, 7.0, 7.0, 8.0),
+                    ),
+                ),
+                yTo = 24.0,
+            )
+        ),
+        group(id = 5L, name = "Push exercises", colorIndex = 11),
+        group(id = 6L, name = "Pull exercises", colorIndex = 6),
+        GroupChild.ChildReminder(
+            groupItemId = 1L,
+            id = 1L,
+            reminder = ReminderViewData.WeekDayReminderViewData(
+                id = 1L,
+                groupItemId = 1L,
+                name = "Push / pull workout",
+                enabled = true,
+                nextScheduled = LocalDateTime.of(2026, 5, 8, 18, 0),
+                checkedDays = CheckedDays(
+                    monday = true,
+                    tuesday = false,
+                    wednesday = true,
+                    thursday = false,
+                    friday = true,
+                    saturday = false,
+                    sunday = false,
+                ),
+                reminderDto = null,
+            )
+        ),
+    )
 }
 
 internal fun playStoreRestDayStatisticsChildren(): List<GroupChild> = listOf(

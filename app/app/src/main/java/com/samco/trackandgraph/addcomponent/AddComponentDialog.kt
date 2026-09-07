@@ -321,7 +321,7 @@ private fun AddSymlinkDestination(
 }
 
 @Composable
-private fun ComponentTypeSelectionScreen(
+internal fun ComponentTypeSelectionScreen(
     onAddTracker: () -> Unit,
     onAddGraphOrStat: () -> Unit,
     onAddGroup: () -> Unit,

@@ -61,7 +61,7 @@ fun PlayStoreScreenshot05() {
 @Preview(name = "Play Store Screenshot 6", device = PLAY_STORE_DEVICE)
 @Composable
 fun PlayStoreScreenshot06() {
-    PlayStoreGroupsListScreenshotContent()
+    PlayStoreFlexibleOrganisationScreenshotContent()
 }
 
 @PreviewTest

@@ -104,11 +104,6 @@ internal data class TrackerSpec(
     val defaultLabel: String,
 )
 
-internal data class GroupSpec(
-    val name: String,
-    val colorIndex: Int,
-)
-
 internal data class PreviewLine(
     val name: String,
     val colorIndex: Int,

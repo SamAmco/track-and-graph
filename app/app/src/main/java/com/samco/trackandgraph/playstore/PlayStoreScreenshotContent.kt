@@ -19,12 +19,15 @@ package com.samco.trackandgraph.playstore
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.addcomponent.ComponentTypeSelectionScreen
 import com.samco.trackandgraph.functions.FunctionsScreenContent
 import com.samco.trackandgraph.group.FunctionClickListeners
 import com.samco.trackandgraph.group.GraphStatClickListeners
@@ -33,6 +36,9 @@ import com.samco.trackandgraph.group.GroupScreenView
 import com.samco.trackandgraph.group.TrackerClickListeners
 import com.samco.trackandgraph.reminders.ui.RemindersScreen
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.ui.CustomDialog
+import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 
 private const val PLAY_STORE_DEVICE = "spec:width=1080px,height=2340px,dpi=420"
 
@@ -66,10 +72,10 @@ internal fun PlayStoreRestDayStatisticsPreview() {
     PlayStoreRestDayStatisticsScreenshotContent()
 }
 
-@Preview(name = "Play Store 6 - Groups list", device = PLAY_STORE_DEVICE)
+@Preview(name = "Play Store 6 - Flexible organisation", device = PLAY_STORE_DEVICE)
 @Composable
-internal fun PlayStoreGroupsListPreview() {
-    PlayStoreGroupsListScreenshotContent()
+internal fun PlayStoreFlexibleOrganisationPreview() {
+    PlayStoreFlexibleOrganisationScreenshotContent()
 }
 
 @Preview(name = "Play Store 7 - Reminders", device = PLAY_STORE_DEVICE)
@@ -161,28 +167,54 @@ internal fun PlayStoreRestDayStatisticsScreenshotContent() {
 }
 
 @Composable
-internal fun PlayStoreGroupsListScreenshotContent() {
+internal fun PlayStoreFlexibleOrganisationScreenshotContent() {
     TnGComposeTheme {
         PlayStorePreviewEnvironment {
-            PlayStoreGroupFrame(
-                title = "Track & Graph",
-                backNavigationAction = false,
-            ) {
-                GroupScreenView(
-                    lazyGridState = rememberLazyGridState(),
-                    isLoading = false,
-                    showEmptyText = false,
-                    showFab = false,
-                    showReleaseNotesButton = false,
-                    allChildren = playStoreGroupsListChildren(),
-                    trackerClickListeners = TrackerClickListeners(),
-                    graphStatClickListeners = GraphStatClickListeners(),
-                    groupClickListeners = GroupClickListeners(),
-                    functionClickListeners = FunctionClickListeners(),
-                    fabInsetPaddingOverride = PaddingValues(bottom = PlayStoreNavigationBarHeight)
-                )
+            Box(modifier = Modifier.fillMaxSize()) {
+                PlayStoreGroupFrame(title = "Push / Pull Workout") {
+                    GroupScreenView(
+                        lazyGridState = rememberLazyGridState(),
+                        isLoading = false,
+                        showEmptyText = false,
+                        showFab = false,
+                        showReleaseNotesButton = false,
+                        allChildren = playStoreWorkoutChildren(),
+                        trackerClickListeners = TrackerClickListeners(),
+                        graphStatClickListeners = GraphStatClickListeners(),
+                        groupClickListeners = GroupClickListeners(),
+                        functionClickListeners = FunctionClickListeners(),
+                        fabInsetPaddingOverride = PaddingValues(bottom = PlayStoreNavigationBarHeight)
+                    )
+                }
+                PlayStoreAddComponentDialogOverlay()
             }
         }
+    }
+}
+
+@Composable
+private fun PlayStoreAddComponentDialogOverlay() {
+    CustomDialog(
+        onDismissRequest = {},
+        scrollContent = false,
+        supportSmoothHeightAnimation = true,
+        modifier = Modifier.width(330.dp),
+        paddingValues = PaddingValues(
+            start = inputSpacingLarge,
+            end = inputSpacingLarge,
+            bottom = halfDialogInputSpacing,
+            top = inputSpacingLarge,
+        ),
+    ) {
+        ComponentTypeSelectionScreen(
+            onAddTracker = {},
+            onAddGraphOrStat = {},
+            onAddGroup = {},
+            onAddFunction = {},
+            onAddReminder = {},
+            onAddSymlink = {},
+            onDismiss = {},
+        )
     }
 }
 
