@@ -103,6 +103,18 @@ android {
                 "@xml/production_network_security_config"
             manifestPlaceholders["recreateAlarmsEnabled"] = "true"
         }
+        create("benchmark") {
+            initWith(getByName("release"))
+            isDebuggable = false
+            isProfileable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".benchmark"
+            versionNameSuffix = "-benchmark"
+            matchingFallbacks += listOf("release")
+            resValue("string", "app_name", "Benchmark Track & Graph")
+        }
     }
 
     flavorDimensions += "distribution"

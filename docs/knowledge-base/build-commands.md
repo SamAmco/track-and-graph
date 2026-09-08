@@ -3,6 +3,7 @@ title: Build, test, and screenshot commands
 description: Gradle commands for building and running tests; Play Store vs FOSS release flavor intent, including distribution-specific support payments; Compose screenshot-test setup for Play Store and tutorial image capture.
 topics:
   - Build: cd app && ./gradlew assembleDebug
+  - Benchmark install: cd app && ./gradlew :app:installFossBenchmark
   - Test: cd app && ./gradlew :data:testDebugUnitTest
   - Release flavors: playStore uses Google Play Billing support; foss uses external Buy Me a Coffee support
   - F-Droid metadata should build the foss flavor explicitly, not a flavorless release
@@ -16,7 +17,7 @@ topics:
   - Tutorial screenshots: Compose screenshot test previews, no emulator
   - AGP 9.3 fixes screenshot-test manifest generation that failed under AGP 9.1
   - Kotlin and Kotlin Gradle plugin versions stay aligned; Kotlin 2.4 + AGP 9.3 requires explicit build and screenshot verification
-keywords: [build, gradle, dependency, version-catalog, Kotlin, KGP, AGP, compatibility, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
+keywords: [build, gradle, dependency, version-catalog, Kotlin, KGP, AGP, compatibility, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, benchmark, profileable, installFossBenchmark, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
 ---
 
 # Build Commands
@@ -26,7 +27,10 @@ All commands run from `app/` directory (`gradlew` is at `app/gradlew`, not the p
 ```bash
 cd app && ./gradlew assembleDebug              # Build debug APK
 cd app && ./gradlew :data:testDebugUnitTest    # Run data unit tests
+cd app && ./gradlew :app:installFossBenchmark # Install the release-like profiling build
 ```
+
+The `benchmark` build type is intended for quick, manual performance checks on a real device. It inherits release configuration, is non-debuggable and profileable, uses release variants of library modules, and is signed with the debug key under the separate `.benchmark` application ID. R8 minification and resource shrinking are disabled to keep iteration fast; use `debugMinify` or a release build when validating results that may depend on R8 optimization.
 
 Release distribution variants:
 
