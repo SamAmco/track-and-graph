@@ -121,13 +121,38 @@ class DataDisplayIntervalHelper @Inject constructor() {
         )
     }
 
+    /**
+     * Selects readable bounds and subdivisions. When [approximateLineCount] is supplied, it is
+     * treated as a layout-derived preference; one extra line is allowed when that produces a
+     * substantially clearer interval. Omitting it preserves the legacy 6–12 line behavior.
+     */
     fun getYParameters(
         yMin: Double,
         yMax: Double,
         isDurationBasedRange: Boolean,
         fixedBounds: Boolean,
+        approximateLineCount: Int? = null,
     ): YAxisParameters {
-        val parameters = getYParametersInternal(yMin, yMax, isDurationBasedRange, fixedBounds)
+        val minimumLines = approximateLineCount
+            ?.coerceAtLeast(MINIMUM_SUPPORTED_LINE_COUNT)
+            ?.coerceAtMost(DEFAULT_MIN_LINES)
+            ?: DEFAULT_MIN_LINES
+        val maximumLines = approximateLineCount
+            ?.coerceAtLeast(MINIMUM_SUPPORTED_LINE_COUNT)
+            ?.coerceAtMost(Int.MAX_VALUE - 1)
+            ?.plus(1)
+            ?: DEFAULT_MAX_LINES
+        val fallbackLines = approximateLineCount
+            ?.coerceAtLeast(MINIMUM_SUPPORTED_LINE_COUNT)
+            ?: DEFAULT_FALLBACK_LINES
+        val parameters = getYParametersInternal(
+            yMin = yMin,
+            yMax = yMax,
+            timeData = isDurationBasedRange,
+            fixedBounds = fixedBounds,
+            minimumLines = minimumLines,
+            maximumLines = maximumLines,
+        )
         if (parameters != null) {
             return YAxisParameters(
                 subdivides = parameters.nLines,
@@ -136,18 +161,20 @@ class DataDisplayIntervalHelper @Inject constructor() {
             )
         }
 
-        // fallback if we don't find any solution. Gets used when all our solutions use to little of the range.
-        // this was the default behavior before this new algorithm existed
+        // Fall back to evenly splitting the exact range when no candidate uses enough of it. Legacy
+        // callers retain the previous 11-line fallback; adaptive callers retain their requested count.
         return YAxisParameters(
-            subdivides = 11,
+            subdivides = fallbackLines,
             boundsMin = yMin,
             boundsMax = yMax
         )
     }
 
     companion object {
-        private const val MIN_INTERVALS = 6
-        private const val MAX_INTERVALS = 12
+        private const val MINIMUM_SUPPORTED_LINE_COUNT = 2
+        private const val DEFAULT_MIN_LINES = 6
+        private const val DEFAULT_MAX_LINES = 12
+        private const val DEFAULT_FALLBACK_LINES = 11
         private val MIN_USED_RANGE_STEPS = listOf(0.99999, 0.9, 0.8, 0.7)
     }
 
@@ -156,8 +183,12 @@ class DataDisplayIntervalHelper @Inject constructor() {
         yMin: Double,
         yMax: Double,
         timeData: Boolean,
-        fixedBounds: Boolean
+        fixedBounds: Boolean,
+        minimumLines: Int = DEFAULT_MIN_LINES,
+        maximumLines: Int = DEFAULT_MAX_LINES,
     ): PossibleInterval? {
+        require(minimumLines >= MINIMUM_SUPPORTED_LINE_COUNT)
+        require(maximumLines >= minimumLines)
         val yRange = yMax - yMin
 
         val (base, preferredDivisors, allDivisors) = when (timeData) {
@@ -191,11 +222,11 @@ class DataDisplayIntervalHelper @Inject constructor() {
             // so after we generate a lot of possible interval prototypes, in this first filter we get rid of all the
             // ones who just are not plausible at all. We'll do a second check with the exact data further below
             .filter { interval ->
-                ceil(yRange / interval.interval) >= MIN_INTERVALS - 1 &&
-                        ceil(yRange / interval.interval) <= MAX_INTERVALS + 1
+                ceil(yRange / interval.interval) >= minimumLines - 1 &&
+                        ceil(yRange / interval.interval) <= maximumLines + 1
             }
             .mapNotNull { proto -> finishProto(proto, yMin, yMax, fixedBounds = fixedBounds) }
-            .filter { interval -> interval.nLines in MIN_INTERVALS..MAX_INTERVALS }
+            .filter { interval -> interval.nLines in minimumLines..maximumLines }
 
         if (reasonableIntervals.isEmpty()) return null
 

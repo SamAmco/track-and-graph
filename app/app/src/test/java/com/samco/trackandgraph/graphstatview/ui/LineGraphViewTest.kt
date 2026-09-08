@@ -40,6 +40,45 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `fixed y ticks retain legacy whole number divisions`() {
+        assertEquals(
+            listOf(0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0),
+            calculateYTicks(rawMin = 0.0, rawMax = 12.0, targetCount = 8, fixed = true),
+        )
+    }
+
+    @Test
+    fun `fixed zero to one hundred range uses the same clean ticks at different heights`() {
+        val points = listOf(point(0), point(100, 100.0))
+        val listLayout = requireNotNull(
+            layout(points, height = 220f, fixedYMin = 0.0, fixedYMax = 100.0)
+        )
+        val fullScreenLayout = requireNotNull(
+            layout(points, height = 600f, fixedYMin = 0.0, fixedYMax = 100.0)
+        )
+
+        val expected = listOf(0.0, 20.0, 40.0, 60.0, 80.0, 100.0)
+        assertEquals(expected, listLayout.yTicks.map { it.value })
+        assertEquals(expected, fullScreenLayout.yTicks.map { it.value })
+    }
+
+    @Test
+    fun `duration y ticks use clock friendly legacy intervals`() {
+        val ticks = calculateYTicks(
+            rawMin = 1.0 * 60 * 60 + 53 * 60,
+            rawMax = 8.0 * 60 * 60 + 25 * 60,
+            targetCount = 8,
+            fixed = false,
+            durationBasedRange = true,
+        )
+        val intervals = ticks.zipWithNext { first, second -> second - first }
+
+        assertTrue(intervals.isNotEmpty())
+        assertTrue(intervals.all { it == intervals.first() })
+        assertEquals(0.0, intervals.first() % (30 * 60))
+    }
+
+    @Test
     fun `dynamic y ticks cover negative crossing zero tiny and large ranges`() {
         listOf(
             -9.1 to -0.7,
@@ -368,6 +407,7 @@ class LineGraphViewTest {
     private fun layout(
         points: List<LineGraphPoint>,
         width: Float = 400f,
+        height: Float = 220f,
         visibleMinX: Long = 0L,
         visibleMaxX: Long = 100L,
         fixedYMin: Double? = null,
@@ -375,7 +415,7 @@ class LineGraphViewTest {
         measureText: (String) -> IntSize = { IntSize(width = 30, height = 10) },
     ) = calculateLineGraphLayout(
         width = width,
-        height = 220f,
+        height = height,
         visibleMinX = visibleMinX,
         visibleMaxX = visibleMaxX,
         points = points,

@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.YRangeType
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
 import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
@@ -71,10 +72,8 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
-import kotlin.math.log10
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
 import kotlin.math.roundToLong
 import kotlin.math.sin
 import timber.log.Timber
@@ -84,6 +83,7 @@ private const val REVEAL_DURATION_MILLIS = 450
 private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
 private val lineWidth = 2.dp
 private val vertexWidth = 6.dp
+private val yAxisIntervalHelper = DataDisplayIntervalHelper()
 
 private val lineGraphSecondFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 private val lineGraphMinuteFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -425,6 +425,7 @@ internal fun calculateLineGraphLayout(
         initialRange.second,
         approximateTickCount,
         fixedYMin != null && fixedYMax != null,
+        durationBasedRange,
     )
     val yTicks = yValues.map { value ->
         YTick(value, if (durationBasedRange) formatTimeDuration(value.roundToLong()) else formatLineGraphNumber(value))
@@ -561,30 +562,18 @@ internal fun calculateYTicks(
     rawMax: Double,
     targetCount: Int,
     fixed: Boolean,
+    durationBasedRange: Boolean = false,
 ): List<Double> {
-    if (fixed) {
-        val step = (rawMax - rawMin) / (targetCount - 1)
-        return List(targetCount) { rawMin + step * it }.let { it.dropLast(1) + rawMax }
-    }
-    val step = niceStep((rawMax - rawMin) / (targetCount - 1))
-    val minValue = floor(rawMin / step) * step
-    val maxValue = ceil(rawMax / step) * step
-    val count = ((maxValue - minValue) / step).roundToLong().toInt() + 1
-    return List(count) { minValue + step * it }.let { it.dropLast(1) + maxValue }
-}
-
-private fun niceStep(rawStep: Double): Double {
-    val exponent = floor(log10(rawStep))
-    val magnitude = 10.0.pow(exponent)
-    val fraction = rawStep / magnitude
-    val niceFraction = when {
-        fraction <= 1.0 -> 1.0
-        fraction <= 2.0 -> 2.0
-        fraction <= 2.5 -> 2.5
-        fraction <= 5.0 -> 5.0
-        else -> 10.0
-    }
-    return niceFraction * magnitude
+    val parameters = yAxisIntervalHelper.getYParameters(
+        yMin = rawMin,
+        yMax = rawMax,
+        isDurationBasedRange = durationBasedRange,
+        fixedBounds = fixed,
+        approximateLineCount = targetCount,
+    )
+    val step = (parameters.boundsMax - parameters.boundsMin) / (parameters.subdivides - 1)
+    return List(parameters.subdivides) { parameters.boundsMin + step * it }
+        .let { it.dropLast(1) + parameters.boundsMax }
 }
 
 internal fun expandEqualRange(minValue: Double, maxValue: Double): Pair<Double, Double> {
