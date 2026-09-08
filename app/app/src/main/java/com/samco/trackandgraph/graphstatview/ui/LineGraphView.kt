@@ -14,7 +14,11 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -34,6 +39,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -164,6 +171,13 @@ private fun LineGraphBodyView(
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var layout by remember(viewData) { mutableStateOf<LineGraphLayout?>(null) }
     val reveal = remember(viewData) { Animatable(0f) }
+    val viewportTransform = rememberUpdatedState<(Float, Float) -> Unit> { panX, gestureZoom ->
+        val plotWidth = layout?.plotRect?.width ?: return@rememberUpdatedState
+        zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
+        val newHalfSpanFraction = 0.5 / zoom
+        centerFraction = (centerFraction - panX / plotWidth / zoom)
+            .coerceIn(newHalfSpanFraction, 1.0 - newHalfSpanFraction)
+    }
 
     LaunchedEffect(
         canvasSize,
@@ -209,12 +223,14 @@ private fun LineGraphBodyView(
             .onSizeChanged { canvasSize = it }
             .pointerInput(isInteractive, canvasSize, maximumZoom) {
                 if (!isInteractive) return@pointerInput
-                detectTransformGestures { _, pan, gestureZoom, _ ->
-                    val plotWidth = layout?.plotRect?.width ?: return@detectTransformGestures
-                    zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
-                    val newHalfSpanFraction = 0.5 / zoom
-                    centerFraction = (centerFraction - pan.x / plotWidth / zoom)
-                        .coerceIn(newHalfSpanFraction, 1.0 - newHalfSpanFraction)
+                detectLineGraphPinchGestures { panX, gestureZoom ->
+                    viewportTransform.value(panX, gestureZoom)
+                }
+            }
+            .pointerInput(isInteractive, canvasSize, maximumZoom) {
+                if (!isInteractive) return@pointerInput
+                detectHorizontalDragGestures { _, dragAmount ->
+                    viewportTransform.value(dragAmount, 1f)
                 }
             }
     ) {
@@ -315,6 +331,23 @@ private fun LineGraphBodyView(
     GraphLegend(
         items = lines.map { GraphLegendItem(color = getColor(it.color), label = it.name) }
     )
+}
+
+private suspend fun PointerInputScope.detectLineGraphPinchGestures(
+    onTransform: (panX: Float, zoom: Float) -> Unit,
+) = awaitEachGesture {
+    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+    var transforming = false
+    do {
+        val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+        if (event.changes.count { it.pressed } > 1) transforming = true
+        if (transforming) {
+            val pan = event.calculatePan()
+            val zoom = event.calculateZoom()
+            if (pan.x != 0f || zoom != 1f) onTransform(pan.x, zoom)
+            event.changes.forEach { it.consume() }
+        }
+    } while (event.changes.any { it.pressed })
 }
 
 internal data class LineGraphLayout(
