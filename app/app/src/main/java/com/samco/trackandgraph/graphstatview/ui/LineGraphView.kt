@@ -139,11 +139,9 @@ private fun LineGraphBodyView(
             performanceLogger.recordPointPreparation(startedAt, points.size)
         }
     }
-    val allTimes = remember(allPoints) {
-        allPoints.map { it.timestamp.toInstant().toEpochMilli() }.distinct().sorted()
-    }
-    val fullMinX = allTimes.first()
-    val fullMaxX = allTimes.last().let { if (it == fullMinX) it + 1L else it }
+    val fullMinX = allPoints.first().timestamp.toInstant().toEpochMilli()
+    val fullMaxX = allPoints.last().timestamp.toInstant().toEpochMilli()
+        .let { if (it == fullMinX) it + 1L else it }
     val isInteractive = graphViewMode is GraphViewMode.FullScreenMode
     var zoom by remember(viewData) { mutableDoubleStateOf(1.0) }
     var centerFraction by remember(viewData) { mutableDoubleStateOf(0.5) }
@@ -375,25 +373,26 @@ internal fun calculateLineGraphLayout(
     val yTicks = yValues.map { value ->
         YTick(value, if (durationBasedRange) formatTimeDuration(value.roundToLong()) else formatLineGraphNumber(value))
     }
-    val widestYLabel = yTicks.maxOf { measureText(it.label).width }.toFloat()
-    val labelHeight = yTicks.maxOf { measureText(it.label).height }.toFloat()
+    val yLabelSizes = yTicks.map { measureText(it.label) }
+    val widestYLabel = yLabelSizes.maxOf { it.width }.toFloat()
+    val labelHeight = yLabelSizes.maxOf { it.height }.toFloat()
     val left = widestYLabel + 14f * density
     val right = width - 8f * density
     val top = max(8f * density, labelHeight / 2f)
 
     val angleRadians = Math.toRadians(abs(X_LABEL_ANGLE).toDouble())
+    val xLabelSizes = mutableMapOf<String, IntSize>()
     val candidates = points.asSequence()
         .map { it.timestamp.toInstant().toEpochMilli() }
         .filter { it in visibleMinX..visibleMaxX }
         .distinct()
-        .sorted()
         .map { millis ->
             val label = formatLineGraphTimestamp(
                 epochMillis = millis,
                 durationMillis = visibleMaxX - visibleMinX,
                 zoneId = ZoneId.systemDefault(),
             )
-            val measured = measureText(label)
+            val measured = xLabelSizes.getOrPut(label) { measureText(label) }
             XTick(
                 epochMillis = millis,
                 label = label,
@@ -401,7 +400,7 @@ internal fun calculateLineGraphLayout(
             )
         }
         .toList()
-    val maxLabelWidth = candidates.maxOfOrNull { measureText(it.label).width }?.toFloat() ?: 0f
+    val maxLabelWidth = xLabelSizes.values.maxOfOrNull { it.width }?.toFloat() ?: 0f
     val rotatedLabelHeight = (
         maxLabelWidth * sin(angleRadians) + labelHeight * cos(angleRadians)
         ).toFloat()

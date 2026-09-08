@@ -18,6 +18,7 @@ import org.junit.Test
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 
 class LineGraphViewTest {
@@ -261,6 +262,26 @@ class LineGraphViewTest {
         )
 
         assertEquals(listOf(0L, 50L, 100L), layout.xTicks.map { it.epochMillis })
+    }
+
+    @Test
+    fun `layout measures repeated x labels only once`() {
+        val measurementCounts = mutableMapOf<String, Int>()
+        val repeatedLabel = formatLineGraphTimestamp(
+            epochMillis = 0,
+            durationMillis = 100,
+            zoneId = ZoneId.systemDefault(),
+        )
+
+        layout(
+            points = listOf(point(0), point(100, 1.0)),
+            measureText = { label ->
+                measurementCounts[label] = measurementCounts.getOrDefault(label, 0) + 1
+                IntSize(width = 1, height = 10)
+            },
+        )
+
+        assertEquals(1, measurementCounts[repeatedLabel])
     }
 
     private fun layout(
