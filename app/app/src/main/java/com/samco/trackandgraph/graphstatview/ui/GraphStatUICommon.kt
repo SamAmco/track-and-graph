@@ -39,9 +39,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.androidplot.Plot
 import com.androidplot.ui.Anchor
 import com.androidplot.ui.HorizontalPositioning
@@ -68,6 +70,14 @@ import kotlin.math.roundToLong
 
 private const val GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER = 0.8f
 private const val GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER = 0.9f
+
+internal const val graphGridLineAlpha = 0.25f
+internal val graphGridLineThickness = 0.5.dp
+internal val graphAxisTextStyle: TextStyle
+    @Composable get() = MaterialTheme.typography.bodySmall.copy(
+        color = MaterialTheme.colorScheme.onSurface,
+        fontSize = 12.sp,
+    )
 
 @Composable
 fun ProvideGraphVicoTheme(content: @Composable () -> Unit) {

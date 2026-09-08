@@ -44,10 +44,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -81,8 +78,22 @@ import timber.log.Timber
 private const val X_LABEL_ANGLE = -28f
 private const val REVEAL_DURATION_MILLIS = 450
 private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
+private const val APPROXIMATE_Y_TICK_SPACING_DP = 32f
+private const val MINIMUM_Y_TICK_COUNT = 3
+private const val MAXIMUM_Y_TICK_COUNT = 8
 private val lineWidth = 2.dp
 private val vertexWidth = 6.dp
+private val pointLabelTextSize = 9.sp
+private val plotStartPadding = 14.dp
+private val plotEndPadding = 8.dp
+private val plotTopPadding = 8.dp
+private val plotBottomPadding = 10.dp
+private val yAxisLabelPadding = 6.dp
+private val xAxisTickLength = 3.dp
+private val xAxisLabelPadding = 6.dp
+private val axisLabelMinimumGap = 4.dp
+private val timeMarkerWidth = 3.dp
+private val pointLabelPadding = 3.dp
 private val yAxisIntervalHelper = DataDisplayIntervalHelper()
 
 private val lineGraphSecondFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
@@ -158,14 +169,9 @@ private fun LineGraphBodyView(
     val visibleMaxX = viewport.maxX
 
     val textMeasurer = rememberTextMeasurer()
-    val axisFont = remember { FontFamily(Font(R.font.roboto_mono)) }
-    val axisTextStyle = TextStyle(
-        color = MaterialTheme.colorScheme.onSurface,
-        fontFamily = axisFont,
-        fontSize = 10.sp,
-    )
-    val pointTextStyle = axisTextStyle.copy(fontSize = 9.sp)
-    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+    val axisTextStyle = graphAxisTextStyle
+    val pointTextStyle = axisTextStyle.copy(fontSize = pointLabelTextSize)
+    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)
     val markerColor = MaterialTheme.colorScheme.error
     val density = LocalDensity.current
     val graphHeight = graphHeightFor(graphViewMode, hasLegend = true)
@@ -247,22 +253,40 @@ private fun LineGraphBodyView(
 
         currentLayout.yTicks.forEach { tick ->
             val y = currentLayout.yToPixel(tick.value)
-            drawLine(revealedGridColor, Offset(plot.left, y), Offset(plot.right, y), 0.5.dp.toPx())
+            drawLine(
+                revealedGridColor,
+                Offset(plot.left, y),
+                Offset(plot.right, y),
+                graphGridLineThickness.toPx(),
+            )
             val measured = textMeasurer.measure(tick.label, axisTextStyle)
             drawText(
                 textMeasurer = textMeasurer,
                 text = tick.label,
                 style = revealedAxisStyle,
-                topLeft = Offset(plot.left - measured.size.width - 6.dp.toPx(), y - measured.size.height / 2f),
+                topLeft = Offset(
+                    plot.left - measured.size.width - yAxisLabelPadding.toPx(),
+                    y - measured.size.height / 2f,
+                ),
             )
         }
-        drawLine(revealedGridColor, Offset(plot.left, plot.top), Offset(plot.left, plot.bottom), 0.5.dp.toPx())
+        drawLine(
+            revealedGridColor,
+            Offset(plot.left, plot.top),
+            Offset(plot.left, plot.bottom),
+            graphGridLineThickness.toPx(),
+        )
 
         currentLayout.xTicks.forEach { tick ->
             val x = currentLayout.xToPixel(tick.epochMillis)
-            drawLine(revealedGridColor, Offset(x, plot.top), Offset(x, plot.bottom + 3.dp.toPx()), 0.5.dp.toPx())
+            drawLine(
+                revealedGridColor,
+                Offset(x, plot.top),
+                Offset(x, plot.bottom + xAxisTickLength.toPx()),
+                graphGridLineThickness.toPx(),
+            )
             val measured = textMeasurer.measure(tick.label, axisTextStyle)
-            val pivot = Offset(x, plot.bottom + 6.dp.toPx())
+            val pivot = Offset(x, plot.bottom + xAxisLabelPadding.toPx())
             rotate(X_LABEL_ANGLE, pivot) {
                 drawText(
                     textMeasurer = textMeasurer,
@@ -281,7 +305,7 @@ private fun LineGraphBodyView(
                         markerColor.copy(alpha = graphAlpha),
                         Offset(markerX, plot.top),
                         Offset(markerX, plot.bottom),
-                        3.dp.toPx(),
+                        timeMarkerWidth.toPx(),
                     )
                 }
             }
@@ -312,7 +336,10 @@ private fun LineGraphBodyView(
                             drawText(
                                 textMeasurer,
                                 label,
-                                Offset(pointOffset.x - measured.size.width - 3.dp.toPx(), pointOffset.y - measured.size.height),
+                                Offset(
+                                    pointOffset.x - measured.size.width - pointLabelPadding.toPx(),
+                                    pointOffset.y - measured.size.height,
+                                ),
                                 pointTextStyle.copy(color = pointTextStyle.color.copy(alpha = graphAlpha)),
                             )
                         }
@@ -419,7 +446,9 @@ internal fun calculateLineGraphLayout(
     if (!rawYMin.isFinite() || !rawYMax.isFinite() || rawYMax < rawYMin) return null
 
     val initialRange = expandEqualRange(rawYMin, rawYMax)
-    val approximateTickCount = (height / (32f * density)).toInt().coerceIn(3, 8)
+    val approximateTickCount = (height / (APPROXIMATE_Y_TICK_SPACING_DP * density))
+        .toInt()
+        .coerceIn(MINIMUM_Y_TICK_COUNT, MAXIMUM_Y_TICK_COUNT)
     val yValues = calculateYTicks(
         initialRange.first,
         initialRange.second,
@@ -433,9 +462,9 @@ internal fun calculateLineGraphLayout(
     val yLabelSizes = yTicks.map { measureText(it.label) }
     val widestYLabel = yLabelSizes.maxOf { it.width }.toFloat()
     val labelHeight = yLabelSizes.maxOf { it.height }.toFloat()
-    val left = widestYLabel + 14f * density
-    val right = width - 8f * density
-    val top = max(8f * density, labelHeight / 2f)
+    val left = widestYLabel + plotStartPadding.value * density
+    val right = width - plotEndPadding.value * density
+    val top = max(plotTopPadding.value * density, labelHeight / 2f)
 
     val angleRadians = Math.toRadians(abs(X_LABEL_ANGLE).toDouble())
     val xLabelSizes = mutableMapOf<String, IntSize>()
@@ -469,10 +498,10 @@ internal fun calculateLineGraphLayout(
     val rotatedLabelHeight = (
         maxLabelWidth * sin(angleRadians) + labelHeight * cos(angleRadians)
         ).toFloat()
-    val bottom = height - rotatedLabelHeight - 10f * density
+    val bottom = height - rotatedLabelHeight - plotBottomPadding.value * density
     if (right <= left || bottom <= top) return null
     val plot = Rect(left, top, right, bottom)
-    val minimumGap = 4f * density
+    val minimumGap = axisLabelMinimumGap.value * density
     val maximumProjectedWidth = candidates.maxOfOrNull { it.tick.projectedWidth } ?: 0f
     val maximumTickCount = maximumLineGraphTickCount(
         plotWidth = plot.width,

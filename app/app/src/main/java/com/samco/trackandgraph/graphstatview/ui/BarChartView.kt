@@ -69,6 +69,7 @@ import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.compose.cartesian.Zoom
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
@@ -112,6 +113,8 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 private val barThickness = 16.dp
+private val barBorderThickness = 0.5.dp
+private val barCollectionSpacing = 0.dp
 
 @Composable
 fun BarChartView(
@@ -371,12 +374,12 @@ private fun BarChartBodyView(
                     fill = Fill(Color(getColorInt(series.color))),
                     thickness = barThickness,
                     strokeFill = borderFill,
-                    strokeThickness = 0.5.dp,
+                    strokeThickness = barBorderThickness,
                 )
             }
             val columnLayer = rememberColumnCartesianLayer(
                 columnProvider = ColumnCartesianLayer.ColumnProvider.series(columns),
-                columnCollectionSpacing = 0.dp,
+                columnCollectionSpacing = barCollectionSpacing,
                 mergeMode = { ColumnCartesianLayer.MergeMode.Stacked },
                 rangeProvider = CartesianLayerRangeProvider.fixed(
                     minX = -0.5,
@@ -388,11 +391,14 @@ private fun BarChartBodyView(
 
             val xAxisFormatter = remember(context, xDates) { getXAxisFormatter(context, xDates) }
             val gridLine = rememberLineComponent(
-                fill = Fill(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)),
-                thickness = 0.5.dp,
+                fill = Fill(MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)),
+                thickness = graphGridLineThickness,
             )
+            val bottomAxisLabel = rememberAxisLabelComponent(style = graphAxisTextStyle)
+            val startAxisLabel = rememberAxisLabelComponent(style = graphAxisTextStyle)
             val bottomAxis = HorizontalAxis.rememberBottom(
                 line = gridLine,
+                label = bottomAxisLabel,
                 valueFormatter = CartesianValueFormatter { _, value, _ ->
                     xDates[value.roundToInt().coerceIn(xDates.indices)].format(xAxisFormatter)
                 },
@@ -404,6 +410,7 @@ private fun BarChartBodyView(
             )
             val startAxis = VerticalAxis.rememberStart(
                 line = gridLine,
+                label = startAxisLabel,
                 valueFormatter = CartesianValueFormatter { _, value, _ ->
                     if (durationBasedRange) formatTimeDuration(value.toLong())
                     else doubleToString(value)
