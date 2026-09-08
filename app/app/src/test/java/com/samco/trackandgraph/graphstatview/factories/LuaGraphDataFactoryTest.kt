@@ -314,17 +314,13 @@ class LuaGraphDataFactoryTest {
         assertEquals(ViewColorSpec.ColorIndex(2), lineGraph.lines[1].color)
         assertEquals(LineGraphPointStyle.CIRCLES_AND_NUMBERS, lineGraph.lines[1].pointStyle)
 
-        assertEquals(3.0, lineGraph.lines[0].line?.getY(0))
-        assertEquals(2.0, lineGraph.lines[0].line?.getY(1))
-        assertEquals(1.0, lineGraph.lines[0].line?.getY(2))
+        assertEquals(listOf(1.0, 2.0, 3.0), lineGraph.lines[0].points.map { it.value })
 
-        assertEquals(6.0, lineGraph.lines[1].line?.getY(0))
-        assertEquals(5.0, lineGraph.lines[1].line?.getY(1))
-        assertEquals(4.0, lineGraph.lines[1].line?.getY(2))
+        assertEquals(listOf(4.0, 5.0, 6.0), lineGraph.lines[1].points.map { it.value })
 
         assertEquals(false, lineGraph.durationBasedRange)
-        assertEquals(1.0, lineGraph.bounds.minY.toDouble())
-        assertEquals(10.0, lineGraph.bounds.maxY.toDouble())
+        assertEquals(1.0, lineGraph.fixedYMin)
+        assertEquals(10.0, lineGraph.fixedYMax)
         assertEquals(YRangeType.FIXED, lineGraph.yRangeType)
         verify(luaEngine).releaseVM(testVmLock)
     }

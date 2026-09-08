@@ -1,0 +1,293 @@
+/*
+ * This file is part of Track & Graph
+ *
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
+package com.samco.trackandgraph.graphstatview.ui
+
+import androidx.compose.ui.unit.IntSize
+import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
+import org.junit.Test
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+
+class LineGraphViewTest {
+
+    @Test
+    fun `dynamic y ticks use clear rounded intervals around the data`() {
+        assertEquals(
+            listOf(0.0, 2.5, 5.0, 7.5, 10.0),
+            calculateYTicks(rawMin = 0.7, rawMax = 9.1, targetCount = 5, fixed = false),
+        )
+    }
+
+    @Test
+    fun `fixed y ticks preserve exact configured bounds`() {
+        assertEquals(
+            listOf(1.0, 4.0, 7.0, 10.0),
+            calculateYTicks(rawMin = 1.0, rawMax = 10.0, targetCount = 4, fixed = true),
+        )
+    }
+
+    @Test
+    fun `dynamic y ticks cover negative crossing zero tiny and large ranges`() {
+        listOf(
+            -9.1 to -0.7,
+            -2.1 to 7.2,
+            0.00012 to 0.00019,
+            1.2e12 to 9.8e12,
+        ).forEach { (minimum, maximum) ->
+            val ticks = calculateYTicks(
+                rawMin = minimum,
+                rawMax = maximum,
+                targetCount = 5,
+                fixed = false,
+            )
+            val tolerance = maxOf(kotlin.math.abs(minimum), kotlin.math.abs(maximum), 1.0) * 1e-12
+
+            assertTrue("Ticks must all be finite for $minimum..$maximum", ticks.all(Double::isFinite))
+            assertTrue("Ticks must be strictly increasing for $minimum..$maximum", ticks.zipWithNext().all {
+                (first, second) -> first < second
+            })
+            assertTrue(
+                "Ticks must cover the minimum for $minimum..$maximum",
+                ticks.first() <= minimum + tolerance,
+            )
+            assertTrue(
+                "Ticks must cover the maximum for $minimum..$maximum",
+                ticks.last() >= maximum - tolerance,
+            )
+        }
+    }
+
+    @Test
+    fun `equal y ranges expand to finite nonzero ranges`() {
+        assertEquals(-1.0 to 1.0, expandEqualRange(0.0, 0.0))
+        assertEquals(90.0 to 110.0, expandEqualRange(100.0, 100.0))
+    }
+
+    @Test
+    fun `x ticks use actual data positions and reject overlapping labels`() {
+        val selected = selectLineGraphXTicks(
+            candidates = listOf(
+                XTick(epochMillis = 0, label = "a", projectedWidth = 20f),
+                XTick(epochMillis = 20, label = "b", projectedWidth = 20f),
+                XTick(epochMillis = 30, label = "c", projectedWidth = 20f),
+                XTick(epochMillis = 70, label = "d", projectedWidth = 20f),
+                XTick(epochMillis = 100, label = "e", projectedWidth = 20f),
+            ),
+            minX = 0,
+            maxX = 100,
+            plotLeft = 30f,
+            plotWidth = 100f,
+            minimumGap = 5f,
+        )
+
+        assertEquals(listOf(0L, 30L, 70L, 100L), selected.map { it.epochMillis })
+    }
+
+    @Test
+    fun `x ticks omit labels that would cross the left canvas edge`() {
+        val selected = selectLineGraphXTicks(
+            candidates = listOf(
+                XTick(epochMillis = 0, label = "too wide", projectedWidth = 40f),
+                XTick(epochMillis = 50, label = "fits", projectedWidth = 20f),
+            ),
+            minX = 0,
+            maxX = 100,
+            plotLeft = 30f,
+            plotWidth = 100f,
+            minimumGap = 5f,
+        )
+
+        assertEquals(listOf(50L), selected.map { it.epochMillis })
+    }
+
+    @Test
+    fun `x tick selection handles empty and single candidate lists`() {
+        assertTrue(
+            selectLineGraphXTicks(emptyList(), 0, 100, 30f, 100f, 5f).isEmpty()
+        )
+        assertEquals(
+            listOf(50L),
+            selectLineGraphXTicks(
+                candidates = listOf(XTick(50, "fits", 20f)),
+                minX = 0,
+                maxX = 100,
+                plotLeft = 30f,
+                plotWidth = 100f,
+                minimumGap = 5f,
+            ).map { it.epochMillis },
+        )
+    }
+
+    @Test
+    fun `day and month labels use named unambiguous formats`() {
+        val timestamp = OffsetDateTime.of(2026, 3, 3, 12, 0, 0, 0, ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
+        assertEquals(
+            "03 Mar",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "Mar 2026",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(365).toMillis(), ZoneOffset.UTC),
+        )
+    }
+
+    @Test
+    fun `timestamp format changes at duration boundaries`() {
+        val timestamp = OffsetDateTime.of(2026, 3, 3, 12, 34, 56, 0, ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
+        assertEquals(
+            "12:34:56",
+            formatLineGraphTimestamp(timestamp, Duration.ofMinutes(5).minusMillis(1).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "12:34",
+            formatLineGraphTimestamp(timestamp, Duration.ofMinutes(5).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "12:34",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(1).minusMillis(1).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "03 Mar",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(1).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "03 Mar",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(304).minusMillis(1).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "Mar 2026",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(304).toMillis(), ZoneOffset.UTC),
+        )
+    }
+
+    @Test
+    fun `timestamp labels use the supplied display timezone`() {
+        val timestamp = OffsetDateTime.of(2026, 3, 3, 0, 30, 0, 0, ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
+        assertEquals(
+            "02 Mar",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.ofHours(-1)),
+        )
+    }
+
+    @Test
+    fun `viewport points include one neighbour beyond each edge`() {
+        val points = listOf(0L, 10L, 20L, 30L, 40L).map(::point)
+
+        assertEquals(
+            listOf(10L, 20L, 30L),
+            pointsForViewport(points, minX = 15L, maxX = 25L).map(::epochMillis),
+        )
+        assertEquals(
+            listOf(0L, 10L, 20L, 30L, 40L),
+            pointsForViewport(points, minX = 10L, maxX = 30L).map(::epochMillis),
+        )
+        assertTrue(pointsForViewport(emptyList(), minX = 10L, maxX = 30L).isEmpty())
+    }
+
+    @Test
+    fun `layout reserves measured width for y labels`() {
+        val points = listOf(point(0, -10.0), point(100, 10.0))
+        val narrow = layout(points, measureText = { IntSize(width = 10, height = 10) })
+        val wide = layout(points, measureText = { IntSize(width = 80, height = 10) })
+
+        assertEquals(70f, requireNotNull(wide).plotRect.left - requireNotNull(narrow).plotRect.left)
+    }
+
+    @Test
+    fun `layout expands an all zero dynamic range`() {
+        val layout = requireNotNull(layout(listOf(point(0), point(100))))
+
+        assertTrue(layout.minY.isFinite())
+        assertTrue(layout.maxY.isFinite())
+        assertTrue(layout.minY < 0.0)
+        assertTrue(layout.maxY > 0.0)
+    }
+
+    @Test
+    fun `dynamic layout uses data inside the visible viewport`() {
+        val layout = requireNotNull(
+            layout(
+                points = listOf(point(0, 100.0), point(50, 1.0), point(100, 2.0)),
+                visibleMinX = 40,
+                visibleMaxX = 100,
+            )
+        )
+
+        assertEquals(1.0, layout.minY)
+        assertEquals(2.0, layout.maxY)
+    }
+
+    @Test
+    fun `layout rejects invalid fixed bounds and insufficient width`() {
+        val points = listOf(point(0), point(100, 1.0))
+
+        assertNull(layout(points, fixedYMin = 10.0, fixedYMax = 1.0))
+        assertNull(layout(points, fixedYMin = Double.NaN, fixedYMax = 1.0))
+        assertNull(
+            layout(
+                points = points,
+                width = 40f,
+                measureText = { IntSize(width = 40, height = 10) },
+            )
+        )
+    }
+
+    @Test
+    fun `layout x ticks are unique actual data timestamps`() {
+        val points = listOf(point(0), point(50), point(50, 2.0), point(100))
+        val layout = requireNotNull(
+            layout(points, measureText = { IntSize(width = 1, height = 10) })
+        )
+
+        assertEquals(listOf(0L, 50L, 100L), layout.xTicks.map { it.epochMillis })
+    }
+
+    private fun layout(
+        points: List<LineGraphPoint>,
+        width: Float = 400f,
+        visibleMinX: Long = 0L,
+        visibleMaxX: Long = 100L,
+        fixedYMin: Double? = null,
+        fixedYMax: Double? = null,
+        measureText: (String) -> IntSize = { IntSize(width = 30, height = 10) },
+    ) = calculateLineGraphLayout(
+        width = width,
+        height = 220f,
+        visibleMinX = visibleMinX,
+        visibleMaxX = visibleMaxX,
+        points = points,
+        durationBasedRange = false,
+        fixedYMin = fixedYMin,
+        fixedYMax = fixedYMax,
+        measureText = measureText,
+        density = 1f,
+    )
+
+    private fun point(epochMillis: Long, value: Double = 0.0) = LineGraphPoint(
+        timestamp = Instant.ofEpochMilli(epochMillis).atOffset(ZoneOffset.UTC),
+        value = value,
+    )
+
+    private fun epochMillis(point: LineGraphPoint) = point.timestamp.toInstant().toEpochMilli()
+}

@@ -1,17 +1,28 @@
 ---
-title: Graph rendering — renderer-neutral view data and Vico bar charts
-description: Incremental AndroidPlot migration architecture; bar-chart factories emit plain Kotlin series and bounds, while the Compose UI owns Vico models, styling, axes, zoom, and marker interactions.
+title: Graph rendering — Compose line graphs and Vico bar charts
+description: Renderer-neutral graph contracts; Compose Canvas line rendering and Vico bar rendering own their axes, measured labels, styling, interaction, and defensive validation in the UI.
 topics:
   - Renderer-neutral graph view-data contracts
+  - Compose Canvas line-graph rendering
   - Vico stacked bar-chart rendering
   - Shared contract for database and Lua time-bar graphs
   - Selection, time markers, pan, zoom, axes, and performance
-keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, zoom, pan, Lua, migration, NaN, zero-range, finite]
+keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, axis, label, Roboto Mono, zoom, pan, Lua, migration, NaN, zero-range, finite]
 ---
 
 # Graph Rendering
 
 Graph rendering is being migrated incrementally from AndroidPlot to native Compose. Do not make factories or view-data DTOs depend on the replacement renderer: renderer-specific models belong in the UI.
+
+## Line-chart boundary
+
+Line charts are drawn directly with Compose Canvas. `ILineGraphViewData` exposes timestamp/value `LineGraphPoint` lists and optional configured fixed Y bounds; it must not expose AndroidPlot series, regions, or axis subdivisions. Both `LineGraphDataFactory` and `LineGraphLuaHelper` produce this same contract. They keep points in ascending timestamp order, and a line needs at least two points to be plottable.
+
+`LineGraphView` owns all layout decisions because they depend on the rendered size and measured text. It calculates Y bounds and tick density from visible finite data and available height, preserving exact configured bounds for fixed-range graphs. It measures axis text in Roboto Mono before setting the plot rectangle, which prevents wide or negative Y labels from being clipped at the left edge. Equal dynamic Y ranges are expanded defensively.
+
+X ticks are selected from actual data-point timestamps, including irregular series, rather than fixed temporal subdivisions. The selector measures labels after the retained -28-degree rotation and greedily excludes overlaps. Formatting is based on the visible duration: seconds and minutes use clock formats, day-scale labels use `dd MMM`, and long ranges use `MMM yyyy`. Recalculate both axes when the full-screen viewport changes.
+
+List-mode line charts are static. Full-screen charts support horizontal pan and pinch zoom; keep the viewport clamped to the complete data extent. Axis layout is replaced as the viewport changes, so the pointer-input coroutine must be keyed to stable inputs such as interaction mode and canvas size, not the calculated layout—otherwise the first recalculation cancels the active gesture. The initial complete graph—including axes and an optional time marker—fades in only after text measurement and layout finish. Viewport changes must not restart or cancel this reveal.
 
 ## Bar-chart boundary
 
@@ -44,4 +55,4 @@ The bar-chart axes, ticks, and plot-area guidelines use `onSurface` at 70% opaci
 
 ## Further migrations
 
-AndroidPlot remains in the line, histogram, and pie paths. When migrating another graph type, first replace AndroidPlot objects in its view-data contract with domain values, update both standard and Lua producers where applicable, then introduce renderer models only inside the Compose UI.
+AndroidPlot remains in the histogram and pie paths. When migrating another graph type, first replace AndroidPlot objects in its view-data contract with domain values, update both standard and Lua producers where applicable, then introduce renderer models only inside the Compose UI.

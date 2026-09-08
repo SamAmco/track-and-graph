@@ -17,8 +17,6 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.androidplot.xy.FastXYSeries
-import com.androidplot.xy.RectRegion
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
@@ -38,12 +36,11 @@ import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
-import com.samco.trackandgraph.graphstatview.factories.helpers.AndroidPlotSeriesHelper
-import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
+import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.CompositeFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataPaddingFunction
@@ -67,8 +64,6 @@ import javax.inject.Inject
 class LineGraphDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
-    private val androidPlotSeriesHelper: AndroidPlotSeriesHelper,
-    private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val timeHelper: TimeHelper,
@@ -98,7 +93,7 @@ class LineGraphDataFactory @Inject constructor(
             }
 
             val plottableData = generatePlottingData(dataSamples, config, onDataSampled)
-            val hasPlottableData = plottableData.lines.any { it.line != null }
+            val hasPlottableData = plottableData.lines.any { it.points.size >= 2 }
 
             // Only show a duration based range if the user selected duration for a line graph
             // feature, and that feature actually says it is a duration still (this could have
@@ -107,22 +102,16 @@ class LineGraphDataFactory @Inject constructor(
                 pair.first.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE
                         && pair.second.dataSampleProperties.isDuration
             }
-            val (bounds, yAxisParameters) = getYAxisParameters(
-                config,
-                plottableData.lines.map { it.line },
-                durationBasedRange
-            )
-
             return@withContext object : ILineGraphViewData {
                 override val durationBasedRange = durationBasedRange
                 override val yRangeType = config.yRangeType
-                override val bounds = bounds
+                override val fixedYMin = config.yFrom.takeIf { config.yRangeType == YRangeType.FIXED }
+                override val fixedYMax = config.yTo.takeIf { config.yRangeType == YRangeType.FIXED }
                 override val hasPlottableData = hasPlottableData
                 override val endTime = plottableData.endTime
                 override val lines = plottableData.lines
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
-                override val yAxisSubdivides = yAxisParameters
             }
         } catch (throwable: Throwable) {
             if (throwable is CancellationException) throw throwable
@@ -193,15 +182,15 @@ class LineGraphDataFactory @Inject constructor(
             // to be processed
             val dataPoints = clippedSample.toListCancellable().asReversed()
 
-            val series = if (dataPoints.size >= 2) {
-                getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
-            } else null
+            val points = if (dataPoints.size >= 2) {
+                getLinePoints(dataPoints, pair.first)
+            } else emptyList()
 
             Line(
                 name = feature.name,
                 color = ColorSpec.ColorIndex(feature.colorIndex),
                 pointStyle = feature.pointStyle,
-                line = series
+                points = points
             )
         }
 
@@ -253,11 +242,10 @@ class LineGraphDataFactory @Inject constructor(
         else dataPeekIterator.next().timestamp
     }
 
-    private suspend fun getXYSeriesFromDataPoints(
+    private suspend fun getLinePoints(
         dataSample: List<IDataPoint>,
-        endTime: OffsetDateTime,
         lineGraphFeature: LineGraphFeature
-    ): FastXYSeries {
+    ): List<LineGraphPoint> {
         val scale = lineGraphFeature.scale
         val offset = lineGraphFeature.offset
         val durationDivisor = when (lineGraphFeature.durationPlottingMode) {
@@ -267,50 +255,13 @@ class LineGraphDataFactory @Inject constructor(
         }
 
         val coroutineContext = currentCoroutineContext()
-        val yValues = ArrayList<Number>(dataSample.size)
-        val xValues = ArrayList<Number>(dataSample.size)
-        dataSample.forEachIndexed { index, dp ->
+        return dataSample.mapIndexed { index, dp ->
             if (index % CANCELLATION_CHECK_INTERVAL == 0) coroutineContext.ensureActive()
-            yValues.add((dp.value * scale / durationDivisor) + offset)
-            xValues.add(Duration.between(endTime, dp.timestamp).toMillis())
-        }
-        coroutineContext.ensureActive()
-
-        return androidPlotSeriesHelper.getFastXYSeries(
-            name = lineGraphFeature.name,
-            xValues = xValues,
-            yValues = yValues,
-        )
-    }
-
-    private data class YAxisParams(
-        val bounds: RectRegion,
-        val subdivides: Int,
-    )
-
-    private fun getYAxisParameters(
-        lineGraph: LineGraphWithFeatures,
-        series: Collection<FastXYSeries?>,
-        timeBasedRange: Boolean
-    ): YAxisParams {
-        val fixed = lineGraph.yRangeType == YRangeType.FIXED
-
-        val bounds = RectRegion()
-        series.forEach { it?.let { bounds.union(it.minMax()) } }
-
-        val (yMin, yMax) =
-            if (fixed) Pair(lineGraph.yFrom, lineGraph.yTo)
-            else Pair(bounds.minY, bounds.maxY)
-
-        if (yMin == null || yMax == null) return YAxisParams(bounds, 11)
-
-        val parameters = dataDisplayIntervalHelper
-            .getYParameters(yMin.toDouble(), yMax.toDouble(), timeBasedRange, fixed)
-
-        bounds.minY = parameters.boundsMin
-        bounds.maxY = parameters.boundsMax
-
-        return YAxisParams(bounds, parameters.subdivides)
+            LineGraphPoint(
+                timestamp = dp.timestamp,
+                value = (dp.value * scale / durationDivisor) + offset,
+            )
+        }.also { coroutineContext.ensureActive() }
     }
 
     private suspend fun DataSample.toListCancellable(): List<IDataPoint> {

@@ -5,7 +5,6 @@ import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.sampling.DataSampler
-import com.samco.trackandgraph.graphstatview.factories.helpers.AndroidPlotSeriesHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import dagger.BindsInstance

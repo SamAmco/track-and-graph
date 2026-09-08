@@ -138,14 +138,15 @@ class LineGraphDataFactoryTest {
 
         assertEquals(1, lineGraphViewData.lines.size)
         val line = lineGraphViewData.lines[0]
-        val series = requireNotNull(line.line)
-        assertEquals(10, series.size())
+        val points = line.points
+        assertEquals(10, points.size)
 
         val startEpochMilli = now.minusDays(109L).toInstant().toEpochMilli()
         val end = now.minusDays(100L)
         val endEpochMilli = end.toInstant().toEpochMilli()
         val expected = endEpochMilli - startEpochMilli
-        val actual = series.getX(9).toLong() - series.getX(0).toLong()
+        val actual = points[9].timestamp.toInstant().toEpochMilli() -
+            points[0].timestamp.toInstant().toEpochMilli()
 
         assertEquals(expected, actual)
 
@@ -191,7 +192,7 @@ class LineGraphDataFactoryTest {
         val lineGraphViewData = uut().getViewData(graphOrStat)
 
         assertEquals(1, lineGraphViewData.lines.size)
-        assertEquals(3, lineGraphViewData.lines[0].line?.size())
+        assertEquals(3, lineGraphViewData.lines[0].points.size)
         verify(dataSampler).getDataSampleForFeatureId(1L, null)
         verify(luaEngine, never()).releaseVM(any())
     }

@@ -16,7 +16,6 @@
  */
 package com.samco.trackandgraph.graphstatview.factories.helpers
 
-import com.androidplot.xy.RectRegion
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
@@ -24,17 +23,15 @@ import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
 import com.samco.trackandgraph.data.lua.dto.Line
 import com.samco.trackandgraph.data.lua.dto.LinePointStyle
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line as LineViewData
 
 class LineGraphLuaHelper @Inject constructor(
-    private val androidPlotSeriesHelper: AndroidPlotSeriesHelper,
-    private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
 ) {
     operator fun invoke(
         lineGraphData: LuaGraphResultData.LineGraphData,
@@ -47,37 +44,21 @@ class LineGraphLuaHelper @Inject constructor(
             else YRangeType.FIXED
 
         val endTime = lines
-            .mapNotNull { it.linePoints.firstOrNull() }
+            .flatMap { it.linePoints }
             .maxOfOrNull { it.timestamp }
             ?: return null
 
-        val lineViewData = getLineViewData(lines, endTime)
-
-        val bounds = RectRegion()
-        lineViewData.forEach { line -> line.line?.let { bounds.union(it.minMax()) } }
-
-        val yMin = lineGraphData.yMin ?: bounds.minY
-        val yMax = lineGraphData.yMax ?: bounds.maxY
-
-        bounds.minY = yMin
-        bounds.maxY = yMax
-
-        val parameters = dataDisplayIntervalHelper.getYParameters(
-            yMin = yMin.toDouble(),
-            yMax = yMax.toDouble(),
-            isDurationBasedRange = lineGraphData.durationBasedRange,
-            fixedBounds = yRangeType == YRangeType.FIXED
-        )
+        val lineViewData = getLineViewData(lines)
 
         return object : ILuaGraphViewData {
             override val wrapped: IGraphStatViewData = object : ILineGraphViewData {
                 override val durationBasedRange: Boolean = lineGraphData.durationBasedRange
                 override val yRangeType: YRangeType = yRangeType
-                override val bounds: RectRegion = bounds
-                override val hasPlottableData: Boolean = true
+                override val fixedYMin: Double? = lineGraphData.yMin
+                override val fixedYMax: Double? = lineGraphData.yMax
+                override val hasPlottableData: Boolean = lineViewData.any { it.points.size >= 2 }
                 override val endTime: OffsetDateTime = endTime
                 override val lines: List<LineViewData> = lineViewData
-                override val yAxisSubdivides: Int = parameters.subdivides
                 override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
                 override val graphOrStat: GraphOrStat = graphOrStat.copy(type = GraphStatType.LINE_GRAPH)
             }
@@ -86,18 +67,14 @@ class LineGraphLuaHelper @Inject constructor(
         }
     }
 
-    private fun getLineViewData(lines: List<Line>, endTime: OffsetDateTime): List<LineViewData> = lines
+    private fun getLineViewData(lines: List<Line>): List<LineViewData> = lines
         .mapIndexed { index, line ->
-            val pointsReversed = line.linePoints.asReversed()
+            val pointsAscending = line.linePoints.sortedBy { it.timestamp }
             LineViewData(
                 name = line.label ?: "",
                 color = (line.lineColor ?: indexColorSpec(index)).toColorSpec(),
                 pointStyle = line.pointStyle.toViewPointStyle(),
-                line = androidPlotSeriesHelper.getFastXYSeries(
-                    name = line.label ?: "",
-                    xValues = pointsReversed.map { Duration.between(endTime, it.timestamp).toMillis() },
-                    yValues = pointsReversed.map { it.value },
-                )
+                points = pointsAscending.map { LineGraphPoint(it.timestamp, it.value) },
             )
         }
 

@@ -18,9 +18,9 @@ docs:
     keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, scrolling, adaptive height, keyboard, focus, FocusRequester, asynchronous, loading-state, preview, Navigation 3, ViewModelStore, rememberViewModelStoreOwner, rememberUpdatedState, entryProvider, retained-entry, hiltViewModel, configuration-change, nested-navigation, reset-callback, onPop]
 
   - file: graph-rendering.md
-    title: Graph rendering — renderer-neutral view data and Vico bar charts
-    description: Incremental AndroidPlot migration architecture; bar-chart factories emit plain Kotlin series and bounds, while the Compose UI owns Vico models, styling, axes, zoom, and marker interactions.
-    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, zoom, pan, Lua, migration, NaN, zero-range, finite]
+    title: Graph rendering — Compose line graphs and Vico bar charts
+    description: Renderer-neutral graph contracts; Compose Canvas line rendering and Vico bar rendering own their axes, measured labels, styling, interaction, and defensive validation in the UI.
+    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, marker, axis, label, Roboto Mono, zoom, pan, Lua, migration, NaN, zero-range, finite]
 
   - file: app-lock.md
     title: App lock — security boundary, persistence, and UI shell

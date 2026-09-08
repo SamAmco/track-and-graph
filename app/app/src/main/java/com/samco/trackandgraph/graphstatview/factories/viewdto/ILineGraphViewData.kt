@@ -17,17 +17,20 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.androidplot.xy.FastXYSeries
-import com.androidplot.xy.RectRegion
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import org.threeten.bp.OffsetDateTime
+
+data class LineGraphPoint(
+    val timestamp: OffsetDateTime,
+    val value: Double,
+)
 
 data class Line(
     val name: String,
     val color: ColorSpec,
     val pointStyle: LineGraphPointStyle,
-    val line: FastXYSeries?,
+    val points: List<LineGraphPoint>,
 )
 
 interface ILineGraphViewData : IGraphStatViewData {
@@ -46,12 +49,12 @@ interface ILineGraphViewData : IGraphStatViewData {
     val yRangeType: YRangeType
         get() = YRangeType.DYNAMIC
 
-    /**
-     * The bounds expect the x max to be 0, and the x min to be a negative number of milliseconds
-     * representing the full duration of the graph. Sorry, I don't know what I was thinking.
-     */
-    val bounds: RectRegion
-        get() = RectRegion()
+    /** Fixed bounds requested by the graph configuration. Dynamic graphs leave these null. */
+    val fixedYMin: Double?
+        get() = null
+
+    val fixedYMax: Double?
+        get() = null
 
     /**
      * If the graph has no plottable data a message will be shown to the user instead of the graph.
@@ -65,16 +68,7 @@ interface ILineGraphViewData : IGraphStatViewData {
     val endTime: OffsetDateTime
         get() = OffsetDateTime.MIN
 
-    /**
-     * The x co-ordinate of each point is a negative number of milliseconds representing the
-     * time between it and the end time.
-     */
+    /** Renderer-neutral timestamp/value series, in ascending timestamp order. */
     val lines: List<Line>
         get() = emptyList()
-
-    /**
-     * Android plot parameters for they y axis divisions.
-     */
-    val yAxisSubdivides: Int
-        get() = 11
 }

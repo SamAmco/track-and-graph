@@ -16,8 +16,6 @@
  */
 package com.samco.trackandgraph.playstore
 
-import com.androidplot.xy.FastXYSeries
-import com.androidplot.xy.RectRegion
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
@@ -27,6 +25,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
+import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -42,7 +41,9 @@ internal fun lineGraphViewData(
     yTo: Double? = null,
 ): ILineGraphViewData {
     val pointCount = lines.maxOf { it.values.size }
-    val xValues = List(pointCount) { index -> (index - (pointCount - 1L)) * MILLIS_PER_WEEK }
+    val timestamps = List(pointCount) { index ->
+        PREVIEW_END_TIME.plus(Duration.ofMillis((index - (pointCount - 1L)) * MILLIS_PER_WEEK))
+    }
     val yMax = lines
         .flatMap { it.values }
         .maxOrNull()
@@ -54,35 +55,20 @@ internal fun lineGraphViewData(
         override val state = IGraphStatViewData.State.READY
         override val graphOrStat = graphOrStat(id, name, GraphStatType.LINE_GRAPH)
         override val yRangeType = YRangeType.FIXED
-        override val bounds = RectRegion(xValues.first(), xValues.last(), yFrom, yMaxBound)
+        override val fixedYMin = yFrom
+        override val fixedYMax = yMaxBound
         override val hasPlottableData = true
         override val endTime = PREVIEW_END_TIME
-        override val lines = lines.map { it.toLine(xValues) }
+        override val lines = lines.map { it.toLine(timestamps) }
     }
 }
 
-internal fun PreviewLine.toLine(xValues: List<Long>): Line {
-    val yNumbers = values.map { it as Number }
-    val series = object : FastXYSeries {
-        internal val minMax = RectRegion(
-            xValues.minOrNull(),
-            xValues.maxOrNull(),
-            values.minOrNull(),
-            values.maxOrNull(),
-        )
-
-        override fun minMax(): RectRegion = minMax
-        override fun getX(index: Int): Number = xValues[index]
-        override fun getY(index: Int): Number = yNumbers[index]
-        override fun getTitle(): String = name
-        override fun size(): Int = values.size
-    }
-
+internal fun PreviewLine.toLine(timestamps: List<OffsetDateTime>): Line {
     return Line(
         name = name,
         color = ColorSpec.ColorIndex(colorIndex),
         pointStyle = pointStyle,
-        line = series,
+        points = timestamps.zip(values) { timestamp, value -> LineGraphPoint(timestamp, value) },
     )
 }
 
