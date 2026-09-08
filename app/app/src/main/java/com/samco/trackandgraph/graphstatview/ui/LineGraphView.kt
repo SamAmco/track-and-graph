@@ -73,7 +73,6 @@ import timber.log.Timber
 
 private const val X_LABEL_ANGLE = -28f
 private const val REVEAL_DURATION_MILLIS = 450
-private const val MAX_ZOOM = 8.0
 private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
 private val lineWidth = 2.dp
 private val vertexWidth = 6.dp
@@ -81,7 +80,7 @@ private val vertexWidth = 6.dp
 private val lineGraphSecondFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 private val lineGraphMinuteFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val lineGraphDayFormatter = DateTimeFormatter.ofPattern("dd MMM")
-private val lineGraphMonthFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
+private val lineGraphMonthFormatter = DateTimeFormatter.ofPattern("MMM’yy")
 private val lineGraphNumberFormatter = DecimalFormat("#,##0.###")
 
 @Composable
@@ -145,12 +144,10 @@ private fun LineGraphBodyView(
     val isInteractive = graphViewMode is GraphViewMode.FullScreenMode
     var zoom by remember(viewData) { mutableDoubleStateOf(1.0) }
     var centerFraction by remember(viewData) { mutableDoubleStateOf(0.5) }
-    val visibleSpan = max(1.0, (fullMaxX - fullMinX).toDouble() / zoom)
-    val halfSpanFraction = 0.5 / zoom
-    val constrainedCenterFraction = centerFraction.coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
-    val centerX = fullMinX + (fullMaxX - fullMinX) * constrainedCenterFraction
-    val visibleMinX = (centerX - visibleSpan / 2.0).roundToLong()
-    val visibleMaxX = (centerX + visibleSpan / 2.0).roundToLong()
+    val maximumZoom = maximumLineGraphZoom(fullMinX, fullMaxX)
+    val viewport = calculateLineGraphViewport(fullMinX, fullMaxX, zoom, centerFraction)
+    val visibleMinX = viewport.minX
+    val visibleMaxX = viewport.maxX
 
     val textMeasurer = rememberTextMeasurer()
     val axisFont = remember { FontFamily(Font(R.font.roboto_mono)) }
@@ -180,8 +177,9 @@ private fun LineGraphBodyView(
         axisTextStyle,
     ) {
         if (canvasSize == IntSize.Zero) return@LaunchedEffect
-        // Let the empty/background frame render before doing text measurement and revealing the plot.
-        yield()
+        // Only the initial layout needs an empty/background frame before the reveal.
+        // Yielding every viewport update makes axis movement lag behind the gesture.
+        if (layout == null) yield()
         val startedAt = performanceLogger.startMeasurement()
         layout = calculateLineGraphLayout(
             width = canvasSize.width.toFloat(),
@@ -209,11 +207,11 @@ private fun LineGraphBodyView(
             .height(graphHeight)
             .background(graphBackgroundColor)
             .onSizeChanged { canvasSize = it }
-            .pointerInput(isInteractive, canvasSize) {
+            .pointerInput(isInteractive, canvasSize, maximumZoom) {
                 if (!isInteractive) return@pointerInput
                 detectTransformGestures { _, pan, gestureZoom, _ ->
                     val plotWidth = layout?.plotRect?.width ?: return@detectTransformGestures
-                    zoom = (zoom * gestureZoom).coerceIn(1.0, MAX_ZOOM)
+                    zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
                     val newHalfSpanFraction = 0.5 / zoom
                     centerFraction = (centerFraction - pan.x / plotWidth / zoom)
                         .coerceIn(newHalfSpanFraction, 1.0 - newHalfSpanFraction)
@@ -342,6 +340,30 @@ internal data class LineGraphLayout(
 
 internal data class XTick(val epochMillis: Long, val label: String, val projectedWidth: Float)
 internal data class YTick(val value: Double, val label: String)
+private data class IndexedXTick(val index: Int, val tick: XTick)
+
+internal data class LineGraphViewport(val minX: Long, val maxX: Long)
+
+internal fun maximumLineGraphZoom(fullMinX: Long, fullMaxX: Long): Double =
+    max(1.0, fullMaxX.toDouble() - fullMinX.toDouble())
+
+internal fun calculateLineGraphViewport(
+    fullMinX: Long,
+    fullMaxX: Long,
+    zoom: Double,
+    centerFraction: Double,
+): LineGraphViewport {
+    val fullSpan = max(1.0, fullMaxX.toDouble() - fullMinX.toDouble())
+    val constrainedZoom = zoom.coerceIn(1.0, fullSpan)
+    val visibleSpan = max(1.0, fullSpan / constrainedZoom)
+    val halfSpanFraction = 0.5 / constrainedZoom
+    val constrainedCenter = centerFraction.coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
+    val centerX = fullMinX + fullSpan * constrainedCenter
+    val spanMillis = ceil(visibleSpan).toLong().coerceAtLeast(1L)
+    val minX = (centerX - visibleSpan / 2.0).roundToLong()
+        .coerceIn(fullMinX, fullMaxX - spanMillis)
+    return LineGraphViewport(minX = minX, maxX = minX + spanMillis)
+}
 
 internal fun calculateLineGraphLayout(
     width: Float,
@@ -382,24 +404,32 @@ internal fun calculateLineGraphLayout(
 
     val angleRadians = Math.toRadians(abs(X_LABEL_ANGLE).toDouble())
     val xLabelSizes = mutableMapOf<String, IntSize>()
-    val candidates = points.asSequence()
-        .map { it.timestamp.toInstant().toEpochMilli() }
-        .filter { it in visibleMinX..visibleMaxX }
-        .distinct()
-        .map { millis ->
-            val label = formatLineGraphTimestamp(
-                epochMillis = millis,
-                durationMillis = visibleMaxX - visibleMinX,
-                zoneId = ZoneId.systemDefault(),
-            )
-            val measured = xLabelSizes.getOrPut(label) { measureText(label) }
-            XTick(
-                epochMillis = millis,
-                label = label,
-                projectedWidth = (measured.width * cos(angleRadians) + measured.height * sin(angleRadians)).toFloat(),
-            )
+    val candidates = mutableListOf<IndexedXTick>()
+    var uniqueTimestampCount = 0
+    var previousMillis: Long? = null
+    points.forEach { point ->
+        val millis = point.timestamp.toInstant().toEpochMilli()
+        if (millis != previousMillis) {
+            previousMillis = millis
+            val index = uniqueTimestampCount++
+            if (millis in visibleMinX..visibleMaxX) {
+                val label = formatLineGraphTimestamp(
+                    epochMillis = millis,
+                    durationMillis = visibleMaxX - visibleMinX,
+                    zoneId = ZoneId.systemDefault(),
+                )
+                val measured = xLabelSizes.getOrPut(label) { measureText(label) }
+                candidates += IndexedXTick(
+                    index = index,
+                    tick = XTick(
+                        epochMillis = millis,
+                        label = label,
+                        projectedWidth = (measured.width * cos(angleRadians) + measured.height * sin(angleRadians)).toFloat(),
+                    ),
+                )
+            }
         }
-        .toList()
+    }
     val maxLabelWidth = xLabelSizes.values.maxOfOrNull { it.width }?.toFloat() ?: 0f
     val rotatedLabelHeight = (
         maxLabelWidth * sin(angleRadians) + labelHeight * cos(angleRadians)
@@ -407,13 +437,32 @@ internal fun calculateLineGraphLayout(
     val bottom = height - rotatedLabelHeight - 10f * density
     if (right <= left || bottom <= top) return null
     val plot = Rect(left, top, right, bottom)
+    val minimumGap = 4f * density
+    val maximumProjectedWidth = candidates.maxOfOrNull { it.tick.projectedWidth } ?: 0f
+    val maximumTickCount = maximumLineGraphTickCount(
+        plotWidth = plot.width,
+        maximumProjectedWidth = maximumProjectedWidth,
+        minimumGap = minimumGap,
+    )
+    val stride = anchoredLineGraphTickStride(
+        totalTimestampCount = uniqueTimestampCount,
+        visibleSpan = visibleMaxX - visibleMinX,
+        fullSpan = points.last().timestamp.toInstant().toEpochMilli() -
+            points.first().timestamp.toInstant().toEpochMilli(),
+        maximumTickCount = maximumTickCount,
+    )
+    val anchoredCandidates = if (candidates.size <= maximumTickCount) {
+        candidates.map { it.tick }
+    } else {
+        candidates.filter { it.index % stride == 0 }.map { it.tick }
+    }
     val xTicks = selectLineGraphXTicks(
-        candidates = candidates,
+        candidates = anchoredCandidates,
         minX = visibleMinX,
         maxX = visibleMaxX,
         plotLeft = plot.left,
         plotWidth = plot.width,
-        minimumGap = 4f * density,
+        minimumGap = minimumGap,
     )
     return LineGraphLayout(
         plotRect = plot,
@@ -424,6 +473,30 @@ internal fun calculateLineGraphLayout(
         xTicks = xTicks,
         yTicks = yTicks,
     )
+}
+
+internal fun maximumLineGraphTickCount(
+    plotWidth: Float,
+    maximumProjectedWidth: Float,
+    minimumGap: Float,
+): Int = floor(plotWidth / max(1f, maximumProjectedWidth + minimumGap)).toInt().coerceAtLeast(1)
+
+internal fun anchoredLineGraphTickStride(
+    totalTimestampCount: Int,
+    visibleSpan: Long,
+    fullSpan: Long,
+    maximumTickCount: Int,
+): Int {
+    if (totalTimestampCount <= 1 || fullSpan <= 0L) return 1
+    val estimatedVisibleCount = ceil(
+        totalTimestampCount * visibleSpan.toDouble() / fullSpan.toDouble()
+    ).toInt().coerceIn(1, totalTimestampCount)
+    val requiredStride = ceil(estimatedVisibleCount.toDouble() / maximumTickCount.coerceAtLeast(1))
+        .toInt()
+        .coerceAtLeast(1)
+    var stride = 1
+    while (stride < requiredStride && stride <= Int.MAX_VALUE / 2) stride *= 2
+    return stride
 }
 
 /** Greedily keeps timestamp labels whose measured, rotated bounds do not overlap. */

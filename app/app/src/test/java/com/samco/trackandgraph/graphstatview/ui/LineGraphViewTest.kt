@@ -132,6 +132,71 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `maximum zoom is limited only by millisecond timestamp precision`() {
+        assertEquals(86_400_000.0, maximumLineGraphZoom(0L, 86_400_000L))
+
+        val viewport = calculateLineGraphViewport(
+            fullMinX = 0L,
+            fullMaxX = 86_400_000L,
+            zoom = Double.MAX_VALUE,
+            centerFraction = 0.5,
+        )
+
+        assertEquals(1L, viewport.maxX - viewport.minX)
+    }
+
+    @Test
+    fun `anchored tick strides add intermediate labels as the viewport zooms in`() {
+        val wideStride = anchoredLineGraphTickStride(
+            totalTimestampCount = 100,
+            visibleSpan = 100,
+            fullSpan = 100,
+            maximumTickCount = 20,
+        )
+        val zoomedStride = anchoredLineGraphTickStride(
+            totalTimestampCount = 100,
+            visibleSpan = 50,
+            fullSpan = 100,
+            maximumTickCount = 20,
+        )
+
+        assertEquals(8, wideStride)
+        assertEquals(4, zoomedStride)
+        assertEquals(0, wideStride % zoomedStride)
+    }
+
+    @Test
+    fun `panning retains anchored x ticks shared by both viewports`() {
+        val points = (0L..160L step 10L).map { point(it, it.toDouble()) }
+        val left = requireNotNull(
+            layout(points, width = 140f, visibleMinX = 0L, visibleMaxX = 80L)
+        )
+        val right = requireNotNull(
+            layout(points, width = 140f, visibleMinX = 40L, visibleMaxX = 120L)
+        )
+
+        assertEquals(
+            left.xTicks.map { it.epochMillis }.filter { it in 40L..80L },
+            right.xTicks.map { it.epochMillis }.filter { it in 40L..80L },
+        )
+    }
+
+    @Test
+    fun `zooming in retains coarse x ticks and adds finer ones`() {
+        val points = (0L..160L step 10L).map { point(it, it.toDouble()) }
+        val wide = requireNotNull(
+            layout(points, width = 140f, visibleMinX = 0L, visibleMaxX = 160L)
+        )
+        val zoomed = requireNotNull(
+            layout(points, width = 140f, visibleMinX = 40L, visibleMaxX = 120L)
+        )
+        val coarseTicksStillVisible = wide.xTicks.map { it.epochMillis }.filter { it in 40L..120L }
+
+        assertTrue(zoomed.xTicks.size > coarseTicksStillVisible.size)
+        assertTrue(zoomed.xTicks.map { it.epochMillis }.containsAll(coarseTicksStillVisible))
+    }
+
+    @Test
     fun `day and month labels use named unambiguous formats`() {
         val timestamp = OffsetDateTime.of(2026, 3, 3, 12, 0, 0, 0, ZoneOffset.UTC)
             .toInstant()
@@ -142,7 +207,7 @@ class LineGraphViewTest {
             formatLineGraphTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
-            "Mar 2026",
+            "Mar’26",
             formatLineGraphTimestamp(timestamp, Duration.ofDays(365).toMillis(), ZoneOffset.UTC),
         )
     }
@@ -174,7 +239,7 @@ class LineGraphViewTest {
             formatLineGraphTimestamp(timestamp, Duration.ofDays(304).minusMillis(1).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
-            "Mar 2026",
+            "Mar’26",
             formatLineGraphTimestamp(timestamp, Duration.ofDays(304).toMillis(), ZoneOffset.UTC),
         )
     }
