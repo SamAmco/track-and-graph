@@ -9,6 +9,7 @@
 
 package com.samco.trackandgraph.graphstatview.ui
 
+import android.os.SystemClock
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -68,10 +69,12 @@ import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToLong
 import kotlin.math.sin
+import timber.log.Timber
 
 private const val X_LABEL_ANGLE = -28f
 private const val REVEAL_DURATION_MILLIS = 450
 private const val MAX_ZOOM = 8.0
+private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
 private val lineWidth = 2.dp
 private val vertexWidth = 6.dp
 
@@ -89,10 +92,20 @@ fun LineGraphView(
     graphBackgroundColor: Color,
     timeMarker: OffsetDateTime? = null,
 ) {
-    val renderableLines = remember(viewData.lines) {
-        viewData.lines.map { line ->
+    val performanceLogger = remember(viewData) {
+        LineGraphPerformanceLogger(viewData.graphOrStat.id)
+    }
+    val renderableLines = remember(viewData.lines, performanceLogger) {
+        val startedAt = performanceLogger.now()
+        val result = viewData.lines.map { line ->
             line.copy(points = line.points.filter { point -> point.value.isFinite() })
         }
+        performanceLogger.recordPreparation(
+            startedAt = startedAt,
+            inputPointCount = viewData.lines.sumOf { it.points.size },
+            finitePointCount = result.sumOf { it.points.size },
+        )
+        result
     }
     if (!viewData.hasPlottableData || renderableLines.none { it.points.size >= 2 }) {
         GraphErrorView(modifier, R.string.graph_stat_view_not_enough_data_graph)
@@ -106,6 +119,7 @@ fun LineGraphView(
         timeMarker = timeMarker,
         graphViewMode = graphViewMode,
         graphBackgroundColor = graphBackgroundColor,
+        performanceLogger = performanceLogger,
     )
 }
 
@@ -117,8 +131,14 @@ private fun LineGraphBodyView(
     timeMarker: OffsetDateTime?,
     graphViewMode: GraphViewMode,
     graphBackgroundColor: Color,
+    performanceLogger: LineGraphPerformanceLogger,
 ) = Column(modifier = modifier) {
-    val allPoints = remember(lines) { lines.flatMap { it.points }.sortedBy { it.timestamp } }
+    val allPoints = remember(lines, performanceLogger) {
+        val startedAt = performanceLogger.now()
+        lines.flatMap { it.points }.sortedBy { it.timestamp }.also { points ->
+            performanceLogger.recordPointPreparation(startedAt, points.size)
+        }
+    }
     val allTimes = remember(allPoints) {
         allPoints.map { it.timestamp.toInstant().toEpochMilli() }.distinct().sorted()
     }
@@ -164,6 +184,7 @@ private fun LineGraphBodyView(
         if (canvasSize == IntSize.Zero) return@LaunchedEffect
         // Let the empty/background frame render before doing text measurement and revealing the plot.
         yield()
+        val startedAt = performanceLogger.startMeasurement()
         layout = calculateLineGraphLayout(
             width = canvasSize.width.toFloat(),
             height = canvasSize.height.toFloat(),
@@ -176,6 +197,7 @@ private fun LineGraphBodyView(
             measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
             density = density.density,
         )
+        performanceLogger.recordLayout(startedAt)
     }
     LaunchedEffect(viewData, layout != null) {
         if (layout != null) {
@@ -201,6 +223,8 @@ private fun LineGraphBodyView(
             }
     ) {
         val currentLayout = layout ?: return@Canvas
+        val drawStartedAt = performanceLogger.startMeasurement()
+        var visiblePointCount = 0
         val plot = currentLayout.plotRect
         val graphAlpha = reveal.value
         val revealedGridColor = gridColor.copy(alpha = gridColor.alpha * graphAlpha)
@@ -252,6 +276,7 @@ private fun LineGraphBodyView(
             lines.forEach { line ->
                 val visiblePoints = pointsForViewport(line.points, visibleMinX, visibleMaxX)
                 if (visiblePoints.isEmpty()) return@forEach
+                visiblePointCount += visiblePoints.size
                 val color = getColor(line.color).copy(alpha = graphAlpha)
                 if (line.pointStyle != LineGraphPointStyle.CIRCLES_ONLY && visiblePoints.size >= 2) {
                     val path = Path()
@@ -282,6 +307,13 @@ private fun LineGraphBodyView(
                 }
             }
         }
+        performanceLogger.recordFirstDraw(
+            startedAt = drawStartedAt,
+            visiblePointCount = visiblePointCount,
+            lineCount = lines.size,
+            xTickCount = currentLayout.xTicks.size,
+            yTickCount = currentLayout.yTicks.size,
+        )
     }
 
     GraphLegend(
@@ -487,4 +519,64 @@ internal fun pointsForViewport(
 
 private fun formatLineGraphNumber(value: Double): String = synchronized(lineGraphNumberFormatter) {
     lineGraphNumberFormatter.format(value)
+}
+
+private class LineGraphPerformanceLogger(
+    private val graphId: Long,
+) {
+    private var logged = false
+    private var firstRenderWorkNanos = 0L
+    private var inputPointCount = 0
+    private var finitePointCount = 0
+    private var mergedPointCount = 0
+
+    fun now(): Long = SystemClock.elapsedRealtimeNanos()
+
+    fun startMeasurement(): Long? = if (logged) null else now()
+
+    fun recordPreparation(
+        startedAt: Long,
+        inputPointCount: Int,
+        finitePointCount: Int,
+    ) {
+        firstRenderWorkNanos += elapsedNanos(startedAt)
+        this.inputPointCount = inputPointCount
+        this.finitePointCount = finitePointCount
+    }
+
+    fun recordPointPreparation(startedAt: Long, pointCount: Int) {
+        firstRenderWorkNanos += elapsedNanos(startedAt)
+        mergedPointCount = pointCount
+    }
+
+    fun recordLayout(startedAt: Long?) {
+        if (startedAt != null) firstRenderWorkNanos += elapsedNanos(startedAt)
+    }
+
+    fun recordFirstDraw(
+        startedAt: Long?,
+        visiblePointCount: Int,
+        lineCount: Int,
+        xTickCount: Int,
+        yTickCount: Int,
+    ) {
+        if (logged) return
+        logged = true
+        firstRenderWorkNanos += elapsedNanos(requireNotNull(startedAt))
+
+        Timber.tag(PERFORMANCE_LOG_TAG).i(
+            "graph=%d firstRenderWorkMs=%.3f lines=%d inputPoints=%d finitePoints=%d mergedPoints=%d visiblePoints=%d xTicks=%d yTicks=%d",
+            graphId,
+            firstRenderWorkNanos / 1_000_000.0,
+            lineCount,
+            inputPointCount,
+            finitePointCount,
+            mergedPointCount,
+            visiblePointCount,
+            xTickCount,
+            yTickCount,
+        )
+    }
+
+    private fun elapsedNanos(startedAt: Long) = now() - startedAt
 }

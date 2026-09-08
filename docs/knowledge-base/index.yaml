@@ -20,7 +20,7 @@ docs:
   - file: graph-rendering.md
     title: Graph rendering — Compose line graphs and Vico bar charts
     description: Renderer-neutral graph contracts; Compose Canvas line rendering and Vico bar rendering own their axes, measured labels, styling, interaction, and defensive validation in the UI.
-    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, marker, axis, label, Roboto Mono, zoom, pan, Lua, migration, NaN, zero-range, finite]
+    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, marker, axis, label, Roboto Mono, zoom, pan, Lua, migration, NaN, zero-range, finite]
 
   - file: app-lock.md
     title: App lock — security boundary, persistence, and UI shell

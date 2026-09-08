@@ -7,7 +7,7 @@ topics:
   - Vico stacked bar-chart rendering
   - Shared contract for database and Lua time-bar graphs
   - Selection, time markers, pan, zoom, axes, and performance
-keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, axis, label, Roboto Mono, zoom, pan, Lua, migration, NaN, zero-range, finite]
+keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, axis, label, Roboto Mono, zoom, pan, Lua, migration, NaN, zero-range, finite]
 ---
 
 # Graph Rendering
@@ -23,6 +23,8 @@ Line charts are drawn directly with Compose Canvas. `ILineGraphViewData` exposes
 X ticks are selected from actual data-point timestamps, including irregular series, rather than fixed temporal subdivisions. The selector measures labels after the retained -28-degree rotation and greedily excludes overlaps. Formatting is based on the visible duration: seconds and minutes use clock formats, day-scale labels use `dd MMM`, and long ranges use `MMM yyyy`. Recalculate both axes when the full-screen viewport changes.
 
 List-mode line charts are static. Full-screen charts support horizontal pan and pinch zoom; keep the viewport clamped to the complete data extent. Axis layout is replaced as the viewport changes, so the pointer-input coroutine must be keyed to stable inputs such as interaction mode and canvas size, not the calculated layout—otherwise the first recalculation cancels the active gesture. The initial complete graph—including axes and an optional time marker—fades in only after text measurement and layout finish. Viewport changes must not restart or cancel this reveal.
+
+Every rendered line-graph instance emits one `LineGraphPerf` info-level Logcat entry in all build variants after its first completed Canvas draw. `firstRenderWorkMs` sums active preparation, merge/sort, initial layout/text measurement, and Canvas draw time; it intentionally excludes the deliberately yielded frame and other scheduling delay. The same entry includes line, input/finite/merged/visible-point, and X/Y tick counts so timings from real graphs can be compared meaningfully. Do not add per-frame logging to this path: Logcat traffic during pan, zoom, or reveal would distort the rendering performance being observed.
 
 ## Bar-chart boundary
 
