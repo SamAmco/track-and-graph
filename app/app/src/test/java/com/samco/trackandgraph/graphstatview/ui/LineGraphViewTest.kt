@@ -213,6 +213,22 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `september is always abbreviated to three characters`() {
+        val timestamp = OffsetDateTime.of(2026, 9, 3, 12, 0, 0, 0, ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
+        assertEquals(
+            "03 Sep",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "Sep’26",
+            formatLineGraphTimestamp(timestamp, Duration.ofDays(365).toMillis(), ZoneOffset.UTC),
+        )
+    }
+
+    @Test
     fun `timestamp format changes at duration boundaries`() {
         val timestamp = OffsetDateTime.of(2026, 3, 3, 12, 34, 56, 0, ZoneOffset.UTC)
             .toInstant()

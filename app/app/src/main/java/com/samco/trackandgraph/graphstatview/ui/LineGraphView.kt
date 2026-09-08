@@ -66,6 +66,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import java.text.DecimalFormat
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
@@ -86,8 +87,8 @@ private val vertexWidth = 6.dp
 
 private val lineGraphSecondFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 private val lineGraphMinuteFormatter = DateTimeFormatter.ofPattern("HH:mm")
-private val lineGraphDayFormatter = DateTimeFormatter.ofPattern("dd MMM")
-private val lineGraphMonthFormatter = DateTimeFormatter.ofPattern("MMM’yy")
+private val lineGraphDayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH)
+private val lineGraphMonthFormatter = DateTimeFormatter.ofPattern("MMM’yy", Locale.ENGLISH)
 private val lineGraphNumberFormatter = DecimalFormat("#,##0.###")
 
 @Composable
