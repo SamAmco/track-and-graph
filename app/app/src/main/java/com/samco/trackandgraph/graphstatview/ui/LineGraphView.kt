@@ -402,6 +402,7 @@ internal data class LineGraphLayout(
 internal data class XTick(val epochMillis: Long, val label: String, val projectedWidth: Float)
 internal data class YTick(val value: Double, val label: String)
 private data class IndexedXTick(val index: Int, val tick: XTick)
+private data class IndexedTimestamp(val index: Int, val epochMillis: Long)
 
 internal data class LineGraphViewport(val minX: Long, val maxX: Long)
 
@@ -466,9 +467,7 @@ internal fun calculateLineGraphLayout(
     val right = width - plotEndPadding.value * density
     val top = max(plotTopPadding.value * density, labelHeight / 2f)
 
-    val angleRadians = Math.toRadians(abs(X_LABEL_ANGLE).toDouble())
-    val xLabelSizes = mutableMapOf<String, IntSize>()
-    val candidates = mutableListOf<IndexedXTick>()
+    val visibleTimestamps = mutableListOf<IndexedTimestamp>()
     var uniqueTimestampCount = 0
     var previousMillis: Long? = null
     points.forEach { point ->
@@ -477,23 +476,74 @@ internal fun calculateLineGraphLayout(
             previousMillis = millis
             val index = uniqueTimestampCount++
             if (millis in visibleMinX..visibleMaxX) {
-                val label = formatLineGraphTimestamp(
-                    epochMillis = millis,
-                    durationMillis = visibleMaxX - visibleMinX,
-                    zoneId = ZoneId.systemDefault(),
-                )
-                val measured = xLabelSizes.getOrPut(label) { measureText(label) }
-                candidates += IndexedXTick(
-                    index = index,
-                    tick = XTick(
-                        epochMillis = millis,
-                        label = label,
-                        projectedWidth = (measured.width * cos(angleRadians) + measured.height * sin(angleRadians)).toFloat(),
-                    ),
-                )
+                visibleTimestamps += IndexedTimestamp(index, millis)
             }
         }
     }
+
+    val visibleSpan = visibleMaxX - visibleMinX
+    val fullSpan = points.last().timestamp.toInstant().toEpochMilli() -
+        points.first().timestamp.toInstant().toEpochMilli()
+    val formatter = xFormatterFor(visibleSpan)
+    val angleRadians = Math.toRadians(abs(X_LABEL_ANGLE).toDouble())
+    val minimumGap = axisLabelMinimumGap.value * density
+    val plotWidth = right - left
+    val zoneId = ZoneId.systemDefault()
+    val xLabelSizes = mutableMapOf<String, IntSize>()
+    val representativeTimestamp = visibleTimestamps.getOrNull(visibleTimestamps.size / 2)
+    val representativeLabel = representativeTimestamp?.let { timestamp ->
+        formatLineGraphTimestamp(timestamp.epochMillis, formatter, zoneId)
+    }
+    val suggestedStride = representativeLabel?.let { label ->
+        val estimatedSize = measureText(label).also { xLabelSizes[label] = it }
+        val estimatedProjectedWidth = projectedLabelWidth(estimatedSize, angleRadians)
+        val estimatedMaximumTickCount = maximumLineGraphTickCount(
+            plotWidth = plotWidth,
+            maximumProjectedWidth = estimatedProjectedWidth,
+            minimumGap = minimumGap,
+        )
+        max(
+            anchoredLineGraphTickStride(
+                totalTimestampCount = uniqueTimestampCount,
+                visibleSpan = visibleSpan,
+                fullSpan = fullSpan,
+                maximumTickCount = estimatedMaximumTickCount,
+            ),
+            lineGraphTickStride(
+                itemCount = visibleTimestamps.size,
+                maximumTickCount = estimatedMaximumTickCount,
+            ),
+        )
+    } ?: 1
+
+    // The representative is an actual candidate, so measuring it is useful whichever path wins.
+    // Compare upper bounds for the remaining work: measure every visible timestamp, or measure only
+    // globally anchored stride candidates (plus the representative if that stride excludes it).
+    val suggestedCandidateCount = visibleTimestamps.count { it.index % suggestedStride == 0 }
+    val stridedMeasurementUpperBound = suggestedCandidateCount +
+        if (representativeTimestamp?.index?.rem(suggestedStride) == 0) 0 else 1
+    val preliminaryStride = if (stridedMeasurementUpperBound < visibleTimestamps.size) {
+        suggestedStride
+    } else {
+        1
+    }
+
+    val candidates = visibleTimestamps
+        .asSequence()
+        .filter { it.index % preliminaryStride == 0 }
+        .map { timestamp ->
+            val label = formatLineGraphTimestamp(timestamp.epochMillis, formatter, zoneId)
+            val measured = xLabelSizes.getOrPut(label) { measureText(label) }
+            IndexedXTick(
+                index = timestamp.index,
+                tick = XTick(
+                    epochMillis = timestamp.epochMillis,
+                    label = label,
+                    projectedWidth = projectedLabelWidth(measured, angleRadians),
+                ),
+            )
+        }
+        .toList()
     val maxLabelWidth = xLabelSizes.values.maxOfOrNull { it.width }?.toFloat() ?: 0f
     val rotatedLabelHeight = (
         maxLabelWidth * sin(angleRadians) + labelHeight * cos(angleRadians)
@@ -501,19 +551,20 @@ internal fun calculateLineGraphLayout(
     val bottom = height - rotatedLabelHeight - plotBottomPadding.value * density
     if (right <= left || bottom <= top) return null
     val plot = Rect(left, top, right, bottom)
-    val minimumGap = axisLabelMinimumGap.value * density
     val maximumProjectedWidth = candidates.maxOfOrNull { it.tick.projectedWidth } ?: 0f
     val maximumTickCount = maximumLineGraphTickCount(
         plotWidth = plot.width,
         maximumProjectedWidth = maximumProjectedWidth,
         minimumGap = minimumGap,
     )
-    val stride = anchoredLineGraphTickStride(
-        totalTimestampCount = uniqueTimestampCount,
-        visibleSpan = visibleMaxX - visibleMinX,
-        fullSpan = points.last().timestamp.toInstant().toEpochMilli() -
-            points.first().timestamp.toInstant().toEpochMilli(),
-        maximumTickCount = maximumTickCount,
+    val stride = max(
+        preliminaryStride,
+        anchoredLineGraphTickStride(
+            totalTimestampCount = uniqueTimestampCount,
+            visibleSpan = visibleSpan,
+            fullSpan = fullSpan,
+            maximumTickCount = maximumTickCount,
+        ),
     )
     val anchoredCandidates = if (candidates.size <= maximumTickCount) {
         candidates.map { it.tick }
@@ -545,6 +596,18 @@ internal fun maximumLineGraphTickCount(
     minimumGap: Float,
 ): Int = floor(plotWidth / max(1f, maximumProjectedWidth + minimumGap)).toInt().coerceAtLeast(1)
 
+private fun projectedLabelWidth(size: IntSize, angleRadians: Double): Float =
+    (size.width * cos(angleRadians) + size.height * sin(angleRadians)).toFloat()
+
+private fun lineGraphTickStride(itemCount: Int, maximumTickCount: Int): Int {
+    val requiredStride = ceil(itemCount.toDouble() / maximumTickCount.coerceAtLeast(1))
+        .toInt()
+        .coerceAtLeast(1)
+    var stride = 1
+    while (stride < requiredStride && stride <= Int.MAX_VALUE / 2) stride *= 2
+    return stride
+}
+
 internal fun anchoredLineGraphTickStride(
     totalTimestampCount: Int,
     visibleSpan: Long,
@@ -555,12 +618,7 @@ internal fun anchoredLineGraphTickStride(
     val estimatedVisibleCount = ceil(
         totalTimestampCount * visibleSpan.toDouble() / fullSpan.toDouble()
     ).toInt().coerceIn(1, totalTimestampCount)
-    val requiredStride = ceil(estimatedVisibleCount.toDouble() / maximumTickCount.coerceAtLeast(1))
-        .toInt()
-        .coerceAtLeast(1)
-    var stride = 1
-    while (stride < requiredStride && stride <= Int.MAX_VALUE / 2) stride *= 2
-    return stride
+    return lineGraphTickStride(estimatedVisibleCount, maximumTickCount)
 }
 
 /** Greedily keeps timestamp labels whose measured, rotated bounds do not overlap. */
@@ -618,13 +676,17 @@ private fun xFormatterFor(durationMillis: Long): DateTimeFormatter = when {
     else -> lineGraphMonthFormatter
 }
 
+private fun formatLineGraphTimestamp(
+    epochMillis: Long,
+    formatter: DateTimeFormatter,
+    zoneId: ZoneId,
+): String = Instant.ofEpochMilli(epochMillis).atZone(zoneId).format(formatter)
+
 internal fun formatLineGraphTimestamp(
     epochMillis: Long,
     durationMillis: Long,
     zoneId: ZoneId,
-): String = Instant.ofEpochMilli(epochMillis)
-    .atZone(zoneId)
-    .format(xFormatterFor(durationMillis))
+): String = formatLineGraphTimestamp(epochMillis, xFormatterFor(durationMillis), zoneId)
 
 internal fun pointsForViewport(
     points: List<LineGraphPoint>,

@@ -404,6 +404,46 @@ class LineGraphViewTest {
         assertEquals(1, measurementCounts[repeatedLabel])
     }
 
+    @Test
+    fun `small x tick sets do not perform extra estimate measurements`() {
+        val measuredLabels = mutableListOf<String>()
+
+        layout(
+            points = listOf(point(0), point(1_000), point(2_000)),
+            visibleMaxX = 2_000,
+            measureText = { label ->
+                measuredLabels += label
+                IntSize(width = 30, height = 10)
+            },
+        )
+
+        val measuredTimeLabels = measuredLabels.filter { it.matches(Regex("\\d{2}:\\d{2}:\\d{2}")) }
+        assertEquals(3, measuredTimeLabels.size)
+    }
+
+    @Test
+    fun `dense x tick sets measure only stride eligible labels`() {
+        val end = Duration.ofHours(23).toMillis()
+        val measuredLabels = mutableListOf<String>()
+        val points = List(5_000) { index ->
+            point(end * index / 4_999, index.toDouble())
+        }
+
+        layout(
+            points = points,
+            visibleMaxX = end,
+            measureText = { label ->
+                measuredLabels += label
+                IntSize(width = 40, height = 10)
+            },
+        )
+
+        val measuredTimeLabels = measuredLabels.filter { label ->
+            label.matches(Regex("\\d{2}:\\d{2}"))
+        }
+        assertTrue("Measured ${measuredTimeLabels.size} X labels", measuredTimeLabels.size <= 16)
+    }
+
     private fun layout(
         points: List<LineGraphPoint>,
         width: Float = 400f,
