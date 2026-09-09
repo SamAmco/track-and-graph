@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -95,6 +96,8 @@ private val axisLabelMinimumGap = 4.dp
 private val timeMarkerWidth = 3.dp
 private val pointLabelPadding = 3.dp
 private val yAxisIntervalHelper = DataDisplayIntervalHelper()
+
+internal enum class LineGraphPinchAxis { HORIZONTAL, VERTICAL }
 
 private val lineGraphSecondFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 private val lineGraphMinuteFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -177,13 +180,46 @@ private fun LineGraphBodyView(
     val graphHeight = graphHeightFor(graphViewMode, hasLegend = true)
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var layout by remember(viewData) { mutableStateOf<LineGraphLayout?>(null) }
+    var fullYViewport by remember(viewData) { mutableStateOf<LineGraphYViewport?>(null) }
+    var requestedYViewport by remember(viewData) { mutableStateOf<LineGraphYViewport?>(null) }
+    var displayedYViewport by remember(viewData) { mutableStateOf<LineGraphYViewport?>(null) }
+    var verticalZoomCenter by remember(viewData) { mutableDoubleStateOf(0.0) }
+    var yLayoutRevision by remember(viewData) { mutableIntStateOf(0) }
     val reveal = remember(viewData) { Animatable(0f) }
-    val viewportTransform = rememberUpdatedState<(Float, Float) -> Unit> { panX, gestureZoom ->
+    val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit> { panX, gestureZoom ->
         val plotWidth = layout?.plotRect?.width ?: return@rememberUpdatedState
         zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
         val newHalfSpanFraction = 0.5 / zoom
         centerFraction = (centerFraction - panX / plotWidth / zoom)
             .coerceIn(newHalfSpanFraction, 1.0 - newHalfSpanFraction)
+    }
+    val startVerticalZoom = rememberUpdatedState {
+        val currentLayout = layout ?: return@rememberUpdatedState
+        val currentViewport = LineGraphYViewport(currentLayout.minY, currentLayout.maxY)
+        val center = visibleDataYCenter(
+            points = allPoints,
+            minX = visibleMinX,
+            maxX = visibleMaxX,
+            fallback = currentViewport.center,
+        )
+        verticalZoomCenter = center
+        displayedYViewport = currentViewport.centeredOn(center)
+    }
+    val updateVerticalZoom = rememberUpdatedState<(Float) -> Unit> { gestureZoom ->
+        val currentViewport = displayedYViewport ?: return@rememberUpdatedState
+        val completeViewport = fullYViewport ?: return@rememberUpdatedState
+        displayedYViewport = calculateLineGraphYViewport(
+            current = currentViewport,
+            complete = completeViewport,
+            center = verticalZoomCenter,
+            gestureZoom = gestureZoom.toDouble(),
+        )
+    }
+    val finishVerticalZoom = rememberUpdatedState {
+        displayedYViewport?.let {
+            requestedYViewport = it
+            yLayoutRevision++
+        }
     }
 
     LaunchedEffect(
@@ -195,6 +231,8 @@ private fun LineGraphBodyView(
         viewData.yRangeType,
         viewData.fixedYMin,
         viewData.fixedYMax,
+        requestedYViewport,
+        yLayoutRevision,
         axisTextStyle,
     ) {
         if (canvasSize == IntSize.Zero) return@LaunchedEffect
@@ -211,9 +249,14 @@ private fun LineGraphBodyView(
             durationBasedRange = viewData.durationBasedRange,
             fixedYMin = viewData.fixedYMin.takeIf { viewData.yRangeType == YRangeType.FIXED },
             fixedYMax = viewData.fixedYMax.takeIf { viewData.yRangeType == YRangeType.FIXED },
+            requestedYViewport = requestedYViewport,
             measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
             density = density.density,
         )
+        if (fullYViewport == null) {
+            layout?.let { fullYViewport = LineGraphYViewport(it.minY, it.maxY) }
+        }
+        if (requestedYViewport != null) displayedYViewport = null
         performanceLogger.recordLayout(startedAt)
     }
     LaunchedEffect(viewData, layout != null) {
@@ -230,18 +273,26 @@ private fun LineGraphBodyView(
             .onSizeChanged { canvasSize = it }
             .pointerInput(isInteractive, canvasSize, maximumZoom) {
                 if (!isInteractive) return@pointerInput
-                detectLineGraphPinchGestures { panX, gestureZoom ->
-                    viewportTransform.value(panX, gestureZoom)
-                }
+                detectLineGraphPinchGestures(
+                    onHorizontalTransform = { panX, gestureZoom ->
+                        horizontalViewportTransform.value(panX, gestureZoom)
+                    },
+                    onVerticalStart = { startVerticalZoom.value() },
+                    onVerticalTransform = { gestureZoom -> updateVerticalZoom.value(gestureZoom) },
+                    onVerticalEnd = { finishVerticalZoom.value() },
+                )
             }
             .pointerInput(isInteractive, canvasSize, maximumZoom) {
                 if (!isInteractive) return@pointerInput
                 detectHorizontalDragGestures { _, dragAmount ->
-                    viewportTransform.value(dragAmount, 1f)
+                    horizontalViewportTransform.value(dragAmount, 1f)
                 }
             }
     ) {
-        val currentLayout = layout ?: return@Canvas
+        val baseLayout = layout ?: return@Canvas
+        val currentLayout = displayedYViewport?.let { viewport ->
+            baseLayout.copy(minY = viewport.minY, maxY = viewport.maxY)
+        } ?: baseLayout
         val drawStartedAt = performanceLogger.startMeasurement()
         var visiblePointCount = 0
         val plot = currentLayout.plotRect
@@ -253,6 +304,7 @@ private fun LineGraphBodyView(
 
         currentLayout.yTicks.forEach { tick ->
             val y = currentLayout.yToPixel(tick.value)
+            if (y !in plot.top..plot.bottom) return@forEach
             drawLine(
                 revealedGridColor,
                 Offset(plot.left, y),
@@ -362,20 +414,66 @@ private fun LineGraphBodyView(
 }
 
 private suspend fun PointerInputScope.detectLineGraphPinchGestures(
-    onTransform: (panX: Float, zoom: Float) -> Unit,
+    onHorizontalTransform: (panX: Float, zoom: Float) -> Unit,
+    onVerticalStart: () -> Unit,
+    onVerticalTransform: (zoom: Float) -> Unit,
+    onVerticalEnd: () -> Unit,
 ) = awaitEachGesture {
     awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-    var transforming = false
+    var axis: LineGraphPinchAxis? = null
+    var verticalZoomFinished = false
+    var initialHorizontalSeparation: Float? = null
+    var initialVerticalSeparation: Float? = null
     do {
         val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-        if (event.changes.count { it.pressed } > 1) transforming = true
-        if (transforming) {
+        val pressed = event.changes.filter { it.pressed }
+        if (pressed.size > 1) {
+            val horizontalSeparation = abs(pressed[0].position.x - pressed[1].position.x)
+            val verticalSeparation = abs(pressed[0].position.y - pressed[1].position.y)
+            val initialHorizontal = initialHorizontalSeparation ?: horizontalSeparation.also {
+                initialHorizontalSeparation = it
+            }
+            val initialVertical = initialVerticalSeparation ?: verticalSeparation.also {
+                initialVerticalSeparation = it
+            }
+            if (axis == null) {
+                val horizontalChange = abs(horizontalSeparation - initialHorizontal)
+                val verticalChange = abs(verticalSeparation - initialVertical)
+                if (max(horizontalChange, verticalChange) >= viewConfiguration.touchSlop) {
+                    axis = lineGraphPinchAxis(horizontalChange, verticalChange)
+                    if (axis == LineGraphPinchAxis.VERTICAL) onVerticalStart()
+                }
+            }
             val pan = event.calculatePan()
             val zoom = event.calculateZoom()
-            if (pan.x != 0f || zoom != 1f) onTransform(pan.x, zoom)
+            when (axis) {
+                LineGraphPinchAxis.HORIZONTAL -> {
+                    if (pan.x != 0f || zoom != 1f) onHorizontalTransform(pan.x, zoom)
+                }
+                LineGraphPinchAxis.VERTICAL -> {
+                    if (zoom != 1f) onVerticalTransform(zoom)
+                }
+                null -> Unit
+            }
+            event.changes.forEach { it.consume() }
+        } else if (axis != null) {
+            if (axis == LineGraphPinchAxis.VERTICAL && !verticalZoomFinished) {
+                onVerticalEnd()
+                verticalZoomFinished = true
+            }
             event.changes.forEach { it.consume() }
         }
     } while (event.changes.any { it.pressed })
+    if (axis == LineGraphPinchAxis.VERTICAL && !verticalZoomFinished) onVerticalEnd()
+}
+
+internal fun lineGraphPinchAxis(
+    horizontalSeparationChange: Float,
+    verticalSeparationChange: Float,
+): LineGraphPinchAxis = if (verticalSeparationChange > horizontalSeparationChange) {
+    LineGraphPinchAxis.VERTICAL
+} else {
+    LineGraphPinchAxis.HORIZONTAL
 }
 
 internal data class LineGraphLayout(
@@ -411,6 +509,50 @@ internal data class YTick(val value: Double, val label: String)
 
 internal data class LineGraphViewport(val minX: Long, val maxX: Long)
 
+internal data class LineGraphYViewport(val minY: Double, val maxY: Double) {
+    val span: Double get() = maxY - minY
+    val center: Double get() = minY + span / 2.0
+
+    fun centeredOn(newCenter: Double) = LineGraphYViewport(
+        minY = newCenter - span / 2.0,
+        maxY = newCenter + span / 2.0,
+    )
+}
+
+internal fun calculateLineGraphYViewport(
+    current: LineGraphYViewport,
+    complete: LineGraphYViewport,
+    center: Double,
+    gestureZoom: Double,
+): LineGraphYViewport {
+    if (!gestureZoom.isFinite() || gestureZoom <= 0.0) return current
+    val minimumSpan = min(complete.span, max(Math.ulp(center), Math.ulp(complete.span)) * 4.0)
+    val newSpan = (current.span / gestureZoom).coerceIn(minimumSpan, complete.span)
+    if (newSpan >= complete.span) return complete
+    return LineGraphYViewport(
+        minY = center - newSpan / 2.0,
+        maxY = center + newSpan / 2.0,
+    )
+}
+
+internal fun visibleDataYCenter(
+    points: List<LineGraphPoint>,
+    minX: Long,
+    maxX: Long,
+    fallback: Double,
+): Double {
+    var minimum = Double.POSITIVE_INFINITY
+    var maximum = Double.NEGATIVE_INFINITY
+    points.forEach { point ->
+        if (point.timestamp.toInstant().toEpochMilli() in minX..maxX) {
+            minimum = min(minimum, point.value)
+            maximum = max(maximum, point.value)
+        }
+    }
+    return if (minimum.isFinite() && maximum.isFinite()) minimum + (maximum - minimum) / 2.0
+    else fallback
+}
+
 internal fun maximumLineGraphZoom(fullMinX: Long, fullMaxX: Long): Double =
     max(1.0, fullMaxX.toDouble() - fullMinX.toDouble())
 
@@ -441,14 +583,12 @@ internal fun calculateLineGraphLayout(
     durationBasedRange: Boolean,
     fixedYMin: Double?,
     fixedYMax: Double?,
+    requestedYViewport: LineGraphYViewport? = null,
     measureText: (String) -> IntSize,
     density: Float,
 ): LineGraphLayout? {
-    val visiblePoints = points.filter {
-        it.timestamp.toInstant().toEpochMilli() in visibleMinX..visibleMaxX
-    }.ifEmpty { points }
-    val rawYMin = fixedYMin ?: visiblePoints.minOfOrNull { it.value } ?: return null
-    val rawYMax = fixedYMax ?: visiblePoints.maxOfOrNull { it.value } ?: return null
+    val rawYMin = requestedYViewport?.minY ?: fixedYMin ?: points.minOfOrNull { it.value } ?: return null
+    val rawYMax = requestedYViewport?.maxY ?: fixedYMax ?: points.maxOfOrNull { it.value } ?: return null
     if (!rawYMin.isFinite() || !rawYMax.isFinite() || rawYMax < rawYMin) return null
 
     val initialRange = expandEqualRange(rawYMin, rawYMax)
@@ -459,7 +599,7 @@ internal fun calculateLineGraphLayout(
         initialRange.first,
         initialRange.second,
         approximateTickCount,
-        fixedYMin != null && fixedYMax != null,
+        requestedYViewport != null || fixedYMin != null && fixedYMax != null,
         durationBasedRange,
     )
     val yTicks = yValues.map { value ->

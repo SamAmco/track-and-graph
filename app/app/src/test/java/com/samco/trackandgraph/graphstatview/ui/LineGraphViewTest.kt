@@ -365,17 +365,68 @@ class LineGraphViewTest {
     }
 
     @Test
-    fun `dynamic layout uses data inside the visible viewport`() {
-        val layout = requireNotNull(
+    fun `horizontal viewport changes do not change dynamic y layout`() {
+        val points = listOf(point(0, 100.0), point(50, 1.0), point(100, 2.0))
+        val left = requireNotNull(
             layout(
-                points = listOf(point(0, 100.0), point(50, 1.0), point(100, 2.0)),
+                points = points,
+                visibleMinX = 0,
+                visibleMaxX = 60,
+            )
+        )
+        val right = requireNotNull(
+            layout(
+                points = points,
                 visibleMinX = 40,
                 visibleMaxX = 100,
             )
         )
 
-        assertEquals(1.0, layout.minY)
-        assertEquals(2.0, layout.maxY)
+        assertEquals(left.minY, right.minY)
+        assertEquals(left.maxY, right.maxY)
+        assertEquals(left.yTicks, right.yTicks)
+        assertEquals(left.plotRect.left, right.plotRect.left)
+        assertTrue(left.minY <= 1.0)
+        assertTrue(left.maxY >= 100.0)
+    }
+
+    @Test
+    fun `vertical zoom changes span around the visible data center`() {
+        val zoomed = calculateLineGraphYViewport(
+            current = LineGraphYViewport(0.0, 100.0),
+            complete = LineGraphYViewport(0.0, 100.0),
+            center = 40.0,
+            gestureZoom = 2.0,
+        )
+
+        assertEquals(LineGraphYViewport(15.0, 65.0), zoomed)
+    }
+
+    @Test
+    fun `vertical zoom out stops at the complete y span`() {
+        val zoomed = calculateLineGraphYViewport(
+            current = LineGraphYViewport(25.0, 75.0),
+            complete = LineGraphYViewport(0.0, 100.0),
+            center = 40.0,
+            gestureZoom = 0.1,
+        )
+
+        assertEquals(LineGraphYViewport(0.0, 100.0), zoomed)
+    }
+
+    @Test
+    fun `vertical zoom centers on finite data in the horizontal viewport`() {
+        val points = listOf(point(0, 100.0), point(50, 20.0), point(100, 40.0))
+
+        assertEquals(30.0, visibleDataYCenter(points, 40, 100, fallback = 7.0))
+        assertEquals(7.0, visibleDataYCenter(points, 10, 20, fallback = 7.0))
+    }
+
+    @Test
+    fun `pinch locks to the axis with the larger separation change`() {
+        assertEquals(LineGraphPinchAxis.HORIZONTAL, lineGraphPinchAxis(20f, 5f))
+        assertEquals(LineGraphPinchAxis.VERTICAL, lineGraphPinchAxis(5f, 20f))
+        assertEquals(LineGraphPinchAxis.HORIZONTAL, lineGraphPinchAxis(10f, 10f))
     }
 
     @Test
