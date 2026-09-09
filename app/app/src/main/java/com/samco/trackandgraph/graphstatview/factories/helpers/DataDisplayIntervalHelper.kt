@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatview.factories.helpers
 
 import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.log
@@ -123,8 +124,9 @@ class DataDisplayIntervalHelper @Inject constructor() {
 
     /**
      * Selects readable bounds and subdivisions. When [approximateLineCount] is supplied, it is
-     * treated as a layout-derived preference; one extra line is allowed when that produces a
-     * substantially clearer interval. Omitting it preserves the legacy 6–12 line behavior.
+     * treated as a layout-derived preference rather than a minimum. Candidates may use as few as
+     * two lines, or one more than requested, when that produces a substantially clearer interval.
+     * Omitting it preserves the legacy 6–12 line behavior.
      */
     fun getYParameters(
         yMin: Double,
@@ -133,12 +135,14 @@ class DataDisplayIntervalHelper @Inject constructor() {
         fixedBounds: Boolean,
         approximateLineCount: Int? = null,
     ): YAxisParameters {
-        val minimumLines = approximateLineCount
+        val preferredLineCount = approximateLineCount
             ?.coerceAtLeast(MINIMUM_SUPPORTED_LINE_COUNT)
-            ?.coerceAtMost(DEFAULT_MIN_LINES)
-            ?: DEFAULT_MIN_LINES
-        val maximumLines = approximateLineCount
-            ?.coerceAtLeast(MINIMUM_SUPPORTED_LINE_COUNT)
+        val minimumLines = if (preferredLineCount == null) {
+            DEFAULT_MIN_LINES
+        } else {
+            MINIMUM_SUPPORTED_LINE_COUNT
+        }
+        val maximumLines = preferredLineCount
             ?.coerceAtMost(Int.MAX_VALUE - 1)
             ?.plus(1)
             ?: DEFAULT_MAX_LINES
@@ -152,6 +156,7 @@ class DataDisplayIntervalHelper @Inject constructor() {
             fixedBounds = fixedBounds,
             minimumLines = minimumLines,
             maximumLines = maximumLines,
+            preferredLineCount = preferredLineCount,
         )
         if (parameters != null) {
             return YAxisParameters(
@@ -186,6 +191,7 @@ class DataDisplayIntervalHelper @Inject constructor() {
         fixedBounds: Boolean,
         minimumLines: Int = DEFAULT_MIN_LINES,
         maximumLines: Int = DEFAULT_MAX_LINES,
+        preferredLineCount: Int? = null,
     ): PossibleInterval? {
         require(minimumLines >= MINIMUM_SUPPORTED_LINE_COUNT)
         require(maximumLines >= minimumLines)
@@ -233,11 +239,25 @@ class DataDisplayIntervalHelper @Inject constructor() {
         for (minUsedRange in MIN_USED_RANGE_STEPS) {
             // gradually have lower expectations in our output
 
+            val intervalsUsingEnoughRange = reasonableIntervals
+                .filter { it.percentageRangeUsed >= minUsedRange }
+
+            if (preferredLineCount != null) {
+                intervalsUsingEnoughRange
+                    .sortedWith(
+                        compareBy<PossibleInterval> {
+                            abs(it.nLines - preferredLineCount) + if (it.preferred) 0 else 1
+                        }.thenBy { if (it.preferred) 0 else 1 }
+                            .thenByDescending { it.interval }
+                    )
+                    .firstOrNull()
+                    ?.let { return it }
+            }
+
             for (pref in listOf(true, false)) {
                 // prefer the 'preferred' intervals when it comes to each used_range step
-                reasonableIntervals
+                intervalsUsingEnoughRange
                     .filter { it.preferred == pref }
-                    .filter { it.percentageRangeUsed >= minUsedRange }
                     .sortedByDescending { it.interval }   // prefer larger intervals
                     .forEach { return it }  // returns the first element, if there is one
             }

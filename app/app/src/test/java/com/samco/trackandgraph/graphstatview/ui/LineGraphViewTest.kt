@@ -48,6 +48,14 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `fixed thirty to fifty range prefers five unit intervals`() {
+        assertEquals(
+            listOf(30.0, 35.0, 40.0, 45.0, 50.0),
+            calculateYTicks(rawMin = 30.0, rawMax = 50.0, targetCount = 6, fixed = true),
+        )
+    }
+
+    @Test
     fun `fixed zero to one hundred range uses the same clean ticks at different heights`() {
         val points = listOf(point(0), point(100, 100.0))
         val listLayout = requireNotNull(
