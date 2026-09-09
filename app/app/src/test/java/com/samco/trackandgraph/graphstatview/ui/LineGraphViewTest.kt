@@ -208,16 +208,18 @@ class LineGraphViewTest {
     fun `panning retains anchored x ticks shared by both viewports`() {
         val points = (0L..160L step 10L).map { point(it, it.toDouble()) }
         val left = requireNotNull(
-            layout(points, width = 140f, visibleMinX = 0L, visibleMaxX = 80L)
+            layout(points, width = 180f, visibleMinX = 20L, visibleMaxX = 100L)
         )
         val right = requireNotNull(
-            layout(points, width = 140f, visibleMinX = 40L, visibleMaxX = 120L)
+            layout(points, width = 180f, visibleMinX = 40L, visibleMaxX = 120L)
         )
+        val viewportBoundaries = setOf(left.minX, left.maxX, right.minX, right.maxX)
 
         assertEquals(
-            left.xTicks.map { it.epochMillis }.filter { it in 40L..80L },
-            right.xTicks.map { it.epochMillis }.filter { it in 40L..80L },
+            left.xTicks.map { it.epochMillis }.filter { it in 40L..100L && it !in viewportBoundaries },
+            right.xTicks.map { it.epochMillis }.filter { it in 40L..100L && it !in viewportBoundaries },
         )
+        assertEquals(listOf(80L), left.xTicks.map { it.epochMillis }.filter { it !in viewportBoundaries })
     }
 
     @Test
@@ -385,6 +387,55 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `layout prefers visible boundary labels when both fit`() {
+        val points = (0L..90L step 10L).map(::point)
+        val layout = requireNotNull(
+            layout(
+                points = points,
+                width = 900f,
+                visibleMaxX = 90L,
+                measureText = ::measureWideXLabel,
+            )
+        )
+
+        assertEquals(0L, layout.xTicks.first().epochMillis)
+        assertEquals(90L, layout.xTicks.last().epochMillis)
+        assertTrue(layout.plotRect.left >= layout.xTicks.first().projectedWidth)
+    }
+
+    @Test
+    fun `layout retains the first boundary label and omits an overlapping end label`() {
+        val points = (0L..90L step 10L).map(::point)
+        val layout = requireNotNull(
+            layout(
+                points = points,
+                width = 300f,
+                visibleMaxX = 90L,
+                measureText = ::measureWideXLabel,
+            )
+        )
+
+        assertEquals(0L, layout.xTicks.first().epochMillis)
+        assertTrue(90L !in layout.xTicks.map { it.epochMillis })
+    }
+
+    @Test
+    fun `first visible label follows the viewport while panning`() {
+        val points = (0L..160L step 10L).map(::point)
+        val layout = requireNotNull(
+            layout(
+                points = points,
+                width = 300f,
+                visibleMinX = 40L,
+                visibleMaxX = 120L,
+                measureText = ::measureWideXLabel,
+            )
+        )
+
+        assertEquals(40L, layout.xTicks.first().epochMillis)
+    }
+
+    @Test
     fun `layout measures repeated x labels only once`() {
         val measurementCounts = mutableMapOf<String, Int>()
         val repeatedLabel = formatLineGraphTimestamp(
@@ -472,4 +523,9 @@ class LineGraphViewTest {
     )
 
     private fun epochMillis(point: LineGraphPoint) = point.timestamp.toInstant().toEpochMilli()
+
+    private fun measureWideXLabel(label: String) = IntSize(
+        width = if (':' in label) 80 else 10,
+        height = 20,
+    )
 }

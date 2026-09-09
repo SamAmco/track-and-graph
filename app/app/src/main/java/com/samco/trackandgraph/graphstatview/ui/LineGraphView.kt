@@ -463,7 +463,7 @@ internal fun calculateLineGraphLayout(
     val yLabelSizes = yTicks.map { measureText(it.label) }
     val widestYLabel = yLabelSizes.maxOf { it.width }.toFloat()
     val labelHeight = yLabelSizes.maxOf { it.height }.toFloat()
-    val left = widestYLabel + plotStartPadding.value * density
+    val yAxisLeft = widestYLabel + plotStartPadding.value * density
     val right = width - plotEndPadding.value * density
     val top = max(plotTopPadding.value * density, labelHeight / 2f)
 
@@ -487,7 +487,7 @@ internal fun calculateLineGraphLayout(
     val formatter = xFormatterFor(visibleSpan)
     val angleRadians = Math.toRadians(abs(X_LABEL_ANGLE).toDouble())
     val minimumGap = axisLabelMinimumGap.value * density
-    val plotWidth = right - left
+    val preliminaryPlotWidth = right - yAxisLeft
     val zoneId = ZoneId.systemDefault()
     val xLabelSizes = mutableMapOf<String, IntSize>()
     val representativeTimestamp = visibleTimestamps.getOrNull(visibleTimestamps.size / 2)
@@ -498,7 +498,7 @@ internal fun calculateLineGraphLayout(
         val estimatedSize = measureText(label).also { xLabelSizes[label] = it }
         val estimatedProjectedWidth = projectedLabelWidth(estimatedSize, angleRadians)
         val estimatedMaximumTickCount = maximumLineGraphTickCount(
-            plotWidth = plotWidth,
+            plotWidth = preliminaryPlotWidth,
             maximumProjectedWidth = estimatedProjectedWidth,
             minimumGap = minimumGap,
         )
@@ -519,9 +519,26 @@ internal fun calculateLineGraphLayout(
     // The representative is an actual candidate, so measuring it is useful whichever path wins.
     // Compare upper bounds for the remaining work: measure every visible timestamp, or measure only
     // globally anchored stride candidates (plus the representative if that stride excludes it).
-    val suggestedCandidateCount = visibleTimestamps.count { it.index % suggestedStride == 0 }
+    val firstVisibleIndex = visibleTimestamps.firstOrNull()?.index
+    val lastVisibleIndex = visibleTimestamps.lastOrNull()?.index
+    val suggestedCandidateCount = visibleTimestamps.count { timestamp ->
+        isLineGraphTickCandidate(
+            index = timestamp.index,
+            stride = suggestedStride,
+            firstVisibleIndex = firstVisibleIndex,
+            lastVisibleIndex = lastVisibleIndex,
+        )
+    }
+    val representativeIsSuggested = representativeTimestamp?.let { timestamp ->
+        isLineGraphTickCandidate(
+            index = timestamp.index,
+            stride = suggestedStride,
+            firstVisibleIndex = firstVisibleIndex,
+            lastVisibleIndex = lastVisibleIndex,
+        )
+    } == true
     val stridedMeasurementUpperBound = suggestedCandidateCount +
-        if (representativeTimestamp?.index?.rem(suggestedStride) == 0) 0 else 1
+        if (representativeIsSuggested) 0 else 1
     val preliminaryStride = if (stridedMeasurementUpperBound < visibleTimestamps.size) {
         suggestedStride
     } else {
@@ -530,7 +547,14 @@ internal fun calculateLineGraphLayout(
 
     val candidates = visibleTimestamps
         .asSequence()
-        .filter { it.index % preliminaryStride == 0 }
+        .filter { timestamp ->
+            isLineGraphTickCandidate(
+                index = timestamp.index,
+                stride = preliminaryStride,
+                firstVisibleIndex = firstVisibleIndex,
+                lastVisibleIndex = lastVisibleIndex,
+            )
+        }
         .map { timestamp ->
             val label = formatLineGraphTimestamp(timestamp.epochMillis, formatter, zoneId)
             val measured = xLabelSizes.getOrPut(label) { measureText(label) }
@@ -544,6 +568,12 @@ internal fun calculateLineGraphLayout(
             )
         }
         .toList()
+    val firstLabelWidth = candidates
+        .firstOrNull { it.index == firstVisibleIndex }
+        ?.tick
+        ?.projectedWidth
+        ?: 0f
+    val left = max(yAxisLeft, firstLabelWidth)
     val maxLabelWidth = xLabelSizes.values.maxOfOrNull { it.width }?.toFloat() ?: 0f
     val rotatedLabelHeight = (
         maxLabelWidth * sin(angleRadians) + labelHeight * cos(angleRadians)
@@ -569,7 +599,14 @@ internal fun calculateLineGraphLayout(
     val anchoredCandidates = if (candidates.size <= maximumTickCount) {
         candidates.map { it.tick }
     } else {
-        candidates.filter { it.index % stride == 0 }.map { it.tick }
+        candidates.filter { candidate ->
+            isLineGraphTickCandidate(
+                index = candidate.index,
+                stride = stride,
+                firstVisibleIndex = firstVisibleIndex,
+                lastVisibleIndex = lastVisibleIndex,
+            )
+        }.map { it.tick }
     }
     val xTicks = selectLineGraphXTicks(
         candidates = anchoredCandidates,
@@ -607,6 +644,13 @@ private fun lineGraphTickStride(itemCount: Int, maximumTickCount: Int): Int {
     while (stride < requiredStride && stride <= Int.MAX_VALUE / 2) stride *= 2
     return stride
 }
+
+private fun isLineGraphTickCandidate(
+    index: Int,
+    stride: Int,
+    firstVisibleIndex: Int?,
+    lastVisibleIndex: Int?,
+): Boolean = index == firstVisibleIndex || index == lastVisibleIndex || index % stride == 0
 
 internal fun anchoredLineGraphTickStride(
     totalTimestampCount: Int,
