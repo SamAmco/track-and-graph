@@ -193,23 +193,32 @@ class LineGraphViewTest {
     }
 
     @Test
-    fun `anchored tick strides add intermediate labels as the viewport zooms in`() {
-        val wideStride = anchoredLineGraphTickStride(
-            totalTimestampCount = 100,
+    fun `time tick layers refine by powers of two as the viewport zooms in`() {
+        val wideDivisions = lineGraphTimeDivisionCount(
+            fullSpan = 100,
             visibleSpan = 100,
-            fullSpan = 100,
-            maximumTickCount = 20,
+            maximumTickCount = 4,
         )
-        val zoomedStride = anchoredLineGraphTickStride(
-            totalTimestampCount = 100,
-            visibleSpan = 50,
+        val zoomedDivisions = lineGraphTimeDivisionCount(
             fullSpan = 100,
-            maximumTickCount = 20,
+            visibleSpan = 50,
+            maximumTickCount = 4,
         )
 
-        assertEquals(8, wideStride)
-        assertEquals(4, zoomedStride)
-        assertEquals(0, wideStride % zoomedStride)
+        assertEquals(4L, wideDivisions)
+        assertEquals(8L, zoomedDivisions)
+        assertEquals(0L, zoomedDivisions % wideDivisions)
+    }
+
+    @Test
+    fun `time tick layers snap to data and retain coarse ticks at finer resolutions`() {
+        val timestamps = listOf(0L, 11L, 23L, 39L, 52L, 68L, 79L, 91L, 100L)
+        val coarse = lineGraphTimeTickCandidates(timestamps, 0, 100, 0, 100, 4)
+        val fine = lineGraphTimeTickCandidates(timestamps, 0, 100, 0, 100, 8)
+
+        assertEquals(listOf(0L, 23L, 52L, 79L, 100L), coarse)
+        assertTrue(fine.containsAll(coarse))
+        assertTrue(fine.all(timestamps::contains))
     }
 
     @Test
@@ -395,53 +404,55 @@ class LineGraphViewTest {
     }
 
     @Test
-    fun `layout prefers visible boundary labels when both fit`() {
-        val points = (0L..90L step 10L).map(::point)
+    fun `layout pins boundary labels to the viewport when both fit`() {
+        val points = listOf(0L, 20L, 40L, 60L, 70L, 100L).map(::point)
         val layout = requireNotNull(
             layout(
                 points = points,
                 width = 900f,
-                visibleMaxX = 90L,
+                visibleMinX = 5L,
+                visibleMaxX = 95L,
                 measureText = ::measureWideXLabel,
             )
         )
 
-        assertEquals(0L, layout.xTicks.first().epochMillis)
-        assertEquals(90L, layout.xTicks.last().epochMillis)
+        assertEquals(5L, layout.xTicks.first().epochMillis)
+        assertEquals(95L, layout.xTicks.last().epochMillis)
         assertEquals(layout.xTicks.first().projectedLeftExtent, layout.plotRect.left)
         assertTrue(layout.plotRect.left < layout.xTicks.first().projectedWidth)
     }
 
     @Test
     fun `layout retains the first boundary label and omits an overlapping end label`() {
-        val points = (0L..90L step 10L).map(::point)
+        val points = listOf(0L, 80L, 100L).map(::point)
         val layout = requireNotNull(
             layout(
                 points = points,
                 width = 300f,
-                visibleMaxX = 90L,
+                visibleMinX = 5L,
+                visibleMaxX = 95L,
                 measureText = ::measureWideXLabel,
             )
         )
 
-        assertEquals(0L, layout.xTicks.first().epochMillis)
-        assertTrue(90L !in layout.xTicks.map { it.epochMillis })
+        assertEquals(5L, layout.xTicks.first().epochMillis)
+        assertTrue(95L !in layout.xTicks.map { it.epochMillis })
     }
 
     @Test
-    fun `first visible label follows the viewport while panning`() {
+    fun `first label follows the viewport bound while panning`() {
         val points = (0L..160L step 10L).map(::point)
         val layout = requireNotNull(
             layout(
                 points = points,
                 width = 300f,
-                visibleMinX = 40L,
-                visibleMaxX = 120L,
+                visibleMinX = 45L,
+                visibleMaxX = 125L,
                 measureText = ::measureWideXLabel,
             )
         )
 
-        assertEquals(40L, layout.xTicks.first().epochMillis)
+        assertEquals(45L, layout.xTicks.first().epochMillis)
     }
 
     @Test
@@ -482,7 +493,7 @@ class LineGraphViewTest {
     }
 
     @Test
-    fun `dense x tick sets measure only stride eligible labels`() {
+    fun `dense x tick sets measure only the selected time layer`() {
         val end = Duration.ofHours(23).toMillis()
         val measuredLabels = mutableListOf<String>()
         val points = List(5_000) { index ->
