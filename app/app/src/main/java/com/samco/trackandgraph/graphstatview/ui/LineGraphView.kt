@@ -399,7 +399,14 @@ internal data class LineGraphLayout(
     )
 }
 
-internal data class XTick(val epochMillis: Long, val label: String, val projectedWidth: Float)
+internal data class XTick(
+    val epochMillis: Long,
+    val label: String,
+    val projectedWidth: Float,
+    val projectedRightExtent: Float = 0f,
+) {
+    val projectedLeftExtent: Float get() = projectedWidth - projectedRightExtent
+}
 internal data class YTick(val value: Double, val label: String)
 private data class IndexedXTick(val index: Int, val tick: XTick)
 private data class IndexedTimestamp(val index: Int, val epochMillis: Long)
@@ -564,6 +571,7 @@ internal fun calculateLineGraphLayout(
                     epochMillis = timestamp.epochMillis,
                     label = label,
                     projectedWidth = projectedLabelWidth(measured, angleRadians),
+                    projectedRightExtent = projectedLabelRightExtent(measured, angleRadians),
                 ),
             )
         }
@@ -571,7 +579,7 @@ internal fun calculateLineGraphLayout(
     val firstLabelWidth = candidates
         .firstOrNull { it.index == firstVisibleIndex }
         ?.tick
-        ?.projectedWidth
+        ?.projectedLeftExtent
         ?: 0f
     val left = max(yAxisLeft, firstLabelWidth)
     val maxLabelWidth = xLabelSizes.values.maxOfOrNull { it.width }?.toFloat() ?: 0f
@@ -636,6 +644,9 @@ internal fun maximumLineGraphTickCount(
 private fun projectedLabelWidth(size: IntSize, angleRadians: Double): Float =
     (size.width * cos(angleRadians) + size.height * sin(angleRadians)).toFloat()
 
+private fun projectedLabelRightExtent(size: IntSize, angleRadians: Double): Float =
+    (size.height * sin(angleRadians)).toFloat()
+
 private fun lineGraphTickStride(itemCount: Int, maximumTickCount: Int): Int {
     val requiredStride = ceil(itemCount.toDouble() / maximumTickCount.coerceAtLeast(1))
         .toInt()
@@ -679,10 +690,10 @@ internal fun selectLineGraphXTicks(
     var previousRight = Float.NEGATIVE_INFINITY
     candidates.forEach { tick ->
         val x = plotLeft + ((tick.epochMillis - minX).toDouble() / (maxX - minX) * plotWidth).toFloat()
-        val labelLeft = x - tick.projectedWidth
+        val labelLeft = x - tick.projectedLeftExtent
         if (labelLeft >= 0f && labelLeft >= previousRight + minimumGap) {
             selected += tick
-            previousRight = x
+            previousRight = x + tick.projectedRightExtent
         }
     }
     return selected

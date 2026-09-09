@@ -408,7 +408,8 @@ class LineGraphViewTest {
 
         assertEquals(0L, layout.xTicks.first().epochMillis)
         assertEquals(90L, layout.xTicks.last().epochMillis)
-        assertTrue(layout.plotRect.left >= layout.xTicks.first().projectedWidth)
+        assertEquals(layout.xTicks.first().projectedLeftExtent, layout.plotRect.left)
+        assertTrue(layout.plotRect.left < layout.xTicks.first().projectedWidth)
     }
 
     @Test
