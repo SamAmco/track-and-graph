@@ -355,6 +355,43 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `full screen layout can reserve stable maximum start label space`() {
+        val points = listOf(point(0), point(100))
+        val narrowStart = requireNotNull(
+            layout(
+                points = points,
+                visibleMinX = 0,
+                visibleMaxX = 80,
+                reservedXLabelWidth = 75f,
+            )
+        )
+        val wideStart = requireNotNull(
+            layout(
+                points = points,
+                visibleMinX = 20,
+                visibleMaxX = 100,
+                reservedXLabelWidth = 75f,
+            )
+        )
+
+        assertEquals(
+            75f * kotlin.math.cos(Math.toRadians(28.0)).toFloat(),
+            narrowStart.plotRect.left,
+        )
+        assertEquals(narrowStart.plotRect.left, wideStart.plotRect.left)
+        assertEquals(narrowStart.plotRect.bottom, wideStart.plotRect.bottom)
+    }
+
+    @Test
+    fun `maximum x label width checks every named month`() {
+        val width = maximumLineGraphXLabelWidth(Duration.ofDays(30).toMillis()) { label ->
+            IntSize(width = if (label.endsWith("May")) 80 else 30, height = 10)
+        }
+
+        assertEquals(80f, width)
+    }
+
+    @Test
     fun `layout expands an all zero dynamic range`() {
         val layout = requireNotNull(layout(listOf(point(0), point(100))))
 
@@ -574,6 +611,7 @@ class LineGraphViewTest {
         visibleMaxX: Long = 100L,
         fixedYMin: Double? = null,
         fixedYMax: Double? = null,
+        reservedXLabelWidth: Float? = null,
         measureText: (String) -> IntSize = { IntSize(width = 30, height = 10) },
     ) = calculateLineGraphLayout(
         width = width,
@@ -584,6 +622,7 @@ class LineGraphViewTest {
         durationBasedRange = false,
         fixedYMin = fixedYMin,
         fixedYMax = fixedYMax,
+        reservedXLabelWidth = reservedXLabelWidth,
         measureText = measureText,
         density = 1f,
     )

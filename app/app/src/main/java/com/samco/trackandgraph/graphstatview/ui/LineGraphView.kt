@@ -104,6 +104,10 @@ private val lineGraphMinuteFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val lineGraphDayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH)
 private val lineGraphMonthFormatter = DateTimeFormatter.ofPattern("MMM’yy", Locale.ENGLISH)
 private val lineGraphNumberFormatter = DecimalFormat("#,##0.###")
+private val lineGraphMonthAbbreviations = listOf(
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+)
 
 @Composable
 fun LineGraphView(
@@ -170,6 +174,7 @@ private fun LineGraphBodyView(
     val viewport = calculateLineGraphViewport(fullMinX, fullMaxX, zoom, centerFraction)
     val visibleMinX = viewport.minX
     val visibleMaxX = viewport.maxX
+    val visibleSpan = visibleMaxX - visibleMinX
 
     val textMeasurer = rememberTextMeasurer()
     val axisTextStyle = graphAxisTextStyle
@@ -178,6 +183,13 @@ private fun LineGraphBodyView(
     val markerColor = MaterialTheme.colorScheme.error
     val density = LocalDensity.current
     val graphHeight = graphHeightFor(graphViewMode, hasLegend = true)
+    val maximumXLabelWidth = if (isInteractive) {
+        remember(visibleXLabelFormat(visibleSpan), textMeasurer, axisTextStyle) {
+            maximumLineGraphXLabelWidth(visibleSpan) { label ->
+                textMeasurer.measure(label, axisTextStyle).size
+            }
+        }
+    } else null
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var layout by remember(viewData) { mutableStateOf<LineGraphLayout?>(null) }
     var fullYViewport by remember(viewData) { mutableStateOf<LineGraphYViewport?>(null) }
@@ -233,6 +245,7 @@ private fun LineGraphBodyView(
         viewData.fixedYMax,
         requestedYViewport,
         yLayoutRevision,
+        maximumXLabelWidth,
         axisTextStyle,
     ) {
         if (canvasSize == IntSize.Zero) return@LaunchedEffect
@@ -250,6 +263,7 @@ private fun LineGraphBodyView(
             fixedYMin = viewData.fixedYMin.takeIf { viewData.yRangeType == YRangeType.FIXED },
             fixedYMax = viewData.fixedYMax.takeIf { viewData.yRangeType == YRangeType.FIXED },
             requestedYViewport = requestedYViewport,
+            reservedXLabelWidth = maximumXLabelWidth,
             measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
             density = density.density,
         )
@@ -584,6 +598,7 @@ internal fun calculateLineGraphLayout(
     fixedYMin: Double?,
     fixedYMax: Double?,
     requestedYViewport: LineGraphYViewport? = null,
+    reservedXLabelWidth: Float? = null,
     measureText: (String) -> IntSize,
     density: Float,
 ): LineGraphLayout? {
@@ -642,7 +657,13 @@ internal fun calculateLineGraphLayout(
     }
     val startBoundaryTick = tickAt(visibleMinX)
     val endBoundaryTick = tickAt(visibleMaxX)
-    val left = max(yAxisLeft, startBoundaryTick.projectedLeftExtent)
+    val reservedStartLabelLeftExtent = reservedXLabelWidth
+        ?.times(cos(angleRadians).toFloat())
+        ?: 0f
+    val left = max(
+        max(yAxisLeft, startBoundaryTick.projectedLeftExtent),
+        reservedStartLabelLeftExtent,
+    )
     val preliminaryPlotWidth = right - left
     val representativeMillis = allTimestamps[allTimestamps.size / 2]
     val representativeLabel = formatLineGraphTimestamp(representativeMillis, formatter, zoneId)
@@ -650,8 +671,8 @@ internal fun calculateLineGraphLayout(
     val estimatedProjectedWidth = projectedLabelWidth(estimatedSize, angleRadians)
     val estimatedProjectedRightExtent = projectedLabelRightExtent(estimatedSize, angleRadians)
     val capacityPlotLeft = max(
-        yAxisLeft,
-        estimatedProjectedWidth - estimatedProjectedRightExtent,
+        max(yAxisLeft, estimatedProjectedWidth - estimatedProjectedRightExtent),
+        reservedStartLabelLeftExtent,
     )
     val estimatedMaximumTickCount = maximumLineGraphTickCount(
         plotWidth = right - capacityPlotLeft,
@@ -682,9 +703,12 @@ internal fun calculateLineGraphLayout(
         plotWidth = preliminaryPlotWidth,
         minimumGap = minimumGap,
     )
-    val maxLabelWidth = xTicks.maxOfOrNull { tick ->
-        xLabelSizes.getValue(tick.label).width
-    }?.toFloat() ?: 0f
+    val maxLabelWidth = max(
+        xTicks.maxOfOrNull { tick ->
+            xLabelSizes.getValue(tick.label).width
+        }?.toFloat() ?: 0f,
+        reservedXLabelWidth ?: 0f,
+    )
     val rotatedLabelHeight = (
         maxLabelWidth * sin(angleRadians) + labelHeight * cos(angleRadians)
         ).toFloat()
@@ -822,11 +846,36 @@ internal fun expandEqualRange(minValue: Double, maxValue: Double): Pair<Double, 
     return minValue - padding to maxValue + padding
 }
 
-private fun xFormatterFor(durationMillis: Long): DateTimeFormatter = when {
-    Duration.ofMillis(durationMillis).toMinutes() < 5L -> lineGraphSecondFormatter
-    Duration.ofMillis(durationMillis).toDays() < 1L -> lineGraphMinuteFormatter
-    Duration.ofMillis(durationMillis).toDays() < 304L -> lineGraphDayFormatter
-    else -> lineGraphMonthFormatter
+private enum class LineGraphXLabelFormat(val formatter: DateTimeFormatter) {
+    SECOND(lineGraphSecondFormatter),
+    MINUTE(lineGraphMinuteFormatter),
+    DAY(lineGraphDayFormatter),
+    MONTH(lineGraphMonthFormatter),
+}
+
+private fun visibleXLabelFormat(durationMillis: Long): LineGraphXLabelFormat = when {
+    Duration.ofMillis(durationMillis).toMinutes() < 5L -> LineGraphXLabelFormat.SECOND
+    Duration.ofMillis(durationMillis).toDays() < 1L -> LineGraphXLabelFormat.MINUTE
+    Duration.ofMillis(durationMillis).toDays() < 304L -> LineGraphXLabelFormat.DAY
+    else -> LineGraphXLabelFormat.MONTH
+}
+
+private fun xFormatterFor(durationMillis: Long): DateTimeFormatter =
+    visibleXLabelFormat(durationMillis).formatter
+
+internal fun maximumLineGraphXLabelWidth(
+    durationMillis: Long,
+    measureText: (String) -> IntSize,
+): Float {
+    // Roboto uses tabular numerals, so 8s provide one stable numeric representative while
+    // named formats check every possible three-letter English month.
+    val candidates = when (visibleXLabelFormat(durationMillis)) {
+        LineGraphXLabelFormat.SECOND -> listOf("88:88:88")
+        LineGraphXLabelFormat.MINUTE -> listOf("88:88")
+        LineGraphXLabelFormat.DAY -> lineGraphMonthAbbreviations.map { "88 $it" }
+        LineGraphXLabelFormat.MONTH -> lineGraphMonthAbbreviations.map { "$it’88" }
+    }
+    return candidates.maxOf { measureText(it).width }.toFloat()
 }
 
 private fun formatLineGraphTimestamp(
