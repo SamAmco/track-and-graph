@@ -60,12 +60,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
+import com.patrykandpatrick.vico.compose.cartesian.CartesianMeasuringContext
 import com.patrykandpatrick.vico.compose.cartesian.Zoom
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
@@ -83,7 +87,11 @@ import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarkerVisibil
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.DrawingContext
 import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.common.Insets
+import com.patrykandpatrick.vico.compose.common.Position
+import com.patrykandpatrick.vico.compose.common.component.TextComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
@@ -91,8 +99,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.helpers.formatTimeDuration
-import com.samco.trackandgraph.helpers.getDayMonthFormatter
-import com.samco.trackandgraph.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.ui.ui.ColorCircle
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
@@ -102,15 +108,18 @@ import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAmount
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToLong
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 private val barThickness = 16.dp
 private val barBorderThickness = 0.5.dp
@@ -389,24 +398,41 @@ private fun BarChartBodyView(
                 ),
             )
 
-            val xAxisFormatter = remember(context, xDates) { getXAxisFormatter(context, xDates) }
+            val xLabelText = GraphXAxisLabelText(
+                months = stringArrayResource(R.array.abbreviated_months).toList(),
+                weekdays = stringArrayResource(R.array.abbreviated_weekdays).toList(),
+                weekdayDayFormat = stringResource(R.string.compact_weekday_day_format),
+                dayMonthFormat = stringResource(R.string.compact_day_month_format),
+                monthYearFormat = stringResource(R.string.compact_month_year_format),
+            )
+            val axisTextStyle = graphAxisTextStyle
+            val textMeasurer = rememberTextMeasurer()
+            val measurementLabel = remember(xLabelText, textMeasurer, axisTextStyle) {
+                GraphXAxisLabelFormat.entries
+                    .flatMap { format -> graphXAxisLabelCandidates(format, xLabelText) }
+                    .maxBy { label -> textMeasurer.measure(label, axisTextStyle).size.width }
+            }
             val gridLine = rememberLineComponent(
                 fill = Fill(MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)),
                 thickness = graphGridLineThickness,
             )
-            val bottomAxisLabel = rememberAxisLabelComponent(style = graphAxisTextStyle)
-            val startAxisLabel = rememberAxisLabelComponent(style = graphAxisTextStyle)
+            val bottomAxisLabel = remember(axisTextStyle) {
+                EndAnchoredAxisLabelComponent(axisTextStyle)
+            }
+            val startAxisLabel = rememberAxisLabelComponent(style = axisTextStyle)
+            val bottomAxisItemPlacer = remember(xDates, xLabelText, measurementLabel) {
+                AdaptiveHorizontalAxisItemPlacer(xDates, xLabelText, measurementLabel)
+            }
             val bottomAxis = HorizontalAxis.rememberBottom(
                 line = gridLine,
                 label = bottomAxisLabel,
-                valueFormatter = CartesianValueFormatter { _, value, _ ->
-                    xDates[value.roundToInt().coerceIn(xDates.indices)].format(xAxisFormatter)
+                labelRotationDegrees = graphXAxisLabelAngle,
+                valueFormatter = CartesianValueFormatter { measuringContext, value, _ ->
+                    bottomAxisItemPlacer.getLabel(measuringContext, value)
                 },
                 tick = gridLine,
                 guideline = gridLine,
-                itemPlacer = remember(xDates.size) {
-                    AdaptiveHorizontalAxisItemPlacer(xDates.size)
-                },
+                itemPlacer = bottomAxisItemPlacer,
             )
             val startAxis = VerticalAxis.rememberStart(
                 line = gridLine,
@@ -542,38 +568,126 @@ private fun calculateLabelSpacing(barCount: Int): Int {
     return spacing
 }
 
+/** Makes Vico's rotated labels use the same top-right text anchor as line-graph labels. */
+private class EndAnchoredAxisLabelComponent(
+    textStyle: TextStyle,
+) : TextComponent(
+    textStyle = textStyle,
+    padding = Insets(vertical = 4.dp),
+) {
+    override fun draw(
+        context: DrawingContext,
+        text: CharSequence,
+        x: Float,
+        y: Float,
+        horizontalPosition: Position.Horizontal,
+        verticalPosition: Position.Vertical,
+        maxWidth: Int,
+        maxHeight: Int,
+        rotationDegrees: Float,
+    ) {
+        val unrotatedHeight = getBounds(
+            context = context,
+            text = text,
+            maxWidth = maxWidth,
+            maxHeight = maxHeight,
+            pad = false,
+        ).height
+        val anchorOffset = (
+            unrotatedHeight * sin(Math.toRadians(abs(rotationDegrees).toDouble()))
+            ).toFloat() * context.layoutDirectionMultiplier
+        super.draw(
+            context = context,
+            text = text,
+            x = x + anchorOffset,
+            y = y,
+            horizontalPosition = if (context.isLtr) {
+                Position.Horizontal.Start
+            } else {
+                Position.Horizontal.End
+            },
+            verticalPosition = verticalPosition,
+            maxWidth = maxWidth,
+            maxHeight = maxHeight,
+            rotationDegrees = rotationDegrees,
+        )
+    }
+}
+
 private class AdaptiveHorizontalAxisItemPlacer(
-    barCount: Int,
+    private val xDates: List<ZonedDateTime>,
+    private val labelText: GraphXAxisLabelText,
+    private val measurementLabel: String,
 ) : HorizontalAxis.ItemPlacer by HorizontalAxis.ItemPlacer.aligned(
-    spacing = { calculateLabelSpacing(barCount) },
+    spacing = { calculateLabelSpacing(xDates.size) },
     addExtremeLabelPadding = true,
 ) {
+    private val fullDurationMillis = Duration.between(xDates.first(), xDates.last())
+        .toMillis()
+        .coerceAtLeast(1L)
+    private var visibleLabelFormat = graphXAxisLabelFormatForDuration(fullDurationMillis)
+
+    fun getLabel(context: CartesianMeasuringContext, value: Double): String {
+        if (context !is CartesianDrawingContext) return measurementLabel
+        val date = xDates[value.roundToInt().coerceIn(xDates.indices)]
+        return formatGraphXAxisTimestamp(
+            epochMillis = date.toInstant().toEpochMilli(),
+            format = visibleLabelFormat,
+            zoneId = ZoneId.systemDefault(),
+            labelText = labelText,
+        )
+    }
+
     override fun getLabelValues(
         context: CartesianDrawingContext,
         visibleXRange: ClosedFloatingPointRange<Double>,
         fullXRange: ClosedFloatingPointRange<Double>,
         maxLabelWidth: Float,
     ): List<Double> {
-        val visibleBarCount = ceil(visibleXRange.endInclusive - visibleXRange.start).toInt() + 1
-        val spacing = calculateLabelSpacing(visibleBarCount)
-        val first = ceil(visibleXRange.start / spacing).toInt() * spacing
-        val last = floor(visibleXRange.endInclusive / spacing).toInt() * spacing
+        val fullIndexSpan = (fullXRange.endInclusive - fullXRange.start).coerceAtLeast(1.0)
+        val visibleIndexSpan = (visibleXRange.endInclusive - visibleXRange.start)
+            .coerceIn(0.0, fullIndexSpan)
+        val visibleDurationMillis = (fullDurationMillis * visibleIndexSpan / fullIndexSpan)
+            .roundToLong()
+            .coerceAtLeast(1L)
+        visibleLabelFormat = graphXAxisLabelFormatForDuration(visibleDurationMillis)
+
+        val spacing = calculateBarChartLabelSpacing(
+            visibleBarCount = ceil(visibleIndexSpan).toInt() + 1,
+            maxLabelWidth = maxLabelWidth,
+            xSpacing = context.layerDimensions.xSpacing,
+            minimumGap = with(context) { 4.dp.pixels },
+        )
+        val first = ceil(max(0.0, visibleXRange.start) / spacing).toInt() * spacing
+        val last = floor(min(xDates.lastIndex.toDouble(), visibleXRange.endInclusive) / spacing)
+            .toInt() * spacing
         if (first > last) return emptyList()
-        return (first..last step spacing).map(Int::toDouble)
+        // Vico expects a small overflow on both sides so labels move smoothly through the clip
+        // bounds while panning and can be sized relative to their actual neighbours.
+        val overflowFirst = (first - 2 * spacing).coerceAtLeast(0)
+        val overflowLast = (last + 2 * spacing).coerceAtMost(xDates.lastIndex)
+        return (overflowFirst..overflowLast step spacing).map(Int::toDouble)
     }
 }
 
-private fun getXAxisFormatter(
-    context: Context,
-    xDates: List<ZonedDateTime>,
-): DateTimeFormatter {
-    val durationRange = Duration.between(xDates.first(), xDates.last())
-    return when {
-        durationRange.toMinutes() < 5L -> DateTimeFormatter.ofPattern("HH:mm:ss")
-        durationRange.toDays() >= 304 -> getMonthYearFormatter(context)
-        durationRange.toDays() >= 1 -> getDayMonthFormatter(context)
-        else -> DateTimeFormatter.ofPattern("HH:mm")
-    }
+internal fun calculateBarChartLabelSpacing(
+    visibleBarCount: Int,
+    maxLabelWidth: Float,
+    xSpacing: Float,
+    minimumGap: Float,
+): Int {
+    val densitySpacing = calculateLabelSpacing(visibleBarCount)
+    if (xSpacing <= 0f || !xSpacing.isFinite()) return densitySpacing
+    val widthSpacing = ceil((maxLabelWidth + minimumGap) / xSpacing)
+        .toInt()
+        .coerceAtLeast(1)
+    return nextPowerOfTwo(max(densitySpacing, widthSpacing))
+}
+
+private fun nextPowerOfTwo(value: Int): Int {
+    var result = 1
+    while (result < value && result <= Int.MAX_VALUE / 2) result *= 2
+    return result
 }
 
 @Preview(showBackground = true)

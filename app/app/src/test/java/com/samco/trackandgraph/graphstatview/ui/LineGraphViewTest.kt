@@ -431,7 +431,7 @@ class LineGraphViewTest {
         ).forEach { (duration, expected) ->
             assertEquals(
                 expected,
-                formatLineGraphStartTimestamp(timestamp, duration, ZoneOffset.UTC, englishXLabelText),
+                formatGraphXAxisStartTimestamp(timestamp, duration, ZoneOffset.UTC, englishXLabelText),
             )
         }
     }
@@ -479,7 +479,7 @@ class LineGraphViewTest {
 
         assertEquals(
             "Di 03",
-            formatLineGraphTimestamp(
+            formatGraphXAxisTimestamp(
                 timestamp,
                 Duration.ofDays(7).toMillis(),
                 ZoneOffset.UTC,
@@ -841,9 +841,9 @@ class LineGraphViewTest {
         epochMillis: Long,
         durationMillis: Long,
         zoneId: ZoneId,
-    ) = formatLineGraphTimestamp(epochMillis, durationMillis, zoneId, englishXLabelText)
+    ) = formatGraphXAxisTimestamp(epochMillis, durationMillis, zoneId, englishXLabelText)
 
-    private val englishXLabelText = LineGraphXLabelText(
+    private val englishXLabelText = GraphXAxisLabelText(
         months = listOf(
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",

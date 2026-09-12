@@ -51,4 +51,30 @@ class BarChartViewTest {
         assertNull(getRenderableBarChartYRange(0.0, Double.POSITIVE_INFINITY))
         assertNull(getRenderableBarChartYRange(1.0, 0.0))
     }
+
+    @Test
+    fun xLabelSpacingRemainsPowerOfTwoWhenMeasuredLabelsNeedMoreRoom() {
+        assertEquals(
+            8,
+            calculateBarChartLabelSpacing(
+                visibleBarCount = 26,
+                maxLabelWidth = 120f,
+                xSpacing = 25f,
+                minimumGap = 4f,
+            ),
+        )
+    }
+
+    @Test
+    fun xLabelSpacingRetainsApproximateTenLabelLimitWhenLabelsFit() {
+        assertEquals(
+            4,
+            calculateBarChartLabelSpacing(
+                visibleBarCount = 26,
+                maxLabelWidth = 60f,
+                xSpacing = 25f,
+                minimumGap = 4f,
+            ),
+        )
+    }
 }

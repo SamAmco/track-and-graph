@@ -72,6 +72,7 @@ private const val GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER = 0.8f
 private const val GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER = 0.9f
 
 internal const val graphGridLineAlpha = 0.25f
+internal const val graphXAxisLabelAngle = -28f
 internal val graphGridLineThickness = 0.5.dp
 internal val graphAxisTextStyle: TextStyle
     @Composable get() = MaterialTheme.typography.bodySmall.copy(

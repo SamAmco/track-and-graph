@@ -65,7 +65,6 @@ import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
 import java.text.DecimalFormat
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -77,7 +76,6 @@ import kotlin.math.roundToLong
 import kotlin.math.sin
 import timber.log.Timber
 
-private const val X_LABEL_ANGLE = -28f
 private const val REVEAL_DURATION_MILLIS = 450
 private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
 private const val APPROXIMATE_Y_TICK_SPACING_DP = 32f
@@ -103,8 +101,6 @@ private val yAxisIntervalHelper = DataDisplayIntervalHelper()
 
 internal enum class LineGraphPinchAxis { HORIZONTAL, VERTICAL }
 
-private val lineGraphSecondFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-private val lineGraphMinuteFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val lineGraphNumberFormatter = DecimalFormat("#,##0.###")
 
 @Composable
@@ -173,7 +169,7 @@ private fun LineGraphBodyView(
     val visibleMinX = viewport.minX
     val visibleMaxX = viewport.maxX
     val visibleSpan = visibleMaxX - visibleMinX
-    val xLabelText = LineGraphXLabelText(
+    val xLabelText = GraphXAxisLabelText(
         months = stringArrayResource(R.array.abbreviated_months).toList(),
         weekdays = stringArrayResource(R.array.abbreviated_weekdays).toList(),
         weekdayDayFormat = stringResource(R.string.compact_weekday_day_format),
@@ -189,14 +185,14 @@ private fun LineGraphBodyView(
     val density = LocalDensity.current
     val graphHeight = graphHeightFor(graphViewMode, hasLegend = true)
     val maximumXTickLabelWidth = if (isInteractive) {
-        remember(visibleXLabelFormat(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
+        remember(graphXAxisLabelFormatForDuration(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
             maximumLineGraphXLabelWidth(visibleSpan, xLabelText) { label ->
                 textMeasurer.measure(label, axisTextStyle).size
             }
         }
     } else null
     val maximumStartXLabelWidth = if (isInteractive) {
-        remember(contextualStartXLabelFormat(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
+        remember(graphXAxisContextualStartLabelFormat(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
             maximumLineGraphStartXLabelWidth(visibleSpan, xLabelText) { label ->
                 textMeasurer.measure(label, axisTextStyle).size
             }
@@ -376,7 +372,7 @@ private fun LineGraphBodyView(
             )
             val measured = textMeasurer.measure(tick.label, axisTextStyle)
             val pivot = Offset(x, plot.bottom + xAxisLabelPadding.toPx())
-            rotate(X_LABEL_ANGLE, pivot) {
+            rotate(graphXAxisLabelAngle, pivot) {
                 drawText(
                     textMeasurer = textMeasurer,
                     text = tick.label,
@@ -546,14 +542,6 @@ internal data class YTick(val value: Double, val label: String)
 
 internal data class LineGraphViewport(val minX: Long, val maxX: Long)
 
-internal data class LineGraphXLabelText(
-    val months: List<String>,
-    val weekdays: List<String>,
-    val weekdayDayFormat: String,
-    val dayMonthFormat: String,
-    val monthYearFormat: String,
-)
-
 internal data class LineGraphYViewport(val minY: Double, val maxY: Double) {
     val span: Double get() = maxY - minY
     val center: Double get() = minY + span / 2.0
@@ -640,7 +628,7 @@ internal fun calculateLineGraphLayout(
     requestedYViewport: LineGraphYViewport? = null,
     maximumXTickLabelWidth: Float? = null,
     reservedStartXLabelWidth: Float? = null,
-    xLabelText: LineGraphXLabelText,
+    xLabelText: GraphXAxisLabelText,
     measureText: (String) -> IntSize,
     density: Float,
 ): LineGraphLayout? {
@@ -682,13 +670,13 @@ internal fun calculateLineGraphLayout(
     val visibleSpan = visibleMaxX - visibleMinX
     val fullMinX = allTimestamps.first()
     val fullMaxX = allTimestamps.last()
-    val labelFormat = visibleXLabelFormat(visibleSpan)
-    val angleRadians = Math.toRadians(abs(X_LABEL_ANGLE).toDouble())
+    val labelFormat = graphXAxisLabelFormatForDuration(visibleSpan)
+    val angleRadians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
     val minimumGap = axisLabelMinimumGap.value * density
     val zoneId = ZoneId.systemDefault()
     val xLabelSizes = mutableMapOf<String, IntSize>()
-    fun tickAt(epochMillis: Long, format: LineGraphXLabelFormat = labelFormat): XTick {
-        val label = formatLineGraphTimestamp(epochMillis, format, zoneId, xLabelText)
+    fun tickAt(epochMillis: Long, format: GraphXAxisLabelFormat = labelFormat): XTick {
+        val label = formatGraphXAxisTimestamp(epochMillis, format, zoneId, xLabelText)
         val measured = xLabelSizes.getOrPut(label) { measureText(label) }
         return XTick(
             epochMillis = epochMillis,
@@ -697,7 +685,7 @@ internal fun calculateLineGraphLayout(
             projectedRightExtent = projectedLabelRightExtent(measured, angleRadians),
         )
     }
-    val startBoundaryTick = tickAt(visibleMinX, contextualStartXLabelFormat(labelFormat))
+    val startBoundaryTick = tickAt(visibleMinX, graphXAxisContextualStartLabelFormat(labelFormat))
     val endBoundaryTick = tickAt(visibleMaxX)
     val reservedStartLabelLeftExtent = reservedStartXLabelWidth
         ?.times(cos(angleRadians).toFloat())
@@ -708,7 +696,7 @@ internal fun calculateLineGraphLayout(
     )
     val preliminaryPlotWidth = right - left
     val representativeMillis = allTimestamps[allTimestamps.size / 2]
-    val representativeLabel = formatLineGraphTimestamp(
+    val representativeLabel = formatGraphXAxisTimestamp(
         representativeMillis,
         labelFormat,
         zoneId,
@@ -892,123 +880,36 @@ internal fun expandEqualRange(minValue: Double, maxValue: Double): Pair<Double, 
     return minValue - padding to maxValue + padding
 }
 
-private enum class LineGraphXLabelFormat { SECOND, MINUTE, WEEKDAY, DAY, MONTH }
-
-private fun visibleXLabelFormat(durationMillis: Long): LineGraphXLabelFormat = when {
-    Duration.ofMillis(durationMillis).toMinutes() < 5L -> LineGraphXLabelFormat.SECOND
-    Duration.ofMillis(durationMillis).toDays() < 1L -> LineGraphXLabelFormat.MINUTE
-    Duration.ofMillis(durationMillis).toDays() < 14L -> LineGraphXLabelFormat.WEEKDAY
-    Duration.ofMillis(durationMillis).toDays() < 304L -> LineGraphXLabelFormat.DAY
-    else -> LineGraphXLabelFormat.MONTH
-}
-
-private fun contextualStartXLabelFormat(durationMillis: Long): LineGraphXLabelFormat =
-    contextualStartXLabelFormat(visibleXLabelFormat(durationMillis))
-
-private fun contextualStartXLabelFormat(format: LineGraphXLabelFormat): LineGraphXLabelFormat =
-    when (format) {
-        LineGraphXLabelFormat.SECOND,
-        LineGraphXLabelFormat.MINUTE,
-        LineGraphXLabelFormat.WEEKDAY -> LineGraphXLabelFormat.DAY
-        LineGraphXLabelFormat.DAY,
-        LineGraphXLabelFormat.MONTH -> LineGraphXLabelFormat.MONTH
-    }
-
 internal fun maximumLineGraphXLabelWidth(
     durationMillis: Long,
-    labelText: LineGraphXLabelText,
+    labelText: GraphXAxisLabelText,
     measureText: (String) -> IntSize,
 ): Float {
-    return maximumLineGraphXLabelWidth(visibleXLabelFormat(durationMillis), labelText, measureText)
+    return maximumLineGraphXLabelWidth(
+        graphXAxisLabelFormatForDuration(durationMillis),
+        labelText,
+        measureText,
+    )
 }
 
 internal fun maximumLineGraphStartXLabelWidth(
     durationMillis: Long,
-    labelText: LineGraphXLabelText,
+    labelText: GraphXAxisLabelText,
     measureText: (String) -> IntSize,
 ): Float = maximumLineGraphXLabelWidth(
-    contextualStartXLabelFormat(durationMillis),
+    graphXAxisContextualStartLabelFormat(durationMillis),
     labelText,
     measureText,
 )
 
 private fun maximumLineGraphXLabelWidth(
-    format: LineGraphXLabelFormat,
-    labelText: LineGraphXLabelText,
+    format: GraphXAxisLabelFormat,
+    labelText: GraphXAxisLabelText,
     measureText: (String) -> IntSize,
 ): Float {
-    val candidates = when (format) {
-        LineGraphXLabelFormat.SECOND -> listOf("88:88:88")
-        LineGraphXLabelFormat.MINUTE -> listOf("88:88")
-        LineGraphXLabelFormat.WEEKDAY -> labelText.weekdays.map {
-            formatLineGraphLabel(labelText.weekdayDayFormat, it, "88")
-        }
-        LineGraphXLabelFormat.DAY -> labelText.months.map {
-            formatLineGraphLabel(labelText.dayMonthFormat, "88", it)
-        }
-        LineGraphXLabelFormat.MONTH -> labelText.months.map {
-            formatLineGraphLabel(labelText.monthYearFormat, it, "88")
-        }
-    }
+    val candidates = graphXAxisLabelCandidates(format, labelText)
     return candidates.maxOf { measureText(it).width }.toFloat()
 }
-
-private fun formatLineGraphTimestamp(
-    epochMillis: Long,
-    format: LineGraphXLabelFormat,
-    zoneId: ZoneId,
-    labelText: LineGraphXLabelText,
-): String {
-    val dateTime = Instant.ofEpochMilli(epochMillis).atZone(zoneId)
-    return when (format) {
-        LineGraphXLabelFormat.SECOND -> dateTime.format(lineGraphSecondFormatter)
-        LineGraphXLabelFormat.MINUTE -> dateTime.format(lineGraphMinuteFormatter)
-        LineGraphXLabelFormat.WEEKDAY -> formatLineGraphLabel(
-            labelText.weekdayDayFormat,
-            labelText.weekdays[dateTime.dayOfWeek.value - 1],
-            twoDigitString(dateTime.dayOfMonth),
-        )
-        LineGraphXLabelFormat.DAY -> formatLineGraphLabel(
-            labelText.dayMonthFormat,
-            twoDigitString(dateTime.dayOfMonth),
-            labelText.months[dateTime.monthValue - 1],
-        )
-        LineGraphXLabelFormat.MONTH -> formatLineGraphLabel(
-            labelText.monthYearFormat,
-            labelText.months[dateTime.monthValue - 1],
-            twoDigitString(Math.floorMod(dateTime.year, 100)),
-        )
-    }
-}
-
-private fun formatLineGraphLabel(format: String, first: String, second: String): String =
-    String.format(format, first, second)
-
-private fun twoDigitString(value: Int): String = value.toString().padStart(2, '0')
-
-internal fun formatLineGraphTimestamp(
-    epochMillis: Long,
-    durationMillis: Long,
-    zoneId: ZoneId,
-    labelText: LineGraphXLabelText,
-): String = formatLineGraphTimestamp(
-    epochMillis,
-    visibleXLabelFormat(durationMillis),
-    zoneId,
-    labelText,
-)
-
-internal fun formatLineGraphStartTimestamp(
-    epochMillis: Long,
-    durationMillis: Long,
-    zoneId: ZoneId,
-    labelText: LineGraphXLabelText,
-): String = formatLineGraphTimestamp(
-    epochMillis,
-    contextualStartXLabelFormat(durationMillis),
-    zoneId,
-    labelText,
-)
 
 internal fun pointsForViewport(
     points: List<LineGraphPoint>,
