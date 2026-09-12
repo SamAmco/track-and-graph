@@ -185,9 +185,16 @@ private fun LineGraphBodyView(
     val markerColor = MaterialTheme.colorScheme.error
     val density = LocalDensity.current
     val graphHeight = graphHeightFor(graphViewMode, hasLegend = true)
-    val maximumXLabelWidth = if (isInteractive) {
+    val maximumXTickLabelWidth = if (isInteractive) {
         remember(visibleXLabelFormat(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
             maximumLineGraphXLabelWidth(visibleSpan, xLabelText) { label ->
+                textMeasurer.measure(label, axisTextStyle).size
+            }
+        }
+    } else null
+    val maximumStartXLabelWidth = if (isInteractive) {
+        remember(contextualStartXLabelFormat(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
+            maximumLineGraphStartXLabelWidth(visibleSpan, xLabelText) { label ->
                 textMeasurer.measure(label, axisTextStyle).size
             }
         }
@@ -249,7 +256,8 @@ private fun LineGraphBodyView(
         viewData.fixedYMax,
         requestedYViewport,
         yLayoutRevision,
-        maximumXLabelWidth,
+        maximumXTickLabelWidth,
+        maximumStartXLabelWidth,
         xLabelText,
         axisTextStyle,
     ) {
@@ -268,7 +276,8 @@ private fun LineGraphBodyView(
             fixedYMin = viewData.fixedYMin.takeIf { viewData.yRangeType == YRangeType.FIXED },
             fixedYMax = viewData.fixedYMax.takeIf { viewData.yRangeType == YRangeType.FIXED },
             requestedYViewport = requestedYViewport,
-            reservedXLabelWidth = maximumXLabelWidth,
+            maximumXTickLabelWidth = maximumXTickLabelWidth,
+            reservedStartXLabelWidth = maximumStartXLabelWidth,
             xLabelText = xLabelText,
             measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
             density = density.density,
@@ -617,7 +626,8 @@ internal fun calculateLineGraphLayout(
     fixedYMin: Double?,
     fixedYMax: Double?,
     requestedYViewport: LineGraphYViewport? = null,
-    reservedXLabelWidth: Float? = null,
+    maximumXTickLabelWidth: Float? = null,
+    reservedStartXLabelWidth: Float? = null,
     xLabelText: LineGraphXLabelText,
     measureText: (String) -> IntSize,
     density: Float,
@@ -665,8 +675,8 @@ internal fun calculateLineGraphLayout(
     val minimumGap = axisLabelMinimumGap.value * density
     val zoneId = ZoneId.systemDefault()
     val xLabelSizes = mutableMapOf<String, IntSize>()
-    fun tickAt(epochMillis: Long): XTick {
-        val label = formatLineGraphTimestamp(epochMillis, labelFormat, zoneId, xLabelText)
+    fun tickAt(epochMillis: Long, format: LineGraphXLabelFormat = labelFormat): XTick {
+        val label = formatLineGraphTimestamp(epochMillis, format, zoneId, xLabelText)
         val measured = xLabelSizes.getOrPut(label) { measureText(label) }
         return XTick(
             epochMillis = epochMillis,
@@ -675,9 +685,9 @@ internal fun calculateLineGraphLayout(
             projectedRightExtent = projectedLabelRightExtent(measured, angleRadians),
         )
     }
-    val startBoundaryTick = tickAt(visibleMinX)
+    val startBoundaryTick = tickAt(visibleMinX, contextualStartXLabelFormat(labelFormat))
     val endBoundaryTick = tickAt(visibleMaxX)
-    val reservedStartLabelLeftExtent = reservedXLabelWidth
+    val reservedStartLabelLeftExtent = reservedStartXLabelWidth
         ?.times(cos(angleRadians).toFloat())
         ?: 0f
     val left = max(
@@ -694,16 +704,11 @@ internal fun calculateLineGraphLayout(
     )
     val estimatedSize = xLabelSizes.getOrPut(representativeLabel) { measureText(representativeLabel) }
     val estimatedProjectedWidth = projectedLabelWidth(estimatedSize, angleRadians)
-    val estimatedProjectedRightExtent = projectedLabelRightExtent(estimatedSize, angleRadians)
-    val capacityProjectedLabelWidth = reservedXLabelWidth?.let { width ->
+    val capacityProjectedLabelWidth = maximumXTickLabelWidth?.let { width ->
         (width * cos(angleRadians) + estimatedSize.height * sin(angleRadians)).toFloat()
     } ?: estimatedProjectedWidth
-    val capacityPlotLeft = max(
-        max(yAxisLeft, estimatedProjectedWidth - estimatedProjectedRightExtent),
-        reservedStartLabelLeftExtent,
-    )
     val estimatedMaximumTickCount = maximumLineGraphTickCount(
-        plotWidth = right - capacityPlotLeft,
+        plotWidth = preliminaryPlotWidth,
         maximumProjectedWidth = capacityProjectedLabelWidth,
         minimumGap = minimumGap,
     )
@@ -731,11 +736,12 @@ internal fun calculateLineGraphLayout(
         plotWidth = preliminaryPlotWidth,
         minimumGap = minimumGap,
     )
-    val maxLabelWidth = max(
+    val maxLabelWidth = maxOf(
         xTicks.maxOfOrNull { tick ->
             xLabelSizes.getValue(tick.label).width
         }?.toFloat() ?: 0f,
-        reservedXLabelWidth ?: 0f,
+        maximumXTickLabelWidth ?: 0f,
+        reservedStartXLabelWidth ?: 0f,
     )
     val rotatedLabelHeight = (
         maxLabelWidth * sin(angleRadians) + labelHeight * cos(angleRadians)
@@ -884,12 +890,42 @@ private fun visibleXLabelFormat(durationMillis: Long): LineGraphXLabelFormat = w
     else -> LineGraphXLabelFormat.MONTH
 }
 
+private fun contextualStartXLabelFormat(durationMillis: Long): LineGraphXLabelFormat =
+    contextualStartXLabelFormat(visibleXLabelFormat(durationMillis))
+
+private fun contextualStartXLabelFormat(format: LineGraphXLabelFormat): LineGraphXLabelFormat =
+    when (format) {
+        LineGraphXLabelFormat.SECOND,
+        LineGraphXLabelFormat.MINUTE,
+        LineGraphXLabelFormat.WEEKDAY -> LineGraphXLabelFormat.DAY
+        LineGraphXLabelFormat.DAY,
+        LineGraphXLabelFormat.MONTH -> LineGraphXLabelFormat.MONTH
+    }
+
 internal fun maximumLineGraphXLabelWidth(
     durationMillis: Long,
     labelText: LineGraphXLabelText,
     measureText: (String) -> IntSize,
 ): Float {
-    val candidates = when (visibleXLabelFormat(durationMillis)) {
+    return maximumLineGraphXLabelWidth(visibleXLabelFormat(durationMillis), labelText, measureText)
+}
+
+internal fun maximumLineGraphStartXLabelWidth(
+    durationMillis: Long,
+    labelText: LineGraphXLabelText,
+    measureText: (String) -> IntSize,
+): Float = maximumLineGraphXLabelWidth(
+    contextualStartXLabelFormat(durationMillis),
+    labelText,
+    measureText,
+)
+
+private fun maximumLineGraphXLabelWidth(
+    format: LineGraphXLabelFormat,
+    labelText: LineGraphXLabelText,
+    measureText: (String) -> IntSize,
+): Float {
+    val candidates = when (format) {
         LineGraphXLabelFormat.SECOND -> listOf("88:88:88")
         LineGraphXLabelFormat.MINUTE -> listOf("88:88")
         LineGraphXLabelFormat.WEEKDAY -> labelText.weekdays.map {
@@ -946,6 +982,18 @@ internal fun formatLineGraphTimestamp(
 ): String = formatLineGraphTimestamp(
     epochMillis,
     visibleXLabelFormat(durationMillis),
+    zoneId,
+    labelText,
+)
+
+internal fun formatLineGraphStartTimestamp(
+    epochMillis: Long,
+    durationMillis: Long,
+    zoneId: ZoneId,
+    labelText: LineGraphXLabelText,
+): String = formatLineGraphTimestamp(
+    epochMillis,
+    contextualStartXLabelFormat(durationMillis),
     zoneId,
     labelText,
 )

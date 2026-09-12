@@ -370,7 +370,7 @@ class LineGraphViewTest {
                 points = points,
                 visibleMinX = 0,
                 visibleMaxX = 80,
-                reservedXLabelWidth = 75f,
+                reservedStartXLabelWidth = 75f,
             )
         )
         val wideStart = requireNotNull(
@@ -378,7 +378,7 @@ class LineGraphViewTest {
                 points = points,
                 visibleMinX = 20,
                 visibleMaxX = 100,
-                reservedXLabelWidth = 75f,
+                reservedStartXLabelWidth = 75f,
             )
         )
 
@@ -397,6 +397,58 @@ class LineGraphViewTest {
             englishXLabelText,
         ) { label ->
             IntSize(width = if (label.endsWith("May")) 80 else 30, height = 10)
+        }
+
+        assertEquals(80f, width)
+    }
+
+    @Test
+    fun `start x label provides date context for finer tick formats`() {
+        val timestamp = OffsetDateTime.of(2026, 3, 3, 12, 34, 56, 0, ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
+        listOf(
+            Duration.ofMinutes(1).toMillis() to "03 Mar",
+            Duration.ofHours(1).toMillis() to "03 Mar",
+            Duration.ofDays(7).toMillis() to "03 Mar",
+            Duration.ofDays(30).toMillis() to "Mar’26",
+            Duration.ofDays(365).toMillis() to "Mar’26",
+        ).forEach { (duration, expected) ->
+            assertEquals(
+                expected,
+                formatLineGraphStartTimestamp(timestamp, duration, ZoneOffset.UTC, englishXLabelText),
+            )
+        }
+    }
+
+    @Test
+    fun `only the pinned start tick uses the contextual format`() {
+        val start = OffsetDateTime.of(2026, 3, 3, 12, 0, 0, 0, ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+        val end = start + Duration.ofHours(1).toMillis()
+        val layout = requireNotNull(
+            layout(
+                points = (0L..6L).map { point(start + Duration.ofMinutes(it * 10).toMillis()) },
+                width = 900f,
+                visibleMinX = start,
+                visibleMaxX = end,
+                measureText = { IntSize(width = 20, height = 10) },
+            )
+        )
+
+        assertEquals("03 Mar", layout.xTicks.first().label)
+        assertTrue(layout.xTicks.drop(1).all { ':' in it.label })
+    }
+
+    @Test
+    fun `maximum start x label width uses its contextual format`() {
+        val width = maximumLineGraphStartXLabelWidth(
+            Duration.ofDays(30).toMillis(),
+            englishXLabelText,
+        ) { label ->
+            IntSize(width = if (label == "Sep’88") 80 else 30, height = 10)
         }
 
         assertEquals(80f, width)
@@ -430,7 +482,7 @@ class LineGraphViewTest {
     }
 
     @Test
-    fun `reserved maximum label width controls x tick spacing`() {
+    fun `reserved maximum tick label width controls x tick spacing`() {
         val points = (0L..100L step 5L).map(::point)
         val compact = requireNotNull(
             layout(points, width = 400f, measureText = { IntSize(10, 10) })
@@ -439,7 +491,7 @@ class LineGraphViewTest {
             layout(
                 points,
                 width = 400f,
-                reservedXLabelWidth = 100f,
+                maximumXTickLabelWidth = 100f,
                 measureText = { IntSize(10, 10) },
             )
         )
@@ -698,7 +750,8 @@ class LineGraphViewTest {
         fixedYMin: Double? = null,
         fixedYMax: Double? = null,
         requestedYViewport: LineGraphYViewport? = null,
-        reservedXLabelWidth: Float? = null,
+        maximumXTickLabelWidth: Float? = null,
+        reservedStartXLabelWidth: Float? = null,
         measureText: (String) -> IntSize = { IntSize(width = 30, height = 10) },
     ) = calculateLineGraphLayout(
         width = width,
@@ -710,7 +763,8 @@ class LineGraphViewTest {
         fixedYMin = fixedYMin,
         fixedYMax = fixedYMax,
         requestedYViewport = requestedYViewport,
-        reservedXLabelWidth = reservedXLabelWidth,
+        maximumXTickLabelWidth = maximumXTickLabelWidth,
+        reservedStartXLabelWidth = reservedStartXLabelWidth,
         xLabelText = englishXLabelText,
         measureText = measureText,
         density = 1f,
@@ -741,7 +795,7 @@ class LineGraphViewTest {
     )
 
     private fun measureWideXLabel(label: String) = IntSize(
-        width = if (':' in label) 80 else 10,
+        width = if (':' in label || label.any(Char::isLetter)) 80 else 10,
         height = 20,
     )
 }
