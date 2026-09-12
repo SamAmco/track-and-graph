@@ -83,6 +83,9 @@ private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
 private const val APPROXIMATE_Y_TICK_SPACING_DP = 32f
 private const val MINIMUM_Y_TICK_COUNT = 3
 private const val MAXIMUM_Y_TICK_COUNT = 8
+private const val MINIMUM_X_VIEWPORT_MILLIS = 10_000L
+private const val MINIMUM_NUMERIC_Y_VIEWPORT_SPAN = 0.01
+private const val MINIMUM_DURATION_Y_VIEWPORT_SPAN_SECONDS = 10.0
 private val lineWidth = 2.dp
 private val vertexWidth = 6.dp
 private val pointLabelTextSize = 9.sp
@@ -234,6 +237,11 @@ private fun LineGraphBodyView(
             complete = completeViewport,
             center = verticalZoomCenter,
             gestureZoom = gestureZoom.toDouble(),
+            minimumSpan = if (viewData.durationBasedRange) {
+                MINIMUM_DURATION_Y_VIEWPORT_SPAN_SECONDS
+            } else {
+                MINIMUM_NUMERIC_Y_VIEWPORT_SPAN
+            },
         )
     }
     val finishVerticalZoom = rememberUpdatedState {
@@ -561,10 +569,14 @@ internal fun calculateLineGraphYViewport(
     complete: LineGraphYViewport,
     center: Double,
     gestureZoom: Double,
+    minimumSpan: Double = MINIMUM_NUMERIC_Y_VIEWPORT_SPAN,
 ): LineGraphYViewport {
     if (!gestureZoom.isFinite() || gestureZoom <= 0.0) return current
-    val minimumSpan = min(complete.span, max(Math.ulp(center), Math.ulp(complete.span)) * 4.0)
-    val newSpan = (current.span / gestureZoom).coerceIn(minimumSpan, complete.span)
+    val effectiveMinimumSpan = min(
+        complete.span,
+        max(minimumSpan, max(Math.ulp(center), Math.ulp(complete.span)) * 4.0),
+    )
+    val newSpan = (current.span / gestureZoom).coerceIn(effectiveMinimumSpan, complete.span)
     if (newSpan >= complete.span) return complete
     return LineGraphYViewport(
         minY = center - newSpan / 2.0,
@@ -596,7 +608,7 @@ internal fun visibleDataYCenter(
 }
 
 internal fun maximumLineGraphZoom(fullMinX: Long, fullMaxX: Long): Double =
-    max(1.0, fullMaxX.toDouble() - fullMinX.toDouble())
+    max(1.0, (fullMaxX.toDouble() - fullMinX.toDouble()) / MINIMUM_X_VIEWPORT_MILLIS)
 
 internal fun calculateLineGraphViewport(
     fullMinX: Long,
@@ -605,8 +617,8 @@ internal fun calculateLineGraphViewport(
     centerFraction: Double,
 ): LineGraphViewport {
     val fullSpan = max(1.0, fullMaxX.toDouble() - fullMinX.toDouble())
-    val constrainedZoom = zoom.coerceIn(1.0, fullSpan)
-    val visibleSpan = max(1.0, fullSpan / constrainedZoom)
+    val constrainedZoom = zoom.coerceIn(1.0, maximumLineGraphZoom(fullMinX, fullMaxX))
+    val visibleSpan = max(min(fullSpan, MINIMUM_X_VIEWPORT_MILLIS.toDouble()), fullSpan / constrainedZoom)
     val halfSpanFraction = 0.5 / constrainedZoom
     val constrainedCenter = centerFraction.coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
     val centerX = fullMinX + fullSpan * constrainedCenter

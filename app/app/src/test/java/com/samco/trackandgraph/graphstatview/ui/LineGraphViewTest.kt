@@ -179,8 +179,8 @@ class LineGraphViewTest {
     }
 
     @Test
-    fun `maximum zoom is limited only by millisecond timestamp precision`() {
-        assertEquals(86_400_000.0, maximumLineGraphZoom(0L, 86_400_000L))
+    fun `maximum zoom stops at a ten second viewport`() {
+        assertEquals(8_640.0, maximumLineGraphZoom(0L, 86_400_000L))
 
         val viewport = calculateLineGraphViewport(
             fullMinX = 0L,
@@ -189,7 +189,21 @@ class LineGraphViewTest {
             centerFraction = 0.5,
         )
 
-        assertEquals(1L, viewport.maxX - viewport.minX)
+        assertEquals(10_000L, viewport.maxX - viewport.minX)
+    }
+
+    @Test
+    fun `graphs shorter than ten seconds cannot zoom beyond their complete range`() {
+        assertEquals(1.0, maximumLineGraphZoom(0L, 5_000L))
+
+        val viewport = calculateLineGraphViewport(
+            fullMinX = 0L,
+            fullMaxX = 5_000L,
+            zoom = Double.MAX_VALUE,
+            centerFraction = 0.5,
+        )
+
+        assertEquals(LineGraphViewport(0L, 5_000L), viewport)
     }
 
     @Test
@@ -560,6 +574,51 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `numeric vertical zoom stops at three decimal display precision`() {
+        val zoomed = calculateLineGraphYViewport(
+            current = LineGraphYViewport(0.0, 100.0),
+            complete = LineGraphYViewport(0.0, 100.0),
+            center = 50.0,
+            gestureZoom = Double.MAX_VALUE,
+        )
+
+        assertEquals(0.01, zoomed.span, 1e-12)
+    }
+
+    @Test
+    fun `duration vertical zoom stops at whole second display precision`() {
+        val zoomed = calculateLineGraphYViewport(
+            current = LineGraphYViewport(0.0, 100.0),
+            complete = LineGraphYViewport(0.0, 100.0),
+            center = 50.0,
+            gestureZoom = Double.MAX_VALUE,
+            minimumSpan = 10.0,
+        )
+
+        assertEquals(10.0, zoomed.span, 1e-12)
+    }
+
+    @Test
+    fun `minimum vertical zoom ranges retain distinct y labels`() {
+        val numericLayout = requireNotNull(
+            layout(
+                points = listOf(point(0, 0.0), point(100, 100.0)),
+                requestedYViewport = LineGraphYViewport(49.995, 50.005),
+            )
+        )
+        val durationLayout = requireNotNull(
+            layout(
+                points = listOf(point(0, 0.0), point(100, 100.0)),
+                requestedYViewport = LineGraphYViewport(45.0, 55.0),
+                durationBasedRange = true,
+            )
+        )
+
+        assertEquals(numericLayout.yTicks.size, numericLayout.yTicks.map { it.label }.distinct().size)
+        assertEquals(durationLayout.yTicks.size, durationLayout.yTicks.map { it.label }.distinct().size)
+    }
+
+    @Test
     fun `vertical zoom settles on the complete viewport when nearly zoomed out`() {
         val complete = LineGraphYViewport(0.0, 1.0)
 
@@ -747,6 +806,7 @@ class LineGraphViewTest {
         height: Float = 220f,
         visibleMinX: Long = 0L,
         visibleMaxX: Long = 100L,
+        durationBasedRange: Boolean = false,
         fixedYMin: Double? = null,
         fixedYMax: Double? = null,
         requestedYViewport: LineGraphYViewport? = null,
@@ -759,7 +819,7 @@ class LineGraphViewTest {
         visibleMinX = visibleMinX,
         visibleMaxX = visibleMaxX,
         points = points,
-        durationBasedRange = false,
+        durationBasedRange = durationBasedRange,
         fixedYMin = fixedYMin,
         fixedYMax = fixedYMax,
         requestedYViewport = requestedYViewport,
