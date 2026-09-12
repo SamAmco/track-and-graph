@@ -542,7 +542,7 @@
     <string name="saturday">Sábado</string>
     <string name="sunday">Domingo</string>
 
-    <!-- Fechas compactas de gráficos de líneas -->
+    <!-- Fechas compactas -->
     <string-array name="abbreviated_months">
         <item>Ene</item>
         <item>Feb</item>
@@ -557,6 +557,16 @@
         <item>Nov</item>
         <item>Dic</item>
     </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
     <string name="compact_day_month_format">%1$s %2$s</string>
     <string name="compact_month_year_format">%1$s’%2$s</string>
 </resources>

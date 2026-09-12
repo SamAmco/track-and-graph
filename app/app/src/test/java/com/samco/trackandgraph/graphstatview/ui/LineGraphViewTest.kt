@@ -305,8 +305,16 @@ class LineGraphViewTest {
             formatTimestamp(timestamp, Duration.ofDays(1).minusMillis(1).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
-            "03 Mar",
+            "Tue 03",
             formatTimestamp(timestamp, Duration.ofDays(1).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "Tue 03",
+            formatTimestamp(timestamp, Duration.ofDays(14).minusMillis(1).toMillis(), ZoneOffset.UTC),
+        )
+        assertEquals(
+            "03 Mar",
+            formatTimestamp(timestamp, Duration.ofDays(14).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "03 Mar",
@@ -392,6 +400,33 @@ class LineGraphViewTest {
         }
 
         assertEquals(80f, width)
+    }
+
+    @Test
+    fun `weekday labels and maximum width use supplied localized text`() {
+        val germanLabels = englishXLabelText.copy(
+            weekdays = listOf("Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"),
+        )
+        val timestamp = OffsetDateTime.of(2026, 3, 3, 12, 0, 0, 0, ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
+        assertEquals(
+            "Di 03",
+            formatLineGraphTimestamp(
+                timestamp,
+                Duration.ofDays(7).toMillis(),
+                ZoneOffset.UTC,
+                germanLabels,
+            ),
+        )
+        assertEquals(
+            50f,
+            maximumLineGraphXLabelWidth(
+                Duration.ofDays(7).toMillis(),
+                germanLabels,
+            ) { label -> IntSize(if (label.startsWith("Mi")) 50 else 20, 10) },
+        )
     }
 
     @Test
@@ -667,6 +702,8 @@ class LineGraphViewTest {
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
         ),
+        weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
+        weekdayDayFormat = "%1\$s %2\$s",
         dayMonthFormat = "%1\$s %2\$s",
         monthYearFormat = "%1\$s’%2\$s",
     )

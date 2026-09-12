@@ -563,7 +563,7 @@
     <string name="saturday">Samedi</string>
     <string name="sunday">Dimanche</string>
 
-    <!-- Dates compactes des graphiques linéaires -->
+    <!-- Dates compactes -->
     <string-array name="abbreviated_months">
         <item>Janv</item>
         <item>Févr</item>
@@ -578,6 +578,16 @@
         <item>Nov</item>
         <item>Déc</item>
     </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mer</item>
+        <item>Jeu</item>
+        <item>Ven</item>
+        <item>Sam</item>
+        <item>Dim</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
     <string name="compact_day_month_format">%1$s %2$s</string>
     <string name="compact_month_year_format">%1$s’%2$s</string>
 </resources>

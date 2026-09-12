@@ -172,6 +172,8 @@ private fun LineGraphBodyView(
     val visibleSpan = visibleMaxX - visibleMinX
     val xLabelText = LineGraphXLabelText(
         months = stringArrayResource(R.array.abbreviated_months).toList(),
+        weekdays = stringArrayResource(R.array.abbreviated_weekdays).toList(),
+        weekdayDayFormat = stringResource(R.string.compact_weekday_day_format),
         dayMonthFormat = stringResource(R.string.compact_day_month_format),
         monthYearFormat = stringResource(R.string.compact_month_year_format),
     )
@@ -527,6 +529,8 @@ internal data class LineGraphViewport(val minX: Long, val maxX: Long)
 
 internal data class LineGraphXLabelText(
     val months: List<String>,
+    val weekdays: List<String>,
+    val weekdayDayFormat: String,
     val dayMonthFormat: String,
     val monthYearFormat: String,
 )
@@ -863,11 +867,12 @@ internal fun expandEqualRange(minValue: Double, maxValue: Double): Pair<Double, 
     return minValue - padding to maxValue + padding
 }
 
-private enum class LineGraphXLabelFormat { SECOND, MINUTE, DAY, MONTH }
+private enum class LineGraphXLabelFormat { SECOND, MINUTE, WEEKDAY, DAY, MONTH }
 
 private fun visibleXLabelFormat(durationMillis: Long): LineGraphXLabelFormat = when {
     Duration.ofMillis(durationMillis).toMinutes() < 5L -> LineGraphXLabelFormat.SECOND
     Duration.ofMillis(durationMillis).toDays() < 1L -> LineGraphXLabelFormat.MINUTE
+    Duration.ofMillis(durationMillis).toDays() < 14L -> LineGraphXLabelFormat.WEEKDAY
     Duration.ofMillis(durationMillis).toDays() < 304L -> LineGraphXLabelFormat.DAY
     else -> LineGraphXLabelFormat.MONTH
 }
@@ -880,6 +885,9 @@ internal fun maximumLineGraphXLabelWidth(
     val candidates = when (visibleXLabelFormat(durationMillis)) {
         LineGraphXLabelFormat.SECOND -> listOf("88:88:88")
         LineGraphXLabelFormat.MINUTE -> listOf("88:88")
+        LineGraphXLabelFormat.WEEKDAY -> labelText.weekdays.map {
+            formatLineGraphLabel(labelText.weekdayDayFormat, it, "88")
+        }
         LineGraphXLabelFormat.DAY -> labelText.months.map {
             formatLineGraphLabel(labelText.dayMonthFormat, "88", it)
         }
@@ -900,6 +908,11 @@ private fun formatLineGraphTimestamp(
     return when (format) {
         LineGraphXLabelFormat.SECOND -> dateTime.format(lineGraphSecondFormatter)
         LineGraphXLabelFormat.MINUTE -> dateTime.format(lineGraphMinuteFormatter)
+        LineGraphXLabelFormat.WEEKDAY -> formatLineGraphLabel(
+            labelText.weekdayDayFormat,
+            labelText.weekdays[dateTime.dayOfWeek.value - 1],
+            twoDigitString(dateTime.dayOfMonth),
+        )
         LineGraphXLabelFormat.DAY -> formatLineGraphLabel(
             labelText.dayMonthFormat,
             twoDigitString(dateTime.dayOfMonth),
