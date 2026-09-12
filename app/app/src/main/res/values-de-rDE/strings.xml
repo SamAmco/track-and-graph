@@ -542,4 +542,22 @@
     <string name="friday">Freitag</string>
     <string name="saturday">Samstag</string>
     <string name="sunday">Sonntag</string>
+
+    <!-- Kompakte Datumsangaben für Liniendiagramme -->
+    <string-array name="abbreviated_months">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>März</item>
+        <item>Apr</item>
+        <item>Mai</item>
+        <item>Juni</item>
+        <item>Juli</item>
+        <item>Aug</item>
+        <item>Sept</item>
+        <item>Okt</item>
+        <item>Nov</item>
+        <item>Dez</item>
+    </string-array>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
 </resources>

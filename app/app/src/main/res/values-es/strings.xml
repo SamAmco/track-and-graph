@@ -541,4 +541,22 @@
     <string name="friday">Viernes</string>
     <string name="saturday">Sábado</string>
     <string name="sunday">Domingo</string>
+
+    <!-- Fechas compactas de gráficos de líneas -->
+    <string-array name="abbreviated_months">
+        <item>Ene</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Abr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Ago</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dic</item>
+    </string-array>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
 </resources>

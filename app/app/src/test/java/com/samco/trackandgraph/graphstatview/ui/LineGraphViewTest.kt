@@ -262,11 +262,11 @@ class LineGraphViewTest {
 
         assertEquals(
             "03 Mar",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "Mar’26",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(365).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(365).toMillis(), ZoneOffset.UTC),
         )
     }
 
@@ -278,11 +278,11 @@ class LineGraphViewTest {
 
         assertEquals(
             "03 Sep",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "Sep’26",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(365).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(365).toMillis(), ZoneOffset.UTC),
         )
     }
 
@@ -294,27 +294,27 @@ class LineGraphViewTest {
 
         assertEquals(
             "12:34:56",
-            formatLineGraphTimestamp(timestamp, Duration.ofMinutes(5).minusMillis(1).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofMinutes(5).minusMillis(1).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "12:34",
-            formatLineGraphTimestamp(timestamp, Duration.ofMinutes(5).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofMinutes(5).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "12:34",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(1).minusMillis(1).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(1).minusMillis(1).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "03 Mar",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(1).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(1).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "03 Mar",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(304).minusMillis(1).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(304).minusMillis(1).toMillis(), ZoneOffset.UTC),
         )
         assertEquals(
             "Mar’26",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(304).toMillis(), ZoneOffset.UTC),
+            formatTimestamp(timestamp, Duration.ofDays(304).toMillis(), ZoneOffset.UTC),
         )
     }
 
@@ -326,7 +326,7 @@ class LineGraphViewTest {
 
         assertEquals(
             "02 Mar",
-            formatLineGraphTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.ofHours(-1)),
+            formatTimestamp(timestamp, Duration.ofDays(30).toMillis(), ZoneOffset.ofHours(-1)),
         )
     }
 
@@ -384,11 +384,32 @@ class LineGraphViewTest {
 
     @Test
     fun `maximum x label width checks every named month`() {
-        val width = maximumLineGraphXLabelWidth(Duration.ofDays(30).toMillis()) { label ->
+        val width = maximumLineGraphXLabelWidth(
+            Duration.ofDays(30).toMillis(),
+            englishXLabelText,
+        ) { label ->
             IntSize(width = if (label.endsWith("May")) 80 else 30, height = 10)
         }
 
         assertEquals(80f, width)
+    }
+
+    @Test
+    fun `reserved maximum label width controls x tick spacing`() {
+        val points = (0L..100L step 5L).map(::point)
+        val compact = requireNotNull(
+            layout(points, width = 400f, measureText = { IntSize(10, 10) })
+        )
+        val reserved = requireNotNull(
+            layout(
+                points,
+                width = 400f,
+                reservedXLabelWidth = 100f,
+                measureText = { IntSize(10, 10) },
+            )
+        )
+
+        assertTrue(reserved.xTicks.size < compact.xTicks.size)
     }
 
     @Test
@@ -546,7 +567,7 @@ class LineGraphViewTest {
     @Test
     fun `layout measures repeated x labels only once`() {
         val measurementCounts = mutableMapOf<String, Int>()
-        val repeatedLabel = formatLineGraphTimestamp(
+        val repeatedLabel = formatTimestamp(
             epochMillis = 0,
             durationMillis = 100,
             zoneId = ZoneId.systemDefault(),
@@ -623,6 +644,7 @@ class LineGraphViewTest {
         fixedYMin = fixedYMin,
         fixedYMax = fixedYMax,
         reservedXLabelWidth = reservedXLabelWidth,
+        xLabelText = englishXLabelText,
         measureText = measureText,
         density = 1f,
     )
@@ -633,6 +655,21 @@ class LineGraphViewTest {
     )
 
     private fun epochMillis(point: LineGraphPoint) = point.timestamp.toInstant().toEpochMilli()
+
+    private fun formatTimestamp(
+        epochMillis: Long,
+        durationMillis: Long,
+        zoneId: ZoneId,
+    ) = formatLineGraphTimestamp(epochMillis, durationMillis, zoneId, englishXLabelText)
+
+    private val englishXLabelText = LineGraphXLabelText(
+        months = listOf(
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        ),
+        dayMonthFormat = "%1\$s %2\$s",
+        monthYearFormat = "%1\$s’%2\$s",
+    )
 
     private fun measureWideXLabel(label: String) = IntSize(
         width = if (':' in label) 80 else 10,
