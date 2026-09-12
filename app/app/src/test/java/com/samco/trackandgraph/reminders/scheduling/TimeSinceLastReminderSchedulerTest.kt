@@ -27,6 +27,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
@@ -237,6 +238,56 @@ internal class TimeSinceLastReminderSchedulerTest {
     }
 
     @Test
+    fun `schedules day based reminder at configured time of day`() = runTest {
+        val featureId = 123L
+        timeProvider.currentTime = ZonedDateTime.of(2024, 1, 10, 10, 0, 0, 0, ZoneId.of("UTC"))
+        dataSampler.setDataPointsForFeature(featureId, listOf(
+            DataPoint(
+                timestamp = OffsetDateTime.of(2024, 1, 9, 17, 45, 0, 0, ZoneOffset.UTC),
+                featureId = featureId,
+                value = 1.0,
+                label = "",
+                note = ""
+            )
+        ))
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.DAYS),
+            secondInterval = null,
+            timeOfDay = LocalTime.of(9, 30)
+        )
+
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
+
+        val expected = ZonedDateTime.of(2024, 1, 12, 9, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `ignores configured time of day for hour based reminder`() = runTest {
+        val featureId = 123L
+        timeProvider.currentTime = ZonedDateTime.of(2024, 1, 10, 10, 0, 0, 0, ZoneId.of("UTC"))
+        dataSampler.setDataPointsForFeature(featureId, listOf(
+            DataPoint(
+                timestamp = OffsetDateTime.of(2024, 1, 10, 9, 0, 0, 0, ZoneOffset.UTC),
+                featureId = featureId,
+                value = 1.0,
+                label = "",
+                note = ""
+            )
+        ))
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(interval = 3, period = Period.HOURS),
+            secondInterval = null,
+            timeOfDay = LocalTime.of(9, 30)
+        )
+
+        val result = uut.scheduleNext(featureId, params, timeProvider.now().toInstant())
+
+        val expected = ZonedDateTime.of(2024, 1, 10, 12, 0, 0, 0, ZoneId.of("UTC")).toInstant()
+        assertEquals(expected, result)
+    }
+
+    @Test
     fun `uses latest data point when multiple exist`() = runTest {
         // PREPARE - Multiple data points, should use the most recent
         val featureId = 123L
@@ -280,4 +331,3 @@ internal class TimeSinceLastReminderSchedulerTest {
         assertEquals("Should use latest data point", expected, result)
     }
 }
-

@@ -536,6 +536,7 @@
     <string name="reminder_disabled">Rappel désactivé</string>
     <string name="repeat_every">Répéter tous les</string>
     <string name="at_time">À</string>
+    <string name="at_a_specific_time">À une heure précise</string>
     <string name="ending_at">Se termine le</string>
     <string name="starting_from">À partir du</string>
     <string name="repeat_on_week_days">Répéter les jours de la semaine</string>

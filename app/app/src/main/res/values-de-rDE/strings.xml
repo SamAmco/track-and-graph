@@ -516,6 +516,7 @@
     <string name="reminder_disabled">Erinnerung deaktiviert</string>
     <string name="repeat_every">Wiederholen alle</string>
     <string name="at_time">Um</string>
+    <string name="at_a_specific_time">Zu einer bestimmten Uhrzeit</string>
     <string name="ending_at">Endet am</string>
     <string name="starting_from">Beginnend ab</string>
     <string name="repeat_on_week_days">An Wochentagen wiederholen</string>

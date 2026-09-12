@@ -235,6 +235,7 @@
     <string name="reminder_disabled">Reminder disabled</string>
     <string name="repeat_every">Repeat Every</string>
     <string name="at_time">At Time</string>
+    <string name="at_a_specific_time">At a specific time</string>
     <string name="ending_at">Ending at</string>
     <string name="starting_from">Starting From</string>
     <string name="repeat_on_week_days">Repeat On Week Days</string>

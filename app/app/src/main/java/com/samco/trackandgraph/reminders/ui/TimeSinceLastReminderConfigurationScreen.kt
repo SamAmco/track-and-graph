@@ -21,6 +21,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +49,7 @@ import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
+import com.samco.trackandgraph.data.database.dto.supportsTimeOfDay
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -57,6 +59,9 @@ import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.ui.RowCheckbox
 import com.samco.trackandgraph.ui.ui.SelectorButton
+import com.samco.trackandgraph.ui.ui.TimeButton
+import com.samco.trackandgraph.ui.ui.dateTimeButtonWidth
+import org.threeten.bp.LocalTime
 
 @Composable
 fun TimeSinceLastReminderConfigurationScreen(
@@ -73,6 +78,8 @@ fun TimeSinceLastReminderConfigurationScreen(
     val secondInterval by viewModel.secondInterval.collectAsState()
     val secondPeriod by viewModel.secondPeriod.collectAsState()
     val hasSecondInterval by viewModel.hasSecondInterval.collectAsState()
+    val hasTimeOfDay by viewModel.hasTimeOfDay.collectAsState()
+    val selectedTime by viewModel.selectedTime.collectAsState()
     val featureName by viewModel.featureName.collectAsState()
     val continueEnabled by viewModel.continueEnabled.collectAsState()
     val context = LocalContext.current
@@ -96,6 +103,10 @@ fun TimeSinceLastReminderConfigurationScreen(
         onSecondPeriodChanged = viewModel::updateSecondPeriod,
         hasSecondInterval = hasSecondInterval,
         onHasSecondIntervalChanged = viewModel::updateHasSecondInterval,
+        hasTimeOfDay = hasTimeOfDay,
+        onHasTimeOfDayChanged = viewModel::updateHasTimeOfDay,
+        selectedTime = selectedTime,
+        onTimeSelected = viewModel::updateSelectedTime,
         featureName = featureName,
         onFeatureIdChanged = viewModel::updateFeatureId,
         onInfoClick = { viewModel.onOpenFunctionsRemindersInfo(context) },
@@ -124,6 +135,10 @@ fun TimeSinceLastReminderConfigurationContent(
     onSecondPeriodChanged: (Period) -> Unit,
     hasSecondInterval: Boolean,
     onHasSecondIntervalChanged: (Boolean) -> Unit,
+    hasTimeOfDay: Boolean,
+    onHasTimeOfDayChanged: (Boolean) -> Unit,
+    selectedTime: LocalTime,
+    onTimeSelected: (LocalTime) -> Unit,
     featureName: String,
     onFeatureIdChanged: (Long?) -> Unit,
     onInfoClick: () -> Unit,
@@ -222,6 +237,28 @@ fun TimeSinceLastReminderConfigurationContent(
             onPeriodChanged = onFirstPeriodChanged
         )
 
+        AnimatedVisibility(firstPeriod.supportsTimeOfDay()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                DialogInputSpacing()
+                RowCheckbox(
+                    checked = hasTimeOfDay,
+                    onCheckedChange = onHasTimeOfDayChanged,
+                    text = stringResource(R.string.at_a_specific_time),
+                    textStyle = MaterialTheme.typography.titleSmall,
+                )
+                AnimatedVisibility(hasTimeOfDay) {
+                    Column {
+                        DialogInputSpacing()
+                        TimeButton(
+                            modifier = Modifier.widthIn(min = dateTimeButtonWidth),
+                            time = selectedTime,
+                            onTimeSelected = onTimeSelected
+                        )
+                    }
+                }
+            }
+        }
+
         InputSpacingLarge()
         HorizontalDivider()
         InputSpacingLarge()
@@ -279,6 +316,10 @@ fun TimeSinceLastReminderConfigurationContentPreview() {
             onSecondPeriodChanged = {},
             hasSecondInterval = true,
             onHasSecondIntervalChanged = {},
+            hasTimeOfDay = true,
+            onHasTimeOfDayChanged = {},
+            selectedTime = LocalTime.of(9, 0),
+            onTimeSelected = {},
             featureName = "Exercise Sessions",
             onFeatureIdChanged = {},
             onInfoClick = {},

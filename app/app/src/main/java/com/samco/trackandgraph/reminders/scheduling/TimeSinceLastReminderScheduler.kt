@@ -20,9 +20,11 @@ package com.samco.trackandgraph.reminders.scheduling
 import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
 import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.ReminderParams
+import com.samco.trackandgraph.data.database.dto.supportsTimeOfDay
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.time.TimeProvider
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId
 import javax.inject.Inject
 
@@ -52,6 +54,12 @@ internal open class TimeSinceLastReminderScheduler @Inject constructor(
 
         // Calculate the first reminder time (lastTracked + firstInterval)
         val firstReminderTime = addIntervalToInstant(lastTrackedInstant, params.firstInterval, currentZone)
+            .let { intervalTime ->
+                params.timeOfDay
+                    ?.takeIf { params.firstInterval.period.supportsTimeOfDay() }
+                    ?.let { timeOfDay -> intervalTime.withTimeOfDay(timeOfDay, currentZone) }
+                    ?: intervalTime
+            }
 
         // If first reminder time is after now, schedule it
         if (firstReminderTime.isAfter(afterTimeWithBuffer)) {
@@ -87,4 +95,12 @@ internal open class TimeSinceLastReminderScheduler @Inject constructor(
         }
         return result.toInstant()
     }
+
+    private fun Instant.withTimeOfDay(time: LocalTime, zone: ZoneId): Instant =
+        atZone(zone)
+            .withHour(time.hour)
+            .withMinute(time.minute)
+            .withSecond(time.second)
+            .withNano(time.nano)
+            .toInstant()
 }

@@ -4,7 +4,7 @@ description: Reminder data and lifecycle, including global and grouped placement
 topics:
   - Every reminder has one null-group Reminders-screen placement and may have one additional group placement
   - Reminders can belong to at most one group and cannot be symlinked
-  - ReminderParams types and serialized enabled state; missing enabled values default to true
+  - ReminderParams types, serialized enabled state, and optional time-of-day state for Time Since Last
   - Disabled reminders remain stored and visible but cancel/skip notification scheduling
   - Delete: always deletes the reminder and every placement, regardless of deleteEverywhere
   - Duplicate: reproduces both placements and inserts after the original independently in each list
@@ -105,6 +105,14 @@ sealed class ReminderParams {
     data class TimeSinceLastParams(...) // After duration since last entry
 }
 ```
+
+`TimeSinceLastParams.timeOfDay` is nullable and applies only when the first interval is measured in
+days, weeks, months, or years. A missing or null value preserves the original behavior of adding the
+interval while retaining the last data point's local time. When set, the scheduler adds the calendar
+interval and then replaces the resulting local time with the configured time of day. This field is
+stored inside the existing params JSON, so it requires no Room migration. Production JSON parsing
+ignores unknown keys, allowing older production clients to read reminders written by newer clients;
+debug parsing intentionally rejects unknown keys. New clients default a missing field to null.
 
 ## Enable and Disable Behavior
 

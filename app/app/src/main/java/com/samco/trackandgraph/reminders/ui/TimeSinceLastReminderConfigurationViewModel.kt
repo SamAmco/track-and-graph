@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
+import com.samco.trackandgraph.data.database.dto.supportsTimeOfDay
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.util.FeaturePathProvider
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.threeten.bp.LocalTime
 import javax.inject.Inject
 
 interface TimeSinceLastReminderConfigurationViewModel {
@@ -48,6 +50,8 @@ interface TimeSinceLastReminderConfigurationViewModel {
     val secondInterval: StateFlow<String>
     val secondPeriod: StateFlow<Period>
     val hasSecondInterval: StateFlow<Boolean>
+    val hasTimeOfDay: StateFlow<Boolean>
+    val selectedTime: StateFlow<LocalTime>
     val featureName: StateFlow<String>
     val continueEnabled: StateFlow<Boolean>
 
@@ -58,6 +62,8 @@ interface TimeSinceLastReminderConfigurationViewModel {
     fun updateSecondInterval(interval: String)
     fun updateSecondPeriod(period: Period)
     fun updateHasSecondInterval(hasSecondInterval: Boolean)
+    fun updateHasTimeOfDay(hasTimeOfDay: Boolean)
+    fun updateSelectedTime(time: LocalTime)
     fun updateFeatureId(id: Long?)
     fun getReminderInput(): ReminderInput
     fun initializeFromReminder(reminder: Reminder?, params: ReminderParams.TimeSinceLastParams?)
@@ -90,6 +96,12 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
 
     private val _hasSecondInterval = MutableStateFlow(false)
     override val hasSecondInterval: StateFlow<Boolean> = _hasSecondInterval.asStateFlow()
+
+    private val _hasTimeOfDay = MutableStateFlow(false)
+    override val hasTimeOfDay: StateFlow<Boolean> = _hasTimeOfDay.asStateFlow()
+
+    private val _selectedTime = MutableStateFlow(LocalTime.of(9, 0))
+    override val selectedTime: StateFlow<LocalTime> = _selectedTime.asStateFlow()
 
     private val _featureId = MutableStateFlow<Long?>(null)
 
@@ -137,6 +149,14 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
         _hasSecondInterval.value = hasSecondInterval
     }
 
+    override fun updateHasTimeOfDay(hasTimeOfDay: Boolean) {
+        _hasTimeOfDay.value = hasTimeOfDay
+    }
+
+    override fun updateSelectedTime(time: LocalTime) {
+        _selectedTime.value = time
+    }
+
     override fun updateFeatureId(id: Long?) {
         _featureId.value = id
         viewModelScope.launch {
@@ -161,6 +181,9 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
                 secondInterval = if (_hasSecondInterval.value) {
                     IntervalPeriodPair(interval = secondIntervalInt, period = _secondPeriod.value)
                 } else null,
+                timeOfDay = _selectedTime.value.takeIf {
+                    _hasTimeOfDay.value && _firstPeriod.value.supportsTimeOfDay()
+                },
                 enabled = _enabled.value
             )
         )
@@ -184,6 +207,8 @@ class TimeSinceLastReminderConfigurationViewModelImpl @Inject constructor(
             _firstInterval.value = params.firstInterval.interval.toString()
             _firstPeriod.value = params.firstInterval.period
             _hasSecondInterval.value = params.secondInterval != null
+            _hasTimeOfDay.value = params.timeOfDay != null
+            params.timeOfDay?.let { _selectedTime.value = it }
             params.secondInterval?.let {
                 _secondInterval.value = it.interval.toString()
                 _secondPeriod.value = it.period

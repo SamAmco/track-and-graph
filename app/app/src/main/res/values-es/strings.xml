@@ -515,6 +515,7 @@
     <string name="reminder_disabled">Recordatorio desactivado</string>
     <string name="repeat_every">Repetir cada</string>
     <string name="at_time">A las</string>
+    <string name="at_a_specific_time">A una hora específica</string>
     <string name="ending_at">Termina el</string>
     <string name="starting_from">Comenzando desde</string>
     <string name="repeat_on_week_days">Repetir en días de la semana</string>

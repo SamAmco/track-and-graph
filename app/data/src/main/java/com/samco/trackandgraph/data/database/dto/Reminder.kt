@@ -121,6 +121,8 @@ sealed class ReminderParams {
     data class TimeSinceLastParams(
         val firstInterval: IntervalPeriodPair,
         val secondInterval: IntervalPeriodPair?,
+        @Serializable(with = LocalTimeSerializer::class)
+        val timeOfDay: LocalTime? = null,
         override val enabled: Boolean = true
     ) : ReminderParams()
 }
@@ -145,6 +147,11 @@ enum class Period {
     MONTHS,
     @SerialName("years")
     YEARS
+}
+
+fun Period.supportsTimeOfDay(): Boolean = when (this) {
+    Period.DAYS, Period.WEEKS, Period.MONTHS, Period.YEARS -> true
+    Period.MINUTES, Period.HOURS -> false
 }
 
 @Serializable

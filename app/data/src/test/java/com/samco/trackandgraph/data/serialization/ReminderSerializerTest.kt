@@ -18,9 +18,13 @@
 package com.samco.trackandgraph.data.serialization
 
 import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.IntervalPeriodPair
+import com.samco.trackandgraph.data.database.dto.Period
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.LocalTime
@@ -64,5 +68,34 @@ class ReminderSerializerTest {
 
         assertTrue(encoded.contains("\"enabled\":false"))
         assertFalse((serializer.deserializeParams(encoded) as ReminderParams.WeekDayParams).enabled)
+    }
+
+    @Test
+    fun `deserializes time since last reminder without time of day as unset`() {
+        val encoded = """
+            {
+                "type":"timesincelast",
+                "firstInterval":{"interval":3,"period":"days"},
+                "secondInterval":null
+            }
+        """.trimIndent()
+
+        val result = serializer.deserializeParams(encoded) as ReminderParams.TimeSinceLastParams
+
+        assertNull(result.timeOfDay)
+    }
+
+    @Test
+    fun `round trips time of day for time since last reminder`() {
+        val params = ReminderParams.TimeSinceLastParams(
+            firstInterval = IntervalPeriodPair(3, Period.DAYS),
+            secondInterval = null,
+            timeOfDay = LocalTime.of(9, 30)
+        )
+
+        val result = serializer.deserializeParams(serializer.serializeParams(params)!!)
+            as ReminderParams.TimeSinceLastParams
+
+        assertEquals(LocalTime.of(9, 30), result.timeOfDay)
     }
 }
