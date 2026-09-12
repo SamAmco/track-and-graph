@@ -333,6 +333,7 @@
     <string name="total_formatted">Total: %s</string>
     <string name="from_formatted">De: %s</string>
     <string name="to_formatted">A: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
     <string name="seconds_generic">Segundo(s)</string>
     <string name="minutes_generic">Minuto(s)</string>
     <string name="hours_generic">Hora(s)</string>

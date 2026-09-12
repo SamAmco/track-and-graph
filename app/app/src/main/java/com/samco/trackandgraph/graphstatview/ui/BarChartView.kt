@@ -27,8 +27,15 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,52 +54,40 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
-import com.patrykandpatrick.vico.compose.cartesian.Zoom
-import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.compose.cartesian.data.columnModel
-import com.patrykandpatrick.vico.compose.cartesian.decoration.Decoration
-import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarker
-import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarkerController
-import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarkerVisibilityListener
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
-import com.patrykandpatrick.vico.compose.common.Fill
-import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.helpers.formatTimeDuration
-import com.samco.trackandgraph.helpers.getDayMonthFormatter
-import com.samco.trackandgraph.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.ui.ui.ColorCircle
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.HalfDialogInputSpacing
@@ -102,19 +97,18 @@ import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAmount
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
-private val barThickness = 16.dp
 private val barBorderThickness = 0.5.dp
-private val barCollectionSpacing = 0.dp
+private const val maximumBarChartZoom = 20.0
 
 @Composable
 fun BarChartView(
@@ -188,11 +182,11 @@ fun BarChartView(
 }
 
 /**
- * Returns bounds that Vico can safely use for coordinate calculations.
+ * Returns finite, non-inverted bounds that the chart can safely use for coordinate calculations.
  *
- * A zero-length range makes Vico divide by zero while positioning axis guidelines, producing a
- * NaN rectangle that Compose refuses to draw. Equal finite bounds are expanded for compatibility
- * with existing saved graphs; inverted and non-finite bounds are rejected.
+ * A zero-length range would divide by zero while mapping values to pixels. Equal finite bounds are
+ * expanded for compatibility with existing saved graphs; inverted and non-finite bounds are
+ * rejected.
  */
 internal fun getRenderableBarChartYRange(yMin: Double, yMax: Double): Pair<Double, Double>? {
     if (!yMin.isFinite() || !yMax.isFinite() || yMax < yMin) return null
@@ -244,7 +238,7 @@ private fun BarChartDataOverlay(
     val toText = remember(highlightedIndex, xDates) {
         formatDayMonthYearHourMinute(context, xDates[highlightedIndex])
     }
-    val extraDetails = remember(highlightedIndex, bars, durationBasedRange) {
+    val extraDetails = remember(context, highlightedIndex, bars, durationBasedRange) {
         val sum = bars.sumOf { it.values[highlightedIndex] }
         if (sum < 1e-6) {
             emptyList()
@@ -259,7 +253,12 @@ private fun BarChartDataOverlay(
                 }
                 ExtraDetails(
                     color = series.color,
-                    label = "${series.label}: $displayedValue (${doubleToString(percentage, 1)}%)"
+                    label = context.getString(
+                        R.string.bar_chart_series_breakdown_format,
+                        series.label,
+                        displayedValue,
+                        doubleToString(percentage, 1),
+                    ),
                 )
             }
         }
@@ -350,230 +349,320 @@ private fun BarChartBodyView(
     graphViewMode: GraphViewMode,
     graphBackgroundColor: Color,
 ) {
-    ProvideGraphVicoTheme {
-        Column(modifier = modifier) {
-            val context = LocalContext.current
-            val hasLegend = bars.size > 1
-            val modelProducer = remember { CartesianChartModelProducer() }
-
-            LaunchedEffect(modelProducer, bars) {
-                modelProducer.runTransaction {
-                    columnModel {
-                        bars.forEach { series(it.values) }
-                    }
-                }
-            }
-
-            val borderFill = if (xDates.size < 60) {
-                Fill(MaterialTheme.colorScheme.onSurface)
-            } else {
-                Fill.Transparent
-            }
-            val columns = bars.map { series ->
-                rememberLineComponent(
-                    fill = Fill(Color(getColorInt(series.color))),
-                    thickness = barThickness,
-                    strokeFill = borderFill,
-                    strokeThickness = barBorderThickness,
-                )
-            }
-            val columnLayer = rememberColumnCartesianLayer(
-                columnProvider = ColumnCartesianLayer.ColumnProvider.series(columns),
-                columnCollectionSpacing = barCollectionSpacing,
-                mergeMode = { ColumnCartesianLayer.MergeMode.Stacked },
-                rangeProvider = CartesianLayerRangeProvider.fixed(
-                    minX = -0.5,
-                    maxX = xDates.lastIndex + 0.5,
-                    minY = yMin,
-                    maxY = yMax,
-                ),
-            )
-
-            val xAxisFormatter = remember(context, xDates) { getXAxisFormatter(context, xDates) }
-            val gridLine = rememberLineComponent(
-                fill = Fill(MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)),
-                thickness = graphGridLineThickness,
-            )
-            val bottomAxisLabel = rememberAxisLabelComponent(style = graphAxisTextStyle)
-            val startAxisLabel = rememberAxisLabelComponent(style = graphAxisTextStyle)
-            val bottomAxis = HorizontalAxis.rememberBottom(
-                line = gridLine,
-                label = bottomAxisLabel,
-                valueFormatter = CartesianValueFormatter { _, value, _ ->
-                    xDates[value.roundToInt().coerceIn(xDates.indices)].format(xAxisFormatter)
-                },
-                tick = gridLine,
-                guideline = gridLine,
-                itemPlacer = remember(xDates.size) {
-                    AdaptiveHorizontalAxisItemPlacer(xDates.size)
-                },
-            )
-            val startAxis = VerticalAxis.rememberStart(
-                line = gridLine,
-                label = startAxisLabel,
-                valueFormatter = CartesianValueFormatter { _, value, _ ->
-                    if (durationBasedRange) formatTimeDuration(value.toLong())
-                    else doubleToString(value)
-                },
-                tick = gridLine,
-                guideline = gridLine,
-                itemPlacer = VerticalAxis.ItemPlacer.count(
-                    count = { yAxisSubdivides.coerceAtLeast(1) },
-                ),
-            )
-
-            val interactionMarker = remember { object : CartesianMarker {} }
-            val highlightDecoration = rememberHighlightDecoration(
-                color = MaterialTheme.colorScheme.onSurface,
-                barThickness = barThickness,
-                highlightedIndex = highlightedIndex,
-            )
-            val markerVisibilityListener = remember(onHighlightedIndexChanged, xDates) {
-                object : CartesianMarkerVisibilityListener {
-                    override fun onShown(marker: CartesianMarker, targets: List<CartesianMarker.Target>) {
-                        onHighlightedIndexChanged(targets.firstOrNull()?.x?.roundToInt()?.takeIf {
-                            it in xDates.indices
-                        })
-                    }
-
-                    override fun onUpdated(marker: CartesianMarker, targets: List<CartesianMarker.Target>) {
-                        onShown(marker, targets)
-                    }
-
-                    override fun onHidden(marker: CartesianMarker) {
-                        onHighlightedIndexChanged(null)
-                    }
-                }
-            }
-
-            val chart = rememberCartesianChart(
-                columnLayer,
-                startAxis = startAxis,
-                bottomAxis = bottomAxis,
-                marker = if (listMode) null else interactionMarker,
-                markerVisibilityListener = markerVisibilityListener,
-                decorations = listOf(highlightDecoration),
-                markerController = CartesianMarkerController.rememberToggleOnTap(),
-                getXStep = { _, _, _ -> 1.0 },
-            )
-            val scrollState = rememberVicoScrollState(scrollEnabled = !listMode)
-            val zoomState = rememberVicoZoomState(
-                zoomEnabled = !listMode,
-                initialZoom = Zoom.Content,
-            )
-            val graphHeight = graphHeightFor(graphViewMode, hasLegend)
-
-            CartesianChartHost(
-                chart = chart,
-                modelProducer = modelProducer,
-                scrollState = scrollState,
-                zoomState = zoomState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(graphHeight)
-                    .background(graphBackgroundColor),
-            )
-
-            DialogInputSpacing()
-            if (hasLegend) {
-                GraphLegend(
-                    items = bars.map { bar ->
-                        GraphLegendItem(
-                            color = getColor(bar.color),
-                            label = bar.label.ifEmpty { context.getString(R.string.no_label) },
-                        )
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun rememberHighlightDecoration(
-    color: Color,
-    barThickness: Dp,
-    highlightedIndex: Int?,
-): Decoration = remember(color, barThickness, highlightedIndex) {
-    object : Decoration {
-        private val paint = Paint().apply { this.color = color.copy(alpha = 0.2f) }
-
-        override fun drawOverLayers(
-            context: CartesianDrawingContext,
+    Column(modifier = modifier) {
+        val context = LocalContext.current
+        val hasLegend = bars.size > 1
+        val isInteractive = !listMode
+        val maximumZoom = min(maximumBarChartZoom, xDates.size.toDouble()).coerceAtLeast(1.0)
+        var zoom by remember(xDates) { mutableDoubleStateOf(1.0) }
+        var centerFraction by remember(xDates) { mutableDoubleStateOf(0.5) }
+        val viewport = calculateBarChartViewport(xDates.size, zoom, centerFraction)
+        val xLabelText = GraphXAxisLabelText(
+            months = stringArrayResource(R.array.abbreviated_months).toList(),
+            weekdays = stringArrayResource(R.array.abbreviated_weekdays).toList(),
+            weekdayDayFormat = stringResource(R.string.compact_weekday_day_format),
+            dayMonthFormat = stringResource(R.string.compact_day_month_format),
+            monthYearFormat = stringResource(R.string.compact_month_year_format),
+        )
+        val textMeasurer = rememberTextMeasurer()
+        val axisTextStyle = graphAxisTextStyle
+        val density = LocalDensity.current
+        val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)
+        val highlightColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+        val barColors = bars.map { getColor(it.color) }
+        val borderColor = MaterialTheme.colorScheme.onSurface
+        var canvasSize by remember { mutableStateOf(IntSize.Zero) }
+        val layout = remember(
+            canvasSize,
+            viewport,
+            xDates,
+            durationBasedRange,
+            yMin,
+            yMax,
+            yAxisSubdivides,
+            xLabelText,
+            textMeasurer,
+            axisTextStyle,
+            density,
         ) {
-            val selectedX = highlightedIndex?.toDouble() ?: return
-            val xSpacing = context.layerDimensions.xSpacing
-            if (xSpacing == 0f) return
-            val xStep = context.ranges.xStep
-            val fullRangeStart = context.ranges.minX -
-                context.layerDimensions.startPadding / xSpacing * xStep
-            val visibleRangeStart = fullRangeStart +
-                context.layoutDirectionMultiplier * context.scroll / xSpacing * xStep
-            val xOffset = (
-                (selectedX - visibleRangeStart) /
-                    xStep *
-                    xSpacing
-                ).toFloat()
-            val centerX = if (context.isLtr) {
-                context.layerBounds.left + xOffset
-            } else {
-                context.layerBounds.right - xOffset
+            if (canvasSize == IntSize.Zero) null else calculateBarChartLayout(
+                width = canvasSize.width.toFloat(),
+                height = canvasSize.height.toFloat(),
+                xDates = xDates,
+                viewport = viewport,
+                yMin = yMin,
+                yMax = yMax,
+                yAxisSubdivides = yAxisSubdivides,
+                durationBasedRange = durationBasedRange,
+                xLabelText = xLabelText,
+                measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
+                density = density.density,
+            )
+        }
+        val reveal = rememberGraphReveal(xDates to bars, layout != null)
+        val currentLayout = rememberUpdatedState(layout)
+        val currentHighlightedIndex = rememberUpdatedState(highlightedIndex)
+        val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit>(
+            newValue = { panX, gestureZoom ->
+                currentLayout.value?.plotRect?.width?.let { plotWidth ->
+                    zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
+                    val halfSpanFraction = 0.5 / zoom
+                    centerFraction = (centerFraction - panX / plotWidth / zoom)
+                        .coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
+                }
+            },
+        )
+        val graphHeight = graphHeightFor(graphViewMode, hasLegend)
+
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(graphHeight)
+                .background(graphBackgroundColor)
+                .onSizeChanged { canvasSize = it }
+                .pointerInput(isInteractive) {
+                    if (!isInteractive) return@pointerInput
+                    detectTapGestures { offset ->
+                        currentLayout.value?.barIndexAt(offset)?.let { index ->
+                            onHighlightedIndexChanged(
+                                index.takeUnless { it == currentHighlightedIndex.value }
+                            )
+                        }
+                    }
+                }
+                .pointerInput(isInteractive, maximumZoom) {
+                    if (!isInteractive) return@pointerInput
+                    detectBarChartPinchGestures { panX, gestureZoom ->
+                        horizontalViewportTransform.value(panX, gestureZoom)
+                    }
+                }
+                .pointerInput(isInteractive, maximumZoom) {
+                    if (!isInteractive) return@pointerInput
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        horizontalViewportTransform.value(dragAmount, 1f)
+                    }
+                },
+        ) {
+            val chartLayout = layout ?: return@Canvas
+            val plot = chartLayout.plotRect
+            val alpha = reveal.value
+            drawGraphAxes(
+                plot = plot,
+                xTicks = chartLayout.xTicks,
+                yTicks = chartLayout.yTicks,
+                xToPixel = chartLayout::xToPixel,
+                yToPixel = chartLayout::yToPixel,
+                textMeasurer = textMeasurer,
+                axisTextStyle = axisTextStyle,
+                gridColor = gridColor,
+                alpha = alpha,
+            )
+            clipRect(plot.left, plot.top, plot.right, plot.bottom) {
+                val firstBar = ceil(chartLayout.minX - 0.5).toInt().coerceAtLeast(0)
+                val lastBar = floor(chartLayout.maxX + 0.5).toInt().coerceAtMost(xDates.lastIndex)
+                if (firstBar <= lastBar) {
+                    val barWidth = chartLayout.xToPixel(0.5) - chartLayout.xToPixel(-0.5)
+                    for (index in firstBar..lastBar) {
+                        val centerX = chartLayout.xToPixel(index.toDouble())
+                        var positiveTotal = 0.0
+                        var negativeTotal = 0.0
+                        bars.forEachIndexed { seriesIndex, series ->
+                            val value = series.values[index]
+                            val start = if (value >= 0.0) positiveTotal else negativeTotal
+                            val end = start + value
+                            if (value >= 0.0) positiveTotal = end else negativeTotal = end
+                            val top = min(chartLayout.yToPixel(start), chartLayout.yToPixel(end))
+                            val bottom = max(chartLayout.yToPixel(start), chartLayout.yToPixel(end))
+                            if (bottom > top) {
+                                val rectTopLeft = Offset(centerX - barWidth / 2f, top)
+                                val rectSize = Size(barWidth, bottom - top)
+                                drawRect(
+                                    color = barColors[seriesIndex].copy(alpha = alpha),
+                                    topLeft = rectTopLeft,
+                                    size = rectSize,
+                                )
+                                if (xDates.size < 60) {
+                                    drawRect(
+                                        color = borderColor.copy(alpha = alpha),
+                                        topLeft = rectTopLeft,
+                                        size = rectSize,
+                                        style = Stroke(barBorderThickness.toPx()),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                highlightedIndex?.let { index ->
+                    val centerX = chartLayout.xToPixel(index.toDouble())
+                    val halfWidth = (chartLayout.xToPixel(0.5) - chartLayout.xToPixel(-0.5)) / 2f
+                    drawRect(
+                        color = highlightColor.copy(alpha = highlightColor.alpha * alpha),
+                        topLeft = Offset(centerX - halfWidth, plot.top),
+                        size = Size(halfWidth * 2f, plot.height),
+                    )
+                }
             }
-            val width = with(context) { barThickness.pixels } * context.zoom
-            val left = max(centerX - width / 2f, context.layerBounds.left)
-            val right = min(centerX + width / 2f, context.layerBounds.right)
-            if (left >= right) return
-            context.canvas.drawRect(
-                Rect(
-                    left = left,
-                    top = context.layerBounds.top,
-                    right = right,
-                    bottom = context.layerBounds.bottom,
-                ),
-                paint,
+        }
+
+        DialogInputSpacing()
+        if (hasLegend) {
+            GraphLegend(
+                items = bars.map { bar ->
+                    GraphLegendItem(
+                        color = getColor(bar.color),
+                        label = bar.label.ifEmpty { context.getString(R.string.no_label) },
+                    )
+                }
             )
         }
     }
 }
 
-private fun calculateLabelSpacing(barCount: Int): Int {
-    var spacing = 1
-    while (barCount.toDouble() / spacing > 10.0) spacing *= 2
-    return spacing
-}
+internal data class BarChartViewport(val minX: Double, val maxX: Double)
 
-private class AdaptiveHorizontalAxisItemPlacer(
+internal fun calculateBarChartViewport(
     barCount: Int,
-) : HorizontalAxis.ItemPlacer by HorizontalAxis.ItemPlacer.aligned(
-    spacing = { calculateLabelSpacing(barCount) },
-    addExtremeLabelPadding = true,
+    zoom: Double,
+    centerFraction: Double,
+): BarChartViewport {
+    val count = barCount.coerceAtLeast(1).toDouble()
+    val constrainedZoom = zoom.coerceIn(1.0, min(maximumBarChartZoom, count))
+    val visibleSpan = count / constrainedZoom
+    val halfSpanFraction = 0.5 / constrainedZoom
+    val constrainedCenter = centerFraction.coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
+    val center = -0.5 + count * constrainedCenter
+    return BarChartViewport(center - visibleSpan / 2.0, center + visibleSpan / 2.0)
+}
+
+internal data class BarChartLayout(
+    val plotRect: Rect,
+    val minX: Double,
+    val maxX: Double,
+    val minY: Double,
+    val maxY: Double,
+    val barCount: Int,
+    val xTicks: List<GraphXAxisTick<Double>>,
+    val yTicks: List<GraphYAxisTick>,
 ) {
-    override fun getLabelValues(
-        context: CartesianDrawingContext,
-        visibleXRange: ClosedFloatingPointRange<Double>,
-        fullXRange: ClosedFloatingPointRange<Double>,
-        maxLabelWidth: Float,
-    ): List<Double> {
-        val visibleBarCount = ceil(visibleXRange.endInclusive - visibleXRange.start).toInt() + 1
-        val spacing = calculateLabelSpacing(visibleBarCount)
-        val first = ceil(visibleXRange.start / spacing).toInt() * spacing
-        val last = floor(visibleXRange.endInclusive / spacing).toInt() * spacing
-        if (first > last) return emptyList()
-        return (first..last step spacing).map(Int::toDouble)
+    fun xToPixel(value: Double): Float = plotRect.left +
+        ((value - minX) / (maxX - minX) * plotRect.width).toFloat()
+
+    fun yToPixel(value: Double): Float = plotRect.bottom -
+        ((value - minY) / (maxY - minY) * plotRect.height).toFloat()
+
+    fun barIndexAt(offset: Offset): Int? {
+        if (!plotRect.contains(offset)) return null
+        val value = minX + (offset.x - plotRect.left) / plotRect.width * (maxX - minX)
+        return floor(value + 0.5).toInt().takeIf { it in 0 until barCount }
     }
 }
 
-private fun getXAxisFormatter(
-    context: Context,
+internal fun calculateBarChartLayout(
+    width: Float,
+    height: Float,
     xDates: List<ZonedDateTime>,
-): DateTimeFormatter {
-    val durationRange = Duration.between(xDates.first(), xDates.last())
-    return when {
-        durationRange.toMinutes() < 5L -> DateTimeFormatter.ofPattern("HH:mm:ss")
-        durationRange.toDays() >= 304 -> getMonthYearFormatter(context)
-        durationRange.toDays() >= 1 -> getDayMonthFormatter(context)
-        else -> DateTimeFormatter.ofPattern("HH:mm")
+    viewport: BarChartViewport,
+    yMin: Double,
+    yMax: Double,
+    yAxisSubdivides: Int,
+    durationBasedRange: Boolean,
+    xLabelText: GraphXAxisLabelText,
+    measureText: (String) -> IntSize,
+    density: Float,
+): BarChartLayout? {
+    if (width <= 0f || height <= 0f || xDates.isEmpty() || yMax <= yMin) return null
+    val tickCount = yAxisSubdivides.coerceAtLeast(2)
+    val yTicks = List(tickCount) { index ->
+        val value = yMin + (yMax - yMin) * index / (tickCount - 1)
+        GraphYAxisTick(
+            value = value,
+            label = if (durationBasedRange) formatTimeDuration(value.roundToLong()) else doubleToString(value),
+        )
     }
+    val yLabelSizes = yTicks.map { measureText(it.label) }
+    val widestYLabel = yLabelSizes.maxOf { it.width }.toFloat()
+    val labelHeight = yLabelSizes.maxOf { it.height }.toFloat()
+    val right = width - graphPlotEndPadding.value * density
+    val top = max(graphPlotTopPadding.value * density, labelHeight / 2f)
+    val fullDuration = Duration.between(xDates.first(), xDates.last()).toMillis().coerceAtLeast(1L)
+    val visibleDuration = (fullDuration * (viewport.maxX - viewport.minX) / xDates.size)
+        .roundToLong().coerceAtLeast(1L)
+    val format = graphXAxisLabelFormatForDuration(visibleDuration)
+    val zoneId = ZoneId.systemDefault()
+    val maximumLabelSize = graphXAxisLabelCandidates(format, xLabelText)
+        .map(measureText)
+        .maxBy { it.width }
+    val firstVisibleIndex = ceil(viewport.minX).toInt().coerceAtLeast(0)
+    val firstLabel = formatGraphXAxisTimestamp(
+        xDates[firstVisibleIndex.coerceAtMost(xDates.lastIndex)].toInstant().toEpochMilli(),
+        format,
+        zoneId,
+        xLabelText,
+    )
+    val firstLabelSize = measureText(firstLabel)
+    val left = max(
+        widestYLabel + graphPlotStartPadding.value * density,
+        if (firstVisibleIndex == 0) {
+            graphRotatedLabelWidth(firstLabelSize) - graphRotatedLabelRightExtent(firstLabelSize)
+        } else 0f,
+    )
+    val plotWidth = right - left
+    if (plotWidth <= 0f) return null
+    val xSpacing = plotWidth / (viewport.maxX - viewport.minX).toFloat()
+    val labelSpacing = calculateCategoricalGraphLabelSpacing(
+        visibleBucketCount = ceil(viewport.maxX - viewport.minX).toInt(),
+        maximumProjectedLabelWidth = graphRotatedLabelWidth(maximumLabelSize),
+        bucketWidth = xSpacing,
+        minimumGap = graphAxisLabelMinimumGap.value * density,
+    )
+    val firstTick = ceil(max(0.0, viewport.minX) / labelSpacing).toInt() * labelSpacing
+    val lastTick = floor(min(xDates.lastIndex.toDouble(), viewport.maxX) / labelSpacing)
+        .toInt() * labelSpacing
+    val xTicks = if (firstTick > lastTick) emptyList() else {
+        (firstTick..lastTick step labelSpacing).map { index ->
+            val label = formatGraphXAxisTimestamp(
+                xDates[index].toInstant().toEpochMilli(), format, zoneId, xLabelText,
+            )
+            val size = measureText(label)
+            GraphXAxisTick(
+                value = index.toDouble(),
+                label = label,
+                projectedWidth = graphRotatedLabelWidth(size),
+                projectedRightExtent = graphRotatedLabelRightExtent(size),
+            )
+        }
+    }
+    val bottom = height - graphRotatedLabelHeight(
+        maximumLabelSize.width.toFloat(),
+        maximumLabelSize.height.toFloat(),
+    ) - graphPlotBottomPadding.value * density
+    if (bottom <= top) return null
+    return BarChartLayout(
+        plotRect = Rect(left, top, right, bottom),
+        minX = viewport.minX,
+        maxX = viewport.maxX,
+        minY = yMin,
+        maxY = yMax,
+        barCount = xDates.size,
+        xTicks = xTicks,
+        yTicks = yTicks,
+    )
+}
+
+private suspend fun PointerInputScope.detectBarChartPinchGestures(
+    onTransform: (panX: Float, zoom: Float) -> Unit,
+) = awaitEachGesture {
+    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+    do {
+        val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+        if (event.changes.count { it.pressed } > 1) {
+            val pan = event.calculatePan()
+            val zoom = event.calculateZoom()
+            if (pan.x != 0f || zoom != 1f) onTransform(pan.x, zoom)
+            event.changes.forEach { it.consume() }
+        }
+    } while (event.changes.any { it.pressed })
 }
 
 @Preview(showBackground = true)

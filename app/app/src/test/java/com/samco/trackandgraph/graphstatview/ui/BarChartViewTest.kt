@@ -51,4 +51,41 @@ class BarChartViewTest {
         assertNull(getRenderableBarChartYRange(0.0, Double.POSITIVE_INFINITY))
         assertNull(getRenderableBarChartYRange(1.0, 0.0))
     }
+
+    @Test
+    fun xLabelSpacingRemainsPowerOfTwoWhenMeasuredLabelsNeedMoreRoom() {
+        assertEquals(
+            8,
+            calculateCategoricalGraphLabelSpacing(
+                visibleBucketCount = 26,
+                maximumProjectedLabelWidth = 120f,
+                bucketWidth = 25f,
+                minimumGap = 4f,
+            ),
+        )
+    }
+
+    @Test
+    fun xLabelSpacingRetainsApproximateTenLabelLimitWhenLabelsFit() {
+        assertEquals(
+            4,
+            calculateCategoricalGraphLabelSpacing(
+                visibleBucketCount = 26,
+                maximumProjectedLabelWidth = 60f,
+                bucketWidth = 25f,
+                minimumGap = 4f,
+            ),
+        )
+    }
+
+    @Test
+    fun barViewportInitiallyIncludesEveryBucketEdge() {
+        assertEquals(BarChartViewport(-0.5, 25.5), calculateBarChartViewport(26, 1.0, 0.5))
+    }
+
+    @Test
+    fun barViewportClampsZoomAndPanToBucketEdges() {
+        assertEquals(BarChartViewport(-0.5, 0.5), calculateBarChartViewport(4, 99.0, -1.0))
+        assertEquals(BarChartViewport(2.5, 3.5), calculateBarChartViewport(4, 4.0, 2.0))
+    }
 }

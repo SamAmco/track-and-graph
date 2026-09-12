@@ -334,6 +334,7 @@
     <string name="total_formatted">Gesamt: %s</string>
     <string name="from_formatted">Von: %s</string>
     <string name="to_formatted">Zu: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
     <string name="seconds_generic">Sekunde(n)</string>
     <string name="minutes_generic">Minute(n)</string>
     <string name="hours_generic">Stunde(n)</string>

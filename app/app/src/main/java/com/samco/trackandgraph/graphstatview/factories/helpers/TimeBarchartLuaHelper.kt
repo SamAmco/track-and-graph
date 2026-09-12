@@ -50,7 +50,7 @@ class TimeBarchartLuaHelper @Inject constructor(
 
         val requestedYMax = lineGraphData.yMax
             ?: lineGraphData.bars.maxOf { bar -> bar.segments.sumOf { it.value } }
-        // Vico cannot render a zero-length range. Match the regular bar-chart path by giving
+        // Pixel mapping cannot render a zero-length range. Match the regular bar-chart path by giving
         // all-zero Lua charts a useful default range.
         val yMaxForRange = if (requestedYMax == 0.0) 1.0 else requestedYMax
 

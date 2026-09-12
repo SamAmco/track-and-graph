@@ -127,11 +127,11 @@ class LineGraphViewTest {
     fun `x ticks use actual data positions and reject overlapping labels`() {
         val selected = selectLineGraphXTicks(
             candidates = listOf(
-                XTick(epochMillis = 0, label = "a", projectedWidth = 20f),
-                XTick(epochMillis = 20, label = "b", projectedWidth = 20f),
-                XTick(epochMillis = 30, label = "c", projectedWidth = 20f),
-                XTick(epochMillis = 70, label = "d", projectedWidth = 20f),
-                XTick(epochMillis = 100, label = "e", projectedWidth = 20f),
+                GraphXAxisTick(value = 0, label = "a", projectedWidth = 20f),
+                GraphXAxisTick(value = 20, label = "b", projectedWidth = 20f),
+                GraphXAxisTick(value = 30, label = "c", projectedWidth = 20f),
+                GraphXAxisTick(value = 70, label = "d", projectedWidth = 20f),
+                GraphXAxisTick(value = 100, label = "e", projectedWidth = 20f),
             ),
             minX = 0,
             maxX = 100,
@@ -140,15 +140,15 @@ class LineGraphViewTest {
             minimumGap = 5f,
         )
 
-        assertEquals(listOf(0L, 30L, 70L, 100L), selected.map { it.epochMillis })
+        assertEquals(listOf(0L, 30L, 70L, 100L), selected.map { it.value })
     }
 
     @Test
     fun `x ticks omit labels that would cross the left canvas edge`() {
         val selected = selectLineGraphXTicks(
             candidates = listOf(
-                XTick(epochMillis = 0, label = "too wide", projectedWidth = 40f),
-                XTick(epochMillis = 50, label = "fits", projectedWidth = 20f),
+                GraphXAxisTick(value = 0, label = "too wide", projectedWidth = 40f),
+                GraphXAxisTick(value = 50, label = "fits", projectedWidth = 20f),
             ),
             minX = 0,
             maxX = 100,
@@ -157,7 +157,7 @@ class LineGraphViewTest {
             minimumGap = 5f,
         )
 
-        assertEquals(listOf(50L), selected.map { it.epochMillis })
+        assertEquals(listOf(50L), selected.map { it.value })
     }
 
     @Test
@@ -168,13 +168,13 @@ class LineGraphViewTest {
         assertEquals(
             listOf(50L),
             selectLineGraphXTicks(
-                candidates = listOf(XTick(50, "fits", 20f)),
+                candidates = listOf(GraphXAxisTick(50, "fits", 20f)),
                 minX = 0,
                 maxX = 100,
                 plotLeft = 30f,
                 plotWidth = 100f,
                 minimumGap = 5f,
-            ).map { it.epochMillis },
+            ).map { it.value },
         )
     }
 
@@ -247,10 +247,10 @@ class LineGraphViewTest {
         val viewportBoundaries = setOf(left.minX, left.maxX, right.minX, right.maxX)
 
         assertEquals(
-            left.xTicks.map { it.epochMillis }.filter { it in 40L..100L && it !in viewportBoundaries },
-            right.xTicks.map { it.epochMillis }.filter { it in 40L..100L && it !in viewportBoundaries },
+            left.xTicks.map { it.value }.filter { it in 40L..100L && it !in viewportBoundaries },
+            right.xTicks.map { it.value }.filter { it in 40L..100L && it !in viewportBoundaries },
         )
-        assertEquals(listOf(80L), left.xTicks.map { it.epochMillis }.filter { it !in viewportBoundaries })
+        assertEquals(listOf(80L), left.xTicks.map { it.value }.filter { it !in viewportBoundaries })
     }
 
     @Test
@@ -262,10 +262,10 @@ class LineGraphViewTest {
         val zoomed = requireNotNull(
             layout(points, width = 140f, visibleMinX = 40L, visibleMaxX = 120L)
         )
-        val coarseTicksStillVisible = wide.xTicks.map { it.epochMillis }.filter { it in 40L..120L }
+        val coarseTicksStillVisible = wide.xTicks.map { it.value }.filter { it in 40L..120L }
 
         assertTrue(zoomed.xTicks.size > coarseTicksStillVisible.size)
-        assertTrue(zoomed.xTicks.map { it.epochMillis }.containsAll(coarseTicksStillVisible))
+        assertTrue(zoomed.xTicks.map { it.value }.containsAll(coarseTicksStillVisible))
     }
 
     @Test
@@ -431,7 +431,7 @@ class LineGraphViewTest {
         ).forEach { (duration, expected) ->
             assertEquals(
                 expected,
-                formatLineGraphStartTimestamp(timestamp, duration, ZoneOffset.UTC, englishXLabelText),
+                formatGraphXAxisStartTimestamp(timestamp, duration, ZoneOffset.UTC, englishXLabelText),
             )
         }
     }
@@ -479,7 +479,7 @@ class LineGraphViewTest {
 
         assertEquals(
             "Di 03",
-            formatLineGraphTimestamp(
+            formatGraphXAxisTimestamp(
                 timestamp,
                 Duration.ofDays(7).toMillis(),
                 ZoneOffset.UTC,
@@ -685,7 +685,7 @@ class LineGraphViewTest {
             layout(points, measureText = { IntSize(width = 1, height = 10) })
         )
 
-        assertEquals(listOf(0L, 50L, 100L), layout.xTicks.map { it.epochMillis })
+        assertEquals(listOf(0L, 50L, 100L), layout.xTicks.map { it.value })
     }
 
     @Test
@@ -701,8 +701,8 @@ class LineGraphViewTest {
             )
         )
 
-        assertEquals(5L, layout.xTicks.first().epochMillis)
-        assertEquals(95L, layout.xTicks.last().epochMillis)
+        assertEquals(5L, layout.xTicks.first().value)
+        assertEquals(95L, layout.xTicks.last().value)
         assertEquals(layout.xTicks.first().projectedLeftExtent, layout.plotRect.left)
         assertTrue(layout.plotRect.left < layout.xTicks.first().projectedWidth)
     }
@@ -720,8 +720,8 @@ class LineGraphViewTest {
             )
         )
 
-        assertEquals(5L, layout.xTicks.first().epochMillis)
-        assertTrue(95L !in layout.xTicks.map { it.epochMillis })
+        assertEquals(5L, layout.xTicks.first().value)
+        assertTrue(95L !in layout.xTicks.map { it.value })
     }
 
     @Test
@@ -737,7 +737,7 @@ class LineGraphViewTest {
             )
         )
 
-        assertEquals(45L, layout.xTicks.first().epochMillis)
+        assertEquals(45L, layout.xTicks.first().value)
     }
 
     @Test
@@ -841,9 +841,9 @@ class LineGraphViewTest {
         epochMillis: Long,
         durationMillis: Long,
         zoneId: ZoneId,
-    ) = formatLineGraphTimestamp(epochMillis, durationMillis, zoneId, englishXLabelText)
+    ) = formatGraphXAxisTimestamp(epochMillis, durationMillis, zoneId, englishXLabelText)
 
-    private val englishXLabelText = LineGraphXLabelText(
+    private val englishXLabelText = GraphXAxisLabelText(
         months = listOf(
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",

@@ -52,8 +52,6 @@ import com.androidplot.xy.BoundaryMode
 import com.androidplot.xy.StepMode
 import com.androidplot.xy.XYGraphWidget
 import com.androidplot.xy.XYPlot
-import com.patrykandpatrick.vico.compose.common.ProvideVicoTheme
-import com.patrykandpatrick.vico.compose.m3.common.rememberM3VicoTheme
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
@@ -72,21 +70,13 @@ private const val GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER = 0.8f
 private const val GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER = 0.9f
 
 internal const val graphGridLineAlpha = 0.25f
+internal const val graphXAxisLabelAngle = -28f
 internal val graphGridLineThickness = 0.5.dp
 internal val graphAxisTextStyle: TextStyle
     @Composable get() = MaterialTheme.typography.bodySmall.copy(
         color = MaterialTheme.colorScheme.onSurface,
         fontSize = 12.sp,
     )
-
-@Composable
-fun ProvideGraphVicoTheme(content: @Composable () -> Unit) {
-    val theme = rememberM3VicoTheme(
-        lineColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-        textColor = MaterialTheme.colorScheme.onSurface,
-    )
-    ProvideVicoTheme(theme, content)
-}
 
 fun xyPlotSetup(
     xyPlot: XYPlot,
