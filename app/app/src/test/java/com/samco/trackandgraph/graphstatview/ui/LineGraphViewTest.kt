@@ -508,6 +508,36 @@ class LineGraphViewTest {
     }
 
     @Test
+    fun `vertical zoom settles on the complete viewport when nearly zoomed out`() {
+        val complete = LineGraphYViewport(0.0, 1.0)
+
+        assertEquals(
+            complete,
+            settleLineGraphYViewport(LineGraphYViewport(0.001, 0.999), complete),
+        )
+        assertEquals(
+            LineGraphYViewport(0.03, 0.97),
+            settleLineGraphYViewport(LineGraphYViewport(0.03, 0.97), complete),
+        )
+    }
+
+    @Test
+    fun `vertical zoom settles on clear rounded y bounds`() {
+        val layout = requireNotNull(
+            layout(
+                points = listOf(point(0), point(100, 10.0)),
+                fixedYMin = 0.0,
+                fixedYMax = 10.0,
+                requestedYViewport = LineGraphYViewport(0.0, 1.9),
+            )
+        )
+
+        assertEquals(0.0, layout.minY)
+        assertEquals(2.0, layout.maxY)
+        assertEquals(listOf(0.0, 0.5, 1.0, 1.5, 2.0), layout.yTicks.map { it.value })
+    }
+
+    @Test
     fun `vertical zoom centers on finite data in the horizontal viewport`() {
         val points = listOf(point(0, 100.0), point(50, 20.0), point(100, 40.0))
 
@@ -667,6 +697,7 @@ class LineGraphViewTest {
         visibleMaxX: Long = 100L,
         fixedYMin: Double? = null,
         fixedYMax: Double? = null,
+        requestedYViewport: LineGraphYViewport? = null,
         reservedXLabelWidth: Float? = null,
         measureText: (String) -> IntSize = { IntSize(width = 30, height = 10) },
     ) = calculateLineGraphLayout(
@@ -678,6 +709,7 @@ class LineGraphViewTest {
         durationBasedRange = false,
         fixedYMin = fixedYMin,
         fixedYMax = fixedYMax,
+        requestedYViewport = requestedYViewport,
         reservedXLabelWidth = reservedXLabelWidth,
         xLabelText = englishXLabelText,
         measureText = measureText,

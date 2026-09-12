@@ -231,7 +231,9 @@ private fun LineGraphBodyView(
     }
     val finishVerticalZoom = rememberUpdatedState {
         displayedYViewport?.let {
-            requestedYViewport = it
+            requestedYViewport = fullYViewport?.let { complete ->
+                settleLineGraphYViewport(it, complete)
+            } ?: it
             yLayoutRevision++
         }
     }
@@ -561,6 +563,11 @@ internal fun calculateLineGraphYViewport(
     )
 }
 
+internal fun settleLineGraphYViewport(
+    requested: LineGraphYViewport,
+    complete: LineGraphYViewport,
+): LineGraphYViewport = if (requested.span >= complete.span * 0.98) complete else requested
+
 internal fun visibleDataYCenter(
     points: List<LineGraphPoint>,
     minX: Long,
@@ -627,7 +634,7 @@ internal fun calculateLineGraphLayout(
         initialRange.first,
         initialRange.second,
         approximateTickCount,
-        requestedYViewport != null || fixedYMin != null && fixedYMax != null,
+        requestedYViewport == null && fixedYMin != null && fixedYMax != null,
         durationBasedRange,
     )
     val yTicks = yValues.map { value ->
