@@ -83,7 +83,9 @@ class ViewGraphStatViewModelImpl @Inject constructor(
     private val graphStatResult = graphStatId
         .filterNotNull()
         .flatMapLatest { getGraphData(it) }
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+        // Keep the expensive graph calculation alive while this full-screen destination's
+        // ViewModel exists. Lifecycle-aware UI collection must not restart it after backgrounding.
+        .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
     private fun getGraphData(id: Long) = flow {
         val graphStat = dataInteractor.getGraphStatById(id)

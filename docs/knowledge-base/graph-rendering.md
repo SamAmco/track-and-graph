@@ -28,6 +28,8 @@ Do not use the general `detectTransformGestures` detector here: it consumes one-
 
 Every rendered line-graph instance emits one `LineGraphPerf` info-level Logcat entry in all build variants after its first completed Canvas draw. `firstRenderWorkMs` sums active preparation, merge/sort, initial layout/text measurement, and Canvas draw time; it intentionally excludes the deliberately yielded frame and other scheduling delay. The same entry includes line, input/finite/merged/visible-point, and X/Y tick counts so timings from real graphs can be compared meaningfully. Do not add per-frame logging to this path: Logcat traffic during pan, zoom, or reveal would distort the rendering performance being observed.
 
+The full-screen graph ViewModel shares its expensive combined view-data calculation with `SharingStarted.Lazily`. Once first displayed, that calculation remains active for the lifetime of the navigation destination's ViewModel, even while lifecycle-aware Compose collectors stop in the background. Keep downstream UI state lifecycle-aware. Using zero-timeout `WhileSubscribed` for the root calculation makes returning to the app restart it and replace the ready graph with a loading state; process death still recreates and reloads the graph normally.
+
 ## Bar-chart boundary
 
 Bar charts are the first Vico-based graph type. `IBarChartViewData` exposes:
