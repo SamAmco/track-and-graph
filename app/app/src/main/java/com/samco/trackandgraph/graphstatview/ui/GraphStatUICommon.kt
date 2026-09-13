@@ -44,27 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.androidplot.Plot
-import com.androidplot.ui.Anchor
-import com.androidplot.ui.HorizontalPositioning
-import com.androidplot.ui.VerticalPositioning
-import com.androidplot.xy.BoundaryMode
-import com.androidplot.xy.StepMode
-import com.androidplot.xy.XYGraphWidget
-import com.androidplot.xy.XYPlot
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
-import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.ui.ui.ColorCircle
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.dataVisColorList
-import java.text.DecimalFormat
-import java.text.FieldPosition
-import java.text.Format
-import java.text.ParsePosition
-import kotlin.math.roundToLong
 
 private const val GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER = 0.8f
 private const val GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER = 0.9f
@@ -77,84 +62,6 @@ internal val graphAxisTextStyle: TextStyle
         color = MaterialTheme.colorScheme.onSurface,
         fontSize = 12.sp,
     )
-
-fun xyPlotSetup(
-    xyPlot: XYPlot,
-    @ColorInt onSurfaceColor: Int,
-    @ColorInt containerColor: Int,
-) {
-    xyPlot.layoutManager.remove(xyPlot.legend)
-    xyPlot.layoutManager.remove(xyPlot.rangeTitle)
-    xyPlot.layoutManager.remove(xyPlot.title)
-    xyPlot.domainTitle.position(
-        0f,
-        HorizontalPositioning.ABSOLUTE_FROM_CENTER,
-        0f,
-        VerticalPositioning.ABSOLUTE_FROM_BOTTOM,
-        Anchor.BOTTOM_MIDDLE
-    )
-    xyPlot.setBorderStyle(Plot.BorderStyle.NONE, null, null)
-    xyPlot.graph.position(
-        0f,
-        HorizontalPositioning.ABSOLUTE_FROM_LEFT,
-        0f,
-        VerticalPositioning.ABSOLUTE_FROM_TOP
-    )
-    xyPlot.setPlotMargins(0f, 0f, 0f, 0f)
-    xyPlot.setPlotPadding(0f, 0f, 0f, 0f)
-    xyPlot.graph.setPadding(0f, 0f, 0f, 10f)
-    xyPlot.graph.setMargins(0f, 20f, 0f, 0f)
-
-    xyPlot.domainTitle.labelPaint.color = onSurfaceColor
-    xyPlot.graph.domainGridLinePaint.color = onSurfaceColor
-    xyPlot.graph.rangeGridLinePaint.color = onSurfaceColor
-    xyPlot.graph.domainSubGridLinePaint.color = onSurfaceColor
-    xyPlot.graph.rangeSubGridLinePaint.color = onSurfaceColor
-    xyPlot.graph.domainOriginLinePaint.color = onSurfaceColor
-    xyPlot.graph.domainOriginLinePaint.strokeWidth = 1f
-    xyPlot.graph.rangeOriginLinePaint.color = onSurfaceColor
-    xyPlot.graph.rangeOriginLinePaint.strokeWidth = 1f
-
-    //Setting the layer type enables transparent backgrounds, I don't know why
-    // I discovered it here: https://groups.google.com/g/androidplot/c/5QnJXD0uIIU
-    xyPlot.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-
-    xyPlot.graph.gridBackgroundPaint.color = containerColor
-    xyPlot.backgroundPaint.color = containerColor
-    xyPlot.graph.backgroundPaint.color = containerColor
-
-    xyPlot.graph.paddingLeft = 0f
-    xyPlot.graph.paddingBottom = 0f
-    xyPlot.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
-    xyPlot.setDomainBoundaries(0, 1, BoundaryMode.GROW)
-    xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format = DecimalFormat("0.0")
-}
-
-fun setUpXYPlotYAxis(
-    binding: GraphXyPlotBinding,
-    yAxisSubdivides: Int,
-    durationBasedRange: Boolean
-) {
-    binding.xyPlot.setRangeStep(
-        StepMode.SUBDIVIDE,
-        yAxisSubdivides.toDouble(),
-    )
-    if (durationBasedRange) {
-        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
-            object : Format() {
-                override fun format(
-                    obj: Any,
-                    toAppendTo: StringBuffer,
-                    pos: FieldPosition
-                ): StringBuffer {
-                    val sec = (obj as Number).toDouble().roundToLong()
-                    return toAppendTo.append(formatTimeDuration(sec))
-                }
-
-                override fun parseObject(source: String, pos: ParsePosition) = null
-            }
-    }
-}
 
 fun setGraphHeight(
     graphView: View,

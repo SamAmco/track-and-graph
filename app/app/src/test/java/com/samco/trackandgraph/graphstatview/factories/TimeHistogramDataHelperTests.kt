@@ -173,6 +173,37 @@ class TimeHistogramDataHelperTests {
     }
 
     @Test
+    fun zeroValueTotalsProduceFiniteEmptyBins() {
+        val sample = makeDataSample(
+            listOf(0.0 to OffsetDateTime.of(2020, 7, 1, 9, 0, 0, 0, ZoneOffset.UTC))
+        )
+
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, TimeHistogramWindow.HOUR, sumByCount = false)
+
+        Assert.assertEquals(List(60) { 0.0 }, answer?.get(""))
+    }
+
+    @Test
+    fun monthBinsUseCalendarDaysIncludingDayThirtyOne() {
+        val sample = makeDataSample(
+            listOf(
+                1.0 to OffsetDateTime.of(2020, 2, 28, 9, 0, 0, 0, ZoneOffset.UTC),
+                1.0 to OffsetDateTime.of(2020, 1, 31, 9, 0, 0, 0, ZoneOffset.UTC),
+            )
+        )
+
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, TimeHistogramWindow.MONTH, sumByCount = true)
+        val expected = MutableList(31) { 0.0 }.apply {
+            this[27] = 50.0
+            this[30] = 50.0
+        }
+
+        Assert.assertEquals(expected, answer?.get(""))
+    }
+
+    @Test
     fun test_getHistogramBinsForSample_sumByVal_week_cont_StartTime() {
         //GIVEN
         val month = OffsetDateTime.of(2020, 7, 1, 3, 30, 0, 0, ZoneOffset.UTC)

@@ -81,6 +81,7 @@ class TimeHistogramDataFactory @Inject constructor(
                 override val window = TimeHistogramWindowData.getWindowData(config.window)
                 override val barValues = barValues
                 override val maxDisplayHeight = maxDisplayHeight
+                override val firstDayOfWeek = timeHelper.aggregationPreferences.firstDayOfWeek
             }
         } catch (throwable: Throwable) {
             object : ITimeHistogramViewData {

@@ -19,6 +19,9 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 
 import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
+import java.util.Locale
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.temporal.WeekFields
 
 interface ITimeHistogramViewData : IGraphStatViewData {
     data class BarValue(val label: String, val values: List<Double>)
@@ -31,4 +34,7 @@ interface ITimeHistogramViewData : IGraphStatViewData {
 
     val maxDisplayHeight: Double
         get() = 0.0
+
+    val firstDayOfWeek: DayOfWeek
+        get() = WeekFields.of(Locale.getDefault()).firstDayOfWeek
 }

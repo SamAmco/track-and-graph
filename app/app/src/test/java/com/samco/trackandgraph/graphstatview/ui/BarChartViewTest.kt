@@ -80,12 +80,21 @@ class BarChartViewTest {
 
     @Test
     fun barViewportInitiallyIncludesEveryBucketEdge() {
-        assertEquals(BarChartViewport(-0.5, 25.5), calculateBarChartViewport(26, 1.0, 0.5))
+        assertEquals(
+            CategoricalGraphViewport(-0.5, 25.5),
+            calculateCategoricalGraphViewport(26, 1.0, 0.5, maximumZoom = 20.0),
+        )
     }
 
     @Test
     fun barViewportClampsZoomAndPanToBucketEdges() {
-        assertEquals(BarChartViewport(-0.5, 0.5), calculateBarChartViewport(4, 99.0, -1.0))
-        assertEquals(BarChartViewport(2.5, 3.5), calculateBarChartViewport(4, 4.0, 2.0))
+        assertEquals(
+            CategoricalGraphViewport(-0.5, 0.5),
+            calculateCategoricalGraphViewport(4, 99.0, -1.0, maximumZoom = 20.0),
+        )
+        assertEquals(
+            CategoricalGraphViewport(2.5, 3.5),
+            calculateCategoricalGraphViewport(4, 4.0, 2.0, maximumZoom = 20.0),
+        )
     }
 }

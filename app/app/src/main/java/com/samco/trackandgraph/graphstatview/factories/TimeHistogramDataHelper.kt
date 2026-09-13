@@ -36,11 +36,9 @@ class TimeHistogramDataHelper(
      * the largest of those sums.
      */
     fun getLargestBin(bins: List<List<Double>>?): Double? {
-        return bins
-            ?.getOrElse(0) { null }
-            ?.size
-            ?.downTo(1)
-            ?.maxOfOrNull { index -> bins.sumOf { it[index - 1] } }
+        val binCount = bins?.firstOrNull()?.size ?: return null
+        if (binCount == 0 || bins.any { it.size != binCount }) return null
+        return (0 until binCount).maxOfOrNull { index -> bins.sumOf { it[index] } }
     }
 
     internal fun getHistogramBinsForSample(
@@ -102,6 +100,9 @@ class TimeHistogramDataHelper(
     ): Map<String, List<Double>> {
         val binTotalMaps = calculateBinTotals(sample, window, endTime, addFunction)
         val total = binTotalMaps.map { it.value.sum() }.sum()
+        if (!total.isFinite() || kotlin.math.abs(total) < 1e-12) {
+            return binTotalMaps.mapValues { (_, bins) -> List(bins.size) { 0.0 } }
+        }
         return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { (it / total) * 100.0 } }.toMap()
     }
 
@@ -115,8 +116,8 @@ class TimeHistogramDataHelper(
         addFunction: (IDataPoint, MutableMap<String, MutableList<Double>>, Int) -> Unit
     ): Map<String, List<Double>> {
         val binTotalMap = mutableMapOf<String, MutableList<Double>>()
-        var currEnd = endTime
-        var currStart = currEnd - window.period
+        var currEndExclusive = endTime.plusNanos(1)
+        var currStart = currEndExclusive - window.period
         var binned = 0
         var nextPoint = sample[0]
         val timeOf = { dp: IDataPoint ->
@@ -125,18 +126,9 @@ class TimeHistogramDataHelper(
             dp.timestamp.atZoneSimilarLocal(timeHelper.zoneId)
         }
         while (binned < sample.size) {
-            val periodDuration = Duration
-                .between(currStart, currEnd)
-                .seconds
-                .toDouble()
             var nextPointTime = timeOf(nextPoint)
-            while (nextPointTime > currStart) {
-                val distance = Duration.between(
-                    currStart,
-                    nextPointTime
-                ).seconds.toDouble()
-                var binIndex = (window.numBins * (distance / periodDuration)).toInt()
-                if (binIndex == window.numBins) binIndex--
+            while (!nextPointTime.isBefore(currStart)) {
+                val binIndex = getBinIndex(window, currStart, nextPointTime)
                 if (!binTotalMap.containsKey(nextPoint.label)) {
                     binTotalMap[nextPoint.label] = MutableList(window.numBins) { 0.0 }
                 }
@@ -145,10 +137,37 @@ class TimeHistogramDataHelper(
                 nextPoint = sample[binned]
                 nextPointTime = timeOf(nextPoint)
             }
-            currEnd -= window.period
-            currStart -= window.period
+            currEndExclusive = currStart
+            currStart = currEndExclusive - window.period
         }
         return binTotalMap
+    }
+
+    /** Assigns bins using local calendar units so labels remain correct across DST and long months. */
+    private fun getBinIndex(
+        window: TimeHistogramWindowData,
+        windowStart: ZonedDateTime,
+        pointTime: ZonedDateTime,
+    ): Int {
+        val localElapsed = Duration.between(
+            windowStart.toLocalDateTime(),
+            pointTime.toLocalDateTime(),
+        )
+        val index = when (window.window) {
+            TimeHistogramWindow.HOUR -> localElapsed.toMinutes().toInt()
+            TimeHistogramWindow.DAY -> localElapsed.toHours().toInt()
+            TimeHistogramWindow.WEEK,
+            TimeHistogramWindow.MONTH -> localElapsed.toDays().toInt()
+
+            TimeHistogramWindow.THREE_MONTHS,
+            TimeHistogramWindow.SIX_MONTHS -> (localElapsed.toDays() / 7).toInt()
+
+            TimeHistogramWindow.YEAR ->
+                (1 until window.numBins).lastOrNull { monthIndex ->
+                    !pointTime.isBefore(windowStart.plusMonths(monthIndex.toLong()))
+                } ?: 0
+        }
+        return index.coerceIn(0, window.numBins - 1)
     }
 
     /**

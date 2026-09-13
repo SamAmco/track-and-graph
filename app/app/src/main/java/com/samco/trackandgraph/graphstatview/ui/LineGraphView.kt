@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.YRangeType
-import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
 import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
@@ -73,9 +72,6 @@ import kotlin.math.sin
 import timber.log.Timber
 
 private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
-private const val APPROXIMATE_Y_TICK_SPACING_DP = 32f
-private const val MINIMUM_Y_TICK_COUNT = 3
-private const val MAXIMUM_Y_TICK_COUNT = 8
 private const val MINIMUM_X_VIEWPORT_MILLIS = 10_000L
 private const val MINIMUM_NUMERIC_Y_VIEWPORT_SPAN = 0.01
 private const val MINIMUM_DURATION_Y_VIEWPORT_SPAN_SECONDS = 10.0
@@ -84,7 +80,6 @@ private val vertexWidth = 6.dp
 private val pointLabelTextSize = 9.sp
 private val timeMarkerWidth = 3.dp
 private val pointLabelPadding = 3.dp
-private val yAxisIntervalHelper = DataDisplayIntervalHelper()
 
 internal enum class LineGraphPinchAxis { HORIZONTAL, VERTICAL }
 
@@ -568,9 +563,7 @@ internal fun calculateLineGraphLayout(
     if (!rawYMin.isFinite() || !rawYMax.isFinite() || rawYMax < rawYMin) return null
 
     val initialRange = expandEqualRange(rawYMin, rawYMax)
-    val approximateTickCount = (height / (APPROXIMATE_Y_TICK_SPACING_DP * density))
-        .toInt()
-        .coerceIn(MINIMUM_Y_TICK_COUNT, MAXIMUM_Y_TICK_COUNT)
+    val approximateTickCount = approximateGraphYTickCount(height, density)
     val yValues = calculateYTicks(
         initialRange.first,
         initialRange.second,
@@ -758,49 +751,18 @@ internal fun selectLineGraphXTicks(
     plotWidth: Float,
     minimumGap: Float,
 ): List<GraphXAxisTick<Long>> {
-    if (candidates.isEmpty()) return emptyList()
-    val selected = mutableListOf<GraphXAxisTick<Long>>()
-    var previousRight = Float.NEGATIVE_INFINITY
-    fun horizontalBounds(tick: GraphXAxisTick<Long>): Pair<Float, Float> {
-        val x = plotLeft + ((tick.value - minX).toDouble() / (maxX - minX) * plotWidth).toFloat()
-        return x - tick.projectedLeftExtent to x + tick.projectedRightExtent
-    }
-    candidates
+    val orderedCandidates = candidates
         .distinctBy { it.value }
         .sortedBy { it.value }
-        .forEach { tick ->
-            val (labelLeft, labelRight) = horizontalBounds(tick)
-            if (labelLeft >= 0f && labelLeft >= previousRight + minimumGap) {
-                selected += tick
-                previousRight = labelRight
-            }
-        }
-    return selected
-}
-
-internal fun calculateYTicks(
-    rawMin: Double,
-    rawMax: Double,
-    targetCount: Int,
-    fixed: Boolean,
-    durationBasedRange: Boolean = false,
-): List<Double> {
-    val parameters = yAxisIntervalHelper.getYParameters(
-        yMin = rawMin,
-        yMax = rawMax,
-        isDurationBasedRange = durationBasedRange,
-        fixedBounds = fixed,
-        approximateLineCount = targetCount,
+    return selectGraphXAxisTicks(
+        candidates = orderedCandidates,
+        xToPixel = { value ->
+            plotLeft + ((value - minX).toDouble() / (maxX - minX) * plotWidth).toFloat()
+        },
+        minimumX = 0f,
+        maximumX = Float.POSITIVE_INFINITY,
+        minimumGap = minimumGap,
     )
-    val step = (parameters.boundsMax - parameters.boundsMin) / (parameters.subdivides - 1)
-    return List(parameters.subdivides) { parameters.boundsMin + step * it }
-        .let { it.dropLast(1) + parameters.boundsMax }
-}
-
-internal fun expandEqualRange(minValue: Double, maxValue: Double): Pair<Double, Double> {
-    if (maxValue > minValue) return minValue to maxValue
-    val padding = max(1.0, abs(minValue) * 0.1)
-    return minValue - padding to maxValue + padding
 }
 
 internal fun maximumLineGraphXLabelWidth(

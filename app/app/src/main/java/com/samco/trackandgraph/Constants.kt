@@ -49,7 +49,7 @@ data class TimeHistogramWindowData(
             TimeHistogramWindow.MONTH -> TimeHistogramWindowData(
                 window = TimeHistogramWindow.MONTH,
                 period = Period.ofMonths(1),
-                numBins = 30
+                numBins = 31
             )
             TimeHistogramWindow.THREE_MONTHS -> TimeHistogramWindowData(
                 window = TimeHistogramWindow.THREE_MONTHS,

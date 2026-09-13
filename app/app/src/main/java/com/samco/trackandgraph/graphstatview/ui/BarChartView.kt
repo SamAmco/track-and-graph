@@ -30,10 +30,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculatePan
-import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -65,13 +61,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -81,7 +72,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
@@ -107,7 +97,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToLong
 
-private val barBorderThickness = 0.5.dp
 private const val maximumBarChartZoom = 20.0
 
 @Composable
@@ -356,7 +345,12 @@ private fun BarChartBodyView(
         val maximumZoom = min(maximumBarChartZoom, xDates.size.toDouble()).coerceAtLeast(1.0)
         var zoom by remember(xDates) { mutableDoubleStateOf(1.0) }
         var centerFraction by remember(xDates) { mutableDoubleStateOf(0.5) }
-        val viewport = calculateBarChartViewport(xDates.size, zoom, centerFraction)
+        val viewport = calculateCategoricalGraphViewport(
+            bucketCount = xDates.size,
+            zoom = zoom,
+            centerFraction = centerFraction,
+            maximumZoom = maximumBarChartZoom,
+        )
         val xLabelText = GraphXAxisLabelText(
             months = stringArrayResource(R.array.abbreviated_months).toList(),
             weekdays = stringArrayResource(R.array.abbreviated_weekdays).toList(),
@@ -370,6 +364,7 @@ private fun BarChartBodyView(
         val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)
         val highlightColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
         val barColors = bars.map { getColor(it.color) }
+        val barSeriesValues = remember(bars) { bars.map { it.values } }
         val borderColor = MaterialTheme.colorScheme.onSurface
         var canvasSize by remember { mutableStateOf(IntSize.Zero) }
         val layout = remember(
@@ -432,7 +427,7 @@ private fun BarChartBodyView(
                 }
                 .pointerInput(isInteractive, maximumZoom) {
                     if (!isInteractive) return@pointerInput
-                    detectBarChartPinchGestures { panX, gestureZoom ->
+                    detectHorizontalGraphPinchGestures { panX, gestureZoom ->
                         horizontalViewportTransform.value(panX, gestureZoom)
                     }
                 }
@@ -457,51 +452,22 @@ private fun BarChartBodyView(
                 gridColor = gridColor,
                 alpha = alpha,
             )
-            clipRect(plot.left, plot.top, plot.right, plot.bottom) {
-                val firstBar = ceil(chartLayout.minX - 0.5).toInt().coerceAtLeast(0)
-                val lastBar = floor(chartLayout.maxX + 0.5).toInt().coerceAtMost(xDates.lastIndex)
-                if (firstBar <= lastBar) {
-                    val barWidth = chartLayout.xToPixel(0.5) - chartLayout.xToPixel(-0.5)
-                    for (index in firstBar..lastBar) {
-                        val centerX = chartLayout.xToPixel(index.toDouble())
-                        var positiveTotal = 0.0
-                        var negativeTotal = 0.0
-                        bars.forEachIndexed { seriesIndex, series ->
-                            val value = series.values[index]
-                            val start = if (value >= 0.0) positiveTotal else negativeTotal
-                            val end = start + value
-                            if (value >= 0.0) positiveTotal = end else negativeTotal = end
-                            val top = min(chartLayout.yToPixel(start), chartLayout.yToPixel(end))
-                            val bottom = max(chartLayout.yToPixel(start), chartLayout.yToPixel(end))
-                            if (bottom > top) {
-                                val rectTopLeft = Offset(centerX - barWidth / 2f, top)
-                                val rectSize = Size(barWidth, bottom - top)
-                                drawRect(
-                                    color = barColors[seriesIndex].copy(alpha = alpha),
-                                    topLeft = rectTopLeft,
-                                    size = rectSize,
-                                )
-                                if (xDates.size < 60) {
-                                    drawRect(
-                                        color = borderColor.copy(alpha = alpha),
-                                        topLeft = rectTopLeft,
-                                        size = rectSize,
-                                        style = Stroke(barBorderThickness.toPx()),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                highlightedIndex?.let { index ->
-                    val centerX = chartLayout.xToPixel(index.toDouble())
-                    val halfWidth = (chartLayout.xToPixel(0.5) - chartLayout.xToPixel(-0.5)) / 2f
-                    drawRect(
-                        color = highlightColor.copy(alpha = highlightColor.alpha * alpha),
-                        topLeft = Offset(centerX - halfWidth, plot.top),
-                        size = Size(halfWidth * 2f, plot.height),
-                    )
-                }
+            val firstBar = ceil(chartLayout.minX - 0.5).toInt().coerceAtLeast(0)
+            val lastBar = floor(chartLayout.maxX + 0.5).toInt().coerceAtMost(xDates.lastIndex)
+            if (firstBar <= lastBar) {
+                drawStackedGraphBars(
+                    plot = plot,
+                    bucketRange = firstBar..lastBar,
+                    valuesBySeries = barSeriesValues,
+                    colors = barColors,
+                    xToPixel = chartLayout::xToPixel,
+                    yToPixel = chartLayout::yToPixel,
+                    alpha = alpha,
+                    borderColor = borderColor,
+                    drawBorders = xDates.size < 60,
+                    highlightedBucket = highlightedIndex,
+                    highlightColor = highlightColor,
+                )
             }
         }
 
@@ -517,22 +483,6 @@ private fun BarChartBodyView(
             )
         }
     }
-}
-
-internal data class BarChartViewport(val minX: Double, val maxX: Double)
-
-internal fun calculateBarChartViewport(
-    barCount: Int,
-    zoom: Double,
-    centerFraction: Double,
-): BarChartViewport {
-    val count = barCount.coerceAtLeast(1).toDouble()
-    val constrainedZoom = zoom.coerceIn(1.0, min(maximumBarChartZoom, count))
-    val visibleSpan = count / constrainedZoom
-    val halfSpanFraction = 0.5 / constrainedZoom
-    val constrainedCenter = centerFraction.coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
-    val center = -0.5 + count * constrainedCenter
-    return BarChartViewport(center - visibleSpan / 2.0, center + visibleSpan / 2.0)
 }
 
 internal data class BarChartLayout(
@@ -562,7 +512,7 @@ internal fun calculateBarChartLayout(
     width: Float,
     height: Float,
     xDates: List<ZonedDateTime>,
-    viewport: BarChartViewport,
+    viewport: CategoricalGraphViewport,
     yMin: Double,
     yMax: Double,
     yAxisSubdivides: Int,
@@ -648,21 +598,6 @@ internal fun calculateBarChartLayout(
         xTicks = xTicks,
         yTicks = yTicks,
     )
-}
-
-private suspend fun PointerInputScope.detectBarChartPinchGestures(
-    onTransform: (panX: Float, zoom: Float) -> Unit,
-) = awaitEachGesture {
-    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-    do {
-        val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-        if (event.changes.count { it.pressed } > 1) {
-            val pan = event.calculatePan()
-            val zoom = event.calculateZoom()
-            if (pan.x != 0f || zoom != 1f) onTransform(pan.x, zoom)
-            event.changes.forEach { it.consume() }
-        }
-    } while (event.changes.any { it.pressed })
 }
 
 @Preview(showBackground = true)
