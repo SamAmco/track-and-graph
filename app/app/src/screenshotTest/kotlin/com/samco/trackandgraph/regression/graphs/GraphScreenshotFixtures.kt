@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
@@ -43,6 +46,7 @@ import org.threeten.bp.Period
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
+import java.util.TimeZone
 import kotlin.math.sin
 
 private val snapshotEndTime = OffsetDateTime.of(2026, 7, 19, 12, 0, 0, 0, ZoneOffset.UTC)
@@ -180,6 +184,12 @@ internal fun PieChartSnapshot(index: Int) = GraphSnapshotFrame {
 
 @Composable
 private fun GraphSnapshotFrame(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    remember(context) {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+        AndroidThreeTen.init(context)
+        true
+    }
     TnGComposeTheme {
         Surface(
             modifier = Modifier.fillMaxWidth(),
