@@ -199,8 +199,9 @@ fun formatTimeDuration(seconds: Long): String {
 }
 
 fun formatTimeToDaysHoursMinutesSeconds(
-    context: Context,
     millis: Long,
+    dayText: String,
+    daysText: String,
     twoLines: Boolean = true
 ): String {
     val totalSeconds = millis / 1000
@@ -218,9 +219,7 @@ fun formatTimeToDaysHoursMinutesSeconds(
     return StringBuilder().apply {
         if (daysNum == 0) append(hms)
         else {
-            val daysSuffix =
-                if (daysNum == 1) context.getString(R.string.day)
-                else context.getString(R.string.days)
+            val daysSuffix = if (daysNum == 1) dayText else daysText
 
             append("$days $daysSuffix")
 
@@ -232,6 +231,17 @@ fun formatTimeToDaysHoursMinutesSeconds(
         }
     }.toString()
 }
+
+fun formatTimeToDaysHoursMinutesSeconds(
+    context: Context,
+    millis: Long,
+    twoLines: Boolean = true,
+): String = formatTimeToDaysHoursMinutesSeconds(
+    millis = millis,
+    dayText = context.getString(R.string.day),
+    daysText = context.getString(R.string.days),
+    twoLines = twoLines,
+)
 
 fun formatRelativeTimeSpan(
     context: Context,

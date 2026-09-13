@@ -22,7 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
@@ -42,8 +42,9 @@ fun AverageTimeBetweenView(
         Text(
             modifier = modifier.fillMaxSize(),
             text = formatTimeToDaysHoursMinutesSeconds(
-                context = LocalContext.current,
-                millis = viewData.averageMillis.toLong()
+                millis = viewData.averageMillis.toLong(),
+                dayText = stringResource(R.string.day),
+                daysText = stringResource(R.string.days),
             ),
             style = MaterialTheme.typography.displayMedium,
             textAlign = TextAlign.Center,

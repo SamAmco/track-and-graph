@@ -36,6 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
@@ -43,7 +45,6 @@ import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.helpers.formatTimeToDaysHoursMinutesSeconds
-import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.ui.DataPointValueAndDescription
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
@@ -87,17 +88,24 @@ private fun LastValueStatViewBody(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     val context = LocalContext.current
-    val weekdayNames = getWeekDayNames(context)
+    val weekdayNames = stringArrayResource(R.array.abbreviated_weekdays).toList()
+    val dayText = stringResource(R.string.day)
+    val daysText = stringResource(R.string.days)
     fun getDurationText(): String {
         val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
-        return formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
+        return formatTimeToDaysHoursMinutesSeconds(
+            millis = duration.toMillis(),
+            dayText = dayText,
+            daysText = daysText,
+            twoLines = false,
+        )
     }
 
-    var durationText by remember(dataPoint.timestamp, context) {
+    var durationText by remember(dataPoint.timestamp, dayText, daysText) {
         mutableStateOf(getDurationText())
     }
 
-    LaunchedEffect(dataPoint.timestamp, context) {
+    LaunchedEffect(dataPoint.timestamp, dayText, daysText) {
         while (isActive) {
             durationText = getDurationText()
             delay(1.seconds)
