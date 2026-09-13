@@ -18,6 +18,7 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
@@ -29,6 +30,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.sampling.RawDataSample
+import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
@@ -263,6 +265,30 @@ class LuaGraphDataFactoryTest {
             pieChart.segments
         )
         assertEquals(null, result.error)
+        verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
+    fun `mixed-sign Lua pie segments return a specific graph error`() = runTest {
+        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.PieChartData(
+                    segments = listOf(
+                        PieChartSegment(-10.0, "outgoing", null),
+                        PieChartSegment(5.0, "incoming", null),
+                    ),
+                ),
+            ),
+        )
+
+        val result = callGetViewData()
+
+        assertEquals(IGraphStatViewData.State.ERROR, result.state)
+        assertEquals(null, result.wrapped)
+        assertEquals(
+            R.string.pie_chart_mixed_signs_error,
+            (result.error as GraphStatInitException).errorTextId,
+        )
         verify(luaEngine).releaseVM(testVmLock)
     }
 

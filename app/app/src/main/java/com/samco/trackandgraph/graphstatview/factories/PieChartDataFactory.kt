@@ -28,6 +28,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.helpers.validatePieChartSegmentSigns
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
@@ -68,6 +69,13 @@ class PieChartDataFactory @Inject constructor(
                     override val graphOrStat = graphOrStat
                 }
             val segments = getPieChartSegments(plottingData, config.sumByCount)
+            validatePieChartSegmentSigns(segments.map { it.second })?.let { error ->
+                return object : IPieChartViewData {
+                    override val state = IGraphStatViewData.State.ERROR
+                    override val graphOrStat = graphOrStat
+                    override val error = error
+                }
+            }
             val total = segments.sumOf { s -> s.second }
             val percentages = segments.map {
                 IPieChartViewData.Segment(

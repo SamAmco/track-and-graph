@@ -160,6 +160,7 @@
     <string name="graph_stat_view_not_found">Une erreur est survenue lors de la recherche de ce graphique</string>.
     <string name="graph_stat_view_not_enough_data_stat">Cette statistique s\'affichera lorsqu\'il y aura suffisamment de données.</string>
     <string name="graph_stat_view_not_enough_data_graph">Ce graphique s\'affichera quand il y aura suffisamment de données.</string>
+    <string name="pie_chart_mixed_signs_error">Ce diagramme circulaire ne peut pas être affiché, car il contient des tailles de segments à la fois positives et négatives.</string>
     <string name="finish">Terminer</string>
     <string name="about_description"><![CDATA[Track & Graph est un logiciel gratuit et open source sous licence GPL 3.0.]]></string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>

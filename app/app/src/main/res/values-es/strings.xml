@@ -158,6 +158,7 @@
     <string name="graph_stat_view_not_found">Se ha producido un error al encontrar este gráfico</string>
     <string name="graph_stat_view_not_enough_data_stat">Esta estadística se mostrará cuando se hayan registrado suficientes datos para generarla.</string>
     <string name="graph_stat_view_not_enough_data_graph">Este gráfico mostrará cuando se hayan registrado suficientes datos para generarlo.</string>
+    <string name="pie_chart_mixed_signs_error">Este gráfico circular no se puede representar porque contiene tamaños de segmento tanto positivos como negativos.</string>
     <string name="finish">Finalizar</string>
     <string name="about_description"><![CDATA[Track & Graph es un software libre y de código abierto bajo la licencia GPL 3.0.]]></string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>

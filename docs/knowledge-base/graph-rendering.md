@@ -72,6 +72,8 @@ Histogram buckets represent local calendar units rather than equal elapsed-time 
 
 Pie charts draw filled arcs directly with Compose Canvas and use the common reveal and graph-height policy. Values must be finite and non-negative with a finite positive total; the renderer normalizes sweep angles by that total. Legend percentages are the producer-supplied display percentages and use localized format resources.
 
+When the final pie segments contain both positive and negative sizes, the database and Lua producers return a shared `GraphStatInitException` validation result so the standard graph error path shows the dedicated mixed-sign explanation. Keep this decision out of the Canvas view, whose invalid-data check is only a defensive rendering boundary. A same-sign negative source is normalized by the producers into non-negative proportions; mixed signs cannot form meaningful parts of one whole.
+
 Default colors follow the palette's contrast-spreading sequence and wrap safely. Because the pie has no segment borders, automatic colors must differ across every shared edge, including the cyclic last-to-first edge when the palette repeats; adjust an automatically assigned endpoint color at that boundary rather than allowing the two arcs to merge visually. Explicit user colors remain authoritative. Once the segment count exceeds the palette size, colors repeat and every segment gains its numeric index both near the outside of its arc and in the legend. Place the measured index rectangle just inside the circumference to maximize available radial space, and choose black or white text from the segment luminance. With no repeated colors, omit labels from the arcs.
 
 ## Renderer ownership

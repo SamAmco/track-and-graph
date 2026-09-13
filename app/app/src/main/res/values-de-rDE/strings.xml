@@ -159,6 +159,7 @@
     <string name="graph_stat_view_not_found">Beim Auswerten dieses Diagramms ist ein Fehler aufgetreten.</string>
     <string name="graph_stat_view_not_enough_data_stat">Diese Statistik wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
     <string name="graph_stat_view_not_enough_data_graph">Dieses Diagramm wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
+    <string name="pie_chart_mixed_signs_error">Dieses Kreisdiagramm kann nicht dargestellt werden, weil es sowohl positive als auch negative Segmentgrößen enthält.</string>
     <string name="finish">Beenden</string>
     <string name="about_description"><![CDATA[Track & Graph ist freie und quelloffene Software unter der GPL 3.0-Lizenz.]]></string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>

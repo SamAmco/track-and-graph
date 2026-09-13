@@ -18,6 +18,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
@@ -27,6 +28,8 @@ import com.samco.trackandgraph.data.database.dto.PieChart
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.data.sampling.DataSampler
+import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -148,6 +151,26 @@ class PieChartDataFactoryTest {
         assertEquals(
             listOf("label1", "label2", "label3", "label4"),
             data.segments!!.map { it.title }
+        )
+    }
+
+    @Test
+    fun `mixed-sign segment sizes return a specific graph error`() = runTest {
+        val dataSample = DataSample.fromSequence(
+            sequenceOf(
+                dataPoint(-10.0, "outgoing"),
+                dataPoint(5.0, "incoming"),
+            ),
+        ) {}
+        whenever(dataSampler.getDataSampleForFeatureId(featureId, null)).thenReturn(dataSample)
+        whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(pieChart)
+
+        val data = uut.getViewData(graphOrStat)
+
+        assertEquals(IGraphStatViewData.State.ERROR, data.state)
+        assertEquals(
+            R.string.pie_chart_mixed_signs_error,
+            (data.error as GraphStatInitException).errorTextId,
         )
     }
 
