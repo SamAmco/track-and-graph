@@ -42,6 +42,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -165,6 +166,7 @@ private fun LineGraphBodyView(
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)
     val markerColor = MaterialTheme.colorScheme.error
     val density = LocalDensity.current
+    val inspectionMode = LocalInspectionMode.current
     val graphHeight = graphHeightFor(graphViewMode, hasLegend = true)
     val maximumXTickLabelWidth = if (isInteractive) {
         remember(graphXAxisLabelFormatForDuration(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
@@ -298,7 +300,24 @@ private fun LineGraphBodyView(
                 }
             }
     ) {
-        val baseLayout = layout ?: return@Canvas
+        val baseLayout = layout ?: (if (inspectionMode) {
+            calculateLineGraphLayout(
+                width = size.width,
+                height = size.height,
+                visibleMinX = visibleMinX,
+                visibleMaxX = visibleMaxX,
+                points = allPoints,
+                durationBasedRange = viewData.durationBasedRange,
+                fixedYMin = viewData.fixedYMin.takeIf { viewData.yRangeType == YRangeType.FIXED },
+                fixedYMax = viewData.fixedYMax.takeIf { viewData.yRangeType == YRangeType.FIXED },
+                requestedYViewport = requestedYViewport,
+                maximumXTickLabelWidth = maximumXTickLabelWidth,
+                reservedStartXLabelWidth = maximumStartXLabelWidth,
+                xLabelText = xLabelText,
+                measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
+                density = density.density,
+            )
+        } else null) ?: return@Canvas
         val currentLayout = displayedYViewport?.let { viewport ->
             baseLayout.copy(minY = viewport.minY, maxY = viewport.maxY)
         } ?: baseLayout

@@ -19,8 +19,8 @@ docs:
 
   - file: graph-rendering.md
     title: Graph rendering — native Compose Canvas charts
-    description: Renderer-neutral graph contracts; native Compose line, bar, histogram, and pie renderers share layout, label, reveal, styling, and defensive-validation infrastructure.
-    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, histogram, TimeHistogramView, pie-chart, PieChartView, marker, axis, label, zoom, pan, Lua, migration, NaN, zero-range, finite]
+    description: Renderer-neutral graph contracts; native Compose line, bar, histogram, and pie renderers share layout, label, viewport, reveal, styling, and defensive-validation infrastructure.
+    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, histogram, TimeHistogramView, pie-chart, PieChartView, marker, axis, label, zoom, pan, viewport, inspection-mode, Lua, migration, NaN, zero-range, finite]
 
   - file: app-lock.md
     title: App lock — security boundary, persistence, and UI shell
@@ -44,8 +44,8 @@ docs:
 
   - file: build-commands.md
     title: Build, test, and screenshot commands
-    description: Gradle commands for building and running tests; Play Store vs FOSS release flavor intent and support-payment split; build-logic convention plugins; Compose Play Store screenshots; Compose tutorial image capture.
-    keywords: [build, gradle, AGP, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, benchmark, profileable, installFossBenchmark, variant, flavor, playStore, foss, F-Droid, fdroid, support, billing, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
+    description: Gradle commands for building and running tests; release flavor intent; build-logic conventions; Compose asset capture and persisted graph screenshot regression tests.
+    keywords: [build, gradle, AGP, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, benchmark, profileable, installFossBenchmark, variant, flavor, playStore, foss, F-Droid, fdroid, support, billing, bmc, screenshots, regression, golden, reference, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
 
   - file: play-billing.md
     title: Play Store developer support billing

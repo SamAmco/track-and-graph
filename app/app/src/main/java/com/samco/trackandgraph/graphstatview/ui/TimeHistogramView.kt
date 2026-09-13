@@ -37,8 +37,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.drawText
@@ -112,7 +112,7 @@ private fun TimeHistogramBodyView(
     graphViewMode: GraphViewMode,
     graphBackgroundColor: Color,
 ) = Column(modifier = modifier) {
-    val context = LocalContext.current
+    val inspectionMode = LocalInspectionMode.current
     val hasLegend = barValues.size > 1
     val noLabel = stringResource(R.string.no_label)
     val labelText = TimeHistogramLabelText(
@@ -198,7 +198,19 @@ private fun TimeHistogramBodyView(
                 }
             },
     ) {
-        val histogramLayout = layout ?: return@Canvas
+        val histogramLayout = layout ?: (if (inspectionMode) {
+            calculateTimeHistogramLayout(
+                width = size.width,
+                height = size.height,
+                bucketLabels = bucketLabels,
+                viewport = viewport,
+                axisTitle = axisTitle,
+                maxY = maxDisplayHeight,
+                measureAxisText = { text -> textMeasurer.measure(text, axisTextStyle).size },
+                measureTitleText = { text -> textMeasurer.measure(text, axisTitleTextStyle).size },
+                density = density.density,
+            )
+        } else null) ?: return@Canvas
         val alpha = reveal.value
         drawGraphAxes(
             plot = histogramLayout.plotRect,

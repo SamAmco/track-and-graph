@@ -66,7 +66,9 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -216,6 +218,8 @@ private fun BarChartDataOverlay(
     shape = MaterialTheme.shapes.small,
     shadowElevation = cardElevation,
 ) {
+    val locale = LocalConfiguration.current.locales[0]
+    val seriesBreakdownFormat = stringResource(R.string.bar_chart_series_breakdown_format)
     val total = remember(highlightedIndex, bars, durationBasedRange) {
         val totalValue = bars.sumOf { it.values[highlightedIndex] }
         if (durationBasedRange) formatTimeDuration(totalValue.toLong())
@@ -227,7 +231,13 @@ private fun BarChartDataOverlay(
     val toText = remember(highlightedIndex, xDates) {
         formatDayMonthYearHourMinute(context, xDates[highlightedIndex])
     }
-    val extraDetails = remember(context, highlightedIndex, bars, durationBasedRange) {
+    val extraDetails = remember(
+        highlightedIndex,
+        bars,
+        durationBasedRange,
+        locale,
+        seriesBreakdownFormat,
+    ) {
         val sum = bars.sumOf { it.values[highlightedIndex] }
         if (sum < 1e-6) {
             emptyList()
@@ -242,8 +252,9 @@ private fun BarChartDataOverlay(
                 }
                 ExtraDetails(
                     color = series.color,
-                    label = context.getString(
-                        R.string.bar_chart_series_breakdown_format,
+                    label = String.format(
+                        locale,
+                        seriesBreakdownFormat,
                         series.label,
                         displayedValue,
                         doubleToString(percentage, 1),
@@ -339,8 +350,9 @@ private fun BarChartBodyView(
     graphBackgroundColor: Color,
 ) {
     Column(modifier = modifier) {
-        val context = LocalContext.current
+        val inspectionMode = LocalInspectionMode.current
         val hasLegend = bars.size > 1
+        val noLabel = stringResource(R.string.no_label)
         val isInteractive = !listMode
         val maximumZoom = min(maximumBarChartZoom, xDates.size.toDouble()).coerceAtLeast(1.0)
         var zoom by remember(xDates) { mutableDoubleStateOf(1.0) }
@@ -438,7 +450,21 @@ private fun BarChartBodyView(
                     }
                 },
         ) {
-            val chartLayout = layout ?: return@Canvas
+            val chartLayout = layout ?: (if (inspectionMode) {
+                calculateBarChartLayout(
+                    width = size.width,
+                    height = size.height,
+                    xDates = xDates,
+                    viewport = viewport,
+                    yMin = yMin,
+                    yMax = yMax,
+                    yAxisSubdivides = yAxisSubdivides,
+                    durationBasedRange = durationBasedRange,
+                    xLabelText = xLabelText,
+                    measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
+                    density = density.density,
+                )
+            } else null) ?: return@Canvas
             val plot = chartLayout.plotRect
             val alpha = reveal.value
             drawGraphAxes(
@@ -477,7 +503,7 @@ private fun BarChartBodyView(
                 items = bars.map { bar ->
                     GraphLegendItem(
                         color = getColor(bar.color),
-                        label = bar.label.ifEmpty { context.getString(R.string.no_label) },
+                        label = bar.label.ifEmpty { noLabel },
                     )
                 }
             )

@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -102,7 +103,8 @@ internal suspend fun PointerInputScope.detectHorizontalGraphPinchGestures(
 
 @Composable
 internal fun rememberGraphReveal(key: Any?, ready: Boolean): Animatable<Float, *> {
-    val reveal = remember(key) { Animatable(0f) }
+    val inspectionMode = LocalInspectionMode.current
+    val reveal = remember(key, inspectionMode) { Animatable(if (inspectionMode) 1f else 0f) }
     LaunchedEffect(reveal, ready) {
         if (ready && reveal.value == 0f) {
             // Ensure the graph background gets one frame before content fades in.
