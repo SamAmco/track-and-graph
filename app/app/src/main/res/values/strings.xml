@@ -427,6 +427,8 @@
     <string name="from_formatted">From: %s</string>
     <string name="to_formatted">To: %s</string>
     <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
 
     <string name="seconds_generic">Second(s)</string>
     <string name="minutes_generic">Minute(s)</string>

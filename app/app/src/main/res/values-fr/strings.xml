@@ -336,6 +336,8 @@
     <string name="from_formatted">Depuis: %s</string>
     <string name="to_formatted">Pour: %s</string>
     <string name="bar_chart_series_breakdown_format">%1$s : %2$s (%3$s %%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s %%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d : %2$s (%3$s %%)</string>
     <string name="seconds_generic">Seconde(s)</string>
     <string name="minutes_generic">Minute(s)</string>
     <string name="hours_generic">Heure(s)</string>
