@@ -98,6 +98,13 @@ internal val barChartCases: List<IBarChartViewData> = listOf(
         values = List(100) { listOf(1.0) },
         numberedLabels = true,
     ),
+    barChartData(
+        values = listOf(
+            listOf(-10.0, -8.0, -12.0, -4.0, -9.0, -6.0, -11.0),
+            listOf(5.0, 12.0, 7.0, 10.0, 3.0, 9.0, 6.0),
+        ),
+        displayRange = -15.0 to 15.0,
+    ),
 )
 
 internal val histogramCases: List<ITimeHistogramViewData> = TimeHistogramWindow.entries.map { window ->
@@ -221,6 +228,7 @@ private fun barChartData(
     period: TemporalAmount = Period.ofDays(1),
     durationBasedRange: Boolean = false,
     numberedLabels: Boolean = false,
+    displayRange: Pair<Double, Double>? = null,
 ): IBarChartViewData {
     val count = values.first().size
     val dates = List(count) { index ->
@@ -228,10 +236,14 @@ private fun barChartData(
         repeat(count - index) { date = date.minus(period) }
         date
     }
-    val minimum = values.flatten().minOrNull() ?: 0.0
-    val maximum = (0 until count).maxOf { bucket -> values.sumOf { it[bucket] } }
-    val yMin = minOf(0.0, minimum) * 1.15
-    val yMax = maxOf(1.0, maximum * 1.15)
+    val minimum = (0 until count).minOf { bucket ->
+        values.sumOf { series -> minOf(0.0, series[bucket]) }
+    }
+    val maximum = (0 until count).maxOf { bucket ->
+        values.sumOf { series -> maxOf(0.0, series[bucket]) }
+    }
+    val yMin = displayRange?.first ?: minimum * 1.15
+    val yMax = displayRange?.second ?: maxOf(1.0, maximum * 1.15)
     return object : IBarChartViewData {
         override val state = IGraphStatViewData.State.READY
         override val graphOrStat = graphOrStat(GraphStatType.BAR_CHART)

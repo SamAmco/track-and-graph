@@ -33,6 +33,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
+import com.samco.trackandgraph.graphstatview.factories.viewdto.calculateStackedBarYExtents
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -204,15 +205,13 @@ class BarChartDataFactory @Inject constructor(
             // oldest but should be displayed from oldest to newest
             val dates = barDates.asReversed()
 
-            //The values are essentially a grid and we want the largest column sum
-            val maxY = (0 until (barValuesByLabel.values.firstOrNull()?.size ?: 0))
-                .maxOfOrNull { index -> barValuesByLabel.values.sumOf { it[index] } } ?: 0.0
-
-            //If maxY is 0, we want to show a range of 0 to 1
-            val maxYForRange = if (abs(maxY) < 0.0000001) 1.0 else maxY
+            // Positive and negative segments stack independently from zero, so the axis must cover
+            // both totals rather than their net sum.
+            val (minY, maxY) = calculateStackedBarYExtents(series)
+            val maxYForRange = if (abs(maxY - minY) < 0.0000001) 1.0 else maxY
 
             val yMax = if (yRangeType == YRangeType.FIXED) yTo else maxYForRange
-            return BarData(series, dates, 0.0, yMax)
+            return BarData(series, dates, minY, yMax)
         }
     }
 

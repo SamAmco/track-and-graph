@@ -153,6 +153,32 @@ class BarChartDataFactoryTest {
     }
 
     @Test
+    fun `mixed-sign stacks use separate positive and negative axis extents`() {
+        val end = ZonedDateTime.now().withHour(22)
+        val dataSample = DataSample.fromSequence(
+            listOf(
+                dp(end, value = -10.0, label = "outgoing"),
+                dp(end, value = 5.0, label = "incoming"),
+            ).asSequence(),
+        ) {}
+
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = defaultTimeHelper,
+            dataSample = dataSample,
+            endTime = end,
+            barSize = BarChartBarPeriod.DAY,
+            sampleSize = null,
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0,
+        )
+
+        assertEquals(-10.0, barData.yMin, 0.0001)
+        assertEquals(5.0, barData.yMax, 0.0001)
+    }
+
+    @Test
     fun `test bar chart, no label, end time, no duration`() {
         //PREPARE
         val end = ZonedDateTime.now().withHour(22)

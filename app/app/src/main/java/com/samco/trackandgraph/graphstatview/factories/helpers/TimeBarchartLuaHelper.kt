@@ -22,6 +22,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.BarChartSeries
+import com.samco.trackandgraph.graphstatview.factories.viewdto.calculateStackedBarYExtents
 import com.samco.trackandgraph.data.lua.dto.ColorSpec
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.TimeBar
@@ -48,14 +49,14 @@ class TimeBarchartLuaHelper @Inject constructor(
 
         val xDates = getXDates(endTime, lineGraphData.barDuration, bars.size)
 
-        val requestedYMax = lineGraphData.yMax
-            ?: lineGraphData.bars.maxOf { bar -> bar.segments.sumOf { it.value } }
+        val (dataYMin, dataYMax) = calculateStackedBarYExtents(barViewData)
+        val requestedYMax = lineGraphData.yMax ?: dataYMax
         // Pixel mapping cannot render a zero-length range. Match the regular bar-chart path by giving
         // all-zero Lua charts a useful default range.
-        val yMaxForRange = if (requestedYMax == 0.0) 1.0 else requestedYMax
+        val yMaxForRange = if (requestedYMax == dataYMin) 1.0 else requestedYMax
 
         val yAxisParameters = dataDisplayIntervalHelper.getYParameters(
-            yMin = 0.0,
+            yMin = dataYMin,
             yMax = yMaxForRange,
             isDurationBasedRange = lineGraphData.durationBasedRange,
             fixedBounds = lineGraphData.yMax != null

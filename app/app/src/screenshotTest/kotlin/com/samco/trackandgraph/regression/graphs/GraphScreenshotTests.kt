@@ -79,6 +79,9 @@ fun BarSingleBucket() = BarChartSnapshot(7)
 @PreviewTest @GraphPreview @Composable
 fun BarHundredSeriesLegend() = BarChartSnapshot(8)
 
+@PreviewTest @GraphPreview @Composable
+fun BarMixedSignStackedSegments() = BarChartSnapshot(9)
+
 @PreviewTest @GraphLocalesPreview @Composable
 fun HistogramHourWindow() = HistogramSnapshot(0)
 

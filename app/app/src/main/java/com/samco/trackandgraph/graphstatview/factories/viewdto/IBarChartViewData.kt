@@ -26,6 +26,23 @@ data class BarChartSeries(
     val color: ColorSpec,
 )
 
+internal fun calculateStackedBarYExtents(series: List<BarChartSeries>): Pair<Double, Double> {
+    val bucketCount = series.firstOrNull()?.values?.size ?: return 0.0 to 0.0
+    var minimum = 0.0
+    var maximum = 0.0
+    repeat(bucketCount) { bucket ->
+        var negativeTotal = 0.0
+        var positiveTotal = 0.0
+        series.forEach { bar ->
+            val value = bar.values[bucket]
+            if (value < 0.0) negativeTotal += value else positiveTotal += value
+        }
+        minimum = minOf(minimum, negativeTotal)
+        maximum = maxOf(maximum, positiveTotal)
+    }
+    return minimum to maximum
+}
+
 interface IBarChartViewData : IGraphStatViewData {
     /**
      * One x date for every bar in the list. Sorted from oldest to newest. You don't necessarily draw all of them on the x axis.

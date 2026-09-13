@@ -442,6 +442,34 @@ class LuaGraphDataFactoryTest {
     }
 
     @Test
+    fun `mixed-sign Lua stacks use separate positive and negative axis extents`() = runTest {
+        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TimeBarChartData(
+                    barDuration = Period.ofDays(1),
+                    endTime = ZonedDateTime.now(),
+                    durationBasedRange = false,
+                    bars = listOf(
+                        TimeBar(
+                            listOf(
+                                TimeBarSegment(-10.0, "outgoing"),
+                                TimeBarSegment(5.0, "incoming"),
+                            ),
+                        ),
+                    ),
+                    yMax = null,
+                ),
+            ),
+        )
+
+        val barChart = callGetViewData().wrapped as IBarChartViewData
+
+        assertEquals(-10.0, barChart.yMin)
+        assertEquals(5.0, barChart.yMax)
+        verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
     fun `bar chart with non-unique labels`() = runTest {
         whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
             LuaGraphResult(

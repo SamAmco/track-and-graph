@@ -42,6 +42,8 @@ Bar charts are drawn directly with Compose Canvas. `IBarChartViewData` exposes:
 
 Both `BarChartDataFactory` and `TimeBarchartLuaHelper` produce this same plain Kotlin contract. Keep them aligned when changing bar-chart behavior. In particular, Lua segments with the same label but different colors remain distinct series.
 
+For signed stacks, producers calculate Y extents by accumulating positive and negative segments separately in each bucket. Dynamic bounds must cover the largest positive stack and the smallest negative stack rather than their net sum; a configured maximum controls the positive side while the data-derived negative extent remains visible.
+
 `BarChartView` maps buckets onto a continuous edge coordinate range from `-0.5` through `lastIndex + 0.5`, leaving each integer at a bar center. It draws series as stacked rectangles and accumulates positive and negative values separately. The plot remains fixed to the producer-provided Y bounds. Renderer-neutral Canvas infrastructure holds shared X/Y tick models, rotated-label measurement, axis drawing, plot padding, stacked-bar drawing, and the whole-graph fade-in. Categorical label-spacing logic is renderer-neutral so bars and histograms share the same measured collision behavior.
 
 Graph height policy also belongs in `GraphStatUICommon.kt`. `graphHeightFor` applies the shared list height and full-screen multipliers for graphs with and without legends.
