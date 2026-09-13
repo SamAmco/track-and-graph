@@ -17,7 +17,9 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -40,9 +42,7 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -166,7 +166,6 @@ private fun LineGraphBodyView(
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = graphGridLineAlpha)
     val markerColor = MaterialTheme.colorScheme.error
     val density = LocalDensity.current
-    val inspectionMode = LocalInspectionMode.current
     val graphHeight = graphHeightFor(graphViewMode, hasLegend = true)
     val maximumXTickLabelWidth = if (isInteractive) {
         remember(graphXAxisLabelFormatForDuration(visibleSpan), xLabelText, textMeasurer, axisTextStyle) {
@@ -182,128 +181,37 @@ private fun LineGraphBodyView(
             }
         }
     } else null
-    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
-    var layout by remember(viewData) { mutableStateOf<LineGraphLayout?>(null) }
     var fullYViewport by remember(viewData) { mutableStateOf<LineGraphYViewport?>(null) }
     var requestedYViewport by remember(viewData) { mutableStateOf<LineGraphYViewport?>(null) }
     var displayedYViewport by remember(viewData) { mutableStateOf<LineGraphYViewport?>(null) }
     var verticalZoomCenter by remember(viewData) { mutableDoubleStateOf(0.0) }
     var yLayoutRevision by remember(viewData) { mutableIntStateOf(0) }
-    val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit> { panX, gestureZoom ->
-        val plotWidth = layout?.plotRect?.width ?: return@rememberUpdatedState
-        zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
-        val newHalfSpanFraction = 0.5 / zoom
-        centerFraction = (centerFraction - panX / plotWidth / zoom)
-            .coerceIn(newHalfSpanFraction, 1.0 - newHalfSpanFraction)
-    }
-    val startVerticalZoom = rememberUpdatedState {
-        val currentLayout = layout ?: return@rememberUpdatedState
-        val currentViewport = LineGraphYViewport(currentLayout.minY, currentLayout.maxY)
-        val center = visibleDataYCenter(
-            points = allPoints,
-            minX = visibleMinX,
-            maxX = visibleMaxX,
-            fallback = currentViewport.center,
-        )
-        verticalZoomCenter = center
-        displayedYViewport = currentViewport.centeredOn(center)
-    }
-    val updateVerticalZoom = rememberUpdatedState<(Float) -> Unit> { gestureZoom ->
-        val currentViewport = displayedYViewport ?: return@rememberUpdatedState
-        val completeViewport = fullYViewport ?: return@rememberUpdatedState
-        displayedYViewport = calculateLineGraphYViewport(
-            current = currentViewport,
-            complete = completeViewport,
-            center = verticalZoomCenter,
-            gestureZoom = gestureZoom.toDouble(),
-            minimumSpan = if (viewData.durationBasedRange) {
-                MINIMUM_DURATION_Y_VIEWPORT_SPAN_SECONDS
-            } else {
-                MINIMUM_NUMERIC_Y_VIEWPORT_SPAN
-            },
-        )
-    }
-    val finishVerticalZoom = rememberUpdatedState {
-        displayedYViewport?.let {
-            requestedYViewport = fullYViewport?.let { complete ->
-                settleLineGraphYViewport(it, complete)
-            } ?: it
-            yLayoutRevision++
-        }
-    }
-
-    LaunchedEffect(
-        canvasSize,
-        visibleMinX,
-        visibleMaxX,
-        lines,
-        viewData.durationBasedRange,
-        viewData.yRangeType,
-        viewData.fixedYMin,
-        viewData.fixedYMax,
-        requestedYViewport,
-        yLayoutRevision,
-        maximumXTickLabelWidth,
-        maximumStartXLabelWidth,
-        xLabelText,
-        axisTextStyle,
-    ) {
-        if (canvasSize == IntSize.Zero) return@LaunchedEffect
-        // Only the initial layout needs an empty/background frame before the reveal.
-        // Yielding every viewport update makes axis movement lag behind the gesture.
-        val startedAt = performanceLogger.startMeasurement()
-        layout = calculateLineGraphLayout(
-            width = canvasSize.width.toFloat(),
-            height = canvasSize.height.toFloat(),
-            visibleMinX = visibleMinX,
-            visibleMaxX = visibleMaxX,
-            points = allPoints,
-            durationBasedRange = viewData.durationBasedRange,
-            fixedYMin = viewData.fixedYMin.takeIf { viewData.yRangeType == YRangeType.FIXED },
-            fixedYMax = viewData.fixedYMax.takeIf { viewData.yRangeType == YRangeType.FIXED },
-            requestedYViewport = requestedYViewport,
-            maximumXTickLabelWidth = maximumXTickLabelWidth,
-            reservedStartXLabelWidth = maximumStartXLabelWidth,
-            xLabelText = xLabelText,
-            measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
-            density = density.density,
-        )
-        if (fullYViewport == null) {
-            layout?.let { fullYViewport = LineGraphYViewport(it.minY, it.maxY) }
-        }
-        if (requestedYViewport != null) displayedYViewport = null
-        performanceLogger.recordLayout(startedAt)
-    }
-    val reveal = rememberGraphReveal(viewData, layout != null)
-
-    Canvas(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
             .height(graphHeight)
-            .background(graphBackgroundColor)
-            .onSizeChanged { canvasSize = it }
-            .pointerInput(isInteractive, canvasSize, maximumZoom) {
-                if (!isInteractive) return@pointerInput
-                detectLineGraphPinchGestures(
-                    onHorizontalTransform = { panX, gestureZoom ->
-                        horizontalViewportTransform.value(panX, gestureZoom)
-                    },
-                    onVerticalStart = { startVerticalZoom.value() },
-                    onVerticalTransform = { gestureZoom -> updateVerticalZoom.value(gestureZoom) },
-                    onVerticalEnd = { finishVerticalZoom.value() },
-                )
-            }
-            .pointerInput(isInteractive, canvasSize, maximumZoom) {
-                if (!isInteractive) return@pointerInput
-                detectHorizontalDragGestures { _, dragAmount ->
-                    horizontalViewportTransform.value(dragAmount, 1f)
-                }
-            }
+            .background(graphBackgroundColor),
     ) {
-        val baseLayout = layout ?: (if (inspectionMode) {
+        val layout = remember(
+            constraints,
+            visibleMinX,
+            visibleMaxX,
+            lines,
+            viewData.durationBasedRange,
+            viewData.yRangeType,
+            viewData.fixedYMin,
+            viewData.fixedYMax,
+            requestedYViewport,
+            yLayoutRevision,
+            maximumXTickLabelWidth,
+            maximumStartXLabelWidth,
+            xLabelText,
+            axisTextStyle,
+        ) {
+            val startedAt = performanceLogger.startMeasurement()
             calculateLineGraphLayout(
-                width = size.width,
-                height = size.height,
+                width = constraints.maxWidth.toFloat(),
+                height = constraints.maxHeight.toFloat(),
                 visibleMinX = visibleMinX,
                 visibleMaxX = visibleMaxX,
                 points = allPoints,
@@ -316,84 +224,159 @@ private fun LineGraphBodyView(
                 xLabelText = xLabelText,
                 measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
                 density = density.density,
+            ).also { performanceLogger.recordLayout(startedAt) }
+        }
+        LaunchedEffect(layout) {
+            if (fullYViewport == null) {
+                layout?.let { fullYViewport = LineGraphYViewport(it.minY, it.maxY) }
+            }
+            if (requestedYViewport != null) displayedYViewport = null
+        }
+        val reveal = rememberGraphReveal(viewData, layout != null)
+        val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit> { panX, gestureZoom ->
+            val plotWidth = layout?.plotRect?.width ?: return@rememberUpdatedState
+            zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
+            val newHalfSpanFraction = 0.5 / zoom
+            centerFraction = (centerFraction - panX / plotWidth / zoom)
+                .coerceIn(newHalfSpanFraction, 1.0 - newHalfSpanFraction)
+        }
+        val startVerticalZoom = rememberUpdatedState {
+            val currentLayout = layout ?: return@rememberUpdatedState
+            val currentViewport = LineGraphYViewport(currentLayout.minY, currentLayout.maxY)
+            val center = visibleDataYCenter(
+                points = allPoints,
+                minX = visibleMinX,
+                maxX = visibleMaxX,
+                fallback = currentViewport.center,
             )
-        } else null) ?: return@Canvas
-        val currentLayout = displayedYViewport?.let { viewport ->
-            baseLayout.copy(minY = viewport.minY, maxY = viewport.maxY)
-        } ?: baseLayout
-        val drawStartedAt = performanceLogger.startMeasurement()
-        var visiblePointCount = 0
-        val plot = currentLayout.plotRect
-        val graphAlpha = reveal.value
-        drawGraphAxes(
-            plot = plot,
-            xTicks = currentLayout.xTicks,
-            yTicks = currentLayout.yTicks,
-            xToPixel = currentLayout::xToPixel,
-            yToPixel = currentLayout::yToPixel,
-            textMeasurer = textMeasurer,
-            axisTextStyle = axisTextStyle,
-            gridColor = gridColor,
-            alpha = graphAlpha,
-        )
+            verticalZoomCenter = center
+            displayedYViewport = currentViewport.centeredOn(center)
+        }
+        val updateVerticalZoom = rememberUpdatedState<(Float) -> Unit> { gestureZoom ->
+            val currentViewport = displayedYViewport ?: return@rememberUpdatedState
+            val completeViewport = fullYViewport ?: return@rememberUpdatedState
+            displayedYViewport = calculateLineGraphYViewport(
+                current = currentViewport,
+                complete = completeViewport,
+                center = verticalZoomCenter,
+                gestureZoom = gestureZoom.toDouble(),
+                minimumSpan = if (viewData.durationBasedRange) {
+                    MINIMUM_DURATION_Y_VIEWPORT_SPAN_SECONDS
+                } else {
+                    MINIMUM_NUMERIC_Y_VIEWPORT_SPAN
+                },
+            )
+        }
+        val finishVerticalZoom = rememberUpdatedState {
+            displayedYViewport?.let {
+                requestedYViewport = fullYViewport?.let { complete ->
+                    settleLineGraphYViewport(it, complete)
+                } ?: it
+                yLayoutRevision++
+            }
+        }
 
-        clipRect(plot.left, plot.top, plot.right, plot.bottom) {
-            timeMarker?.toInstant()?.toEpochMilli()?.let { markerMillis ->
-                if (markerMillis in visibleMinX..visibleMaxX) {
-                    val markerX = currentLayout.xToPixel(markerMillis)
-                    drawLine(
-                        markerColor.copy(alpha = graphAlpha),
-                        Offset(markerX, plot.top),
-                        Offset(markerX, plot.bottom),
-                        timeMarkerWidth.toPx(),
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(isInteractive, constraints, maximumZoom) {
+                    if (!isInteractive) return@pointerInput
+                    detectLineGraphPinchGestures(
+                        onHorizontalTransform = { panX, gestureZoom ->
+                            horizontalViewportTransform.value(panX, gestureZoom)
+                        },
+                        onVerticalStart = { startVerticalZoom.value() },
+                        onVerticalTransform = { gestureZoom -> updateVerticalZoom.value(gestureZoom) },
+                        onVerticalEnd = { finishVerticalZoom.value() },
                     )
                 }
-            }
-
-            lines.forEach { line ->
-                val visiblePoints = pointsForViewport(line.points, visibleMinX, visibleMaxX)
-                if (visiblePoints.isEmpty()) return@forEach
-                visiblePointCount += visiblePoints.size
-                val color = getColor(line.color).copy(alpha = graphAlpha)
-                if (line.pointStyle != LineGraphPointStyle.CIRCLES_ONLY && visiblePoints.size >= 2) {
-                    val path = Path()
-                    visiblePoints.forEachIndexed { index, point ->
-                        val pointOffset = currentLayout.toPixel(point)
-                        if (index == 0) path.moveTo(pointOffset.x, pointOffset.y)
-                        else path.lineTo(pointOffset.x, pointOffset.y)
+                .pointerInput(isInteractive, constraints, maximumZoom) {
+                    if (!isInteractive) return@pointerInput
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        horizontalViewportTransform.value(dragAmount, 1f)
                     }
-                    drawPath(path, color, style = androidx.compose.ui.graphics.drawscope.Stroke(
-                        width = lineWidth.toPx(), cap = StrokeCap.Round,
-                    ))
+                },
+        ) {
+            val baseLayout = layout ?: return@Canvas
+            val currentLayout = displayedYViewport?.let { viewport ->
+                baseLayout.copy(minY = viewport.minY, maxY = viewport.maxY)
+            } ?: baseLayout
+            val drawStartedAt = performanceLogger.startMeasurement()
+            var visiblePointCount = 0
+            val plot = currentLayout.plotRect
+            val graphAlpha = reveal.value
+            drawGraphAxes(
+                plot = plot,
+                xTicks = currentLayout.xTicks,
+                yTicks = currentLayout.yTicks,
+                xToPixel = currentLayout::xToPixel,
+                yToPixel = currentLayout::yToPixel,
+                textMeasurer = textMeasurer,
+                axisTextStyle = axisTextStyle,
+                gridColor = gridColor,
+                alpha = graphAlpha,
+            )
+
+            clipRect(plot.left, plot.top, plot.right, plot.bottom) {
+                timeMarker?.toInstant()?.toEpochMilli()?.let { markerMillis ->
+                    if (markerMillis in visibleMinX..visibleMaxX) {
+                        val markerX = currentLayout.xToPixel(markerMillis)
+                        drawLine(
+                            markerColor.copy(alpha = graphAlpha),
+                            Offset(markerX, plot.top),
+                            Offset(markerX, plot.bottom),
+                            timeMarkerWidth.toPx(),
+                        )
+                    }
                 }
-                if (line.pointStyle != LineGraphPointStyle.NONE) {
-                    visiblePoints.forEach { point ->
-                        val pointOffset = currentLayout.toPixel(point)
-                        drawCircle(color, vertexWidth.toPx() / 2f, pointOffset)
-                        if (line.pointStyle == LineGraphPointStyle.CIRCLES_AND_NUMBERS) {
-                            val label = formatLineGraphNumber(point.value)
-                            val measured = textMeasurer.measure(label, pointTextStyle)
-                            drawText(
-                                textMeasurer,
-                                label,
-                                Offset(
-                                    pointOffset.x - measured.size.width - pointLabelPadding.toPx(),
-                                    pointOffset.y - measured.size.height,
-                                ),
-                                pointTextStyle.copy(color = pointTextStyle.color.copy(alpha = graphAlpha)),
-                            )
+
+                lines.forEach { line ->
+                    val visiblePoints = pointsForViewport(line.points, visibleMinX, visibleMaxX)
+                    if (visiblePoints.isEmpty()) return@forEach
+                    visiblePointCount += visiblePoints.size
+                    val color = getColor(line.color).copy(alpha = graphAlpha)
+                    if (line.pointStyle != LineGraphPointStyle.CIRCLES_ONLY && visiblePoints.size >= 2) {
+                        val path = Path()
+                        visiblePoints.forEachIndexed { index, point ->
+                            val pointOffset = currentLayout.toPixel(point)
+                            if (index == 0) path.moveTo(pointOffset.x, pointOffset.y)
+                            else path.lineTo(pointOffset.x, pointOffset.y)
+                        }
+                        drawPath(path, color, style = androidx.compose.ui.graphics.drawscope.Stroke(
+                            width = lineWidth.toPx(), cap = StrokeCap.Round,
+                        ))
+                    }
+                    if (line.pointStyle != LineGraphPointStyle.NONE) {
+                        visiblePoints.forEach { point ->
+                            val pointOffset = currentLayout.toPixel(point)
+                            drawCircle(color, vertexWidth.toPx() / 2f, pointOffset)
+                            if (line.pointStyle == LineGraphPointStyle.CIRCLES_AND_NUMBERS) {
+                                val label = formatLineGraphNumber(point.value)
+                                val measured = textMeasurer.measure(label, pointTextStyle)
+                                drawText(
+                                    textMeasurer,
+                                    label,
+                                    Offset(
+                                        pointOffset.x - measured.size.width - pointLabelPadding.toPx(),
+                                        pointOffset.y - measured.size.height,
+                                    ),
+                                    pointTextStyle.copy(
+                                        color = pointTextStyle.color.copy(alpha = graphAlpha)
+                                    ),
+                                )
+                            }
                         }
                     }
                 }
             }
+            performanceLogger.recordFirstDraw(
+                startedAt = drawStartedAt,
+                visiblePointCount = visiblePointCount,
+                lineCount = lines.size,
+                xTickCount = currentLayout.xTicks.size,
+                yTickCount = currentLayout.yTicks.size,
+            )
         }
-        performanceLogger.recordFirstDraw(
-            startedAt = drawStartedAt,
-            visiblePointCount = visiblePointCount,
-            lineCount = lines.size,
-            xTickCount = currentLayout.xTicks.size,
-            yTickCount = currentLayout.yTicks.size,
-        )
     }
 
     GraphLegend(

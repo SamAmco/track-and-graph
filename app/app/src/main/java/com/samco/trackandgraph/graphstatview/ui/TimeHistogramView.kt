@@ -20,14 +20,15 @@ package com.samco.trackandgraph.graphstatview.ui
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -36,9 +37,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.drawText
@@ -112,7 +111,6 @@ private fun TimeHistogramBodyView(
     graphViewMode: GraphViewMode,
     graphBackgroundColor: Color,
 ) = Column(modifier = modifier) {
-    val inspectionMode = LocalInspectionMode.current
     val hasLegend = barValues.size > 1
     val noLabel = stringResource(R.string.no_label)
     val labelText = TimeHistogramLabelText(
@@ -135,7 +133,6 @@ private fun TimeHistogramBodyView(
     val borderColor = MaterialTheme.colorScheme.onSurface
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
-    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     val isInteractive = graphViewMode is GraphViewMode.FullScreenMode
     var zoom by remember(window) { mutableDoubleStateOf(1.0) }
     var centerFraction by remember(window) { mutableDoubleStateOf(0.5) }
@@ -145,63 +142,26 @@ private fun TimeHistogramBodyView(
         zoom = zoom,
         centerFraction = centerFraction,
     )
-    val layout = remember(
-        canvasSize,
-        bucketLabels,
-        axisTitle,
-        viewport,
-        maxDisplayHeight,
-        textMeasurer,
-        axisTextStyle,
-        axisTitleTextStyle,
-        density,
-    ) {
-        if (canvasSize == IntSize.Zero) null else calculateTimeHistogramLayout(
-            width = canvasSize.width.toFloat(),
-            height = canvasSize.height.toFloat(),
-            bucketLabels = bucketLabels,
-            viewport = viewport,
-            axisTitle = axisTitle,
-            maxY = maxDisplayHeight,
-            measureAxisText = { text -> textMeasurer.measure(text, axisTextStyle).size },
-            measureTitleText = { text -> textMeasurer.measure(text, axisTitleTextStyle).size },
-            density = density.density,
-        )
-    }
-    val reveal = rememberGraphReveal(window to barValues, layout != null)
-    val currentLayout = rememberUpdatedState(layout)
-    val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit> { panX, gestureZoom ->
-        currentLayout.value?.plotRect?.width?.let { plotWidth ->
-            zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
-            val halfSpanFraction = 0.5 / zoom
-            centerFraction = (centerFraction - panX / plotWidth / zoom)
-                .coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
-        }
-    }
-
-    Canvas(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
             .height(graphHeightFor(graphViewMode, hasLegend))
-            .background(graphBackgroundColor)
-            .onSizeChanged { canvasSize = it }
-            .pointerInput(isInteractive, maximumZoom) {
-                if (!isInteractive) return@pointerInput
-                detectHorizontalGraphPinchGestures { panX, gestureZoom ->
-                    horizontalViewportTransform.value(panX, gestureZoom)
-                }
-            }
-            .pointerInput(isInteractive, maximumZoom) {
-                if (!isInteractive) return@pointerInput
-                detectHorizontalDragGestures { _, dragAmount ->
-                    horizontalViewportTransform.value(dragAmount, 1f)
-                }
-            },
+            .background(graphBackgroundColor),
     ) {
-        val histogramLayout = layout ?: (if (inspectionMode) {
+        val layout = remember(
+            constraints,
+            bucketLabels,
+            axisTitle,
+            viewport,
+            maxDisplayHeight,
+            textMeasurer,
+            axisTextStyle,
+            axisTitleTextStyle,
+            density,
+        ) {
             calculateTimeHistogramLayout(
-                width = size.width,
-                height = size.height,
+                width = constraints.maxWidth.toFloat(),
+                height = constraints.maxHeight.toFloat(),
                 bucketLabels = bucketLabels,
                 viewport = viewport,
                 axisTitle = axisTitle,
@@ -210,46 +170,75 @@ private fun TimeHistogramBodyView(
                 measureTitleText = { text -> textMeasurer.measure(text, axisTitleTextStyle).size },
                 density = density.density,
             )
-        } else null) ?: return@Canvas
-        val alpha = reveal.value
-        drawGraphAxes(
-            plot = histogramLayout.plotRect,
-            xTicks = histogramLayout.xTicks,
-            yTicks = histogramLayout.yTicks,
-            xToPixel = histogramLayout::xToPixel,
-            yToPixel = histogramLayout::yToPixel,
-            textMeasurer = textMeasurer,
-            axisTextStyle = axisTextStyle,
-            gridColor = gridColor,
-            alpha = alpha,
-        )
-        val firstBar = ceil(histogramLayout.minX - 0.5).toInt().coerceAtLeast(0)
-        val lastBar = floor(histogramLayout.maxX + 0.5).toInt().coerceAtMost(bucketLabels.lastIndex)
-        if (firstBar <= lastBar) {
-            drawStackedGraphBars(
+        }
+        val reveal = rememberGraphReveal(window to barValues, layout != null)
+        val currentLayout = rememberUpdatedState(layout)
+        val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit> { panX, gestureZoom ->
+            currentLayout.value?.plotRect?.width?.let { plotWidth ->
+                zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
+                val halfSpanFraction = 0.5 / zoom
+                centerFraction = (centerFraction - panX / plotWidth / zoom)
+                    .coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
+            }
+        }
+
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(isInteractive, maximumZoom) {
+                    if (!isInteractive) return@pointerInput
+                    detectHorizontalGraphPinchGestures { panX, gestureZoom ->
+                        horizontalViewportTransform.value(panX, gestureZoom)
+                    }
+                }
+                .pointerInput(isInteractive, maximumZoom) {
+                    if (!isInteractive) return@pointerInput
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        horizontalViewportTransform.value(dragAmount, 1f)
+                    }
+                },
+        ) {
+            val histogramLayout = layout ?: return@Canvas
+            val alpha = reveal.value
+            drawGraphAxes(
                 plot = histogramLayout.plotRect,
-                bucketRange = firstBar..lastBar,
-                valuesBySeries = seriesValues,
-                colors = colors,
+                xTicks = histogramLayout.xTicks,
+                yTicks = histogramLayout.yTicks,
                 xToPixel = histogramLayout::xToPixel,
                 yToPixel = histogramLayout::yToPixel,
+                textMeasurer = textMeasurer,
+                axisTextStyle = axisTextStyle,
+                gridColor = gridColor,
                 alpha = alpha,
-                borderColor = borderColor,
-                drawBorders = true,
+            )
+            val firstBar = ceil(histogramLayout.minX - 0.5).toInt().coerceAtLeast(0)
+            val lastBar = floor(histogramLayout.maxX + 0.5).toInt().coerceAtMost(bucketLabels.lastIndex)
+            if (firstBar <= lastBar) {
+                drawStackedGraphBars(
+                    plot = histogramLayout.plotRect,
+                    bucketRange = firstBar..lastBar,
+                    valuesBySeries = seriesValues,
+                    colors = colors,
+                    xToPixel = histogramLayout::xToPixel,
+                    yToPixel = histogramLayout::yToPixel,
+                    alpha = alpha,
+                    borderColor = borderColor,
+                    drawBorders = true,
+                )
+            }
+            val titleSize = textMeasurer.measure(axisTitle, axisTitleTextStyle)
+            drawText(
+                textMeasurer = textMeasurer,
+                text = axisTitle,
+                style = axisTitleTextStyle.copy(
+                    color = axisTitleTextStyle.color.copy(alpha = alpha),
+                ),
+                topLeft = Offset(
+                    histogramLayout.plotRect.center.x - titleSize.size.width / 2f,
+                    histogramLayout.axisTitleTop,
+                ),
             )
         }
-        val titleSize = textMeasurer.measure(axisTitle, axisTitleTextStyle)
-        drawText(
-            textMeasurer = textMeasurer,
-            text = axisTitle,
-            style = axisTitleTextStyle.copy(
-                color = axisTitleTextStyle.color.copy(alpha = alpha),
-            ),
-            topLeft = Offset(
-                histogramLayout.plotRect.center.x - titleSize.size.width / 2f,
-                histogramLayout.axisTitleTop,
-            ),
-        )
     }
 
     DialogInputSpacing()

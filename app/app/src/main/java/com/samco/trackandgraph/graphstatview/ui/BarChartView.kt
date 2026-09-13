@@ -34,9 +34,11 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -64,11 +66,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -350,7 +350,6 @@ private fun BarChartBodyView(
     graphBackgroundColor: Color,
 ) {
     Column(modifier = modifier) {
-        val inspectionMode = LocalInspectionMode.current
         val hasLegend = bars.size > 1
         val noLabel = stringResource(R.string.no_label)
         val isInteractive = !listMode
@@ -378,82 +377,30 @@ private fun BarChartBodyView(
         val barColors = bars.map { getColor(it.color) }
         val barSeriesValues = remember(bars) { bars.map { it.values } }
         val borderColor = MaterialTheme.colorScheme.onSurface
-        var canvasSize by remember { mutableStateOf(IntSize.Zero) }
-        val layout = remember(
-            canvasSize,
-            viewport,
-            xDates,
-            durationBasedRange,
-            yMin,
-            yMax,
-            yAxisSubdivides,
-            xLabelText,
-            textMeasurer,
-            axisTextStyle,
-            density,
-        ) {
-            if (canvasSize == IntSize.Zero) null else calculateBarChartLayout(
-                width = canvasSize.width.toFloat(),
-                height = canvasSize.height.toFloat(),
-                xDates = xDates,
-                viewport = viewport,
-                yMin = yMin,
-                yMax = yMax,
-                yAxisSubdivides = yAxisSubdivides,
-                durationBasedRange = durationBasedRange,
-                xLabelText = xLabelText,
-                measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
-                density = density.density,
-            )
-        }
-        val reveal = rememberGraphReveal(xDates to bars, layout != null)
-        val currentLayout = rememberUpdatedState(layout)
-        val currentHighlightedIndex = rememberUpdatedState(highlightedIndex)
-        val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit>(
-            newValue = { panX, gestureZoom ->
-                currentLayout.value?.plotRect?.width?.let { plotWidth ->
-                    zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
-                    val halfSpanFraction = 0.5 / zoom
-                    centerFraction = (centerFraction - panX / plotWidth / zoom)
-                        .coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
-                }
-            },
-        )
         val graphHeight = graphHeightFor(graphViewMode, hasLegend)
 
-        Canvas(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(graphHeight)
-                .background(graphBackgroundColor)
-                .onSizeChanged { canvasSize = it }
-                .pointerInput(isInteractive) {
-                    if (!isInteractive) return@pointerInput
-                    detectTapGestures { offset ->
-                        currentLayout.value?.barIndexAt(offset)?.let { index ->
-                            onHighlightedIndexChanged(
-                                index.takeUnless { it == currentHighlightedIndex.value }
-                            )
-                        }
-                    }
-                }
-                .pointerInput(isInteractive, maximumZoom) {
-                    if (!isInteractive) return@pointerInput
-                    detectHorizontalGraphPinchGestures { panX, gestureZoom ->
-                        horizontalViewportTransform.value(panX, gestureZoom)
-                    }
-                }
-                .pointerInput(isInteractive, maximumZoom) {
-                    if (!isInteractive) return@pointerInput
-                    detectHorizontalDragGestures { _, dragAmount ->
-                        horizontalViewportTransform.value(dragAmount, 1f)
-                    }
-                },
+                .background(graphBackgroundColor),
         ) {
-            val chartLayout = layout ?: (if (inspectionMode) {
+            val layout = remember(
+                constraints,
+                viewport,
+                xDates,
+                durationBasedRange,
+                yMin,
+                yMax,
+                yAxisSubdivides,
+                xLabelText,
+                textMeasurer,
+                axisTextStyle,
+                density,
+            ) {
                 calculateBarChartLayout(
-                    width = size.width,
-                    height = size.height,
+                    width = constraints.maxWidth.toFloat(),
+                    height = constraints.maxHeight.toFloat(),
                     xDates = xDates,
                     viewport = viewport,
                     yMin = yMin,
@@ -464,36 +411,78 @@ private fun BarChartBodyView(
                     measureText = { text -> textMeasurer.measure(text, axisTextStyle).size },
                     density = density.density,
                 )
-            } else null) ?: return@Canvas
-            val plot = chartLayout.plotRect
-            val alpha = reveal.value
-            drawGraphAxes(
-                plot = plot,
-                xTicks = chartLayout.xTicks,
-                yTicks = chartLayout.yTicks,
-                xToPixel = chartLayout::xToPixel,
-                yToPixel = chartLayout::yToPixel,
-                textMeasurer = textMeasurer,
-                axisTextStyle = axisTextStyle,
-                gridColor = gridColor,
-                alpha = alpha,
+            }
+            val reveal = rememberGraphReveal(xDates to bars, layout != null)
+            val currentLayout = rememberUpdatedState(layout)
+            val currentHighlightedIndex = rememberUpdatedState(highlightedIndex)
+            val horizontalViewportTransform = rememberUpdatedState<(Float, Float) -> Unit>(
+                newValue = { panX, gestureZoom ->
+                    currentLayout.value?.plotRect?.width?.let { plotWidth ->
+                        zoom = (zoom * gestureZoom).coerceIn(1.0, maximumZoom)
+                        val halfSpanFraction = 0.5 / zoom
+                        centerFraction = (centerFraction - panX / plotWidth / zoom)
+                            .coerceIn(halfSpanFraction, 1.0 - halfSpanFraction)
+                    }
+                },
             )
-            val firstBar = ceil(chartLayout.minX - 0.5).toInt().coerceAtLeast(0)
-            val lastBar = floor(chartLayout.maxX + 0.5).toInt().coerceAtMost(xDates.lastIndex)
-            if (firstBar <= lastBar) {
-                drawStackedGraphBars(
+
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(isInteractive) {
+                        if (!isInteractive) return@pointerInput
+                        detectTapGestures { offset ->
+                            currentLayout.value?.barIndexAt(offset)?.let { index ->
+                                onHighlightedIndexChanged(
+                                    index.takeUnless { it == currentHighlightedIndex.value }
+                                )
+                            }
+                        }
+                    }
+                    .pointerInput(isInteractive, maximumZoom) {
+                        if (!isInteractive) return@pointerInput
+                        detectHorizontalGraphPinchGestures { panX, gestureZoom ->
+                            horizontalViewportTransform.value(panX, gestureZoom)
+                        }
+                    }
+                    .pointerInput(isInteractive, maximumZoom) {
+                        if (!isInteractive) return@pointerInput
+                        detectHorizontalDragGestures { _, dragAmount ->
+                            horizontalViewportTransform.value(dragAmount, 1f)
+                        }
+                    },
+            ) {
+                val chartLayout = layout ?: return@Canvas
+                val plot = chartLayout.plotRect
+                val alpha = reveal.value
+                drawGraphAxes(
                     plot = plot,
-                    bucketRange = firstBar..lastBar,
-                    valuesBySeries = barSeriesValues,
-                    colors = barColors,
+                    xTicks = chartLayout.xTicks,
+                    yTicks = chartLayout.yTicks,
                     xToPixel = chartLayout::xToPixel,
                     yToPixel = chartLayout::yToPixel,
+                    textMeasurer = textMeasurer,
+                    axisTextStyle = axisTextStyle,
+                    gridColor = gridColor,
                     alpha = alpha,
-                    borderColor = borderColor,
-                    drawBorders = xDates.size < 60,
-                    highlightedBucket = highlightedIndex,
-                    highlightColor = highlightColor,
                 )
+                val firstBar = ceil(chartLayout.minX - 0.5).toInt().coerceAtLeast(0)
+                val lastBar = floor(chartLayout.maxX + 0.5).toInt().coerceAtMost(xDates.lastIndex)
+                if (firstBar <= lastBar) {
+                    drawStackedGraphBars(
+                        plot = plot,
+                        bucketRange = firstBar..lastBar,
+                        valuesBySeries = barSeriesValues,
+                        colors = barColors,
+                        xToPixel = chartLayout::xToPixel,
+                        yToPixel = chartLayout::yToPixel,
+                        alpha = alpha,
+                        borderColor = borderColor,
+                        drawBorders = xDates.size < 60,
+                        highlightedBucket = highlightedIndex,
+                        highlightColor = highlightColor,
+                    )
+                }
             }
         }
 
