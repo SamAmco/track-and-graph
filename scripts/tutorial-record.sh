@@ -6,7 +6,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-REFERENCE_DIR="$ROOT_DIR/app/app/src/screenshotTestDebug/reference"
+REFERENCE_DIR="$ROOT_DIR/app/app/src/screenshotTestPlayStoreDebug/reference"
 
 cd "$ROOT_DIR"
 
@@ -24,7 +24,7 @@ fi
 
 echo "==> Rendering Compose tutorial previews"
 rm -rf "$REFERENCE_DIR"
-(cd "$ROOT_DIR/app" && ./gradlew :app:updateDebugScreenshotTest --rerun-tasks)
+(cd "$ROOT_DIR/app" && ./gradlew :app:updatePlayStoreDebugScreenshotTest --rerun-tasks)
 
 echo "==> Converting rendered tutorial screenshots to density buckets"
 mkdir -p app/app/src/main/res/drawable-mdpi
