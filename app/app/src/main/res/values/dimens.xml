@@ -17,5 +17,4 @@
 <resources>
     <dimen name="card_margin_small">4dp</dimen>
     <dimen name="card_corner_radius">4dp</dimen>
-    <dimen name="graph_height">220dp</dimen>
 </resources>

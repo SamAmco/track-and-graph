@@ -36,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -52,6 +51,7 @@ import com.samco.trackandgraph.ui.dataVisColorList
 
 private const val GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER = 0.8f
 private const val GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER = 0.9f
+private val listModeGraphHeight = 220.dp
 
 internal const val graphGridLineAlpha = 0.25f
 internal const val graphXAxisLabelAngle = -28f
@@ -67,7 +67,7 @@ fun graphHeightFor(
     graphViewMode: GraphViewMode,
     hasLegend: Boolean,
 ): Dp = when (graphViewMode) {
-    GraphViewMode.ListMode -> dimensionResource(R.dimen.graph_height)
+    GraphViewMode.ListMode -> listModeGraphHeight
     is GraphViewMode.FullScreenMode -> with(LocalDensity.current) {
         (graphViewMode.availableHeight * graphHeightMultiplier(hasLegend)).toDp()
     }
