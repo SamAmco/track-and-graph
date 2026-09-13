@@ -175,6 +175,23 @@ class PieChartDataFactoryTest {
     }
 
     @Test
+    fun `non-finite segment sizes return a specific graph error`() = runTest {
+        val dataSample = DataSample.fromSequence(
+            sequenceOf(dataPoint(Double.NaN, "invalid")),
+        ) {}
+        whenever(dataSampler.getDataSampleForFeatureId(featureId, null)).thenReturn(dataSample)
+        whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(pieChart)
+
+        val data = uut.getViewData(graphOrStat)
+
+        assertEquals(IGraphStatViewData.State.ERROR, data.state)
+        assertEquals(
+            R.string.graph_non_finite_data_error,
+            (data.error as GraphStatInitException).errorTextId,
+        )
+    }
+
+    @Test
     fun `test does not filter empty labels`() = runTest {
         //PREPARE
         val dataSample = DataSample.fromSequence(

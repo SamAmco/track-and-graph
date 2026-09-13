@@ -17,10 +17,13 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.data.sampling.DataSample
+import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.helpers.validateFiniteGraphValues
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -99,8 +102,14 @@ class TimeHistogramDataHelper(
         addFunction: (IDataPoint, MutableMap<String, MutableList<Double>>, Int) -> Unit
     ): Map<String, List<Double>> {
         val binTotalMaps = calculateBinTotals(sample, window, endTime, addFunction)
+        val rawBinValues = binTotalMaps.asSequence().flatMap { it.value.asSequence() }.asIterable()
+        validateFiniteGraphValues(rawBinValues)?.let { throw it }
+        if (rawBinValues.any { it > 0.0 } && rawBinValues.any { it < 0.0 }) {
+            throw GraphStatInitException(R.string.histogram_mixed_signs_error)
+        }
         val total = binTotalMaps.map { it.value.sum() }.sum()
-        if (!total.isFinite() || kotlin.math.abs(total) < 1e-12) {
+        validateFiniteGraphValues(listOf(total))?.let { throw it }
+        if (kotlin.math.abs(total) < 1e-12) {
             return binTotalMaps.mapValues { (_, bins) -> List(bins.size) { 0.0 } }
         }
         return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { (it / total) * 100.0 } }.toMap()

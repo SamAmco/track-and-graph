@@ -46,6 +46,9 @@ class TimeBarchartLuaHelper @Inject constructor(
         } catch (t: Throwable) {
             return errorProcessingBarViewData(t, graphOrStat)
         }
+        validateBarChartSeries(barViewData, bars.size)?.let {
+            return errorProcessingBarViewData(it, graphOrStat)
+        }
 
         val xDates = getXDates(endTime, lineGraphData.barDuration, bars.size)
 
@@ -54,6 +57,9 @@ class TimeBarchartLuaHelper @Inject constructor(
         // Pixel mapping cannot render a zero-length range. Match the regular bar-chart path by giving
         // all-zero Lua charts a useful default range.
         val yMaxForRange = if (requestedYMax == dataYMin) 1.0 else requestedYMax
+        validateGraphYRange(dataYMin, yMaxForRange)?.let {
+            return errorProcessingBarViewData(it, graphOrStat)
+        }
 
         val yAxisParameters = dataDisplayIntervalHelper.getYParameters(
             yMin = dataYMin,

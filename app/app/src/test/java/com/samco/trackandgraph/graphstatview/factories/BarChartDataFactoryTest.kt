@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.BarChart
 import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.data.database.dto.DataPoint
@@ -27,6 +28,8 @@ import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.data.sampling.DataSampler
+import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.aggregation.GlobalAggregationPreferences
@@ -112,6 +115,38 @@ class BarChartDataFactoryTest {
         assertEquals(1, viewData.bars.size)
         assertEquals(1.5, viewData.yMax, 0.0001)
         assertEquals(true, dataSampledCalled)
+    }
+
+    @Test
+    fun `non-finite bar values return a specific graph error`() = runTest {
+        val end = ZonedDateTime.now().withHour(22)
+        val dataSample = DataSample.fromSequence(
+            sequenceOf(dp(end, value = Double.NaN)),
+        ) {}
+        whenever(dataSampler.getDataSampleForFeatureId(1L, null)).thenReturn(dataSample)
+
+        val viewData = uut().getViewData(
+            graphOrStat = dummyGraphOrStat(),
+            config = BarChart(
+                id = 1,
+                graphStatId = 1,
+                featureId = 1,
+                endDate = GraphEndDate.Latest,
+                sampleSize = null,
+                yRangeType = YRangeType.DYNAMIC,
+                yTo = 0.0,
+                scale = 1.0,
+                barPeriod = BarChartBarPeriod.DAY,
+                sumByCount = false,
+            ),
+            onDataSampled = {},
+        )
+
+        assertEquals(IGraphStatViewData.State.ERROR, viewData.state)
+        assertEquals(
+            R.string.graph_non_finite_data_error,
+            (viewData.error as GraphStatInitException).errorTextId,
+        )
     }
 
     @Test

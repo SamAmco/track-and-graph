@@ -29,6 +29,8 @@ import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.validateBarChartSeries
+import com.samco.trackandgraph.graphstatview.factories.helpers.validateGraphYRange
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -254,6 +256,8 @@ class BarChartDataFactory @Inject constructor(
             scale = config.scale,
             checkCancellation = { coroutineContext.ensureActive() },
         )
+        validateBarChartSeries(barData.series, barData.dates.size)?.let { throw it }
+        validateGraphYRange(barData.yMin, barData.yMax)?.let { throw it }
 
         val yAxisParameters = dataDisplayIntervalHelper.getYParameters(
             barData.yMin,

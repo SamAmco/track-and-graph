@@ -28,6 +28,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.helpers.validateGraphSeries
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
@@ -67,6 +68,10 @@ class TimeHistogramDataFactory @Inject constructor(
             dataSample = dataSampler.getDataSampleForFeatureId(config.featureId)
             val barValues =
                 getBarValues(dataSample, config, onDataSampled, timeHistogramDataHelper)
+            val window = TimeHistogramWindowData.getWindowData(config.window)
+            barValues?.let { values ->
+                validateGraphSeries(values.map { it.values }, window.numBins)?.let { throw it }
+            }
             val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.map { it.values })
             val maxDisplayHeight = largestBin?.let {
                 min(
@@ -78,7 +83,7 @@ class TimeHistogramDataFactory @Inject constructor(
             object : ITimeHistogramViewData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
-                override val window = TimeHistogramWindowData.getWindowData(config.window)
+                override val window = window
                 override val barValues = barValues
                 override val maxDisplayHeight = maxDisplayHeight
                 override val firstDayOfWeek = timeHelper.aggregationPreferences.firstDayOfWeek

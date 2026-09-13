@@ -31,16 +31,19 @@ class PieChartLuaHelper @Inject constructor() {
         pieChartData: LuaGraphResultData.PieChartData,
         graphOrStat: GraphOrStat,
     ): ILuaGraphViewData {
-        validatePieChartSegmentSigns(
+        val total = pieChartData.segments?.sumOf { it.value }
+        validatePieChartSegments(
             pieChartData.segments.orEmpty().map { it.value },
         )?.let { return errorViewData(graphOrStat, it) }
+        total?.let { validateFiniteGraphValues(listOf(it)) }
+            ?.let { return errorViewData(graphOrStat, it) }
 
         return object : ILuaGraphViewData {
             override val wrapped: IGraphStatViewData = object : IPieChartViewData {
                 override val segments: List<IPieChartViewData.Segment>? =
                     pieChartData.segments?.let { segments ->
-                        val total = segments.sumOf { segment -> segment.value }
-                        val scale = 100 / total
+                        if (total == 0.0) return@let null
+                        val scale = 100 / requireNotNull(total)
                         return@let segments.map { it.toPieChartSegment(scale) }
                     }
                 override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY

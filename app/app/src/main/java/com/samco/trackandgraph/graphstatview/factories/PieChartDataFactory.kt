@@ -28,7 +28,8 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
-import com.samco.trackandgraph.graphstatview.factories.helpers.validatePieChartSegmentSigns
+import com.samco.trackandgraph.graphstatview.factories.helpers.validateFiniteGraphValues
+import com.samco.trackandgraph.graphstatview.factories.helpers.validatePieChartSegments
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.functions.data_sample_functions.DataClippingFunction
@@ -69,7 +70,7 @@ class PieChartDataFactory @Inject constructor(
                     override val graphOrStat = graphOrStat
                 }
             val segments = getPieChartSegments(plottingData, config.sumByCount)
-            validatePieChartSegmentSigns(segments.map { it.second })?.let { error ->
+            validatePieChartSegments(segments.map { it.second })?.let { error ->
                 return object : IPieChartViewData {
                     override val state = IGraphStatViewData.State.ERROR
                     override val graphOrStat = graphOrStat
@@ -77,6 +78,13 @@ class PieChartDataFactory @Inject constructor(
                 }
             }
             val total = segments.sumOf { s -> s.second }
+            validateFiniteGraphValues(listOf(total))?.let { throw it }
+            if (total == 0.0) {
+                return object : IPieChartViewData {
+                    override val state = IGraphStatViewData.State.READY
+                    override val graphOrStat = graphOrStat
+                }
+            }
             val percentages = segments.map {
                 IPieChartViewData.Segment(
                     title = it.first,

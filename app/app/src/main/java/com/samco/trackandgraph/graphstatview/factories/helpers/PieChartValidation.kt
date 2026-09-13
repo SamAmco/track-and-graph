@@ -12,7 +12,8 @@ package com.samco.trackandgraph.graphstatview.factories.helpers
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 
-internal fun validatePieChartSegmentSigns(values: Iterable<Double>): GraphStatInitException? {
+internal fun validatePieChartSegments(values: Iterable<Double>): GraphStatInitException? {
+    validateFiniteGraphValues(values)?.let { return it }
     var hasPositive = false
     var hasNegative = false
     values.forEach { value ->

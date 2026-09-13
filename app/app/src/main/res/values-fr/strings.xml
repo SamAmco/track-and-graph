@@ -161,6 +161,10 @@
     <string name="graph_stat_view_not_enough_data_stat">Cette statistique s\'affichera lorsqu\'il y aura suffisamment de données.</string>
     <string name="graph_stat_view_not_enough_data_graph">Ce graphique s\'affichera quand il y aura suffisamment de données.</string>
     <string name="pie_chart_mixed_signs_error">Ce diagramme circulaire ne peut pas être affiché, car il contient des tailles de segments à la fois positives et négatives.</string>
+    <string name="histogram_mixed_signs_error">Cet histogramme ne peut pas être affiché, car il contient des tailles de classes à la fois positives et négatives.</string>
+    <string name="graph_non_finite_data_error">Ce graphique ne peut pas être affiché, car il contient une valeur qui n’est pas un nombre fini.</string>
+    <string name="graph_inconsistent_series_error">Ce graphique ne peut pas être affiché, car ses séries de données ont des tailles différentes.</string>
+    <string name="graph_invalid_y_range_error">Ce graphique ne peut pas être affiché, car la plage de son axe Y n’est pas valide.</string>
     <string name="finish">Terminer</string>
     <string name="about_description"><![CDATA[Track & Graph est un logiciel gratuit et open source sous licence GPL 3.0.]]></string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>

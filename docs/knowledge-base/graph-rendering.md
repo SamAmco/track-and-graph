@@ -15,6 +15,8 @@ keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-gra
 
 All graph rendering is owned by the app and drawn with Compose Canvas; AndroidPlot and Vico are not dependencies. Keep factories and view-data DTOs renderer-neutral: renderer-specific models belong in the UI.
 
+Graph producers own user-facing data validation. Native factories and Lua adapters return `State.ERROR` with a localized `GraphStatInitException` for non-finite values, inconsistent series sizes, invalid Y ranges, and graph-specific signed-proportion errors. Canvas renderers retain defensive guards, but those guards are not the normal route for explaining malformed data. Empty data and data that cannot form the minimum number of points remain ready-state “not enough data” cases.
+
 ## Line-chart boundary
 
 Line charts are drawn directly with Compose Canvas. `ILineGraphViewData` exposes timestamp/value `LineGraphPoint` lists and optional configured fixed Y bounds; it must not expose AndroidPlot series, regions, or axis subdivisions. Both `LineGraphDataFactory` and `LineGraphLuaHelper` produce this same contract. They keep points in ascending timestamp order, and a line needs at least two points to be plottable.
@@ -65,6 +67,8 @@ Line and bar chart axes, ticks, and plot-area guidelines use the shared Canvas c
 ## Histogram boundary
 
 Time histograms are Compose Canvas stacked-bar charts. They reuse the shared axis renderer, stacked rectangle drawing, 12sp tick text, measured rotated-label collision selection, categorical viewport helpers, and whole-graph reveal. The bottom axis title uses the theme's body text size so it remains as prominent as graph legend text. Weekday and month labels come from the localized abbreviation arrays; week labels rotate from the configured first day of the week so their text remains aligned with the producer's bins. The axis title uses only the localized unit name—do not restore technical range suffixes such as `(Mon-Sun)`.
+
+Like pies, value-summed histograms describe proportions and cannot normalize a mixture of positive and negative bin sizes meaningfully. Validate the raw aggregated bins before percentage normalization and return the dedicated mixed-sign graph error. Count-based histograms remain non-negative by construction, and same-sign negative inputs normalize to non-negative proportions.
 
 List-mode histograms remain static. Full-screen histograms share bar-chart horizontal interaction: two-finger horizontal pinch zoom and one-finger horizontal pan, clamped from the complete range down to one visible bucket. X-label layers are globally anchored to 1/2/5 categorical spacings and become progressively denser as the viewport narrows. This makes any omitted label reachable without redistributing labels during a pan. Keep this behavior in the renderer-neutral categorical viewport and gesture helpers so a future categorical graph can reuse it.
 

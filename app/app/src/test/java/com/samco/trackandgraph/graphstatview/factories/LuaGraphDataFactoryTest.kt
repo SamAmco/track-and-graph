@@ -352,6 +352,66 @@ class LuaGraphDataFactoryTest {
     }
 
     @Test
+    fun `invalid Lua line range returns a specific graph error`() = runTest {
+        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.LineGraphData(
+                    lines = listOf(
+                        Line(
+                            label = "line",
+                            lineColor = null,
+                            pointStyle = null,
+                            linePoints = listOf(LinePoint(OffsetDateTime.now(), 1.0)),
+                        ),
+                    ),
+                    yMin = null,
+                    yMax = 10.0,
+                    durationBasedRange = false,
+                ),
+            ),
+        )
+
+        val result = callGetViewData()
+
+        assertEquals(IGraphStatViewData.State.ERROR, result.state)
+        assertEquals(
+            R.string.graph_invalid_y_range_error,
+            (result.error as GraphStatInitException).errorTextId,
+        )
+        verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
+    fun `non-finite Lua line values return a specific graph error`() = runTest {
+        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.LineGraphData(
+                    lines = listOf(
+                        Line(
+                            label = "line",
+                            lineColor = null,
+                            pointStyle = null,
+                            linePoints = listOf(LinePoint(OffsetDateTime.now(), Double.NaN)),
+                        ),
+                    ),
+                    yMin = null,
+                    yMax = null,
+                    durationBasedRange = false,
+                ),
+            ),
+        )
+
+        val result = callGetViewData()
+
+        assertEquals(IGraphStatViewData.State.ERROR, result.state)
+        assertEquals(
+            R.string.graph_non_finite_data_error,
+            (result.error as GraphStatInitException).errorTextId,
+        )
+        verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
     fun `bar chart returns bar chart`() = runTest {
         val endTime = ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
 
@@ -417,6 +477,30 @@ class LuaGraphDataFactoryTest {
 
         assertEquals(0.0, barChart.yMin)
         assertEquals(1.0, barChart.yMax)
+        verify(luaEngine).releaseVM(testVmLock)
+    }
+
+    @Test
+    fun `non-finite Lua bar values return a specific graph error`() = runTest {
+        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TimeBarChartData(
+                    barDuration = Period.ofDays(1),
+                    endTime = ZonedDateTime.now(),
+                    durationBasedRange = false,
+                    bars = listOf(TimeBar(listOf(TimeBarSegment(Double.NaN)))),
+                    yMax = null,
+                ),
+            ),
+        )
+
+        val result = callGetViewData()
+
+        assertEquals(IGraphStatViewData.State.ERROR, result.state)
+        assertEquals(
+            R.string.graph_non_finite_data_error,
+            (result.error as GraphStatInitException).errorTextId,
+        )
         verify(luaEngine).releaseVM(testVmLock)
     }
 

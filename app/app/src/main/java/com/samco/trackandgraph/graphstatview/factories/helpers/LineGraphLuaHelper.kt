@@ -20,13 +20,14 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.YRangeType
+import com.samco.trackandgraph.data.lua.dto.Line
+import com.samco.trackandgraph.data.lua.dto.LinePointStyle
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
-import com.samco.trackandgraph.data.lua.dto.Line
-import com.samco.trackandgraph.data.lua.dto.LinePointStyle
-import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line as LineViewData
@@ -39,8 +40,12 @@ class LineGraphLuaHelper @Inject constructor(
     ): ILuaGraphViewData? {
         val lines = lineGraphData.lines ?: return null
 
+        validateOptionalGraphYRange(lineGraphData.yMin, lineGraphData.yMax)?.let {
+            return errorViewData(graphOrStat, it)
+        }
+
         val yRangeType =
-            if (lineGraphData.yMax == null || lineGraphData.yMin == null) YRangeType.DYNAMIC
+            if (lineGraphData.yMax == null) YRangeType.DYNAMIC
             else YRangeType.FIXED
 
         val endTime = lines
@@ -49,6 +54,11 @@ class LineGraphLuaHelper @Inject constructor(
             ?: return null
 
         val lineViewData = getLineViewData(lines)
+        validateFiniteGraphValues(
+            lineViewData.asSequence()
+                .flatMap { line -> line.points.asSequence().map { it.value } }
+                .asIterable(),
+        )?.let { return errorViewData(graphOrStat, it) }
 
         return object : ILuaGraphViewData {
             override val wrapped: IGraphStatViewData = object : ILineGraphViewData {
@@ -65,6 +75,16 @@ class LineGraphLuaHelper @Inject constructor(
             override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat = graphOrStat
         }
+    }
+
+    private fun errorViewData(
+        graphOrStat: GraphOrStat,
+        error: GraphStatInitException,
+    ) = object : ILuaGraphViewData {
+        override val wrapped: IGraphStatViewData? = null
+        override val state = IGraphStatViewData.State.ERROR
+        override val graphOrStat = graphOrStat
+        override val error = error
     }
 
     private fun getLineViewData(lines: List<Line>): List<LineViewData> = lines

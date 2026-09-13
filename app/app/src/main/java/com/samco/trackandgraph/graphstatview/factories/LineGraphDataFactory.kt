@@ -36,6 +36,8 @@ import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.sampling.DataSample
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.exceptions.LuaEngineDisabledGraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.helpers.validateGraphYRange
+import com.samco.trackandgraph.graphstatview.factories.helpers.validateFiniteGraphValues
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
@@ -82,6 +84,9 @@ class LineGraphDataFactory @Inject constructor(
         val disposables = Collections.synchronizedList(mutableListOf<DataSample>())
         var vmLock: LuaVMLock? = null
         try {
+            if (config.yRangeType == YRangeType.FIXED) {
+                validateGraphYRange(config.yFrom, config.yTo)?.let { throw it }
+            }
             vmLock = acquireLuaVMIfAvailable()
             val dataSamples = config.features.map { lgf ->
                 val dataSample = dataSampler.getDataSampleForFeatureId(
@@ -93,6 +98,11 @@ class LineGraphDataFactory @Inject constructor(
             }
 
             val plottableData = generatePlottingData(dataSamples, config, onDataSampled)
+            validateFiniteGraphValues(
+                plottableData.lines.asSequence()
+                    .flatMap { line -> line.points.asSequence().map { it.value } }
+                    .asIterable(),
+            )?.let { throw it }
             val hasPlottableData = plottableData.lines.any { it.points.size >= 2 }
 
             // Only show a duration based range if the user selected duration for a line graph

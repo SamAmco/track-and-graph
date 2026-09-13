@@ -178,6 +178,10 @@
     <string name="graph_stat_view_not_enough_data_stat">This statistic will show when enough data has been tracked to generate it.</string>
     <string name="graph_stat_view_not_enough_data_graph">This graph will show when enough data has been tracked to generate it.</string>
     <string name="pie_chart_mixed_signs_error">This pie chart can’t be rendered because it contains both positive and negative segment sizes.</string>
+    <string name="histogram_mixed_signs_error">This histogram can’t be rendered because it contains both positive and negative bin sizes.</string>
+    <string name="graph_non_finite_data_error">This graph can’t be rendered because it contains a value that isn’t a finite number.</string>
+    <string name="graph_inconsistent_series_error">This graph can’t be rendered because its data series have inconsistent sizes.</string>
+    <string name="graph_invalid_y_range_error">This graph can’t be rendered because its Y-axis range is invalid.</string>
     <string name="finish">Finish</string>
     <string name="about_description"><![CDATA[Track & Graph is free and open source software under the GPL 3.0 License.]]></string>
     <string name="about_libraries_message">The following open source libraries were used:</string>
