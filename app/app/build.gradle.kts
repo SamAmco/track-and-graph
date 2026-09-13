@@ -190,7 +190,6 @@ dependencies {
     implementation(libs.compose.ui.tooling)
     implementation(libs.compose.material.icons)
     implementation(libs.compose.foundation)
-    implementation(libs.compose.ui.viewbinding)
     implementation(libs.compose.runtime.livedata)
     implementation(libs.compose.material3)
 
@@ -222,9 +221,6 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
-
-    //Graph drawing
-    implementation(libs.androidplot.core)
 
     //Work manager
     implementation(libs.hilt.work)

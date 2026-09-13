@@ -1,18 +1,19 @@
 ---
-title: Graph rendering — Compose Canvas line and bar charts
-description: Renderer-neutral graph contracts; native Compose line and stacked-bar renderers share axis, label, reveal, styling, interaction, and defensive-validation infrastructure.
+title: Graph rendering — native Compose Canvas charts
+description: Renderer-neutral graph contracts; native Compose line, bar, histogram, and pie renderers share layout, label, reveal, styling, and defensive-validation infrastructure.
 topics:
   - Renderer-neutral graph view-data contracts
   - Compose Canvas line-graph rendering
   - Compose Canvas stacked bar-chart rendering
+  - Compose Canvas histogram and pie-chart rendering
   - Shared contract for database and Lua time-bar graphs
   - Selection, time markers, pan, zoom, axes, and performance
-keywords: [graph, chart, rendering, AndroidPlot, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, marker, axis, label, zoom, pan, Lua, migration, histogram, NaN, zero-range, finite]
+keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, BarChartSeries, histogram, TimeHistogramView, pie-chart, PieChartView, marker, axis, label, zoom, pan, Lua, migration, NaN, zero-range, finite]
 ---
 
 # Graph Rendering
 
-Graph rendering is being migrated incrementally from AndroidPlot to native Compose. Do not make factories or view-data DTOs depend on the replacement renderer: renderer-specific models belong in the UI.
+All graph rendering is owned by the app and drawn with Compose Canvas; AndroidPlot and Vico are not dependencies. Keep factories and view-data DTOs renderer-neutral: renderer-specific models belong in the UI.
 
 ## Line-chart boundary
 
@@ -41,9 +42,9 @@ Bar charts are drawn directly with Compose Canvas. `IBarChartViewData` exposes:
 
 Both `BarChartDataFactory` and `TimeBarchartLuaHelper` produce this same plain Kotlin contract. Keep them aligned when changing bar-chart behavior. In particular, Lua segments with the same label but different colors remain distinct series.
 
-`BarChartView` maps buckets onto a continuous edge coordinate range from `-0.5` through `lastIndex + 0.5`, leaving each integer at a bar center. It draws series as stacked rectangles and accumulates positive and negative values separately. The plot remains fixed to the producer-provided Y bounds. Renderer-neutral Canvas infrastructure holds shared X/Y tick models, rotated-label measurement, axis drawing, plot padding, and the whole-graph fade-in. Keep categorical label-spacing logic renderer-neutral as well: histograms can reuse its globally anchored power-of-two bucket layers when they migrate from AndroidPlot.
+`BarChartView` maps buckets onto a continuous edge coordinate range from `-0.5` through `lastIndex + 0.5`, leaving each integer at a bar center. It draws series as stacked rectangles and accumulates positive and negative values separately. The plot remains fixed to the producer-provided Y bounds. Renderer-neutral Canvas infrastructure holds shared X/Y tick models, rotated-label measurement, axis drawing, plot padding, stacked-bar drawing, and the whole-graph fade-in. Categorical label-spacing logic is renderer-neutral so bars and histograms share the same measured collision behavior.
 
-Graph height policy also belongs in `GraphStatUICommon.kt`. `graphHeightFor` converts it to Compose `Dp`, while the legacy `setGraphHeight` applies it to Android View layout parameters; both share the same full-screen multipliers for graphs with and without legends.
+Graph height policy also belongs in `GraphStatUICommon.kt`. `graphHeightFor` applies the shared list height and full-screen multipliers for graphs with and without legends.
 
 ## Preserved interaction behavior
 
@@ -59,6 +60,18 @@ Pixel mapping requires finite chart values and a nonzero Y range. The bar-chart 
 
 Line and bar chart axes, ticks, and plot-area guidelines use the shared Canvas colors and `0.5.dp` thickness. The entire initial graph—including axes, bars or lines, labels, highlights, and time markers—uses the same 450 ms opacity reveal after the first measured layout; viewport changes do not restart it. Bar charts no longer animate columns upward.
 
-## Further migrations
+## Histogram boundary
 
-AndroidPlot remains in the histogram and pie paths; Vico is no longer a dependency. When migrating another graph type, first replace AndroidPlot objects in its view-data contract with domain values, update both standard and Lua producers where applicable, then introduce renderer models only inside the Compose UI. Histograms should reuse the categorical bucket-coordinate, tick-spacing, axis, and reveal infrastructure rather than fork bar-chart layout behavior.
+Time histograms are static Compose Canvas stacked-bar charts. They reuse the shared axis renderer, stacked rectangle drawing, 12sp axis text, measured rotated-label collision selection, and whole-graph reveal. Weekday and month labels come from the localized abbreviation arrays; week labels rotate from the configured first day of the week so their text remains aligned with the producer's bins. The axis title uses only the localized unit name—do not restore technical range suffixes such as `(Mon-Sun)`.
+
+Histogram buckets represent local calendar units rather than equal elapsed-time slices. This matters across daylight-saving changes and unequal month lengths: hourly windows use local minutes, daily windows use local hours, week/month windows use local days, longer month windows use local weeks, and yearly windows use actual calendar months. Treat the configured end instant as inclusive when forming the exclusive sampling boundary. A month has 31 possible day buckets. All-zero input must produce finite zero-height buckets rather than `NaN`.
+
+## Pie-chart boundary
+
+Pie charts draw filled arcs directly with Compose Canvas and use the common reveal and graph-height policy. Values must be finite and non-negative with a finite positive total; the renderer normalizes sweep angles by that total. Legend percentages are the producer-supplied display percentages and use localized format resources.
+
+Default colors follow the palette's contrast-spreading sequence and wrap safely. Once the segment count exceeds the palette size, colors repeat and every segment gains its numeric index both near the outside of its arc and in the legend. Place the measured index rectangle just inside the circumference to maximize available radial space, and choose black or white text from the segment luminance. With no repeated colors, omit labels from the arcs.
+
+## Renderer ownership
+
+Do not add chart-library types to graph view-data contracts. Standard and Lua producers should emit the same domain values, and any measured layout or renderer models should remain inside the Compose UI. When adding graph behavior that applies to more than one renderer, extend the neutral Canvas helpers instead of forking it per chart.

@@ -16,7 +16,6 @@
  */
 package com.samco.trackandgraph.graphstatview.ui
 
-import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -62,19 +61,6 @@ internal val graphAxisTextStyle: TextStyle
         color = MaterialTheme.colorScheme.onSurface,
         fontSize = 12.sp,
     )
-
-fun setGraphHeight(
-    graphView: View,
-    graphViewMode: GraphViewMode,
-    hasLegend: Boolean,
-) {
-    if (graphViewMode is GraphViewMode.FullScreenMode) {
-        val multiplier = graphHeightMultiplier(hasLegend)
-        graphView.layoutParams.height = (graphViewMode.availableHeight * multiplier).toInt()
-    } else {
-        graphView.layoutParams.height = graphView.context.resources.getDimensionPixelSize(R.dimen.graph_height)
-    }
-}
 
 @Composable
 fun graphHeightFor(

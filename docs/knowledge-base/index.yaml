@@ -18,9 +18,9 @@ docs:
     keywords: [dialog, CustomDialog, CustomContinueCancelDialog, ContinueCancelDialogContent, ContinueCancelButtons, padding, scrolling, adaptive height, keyboard, focus, FocusRequester, asynchronous, loading-state, preview, Navigation 3, ViewModelStore, rememberViewModelStoreOwner, rememberUpdatedState, entryProvider, retained-entry, hiltViewModel, configuration-change, nested-navigation, reset-callback, onPop]
 
   - file: graph-rendering.md
-    title: Graph rendering — Compose Canvas line and bar charts
-    description: Renderer-neutral graph contracts; native Compose line and stacked-bar renderers share axis, label, reveal, styling, interaction, and defensive-validation infrastructure.
-    keywords: [graph, chart, rendering, AndroidPlot, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, marker, axis, label, zoom, pan, Lua, migration, histogram, NaN, zero-range, finite]
+    title: Graph rendering — native Compose Canvas charts
+    description: Renderer-neutral graph contracts; native Compose line, bar, histogram, and pie renderers share layout, label, reveal, styling, and defensive-validation infrastructure.
+    keywords: [graph, chart, rendering, AndroidPlot, Vico, Compose, Canvas, line-graph, LineGraphView, LineGraphPerf, Logcat, performance, ILineGraphViewData, LineGraphPoint, bar-chart, BarChartView, IBarChartViewData, histogram, TimeHistogramView, pie-chart, PieChartView, marker, axis, label, zoom, pan, Lua, migration, NaN, zero-range, finite]
 
   - file: app-lock.md
     title: App lock — security boundary, persistence, and UI shell
