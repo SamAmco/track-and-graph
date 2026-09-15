@@ -23,12 +23,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.addcomponent.ComponentTypeSelectionScreen
 import com.samco.trackandgraph.functions.FunctionsScreenContent
+import com.samco.trackandgraph.graphstatview.ui.LocalLastValueCurrentTime
 import com.samco.trackandgraph.group.FunctionClickListeners
 import com.samco.trackandgraph.group.GraphStatClickListeners
 import com.samco.trackandgraph.group.GroupClickListeners
@@ -39,8 +41,10 @@ import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.ui.inputSpacingLarge
+import org.threeten.bp.OffsetDateTime
 
 private const val PLAY_STORE_DEVICE = "spec:width=1080px,height=2340px,dpi=420"
+private val playStorePreviewCurrentTime: () -> OffsetDateTime = { PREVIEW_END_TIME }
 
 @Preview(name = "Play Store 1 - Daily", device = PLAY_STORE_DEVICE)
 @Composable
@@ -146,21 +150,23 @@ internal fun PlayStoreDailyDarkScreenshotContent() {
 @Composable
 internal fun PlayStoreRestDayStatisticsScreenshotContent() {
     TnGComposeTheme {
-        PlayStorePreviewEnvironment {
-            PlayStoreGroupFrame(title = "Rest day statistics") {
-                GroupScreenView(
-                    lazyGridState = rememberLazyGridState(),
-                    isLoading = false,
-                    showEmptyText = false,
-                    showFab = false,
-                    showReleaseNotesButton = false,
-                    allChildren = playStoreRestDayStatisticsChildren(),
-                    trackerClickListeners = TrackerClickListeners(),
-                    graphStatClickListeners = GraphStatClickListeners(),
-                    groupClickListeners = GroupClickListeners(),
-                    functionClickListeners = FunctionClickListeners(),
-                    fabInsetPaddingOverride = PaddingValues(bottom = PlayStoreNavigationBarHeight)
-                )
+        CompositionLocalProvider(LocalLastValueCurrentTime provides playStorePreviewCurrentTime) {
+            PlayStorePreviewEnvironment {
+                PlayStoreGroupFrame(title = "Rest day statistics") {
+                    GroupScreenView(
+                        lazyGridState = rememberLazyGridState(),
+                        isLoading = false,
+                        showEmptyText = false,
+                        showFab = false,
+                        showReleaseNotesButton = false,
+                        allChildren = playStoreRestDayStatisticsChildren(),
+                        trackerClickListeners = TrackerClickListeners(),
+                        graphStatClickListeners = GraphStatClickListeners(),
+                        groupClickListeners = GroupClickListeners(),
+                        functionClickListeners = FunctionClickListeners(),
+                        fabInsetPaddingOverride = PaddingValues(bottom = PlayStoreNavigationBarHeight)
+                    )
+                }
             }
         }
     }

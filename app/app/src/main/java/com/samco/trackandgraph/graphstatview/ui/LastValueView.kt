@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -55,6 +56,9 @@ import kotlinx.coroutines.isActive
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import kotlin.time.Duration.Companion.seconds
+
+private val systemCurrentTime: () -> OffsetDateTime = { OffsetDateTime.now() }
+internal val LocalLastValueCurrentTime = staticCompositionLocalOf { systemCurrentTime }
 
 @Composable
 fun LastValueStatView(
@@ -91,8 +95,9 @@ private fun LastValueStatViewBody(
     val weekdayNames = stringArrayResource(R.array.abbreviated_weekdays).toList()
     val dayText = stringResource(R.string.day)
     val daysText = stringResource(R.string.days)
+    val currentTime = LocalLastValueCurrentTime.current
     fun getDurationText(): String {
-        val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
+        val duration = Duration.between(dataPoint.timestamp, currentTime())
         return formatTimeToDaysHoursMinutesSeconds(
             millis = duration.toMillis(),
             dayText = dayText,
@@ -101,11 +106,11 @@ private fun LastValueStatViewBody(
         )
     }
 
-    var durationText by remember(dataPoint.timestamp, dayText, daysText) {
+    var durationText by remember(dataPoint.timestamp, dayText, daysText, currentTime) {
         mutableStateOf(getDurationText())
     }
 
-    LaunchedEffect(dataPoint.timestamp, dayText, daysText) {
+    LaunchedEffect(dataPoint.timestamp, dayText, daysText, currentTime) {
         while (isActive) {
             durationText = getDurationText()
             delay(1.seconds)

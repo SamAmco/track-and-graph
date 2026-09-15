@@ -110,6 +110,8 @@ Use AGP 9.3.1 or newer with Gradle 9.5.0 or newer for screenshot tests. AGP 9.1.
 
 Keep screenshot-only app data in the playstore package rather than reusing old emulator demo-data generators. The screenshot fixtures are deterministic and can call the real production composables directly, including graph cards and other `AndroidView`-backed content, as long as the fixture provides the state that a ViewModel would normally load from the database.
 
+Preview data with an elapsed-time display must also provide a fixed current-time source; fixing only the underlying event timestamp still makes every render depend on the host clock. The Play Store preview environment pins the last-value graph clock to its shared preview end time while production keeps using the system clock.
+
 ### Play Store System UI
 
 Do not rely on `@Preview(showSystemUi = true)` for Play Store screenshot PNGs. Android Studio can show system UI for interactive previews, but the Compose screenshot-test renderer does not include the Android status bar in generated images. The Play Store frame therefore draws a small fake status bar in Compose and lays out content as if status/navigation bars exist.
