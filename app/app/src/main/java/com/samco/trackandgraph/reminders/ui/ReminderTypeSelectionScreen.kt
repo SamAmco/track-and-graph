@@ -20,6 +20,8 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,11 +43,14 @@ fun ReminderTypeSelectionScreen(
     onPeriodicReminderSelected: () -> Unit,
     onMonthDayReminderSelected: () -> Unit,
     onTimeSinceLastReminderSelected: () -> Unit,
+    onOneTimeReminderSelected: () -> Unit,
     onDismiss: () -> Unit,
     hasAnyFeatures: Boolean = true
 ) {
     Column(
-        modifier = Modifier.padding(horizontal = cardElevation),
+        modifier = Modifier
+            .padding(horizontal = cardElevation)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -81,6 +86,15 @@ fun ReminderTypeSelectionScreen(
             onClick = onMonthDayReminderSelected
         )
 
+        DialogInputSpacing()
+
+        HeroCardButton(
+            modifier = Modifier.fillMaxWidth(),
+            title = stringResource(R.string.one_time_reminder),
+            description = stringResource(R.string.one_time_reminder_description),
+            onClick = onOneTimeReminderSelected,
+        )
+
         if (hasAnyFeatures) {
             DialogInputSpacing()
 
@@ -112,6 +126,7 @@ fun ReminderTypeSelectionScreenPreview() {
             onPeriodicReminderSelected = {},
             onMonthDayReminderSelected = {},
             onTimeSinceLastReminderSelected = {},
+            onOneTimeReminderSelected = {},
             onDismiss = {}
         )
     }

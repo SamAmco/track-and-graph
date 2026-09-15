@@ -5,6 +5,7 @@ topics:
   - Every reminder has one null-group Reminders-screen placement and may have one additional group placement
   - Reminders can belong to at most one group and cannot be symlinked
   - ReminderParams types, serialized enabled state, and optional time-of-day state for Time Since Last
+  - One Time reminders resolve relative delays when saved and may optionally repeat from the first due time
   - Disabled reminders remain stored and visible but cancel/skip notification scheduling
   - Delete: always deletes the reminder and every placement, regardless of deleteEverywhere
   - Duplicate: reproduces both placements and inserts after the original independently in each list
@@ -12,7 +13,7 @@ topics:
   - Reminders-screen cards show the first resolved component path when grouped
   - Scheduling: PlatformScheduler interface isolates Android AlarmManager (KMP pattern)
   - PITFALL: RemindersScreenViewModel dbDisplayIndices MUST react to DataUpdateType.Reminder or new reminders fall to bottom
-keywords: [reminder, groupless, null, component-path, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, move, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
+keywords: [reminder, one-time, standalone, delay, recurrence, groupless, null, component-path, ReminderParams, enabled, disabled, serialization, backward-compatibility, PlatformScheduler, scheduling, cancel, delete, duplicate, move, display-index, RemindersScreenViewModel, DataUpdateType, KMP]
 ---
 
 # Reminders
@@ -103,6 +104,7 @@ sealed class ReminderParams {
     data class PeriodicParams(...)   // Every N hours/days/weeks
     data class MonthDayParams(...)   // Specific day of month
     data class TimeSinceLastParams(...) // After duration since last entry
+    data class OneTimeParams(...)    // Standalone first date/delay, optionally recurring
 }
 ```
 
@@ -113,6 +115,21 @@ interval and then replaces the resulting local time with the configured time of 
 stored inside the existing params JSON, so it requires no Room migration. Production JSON parsing
 ignores unknown keys, allowing older production clients to read reminders written by newer clients;
 debug parsing intentionally rejects unknown keys. New clients default a missing field to null.
+
+`OneTimeParams` supports reminders that do not depend on a tracker or function. The configuration
+offers two mutually exclusive ways to choose the first notification: an explicit local date/time,
+or a relative interval. A relative interval is resolved against the current time when the reminder
+is saved, and the resulting local date/time is persisted in `starts`; `initialDelay` is also kept so
+the choice and interval can be restored while editing. `createdAt` provides the progress-card
+baseline. The bar fills toward the first notification and, like a Time Since Last reminder, remains
+full after that notification while any repeat interval is active. Saving an edit establishes a new
+baseline and recalculates `starts` when relative mode is selected.
+
+The optional `repeatInterval` is anchored to `starts`. With no repeat interval, scheduling returns
+no next occurrence after the first notification fires. With one, the scheduler advances from
+`starts` until it finds the first occurrence after the scheduling cutoff. Calendar units use local
+calendar arithmetic, matching the other reminder schedulers. All fields live in the serialized
+params JSON, so adding this type requires no Room migration.
 
 ## Enable and Disable Behavior
 

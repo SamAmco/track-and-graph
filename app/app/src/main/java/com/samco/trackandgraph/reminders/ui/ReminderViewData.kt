@@ -104,6 +104,20 @@ sealed class ReminderViewData {
         override val path: String? = null,
     ) : ReminderViewData()
 
+    /** View data for standalone one-time reminders, with an optional repeat interval. */
+    data class OneTimeReminderViewData(
+        override val id: Long,
+        override val groupItemId: Long,
+        override val name: String,
+        override val enabled: Boolean,
+        override val nextScheduled: LocalDateTime?,
+        override val reminderDto: Reminder?,
+        val progressToNextReminder: Float,
+        val currentInterval: Int?,
+        val currentPeriod: Period?,
+        override val path: String? = null,
+    ) : ReminderViewData()
+
     companion object {
         /**
          * Creates a ReminderViewData from a Reminder DTO.
@@ -200,7 +214,50 @@ sealed class ReminderViewData {
                         path = path,
                     )
                 }
+
+                is ReminderParams.OneTimeParams -> {
+                    val now = LocalDateTime.now()
+                    val hasReachedFirstNotification = !now.isBefore(params.starts)
+                    val currentInterval = if (hasReachedFirstNotification) {
+                        params.repeatInterval
+                    } else {
+                        params.initialDelay
+                    }
+                    val progress = if (hasReachedFirstNotification) {
+                        1f
+                    } else {
+                        calculateProgressBetween(
+                            starts = params.createdAt,
+                            ends = params.starts,
+                            now = now,
+                        )
+                    }
+
+                    OneTimeReminderViewData(
+                        id = reminder.id,
+                        groupItemId = groupItemId,
+                        name = reminder.reminderName,
+                        enabled = params.enabled,
+                        nextScheduled = nextScheduled,
+                        reminderDto = reminder,
+                        progressToNextReminder = progress,
+                        currentInterval = currentInterval?.interval,
+                        currentPeriod = currentInterval?.period,
+                        path = path,
+                    )
+                }
             }
+        }
+
+        private fun calculateProgressBetween(
+            starts: LocalDateTime,
+            ends: LocalDateTime,
+            now: LocalDateTime,
+        ): Float {
+            val totalMillis = Duration.between(starts, ends).toMillis()
+            if (totalMillis <= 0) return 0f
+            val elapsedMillis = Duration.between(starts, now).toMillis()
+            return (elapsedMillis.toDouble() / totalMillis.toDouble()).coerceIn(0.0, 1.0).toFloat()
         }
 
         /**

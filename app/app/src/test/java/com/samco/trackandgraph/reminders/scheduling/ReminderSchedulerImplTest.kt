@@ -42,11 +42,13 @@ internal class ReminderSchedulerImplTest {
     private val periodicResult = Instant.ofEpochSecond(2000)
     private val monthDayResult = Instant.ofEpochSecond(3000)
     private val timeSinceLastResult = Instant.ofEpochSecond(4000)
+    private val oneTimeResult = Instant.ofEpochSecond(5000)
 
     private var weekDaySchedulerCalled = false
     private var periodicSchedulerCalled = false
     private var monthDaySchedulerCalled = false
     private var timeSinceLastSchedulerCalled = false
+    private var oneTimeSchedulerCalled = false
 
     private val weekDayScheduler = object : WeekDayReminderScheduler(timeProvider) {
         override fun scheduleNext(params: ReminderParams.WeekDayParams, afterTime: Instant): Instant? {
@@ -76,12 +78,20 @@ internal class ReminderSchedulerImplTest {
         }
     }
 
+    private val oneTimeScheduler = object : OneTimeReminderScheduler(timeProvider) {
+        override fun scheduleNext(params: ReminderParams.OneTimeParams, afterTime: Instant): Instant? {
+            oneTimeSchedulerCalled = true
+            return oneTimeResult
+        }
+    }
+
     private val uut = ReminderSchedulerImpl(
         timeProvider,
         weekDayScheduler,
         periodicScheduler,
         monthDayScheduler,
-        timeSinceLastScheduler
+        timeSinceLastScheduler,
+        oneTimeScheduler,
     )
 
     @Test
@@ -175,6 +185,28 @@ internal class ReminderSchedulerImplTest {
         assertEquals(false, periodicSchedulerCalled)
         assertEquals(false, monthDaySchedulerCalled)
         assertEquals(true, timeSinceLastSchedulerCalled)
+        assertEquals(false, oneTimeSchedulerCalled)
+    }
+
+    @Test
+    fun `delegates OneTimeParams to oneTimeScheduler`() = runTest {
+        val reminder = reminderFixture.copy(
+            params = ReminderParams.OneTimeParams(
+                createdAt = LocalDateTime.of(2024, 1, 10, 10, 0),
+                starts = LocalDateTime.of(2024, 1, 10, 12, 0),
+                initialDelay = IntervalPeriodPair(2, Period.HOURS),
+                repeatInterval = null,
+            )
+        )
+
+        val result = uut.scheduleNext(reminder)
+
+        assertEquals(oneTimeResult, result)
+        assertEquals(false, weekDaySchedulerCalled)
+        assertEquals(false, periodicSchedulerCalled)
+        assertEquals(false, monthDaySchedulerCalled)
+        assertEquals(false, timeSinceLastSchedulerCalled)
+        assertEquals(true, oneTimeSchedulerCalled)
     }
 
     @Test
@@ -198,5 +230,6 @@ internal class ReminderSchedulerImplTest {
         assertEquals(false, periodicSchedulerCalled)
         assertEquals(false, monthDaySchedulerCalled)
         assertEquals(false, timeSinceLastSchedulerCalled)
+        assertEquals(false, oneTimeSchedulerCalled)
     }
 }

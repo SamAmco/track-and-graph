@@ -119,6 +119,12 @@ private fun AddReminderDialogBody(
                 onUpsertReminder = onConfirm,
                 onDismiss = onDismiss,
             )
+            is ReminderParams.OneTimeParams -> OneTimeReminderConfigurationScreen(
+                editReminder = editingReminder,
+                editParams = params,
+                onUpsertReminder = onConfirm,
+                onDismiss = onDismiss,
+            )
         }
     } else {
         AddReminderDialogContent(

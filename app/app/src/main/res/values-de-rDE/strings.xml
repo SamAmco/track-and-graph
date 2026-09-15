@@ -518,6 +518,8 @@
     <string name="month_day_reminder_description">Monatliche Muster wie der erste Montag</string>
     <string name="time_since_last_reminder">Zeit-seit-letztem-Eintrag</string>
     <string name="time_since_last_reminder_description">Wenn Sie etwas eine Weile nicht erfasst haben</string>
+    <string name="one_time_reminder">Einmalige Erinnerung</string>
+    <string name="one_time_reminder_description">Eine eigenständige Erinnerung zu einem bestimmten Zeitpunkt oder nach einer Wartezeit</string>
 
     <!-- Reminder configuration -->
     <string name="reminder_name">Erinnerungsname</string>
@@ -532,6 +534,8 @@
     <string name="select_tracker_placeholder">Tracker auswählen</string>
     <string name="remind_after">Erinnern nach</string>
     <string name="then_remind_every">Dann erinnern alle</string>
+    <string name="remind_at_date_and_time">An einem Datum und zu einer Uhrzeit</string>
+    <string name="remind_after_a_delay">Nach einer Wartezeit</string>
     <string name="every_colon">Jeden:</string>
     <string name="ended_at_format">Beendet am: %1$s</string>
     <string name="starting_at_format">Beginnend am: %1$s</string>

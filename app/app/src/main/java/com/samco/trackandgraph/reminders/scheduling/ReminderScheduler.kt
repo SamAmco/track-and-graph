@@ -51,7 +51,8 @@ internal class ReminderSchedulerImpl @Inject constructor(
     private val weekDayScheduler: WeekDayReminderScheduler,
     private val periodicScheduler: PeriodicReminderScheduler,
     private val monthDayScheduler: MonthDayReminderScheduler,
-    private val timeSinceLastScheduler: TimeSinceLastReminderScheduler
+    private val timeSinceLastScheduler: TimeSinceLastReminderScheduler,
+    private val oneTimeScheduler: OneTimeReminderScheduler,
 ) : ReminderScheduler {
 
     override suspend fun scheduleNext(reminder: Reminder): Instant? {
@@ -70,6 +71,7 @@ internal class ReminderSchedulerImpl @Inject constructor(
                 params,
                 afterTime
             )
+            is ReminderParams.OneTimeParams -> oneTimeScheduler.scheduleNext(params, afterTime)
         }
     }
 }

@@ -157,6 +157,11 @@ fun Reminder(
                         DialogInputSpacing()
                         TimeSinceLastReminderDetails(reminderViewData)
                     }
+
+                    is ReminderViewData.OneTimeReminderViewData -> {
+                        DialogInputSpacing()
+                        OneTimeReminderDetails(reminderViewData)
+                    }
                 }
             }
         }

@@ -125,6 +125,23 @@ sealed class ReminderParams {
         val timeOfDay: LocalTime? = null,
         override val enabled: Boolean = true
     ) : ReminderParams()
+
+    /**
+     * A standalone reminder whose first notification is anchored to [starts].
+     * [initialDelay] records that the user chose a relative delay rather than an explicit date,
+     * while [repeatInterval] optionally schedules later notifications from the same anchor.
+     */
+    @Serializable
+    @SerialName("onetime")
+    data class OneTimeParams(
+        @Serializable(with = LocalDateTimeSerializer::class)
+        val createdAt: LocalDateTime,
+        @Serializable(with = LocalDateTimeSerializer::class)
+        val starts: LocalDateTime,
+        val initialDelay: IntervalPeriodPair?,
+        val repeatInterval: IntervalPeriodPair?,
+        override val enabled: Boolean = true
+    ) : ReminderParams()
 }
 
 @Serializable

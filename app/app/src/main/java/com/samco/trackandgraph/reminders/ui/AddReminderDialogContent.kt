@@ -47,6 +47,8 @@ sealed class ReminderDialogNavKey : NavKey {
     object MonthDayReminderConfiguration : ReminderDialogNavKey()
     @Serializable
     object TimeSinceLastReminderConfiguration : ReminderDialogNavKey()
+    @Serializable
+    object OneTimeReminderConfiguration : ReminderDialogNavKey()
 }
 
 @Composable
@@ -133,6 +135,12 @@ private fun reminderDialogEntry(
             onDismiss = onDismiss,
         )
     }
+    is ReminderDialogNavKey.OneTimeReminderConfiguration -> NavEntry(navKey) {
+        OneTimeReminderConfigurationScreen(
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+    }
     else -> error("Unknown navKey: $navKey")
 }
 
@@ -154,6 +162,9 @@ private fun ReminderTypeSelectionDestination(
         },
         onTimeSinceLastReminderSelected = {
             onNavigate(ReminderDialogNavKey.TimeSinceLastReminderConfiguration)
+        },
+        onOneTimeReminderSelected = {
+            onNavigate(ReminderDialogNavKey.OneTimeReminderConfiguration)
         },
         onDismiss = onDismiss,
         hasAnyFeatures = hasAnyFeatures.value,

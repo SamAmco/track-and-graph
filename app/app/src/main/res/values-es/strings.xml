@@ -517,6 +517,8 @@
     <string name="month_day_reminder_description">Patrones mensuales como el primer lunes</string>
     <string name="time_since_last_reminder">Tiempo desde el último registro</string>
     <string name="time_since_last_reminder_description">Cuando no has registrado algo por un tiempo</string>
+    <string name="one_time_reminder">Recordatorio único</string>
+    <string name="one_time_reminder_description">Un recordatorio independiente en una fecha concreta o después de un plazo</string>
 
     <!-- Reminder configuration -->
     <string name="reminder_name">Nombre del recordatorio</string>
@@ -531,6 +533,8 @@
     <string name="select_tracker_placeholder">Seleccionar un tracker</string>
     <string name="remind_after">Recordar después de</string>
     <string name="then_remind_every">Luego recordar cada</string>
+    <string name="remind_at_date_and_time">En una fecha y hora</string>
+    <string name="remind_after_a_delay">Después de un plazo</string>
     <string name="every_colon">Cada:</string>
     <string name="ended_at_format">Terminó el: %1$s</string>
     <string name="starting_at_format">Comienza el: %1$s</string>

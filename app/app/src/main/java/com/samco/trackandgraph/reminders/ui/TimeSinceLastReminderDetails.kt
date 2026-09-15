@@ -39,45 +39,72 @@ import org.threeten.bp.LocalDateTime
 fun TimeSinceLastReminderDetails(
     reminderViewData: ReminderViewData.TimeSinceLastReminderViewData,
     modifier: Modifier = Modifier
+) = IntervalReminderDetails(
+    nextScheduled = reminderViewData.nextScheduled,
+    progressToNextReminder = reminderViewData.progressToNextReminder,
+    currentInterval = reminderViewData.currentInterval,
+    currentPeriod = reminderViewData.currentPeriod,
+    modifier = modifier,
+)
+
+@Composable
+fun OneTimeReminderDetails(
+    reminderViewData: ReminderViewData.OneTimeReminderViewData,
+    modifier: Modifier = Modifier,
+) = IntervalReminderDetails(
+    nextScheduled = reminderViewData.nextScheduled,
+    progressToNextReminder = reminderViewData.progressToNextReminder,
+    currentInterval = reminderViewData.currentInterval,
+    currentPeriod = reminderViewData.currentPeriod,
+    modifier = modifier,
+)
+
+@Composable
+private fun IntervalReminderDetails(
+    nextScheduled: LocalDateTime?,
+    progressToNextReminder: Float,
+    currentInterval: Int?,
+    currentPeriod: Period?,
+    modifier: Modifier = Modifier,
 ) = Column(
     modifier = modifier,
     horizontalAlignment = Alignment.Start,
 ) {
     // Show current period text if we have a next scheduled reminder
-    if (reminderViewData.nextScheduled != null &&
-        reminderViewData.currentInterval != null &&
-        reminderViewData.currentPeriod != null
+    if (nextScheduled != null &&
+        currentInterval != null &&
+        currentPeriod != null
     ) {
-        val periodText = when (reminderViewData.currentPeriod) {
+        val periodText = when (currentPeriod) {
             Period.MINUTES -> pluralStringResource(
                 R.plurals.after_x_minutes,
-                reminderViewData.currentInterval,
-                reminderViewData.currentInterval
+                currentInterval,
+                currentInterval
             )
             Period.HOURS -> pluralStringResource(
                 R.plurals.after_x_hours,
-                reminderViewData.currentInterval,
-                reminderViewData.currentInterval
+                currentInterval,
+                currentInterval
             )
             Period.DAYS -> pluralStringResource(
                 R.plurals.after_x_days,
-                reminderViewData.currentInterval,
-                reminderViewData.currentInterval
+                currentInterval,
+                currentInterval
             )
             Period.WEEKS -> pluralStringResource(
                 R.plurals.after_x_weeks,
-                reminderViewData.currentInterval,
-                reminderViewData.currentInterval
+                currentInterval,
+                currentInterval
             )
             Period.MONTHS -> pluralStringResource(
                 R.plurals.after_x_months,
-                reminderViewData.currentInterval,
-                reminderViewData.currentInterval
+                currentInterval,
+                currentInterval
             )
             Period.YEARS -> pluralStringResource(
                 R.plurals.after_x_years,
-                reminderViewData.currentInterval,
-                reminderViewData.currentInterval
+                currentInterval,
+                currentInterval
             )
         }
 
@@ -91,7 +118,7 @@ fun TimeSinceLastReminderDetails(
     }
 
     LinearProgressIndicator(
-        progress = { reminderViewData.progressToNextReminder },
+        progress = { progressToNextReminder },
         modifier = Modifier
             .fillMaxWidth()
             .padding(halfDialogInputSpacing),

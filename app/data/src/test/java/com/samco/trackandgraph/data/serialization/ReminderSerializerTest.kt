@@ -28,6 +28,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.LocalTime
+import org.threeten.bp.LocalDateTime
 
 class ReminderSerializerTest {
 
@@ -97,5 +98,20 @@ class ReminderSerializerTest {
             as ReminderParams.TimeSinceLastParams
 
         assertEquals(LocalTime.of(9, 30), result.timeOfDay)
+    }
+
+    @Test
+    fun `round trips one time reminder configuration`() {
+        val params = ReminderParams.OneTimeParams(
+            createdAt = LocalDateTime.of(2026, 9, 15, 10, 0),
+            starts = LocalDateTime.of(2026, 9, 15, 12, 0),
+            initialDelay = IntervalPeriodPair(2, Period.HOURS),
+            repeatInterval = IntervalPeriodPair(1, Period.DAYS),
+            enabled = false,
+        )
+
+        val result = serializer.deserializeParams(serializer.serializeParams(params)!!)
+
+        assertEquals(params, result)
     }
 }

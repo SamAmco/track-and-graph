@@ -538,6 +538,8 @@
     <string name="month_day_reminder_description">Motifs mensuels comme le premier lundi</string>
     <string name="time_since_last_reminder">Temps depuis le dernier suivi</string>
     <string name="time_since_last_reminder_description">Quand vous n\'avez pas suivi quelque chose depuis un moment</string>
+    <string name="one_time_reminder">Rappel ponctuel</string>
+    <string name="one_time_reminder_description">Un rappel indépendant à une date précise ou après un délai</string>
 
     <!-- Reminder configuration -->
     <string name="reminder_name">Nom du rappel</string>
@@ -552,6 +554,8 @@
     <string name="select_tracker_placeholder">Sélectionner un tracker</string>
     <string name="remind_after">Rappeler après</string>
     <string name="then_remind_every">Puis rappeler tous les</string>
+    <string name="remind_at_date_and_time">À une date et une heure</string>
+    <string name="remind_after_a_delay">Après un délai</string>
     <string name="every_colon">Chaque :</string>
     <string name="ended_at_format">Terminé le : %1$s</string>
     <string name="starting_at_format">Commence le : %1$s</string>
