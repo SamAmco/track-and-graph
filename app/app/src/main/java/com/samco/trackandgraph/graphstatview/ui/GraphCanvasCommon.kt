@@ -32,16 +32,12 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import kotlinx.coroutines.yield
 import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sin
 
 internal const val graphRevealDurationMillis = 450
 private const val approximateGraphYTickSpacingDp = 32f
@@ -54,18 +50,8 @@ internal val graphPlotBottomPadding = 10.dp
 internal val graphYAxisLabelPadding = 6.dp
 internal val graphXAxisTickLength = 3.dp
 internal val graphXAxisLabelPadding = 6.dp
-internal val graphAxisLabelMinimumGap = 4.dp
 internal val graphBarBorderThickness = 0.5.dp
 private val graphYAxisIntervalHelper = DataDisplayIntervalHelper()
-
-internal data class GraphXAxisTick<T>(
-    val value: T,
-    val label: String,
-    val projectedWidth: Float,
-    val projectedRightExtent: Float = 0f,
-) {
-    val projectedLeftExtent: Float get() = projectedWidth - projectedRightExtent
-}
 
 internal data class GraphYAxisTick(val value: Double, val label: String)
 
@@ -115,59 +101,6 @@ internal fun rememberGraphReveal(key: Any?, ready: Boolean): Animatable<Float, *
     return reveal
 }
 
-internal fun graphRotatedLabelWidth(size: IntSize): Float {
-    val radians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
-    return (size.width * cos(radians) + size.height * sin(radians)).toFloat()
-}
-
-internal fun graphRotatedLabelRightExtent(size: IntSize): Float {
-    val radians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
-    return (size.height * sin(radians)).toFloat()
-}
-
-internal fun graphRotatedLabelHeight(maximumWidth: Float, labelHeight: Float): Float {
-    val radians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
-    return (maximumWidth * sin(radians) + labelHeight * cos(radians)).toFloat()
-}
-
-/** Power-of-two bucket spacing shared by categorical charts such as bars and histograms. */
-internal fun calculateCategoricalGraphLabelSpacing(
-    visibleBucketCount: Int,
-    maximumProjectedLabelWidth: Float,
-    bucketWidth: Float,
-    minimumGap: Float,
-): Int {
-    var densitySpacing = 1
-    while (visibleBucketCount.toDouble() / densitySpacing > 10.0) densitySpacing *= 2
-    if (bucketWidth <= 0f || !bucketWidth.isFinite()) return densitySpacing
-    val widthSpacing = ceil((maximumProjectedLabelWidth + minimumGap) / bucketWidth)
-        .toInt()
-        .coerceAtLeast(1)
-    return nextPowerOfTwo(max(densitySpacing, widthSpacing))
-}
-
-/** Greedily retains measured, rotated labels that fit within the available horizontal bounds. */
-internal fun <T> selectGraphXAxisTicks(
-    candidates: List<GraphXAxisTick<T>>,
-    xToPixel: (T) -> Float,
-    minimumX: Float,
-    maximumX: Float,
-    minimumGap: Float,
-): List<GraphXAxisTick<T>> {
-    val selected = mutableListOf<GraphXAxisTick<T>>()
-    var previousRight = Float.NEGATIVE_INFINITY
-    candidates.forEach { tick ->
-        val x = xToPixel(tick.value)
-        val left = x - tick.projectedLeftExtent
-        val right = x + tick.projectedRightExtent
-        if (left >= minimumX && right <= maximumX && left >= previousRight + minimumGap) {
-            selected += tick
-            previousRight = right
-        }
-    }
-    return selected
-}
-
 internal fun approximateGraphYTickCount(height: Float, density: Float): Int =
     (height / (approximateGraphYTickSpacingDp * density))
         .toInt()
@@ -196,12 +129,6 @@ internal fun expandEqualRange(minValue: Double, maxValue: Double): Pair<Double, 
     if (maxValue > minValue) return minValue to maxValue
     val padding = max(1.0, abs(minValue) * 0.1)
     return minValue - padding to maxValue + padding
-}
-
-private fun nextPowerOfTwo(value: Int): Int {
-    var result = 1
-    while (result < value && result <= Int.MAX_VALUE / 2) result *= 2
-    return result
 }
 
 internal fun <T> DrawScope.drawGraphAxes(
