@@ -53,12 +53,12 @@ class BarChartViewTest {
     }
 
     @Test
-    fun xLabelSpacingRemainsPowerOfTwoWhenMeasuredLabelsNeedMoreRoom() {
+    fun xLabelSpacingUsesRotatedHeightRatherThanProjectedBoundingBox() {
         assertEquals(
-            8,
+            4,
             calculateCategoricalGraphLabelSpacing(
                 visibleBucketCount = 26,
-                maximumProjectedLabelWidth = 120f,
+                maximumLabelMetrics = GraphXAxisLabelMetrics(width = 120f, height = 12f),
                 bucketWidth = 25f,
                 minimumGap = 4f,
             ),
@@ -71,7 +71,7 @@ class BarChartViewTest {
             4,
             calculateCategoricalGraphLabelSpacing(
                 visibleBucketCount = 26,
-                maximumProjectedLabelWidth = 60f,
+                maximumLabelMetrics = GraphXAxisLabelMetrics(width = 60f, height = 12f),
                 bucketWidth = 25f,
                 minimumGap = 4f,
             ),

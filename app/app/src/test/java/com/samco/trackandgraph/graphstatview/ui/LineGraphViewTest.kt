@@ -127,11 +127,11 @@ class LineGraphViewTest {
     fun `x ticks use actual data positions and reject overlapping labels`() {
         val selected = selectLineGraphXTicks(
             candidates = listOf(
-                GraphXAxisTick(value = 0, label = "a", projectedWidth = 20f),
-                GraphXAxisTick(value = 20, label = "b", projectedWidth = 20f),
-                GraphXAxisTick(value = 30, label = "c", projectedWidth = 20f),
-                GraphXAxisTick(value = 70, label = "d", projectedWidth = 20f),
-                GraphXAxisTick(value = 100, label = "e", projectedWidth = 20f),
+                xTick(0, "a"),
+                xTick(20, "b"),
+                xTick(30, "c"),
+                xTick(70, "d"),
+                xTick(100, "e"),
             ),
             minX = 0,
             maxX = 100,
@@ -147,8 +147,8 @@ class LineGraphViewTest {
     fun `x ticks omit labels that would cross the left canvas edge`() {
         val selected = selectLineGraphXTicks(
             candidates = listOf(
-                GraphXAxisTick(value = 0, label = "too wide", projectedWidth = 40f),
-                GraphXAxisTick(value = 50, label = "fits", projectedWidth = 20f),
+                xTick(0, "too wide", width = 40f),
+                xTick(50, "fits"),
             ),
             minX = 0,
             maxX = 100,
@@ -168,7 +168,7 @@ class LineGraphViewTest {
         assertEquals(
             listOf(50L),
             selectLineGraphXTicks(
-                candidates = listOf(GraphXAxisTick(50, "fits", 20f)),
+                candidates = listOf(xTick(50, "fits")),
                 minX = 0,
                 maxX = 100,
                 plotLeft = 30f,
@@ -250,7 +250,7 @@ class LineGraphViewTest {
             left.xTicks.map { it.value }.filter { it in 40L..100L && it !in viewportBoundaries },
             right.xTicks.map { it.value }.filter { it in 40L..100L && it !in viewportBoundaries },
         )
-        assertEquals(listOf(80L), left.xTicks.map { it.value }.filter { it !in viewportBoundaries })
+        assertEquals(listOf(60L, 80L), left.xTicks.map { it.value }.filter { it !in viewportBoundaries })
     }
 
     @Test
@@ -704,7 +704,7 @@ class LineGraphViewTest {
         assertEquals(5L, layout.xTicks.first().value)
         assertEquals(95L, layout.xTicks.last().value)
         assertEquals(layout.xTicks.first().projectedLeftExtent, layout.plotRect.left)
-        assertTrue(layout.plotRect.left < layout.xTicks.first().projectedWidth)
+        assertTrue(layout.plotRect.left < layout.xTicks.first().metrics.projectedWidth)
     }
 
     @Test
@@ -836,6 +836,13 @@ class LineGraphViewTest {
     )
 
     private fun epochMillis(point: LineGraphPoint) = point.timestamp.toInstant().toEpochMilli()
+
+    private fun xTick(
+        value: Long,
+        label: String,
+        width: Float = 20f,
+        height: Float = 10f,
+    ) = GraphXAxisTick(value, label, GraphXAxisLabelMetrics(width, height))
 
     private fun formatTimestamp(
         epochMillis: Long,

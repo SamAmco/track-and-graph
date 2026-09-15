@@ -19,47 +19,84 @@ import kotlin.math.sin
 
 internal val graphAxisLabelMinimumGap = 4.dp
 
+private val graphXAxisLabelAngleRadians =
+    Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
+private val graphXAxisLabelAngleCosine = cos(graphXAxisLabelAngleRadians).toFloat()
+private val graphXAxisLabelAngleSine = sin(graphXAxisLabelAngleRadians).toFloat()
+
+internal data class GraphXAxisLabelMetrics(
+    val width: Float,
+    val height: Float,
+) {
+    constructor(size: IntSize) : this(size.width.toFloat(), size.height.toFloat())
+
+    val projectedLeftExtent: Float = width * graphXAxisLabelAngleCosine
+    val projectedRightExtent: Float = height * graphXAxisLabelAngleSine
+    val projectedWidth: Float = projectedLeftExtent + projectedRightExtent
+    val projectedHeight: Float =
+        width * graphXAxisLabelAngleSine + height * graphXAxisLabelAngleCosine
+
+    /**
+     * Horizontal distance between the labels' right-edge anchors that separates their rotated
+     * rectangles. The rectangles are disjoint once either their text axes or height axes separate.
+     */
+    fun minimumAnchorDistanceTo(
+        next: GraphXAxisLabelMetrics,
+        minimumGap: Float,
+    ): Float {
+        val gap = minimumGap.coerceAtLeast(0f)
+        val distanceAlongText = if (graphXAxisLabelAngleCosine > 0f) {
+            (next.width + gap) / graphXAxisLabelAngleCosine
+        } else Float.POSITIVE_INFINITY
+        val distanceAcrossHeight = if (graphXAxisLabelAngleSine > 0f) {
+            (height + gap) / graphXAxisLabelAngleSine
+        } else Float.POSITIVE_INFINITY
+        return minOf(distanceAlongText, distanceAcrossHeight)
+    }
+}
+
 internal data class GraphXAxisTick<T>(
     val value: T,
     val label: String,
-    val projectedWidth: Float,
-    val projectedRightExtent: Float = 0f,
+    val metrics: GraphXAxisLabelMetrics,
 ) {
-    val projectedLeftExtent: Float get() = projectedWidth - projectedRightExtent
+    val projectedLeftExtent: Float get() = metrics.projectedLeftExtent
+    val projectedRightExtent: Float get() = metrics.projectedRightExtent
 }
 
 internal fun graphRotatedLabelWidth(size: IntSize): Float {
-    val radians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
-    return (size.width * cos(radians) + size.height * sin(radians)).toFloat()
+    return GraphXAxisLabelMetrics(size).projectedWidth
 }
 
 internal fun graphRotatedLabelRightExtent(size: IntSize): Float {
-    val radians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
-    return (size.height * sin(radians)).toFloat()
+    return GraphXAxisLabelMetrics(size).projectedRightExtent
 }
 
 internal fun graphRotatedLabelHeight(maximumWidth: Float, labelHeight: Float): Float {
-    val radians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
-    return (maximumWidth * sin(radians) + labelHeight * cos(radians)).toFloat()
+    return GraphXAxisLabelMetrics(maximumWidth, labelHeight).projectedHeight
 }
 
 /** Power-of-two bucket spacing shared by categorical charts such as bars and histograms. */
 internal fun calculateCategoricalGraphLabelSpacing(
     visibleBucketCount: Int,
-    maximumProjectedLabelWidth: Float,
+    maximumLabelMetrics: GraphXAxisLabelMetrics,
     bucketWidth: Float,
     minimumGap: Float,
 ): Int {
     var densitySpacing = 1
     while (visibleBucketCount.toDouble() / densitySpacing > 10.0) densitySpacing *= 2
     if (bucketWidth <= 0f || !bucketWidth.isFinite()) return densitySpacing
-    val widthSpacing = ceil((maximumProjectedLabelWidth + minimumGap) / bucketWidth)
+    val minimumAnchorDistance = maximumLabelMetrics.minimumAnchorDistanceTo(
+        maximumLabelMetrics,
+        minimumGap,
+    )
+    val widthSpacing = ceil(minimumAnchorDistance / bucketWidth)
         .toInt()
         .coerceAtLeast(1)
     return nextPowerOfTwo(max(densitySpacing, widthSpacing))
 }
 
-/** Greedily retains measured, rotated labels that fit within the available horizontal bounds. */
+/** Greedily retains measured labels whose rotated rectangles fit without colliding. */
 internal fun <T> selectGraphXAxisTicks(
     candidates: List<GraphXAxisTick<T>>,
     xToPixel: (T) -> Float,
@@ -68,14 +105,23 @@ internal fun <T> selectGraphXAxisTicks(
     minimumGap: Float,
 ): List<GraphXAxisTick<T>> {
     val selected = mutableListOf<GraphXAxisTick<T>>()
-    var previousRight = Float.NEGATIVE_INFINITY
+    var previousTick: GraphXAxisTick<T>? = null
+    var previousX = 0f
     candidates.forEach { tick ->
         val x = xToPixel(tick.value)
         val left = x - tick.projectedLeftExtent
         val right = x + tick.projectedRightExtent
-        if (left >= minimumX && right <= maximumX && left >= previousRight + minimumGap) {
+        val minimumAnchorDistance = previousTick?.metrics?.minimumAnchorDistanceTo(
+            tick.metrics,
+            minimumGap,
+        ) ?: 0f
+        if (
+            left >= minimumX && right <= maximumX &&
+            x - previousX >= minimumAnchorDistance
+        ) {
             selected += tick
-            previousRight = right
+            previousTick = tick
+            previousX = x
         }
     }
     return selected

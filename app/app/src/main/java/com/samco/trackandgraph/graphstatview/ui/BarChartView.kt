@@ -577,7 +577,7 @@ internal fun calculateBarChartLayout(
     val xSpacing = plotWidth / (viewport.maxX - viewport.minX).toFloat()
     val labelSpacing = calculateCategoricalGraphLabelSpacing(
         visibleBucketCount = ceil(viewport.maxX - viewport.minX).toInt(),
-        maximumProjectedLabelWidth = graphRotatedLabelWidth(maximumLabelSize),
+        maximumLabelMetrics = GraphXAxisLabelMetrics(maximumLabelSize),
         bucketWidth = xSpacing,
         minimumGap = graphAxisLabelMinimumGap.value * density,
     )
@@ -593,11 +593,17 @@ internal fun calculateBarChartLayout(
             GraphXAxisTick(
                 value = index.toDouble(),
                 label = label,
-                projectedWidth = graphRotatedLabelWidth(size),
-                projectedRightExtent = graphRotatedLabelRightExtent(size),
+                metrics = GraphXAxisLabelMetrics(size),
             )
         }
     }
+    val selectedXTicks = selectGraphXAxisTicks(
+        candidates = xTicks,
+        xToPixel = { value -> left + ((value - viewport.minX) / (viewport.maxX - viewport.minX) * plotWidth).toFloat() },
+        minimumX = 0f,
+        maximumX = width,
+        minimumGap = graphAxisLabelMinimumGap.value * density,
+    )
     val bottom = height - graphRotatedLabelHeight(
         maximumLabelSize.width.toFloat(),
         maximumLabelSize.height.toFloat(),
@@ -610,7 +616,7 @@ internal fun calculateBarChartLayout(
         minY = yMin,
         maxY = yMax,
         barCount = xDates.size,
-        xTicks = xTicks,
+        xTicks = selectedXTicks,
         yTicks = yTicks,
     )
 }

@@ -69,7 +69,6 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToLong
-import kotlin.math.sin
 import timber.log.Timber
 
 private const val PERFORMANCE_LOG_TAG = "LineGraphPerf"
@@ -607,8 +606,7 @@ internal fun calculateLineGraphLayout(
         return GraphXAxisTick(
             value = epochMillis,
             label = label,
-            projectedWidth = graphRotatedLabelWidth(measured),
-            projectedRightExtent = graphRotatedLabelRightExtent(measured),
+            metrics = GraphXAxisLabelMetrics(measured),
         )
     }
     val startBoundaryTick = tickAt(visibleMinX, graphXAxisContextualStartLabelFormat(labelFormat))
@@ -629,14 +627,16 @@ internal fun calculateLineGraphLayout(
         xLabelText,
     )
     val estimatedSize = xLabelSizes.getOrPut(representativeLabel) { measureText(representativeLabel) }
-    val estimatedProjectedWidth = graphRotatedLabelWidth(estimatedSize)
-    val capacityProjectedLabelWidth = maximumXTickLabelWidth?.let { width ->
-        (width * cos(angleRadians) + estimatedSize.height * sin(angleRadians)).toFloat()
-    } ?: estimatedProjectedWidth
+    val capacityLabelMetrics = GraphXAxisLabelMetrics(
+        width = maximumXTickLabelWidth ?: estimatedSize.width.toFloat(),
+        height = estimatedSize.height.toFloat(),
+    )
     val estimatedMaximumTickCount = maximumLineGraphTickCount(
         plotWidth = preliminaryPlotWidth,
-        maximumProjectedWidth = capacityProjectedLabelWidth,
-        minimumGap = minimumGap,
+        minimumAnchorDistance = capacityLabelMetrics.minimumAnchorDistanceTo(
+            capacityLabelMetrics,
+            minimumGap,
+        ),
     )
     val divisionCount = lineGraphTimeDivisionCount(
         fullSpan = fullMaxX - fullMinX,
@@ -686,9 +686,8 @@ internal fun calculateLineGraphLayout(
 
 internal fun maximumLineGraphTickCount(
     plotWidth: Float,
-    maximumProjectedWidth: Float,
-    minimumGap: Float,
-): Int = floor(plotWidth / max(1f, maximumProjectedWidth + minimumGap)).toInt().coerceAtLeast(1)
+    minimumAnchorDistance: Float,
+): Int = floor(plotWidth / max(1f, minimumAnchorDistance)).toInt().coerceAtLeast(1)
 
 internal fun lineGraphTimeDivisionCount(
     fullSpan: Long,
