@@ -57,8 +57,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewDat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
 import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
 import com.samco.trackandgraph.helpers.formatTimeDuration
-import org.threeten.bp.Duration
-import org.threeten.bp.Instant
+import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import java.text.DecimalFormat
@@ -377,6 +376,8 @@ private fun LineGraphBodyView(
             )
         }
     }
+
+    DialogInputSpacing()
 
     GraphLegend(
         items = lines.map { GraphLegendItem(color = getColor(it.color), label = it.name) }

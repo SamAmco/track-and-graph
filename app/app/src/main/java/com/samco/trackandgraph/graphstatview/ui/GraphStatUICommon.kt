@@ -51,7 +51,7 @@ import com.samco.trackandgraph.ui.dataVisColorList
 
 private const val GRAPH_HEIGHT_WITH_LEGEND_MULTIPLIER = 0.8f
 private const val GRAPH_HEIGHT_WITHOUT_LEGEND_MULTIPLIER = 0.9f
-private val listModeGraphHeight = 220.dp
+private val listModeGraphHeight = 225.dp
 
 internal const val graphGridLineAlpha = 0.25f
 internal const val graphXAxisLabelAngle = -28f
