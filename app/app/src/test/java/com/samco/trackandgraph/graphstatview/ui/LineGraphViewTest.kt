@@ -137,7 +137,6 @@ class LineGraphViewTest {
             maxX = 100,
             plotLeft = 30f,
             plotWidth = 100f,
-            minimumGap = 5f,
         )
 
         assertEquals(listOf(0L, 30L, 70L, 100L), selected.map { it.value })
@@ -154,7 +153,6 @@ class LineGraphViewTest {
             maxX = 100,
             plotLeft = 30f,
             plotWidth = 100f,
-            minimumGap = 5f,
         )
 
         assertEquals(listOf(50L), selected.map { it.value })
@@ -163,7 +161,7 @@ class LineGraphViewTest {
     @Test
     fun `x tick selection handles empty and single candidate lists`() {
         assertTrue(
-            selectLineGraphXTicks(emptyList(), 0, 100, 30f, 100f, 5f).isEmpty()
+            selectLineGraphXTicks(emptyList(), 0, 100, 30f, 100f).isEmpty()
         )
         assertEquals(
             listOf(50L),
@@ -173,7 +171,6 @@ class LineGraphViewTest {
                 maxX = 100,
                 plotLeft = 30f,
                 plotWidth = 100f,
-                minimumGap = 5f,
             ).map { it.value },
         )
     }

@@ -18,10 +18,10 @@ class GraphXAxisLayoutTest {
     @Test
     fun rotatedRectanglesNeedLessSpaceThanTheirProjectedBounds() {
         val metrics = GraphXAxisLabelMetrics(width = 60f, height = 12f)
-        val anchorDistance = metrics.minimumAnchorDistanceTo(metrics, minimumGap = 4f)
+        val anchorDistance = metrics.minimumAnchorDistanceTo(metrics)
 
-        assertTrue(anchorDistance < metrics.projectedWidth + 4f)
-        assertEquals(34.08f, anchorDistance, 0.01f)
+        assertTrue(anchorDistance < metrics.projectedWidth)
+        assertEquals(25.56f, anchorDistance, 0.01f)
     }
 
     @Test
@@ -37,10 +37,9 @@ class GraphXAxisLayoutTest {
             xToPixel = { it },
             minimumX = Float.NEGATIVE_INFINITY,
             maximumX = Float.POSITIVE_INFINITY,
-            minimumGap = 4f,
         )
 
-        assertTrue(35f < metrics.projectedWidth + 4f)
+        assertTrue(35f < metrics.projectedWidth)
         assertEquals(candidates, selected)
     }
 }

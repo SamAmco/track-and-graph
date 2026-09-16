@@ -597,7 +597,6 @@ internal fun calculateLineGraphLayout(
     val fullMaxX = allTimestamps.last()
     val labelFormat = graphXAxisLabelFormatForDuration(visibleSpan)
     val angleRadians = Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
-    val minimumGap = graphAxisLabelMinimumGap.value * density
     val zoneId = ZoneId.systemDefault()
     val xLabelSizes = mutableMapOf<String, IntSize>()
     fun tickAt(epochMillis: Long, format: GraphXAxisLabelFormat = labelFormat): GraphXAxisTick<Long> {
@@ -633,10 +632,7 @@ internal fun calculateLineGraphLayout(
     )
     val estimatedMaximumTickCount = maximumLineGraphTickCount(
         plotWidth = preliminaryPlotWidth,
-        minimumAnchorDistance = capacityLabelMetrics.minimumAnchorDistanceTo(
-            capacityLabelMetrics,
-            minimumGap,
-        ),
+        minimumAnchorDistance = capacityLabelMetrics.minimumAnchorDistanceTo(capacityLabelMetrics),
     )
     val divisionCount = lineGraphTimeDivisionCount(
         fullSpan = fullMaxX - fullMinX,
@@ -660,7 +656,6 @@ internal fun calculateLineGraphLayout(
         maxX = visibleMaxX,
         plotLeft = left,
         plotWidth = preliminaryPlotWidth,
-        minimumGap = minimumGap,
     )
     val maxLabelWidth = maxOf(
         xTicks.maxOfOrNull { tick ->
@@ -750,7 +745,6 @@ internal fun selectLineGraphXTicks(
     maxX: Long,
     plotLeft: Float,
     plotWidth: Float,
-    minimumGap: Float,
 ): List<GraphXAxisTick<Long>> {
     val orderedCandidates = candidates
         .distinctBy { it.value }
@@ -762,7 +756,6 @@ internal fun selectLineGraphXTicks(
         },
         minimumX = 0f,
         maximumX = Float.POSITIVE_INFINITY,
-        minimumGap = minimumGap,
     )
 }
 

@@ -361,7 +361,6 @@ internal fun calculateTimeHistogramLayout(
         visibleBucketCount = ceil(viewport.maxX - viewport.minX).toInt(),
         maximumLabelMetrics = GraphXAxisLabelMetrics(maximumLabelSize),
         bucketWidth = bucketWidth,
-        minimumGap = graphAxisLabelMinimumGap.value * density,
     )
     val firstTick = ceil(max(0.0, viewport.minX) / labelSpacing).toInt() * labelSpacing
     val lastTick = floor(min(bucketLabels.lastIndex.toDouble(), viewport.maxX) / labelSpacing)
@@ -383,7 +382,6 @@ internal fun calculateTimeHistogramLayout(
         xToPixel = ::xToPixel,
         minimumX = 0f,
         maximumX = width,
-        minimumGap = graphAxisLabelMinimumGap.value * density,
     )
     return TimeHistogramLayout(
         plotRect = plot,
@@ -401,12 +399,11 @@ internal fun calculateTimeHistogramLabelSpacing(
     visibleBucketCount: Int,
     maximumLabelMetrics: GraphXAxisLabelMetrics,
     bucketWidth: Float,
-    minimumGap: Float,
 ): Int {
     val densitySpacing = ceil(visibleBucketCount.coerceAtLeast(1) / 12.0).toInt()
     val collisionSpacing = if (bucketWidth > 0f && bucketWidth.isFinite()) {
         ceil(
-            maximumLabelMetrics.minimumAnchorDistanceTo(maximumLabelMetrics, minimumGap) /
+            maximumLabelMetrics.minimumAnchorDistanceTo(maximumLabelMetrics) /
                 bucketWidth
         ).toInt()
     } else 1

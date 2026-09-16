@@ -10,14 +10,11 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
-
-internal val graphAxisLabelMinimumGap = 4.dp
 
 private val graphXAxisLabelAngleRadians =
     Math.toRadians(abs(graphXAxisLabelAngle).toDouble())
@@ -40,16 +37,12 @@ internal data class GraphXAxisLabelMetrics(
      * Horizontal distance between the labels' right-edge anchors that separates their rotated
      * rectangles. The rectangles are disjoint once either their text axes or height axes separate.
      */
-    fun minimumAnchorDistanceTo(
-        next: GraphXAxisLabelMetrics,
-        minimumGap: Float,
-    ): Float {
-        val gap = minimumGap.coerceAtLeast(0f)
+    fun minimumAnchorDistanceTo(next: GraphXAxisLabelMetrics): Float {
         val distanceAlongText = if (graphXAxisLabelAngleCosine > 0f) {
-            (next.width + gap) / graphXAxisLabelAngleCosine
+            next.width / graphXAxisLabelAngleCosine
         } else Float.POSITIVE_INFINITY
         val distanceAcrossHeight = if (graphXAxisLabelAngleSine > 0f) {
-            (height + gap) / graphXAxisLabelAngleSine
+            height / graphXAxisLabelAngleSine
         } else Float.POSITIVE_INFINITY
         return minOf(distanceAlongText, distanceAcrossHeight)
     }
@@ -81,15 +74,11 @@ internal fun calculateCategoricalGraphLabelSpacing(
     visibleBucketCount: Int,
     maximumLabelMetrics: GraphXAxisLabelMetrics,
     bucketWidth: Float,
-    minimumGap: Float,
 ): Int {
     var densitySpacing = 1
     while (visibleBucketCount.toDouble() / densitySpacing > 10.0) densitySpacing *= 2
     if (bucketWidth <= 0f || !bucketWidth.isFinite()) return densitySpacing
-    val minimumAnchorDistance = maximumLabelMetrics.minimumAnchorDistanceTo(
-        maximumLabelMetrics,
-        minimumGap,
-    )
+    val minimumAnchorDistance = maximumLabelMetrics.minimumAnchorDistanceTo(maximumLabelMetrics)
     val widthSpacing = ceil(minimumAnchorDistance / bucketWidth)
         .toInt()
         .coerceAtLeast(1)
@@ -102,7 +91,6 @@ internal fun <T> selectGraphXAxisTicks(
     xToPixel: (T) -> Float,
     minimumX: Float,
     maximumX: Float,
-    minimumGap: Float,
 ): List<GraphXAxisTick<T>> {
     val selected = mutableListOf<GraphXAxisTick<T>>()
     var previousTick: GraphXAxisTick<T>? = null
@@ -111,10 +99,7 @@ internal fun <T> selectGraphXAxisTicks(
         val x = xToPixel(tick.value)
         val left = x - tick.projectedLeftExtent
         val right = x + tick.projectedRightExtent
-        val minimumAnchorDistance = previousTick?.metrics?.minimumAnchorDistanceTo(
-            tick.metrics,
-            minimumGap,
-        ) ?: 0f
+        val minimumAnchorDistance = previousTick?.metrics?.minimumAnchorDistanceTo(tick.metrics) ?: 0f
         if (
             left >= minimumX && right <= maximumX &&
             x - previousX >= minimumAnchorDistance

@@ -579,7 +579,6 @@ internal fun calculateBarChartLayout(
         visibleBucketCount = ceil(viewport.maxX - viewport.minX).toInt(),
         maximumLabelMetrics = GraphXAxisLabelMetrics(maximumLabelSize),
         bucketWidth = xSpacing,
-        minimumGap = graphAxisLabelMinimumGap.value * density,
     )
     val firstTick = ceil(max(0.0, viewport.minX) / labelSpacing).toInt() * labelSpacing
     val lastTick = floor(min(xDates.lastIndex.toDouble(), viewport.maxX) / labelSpacing)
@@ -602,7 +601,6 @@ internal fun calculateBarChartLayout(
         xToPixel = { value -> left + ((value - viewport.minX) / (viewport.maxX - viewport.minX) * plotWidth).toFloat() },
         minimumX = 0f,
         maximumX = width,
-        minimumGap = graphAxisLabelMinimumGap.value * density,
     )
     val bottom = height - graphRotatedLabelHeight(
         maximumLabelSize.width.toFloat(),

@@ -60,7 +60,6 @@ class BarChartViewTest {
                 visibleBucketCount = 26,
                 maximumLabelMetrics = GraphXAxisLabelMetrics(width = 120f, height = 12f),
                 bucketWidth = 25f,
-                minimumGap = 4f,
             ),
         )
     }
@@ -73,7 +72,6 @@ class BarChartViewTest {
                 visibleBucketCount = 26,
                 maximumLabelMetrics = GraphXAxisLabelMetrics(width = 60f, height = 12f),
                 bucketWidth = 25f,
-                minimumGap = 4f,
             ),
         )
     }
