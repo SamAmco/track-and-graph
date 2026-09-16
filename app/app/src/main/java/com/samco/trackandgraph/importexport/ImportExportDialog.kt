@@ -38,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -53,6 +54,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.csvreadwriter.ImportFeaturesException
 import com.samco.trackandgraph.importexport.ImportExportFeatureUtils.getFileNameFromUri
@@ -70,6 +73,23 @@ import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 
 @Composable
 fun ImportExportDialog(
+    trackGroupId: Long,
+    trackGroupName: String?,
+    onDismissRequest: () -> Unit,
+) {
+    val dialogOwner = rememberViewModelStoreOwner()
+
+    CompositionLocalProvider(LocalViewModelStoreOwner provides dialogOwner) {
+        ImportExportDialogDestination(
+            trackGroupId = trackGroupId,
+            trackGroupName = trackGroupName,
+            onDismissRequest = onDismissRequest,
+        )
+    }
+}
+
+@Composable
+private fun ImportExportDialogDestination(
     trackGroupId: Long,
     trackGroupName: String?,
     onDismissRequest: () -> Unit,
