@@ -91,7 +91,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
                 }
 
                 reminderInteractor.clearNotifications()
-                TrackAndGraphDatabase.stageRestore(context, tempFile)
+                TrackAndGraphDatabase.validateAndStageRestore(context, tempFile)
 
                 return RestoreResult.SUCCESS
             } catch (t: Throwable) {
@@ -112,13 +112,20 @@ class BackupRestoreInteractorImpl @Inject constructor(
                 SQLiteDatabase.OPEN_READONLY
             )
 
-            if (db.version > TNG_DATABASE_VERSION) return false
+            val integrityCheckResults = db.rawQuery("PRAGMA integrity_check", null).use { cursor ->
+                buildList {
+                    while (cursor.moveToNext()) add(cursor.getString(0))
+                }
+            }
+            return isValidRestoreDatabaseMetadata(
+                version = db.version,
+                integrityCheckResults = integrityCheckResults,
+            )
         } catch (t: Throwable) {
             return false
         } finally {
             db?.close()
         }
-        return true
     }
 
     override suspend fun performAutoBackup(): BackupResult {
@@ -248,3 +255,10 @@ class BackupRestoreInteractorImpl @Inject constructor(
         backupConfigChanged.tryEmit(Unit)
     }
 }
+
+internal fun isValidRestoreDatabaseMetadata(
+    version: Int,
+    integrityCheckResults: List<String>,
+): Boolean =
+    version in 1..TNG_DATABASE_VERSION &&
+            integrityCheckResults == listOf("ok")

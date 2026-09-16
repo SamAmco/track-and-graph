@@ -74,8 +74,8 @@ docs:
 
   - file: database-backup-restore.md
     title: Database backup and restore lifecycle
-    description: Backup checkpointing and the staged, restart-based restore protocol that prevents replacing a database while Room is active.
-    keywords: [database, backup, restore, Room, SQLite, WAL, SHM, checkpoint, staging, atomic-rename, PendingDatabaseRestore]
+    description: Backup checkpointing, SQLite integrity/version checks, generated Room schema validation, and the staged restart-based protocol that prevents replacing a database while Room is active.
+    keywords: [database, backup, restore, Room, SQLite, integrity_check, user_version, schema-validation, WAL, SHM, checkpoint, staging, atomic-rename, PendingDatabaseRestore]
 
   - file: group-hierarchy.md
     title: Group DAG structure and symlinks

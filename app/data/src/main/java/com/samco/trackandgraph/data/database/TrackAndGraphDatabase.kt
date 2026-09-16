@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.data.database
 
 import android.content.Context
+import androidx.annotation.WorkerThread
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -65,12 +66,15 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAmount
+import java.io.File
+import java.io.FileOutputStream
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 const val TNG_DATABASE_VERSION = 60
 
 private const val TNG_DATABASE_NAME = "trackandgraph_database"
+private const val TNG_RESTORE_VALIDATION_DATABASE_NAME = "trackandgraph_restore_validation"
 
 @Database(
     entities = [
@@ -107,14 +111,44 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
         private var INSTANCE: TrackAndGraphDatabase? = null
 
         /**
-         * Copies an already validated database to a private staging file. It will replace the live
-         * database the next time a process constructs the Room singleton.
+         * Validates a restore candidate with Room, then stages it for the next process start.
+         * This performs blocking file and database I/O and must be called from a worker thread.
          */
-        fun stageRestore(context: Context, source: java.io.File) {
-            PendingDatabaseRestore.stage(
-                source = source,
-                databaseFile = context.applicationContext.getDatabasePath(TNG_DATABASE_NAME),
-            )
+        @WorkerThread
+        fun validateAndStageRestore(context: Context, source: File) {
+            val appContext = context.applicationContext
+            val validationFile = appContext.getDatabasePath(TNG_RESTORE_VALIDATION_DATABASE_NAME)
+            var validationDatabase: TrackAndGraphDatabase? = null
+
+            appContext.deleteDatabase(TNG_RESTORE_VALIDATION_DATABASE_NAME)
+            try {
+                validationFile.parentFile?.mkdirs()
+                source.inputStream().use { input ->
+                    FileOutputStream(validationFile).use { output ->
+                        input.copyTo(output)
+                        output.fd.sync()
+                    }
+                }
+
+                validationDatabase = createRoomInstance(
+                    context = appContext,
+                    name = TNG_RESTORE_VALIDATION_DATABASE_NAME,
+                    allowDestructiveMigration = false,
+                    journalMode = JournalMode.TRUNCATE,
+                )
+                // Room opens lazily. Force migrations and generated schema validation now.
+                validationDatabase.openHelper.writableDatabase
+                validationDatabase.close()
+                validationDatabase = null
+
+                PendingDatabaseRestore.stage(
+                    source = validationFile,
+                    databaseFile = appContext.getDatabasePath(TNG_DATABASE_NAME),
+                )
+            } finally {
+                validationDatabase?.close()
+                appContext.deleteDatabase(TNG_RESTORE_VALIDATION_DATABASE_NAME)
+            }
         }
 
         fun getInstance(context: Context): TrackAndGraphDatabase {
@@ -124,23 +158,39 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                     PendingDatabaseRestore.installIfPending(
                         context.applicationContext.getDatabasePath(TNG_DATABASE_NAME)
                     )
-                    instance = createRoomInstance(context)
+                    instance = createRoomInstance(
+                        context = context,
+                        name = TNG_DATABASE_NAME,
+                        allowDestructiveMigration = true,
+                    )
                     INSTANCE = instance
                 }
                 return instance
             }
         }
 
-        private fun createRoomInstance(context: Context): TrackAndGraphDatabase {
-            return Room.databaseBuilder(
+        private fun createRoomInstance(
+            context: Context,
+            name: String,
+            allowDestructiveMigration: Boolean,
+            journalMode: JournalMode? = null,
+        ): TrackAndGraphDatabase {
+            val builder = Room.databaseBuilder(
                 context.applicationContext,
                 TrackAndGraphDatabase::class.java,
-                TNG_DATABASE_NAME // This name is also in backup_rules.xml
+                name
             )
                 .addMigrations(*allMigrations)
-                .fallbackToDestructiveMigration(dropAllTables = true)
                 .addCallback(databaseCallback())
-                .build()
+
+            if (allowDestructiveMigration) {
+                builder.fallbackToDestructiveMigration(dropAllTables = true)
+            }
+            if (journalMode != null) {
+                builder.setJournalMode(journalMode)
+            }
+
+            return builder.build()
         }
 
         private fun databaseCallback() = object : RoomDatabase.Callback() {

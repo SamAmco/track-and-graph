@@ -21,10 +21,15 @@ observers, workers, or other callers may still be querying it.
 
 Restore instead uses two phases:
 
-1. While the current process is running, copy the selected file to a temporary file and perform the
-   existing backup validation. `TrackAndGraphDatabase.stageRestore` then copies it to a private
-   staging file beside the real database, flushes it, and creates a pending marker. The live
-   database remains open and unchanged.
+1. While the current process is running, copy the selected file to a temporary file and validate it.
+   A restore candidate must pass SQLite's full `PRAGMA integrity_check` and have a positive
+   `user_version` no newer than the app. Version zero is rejected because Room may treat it as a new
+   database. Room then opens a private copy using the production database class and migration list,
+   with destructive fallback disabled. Room itself determines whether a migration path exists,
+   runs it, and performs its generated current-schema validation. There is no second hard-coded
+   minimum version or table list to maintain. The migrated, validated copy is staged beside the
+   real database, flushed, and accompanied by a pending marker. The live database remains open and
+   unchanged.
 2. On the next process start, `TrackAndGraphDatabase.getInstance` checks the marker before building
    Room. `PendingDatabaseRestore` atomically renames the staged database over the real file, removes
    sidecars belonging to the replaced database, and only then clears the marker and allows Room to
@@ -39,6 +44,7 @@ The staging file is in the database directory so promotion uses a same-filesyste
 The explicit cloud-backup allowlist includes only the real database name, not restore staging
 artifacts.
 
-This protocol deliberately retains the existing version check, Room migrations, and destructive
-migration policy. It solves live-file replacement and stale-sidecar races; it is not a separate
-schema-validation or rollback system.
+The normal database's configured destructive-migration policy remains unchanged. Restore
+validation never enables that fallback: unsupported or structurally incompatible candidates are
+rejected before the live database is replaced. This protocol does not provide a post-install
+rollback system.
