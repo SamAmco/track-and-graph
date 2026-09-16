@@ -30,6 +30,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.samco.trackandgraph.data.database.dto.ReminderInput
+import com.samco.trackandgraph.navigation.popLastIfNotRoot
 import com.samco.trackandgraph.ui.compose.animation.popTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.predictivePopTransitionSpec
 import com.samco.trackandgraph.ui.compose.animation.navSizeTransform
@@ -84,9 +85,7 @@ fun AddReminderDialogContent(
         entries = entries,
         contentAlignment = Alignment.Center,
         onBack = {
-            if (navBackStack.size > 1) {
-                navBackStack.removeLastOrNull()
-            } else {
+            if (!navBackStack.popLastIfNotRoot()) {
                 onNavigateBackFromTypeSelection()
             }
         },

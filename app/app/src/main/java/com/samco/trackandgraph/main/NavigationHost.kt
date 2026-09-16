@@ -50,6 +50,7 @@ import com.samco.trackandgraph.group.GroupNavKey
 import com.samco.trackandgraph.group.GroupScreen
 import com.samco.trackandgraph.notes.NotesNavKey
 import com.samco.trackandgraph.notes.NotesScreen
+import com.samco.trackandgraph.navigation.popLastIfNotRoot
 import com.samco.trackandgraph.reminders.ui.RemindersNavKey
 import com.samco.trackandgraph.reminders.ui.RemindersScreen
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
@@ -80,7 +81,7 @@ fun NavigationHost(
     predictivePopTransitionSpec = predictivePopTransitionSpec(),
 
     backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
+    onBack = { backStack.popLastIfNotRoot() },
     entryProvider = { destination ->
         when (destination) {
             is GroupNavKey -> NavEntry(destination) {
@@ -150,7 +151,7 @@ fun NavigationHost(
             is AddTrackerNavKey -> NavEntry(destination) {
                 AddTrackerScreen(
                     navArgs = destination,
-                    onPopBack = { backStack.removeLastOrNull() }
+                    onPopBack = { backStack.popLastIfNotRoot() }
                 )
             }
 
@@ -158,14 +159,14 @@ fun NavigationHost(
                 GraphStatInputScreen(
                     navArgs = destination,
                     urlNavigator = urlNavigator,
-                    onPopBack = { backStack.removeLastOrNull() }
+                    onPopBack = { backStack.popLastIfNotRoot() }
                 )
             }
 
             is FunctionsNavKey -> NavEntry(destination) {
                 FunctionsScreen(
                     navArgs = destination,
-                    onPopBack = { backStack.removeLastOrNull() }
+                    onPopBack = { backStack.popLastIfNotRoot() }
                 )
             }
 

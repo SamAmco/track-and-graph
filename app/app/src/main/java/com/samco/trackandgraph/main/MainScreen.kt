@@ -87,6 +87,7 @@ import com.samco.trackandgraph.group.GroupNavKey
 import com.samco.trackandgraph.navigation.DeepLink
 import com.samco.trackandgraph.navigation.DeepLinkNavigatorImpl
 import com.samco.trackandgraph.navigation.LocalDeepLinkNavigator
+import com.samco.trackandgraph.navigation.popLastIfNotRoot
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.animation.NAV_ANIM_DURATION_MILLIS
 import com.samco.trackandgraph.ui.compose.appbar.AppBarConfig
@@ -218,7 +219,7 @@ private fun MainView(
                         scope.launch { drawerState.close() }
                         backStack[0] = GroupNavKey()
                         while (backStack.size > 1) {
-                            backStack.removeLastOrNull()
+                            backStack.popLastIfNotRoot()
                         }
                         backStack.add(it)
                     },
@@ -307,7 +308,7 @@ fun AppBar(
                     onClick = {
                         when {
                             config.overrideBackNavigationAction != null -> config.overrideBackNavigationAction.invoke()
-                            config.backNavigationAction && backStack.size > 1 -> backStack.removeLastOrNull()
+                            config.backNavigationAction -> backStack.popLastIfNotRoot()
                             else -> scope.launch { drawerState.open() }
                         }
                     }

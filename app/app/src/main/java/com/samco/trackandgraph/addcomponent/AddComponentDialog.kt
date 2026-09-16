@@ -39,6 +39,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.addgroup.AddGroupDialogContent
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.data.database.dto.GroupChildType
+import com.samco.trackandgraph.navigation.popLastIfNotRoot
 import com.samco.trackandgraph.reminders.ui.AddReminderDialogContent
 import com.samco.trackandgraph.reminders.ui.AddReminderViewModelImpl
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialogContent
@@ -100,9 +101,7 @@ fun AddComponentDialog(
         onDismiss()
     }
     val navigateBack: () -> Unit = {
-        if (navBackStack.size > 1) {
-            navBackStack.removeLastOrNull()
-        } else {
+        if (!navBackStack.popLastIfNotRoot()) {
             dismiss()
         }
     }

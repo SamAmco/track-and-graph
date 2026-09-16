@@ -70,8 +70,7 @@ internal fun NavBackStack<NavKey>.applyGroupDescentPath(descent: GroupDescentPat
     if (descent.groupIds.isEmpty()) {
         if (descent.groupItemId == null) return
         val top = lastOrNull() as? GroupNavKey ?: return
-        removeLastOrNull()
-        add(top.copy(scrollToGroupItemId = descent.groupItemId))
+        this[lastIndex] = top.copy(scrollToGroupItemId = descent.groupItemId)
         return
     }
     descent.groupIds.forEachIndexed { index, groupId ->

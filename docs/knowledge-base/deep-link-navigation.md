@@ -11,6 +11,7 @@ topics:
   - SearchResultItem.paths.size drives UI branching — 1 navigates directly, >1 opens SymlinksDialog in tap-to-navigate mode
   - DeepLinkNavigator is provided via LocalDeepLinkNavigator CompositionLocal (matches LocalTopBarController precedent)
   - DeepLinkNavigatorImpl is not @Singleton — it captures the NavBackStack which is per-composition
+  - Every mounted NavDisplay must retain a root entry; popLastIfNotRoot centralizes this invariant and tolerates repeated callbacks
   - applyGroupDescentPath APPENDS onto the current back stack — pushes one GroupNavKey per id; last entry carries scrollToGroupItemId (null when navigating to the group itself)
   - Empty groupIds → top entry is replaced with a copy carrying the scroll hint, no nav transition; empty groupIds + null groupItemId is a no-op
   - GroupNode placements get descent = (groupIds + childGroupId, groupItemId = null) so tapping a group in search navigates INTO it instead of scrolling to it in its parent
@@ -20,7 +21,7 @@ topics:
   - Search must hide before navigating — the nav back-stack only covers nav3 destinations, not the in-place search overlay
   - Reminder notifications carry reminderId rather than groupItemId so moving a reminder does not stale the payload
   - MainActivity resolves the reminder's current first path from the root GroupGraph; missing/global-only reminders fall back to a normal app launch
-keywords: [deep-link, DeepLink, DeepLinkNavigator, DeepLinkNavigatorImpl, LocalDeepLinkNavigator, GroupDescentPath, ResolvedPath, SearchResultItem, applyGroupDescentPath, descent-relative, append-semantics, scrollToGroupItemId, GroupNavKey, NavBackStack, CompositionLocal, staticCompositionLocalOf, navigation3, symlink, disambiguation, SymlinksDialog, SymlinksDialogContent, onPathClick, search, SearchScreen, ComponentKey, buildResolvedPaths, walkPaths, rememberSaveable, MonotonicFrameClock, animateScrollToItem, LaunchedEffect, hideSearch]
+keywords: [deep-link, DeepLink, DeepLinkNavigator, DeepLinkNavigatorImpl, LocalDeepLinkNavigator, GroupDescentPath, ResolvedPath, SearchResultItem, applyGroupDescentPath, popLastIfNotRoot, root-entry, empty-backstack, descent-relative, append-semantics, scrollToGroupItemId, GroupNavKey, NavBackStack, NavDisplay, CompositionLocal, staticCompositionLocalOf, navigation3, symlink, disambiguation, SymlinksDialog, SymlinksDialogContent, onPathClick, search, SearchScreen, ComponentKey, buildResolvedPaths, walkPaths, rememberSaveable, MonotonicFrameClock, animateScrollToItem, LaunchedEffect, hideSearch]
 ---
 
 # Deep-link navigation
@@ -55,6 +56,21 @@ The downside is the O(paths) walk instead of O(depth), but paths are computed on
 - **`GroupDescentPath` (data, `navigation/GroupDescentPath.kt`)** — `(groupIds: List<Long>, groupItemId: Long)`. Carries only ids so any caller can construct one with minimal information — no `Group` DTOs needed. Semantically a descent chain; see the section above.
 - **`DeepLinkNavigator` (`navigation/DeepLinkNavigator.kt`)** — interface + CompositionLocal + impl. The impl is *not* `@Singleton` because it holds a reference to the `NavBackStack`, which is created per `MainScreen` composition via `rememberNavBackStack`.
 - **`applyGroupDescentPath` (extension on `NavBackStack<NavKey>`)** — imperative glue. Lives next to the rest of the back-stack wiring conceptually (same module, same file as the navigator). Pushes one `GroupNavKey` per id (outer-to-inner); the last entry carries `scrollToGroupItemId`. Empty `groupIds` replaces the top entry with a `copy(scrollToGroupItemId = …)` so the current screen scrolls without a nav transition.
+
+## Back-stack root invariant
+
+Every mounted Navigation 3 `NavDisplay` requires a non-empty back stack. Do not use
+`removeLastOrNull()` directly for Back or destination-completion callbacks: two callbacks can be
+delivered before navigation recomposes, allowing the second call to remove the root entry and
+crash `NavDisplay`. Route ordinary pops through `popLastIfNotRoot()`, including callbacks handed to
+child screens. It checks and mutates together and becomes a no-op once only the root remains.
+
+Dialog teardown is different: a dialog host may intentionally clear its stack to release decorated
+entry ViewModels, but its `NavDisplay` must already be absent or conditionally excluded when the
+decorated entries are empty. See [dialogs.md](dialogs.md) for that lifetime pattern.
+
+Replacing the current destination is not a pop followed by an add. Assign the replacement at
+`lastIndex` so observers never see a transient empty stack when replacing the sole root entry.
 
 ## Why CompositionLocal over callback plumbing
 
