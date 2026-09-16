@@ -12,6 +12,7 @@ package com.samco.trackandgraph.reminders.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,13 +34,16 @@ import com.samco.trackandgraph.data.database.dto.Reminder
 import com.samco.trackandgraph.data.database.dto.ReminderInput
 import com.samco.trackandgraph.data.database.dto.ReminderParams
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.ui.DateTimeButtonRow
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.ui.RowCheckbox
 import com.samco.trackandgraph.ui.ui.RowRadioButton
+import com.samco.trackandgraph.ui.ui.buttonSize
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @Composable
 fun OneTimeReminderConfigurationScreen(
@@ -125,21 +129,34 @@ private fun OneTimeReminderConfigurationContent(
             onReminderNameChanged = onReminderNameChanged,
             enabled = enabled,
             onEnabledChanged = onEnabledChanged,
-            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
         )
 
         InputSpacingLarge()
-        HorizontalDivider()
+
+        Text(
+            text = stringResource(R.string.first_reminder),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.tngColors.onSurface,
+        )
+
         InputSpacingLarge()
 
         RowRadioButton(
+            modifier = Modifier.fillMaxWidth(),
             selected = startType == OneTimeStartType.DATE_TIME,
             text = stringResource(R.string.remind_at_date_and_time),
             onClick = { onStartTypeChanged(OneTimeStartType.DATE_TIME) },
             textStyle = MaterialTheme.typography.titleSmall,
         )
         AnimatedVisibility(startType == OneTimeStartType.DATE_TIME) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = buttonSize),
+            ) {
                 DialogInputSpacing()
                 DateTimeButtonRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -152,13 +169,18 @@ private fun OneTimeReminderConfigurationContent(
         DialogInputSpacing()
 
         RowRadioButton(
+            modifier = Modifier.fillMaxWidth(),
             selected = startType == OneTimeStartType.AFTER_DELAY,
             text = stringResource(R.string.remind_after_a_delay),
             onClick = { onStartTypeChanged(OneTimeStartType.AFTER_DELAY) },
             textStyle = MaterialTheme.typography.titleSmall,
         )
         AnimatedVisibility(startType == OneTimeStartType.AFTER_DELAY) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = buttonSize),
+            ) {
                 DialogInputSpacing()
                 IntervalPeriodRow(
                     interval = delayInterval,
@@ -171,16 +193,21 @@ private fun OneTimeReminderConfigurationContent(
 
         InputSpacingLarge()
         HorizontalDivider()
-        InputSpacingLarge()
+        DialogInputSpacing()
 
         RowCheckbox(
+            modifier = Modifier.fillMaxWidth(),
             checked = hasRepeatInterval,
             onCheckedChange = onHasRepeatIntervalChanged,
             text = stringResource(R.string.then_remind_every),
             textStyle = MaterialTheme.typography.titleSmall,
         )
         AnimatedVisibility(hasRepeatInterval) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = buttonSize),
+            ) {
                 DialogInputSpacing()
                 IntervalPeriodRow(
                     interval = repeatInterval,
@@ -213,7 +240,7 @@ private fun OneTimeReminderConfigurationContentPreview() {
             onEnabledChanged = {},
             startType = OneTimeStartType.AFTER_DELAY,
             onStartTypeChanged = {},
-            starts = OffsetDateTime.now().plusHours(1),
+            starts = OffsetDateTime.of(2026, 9, 16, 14, 30, 0, 0, ZoneOffset.UTC),
             onStartsChanged = {},
             delayInterval = "2",
             onDelayIntervalChanged = {},

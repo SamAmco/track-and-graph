@@ -556,6 +556,7 @@
     <string name="then_remind_every">Puis rappeler tous les</string>
     <string name="remind_at_date_and_time">À une date et une heure</string>
     <string name="remind_after_a_delay">Après un délai</string>
+    <string name="first_reminder">Premier rappel</string>
     <string name="every_colon">Chaque :</string>
     <string name="ended_at_format">Terminé le : %1$s</string>
     <string name="starting_at_format">Commence le : %1$s</string>

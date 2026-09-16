@@ -61,6 +61,7 @@ fun RowRadioButton(
         enabled = onClick != null,
         onClick = null,
     )
+    DialogInputSpacing()
     Text(
         text = text,
         style = textStyle,

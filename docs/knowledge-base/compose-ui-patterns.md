@@ -6,12 +6,13 @@ topics:
   - Pure-UI composable takes only state values and callbacks — no ViewModels
   - New screens and UI components should include @Preview functions by default
   - @Preview functions call the pure-UI composable with hardcoded data
+  - ThreeTen preview fixtures use fixed offsets because the preview renderer has no timezone database
   - Flavor-only previews belong in a concrete debug-variant source set
   - Reuse shared app/ui controls, including HeroCardButton variants, before defining local Material wrappers
   - Use shared spacing tokens/helpers before introducing hard-coded dimensions
   - Naming conventions for each layer
   - TextChip/TngChip selected styling versus pressed-state feedback
-keywords: [compose, composable, preview, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, HeroCardButton, IconHeroCardButton, Painter, TextButton, SmallTextButton, RowCheckbox, RowRadioButton, Divider, spacing, dimensions, hard-coded, dialogInputSpacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
+keywords: [compose, composable, preview, ThreeTenABP, ZoneRulesException, No time-zone data files registered, OffsetDateTime.now, ZoneId.systemDefault, ZoneOffset.UTC, deterministic-time, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, HeroCardButton, IconHeroCardButton, Painter, TextButton, SmallTextButton, RowCheckbox, RowRadioButton, OutlinedTextMapSpinner, Divider, spacing, dimensions, hard-coded, dialogInputSpacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
 ---
 
 # Compose UI Patterns
@@ -26,7 +27,7 @@ When adding or migrating shared UI, add preview functions in the same file unles
 
 Previews are the default for new screens, dialogs, and UI components. Skip them only when there is a concrete blocker such as an AndroidView/runtime dependency that cannot reasonably be faked; otherwise split the UI so a pure composable can be previewed with hardcoded state.
 
-Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), hero cards (`HeroCardButton`, `IconHeroCardButton`), text fields (`FullWidthTextField`, `PasswordTextField`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`, `RowRadioButton`). `IconHeroCardButton` accepts a `Painter` rather than an app drawable resource ID so it remains reusable from the dependency-lower UI module; the feature caller resolves its own drawable and localized title. If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
+Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), hero cards (`HeroCardButton`, `IconHeroCardButton`), text fields (`FullWidthTextField`, `PasswordTextField`), selectors (`TextMapSpinner`, `OutlinedTextMapSpinner`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`, `RowRadioButton`). `IconHeroCardButton` accepts a `Painter` rather than an app drawable resource ID so it remains reusable from the dependency-lower UI module; the feature caller resolves its own drawable and localized title. If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
 
 Do not introduce ad-hoc hard-coded dimensions in Compose UI. In particular, do not add literal fixed or minimum heights just to make content look balanced; let content determine its intrinsic size and use the shared spacing tokens in `app/ui` for padding and gaps. For dialog/content gaps, prefer `dialogInputSpacing` or its helper composable over repeating the equivalent `.dp` value inline. If a genuinely new reusable dimension is required and no existing token describes it, add a named token rather than embedding the value in a feature composable.
 
@@ -101,6 +102,26 @@ private fun GroupDeleteDialogUniquePreview() {
     }
 }
 ```
+
+### ThreeTen date/time fixtures
+
+The Compose Preview renderer does not run the application initializer that registers ThreeTenABP's
+timezone data. Calls that resolve the system or a named timezone can therefore fail with
+`ZoneRulesException: No time-zone data files registered`. Common triggers include
+`OffsetDateTime.now()`, `ZonedDateTime.now()`, `ZoneId.systemDefault()`, and named region zones.
+
+Use a deterministic fixture with a fixed offset instead:
+
+```kotlin
+val previewDateTime = OffsetDateTime.of(
+    2026, 9, 16, 14, 30, 0, 0,
+    ZoneOffset.UTC,
+)
+```
+
+Keep this rule at the preview boundary. Production code should continue using its injected time
+source or real timezone as appropriate; do not initialize ThreeTenABP inside an individual preview
+just to make fixture construction work.
 
 ## Naming Conventions
 

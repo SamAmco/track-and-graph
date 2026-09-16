@@ -250,6 +250,7 @@
     <string name="then_remind_every">Then Remind Every</string>
     <string name="remind_at_date_and_time">At a Date and Time</string>
     <string name="remind_after_a_delay">After a Delay</string>
+    <string name="first_reminder">First Reminder</string>
     <string name="every_colon">Every:</string>
     <string name="ended_at_format">Ended at: %1$s</string>
     <string name="starting_at_format">Starting at: %1$s</string>

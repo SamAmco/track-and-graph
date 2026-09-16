@@ -535,6 +535,7 @@
     <string name="then_remind_every">Luego recordar cada</string>
     <string name="remind_at_date_and_time">En una fecha y hora</string>
     <string name="remind_after_a_delay">Después de un plazo</string>
+    <string name="first_reminder">Primer recordatorio</string>
     <string name="every_colon">Cada:</string>
     <string name="ended_at_format">Terminó el: %1$s</string>
     <string name="starting_at_format">Comienza el: %1$s</string>

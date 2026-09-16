@@ -536,6 +536,7 @@
     <string name="then_remind_every">Dann erinnern alle</string>
     <string name="remind_at_date_and_time">An einem Datum und zu einer Uhrzeit</string>
     <string name="remind_after_a_delay">Nach einer Wartezeit</string>
+    <string name="first_reminder">Erste Erinnerung</string>
     <string name="every_colon">Jeden:</string>
     <string name="ended_at_format">Beendet am: %1$s</string>
     <string name="starting_at_format">Beginnend am: %1$s</string>
