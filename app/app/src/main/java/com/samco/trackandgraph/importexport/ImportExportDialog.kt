@@ -34,6 +34,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,13 +51,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.csvreadwriter.ImportFeaturesException
 import com.samco.trackandgraph.importexport.ImportExportFeatureUtils.getFileNameFromUri
-import com.samco.trackandgraph.ui.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.theming.DialogTheme
 import com.samco.trackandgraph.ui.ui.ContinueCancelButtons
 import com.samco.trackandgraph.ui.ui.CustomDialog
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
@@ -101,17 +101,8 @@ fun ImportExportDialog(
 
     // Export state
     val exportState by exportViewModel.exportState.collectAsStateWithLifecycle()
-    val selectedExportFileUri by exportViewModel.selectedFileUri.collectAsStateWithLifecycle()
     val availableFeatures by exportViewModel.availableFeatures.collectAsStateWithLifecycle()
     val selectedFeatures by exportViewModel.selectedFeatures.collectAsStateWithLifecycle()
-
-    val selectedExportFileName by remember {
-        derivedStateOf {
-            selectedExportFileUri?.let { uri ->
-                getFileNameFromUri(context, uri)
-            }
-        }
-    }
 
     // Handle import completion
     LaunchedEffect(importState) {
@@ -170,7 +161,7 @@ fun ImportExportDialog(
     val exportFileCreationLauncher = rememberLauncherForActivityResult(
         contract = CreateCsvDocumentActivityResultContract(trackGroupName)
     ) { uri: Uri? ->
-        uri?.let { exportViewModel.setSelectedFileUri(it) }
+        uri?.let { exportViewModel.beginExport(it) }
     }
 
     ImportExportDialogContent(
@@ -184,13 +175,10 @@ fun ImportExportDialog(
         onImportConfirm = { importViewModel.beginImport(trackGroupId) },
         // Export state
         exportState = exportState,
-        selectedExportFileUri = selectedExportFileUri,
-        selectedExportFileName = selectedExportFileName,
         availableFeatures = availableFeatures,
         selectedFeatures = selectedFeatures,
-        onSelectExportFile = { exportFileCreationLauncher.launch(Unit) },
         onToggleFeature = exportViewModel::toggleFeatureSelection,
-        onExportConfirm = { exportViewModel.beginExport() },
+        onExportConfirm = { exportFileCreationLauncher.launch(Unit) },
         // Common
         onDismissRequest = {
             importViewModel.reset()
@@ -212,11 +200,8 @@ private fun ImportExportDialogContent(
     onImportConfirm: () -> Unit,
     // Export state
     exportState: ExportState,
-    selectedExportFileUri: Uri?,
-    selectedExportFileName: String?,
     availableFeatures: List<FeatureDto>,
     selectedFeatures: List<FeatureDto>,
-    onSelectExportFile: () -> Unit,
     onToggleFeature: (FeatureDto) -> Unit,
     onExportConfirm: () -> Unit,
     // Common
@@ -231,47 +216,75 @@ private fun ImportExportDialogContent(
             top = 0.dp,
         )
     ) {
-        // Tab Row
-        PrimaryTabRow(
-            selectedTabIndex = selectedTab,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Tab(
-                selected = selectedTab == 0,
-                onClick = { onTabSelected(0) },
-                text = { Text(stringResource(R.string.importButton)) }
-            )
-            Tab(
-                selected = selectedTab == 1,
-                onClick = { onTabSelected(1) },
-                text = { Text(stringResource(R.string.exportButton)) }
-            )
-        }
+        ImportExportDialogBody(
+            selectedTab = selectedTab,
+            onTabSelected = onTabSelected,
+            selectedImportFileUri = selectedImportFileUri,
+            selectedImportFileName = selectedImportFileName,
+            importState = importState,
+            onSelectImportFile = onSelectImportFile,
+            onImportConfirm = onImportConfirm,
+            exportState = exportState,
+            availableFeatures = availableFeatures,
+            selectedFeatures = selectedFeatures,
+            onToggleFeature = onToggleFeature,
+            onExportConfirm = onExportConfirm,
+            onCancel = onDismissRequest,
+        )
+    }
+}
 
-        InputSpacingLarge()
+@Composable
+private fun ImportExportDialogBody(
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+    selectedImportFileUri: Uri?,
+    selectedImportFileName: String?,
+    importState: ImportState,
+    onSelectImportFile: () -> Unit,
+    onImportConfirm: () -> Unit,
+    exportState: ExportState,
+    availableFeatures: List<FeatureDto>,
+    selectedFeatures: List<FeatureDto>,
+    onToggleFeature: (FeatureDto) -> Unit,
+    onExportConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    PrimaryTabRow(
+        selectedTabIndex = selectedTab,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Tab(
+            selected = selectedTab == 0,
+            onClick = { onTabSelected(0) },
+            text = { Text(stringResource(R.string.importButton)) }
+        )
+        Tab(
+            selected = selectedTab == 1,
+            onClick = { onTabSelected(1) },
+            text = { Text(stringResource(R.string.exportButton)) }
+        )
+    }
 
-        // Content based on selected tab
-        when (selectedTab) {
-            0 -> ImportTabContent(
-                selectedFileUri = selectedImportFileUri,
-                selectedFileName = selectedImportFileName,
-                importState = importState,
-                onSelectFile = onSelectImportFile,
-                onConfirm = onImportConfirm,
-                onCancel = onDismissRequest
-            )
-            1 -> ExportTabContent(
-                exportState = exportState,
-                selectedFileUri = selectedExportFileUri,
-                selectedFileName = selectedExportFileName,
-                availableFeatures = availableFeatures,
-                selectedFeatures = selectedFeatures,
-                onCreateFile = onSelectExportFile,
-                onToggleFeature = onToggleFeature,
-                onConfirm = onExportConfirm,
-                onCancel = onDismissRequest
-            )
-        }
+    InputSpacingLarge()
+
+    when (selectedTab) {
+        0 -> ImportTabContent(
+            selectedFileUri = selectedImportFileUri,
+            selectedFileName = selectedImportFileName,
+            importState = importState,
+            onSelectFile = onSelectImportFile,
+            onConfirm = onImportConfirm,
+            onCancel = onCancel
+        )
+        1 -> ExportTabContent(
+            exportState = exportState,
+            availableFeatures = availableFeatures,
+            selectedFeatures = selectedFeatures,
+            onToggleFeature = onToggleFeature,
+            onConfirm = onExportConfirm,
+            onCancel = onCancel
+        )
     }
 }
 
@@ -356,11 +369,8 @@ private fun ImportTabContent(
 @Composable
 private fun ExportTabContent(
     exportState: ExportState,
-    selectedFileUri: Uri?,
-    selectedFileName: String?,
     availableFeatures: List<FeatureDto>,
     selectedFeatures: List<FeatureDto>,
-    onCreateFile: () -> Unit,
     onToggleFeature: (FeatureDto) -> Unit,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
@@ -369,24 +379,10 @@ private fun ExportTabContent(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
-        // File selection section
+        // Header text
         Text(
             text = stringResource(R.string.export_to),
             style = MaterialTheme.typography.bodyMedium
-        )
-
-        SelectorButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = cardPadding),
-            text = selectedFileName ?: stringResource(R.string.select_file),
-            enabled = exportState == ExportState.WAITING,
-            textColor = if (selectedFileUri == null) {
-                MaterialTheme.colorScheme.error
-            } else {
-                MaterialTheme.colorScheme.onSurface
-            },
-            onClick = onCreateFile
         )
 
         for (feature in availableFeatures) {
@@ -412,8 +408,7 @@ private fun ExportTabContent(
 
         ContinueCancelButtons(
             continueText = R.string.exportButton,
-            continueEnabled = selectedFileUri != null &&
-                selectedFeatures.isNotEmpty() &&
+            continueEnabled = selectedFeatures.isNotEmpty() &&
                 exportState != ExportState.LOADING &&
                 exportState != ExportState.EXPORTING,
             onContinue = onConfirm,
@@ -451,11 +446,11 @@ private fun getStringForImportException(context: Context, exception: ImportFeatu
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 393)
 @Composable
 private fun ImportExportDialogImportTabPreview() {
-    TnGComposeTheme {
-        ImportExportDialogContent(
+    ImportExportDialogPreviewSurface {
+        ImportExportDialogBody(
             selectedTab = 0,
             onTabSelected = {},
             selectedImportFileUri = null,
@@ -464,28 +459,25 @@ private fun ImportExportDialogImportTabPreview() {
             onSelectImportFile = {},
             onImportConfirm = {},
             exportState = ExportState.WAITING,
-            selectedExportFileUri = null,
-            selectedExportFileName = null,
             availableFeatures = emptyList(),
             selectedFeatures = emptyList(),
-            onSelectExportFile = {},
             onToggleFeature = {},
             onExportConfirm = {},
-            onDismissRequest = {}
+            onCancel = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 393)
 @Composable
 private fun ImportExportDialogExportTabPreview() {
-    TnGComposeTheme {
+    ImportExportDialogPreviewSurface {
         val sampleFeatures = listOf(
             FeatureDto(1L, "Weight"),
             FeatureDto(2L, "Sleep Hours"),
             FeatureDto(3L, "Exercise")
         )
-        ImportExportDialogContent(
+        ImportExportDialogBody(
             selectedTab = 1,
             onTabSelected = {},
             selectedImportFileUri = null,
@@ -494,14 +486,39 @@ private fun ImportExportDialogExportTabPreview() {
             onSelectImportFile = {},
             onImportConfirm = {},
             exportState = ExportState.WAITING,
-            selectedExportFileUri = "file://test.csv".toUri(),
-            selectedExportFileName = "test_export.csv",
             availableFeatures = sampleFeatures,
             selectedFeatures = sampleFeatures.take(2),
-            onSelectExportFile = {},
             onToggleFeature = {},
             onExportConfirm = {},
-            onDismissRequest = {}
+            onCancel = {}
         )
+    }
+}
+
+@Composable
+private fun ImportExportDialogPreviewSurface(content: @Composable () -> Unit) {
+    DialogTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(inputSpacingLarge),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surface,
+            ) {
+                Column(
+                    modifier = Modifier.padding(
+                        start = inputSpacingLarge,
+                        end = inputSpacingLarge,
+                        bottom = cardPadding,
+                    )
+                ) {
+                    content()
+                }
+            }
+        }
     }
 }

@@ -52,16 +52,14 @@ data class FeatureDto(
 
 interface ExportFeaturesViewModel {
     val exportState: StateFlow<ExportState>
-    val selectedFileUri: StateFlow<Uri?>
     val availableFeatures: StateFlow<List<FeatureDto>>
     val selectedFeatures: StateFlow<List<FeatureDto>>
     val errors: ReceiveChannel<String>
 
     fun loadFeatures(groupId: Long)
     fun reset()
-    fun setSelectedFileUri(uri: Uri?)
     fun toggleFeatureSelection(feature: FeatureDto)
-    fun beginExport()
+    fun beginExport(uri: Uri)
 }
 
 @HiltViewModel
@@ -75,9 +73,6 @@ class ExportFeaturesViewModelImpl @Inject constructor(
 
     private val _exportState = MutableStateFlow(ExportState.WAITING)
     override val exportState: StateFlow<ExportState> = _exportState.asStateFlow()
-
-    private val _selectedFileUri = MutableStateFlow<Uri?>(null)
-    override val selectedFileUri: StateFlow<Uri?> = _selectedFileUri.asStateFlow()
 
     private val featuresSet = AtomicBoolean(false)
 
@@ -112,14 +107,9 @@ class ExportFeaturesViewModelImpl @Inject constructor(
 
     override fun reset() {
         _exportState.value = ExportState.WAITING
-        _selectedFileUri.value = null
         _availableFeatures.value = emptyList()
         _selectedFeatures.value = emptyList()
         featuresSet.set(false)
-    }
-
-    override fun setSelectedFileUri(uri: Uri?) {
-        _selectedFileUri.value = uri
     }
 
     override fun toggleFeatureSelection(feature: FeatureDto) {
@@ -131,17 +121,15 @@ class ExportFeaturesViewModelImpl @Inject constructor(
         }
     }
 
-    override fun beginExport() {
-        _selectedFileUri.value?.let { uri ->
-            viewModelScope.launch(ui) {
-                _exportState.value = ExportState.EXPORTING
-                try {
-                    doExport(uri)
-                    _exportState.value = ExportState.DONE
-                } catch (e: Exception) {
-                    errors.trySend("${e.message}")
-                    _exportState.value = ExportState.WAITING
-                }
+    override fun beginExport(uri: Uri) {
+        viewModelScope.launch(ui) {
+            _exportState.value = ExportState.EXPORTING
+            try {
+                doExport(uri)
+                _exportState.value = ExportState.DONE
+            } catch (e: Exception) {
+                errors.trySend("${e.message}")
+                _exportState.value = ExportState.WAITING
             }
         }
     }
