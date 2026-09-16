@@ -80,11 +80,10 @@ class BackupRestoreInteractorImpl @Inject constructor(
 
     override suspend fun performManualRestore(uri: Uri): RestoreResult {
         context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            val tempFile = File.createTempFile("dbrestore", ".db", context.cacheDir)
             try {
-                val tempFile = File.createTempFile("dbrestore", "db")
-
                 tempFile.outputStream().use { tempOutStream ->
-                    inputStream.use { it.copyTo(tempOutStream) }
+                    inputStream.copyTo(tempOutStream)
                 }
 
                 if (!isValidDatabase(tempFile)) {
@@ -92,23 +91,14 @@ class BackupRestoreInteractorImpl @Inject constructor(
                 }
 
                 reminderInteractor.clearNotifications()
-                database.openHelper.close()
-
-                tempFile.inputStream().use {
-                    val databaseFileOutputStream = database.openHelper.writableDatabase.path
-                        ?.let { path -> File(path).takeIf { it.exists() } }
-                        ?.outputStream()
-                        ?: return RestoreResult.FAIL_COULD_NOT_COPY
-
-                    it.copyTo(databaseFileOutputStream)
-                }
-
-                tempFile.deleteOnExit()
+                TrackAndGraphDatabase.stageRestore(context, tempFile)
 
                 return RestoreResult.SUCCESS
             } catch (t: Throwable) {
-                Timber.e(t, "Error clearing alarms before restore")
+                Timber.e(t, "Error staging database restore")
                 return RestoreResult.FAIL_COULD_NOT_COPY
+            } finally {
+                tempFile.delete()
             }
         } ?: return RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE
     }

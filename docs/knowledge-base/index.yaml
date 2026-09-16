@@ -72,6 +72,11 @@ docs:
     description: How to write Room migrations safely — copy CREATE TABLE SQL from schema JSON (jq), SQLite table-rebuild pattern, DROP TABLE cascade pitfall, migration 58→59 (group_items_table introduction), and migration 59→60 (remove unique constraint to allow same-group duplicates).
     keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 59-60, unique-constraint]
 
+  - file: database-backup-restore.md
+    title: Database backup and restore lifecycle
+    description: Backup checkpointing and the staged, restart-based restore protocol that prevents replacing a database while Room is active.
+    keywords: [database, backup, restore, Room, SQLite, WAL, SHM, checkpoint, staging, atomic-rename, PendingDatabaseRestore]
+
   - file: group-hierarchy.md
     title: Group DAG structure and symlinks
     description: Groups form a DAG (not a tree); deletion handles shared membership; GroupGraph contains every grouped component including reminders; FeaturePathProvider and ComponentPathProvider resolve display paths; DTOs never carry hierarchy info.

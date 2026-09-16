@@ -70,6 +70,8 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
 
 const val TNG_DATABASE_VERSION = 60
 
+private const val TNG_DATABASE_NAME = "trackandgraph_database"
+
 @Database(
     entities = [
         Feature::class,
@@ -103,10 +105,25 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: TrackAndGraphDatabase? = null
+
+        /**
+         * Copies an already validated database to a private staging file. It will replace the live
+         * database the next time a process constructs the Room singleton.
+         */
+        fun stageRestore(context: Context, source: java.io.File) {
+            PendingDatabaseRestore.stage(
+                source = source,
+                databaseFile = context.applicationContext.getDatabasePath(TNG_DATABASE_NAME),
+            )
+        }
+
         fun getInstance(context: Context): TrackAndGraphDatabase {
             synchronized(this) {
                 var instance = INSTANCE
                 if (instance == null) {
+                    PendingDatabaseRestore.installIfPending(
+                        context.applicationContext.getDatabasePath(TNG_DATABASE_NAME)
+                    )
                     instance = createRoomInstance(context)
                     INSTANCE = instance
                 }
@@ -118,7 +135,7 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
             return Room.databaseBuilder(
                 context.applicationContext,
                 TrackAndGraphDatabase::class.java,
-                "trackandgraph_database"//This name is also in backup_rules.xml
+                TNG_DATABASE_NAME // This name is also in backup_rules.xml
             )
                 .addMigrations(*allMigrations)
                 .fallbackToDestructiveMigration(dropAllTables = true)
