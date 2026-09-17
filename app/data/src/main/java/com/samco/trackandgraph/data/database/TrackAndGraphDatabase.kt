@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.data.database
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import androidx.annotation.WorkerThread
 import androidx.room.Database
 import androidx.room.Room
@@ -111,11 +112,14 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
         private var INSTANCE: TrackAndGraphDatabase? = null
 
         /**
-         * Validates a restore candidate with Room, then stages it for the next process start.
+         * Validates a restore candidate with SQLite and Room, then stages it for the next process
+         * start. Returns false when the source is not a valid restorable database. Copy and staging
+         * failures are thrown to the caller.
+         *
          * This performs blocking file and database I/O and must be called from a worker thread.
          */
         @WorkerThread
-        fun validateAndStageRestore(context: Context, source: File) {
+        fun validateAndStageRestore(context: Context, source: File): Boolean {
             val appContext = context.applicationContext
             val validationFile = appContext.getDatabasePath(TNG_RESTORE_VALIDATION_DATABASE_NAME)
             var validationDatabase: TrackAndGraphDatabase? = null
@@ -130,14 +134,20 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                     }
                 }
 
-                validationDatabase = createRoomInstance(
-                    context = appContext,
-                    name = TNG_RESTORE_VALIDATION_DATABASE_NAME,
-                    allowDestructiveMigration = false,
-                    journalMode = JournalMode.TRUNCATE,
-                )
-                // Room opens lazily. Force migrations and generated schema validation now.
-                validationDatabase.openHelper.writableDatabase
+                if (!hasValidRestoreMetadata(validationFile)) return false
+
+                try {
+                    validationDatabase = createRoomInstance(
+                        context = appContext,
+                        name = TNG_RESTORE_VALIDATION_DATABASE_NAME,
+                        allowDestructiveMigration = false,
+                        journalMode = JournalMode.TRUNCATE,
+                    )
+                    // Room opens lazily. Force migrations and generated schema validation now.
+                    validationDatabase.openHelper.writableDatabase
+                } catch (t: Throwable) {
+                    return false
+                }
                 validationDatabase.close()
                 validationDatabase = null
 
@@ -145,9 +155,34 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                     source = validationFile,
                     databaseFile = appContext.getDatabasePath(TNG_DATABASE_NAME),
                 )
+                return true
             } finally {
                 validationDatabase?.close()
                 appContext.deleteDatabase(TNG_RESTORE_VALIDATION_DATABASE_NAME)
+            }
+        }
+
+        private fun hasValidRestoreMetadata(databaseFile: File): Boolean {
+            var database: SQLiteDatabase? = null
+            return try {
+                database = SQLiteDatabase.openDatabase(
+                    databaseFile.path,
+                    null,
+                    SQLiteDatabase.OPEN_READONLY,
+                )
+                val integrityCheckResult = database
+                    .rawQuery("PRAGMA integrity_check(1)", null)
+                    .use { cursor ->
+                        if (cursor.moveToFirst()) cursor.getString(0) else null
+                    }
+                isValidRestoreDatabaseMetadata(
+                    version = database.version,
+                    integrityCheckResult = integrityCheckResult,
+                )
+            } catch (t: Throwable) {
+                false
+            } finally {
+                database?.close()
             }
         }
 
@@ -207,6 +242,11 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
         }
     }
 }
+
+internal fun isValidRestoreDatabaseMetadata(
+    version: Int,
+    integrityCheckResult: String?,
+): Boolean = version in 1..TNG_DATABASE_VERSION && integrityCheckResult == "ok"
 
 internal class Converters {
 

@@ -2,7 +2,6 @@ package com.samco.trackandgraph.backupandrestore
 
 import android.content.Context
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -12,7 +11,6 @@ import com.samco.trackandgraph.backupandrestore.dto.AutoBackupInfo
 import com.samco.trackandgraph.backupandrestore.dto.BackupConfig
 import com.samco.trackandgraph.backupandrestore.dto.BackupResult
 import com.samco.trackandgraph.backupandrestore.dto.RestoreResult
-import com.samco.trackandgraph.data.database.TNG_DATABASE_VERSION
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.helpers.PrefHelper
@@ -86,12 +84,11 @@ class BackupRestoreInteractorImpl @Inject constructor(
                     inputStream.copyTo(tempOutStream)
                 }
 
-                if (!isValidDatabase(tempFile)) {
+                if (!TrackAndGraphDatabase.validateAndStageRestore(context, tempFile)) {
                     return RestoreResult.FAIL_INVALID_DATABASE
                 }
 
                 reminderInteractor.clearNotifications()
-                TrackAndGraphDatabase.validateAndStageRestore(context, tempFile)
 
                 return RestoreResult.SUCCESS
             } catch (t: Throwable) {
@@ -101,31 +98,6 @@ class BackupRestoreInteractorImpl @Inject constructor(
                 tempFile.delete()
             }
         } ?: return RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE
-    }
-
-    private fun isValidDatabase(dbFile: File): Boolean {
-        var db: SQLiteDatabase? = null
-        try {
-            db = SQLiteDatabase.openDatabase(
-                dbFile.path,
-                null,
-                SQLiteDatabase.OPEN_READONLY
-            )
-
-            val integrityCheckResults = db.rawQuery("PRAGMA integrity_check", null).use { cursor ->
-                buildList {
-                    while (cursor.moveToNext()) add(cursor.getString(0))
-                }
-            }
-            return isValidRestoreDatabaseMetadata(
-                version = db.version,
-                integrityCheckResults = integrityCheckResults,
-            )
-        } catch (t: Throwable) {
-            return false
-        } finally {
-            db?.close()
-        }
     }
 
     override suspend fun performAutoBackup(): BackupResult {
@@ -255,10 +227,3 @@ class BackupRestoreInteractorImpl @Inject constructor(
         backupConfigChanged.tryEmit(Unit)
     }
 }
-
-internal fun isValidRestoreDatabaseMetadata(
-    version: Int,
-    integrityCheckResults: List<String>,
-): Boolean =
-    version in 1..TNG_DATABASE_VERSION &&
-            integrityCheckResults == listOf("ok")

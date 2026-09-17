@@ -1,6 +1,6 @@
 ---
 title: Database backup and restore lifecycle
-description: Backup checkpointing and the staged, restart-based restore protocol that prevents replacing a database while Room is active.
+description: Backup checkpointing, consolidated SQLite and Room validation, and the staged restart-based restore protocol that prevents replacing a database while Room is active.
 topics:
   - Backups checkpoint WAL before copying the main database file
   - Restores are staged while Room remains open and installed before Room opens in a new process
@@ -22,8 +22,10 @@ observers, workers, or other callers may still be querying it.
 Restore instead uses two phases:
 
 1. While the current process is running, copy the selected file to a temporary file and validate it.
-   A restore candidate must pass SQLite's full `PRAGMA integrity_check` and have a positive
+   A single data-layer operation owns validation and staging. A restore candidate must pass
+   SQLite's full `PRAGMA integrity_check(1)` and have a positive
    `user_version` no newer than the app. Version zero is rejected because Room may treat it as a new
+   database. The argument limits error output to one row while still checking the whole healthy
    database. Room then opens a private copy using the production database class and migration list,
    with destructive fallback disabled. Room itself determines whether a migration path exists,
    runs it, and performs its generated current-schema validation. There is no second hard-coded
