@@ -116,7 +116,13 @@ LaunchedEffect(Unit) {
 
 ## String Resources and Localization
 
-The app is localized into 4 languages: English (`values/`), French (`values-fr/`), Spanish (`values-es/`), and German (`values-de-rDE/`). When modifying any user-visible string in `strings.xml`, **always update all 4 translations**. Search for the string name across all `strings.xml` files to find every locale.
+English in the unqualified `values/` directories is the sole source of truth.
+Do not add translated-only resources to English. The currently checked-in human
+translations are French (`values-fr/`), Spanish (`values-es/`), and German
+(`values-de-rDE/`). After changing user-visible English resources, use the
+incremental audit/translation workflow documented in
+`localization.md`; do not manually propagate source structure across locale
+files.
 
 ## Build Commands
 

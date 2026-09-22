@@ -6,34 +6,18 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import json
-import os
 import sys
 from pathlib import Path
 
 from markdown_validation import validate_markdown
 from providers.base import Translator, TranslatorError
-from providers.openai_responses import DEFAULT_MODEL, OpenAIResponsesTranslator
 from languages import SUPPORTED_TARGETS, TranslationTarget
-
-
-DEFAULT_DOMAIN_BRIEF = Path(__file__).with_name("domain_brief.md")
-DOMAIN_BRIEF_MAX_CHARACTERS = 8000
-
-
-def parse_target(value: str) -> TranslationTarget:
-    try:
-        locale, language = value.split("=", 1)
-    except ValueError as error:
-        raise argparse.ArgumentTypeError("target must be LOCALE=LANGUAGE") from error
-    if not locale.strip() or not language.strip():
-        raise argparse.ArgumentTypeError("target must have a locale and language")
-    return TranslationTarget(locale.strip(), language.strip())
-
-
-def _translator(provider: str, api_key: str, model: str) -> Translator:
-    if provider == "openai":
-        return OpenAIResponsesTranslator(api_key=api_key, model=model)
-    raise ValueError(f"unsupported provider: {provider}")
+from translation_runtime import (
+    add_provider_arguments,
+    create_translator,
+    load_domain_brief,
+    parse_target,
+)
 
 
 def _instructions(
@@ -83,9 +67,7 @@ def main() -> int:
         help="translate only LOCALE=LANGUAGE; repeat as needed (default: all supported languages)",
     )
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--domain-brief", type=Path, default=DEFAULT_DOMAIN_BRIEF)
-    parser.add_argument("--provider", choices=("openai",), default="openai")
-    parser.add_argument("--model", default=DEFAULT_MODEL)
+    add_provider_arguments(parser)
     parser.add_argument(
         "--retries", type=int, default=0,
         help="optional paid retries after a provider or validation failure (default: none)",
@@ -94,21 +76,17 @@ def main() -> int:
     if args.retries < 0:
         parser.error("--retries cannot be negative")
 
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        parser.error("OPENAI_API_KEY is not set")
-    translator = _translator(args.provider, api_key, args.model)
+    try:
+        translator = create_translator(args.provider, args.model)
+    except ValueError as error:
+        parser.error(str(error))
     targets = tuple(args.target) if args.target else SUPPORTED_TARGETS
 
     source = args.markdown.read_text(encoding="utf-8")
-    domain_context = args.domain_brief.read_text(encoding="utf-8").strip()
-    if not domain_context:
-        parser.error("domain brief is empty")
-    if len(domain_context) > DOMAIN_BRIEF_MAX_CHARACTERS:
-        parser.error(
-            f"domain brief is {len(domain_context)} characters; "
-            f"maximum is {DOMAIN_BRIEF_MAX_CHARACTERS}"
-        )
+    try:
+        domain_context = load_domain_brief(args.domain_brief)
+    except ValueError as error:
+        parser.error(str(error))
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     def translate(

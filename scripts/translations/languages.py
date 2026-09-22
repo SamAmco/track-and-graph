@@ -1,8 +1,9 @@
 """Shared translation targets derived from Google Play's locale list.
 
 English is the source language. RTL languages are intentionally excluded until
-the app supports RTL layouts. Regional variants are collapsed to one language
-because app content resolves by language and should be translated only once.
+the app supports RTL layouts. Regional variants are collapsed when they share a
+written language. Chinese is split into Simplified and Traditional because one
+translation cannot serve both scripts.
 
 Source: https://support.google.com/googleplay/android-developer/answer/9844778
 Verified: 2026-09-18
@@ -31,7 +32,8 @@ SUPPORTED_TARGETS = (
     TranslationTarget("bg", "Bulgarian"),
     TranslationTarget("my", "Burmese"),
     TranslationTarget("ca", "Catalan"),
-    TranslationTarget("zh", "Chinese"),
+    TranslationTarget("zh-Hans", "Chinese (Simplified)"),
+    TranslationTarget("zh-Hant", "Chinese (Traditional)"),
     TranslationTarget("hr", "Croatian"),
     TranslationTarget("cs", "Czech"),
     TranslationTarget("da", "Danish"),

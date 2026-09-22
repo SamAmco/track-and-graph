@@ -70,8 +70,11 @@ The default is one paid request per locale; repair small structural failures
 locally and rerun `markdown_validation.py` before considering an API retry.
 
 `scripts/translations/languages.py` is the shared source of truth for translation
-targets. It contains 65 non-English, non-RTL Google Play languages; regional
-variants are collapsed to avoid paying for duplicate translations. With no
+targets. It contains 66 non-English, non-RTL written-language targets from
+Google Play's supported localization list. Regional variants are collapsed when
+they share a script, avoiding duplicate translation requests. Chinese remains
+split into Simplified (`zh-Hans`) and Traditional (`zh-Hant`) because the scripts
+are distinct. With no
 `--target` arguments the script uses the full list. Explicit targets select a
 smaller test or retry set. Function translation should reuse this list and the
 provider adapters, but have its own source and output wrapper.

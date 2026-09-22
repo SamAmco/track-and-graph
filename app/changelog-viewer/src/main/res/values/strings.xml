@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">Changelog Viewer</string>
+    <string name="app_name" translatable="false">Changelog Viewer</string>
+    <string name="paste" translatable="false">Paste</string>
+    <string name="clear" translatable="false">Clear</string>
+    <string name="preview" translatable="false">Preview</string>
+    <string name="markdown" translatable="false">Markdown</string>
+    <string name="mock_support_description" translatable="false">Support is voluntary and does not unlock any features.</string>
+    <string name="mock_price_small" translatable="false">£1.99</string>
+    <string name="mock_price_medium" translatable="false">£4.99</string>
+    <string name="mock_price_large" translatable="false">£9.99</string>
+    <string name="sample_markdown" translatable="false"><![CDATA[## New Features
+
+- Paste a changelog here
+- Tap Preview Dialog to see the production dialog
+
+## Fixes
+
+Inline `code`, **bold**, *italic*, links, images, and tables use the same renderer.]]></string>
 </resources>

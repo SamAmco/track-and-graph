@@ -42,6 +42,11 @@ docs:
     description: MVVM pattern, module structure (app shell/features, shared UI, data layer, developer tooling), KMP compatibility constraints, Hilt DI, Channel-based UI events, build logic, and coding conventions.
     keywords: [architecture, MVVM, Hilt, KMP, modules, ui, shared-ui, build-logic, changelog-viewer, Room, coroutines, DataInteractor, Channel, conventions, testing, strings, localization, translations, i18n]
 
+  - file: localization.md
+    title: Localization and translation automation
+    description: English-authoritative Android resource localization, shared translation infrastructure, incremental state, validation, paid-call safety, and locale ownership across app source sets.
+    keywords: [localization, translation, strings.xml, Android resources, values, translatable, domain-brief, app_translation_state, translate_app_resources, incremental, source-of-truth, provider, OpenAI]
+
   - file: build-commands.md
     title: Build, test, and screenshot commands
     description: Gradle commands for building and running tests; release flavor intent; build-logic conventions; Compose asset capture and persisted graph screenshot regression tests.

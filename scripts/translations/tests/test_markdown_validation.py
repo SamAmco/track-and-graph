@@ -46,9 +46,11 @@ class MarkdownValidationTest(unittest.TestCase):
 
     def test_supported_language_list_is_complete_unique_and_ltr(self) -> None:
         locales = [target.locale for target in SUPPORTED_TARGETS]
-        self.assertEqual(65, len(locales))
+        self.assertEqual(66, len(locales))
         self.assertEqual(len(locales), len(set(locales)))
-        self.assertTrue({"de", "es", "fr", "pt", "zh"}.issubset(locales))
+        self.assertTrue(
+            {"de", "es", "fr", "pt", "zh-Hans", "zh-Hant"}.issubset(locales)
+        )
         self.assertTrue({"ar", "fa", "he", "ur"}.isdisjoint(locales))
 
     def test_retry_prompt_includes_failed_structure_details(self) -> None:
@@ -81,9 +83,8 @@ class MarkdownValidationTest(unittest.TestCase):
             ]
             stdout = io.StringIO()
             with (
-                patch.object(release_notes, "_translator", return_value=fake),
+                patch.object(release_notes, "create_translator", return_value=fake),
                 patch.object(sys, "argv", arguments),
-                patch.dict(release_notes.os.environ, {"OPENAI_API_KEY": "test"}),
                 redirect_stdout(stdout),
             ):
                 self.assertEqual(1, release_notes.main())

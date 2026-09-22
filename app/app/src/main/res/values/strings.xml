@@ -99,7 +99,7 @@
         <item>Biyearly</item>
         <item>Yearly</item>
     </string-array>
-    <string-array name="date_formats">
+    <string-array name="date_formats" translatable="false">
         <item>dd/mm/yy</item>
         <item>mm/dd/yy</item>
         <item>yy/mm/dd</item>

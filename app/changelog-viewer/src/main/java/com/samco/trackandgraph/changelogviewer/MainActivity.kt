@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun ChangelogViewerApp() {
+    val sampleMarkdown = stringResource(R.string.sample_markdown)
     var markdown by remember { mutableStateOf(sampleMarkdown) }
     var showPreview by remember { mutableStateOf(false) }
     var showSupportScreen by remember { mutableStateOf(false) }
@@ -69,7 +70,7 @@ private fun ChangelogViewerApp() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 16.dp),
-                text = "Changelog Viewer",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
             )
@@ -87,14 +88,14 @@ private fun ChangelogViewerApp() {
                         markdown = context.clipboardText().orEmpty()
                     },
                 ) {
-                    Text("Paste")
+                    Text(stringResource(R.string.paste))
                 }
 
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = { markdown = "" },
                 ) {
-                    Text("Clear")
+                    Text(stringResource(R.string.clear))
                 }
 
                 Button(
@@ -105,7 +106,7 @@ private fun ChangelogViewerApp() {
                         showPreview = true
                     },
                 ) {
-                    Text("Preview")
+                    Text(stringResource(R.string.preview))
                 }
             }
         },
@@ -120,7 +121,7 @@ private fun ChangelogViewerApp() {
             ChangelogDialogContent(
                 releaseNotes = listOf(
                     ChangelogReleaseNote(
-                        version = "Preview",
+                        version = stringResource(R.string.preview),
                         markdown = markdown,
                     )
                 ),
@@ -200,11 +201,23 @@ private fun MockSupportScreen(
             )
         } else {
             SupportOptionsContent(
-                description = "Support is voluntary and does not unlock any features.",
+                description = stringResource(R.string.mock_support_description),
                 options = listOf(
-                    SupportOptionViewData("small", "£1.99", highlighted = false),
-                    SupportOptionViewData("medium", "£4.99", highlighted = true),
-                    SupportOptionViewData("large", "£9.99", highlighted = false),
+                    SupportOptionViewData(
+                        "small",
+                        stringResource(R.string.mock_price_small),
+                        highlighted = false,
+                    ),
+                    SupportOptionViewData(
+                        "medium",
+                        stringResource(R.string.mock_price_medium),
+                        highlighted = true,
+                    ),
+                    SupportOptionViewData(
+                        "large",
+                        stringResource(R.string.mock_price_large),
+                        highlighted = false,
+                    ),
                 ),
                 purchaseInProgress = false,
                 onOptionClicked = onOptionClicked,
@@ -232,7 +245,7 @@ private fun MarkdownEditor(
         value = markdown,
         onValueChange = onMarkdownChanged,
         textStyle = MaterialTheme.typography.bodyMedium,
-        label = { Text("Markdown") },
+        label = { Text(stringResource(R.string.markdown)) },
     )
 }
 
@@ -242,14 +255,3 @@ private fun Context.clipboardText(): String? {
     if (clipData.itemCount == 0) return null
     return clipData.getItemAt(0).coerceToText(this)?.toString()
 }
-
-private val sampleMarkdown = """
-    ## New Features
-    
-    - Paste a changelog here
-    - Tap Preview Dialog to see the production dialog
-    
-    ## Fixes
-    
-    Inline `code`, **bold**, *italic*, links, images, and tables use the same renderer.
-""".trimIndent()

@@ -21,6 +21,22 @@ endif
 validate-remote-config:
 	@./scripts/validate-remote-config.sh
 
+.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test
+translations-audit:
+	@python3 -B scripts/translations/translate_app_resources.py audit $(TRANSLATION_ARGS)
+
+translations-apply-failure:
+	@python3 -B scripts/translations/translate_app_resources.py apply-failure $(TRANSLATION_ARGS)
+
+translations-baseline:
+	@python3 -B scripts/translations/translate_app_resources.py baseline $(TRANSLATION_ARGS)
+
+translations-generate:
+	@python3 -B scripts/translations/translate_app_resources.py translate $(TRANSLATION_ARGS)
+
+translations-test:
+	@python3 -B -m unittest discover -s scripts/translations/tests -p 'test_*.py' -v
+
 .PHONY: run-community-tests
 run-community-tests: run-community-functions-tests run-community-graph-tests
 
