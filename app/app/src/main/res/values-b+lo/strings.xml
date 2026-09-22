@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">ໜ້າຫຼັກ</string>
+    <string name="add_group">ເພີ່ມກຸ່ມ: </string>
+    <string name="edit_group">ແກ້ໄຂກຸ່ມ: </string>
+    <string name="group">ກຸ່ມ</string>
+    <string name="tracker">ຕົວຕິດຕາມ</string>
+    <string name="function">ຟັງຊັນ</string>
+    <string name="graph_or_stat">ກຣາຟ ຫຼື ສະຖິຕິ</string>
+    <string name="symlink">Symlink</string>
+    <string name="symlinks">Symlinks</string>
+    <string name="reminder">ການເຕືອນ</string>
+    <string name="add_component">ເພີ່ມອົງປະກອບ</string>
+    <string name="symlink_locations_title">ບ່ອນຢູ່ຂອງ \"%1$s\"</string>
+    <string name="add_tracker">ຕິດຕາມສິ່ງໃດໜຶ່ງ:</string>
+    <string name="add">ເພີ່ມ</string>
+    <string name="group_name">ເຊັ່ນ ກິດຈະກຳປະຈຳວັນ</string>
+    <string name="delete">ລຶບ</string>
+    <string name="edit">ແກ້ໄຂ</string>
+    <string name="update">ອັບເດດ</string>
+    <string name="graph_or_stat_name">ຊື່ກຣາຟ: </string>
+    <string name="tracker_name">ຊື່ຕົວຕິດຕາມ</string>
+    <string name="this_is_a_time_or_duration">ນີ້ແມ່ນເວລາ ຫຼື ໄລຍະເວລາ</string>
+    <string name="yes">ແມ່ນ</string>
+    <string name="cancel">ຍົກເລີກ</string>
+    <string name="select_file">ເລືອກໄຟລ໌</string>
+    <string name="empty_group_hint">ຍິນດີຕ້ອນຮັບສູ່ Track &amp; Graph!\n\n ແຕະ + ຢູ່ມຸມຂວາເທິງ ແລະເລືອກຕົວຕິດຕາມເພື່ອເລີ່ມຕົ້ນ.</string>
+    <string name="no_trackers_graph_stats_hint">ກະລຸນາສ້າງຕົວຕິດຕາມກ່ອນສ້າງກຣາຟ.</string>
+    <string name="no_trackers_functions_hint">ກະລຸນາສ້າງຕົວຕິດຕາມກ່ອນສ້າງຟັງຊັນ.</string>
+    <string name="ru_sure_del_group">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບກຸ່ມນີ້ ແລະທຸກຢ່າງໃນນັ້ນ? ບໍ່ສາມາດຍ້ອນກັບໄດ້.</string>
+    <string name="ru_sure_del_graph">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບກຣາຟນີ້? ບໍ່ສາມາດຍ້ອນກັບໄດ້. ຂໍ້ມູນທີ່ຕິດຕາມໄວ້ຈະບໍ່ສູນເສຍ.</string>
+    <string name="ru_sure_del_feature">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບຂໍ້ມູນທີ່ຕິດຕາມນີ້?</string>
+    <string name="item_in_multiple_groups">ລາຍການນີ້ຢູ່ຫຼາຍບ່ອນ. ທ່ານສາມາດເອົາອອກຈາກບ່ອນນີ້ ຫຼື ລຶບອອກທຸກບ່ອນ.</string>
+    <string name="remove_from_this_group">ເອົາອອກຈາກບ່ອນນີ້</string>
+    <string name="delete_everywhere">ລຶບອອກທຸກບ່ອນ</string>
+    <string name="ru_sure_del_function">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບຟັງຊັນນີ້? ບໍ່ສາມາດຍ້ອນກັບໄດ້.</string>
+    <string name="ru_sure_del_reminder">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບການເຕືອນນີ້? ບໍ່ສາມາດຍ້ອນກັບໄດ້.</string>
+    <string name="ru_sure_del_data_point">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບຈຸດຂໍ້ມູນນີ້?</string>
+    <string name="feature_name_cannot_be_null">ກະລຸນາໃສ່ຊື່</string>
+    <string name="tracker_with_that_name_exists">ທ່ານກຳລັງຕິດຕາມສິ່ງທີ່ມີຊື່ນີ້ຢູ່ແລ້ວ</string>
+    <string name="data_points">%1$d ຈຸດຂໍ້ມູນ</string>
+    <string name="items_selected">ເລືອກແລ້ວ %1$d ລາຍການ</string>
+    <string name="select_all">ເລືອກທັງໝົດ</string>
+    <string name="deselect_all">ຍົກເລີກການເລືອກທັງໝົດ</string>
+    <string name="ru_sure_del_data_points">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບຈຸດຂໍ້ມູນເຫຼົ່ານີ້?</string>
+    <string name="delete_selected_content_description">ລຶບລາຍການທີ່ເລືອກ</string>
+    <string name="copy_selected_content_description">ສຳເນົາລາຍການທີ່ເລືອກ</string>
+    <string name="move_selected_content_description">ຍ້າຍລາຍການທີ່ເລືອກ</string>
+    <string name="copy_to">ສຳເນົາໄປທີ່</string>
+    <string name="no_data">ບໍ່ມີຂໍ້ມູນ</string>
+    <string name="skip">ຂ້າມ</string>
+    <string name="exportButton">ສົ່ງອອກ</string>
+    <string name="importButton">ນຳເຂົ້າ</string>
+    <string name="import_export">ນຳເຂົ້າ/ສົ່ງອອກ</string>
+    <string name="search">ຄົ້ນຫາ</string>
+    <string name="type_to_search">ພິມເພື່ອຄົ້ນຫາ</string>
+    <string name="no_results">ບໍ່ພົບຜົນລັບ</string>
+    <string name="export_to">ສົ່ງອອກຂໍ້ມູນທີ່ຕິດຕາມໃນກຸ່ມນີ້ເປັນ CSV:</string>
+    <string name="export_error_message">ສົ່ງອອກບໍ່ສຳເລັດ: %1$s</string>
+    <string name="import_from">ນຳເຂົ້າຂໍ້ມູນທີ່ຕິດຕາມເຂົ້າກຸ່ມນີ້ຈາກ CSV:</string>
+    <string name="import_warning">ຄຳເຕືອນ: ການນຳເຂົ້າບໍ່ສາມາດຍ້ອນກັບໄດ້. Track &amp; Graph ຈະພະຍາຍາມລວມຂໍ້ມູນທີ່ນຳເຂົ້າກັບຂໍ້ມູນເດີມໃນກຸ່ມນີ້ຕາມຊື່.</string>
+    <string name="add_a_graph_or_stat">ເພີ່ມກຣາຟ ຫຼື ສະຖິຕິ</string>
+    <string name="graph_type_label">ປະເພດກຣາຟ:</string>
+    <string name="sample_size">ຂະໜາດຕົວຢ່າງ:</string>
+    <string name="select_a_discrete_feature">ເລືອກຊຸດຂໍ້ມູນທີ່ມີປ້າຍກຳກັບ: </string>
+    <string name="no_labels">ຊຸດຂໍ້ມູນນີ້ບໍ່ມີປ້າຍກຳກັບ</string>
+    <string name="select_a_feature">ເລືອກຊຸດຂໍ້ມູນ:</string>
+    <string name="select_a_tracker">ເລືອກຕົວຕິດຕາມ</string>
+    <string name="offset">ອັອບເຊັດ:</string>
+    <string name="scale">ມາດຕາສ່ວນ:</string>
+    <string name="from">ຈາກ:</string>
+    <string name="to">ເຖິງ:</string>
+    <string name="day">ມື້</string>
+    <string-array name="time_histogram_windows">
+        <item>ລາຍຊົ່ວໂມງ</item>
+        <item>ລາຍວັນ</item>
+        <item>ລາຍອາທິດ</item>
+        <item>ລາຍເດືອນ</item>
+        <item>ລາຍໄຕມາດ</item>
+        <item>ລາຍສອງປີ</item>
+        <item>ລາຍປີ</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>ປະຫຍັດແບັດເຕີຣີ</item>
+        <item>ສີອ່ອນ</item>
+        <item>ສີເຂັ້ມ</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>ຄ່າເລີ່ມຕົ້ນຂອງລະບົບ</item>
+        <item>ສີອ່ອນ</item>
+        <item>ສີເຂັ້ມ</item>
+    </string-array>
+    <string name="graph_type_line_graph">ກຣາຟເສັ້ນ</string>
+    <string name="graph_type_pie_chart">ກຣາຟວົງມົນ</string>
+    <string name="graph_type_average_time_between">ເວລາສະເລ່ຍລະຫວ່າງ</string>
+    <string name="graph_type_time_since">ເວລານັບຈາກ</string>
+    <string name="graph_type_time_histogram">ຮິສໂຕແກຣມເວລາ</string>
+    <string name="graph_type_last_value">ຄ່າທີ່ຕິດຕາມຫຼ້າສຸດ/ເວລານັບຈາກ</string>
+    <string name="graph_type_bar_chart">ກຣາຟແທ່ງ</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>ບໍ່ສະເລ່ຍ</item>
+        <item>ຄ່າສະເລ່ຍເຄື່ອນທີ່ລາຍວັນ</item>
+        <item>ຄ່າສະເລ່ຍເຄື່ອນທີ່ 3 ມື້</item>
+        <item>ຄ່າສະເລ່ຍເຄື່ອນທີ່ລາຍອາທິດ</item>
+        <item>ຄ່າສະເລ່ຍເຄື່ອນທີ່ລາຍເດືອນ</item>
+        <item>ຄ່າສະເລ່ຍເຄື່ອນທີ່ 3 ເດືອນ</item>
+        <item>ຄ່າສະເລ່ຍເຄື່ອນທີ່ 6 ເດືອນ</item>
+        <item>ຄ່າສະເລ່ຍເຄື່ອນທີ່ລາຍປີ</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>ສະແດງເມື່ອມີການຕິດຕາມ</item>
+        <item>ສະແດງຍອດລວມລາຍຊົ່ວໂມງ</item>
+        <item>ສະແດງຍອດລວມລາຍວັນ</item>
+        <item>ສະແດງຍອດລວມລາຍອາທິດ</item>
+        <item>ສະແດງຍອດລວມລາຍເດືອນ</item>
+        <item>ສະແດງຍອດລວມລາຍປີ</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">ຂໍ້ມູນທັງໝົດ</string>
+    <string name="graph_time_durations_a_day">1 ມື້</string>
+    <string name="graph_time_durations_a_week">1 ອາທິດ</string>
+    <string name="graph_time_durations_a_month">1 ເດືອນ</string>
+    <string name="graph_time_durations_three_months">3 ເດືອນ</string>
+    <string name="graph_time_durations_six_months">6 ເດືອນ</string>
+    <string name="graph_time_durations_a_year">1 ປີ</string>
+    <string name="custom">ກຳນົດເອງ</string>
+    <string-array name="y_range_styles">
+        <item>ແບບໄດນາມິກ</item>
+        <item>ຄົງທີ່</item>
+    </string-array>
+    <string name="ending_at_latest">ຈຸດຂໍ້ມູນຫຼ້າສຸດ</string>
+    <string name="ending_at_now">ຕອນນີ້</string>
+    <string name="ending_at_custom_date">ວັນທີກຳນົດເອງ…</string>
+    <string name="hours_and_minutes_ago">%1$d ຊມ. %2$d ນາທີກ່ອນ</string>
+    <string name="import_exception_unknown">ນຳເຂົ້າບໍ່ສຳເລັດ: ເກີດຂໍ້ຜິດພາດບໍ່ຮູ້ສາເຫດ</string>
+    <string name="import_exception_bad_headers">ນຳເຂົ້າບໍ່ສຳເລັດ: ຫົວຕາຕະລາງບໍ່ກົງກັບຫົວຕາຕະລາງທີ່ຄາດໄວ້: %1$s</string>
+    <string name="import_exception_inconsistent_record">ນຳເຂົ້າບໍ່ສຳເລັດ: ບັນທຶກໃນແຖວ %1$s ບໍ່ສອດຄ່ອງກັບຫົວຕາຕະລາງທີ່ຈຳເປັນ</string>
+    <string name="import_exception_bad_timestamp">ນຳເຂົ້າບໍ່ສຳເລັດ: ບໍ່ສາມາດແປຄ່າເວລາຂອງບັນທຶກໃນແຖວ: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">ນຳເຂົ້າບໍ່ສຳເລັດ: ປະເພດຂໍ້ມູນບໍ່ສອດຄ່ອງໃນແຖວ: %1$s</string>
+    <string name="unknown_error_occurred">ເກີດຂໍ້ຜິດພາດບໍ່ຮູ້ສາເຫດ</string>
+    <string name="graph_stat_validation_no_name">ກະລຸນາໃສ່ຊື່</string>
+    <string name="graph_stat_validation_no_line_graph_features">ກະລຸນາເພີ່ມບາງຢ່າງໃສ່ກຣາຟ</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">ກະລຸນາກວດໃຫ້ແນ່ໃຈວ່າ \"ຈາກ\" ນ້ອຍກວ່າ ຫຼື ເທົ່າກັບ \"ເຖິງ\"</string>
+    <string name="graph_stat_validation_unrecognised_color">ກະລຸນາກວດໃຫ້ແນ່ໃຈວ່າທຸກຊຸດຂໍ້ມູນມີສີ</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">ພົບຊຸດຂໍ້ມູນກຣາຟເສັ້ນທີ່ບໍ່ຖືກຕ້ອງ</string>
+    <string name="graph_stat_validation_bad_fixed_range">ກະລຸນາກວດໃຫ້ແນ່ໃຈວ່າ \"ຈາກ\" ນ້ອຍກວ່າ \"ເຖິງ\"</string>
+    <string name="graph_stat_view_not_found">ເກີດຂໍ້ຜິດພາດໃນການຊອກຫາກຣາຟນີ້</string>
+    <string name="graph_stat_view_not_enough_data_stat">ສະຖິຕິນີ້ຈະສະແດງເມື່ອມີການຕິດຕາມຂໍ້ມູນພຽງພໍເພື່ອສ້າງມັນ.</string>
+    <string name="graph_stat_view_not_enough_data_graph">ກຣາຟນີ້ຈະສະແດງເມື່ອມີການຕິດຕາມຂໍ້ມູນພຽງພໍເພື່ອສ້າງມັນ.</string>
+    <string name="pie_chart_mixed_signs_error">ບໍ່ສາມາດສະແດງກຣາຟວົງມົນນີ້ໄດ້ ເພາະມີຂະໜາດສ່ວນທັງບວກ ແລະ ລົບ.</string>
+    <string name="histogram_mixed_signs_error">ບໍ່ສາມາດສະແດງຮິສໂຕແກຣມນີ້ໄດ້ ເພາະມີຂະໜາດຊ່ວງທັງບວກ ແລະ ລົບ.</string>
+    <string name="graph_non_finite_data_error">ບໍ່ສາມາດສະແດງກຣາຟນີ້ໄດ້ ເພາະມີຄ່າທີ່ບໍ່ແມ່ນຈຳນວນຈຳກັດ.</string>
+    <string name="graph_inconsistent_series_error">ບໍ່ສາມາດສະແດງກຣາຟນີ້ໄດ້ ເພາະຊຸດຂໍ້ມູນມີຂະໜາດບໍ່ສອດຄ່ອງກັນ.</string>
+    <string name="graph_invalid_y_range_error">ບໍ່ສາມາດສະແດງກຣາຟນີ້ໄດ້ ເພາະຊ່ວງແກນ Y ບໍ່ຖືກຕ້ອງ.</string>
+    <string name="finish">ສຳເລັດ</string>
+    <string name="about_description">Track &amp; Graph ເປັນຊອບແວຟຣີແລະໂອເພນຊອດ ພາຍໃຕ້ໃບອະນຸຍາດ GPL 3.0.</string>
+    <string name="about_libraries_message">ໃຊ້ຫ້ອງສະໝຸດໂອເພນຊອດຕໍ່ໄປນີ້:</string>
+    <string name="about">ກ່ຽວກັບ</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">FAQ</string>
+    <string name="tutorial_text_1">ໃຊ້ຕົວຕິດຕາມເພື່ອຕິດຕາມຂໍ້ມູນຂອງທ່ານ.</string>
+    <string name="tutorial_text_2">ໃຊ້ກຣາຟແລະສະຖິຕິເພື່ອສະແດງຂໍ້ມູນ.</string>
+    <string name="tutorial_text_3">ໃຊ້ກຸ່ມເພື່ອຈັດລະບຽບຕົວຕິດຕາມ, ກຣາຟ ແລະສະຖິຕິ.</string>
+    <string name="got_it">ເຂົ້າໃຈແລ້ວ!</string>
+    <string name="move_to_colon">ຍ້າຍໄປທີ່:</string>
+    <string name="move_to">ຍ້າຍໄປທີ່</string>
+    <string name="ru_sure_update_data">ການອັບເດດນີ້ອາດປ່ຽນແປງຂໍ້ມູນທີ່ທ່ານຕິດຕາມໄວ້ແລ້ວຢ່າງບໍ່ສາມາດຍ້ອນກັບໄດ້. ແນະນຳຢ່າງຍິ່ງໃຫ້ສຳຮອງຂໍ້ມູນເດີມກ່ອນດຳເນີນການຕໍ່.\n\n ຕ້ອງການດຳເນີນການຕໍ່ບໍ?</string>
+    <string name="ok">ຕົກລົງ</string>
+    <string name="rate_the_app">ໃຫ້ຄະແນນແອັບ</string>
+    <string name="reminders">ການເຕືອນ</string>
+    <string name="no_reminders_hint">ແຕະໄອຄອນ + ເພື່ອສ້າງການແຈ້ງເຕືອນການຕິດຕາມໃໝ່.</string>
+    <string name="mon">ຈ.</string>
+    <string name="tue">ອ.</string>
+    <string name="wed">ພ.</string>
+    <string name="thu">ພຫ.</string>
+    <string name="fri">ສຸກ</string>
+    <string name="sat">ສ.</string>
+    <string name="sun">ອາ.</string>
+    <string name="reminders_notifications_channel_name">ການເຕືອນ</string>
+    <string name="reminders_notifications_channel_description">ການແຈ້ງເຕືອນທີ່ຜູ້ໃຊ້ສ້າງເພື່ອເຕືອນໃຫ້ຕິດຕາມ</string>
+    <string name="default_reminder_name">ເຖິງເວລາຕິດຕາມແລ້ວ!</string>
+    <string name="missed_reminder_single_content">ການເຕືອນຈາກ %1$s</string>
+    <string name="missed_reminders_multiple_content">ທ່ານພາດການເຕືອນ %1$d ລາຍການ</string>
+    <string name="next_reminder_format">ການເຕືອນຖັດໄປ: %1$s</string>
+    <string name="no_upcoming_reminders">ບໍ່ມີການເຕືອນທີ່ຈະມາເຖິງ</string>
+    <string name="select_reminder_type">ເລືອກປະເພດການເຕືອນ</string>
+    <string name="week_day_reminder">ການເຕືອນຕາມມື້ໃນອາທິດ</string>
+    <string name="week_day_reminder_description">ມື້ສະເພາະ ເຊັ່ນ ຈັນ, ພຸດ, ສຸກ</string>
+    <string name="periodic_reminder">ການເຕືອນເປັນໄລຍະ</string>
+    <string name="periodic_reminder_description">ໄລຍະຫ່າງປົກກະຕິ ເຊັ່ນ ທຸກໆ 3 ມື້</string>
+    <string name="month_day_reminder">ການເຕືອນຕາມມື້ໃນເດືອນ</string>
+    <string name="month_day_reminder_description">ຮູບແບບປະຈຳເດືອນ ເຊັ່ນ ວັນຈັນທຳອິດ</string>
+    <string name="time_since_last_reminder">ເວລານັບຈາກການເຕືອນຄັ້ງຫຼ້າສຸດ</string>
+    <string name="time_since_last_reminder_description">ເມື່ອທ່ານບໍ່ໄດ້ຕິດຕາມສິ່ງໃດໜຶ່ງມາໄລຍະໜຶ່ງ</string>
+    <string name="one_time_reminder">ການເຕືອນຄັ້ງດຽວ</string>
+    <string name="one_time_reminder_description">ການເຕືອນຄັ້ງດຽວຕາມເວລາສະເພາະ ຫຼືຫຼັງຈາກໜ່ວງເວລາ</string>
+    <string name="reminder_name">ຊື່ການເຕືອນ</string>
+    <string name="reminder_disabled">ປິດໃຊ້ງານການເຕືອນແລ້ວ</string>
+    <string name="repeat_every">ເຮັດຊ້ຳທຸກ</string>
+    <string name="at_time">ໃນເວລາ</string>
+    <string name="at_a_specific_time">ໃນເວລາສະເພາະ</string>
+    <string name="ending_at">ສິ້ນສຸດໃນ</string>
+    <string name="starting_from">ເລີ່ມຈາກ</string>
+    <string name="repeat_on_week_days">ເຮັດຊ້ຳໃນມື້ໃນອາທິດ</string>
+    <string name="track_feature">ຕິດຕາມຊຸດຂໍ້ມູນ</string>
+    <string name="select_tracker_placeholder">ເລືອກຕົວຕິດຕາມ</string>
+    <string name="remind_after">ເຕືອນຫຼັງຈາກ</string>
+    <string name="then_remind_every">ຈາກນັ້ນເຕືອນທຸກ</string>
+    <string name="remind_at_date_and_time">ໃນວັນທີແລະເວລາ</string>
+    <string name="remind_after_a_delay">ຫຼັງຈາກໜ່ວງເວລາ</string>
+    <string name="first_reminder">ການເຕືອນຄັ້ງທຳອິດ</string>
+    <string name="every_colon">ທຸກ:</string>
+    <string name="ended_at_format">ສິ້ນສຸດໃນ: %1$s</string>
+    <string name="starting_at_format">ເລີ່ມໃນ: %1$s</string>
+    <string name="occurrence_first">ທຳອິດ</string>
+    <string name="occurrence_second">ທີສອງ</string>
+    <string name="occurrence_third">ທີສາມ</string>
+    <string name="occurrence_fourth">ທີສີ່</string>
+    <string name="occurrence_last">ສຸດທ້າຍ</string>
+    <string name="monday">ວັນຈັນ</string>
+    <string name="tuesday">ວັນອັງຄານ</string>
+    <string name="wednesday">ວັນພຸດ</string>
+    <string name="thursday">ວັນພະຫັດ</string>
+    <string name="friday">ວັນສຸກ</string>
+    <string name="saturday">ວັນເສົາ</string>
+    <string name="sunday">ວັນອາທິດ</string>
+    <string-array name="abbreviated_months">
+        <item>ມ.ກ.</item>
+        <item>ກ.ພ.</item>
+        <item>ມ.ນ.</item>
+        <item>ເມ.ສ.</item>
+        <item>ພ.ພ.</item>
+        <item>ມິ.ຖ.</item>
+        <item>ກ.ລ.</item>
+        <item>ສ.ຫ.</item>
+        <item>ກ.ຍ.</item>
+        <item>ຕ.ລ.</item>
+        <item>ພ.ຈ.</item>
+        <item>ທ.ວ.</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>ຈ.</item>
+        <item>ອ.</item>
+        <item>ພ.</item>
+        <item>ພຫ.</item>
+        <item>ສຸກ</item>
+        <item>ສ.</item>
+        <item>ອາ.</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">ຮູບແບບຊ່ວງ:</string>
+    <string name="track_widget_configure_no_data_error">ກະລຸນາຕິດຕາມຂໍ້ມູນກ່ອນ.</string>
+    <string name="track_widget_configure_no_data_selected_error">ທ່ານຕ້ອງເລືອກຊຸດຂໍ້ມູນທີ່ຖືກຕ້ອງເພື່ອສ້າງວິດເຈັດການຕິດຕາມ.</string>
+    <string name="create">ສ້າງ</string>
+    <string name="use_default_value">ຕັ້ງຄ່າເລີ່ມຕົ້ນ</string>
+    <string name="backup_and_restore">ສຳຮອງແລະກູ້ຄືນ</string>
+    <string name="backup_hint_text">ການສຳຮອງຈະບັນທຶກຂໍ້ມູນແອັບທັງໝົດ ລວມທັງຂໍ້ມູນທີ່ຕິດຕາມ, ກຣາຟ ແລະການເຕືອນ. ຄວນສຳຮອງຂໍ້ມູນໄປຍັງອຸປະກອນພາຍນອກ ຫຼືບ່ອນເກັບຂໍ້ມູນຄລາວເປັນປະຈຳ ເຜື່ອອຸປະກອນສູນເສຍ ຫຼືເສຍຫາຍ.</string>
+    <string name="restore_data">ກູ້ຄືນຂໍ້ມູນ</string>
+    <string name="backup_successful">ສຳຮອງສຳເລັດ!</string>
+    <string name="backup_error_could_not_write_to_file">ບໍ່ສາມາດຊອກຫາ ຫຼືຂຽນໄປຍັງໄຟລ໌ທີ່ເລືອກ.</string>
+    <string name="backup_error_could_not_find_database_file">ບໍ່ພົບ ຫຼືບໍ່ສາມາດອ່ານໄຟລ໌ຖານຂໍ້ມູນ.</string>
+    <string name="backup_error_failed_to_copy_database">ເກີດບັນຫາຂະນະສຳເນົາໄຟລ໌ຖານຂໍ້ມູນ.</string>
+    <string name="restore_failed">ກູ້ຄືນບໍ່ສຳເລັດ. %1$s</string>
+    <string name="add_a_longer_description_optional">ເພີ່ມຄຳອະທິບາຍຍາວຂຶ້ນ (ບໍ່ບັງຄັບ)</string>
+    <string name="no_data_points_history_fragment_hint">ປະຫວັດຂອງທ່ານຈະສະແດງຢູ່ບ່ອນນີ້ເມື່ອມີຈຸດຂໍ້ມູນ.</string>
+    <string name="data_resolution_error">ເກີດຂໍ້ຜິດພາດຂະນະພະຍາຍາມແກ້ໄຂຂໍ້ມູນນີ້:\n\n%1$s</string>
+    <string name="info">ຂໍ້ມູນ</string>
+    <string name="no_description">ບໍ່ມີຄຳອະທິບາຍ</string>
+    <string name="description">ຄຳອະທິບາຍ</string>
+    <string name="app_lock_title">ລັອກແອັບ</string>
+    <string name="app_lock_locked_title">Track &amp; Graph ຖືກລັອກ</string>
+    <string name="app_lock_password_label">ລະຫັດຜ່ານ</string>
+    <string name="app_lock_confirm_password_label">ຢືນຢັນລະຫັດຜ່ານ</string>
+    <string name="app_lock_unlock">ປົດລັອກ</string>
+    <string name="app_lock_use_biometrics">ໃຊ້ຊີວະມິຕິ</string>
+    <string name="app_lock_enable">ເປີດໃຊ້ການລັອກແອັບ</string>
+    <string name="app_lock_enabled">ເປີດໃຊ້ການລັອກແອັບແລ້ວ</string>
+    <string name="app_lock_enable_biometric_unlock">ເປີດໃຊ້ການປົດລັອກດ້ວຍຊີວະມິຕິ</string>
+    <string name="app_lock_no_strong_biometric_available">ອຸປະກອນນີ້ບໍ່ຮອງຮັບການປົດລັອກດ້ວຍຊີວະມິຕິທີ່ປອດໄພສູງ.</string>
+    <string name="app_lock_lock_after_background_minutes">ລັອກຫຼັງຈາກຢູ່ເບື້ອງຫຼັງເປັນນາທີ</string>
+    <string name="app_lock_lock_after_background_minutes_hint">ໃຊ້ 0 ເພື່ອລັອກທັນທີທີ່ແອັບອອກຈາກໜ້າຈໍ.</string>
+    <string name="app_lock_change_password">ປ່ຽນລະຫັດຜ່ານ</string>
+    <string name="app_lock_password_changed">ປ່ຽນລະຫັດຜ່ານແລ້ວ</string>
+    <string name="app_lock_disable">ປິດໃຊ້ການລັອກແອັບ</string>
+    <string name="app_lock_unlock_biometric_title">ປົດລັອກ Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">ໃຊ້ຊີວະມິຕິຂອງອຸປະກອນເພື່ອດຳເນີນການຕໍ່</string>
+    <string name="app_lock_use_password">ໃຊ້ລະຫັດຜ່ານ</string>
+    <string name="app_lock_biometric_not_recognized">ບໍ່ຮັບຮູ້ການຢືນຢັນດ້ວຍຊີວະມິຕິ.</string>
+    <string name="app_lock_error_missing_password">ການລັອກແອັບບໍ່ມີລະຫັດຜ່ານ. ປິດແລະເປີດໃຊ້ການລັອກແອັບອີກຄັ້ງ.</string>
+    <string name="app_lock_error_incorrect_password">ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ</string>
+    <string name="app_lock_error_password_hashing_unavailable">ອຸປະກອນນີ້ບໍ່ຮອງຮັບການກວດສອບລະຫັດຜ່ານຂອງການລັອກແອັບ.</string>
+    <string name="app_lock_error_enter_password">ປ້ອນລະຫັດຜ່ານ.</string>
+    <string name="app_lock_error_passwords_do_not_match">ລະຫັດຜ່ານບໍ່ກົງກັນ.</string>
+    <string name="note_input_hint">ໝາຍເຫດ…</string>
+    <string name="add_a_note">ເພີ່ມໝາຍເຫດ</string>
+    <string name="notes">ໝາຍເຫດ</string>
+    <string name="show_global_notes">ທົ່ວໄປ</string>
+    <string name="show_data_point_notes">ຈຸດຂໍ້ມູນ</string>
+    <string name="delete_reminder_content_description">ລຶບການເຕືອນ</string>
+    <string name="restore_error_invalid_database_file">ການກູ້ຄືນລົ້ມເຫຼວ! ໄຟລ໌ທີ່ເລືອກບໍ່ແມ່ນໄຟລ໌ສຳຮອງທີ່ຖືກຕ້ອງ.</string>
+    <string name="auto_backup">ສຳຮອງອັດຕະໂນມັດ</string>
+    <string name="apply">ນຳໃຊ້</string>
+    <string name="backup_every">ສຳຮອງທຸກ: </string>
+    <string name="next_backup_at">\"ສຳຮອງຄັ້ງຕໍ່ໄປເວລາ: \"</string>
+    <string name="backup_notification_channel_name">ການແຈ້ງເຕືອນການສຳຮອງອັດຕະໂນມັດ</string>
+    <string name="backup_notification_channel_description">ແຈ້ງໃຫ້ທ່ານຮູ້ເມື່ອກຳລັງສຳຮອງອັດຕະໂນມັດ ແລະຫາກການສຳຮອງລົ້ມເຫຼວ.</string>
+    <string name="backup_notification_title">ກຳລັງສຳຮອງ…</string>
+    <string name="backup_failed_notification_title">ການສຳຮອງອັດຕະໂນມັດລົ້ມເຫຼວ</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph ບໍ່ສາມາດຊອກຫາ ຫຼືເຂົ້າເຖິງບ່ອນເກັບຂໍ້ມູນສຳຮອງຂອງທ່ານ.</string>
+    <string name="backup_failed_notification_could_not_copy">ເກີດບັນຫາຂະນະສຳຮອງຂໍ້ມູນ. ໄຟລ໌ສຳຮອງອາດເສຍຫາຍ ຫຼືບໍ່ຄົບຖ້ວນ.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">ເລືອກບ່ອນໃໝ່</string>
+    <string name="backup_location">ບ່ອນເກັບສຳຮອງ</string>
+    <string name="enable_auto_backup">ເປີດໃຊ້ການສຳຮອງອັດຕະໂນມັດ</string>
+    <string name="last_successful_backup">ການສຳຮອງສຳເລັດຄັ້ງຫຼ້າສຸດ</string>
+    <string name="next_scheduled_backup">ການສຳຮອງຕາມກຳນົດຄັ້ງຕໍ່ໄປ</string>
+    <string name="notification_permission_prompt">ຄວນເປີດໃຊ້ການແຈ້ງເຕືອນສຳລັບ Track &amp; Graph ເພື່ອຮັບແຈ້ງຫາກການສຳຮອງອັດຕະໂນມັດລົ້ມເຫຼວ.</string>
+    <string name="lua_script_empty">ກະລຸນາເພີ່ມສະຄຣິບ Lua</string>
+    <string name="function_name_empty">ຊື່ຟັງຊັນຫ້າມວ່າງ</string>
+    <string name="function_name">ຊື່ຟັງຊັນ</string>
+    <string name="add_at_least_one_input">ກະລຸນາເພີ່ມອິນພຸດຢ່າງໜ້ອຍໜຶ່ງລາຍການ</string>
+    <string name="output">ເອົາພຸດ</string>
+    <string name="data_source">ແຫຼ່ງຂໍ້ມູນ</string>
+    <string name="lua_script">ສະຄຣິບ Lua</string>
+    <string name="data_source_description">ໂນດແຫຼ່ງຂໍ້ມູນໃຫ້ທ່ານເລືອກຕົວຕິດຕາມ ຫຼືຟັງຊັນເພື່ອໃຊ້ເປັນອິນພຸດ.</string>
+    <string name="lua_script_input_hint">ປ້ອນສະຄຣິບ Lua…</string>
+    <string name="select_node_type">ເລືອກປະເພດໂນດ</string>
+    <string name="file">ໄຟລ໌</string>
+    <string name="lua_feature_names_not_unique">ອິນພຸດຂອງສະຄຣິບຕ້ອງມີຊື່ບໍ່ຊ້ຳກັນ</string>
+    <string name="graph_stat_type_lua_graph">ສະຄຣິບ Lua</string>
+    <string name="launch_lua_disabled">ການເປີດ Lua ຖືກປິດໃຊ້ງານ</string>
+    <string name="no_lua">ບໍ່ມີ Lua</string>
+    <string name="lua_engine_disabled">ເຄື່ອງຈັກ Lua ຖືກປິດໃຊ້ງານ</string>
+    <string name="lua_graph_first_time_user_title">ກຣາຟ ແລະສະຖິຕິຈາກສະຄຣິບ Lua</string>
+    <string name="lua_graph_first_time_user_message">ສະຄຣິບ Lua ແມ່ນຟີເຈີຂັ້ນສູງທີ່ໃຫ້ທ່ານສ້າງກຣາຟ ແລະສະຖິຕິແບບກຳນົດເອງດ້ວຍພາສາໂປຣແກຣມ Lua. \n\nທ່ານສາມາດໂຫຼດສະຄຣິບຂອງຕົນເອງ ຫຼືເລືອກຈາກຄັງ GitHub. ການຕິດຕັ້ງສະຄຣິບຈາກ GitHub ຈະນຳທ່ານກັບໄປຍັງແອັບ ພ້ອມສະຄຣິບທີ່ພ້ອມໃຊ້.</string>
+    <string name="functions_first_time_user_title">ຍິນດີຕ້ອນຮັບສູ່ຟັງຊັນ</string>
+    <string name="functions_first_time_user_message">ຟັງຊັນແມ່ນຟີເຈີຂັ້ນສູງທີ່ໃຫ້ທ່ານລວມ, ຮວບຮວມ ແລະແປງຂໍ້ມູນເປັນແຫຼ່ງຂໍ້ມູນທີ່ຄຳນວນໃໝ່.</string>
+    <string name="learn_more">ຮຽນຮູ້ເພີ່ມທີ່ນີ້</string>
+    <string name="github">GitHub</string>
+    <string name="paste">ວາງ</string>
+    <string name="failed_to_download_file">ດາວໂຫຼດໄຟລ໌ລົ້ມເຫຼວ: %s</string>
+    <string name="confirm_deep_link">ທ່ານໄດ້ຮັບລິ້ງສະຄຣິບຈາກແຫຼ່ງທີ່ບໍ່ຮູ້ຈັກ. ຕິດຕັ້ງສະຄຣິບຈາກແຫຼ່ງທີ່ທ່ານໄວ້ໃຈເທົ່ານັ້ນ. ຕ້ອງການຕິດຕັ້ງສະຄຣິບນີ້ບໍ?</string>
+    <string name="graph_stat_info_button_description">ບົດສອນກ່ຽວກັບກຣາຟ ແລະສະຖິຕິ</string>
+    <string name="network_generic_error">ເກີດຂໍ້ຜິດພາດຂະນະເຂົ້າເຖິງເຄືອຂ່າຍ. ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ ແລະລອງໃໝ່.</string>
+    <string name="function_verification_failure">ກວດສອບລາຍເຊັນຟັງຊັນລົ້ມເຫຼວ. ກະລຸນາກວດວ່າທ່ານມີການເຊື່ອມຕໍ່ທີ່ປອດໄພ ແລະ Track &amp; Graph ເປັນເວີຊັນລ່າສຸດ</string>
+    <string name="function_network_failure">ໂຫຼດຟັງຊັນລົ້ມເຫຼວ. ກະລຸນາກວດວ່າທ່ານເຊື່ອມຕໍ່ອິນເຕີເນັດ. ຫາກບັນຫາຍັງຄົງຢູ່ ກະລຸນາກວດວ່າແອັບເປັນເວີຊັນລ່າສຸດ.</string>
+    <string name="functions_landscape_hint">ຄຳແນະນຳ: ຟັງຊັນເຮັດວຽກໄດ້ດີທີ່ສຸດໃນໂໝດແນວນອນ</string>
+    <string name="functions_start_hint">ເລີ່ມທີ່ນີ້: ກົດຄ້າງ ແລະເລືອກແຫຼ່ງຂໍ້ມູນ</string>
+    <string name="see_whats_new">ເບິ່ງສິ່ງໃໝ່</string>
+    <string name="theme_colon">ຮູບແບບ:</string>
+    <string name="date_format_colon">ຮູບແບບວັນທີ:</string>
+    <string name="add_data_point_button_content_description">ປຸ່ມເພີ່ມຈຸດຂໍ້ມູນ</string>
+    <string name="tracked_data_menu_button_content_description">ປຸ່ມເມນູຂໍ້ມູນທີ່ຕິດຕາມ</string>
+    <string name="tracked_data_history_button_content_description">ປຸ່ມປະຫວັດຂໍ້ມູນທີ່ຕິດຕາມ</string>
+    <string name="delete_line_button_content_description">ປຸ່ມລຶບແຖວ</string>
+    <string name="delete_input_button_content_description">ປຸ່ມລຶບຊ່ອງປ້ອນ</string>
+    <string name="delete_data_point_button_content_description">ປຸ່ມລຶບຈຸດຂໍ້ມູນ</string>
+    <string name="edit_data_point_button_content_description">ປຸ່ມແກ້ໄຂຈຸດຂໍ້ມູນ</string>
+    <string name="add_multiple_choice_answer_button_content_description">ປຸ່ມເພີ່ມຄຳຕອບຫຼາຍຕົວເລືອກ</string>
+    <string name="ending_at_colon">ຕົວຢ່າງສິ້ນສຸດທີ່:</string>
+    <string name="duplicate">ເຮັດຊ້ຳ</string>
+    <string name="no_notes_hint_text">ບັນທຶກທີ່ເພີ່ມຂະນະຕິດຕາມຈະສະແດງຢູ່ບ່ອນນີ້. ທ່ານຍັງສາມາດເພີ່ມບັນທຶກທົ່ວໄປໂດຍໃຊ້ປຸ່ມ +.</string>
+    <string name="add_a_global_note">ເພີ່ມບັນທຶກທົ່ວໄປ:</string>
+    <string name="duration">ໄລຍະເວລາ</string>
+    <string name="weeks">ອາທິດ</string>
+    <string name="months">ເດືອນ</string>
+    <string name="days">ມື້</string>
+    <string name="hours">ຊົ່ວໂມງ</string>
+    <string name="minutes">ນາທີ</string>
+    <string name="seconds">ວິນາທີ</string>
+    <string name="hours_suffix">ຊມ.</string>
+    <string name="minutes_suffix">ນ.</string>
+    <string name="seconds_suffix">ວ.</string>
+    <string name="numeric_to_duration_mode_header">ຄ່າທີ່ຕິດຕາມໄວ້ກ່ອນໜ້ານີ້ໝາຍເຖິງ:</string>
+    <string name="duration_to_numeric_mode_header">ຄ່າທີ່ຕິດຕາມໄວ້ກ່ອນໜ້ານີ້ຄວນປ່ຽນເປັນ:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">ບໍ່ສາມາດປົນໄລຍະເວລາກັບຂໍ້ມູນປະເພດອື່ນໄດ້. ລອງວາດເປັນຊົ່ວໂມງ, ນາທີ ຫຼືວິນາທີ</string>
+    <string name="sum_by_count_checkbox_label">ເລືອກບ່ອນນີ້ເພື່ອນັບຈຳນວນຈຸດຂໍ້ມູນທີ່ຕິດຕາມ ແທນການລວມຄ່າຂອງພວກມັນ.</string>
+    <string name="time_window_size">ຂະໜາດໜ້າຕ່າງເວລາ:</string>
+    <string name="hold_to_preview">ກົດຄ້າງເພື່ອເບິ່ງຕົວຢ່າງ</string>
+    <string name="open">ເປີດ</string>
+    <string name="close">ປິດ</string>
+    <string name="filter_by_label">ກັ່ນຕອງຕາມປ້າຍ</string>
+    <string name="filter_by_value">ກັ່ນຕອງຕາມຊ່ວງຄ່າ</string>
+    <string name="save_changes">ບັນທຶກການປ່ຽນແປງ</string>
+    <string name="timer_notification_channel_name">ຕົວຈັບເວລາ</string>
+    <string name="stop">ຢຸດ</string>
+    <string name="name_your_function">ຕັ້ງຊື່ຟັງຊັນຂອງທ່ານ: </string>
+    <string name="add_some_data_sources">ເພີ່ມແຫຼ່ງຂໍ້ມູນ</string>
+    <string name="value">ຄ່າ</string>
+    <string name="label">ປ້າຍ</string>
+    <string name="continue_word">ດຳເນີນຕໍ່</string>
+    <string name="update_all_data_points">ອັບເດດຈຸດຂໍ້ມູນທັງໝົດ: </string>
+    <string name="where_colon">ບ່ອນໃດ:</string>
+    <string name="to_colon">ເຖິງ:</string>
+    <string name="value_equals">ຄ່າ =</string>
+    <string name="label_equals">ປ້າຍ =</string>
+    <string name="adding_your_first_data_point">ບົດສອນສັ້ນໆກ່ຽວກັບການເພີ່ມຈຸດຂໍ້ມູນ:</string>
+    <string name="next">ຕໍ່ໄປ</string>
+    <string name="each_data_point_has_a_timestamp_and_value">ແຕ່ລະຈຸດຂໍ້ມູນມີເວລາບັນທຶກແລະຄ່າ: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">ຍັງສາມາດມີປ້າຍແລະບັນທຶກໄດ້ຕາມຕ້ອງການ: </string>
+    <string name="data_point_tutorial_page_2_description">ຄ່າແມ່ນຕົວເລກ ດັ່ງນັ້ນທ່ານຈຶ່ງເຫັນວ່າຂໍ້ມູນປ່ຽນແປງໄປຕາມເວລາແນວໃດ</string>
+    <string name="data_point_tutorial_page_2_hint">(ຄຳແນະນຳ: ຖ້າບໍ່ສົນໃຈຄ່າ ໃຫ້ໃຊ້ຄ່າເລີ່ມຕົ້ນ 1)</string>
+    <string name="data_point_tutorial_page_3_description">ໃຊ້ປ້າຍຫາກຕ້ອງການຈັດກຸ່ມຈຸດຂໍ້ມູນ</string>
+    <string name="data_point_tutorial_page_3_hint">(ຄຳແນະນຳ: ຖ້າຕ້ອງການເພີ່ມບໍລິບົດ ຫຼືຄຳອະທິບາຍ ໃຫ້ໃຊ້ຊ່ອງບັນທຶກແທນຊ່ອງປ້າຍ)</string>
+    <string name="help">ຊ່ວຍເຫຼືອ</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">ຕົວເລືອກຂັ້ນສູງ</string>
+    <string name="type_colon">\"ປະເພດ: \"</string>
+    <string name="order_colon">\"ລຳດັບ: \"</string>
+    <string name="value_and_label">ຄ່າ ແລະ ປ້າຍ</string>
+    <string name="value_only">ຄ່າເທົ່ານັ້ນ</string>
+    <string name="label_only">ປ້າຍເທົ່ານັ້ນ</string>
+    <string name="none">ບໍ່ມີ</string>
+    <string name="value_ascending">ຄ່າຈາກນ້ອຍຫາຫຼາຍ</string>
+    <string name="value_descending">ຄ່າຈາກຫຼາຍຫານ້ອຍ</string>
+    <string name="label_ascending">ປ້າຍຈາກນ້ອຍຫາຫຼາຍ</string>
+    <string name="label_descending">ປ້າຍຈາກຫຼາຍຫານ້ອຍ</string>
+    <string name="latest">ລ່າສຸດ</string>
+    <string name="oldest">ເກົ່າສຸດ</string>
+    <string name="track_all">ຕິດຕາມທັງໝົດ</string>
+    <string name="more_details">ລາຍລະອຽດເພີ່ມເຕີມ</string>
+    <string name="suggestions">ຄຳແນະນຳ</string>
+    <string name="no_label">ບໍ່ມີປ້າຍ</string>
+    <string name="confirm_cancel_notes_will_be_lost">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການປິດ? ບັນທຶກທັງໝົດຈະສູນເສຍ.</string>
+    <string name="add_a_label">ເພີ່ມປ້າຍ</string>
+    <string name="bar_interval">ຊ່ວງແທ່ງ:</string>
+    <string name="y_range_max">ຄ່າສູງສຸດຂອງຊ່ວງ Y</string>
+    <string name="total_formatted">ລວມ: %s</string>
+    <string name="from_formatted">ຈາກ: %s</string>
+    <string name="to_formatted">ເຖິງ: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">ວິນາທີ</string>
+    <string name="minutes_generic">ນາທີ</string>
+    <string name="hours_generic">ຊົ່ວໂມງ</string>
+    <string name="days_generic">ມື້</string>
+    <string name="weeks_generic">ອາທິດ</string>
+    <string name="months_generic">ເດືອນ</string>
+    <string name="years_generic">ປີ</string>
+    <plurals name="seconds">
+        <item quantity="other">%d ວິນາທີ</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d ນາທີ</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d ຊົ່ວໂມງ</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d ມື້</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d ອາທິດ</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d ເດືອນ</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d ປີ</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="other">ທຸກ %d ນາທີ</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="other">ທຸກ %d ຊົ່ວໂມງ</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="other">ທຸກ %d ມື້</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="other">ທຸກ %d ອາທິດ</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="other">ທຸກ %d ເດືອນ</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="other">ທຸກ %d ປີ</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="other">ຫຼັງຈາກ %d ນາທີ</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="other">ຫຼັງຈາກ %d ຊົ່ວໂມງ</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="other">ຫຼັງຈາກ %d ມື້</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="other">ຫຼັງຈາກ %d ອາທິດ</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="other">ຫຼັງຈາກ %d ເດືອນ</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="other">ຫຼັງຈາກ %d ປີ</item>
+    </plurals>
+    <string name="restore_hint_text">ຄຳເຕືອນ: ການກູ້ຄືນຈາກຂໍ້ມູນສຳຮອງຈະລຶບຂໍ້ມູນ ແລະການຕັ້ງຄ່າທັງໝົດໃນແອັບປັດຈຸບັນ. ຄວນສຳຮອງຂໍ້ມູນກ່ອນ!</string>
+    <string name="backup_now">ສຳຮອງຕອນນີ້</string>
+    <string name="restore_error_could_not_write_to_database">ການກູ້ຄືນລົ້ມເຫຼວ! ບໍ່ສາມາດຊອກຫາ ຫຼືຂຽນໄປຍັງຖານຂໍ້ມູນ.</string>
+    <string name="restore_error_could_not_read_from_database_file">ການກູ້ຄືນລົ້ມເຫຼວ! ບໍ່ສາມາດຊອກຫາ ຫຼືອ່ານໄຟລ໌ຖານຂໍ້ມູນທີ່ເລືອກ.</string>
+    <string name="restore_error_failed_to_copy_database">ການກູ້ຄືນລົ້ມເຫຼວ! ເກີດບັນຫາຂະນະກູ້ຄືນຖານຂໍ້ມູນ.</string>
+    <string name="select_location">ເລືອກບ່ອນເກັບ…</string>
+    <string name="restore_successful">ກູ້ຄືນສຳເລັດ! ຕອນນີ້ຕ້ອງເລີ່ມ Track &amp; Graph ໃໝ່.</string>
+</resources>

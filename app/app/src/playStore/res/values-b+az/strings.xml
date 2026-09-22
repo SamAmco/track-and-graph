@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Tərtibatçını dəstəkləyin</string>
+    <string name="support_unavailable">Hazırda heç bir dəstək seçimi mövcud deyil.</string>
+    <string name="support_payment_failed">Ödəniş uğursuz oldu. Yenidən cəhd edin.</string>
+    <string name="support_payment_pending">Ödəniş gözləmədədir. Ödəniş təsdiqləndikdən sonra Google Play onu tamamlayacaq.</string>
+</resources>

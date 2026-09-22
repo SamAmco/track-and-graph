@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Tambah</string>
+    <string name="add_a_note">Tambahkan catatan</string>
+    <string name="cancel">Batal</string>
+    <string name="continue_word">Lanjutkan</string>
+    <string name="create">Buat</string>
+    <string name="label">Label</string>
+    <string name="release_notes_support_text">Dukungan Anda membantu Track &amp; Graph terus berjalan dan berkembang 🌱</string>
+    <string name="release_notes_maybe_later">Mungkin Nanti</string>
+    <string name="release_notes_support_development">Donasi untuk Mendukung Pengembangan</string>
+    <string name="release_notes_thank_you">Terima Kasih! ❤️\n\nSetiap dukungan membantu menjadikan Track &amp; Graph lebih baik bagi semua orang 🌱</string>
+    <string name="support_close">Tutup</string>
+    <string name="search">Cari</string>
+    <string name="update">Perbarui</string>
+    <string name="value">Nilai</string>
+</resources>

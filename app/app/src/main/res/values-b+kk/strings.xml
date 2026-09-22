@@ -1,0 +1,518 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Басты бет</string>
+    <string name="add_group">Топ қосу: </string>
+    <string name="edit_group">Топты өңдеу: </string>
+    <string name="group">Топ</string>
+    <string name="tracker">Трекер</string>
+    <string name="function">Функция</string>
+    <string name="graph_or_stat">График немесе статистика</string>
+    <string name="symlink">Симлинк</string>
+    <string name="symlinks">Симлинктер</string>
+    <string name="reminder">Еске салғыш</string>
+    <string name="add_component">Компонент қосу</string>
+    <string name="symlink_locations_title">«%1$s» орналасулары</string>
+    <string name="add_tracker">Нені бақылау керек:</string>
+    <string name="add">Қосу</string>
+    <string name="group_name">мысалы, Күнделікті әрекеттер</string>
+    <string name="delete">Жою</string>
+    <string name="edit">Өңдеу</string>
+    <string name="update">Жаңарту</string>
+    <string name="graph_or_stat_name">График атауы: </string>
+    <string name="tracker_name">Трекер атауы</string>
+    <string name="this_is_a_time_or_duration">Бұл уақыт немесе ұзақтық</string>
+    <string name="yes">Иә</string>
+    <string name="cancel">Бас тарту</string>
+    <string name="select_file">Файлды таңдау</string>
+    <string name="empty_group_hint">Track &amp; Graph қолданбасына қош келдіңіз!\n\n Жұмысты бастау үшін жоғарғы оң жақтағы + белгісін түртіп, «Трекер» таңдаңыз.</string>
+    <string name="no_trackers_graph_stats_hint">Графиктер жасамас бұрын трекер жасаңыз.</string>
+    <string name="no_trackers_functions_hint">Функциялар жасамас бұрын трекер жасаңыз.</string>
+    <string name="ru_sure_del_group">Бұл топты және оның ішіндегінің бәрін жойғыңыз келетініне сенімдісіз бе? Бұл әрекетті қайтару мүмкін емес.</string>
+    <string name="ru_sure_del_graph">Бұл графикті жойғыңыз келетініне сенімдісіз бе? Бұл әрекетті қайтару мүмкін емес. Бақыланған деректер жоғалмайды.</string>
+    <string name="ru_sure_del_feature">Бұл бақыланған деректерді жойғыңыз келетініне сенімдісіз бе?</string>
+    <string name="item_in_multiple_groups">Бұл элемент бірнеше жерде бар. Оны осы жерден алып тастауға немесе барлық жерден жоюға болады.</string>
+    <string name="remove_from_this_group">Осы жерден алып тастау</string>
+    <string name="delete_everywhere">Барлық жерден жою</string>
+    <string name="ru_sure_del_function">Бұл функцияны жойғыңыз келетініне сенімдісіз бе? Бұл әрекетті қайтару мүмкін емес.</string>
+    <string name="ru_sure_del_reminder">Бұл еске салғышты жойғыңыз келетініне сенімдісіз бе? Бұл әрекетті қайтару мүмкін емес.</string>
+    <string name="ru_sure_del_data_point">Бұл деректер нүктесін жойғыңыз келетініне сенімдісіз бе?</string>
+    <string name="feature_name_cannot_be_null">Атау қосыңыз</string>
+    <string name="tracker_with_that_name_exists">Бұл атаумен бір нәрсені бақылап жатырсыз</string>
+    <string name="data_points">%1$d деректер нүктесі</string>
+    <string name="items_selected">%1$d таңдалды</string>
+    <string name="select_all">Барлығын таңдау</string>
+    <string name="deselect_all">Барлығын таңдаудан бас тарту</string>
+    <string name="ru_sure_del_data_points">Бұл деректер нүктелерін жойғыңыз келетініне сенімдісіз бе?</string>
+    <string name="delete_selected_content_description">Таңдалған элементтерді жою</string>
+    <string name="copy_selected_content_description">Таңдалған элементтерді көшіру</string>
+    <string name="move_selected_content_description">Таңдалған элементтерді жылжыту</string>
+    <string name="copy_to">Көшіру орны</string>
+    <string name="no_data">Деректер жоқ</string>
+    <string name="skip">Өткізіп жіберу</string>
+    <string name="exportButton">Экспорттау</string>
+    <string name="importButton">Импорттау</string>
+    <string name="import_export">Импорттау/экспорттау</string>
+    <string name="search">Іздеу</string>
+    <string name="type_to_search">Іздеу үшін теріңіз</string>
+    <string name="no_results">Нәтиже жоқ</string>
+    <string name="export_to">Осы топтағы бақыланған деректерді CSV форматына экспорттау:</string>
+    <string name="export_error_message">Экспорттау сәтсіз аяқталды: %1$s</string>
+    <string name="import_from">CSV файлынан осы топқа бақыланған деректерді импорттау:</string>
+    <string name="import_warning">Ескерту: импорттауды қайтару мүмкін емес. Track &amp; Graph осы топтағы импортталған деректерді атауы бойынша бар деректермен біріктіруге тырысады.</string>
+    <string name="add_a_graph_or_stat">График немесе статистика қосу</string>
+    <string name="graph_type_label">График түрі:</string>
+    <string name="sample_size">Үлгі өлшемі:</string>
+    <string name="select_a_discrete_feature">Белгілері бар деректер жиынын таңдаңыз: </string>
+    <string name="no_labels">Бұл деректер жиынында белгілер жоқ</string>
+    <string name="select_a_feature">Деректер жиынын таңдаңыз:</string>
+    <string name="select_a_tracker">Трекерді таңдаңыз</string>
+    <string name="offset">Ығысу:</string>
+    <string name="scale">Масштаб:</string>
+    <string name="from">Бастап:</string>
+    <string name="to">Дейін:</string>
+    <string name="day">Күн</string>
+    <string-array name="time_histogram_windows">
+        <item>Сағат сайын</item>
+        <item>Күн сайын</item>
+        <item>Апта сайын</item>
+        <item>Ай сайын</item>
+        <item>Тоқсан сайын</item>
+        <item>Жарты жыл сайын</item>
+        <item>Жыл сайын</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Батарея үнемдегіші</item>
+        <item>Ашық</item>
+        <item>Қараңғы</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Жүйе әдепкісі</item>
+        <item>Ашық</item>
+        <item>Қараңғы</item>
+    </string-array>
+    <string name="graph_type_line_graph">Сызықтық график</string>
+    <string name="graph_type_pie_chart">Дөңгелек диаграмма</string>
+    <string name="graph_type_average_time_between">Аралықтағы орташа уақыт</string>
+    <string name="graph_type_time_since">Содан бергі уақыт</string>
+    <string name="graph_type_time_histogram">Уақыт гистограммасы</string>
+    <string name="graph_type_last_value">Соңғы мән/содан бергі уақыт</string>
+    <string name="graph_type_bar_chart">Бағандық диаграмма</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Орташаландырусыз</item>
+        <item>Күндік жылжымалы орташа</item>
+        <item>Үш күндік жылжымалы орташа</item>
+        <item>Апталық жылжымалы орташа</item>
+        <item>Айлық жылжымалы орташа</item>
+        <item>Үш айлық жылжымалы орташа</item>
+        <item>Алты айлық жылжымалы орташа</item>
+        <item>Жылдық жылжымалы орташа</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Бақыланған кезде көрсету</item>
+        <item>Сағаттық жиынтықтарды көрсету</item>
+        <item>Күндік жиынтықтарды көрсету</item>
+        <item>Апталық жиынтықтарды көрсету</item>
+        <item>Айлық жиынтықтарды көрсету</item>
+        <item>Жылдық жиынтықтарды көрсету</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Барлық дерек</string>
+    <string name="graph_time_durations_a_day">Бір күн</string>
+    <string name="graph_time_durations_a_week">Бір апта</string>
+    <string name="graph_time_durations_a_month">Бір ай</string>
+    <string name="graph_time_durations_three_months">Үш ай</string>
+    <string name="graph_time_durations_six_months">Алты ай</string>
+    <string name="graph_time_durations_a_year">Бір жыл</string>
+    <string name="custom">Реттелетін</string>
+    <string-array name="y_range_styles">
+        <item>Динамикалық</item>
+        <item>Бекітілген</item>
+    </string-array>
+    <string name="ending_at_latest">Соңғы деректер нүктесі</string>
+    <string name="ending_at_now">Қазір</string>
+    <string name="ending_at_custom_date">Реттелетін күн…</string>
+    <string name="hours_and_minutes_ago">%1$d сағ %2$d мин бұрын</string>
+    <string name="import_exception_unknown">Импорттау сәтсіз аяқталды: белгісіз қате орын алды</string>
+    <string name="import_exception_bad_headers">Импорттау сәтсіз аяқталды: тақырыптар күтілген тақырыптарға сәйкес келмеді: %1$s</string>
+    <string name="import_exception_inconsistent_record">Импорттау сәтсіз аяқталды: %1$s-жолдағы жазба міндетті тақырыптарға сәйкес емес</string>
+    <string name="import_exception_bad_timestamp">Импорттау сәтсіз аяқталды: %1$s-жолдағы жазбаның уақыт белгісін түсіндіру мүмкін болмады</string>
+    <string name="import_exception_inconsistent_data_type">Импорттау сәтсіз аяқталды: %1$s-жолда деректер түрі сәйкес емес</string>
+    <string name="unknown_error_occurred">Белгісіз қате орын алды</string>
+    <string name="graph_stat_validation_no_name">Атау енгізіңіз</string>
+    <string name="graph_stat_validation_no_line_graph_features">Графикке бір нәрсе қосыңыз</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">«Бастап» мәні «Дейін» мәнінен кіші немесе оған тең екеніне көз жеткізіңіз</string>
+    <string name="graph_stat_validation_unrecognised_color">Барлық деректер жиынында түс бар екеніне көз жеткізіңіз</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Жарамсыз сызықтық график деректер жиыны анықталды</string>
+    <string name="graph_stat_validation_bad_fixed_range">«Бастап» мәні «Дейін» мәнінен кіші екеніне көз жеткізіңіз</string>
+    <string name="graph_stat_view_not_found">Бұл графикті табу кезінде қате орын алды</string>
+    <string name="graph_stat_view_not_enough_data_stat">Бұл статистика оны жасауға жеткілікті дерек бақыланғанда көрсетіледі.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Бұл график оны жасауға жеткілікті дерек бақыланғанда көрсетіледі.</string>
+    <string name="pie_chart_mixed_signs_error">Бұл дөңгелек диаграмманы көрсету мүмкін емес, себебі онда оң және теріс сегмент өлшемдері бар.</string>
+    <string name="histogram_mixed_signs_error">Бұл гистограмманы көрсету мүмкін емес, себебі онда оң және теріс интервал өлшемдері бар.</string>
+    <string name="graph_non_finite_data_error">Бұл графикті көрсету мүмкін емес, себебі онда ақырлы сан болып табылмайтын мән бар.</string>
+    <string name="graph_inconsistent_series_error">Бұл графикті көрсету мүмкін емес, себебі оның деректер қатарларының өлшемдері сәйкес емес.</string>
+    <string name="graph_invalid_y_range_error">Бұл графикті көрсету мүмкін емес, себебі оның Y осінің ауқымы жарамсыз.</string>
+    <string name="finish">Аяқтау</string>
+    <string name="about_description">Track &amp; Graph — GPL 3.0 лицензиясы бойынша таратылатын тегін әрі ашық бастапқы коды бар бағдарлама.</string>
+    <string name="about_libraries_message">Келесі ашық бастапқы кодты кітапханалар пайдаланылды:</string>
+    <string name="about">Қолданба туралы</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Жиі қойылатын сұрақтар</string>
+    <string name="tutorial_text_1">Деректеріңізді бақылау үшін трекерлерді пайдаланыңыз.</string>
+    <string name="tutorial_text_2">Деректерді көрнекі көрсету үшін графиктер мен статистиканы пайдаланыңыз.</string>
+    <string name="tutorial_text_3">Трекерлерді, графиктер мен статистиканы реттеу үшін топтарды пайдаланыңыз.</string>
+    <string name="got_it">Түсіндім!</string>
+    <string name="move_to_colon">Жылжыту орны:</string>
+    <string name="move_to">Жылжыту</string>
+    <string name="ru_sure_update_data">Бұл жаңарту бұрын бақыланған деректерді қайтарылмайтындай өзгертуі мүмкін. Жалғастырмас бұрын бар деректердің сақтық көшірмесін жасау қатаң ұсынылады.\n\n Жалғастырғыңыз келе ме?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Қолданбаны бағалау</string>
+    <string name="reminders">Еске салғыштар</string>
+    <string name="no_reminders_hint">Жаңа бақылау еске салғышы туралы хабарландыру жасау үшін + белгішесін түртіңіз.</string>
+    <string name="mon">Дс</string>
+    <string name="tue">Сс</string>
+    <string name="wed">Ср</string>
+    <string name="thu">Бс</string>
+    <string name="fri">Жм</string>
+    <string name="sat">Сб</string>
+    <string name="sun">Жс</string>
+    <string name="reminders_notifications_channel_name">Еске салғыштар</string>
+    <string name="reminders_notifications_channel_description">Бақылау уақытын еске салу үшін пайдаланушы жасаған хабарландырулар</string>
+    <string name="default_reminder_name">Бақылау уақыты келді!</string>
+    <string name="missed_reminder_single_content">%1$s еске салғышы</string>
+    <string name="missed_reminders_multiple_content">%1$d еске салғышты өткізіп алдыңыз</string>
+    <string name="next_reminder_format">Келесі еске салғыш: %1$s</string>
+    <string name="no_upcoming_reminders">Алдағы еске салғыштар жоқ</string>
+    <string name="select_reminder_type">Еске салғыш түрін таңдаңыз</string>
+    <string name="week_day_reminder">Апта күндері бойынша еске салғыш</string>
+    <string name="week_day_reminder_description">Дүйсенбі, сәрсенбі, жұма сияқты белгілі күндер</string>
+    <string name="periodic_reminder">Мерзімді еске салғыш</string>
+    <string name="periodic_reminder_description">Әр 3 күн сайын сияқты тұрақты аралықтар</string>
+    <string name="month_day_reminder">Ай күні бойынша еске салғыш</string>
+    <string name="month_day_reminder_description">Бірінші дүйсенбі сияқты ай сайынғы үлгілер</string>
+    <string name="time_since_last_reminder">Соңғы еске салғыштан бергі уақыт</string>
+    <string name="time_since_last_reminder_description">Бір нәрсені біраз уақыт бақыламаған кезде</string>
+    <string name="one_time_reminder">Бір реттік еске салғыш</string>
+    <string name="one_time_reminder_description">Белгілі бір уақытта немесе кідірістен кейінгі жеке еске салғыш</string>
+    <string name="reminder_name">Еске салғыш атауы</string>
+    <string name="reminder_disabled">Еске салғыш өшірілген</string>
+    <string name="repeat_every">Қайталау аралығы</string>
+    <string name="at_time">Уақытында</string>
+    <string name="at_a_specific_time">Белгілі бір уақытта</string>
+    <string name="ending_at">Аяқталу уақыты</string>
+    <string name="starting_from">Басталу уақыты</string>
+    <string name="repeat_on_week_days">Апта күндерінде қайталау</string>
+    <string name="track_feature">Дерек көзін бақылау</string>
+    <string name="select_tracker_placeholder">Трекерді таңдаңыз</string>
+    <string name="remind_after">Мына уақыттан кейін еске салу</string>
+    <string name="then_remind_every">Содан кейін мына аралықпен еске салу</string>
+    <string name="remind_at_date_and_time">Күн мен уақытта</string>
+    <string name="remind_after_a_delay">Кідірістен кейін</string>
+    <string name="first_reminder">Алғашқы еске салғыш</string>
+    <string name="every_colon">Әр:</string>
+    <string name="ended_at_format">Аяқталды: %1$s</string>
+    <string name="starting_at_format">Басталады: %1$s</string>
+    <string name="occurrence_first">Бірінші</string>
+    <string name="occurrence_second">Екінші</string>
+    <string name="occurrence_third">Үшінші</string>
+    <string name="occurrence_fourth">Төртінші</string>
+    <string name="occurrence_last">Соңғы</string>
+    <string name="monday">Дүйсенбі</string>
+    <string name="tuesday">Сейсенбі</string>
+    <string name="wednesday">Сәрсенбі</string>
+    <string name="thursday">Бейсенбі</string>
+    <string name="friday">Жұма</string>
+    <string name="saturday">Сенбі</string>
+    <string name="sunday">Жексенбі</string>
+    <string-array name="abbreviated_months">
+        <item>Қаң</item>
+        <item>Ақп</item>
+        <item>Нау</item>
+        <item>Сәу</item>
+        <item>Мам</item>
+        <item>Мау</item>
+        <item>Шіл</item>
+        <item>Там</item>
+        <item>Қыр</item>
+        <item>Қаз</item>
+        <item>Қар</item>
+        <item>Жел</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Дс</item>
+        <item>Сс</item>
+        <item>Ср</item>
+        <item>Бс</item>
+        <item>Жм</item>
+        <item>Сб</item>
+        <item>Жс</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Ауқым стилі:</string>
+    <string name="track_widget_configure_no_data_error">Алдымен деректерді бақылаңыз.</string>
+    <string name="track_widget_configure_no_data_selected_error">Бақылау виджетін жасау үшін жарамды деректер жиынын таңдауыңыз керек.</string>
+    <string name="create">Жасау</string>
+    <string name="use_default_value">Әдепкі мәнді орнату</string>
+    <string name="backup_and_restore">Сақтық көшірме және қалпына келтіру</string>
+    <string name="backup_hint_text">Сақтық көшірме қолданбадағы барлық деректерді, соның ішінде бақыланған деректерді, графиктер мен еске салғыштарды сақтайды. Құрылғыңыз жоғалған немесе бұзылған жағдайда деректердің сақтық көшірмесін сыртқы құрылғыға немесе бұлттық қоймаға жүйелі түрде жасаңыз.</string>
+    <string name="restore_data">Деректерді қалпына келтіру</string>
+    <string name="backup_successful">Сақтық көшірме жасалды!</string>
+    <string name="backup_error_could_not_write_to_file">Таңдалған файлды табу немесе оған жазу мүмкін болмады.</string>
+    <string name="backup_error_could_not_find_database_file">Дерекқор файлын табу немесе оқу мүмкін болмады.</string>
+    <string name="backup_error_failed_to_copy_database">Дерекқор файлын көшіру кезінде қате орын алды.</string>
+    <string name="restore_failed">Қалпына келтіру сәтсіз аяқталды. %1$s</string>
+    <string name="add_a_longer_description_optional">Толығырақ сипаттама қосыңыз (міндетті емес)</string>
+    <string name="no_data_points_history_fragment_hint">Деректер нүктелері болғанда, тарихыңыз осында көрсетіледі.</string>
+    <string name="data_resolution_error">Бұл деректерді шешу кезінде қате орын алды:\n\n%1$s</string>
+    <string name="info">Ақпарат</string>
+    <string name="no_description">Сипаттама жоқ</string>
+    <string name="description">Сипаттама</string>
+    <string name="app_lock_title">Қолданба құлпы</string>
+    <string name="app_lock_locked_title">Track &amp; Graph құлыпталған</string>
+    <string name="app_lock_password_label">Құпиясөз</string>
+    <string name="app_lock_confirm_password_label">Құпиясөзді растаңыз</string>
+    <string name="app_lock_unlock">Құлпын ашу</string>
+    <string name="app_lock_use_biometrics">Биометрияны пайдалану</string>
+    <string name="app_lock_enable">Қолданба құлпын қосу</string>
+    <string name="app_lock_enabled">Қолданба құлпы қосулы</string>
+    <string name="app_lock_enable_biometric_unlock">Биометриялық құлпын ашуды қосу</string>
+    <string name="app_lock_no_strong_biometric_available">Бұл құрылғыда күшті биометриялық құлпын ашу қолжетімді емес.</string>
+    <string name="app_lock_lock_after_background_minutes">Фондық режимдегі минуттардан кейін құлыптау</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Қолданба алдыңғы орыннан кеткен бойда құлыптау үшін 0 мәнін пайдаланыңыз.</string>
+    <string name="app_lock_change_password">Құпиясөзді өзгерту</string>
+    <string name="app_lock_password_changed">Құпиясөз өзгертілді</string>
+    <string name="app_lock_disable">Қолданба құлпын өшіру</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph құлпын ашу</string>
+    <string name="app_lock_unlock_biometric_subtitle">Жалғастыру үшін құрылғыңыздың биометриясын пайдаланыңыз</string>
+    <string name="app_lock_use_password">Құпиясөзді пайдалану</string>
+    <string name="app_lock_biometric_not_recognized">Биометриялық аутентификация танылмады.</string>
+    <string name="app_lock_error_missing_password">Қолданба құлпында құпиясөз жоқ. Қолданба құлпын өшіріп, қайта қосыңыз.</string>
+    <string name="app_lock_error_incorrect_password">Құпиясөз қате</string>
+    <string name="app_lock_error_password_hashing_unavailable">Бұл құрылғыда қолданба құлпының құпиясөзін тексеру қолжетімді емес.</string>
+    <string name="app_lock_error_enter_password">Құпиясөз енгізіңіз.</string>
+    <string name="app_lock_error_passwords_do_not_match">Құпиясөздер сәйкес келмейді.</string>
+    <string name="note_input_hint">Жазбалар…</string>
+    <string name="add_a_note">Жазба қосу</string>
+    <string name="notes">Жазбалар</string>
+    <string name="show_global_notes">Жалпы</string>
+    <string name="show_data_point_notes">Деректер нүктелері</string>
+    <string name="delete_reminder_content_description">Еске салғышты жою</string>
+    <string name="theme_colon">Тақырып:</string>
+    <string name="date_format_colon">Күн форматы:</string>
+    <string name="add_data_point_button_content_description">Деректер нүктесін қосу батырмасы</string>
+    <string name="tracked_data_menu_button_content_description">Бақыланған деректер мәзірінің батырмасы</string>
+    <string name="tracked_data_history_button_content_description">Бақыланған деректер тарихының батырмасы</string>
+    <string name="delete_line_button_content_description">Сызықты жою батырмасы</string>
+    <string name="delete_input_button_content_description">Енгізуді жою батырмасы</string>
+    <string name="delete_data_point_button_content_description">Деректер нүктесін жою батырмасы</string>
+    <string name="edit_data_point_button_content_description">Деректер нүктесін өңдеу батырмасы</string>
+    <string name="add_multiple_choice_answer_button_content_description">Бірнеше таңдау жауабын қосу батырмасы</string>
+    <string name="ending_at_colon">Үлгі аяқталатын уақыт:</string>
+    <string name="duplicate">Көшірмесін жасау</string>
+    <string name="no_notes_hint_text">Бақылау кезінде қосылған жазбалар осында көрсетіледі. + батырмасы арқылы жалпы жазбалар да қоса аласыз.</string>
+    <string name="add_a_global_note">Жалпы жазба қосу:</string>
+    <string name="duration">Ұзақтығы</string>
+    <string name="weeks">Апта</string>
+    <string name="months">Ай</string>
+    <string name="days">Күн</string>
+    <string name="hours">Сағат</string>
+    <string name="minutes">Минут</string>
+    <string name="seconds">Секунд</string>
+    <string name="hours_suffix">сағ</string>
+    <string name="minutes_suffix">мин</string>
+    <string name="seconds_suffix">с</string>
+    <string name="numeric_to_duration_mode_header">Бұрын бақыланған мәндер мынаны білдіреді:</string>
+    <string name="duration_to_numeric_mode_header">Бұрын бақыланған мәндер неге түрлендірілсін:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Уақыт ұзақтығын басқа дерек түрлерімен араластыруға болмайды. Сағат, минут немесе секунд мәндерін көрсетіп көріңіз</string>
+    <string name="sum_by_count_checkbox_label">Мәндердің жалпы қосындысын емес, бақыланған деректер нүктелерінің санын есептеу үшін осы жерге белгі қойыңыз.</string>
+    <string name="time_window_size">Уақыт терезесінің өлшемі:</string>
+    <string name="hold_to_preview">Алдын ала көру үшін басып тұрыңыз</string>
+    <string name="open">Ашу</string>
+    <string name="close">Жабу</string>
+    <string name="filter_by_label">Белгі бойынша сүзу</string>
+    <string name="filter_by_value">Мән ауқымы бойынша сүзу</string>
+    <string name="save_changes">Өзгерістерді сақтау</string>
+    <string name="timer_notification_channel_name">Таймерлер</string>
+    <string name="stop">Тоқтату</string>
+    <string name="name_your_function">Функцияға атау беріңіз: </string>
+    <string name="add_some_data_sources">Дереккөздер қосу</string>
+    <string name="value">Мән</string>
+    <string name="label">Белгі</string>
+    <string name="continue_word">Жалғастыру</string>
+    <string name="update_all_data_points">Барлық деректер нүктелерін жаңарту: </string>
+    <string name="where_colon">Қайда:</string>
+    <string name="to_colon">Дейін:</string>
+    <string name="value_equals">Мән =</string>
+    <string name="label_equals">Белгі =</string>
+    <string name="adding_your_first_data_point">Деректер нүктелерін қосу бойынша қысқаша нұсқаулық:</string>
+    <string name="next">Келесі</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Әр деректер нүктесінде уақыт белгісі мен мән болады: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Оған қосымша белгі мен жазба қосуға болады: </string>
+    <string name="data_point_tutorial_page_2_description">Мән сан түрінде болады, сондықтан деректеріңіздің уақыт өте қалай өзгеретінін көре аласыз</string>
+    <string name="data_point_tutorial_page_2_hint">(Кеңес: мән маңызды болмаса, әдепкі 1 мәнін пайдаланыңыз)</string>
+    <string name="data_point_tutorial_page_3_description">Деректер нүктелерін топтастырғыңыз келсе, белгілерді пайдаланыңыз</string>
+    <string name="data_point_tutorial_page_3_hint">(Кеңес: қосымша мәлімет немесе сипаттама қосу үшін белгі өрісінің орнына жазбаны пайдаланыңыз)</string>
+    <string name="help">Анықтама</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Қосымша параметрлер</string>
+    <string name="type_colon">\"Түрі: \"</string>
+    <string name="order_colon">\"Реті: \"</string>
+    <string name="value_and_label">Мән және белгі</string>
+    <string name="value_only">Тек мән</string>
+    <string name="label_only">Тек белгі</string>
+    <string name="none">Жоқ</string>
+    <string name="value_ascending">Мәні өсу ретімен</string>
+    <string name="value_descending">Мәні кему ретімен</string>
+    <string name="label_ascending">Белгісі өсу ретімен</string>
+    <string name="label_descending">Белгісі кему ретімен</string>
+    <string name="latest">Ең соңғы</string>
+    <string name="oldest">Ең ескі</string>
+    <string name="track_all">Барлығын бақылау</string>
+    <string name="more_details">Толығырақ</string>
+    <string name="suggestions">Ұсыныстар</string>
+    <string name="no_label">Белгісіз</string>
+    <string name="confirm_cancel_notes_will_be_lost">Жабуды қалайсыз ба? Барлық жазбалар жоғалады.</string>
+    <string name="add_a_label">Белгі қосу</string>
+    <string name="bar_interval">Баған аралығы:</string>
+    <string name="y_range_max">Y ауқымының максимумы</string>
+    <string name="total_formatted">Барлығы: %s</string>
+    <string name="from_formatted">Бастап: %s</string>
+    <string name="to_formatted">Дейін: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Секунд</string>
+    <string name="minutes_generic">Минут</string>
+    <string name="hours_generic">Сағат</string>
+    <string name="days_generic">Күн</string>
+    <string name="weeks_generic">Апта</string>
+    <string name="months_generic">Ай</string>
+    <string name="years_generic">Жыл</string>
+    <plurals name="seconds">
+        <item quantity="other">%d секунд</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d минут</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d сағат</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d күн</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d апта</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d ай</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d жыл</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Әр минут сайын</item>
+        <item quantity="other">Әр %d минут сайын</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Әр сағат сайын</item>
+        <item quantity="other">Әр %d сағат сайын</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Күн сайын</item>
+        <item quantity="other">Әр %d күн сайын</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Апта сайын</item>
+        <item quantity="other">Әр %d апта сайын</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Ай сайын</item>
+        <item quantity="other">Әр %d ай сайын</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Жыл сайын</item>
+        <item quantity="other">Әр %d жыл сайын</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">1 минуттан кейін</item>
+        <item quantity="other">%d минуттан кейін</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">1 сағаттан кейін</item>
+        <item quantity="other">%d сағаттан кейін</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">1 күннен кейін</item>
+        <item quantity="other">%d күннен кейін</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">1 аптадан кейін</item>
+        <item quantity="other">%d аптадан кейін</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">1 айдан кейін</item>
+        <item quantity="other">%d айдан кейін</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">1 жылдан кейін</item>
+        <item quantity="other">%d жылдан кейін</item>
+    </plurals>
+    <string name="restore_hint_text">ЕСКЕРТУ: Сақтық көшірмеден қалпына келтіру қолданбадағы барлық деректер мен баптауларды өшіреді. Алдымен деректердің сақтық көшірмесін жасаңыз!</string>
+    <string name="backup_now">Қазір сақтық көшірме жасау</string>
+    <string name="restore_error_could_not_write_to_database">Қалпына келтіру сәтсіз аяқталды! Дерекқорды табу немесе оған жазу мүмкін болмады.</string>
+    <string name="restore_error_could_not_read_from_database_file">Қалпына келтіру сәтсіз аяқталды! Таңдалған дерекқор файлын табу немесе оқу мүмкін болмады.</string>
+    <string name="restore_error_failed_to_copy_database">Қалпына келтіру сәтсіз аяқталды! Дерекқорды қалпына келтіру кезінде қате орын алды.</string>
+    <string name="select_location">Орынды таңдау…</string>
+    <string name="restore_successful">Қалпына келтіру сәтті аяқталды! Track &amp; Graph енді қайта іске қосылуы керек.</string>
+    <string name="restore_error_invalid_database_file">Қалпына келтіру сәтсіз аяқталды! Таңдалған файл жарамды сақтық көшірме емес.</string>
+    <string name="auto_backup">Автоматты сақтық көшірме</string>
+    <string name="apply">Қолдану</string>
+    <string name="backup_every">Сақтық көшірме жасау аралығы: </string>
+    <string name="next_backup_at">\"Келесі сақтық көшірме: \"</string>
+    <string name="backup_notification_channel_name">Автоматты сақтық көшірме хабарландырулары</string>
+    <string name="backup_notification_channel_description">Автоматты сақтық көшірме жасалғанын және оның сәтсіз аяқталғанын хабарлайды.</string>
+    <string name="backup_notification_title">Сақтық көшірме жасалуда…</string>
+    <string name="backup_failed_notification_title">Автоматты сақтық көшірме сәтсіз аяқталды</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph сақтық көшірме орналасқан жерді таба алмады немесе оған қол жеткізе алмады.</string>
+    <string name="backup_failed_notification_could_not_copy">Деректердің сақтық көшірмесін жасау кезінде қате орын алды. Сақтық көшірме зақымдалған немесе толық емес болуы мүмкін.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Жаңа орынды таңдау</string>
+    <string name="backup_location">Сақтық көшірме орны</string>
+    <string name="enable_auto_backup">Автоматты сақтық көшірмені қосу</string>
+    <string name="last_successful_backup">Соңғы сәтті сақтық көшірме</string>
+    <string name="next_scheduled_backup">Келесі жоспарланған сақтық көшірме</string>
+    <string name="notification_permission_prompt">Автоматты сақтық көшірме қандай да бір себеппен сәтсіз аяқталса, хабарлану үшін Track &amp; Graph хабарландыруларын қосыңыз.</string>
+    <string name="lua_script_empty">Lua скриптін қосыңыз</string>
+    <string name="function_name_empty">Функция атауы бос болмауы керек</string>
+    <string name="function_name">Функция атауы</string>
+    <string name="add_at_least_one_input">Кемінде бір кіріс қосыңыз</string>
+    <string name="output">Шығыс</string>
+    <string name="data_source">Дереккөз</string>
+    <string name="lua_script">Lua скрипті</string>
+    <string name="data_source_description">Дереккөз түйіні кіріс ретінде пайдаланылатын трекерді немесе функцияны таңдауға мүмкіндік береді.</string>
+    <string name="lua_script_input_hint">Lua скриптін енгізіңіз…</string>
+    <string name="select_node_type">Түйін түрін таңдау</string>
+    <string name="file">Файл</string>
+    <string name="lua_feature_names_not_unique">Скрипт кірістерінің атаулары бірегей болуы керек</string>
+    <string name="graph_stat_type_lua_graph">Lua скрипті</string>
+    <string name="launch_lua_disabled">Lua іске қосу өшірілген</string>
+    <string name="no_lua">Lua жоқ</string>
+    <string name="lua_engine_disabled">Lua механизмі өшірілген</string>
+    <string name="lua_graph_first_time_user_title">Lua скрипттері бар графиктер мен статистика</string>
+    <string name="lua_graph_first_time_user_message">Lua скрипттері — Lua бағдарламалау тілін пайдаланып, теңшелетін графиктер мен статистика жасауға мүмкіндік беретін кеңейтілген мүмкіндік. \n\nӨз скриптіңізді жүктей аласыз немесе GitHub жинағынан біреуін таңдай аласыз. GitHub-тан скрипт орнатылса, қолданбаға қайта оралып, скрипт пайдалануға дайын болады.</string>
+    <string name="functions_first_time_user_title">Функцияларға қош келдіңіз</string>
+    <string name="functions_first_time_user_message">Функциялар — деректерді біріктіріп, жинақтап және түрлендіріп, жаңа туынды дереккөздер жасауға мүмкіндік беретін кеңейтілген мүмкіндік.</string>
+    <string name="learn_more">Толығырақ ақпарат</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Қою</string>
+    <string name="failed_to_download_file">Файлды жүктеп алу сәтсіз аяқталды: %s</string>
+    <string name="confirm_deep_link">Сізге белгісіз дереккөзден скрипт сілтемесі келді. Скрипттерді тек сенімді дереккөздерден орнатыңыз. Бұл скриптті орнатқыңыз келе ме?</string>
+    <string name="graph_stat_info_button_description">Графиктер мен статистика оқулықтары</string>
+    <string name="network_generic_error">Желіге кіру кезінде қате орын алды. Байланысты тексеріп, қайталап көріңіз.</string>
+    <string name="function_verification_failure">Функция қолтаңбаларын тексеру сәтсіз аяқталды. Қауіпсіз байланыс бар екенін және Track &amp; Graph жаңартылғанын тексеріңіз</string>
+    <string name="function_network_failure">Функцияларды жүктеу сәтсіз аяқталды. Интернетке қосылғаныңызды тексеріңіз. Мәселе шешілмесе, қолданбаның жаңартылғанын тексеріңіз.</string>
+    <string name="functions_landscape_hint">Кеңес: функциялар экран көлденең орналасқанда жақсы жұмыс істейді</string>
+    <string name="functions_start_hint">Осы жерден бастаңыз: ұзақ басып, «Дереккөз» таңдаңыз</string>
+    <string name="see_whats_new">Жаңалықтарды көру</string>
+</resources>

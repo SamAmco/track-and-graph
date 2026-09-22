@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Pridať</string>
+    <string name="add_a_note">Pridať poznámku</string>
+    <string name="cancel">Zrušiť</string>
+    <string name="continue_word">Pokračovať</string>
+    <string name="create">Vytvoriť</string>
+    <string name="label">Štítok</string>
+    <string name="release_notes_support_text">Vaša podpora pomáha udržať Track &amp; Graph pri živote a ďalej ho rozvíjať 🌱</string>
+    <string name="release_notes_maybe_later">Možno neskôr</string>
+    <string name="release_notes_support_development">Prispieť na podporu vývoja</string>
+    <string name="release_notes_thank_you">Ďakujeme! ❤️\n\nKaždá podpora pomáha zlepšovať Track &amp; Graph pre všetkých 🌱</string>
+    <string name="support_close">Zavrieť</string>
+    <string name="search">Hľadať</string>
+    <string name="update">Aktualizovať</string>
+    <string name="value">Hodnota</string>
+</resources>

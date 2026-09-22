@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Поддержать разработчика</string>
+    <string name="support_unavailable">В настоящее время варианты поддержки недоступны.</string>
+    <string name="support_payment_failed">Платёж не выполнен. Повторите попытку.</string>
+    <string name="support_payment_pending">Платёж ожидает подтверждения. Google Play завершит его после подтверждения оплаты.</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Әзірлеушіге қолдау көрсету</string>
+    <string name="support_unavailable">Қазіргі уақытта қолдау көрсету опциялары қолжетімді емес.</string>
+    <string name="support_payment_failed">Төлем сәтсіз аяқталды. Қайталап көріңіз.</string>
+    <string name="support_payment_pending">Төлем өңделуде. Төлем расталғаннан кейін Google Play оны аяқтайды.</string>
+</resources>

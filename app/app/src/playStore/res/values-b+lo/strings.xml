@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ສະໜັບສະໜູນຜູ້ພັດທະນາ</string>
+    <string name="support_unavailable">ຂະນະນີ້ບໍ່ມີຕົວເລືອກສະໜັບສະໜູນ.</string>
+    <string name="support_payment_failed">ການຊຳລະເງິນລົ້ມເຫຼວ. ກະລຸນາລອງໃໝ່.</string>
+    <string name="support_payment_pending">ການຊຳລະເງິນກຳລັງລໍຖ້າ. Google Play ຈະດຳເນີນການໃຫ້ສຳເລັດຫຼັງຢືນຢັນການຊຳລະ.</string>
+</resources>

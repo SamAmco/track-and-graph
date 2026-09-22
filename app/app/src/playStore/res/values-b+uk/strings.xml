@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Підтримати розробника</string>
+    <string name="support_unavailable">Наразі немає доступних варіантів підтримки.</string>
+    <string name="support_payment_failed">Платіж не виконано. Повторіть спробу.</string>
+    <string name="support_payment_pending">Платіж очікує підтвердження. Google Play завершить його після підтвердження платежу.</string>
+</resources>

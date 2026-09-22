@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">डेभलपरलाई सहयोग गर्नुहोस्</string>
+    <string name="support_unavailable">हाल कुनै सहयोग विकल्प उपलब्ध छैन।</string>
+    <string name="support_payment_failed">भुक्तानी असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।</string>
+    <string name="support_payment_pending">भुक्तानी पेन्डिङमा छ। भुक्तानी पुष्टि भएपछि Google Play ले यसलाई पूरा गर्नेछ।</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Apoiar o desenvolvedor</string>
+    <string name="support_unavailable">Nenhuma opção de apoio está disponível no momento.</string>
+    <string name="support_payment_failed">Falha no pagamento. Tente novamente.</string>
+    <string name="support_payment_pending">O pagamento está pendente. O Google Play o concluirá após a confirmação.</string>
+</resources>

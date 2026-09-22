@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">추가</string>
+    <string name="add_a_note">메모 추가</string>
+    <string name="cancel">취소</string>
+    <string name="continue_word">계속</string>
+    <string name="create">만들기</string>
+    <string name="label">라벨</string>
+    <string name="release_notes_support_text">여러분의 후원은 Track &amp; Graph가 계속 발전하는 데 큰 도움이 됩니다 🌱</string>
+    <string name="release_notes_maybe_later">나중에</string>
+    <string name="release_notes_support_development">개발 후원하기</string>
+    <string name="release_notes_thank_you">감사합니다! ❤️\n\n여러분의 모든 후원은 모두를 위한 Track &amp; Graph를 더 나은 앱으로 만드는 데 사용됩니다 🌱</string>
+    <string name="support_close">닫기</string>
+    <string name="search">검색</string>
+    <string name="update">업데이트</string>
+    <string name="value">값</string>
+</resources>

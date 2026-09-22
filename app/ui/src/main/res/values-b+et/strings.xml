@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Lisa</string>
+    <string name="add_a_note">Lisa märge</string>
+    <string name="cancel">Tühista</string>
+    <string name="continue_word">Jätka</string>
+    <string name="create">Loo</string>
+    <string name="label">Silt</string>
+    <string name="release_notes_support_text">Sinu toetus aitab Track &amp; Graphil jätkata ja kasvada 🌱</string>
+    <string name="release_notes_maybe_later">Võib-olla hiljem</string>
+    <string name="release_notes_support_development">Toeta arendust annetusega</string>
+    <string name="release_notes_thank_you">Aitäh! ❤️\n\nIga toetus aitab muuta Track &amp; Graphi kõigi jaoks paremaks 🌱</string>
+    <string name="support_close">Sulge</string>
+    <string name="search">Otsi</string>
+    <string name="update">Uuenda</string>
+    <string name="value">Väärtus</string>
+</resources>

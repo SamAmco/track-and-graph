@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="about_description">Ang Track &amp; Graph ay libre at open source na software sa ilalim ng Lisensya ng GPL 3.0.</string>
+    <string name="about_libraries_message">Ginamit ang sumusunod na open source na mga library:</string>
+    <string name="about">Tungkol dito</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">FAQ</string>
+    <string name="tutorial_text_1">Gamitin ang mga tracker para subaybayan ang iyong data.</string>
+    <string name="tutorial_text_2">Gamitin ang mga graph at istatistika para mailarawan ang data.</string>
+    <string name="tutorial_text_3">Gamitin ang mga grupo para ayusin ang iyong mga tracker, graph at istatistika.</string>
+    <string name="got_it">Nakuha ko!</string>
+    <string name="move_to_colon">Ilipat sa:</string>
+    <string name="move_to">Ilipat sa</string>
+    <string name="ru_sure_update_data">Maaaring permanenteng baguhin ng update na ito ang data na nasubaybayan mo na. Lubos na inirerekomendang mag-backup ng kasalukuyang data bago magpatuloy.\n\n Gusto mo bang magpatuloy?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">I-rate ang app</string>
+    <string name="reminders">Mga paalala</string>
+    <string name="no_reminders_hint">I-tap ang + icon para gumawa ng bagong notification na paalala sa pagsubaybay.</string>
+    <string name="mon">Lun</string>
+    <string name="tue">Mar</string>
+    <string name="wed">Miy</string>
+    <string name="thu">Huw</string>
+    <string name="fri">Biy</string>
+    <string name="sat">Sab</string>
+    <string name="sun">Lin</string>
+    <string name="reminders_notifications_channel_name">Mga paalala</string>
+    <string name="reminders_notifications_channel_description">Mga notification na ginawa ng user para ipaalalang magsubaybay</string>
+    <string name="default_reminder_name">Oras na para magsubaybay!</string>
+    <string name="missed_reminder_single_content">Paalala mula kay %1$s</string>
+    <string name="missed_reminders_multiple_content">May %1$d kang hindi nasagutang paalala</string>
+    <string name="next_reminder_format">Susunod na paalala: %1$s</string>
+    <string name="no_upcoming_reminders">Walang paparating na paalala</string>
+    <string name="select_reminder_type">Pumili ng uri ng paalala</string>
+    <string name="week_day_reminder">Paalalang ayon sa araw ng linggo</string>
+    <string name="week_day_reminder_description">Mga partikular na araw gaya ng Lunes, Miyerkules, Biyernes</string>
+    <string name="periodic_reminder">Pana-panahong paalala</string>
+    <string name="periodic_reminder_description">Mga regular na pagitan gaya ng bawat 3 araw</string>
+    <string name="month_day_reminder">Paalalang ayon sa araw ng buwan</string>
+    <string name="month_day_reminder_description">Mga buwanang pattern gaya ng unang Lunes</string>
+    <string name="time_since_last_reminder">Oras mula sa huling paalala</string>
+    <string name="time_since_last_reminder_description">Kapag matagal ka nang hindi nagsubaybay ng isang bagay</string>
+    <string name="one_time_reminder">Isang beses na paalala</string>
+    <string name="one_time_reminder_description">Isang hiwalay na paalala sa partikular na oras o pagkatapos ng takdang pagitan</string>
+    <string name="reminder_name">Pangalan ng paalala</string>
+    <string name="reminder_disabled">Naka-disable ang paalala</string>
+    <string name="repeat_every">Ulitin bawat</string>
+    <string name="at_time">Sa oras</string>
+    <string name="at_a_specific_time">Sa partikular na oras</string>
+    <string name="ending_at">Magtatapos sa</string>
+    <string name="starting_from">Magsisimula mula</string>
+    <string name="repeat_on_week_days">Ulitin sa mga araw ng linggo</string>
+    <string name="track_feature">Subaybayan ang feature</string>
+    <string name="select_tracker_placeholder">Pumili ng tracker</string>
+    <string name="remind_after">Paalalahanan pagkatapos ng</string>
+    <string name="then_remind_every">Pagkatapos, paalalahanan bawat</string>
+    <string name="remind_at_date_and_time">Sa petsa at oras</string>
+    <string name="remind_after_a_delay">Pagkatapos ng pagitan</string>
+    <string name="first_reminder">Unang paalala</string>
+    <string name="every_colon">Bawat:</string>
+    <string name="ended_at_format">Nagtapos sa: %1$s</string>
+    <string name="starting_at_format">Magsisimula sa: %1$s</string>
+    <string name="occurrence_first">Una</string>
+    <string name="occurrence_second">Ikalawa</string>
+    <string name="occurrence_third">Ikatlo</string>
+    <string name="occurrence_fourth">Ikaapat</string>
+    <string name="occurrence_last">Huli</string>
+    <string name="monday">Lunes</string>
+    <string name="tuesday">Martes</string>
+    <string name="wednesday">Miyerkules</string>
+    <string name="thursday">Huwebes</string>
+    <string name="friday">Biyernes</string>
+    <string name="saturday">Sabado</string>
+    <string name="sunday">Linggo</string>
+    <string-array name="abbreviated_months">
+        <item>Ene</item>
+        <item>Peb</item>
+        <item>Mar</item>
+        <item>Abr</item>
+        <item>May</item>
+        <item>Hun</item>
+        <item>Hul</item>
+        <item>Ago</item>
+        <item>Set</item>
+        <item>Okt</item>
+        <item>Nob</item>
+        <item>Dis</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Miy</item>
+        <item>Huw</item>
+        <item>Biy</item>
+        <item>Sab</item>
+        <item>Lin</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Estilo ng saklaw:</string>
+    <string name="track_widget_configure_no_data_error">Mag-subaybay muna ng data.</string>
+    <string name="track_widget_configure_no_data_selected_error">Kailangan mong pumili ng wastong data set para gumawa ng tracking widget.</string>
+    <string name="create">Gumawa</string>
+    <string name="use_default_value">Magtakda ng default na value</string>
+    <string name="backup_and_restore">Backup at pag-restore</string>
+    <string name="backup_hint_text">Sine-save ng backup ang lahat ng data ng app, kabilang ang lahat ng nasubaybayang data, graph at paalala. Regular na mag-backup sa external device o cloud storage kung sakaling mawala o masira ang iyong device.</string>
+    <string name="restore_data">I-restore ang data</string>
+    <string name="backup_successful">Matagumpay ang backup!</string>
+    <string name="backup_error_could_not_write_to_file">Hindi mahanap o maisulat ang napiling file.</string>
+    <string name="backup_error_could_not_find_database_file">Hindi mahanap o mabasa ang database file.</string>
+    <string name="backup_error_failed_to_copy_database">May nangyaring mali habang kinokopya ang database file.</string>
+    <string name="restore_failed">Hindi matagumpay ang pag-restore. %1$s</string>
+    <string name="add_a_longer_description_optional">Magdagdag ng mas mahabang paglalarawan (opsyonal)</string>
+    <string name="no_data_points_history_fragment_hint">Lalabas dito ang iyong history kapag mayroon ka nang mga data point.</string>
+    <string name="data_resolution_error">May naganap na error habang sinusubukang lutasin ang data na ito:\n\n%1$s</string>
+    <string name="info">Impormasyon</string>
+    <string name="no_description">Walang paglalarawan</string>
+    <string name="description">Paglalarawan</string>
+    <string name="app_lock_title">Lock ng app</string>
+    <string name="app_lock_locked_title">Naka-lock ang Track &amp; Graph</string>
+    <string name="app_lock_password_label">Password</string>
+    <string name="app_lock_confirm_password_label">Kumpirmahin ang password</string>
+    <string name="app_lock_unlock">I-unlock</string>
+    <string name="app_lock_use_biometrics">Gumamit ng biometrics</string>
+    <string name="app_lock_enable">I-enable ang lock ng app</string>
+    <string name="app_lock_enabled">Naka-enable ang lock ng app</string>
+    <string name="app_lock_enable_biometric_unlock">I-enable ang biometric unlock</string>
+    <string name="app_lock_no_strong_biometric_available">Walang available na malakas na biometric unlock sa device na ito.</string>
+    <string name="app_lock_lock_after_background_minutes">I-lock pagkatapos ng ilang minutong nasa background</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Gamitin ang 0 para mag-lock agad kapag umalis ang app sa foreground.</string>
+    <string name="app_lock_change_password">Baguhin ang password</string>
+    <string name="app_lock_password_changed">Nabago ang password</string>
+    <string name="app_lock_disable">I-disable ang lock ng app</string>
+    <string name="app_lock_unlock_biometric_title">I-unlock ang Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Gamitin ang biometrics ng iyong device para magpatuloy</string>
+    <string name="app_lock_use_password">Gumamit ng password</string>
+    <string name="app_lock_biometric_not_recognized">Hindi nakilala ang biometric authentication.</string>
+    <string name="app_lock_error_missing_password">Walang password ang lock ng app. I-disable at i-enable muli ang lock ng app.</string>
+    <string name="app_lock_error_incorrect_password">Maling password</string>
+    <string name="app_lock_error_password_hashing_unavailable">Hindi available sa device na ito ang pag-verify ng password ng lock ng app.</string>
+    <string name="app_lock_error_enter_password">Maglagay ng password.</string>
+    <string name="app_lock_error_passwords_do_not_match">Hindi magkatugma ang mga password.</string>
+    <string name="note_input_hint">Mga tala…</string>
+    <string name="add_a_note">Magdagdag ng tala</string>
+    <string name="notes">Mga tala</string>
+    <string name="show_global_notes">Pangkalahatan</string>
+    <string name="show_data_point_notes">Mga data point</string>
+    <string name="delete_reminder_content_description">Tanggalin ang paalala</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Format ng petsa:</string>
+    <string name="add_data_point_button_content_description">Button para magdagdag ng data point</string>
+    <string name="tracked_data_menu_button_content_description">Button ng menu ng nasubaybayang data</string>
+    <string name="tracked_data_history_button_content_description">Button ng history ng nasubaybayang data</string>
+    <string name="delete_line_button_content_description">Button para magtanggal ng linya</string>
+    <string name="delete_input_button_content_description">Button para magtanggal ng input</string>
+    <string name="delete_data_point_button_content_description">Button para magtanggal ng data point</string>
+    <string name="edit_data_point_button_content_description">Button para mag-edit ng data point</string>
+    <string name="add_multiple_choice_answer_button_content_description">Button para magdagdag ng sagot sa multiple choice</string>
+    <string name="ending_at_colon">Nagtatapos ang sample sa:</string>
+    <string name="duplicate">Gumawa ng kopya</string>
+    <string name="no_notes_hint_text">Lalabas dito ang mga talang idinagdag habang nagsu-subaybay. Maaari ka ring magdagdag ng mga global na tala gamit ang + button.</string>
+    <string name="add_a_global_note">Magdagdag ng global na tala:</string>
+    <string name="duration">Tagal</string>
+    <string name="weeks">Mga linggo</string>
+    <string name="months">Mga buwan</string>
+    <string name="days">Mga araw</string>
+    <string name="hours">Mga oras</string>
+    <string name="minutes">Mga minuto</string>
+    <string name="seconds">Mga segundo</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Ang mga dating nasubaybayang value ay kumakatawan sa:</string>
+    <string name="duration_to_numeric_mode_header">Saan dapat i-convert ang mga dating nasubaybayang value:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Hindi maaaring pagsamahin ang mga tagal ng oras sa ibang uri ng data. Isaalang-alang ang pag-plot ng mga oras, minuto o segundo</string>
+    <string name="sum_by_count_checkbox_label">Lagyan ng check dito para bilangin ang bilang ng mga nasubaybayang data point sa halip na ang kabuuan ng mga value nito.</string>
+    <string name="time_window_size">Laki ng time window:</string>
+    <string name="hold_to_preview">Pindutin nang matagal para i-preview</string>
+    <string name="open">Buksan</string>
+    <string name="close">Isara</string>
+    <string name="filter_by_label">I-filter ayon sa label</string>
+    <string name="filter_by_value">I-filter ayon sa saklaw ng value</string>
+    <string name="save_changes">I-save ang mga pagbabago</string>
+    <string name="timer_notification_channel_name">Mga timer</string>
+    <string name="stop">Ihinto</string>
+    <string name="name_your_function">Pangalanan ang iyong function: </string>
+    <string name="add_some_data_sources">Magdagdag ng mga data source</string>
+    <string name="value">Value</string>
+    <string name="label">Label</string>
+    <string name="continue_word">Magpatuloy</string>
+    <string name="update_all_data_points">I-update ang lahat ng data point: </string>
+    <string name="where_colon">Saan:</string>
+    <string name="to_colon">Kay:</string>
+    <string name="value_equals">Value =</string>
+    <string name="label_equals">Label =</string>
+    <string name="adding_your_first_data_point">Maikling tutorial sa pagdaragdag ng mga data point:</string>
+    <string name="next">Susunod</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Ang bawat data point ay may timestamp at value: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Maaari rin itong magkaroon ng label at tala, kung gusto: </string>
+    <string name="data_point_tutorial_page_2_description">Numero ang value para makita mo kung paano nagbabago ang iyong data sa paglipas ng panahon</string>
+    <string name="data_point_tutorial_page_2_hint">(Pahiwatig: Kung hindi mahalaga ang value, gamitin lang ang default na value na 1)</string>
+    <string name="data_point_tutorial_page_3_description">Gumamit ng mga label kung gusto mong pagpangkatin ang mga data point</string>
+    <string name="data_point_tutorial_page_3_hint">(Pahiwatig: Kung gusto mong magdagdag ng konteksto o paglalarawan, gamitin ang tala sa halip na field ng label)</string>
+    <string name="help">Tulong</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Mga advanced na opsyon</string>
+    <string name="type_colon">\"Uri: \"</string>
+    <string name="order_colon">\"Pagkakasunod-sunod: \"</string>
+    <string name="value_and_label">Value at label</string>
+    <string name="value_only">Value lang</string>
+    <string name="label_only">Label lang</string>
+    <string name="none">Wala</string>
+    <string name="value_ascending">Pataas na value</string>
+    <string name="value_descending">Pababa na value</string>
+    <string name="label_ascending">Pataas na label</string>
+    <string name="label_descending">Pababa na label</string>
+    <string name="latest">Pinakabago</string>
+    <string name="oldest">Pinakaluma</string>
+    <string name="track_all">Subaybayan lahat</string>
+    <string name="more_details">Higit pang detalye</string>
+    <string name="suggestions">Mga mungkahi</string>
+    <string name="no_label">Walang label</string>
+    <string name="confirm_cancel_notes_will_be_lost">Sigurado ka bang gusto mong isara? Mawawala ang lahat ng tala.</string>
+    <string name="add_a_label">Magdagdag ng label</string>
+    <string name="bar_interval">Interval ng bar:</string>
+    <string name="y_range_max">Pinakamataas na saklaw ng Y</string>
+    <string name="total_formatted">Kabuuan: %s</string>
+    <string name="from_formatted">Mula: %s</string>
+    <string name="to_formatted">Kay: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Segundo</string>
+    <string name="minutes_generic">Minuto</string>
+    <string name="hours_generic">Oras</string>
+    <string name="days_generic">Araw</string>
+    <string name="weeks_generic">Linggo</string>
+    <string name="months_generic">Buwan</string>
+    <string name="years_generic">Taon</string>
+    <plurals name="seconds">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundo</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minuto</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d oras</item>
+        <item quantity="other">%d oras</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d araw</item>
+        <item quantity="other">%d araw</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d linggo</item>
+        <item quantity="other">%d linggo</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d buwan</item>
+        <item quantity="other">%d buwan</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d taon</item>
+        <item quantity="other">%d taon</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Bawat minuto</item>
+        <item quantity="other">Bawat %d minuto</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Bawat oras</item>
+        <item quantity="other">Bawat %d oras</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Bawat araw</item>
+        <item quantity="other">Bawat %d araw</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Bawat linggo</item>
+        <item quantity="other">Bawat %d linggo</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Bawat buwan</item>
+        <item quantity="other">Bawat %d buwan</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Bawat taon</item>
+        <item quantity="other">Bawat %d taon</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Pagkalipas ng 1 minuto</item>
+        <item quantity="other">Pagkalipas ng %d minuto</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Pagkalipas ng 1 oras</item>
+        <item quantity="other">Pagkalipas ng %d oras</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Pagkalipas ng 1 araw</item>
+        <item quantity="other">Pagkalipas ng %d araw</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Pagkalipas ng 1 linggo</item>
+        <item quantity="other">Pagkalipas ng %d linggo</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Pagkalipas ng 1 buwan</item>
+        <item quantity="other">Pagkalipas ng %d buwan</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Pagkalipas ng 1 taon</item>
+        <item quantity="other">Pagkalipas ng %d taon</item>
+    </plurals>
+    <string name="restore_hint_text">BABALA: Buburahin ng pag-restore mula sa backup ang lahat ng kasalukuyang data at setup sa app. I-backup muna ang iyong data!</string>
+    <string name="backup_now">Mag-backup ngayon</string>
+    <string name="restore_error_could_not_write_to_database">Hindi matagumpay ang pag-restore! Hindi mahanap o maisulat ang database.</string>
+    <string name="restore_error_could_not_read_from_database_file">Hindi matagumpay ang pag-restore! Hindi mahanap o mabasa ang napiling database file.</string>
+    <string name="restore_error_failed_to_copy_database">Hindi matagumpay ang pag-restore! May nangyaring mali habang nire-restore ang database.</string>
+    <string name="select_location">Pumili ng lokasyon…</string>
+    <string name="restore_successful">Matagumpay ang pag-restore! Kailangang i-restart ngayon ang Track &amp; Graph.</string>
+    <string name="restore_error_invalid_database_file">Hindi matagumpay ang pag-restore! Mukhang hindi wastong backup ang napiling file.</string>
+    <string name="auto_backup">Awtomatikong backup</string>
+    <string name="apply">Ilapat</string>
+    <string name="backup_every">Mag-backup kada: </string>
+    <string name="next_backup_at">\"Susunod na backup: \"</string>
+    <string name="backup_notification_channel_name">Mga notification ng awtomatikong backup</string>
+    <string name="backup_notification_channel_description">Ipapaalam sa iyo kapag isinasagawa ang awtomatikong backup at kung nabigo ito.</string>
+    <string name="backup_notification_title">Isinasagawa ang backup…</string>
+    <string name="backup_failed_notification_title">Nabigo ang awtomatikong backup</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Hindi mahanap o ma-access ng Track &amp; Graph ang lokasyon ng iyong backup.</string>
+    <string name="backup_failed_notification_could_not_copy">May nangyaring mali habang bina-backup ang iyong data. Maaaring sira o hindi kumpleto ang iyong backup.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Pumili ng Bagong Lokasyon</string>
+    <string name="backup_location">Lokasyon ng Backup</string>
+    <string name="enable_auto_backup">I-enable ang Awtomatikong Backup</string>
+    <string name="last_successful_backup">Huling Matagumpay na Backup</string>
+    <string name="next_scheduled_backup">Susunod na Nakatakdang Backup</string>
+    <string name="notification_permission_prompt">Dapat mong i-enable ang mga notification para sa Track &amp; Graph upang maabisuhan kung mabigo ang awtomatikong backup sa anumang dahilan.</string>
+    <string name="lua_script_empty">Magdagdag ng Lua script</string>
+    <string name="function_name_empty">Hindi maaaring walang laman ang pangalan ng function</string>
+    <string name="function_name">Pangalan ng function</string>
+    <string name="add_at_least_one_input">Magdagdag ng kahit isang input</string>
+    <string name="output">Output</string>
+    <string name="data_source">Pinagmumulan ng Data</string>
+    <string name="lua_script">Lua Script</string>
+    <string name="data_source_description">Hinahayaan ka ng node na Pinagmumulan ng Data na pumili ng tracker o function na gagamitin bilang input.</string>
+    <string name="lua_script_input_hint">Maglagay ng Lua script…</string>
+    <string name="select_node_type">Pumili ng Uri ng Node</string>
+    <string name="file">File</string>
+    <string name="lua_feature_names_not_unique">Dapat natatangi ang mga pangalan ng input ng script</string>
+    <string name="graph_stat_type_lua_graph">Lua Script</string>
+    <string name="launch_lua_disabled">Naka-disable ang paglulunsad ng Lua</string>
+    <string name="no_lua">Walang Lua</string>
+    <string name="lua_engine_disabled">Naka-disable ang Lua engine</string>
+    <string name="lua_graph_first_time_user_title">Mga graph at statistic gamit ang Lua script</string>
+    <string name="lua_graph_first_time_user_message">Ang mga Lua script ay advanced na feature na nagbibigay-daan sa paggawa ng mga custom na graph at statistic gamit ang Lua programming language. \n\nMaaari kang mag-load ng sarili mong script o pumili mula sa koleksyon sa GitHub. Kapag nag-install ka ng script mula sa GitHub, babalik ka sa app na handa nang gamitin ang script.</string>
+    <string name="functions_first_time_user_title">Maligayang pagdating sa Functions</string>
+    <string name="functions_first_time_user_message">Ang Functions ay advanced na feature na nagbibigay-daan sa pagsasama, pag-aaggregate, at pagbabago ng iyong data upang maging mga bagong derived data source.</string>
+    <string name="learn_more">Matuto pa rito</string>
+    <string name="github">GitHub</string>
+    <string name="paste">I-paste</string>
+    <string name="failed_to_download_file">Hindi na-download ang file: %s</string>
+    <string name="confirm_deep_link">Nakatanggap ka ng link ng script mula sa hindi kilalang pinagmulan. Mag-install lamang ng script mula sa mga pinagkakatiwalaang source. Gusto mo bang i-install ang script na ito?</string>
+    <string name="graph_stat_info_button_description">Mga tutorial sa graph at statistic</string>
+    <string name="network_generic_error">May naganap na error habang ina-access ang network. Suriin ang iyong koneksyon at subukan muli.</string>
+    <string name="function_verification_failure">Hindi na-verify ang mga signature ng function. Tiyaking secure ang iyong koneksyon at napapanahon ang Track &amp; Graph</string>
+    <string name="function_network_failure">Hindi na-load ang mga function. Tiyaking nakakonekta ka sa internet. Kung magpapatuloy ang problema, tiyaking napapanahon ang app.</string>
+    <string name="functions_landscape_hint">Tip: Pinakamahusay gamitin ang Functions sa landscape</string>
+    <string name="functions_start_hint">Magsimula rito: Pindutin nang matagal at piliin ang Pinagmumulan ng Data</string>
+    <string name="see_whats_new">Tingnan ang Bago</string>
+    <string name="home">Home</string>
+    <string name="add_group">Magdagdag ng Grupo: </string>
+    <string name="edit_group">I-edit ang Grupo: </string>
+    <string name="group">Grupo</string>
+    <string name="tracker">Tracker</string>
+    <string name="function">Function</string>
+    <string name="graph_or_stat">Graph o Estadistika</string>
+    <string name="symlink">Symlink</string>
+    <string name="symlinks">Mga Symlink</string>
+    <string name="reminder">Paalala</string>
+    <string name="add_component">Magdagdag ng Component</string>
+    <string name="symlink_locations_title">Mga lokasyon ng \"%1$s\"</string>
+    <string name="add_tracker">Magtala ng bagay:</string>
+    <string name="add">Idagdag</string>
+    <string name="group_name">hal. Mga Pang-araw-araw na Gawain</string>
+    <string name="delete">Tanggalin</string>
+    <string name="edit">I-edit</string>
+    <string name="update">I-update</string>
+    <string name="graph_or_stat_name">Pangalan ng graph: </string>
+    <string name="tracker_name">Pangalan ng tracker</string>
+    <string name="this_is_a_time_or_duration">Ito ay oras o tagal</string>
+    <string name="yes">Oo</string>
+    <string name="cancel">Kanselahin</string>
+    <string name="select_file">Pumili ng File</string>
+    <string name="empty_group_hint">Maligayang pagdating sa Track &amp; Graph!\n\n I-tap ang + sa kanang itaas at piliin ang Tracker para magsimula.</string>
+    <string name="no_trackers_graph_stats_hint">Gumawa muna ng Tracker bago gumawa ng mga graph.</string>
+    <string name="no_trackers_functions_hint">Gumawa muna ng Tracker bago gumawa ng mga function.</string>
+    <string name="ru_sure_del_group">Sigurado ka bang gusto mong tanggalin ang grupong ito at lahat ng nasa loob nito? Hindi na ito maibabalik.</string>
+    <string name="ru_sure_del_graph">Sigurado ka bang gusto mong tanggalin ang graph na ito? Hindi na ito maibabalik. Hindi mawawala ang anumang naitalang data.</string>
+    <string name="ru_sure_del_feature">Sigurado ka bang gusto mong tanggalin ang naitalang data na ito?</string>
+    <string name="item_in_multiple_groups">Matatagpuan ang item na ito sa maraming lugar. Maaari mo itong alisin dito o tanggalin saanman ito naroroon.</string>
+    <string name="remove_from_this_group">Alisin dito</string>
+    <string name="delete_everywhere">Tanggalin saanman</string>
+    <string name="ru_sure_del_function">Sigurado ka bang gusto mong tanggalin ang function na ito? Hindi na ito maibabalik.</string>
+    <string name="ru_sure_del_reminder">Sigurado ka bang gusto mong tanggalin ang paalalang ito? Hindi na ito maibabalik.</string>
+    <string name="ru_sure_del_data_point">Sigurado ka bang gusto mong tanggalin ang data point na ito?</string>
+    <string name="feature_name_cannot_be_null">Magdagdag ng pangalan</string>
+    <string name="tracker_with_that_name_exists">May tinatala ka na gamit ang pangalang iyon</string>
+    <string name="data_points">%1$d Data Point</string>
+    <string name="items_selected">%1$d ang Napili</string>
+    <string name="select_all">Piliin lahat</string>
+    <string name="deselect_all">Alisin ang pagpili sa lahat</string>
+    <string name="ru_sure_del_data_points">Sigurado ka bang gusto mong tanggalin ang mga data point na ito?</string>
+    <string name="delete_selected_content_description">Tanggalin ang mga napiling item</string>
+    <string name="copy_selected_content_description">Kopyahin ang mga napiling item</string>
+    <string name="move_selected_content_description">Ilipat ang mga napiling item</string>
+    <string name="copy_to">Kopyahin sa</string>
+    <string name="no_data">Walang Data</string>
+    <string name="skip">Laktawan</string>
+    <string name="exportButton">I-export</string>
+    <string name="importButton">I-import</string>
+    <string name="import_export">Import/Export</string>
+    <string name="search">Maghanap</string>
+    <string name="type_to_search">Mag-type para maghanap</string>
+    <string name="no_results">Walang resulta</string>
+    <string name="export_to">I-export sa CSV ang naitalang data sa grupong ito:</string>
+    <string name="export_error_message">Nabigo ang pag-export: %1$s</string>
+    <string name="import_from">Mag-import ng naitalang data mula CSV papunta sa grupong ito:</string>
+    <string name="import_warning">Babala: Hindi na maibabalik ang pag-import. Susubukan ng Track &amp; Graph na pagsamahin ayon sa pangalan ang na-import na data at ang kasalukuyang data sa grupong ito.</string>
+    <string name="add_a_graph_or_stat">Magdagdag ng Graph o Estadistika</string>
+    <string name="graph_type_label">Uri ng graph:</string>
+    <string name="sample_size">Laki ng sample:</string>
+    <string name="select_a_discrete_feature">Pumili ng data set na may mga label: </string>
+    <string name="no_labels">Walang label ang data set na ito</string>
+    <string name="select_a_feature">Pumili ng data set:</string>
+    <string name="select_a_tracker">Pumili ng tracker</string>
+    <string name="offset">Offset:</string>
+    <string name="scale">Scale:</string>
+    <string name="from">Mula:</string>
+    <string name="to">Hanggang:</string>
+    <string name="day">Araw</string>
+    <string-array name="time_histogram_windows">
+        <item>Oras-oras</item>
+        <item>Araw-araw</item>
+        <item>Lingguhan</item>
+        <item>Buwanan</item>
+        <item>Kada quarter</item>
+        <item>Kada dalawang taon</item>
+        <item>Taunan</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Pagtitipid ng Baterya</item>
+        <item>Maliwanag</item>
+        <item>Madilim</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Default ng System</item>
+        <item>Maliwanag</item>
+        <item>Madilim</item>
+    </string-array>
+    <string name="graph_type_line_graph">Line Graph</string>
+    <string name="graph_type_pie_chart">Pie Chart</string>
+    <string name="graph_type_average_time_between">Karaniwang Tagal sa Pagitan</string>
+    <string name="graph_type_time_since">Tagal Mula Noong</string>
+    <string name="graph_type_time_histogram">Histogram ng Oras</string>
+    <string name="graph_type_last_value">Huling Naitala/Tagal Mula Noong</string>
+    <string name="graph_type_bar_chart">Bar Chart</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Walang Pag-average</item>
+        <item>Moving Average sa Isang Araw</item>
+        <item>Moving Average sa Tatlong Araw</item>
+        <item>Moving Average sa Isang Linggo</item>
+        <item>Moving Average sa Isang Buwan</item>
+        <item>Moving Average sa Tatlong Buwan</item>
+        <item>Moving Average sa Anim na Buwan</item>
+        <item>Moving Average sa Isang Taon</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>I-plot Kapag Naitala</item>
+        <item>I-plot ang Kabuuan Bawat Oras</item>
+        <item>I-plot ang Kabuuan Bawat Araw</item>
+        <item>I-plot ang Kabuuan Bawat Linggo</item>
+        <item>I-plot ang Kabuuan Bawat Buwan</item>
+        <item>I-plot ang Kabuuan Bawat Taon</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Lahat ng Data</string>
+    <string name="graph_time_durations_a_day">Isang Araw</string>
+    <string name="graph_time_durations_a_week">Isang Linggo</string>
+    <string name="graph_time_durations_a_month">Isang Buwan</string>
+    <string name="graph_time_durations_three_months">Tatlong Buwan</string>
+    <string name="graph_time_durations_six_months">Anim na Buwan</string>
+    <string name="graph_time_durations_a_year">Isang Taon</string>
+    <string name="custom">Custom</string>
+    <string-array name="y_range_styles">
+        <item>Dinamiko</item>
+        <item>Nakapirmi</item>
+    </string-array>
+    <string name="ending_at_latest">Huling Data Point</string>
+    <string name="ending_at_now">Ngayon</string>
+    <string name="ending_at_custom_date">Custom na petsa…</string>
+    <string name="hours_and_minutes_ago">%1$dh %2$dm ang nakalipas</string>
+    <string name="import_exception_unknown">Nabigo ang pag-import: Nagkaroon ng hindi kilalang error</string>
+    <string name="import_exception_bad_headers">Nabigo ang pag-import: Hindi tumugma ang mga header sa inaasahang header: %1$s</string>
+    <string name="import_exception_inconsistent_record">Nabigo ang pag-import: Hindi tugma sa kinakailangang header ang record sa linya %1$s</string>
+    <string name="import_exception_bad_timestamp">Nabigo ang pag-import: Hindi mabasa ang timestamp ng record sa linya: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Nabigo ang pag-import: Hindi tugma ang uri ng data sa linya: %1$s</string>
+    <string name="unknown_error_occurred">Nagkaroon ng hindi kilalang error</string>
+    <string name="graph_stat_validation_no_name">Maglagay ng pangalan</string>
+    <string name="graph_stat_validation_no_line_graph_features">Magdagdag ng kahit ano sa graph</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Tiyaking ang \"Mula\" ay mas maliit o katumbas ng \"Hanggang\"</string>
+    <string name="graph_stat_validation_unrecognised_color">Tiyaking may kulay ang lahat ng data set</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">May nakitang hindi wastong data set sa line graph</string>
+    <string name="graph_stat_validation_bad_fixed_range">Tiyaking ang \"Mula\" ay mas maliit kaysa \"Hanggang\"</string>
+    <string name="graph_stat_view_not_found">Nagkaroon ng error habang hinahanap ang graph na ito</string>
+    <string name="graph_stat_view_not_enough_data_stat">Lilitaw ang estadistikang ito kapag sapat na ang naitalang data para mabuo ito.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Lilitaw ang graph na ito kapag sapat na ang naitalang data para mabuo ito.</string>
+    <string name="pie_chart_mixed_signs_error">Hindi ma-render ang pie chart na ito dahil naglalaman ito ng parehong positibo at negatibong laki ng segment.</string>
+    <string name="histogram_mixed_signs_error">Hindi ma-render ang histogram na ito dahil naglalaman ito ng parehong positibo at negatibong laki ng bin.</string>
+    <string name="graph_non_finite_data_error">Hindi ma-render ang graph na ito dahil naglalaman ito ng value na hindi finite number.</string>
+    <string name="graph_inconsistent_series_error">Hindi ma-render ang graph na ito dahil hindi pare-pareho ang laki ng mga data series nito.</string>
+    <string name="graph_invalid_y_range_error">Hindi ma-render ang graph na ito dahil hindi wasto ang saklaw ng Y-axis nito.</string>
+    <string name="finish">Tapos</string>
+</resources>

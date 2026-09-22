@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">დამატება</string>
+    <string name="add_a_note">ჩანაწერის დამატება</string>
+    <string name="cancel">გაუქმება</string>
+    <string name="continue_word">გაგრძელება</string>
+    <string name="create">შექმნა</string>
+    <string name="label">ეტიკეტი</string>
+    <string name="release_notes_support_text">თქვენი მხარდაჭერა ეხმარება Track &amp; Graph-ს არსებობასა და განვითარებაში 🌱</string>
+    <string name="release_notes_maybe_later">შეიძლება მოგვიანებით</string>
+    <string name="release_notes_support_development">შეწირეთ თანხა განვითარების მხარდასაჭერად</string>
+    <string name="release_notes_thank_you">გმადლობთ! ❤️\n\nმხარდაჭერის ყოველი წვლილი Track &amp; Graph-ის ყველასთვის გაუმჯობესებას ხმარდება 🌱</string>
+    <string name="support_close">დახურვა</string>
+    <string name="search">ძიება</string>
+    <string name="update">განახლება</string>
+    <string name="value">მნიშვნელობა</string>
+</resources>

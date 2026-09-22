@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Bæta við</string>
+    <string name="add_a_note">Bæta við athugasemd</string>
+    <string name="cancel">Hætta við</string>
+    <string name="continue_word">Halda áfram</string>
+    <string name="create">Búa til</string>
+    <string name="label">Merki</string>
+    <string name="release_notes_support_text">Stuðningur þinn hjálpar Track &amp; Graph að vaxa og dafna 🌱</string>
+    <string name="release_notes_maybe_later">Kannski síðar</string>
+    <string name="release_notes_support_development">Styðja þróunina með framlagi</string>
+    <string name="release_notes_thank_you">Takk fyrir! ❤️\n\nAllur stuðningur hjálpar til við að gera Track &amp; Graph betra fyrir alla 🌱</string>
+    <string name="support_close">Loka</string>
+    <string name="search">Leita</string>
+    <string name="update">Uppfæra</string>
+    <string name="value">Gildi</string>
+</resources>

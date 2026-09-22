@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">គាំទ្រអ្នកអភិវឌ្ឍន៍</string>
+    <string name="support_unavailable">បច្ចុប្បន្នមិនមានជម្រើសគាំទ្រទេ។</string>
+    <string name="support_payment_failed">ការទូទាត់បរាជ័យ។ សូមព្យាយាមម្ដងទៀត។</string>
+    <string name="support_payment_pending">ការទូទាត់កំពុងរង់ចាំ។ Google Play នឹងបញ្ចប់វា បន្ទាប់ពីការទូទាត់ត្រូវបានបញ្ជាក់។</string>
+</resources>

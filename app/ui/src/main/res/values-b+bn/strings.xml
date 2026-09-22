@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">যোগ করুন</string>
+    <string name="add_a_note">একটি নোট যোগ করুন</string>
+    <string name="cancel">বাতিল করুন</string>
+    <string name="continue_word">চালিয়ে যান</string>
+    <string name="create">তৈরি করুন</string>
+    <string name="label">লেবেল</string>
+    <string name="release_notes_support_text">আপনার সহায়তা Track &amp; Graph-কে সচল ও বিকাশমান রাখতে সাহায্য করে 🌱</string>
+    <string name="release_notes_maybe_later">হয়তো পরে</string>
+    <string name="release_notes_support_development">উন্নয়নে সহায়তা করতে দান করুন</string>
+    <string name="release_notes_thank_you">ধন্যবাদ! ❤️\n\nআপনার প্রতিটি সহায়তা সবার জন্য Track &amp; Graph আরও ভালো করতে ব্যবহৃত হয় 🌱</string>
+    <string name="support_close">বন্ধ করুন</string>
+    <string name="search">অনুসন্ধান</string>
+    <string name="update">হালনাগাদ করুন</string>
+    <string name="value">মান</string>
+</resources>

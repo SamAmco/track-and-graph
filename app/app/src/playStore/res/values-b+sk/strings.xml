@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Podporiť vývojára</string>
+    <string name="support_unavailable">Momentálne nie sú k dispozícii žiadne možnosti podpory.</string>
+    <string name="support_payment_failed">Platba zlyhala. Skúste to znova.</string>
+    <string name="support_payment_pending">Platba čaká na spracovanie. Google Play ju dokončí po potvrdení platby.</string>
+</resources>

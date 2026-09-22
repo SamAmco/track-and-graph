@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">新增</string>
+    <string name="add_a_note">新增備註</string>
+    <string name="cancel">取消</string>
+    <string name="continue_word">繼續</string>
+    <string name="create">建立</string>
+    <string name="label">標籤</string>
+    <string name="release_notes_support_text">您的支持讓 Track &amp; Graph 得以持續運作並成長 🌱</string>
+    <string name="release_notes_maybe_later">稍後再說</string>
+    <string name="release_notes_support_development">捐款支持開發</string>
+    <string name="release_notes_thank_you">謝謝您！❤️\n\n每一份支持都將用於讓 Track &amp; Graph 為所有人變得更好 🌱</string>
+    <string name="support_close">關閉</string>
+    <string name="search">搜尋</string>
+    <string name="update">更新</string>
+    <string name="value">值</string>
+</resources>

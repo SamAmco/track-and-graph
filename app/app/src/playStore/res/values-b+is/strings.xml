@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Styðja þróunaraðilann</string>
+    <string name="support_unavailable">Engir stuðningsmöguleikar eru í boði eins og er.</string>
+    <string name="support_payment_failed">Greiðsla mistókst. Reyndu aftur.</string>
+    <string name="support_payment_pending">Greiðsla er í bið. Google Play lýkur henni þegar greiðslan hefur verið staðfest.</string>
+</resources>

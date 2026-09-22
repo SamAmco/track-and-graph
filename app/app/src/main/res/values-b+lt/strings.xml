@@ -1,0 +1,544 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Pagrindinis</string>
+    <string name="add_group">Pridėti grupę: </string>
+    <string name="edit_group">Redaguoti grupę: </string>
+    <string name="group">Grupė</string>
+    <string name="tracker">Sekiklis</string>
+    <string name="function">Funkcija</string>
+    <string name="graph_or_stat">Grafikas arba statistika</string>
+    <string name="symlink">Simbolinė nuoroda</string>
+    <string name="symlinks">Simbolinės nuorodos</string>
+    <string name="reminder">Priminimas</string>
+    <string name="add_component">Pridėti komponentą</string>
+    <string name="symlink_locations_title">„%1$s“ vietos</string>
+    <string name="add_tracker">Ką sekti:</string>
+    <string name="add">Pridėti</string>
+    <string name="group_name">pvz., kasdienė veikla</string>
+    <string name="delete">Ištrinti</string>
+    <string name="edit">Redaguoti</string>
+    <string name="update">Atnaujinti</string>
+    <string name="graph_or_stat_name">Grafiko pavadinimas: </string>
+    <string name="tracker_name">Sekiklio pavadinimas</string>
+    <string name="this_is_a_time_or_duration">Tai yra laikas arba trukmė</string>
+    <string name="yes">Taip</string>
+    <string name="cancel">Atšaukti</string>
+    <string name="select_file">Pasirinkti failą</string>
+    <string name="empty_group_hint">Sveiki atvykę į Track &amp; Graph!\n\n Bakstelėkite + viršuje dešinėje ir pasirinkite „Sekiklis“, kad pradėtumėte.</string>
+    <string name="no_trackers_graph_stats_hint">Prieš kurdami grafikus, sukurkite sekiklį.</string>
+    <string name="no_trackers_functions_hint">Prieš kurdami funkcijas, sukurkite sekiklį.</string>
+    <string name="ru_sure_del_group">Ar tikrai norite ištrinti šią grupę ir viską joje? Šio veiksmo atšaukti negalima.</string>
+    <string name="ru_sure_del_graph">Ar tikrai norite ištrinti šį grafiką? Šio veiksmo atšaukti negalima. Sekami duomenys nebus prarasti.</string>
+    <string name="ru_sure_del_feature">Ar tikrai norite ištrinti šiuos sekamus duomenis?</string>
+    <string name="item_in_multiple_groups">Šis elementas yra keliose vietose. Galite pašalinti jį iš čia arba ištrinti visur.</string>
+    <string name="remove_from_this_group">Pašalinti iš čia</string>
+    <string name="delete_everywhere">Ištrinti visur</string>
+    <string name="ru_sure_del_function">Ar tikrai norite ištrinti šią funkciją? Šio veiksmo atšaukti negalima.</string>
+    <string name="ru_sure_del_reminder">Ar tikrai norite ištrinti šį priminimą? Šio veiksmo atšaukti negalima.</string>
+    <string name="ru_sure_del_data_point">Ar tikrai norite ištrinti šį duomenų tašką?</string>
+    <string name="feature_name_cannot_be_null">Pridėkite pavadinimą</string>
+    <string name="tracker_with_that_name_exists">Jau sekate ką nors tokiu pavadinimu</string>
+    <string name="data_points">%1$d duomenų taškų</string>
+    <string name="items_selected">Pasirinkta: %1$d</string>
+    <string name="select_all">Pasirinkti viską</string>
+    <string name="deselect_all">Panaikinti visų pasirinkimą</string>
+    <string name="ru_sure_del_data_points">Ar tikrai norite ištrinti šiuos duomenų taškus?</string>
+    <string name="delete_selected_content_description">Ištrinti pasirinktus elementus</string>
+    <string name="copy_selected_content_description">Kopijuoti pasirinktus elementus</string>
+    <string name="move_selected_content_description">Perkelti pasirinktus elementus</string>
+    <string name="copy_to">Kopijuoti į</string>
+    <string name="no_data">Nėra duomenų</string>
+    <string name="skip">Praleisti</string>
+    <string name="exportButton">Eksportuoti</string>
+    <string name="importButton">Importuoti</string>
+    <string name="import_export">Importuoti / eksportuoti</string>
+    <string name="search">Ieškoti</string>
+    <string name="type_to_search">Įveskite paieškos tekstą</string>
+    <string name="no_results">Rezultatų nėra</string>
+    <string name="export_to">Eksportuoti šios grupės sekamus duomenis į CSV:</string>
+    <string name="export_error_message">Eksportuoti nepavyko: %1$s</string>
+    <string name="import_from">Importuoti sekamus duomenis į šią grupę iš CSV:</string>
+    <string name="import_warning">Įspėjimas: importavimo negalima atšaukti. Track &amp; Graph bandys sulieti importuotus duomenis su esamais šios grupės duomenimis pagal pavadinimą.</string>
+    <string name="add_a_graph_or_stat">Pridėti grafiką arba statistiką</string>
+    <string name="graph_type_label">Grafiko tipas:</string>
+    <string name="sample_size">Imties dydis:</string>
+    <string name="select_a_discrete_feature">Pasirinkite duomenų rinkinį su etiketėmis: </string>
+    <string name="no_labels">Šis duomenų rinkinys neturi etikečių</string>
+    <string name="select_a_feature">Pasirinkite duomenų rinkinį:</string>
+    <string name="select_a_tracker">Pasirinkite sekiklį</string>
+    <string name="offset">Poslinkis:</string>
+    <string name="scale">Mastelis:</string>
+    <string name="from">Nuo:</string>
+    <string name="to">Iki:</string>
+    <string name="day">Diena</string>
+    <string-array name="time_histogram_windows">
+        <item>Kas valandą</item>
+        <item>Kasdien</item>
+        <item>Kas savaitę</item>
+        <item>Kas mėnesį</item>
+        <item>Kas ketvirtį</item>
+        <item>Kas pusmetį</item>
+        <item>Kasmet</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Baterijos taupymas</item>
+        <item>Šviesi</item>
+        <item>Tamsi</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Sistemos numatytoji</item>
+        <item>Šviesi</item>
+        <item>Tamsi</item>
+    </string-array>
+    <string name="graph_type_line_graph">Linijinis grafikas</string>
+    <string name="graph_type_pie_chart">Skritulinė diagrama</string>
+    <string name="graph_type_average_time_between">Vidutinis laikas tarp įrašų</string>
+    <string name="graph_type_time_since">Laikas nuo</string>
+    <string name="graph_type_time_histogram">Laiko histograma</string>
+    <string name="graph_type_last_value">Paskutinė reikšmė / laikas nuo</string>
+    <string name="graph_type_bar_chart">Stulpelinė diagrama</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Be vidurkinimo</item>
+        <item>Slenkamasis paros vidurkis</item>
+        <item>Slenkamasis trijų dienų vidurkis</item>
+        <item>Slenkamasis savaitės vidurkis</item>
+        <item>Slenkamasis mėnesio vidurkis</item>
+        <item>Slenkamasis trijų mėnesių vidurkis</item>
+        <item>Slenkamasis šešių mėnesių vidurkis</item>
+        <item>Slenkamasis metų vidurkis</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Rodyti įrašymo metu</item>
+        <item>Rodyti valandų sumas</item>
+        <item>Rodyti dienų sumas</item>
+        <item>Rodyti savaičių sumas</item>
+        <item>Rodyti mėnesių sumas</item>
+        <item>Rodyti metų sumas</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Visi duomenys</string>
+    <string name="graph_time_durations_a_day">Diena</string>
+    <string name="graph_time_durations_a_week">Savaitė</string>
+    <string name="graph_time_durations_a_month">Mėnuo</string>
+    <string name="graph_time_durations_three_months">Trys mėnesiai</string>
+    <string name="graph_time_durations_six_months">Šeši mėnesiai</string>
+    <string name="graph_time_durations_a_year">Metai</string>
+    <string name="custom">Pasirinktinis</string>
+    <string-array name="y_range_styles">
+        <item>Dinaminis</item>
+        <item>Fiksuotas</item>
+    </string-array>
+    <string name="ending_at_latest">Paskutinis duomenų taškas</string>
+    <string name="ending_at_now">Dabar</string>
+    <string name="ending_at_custom_date">Pasirinktinė data…</string>
+    <string name="hours_and_minutes_ago">Prieš %1$dh %2$dm</string>
+    <string name="import_exception_unknown">Importuoti nepavyko: įvyko nežinoma klaida</string>
+    <string name="import_exception_bad_headers">Importuoti nepavyko: antraštės neatitiko numatytųjų antraščių: %1$s</string>
+    <string name="import_exception_inconsistent_record">Importuoti nepavyko: eilutės %1$s įrašas neatitinka privalomų antraščių</string>
+    <string name="import_exception_bad_timestamp">Importuoti nepavyko: nepavyko suprasti eilutės %1$s įrašo laiko žymos</string>
+    <string name="import_exception_inconsistent_data_type">Importuoti nepavyko: eilutėje %1$s gautas nesuderinamas duomenų tipas</string>
+    <string name="unknown_error_occurred">Įvyko nežinoma klaida</string>
+    <string name="graph_stat_validation_no_name">Nurodykite pavadinimą</string>
+    <string name="graph_stat_validation_no_line_graph_features">Pridėkite ką nors prie grafiko</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Įsitikinkite, kad „Nuo“ yra mažiau arba lygu „Iki“</string>
+    <string name="graph_stat_validation_unrecognised_color">Įsitikinkite, kad visi duomenų rinkiniai turi spalvą</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Aptiktas netinkamas linijinio grafiko duomenų rinkinys</string>
+    <string name="graph_stat_validation_bad_fixed_range">Įsitikinkite, kad „Nuo“ yra mažiau už „Iki“</string>
+    <string name="graph_stat_view_not_found">Ieškant šio grafiko įvyko klaida</string>
+    <string name="graph_stat_view_not_enough_data_stat">Ši statistika bus rodoma, kai bus sukaupta pakankamai duomenų jai sugeneruoti.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Šis grafikas bus rodomas, kai bus sukaupta pakankamai duomenų jam sugeneruoti.</string>
+    <string name="pie_chart_mixed_signs_error">Šios skritulinės diagramos negalima nubraižyti, nes joje yra ir teigiamų, ir neigiamų segmentų dydžių.</string>
+    <string name="histogram_mixed_signs_error">Šios histogramos negalima nubraižyti, nes joje yra ir teigiamų, ir neigiamų intervalų dydžių.</string>
+    <string name="graph_non_finite_data_error">Šio grafiko negalima nubraižyti, nes jame yra baigtinis skaičius nesanti reikšmė.</string>
+    <string name="graph_inconsistent_series_error">Šio grafiko negalima nubraižyti, nes jo duomenų sekų dydžiai nesutampa.</string>
+    <string name="graph_invalid_y_range_error">Šio grafiko negalima nubraižyti, nes jo Y ašies intervalas netinkamas.</string>
+    <string name="finish">Baigti</string>
+    <string name="about_description">Track &amp; Graph yra nemokama atvirojo kodo programinė įranga, platinama pagal GPL 3.0 licenciją.</string>
+    <string name="about_libraries_message">Naudotos šios atvirojo kodo bibliotekos:</string>
+    <string name="about">Apie</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">DUK</string>
+    <string name="tutorial_text_1">Naudokite sekiklius duomenims sekti.</string>
+    <string name="tutorial_text_2">Naudokite grafikus ir statistiką duomenims vaizduoti.</string>
+    <string name="tutorial_text_3">Naudokite grupes sekikliams, grafikams ir statistikai tvarkyti.</string>
+    <string name="got_it">Supratau!</string>
+    <string name="move_to_colon">Perkelti į:</string>
+    <string name="move_to">Perkelti į</string>
+    <string name="ru_sure_update_data">Šis atnaujinimas gali negrįžtamai pakeisti jau sukauptus duomenis. Prieš tęsiant primygtinai rekomenduojama sukurti esamų duomenų atsarginę kopiją.\n\n Ar norite tęsti?</string>
+    <string name="ok">Gerai</string>
+    <string name="rate_the_app">Įvertinti programėlę</string>
+    <string name="reminders">Priminimai</string>
+    <string name="no_reminders_hint">Bakstelėkite + piktogramą, kad sukurtumėte naują sekimo priminimo pranešimą.</string>
+    <string name="mon">Pr</string>
+    <string name="tue">An</string>
+    <string name="wed">Tr</string>
+    <string name="thu">Kt</string>
+    <string name="fri">Pn</string>
+    <string name="sat">Št</string>
+    <string name="sun">Sk</string>
+    <string name="reminders_notifications_channel_name">Priminimai</string>
+    <string name="reminders_notifications_channel_description">Naudotojo sukurti pranešimai, primenantys, kada sekti duomenis</string>
+    <string name="default_reminder_name">Laikas sekti!</string>
+    <string name="missed_reminder_single_content">Priminimas nuo %1$s</string>
+    <string name="missed_reminders_multiple_content">Praleidote %1$d priminimų</string>
+    <string name="next_reminder_format">Kitas priminimas: %1$s</string>
+    <string name="no_upcoming_reminders">Būsimų priminimų nėra</string>
+    <string name="select_reminder_type">Pasirinkite priminimo tipą</string>
+    <string name="week_day_reminder">Savaitės dienų priminimas</string>
+    <string name="week_day_reminder_description">Konkrečios dienos, pvz., pirmadienis, trečiadienis, penktadienis</string>
+    <string name="periodic_reminder">Periodinis priminimas</string>
+    <string name="periodic_reminder_description">Reguliarūs intervalai, pvz., kas 3 dienas</string>
+    <string name="month_day_reminder">Mėnesio dienos priminimas</string>
+    <string name="month_day_reminder_description">Mėnesio šablonai, pvz., pirmasis pirmadienis</string>
+    <string name="time_since_last_reminder">Laikas nuo paskutinio priminimo</string>
+    <string name="time_since_last_reminder_description">Kai kurį laiką nieko nesekėte</string>
+    <string name="one_time_reminder">Vienkartinis priminimas</string>
+    <string name="one_time_reminder_description">Atskiras priminimas konkrečiu laiku arba po delsos</string>
+    <string name="reminder_name">Priminimo pavadinimas</string>
+    <string name="reminder_disabled">Priminimas išjungtas</string>
+    <string name="repeat_every">Kartoti kas</string>
+    <string name="at_time">Laikas</string>
+    <string name="at_a_specific_time">Konkrečiu laiku</string>
+    <string name="ending_at">Baigiasi</string>
+    <string name="starting_from">Pradedant nuo</string>
+    <string name="repeat_on_week_days">Kartoti savaitės dienomis</string>
+    <string name="track_feature">Sekamas šaltinis</string>
+    <string name="select_tracker_placeholder">Pasirinkite sekiklį</string>
+    <string name="remind_after">Priminti po</string>
+    <string name="then_remind_every">Tada priminti kas</string>
+    <string name="remind_at_date_and_time">Konkrečią datą ir laiką</string>
+    <string name="remind_after_a_delay">Po delsos</string>
+    <string name="first_reminder">Pirmasis priminimas</string>
+    <string name="every_colon">Kas:</string>
+    <string name="ended_at_format">Baigėsi: %1$s</string>
+    <string name="starting_at_format">Prasideda: %1$s</string>
+    <string name="occurrence_first">Pirmas</string>
+    <string name="occurrence_second">Antras</string>
+    <string name="occurrence_third">Trečias</string>
+    <string name="occurrence_fourth">Ketvirtas</string>
+    <string name="occurrence_last">Paskutinis</string>
+    <string name="monday">Pirmadienis</string>
+    <string name="tuesday">Antradienis</string>
+    <string name="wednesday">Trečiadienis</string>
+    <string name="thursday">Ketvirtadienis</string>
+    <string name="friday">Penktadienis</string>
+    <string name="saturday">Šeštadienis</string>
+    <string name="sunday">Sekmadienis</string>
+    <string-array name="abbreviated_months">
+        <item>Sau</item>
+        <item>Vas</item>
+        <item>Kov</item>
+        <item>Bal</item>
+        <item>Geg</item>
+        <item>Bir</item>
+        <item>Lie</item>
+        <item>Rgp</item>
+        <item>Rgs</item>
+        <item>Spa</item>
+        <item>Lap</item>
+        <item>Gru</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Pr</item>
+        <item>An</item>
+        <item>Tr</item>
+        <item>Kt</item>
+        <item>Pn</item>
+        <item>Št</item>
+        <item>Sk</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Intervalo stilius:</string>
+    <string name="track_widget_configure_no_data_error">Pirmiausia sekite duomenis.</string>
+    <string name="track_widget_configure_no_data_selected_error">Norėdami sukurti sekimo valdiklį, turite pasirinkti tinkamą duomenų rinkinį.</string>
+    <string name="create">Sukurti</string>
+    <string name="use_default_value">Nustatyti numatytąją reikšmę</string>
+    <string name="backup_and_restore">Atsarginė kopija ir atkūrimas</string>
+    <string name="backup_hint_text">Atsarginė kopija išsaugo visus programėlės duomenis, įskaitant sekamus duomenis, grafikus ir priminimus. Reguliariai kurkite duomenų atsargines kopijas išoriniame įrenginyje arba debesies saugykloje, jei įrenginys būtų pamestas ar sugestų.</string>
+    <string name="restore_data">Atkurti duomenis</string>
+    <string name="backup_successful">Atsarginė kopija sukurta!</string>
+    <string name="backup_error_could_not_write_to_file">Nepavyko rasti pasirinkto failo arba į jį įrašyti.</string>
+    <string name="backup_error_could_not_find_database_file">Nepavyko rasti arba perskaityti duomenų bazės failo.</string>
+    <string name="backup_error_failed_to_copy_database">Kopijuojant duomenų bazės failą įvyko klaida.</string>
+    <string name="restore_failed">Atkurti nepavyko. %1$s</string>
+    <string name="add_a_longer_description_optional">Pridėkite ilgesnį aprašą (nebūtina)</string>
+    <string name="no_data_points_history_fragment_hint">Jūsų istorija bus rodoma čia, kai turėsite duomenų taškų.</string>
+    <string name="data_resolution_error">Bandant išspręsti šiuos duomenis įvyko klaida:\n\n%1$s</string>
+    <string name="info">Informacija</string>
+    <string name="no_description">Aprašo nėra</string>
+    <string name="description">Aprašas</string>
+    <string name="app_lock_title">Programėlės užraktas</string>
+    <string name="app_lock_locked_title">Track &amp; Graph užrakinta</string>
+    <string name="app_lock_password_label">Slaptažodis</string>
+    <string name="app_lock_confirm_password_label">Patvirtinkite slaptažodį</string>
+    <string name="app_lock_unlock">Atrakinti</string>
+    <string name="app_lock_use_biometrics">Naudoti biometrinius duomenis</string>
+    <string name="app_lock_enable">Įjungti programėlės užraktą</string>
+    <string name="app_lock_enabled">Programėlės užraktas įjungtas</string>
+    <string name="app_lock_enable_biometric_unlock">Įjungti atrakinimą biometriniais duomenimis</string>
+    <string name="app_lock_no_strong_biometric_available">Šiame įrenginyje nėra galimybės atrakinti naudojant stiprius biometrinius duomenis.</string>
+    <string name="app_lock_lock_after_background_minutes">Užrakinti po minučių fone</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Naudokite 0, kad užrakintumėte iškart programėlei išėjus iš pirmojo plano.</string>
+    <string name="app_lock_change_password">Pakeisti slaptažodį</string>
+    <string name="app_lock_password_changed">Slaptažodis pakeistas</string>
+    <string name="app_lock_disable">Išjungti programėlės užraktą</string>
+    <string name="app_lock_unlock_biometric_title">Atrakinti Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Norėdami tęsti, naudokite įrenginio biometrinius duomenis</string>
+    <string name="app_lock_use_password">Naudoti slaptažodį</string>
+    <string name="app_lock_biometric_not_recognized">Biometriniai duomenys neatpažinti.</string>
+    <string name="app_lock_error_missing_password">Programėlės užrakto slaptažodis nerastas. Išjunkite ir vėl įjunkite programėlės užraktą.</string>
+    <string name="app_lock_error_incorrect_password">Neteisingas slaptažodis</string>
+    <string name="app_lock_error_password_hashing_unavailable">Šiame įrenginyje programėlės užrakto slaptažodžio patvirtinimas nepasiekiamas.</string>
+    <string name="app_lock_error_enter_password">Įveskite slaptažodį.</string>
+    <string name="app_lock_error_passwords_do_not_match">Slaptažodžiai nesutampa.</string>
+    <string name="note_input_hint">Pastabos…</string>
+    <string name="add_a_note">Pridėti pastabą</string>
+    <string name="notes">Pastabos</string>
+    <string name="show_global_notes">Visos</string>
+    <string name="show_data_point_notes">Duomenų taškai</string>
+    <string name="delete_reminder_content_description">Ištrinti priminimą</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Datos formatas:</string>
+    <string name="add_data_point_button_content_description">Duomenų taško pridėjimo mygtukas</string>
+    <string name="tracked_data_menu_button_content_description">Sekamų duomenų meniu mygtukas</string>
+    <string name="tracked_data_history_button_content_description">Sekamų duomenų istorijos mygtukas</string>
+    <string name="delete_line_button_content_description">Linijos ištrynimo mygtukas</string>
+    <string name="delete_input_button_content_description">Įvesties ištrynimo mygtukas</string>
+    <string name="delete_data_point_button_content_description">Duomenų taško ištrynimo mygtukas</string>
+    <string name="edit_data_point_button_content_description">Duomenų taško redagavimo mygtukas</string>
+    <string name="add_multiple_choice_answer_button_content_description">Atsakymo su keliais pasirinkimais pridėjimo mygtukas</string>
+    <string name="ending_at_colon">Pavyzdžio pabaiga:</string>
+    <string name="duplicate">Dubliuoti</string>
+    <string name="no_notes_hint_text">Čia bus rodomi sekant pridėti užrašai. Visuotinius užrašus taip pat galite pridėti mygtuku +.</string>
+    <string name="add_a_global_note">Pridėti visuotinį užrašą:</string>
+    <string name="duration">Trukmė</string>
+    <string name="weeks">Savaitės</string>
+    <string name="months">Mėnesiai</string>
+    <string name="days">Dienos</string>
+    <string name="hours">Valandos</string>
+    <string name="minutes">Minutės</string>
+    <string name="seconds">Sekundės</string>
+    <string name="hours_suffix">val.</string>
+    <string name="minutes_suffix">min.</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Ką reiškia anksčiau sekamos reikšmės:</string>
+    <string name="duration_to_numeric_mode_header">Į ką konvertuoti anksčiau sekamas reikšmes:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Negalite maišyti laiko trukmių su kitų tipų duomenimis. Pabandykite vaizduoti valandas, minutes arba sekundes</string>
+    <string name="sum_by_count_checkbox_label">Pažymėkite čia, jei norite skaičiuoti sekamų duomenų taškų skaičių, o ne jų reikšmių sumą.</string>
+    <string name="time_window_size">Laiko lango dydis:</string>
+    <string name="hold_to_preview">Laikykite nuspaudę, kad peržiūrėtumėte</string>
+    <string name="open">Atidaryti</string>
+    <string name="close">Uždaryti</string>
+    <string name="filter_by_label">Filtruoti pagal etiketę</string>
+    <string name="filter_by_value">Filtruoti pagal reikšmių intervalą</string>
+    <string name="save_changes">Išsaugoti pakeitimus</string>
+    <string name="timer_notification_channel_name">Laikmačiai</string>
+    <string name="stop">Stabdyti</string>
+    <string name="name_your_function">Pavadinkite funkciją: </string>
+    <string name="add_some_data_sources">Pridėti duomenų šaltinių</string>
+    <string name="value">Reikšmė</string>
+    <string name="label">Etiketė</string>
+    <string name="continue_word">Tęsti</string>
+    <string name="update_all_data_points">Atnaujinti visus duomenų taškus: </string>
+    <string name="where_colon">Kur:</string>
+    <string name="to_colon">Iki:</string>
+    <string name="value_equals">Reikšmė =</string>
+    <string name="label_equals">Etiketė =</string>
+    <string name="adding_your_first_data_point">Trumpa duomenų taškų pridėjimo pamoka:</string>
+    <string name="next">Kitas</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Kiekvienas duomenų taškas turi laiko žymą ir reikšmę: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Jis taip pat gali turėti etiketę ir užrašą: </string>
+    <string name="data_point_tutorial_page_2_description">Reikšmė yra skaičius, todėl galite matyti, kaip laikui bėgant keičiasi jūsų duomenys</string>
+    <string name="data_point_tutorial_page_2_hint">(Patarimas: jei reikšmė jums nesvarbi, naudokite numatytąją 1 reikšmę)</string>
+    <string name="data_point_tutorial_page_3_description">Naudokite etiketes, jei norite grupuoti duomenų taškus</string>
+    <string name="data_point_tutorial_page_3_hint">(Patarimas: jei norite pridėti daugiau konteksto ar aprašymo, naudokite užrašo, o ne etiketės lauką)</string>
+    <string name="help">Žinynas</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Išplėstinės parinktys</string>
+    <string name="type_colon">\"Tipas: \"</string>
+    <string name="order_colon">\"Tvarka: \"</string>
+    <string name="value_and_label">Reikšmė ir etiketė</string>
+    <string name="value_only">Tik reikšmė</string>
+    <string name="label_only">Tik etiketė</string>
+    <string name="none">Nėra</string>
+    <string name="value_ascending">Didėjančios reikšmės</string>
+    <string name="value_descending">Mažėjančios reikšmės</string>
+    <string name="label_ascending">Didėjančios etiketės</string>
+    <string name="label_descending">Mažėjančios etiketės</string>
+    <string name="latest">Naujausi</string>
+    <string name="oldest">Seniausi</string>
+    <string name="track_all">Sekti visus</string>
+    <string name="more_details">Daugiau informacijos</string>
+    <string name="suggestions">Pasiūlymai</string>
+    <string name="no_label">Be etiketės</string>
+    <string name="confirm_cancel_notes_will_be_lost">Ar tikrai norite uždaryti? Visi užrašai bus prarasti.</string>
+    <string name="add_a_label">Pridėti etiketę</string>
+    <string name="bar_interval">Stulpelių intervalas:</string>
+    <string name="y_range_max">Didžiausia Y intervalo reikšmė</string>
+    <string name="total_formatted">Iš viso: %s</string>
+    <string name="from_formatted">Nuo: %s</string>
+    <string name="to_formatted">Iki: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Sekundė(s)</string>
+    <string name="minutes_generic">Minutė(s)</string>
+    <string name="hours_generic">Valanda(os)</string>
+    <string name="days_generic">Diena(os)</string>
+    <string name="weeks_generic">Savaitė(s)</string>
+    <string name="months_generic">Mėnuo(ys)</string>
+    <string name="years_generic">Metai</string>
+    <plurals name="seconds">
+        <item quantity="one">%d sekundė</item>
+        <item quantity="few">%d sekundės</item>
+        <item quantity="other">%d sekundžių</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minutė</item>
+        <item quantity="few">%d minutės</item>
+        <item quantity="other">%d minučių</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d valanda</item>
+        <item quantity="few">%d valandos</item>
+        <item quantity="other">%d valandų</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d diena</item>
+        <item quantity="few">%d dienos</item>
+        <item quantity="other">%d dienų</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d savaitė</item>
+        <item quantity="few">%d savaitės</item>
+        <item quantity="other">%d savaičių</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d mėnuo</item>
+        <item quantity="few">%d mėnesiai</item>
+        <item quantity="other">%d mėnesių</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d metai</item>
+        <item quantity="few">%d metai</item>
+        <item quantity="other">%d metų</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Kas minutę</item>
+        <item quantity="few">Kas %d minutes</item>
+        <item quantity="other">Kas %d minučių</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Kas valandą</item>
+        <item quantity="few">Kas %d valandas</item>
+        <item quantity="other">Kas %d valandų</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Kasdien</item>
+        <item quantity="few">Kas %d dienas</item>
+        <item quantity="other">Kas %d dienų</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Kas savaitę</item>
+        <item quantity="few">Kas %d savaites</item>
+        <item quantity="other">Kas %d savaičių</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Kas mėnesį</item>
+        <item quantity="few">Kas %d mėnesius</item>
+        <item quantity="other">Kas %d mėnesių</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Kasmet</item>
+        <item quantity="few">Kas %d metus</item>
+        <item quantity="other">Kas %d metų</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Po 1 minutės</item>
+        <item quantity="few">Po %d minučių</item>
+        <item quantity="other">Po %d minučių</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Po 1 valandos</item>
+        <item quantity="few">Po %d valandų</item>
+        <item quantity="other">Po %d valandų</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Po 1 dienos</item>
+        <item quantity="few">Po %d dienų</item>
+        <item quantity="other">Po %d dienų</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Po 1 savaitės</item>
+        <item quantity="few">Po %d savaičių</item>
+        <item quantity="other">Po %d savaičių</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Po 1 mėnesio</item>
+        <item quantity="few">Po %d mėnesių</item>
+        <item quantity="other">Po %d mėnesių</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Po 1 metų</item>
+        <item quantity="few">Po %d metų</item>
+        <item quantity="other">Po %d metų</item>
+    </plurals>
+    <string name="restore_hint_text">ĮSPĖJIMAS: atkūrus atsarginę kopiją bus ištrinti visi programėlėje esantys duomenys ir nustatymai. Pirmiausia sukurkite atsarginę duomenų kopiją!</string>
+    <string name="backup_now">Kurti atsarginę kopiją dabar</string>
+    <string name="restore_error_could_not_write_to_database">Atkurti nepavyko! Nepavyko rasti duomenų bazės arba į ją įrašyti.</string>
+    <string name="restore_error_could_not_read_from_database_file">Atkurti nepavyko! Nepavyko rasti arba perskaityti pasirinkto duomenų bazės failo.</string>
+    <string name="restore_error_failed_to_copy_database">Atkurti nepavyko! Atkuriant duomenų bazę įvyko klaida.</string>
+    <string name="select_location">Pasirinkite vietą…</string>
+    <string name="restore_successful">Atkurta sėkmingai! Dabar Track &amp; Graph reikia paleisti iš naujo.</string>
+    <string name="restore_error_invalid_database_file">Atkurti nepavyko! Pasirinktas failas nėra tinkama atsarginė kopija.</string>
+    <string name="auto_backup">Automatinė atsarginė kopija</string>
+    <string name="apply">Taikyti</string>
+    <string name="backup_every">Kurti atsarginę kopiją kas: </string>
+    <string name="next_backup_at">\"Kita atsarginė kopija: \"</string>
+    <string name="backup_notification_channel_name">Automatinių atsarginių kopijų pranešimai</string>
+    <string name="backup_notification_channel_description">Praneša, kai kuriama automatinė atsarginė kopija ir jei tai nepavyko.</string>
+    <string name="backup_notification_title">Kuriama atsarginė kopija…</string>
+    <string name="backup_failed_notification_title">Automatinė atsarginė kopija nepavyko</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph nepavyko rasti atsarginės kopijos vietos arba gauti prieigos prie jos.</string>
+    <string name="backup_failed_notification_could_not_copy">Kuriant atsarginę duomenų kopiją įvyko klaida. Atsarginė kopija gali būti sugadinta arba neišsami.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Pasirinkti naują vietą</string>
+    <string name="backup_location">Atsarginės kopijos vieta</string>
+    <string name="enable_auto_backup">Įjungti automatines atsargines kopijas</string>
+    <string name="last_successful_backup">Paskutinė sėkminga atsarginė kopija</string>
+    <string name="next_scheduled_backup">Kita suplanuota atsarginė kopija</string>
+    <string name="notification_permission_prompt">Įjunkite Track &amp; Graph pranešimus, kad būtumėte informuoti, jei dėl kokios nors priežasties nepavyktų sukurti automatinės atsarginės kopijos.</string>
+    <string name="lua_script_empty">Pridėkite Lua scenarijų</string>
+    <string name="function_name_empty">Funkcijos pavadinimas negali būti tuščias</string>
+    <string name="function_name">Funkcijos pavadinimas</string>
+    <string name="add_at_least_one_input">Pridėkite bent vieną įvestį</string>
+    <string name="output">Išvestis</string>
+    <string name="data_source">Duomenų šaltinis</string>
+    <string name="lua_script">Lua scenarijus</string>
+    <string name="data_source_description">Duomenų šaltinio mazgas leidžia pasirinkti sekiklį arba funkciją, kuri bus naudojama kaip įvestis.</string>
+    <string name="lua_script_input_hint">Įveskite Lua scenarijų…</string>
+    <string name="select_node_type">Pasirinkite mazgo tipą</string>
+    <string name="file">Failas</string>
+    <string name="lua_feature_names_not_unique">Scenarijaus įvesčių pavadinimai turi būti unikalūs</string>
+    <string name="graph_stat_type_lua_graph">Lua scenarijus</string>
+    <string name="launch_lua_disabled">Lua paleidimas išjungtas</string>
+    <string name="no_lua">Nėra Lua</string>
+    <string name="lua_engine_disabled">Lua variklis išjungtas</string>
+    <string name="lua_graph_first_time_user_title">Lua scenarijų grafikai ir statistika</string>
+    <string name="lua_graph_first_time_user_message">Lua scenarijai yra išplėstinė funkcija, leidžianti kurti pasirinktinius grafikus ir statistiką naudojant Lua programavimo kalbą. \n\nGalite įkelti savo scenarijų arba pasirinkti iš GitHub kolekcijos. Įdiegus scenarijų iš GitHub, grįšite į programėlę, kur scenarijus bus paruoštas naudoti.</string>
+    <string name="functions_first_time_user_title">Sveiki atvykę į funkcijas</string>
+    <string name="functions_first_time_user_message">Funkcijos yra išplėstinė funkcija, leidžianti sujungti, agreguoti ir transformuoti duomenis į naujus išvestinius duomenų šaltinius.</string>
+    <string name="learn_more">Sužinokite daugiau čia</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Įklijuoti</string>
+    <string name="failed_to_download_file">Nepavyko atsisiųsti failo: %s</string>
+    <string name="confirm_deep_link">Gavote scenarijaus nuorodą iš nežinomo šaltinio. Diekite scenarijus tik iš patikimų šaltinių. Ar norite įdiegti šį scenarijų?</string>
+    <string name="graph_stat_info_button_description">Grafikų ir statistikos mokymo programos</string>
+    <string name="network_generic_error">Bandant pasiekti tinklą įvyko klaida. Patikrinkite ryšį ir bandykite dar kartą.</string>
+    <string name="function_verification_failure">Nepavyko patikrinti funkcijų parašų. Įsitikinkite, kad ryšys saugus ir Track &amp; Graph atnaujinta.</string>
+    <string name="function_network_failure">Nepavyko įkelti funkcijų. Įsitikinkite, kad esate prisijungę prie interneto. Jei problema išlieka, patikrinkite, ar programėlė atnaujinta.</string>
+    <string name="functions_landscape_hint">Patarimas: funkcijos geriausiai veikia gulsčiajame režime</string>
+    <string name="functions_start_hint">Pradėkite čia: ilgai paspauskite ir pasirinkite „Duomenų šaltinis“</string>
+    <string name="see_whats_new">Sužinokite, kas naujo</string>
+</resources>

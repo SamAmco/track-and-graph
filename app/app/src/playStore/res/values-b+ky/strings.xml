@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Иштеп чыгуучуну колдоо</string>
+    <string name="support_unavailable">Учурда колдоо жолдору жеткиликтүү эмес.</string>
+    <string name="support_payment_failed">Төлөм ишке ашкан жок. Кайра аракет кылыңыз.</string>
+    <string name="support_payment_pending">Төлөм күтүлүүдө. Төлөм ырасталгандан кийин Google Play аны аягына чыгарат.</string>
+</resources>

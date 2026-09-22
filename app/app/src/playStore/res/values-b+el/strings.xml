@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Υποστήριξη του προγραμματιστή</string>
+    <string name="support_unavailable">Δεν υπάρχουν διαθέσιμες επιλογές υποστήριξης.</string>
+    <string name="support_payment_failed">Η πληρωμή απέτυχε. Δοκιμάστε ξανά.</string>
+    <string name="support_payment_pending">Η πληρωμή εκκρεμεί. Το Google Play θα την ολοκληρώσει αφού επιβεβαιωθεί.</string>
+</resources>

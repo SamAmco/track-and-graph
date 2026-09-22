@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Heim</string>
+    <string name="add_group">Bæta við hópi: </string>
+    <string name="edit_group">Breyta hópi: </string>
+    <string name="group">Hópur</string>
+    <string name="tracker">Mælir</string>
+    <string name="function">Fall</string>
+    <string name="graph_or_stat">Línurit eða tölfræði</string>
+    <string name="symlink">Tengill</string>
+    <string name="symlinks">Tenglar</string>
+    <string name="reminder">Áminning</string>
+    <string name="add_component">Bæta við íhlut</string>
+    <string name="symlink_locations_title">Staðsetningar „%1$s“</string>
+    <string name="add_tracker">Hvað viltu mæla?</string>
+    <string name="add">Bæta við</string>
+    <string name="group_name">t.d. Daglegar athafnir</string>
+    <string name="delete">Eyða</string>
+    <string name="edit">Breyta</string>
+    <string name="update">Uppfæra</string>
+    <string name="graph_or_stat_name">Heiti línurits: </string>
+    <string name="tracker_name">Heiti mælis</string>
+    <string name="this_is_a_time_or_duration">Þetta er tími eða tímalengd</string>
+    <string name="yes">Já</string>
+    <string name="cancel">Hætta við</string>
+    <string name="select_file">Velja skrá</string>
+    <string name="empty_group_hint">Velkomin í Track &amp; Graph!\n\n Pikkaðu á + efst til hægri og veldu Mælir til að byrja.</string>
+    <string name="no_trackers_graph_stats_hint">Búðu til mæli áður en þú býrð til línurit.</string>
+    <string name="no_trackers_functions_hint">Búðu til mæli áður en þú býrð til föll.</string>
+    <string name="ru_sure_del_group">Ertu viss um að þú viljir eyða þessum hópi og öllu sem í honum er? Þessu verður ekki snúið við.</string>
+    <string name="ru_sure_del_graph">Ertu viss um að þú viljir eyða þessu línuriti? Þessu verður ekki snúið við. Engin skráð gögn tapast.</string>
+    <string name="ru_sure_del_feature">Ertu viss um að þú viljir eyða þessum skráðu gögnum?</string>
+    <string name="item_in_multiple_groups">Þetta atriði er á mörgum stöðum. Þú getur fjarlægt það héðan eða eytt því alls staðar.</string>
+    <string name="remove_from_this_group">Fjarlægja héðan</string>
+    <string name="delete_everywhere">Eyða alls staðar</string>
+    <string name="ru_sure_del_function">Ertu viss um að þú viljir eyða þessu falli? Þessu verður ekki snúið við.</string>
+    <string name="ru_sure_del_reminder">Ertu viss um að þú viljir eyða þessari áminningu? Þessu verður ekki snúið við.</string>
+    <string name="ru_sure_del_data_point">Ertu viss um að þú viljir eyða þessum gagnapunkti?</string>
+    <string name="feature_name_cannot_be_null">Bættu við heiti</string>
+    <string name="tracker_with_that_name_exists">Þú ert nú þegar að mæla eitthvað með þessu heiti</string>
+    <string name="data_points">%1$d gagnapunktar</string>
+    <string name="items_selected">%1$d valið</string>
+    <string name="select_all">Velja allt</string>
+    <string name="deselect_all">Afvelja allt</string>
+    <string name="ru_sure_del_data_points">Ertu viss um að þú viljir eyða þessum gagnapunktum?</string>
+    <string name="delete_selected_content_description">Eyða völdum atriðum</string>
+    <string name="copy_selected_content_description">Afrita valin atriði</string>
+    <string name="move_selected_content_description">Færa valin atriði</string>
+    <string name="copy_to">Afrita í</string>
+    <string name="no_data">Engin gögn</string>
+    <string name="skip">Sleppa</string>
+    <string name="exportButton">Flytja út</string>
+    <string name="importButton">Flytja inn</string>
+    <string name="import_export">Flytja inn/út</string>
+    <string name="search">Leita</string>
+    <string name="type_to_search">Sláðu inn til að leita</string>
+    <string name="no_results">Engar niðurstöður</string>
+    <string name="export_to">Flytja skráð gögn í þessum hópi út í CSV:</string>
+    <string name="export_error_message">Útflutningur mistókst: %1$s</string>
+    <string name="import_from">Flytja skráð gögn inn í þennan hóp úr CSV:</string>
+    <string name="import_warning">Viðvörun: Ekki er hægt að afturkalla innflutning. Track &amp; Graph reynir að sameina innflutt gögn við gögn sem fyrir eru í þessum hópi eftir heiti.</string>
+    <string name="add_a_graph_or_stat">Bæta við línuriti eða tölfræði</string>
+    <string name="graph_type_label">Tegund línurits:</string>
+    <string name="sample_size">Úrtaksstærð:</string>
+    <string name="select_a_discrete_feature">Veldu gagnasafn með merkimiðum: </string>
+    <string name="no_labels">Þetta gagnasafn hefur engin merkimiða</string>
+    <string name="select_a_feature">Veldu gagnasafn:</string>
+    <string name="select_a_tracker">Veldu mæli</string>
+    <string name="offset">Hliðrun:</string>
+    <string name="scale">Kvarði:</string>
+    <string name="from">Frá:</string>
+    <string name="to">Til:</string>
+    <string name="day">Dagur</string>
+    <string-array name="time_histogram_windows">
+        <item>Klukkutíma</item>
+        <item>Daglega</item>
+        <item>Vikulega</item>
+        <item>Mánaðarlega</item>
+        <item>Ársfjórðungslega</item>
+        <item>Hálfsárslega</item>
+        <item>Árlega</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Rafhlöðusparnaður</item>
+        <item>Ljóst</item>
+        <item>Dökkt</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Sjálfgefið kerfi</item>
+        <item>Ljóst</item>
+        <item>Dökkt</item>
+    </string-array>
+    <string name="graph_type_line_graph">Línurit</string>
+    <string name="graph_type_pie_chart">Kökurit</string>
+    <string name="graph_type_average_time_between">Meðaltími á milli</string>
+    <string name="graph_type_time_since">Tími frá</string>
+    <string name="graph_type_time_histogram">Tímasúlurit</string>
+    <string name="graph_type_last_value">Síðasta skráning/Tími frá</string>
+    <string name="graph_type_bar_chart">Súlurit</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Ekkert meðaltal</item>
+        <item>Þriggja daga hreyfanlegt meðaltal</item>
+        <item>Þriggja daga hreyfanlegt meðaltal</item>
+        <item>Vikulegt hreyfanlegt meðaltal</item>
+        <item>Mánaðarlegt hreyfanlegt meðaltal</item>
+        <item>Þriggja mánaða hreyfanlegt meðaltal</item>
+        <item>Sex mánaða hreyfanlegt meðaltal</item>
+        <item>Árlegt hreyfanlegt meðaltal</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Teikna við skráningu</item>
+        <item>Teikna klukkutímayfirheildir</item>
+        <item>Teikna daglegar yfirheildir</item>
+        <item>Teikna vikulegar yfirheildir</item>
+        <item>Teikna mánaðarlegar yfirheildir</item>
+        <item>Teikna árlegar yfirheildir</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Öll gögn</string>
+    <string name="graph_time_durations_a_day">Dagur</string>
+    <string name="graph_time_durations_a_week">Vika</string>
+    <string name="graph_time_durations_a_month">Mánuður</string>
+    <string name="graph_time_durations_three_months">Þrír mánuðir</string>
+    <string name="graph_time_durations_six_months">Sex mánuðir</string>
+    <string name="graph_time_durations_a_year">Ár</string>
+    <string name="custom">Sérsniðið</string>
+    <string-array name="y_range_styles">
+        <item>Kvikt</item>
+        <item>Fast</item>
+    </string-array>
+    <string name="ending_at_latest">Síðasti gagnapunktur</string>
+    <string name="ending_at_now">Núna</string>
+    <string name="ending_at_custom_date">Sérsniðin dagsetning…</string>
+    <string name="hours_and_minutes_ago">fyrir %1$dk %2$dm</string>
+    <string name="import_exception_unknown">Innflutningur mistókst: Óþekkt villa kom upp</string>
+    <string name="import_exception_bad_headers">Innflutningur mistókst: Fyrirsagnirnar samsvara ekki væntum fyrirsögnum: %1$s</string>
+    <string name="import_exception_inconsistent_record">Innflutningur mistókst: Færsla í línu %1$s samræmist ekki nauðsynlegum fyrirsögnum</string>
+    <string name="import_exception_bad_timestamp">Innflutningur mistókst: Ekki tókst að túlka tímastimpil færslu í línu: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Innflutningur mistókst: Ósamræmd gagnategund fannst í línu: %1$s</string>
+    <string name="unknown_error_occurred">Óþekkt villa kom upp</string>
+    <string name="graph_stat_validation_no_name">Gefðu upp heiti</string>
+    <string name="graph_stat_validation_no_line_graph_features">Bættu einhverju við línuritið</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Gakktu úr skugga um að „Frá“ sé minna en eða jafnt og „Til“</string>
+    <string name="graph_stat_validation_unrecognised_color">Gakktu úr skugga um að öll gagnasöfn hafi lit</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Ógilt gagnasafn fyrir línurit fannst</string>
+    <string name="graph_stat_validation_bad_fixed_range">Gakktu úr skugga um að „Frá“ sé minna en „Til“</string>
+    <string name="graph_stat_view_not_found">Villa kom upp við að finna þetta línurit</string>
+    <string name="graph_stat_view_not_enough_data_stat">Þessi tölfræði birtist þegar nægum gögnum hefur verið safnað til að mynda hana.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Þetta línurit birtist þegar nægum gögnum hefur verið safnað til að mynda það.</string>
+    <string name="pie_chart_mixed_signs_error">Ekki er hægt að birta þetta kökurit vegna þess að það inniheldur bæði jákvæðar og neikvæðar sneiðastærðir.</string>
+    <string name="histogram_mixed_signs_error">Ekki er hægt að birta þetta súlurit vegna þess að það inniheldur bæði jákvæðar og neikvæðar bilastærðir.</string>
+    <string name="graph_non_finite_data_error">Ekki er hægt að birta þetta línurit vegna þess að það inniheldur gildi sem er ekki endanleg tala.</string>
+    <string name="graph_inconsistent_series_error">Ekki er hægt að birta þetta línurit vegna þess að gagnaraðir þess eru af ósamræmdri stærð.</string>
+    <string name="graph_invalid_y_range_error">Ekki er hægt að birta þetta línurit vegna þess að bil Y-ássins er ógilt.</string>
+    <string name="finish">Ljúka</string>
+    <string name="about_description">Track &amp; Graph er frjáls og opinn hugbúnaður með GPL 3.0-leyfi.</string>
+    <string name="about_libraries_message">Eftirfarandi opnu hugbúnaðarsöfn voru notuð:</string>
+    <string name="about">Um forritið</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Algengar spurningar</string>
+    <string name="tutorial_text_1">Notaðu mæla til að skrá gögn.</string>
+    <string name="tutorial_text_2">Notaðu línurit og tölfræði til að sýna gögn.</string>
+    <string name="tutorial_text_3">Notaðu hópa til að skipuleggja mæla, línurit og tölfræði.</string>
+    <string name="got_it">Skil þetta!</string>
+    <string name="move_to_colon">Færa í:</string>
+    <string name="move_to">Færa í</string>
+    <string name="ru_sure_update_data">Þessi uppfærsla gæti breytt gögnum sem þú hefur þegar skráð á óafturkræfan hátt. Mælt er eindregið með að taka öryggisafrit af núverandi gögnum áður en haldið er áfram.\n\n Viltu halda áfram?</string>
+    <string name="ok">Í lagi</string>
+    <string name="rate_the_app">Gefðu forritinu einkunn</string>
+    <string name="reminders">Áminningar</string>
+    <string name="no_reminders_hint">Pikkaðu á + til að búa til nýja tilkynningu sem minnir þig á að skrá gögn.</string>
+    <string name="mon">Mán.</string>
+    <string name="tue">Þri.</string>
+    <string name="wed">Mið.</string>
+    <string name="thu">Fim.</string>
+    <string name="fri">Fös.</string>
+    <string name="sat">Lau.</string>
+    <string name="sun">Sun.</string>
+    <string name="reminders_notifications_channel_name">Áminningar</string>
+    <string name="reminders_notifications_channel_description">Tilkynningar sem notandi bjó til til að minna á skráningu</string>
+    <string name="default_reminder_name">Tími til að skrá!</string>
+    <string name="missed_reminder_single_content">Áminning frá %1$s</string>
+    <string name="missed_reminders_multiple_content">Þú misstir af %1$d áminningum</string>
+    <string name="next_reminder_format">Næsta áminning: %1$s</string>
+    <string name="no_upcoming_reminders">Engar væntanlegar áminningar</string>
+    <string name="select_reminder_type">Veldu tegund áminningar</string>
+    <string name="week_day_reminder">Vikudagsáminning</string>
+    <string name="week_day_reminder_description">Tilteknir dagar eins og mánudagur, miðvikudagur og föstudagur</string>
+    <string name="periodic_reminder">Reglubundin áminning</string>
+    <string name="periodic_reminder_description">Reglulegt bil, til dæmis á 3 daga fresti</string>
+    <string name="month_day_reminder">Mánaðardagsáminning</string>
+    <string name="month_day_reminder_description">Mánaðarlegt mynstur, til dæmis fyrsti mánudagur</string>
+    <string name="time_since_last_reminder">Tími frá síðustu áminningu</string>
+    <string name="time_since_last_reminder_description">Þegar þú hefur ekki skráð eitthvað um hríð</string>
+    <string name="one_time_reminder">Einnota áminning</string>
+    <string name="one_time_reminder_description">Sjálfstæð áminning á tilteknum tíma eða eftir töf</string>
+    <string name="reminder_name">Heiti áminningar</string>
+    <string name="reminder_disabled">Áminning óvirk</string>
+    <string name="repeat_every">Endurtaka á</string>
+    <string name="at_time">Á tíma</string>
+    <string name="at_a_specific_time">Á tilteknum tíma</string>
+    <string name="ending_at">Lýkur</string>
+    <string name="starting_from">Hefst</string>
+    <string name="repeat_on_week_days">Endurtaka á vikudögum</string>
+    <string name="track_feature">Skrá gagnagjafa</string>
+    <string name="select_tracker_placeholder">Veldu mæli</string>
+    <string name="remind_after">Minna á eftir</string>
+    <string name="then_remind_every">Síðan minna á á</string>
+    <string name="remind_at_date_and_time">Á tilteknum degi og tíma</string>
+    <string name="remind_after_a_delay">Eftir töf</string>
+    <string name="first_reminder">Fyrsta áminning</string>
+    <string name="every_colon">Á:</string>
+    <string name="ended_at_format">Lauk: %1$s</string>
+    <string name="starting_at_format">Hefst: %1$s</string>
+    <string name="occurrence_first">Fyrsti</string>
+    <string name="occurrence_second">Annar</string>
+    <string name="occurrence_third">Þriðji</string>
+    <string name="occurrence_fourth">Fjórði</string>
+    <string name="occurrence_last">Síðasti</string>
+    <string name="monday">Mánudagur</string>
+    <string name="tuesday">Þriðjudagur</string>
+    <string name="wednesday">Miðvikudagur</string>
+    <string name="thursday">Fimmtudagur</string>
+    <string name="friday">Föstudagur</string>
+    <string name="saturday">Laugardagur</string>
+    <string name="sunday">Sunnudagur</string>
+    <string-array name="abbreviated_months">
+        <item>Jan.</item>
+        <item>Feb.</item>
+        <item>Mar.</item>
+        <item>Apr.</item>
+        <item>Maí</item>
+        <item>Jún.</item>
+        <item>Júl.</item>
+        <item>Ágú.</item>
+        <item>Sep.</item>
+        <item>Okt.</item>
+        <item>Nóv.</item>
+        <item>Des.</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Mán.</item>
+        <item>Þri.</item>
+        <item>Mið.</item>
+        <item>Fim.</item>
+        <item>Fös.</item>
+        <item>Lau.</item>
+        <item>Sun.</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Stíll bils:</string>
+    <string name="track_widget_configure_no_data_error">Skráðu fyrst einhver gögn.</string>
+    <string name="track_widget_configure_no_data_selected_error">Þú verður að velja gilt gagnasafn til að búa til skráningargræju.</string>
+    <string name="create">Búa til</string>
+    <string name="use_default_value">Nota sjálfgefið gildi</string>
+    <string name="backup_and_restore">Öryggisafrit og endurheimt</string>
+    <string name="backup_hint_text">Öryggisafrit vistar öll gögn forritsins, þar á meðal skráð gögn, línurit og áminningar. Taktu reglulega öryggisafrit í ytra tæki eða skýjageymslu ef tækið týnist eða skemmist.</string>
+    <string name="restore_data">Endurheimta gögn</string>
+    <string name="backup_successful">Öryggisafrit tókst!</string>
+    <string name="backup_error_could_not_write_to_file">Fann ekki valda skrá eða gat ekki skrifað í hana.</string>
+    <string name="backup_error_could_not_find_database_file">Fann ekki gagnagrunnsskrá eða gat ekki lesið hana.</string>
+    <string name="backup_error_failed_to_copy_database">Eitthvað fór úrskeiðis við að afrita gagnagrunnsskrána.</string>
+    <string name="restore_failed">Endurheimt mistókst. %1$s</string>
+    <string name="add_a_longer_description_optional">Bæta við lengri lýsingu (valfrjálst)</string>
+    <string name="no_data_points_history_fragment_hint">Saga þín birtist hér þegar þú hefur skráð einhverja gagnapunkta.</string>
+    <string name="data_resolution_error">Villa kom upp við að leysa þessi gögn:\n\n%1$s</string>
+    <string name="info">Upplýsingar</string>
+    <string name="no_description">Engin lýsing</string>
+    <string name="description">Lýsing</string>
+    <string name="app_lock_title">Forritslás</string>
+    <string name="app_lock_locked_title">Track &amp; Graph er læst</string>
+    <string name="app_lock_password_label">Lykilorð</string>
+    <string name="app_lock_confirm_password_label">Staðfesta lykilorð</string>
+    <string name="app_lock_unlock">Aflæsa</string>
+    <string name="app_lock_use_biometrics">Nota lífkenni</string>
+    <string name="app_lock_enable">Virkja forritslás</string>
+    <string name="app_lock_enabled">Forritslás er virkur</string>
+    <string name="app_lock_enable_biometric_unlock">Virkja aflæsingu með lífkennum</string>
+    <string name="app_lock_no_strong_biometric_available">Engin sterk lífkennaaflæsing er í boði í þessu tæki.</string>
+    <string name="app_lock_lock_after_background_minutes">Læsa eftir mínútur í bakgrunni</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Notaðu 0 til að læsa um leið og forritið fer úr forgrunni.</string>
+    <string name="app_lock_change_password">Breyta lykilorði</string>
+    <string name="app_lock_password_changed">Lykilorði breytt</string>
+    <string name="app_lock_disable">Gera forritslás óvirkan</string>
+    <string name="app_lock_unlock_biometric_title">Aflæsa Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Notaðu lífkenni tækisins til að halda áfram</string>
+    <string name="app_lock_use_password">Nota lykilorð</string>
+    <string name="app_lock_biometric_not_recognized">Lífkenni þekktist ekki.</string>
+    <string name="app_lock_error_missing_password">Lykilorð forritsláss vantar. Gerðu forritslás óvirkan og virkjaðu hann aftur.</string>
+    <string name="app_lock_error_incorrect_password">Rangt lykilorð</string>
+    <string name="app_lock_error_password_hashing_unavailable">Staðfesting lykilorðs forritsláss er ekki í boði í þessu tæki.</string>
+    <string name="app_lock_error_enter_password">Sláðu inn lykilorð.</string>
+    <string name="app_lock_error_passwords_do_not_match">Lykilorðin passa ekki saman.</string>
+    <string name="note_input_hint">Glósur…</string>
+    <string name="add_a_note">Bæta við glósu</string>
+    <string name="notes">Glósur</string>
+    <string name="show_global_notes">Almennt</string>
+    <string name="show_data_point_notes">Gagnapunktar</string>
+    <string name="delete_reminder_content_description">Eyða áminningu</string>
+    <string name="restore_error_invalid_database_file">Endurheimt tókst ekki! Valda skráin virðist ekki vera gilt öryggisafrit.</string>
+    <string name="auto_backup">Sjálfvirkt öryggisafrit</string>
+    <string name="apply">Nota</string>
+    <string name="backup_every">Taka öryggisafrit á: </string>
+    <string name="next_backup_at">„Næsta öryggisafrit: \"</string>
+    <string name="backup_notification_channel_name">Tilkynningar um sjálfvirk öryggisafrit</string>
+    <string name="backup_notification_channel_description">Lætur þig vita þegar sjálfvirkt öryggisafrit er tekið og ef það mistekst.</string>
+    <string name="backup_notification_title">Tek öryggisafrit…</string>
+    <string name="backup_failed_notification_title">Sjálfvirkt öryggisafrit mistókst</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph fann ekki öryggisafritsstaðinn þinn eða fékk ekki aðgang að honum.</string>
+    <string name="backup_failed_notification_could_not_copy">Eitthvað fór úrskeiðis við að taka öryggisafrit af gögnunum þínum. Öryggisafritið gæti verið skemmt eða ófullkomið.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Velja nýjan stað</string>
+    <string name="backup_location">Staðsetning öryggisafrits</string>
+    <string name="enable_auto_backup">Virkja sjálfvirk öryggisafrit</string>
+    <string name="last_successful_backup">Síðasta vel heppnaða öryggisafrit</string>
+    <string name="next_scheduled_backup">Næsta áætlaða öryggisafrit</string>
+    <string name="notification_permission_prompt">Þú ættir að virkja tilkynningar fyrir Track &amp; Graph til að fá tilkynningu ef sjálfvirkt öryggisafrit mistekst af einhverjum ástæðum.</string>
+    <string name="lua_script_empty">Bættu við Lua-skriftu</string>
+    <string name="function_name_empty">Heiti falls má ekki vera tómt</string>
+    <string name="function_name">Heiti falls</string>
+    <string name="add_at_least_one_input">Bættu við að minnsta kosti einu ílagi</string>
+    <string name="output">Úttak</string>
+    <string name="data_source">Gagnagjafi</string>
+    <string name="lua_script">Lua-skrifta</string>
+    <string name="data_source_description">Gagnagjafahnútur gerir þér kleift að velja mæli eða fall til að nota sem ílag.</string>
+    <string name="lua_script_input_hint">Sláðu inn Lua-skriftu…</string>
+    <string name="select_node_type">Veldu gerð hnúts</string>
+    <string name="file">Skrá</string>
+    <string name="lua_feature_names_not_unique">Ílög skriftu verða að hafa einstök heiti</string>
+    <string name="graph_stat_type_lua_graph">Lua-skrifta</string>
+    <string name="launch_lua_disabled">Ræsing Lua óvirk</string>
+    <string name="no_lua">Ekkert Lua</string>
+    <string name="lua_engine_disabled">Lua-vél óvirk</string>
+    <string name="lua_graph_first_time_user_title">Línurit og tölfræði með Lua-skriftum</string>
+    <string name="lua_graph_first_time_user_message">Lua-skriftur eru háþróaður eiginleiki sem gerir þér kleift að búa til sérsniðin línurit og tölfræði með forritunarmálinu Lua. \n\nÞú getur hlaðið inn eigin skriftu eða valið eina úr GitHub-safninu. Ef þú setur upp skriftu frá GitHub ferðu aftur í forritið með skriftuna tilbúna til notkunar.</string>
+    <string name="functions_first_time_user_title">Velkomin í föll</string>
+    <string name="functions_first_time_user_message">Föll eru háþróaður eiginleiki sem gerir þér kleift að sameina, leggja saman og umbreyta gögnunum þínum í nýja afleidda gagnagjafa.</string>
+    <string name="learn_more">Lærðu meira hér</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Líma</string>
+    <string name="failed_to_download_file">Ekki tókst að hlaða niður skrá: %s</string>
+    <string name="confirm_deep_link">Þú hefur fengið skriftutengil frá óþekktum uppruna. Settu aðeins upp skriftur frá aðilum sem þú treystir. Viltu setja þessa skriftu upp?</string>
+    <string name="graph_stat_info_button_description">Kennsluefni um línurit og tölfræði</string>
+    <string name="network_generic_error">Villa kom upp við aðgang að netinu. Athugaðu tenginguna og reyndu aftur.</string>
+    <string name="function_verification_failure">Ekki tókst að sannreyna undirskriftir falla. Gakktu úr skugga um að tengingin sé örugg og að Track &amp; Graph sé uppfært</string>
+    <string name="function_network_failure">Ekki tókst að hlaða föllum. Gakktu úr skugga um að þú sért tengd(ur) internetinu. Ef vandamálið heldur áfram skaltu ganga úr skugga um að forritið sé uppfært.</string>
+    <string name="functions_landscape_hint">Ábending: Föll virka best í láréttri skjástefnu</string>
+    <string name="functions_start_hint">Byrjaðu hér: Ýttu lengi og veldu Gagnagjafi</string>
+    <string name="see_whats_new">Sjá nýjungar</string>
+    <string name="theme_colon">Þema:</string>
+    <string name="date_format_colon">Dagsetningarsnið:</string>
+    <string name="add_data_point_button_content_description">Hnappur til að bæta við gagnapunkti</string>
+    <string name="tracked_data_menu_button_content_description">Valmyndarhnappur fyrir skráð gögn</string>
+    <string name="tracked_data_history_button_content_description">Saga skráðra gagna, hnappur</string>
+    <string name="delete_line_button_content_description">Hnappur til að eyða línu</string>
+    <string name="delete_input_button_content_description">Hnappur til að eyða innslætti</string>
+    <string name="delete_data_point_button_content_description">Hnappur til að eyða gagnapunkti</string>
+    <string name="edit_data_point_button_content_description">Hnappur til að breyta gagnapunkti</string>
+    <string name="add_multiple_choice_answer_button_content_description">Hnappur til að bæta við fjölvalssvari</string>
+    <string name="ending_at_colon">Sýni lýkur:</string>
+    <string name="duplicate">Afrita</string>
+    <string name="no_notes_hint_text">Athugasemdir sem bætt er við við skráningu birtast hér. Þú getur líka bætt við almennum athugasemdum með + hnappinum.</string>
+    <string name="add_a_global_note">Bæta við almennri athugasemd:</string>
+    <string name="duration">Tímalengd</string>
+    <string name="hours_suffix">klst.</string>
+    <string name="minutes_suffix">mín.</string>
+    <string name="seconds_suffix">sek.</string>
+    <string name="numeric_to_duration_mode_header">Fyrri skráð gildi tákna:</string>
+    <string name="duration_to_numeric_mode_header">Í hvað á að breyta fyrri skráðum gildum:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Ekki er hægt að blanda tímalengd saman við aðrar gagnagerðir. Prófaðu að teikna klukkustundir, mínútur eða sekúndur</string>
+    <string name="sum_by_count_checkbox_label">Hakaðu hér til að telja fjölda skráðra gagnapunkta í stað heildargilda þeirra.</string>
+    <string name="time_window_size">Stærð tímaglugga:</string>
+    <string name="hold_to_preview">Haltu inni til að forskoða</string>
+    <string name="open">Opna</string>
+    <string name="close">Loka</string>
+    <string name="filter_by_label">Sía eftir merki</string>
+    <string name="filter_by_value">Sía eftir gildisbili</string>
+    <string name="save_changes">Vista breytingar</string>
+    <string name="timer_notification_channel_name">Tímamælar</string>
+    <string name="stop">Stöðva</string>
+    <string name="name_your_function">Gefðu fallinu heiti: </string>
+    <string name="add_some_data_sources">Bæta við gagnaveitum</string>
+    <string name="value">Gildi</string>
+    <string name="label">Merki</string>
+    <string name="continue_word">Halda áfram</string>
+    <string name="update_all_data_points">Uppfæra alla gagnapunkta: </string>
+    <string name="where_colon">Hvar:</string>
+    <string name="to_colon">Til:</string>
+    <string name="value_equals">Gildi =</string>
+    <string name="weeks">Vikur</string>
+    <string name="months">Mánuðir</string>
+    <string name="days">Dagar</string>
+    <string name="hours">Klukkustundir</string>
+    <string name="minutes">Mínútur</string>
+    <string name="seconds">Sekúndur</string>
+    <string name="label_equals">Merkimiði =</string>
+    <string name="adding_your_first_data_point">Stutt leiðbeining um að bæta við gagnapunktum:</string>
+    <string name="next">Næsta</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Hver gagnapunktur hefur tímastimpil og gildi: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Hann getur einnig valfrjálst haft merkimiða og athugasemd: </string>
+    <string name="data_point_tutorial_page_2_description">Gildið er tala svo þú getir séð hvernig gögnin þín breytast með tímanum</string>
+    <string name="data_point_tutorial_page_2_hint">(Ábending: Ef gildið skiptir þig ekki máli skaltu nota sjálfgefið gildi, 1)</string>
+    <string name="data_point_tutorial_page_3_description">Notaðu merkimiða ef þú vilt flokka gagnapunktana</string>
+    <string name="data_point_tutorial_page_3_hint">(Ábending: Ef þú vilt bæta við samhengi eða lýsingu skaltu nota athugasemd í stað merkimiðareitsins)</string>
+    <string name="help">Hjálp</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Ítarlegir valkostir</string>
+    <string name="type_colon">\"Tegund: \"</string>
+    <string name="order_colon">\"Röðun: \"</string>
+    <string name="value_and_label">Gildi og merkimiði</string>
+    <string name="value_only">Aðeins gildi</string>
+    <string name="label_only">Aðeins merkimiði</string>
+    <string name="none">Ekkert</string>
+    <string name="value_ascending">Gildi í hækkandi röð</string>
+    <string name="value_descending">Gildi í lækkandi röð</string>
+    <string name="label_ascending">Merkimiði í hækkandi röð</string>
+    <string name="label_descending">Merkimiði í lækkandi röð</string>
+    <string name="latest">Nýjustu</string>
+    <string name="oldest">Elstu</string>
+    <string name="track_all">Skrá allt</string>
+    <string name="more_details">Frekari upplýsingar</string>
+    <string name="suggestions">Tillögur</string>
+    <string name="no_label">Enginn merkimiði</string>
+    <string name="confirm_cancel_notes_will_be_lost">Ertu viss um að þú viljir loka? Allar athugasemdir tapast.</string>
+    <string name="add_a_label">Bæta við merkimiða</string>
+    <string name="bar_interval">Súlubil:</string>
+    <string name="y_range_max">Hámark Y-bils</string>
+    <string name="total_formatted">Samtals: %s</string>
+    <string name="from_formatted">Frá: %s</string>
+    <string name="to_formatted">Til: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Sekúnda(r)</string>
+    <string name="minutes_generic">Mínúta(r)</string>
+    <string name="hours_generic">Klukkustunda(r)</string>
+    <string name="days_generic">Dagur/dagar</string>
+    <string name="weeks_generic">Vika/vikur</string>
+    <string name="months_generic">Mánuður/mánuðir</string>
+    <string name="years_generic">Ár</string>
+    <plurals name="seconds">
+        <item quantity="one">%d sekúnda</item>
+        <item quantity="other">%d sekúndur</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d mínúta</item>
+        <item quantity="other">%d mínútur</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d klukkustund</item>
+        <item quantity="other">%d klukkustundir</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d dagur</item>
+        <item quantity="other">%d dagar</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d vika</item>
+        <item quantity="other">%d vikur</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d mánuður</item>
+        <item quantity="other">%d mánuðir</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d ár</item>
+        <item quantity="other">%d ár</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Á hverri mínútu</item>
+        <item quantity="other">Á %d mínútna fresti</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Á hverri klukkustund</item>
+        <item quantity="other">Á %d klukkustunda fresti</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Daglega</item>
+        <item quantity="other">Á %d daga fresti</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Vikulega</item>
+        <item quantity="other">Á %d vikna fresti</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Mánaðarlega</item>
+        <item quantity="other">Á %d mánaða fresti</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Árlega</item>
+        <item quantity="other">Á %d ára fresti</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Eftir 1 mínútu</item>
+        <item quantity="other">Eftir %d mínútur</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Eftir 1 klukkustund</item>
+        <item quantity="other">Eftir %d klukkustundir</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Eftir 1 dag</item>
+        <item quantity="other">Eftir %d daga</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Eftir 1 viku</item>
+        <item quantity="other">Eftir %d vikur</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Eftir 1 mánuð</item>
+        <item quantity="other">Eftir %d mánuði</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Eftir 1 ár</item>
+        <item quantity="other">Eftir %d ár</item>
+    </plurals>
+    <string name="restore_hint_text">VIÐVÖRUN: Endurheimt úr öryggisafriti eyðir öllum gögnum og uppsetningu sem nú eru í forritinu. Taktu fyrst öryggisafrit af gögnunum þínum!</string>
+    <string name="backup_now">Taka öryggisafrit núna</string>
+    <string name="restore_error_could_not_write_to_database">Endurheimt tókst ekki! Fann ekki gagnagrunninn eða gat ekki skrifað í hann.</string>
+    <string name="restore_error_could_not_read_from_database_file">Endurheimt tókst ekki! Fann ekki valda gagnagrunnsskrá eða gat ekki lesið hana.</string>
+    <string name="restore_error_failed_to_copy_database">Endurheimt tókst ekki! Eitthvað fór úrskeiðis við að endurheimta gagnagrunninn.</string>
+    <string name="select_location">Velja staðsetningu…</string>
+    <string name="restore_successful">Endurheimt tókst! Nú þarf að endurræsa Track &amp; Graph.</string>
+</resources>

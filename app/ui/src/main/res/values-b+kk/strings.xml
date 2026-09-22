@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Қосу</string>
+    <string name="add_a_note">Жазба қосу</string>
+    <string name="cancel">Бас тарту</string>
+    <string name="continue_word">Жалғастыру</string>
+    <string name="create">Жасау</string>
+    <string name="label">Белгі</string>
+    <string name="release_notes_support_text">Қолдауыңыз Track &amp; Graph қолданбасының жұмысын жалғастырып, дамуына көмектеседі 🌱</string>
+    <string name="release_notes_maybe_later">Кейінірек</string>
+    <string name="release_notes_support_development">Әзірлеуді қолдау үшін қайырымдылық жасау</string>
+    <string name="release_notes_thank_you">Рақмет! ❤️\n\nӘрбір қолдау Track &amp; Graph қолданбасын баршаға жақсартуға жұмсалады 🌱</string>
+    <string name="support_close">Жабу</string>
+    <string name="search">Іздеу</string>
+    <string name="update">Жаңарту</string>
+    <string name="value">Мән</string>
+</resources>

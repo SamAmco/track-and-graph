@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">მხარი დაუჭირეთ დეველოპერს</string>
+    <string name="support_unavailable">ამჟამად მხარდაჭერის ვარიანტები ხელმისაწვდომი არ არის.</string>
+    <string name="support_payment_failed">გადახდა ვერ მოხერხდა. ხელახლა სცადეთ.</string>
+    <string name="support_payment_pending">გადახდა მოლოდინის რეჟიმშია. Google Play მას გადახდის დადასტურების შემდეგ დაასრულებს.</string>
+</resources>

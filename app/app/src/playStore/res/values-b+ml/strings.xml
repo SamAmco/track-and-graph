@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ഡെവലപ്പറെ പിന്തുണയ്ക്കുക</string>
+    <string name="support_unavailable">നിലവിൽ പിന്തുണാ ഓപ്ഷനുകളൊന്നും ലഭ്യമല്ല.</string>
+    <string name="support_payment_failed">പേയ്‌മെന്റ് പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക.</string>
+    <string name="support_payment_pending">പേയ്‌മെന്റ് തീർപ്പാക്കാനുണ്ട്. പേയ്‌മെന്റ് സ്ഥിരീകരിച്ച ശേഷം Google Play അത് പൂർത്തിയാക്കും.</string>
+</resources>

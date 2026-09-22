@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">එක් කරන්න</string>
+    <string name="add_a_note">සටහනක් එක් කරන්න</string>
+    <string name="cancel">අවලංගු කරන්න</string>
+    <string name="continue_word">ඉදිරියට යන්න</string>
+    <string name="create">සාදන්න</string>
+    <string name="label">ලේබලය</string>
+    <string name="release_notes_support_text">ඔබේ සහාය Track &amp; Graph පවත්වාගෙන යාමට සහ වර්ධනය කිරීමට උපකාරී වේ 🌱</string>
+    <string name="release_notes_maybe_later">පසුව බලමු</string>
+    <string name="release_notes_support_development">සංවර්ධනයට සහාය වීමට පරිත්‍යාග කරන්න</string>
+    <string name="release_notes_thank_you">ස්තුතියි! ❤️\n\nඔබේ සෑම සහායක්ම සැමට Track &amp; Graph වඩා හොඳ කිරීමට යොදා ගනී 🌱</string>
+    <string name="support_close">වසන්න</string>
+    <string name="search">සොයන්න</string>
+    <string name="update">යාවත්කාලීන කරන්න</string>
+    <string name="value">අගය</string>
+</resources>

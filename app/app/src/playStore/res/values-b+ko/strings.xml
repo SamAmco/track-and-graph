@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">개발자 후원</string>
+    <string name="support_unavailable">현재 이용 가능한 후원 옵션이 없습니다.</string>
+    <string name="support_payment_failed">결제에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="support_payment_pending">결제가 보류 중입니다. 결제가 확인되면 Google Play에서 완료합니다.</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ಡೆವಲಪರ್‌ಗೆ ಬೆಂಬಲ ನೀಡಿ</string>
+    <string name="support_unavailable">ಪ್ರಸ್ತುತ ಯಾವುದೇ ಬೆಂಬಲ ಆಯ್ಕೆಗಳು ಲಭ್ಯವಿಲ್ಲ.</string>
+    <string name="support_payment_failed">ಪಾವತಿ ವಿಫಲವಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="support_payment_pending">ಪಾವತಿ ಬಾಕಿಯಿದೆ. ಪಾವತಿ ದೃಢಪಟ್ಟ ನಂತರ Google Play ಅದನ್ನು ಪೂರ್ಣಗೊಳಿಸುತ್ತದೆ.</string>
+</resources>

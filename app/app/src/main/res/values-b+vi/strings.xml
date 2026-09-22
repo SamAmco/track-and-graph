@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Trang chủ</string>
+    <string name="add_group">Thêm nhóm: </string>
+    <string name="edit_group">Chỉnh sửa nhóm: </string>
+    <string name="group">Nhóm</string>
+    <string name="tracker">Bộ theo dõi</string>
+    <string name="function">Hàm</string>
+    <string name="graph_or_stat">Biểu đồ hoặc thống kê</string>
+    <string name="symlink">Liên kết biểu tượng</string>
+    <string name="symlinks">Các liên kết biểu tượng</string>
+    <string name="reminder">Lời nhắc</string>
+    <string name="add_component">Thêm thành phần</string>
+    <string name="symlink_locations_title">Vị trí của \"%1$s\"</string>
+    <string name="add_tracker">Theo dõi một điều gì đó:</string>
+    <string name="add">Thêm</string>
+    <string name="group_name">ví dụ: Hoạt động hằng ngày</string>
+    <string name="delete">Xóa</string>
+    <string name="edit">Chỉnh sửa</string>
+    <string name="update">Cập nhật</string>
+    <string name="graph_or_stat_name">Tên biểu đồ: </string>
+    <string name="tracker_name">Tên bộ theo dõi</string>
+    <string name="this_is_a_time_or_duration">Đây là thời điểm hoặc khoảng thời gian</string>
+    <string name="yes">Có</string>
+    <string name="cancel">Hủy</string>
+    <string name="select_file">Chọn tệp</string>
+    <string name="empty_group_hint">Chào mừng bạn đến với Track &amp; Graph!\n\n Nhấn + ở góc trên bên phải và chọn Bộ theo dõi để bắt đầu.</string>
+    <string name="no_trackers_graph_stats_hint">Vui lòng tạo Bộ theo dõi trước khi tạo biểu đồ.</string>
+    <string name="no_trackers_functions_hint">Vui lòng tạo Bộ theo dõi trước khi tạo hàm.</string>
+    <string name="ru_sure_del_group">Bạn có chắc muốn xóa nhóm này và mọi thứ trong đó không? Không thể hoàn tác.</string>
+    <string name="ru_sure_del_graph">Bạn có chắc muốn xóa biểu đồ này không? Không thể hoàn tác. Dữ liệu đã theo dõi sẽ không bị mất.</string>
+    <string name="ru_sure_del_feature">Bạn có chắc muốn xóa dữ liệu đã theo dõi này không?</string>
+    <string name="item_in_multiple_groups">Mục này tồn tại ở nhiều nơi. Bạn có thể xóa mục này khỏi đây hoặc xóa ở mọi nơi.</string>
+    <string name="remove_from_this_group">Xóa khỏi đây</string>
+    <string name="delete_everywhere">Xóa ở mọi nơi</string>
+    <string name="ru_sure_del_function">Bạn có chắc muốn xóa hàm này không? Không thể hoàn tác.</string>
+    <string name="ru_sure_del_reminder">Bạn có chắc muốn xóa lời nhắc này không? Không thể hoàn tác.</string>
+    <string name="ru_sure_del_data_point">Bạn có chắc muốn xóa điểm dữ liệu này không?</string>
+    <string name="feature_name_cannot_be_null">Vui lòng thêm tên</string>
+    <string name="tracker_with_that_name_exists">Bạn đã theo dõi một mục có tên đó</string>
+    <string name="data_points">%1$d điểm dữ liệu</string>
+    <string name="items_selected">Đã chọn %1$d</string>
+    <string name="select_all">Chọn tất cả</string>
+    <string name="deselect_all">Bỏ chọn tất cả</string>
+    <string name="ru_sure_del_data_points">Bạn có chắc muốn xóa các điểm dữ liệu này không?</string>
+    <string name="delete_selected_content_description">Xóa các mục đã chọn</string>
+    <string name="copy_selected_content_description">Sao chép các mục đã chọn</string>
+    <string name="move_selected_content_description">Di chuyển các mục đã chọn</string>
+    <string name="copy_to">Sao chép vào</string>
+    <string name="no_data">Không có dữ liệu</string>
+    <string name="skip">Bỏ qua</string>
+    <string name="exportButton">Xuất</string>
+    <string name="importButton">Nhập</string>
+    <string name="import_export">Nhập/Xuất</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="type_to_search">Nhập để tìm kiếm</string>
+    <string name="no_results">Không có kết quả</string>
+    <string name="export_to">Xuất dữ liệu đã theo dõi trong nhóm này sang CSV:</string>
+    <string name="export_error_message">Xuất không thành công: %1$s</string>
+    <string name="import_from">Nhập dữ liệu đã theo dõi vào nhóm này từ CSV:</string>
+    <string name="import_warning">Cảnh báo: Không thể hoàn tác thao tác nhập. Track &amp; Graph sẽ cố gắng hợp nhất dữ liệu đã nhập với dữ liệu hiện có trong nhóm này theo tên.</string>
+    <string name="add_a_graph_or_stat">Thêm biểu đồ hoặc thống kê</string>
+    <string name="graph_type_label">Loại biểu đồ:</string>
+    <string name="sample_size">Kích thước mẫu:</string>
+    <string name="select_a_discrete_feature">Chọn tập dữ liệu có nhãn: </string>
+    <string name="no_labels">Tập dữ liệu này không có nhãn</string>
+    <string name="select_a_feature">Chọn tập dữ liệu:</string>
+    <string name="select_a_tracker">Chọn bộ theo dõi</string>
+    <string name="offset">Độ lệch:</string>
+    <string name="scale">Tỷ lệ:</string>
+    <string name="from">Từ:</string>
+    <string name="to">Đến:</string>
+    <string name="day">Ngày</string>
+    <string-array name="time_histogram_windows">
+        <item>Hàng giờ</item>
+        <item>Hàng ngày</item>
+        <item>Hàng tuần</item>
+        <item>Hàng tháng</item>
+        <item>Hàng quý</item>
+        <item>Nửa năm</item>
+        <item>Hàng năm</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Tiết kiệm pin</item>
+        <item>Sáng</item>
+        <item>Tối</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Mặc định hệ thống</item>
+        <item>Sáng</item>
+        <item>Tối</item>
+    </string-array>
+    <string name="graph_type_line_graph">Biểu đồ đường</string>
+    <string name="graph_type_pie_chart">Biểu đồ tròn</string>
+    <string name="graph_type_average_time_between">Thời gian trung bình giữa các lần</string>
+    <string name="graph_type_time_since">Thời gian kể từ</string>
+    <string name="graph_type_time_histogram">Biểu đồ tần suất thời gian</string>
+    <string name="graph_type_last_value">Lần theo dõi gần nhất/Thời gian kể từ</string>
+    <string name="graph_type_bar_chart">Biểu đồ cột</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Không lấy trung bình</item>
+        <item>Trung bình trượt hằng ngày</item>
+        <item>Trung bình trượt ba ngày</item>
+        <item>Trung bình trượt hằng tuần</item>
+        <item>Trung bình trượt hằng tháng</item>
+        <item>Trung bình trượt ba tháng</item>
+        <item>Trung bình trượt sáu tháng</item>
+        <item>Trung bình trượt hằng năm</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Vẽ khi theo dõi</item>
+        <item>Vẽ tổng theo giờ</item>
+        <item>Vẽ tổng theo ngày</item>
+        <item>Vẽ tổng theo tuần</item>
+        <item>Vẽ tổng theo tháng</item>
+        <item>Vẽ tổng theo năm</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Tất cả dữ liệu</string>
+    <string name="graph_time_durations_a_day">Một ngày</string>
+    <string name="graph_time_durations_a_week">Một tuần</string>
+    <string name="graph_time_durations_a_month">Một tháng</string>
+    <string name="graph_time_durations_three_months">Ba tháng</string>
+    <string name="graph_time_durations_six_months">Sáu tháng</string>
+    <string name="graph_time_durations_a_year">Một năm</string>
+    <string name="custom">Tùy chỉnh</string>
+    <string-array name="y_range_styles">
+        <item>Động</item>
+        <item>Cố định</item>
+    </string-array>
+    <string name="ending_at_latest">Điểm dữ liệu gần nhất</string>
+    <string name="ending_at_now">Hiện tại</string>
+    <string name="ending_at_custom_date">Ngày tùy chỉnh…</string>
+    <string name="hours_and_minutes_ago">%1$dh %2$dm trước</string>
+    <string name="import_exception_unknown">Nhập không thành công: Đã xảy ra lỗi không xác định</string>
+    <string name="import_exception_bad_headers">Nhập không thành công: Tiêu đề không khớp với tiêu đề dự kiến: %1$s</string>
+    <string name="import_exception_inconsistent_record">Nhập không thành công: Bản ghi ở dòng %1$s không nhất quán với các tiêu đề bắt buộc</string>
+    <string name="import_exception_bad_timestamp">Nhập không thành công: Không thể diễn giải dấu thời gian của bản ghi ở dòng: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Nhập không thành công: Kiểu dữ liệu không nhất quán ở dòng: %1$s</string>
+    <string name="unknown_error_occurred">Đã xảy ra lỗi không xác định</string>
+    <string name="graph_stat_validation_no_name">Vui lòng nhập tên</string>
+    <string name="graph_stat_validation_no_line_graph_features">Vui lòng thêm nội dung vào biểu đồ</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Vui lòng đảm bảo \"Từ\" nhỏ hơn hoặc bằng \"Đến\"</string>
+    <string name="graph_stat_validation_unrecognised_color">Vui lòng đảm bảo tất cả tập dữ liệu đều có màu</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Phát hiện tập dữ liệu biểu đồ đường không hợp lệ</string>
+    <string name="graph_stat_validation_bad_fixed_range">Vui lòng đảm bảo \"Từ\" nhỏ hơn \"Đến\"</string>
+    <string name="graph_stat_view_not_found">Đã xảy ra lỗi khi tìm biểu đồ này</string>
+    <string name="graph_stat_view_not_enough_data_stat">Thống kê này sẽ hiển thị khi đã theo dõi đủ dữ liệu để tạo thống kê.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Biểu đồ này sẽ hiển thị khi đã theo dõi đủ dữ liệu để tạo biểu đồ.</string>
+    <string name="pie_chart_mixed_signs_error">Không thể hiển thị biểu đồ tròn này vì biểu đồ chứa cả phần có kích thước dương và âm.</string>
+    <string name="histogram_mixed_signs_error">Không thể hiển thị biểu đồ tần suất này vì biểu đồ chứa cả khoảng có kích thước dương và âm.</string>
+    <string name="graph_non_finite_data_error">Không thể hiển thị biểu đồ này vì biểu đồ chứa một giá trị không phải là số hữu hạn.</string>
+    <string name="graph_inconsistent_series_error">Không thể hiển thị biểu đồ này vì các chuỗi dữ liệu có kích thước không nhất quán.</string>
+    <string name="graph_invalid_y_range_error">Không thể hiển thị biểu đồ này vì phạm vi trục Y không hợp lệ.</string>
+    <string name="finish">Hoàn tất</string>
+    <string name="about_description">Track &amp; Graph là phần mềm miễn phí và mã nguồn mở theo Giấy phép GPL 3.0.</string>
+    <string name="about_libraries_message">Các thư viện mã nguồn mở sau đây đã được sử dụng:</string>
+    <string name="about">Giới thiệu</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Câu hỏi thường gặp</string>
+    <string name="tutorial_text_1">Dùng bộ theo dõi để theo dõi dữ liệu của bạn.</string>
+    <string name="tutorial_text_2">Dùng biểu đồ và thống kê để trực quan hóa dữ liệu.</string>
+    <string name="tutorial_text_3">Dùng nhóm để sắp xếp các bộ theo dõi, biểu đồ và thống kê.</string>
+    <string name="got_it">Đã hiểu!</string>
+    <string name="move_to_colon">Di chuyển đến:</string>
+    <string name="move_to">Di chuyển đến</string>
+    <string name="ru_sure_update_data">Bản cập nhật này có thể sửa đổi không thể hoàn tác dữ liệu bạn đã theo dõi. Bạn nên sao lưu dữ liệu hiện có trước khi tiếp tục.\n\n Bạn có muốn tiếp tục không?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Đánh giá ứng dụng</string>
+    <string name="reminders">Lời nhắc</string>
+    <string name="no_reminders_hint">Nhấn biểu tượng + để tạo thông báo nhắc theo dõi mới.</string>
+    <string name="mon">T2</string>
+    <string name="tue">T3</string>
+    <string name="wed">T4</string>
+    <string name="thu">T5</string>
+    <string name="fri">T6</string>
+    <string name="sat">T7</string>
+    <string name="sun">CN</string>
+    <string name="reminders_notifications_channel_name">Lời nhắc</string>
+    <string name="reminders_notifications_channel_description">Thông báo do người dùng tạo để nhắc bạn theo dõi</string>
+    <string name="default_reminder_name">Đến lúc theo dõi!</string>
+    <string name="missed_reminder_single_content">Lời nhắc từ %1$s</string>
+    <string name="missed_reminders_multiple_content">Bạn đã bỏ lỡ %1$d lời nhắc</string>
+    <string name="next_reminder_format">Lời nhắc tiếp theo: %1$s</string>
+    <string name="no_upcoming_reminders">Không có lời nhắc sắp tới</string>
+    <string name="select_reminder_type">Chọn loại lời nhắc</string>
+    <string name="week_day_reminder">Lời nhắc theo ngày trong tuần</string>
+    <string name="week_day_reminder_description">Các ngày cụ thể như thứ Hai, thứ Tư, thứ Sáu</string>
+    <string name="periodic_reminder">Lời nhắc định kỳ</string>
+    <string name="periodic_reminder_description">Khoảng thời gian đều đặn như mỗi 3 ngày</string>
+    <string name="month_day_reminder">Lời nhắc theo ngày trong tháng</string>
+    <string name="month_day_reminder_description">Mẫu hằng tháng như thứ Hai đầu tiên</string>
+    <string name="time_since_last_reminder">Thời gian kể từ lời nhắc gần nhất</string>
+    <string name="time_since_last_reminder_description">Khi bạn đã lâu chưa theo dõi một mục</string>
+    <string name="one_time_reminder">Lời nhắc một lần</string>
+    <string name="one_time_reminder_description">Lời nhắc độc lập vào thời điểm cụ thể hoặc sau một khoảng trễ</string>
+    <string name="reminder_name">Tên lời nhắc</string>
+    <string name="reminder_disabled">Lời nhắc đã tắt</string>
+    <string name="repeat_every">Lặp lại mỗi</string>
+    <string name="at_time">Vào lúc</string>
+    <string name="at_a_specific_time">Vào thời điểm cụ thể</string>
+    <string name="ending_at">Kết thúc lúc</string>
+    <string name="starting_from">Bắt đầu từ</string>
+    <string name="repeat_on_week_days">Lặp lại vào các ngày trong tuần</string>
+    <string name="track_feature">Theo dõi dữ liệu</string>
+    <string name="select_tracker_placeholder">Chọn bộ theo dõi</string>
+    <string name="remind_after">Nhắc sau</string>
+    <string name="then_remind_every">Sau đó nhắc mỗi</string>
+    <string name="remind_at_date_and_time">Vào ngày và giờ</string>
+    <string name="remind_after_a_delay">Sau một khoảng trễ</string>
+    <string name="first_reminder">Lời nhắc đầu tiên</string>
+    <string name="every_colon">Mỗi:</string>
+    <string name="ended_at_format">Đã kết thúc lúc: %1$s</string>
+    <string name="starting_at_format">Bắt đầu lúc: %1$s</string>
+    <string name="occurrence_first">Thứ nhất</string>
+    <string name="occurrence_second">Thứ hai</string>
+    <string name="occurrence_third">Thứ ba</string>
+    <string name="occurrence_fourth">Thứ tư</string>
+    <string name="occurrence_last">Cuối cùng</string>
+    <string name="monday">Thứ Hai</string>
+    <string name="tuesday">Thứ Ba</string>
+    <string name="wednesday">Thứ Tư</string>
+    <string name="thursday">Thứ Năm</string>
+    <string name="friday">Thứ Sáu</string>
+    <string name="saturday">Thứ Bảy</string>
+    <string name="sunday">Chủ Nhật</string>
+    <string-array name="abbreviated_months">
+        <item>Th1</item>
+        <item>Th2</item>
+        <item>Th3</item>
+        <item>Th4</item>
+        <item>Th5</item>
+        <item>Th6</item>
+        <item>Th7</item>
+        <item>Th8</item>
+        <item>Th9</item>
+        <item>Th10</item>
+        <item>Th11</item>
+        <item>Th12</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>T2</item>
+        <item>T3</item>
+        <item>T4</item>
+        <item>T5</item>
+        <item>T6</item>
+        <item>T7</item>
+        <item>CN</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Kiểu phạm vi:</string>
+    <string name="track_widget_configure_no_data_error">Vui lòng theo dõi dữ liệu trước.</string>
+    <string name="track_widget_configure_no_data_selected_error">Bạn phải chọn một tập dữ liệu hợp lệ để tạo tiện ích theo dõi.</string>
+    <string name="create">Tạo</string>
+    <string name="use_default_value">Đặt giá trị mặc định</string>
+    <string name="backup_and_restore">Sao lưu và khôi phục</string>
+    <string name="backup_hint_text">Bản sao lưu lưu tất cả dữ liệu ứng dụng, bao gồm dữ liệu đã theo dõi, biểu đồ và lời nhắc. Bạn nên thường xuyên sao lưu dữ liệu vào thiết bị bên ngoài hoặc bộ nhớ đám mây phòng khi thiết bị bị mất hoặc hỏng.</string>
+    <string name="restore_data">Khôi phục dữ liệu</string>
+    <string name="backup_successful">Sao lưu thành công!</string>
+    <string name="backup_error_could_not_write_to_file">Không thể tìm hoặc ghi vào tệp đã chọn.</string>
+    <string name="backup_error_could_not_find_database_file">Không thể tìm hoặc đọc tệp cơ sở dữ liệu.</string>
+    <string name="backup_error_failed_to_copy_database">Đã xảy ra lỗi khi sao chép tệp cơ sở dữ liệu.</string>
+    <string name="restore_failed">Khôi phục không thành công. %1$s</string>
+    <string name="add_a_longer_description_optional">Thêm mô tả dài hơn (không bắt buộc)</string>
+    <string name="no_data_points_history_fragment_hint">Lịch sử sẽ hiển thị ở đây khi bạn có một số điểm dữ liệu.</string>
+    <string name="data_resolution_error">Đã xảy ra lỗi khi cố gắng phân giải dữ liệu này:\n\n%1$s</string>
+    <string name="info">Thông tin</string>
+    <string name="no_description">Không có mô tả</string>
+    <string name="description">Mô tả</string>
+    <string name="app_lock_title">Khóa ứng dụng</string>
+    <string name="app_lock_locked_title">Track &amp; Graph đã bị khóa</string>
+    <string name="app_lock_password_label">Mật khẩu</string>
+    <string name="app_lock_confirm_password_label">Xác nhận mật khẩu</string>
+    <string name="app_lock_unlock">Mở khóa</string>
+    <string name="app_lock_use_biometrics">Dùng sinh trắc học</string>
+    <string name="app_lock_enable">Bật khóa ứng dụng</string>
+    <string name="app_lock_enabled">Đã bật khóa ứng dụng</string>
+    <string name="app_lock_enable_biometric_unlock">Bật mở khóa bằng sinh trắc học</string>
+    <string name="app_lock_no_strong_biometric_available">Thiết bị này không có phương thức mở khóa sinh trắc học mạnh.</string>
+    <string name="app_lock_lock_after_background_minutes">Khóa sau số phút chạy nền</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Dùng 0 để khóa ngay khi ứng dụng rời khỏi nền trước.</string>
+    <string name="app_lock_change_password">Đổi mật khẩu</string>
+    <string name="app_lock_password_changed">Đã đổi mật khẩu</string>
+    <string name="app_lock_disable">Tắt khóa ứng dụng</string>
+    <string name="app_lock_unlock_biometric_title">Mở khóa Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Dùng sinh trắc học của thiết bị để tiếp tục</string>
+    <string name="app_lock_use_password">Dùng mật khẩu</string>
+    <string name="app_lock_biometric_not_recognized">Không nhận diện được xác thực sinh trắc học.</string>
+    <string name="app_lock_error_missing_password">Khóa ứng dụng không có mật khẩu. Hãy tắt rồi bật lại khóa ứng dụng.</string>
+    <string name="app_lock_error_incorrect_password">Mật khẩu không đúng</string>
+    <string name="app_lock_error_password_hashing_unavailable">Không thể xác minh mật khẩu khóa ứng dụng trên thiết bị này.</string>
+    <string name="app_lock_error_enter_password">Nhập mật khẩu.</string>
+    <string name="app_lock_error_passwords_do_not_match">Mật khẩu không khớp.</string>
+    <string name="note_input_hint">Ghi chú…</string>
+    <string name="add_a_note">Thêm ghi chú</string>
+    <string name="notes">Ghi chú</string>
+    <string name="show_global_notes">Toàn cục</string>
+    <string name="show_data_point_notes">Điểm dữ liệu</string>
+    <string name="delete_reminder_content_description">Xóa lời nhắc</string>
+    <string name="theme_colon">Chủ đề:</string>
+    <string name="date_format_colon">Định dạng ngày:</string>
+    <string name="add_data_point_button_content_description">Nút thêm điểm dữ liệu</string>
+    <string name="tracked_data_menu_button_content_description">Nút menu dữ liệu đã theo dõi</string>
+    <string name="tracked_data_history_button_content_description">Nút lịch sử dữ liệu đã theo dõi</string>
+    <string name="delete_line_button_content_description">Nút xóa dòng</string>
+    <string name="delete_input_button_content_description">Nút xóa trường nhập</string>
+    <string name="delete_data_point_button_content_description">Nút xóa điểm dữ liệu</string>
+    <string name="edit_data_point_button_content_description">Nút chỉnh sửa điểm dữ liệu</string>
+    <string name="add_multiple_choice_answer_button_content_description">Nút thêm đáp án trắc nghiệm</string>
+    <string name="ending_at_colon">Mẫu kết thúc lúc:</string>
+    <string name="duplicate">Nhân bản</string>
+    <string name="no_notes_hint_text">Các ghi chú được thêm khi theo dõi sẽ hiển thị ở đây. Bạn cũng có thể thêm ghi chú chung bằng nút +.</string>
+    <string name="add_a_global_note">Thêm ghi chú chung:</string>
+    <string name="duration">Thời lượng</string>
+    <string name="weeks">Tuần</string>
+    <string name="months">Tháng</string>
+    <string name="days">Ngày</string>
+    <string name="hours">Giờ</string>
+    <string name="minutes">Phút</string>
+    <string name="seconds">Giây</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Các giá trị đã theo dõi trước đây biểu thị:</string>
+    <string name="duration_to_numeric_mode_header">Các giá trị đã theo dõi trước đây sẽ được chuyển đổi thành:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Bạn không thể kết hợp thời lượng với các loại dữ liệu khác. Hãy cân nhắc biểu diễn theo giờ, phút hoặc giây</string>
+    <string name="sum_by_count_checkbox_label">Chọn đây để đếm số điểm dữ liệu đã theo dõi thay vì tổng các giá trị của chúng.</string>
+    <string name="time_window_size">Kích thước khoảng thời gian:</string>
+    <string name="hold_to_preview">Nhấn giữ để xem trước</string>
+    <string name="open">Mở</string>
+    <string name="close">Đóng</string>
+    <string name="filter_by_label">Lọc theo nhãn</string>
+    <string name="filter_by_value">Lọc theo khoảng giá trị</string>
+    <string name="save_changes">Lưu thay đổi</string>
+    <string name="timer_notification_channel_name">Bộ hẹn giờ</string>
+    <string name="stop">Dừng</string>
+    <string name="name_your_function">Đặt tên cho hàm: </string>
+    <string name="add_some_data_sources">Thêm nguồn dữ liệu</string>
+    <string name="value">Giá trị</string>
+    <string name="label">Nhãn</string>
+    <string name="continue_word">Tiếp tục</string>
+    <string name="update_all_data_points">Cập nhật tất cả điểm dữ liệu: </string>
+    <string name="where_colon">Từ:</string>
+    <string name="to_colon">Đến:</string>
+    <string name="value_equals">Giá trị =</string>
+    <string name="label_equals">Nhãn =</string>
+    <string name="adding_your_first_data_point">Hướng dẫn nhanh về cách thêm điểm dữ liệu:</string>
+    <string name="next">Tiếp theo</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Mỗi điểm dữ liệu có dấu thời gian và giá trị: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Bạn cũng có thể thêm nhãn và ghi chú nếu muốn: </string>
+    <string name="data_point_tutorial_page_2_description">Giá trị là một con số để bạn có thể xem dữ liệu thay đổi theo thời gian như thế nào</string>
+    <string name="data_point_tutorial_page_2_hint">(Mẹo: Nếu không quan tâm đến giá trị, hãy dùng giá trị mặc định là 1)</string>
+    <string name="data_point_tutorial_page_3_description">Sử dụng nhãn nếu bạn muốn nhóm các điểm dữ liệu</string>
+    <string name="data_point_tutorial_page_3_hint">(Mẹo: Nếu muốn thêm ngữ cảnh hoặc mô tả, hãy dùng ghi chú thay vì trường nhãn)</string>
+    <string name="help">Trợ giúp</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Tùy chọn nâng cao</string>
+    <string name="type_colon">\"Loại: \"</string>
+    <string name="order_colon">\"Thứ tự: \"</string>
+    <string name="value_and_label">Giá trị và nhãn</string>
+    <string name="value_only">Chỉ giá trị</string>
+    <string name="label_only">Chỉ nhãn</string>
+    <string name="none">Không có</string>
+    <string name="value_ascending">Giá trị tăng dần</string>
+    <string name="value_descending">Giá trị giảm dần</string>
+    <string name="label_ascending">Nhãn tăng dần</string>
+    <string name="label_descending">Nhãn giảm dần</string>
+    <string name="latest">Mới nhất</string>
+    <string name="oldest">Cũ nhất</string>
+    <string name="track_all">Theo dõi tất cả</string>
+    <string name="more_details">Thêm chi tiết</string>
+    <string name="suggestions">Gợi ý</string>
+    <string name="no_label">Không có nhãn</string>
+    <string name="confirm_cancel_notes_will_be_lost">Bạn có chắc muốn đóng không? Tất cả ghi chú sẽ bị mất.</string>
+    <string name="add_a_label">Thêm nhãn</string>
+    <string name="bar_interval">Khoảng cách cột:</string>
+    <string name="y_range_max">Giá trị lớn nhất của trục Y</string>
+    <string name="total_formatted">Tổng: %s</string>
+    <string name="from_formatted">Từ: %s</string>
+    <string name="to_formatted">Đến: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Giây</string>
+    <string name="minutes_generic">Phút</string>
+    <string name="hours_generic">Giờ</string>
+    <string name="days_generic">Ngày</string>
+    <string name="weeks_generic">Tuần</string>
+    <string name="months_generic">Tháng</string>
+    <string name="years_generic">Năm</string>
+    <plurals name="seconds">
+        <item quantity="other">%d giây</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d phút</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d giờ</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d ngày</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d tuần</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d tháng</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d năm</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="other">Mỗi %d phút</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="other">Mỗi %d giờ</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="other">Mỗi %d ngày</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="other">Mỗi %d tuần</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="other">Mỗi %d tháng</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="other">Mỗi %d năm</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="other">Sau %d phút</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="other">Sau %d giờ</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="other">Sau %d ngày</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="other">Sau %d tuần</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="other">Sau %d tháng</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="other">Sau %d năm</item>
+    </plurals>
+    <string name="restore_hint_text">CẢNH BÁO: Khôi phục từ bản sao lưu sẽ xóa toàn bộ dữ liệu và thiết lập hiện có trong ứng dụng. Bạn nên sao lưu dữ liệu trước!</string>
+    <string name="backup_now">Sao lưu ngay</string>
+    <string name="restore_error_could_not_write_to_database">Khôi phục thất bại! Không thể tìm hoặc ghi vào cơ sở dữ liệu.</string>
+    <string name="restore_error_could_not_read_from_database_file">Khôi phục thất bại! Không thể tìm hoặc đọc tệp cơ sở dữ liệu đã chọn.</string>
+    <string name="restore_error_failed_to_copy_database">Khôi phục thất bại! Đã xảy ra lỗi khi khôi phục cơ sở dữ liệu.</string>
+    <string name="select_location">Chọn vị trí…</string>
+    <string name="restore_successful">Khôi phục thành công! Track &amp; Graph hiện phải được khởi động lại.</string>
+    <string name="restore_error_invalid_database_file">Khôi phục thất bại! Tệp đã chọn có vẻ không phải là bản sao lưu hợp lệ.</string>
+    <string name="auto_backup">Tự động sao lưu</string>
+    <string name="apply">Áp dụng</string>
+    <string name="backup_every">Sao lưu mỗi: </string>
+    <string name="next_backup_at">\"Lần sao lưu tiếp theo: \"</string>
+    <string name="backup_notification_channel_name">Thông báo sao lưu tự động</string>
+    <string name="backup_notification_channel_description">Cho bạn biết khi đang thực hiện sao lưu tự động và nếu thao tác thất bại.</string>
+    <string name="backup_notification_title">Đang sao lưu…</string>
+    <string name="backup_failed_notification_title">Sao lưu tự động thất bại</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph không thể tìm hoặc truy cập vị trí sao lưu của bạn.</string>
+    <string name="backup_failed_notification_could_not_copy">Đã xảy ra lỗi khi sao lưu dữ liệu. Bản sao lưu có thể bị hỏng hoặc chưa hoàn chỉnh.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Chọn vị trí mới</string>
+    <string name="backup_location">Vị trí sao lưu</string>
+    <string name="enable_auto_backup">Bật sao lưu tự động</string>
+    <string name="last_successful_backup">Lần sao lưu thành công gần nhất</string>
+    <string name="next_scheduled_backup">Lần sao lưu theo lịch tiếp theo</string>
+    <string name="notification_permission_prompt">Bạn nên bật thông báo cho Track &amp; Graph để được thông báo nếu sao lưu tự động thất bại vì bất kỳ lý do nào.</string>
+    <string name="lua_script_empty">Vui lòng thêm tập lệnh Lua</string>
+    <string name="function_name_empty">Tên hàm không được để trống</string>
+    <string name="function_name">Tên hàm</string>
+    <string name="add_at_least_one_input">Vui lòng thêm ít nhất một đầu vào</string>
+    <string name="output">Đầu ra</string>
+    <string name="data_source">Nguồn dữ liệu</string>
+    <string name="lua_script">Tập lệnh Lua</string>
+    <string name="data_source_description">Nút Nguồn dữ liệu cho phép bạn chọn một bộ theo dõi hoặc hàm để dùng làm đầu vào.</string>
+    <string name="lua_script_input_hint">Nhập tập lệnh Lua…</string>
+    <string name="select_node_type">Chọn loại nút</string>
+    <string name="file">Tệp</string>
+    <string name="lua_feature_names_not_unique">Các đầu vào tập lệnh phải có tên duy nhất</string>
+    <string name="graph_stat_type_lua_graph">Tập lệnh Lua</string>
+    <string name="launch_lua_disabled">Khởi chạy Lua đã bị tắt</string>
+    <string name="no_lua">Không có Lua</string>
+    <string name="lua_engine_disabled">Công cụ Lua đã bị tắt</string>
+    <string name="lua_graph_first_time_user_title">Biểu đồ và thống kê bằng tập lệnh Lua</string>
+    <string name="lua_graph_first_time_user_message">Tập lệnh Lua là tính năng nâng cao cho phép bạn tạo biểu đồ và thống kê tùy chỉnh bằng ngôn ngữ lập trình Lua. \n\nBạn có thể tải tập lệnh của riêng mình hoặc chọn một tập lệnh từ bộ sưu tập GitHub. Cài đặt tập lệnh từ GitHub sẽ đưa bạn trở lại ứng dụng với tập lệnh sẵn sàng sử dụng.</string>
+    <string name="functions_first_time_user_title">Chào mừng đến với Hàm</string>
+    <string name="functions_first_time_user_message">Hàm là tính năng nâng cao cho phép bạn kết hợp, tổng hợp và chuyển đổi dữ liệu thành các nguồn dữ liệu dẫn xuất mới.</string>
+    <string name="learn_more">Tìm hiểu thêm tại đây</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Dán</string>
+    <string name="failed_to_download_file">Không thể tải tệp xuống: %s</string>
+    <string name="confirm_deep_link">Bạn đã nhận được liên kết tập lệnh từ một nguồn không xác định. Chỉ cài đặt tập lệnh từ các nguồn bạn tin cậy. Bạn có muốn cài đặt tập lệnh này không?</string>
+    <string name="graph_stat_info_button_description">Hướng dẫn về biểu đồ và thống kê</string>
+    <string name="network_generic_error">Đã xảy ra lỗi khi cố gắng truy cập mạng. Vui lòng kiểm tra kết nối và thử lại.</string>
+    <string name="function_verification_failure">Không thể xác minh chữ ký hàm. Vui lòng đảm bảo bạn có kết nối an toàn và Track &amp; Graph đã được cập nhật</string>
+    <string name="function_network_failure">Không thể tải các hàm. Vui lòng đảm bảo bạn đã kết nối Internet. Nếu sự cố vẫn tiếp diễn, hãy đảm bảo ứng dụng đã được cập nhật.</string>
+    <string name="functions_landscape_hint">Mẹo: Hàm hoạt động tốt nhất ở chế độ ngang</string>
+    <string name="functions_start_hint">Bắt đầu tại đây: Nhấn giữ và chọn Nguồn dữ liệu</string>
+    <string name="see_whats_new">Xem nội dung mới</string>
+</resources>

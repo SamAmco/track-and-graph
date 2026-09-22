@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">A fejlesztő támogatása</string>
+    <string name="support_unavailable">Jelenleg nem érhetők el támogatási lehetőségek.</string>
+    <string name="support_payment_failed">A fizetés sikertelen. Próbáld újra.</string>
+    <string name="support_payment_pending">A fizetés függőben van. A Google Play a fizetés megerősítése után véglegesíti.</string>
+</resources>

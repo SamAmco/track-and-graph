@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">เพิ่ม</string>
+    <string name="add_a_note">เพิ่มโน้ต</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="continue_word">ดำเนินการต่อ</string>
+    <string name="create">สร้าง</string>
+    <string name="label">ป้ายกำกับ</string>
+    <string name="release_notes_support_text">การสนับสนุนของคุณช่วยให้ Track &amp; Graph ดำเนินต่อและเติบโต 🌱</string>
+    <string name="release_notes_maybe_later">ไว้ทีหลัง</string>
+    <string name="release_notes_support_development">บริจาคเพื่อสนับสนุนการพัฒนา</string>
+    <string name="release_notes_thank_you">ขอบคุณ! ❤️\n\nการสนับสนุนทุกส่วนช่วยให้ Track &amp; Graph ดียิ่งขึ้นสำหรับทุกคน 🌱</string>
+    <string name="support_close">ปิด</string>
+    <string name="search">ค้นหา</string>
+    <string name="update">อัปเดต</string>
+    <string name="value">ค่า</string>
+</resources>

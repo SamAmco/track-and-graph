@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Hozzáadás</string>
+    <string name="add_a_note">Jegyzet hozzáadása</string>
+    <string name="cancel">Mégse</string>
+    <string name="continue_word">Folytatás</string>
+    <string name="create">Létrehozás</string>
+    <string name="label">Címke</string>
+    <string name="release_notes_support_text">A támogatásod segít életben tartani és fejleszteni a Track &amp; Graphot 🌱</string>
+    <string name="release_notes_maybe_later">Talán később</string>
+    <string name="release_notes_support_development">Adományozz a fejlesztés támogatására</string>
+    <string name="release_notes_thank_you">Köszönjük! ❤️\n\nMinden támogatás a Track &amp; Graph fejlesztését segíti 🌱</string>
+    <string name="support_close">Bezárás</string>
+    <string name="search">Keresés</string>
+    <string name="update">Frissítés</string>
+    <string name="value">Érték</string>
+</resources>

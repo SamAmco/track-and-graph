@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Støt udvikleren</string>
+    <string name="support_unavailable">Der er i øjeblikket ingen tilgængelige supportmuligheder.</string>
+    <string name="support_payment_failed">Betalingen mislykkedes. Prøv igen.</string>
+    <string name="support_payment_pending">Betalingen afventer. Google Play gennemfører den, når betalingen er bekræftet.</string>
+</resources>

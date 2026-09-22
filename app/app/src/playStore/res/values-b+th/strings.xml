@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">สนับสนุนนักพัฒนา</string>
+    <string name="support_unavailable">ขณะนี้ไม่มีตัวเลือกการสนับสนุน</string>
+    <string name="support_payment_failed">ชำระเงินไม่สำเร็จ โปรดลองอีกครั้ง</string>
+    <string name="support_payment_pending">การชำระเงินอยู่ระหว่างดำเนินการ Google Play จะดำเนินการให้เสร็จสิ้นหลังยืนยันการชำระเงิน</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Добавить</string>
+    <string name="add_a_note">Добавить заметку</string>
+    <string name="cancel">Отмена</string>
+    <string name="continue_word">Продолжить</string>
+    <string name="create">Создать</string>
+    <string name="label">Метка</string>
+    <string name="release_notes_support_text">Ваша поддержка помогает Track &amp; Graph развиваться 🌱</string>
+    <string name="release_notes_maybe_later">В другой раз</string>
+    <string name="release_notes_support_development">Поддержать разработку</string>
+    <string name="release_notes_thank_you">Спасибо! ❤️\n\nВся поддержка помогает сделать Track &amp; Graph лучше для всех 🌱</string>
+    <string name="support_close">Закрыть</string>
+    <string name="search">Поиск</string>
+    <string name="update">Обновить</string>
+    <string name="value">Значение</string>
+</resources>

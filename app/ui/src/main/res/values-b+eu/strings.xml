@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Gehitu</string>
+    <string name="add_a_note">Gehitu ohar bat</string>
+    <string name="cancel">Utzi</string>
+    <string name="continue_word">Jarraitu</string>
+    <string name="create">Sortu</string>
+    <string name="label">Etiketa</string>
+    <string name="release_notes_support_text">Zure laguntzak Track &amp; Graph bizirik eta hazten mantentzen laguntzen du 🌱</string>
+    <string name="release_notes_maybe_later">Agian geroago</string>
+    <string name="release_notes_support_development">Egin dohaintza garapena laguntzeko</string>
+    <string name="release_notes_thank_you">Eskerrik asko! ❤️\n\nLaguntza bakoitzak Track &amp; Graph hobetzen laguntzen du guztiontzat 🌱</string>
+    <string name="support_close">Itxi</string>
+    <string name="search">Bilatu</string>
+    <string name="update">Eguneratu</string>
+    <string name="value">Balioa</string>
+</resources>

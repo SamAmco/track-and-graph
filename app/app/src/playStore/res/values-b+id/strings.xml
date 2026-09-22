@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Dukung pengembang</string>
+    <string name="support_unavailable">Belum ada opsi dukungan yang tersedia.</string>
+    <string name="support_payment_failed">Pembayaran gagal. Coba lagi.</string>
+    <string name="support_payment_pending">Pembayaran tertunda. Google Play akan menyelesaikannya setelah pembayaran dikonfirmasi.</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">डेवलपर का समर्थन करें</string>
+    <string name="support_unavailable">फ़िलहाल समर्थन के विकल्प उपलब्ध नहीं हैं।</string>
+    <string name="support_payment_failed">भुगतान विफल हुआ। कृपया फिर कोशिश करें।</string>
+    <string name="support_payment_pending">भुगतान लंबित है। भुगतान की पुष्टि होने के बाद Google Play इसे पूरा करेगा।</string>
+</resources>

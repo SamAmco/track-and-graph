@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Adicionar</string>
+    <string name="add_a_note">Adicionar uma nota</string>
+    <string name="cancel">Cancelar</string>
+    <string name="continue_word">Continuar</string>
+    <string name="create">Criar</string>
+    <string name="label">Rótulo</string>
+    <string name="release_notes_support_text">Seu apoio ajuda a manter o Track &amp; Graph ativo e crescendo 🌱</string>
+    <string name="release_notes_maybe_later">Talvez mais tarde</string>
+    <string name="release_notes_support_development">Doar para apoiar o desenvolvimento</string>
+    <string name="release_notes_thank_you">Obrigado! ❤️\n\nTodo apoio contribui para tornar o Track &amp; Graph melhor para todos 🌱</string>
+    <string name="support_close">Fechar</string>
+    <string name="search">Pesquisar</string>
+    <string name="update">Atualizar</string>
+    <string name="value">Valor</string>
+</resources>

@@ -21,7 +21,7 @@
     <string name="reminder">Rappel</string>
     <string name="add_component">Ajouter un composant</string>
     <string name="symlink_locations_title">Emplacements de \"%1$s\"</string>
-    <string name="add_tracker">Suivre quelquechose : </string>
+    <string name="add_tracker">Suivre quelque chose :</string>
     <string name="add">Ajouter</string>
     <string name="group_name">ex. Activités quotidiennes</string>
     <string name="delete">Supprimer</string>
@@ -37,7 +37,7 @@
     <string name="no_trackers_graph_stats_hint">Veuillez créer un suivi avant de créer des graphiques.</string>
     <string name="no_trackers_functions_hint">Veuillez créer un suivi avant de créer des fonctions.</string>
     <string name="ru_sure_del_group">Êtes-vous sûr de vouloir supprimer ce groupe et tout ce qu\'il contient ? Vous ne pouvez pas faire marche arrière.</string>
-    <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ce suivi ?</string>
+    <string name="ru_sure_del_feature">Voulez-vous vraiment supprimer ces données suivies ?</string>
     <string name="item_in_multiple_groups">Cet élément existe à plusieurs endroits. Vous pouvez le retirer d\'ici ou le supprimer partout.</string>
     <string name="remove_from_this_group">Retirer d\'ici</string>
     <string name="delete_everywhere">Supprimer partout</string>
@@ -62,12 +62,12 @@
     <string name="search">Rechercher</string>
     <string name="type_to_search">Saisissez pour rechercher</string>
     <string name="no_results">Aucun résultat</string>
-    <string name="export_to">Exportez les données suivies de ce groupe au format CSV :</string>
+    <string name="export_to">Exporter les données suivies de ce groupe au format CSV :</string>
     <string name="export_error_message">Échec de l\'exportation : %1$s</string>
-    <string name="import_from">Importez les données suivies dans ce groupe à partir d\'un fichier CSV:</string>
+    <string name="import_from">Importer des données suivies dans ce groupe à partir d\'un fichier CSV :</string>
     <string name="import_warning">Attention : l\'import est irréversible. Track &amp; Graph essaiera de fusionner toutes les données importées avec les données existantes dans ce groupe par nom.</string>
-    <string name="add_a_graph_or_stat">Ajouter un Graphique ou une Statistique</string>
-    <string name="graph_type_label">Type de Graphique : </string>
+    <string name="add_a_graph_or_stat">Ajouter un graphique ou une statistique</string>
+    <string name="graph_type_label">Type de graphique :</string>
     <string name="sample_size">Taille de l\'échantillon : </string>
     <string name="select_a_discrete_feature">Sélectionnez un ensemble de données avec des libellés : </string>
     <string name="no_labels">Cet ensemble de données n\'a pas de libellés</string>
@@ -98,9 +98,9 @@
         <item>Jour</item>
         <item>Nuit</item>
     </string-array>
-    <string name="graph_type_line_graph">Graphique linéraire</string>
+    <string name="graph_type_line_graph">Graphique linéaire</string>
     <string name="graph_type_pie_chart">Camembert</string>
-    <string name="graph_type_average_time_between">Ecart moyen entre entrées</string>
+    <string name="graph_type_average_time_between">Écart moyen entre les entrées</string>
     <string name="graph_type_time_since">Temps depuis la dernière entrée</string>
     <string name="graph_type_time_histogram">Histogramme temporel</string>
     <string-array name="line_graph_averaging_mode_names">
@@ -114,14 +114,14 @@
         <item>Moyenne glissante sur un an</item>
     </string-array>
     <string-array name="line_graph_plot_mode_names">
-        <item>Tracer quand la données existe</item>
+        <item>Tracer lors du suivi</item>
         <item>Tracer le total horaire</item>
         <item>Tracer le total journalier</item>
         <item>Tracer le total hebdomadaire</item>
         <item>Tracer le total mensuel</item>
         <item>Tracer le total annuel</item>
     </string-array>
-    <string name="graph_type_last_value">Dernier suivi/Durée depuis</string>
+    <string name="graph_type_last_value">Dernier suivi/Temps écoulé</string>
     <string name="graph_time_durations_all_data">Toutes les données</string>
     <string name="graph_time_durations_a_day">1 jour</string>
     <string name="graph_time_durations_a_week">1 semaine</string>
@@ -154,7 +154,7 @@
     <string name="graph_stat_validation_invalid_value_stat_from_to">Veuillez vous assurer que "Depuis" est antérieur ou égal à "Jusqu\'à"</string>.
     <string name="graph_stat_validation_unrecognised_color">Veuillez vous assurer que tous les ensembles de données ont une couleur</string>.
     <string name="graph_stat_validation_invalid_line_graph_feature">Ensemble de données de graphique linéaire non valide détecté</string>.
-    <string name="graph_stat_validation_bad_fixed_range">Veuillez vous assurer que "Depuis" est antérieur "Jusqu\'à"</string>
+    <string name="graph_stat_validation_bad_fixed_range">Veuillez vous assurer que "Depuis" est antérieur à "Jusqu\'à"</string>
 
     .
     <string name="graph_stat_view_not_found">Une erreur est survenue lors de la recherche de ce graphique</string>.
@@ -173,7 +173,7 @@
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
     <string name="faq">FAQ</string>
-    <string name="tutorial_text_1">Utilisez des suivi pour suivre vos données.</string>
+    <string name="tutorial_text_1">Utilisez des suivis pour suivre vos données.</string>
     <string name="tutorial_text_2">Utilisez des graphiques et des statistiques pour visualiser les données.</string>
     <string name="tutorial_text_3">Utilisez des groupes pour organiser vos suivis, graphiques et statistiques.</string>
     <string name="got_it">J\'ai compris!</string>
@@ -181,7 +181,7 @@
     <string name="move_to">Déplacer vers</string>
     <string name="copy_to">Copier vers</string>
 
-    <string name="ru_sure_update_data">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.</string>
+    <string name="ru_sure_update_data">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.\n\nVoulez-vous continuer ?</string>
     <string name="ok">OK</string>
 
     <string name="rate_the_app">Notez l\'application</string>
@@ -195,8 +195,8 @@
     <string name="sat">Sam</string>
     <string name="sun">Dim</string>
     <string name="reminders_notifications_channel_name">Rappels</string>
-    <string name="reminders_notifications_channel_description">Notifications créées par l\'utilisateur pour vous rappeler vos suivis</string>.
-    <string name="default_reminder_name">Commencez le suivi !</string>
+    <string name="reminders_notifications_channel_description">Notifications créées par l\'utilisateur pour vous rappeler quand effectuer un suivi</string>
+    <string name="default_reminder_name">C\'est l\'heure du suivi !</string>
     <string name="range_style">Style de plage : </string>
 
     <string name="track_widget_configure_no_data_error">Veuillez d\'abord ajouter quelques entrées.</string>
@@ -271,8 +271,8 @@
     <string name="seconds">Seconds</string>
     <string name="minutes_suffix">m</string>
     <string name="seconds_suffix">s</string>
-    <string name="numeric_to_duration_mode_header">Les valeurs précédemment suivies représentent : </string>
-    <string name="duration_to_numeric_mode_header">Qu\'est-ce que les valeurs précédemment suivies doivent être converties en : </string>
+    <string name="numeric_to_duration_mode_header">Les valeurs précédemment suivies représentent :</string>
+    <string name="duration_to_numeric_mode_header">Les valeurs précédemment suivies doivent être converties en :</string>
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">Vous ne pouvez pas mélanger les durées avec d\'autres types de données. Pensez à tracer des heures, des minutes ou des secondes</string>.
     <string name="sum_by_count_checkbox_label">Cochez ici pour compter le nombre d\'entrées plutôt que le total de leurs valeurs.</string>
     <string name="time_window_size">Taille de la fenêtre de temps : </string>
@@ -286,7 +286,7 @@
     <string name="tracker">Suivi</string>
     <string name="function">Fonction</string>
     <string name="graph_or_stat">Graphique ou statistique</string>
-    <string name="ru_sure_del_graph">Voulez-vous vraiment supprimer ce graphique? Vous ne pouvez pas inverser cela. Vous ne perdrez aucune donnée suivie.</string>
+    <string name="ru_sure_del_graph">Voulez-vous vraiment supprimer ce graphique ? Cette action est irréversible. Vous ne perdrez aucune donnée suivie.</string>
     <string name="open">Ouverte</string>
     <string name="close">Fermer</string>
     <string name="filter_by_label">Filtrer par libellé</string>
@@ -497,7 +497,7 @@
     <string name="add_at_least_one_input">Veuillez ajouter au moins une entrée</string>
     <string name="output">Sortie</string>
     <string name="data_source">Source de Données</string>
-    <string name="data_source_description">Un nœud Source de Données vous permet de sélectionner un tracker ou une fonction à utiliser comme entrée.</string>
+    <string name="data_source_description">Un nœud Source de données vous permet de sélectionner un suivi ou une fonction à utiliser comme entrée.</string>
     <string name="lua_script">Script Lua</string>
 
     <string name="lua_script_input_hint">Entrez un script Lua…</string>
@@ -510,7 +510,7 @@
     <string name="lua_engine_disabled">Moteur Lua désactivé</string>
     <string name="lua_graph_first_time_user_title">Graphiques et statistiques des scripts Lua</string>
     <string name="lua_graph_first_time_user_message">Les scripts Lua sont une fonctionnalité avancée qui vous permet de créer des graphiques et des statistiques personnalisés avec le langage de programmation Lua. \n\nVous pouvez charger le vôtre, ou en choisir un dans la collection GitHub. L\'installation d\'un script depuis GitHub vous ramènera à l\'application avec le script prêt à l\'emploi.</string>
-    <string name="functions_first_time_user_title">Bienvenue dans les Fonctions</string>
+    <string name="functions_first_time_user_title">Bienvenue dans les fonctions</string>
     <string name="functions_first_time_user_message">Les fonctions sont une fonctionnalité avancée qui vous permet de combiner, agréger et transformer vos données en nouvelles sources de données dérivées.</string>    <string name="learn_more">En savoir plus ici</string>
     <string name="github">GitHub</string>
     <string name="paste">Coller</string>
@@ -520,8 +520,8 @@
     <string name="network_generic_error">Une erreur s\'est produite lors de la tentative d\'accès au réseau. Veuillez vérifier votre connexion et réessayer.</string>
     <string name="function_verification_failure">Échec de la vérification des signatures des fonctions. Veuillez vous assurer que vous avez une connexion sécurisée et que Track &amp; Graph est à jour</string>
     <string name="function_network_failure">Échec du chargement des fonctions. Veuillez vous assurer que vous êtes connecté à internet. Si le problème persiste, veuillez vous assurer que l\'application est à jour.</string>
-    <string name="functions_landscape_hint">Astuce : Les fonctions fonctionnent mieux en mode paysage</string>
-    <string name="functions_start_hint">Commencez ici : Appui long et sélectionner Source de données</string>
+    <string name="functions_landscape_hint">Astuce : les fonctions sont plus faciles à utiliser en mode paysage</string>
+    <string name="functions_start_hint">Commencez ici : effectuez un appui long et sélectionnez Source de données</string>
     <string name="see_whats_new">Voir les Nouveautés</string>
     <string name="missed_reminder_single_content">Rappel de %1$s</string>
     <string name="missed_reminders_multiple_content">Vous avez manqué %1$d rappels</string>
@@ -550,8 +550,8 @@
     <string name="ending_at">Se termine le</string>
     <string name="starting_from">À partir du</string>
     <string name="repeat_on_week_days">Répéter les jours de la semaine</string>
-    <string name="track_feature">Sélectionner un tracker</string>
-    <string name="select_tracker_placeholder">Sélectionner un tracker</string>
+    <string name="track_feature">Suivre des données</string>
+    <string name="select_tracker_placeholder">Sélectionner un suivi</string>
     <string name="remind_after">Rappeler après</string>
     <string name="then_remind_every">Puis rappeler tous les</string>
     <string name="remind_at_date_and_time">À une date et une heure</string>

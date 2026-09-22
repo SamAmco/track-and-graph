@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ဖန်တီးသူကို ပံ့ပိုးရန်</string>
+    <string name="support_unavailable">လက်ရှိတွင် ပံ့ပိုးရန် ရွေးချယ်စရာများ မရှိပါ။</string>
+    <string name="support_payment_failed">ငွေပေးချေမှု မအောင်မြင်ပါ။ ထပ်မံကြိုးစားပါ။</string>
+    <string name="support_payment_pending">ငွေပေးချေမှု ဆိုင်းငံ့ထားသည်။ ငွေပေးချေမှု အတည်ပြုပြီးနောက် Google Play က ဆောင်ရွက်ပေးမည်။</string>
+</resources>

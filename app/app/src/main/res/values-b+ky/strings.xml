@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Башкы бет</string>
+    <string name="add_group">Топ кошуу: </string>
+    <string name="edit_group">Топту түзөтүү: </string>
+    <string name="group">Топ</string>
+    <string name="tracker">Трекер</string>
+    <string name="function">Функция</string>
+    <string name="graph_or_stat">График же статистика</string>
+    <string name="symlink">Symlink</string>
+    <string name="symlinks">Symlink\'тер</string>
+    <string name="reminder">Эскертме</string>
+    <string name="add_component">Компонент кошуу</string>
+    <string name="symlink_locations_title">\"%1$s\" жайгашкан жерлер</string>
+    <string name="add_tracker">Эмнени көзөмөлдөө керек:</string>
+    <string name="add">Кошуу</string>
+    <string name="group_name">мис., Күнүмдүк иштер</string>
+    <string name="delete">Өчүрүү</string>
+    <string name="edit">Түзөтүү</string>
+    <string name="update">Жаңыртуу</string>
+    <string name="graph_or_stat_name">Графиктин аты: </string>
+    <string name="tracker_name">Трекердин аты</string>
+    <string name="this_is_a_time_or_duration">Бул убакыт же узактык</string>
+    <string name="yes">Ооба</string>
+    <string name="cancel">Жокко чыгаруу</string>
+    <string name="select_file">Файл тандоо</string>
+    <string name="empty_group_hint">Track &amp; Graph\'ка кош келиңиз!\n\n Жогорку оң жактагы + баскычын басып, баштоо үчүн «Трекерди» тандаңыз.</string>
+    <string name="no_trackers_graph_stats_hint">График түзүүдөн мурун Трекер түзүңүз.</string>
+    <string name="no_trackers_functions_hint">Функция түзүүдөн мурун Трекер түзүңүз.</string>
+    <string name="ru_sure_del_group">Бул топту жана ичиндегинин баарын өчүрүүнү каалайсызбы? Бул аракетти кайтаруу мүмкүн эмес.</string>
+    <string name="ru_sure_del_graph">Бул графикти өчүрүүнү каалайсызбы? Бул аракетти кайтаруу мүмкүн эмес. Көзөмөлдөнгөн дайындарыңыз жоголбойт.</string>
+    <string name="ru_sure_del_feature">Көзөмөлдөнгөн бул дайындарды өчүрүүнү каалайсызбы?</string>
+    <string name="item_in_multiple_groups">Бул нерсе бир нече жерде бар. Аны бул жерден алып салсаңыз же бардык жерден өчүрсөңүз болот.</string>
+    <string name="remove_from_this_group">Бул жерден алып салуу</string>
+    <string name="delete_everywhere">Бардык жерден өчүрүү</string>
+    <string name="ru_sure_del_function">Бул функцияны өчүрүүнү каалайсызбы? Бул аракетти кайтаруу мүмкүн эмес.</string>
+    <string name="ru_sure_del_reminder">Бул эскертмени өчүрүүнү каалайсызбы? Бул аракетти кайтаруу мүмкүн эмес.</string>
+    <string name="ru_sure_del_data_point">Бул дайын чекитин өчүрүүнү каалайсызбы?</string>
+    <string name="feature_name_cannot_be_null">Атын кошуңуз</string>
+    <string name="tracker_with_that_name_exists">Мындай аталыштагы нерсени мурунтан эле көзөмөлдөп жатасыз</string>
+    <string name="data_points">%1$d дайын чекити</string>
+    <string name="items_selected">%1$d тандалды</string>
+    <string name="select_all">Баарын тандоо</string>
+    <string name="deselect_all">Баарынын тандоосун алып салуу</string>
+    <string name="ru_sure_del_data_points">Бул дайын чекиттерин өчүрүүнү каалайсызбы?</string>
+    <string name="delete_selected_content_description">Тандалган нерселерди өчүрүү</string>
+    <string name="copy_selected_content_description">Тандалган нерселерди көчүрүү</string>
+    <string name="move_selected_content_description">Тандалган нерселерди жылдыруу</string>
+    <string name="copy_to">Көчүрүү</string>
+    <string name="no_data">Дайындар жок</string>
+    <string name="skip">Өткөрүп жиберүү</string>
+    <string name="exportButton">Экспорттоо</string>
+    <string name="importButton">Импорттоо</string>
+    <string name="import_export">Импорттоо/экспорттоо</string>
+    <string name="search">Издөө</string>
+    <string name="type_to_search">Издөө үчүн жазыңыз</string>
+    <string name="no_results">Натыйжа жок</string>
+    <string name="export_to">Бул топтогу көзөмөлдөнгөн дайындарды CSV\'ге экспорттоо:</string>
+    <string name="export_error_message">Экспорттоо ишке ашкан жок: %1$s</string>
+    <string name="import_from">CSV\'ден бул топко көзөмөлдөнгөн дайындарды импорттоо:</string>
+    <string name="import_warning">Эскертүү: Импорттоону кайтаруу мүмкүн эмес. Track &amp; Graph бул топтогу импорттолгон дайындарды аты боюнча бар дайындар менен бириктирүүгө аракет кылат.</string>
+    <string name="add_a_graph_or_stat">График же статистика кошуу</string>
+    <string name="graph_type_label">Графиктин түрү:</string>
+    <string name="sample_size">Үлгүнүн өлчөмү:</string>
+    <string name="select_a_discrete_feature">Белгилери бар дайындар топтомун тандаңыз: </string>
+    <string name="no_labels">Бул дайындар топтомунда белгилер жок</string>
+    <string name="select_a_feature">Дайындар топтомун тандаңыз:</string>
+    <string name="select_a_tracker">Трекерди тандаңыз</string>
+    <string name="offset">Жылдыруу:</string>
+    <string name="scale">Масштаб:</string>
+    <string name="from">Башталышы:</string>
+    <string name="to">Аягы:</string>
+    <string name="day">Күн</string>
+    <string-array name="time_histogram_windows">
+        <item>Саат сайын</item>
+        <item>Күн сайын</item>
+        <item>Жума сайын</item>
+        <item>Ай сайын</item>
+        <item>Чейрек сайын</item>
+        <item>Жарым жыл сайын</item>
+        <item>Жыл сайын</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Батареяны үнөмдөө</item>
+        <item>Ачык</item>
+        <item>Күңүрт</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Системанын демейки жөндөөсү</item>
+        <item>Ачык</item>
+        <item>Күңүрт</item>
+    </string-array>
+    <string name="graph_type_line_graph">Сызыктуу график</string>
+    <string name="graph_type_pie_chart">Тегерек диаграмма</string>
+    <string name="graph_type_average_time_between">Аралыктын орточо убактысы</string>
+    <string name="graph_type_time_since">Өткөн убакыт</string>
+    <string name="graph_type_time_histogram">Убакыт гистограммасы</string>
+    <string name="graph_type_last_value">Акыркы көзөмөлдөнгөн маани/Өткөн убакыт</string>
+    <string name="graph_type_bar_chart">Тилкелүү диаграмма</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Орточолоштуруусуз</item>
+        <item>Күндүк жылма орточо</item>
+        <item>Үч күндүк жылма орточо</item>
+        <item>Жумалык жылма орточо</item>
+        <item>Айлык жылма орточо</item>
+        <item>Үч айлык жылма орточо</item>
+        <item>Алты айлык жылма орточо</item>
+        <item>Жылдык жылма орточо</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Көзөмөлдөнгөндө чийүү</item>
+        <item>Сааттык жыйынтыктарды чийүү</item>
+        <item>Күндүк жыйынтыктарды чийүү</item>
+        <item>Жумалык жыйынтыктарды чийүү</item>
+        <item>Айлык жыйынтыктарды чийүү</item>
+        <item>Жылдык жыйынтыктарды чийүү</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Бардык дайындар</string>
+    <string name="graph_time_durations_a_day">Бир күн</string>
+    <string name="graph_time_durations_a_week">Бир жума</string>
+    <string name="graph_time_durations_a_month">Бир ай</string>
+    <string name="graph_time_durations_three_months">Үч ай</string>
+    <string name="graph_time_durations_six_months">Алты ай</string>
+    <string name="graph_time_durations_a_year">Бир жыл</string>
+    <string name="custom">Ыңгайлаштырылган</string>
+    <string-array name="y_range_styles">
+        <item>Динамикалык</item>
+        <item>Бекитилген</item>
+    </string-array>
+    <string name="ending_at_latest">Акыркы дайын чекити</string>
+    <string name="ending_at_now">Азыр</string>
+    <string name="ending_at_custom_date">Ыңгайлаштырылган дата…</string>
+    <string name="hours_and_minutes_ago">%1$dс %2$dмүн мурун</string>
+    <string name="import_exception_unknown">Импорттоо ишке ашкан жок: белгисиз ката кетти</string>
+    <string name="import_exception_bad_headers">Импорттоо ишке ашкан жок: баш аттар күтүлгөн баш аттарга дал келген жок: %1$s</string>
+    <string name="import_exception_inconsistent_record">Импорттоо ишке ашкан жок: %1$s-саптагы жазуу талап кылынган баш аттарга шайкеш эмес</string>
+    <string name="import_exception_bad_timestamp">Импорттоо ишке ашкан жок: %1$s-саптагы жазуунун убакыт белгисин чечмелөө мүмкүн болгон жок</string>
+    <string name="import_exception_inconsistent_data_type">Импорттоо ишке ашкан жок: %1$s-сапта шайкеш эмес дайын түрү алынды</string>
+    <string name="unknown_error_occurred">Белгисиз ката кетти</string>
+    <string name="graph_stat_validation_no_name">Атын көрсөтүңүз</string>
+    <string name="graph_stat_validation_no_line_graph_features">Графикке бир нерсе кошуңуз</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">\"Башталышы\" \"Аягы\" маанисинен кичине же ага барабар экенин текшериңиз</string>
+    <string name="graph_stat_validation_unrecognised_color">Бардык дайындар топтомдорунун түсү бар экенин текшериңиз</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Жараксыз сызыктуу график дайындар топтому табылды</string>
+    <string name="graph_stat_validation_bad_fixed_range">\"Башталышы\" \"Аягы\" маанисинен кичине экенин текшериңиз</string>
+    <string name="graph_stat_view_not_found">Бул графикти табууда ката кетти</string>
+    <string name="graph_stat_view_not_enough_data_stat">Бул статистика аны түзүүгө жетиштүү дайын көзөмөлдөнгөндө көрсөтүлөт.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Бул график аны түзүүгө жетиштүү дайын көзөмөлдөнгөндө көрсөтүлөт.</string>
+    <string name="pie_chart_mixed_signs_error">Бул тегерек диаграмманы көрсөтүү мүмкүн эмес, анткени анда оң жана терс сегмент өлчөмдөрү бар.</string>
+    <string name="histogram_mixed_signs_error">Бул гистограмманы көрсөтүү мүмкүн эмес, анткени анда оң жана терс интервал өлчөмдөрү бар.</string>
+    <string name="graph_non_finite_data_error">Бул графикти көрсөтүү мүмкүн эмес, анткени анда чектелген сан эмес маани бар.</string>
+    <string name="graph_inconsistent_series_error">Бул графикти көрсөтүү мүмкүн эмес, анткени анын дайындар серияларынын өлчөмдөрү шайкеш эмес.</string>
+    <string name="graph_invalid_y_range_error">Бул графикти көрсөтүү мүмкүн эмес, анткени анын Y огу үчүн диапазон жараксыз.</string>
+    <string name="finish">Бүттү</string>
+    <string name="about_description">Track &amp; Graph — GPL 3.0 лицензиясы боюнча акысыз жана ачык булактуу программа.</string>
+    <string name="about_libraries_message">Төмөнкү ачык булактуу китепканалар колдонулду:</string>
+    <string name="about">Тиркеме жөнүндө</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Көп берилүүчү суроолор</string>
+    <string name="tutorial_text_1">Дайындарыңызды көзөмөлдөө үчүн трекерлерди колдонуңуз.</string>
+    <string name="tutorial_text_2">Дайындарды визуалдаштыруу үчүн графиктерди жана статистиканы колдонуңуз.</string>
+    <string name="tutorial_text_3">Трекерлерди, графиктерди жана статистиканы иреттөө үчүн топторду колдонуңуз.</string>
+    <string name="got_it">Түшүндүм!</string>
+    <string name="move_to_colon">Жылдыруу:</string>
+    <string name="move_to">Жылдыруу</string>
+    <string name="ru_sure_update_data">Бул жаңыртуу мурун көзөмөлдөнгөн дайындарыңызды кайтарылгыс өзгөртүшү мүмкүн. Улантуудан мурун бар дайындардын камдык көчүрмөсүн сактоо сунушталат.\n\n Улантууну каалайсызбы?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Тиркемеге баа бериңиз</string>
+    <string name="reminders">Эскертмелер</string>
+    <string name="no_reminders_hint">Жаңы көзөмөлдөө эскертмесин түзүү үчүн + белгисин басыңыз.</string>
+    <string name="mon">Дш</string>
+    <string name="tue">Шш</string>
+    <string name="wed">Шр</string>
+    <string name="thu">Бш</string>
+    <string name="fri">Жм</string>
+    <string name="sat">Иш</string>
+    <string name="sun">Жк</string>
+    <string name="reminders_notifications_channel_name">Эскертмелер</string>
+    <string name="reminders_notifications_channel_description">Көзөмөлдөө убактысын эскерткен, колдонуучу түзгөн билдирмелер</string>
+    <string name="default_reminder_name">Көзөмөлдөө убактысы келди!</string>
+    <string name="missed_reminder_single_content">%1$s эскертмеси</string>
+    <string name="missed_reminders_multiple_content">Сиз %1$d эскертмени өткөрүп жибердиңиз</string>
+    <string name="next_reminder_format">Кийинки эскертме: %1$s</string>
+    <string name="no_upcoming_reminders">Алдыдагы эскертмелер жок</string>
+    <string name="select_reminder_type">Эскертменин түрүн тандаңыз</string>
+    <string name="week_day_reminder">Аптанын күндөрү боюнча эскертме</string>
+    <string name="week_day_reminder_description">Дүйшөмбү, шаршемби, жума сыяктуу белгилүү күндөр</string>
+    <string name="periodic_reminder">Мезгилдүү эскертме</string>
+    <string name="periodic_reminder_description">Ар 3 күн сайын сыяктуу үзгүлтүксүз аралыктар</string>
+    <string name="month_day_reminder">Айдын күнү боюнча эскертме</string>
+    <string name="month_day_reminder_description">Биринчи дүйшөмбү сыяктуу айлык тартиптер</string>
+    <string name="time_since_last_reminder">Акыркы эскертмеден кийинки убакыт</string>
+    <string name="time_since_last_reminder_description">Бир нерсени бир аз убакыттан бери көзөмөлдөбөгөндө</string>
+    <string name="one_time_reminder">Бир жолку эскертме</string>
+    <string name="one_time_reminder_description">Белгилүү убакта же кечигүүдөн кийин көрсөтүлүүчү өз алдынча эскертме</string>
+    <string name="reminder_name">Эскертменин аты</string>
+    <string name="reminder_disabled">Эскертме өчүрүлдү</string>
+    <string name="repeat_every">Кайталоо аралыгы</string>
+    <string name="at_time">Убактысы</string>
+    <string name="at_a_specific_time">Белгилүү убакта</string>
+    <string name="ending_at">Аяктоо убактысы</string>
+    <string name="starting_from">Баштоо убактысы</string>
+    <string name="repeat_on_week_days">Аптанын күндөрүндө кайталоо</string>
+    <string name="track_feature">Функцияны көзөмөлдөө</string>
+    <string name="select_tracker_placeholder">Трекерди тандаңыз</string>
+    <string name="remind_after">Эскертүү аралыгы</string>
+    <string name="then_remind_every">Андан кийин кайталоо аралыгы</string>
+    <string name="remind_at_date_and_time">Күнү жана убактысы боюнча</string>
+    <string name="remind_after_a_delay">Кечигүүдөн кийин</string>
+    <string name="first_reminder">Биринчи эскертме</string>
+    <string name="every_colon">Ар:</string>
+    <string name="ended_at_format">Аяктайт: %1$s</string>
+    <string name="starting_at_format">Башталат: %1$s</string>
+    <string name="occurrence_first">Биринчи</string>
+    <string name="occurrence_second">Экинчи</string>
+    <string name="occurrence_third">Үчүнчү</string>
+    <string name="occurrence_fourth">Төртүнчү</string>
+    <string name="occurrence_last">Акыркы</string>
+    <string name="monday">Дүйшөмбү</string>
+    <string name="tuesday">Шейшемби</string>
+    <string name="wednesday">Шаршемби</string>
+    <string name="thursday">Бейшемби</string>
+    <string name="friday">Жума</string>
+    <string name="saturday">Ишемби</string>
+    <string name="sunday">Жекшемби</string>
+    <string-array name="abbreviated_months">
+        <item>Янв</item>
+        <item>Фев</item>
+        <item>Мар</item>
+        <item>Апр</item>
+        <item>Май</item>
+        <item>Июн</item>
+        <item>Июл</item>
+        <item>Авг</item>
+        <item>Сен</item>
+        <item>Окт</item>
+        <item>Ноя</item>
+        <item>Дек</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Дш</item>
+        <item>Шш</item>
+        <item>Шр</item>
+        <item>Бш</item>
+        <item>Жм</item>
+        <item>Иш</item>
+        <item>Жк</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Диапазондун стили:</string>
+    <string name="track_widget_configure_no_data_error">Адегенде дайындарды көзөмөлдөңүз.</string>
+    <string name="track_widget_configure_no_data_selected_error">Көзөмөлдөө виджетин түзүү үчүн жарактуу дайындар топтомун тандашыңыз керек.</string>
+    <string name="create">Түзүү</string>
+    <string name="use_default_value">Демейки маани коюу</string>
+    <string name="backup_and_restore">Камдык көчүрмө жана калыбына келтирүү</string>
+    <string name="backup_hint_text">Камдык көчүрмө тиркемедеги бардык дайындарды, анын ичинде көзөмөлдөнгөн дайындарды, графиктерди жана эскертмелерди сактайт. Түзмөгүңүз жоголуп же бузулуп калса, дайындарыңызды тышкы түзмөккө же булут сактагычына үзгүлтүксүз сактап туруңуз.</string>
+    <string name="restore_data">Дайындарды калыбына келтирүү</string>
+    <string name="backup_successful">Камдык көчүрмө ийгиликтүү сакталды!</string>
+    <string name="backup_error_could_not_write_to_file">Тандалган файлды табуу же ага жазуу мүмкүн эмес.</string>
+    <string name="backup_error_could_not_find_database_file">Маалымат базасынын файлын табуу же окуу мүмкүн эмес.</string>
+    <string name="backup_error_failed_to_copy_database">Маалымат базасынын файлын көчүрүүдө ката кетти.</string>
+    <string name="restore_failed">Калыбына келтирүү ишке ашкан жок. %1$s</string>
+    <string name="add_a_longer_description_optional">Кеңири сүрөттөмө кошуңуз (милдеттүү эмес)</string>
+    <string name="no_data_points_history_fragment_hint">Дайын чекиттери кошулганда, тарыхыңыз бул жерде көрсөтүлөт.</string>
+    <string name="data_resolution_error">Бул дайындарды чечмелөөдө ката кетти:\n\n%1$s</string>
+    <string name="info">Маалымат</string>
+    <string name="no_description">Сүрөттөмө жок</string>
+    <string name="description">Сүрөттөмө</string>
+    <string name="app_lock_title">Тиркемени кулпулоо</string>
+    <string name="app_lock_locked_title">Track &amp; Graph кулпуланды</string>
+    <string name="app_lock_password_label">Сырсөз</string>
+    <string name="app_lock_confirm_password_label">Сырсөздү ырастаңыз</string>
+    <string name="app_lock_unlock">Кулпуну ачуу</string>
+    <string name="app_lock_use_biometrics">Биометриканы колдонуу</string>
+    <string name="app_lock_enable">Тиркеме кулпусун иштетүү</string>
+    <string name="app_lock_enabled">Тиркеме кулпусу иштетилди</string>
+    <string name="app_lock_enable_biometric_unlock">Биометрикалык ачууну иштетүү</string>
+    <string name="app_lock_no_strong_biometric_available">Бул түзмөктө күчтүү биометрикалык ачуу жеткиликтүү эмес.</string>
+    <string name="app_lock_lock_after_background_minutes">Фондо болгон мүнөттөрдөн кийин кулпулоо</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Тиркеме алдыңкы пландан кеткенде дароо кулпулоо үчүн 0 коюңуз.</string>
+    <string name="app_lock_change_password">Сырсөздү өзгөртүү</string>
+    <string name="app_lock_password_changed">Сырсөз өзгөртүлдү</string>
+    <string name="app_lock_disable">Тиркеме кулпусун өчүрүү</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph кулпусун ачуу</string>
+    <string name="app_lock_unlock_biometric_subtitle">Улантуу үчүн түзмөгүңүздүн биометрикасын колдонуңуз</string>
+    <string name="app_lock_use_password">Сырсөздү колдонуу</string>
+    <string name="app_lock_biometric_not_recognized">Биометрикалык аутентификация таанылган жок.</string>
+    <string name="app_lock_error_missing_password">Тиркеме кулпусунун сырсөзү жок. Кулпуну өчүрүп, кайра иштетиңиз.</string>
+    <string name="app_lock_error_incorrect_password">Туура эмес сырсөз</string>
+    <string name="app_lock_error_password_hashing_unavailable">Бул түзмөктө тиркеме кулпусунун сырсөзүн текшерүү жеткиликтүү эмес.</string>
+    <string name="app_lock_error_enter_password">Сырсөз киргизиңиз.</string>
+    <string name="app_lock_error_passwords_do_not_match">Сырсөздөр дал келбейт.</string>
+    <string name="note_input_hint">Эскертмелер…</string>
+    <string name="add_a_note">Эскертме кошуу</string>
+    <string name="notes">Эскертмелер</string>
+    <string name="show_global_notes">Жалпы</string>
+    <string name="show_data_point_notes">Дайын чекиттери</string>
+    <string name="delete_reminder_content_description">Эскертмени өчүрүү</string>
+    <string name="theme_colon">Тема:</string>
+    <string name="date_format_colon">Күн форматы:</string>
+    <string name="add_data_point_button_content_description">Дайын чекитин кошуу баскычы</string>
+    <string name="tracked_data_menu_button_content_description">Көзөмөлдөнгөн дайындар менюсунун баскычы</string>
+    <string name="tracked_data_history_button_content_description">Көзөмөлдөнгөн дайындар тарыхынын баскычы</string>
+    <string name="delete_line_button_content_description">Сапты өчүрүү баскычы</string>
+    <string name="delete_input_button_content_description">Киргизүүнү өчүрүү баскычы</string>
+    <string name="delete_data_point_button_content_description">Дайын чекитин өчүрүү баскычы</string>
+    <string name="edit_data_point_button_content_description">Дайын чекитин түзөтүү баскычы</string>
+    <string name="add_multiple_choice_answer_button_content_description">Бир нече тандоонун жообун кошуу баскычы</string>
+    <string name="ending_at_colon">Үлгү аяктаган убакыт:</string>
+    <string name="duplicate">Көчүрмөлөө</string>
+    <string name="no_notes_hint_text">Көзөмөлдөөдө кошулган эскертмелер бул жерде көрсөтүлөт. Ошондой эле + баскычы аркылуу жалпы эскертмелерди кошо аласыз.</string>
+    <string name="add_a_global_note">Жалпы эскертме кошуу:</string>
+    <string name="duration">Узактык</string>
+    <string name="weeks">Апталар</string>
+    <string name="months">Айлар</string>
+    <string name="days">Күндөр</string>
+    <string name="hours">Сааттар</string>
+    <string name="minutes">Мүнөттөр</string>
+    <string name="seconds">Секунддар</string>
+    <string name="hours_suffix">с</string>
+    <string name="minutes_suffix">мүн</string>
+    <string name="seconds_suffix">сек</string>
+    <string name="numeric_to_duration_mode_header">Мурун көзөмөлдөнгөн маанилер төмөнкүлөрдү билдирет:</string>
+    <string name="duration_to_numeric_mode_header">Мурун көзөмөлдөнгөн маанилер эмнеге айландырылышы керек:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Убакыт узактыктарын башка дайын түрлөрү менен аралаштырууга болбойт. Сааттарды, мүнөттөрдү же секунддарды графикке түшүрүп көрүңүз</string>
+    <string name="sum_by_count_checkbox_label">Маанилеринин жалпы суммасын эмес, көзөмөлдөнгөн дайын чекиттеринин санын эсептөө үчүн бул жерди белгилеңиз.</string>
+    <string name="time_window_size">Убакыт терезесинин өлчөмү:</string>
+    <string name="hold_to_preview">Алдын ала көрүү үчүн басып туруңуз</string>
+    <string name="open">Ачуу</string>
+    <string name="close">Жабуу</string>
+    <string name="filter_by_label">Белги боюнча чыпкалоо</string>
+    <string name="filter_by_value">Маанилер диапазону боюнча чыпкалоо</string>
+    <string name="save_changes">Өзгөртүүлөрдү сактоо</string>
+    <string name="timer_notification_channel_name">Таймерлер</string>
+    <string name="stop">Токтотуу</string>
+    <string name="name_your_function">Функцияңыздын атын жазыңыз: </string>
+    <string name="add_some_data_sources">Дайын булактарын кошуу</string>
+    <string name="value">Маани</string>
+    <string name="label">Белги</string>
+    <string name="continue_word">Улантуу</string>
+    <string name="update_all_data_points">Бардык дайын чекиттерин жаңыртуу: </string>
+    <string name="where_colon">Кайда:</string>
+    <string name="to_colon">Аягына:</string>
+    <string name="value_equals">Маани =</string>
+    <string name="label_equals">Белги =</string>
+    <string name="adding_your_first_data_point">Дайын чекиттерин кошуу боюнча кыскача үйрөткүч:</string>
+    <string name="next">Кийинки</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Ар бир дайын чекитинин убакыт белгиси жана мааниси бар: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Анда кааласаңыз, белги жана эскертме да болушу мүмкүн: </string>
+    <string name="data_point_tutorial_page_2_description">Маани сан түрүндө болот, андыктан дайындарыңыздын убакыттын өтүшү менен кандай өзгөрөрүн көрө аласыз</string>
+    <string name="data_point_tutorial_page_2_hint">(Кеңеш: Эгер маани маанилүү болбосо, демейки 1 маанисин колдонуңуз)</string>
+    <string name="data_point_tutorial_page_3_description">Дайын чекиттерин топтогуңуз келсе, белгилерди колдонуңуз</string>
+    <string name="data_point_tutorial_page_3_hint">(Кеңеш: Кошумча түшүндүрмө керек болсо, белги талаасынын ордуна эскертмени колдонуңуз)</string>
+    <string name="help">Жардам</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Өркүндөтүлгөн параметрлер</string>
+    <string name="type_colon">\"Түрү: \"</string>
+    <string name="order_colon">\"Ирети: \"</string>
+    <string name="value_and_label">Маани жана белги</string>
+    <string name="value_only">Маани гана</string>
+    <string name="label_only">Белги гана</string>
+    <string name="none">Жок</string>
+    <string name="value_ascending">Маани боюнча өсүү тартибинде</string>
+    <string name="value_descending">Маани боюнча кемүү тартибинде</string>
+    <string name="label_ascending">Белги боюнча өсүү тартибинде</string>
+    <string name="label_descending">Белги боюнча кемүү тартибинде</string>
+    <string name="latest">Эң акыркы</string>
+    <string name="oldest">Эң эски</string>
+    <string name="track_all">Баарын көзөмөлдөө</string>
+    <string name="more_details">Кененирээк маалымат</string>
+    <string name="suggestions">Сунуштар</string>
+    <string name="no_label">Белгисиз</string>
+    <string name="confirm_cancel_notes_will_be_lost">Жабууну каалайсызбы? Бардык эскертмелер жоголот.</string>
+    <string name="add_a_label">Белги кошуу</string>
+    <string name="bar_interval">Мамычалар аралыгы:</string>
+    <string name="y_range_max">Y диапазонунун максималдуу мааниси</string>
+    <string name="total_formatted">Жалпы: %s</string>
+    <string name="from_formatted">Башталышы: %s</string>
+    <string name="to_formatted">Аягы: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Секунд(дар)</string>
+    <string name="minutes_generic">Мүнөт(төр)</string>
+    <string name="hours_generic">Саат(тар)</string>
+    <string name="days_generic">Күн(дөр)</string>
+    <string name="weeks_generic">Апта(лар)</string>
+    <string name="months_generic">Ай(лар)</string>
+    <string name="years_generic">Жыл(дар)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d секунд</item>
+        <item quantity="other">%d секунд</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d мүнөт</item>
+        <item quantity="other">%d мүнөт</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d саат</item>
+        <item quantity="other">%d саат</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d күн</item>
+        <item quantity="other">%d күн</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d апта</item>
+        <item quantity="other">%d апта</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d ай</item>
+        <item quantity="other">%d ай</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d жыл</item>
+        <item quantity="other">%d жыл</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Ар мүнөт сайын</item>
+        <item quantity="other">Ар %d мүнөт сайын</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Ар саат сайын</item>
+        <item quantity="other">Ар %d саат сайын</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Ар күн сайын</item>
+        <item quantity="other">Ар %d күн сайын</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Ар апта сайын</item>
+        <item quantity="other">Ар %d апта сайын</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Ар ай сайын</item>
+        <item quantity="other">Ар %d ай сайын</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Ар жыл сайын</item>
+        <item quantity="other">Ар %d жыл сайын</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">1 мүнөттөн кийин</item>
+        <item quantity="other">%d мүнөттөн кийин</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">1 сааттан кийин</item>
+        <item quantity="other">%d сааттан кийин</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">1 күндөн кийин</item>
+        <item quantity="other">%d күндөн кийин</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">1 аптадан кийин</item>
+        <item quantity="other">%d аптадан кийин</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">1 айдан кийин</item>
+        <item quantity="other">%d айдан кийин</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">1 жылдан кийин</item>
+        <item quantity="other">%d жылдан кийин</item>
+    </plurals>
+    <string name="restore_hint_text">ЭСКЕРТҮҮ: Камдык көчүрмөдөн калыбына келтирүү тиркемедеги бардык дайындарды жана учурдагы жөндөөлөрдү өчүрөт. Адегенде дайындарыңыздын камдык көчүрмөсүн сактаңыз!</string>
+    <string name="backup_now">Азыр камдык көчүрмө сактоо</string>
+    <string name="restore_error_could_not_write_to_database">Калыбына келтирүү ишке ашкан жок! Маалымат базасын табуу же ага жазуу мүмкүн эмес.</string>
+    <string name="restore_error_could_not_read_from_database_file">Калыбына келтирүү ишке ашкан жок! Тандалган маалымат базасынын файлын табуу же окуу мүмкүн эмес.</string>
+    <string name="restore_error_failed_to_copy_database">Калыбына келтирүү ишке ашкан жок! Маалымат базасын калыбына келтирүүдө ката кетти.</string>
+    <string name="select_location">Жайгашкан жерди тандоо…</string>
+    <string name="restore_successful">Калыбына келтирүү ийгиликтүү аяктады! Эми Track &amp; Graph кайра иштетилиши керек.</string>
+    <string name="restore_error_invalid_database_file">Калыбына келтирүү ишке ашкан жок! Тандалган файл жарактуу камдык көчүрмө эмес.</string>
+    <string name="auto_backup">Автоматтык камдык көчүрмө</string>
+    <string name="apply">Колдонуу</string>
+    <string name="backup_every">Камдык көчүрмө алуу аралыгы: </string>
+    <string name="next_backup_at">\"Кийинки камдык көчүрмө: \"</string>
+    <string name="backup_notification_channel_name">Автоматтык камдык көчүрмө эскертмелери</string>
+    <string name="backup_notification_channel_description">Автоматтык камдык көчүрмө алынганда же ката кеткенде билдирет.</string>
+    <string name="backup_notification_title">Камдык көчүрмө алынууда…</string>
+    <string name="backup_failed_notification_title">Автоматтык камдык көчүрмө алынган жок</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph камдык көчүрмө сакталган жерди таба же ага кире алган жок.</string>
+    <string name="backup_failed_notification_could_not_copy">Дайындарыңыздын камдык көчүрмөсүн алууда ката кетти. Камдык көчүрмө бузулган же толук эмес болушу мүмкүн.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Жаңы жерди тандоо</string>
+    <string name="backup_location">Камдык көчүрмө сакталган жер</string>
+    <string name="enable_auto_backup">Автоматтык камдык көчүрмөнү иштетүү</string>
+    <string name="last_successful_backup">Акыркы ийгиликтүү камдык көчүрмө</string>
+    <string name="next_scheduled_backup">Кийинки пландалган камдык көчүрмө</string>
+    <string name="notification_permission_prompt">Автоматтык камдык көчүрмө кандайдыр бир себептен алынбай калса, билдирүү алуу үчүн Track &amp; Graph эскертмелерин иштетүү керек.</string>
+    <string name="lua_script_empty">Lua скриптин кошуңуз</string>
+    <string name="function_name_empty">Функциянын аталышы бош болбошу керек</string>
+    <string name="function_name">Функциянын аталышы</string>
+    <string name="add_at_least_one_input">Кеминде бир киргизүү кошуңуз</string>
+    <string name="output">Чыгыш</string>
+    <string name="data_source">Маалымат булагы</string>
+    <string name="lua_script">Lua скрипти</string>
+    <string name="data_source_description">Маалымат булагы түйүнү киргизүү катары трекерди же функцияны тандоого мүмкүндүк берет.</string>
+    <string name="lua_script_input_hint">Lua скриптин киргизиңиз…</string>
+    <string name="select_node_type">Түйүн түрүн тандоо</string>
+    <string name="file">Файл</string>
+    <string name="lua_feature_names_not_unique">Скрипт киргизүүлөрүнүн аталыштары уникалдуу болушу керек</string>
+    <string name="graph_stat_type_lua_graph">Lua скрипти</string>
+    <string name="launch_lua_disabled">Lua иштетүү өчүрүлгөн</string>
+    <string name="no_lua">Lua жок</string>
+    <string name="lua_engine_disabled">Lua кыймылдаткычы өчүрүлгөн</string>
+    <string name="lua_graph_first_time_user_title">Lua скрипттеринин графиктери жана статистикасы</string>
+    <string name="lua_graph_first_time_user_message">Lua скрипттери — Lua программалоо тили менен өзгөчө графиктерди жана статистиканы түзүүгө мүмкүндүк берген өркүндөтүлгөн мүмкүнчүлүк. \n\nӨз скриптиңизди жүктөй аласыз же GitHub коллекциясынан тандай аласыз. GitHub\'дан скрипт орнотулгандан кийин, колдонууга даяр скрипт менен тиркемеге кайтып келесиз.</string>
+    <string name="functions_first_time_user_title">Функцияларга кош келиңиз</string>
+    <string name="functions_first_time_user_message">Функциялар — дайындарыңызды бириктирип, жыйынтыктап жана өзгөртүп, жаңы туунду маалымат булактарын түзүүгө мүмкүндүк берген өркүндөтүлгөн мүмкүнчүлүк.</string>
+    <string name="learn_more">Бул жерден көбүрөөк билиңиз</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Коюу</string>
+    <string name="failed_to_download_file">Файл жүктөлгөн жок: %s</string>
+    <string name="confirm_deep_link">Сиз белгисиз булактан скрипт шилтемесин алдыңыз. Скрипттерди ишенген булактардан гана орнотуңуз. Бул скриптти орноткуңуз келеби?</string>
+    <string name="graph_stat_info_button_description">Графиктер жана статистика боюнча окуу куралдары</string>
+    <string name="network_generic_error">Тармакка кирүү аракетинде ката кетти. Байланышыңызды текшерип, кайра аракет кылыңыз.</string>
+    <string name="function_verification_failure">Функциянын сигнатураларын текшерүү ишке ашкан жок. Коопсуз байланыш бар экенин жана Track &amp; Graph жаңыртылганын текшериңиз</string>
+    <string name="function_network_failure">Функциялар жүктөлгөн жок. Интернетке туташканыңызды текшериңиз. Көйгөй чечилбесе, тиркеме жаңыртылганын текшериңиз.</string>
+    <string name="functions_landscape_hint">Кеңеш: Функциялар экран туурасынан турганда жакшы иштейт</string>
+    <string name="functions_start_hint">Ушул жерден баштаңыз: узак басып, «Маалымат булагын» тандаңыз</string>
+    <string name="see_whats_new">Жаңылыктарды көрүү</string>
+</resources>

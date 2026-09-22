@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Hasiera</string>
+    <string name="add_group">Gehitu taldea: </string>
+    <string name="edit_group">Editatu taldea: </string>
+    <string name="group">Taldea</string>
+    <string name="tracker">Jarraipena</string>
+    <string name="function">Funtzioa</string>
+    <string name="graph_or_stat">Grafikoa edo estatistika</string>
+    <string name="symlink">Esteka sinbolikoa</string>
+    <string name="symlinks">Esteka sinbolikoak</string>
+    <string name="reminder">Gogorarazpena</string>
+    <string name="add_component">Gehitu osagaia</string>
+    <string name="symlink_locations_title">\"%1$s\"(r)en kokapenak</string>
+    <string name="add_tracker">Egin jarraipena zerbaiti:</string>
+    <string name="add">Gehitu</string>
+    <string name="group_name">adib. Eguneroko jarduerak</string>
+    <string name="delete">Ezabatu</string>
+    <string name="edit">Editatu</string>
+    <string name="update">Eguneratu</string>
+    <string name="graph_or_stat_name">Grafikoaren izena: </string>
+    <string name="tracker_name">Jarraipenaren izena</string>
+    <string name="this_is_a_time_or_duration">Hau denbora edo iraupena da</string>
+    <string name="yes">Bai</string>
+    <string name="cancel">Utzi</string>
+    <string name="select_file">Hautatu fitxategia</string>
+    <string name="empty_group_hint">Ongi etorri Track &amp; Graph-era!\n\n Sakatu + goiko eskuinaldean eta hautatu Jarraipena hasteko.</string>
+    <string name="no_trackers_graph_stats_hint">Sortu Jarraipen bat grafikorik sortu aurretik.</string>
+    <string name="no_trackers_functions_hint">Sortu Jarraipen bat funtziorik sortu aurretik.</string>
+    <string name="ru_sure_del_group">Ziur zaude talde hau eta barruan duen guztia ezabatu nahi dituzula? Ezin da desegin.</string>
+    <string name="ru_sure_del_graph">Ziur zaude grafiko hau ezabatu nahi duzula? Ezin da desegin. Ez duzu jarraipeneko daturik galduko.</string>
+    <string name="ru_sure_del_feature">Ziur zaude jarraipeneko datu hauek ezabatu nahi dituzula?</string>
+    <string name="item_in_multiple_groups">Elementu hau hainbat tokitan dago. Hemendik ken dezakezu edo leku guztietatik ezabatu.</string>
+    <string name="remove_from_this_group">Kendu hemendik</string>
+    <string name="delete_everywhere">Ezabatu leku guztietatik</string>
+    <string name="ru_sure_del_function">Ziur zaude funtzio hau ezabatu nahi duzula? Ezin da desegin.</string>
+    <string name="ru_sure_del_reminder">Ziur zaude gogorarazpen hau ezabatu nahi duzula? Ezin da desegin.</string>
+    <string name="ru_sure_del_data_point">Ziur zaude datu-puntu hau ezabatu nahi duzula?</string>
+    <string name="feature_name_cannot_be_null">Gehitu izen bat</string>
+    <string name="tracker_with_that_name_exists">Izen hori duen zerbaiten jarraipena egiten ari zara jada</string>
+    <string name="data_points">%1$d datu-puntu</string>
+    <string name="items_selected">%1$d hautatuta</string>
+    <string name="select_all">Hautatu denak</string>
+    <string name="deselect_all">Desautatu denak</string>
+    <string name="ru_sure_del_data_points">Ziur zaude datu-puntu hauek ezabatu nahi dituzula?</string>
+    <string name="delete_selected_content_description">Ezabatu hautatutako elementuak</string>
+    <string name="copy_selected_content_description">Kopiatu hautatutako elementuak</string>
+    <string name="move_selected_content_description">Mugitu hautatutako elementuak</string>
+    <string name="copy_to">Kopiatu hona</string>
+    <string name="no_data">Daturik ez</string>
+    <string name="skip">Saltatu</string>
+    <string name="exportButton">Esportatu</string>
+    <string name="importButton">Inportatu</string>
+    <string name="import_export">Inportatu/Esportatu</string>
+    <string name="search">Bilatu</string>
+    <string name="type_to_search">Idatzi bilatzeko</string>
+    <string name="no_results">Ez dago emaitzarik</string>
+    <string name="export_to">Esportatu talde honetako jarraipeneko datuak CSVra:</string>
+    <string name="export_error_message">Esportazioak huts egin du: %1$s</string>
+    <string name="import_from">Inportatu talde honetara CSVko jarraipeneko datuak:</string>
+    <string name="import_warning">Abisua: inportazioa ezin da desegin. Track &amp; Graph aplikazioa inportatutako datuak talde honetako lehendik dauden datuekin izenaren arabera bateratzen saiatuko da.</string>
+    <string name="add_a_graph_or_stat">Gehitu grafikoa edo estatistika</string>
+    <string name="graph_type_label">Grafiko mota:</string>
+    <string name="sample_size">Laginaren tamaina:</string>
+    <string name="select_a_discrete_feature">Hautatu etiketak dituen datu multzoa: </string>
+    <string name="no_labels">Datu multzo honek ez du etiketarik</string>
+    <string name="select_a_feature">Hautatu datu multzoa:</string>
+    <string name="select_a_tracker">Hautatu jarraipena</string>
+    <string name="offset">Desplazamendua:</string>
+    <string name="scale">Eskala:</string>
+    <string name="from">Hemendik:</string>
+    <string name="to">Hona:</string>
+    <string name="day">Eguna</string>
+    <string-array name="time_histogram_windows">
+        <item>Orduro</item>
+        <item>Egunero</item>
+        <item>Astero</item>
+        <item>Hilero</item>
+        <item>Hiruhilekoan behin</item>
+        <item>Sei hilean behin</item>
+        <item>Urtero</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Bateria aurreztea</item>
+        <item>Argia</item>
+        <item>Iluna</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Sistemaren lehenetsia</item>
+        <item>Argia</item>
+        <item>Iluna</item>
+    </string-array>
+    <string name="graph_type_line_graph">Lerro-grafikoa</string>
+    <string name="graph_type_pie_chart">Sektore-diagrama</string>
+    <string name="graph_type_average_time_between">Bien arteko batez besteko denbora</string>
+    <string name="graph_type_time_since">Ordutik igarotako denbora</string>
+    <string name="graph_type_time_histogram">Denbora-histograma</string>
+    <string name="graph_type_last_value">Azken jarraipena/ordutik igarotako denbora</string>
+    <string name="graph_type_bar_chart">Barra-diagrama</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Batez bestekorik gabe</item>
+        <item>Eguneko batez besteko mugikorra</item>
+        <item>Hiru eguneko batez besteko mugikorra</item>
+        <item>Asteko batez besteko mugikorra</item>
+        <item>Hileko batez besteko mugikorra</item>
+        <item>Hiru hileko batez besteko mugikorra</item>
+        <item>Sei hileko batez besteko mugikorra</item>
+        <item>Urteko batez besteko mugikorra</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Marraztu jarraipena egiten denean</item>
+        <item>Marraztu orduko guztizkoak</item>
+        <item>Marraztu eguneko guztizkoak</item>
+        <item>Marraztu asteko guztizkoak</item>
+        <item>Marraztu hileko guztizkoak</item>
+        <item>Marraztu urteko guztizkoak</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Datu guztiak</string>
+    <string name="graph_time_durations_a_day">Egun bat</string>
+    <string name="graph_time_durations_a_week">Aste bat</string>
+    <string name="graph_time_durations_a_month">Hilabete bat</string>
+    <string name="graph_time_durations_three_months">Hiru hilabete</string>
+    <string name="graph_time_durations_six_months">Sei hilabete</string>
+    <string name="graph_time_durations_a_year">Urte bat</string>
+    <string name="custom">Pertsonalizatua</string>
+    <string-array name="y_range_styles">
+        <item>Dinamikoa</item>
+        <item>Finkoa</item>
+    </string-array>
+    <string name="ending_at_latest">Azken datu-puntua</string>
+    <string name="ending_at_now">Orain</string>
+    <string name="ending_at_custom_date">Data pertsonalizatua…</string>
+    <string name="hours_and_minutes_ago">Duela %1$d ordu eta %2$d minutu</string>
+    <string name="import_exception_unknown">Inportazioak huts egin du: errore ezezaguna gertatu da</string>
+    <string name="import_exception_bad_headers">Inportazioak huts egin du: goiburuak ez datoz bat espero ziren goiburuekin: %1$s</string>
+    <string name="import_exception_inconsistent_record">Inportazioak huts egin du: %1$s lerroko erregistroa ez dator bat beharrezko goiburuekin</string>
+    <string name="import_exception_bad_timestamp">Inportazioak huts egin du: ezin izan da %1$s lerroko erregistroaren denbora-zigilua interpretatu</string>
+    <string name="import_exception_inconsistent_data_type">Inportazioak huts egin du: datu mota ez-koherentea jaso da %1$s lerroan</string>
+    <string name="unknown_error_occurred">Errore ezezaguna gertatu da</string>
+    <string name="graph_stat_validation_no_name">Eman izen bat</string>
+    <string name="graph_stat_validation_no_line_graph_features">Gehitu zerbait grafikoari</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Ziurtatu \"Hemendik\" balioa \"Hona\" balioa baino txikiagoa edo berdina dela</string>
+    <string name="graph_stat_validation_unrecognised_color">Ziurtatu datu multzo guztiek kolore bat dutela</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Lerro-grafikoaren datu multzo baliogabea detektatu da</string>
+    <string name="graph_stat_validation_bad_fixed_range">Ziurtatu \"Hemendik\" balioa \"Hona\" balioa baino txikiagoa dela</string>
+    <string name="graph_stat_view_not_found">Errore bat gertatu da grafiko hau bilatzean</string>
+    <string name="graph_stat_view_not_enough_data_stat">Estatistika hau datu nahikoa jarraitu denean agertuko da.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Grafiko hau datu nahikoa jarraitu denean agertuko da.</string>
+    <string name="pie_chart_mixed_signs_error">Ezin da sektore-diagrama hau errendatu, segmentuen tamainak positiboak eta negatiboak baititu.</string>
+    <string name="histogram_mixed_signs_error">Ezin da histograma hau errendatu, barren tamainak positiboak eta negatiboak baititu.</string>
+    <string name="graph_non_finite_data_error">Ezin da grafiko hau errendatu, balioren bat ez baita zenbaki finitu bat.</string>
+    <string name="graph_inconsistent_series_error">Ezin da grafiko hau errendatu, datu-serien tamainak ez baitatoz bat.</string>
+    <string name="graph_invalid_y_range_error">Ezin da grafiko hau errendatu, Y ardatzaren barrutia baliogabea baita.</string>
+    <string name="finish">Amaitu</string>
+    <string name="about_description">Track &amp; Graph software librea eta kode irekikoa da, GPL 3.0 lizentziapean.</string>
+    <string name="about_libraries_message">Kode irekiko liburutegi hauek erabili dira:</string>
+    <string name="about">Honi buruz</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Ohiko galderak</string>
+    <string name="tutorial_text_1">Erabili jarraipenak zure datuen jarraipena egiteko.</string>
+    <string name="tutorial_text_2">Erabili grafikoak eta estatistikak datuak bistaratzeko.</string>
+    <string name="tutorial_text_3">Erabili taldeak zure jarraipenak, grafikoak eta estatistikak antolatzeko.</string>
+    <string name="got_it">Ados!</string>
+    <string name="move_to_colon">Eraman hona:</string>
+    <string name="move_to">Eraman hona</string>
+    <string name="ru_sure_update_data">Eguneratze honek lehendik jarraitutako datuak atzeraezinez alda ditzake. Jarraitu aurretik lehendik dauden datuen babeskopia egitea gomendatzen da.\n\n Jarraitu nahi duzu?</string>
+    <string name="ok">Ados</string>
+    <string name="rate_the_app">Baloratu aplikazioa</string>
+    <string name="reminders">Gogorarazpenak</string>
+    <string name="no_reminders_hint">Sakatu + ikonoa jarraipen-gogorarazpenen jakinarazpen berri bat sortzeko.</string>
+    <string name="mon">Al.</string>
+    <string name="tue">Ar.</string>
+    <string name="wed">Az.</string>
+    <string name="thu">Og.</string>
+    <string name="fri">Or.</string>
+    <string name="sat">Lr.</string>
+    <string name="sun">Ig.</string>
+    <string name="reminders_notifications_channel_name">Gogorarazpenak</string>
+    <string name="reminders_notifications_channel_description">Erabiltzaileak sortutako jakinarazpenak, noiz jarraitu behar duzun gogorarazteko</string>
+    <string name="default_reminder_name">Jarraitzeko ordua!</string>
+    <string name="missed_reminder_single_content">%1$s(e)ko gogorarazpena</string>
+    <string name="missed_reminders_multiple_content">%1$d gogorarazpen galdu dituzu</string>
+    <string name="next_reminder_format">Hurrengo gogorarazpena: %1$s</string>
+    <string name="no_upcoming_reminders">Ez dago hurrengo gogorarazpenik</string>
+    <string name="select_reminder_type">Hautatu gogorarazpen mota</string>
+    <string name="week_day_reminder">Asteko egunetako gogorarazpena</string>
+    <string name="week_day_reminder_description">Egun zehatzak, hala nola astelehena, asteazkena eta ostirala</string>
+    <string name="periodic_reminder">Aldizkako gogorarazpena</string>
+    <string name="periodic_reminder_description">Tarte erregularrak, adibidez 3 egunean behin</string>
+    <string name="month_day_reminder">Hileko eguneko gogorarazpena</string>
+    <string name="month_day_reminder_description">Hileko ereduak, adibidez lehen astelehena</string>
+    <string name="time_since_last_reminder">Azken gogorarazpenetik igarotako denbora</string>
+    <string name="time_since_last_reminder_description">Denbora batez zerbaiten jarraipena egin ez duzunean</string>
+    <string name="one_time_reminder">Behin-behineko gogorarazpena</string>
+    <string name="one_time_reminder_description">Ordu zehatz batean edo atzerapen baten ondoren agertzen den gogorarazpen independentea</string>
+    <string name="reminder_name">Gogorarazpenaren izena</string>
+    <string name="reminder_disabled">Gogorarazpena desgaituta</string>
+    <string name="repeat_every">Errepikatu honela: behin</string>
+    <string name="at_time">Ordua</string>
+    <string name="at_a_specific_time">Ordu zehatz batean</string>
+    <string name="ending_at">Amaiera-ordua</string>
+    <string name="starting_from">Hasiera-data</string>
+    <string name="repeat_on_week_days">Errepikatu asteko egunetan</string>
+    <string name="track_feature">Egin datu-iturri baten jarraipena</string>
+    <string name="select_tracker_placeholder">Hautatu jarraipena</string>
+    <string name="remind_after">Gogorarazi honen ondoren</string>
+    <string name="then_remind_every">Ondoren, gogorarazi honela: behin</string>
+    <string name="remind_at_date_and_time">Data eta ordu batean</string>
+    <string name="remind_after_a_delay">Atzerapen baten ondoren</string>
+    <string name="first_reminder">Lehen gogorarazpena</string>
+    <string name="every_colon">Bakoitzean:</string>
+    <string name="ended_at_format">Amaiera: %1$s</string>
+    <string name="starting_at_format">Hasiera: %1$s</string>
+    <string name="occurrence_first">Lehenengoa</string>
+    <string name="occurrence_second">Bigarrena</string>
+    <string name="occurrence_third">Hirugarrena</string>
+    <string name="occurrence_fourth">Laugarrena</string>
+    <string name="occurrence_last">Azkena</string>
+    <string name="monday">Astelehena</string>
+    <string name="tuesday">Asteartea</string>
+    <string name="wednesday">Asteazkena</string>
+    <string name="thursday">Osteguna</string>
+    <string name="friday">Ostirala</string>
+    <string name="saturday">Larunbata</string>
+    <string name="sunday">Igandea</string>
+    <string-array name="abbreviated_months">
+        <item>Urt</item>
+        <item>Ots</item>
+        <item>Mar</item>
+        <item>Api</item>
+        <item>Mai</item>
+        <item>Eka</item>
+        <item>Uzt</item>
+        <item>Abu</item>
+        <item>Ira</item>
+        <item>Urr</item>
+        <item>Aza</item>
+        <item>Abe</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Al.</item>
+        <item>Ar.</item>
+        <item>Az.</item>
+        <item>Og.</item>
+        <item>Or.</item>
+        <item>Lr.</item>
+        <item>Ig.</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Barrutiaren estiloa:</string>
+    <string name="track_widget_configure_no_data_error">Egin datu batzuen jarraipena lehenik.</string>
+    <string name="track_widget_configure_no_data_selected_error">Datu-multzo baliodun bat hautatu behar duzu jarraipen-widgeta sortzeko.</string>
+    <string name="create">Sortu</string>
+    <string name="use_default_value">Ezarri balio lehenetsia</string>
+    <string name="backup_and_restore">Babeskopia eta leheneratzea</string>
+    <string name="backup_hint_text">Babeskopiak aplikazioko datu guztiak gordetzen ditu, jarraitutako datuak, grafikoak eta gogorarazpenak barne. Zure datuen babeskopia kanpoko gailu batean edo hodeiko biltegian egitea komeni da aldizka, gailua galdu edo hondatuko balitz ere.</string>
+    <string name="restore_data">Leheneratu datuak</string>
+    <string name="backup_successful">Babeskopia behar bezala eginda!</string>
+    <string name="backup_error_could_not_write_to_file">Ezin izan da hautatutako fitxategia aurkitu edo bertan idatzi.</string>
+    <string name="backup_error_could_not_find_database_file">Ezin izan da datu-basearen fitxategia aurkitu edo irakurri.</string>
+    <string name="backup_error_failed_to_copy_database">Arazoren bat gertatu da datu-basearen fitxategia kopiatzean.</string>
+    <string name="restore_failed">Leheneratzeak huts egin du. %1$s</string>
+    <string name="add_a_longer_description_optional">Gehitu deskribapen luzeagoa (aukerakoa)</string>
+    <string name="no_data_points_history_fragment_hint">Zure historia hemen agertuko da datu-puntu batzuk dituzunean.</string>
+    <string name="data_resolution_error">Errore bat gertatu da datu hauek ebazten saiatzean:\n\n%1$s</string>
+    <string name="info">Informazioa</string>
+    <string name="no_description">Deskribapenik ez</string>
+    <string name="description">Deskribapena</string>
+    <string name="app_lock_title">Aplikazioaren blokeoa</string>
+    <string name="app_lock_locked_title">Track &amp; Graph blokeatuta dago</string>
+    <string name="app_lock_password_label">Pasahitza</string>
+    <string name="app_lock_confirm_password_label">Berretsi pasahitza</string>
+    <string name="app_lock_unlock">Desblokeatu</string>
+    <string name="app_lock_use_biometrics">Erabili biometria</string>
+    <string name="app_lock_enable">Gaitu aplikazioaren blokeoa</string>
+    <string name="app_lock_enabled">Aplikazioaren blokeoa gaituta dago</string>
+    <string name="app_lock_enable_biometric_unlock">Gaitu desblokeo biometrikoa</string>
+    <string name="app_lock_no_strong_biometric_available">Gailu honetan ez dago desblokeo biometriko sendorik erabilgarri.</string>
+    <string name="app_lock_lock_after_background_minutes">Blokeatu atzeko planoan minutu hauen ondoren</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Erabili 0 aplikazioa lehen planotik ateratzean bertan blokeatzeko.</string>
+    <string name="app_lock_change_password">Aldatu pasahitza</string>
+    <string name="app_lock_password_changed">Pasahitza aldatu da</string>
+    <string name="app_lock_disable">Desgaitu aplikazioaren blokeoa</string>
+    <string name="app_lock_unlock_biometric_title">Desblokeatu Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Erabili gailuaren biometria jarraitzeko</string>
+    <string name="app_lock_use_password">Erabili pasahitza</string>
+    <string name="app_lock_biometric_not_recognized">Autentifikazio biometrikoa ez da ezagutu.</string>
+    <string name="app_lock_error_missing_password">Aplikazioaren blokeoari pasahitza falta zaio. Desgaitu eta gaitu berriro aplikazioaren blokeoa.</string>
+    <string name="app_lock_error_incorrect_password">Pasahitz okerra</string>
+    <string name="app_lock_error_password_hashing_unavailable">Aplikazioaren blokeoaren pasahitzaren egiaztapena ez dago erabilgarri gailu honetan.</string>
+    <string name="app_lock_error_enter_password">Sartu pasahitza.</string>
+    <string name="app_lock_error_passwords_do_not_match">Pasahitzak ez datoz bat.</string>
+    <string name="note_input_hint">Oharrak…</string>
+    <string name="add_a_note">Gehitu oharra</string>
+    <string name="notes">Oharrak</string>
+    <string name="show_global_notes">Globala</string>
+    <string name="show_data_point_notes">Datu-puntuak</string>
+    <string name="delete_reminder_content_description">Ezabatu gogorarazpena</string>
+    <string name="theme_colon">Gaia:</string>
+    <string name="date_format_colon">Data-formatua:</string>
+    <string name="add_data_point_button_content_description">Datu-puntua gehitzeko botoia</string>
+    <string name="tracked_data_menu_button_content_description">Jarraipeneko datuen menu-botoia</string>
+    <string name="tracked_data_history_button_content_description">Jarraipeneko datuen historiaren botoia</string>
+    <string name="delete_line_button_content_description">Lerroa ezabatzeko botoia</string>
+    <string name="delete_input_button_content_description">Sarrera ezabatzeko botoia</string>
+    <string name="delete_data_point_button_content_description">Datu-puntua ezabatzeko botoia</string>
+    <string name="edit_data_point_button_content_description">Datu-puntua editatzeko botoia</string>
+    <string name="add_multiple_choice_answer_button_content_description">Aukera anitzeko erantzuna gehitzeko botoia</string>
+    <string name="ending_at_colon">Laginaren amaiera:</string>
+    <string name="duplicate">Bikoiztu</string>
+    <string name="no_notes_hint_text">Jarraipenean gehitutako oharrak hemen agertuko dira. Ohar globalak ere gehi ditzakezu + botoia erabiliz.</string>
+    <string name="add_a_global_note">Gehitu ohar global bat:</string>
+    <string name="duration">Iraupena</string>
+    <string name="weeks">Asteak</string>
+    <string name="months">Hilabeteak</string>
+    <string name="days">Egunak</string>
+    <string name="hours">Orduak</string>
+    <string name="minutes">Minutuak</string>
+    <string name="seconds">Segundoak</string>
+    <string name="hours_suffix">o</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Aurrez jarraitutako balioek adierazten dute:</string>
+    <string name="duration_to_numeric_mode_header">Zertara bihurtu behar dira aurrez jarraitutako balioak:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Ezin dituzu denbora-iraupenak beste datu-mota batzuekin nahastu. Orduak, minutuak edo segundoak irudikatzea komeni da</string>
+    <string name="sum_by_count_checkbox_label">Markatu hemen jarraitutako datu-puntuen kopurua zenbatzeko, haien balioen guztizkoa beharrean.</string>
+    <string name="time_window_size">Denbora-leihoaren tamaina:</string>
+    <string name="hold_to_preview">Eduki sakatuta aurrebista ikusteko</string>
+    <string name="open">Ireki</string>
+    <string name="close">Itxi</string>
+    <string name="filter_by_label">Iragazi etiketaren arabera</string>
+    <string name="filter_by_value">Iragazi balio-tartearen arabera</string>
+    <string name="save_changes">Gorde aldaketak</string>
+    <string name="timer_notification_channel_name">Tenporizadoreak</string>
+    <string name="stop">Gelditu</string>
+    <string name="name_your_function">Izendatu funtzioa: </string>
+    <string name="add_some_data_sources">Gehitu datu-iturburuak</string>
+    <string name="value">Balioa</string>
+    <string name="label">Etiketa</string>
+    <string name="continue_word">Jarraitu</string>
+    <string name="update_all_data_points">Eguneratu datu-puntu guztiak: </string>
+    <string name="where_colon">Non:</string>
+    <string name="to_colon">Hona:</string>
+    <string name="value_equals">Balioa =</string>
+    <string name="label_equals">Etiketa =</string>
+    <string name="adding_your_first_data_point">Datu-puntuak gehitzeko tutorial laburra:</string>
+    <string name="next">Hurrengoa</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Datu-puntu bakoitzak denbora-zigilu bat eta balio bat ditu: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Aukeran, etiketa eta ohar bat ere izan ditzake: </string>
+    <string name="data_point_tutorial_page_2_description">Balioa zenbaki bat da, zure datuak denboran nola aldatzen diren ikus dezazun</string>
+    <string name="data_point_tutorial_page_2_hint">(Aholkua: Balioak axola ez badizu, erabili 1 balio lehenetsia)</string>
+    <string name="data_point_tutorial_page_3_description">Erabili etiketak datu-puntuak taldekatu nahi badituzu</string>
+    <string name="data_point_tutorial_page_3_hint">(Aholkua: Testuinguru edo azalpen gehiago gehitu nahi baduzu, erabili oharra etiketa-eremuaren ordez)</string>
+    <string name="help">Laguntza</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Aukera aurreratuak</string>
+    <string name="type_colon">\"Mota: \"</string>
+    <string name="order_colon">\"Ordena: \"</string>
+    <string name="value_and_label">Balioa eta etiketa</string>
+    <string name="value_only">Balioa soilik</string>
+    <string name="label_only">Etiketa soilik</string>
+    <string name="none">Bat ere ez</string>
+    <string name="value_ascending">Balioa gorantz</string>
+    <string name="value_descending">Balioa beherantz</string>
+    <string name="label_ascending">Etiketa gorantz</string>
+    <string name="label_descending">Etiketa beherantz</string>
+    <string name="latest">Azkena</string>
+    <string name="oldest">Zaharrena</string>
+    <string name="track_all">Jarraitu guztiak</string>
+    <string name="more_details">Xehetasun gehiago</string>
+    <string name="suggestions">Iradokizunak</string>
+    <string name="no_label">Etiketarik ez</string>
+    <string name="confirm_cancel_notes_will_be_lost">Ziur zaude itxi nahi duzula? Ohar guztiak galduko dira.</string>
+    <string name="add_a_label">Gehitu etiketa bat</string>
+    <string name="bar_interval">Barra-tartea:</string>
+    <string name="y_range_max">Y barrutiaren maximoa</string>
+    <string name="total_formatted">Guztira: %s</string>
+    <string name="from_formatted">Hemendik: %s</string>
+    <string name="to_formatted">Hona: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Segundoa(k)</string>
+    <string name="minutes_generic">Minutua(k)</string>
+    <string name="hours_generic">Ordua(k)</string>
+    <string name="days_generic">Eguna(k)</string>
+    <string name="weeks_generic">Astea(k)</string>
+    <string name="months_generic">Hilabetea(k)</string>
+    <string name="years_generic">Urtea(k)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundo</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minutu</item>
+        <item quantity="other">%d minutu</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d ordu</item>
+        <item quantity="other">%d ordu</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d egun</item>
+        <item quantity="other">%d egun</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d aste</item>
+        <item quantity="other">%d aste</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d hilabete</item>
+        <item quantity="other">%d hilabete</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d urte</item>
+        <item quantity="other">%d urte</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Minuturo</item>
+        <item quantity="other">%d minuturo</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Orduro</item>
+        <item quantity="other">%d orduro</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Egunero</item>
+        <item quantity="other">%d egunero</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Astero</item>
+        <item quantity="other">%d astero</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Hilero</item>
+        <item quantity="other">%d hilero</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Urtero</item>
+        <item quantity="other">%d urtero</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Minutu 1 igaro ondoren</item>
+        <item quantity="other">%d minutu igaro ondoren</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Ordu 1 igaro ondoren</item>
+        <item quantity="other">%d ordu igaro ondoren</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Egun 1 igaro ondoren</item>
+        <item quantity="other">%d egun igaro ondoren</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Aste 1 igaro ondoren</item>
+        <item quantity="other">%d aste igaro ondoren</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Hilabete 1 igaro ondoren</item>
+        <item quantity="other">%d hilabete igaro ondoren</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Urte 1 igaro ondoren</item>
+        <item quantity="other">%d urte igaro ondoren</item>
+    </plurals>
+    <string name="restore_hint_text">ABISUA: Babeskopia batetik leheneratzeak aplikazioan une honetan dauden datu eta konfigurazio guztiak ezabatuko ditu. Egin zure datuen babeskopia lehenik!</string>
+    <string name="backup_now">Egin babeskopia orain</string>
+    <string name="restore_error_could_not_write_to_database">Leheneratzeak huts egin du! Ezin izan da datu-basea aurkitu edo bertan idatzi.</string>
+    <string name="restore_error_could_not_read_from_database_file">Leheneratzeak huts egin du! Ezin izan da hautatutako datu-basearen fitxategia aurkitu edo irakurri.</string>
+    <string name="restore_error_failed_to_copy_database">Leheneratzeak huts egin du! Arazoren bat gertatu da datu-basea leheneratzean.</string>
+    <string name="select_location">Hautatu kokalekua…</string>
+    <string name="restore_successful">Leheneratzea behar bezala egin da! Track &amp; Graph berrabiarazi behar da orain.</string>
+    <string name="restore_error_invalid_database_file">Leheneratzeak huts egin du! Hautatutako fitxategia ez dirudi baliozko babeskopia denik.</string>
+    <string name="auto_backup">Babeskopia automatikoa</string>
+    <string name="apply">Aplikatu</string>
+    <string name="backup_every">Egin babeskopia honen maiztasunarekin: </string>
+    <string name="next_backup_at">\"Hurrengo babeskopia: \"</string>
+    <string name="backup_notification_channel_name">Babeskopia automatikoen jakinarazpenak</string>
+    <string name="backup_notification_channel_description">Babeskopia automatikoa egiten ari den eta huts egin duen jakinaraziko dizu.</string>
+    <string name="backup_notification_title">Babeskopia egiten…</string>
+    <string name="backup_failed_notification_title">Babeskopia automatikoak huts egin du</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph-ek ezin izan du babeskopiaren kokapena aurkitu edo atzitu.</string>
+    <string name="backup_failed_notification_could_not_copy">Arazoren bat gertatu da datuen babeskopia egitean. Baliteke babeskopia hondatuta edo osatu gabe egotea.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Hautatu kokapen berria</string>
+    <string name="backup_location">Babeskopiaren kokapena</string>
+    <string name="enable_auto_backup">Gaitu babeskopia automatikoa</string>
+    <string name="last_successful_backup">Azken babeskopia arrakastatsua</string>
+    <string name="next_scheduled_backup">Programatutako hurrengo babeskopia</string>
+    <string name="notification_permission_prompt">Track &amp; Graph-en jakinarazpenak gaitu beharko zenituzke, babeskopia automatikoak edozein arrazoirengatik huts egiten badu jakinaraz diezazugun.</string>
+    <string name="lua_script_empty">Gehitu Lua script bat</string>
+    <string name="function_name_empty">Funtzioaren izena ezin da hutsik egon</string>
+    <string name="function_name">Funtzioaren izena</string>
+    <string name="add_at_least_one_input">Gehitu gutxienez sarrera bat</string>
+    <string name="output">Irteera</string>
+    <string name="data_source">Datu-iturria</string>
+    <string name="lua_script">Lua script-a</string>
+    <string name="data_source_description">Datu-iturburu nodoak sarrera gisa erabiltzeko Tracker edo Function bat hautatzeko aukera ematen du.</string>
+    <string name="lua_script_input_hint">Sartu Lua script bat…</string>
+    <string name="select_node_type">Hautatu nodo mota</string>
+    <string name="file">Fitxategia</string>
+    <string name="lua_feature_names_not_unique">Scriptaren sarrerek izen bakarrak izan behar dituzte</string>
+    <string name="graph_stat_type_lua_graph">Lua script-a</string>
+    <string name="launch_lua_disabled">Lua abiaraztea desgaituta</string>
+    <string name="no_lua">Lua-rik ez</string>
+    <string name="lua_engine_disabled">Lua motorra desgaituta</string>
+    <string name="lua_graph_first_time_user_title">Lua script bidezko grafikoak eta estatistikak</string>
+    <string name="lua_graph_first_time_user_message">Lua script-ak Lua programazio-lengoaiarekin grafiko eta estatistika pertsonalizatuak sortzeko aukera ematen duen funtzio aurreratua dira. \n\nZurea karga dezakezu edo GitHub-eko bildumako bat aukeratu. GitHub-etik script bat instalatzean, aplikaziora itzuliko zara, script-a erabiltzeko prest dagoela.</string>
+    <string name="functions_first_time_user_title">Ongi etorri Functions-era</string>
+    <string name="functions_first_time_user_message">Functions funtzio aurreratua da, zure datuak konbinatu, agregatu eta eraldatuz datu-iturri deribatu berriak sortzeko aukera ematen duena.</string>
+    <string name="learn_more">Informazio gehiago hemen</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Itsatsi</string>
+    <string name="failed_to_download_file">Ezin izan da fitxategia deskargatu: %s</string>
+    <string name="confirm_deep_link">Iturri ezezagun bateko script-esteka jaso duzu. Instalatu script-ak soilik konfiantzazko iturrietatik. Script hau instalatu nahi duzu?</string>
+    <string name="graph_stat_info_button_description">Grafikoen eta estatistiken tutorialak</string>
+    <string name="network_generic_error">Errore bat gertatu da sarera sartzean. Egiaztatu konexioa eta saiatu berriro.</string>
+    <string name="function_verification_failure">Ezin izan dira funtzio-sinadurak egiaztatu. Ziurtatu konexio segurua duzula eta Track &amp; Graph eguneratuta dagoela</string>
+    <string name="function_network_failure">Ezin izan dira funtzioak kargatu. Ziurtatu Internetera konektatuta zaudela. Arazoak jarraitzen badu, ziurtatu aplikazioa eguneratuta dagoela.</string>
+    <string name="functions_landscape_hint">Aholkua: Functions-ek hobeto funtzionatzen du horizontalean</string>
+    <string name="functions_start_hint">Hasi hemen: sakatu luze eta hautatu Datu-iturria</string>
+    <string name="see_whats_new">Ikusi berritasunak</string>
+</resources>

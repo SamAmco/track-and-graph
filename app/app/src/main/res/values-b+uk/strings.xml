@@ -1,0 +1,563 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Головна</string>
+    <string name="add_group">Додати групу: </string>
+    <string name="edit_group">Редагувати групу: </string>
+    <string name="group">Група</string>
+    <string name="tracker">Трекер</string>
+    <string name="function">Функція</string>
+    <string name="graph_or_stat">Графік або статистика</string>
+    <string name="symlink">Символічне посилання</string>
+    <string name="symlinks">Символічні посилання</string>
+    <string name="reminder">Нагадування</string>
+    <string name="add_component">Додати компонент</string>
+    <string name="symlink_locations_title">Розташування «%1$s»</string>
+    <string name="add_tracker">Відстежувати:</string>
+    <string name="add">Додати</string>
+    <string name="group_name">наприклад, Щоденні справи</string>
+    <string name="delete">Видалити</string>
+    <string name="edit">Редагувати</string>
+    <string name="update">Оновити</string>
+    <string name="graph_or_stat_name">Назва графіка: </string>
+    <string name="tracker_name">Назва трекера</string>
+    <string name="this_is_a_time_or_duration">Це час або тривалість</string>
+    <string name="yes">Так</string>
+    <string name="cancel">Скасувати</string>
+    <string name="select_file">Вибрати файл</string>
+    <string name="empty_group_hint">Вітаємо в Track &amp; Graph!\n\n Торкніться + у правому верхньому куті й виберіть «Трекер», щоб почати.</string>
+    <string name="no_trackers_graph_stats_hint">Спочатку створіть трекер, перш ніж створювати графіки.</string>
+    <string name="no_trackers_functions_hint">Спочатку створіть трекер, перш ніж створювати функції.</string>
+    <string name="ru_sure_del_group">Ви впевнені, що хочете видалити цю групу та все, що в ній є? Цю дію не можна скасувати.</string>
+    <string name="ru_sure_del_graph">Ви впевнені, що хочете видалити цей графік? Цю дію не можна скасувати. Відстежені дані не буде втрачено.</string>
+    <string name="ru_sure_del_feature">Ви впевнені, що хочете видалити ці відстежені дані?</string>
+    <string name="item_in_multiple_groups">Цей елемент існує в кількох місцях. Ви можете вилучити його звідси або видалити всюди.</string>
+    <string name="remove_from_this_group">Вилучити звідси</string>
+    <string name="delete_everywhere">Видалити всюди</string>
+    <string name="ru_sure_del_function">Ви впевнені, що хочете видалити цю функцію? Цю дію не можна скасувати.</string>
+    <string name="ru_sure_del_reminder">Ви впевнені, що хочете видалити це нагадування? Цю дію не можна скасувати.</string>
+    <string name="ru_sure_del_data_point">Ви впевнені, що хочете видалити цю точку даних?</string>
+    <string name="feature_name_cannot_be_null">Додайте назву</string>
+    <string name="tracker_with_that_name_exists">Ви вже відстежуєте щось із такою назвою</string>
+    <string name="data_points">%1$d точок даних</string>
+    <string name="items_selected">Вибрано: %1$d</string>
+    <string name="select_all">Вибрати все</string>
+    <string name="deselect_all">Скасувати вибір усіх</string>
+    <string name="ru_sure_del_data_points">Ви впевнені, що хочете видалити ці точки даних?</string>
+    <string name="delete_selected_content_description">Видалити вибрані елементи</string>
+    <string name="copy_selected_content_description">Копіювати вибрані елементи</string>
+    <string name="move_selected_content_description">Перемістити вибрані елементи</string>
+    <string name="copy_to">Копіювати до</string>
+    <string name="no_data">Немає даних</string>
+    <string name="skip">Пропустити</string>
+    <string name="exportButton">Експорт</string>
+    <string name="importButton">Імпорт</string>
+    <string name="import_export">Імпорт/експорт</string>
+    <string name="search">Пошук</string>
+    <string name="type_to_search">Введіть запит</string>
+    <string name="no_results">Нічого не знайдено</string>
+    <string name="export_to">Експортувати відстежені дані цієї групи у CSV:</string>
+    <string name="export_error_message">Не вдалося експортувати: %1$s</string>
+    <string name="import_from">Імпортувати відстежені дані до цієї групи з CSV:</string>
+    <string name="import_warning">Попередження: імпорт неможливо скасувати. Track &amp; Graph спробує об’єднати імпортовані дані з наявними даними цієї групи за назвою.</string>
+    <string name="add_a_graph_or_stat">Додати графік або статистику</string>
+    <string name="graph_type_label">Тип графіка:</string>
+    <string name="sample_size">Розмір вибірки:</string>
+    <string name="select_a_discrete_feature">Виберіть набір даних із мітками: </string>
+    <string name="no_labels">Цей набір даних не має міток</string>
+    <string name="select_a_feature">Виберіть набір даних:</string>
+    <string name="select_a_tracker">Виберіть трекер</string>
+    <string name="offset">Зсув:</string>
+    <string name="scale">Масштаб:</string>
+    <string name="from">Від:</string>
+    <string name="to">До:</string>
+    <string name="day">День</string>
+    <string-array name="time_histogram_windows">
+        <item>Щогодини</item>
+        <item>Щодня</item>
+        <item>Щотижня</item>
+        <item>Щомісяця</item>
+        <item>Щокварталу</item>
+        <item>Раз на пів року</item>
+        <item>Щорічно</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Заощадження заряду</item>
+        <item>Світла</item>
+        <item>Темна</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Системна за замовчуванням</item>
+        <item>Світла</item>
+        <item>Темна</item>
+    </string-array>
+    <string name="graph_type_line_graph">Лінійний графік</string>
+    <string name="graph_type_pie_chart">Кругова діаграма</string>
+    <string name="graph_type_average_time_between">Середній час між подіями</string>
+    <string name="graph_type_time_since">Час від події</string>
+    <string name="graph_type_time_histogram">Гістограма часу</string>
+    <string name="graph_type_last_value">Останнє значення/час від події</string>
+    <string name="graph_type_bar_chart">Стовпчикова діаграма</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Без усереднення</item>
+        <item>Ковзне середнє за день</item>
+        <item>Ковзне середнє за три дні</item>
+        <item>Ковзне середнє за тиждень</item>
+        <item>Ковзне середнє за місяць</item>
+        <item>Ковзне середнє за три місяці</item>
+        <item>Ковзне середнє за шість місяців</item>
+        <item>Ковзне середнє за рік</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Показувати під час відстеження</item>
+        <item>Показувати погодинні підсумки</item>
+        <item>Показувати щоденні підсумки</item>
+        <item>Показувати щотижневі підсумки</item>
+        <item>Показувати щомісячні підсумки</item>
+        <item>Показувати щорічні підсумки</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Усі дані</string>
+    <string name="graph_time_durations_a_day">День</string>
+    <string name="graph_time_durations_a_week">Тиждень</string>
+    <string name="graph_time_durations_a_month">Місяць</string>
+    <string name="graph_time_durations_three_months">Три місяці</string>
+    <string name="graph_time_durations_six_months">Шість місяців</string>
+    <string name="graph_time_durations_a_year">Рік</string>
+    <string name="custom">Власний</string>
+    <string-array name="y_range_styles">
+        <item>Динамічний</item>
+        <item>Фіксований</item>
+    </string-array>
+    <string name="ending_at_latest">Остання точка даних</string>
+    <string name="ending_at_now">Зараз</string>
+    <string name="ending_at_custom_date">Власна дата…</string>
+    <string name="hours_and_minutes_ago">%1$dh %2$dm тому</string>
+    <string name="import_exception_unknown">Не вдалося імпортувати: сталася невідома помилка</string>
+    <string name="import_exception_bad_headers">Не вдалося імпортувати: заголовки не відповідають очікуваним: %1$s</string>
+    <string name="import_exception_inconsistent_record">Не вдалося імпортувати: запис у рядку %1$s не відповідає потрібним заголовкам</string>
+    <string name="import_exception_bad_timestamp">Не вдалося імпортувати: не вдалося розпізнати часову мітку запису в рядку %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Не вдалося імпортувати: непослідовний тип даних у рядку %1$s</string>
+    <string name="unknown_error_occurred">Сталася невідома помилка</string>
+    <string name="graph_stat_validation_no_name">Укажіть назву</string>
+    <string name="graph_stat_validation_no_line_graph_features">Додайте щось до графіка</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Переконайтеся, що «Від» менше або дорівнює «До»</string>
+    <string name="graph_stat_validation_unrecognised_color">Переконайтеся, що для всіх наборів даних указано колір</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Виявлено недійсний набір даних лінійного графіка</string>
+    <string name="graph_stat_validation_bad_fixed_range">Переконайтеся, що «Від» менше за «До»</string>
+    <string name="graph_stat_view_not_found">Сталася помилка під час пошуку цього графіка</string>
+    <string name="graph_stat_view_not_enough_data_stat">Ця статистика з’явиться, коли буде відстежено достатньо даних для її створення.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Цей графік з’явиться, коли буде відстежено достатньо даних для його створення.</string>
+    <string name="pie_chart_mixed_signs_error">Неможливо побудувати цю кругову діаграму, оскільки вона містить додатні й від’ємні розміри сегментів.</string>
+    <string name="histogram_mixed_signs_error">Неможливо побудувати цю гістограму, оскільки вона містить додатні й від’ємні розміри інтервалів.</string>
+    <string name="graph_non_finite_data_error">Неможливо побудувати цей графік, оскільки він містить значення, яке не є скінченним числом.</string>
+    <string name="graph_inconsistent_series_error">Неможливо побудувати цей графік, оскільки його ряди даних мають різні розміри.</string>
+    <string name="graph_invalid_y_range_error">Неможливо побудувати цей графік, оскільки діапазон осі Y недійсний.</string>
+    <string name="finish">Готово</string>
+    <string name="about_description">Track &amp; Graph — безкоштовне програмне забезпечення з відкритим кодом за ліцензією GPL 3.0.</string>
+    <string name="about_libraries_message">Використано такі бібліотеки з відкритим кодом:</string>
+    <string name="about">Про застосунок</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Поширені запитання</string>
+    <string name="tutorial_text_1">Використовуйте трекери для відстеження даних.</string>
+    <string name="tutorial_text_2">Використовуйте графіки та статистику для візуалізації даних.</string>
+    <string name="tutorial_text_3">Використовуйте групи, щоб упорядковувати трекери, графіки та статистику.</string>
+    <string name="got_it">Зрозуміло!</string>
+    <string name="move_to_colon">Перемістити до:</string>
+    <string name="move_to">Перемістити до</string>
+    <string name="ru_sure_update_data">Це оновлення може безповоротно змінити вже відстежені дані. Настійно рекомендуємо створити резервну копію наявних даних перед продовженням.\n\n Продовжити?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Оцінити застосунок</string>
+    <string name="reminders">Нагадування</string>
+    <string name="no_reminders_hint">Торкніться значка +, щоб створити нове сповіщення-нагадування про відстеження.</string>
+    <string name="mon">Пн</string>
+    <string name="tue">Вт</string>
+    <string name="wed">Ср</string>
+    <string name="thu">Чт</string>
+    <string name="fri">Пт</string>
+    <string name="sat">Сб</string>
+    <string name="sun">Нд</string>
+    <string name="reminders_notifications_channel_name">Нагадування</string>
+    <string name="reminders_notifications_channel_description">Створені користувачем сповіщення, що нагадують, коли потрібно відстежити дані</string>
+    <string name="default_reminder_name">Час відстежити!</string>
+    <string name="missed_reminder_single_content">Нагадування від %1$s</string>
+    <string name="missed_reminders_multiple_content">Ви пропустили нагадування: %1$d</string>
+    <string name="next_reminder_format">Наступне нагадування: %1$s</string>
+    <string name="no_upcoming_reminders">Немає майбутніх нагадувань</string>
+    <string name="select_reminder_type">Виберіть тип нагадування</string>
+    <string name="week_day_reminder">Нагадування за днями тижня</string>
+    <string name="week_day_reminder_description">Певні дні, як-от понеділок, середа, п’ятниця</string>
+    <string name="periodic_reminder">Періодичне нагадування</string>
+    <string name="periodic_reminder_description">Регулярні інтервали, наприклад кожні 3 дні</string>
+    <string name="month_day_reminder">Нагадування за днем місяця</string>
+    <string name="month_day_reminder_description">Щомісячні шаблони, наприклад перший понеділок</string>
+    <string name="time_since_last_reminder">Час від останнього нагадування</string>
+    <string name="time_since_last_reminder_description">Коли ви певний час нічого не відстежували</string>
+    <string name="one_time_reminder">Одноразове нагадування</string>
+    <string name="one_time_reminder_description">Окреме нагадування на певний час або після затримки</string>
+    <string name="reminder_name">Назва нагадування</string>
+    <string name="reminder_disabled">Нагадування вимкнено</string>
+    <string name="repeat_every">Повторювати кожні</string>
+    <string name="at_time">О певній годині</string>
+    <string name="at_a_specific_time">У певний час</string>
+    <string name="ending_at">Завершення</string>
+    <string name="starting_from">Початок</string>
+    <string name="repeat_on_week_days">Повторювати у дні тижня</string>
+    <string name="track_feature">Відстежувати джерело даних</string>
+    <string name="select_tracker_placeholder">Виберіть трекер</string>
+    <string name="remind_after">Нагадати через</string>
+    <string name="then_remind_every">Потім нагадувати кожні</string>
+    <string name="remind_at_date_and_time">У певні дату й час</string>
+    <string name="remind_after_a_delay">Після затримки</string>
+    <string name="first_reminder">Перше нагадування</string>
+    <string name="every_colon">Кожні:</string>
+    <string name="ended_at_format">Завершено: %1$s</string>
+    <string name="starting_at_format">Початок: %1$s</string>
+    <string name="occurrence_first">Перший</string>
+    <string name="occurrence_second">Другий</string>
+    <string name="occurrence_third">Третій</string>
+    <string name="occurrence_fourth">Четвертий</string>
+    <string name="occurrence_last">Останній</string>
+    <string name="monday">Понеділок</string>
+    <string name="tuesday">Вівторок</string>
+    <string name="wednesday">Середа</string>
+    <string name="thursday">Четвер</string>
+    <string name="friday">П’ятниця</string>
+    <string name="saturday">Субота</string>
+    <string name="sunday">Неділя</string>
+    <string-array name="abbreviated_months">
+        <item>Січ</item>
+        <item>Лют</item>
+        <item>Бер</item>
+        <item>Кві</item>
+        <item>Тра</item>
+        <item>Чер</item>
+        <item>Лип</item>
+        <item>Сер</item>
+        <item>Вер</item>
+        <item>Жов</item>
+        <item>Лис</item>
+        <item>Гру</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+        <item>Сб</item>
+        <item>Нд</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Стиль діапазону:</string>
+    <string name="track_widget_configure_no_data_error">Спочатку відстежте дані.</string>
+    <string name="track_widget_configure_no_data_selected_error">Для створення віджета відстеження потрібно вибрати дійсний набір даних.</string>
+    <string name="create">Створити</string>
+    <string name="use_default_value">Установити значення за замовчуванням</string>
+    <string name="backup_and_restore">Резервне копіювання та відновлення</string>
+    <string name="backup_hint_text">Резервна копія зберігає всі дані застосунку, зокрема відстежені дані, графіки та нагадування. Регулярно створюйте резервні копії на зовнішньому пристрої або в хмарному сховищі на випадок втрати чи пошкодження пристрою.</string>
+    <string name="restore_data">Відновити дані</string>
+    <string name="backup_successful">Резервну копію створено!</string>
+    <string name="backup_error_could_not_write_to_file">Не вдалося знайти вибраний файл або записати до нього дані.</string>
+    <string name="backup_error_could_not_find_database_file">Не вдалося знайти або прочитати файл бази даних.</string>
+    <string name="backup_error_failed_to_copy_database">Під час копіювання файлу бази даних сталася помилка.</string>
+    <string name="restore_failed">Не вдалося відновити дані. %1$s</string>
+    <string name="add_a_longer_description_optional">Додайте довший опис (необов’язково)</string>
+    <string name="no_data_points_history_fragment_hint">Тут з’явиться історія, коли у вас будуть точки даних.</string>
+    <string name="data_resolution_error">Під час спроби обробити ці дані сталася помилка:\n\n%1$s</string>
+    <string name="info">Інформація</string>
+    <string name="no_description">Немає опису</string>
+    <string name="description">Опис</string>
+    <string name="app_lock_title">Блокування застосунку</string>
+    <string name="app_lock_locked_title">Track &amp; Graph заблоковано</string>
+    <string name="app_lock_password_label">Пароль</string>
+    <string name="app_lock_confirm_password_label">Підтвердіть пароль</string>
+    <string name="app_lock_unlock">Розблокувати</string>
+    <string name="app_lock_use_biometrics">Використовувати біометрію</string>
+    <string name="app_lock_enable">Увімкнути блокування застосунку</string>
+    <string name="app_lock_enabled">Блокування застосунку ввімкнено</string>
+    <string name="app_lock_enable_biometric_unlock">Увімкнути біометричне розблокування</string>
+    <string name="app_lock_no_strong_biometric_available">На цьому пристрої недоступне надійне біометричне розблокування.</string>
+    <string name="app_lock_lock_after_background_minutes">Заблокувати через стільки хвилин у фоновому режимі</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Укажіть 0, щоб блокувати застосунок одразу після виходу з активного режиму.</string>
+    <string name="app_lock_change_password">Змінити пароль</string>
+    <string name="app_lock_password_changed">Пароль змінено</string>
+    <string name="app_lock_disable">Вимкнути блокування застосунку</string>
+    <string name="app_lock_unlock_biometric_title">Розблокувати Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Використовуйте біометрію пристрою, щоб продовжити</string>
+    <string name="app_lock_use_password">Використати пароль</string>
+    <string name="app_lock_biometric_not_recognized">Біометричні дані не розпізнано.</string>
+    <string name="app_lock_error_missing_password">Для блокування застосунку немає пароля. Вимкніть і знову ввімкніть блокування застосунку.</string>
+    <string name="app_lock_error_incorrect_password">Неправильний пароль</string>
+    <string name="app_lock_error_password_hashing_unavailable">Перевірка пароля блокування застосунку недоступна на цьому пристрої.</string>
+    <string name="app_lock_error_enter_password">Введіть пароль.</string>
+    <string name="app_lock_error_passwords_do_not_match">Паролі не збігаються.</string>
+    <string name="note_input_hint">Нотатки…</string>
+    <string name="add_a_note">Додати нотатку</string>
+    <string name="notes">Нотатки</string>
+    <string name="show_global_notes">Загальні</string>
+    <string name="show_data_point_notes">Точки даних</string>
+    <string name="delete_reminder_content_description">Видалити нагадування</string>
+    <string name="theme_colon">Тема:</string>
+    <string name="date_format_colon">Формат дати:</string>
+    <string name="add_data_point_button_content_description">Кнопка додавання точки даних</string>
+    <string name="tracked_data_menu_button_content_description">Кнопка меню відстежених даних</string>
+    <string name="tracked_data_history_button_content_description">Кнопка історії відстежених даних</string>
+    <string name="delete_line_button_content_description">Кнопка видалення лінії</string>
+    <string name="delete_input_button_content_description">Кнопка видалення введених даних</string>
+    <string name="delete_data_point_button_content_description">Кнопка видалення точки даних</string>
+    <string name="edit_data_point_button_content_description">Кнопка редагування точки даних</string>
+    <string name="add_multiple_choice_answer_button_content_description">Кнопка додавання варіанта відповіді</string>
+    <string name="ending_at_colon">Завершення вибірки:</string>
+    <string name="duplicate">Дублювати</string>
+    <string name="no_notes_hint_text">Тут відображатимуться нотатки, додані під час відстеження. Також можна додати загальні нотатки за допомогою кнопки +.</string>
+    <string name="add_a_global_note">Додайте загальну нотатку:</string>
+    <string name="duration">Тривалість</string>
+    <string name="weeks">Тижні</string>
+    <string name="months">Місяці</string>
+    <string name="days">Дні</string>
+    <string name="hours">Години</string>
+    <string name="minutes">Хвилини</string>
+    <string name="seconds">Секунди</string>
+    <string name="hours_suffix">год</string>
+    <string name="minutes_suffix">хв</string>
+    <string name="seconds_suffix">с</string>
+    <string name="numeric_to_duration_mode_header">Раніше відстежені значення означають:</string>
+    <string name="duration_to_numeric_mode_header">На що перетворити раніше відстежені значення:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Не можна поєднувати тривалості з іншими типами даних. Спробуйте побудувати графік для годин, хвилин або секунд</string>
+    <string name="sum_by_count_checkbox_label">Поставте прапорець, щоб рахувати кількість відстежених точок даних, а не суму їхніх значень.</string>
+    <string name="time_window_size">Розмір часового вікна:</string>
+    <string name="hold_to_preview">Утримуйте для попереднього перегляду</string>
+    <string name="open">Відкрити</string>
+    <string name="close">Закрити</string>
+    <string name="filter_by_label">Фільтрувати за міткою</string>
+    <string name="filter_by_value">Фільтрувати за діапазоном значень</string>
+    <string name="save_changes">Зберегти зміни</string>
+    <string name="timer_notification_channel_name">Таймери</string>
+    <string name="stop">Зупинити</string>
+    <string name="name_your_function">Назвіть функцію: </string>
+    <string name="add_some_data_sources">Додайте джерела даних</string>
+    <string name="value">Значення</string>
+    <string name="label">Мітка</string>
+    <string name="continue_word">Продовжити</string>
+    <string name="update_all_data_points">Оновити всі точки даних: </string>
+    <string name="where_colon">Де:</string>
+    <string name="to_colon">До:</string>
+    <string name="value_equals">Значення =</string>
+    <string name="label_equals">Мітка =</string>
+    <string name="adding_your_first_data_point">Короткий посібник із додавання точок даних:</string>
+    <string name="next">Далі</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Кожна точка даних має часову мітку та значення: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Також вона може мати мітку й нотатку: </string>
+    <string name="data_point_tutorial_page_2_description">Значення є числом, тож ви можете бачити, як змінюються дані з часом</string>
+    <string name="data_point_tutorial_page_2_hint">(Підказка: якщо значення не має значення, залиште стандартне значення 1)</string>
+    <string name="data_point_tutorial_page_3_description">Використовуйте мітки, щоб групувати точки даних</string>
+    <string name="data_point_tutorial_page_3_hint">(Підказка: щоб додати контекст або опис, використовуйте нотатку, а не поле мітки)</string>
+    <string name="help">Довідка</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Розширені параметри</string>
+    <string name="type_colon">\"Тип: \"</string>
+    <string name="order_colon">\"Порядок: \"</string>
+    <string name="value_and_label">Значення та мітка</string>
+    <string name="value_only">Лише значення</string>
+    <string name="label_only">Лише мітка</string>
+    <string name="none">Немає</string>
+    <string name="value_ascending">Значення за зростанням</string>
+    <string name="value_descending">Значення за спаданням</string>
+    <string name="label_ascending">Мітка за зростанням</string>
+    <string name="label_descending">Мітка за спаданням</string>
+    <string name="latest">Найновіші</string>
+    <string name="oldest">Найстаріші</string>
+    <string name="track_all">Відстежувати всі</string>
+    <string name="more_details">Докладніше</string>
+    <string name="suggestions">Пропозиції</string>
+    <string name="no_label">Без мітки</string>
+    <string name="confirm_cancel_notes_will_be_lost">Ви впевнені, що хочете закрити? Усі нотатки буде втрачено.</string>
+    <string name="add_a_label">Додати мітку</string>
+    <string name="bar_interval">Інтервал стовпців:</string>
+    <string name="y_range_max">Максимум діапазону Y</string>
+    <string name="total_formatted">Усього: %s</string>
+    <string name="from_formatted">Від: %s</string>
+    <string name="to_formatted">До: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Секунда(и)</string>
+    <string name="minutes_generic">Хвилина(и)</string>
+    <string name="hours_generic">Година(и)</string>
+    <string name="days_generic">День(дні)</string>
+    <string name="weeks_generic">Тиждень(ні)</string>
+    <string name="months_generic">Місяць(ці)</string>
+    <string name="years_generic">Рік(роки)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d секунда</item>
+        <item quantity="few">%d секунди</item>
+        <item quantity="many">%d секунд</item>
+        <item quantity="other">%d секунди</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d хвилина</item>
+        <item quantity="few">%d хвилини</item>
+        <item quantity="many">%d хвилин</item>
+        <item quantity="other">%d хвилини</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d година</item>
+        <item quantity="few">%d години</item>
+        <item quantity="many">%d годин</item>
+        <item quantity="other">%d години</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дні</item>
+        <item quantity="many">%d днів</item>
+        <item quantity="other">%d дні</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d тиждень</item>
+        <item quantity="few">%d тижні</item>
+        <item quantity="many">%d тижнів</item>
+        <item quantity="other">%d тижні</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d місяць</item>
+        <item quantity="few">%d місяці</item>
+        <item quantity="many">%d місяців</item>
+        <item quantity="other">%d місяці</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d рік</item>
+        <item quantity="few">%d роки</item>
+        <item quantity="many">%d років</item>
+        <item quantity="other">%d роки</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Щохвилини</item>
+        <item quantity="few">Кожні %d хвилини</item>
+        <item quantity="many">Кожні %d хвилин</item>
+        <item quantity="other">Кожні %d хвилини</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Щогодини</item>
+        <item quantity="few">Кожні %d години</item>
+        <item quantity="many">Кожні %d годин</item>
+        <item quantity="other">Кожні %d години</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Щодня</item>
+        <item quantity="few">Кожні %d дні</item>
+        <item quantity="many">Кожні %d днів</item>
+        <item quantity="other">Кожні %d дні</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Щотижня</item>
+        <item quantity="few">Кожні %d тижні</item>
+        <item quantity="many">Кожні %d тижнів</item>
+        <item quantity="other">Кожні %d тижні</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Щомісяця</item>
+        <item quantity="few">Кожні %d місяці</item>
+        <item quantity="many">Кожні %d місяців</item>
+        <item quantity="other">Кожні %d місяці</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Щороку</item>
+        <item quantity="few">Кожні %d роки</item>
+        <item quantity="many">Кожні %d років</item>
+        <item quantity="other">Кожні %d роки</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Через 1 хвилину</item>
+        <item quantity="few">Через %d хвилини</item>
+        <item quantity="many">Через %d хвилин</item>
+        <item quantity="other">Через %d хвилини</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Через 1 годину</item>
+        <item quantity="few">Через %d години</item>
+        <item quantity="many">Через %d годин</item>
+        <item quantity="other">Через %d години</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Через 1 день</item>
+        <item quantity="few">Через %d дні</item>
+        <item quantity="many">Через %d днів</item>
+        <item quantity="other">Через %d дні</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Через 1 тиждень</item>
+        <item quantity="few">Через %d тижні</item>
+        <item quantity="many">Через %d тижнів</item>
+        <item quantity="other">Через %d тижні</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Через 1 місяць</item>
+        <item quantity="few">Через %d місяці</item>
+        <item quantity="many">Через %d місяців</item>
+        <item quantity="other">Через %d місяці</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Через 1 рік</item>
+        <item quantity="few">Через %d роки</item>
+        <item quantity="many">Через %d років</item>
+        <item quantity="other">Через %d роки</item>
+    </plurals>
+    <string name="restore_hint_text">ПОПЕРЕДЖЕННЯ: відновлення з резервної копії видалить усі дані та поточні налаштування застосунку. Спочатку створіть резервну копію даних!</string>
+    <string name="backup_now">Створити резервну копію</string>
+    <string name="restore_error_could_not_write_to_database">Не вдалося відновити! Не вдалося знайти базу даних або записати до неї дані.</string>
+    <string name="restore_error_could_not_read_from_database_file">Не вдалося відновити! Не вдалося знайти або прочитати вибраний файл бази даних.</string>
+    <string name="restore_error_failed_to_copy_database">Не вдалося відновити! Під час відновлення бази даних сталася помилка.</string>
+    <string name="select_location">Виберіть розташування…</string>
+    <string name="restore_successful">Відновлення успішне! Тепер Track &amp; Graph потрібно перезапустити.</string>
+    <string name="restore_error_invalid_database_file">Не вдалося відновити! Вибраний файл не є дійсною резервною копією.</string>
+    <string name="auto_backup">Автоматичне резервне копіювання</string>
+    <string name="apply">Застосувати</string>
+    <string name="backup_every">Створювати резервну копію кожні: </string>
+    <string name="next_backup_at">\"Наступна резервна копія: \"</string>
+    <string name="backup_notification_channel_name">Сповіщення про автоматичне резервне копіювання</string>
+    <string name="backup_notification_channel_description">Повідомляє, коли виконується автоматичне резервне копіювання та якщо воно не вдалося.</string>
+    <string name="backup_notification_title">Виконується резервне копіювання…</string>
+    <string name="backup_failed_notification_title">Не вдалося створити автоматичну резервну копію</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph не вдалося знайти місце для резервної копії або отримати до нього доступ.</string>
+    <string name="backup_failed_notification_could_not_copy">Під час резервного копіювання даних сталася помилка. Резервна копія може бути пошкодженою або неповною.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Вибрати нове місце</string>
+    <string name="backup_location">Місце для резервної копії</string>
+    <string name="enable_auto_backup">Увімкнути автоматичне резервне копіювання</string>
+    <string name="last_successful_backup">Остання успішна резервна копія</string>
+    <string name="next_scheduled_backup">Наступна запланована резервна копія</string>
+    <string name="notification_permission_prompt">Увімкніть сповіщення Track &amp; Graph, щоб отримувати повідомлення, якщо автоматичне резервне копіювання не вдасться.</string>
+    <string name="lua_script_empty">Додайте скрипт Lua</string>
+    <string name="function_name_empty">Назва функції не може бути порожньою</string>
+    <string name="function_name">Назва функції</string>
+    <string name="add_at_least_one_input">Додайте принаймні одне вхідне значення</string>
+    <string name="output">Вихід</string>
+    <string name="data_source">Джерело даних</string>
+    <string name="lua_script">Скрипт Lua</string>
+    <string name="data_source_description">Вузол джерела даних дає змогу вибрати трекер або функцію як вхідні дані.</string>
+    <string name="lua_script_input_hint">Введіть скрипт Lua…</string>
+    <string name="select_node_type">Виберіть тип вузла</string>
+    <string name="file">Файл</string>
+    <string name="lua_feature_names_not_unique">Вхідні дані скрипту повинні мати унікальні назви</string>
+    <string name="graph_stat_type_lua_graph">Скрипт Lua</string>
+    <string name="launch_lua_disabled">Запуск Lua вимкнено</string>
+    <string name="no_lua">Lua недоступна</string>
+    <string name="lua_engine_disabled">Механізм Lua вимкнено</string>
+    <string name="lua_graph_first_time_user_title">Графіки та статистика зі скриптами Lua</string>
+    <string name="lua_graph_first_time_user_message">Скрипти Lua — це розширена функція, яка дає змогу створювати власні графіки та статистику мовою програмування Lua. \n\nВи можете завантажити власний скрипт або вибрати його з колекції GitHub. Після встановлення скрипту з GitHub ви повернетеся до застосунку, де скрипт буде готовий до використання.</string>
+    <string name="functions_first_time_user_title">Ласкаво просимо до функцій</string>
+    <string name="functions_first_time_user_message">Функції — це розширена можливість об’єднувати, агрегувати та перетворювати дані на нові похідні джерела даних.</string>
+    <string name="learn_more">Дізнатися більше</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Вставити</string>
+    <string name="failed_to_download_file">Не вдалося завантажити файл: %s</string>
+    <string name="confirm_deep_link">Ви отримали посилання на скрипт із невідомого джерела. Встановлюйте скрипти лише з надійних джерел. Встановити цей скрипт?</string>
+    <string name="graph_stat_info_button_description">Посібники з графіків і статистики</string>
+    <string name="network_generic_error">Під час спроби отримати доступ до мережі сталася помилка. Перевірте з’єднання та повторіть спробу.</string>
+    <string name="function_verification_failure">Не вдалося перевірити сигнатури функцій. Переконайтеся, що з’єднання захищене, а Track &amp; Graph оновлено.</string>
+    <string name="function_network_failure">Не вдалося завантажити функції. Переконайтеся, що ви підключені до інтернету. Якщо проблема не зникає, переконайтеся, що застосунок оновлено.</string>
+    <string name="functions_landscape_hint">Порада: функції найкраще працюють у альбомній орієнтації</string>
+    <string name="functions_start_hint">Почніть тут: натисніть і утримуйте, а потім виберіть «Джерело даних»</string>
+    <string name="see_whats_new">Переглянути нові можливості</string>
+</resources>

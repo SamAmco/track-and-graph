@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">ਸ਼ਾਮਲ ਕਰੋ</string>
+    <string name="add_a_note">ਨੋਟ ਸ਼ਾਮਲ ਕਰੋ</string>
+    <string name="cancel">ਰੱਦ ਕਰੋ</string>
+    <string name="continue_word">ਜਾਰੀ ਰੱਖੋ</string>
+    <string name="create">ਬਣਾਓ</string>
+    <string name="label">ਲੇਬਲ</string>
+    <string name="release_notes_support_text">ਤੁਹਾਡਾ ਸਮਰਥਨ Track &amp; Graph ਨੂੰ ਚਲਦਾ ਅਤੇ ਵਿਕਸਤ ਰਹਿਣ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ 🌱</string>
+    <string name="release_notes_maybe_later">ਸ਼ਾਇਦ ਬਾਅਦ ਵਿੱਚ</string>
+    <string name="release_notes_support_development">ਵਿਕਾਸ ਲਈ ਦਾਨ ਕਰੋ</string>
+    <string name="release_notes_thank_you">ਧੰਨਵਾਦ! ❤️\n\nਤੁਹਾਡੇ ਸਮਰਥਨ ਦਾ ਹਰ ਹਿੱਸਾ Track &amp; Graph ਨੂੰ ਸਭ ਲਈ ਬਿਹਤਰ ਬਣਾਉਣ ਵਿੱਚ ਲੱਗਦਾ ਹੈ 🌱</string>
+    <string name="support_close">ਬੰਦ ਕਰੋ</string>
+    <string name="search">ਖੋਜੋ</string>
+    <string name="update">ਅੱਪਡੇਟ ਕਰੋ</string>
+    <string name="value">ਮੁੱਲ</string>
+</resources>

@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Inicio</string>
+    <string name="add_group">Engadir grupo: </string>
+    <string name="edit_group">Editar grupo: </string>
+    <string name="group">Grupo</string>
+    <string name="tracker">Rexistro</string>
+    <string name="function">Función</string>
+    <string name="graph_or_stat">Gráfico ou estatística</string>
+    <string name="symlink">Ligazón simbólica</string>
+    <string name="symlinks">Ligazóns simbólicas</string>
+    <string name="reminder">Recordatorio</string>
+    <string name="add_component">Engadir un compoñente</string>
+    <string name="symlink_locations_title">Localizacións de \"%1$s\"</string>
+    <string name="add_tracker">Rexistrar algo:</string>
+    <string name="add">Engadir</string>
+    <string name="group_name">p. ex., Actividades diarias</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="update">Actualizar</string>
+    <string name="graph_or_stat_name">Nome do gráfico: </string>
+    <string name="tracker_name">Nome do rexistro</string>
+    <string name="this_is_a_time_or_duration">É unha hora ou duración</string>
+    <string name="yes">Si</string>
+    <string name="cancel">Cancelar</string>
+    <string name="select_file">Seleccionar ficheiro</string>
+    <string name="empty_group_hint">Dámosche a benvida a Track &amp; Graph!\n\n Toca + na esquina superior dereita e selecciona Rexistro para comezar.</string>
+    <string name="no_trackers_graph_stats_hint">Crea un rexistro antes de crear gráficos.</string>
+    <string name="no_trackers_functions_hint">Crea un rexistro antes de crear funcións.</string>
+    <string name="ru_sure_del_group">Seguro que queres eliminar este grupo e todo o que contén? Non se pode desfacer.</string>
+    <string name="ru_sure_del_graph">Seguro que queres eliminar este gráfico? Non se pode desfacer. Non perderás ningún dato rexistrado.</string>
+    <string name="ru_sure_del_feature">Seguro que queres eliminar estes datos rexistrados?</string>
+    <string name="item_in_multiple_groups">Este elemento existe en varios lugares. Podes eliminalo de aquí ou eliminalo de todas partes.</string>
+    <string name="remove_from_this_group">Eliminar de aquí</string>
+    <string name="delete_everywhere">Eliminar de todas partes</string>
+    <string name="ru_sure_del_function">Seguro que queres eliminar esta función? Non se pode desfacer.</string>
+    <string name="ru_sure_del_reminder">Seguro que queres eliminar este recordatorio? Non se pode desfacer.</string>
+    <string name="ru_sure_del_data_point">Seguro que queres eliminar este punto de datos?</string>
+    <string name="feature_name_cannot_be_null">Engade un nome</string>
+    <string name="tracker_with_that_name_exists">Xa estás rexistrando algo con ese nome</string>
+    <string name="data_points">%1$d puntos de datos</string>
+    <string name="items_selected">%1$d seleccionados</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="deselect_all">Deseleccionar todo</string>
+    <string name="ru_sure_del_data_points">Seguro que queres eliminar estes puntos de datos?</string>
+    <string name="delete_selected_content_description">Eliminar elementos seleccionados</string>
+    <string name="copy_selected_content_description">Copiar elementos seleccionados</string>
+    <string name="move_selected_content_description">Mover elementos seleccionados</string>
+    <string name="copy_to">Copiar a</string>
+    <string name="no_data">Sen datos</string>
+    <string name="skip">Omitir</string>
+    <string name="exportButton">Exportar</string>
+    <string name="importButton">Importar</string>
+    <string name="import_export">Importar/Exportar</string>
+    <string name="search">Buscar</string>
+    <string name="type_to_search">Escribe para buscar</string>
+    <string name="no_results">Non hai resultados</string>
+    <string name="export_to">Exportar a CSV os datos rexistrados deste grupo:</string>
+    <string name="export_error_message">Fallou a exportación: %1$s</string>
+    <string name="import_from">Importar datos rexistrados desde un CSV a este grupo:</string>
+    <string name="import_warning">Aviso: A importación é irreversible. Track &amp; Graph tentará combinar os datos importados cos datos existentes neste grupo polo nome.</string>
+    <string name="add_a_graph_or_stat">Engadir un gráfico ou estatística</string>
+    <string name="graph_type_label">Tipo de gráfico:</string>
+    <string name="sample_size">Tamaño da mostra:</string>
+    <string name="select_a_discrete_feature">Selecciona un conxunto de datos con etiquetas: </string>
+    <string name="no_labels">Este conxunto de datos non ten etiquetas</string>
+    <string name="select_a_feature">Selecciona un conxunto de datos:</string>
+    <string name="select_a_tracker">Selecciona un rexistro</string>
+    <string name="offset">Desprazamento:</string>
+    <string name="scale">Escala:</string>
+    <string name="from">Desde:</string>
+    <string name="to">Ata:</string>
+    <string name="day">Día</string>
+    <string-array name="time_histogram_windows">
+        <item>Cada hora</item>
+        <item>Diario</item>
+        <item>Semanal</item>
+        <item>Mensual</item>
+        <item>Trimestral</item>
+        <item>Semestral</item>
+        <item>Anual</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Aforro de batería</item>
+        <item>Claro</item>
+        <item>Escuro</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Predeterminado do sistema</item>
+        <item>Claro</item>
+        <item>Escuro</item>
+    </string-array>
+    <string name="graph_type_line_graph">Gráfico de liñas</string>
+    <string name="graph_type_pie_chart">Gráfico circular</string>
+    <string name="graph_type_average_time_between">Tempo medio entre eventos</string>
+    <string name="graph_type_time_since">Tempo desde</string>
+    <string name="graph_type_time_histogram">Histograma temporal</string>
+    <string name="graph_type_last_value">Último rexistro/Tempo desde</string>
+    <string name="graph_type_bar_chart">Gráfico de barras</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Sen media</item>
+        <item>Media móbil diaria</item>
+        <item>Media móbil de tres días</item>
+        <item>Media móbil semanal</item>
+        <item>Media móbil mensual</item>
+        <item>Media móbil de tres meses</item>
+        <item>Media móbil de seis meses</item>
+        <item>Media móbil anual</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Representar ao rexistrar</item>
+        <item>Representar totais horarios</item>
+        <item>Representar totais diarios</item>
+        <item>Representar totais semanais</item>
+        <item>Representar totais mensuais</item>
+        <item>Representar totais anuais</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Todos os datos</string>
+    <string name="graph_time_durations_a_day">Un día</string>
+    <string name="graph_time_durations_a_week">Unha semana</string>
+    <string name="graph_time_durations_a_month">Un mes</string>
+    <string name="graph_time_durations_three_months">Tres meses</string>
+    <string name="graph_time_durations_six_months">Seis meses</string>
+    <string name="graph_time_durations_a_year">Un ano</string>
+    <string name="custom">Personalizado</string>
+    <string-array name="y_range_styles">
+        <item>Dinámico</item>
+        <item>Fixado</item>
+    </string-array>
+    <string name="ending_at_latest">Último punto de datos</string>
+    <string name="ending_at_now">Agora</string>
+    <string name="ending_at_custom_date">Data personalizada…</string>
+    <string name="hours_and_minutes_ago">Hai %1$dh e %2$dm</string>
+    <string name="import_exception_unknown">Fallou a importación: produciuse un erro descoñecido</string>
+    <string name="import_exception_bad_headers">Fallou a importación: as cabeceiras non coinciden coas esperadas: %1$s</string>
+    <string name="import_exception_inconsistent_record">Fallou a importación: o rexistro da liña %1$s non é coherente coas cabeceiras requiridas</string>
+    <string name="import_exception_bad_timestamp">Fallou a importación: non se puido interpretar a marca de tempo do rexistro da liña: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Fallou a importación: tipo de datos incoherente na liña: %1$s</string>
+    <string name="unknown_error_occurred">Produciuse un erro descoñecido</string>
+    <string name="graph_stat_validation_no_name">Indica un nome</string>
+    <string name="graph_stat_validation_no_line_graph_features">Engade algo ao gráfico</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Asegúrate de que \"Desde\" sexa menor ou igual ca \"Ata\"</string>
+    <string name="graph_stat_validation_unrecognised_color">Asegúrate de que todos os conxuntos de datos teñan unha cor</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Detectouse un conxunto de datos de gráfico de liñas non válido</string>
+    <string name="graph_stat_validation_bad_fixed_range">Asegúrate de que \"Desde\" sexa menor ca \"Ata\"</string>
+    <string name="graph_stat_view_not_found">Produciuse un erro ao buscar este gráfico</string>
+    <string name="graph_stat_view_not_enough_data_stat">Esta estatística amosarase cando haxa suficientes datos rexistrados para xerala.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Este gráfico amosarase cando haxa suficientes datos rexistrados para xeralo.</string>
+    <string name="pie_chart_mixed_signs_error">Non se pode representar este gráfico circular porque contén tamaños de segmentos positivos e negativos.</string>
+    <string name="histogram_mixed_signs_error">Non se pode representar este histograma porque contén tamaños de intervalos positivos e negativos.</string>
+    <string name="graph_non_finite_data_error">Non se pode representar este gráfico porque contén un valor que non é un número finito.</string>
+    <string name="graph_inconsistent_series_error">Non se pode representar este gráfico porque as súas series de datos teñen tamaños incoherentes.</string>
+    <string name="graph_invalid_y_range_error">Non se pode representar este gráfico porque o intervalo do eixe Y non é válido.</string>
+    <string name="finish">Rematar</string>
+    <string name="about_description">Track &amp; Graph é software libre e de código aberto baixo a licenza GPL 3.0.</string>
+    <string name="about_libraries_message">Usáronse as seguintes bibliotecas de código aberto:</string>
+    <string name="about">Sobre</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Preguntas frecuentes</string>
+    <string name="tutorial_text_1">Usa rexistros para rexistrar os teus datos.</string>
+    <string name="tutorial_text_2">Usa gráficos e estatísticas para visualizar os datos.</string>
+    <string name="tutorial_text_3">Usa grupos para organizar os teus rexistros, gráficos e estatísticas.</string>
+    <string name="got_it">Entendido!</string>
+    <string name="move_to_colon">Mover a:</string>
+    <string name="move_to">Mover a</string>
+    <string name="ru_sure_update_data">Esta actualización pode modificar de forma irreversible os datos que xa rexistraches. Recoméndase encarecidamente facer unha copia de seguridade dos datos existentes antes de continuar.\n\n Queres continuar?</string>
+    <string name="ok">Aceptar</string>
+    <string name="rate_the_app">Valorar a aplicación</string>
+    <string name="reminders">Recordatorios</string>
+    <string name="no_reminders_hint">Toca a icona + para crear unha nova notificación de recordatorio de rexistro.</string>
+    <string name="mon">Lun</string>
+    <string name="tue">Mar</string>
+    <string name="wed">Mér</string>
+    <string name="thu">Xov</string>
+    <string name="fri">Ven</string>
+    <string name="sat">Sáb</string>
+    <string name="sun">Dom</string>
+    <string name="reminders_notifications_channel_name">Recordatorios</string>
+    <string name="reminders_notifications_channel_description">Notificacións creadas polo usuario para lembrarche cando rexistrar datos</string>
+    <string name="default_reminder_name">Hora de rexistrar!</string>
+    <string name="missed_reminder_single_content">Recordatorio de %1$s</string>
+    <string name="missed_reminders_multiple_content">Perdiches %1$d recordatorios</string>
+    <string name="next_reminder_format">Seguinte recordatorio: %1$s</string>
+    <string name="no_upcoming_reminders">Non hai próximos recordatorios</string>
+    <string name="select_reminder_type">Selecciona un tipo de recordatorio</string>
+    <string name="week_day_reminder">Recordatorio por días da semana</string>
+    <string name="week_day_reminder_description">Días específicos como luns, mércores e venres</string>
+    <string name="periodic_reminder">Recordatorio periódico</string>
+    <string name="periodic_reminder_description">Intervalos regulares, como cada 3 días</string>
+    <string name="month_day_reminder">Recordatorio por día do mes</string>
+    <string name="month_day_reminder_description">Patróns mensuais, como o primeiro luns</string>
+    <string name="time_since_last_reminder">Tempo desde o último recordatorio</string>
+    <string name="time_since_last_reminder_description">Cando levas un tempo sen rexistrar algo</string>
+    <string name="one_time_reminder">Recordatorio único</string>
+    <string name="one_time_reminder_description">Un recordatorio independente nunha hora específica ou tras un atraso</string>
+    <string name="reminder_name">Nome do recordatorio</string>
+    <string name="reminder_disabled">Recordatorio desactivado</string>
+    <string name="repeat_every">Repetir cada</string>
+    <string name="at_time">Á hora</string>
+    <string name="at_a_specific_time">Nunha hora específica</string>
+    <string name="ending_at">Remata o</string>
+    <string name="starting_from">Comeza o</string>
+    <string name="repeat_on_week_days">Repetir nos días da semana</string>
+    <string name="track_feature">Rexistrar fonte de datos</string>
+    <string name="select_tracker_placeholder">Selecciona un rexistro</string>
+    <string name="remind_after">Lembrar despois de</string>
+    <string name="then_remind_every">Despois, lembrar cada</string>
+    <string name="remind_at_date_and_time">Nunha data e hora</string>
+    <string name="remind_after_a_delay">Despois dun atraso</string>
+    <string name="first_reminder">Primeiro recordatorio</string>
+    <string name="every_colon">Cada:</string>
+    <string name="ended_at_format">Rematou o: %1$s</string>
+    <string name="starting_at_format">Comeza o: %1$s</string>
+    <string name="occurrence_first">Primeiro</string>
+    <string name="occurrence_second">Segundo</string>
+    <string name="occurrence_third">Terceiro</string>
+    <string name="occurrence_fourth">Cuarto</string>
+    <string name="occurrence_last">Último</string>
+    <string name="monday">Luns</string>
+    <string name="tuesday">Martes</string>
+    <string name="wednesday">Mércores</string>
+    <string name="thursday">Xoves</string>
+    <string name="friday">Venres</string>
+    <string name="saturday">Sábado</string>
+    <string name="sunday">Domingo</string>
+    <string-array name="abbreviated_months">
+        <item>Xan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Abr</item>
+        <item>Mai</item>
+        <item>Xuñ</item>
+        <item>Xul</item>
+        <item>Ago</item>
+        <item>Set</item>
+        <item>Out</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mér</item>
+        <item>Xov</item>
+        <item>Ven</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Estilo do intervalo:</string>
+    <string name="track_widget_configure_no_data_error">Rexistra primeiro algún dato.</string>
+    <string name="track_widget_configure_no_data_selected_error">Debes seleccionar un conxunto de datos válido para crear un widget de rexistro.</string>
+    <string name="create">Crear</string>
+    <string name="use_default_value">Establecer un valor predeterminado</string>
+    <string name="backup_and_restore">Copia de seguridade e restauración</string>
+    <string name="backup_hint_text">A copia de seguridade garda todos os datos da aplicación, incluídos os datos rexistrados, gráficos e recordatorios. Debes facer copias de seguridade regularmente nun dispositivo externo ou almacenamento na nube por se perdes ou danas o dispositivo.</string>
+    <string name="restore_data">Restaurar datos</string>
+    <string name="backup_successful">Copia de seguridade realizada!</string>
+    <string name="backup_error_could_not_write_to_file">Non se puido atopar o ficheiro seleccionado nin escribir nel.</string>
+    <string name="backup_error_could_not_find_database_file">Non se puido atopar nin ler o ficheiro da base de datos.</string>
+    <string name="backup_error_failed_to_copy_database">Produciuse un erro ao copiar o ficheiro da base de datos.</string>
+    <string name="restore_failed">Fallou a restauración. %1$s</string>
+    <string name="add_a_longer_description_optional">Engade unha descrición máis longa (opcional)</string>
+    <string name="no_data_points_history_fragment_hint">O teu historial aparecerá aquí cando teñas algúns puntos de datos.</string>
+    <string name="data_resolution_error">Produciuse un erro ao intentar resolver estes datos:\n\n%1$s</string>
+    <string name="info">Información</string>
+    <string name="no_description">Sen descrición</string>
+    <string name="description">Descrición</string>
+    <string name="app_lock_title">Bloqueo da aplicación</string>
+    <string name="app_lock_locked_title">Track &amp; Graph está bloqueado</string>
+    <string name="app_lock_password_label">Contrasinal</string>
+    <string name="app_lock_confirm_password_label">Confirmar contrasinal</string>
+    <string name="app_lock_unlock">Desbloquear</string>
+    <string name="app_lock_use_biometrics">Usar datos biométricos</string>
+    <string name="app_lock_enable">Activar o bloqueo da aplicación</string>
+    <string name="app_lock_enabled">O bloqueo da aplicación está activado</string>
+    <string name="app_lock_enable_biometric_unlock">Activar o desbloqueo biométrico</string>
+    <string name="app_lock_no_strong_biometric_available">Non hai ningún desbloqueo biométrico seguro dispoñible neste dispositivo.</string>
+    <string name="app_lock_lock_after_background_minutes">Bloquear despois de minutos en segundo plano</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Usa 0 para bloquear en canto a aplicación abandone o primeiro plano.</string>
+    <string name="app_lock_change_password">Cambiar o contrasinal</string>
+    <string name="app_lock_password_changed">Contrasinal cambiado</string>
+    <string name="app_lock_disable">Desactivar o bloqueo da aplicación</string>
+    <string name="app_lock_unlock_biometric_title">Desbloquear Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Usa os datos biométricos do dispositivo para continuar</string>
+    <string name="app_lock_use_password">Usar contrasinal</string>
+    <string name="app_lock_biometric_not_recognized">Non se recoñeceu a autenticación biométrica.</string>
+    <string name="app_lock_error_missing_password">O bloqueo da aplicación non ten contrasinal. Desactiva e volve activar o bloqueo da aplicación.</string>
+    <string name="app_lock_error_incorrect_password">Contrasinal incorrecto</string>
+    <string name="app_lock_error_password_hashing_unavailable">A verificación do contrasinal do bloqueo da aplicación non está dispoñible neste dispositivo.</string>
+    <string name="app_lock_error_enter_password">Introduce un contrasinal.</string>
+    <string name="app_lock_error_passwords_do_not_match">Os contrasinais non coinciden.</string>
+    <string name="note_input_hint">Notas…</string>
+    <string name="add_a_note">Engadir unha nota</string>
+    <string name="notes">Notas</string>
+    <string name="show_global_notes">Globais</string>
+    <string name="show_data_point_notes">Puntos de datos</string>
+    <string name="delete_reminder_content_description">Eliminar recordatorio</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Formato de data:</string>
+    <string name="add_data_point_button_content_description">Botón para engadir un punto de datos</string>
+    <string name="tracked_data_menu_button_content_description">Botón do menú de datos rexistrados</string>
+    <string name="tracked_data_history_button_content_description">Botón do historial de datos rexistrados</string>
+    <string name="delete_line_button_content_description">Botón para eliminar a liña</string>
+    <string name="delete_input_button_content_description">Botón para eliminar a entrada</string>
+    <string name="delete_data_point_button_content_description">Botón para eliminar o punto de datos</string>
+    <string name="edit_data_point_button_content_description">Botón para editar o punto de datos</string>
+    <string name="add_multiple_choice_answer_button_content_description">Botón para engadir unha resposta de opción múltiple</string>
+    <string name="ending_at_colon">Mostra que remata en:</string>
+    <string name="duplicate">Duplicar</string>
+    <string name="no_notes_hint_text">As notas engadidas ao rexistrar datos aparecerán aquí. Tamén podes engadir notas globais usando o botón +.</string>
+    <string name="add_a_global_note">Engadir unha nota global:</string>
+    <string name="duration">Duración</string>
+    <string name="weeks">Semanas</string>
+    <string name="months">Meses</string>
+    <string name="days">Días</string>
+    <string name="hours">Horas</string>
+    <string name="minutes">Minutos</string>
+    <string name="seconds">Segundos</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Os valores rexistrados anteriormente representan:</string>
+    <string name="duration_to_numeric_mode_header">En que se deben converter os valores rexistrados anteriormente:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Non podes mesturar duracións de tempo con outros tipos de datos. Considera representar horas, minutos ou segundos</string>
+    <string name="sum_by_count_checkbox_label">Marca aquí para contar o número de puntos de datos rexistrados en vez do total dos seus valores.</string>
+    <string name="time_window_size">Tamaño da xanela temporal:</string>
+    <string name="hold_to_preview">Mantén premido para previsualizar</string>
+    <string name="open">Abrir</string>
+    <string name="close">Pechar</string>
+    <string name="filter_by_label">Filtrar por etiqueta</string>
+    <string name="filter_by_value">Filtrar por intervalo de valores</string>
+    <string name="save_changes">Gardar cambios</string>
+    <string name="timer_notification_channel_name">Temporizadores</string>
+    <string name="stop">Deter</string>
+    <string name="name_your_function">Ponlle un nome á función: </string>
+    <string name="add_some_data_sources">Engadir fontes de datos</string>
+    <string name="value">Valor</string>
+    <string name="label">Etiqueta</string>
+    <string name="continue_word">Continuar</string>
+    <string name="update_all_data_points">Actualizar todos os puntos de datos: </string>
+    <string name="where_colon">Onde:</string>
+    <string name="to_colon">Ata:</string>
+    <string name="value_equals">Valor =</string>
+    <string name="label_equals">Etiqueta =</string>
+    <string name="adding_your_first_data_point">Un breve titorial sobre como engadir puntos de datos:</string>
+    <string name="next">Seguinte</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Cada punto de datos ten unha marca temporal e un valor: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Tamén pode ter opcionalmente unha etiqueta e unha nota: </string>
+    <string name="data_point_tutorial_page_2_description">O valor é un número, polo que podes ver como cambian os teus datos co tempo</string>
+    <string name="data_point_tutorial_page_2_hint">(Consello: se non che importa o valor, usa o valor predeterminado de 1)</string>
+    <string name="data_point_tutorial_page_3_description">Usa etiquetas se queres agrupar os puntos de datos</string>
+    <string name="data_point_tutorial_page_3_hint">(Consello: se queres engadir máis contexto ou descrición, usa a nota en vez do campo de etiqueta)</string>
+    <string name="help">Axuda</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Opcións avanzadas</string>
+    <string name="type_colon">\"Tipo: \"</string>
+    <string name="order_colon">\"Orde: \"</string>
+    <string name="value_and_label">Valor e etiqueta</string>
+    <string name="value_only">Só valor</string>
+    <string name="label_only">Só etiqueta</string>
+    <string name="none">Ningún</string>
+    <string name="value_ascending">Valor ascendente</string>
+    <string name="value_descending">Valor descendente</string>
+    <string name="label_ascending">Etiqueta ascendente</string>
+    <string name="label_descending">Etiqueta descendente</string>
+    <string name="latest">Máis recente</string>
+    <string name="oldest">Máis antigo</string>
+    <string name="track_all">Rexistrar todo</string>
+    <string name="more_details">Máis detalles</string>
+    <string name="suggestions">Suxestións</string>
+    <string name="no_label">Sen etiqueta</string>
+    <string name="confirm_cancel_notes_will_be_lost">Seguro que queres pechar? Perderanse todas as notas.</string>
+    <string name="add_a_label">Engadir unha etiqueta</string>
+    <string name="bar_interval">Intervalo das barras:</string>
+    <string name="y_range_max">Máximo do intervalo Y</string>
+    <string name="total_formatted">Total: %s</string>
+    <string name="from_formatted">Desde: %s</string>
+    <string name="to_formatted">Ata: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Segundo(s)</string>
+    <string name="minutes_generic">Minuto(s)</string>
+    <string name="hours_generic">Hora(s)</string>
+    <string name="days_generic">Día(s)</string>
+    <string name="weeks_generic">Semana(s)</string>
+    <string name="months_generic">Mes(s)</string>
+    <string name="years_generic">Ano(s)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d semana</item>
+        <item quantity="other">%d semanas</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d mes</item>
+        <item quantity="other">%d meses</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d ano</item>
+        <item quantity="other">%d anos</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Cada minuto</item>
+        <item quantity="other">Cada %d minutos</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Cada hora</item>
+        <item quantity="other">Cada %d horas</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Cada día</item>
+        <item quantity="other">Cada %d días</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Cada semana</item>
+        <item quantity="other">Cada %d semanas</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Cada mes</item>
+        <item quantity="other">Cada %d meses</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Cada ano</item>
+        <item quantity="other">Cada %d anos</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Despois de 1 minuto</item>
+        <item quantity="other">Despois de %d minutos</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Despois de 1 hora</item>
+        <item quantity="other">Despois de %d horas</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Despois de 1 día</item>
+        <item quantity="other">Despois de %d días</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Despois de 1 semana</item>
+        <item quantity="other">Despois de %d semanas</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Despois de 1 mes</item>
+        <item quantity="other">Despois de %d meses</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Despois de 1 ano</item>
+        <item quantity="other">Despois de %d anos</item>
+    </plurals>
+    <string name="restore_hint_text">AVISO: Restaurar desde unha copia de seguridade borrará todos os datos e a configuración actual da aplicación. Primeiro deberías facer unha copia de seguridade dos teus datos!</string>
+    <string name="backup_now">Facer copia agora</string>
+    <string name="restore_error_could_not_write_to_database">Non se puido restaurar! Non se puido atopar a base de datos nin escribir nela.</string>
+    <string name="restore_error_could_not_read_from_database_file">Non se puido restaurar! Non se puido atopar nin ler o ficheiro de base de datos seleccionado.</string>
+    <string name="restore_error_failed_to_copy_database">Non se puido restaurar! Produciuse un erro ao restaurar a base de datos.</string>
+    <string name="select_location">Seleccionar localización…</string>
+    <string name="restore_successful">Restauración correcta! Agora hai que reiniciar Track &amp; Graph.</string>
+    <string name="restore_error_invalid_database_file">Non se puido restaurar! O ficheiro seleccionado non parece ser unha copia de seguridade válida.</string>
+    <string name="auto_backup">Copia de seguridade automática</string>
+    <string name="apply">Aplicar</string>
+    <string name="backup_every">Facer copia cada: </string>
+    <string name="next_backup_at">\"Próxima copia ás: \"</string>
+    <string name="backup_notification_channel_name">Notificacións de copias automáticas</string>
+    <string name="backup_notification_channel_description">Infórmache cando se está facendo unha copia automática e se falla.</string>
+    <string name="backup_notification_title">Copia en curso…</string>
+    <string name="backup_failed_notification_title">Fallou a copia automática</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph non puido atopar nin acceder á localización da copia de seguridade.</string>
+    <string name="backup_failed_notification_could_not_copy">Produciuse un erro ao facer a copia dos teus datos. A copia pode estar danada ou incompleta.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Seleccionar nova localización</string>
+    <string name="backup_location">Localización da copia</string>
+    <string name="enable_auto_backup">Activar a copia automática</string>
+    <string name="last_successful_backup">Última copia correcta</string>
+    <string name="next_scheduled_backup">Próxima copia programada</string>
+    <string name="notification_permission_prompt">Debes activar as notificacións de Track &amp; Graph para recibir avisos se a copia automática falla por calquera motivo.</string>
+    <string name="lua_script_empty">Engade un script de Lua</string>
+    <string name="function_name_empty">O nome da función non pode estar baleiro</string>
+    <string name="function_name">Nome da función</string>
+    <string name="add_at_least_one_input">Engade polo menos unha entrada</string>
+    <string name="output">Saída</string>
+    <string name="data_source">Fonte de datos</string>
+    <string name="lua_script">Script de Lua</string>
+    <string name="data_source_description">Un nodo de fonte de datos permíteche seleccionar un rexistro ou función para usalo como entrada.</string>
+    <string name="lua_script_input_hint">Introduce un script de Lua…</string>
+    <string name="select_node_type">Seleccionar tipo de nodo</string>
+    <string name="file">Ficheiro</string>
+    <string name="lua_feature_names_not_unique">As entradas do script deben ter nomes únicos</string>
+    <string name="graph_stat_type_lua_graph">Script de Lua</string>
+    <string name="launch_lua_disabled">Inicio de Lua desactivado</string>
+    <string name="no_lua">Sen Lua</string>
+    <string name="lua_engine_disabled">Motor de Lua desactivado</string>
+    <string name="lua_graph_first_time_user_title">Gráficos e estatísticas con scripts de Lua</string>
+    <string name="lua_graph_first_time_user_message">Os scripts de Lua son unha función avanzada que che permite crear gráficos e estatísticas personalizados coa linguaxe de programación Lua. \n\nPodes cargar un propio ou escoller un da colección de GitHub. Ao instalar un script desde GitHub, volverás á aplicación co script listo para usar.</string>
+    <string name="functions_first_time_user_title">Benvido ás funcións</string>
+    <string name="functions_first_time_user_message">As funcións son unha función avanzada que che permite combinar, agregar e transformar os teus datos en novas fontes de datos derivadas.</string>
+    <string name="learn_more">Máis información aquí</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Pegar</string>
+    <string name="failed_to_download_file">Non se puido descargar o ficheiro: %s</string>
+    <string name="confirm_deep_link">Recibiches unha ligazón a un script desde unha fonte descoñecida. Instala scripts só de fontes nas que confíes. Queres instalar este script?</string>
+    <string name="graph_stat_info_button_description">Titoriais sobre gráficos e estatísticas</string>
+    <string name="network_generic_error">Produciuse un erro ao tentar acceder á rede. Comproba a conexión e téntao de novo.</string>
+    <string name="function_verification_failure">Non se puideron verificar as sinaturas da función. Asegúrate de ter unha conexión segura e de que Track &amp; Graph está actualizado</string>
+    <string name="function_network_failure">Non se puideron cargar as funcións. Asegúrate de ter conexión a internet. Se o problema persiste, comproba que a aplicación está actualizada.</string>
+    <string name="functions_landscape_hint">Consello: as funcións funcionan mellor en horizontal</string>
+    <string name="functions_start_hint">Comeza aquí: mantén premido e selecciona Fonte de datos</string>
+    <string name="see_whats_new">Ver as novidades</string>
+</resources>

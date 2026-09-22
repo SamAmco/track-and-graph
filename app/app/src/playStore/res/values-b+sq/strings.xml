@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Mbështetni zhvilluesin</string>
+    <string name="support_unavailable">Aktualisht nuk ka opsione mbështetjeje.</string>
+    <string name="support_payment_failed">Pagesa dështoi. Provoni përsëri.</string>
+    <string name="support_payment_pending">Pagesa është në pritje. Google Play do ta përfundojë pasi pagesa të konfirmohet.</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">追加</string>
+    <string name="add_a_note">メモを追加</string>
+    <string name="cancel">キャンセル</string>
+    <string name="continue_word">続行</string>
+    <string name="create">作成</string>
+    <string name="label">ラベル</string>
+    <string name="release_notes_support_text">皆さまの支援がTrack &amp; Graphの継続と成長を支えます 🌱</string>
+    <string name="release_notes_maybe_later">また後で</string>
+    <string name="release_notes_support_development">開発を支援するために寄付</string>
+    <string name="release_notes_thank_you">ありがとうございます！ ❤️\n\n皆さまの支援は、Track &amp; Graphをより良くするために役立てられます 🌱</string>
+    <string name="support_close">閉じる</string>
+    <string name="search">検索</string>
+    <string name="update">更新</string>
+    <string name="value">値</string>
+</resources>

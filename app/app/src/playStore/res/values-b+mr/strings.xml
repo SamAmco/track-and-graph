@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">डेव्हलपरला समर्थन द्या</string>
+    <string name="support_unavailable">सध्या कोणतेही समर्थन पर्याय उपलब्ध नाहीत.</string>
+    <string name="support_payment_failed">पेमेंट अयशस्वी झाले. कृपया पुन्हा प्रयत्न करा.</string>
+    <string name="support_payment_pending">पेमेंट प्रलंबित आहे. पेमेंटची पुष्टी झाल्यानंतर Google Play ते पूर्ण करेल.</string>
+</resources>

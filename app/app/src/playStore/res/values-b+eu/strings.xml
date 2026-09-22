@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Lagundu garatzaileari</string>
+    <string name="support_unavailable">Une honetan ez dago laguntza-aukerarik erabilgarri.</string>
+    <string name="support_payment_failed">Ordainketak huts egin du. Saiatu berriro.</string>
+    <string name="support_payment_pending">Ordainketa egiteke dago. Google Play-ek ordainketa baieztatu ondoren osatuko du.</string>
+</resources>

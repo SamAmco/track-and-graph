@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Lisää</string>
+    <string name="add_a_note">Lisää muistiinpano</string>
+    <string name="cancel">Peruuta</string>
+    <string name="continue_word">Jatka</string>
+    <string name="create">Luo</string>
+    <string name="label">Tunniste</string>
+    <string name="release_notes_support_text">Tukesi auttaa pitämään Track &amp; Graphin elossa ja kasvussa 🌱</string>
+    <string name="release_notes_maybe_later">Ehkä myöhemmin</string>
+    <string name="release_notes_support_development">Tue kehitystyötä lahjoittamalla</string>
+    <string name="release_notes_thank_you">Kiitos! ❤️\n\nJokainen tuki auttaa tekemään Track &amp; Graphista paremman kaikille 🌱</string>
+    <string name="support_close">Sulje</string>
+    <string name="search">Haku</string>
+    <string name="update">Päivitä</string>
+    <string name="value">Arvo</string>
+</resources>

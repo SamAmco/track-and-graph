@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="about_description">Track &amp; Graph adalah perangkat lunak gratis dan sumber terbuka berdasarkan Lisensi GPL 3.0.</string>
+    <string name="about_libraries_message">Pustaka sumber terbuka berikut digunakan:</string>
+    <string name="about">Tentang</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">FAQ</string>
+    <string name="tutorial_text_1">Gunakan pelacak untuk mencatat data Anda.</string>
+    <string name="tutorial_text_2">Gunakan grafik dan statistik untuk memvisualisasikan data.</string>
+    <string name="tutorial_text_3">Gunakan grup untuk mengatur pelacak, grafik, dan statistik Anda.</string>
+    <string name="got_it">Mengerti!</string>
+    <string name="move_to_colon">Pindahkan ke:</string>
+    <string name="move_to">Pindahkan ke</string>
+    <string name="ru_sure_update_data">Pembaruan ini dapat mengubah data yang telah Anda catat secara permanen. Sangat disarankan untuk mencadangkan data yang ada sebelum melanjutkan.\n\n Apakah Anda ingin melanjutkan?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Beri rating aplikasi</string>
+    <string name="reminders">Pengingat</string>
+    <string name="no_reminders_hint">Ketuk ikon + untuk membuat notifikasi pengingat pencatatan baru.</string>
+    <string name="mon">Sen</string>
+    <string name="tue">Sel</string>
+    <string name="wed">Rab</string>
+    <string name="thu">Kam</string>
+    <string name="fri">Jum</string>
+    <string name="sat">Sab</string>
+    <string name="sun">Min</string>
+    <string name="reminders_notifications_channel_name">Pengingat</string>
+    <string name="reminders_notifications_channel_description">Notifikasi yang dibuat pengguna untuk mengingatkan Anda kapan harus mencatat</string>
+    <string name="default_reminder_name">Waktunya mencatat!</string>
+    <string name="missed_reminder_single_content">Pengingat dari %1$s</string>
+    <string name="missed_reminders_multiple_content">Anda melewatkan %1$d pengingat</string>
+    <string name="next_reminder_format">Pengingat berikutnya: %1$s</string>
+    <string name="no_upcoming_reminders">Tidak Ada Pengingat Mendatang</string>
+    <string name="select_reminder_type">Pilih Jenis Pengingat</string>
+    <string name="week_day_reminder">Pengingat Hari Mingguan</string>
+    <string name="week_day_reminder_description">Hari tertentu seperti Senin, Rabu, Jumat</string>
+    <string name="periodic_reminder">Pengingat Berkala</string>
+    <string name="periodic_reminder_description">Interval rutin seperti setiap 3 hari</string>
+    <string name="month_day_reminder">Pengingat Hari Bulanan</string>
+    <string name="month_day_reminder_description">Pola bulanan seperti Senin pertama</string>
+    <string name="time_since_last_reminder">Waktu Sejak Pengingat Terakhir</string>
+    <string name="time_since_last_reminder_description">Saat Anda sudah lama tidak mencatat sesuatu</string>
+    <string name="one_time_reminder">Pengingat Satu Kali</string>
+    <string name="one_time_reminder_description">Pengingat mandiri pada waktu tertentu atau setelah jeda</string>
+    <string name="reminder_name">Nama Pengingat</string>
+    <string name="reminder_disabled">Pengingat dinonaktifkan</string>
+    <string name="repeat_every">Ulangi Setiap</string>
+    <string name="at_time">Pada Waktu</string>
+    <string name="at_a_specific_time">Pada waktu tertentu</string>
+    <string name="ending_at">Berakhir pada</string>
+    <string name="starting_from">Mulai Dari</string>
+    <string name="repeat_on_week_days">Ulangi Pada Hari Minggu</string>
+    <string name="track_feature">Catat Sumber Data</string>
+    <string name="select_tracker_placeholder">Pilih pelacak</string>
+    <string name="remind_after">Ingatkan Setelah</string>
+    <string name="then_remind_every">Lalu Ingatkan Setiap</string>
+    <string name="remind_at_date_and_time">Pada Tanggal dan Waktu</string>
+    <string name="remind_after_a_delay">Setelah Jeda</string>
+    <string name="first_reminder">Pengingat Pertama</string>
+    <string name="every_colon">Setiap:</string>
+    <string name="ended_at_format">Berakhir pada: %1$s</string>
+    <string name="starting_at_format">Dimulai pada: %1$s</string>
+    <string name="occurrence_first">Pertama</string>
+    <string name="occurrence_second">Kedua</string>
+    <string name="occurrence_third">Ketiga</string>
+    <string name="occurrence_fourth">Keempat</string>
+    <string name="occurrence_last">Terakhir</string>
+    <string name="monday">Senin</string>
+    <string name="tuesday">Selasa</string>
+    <string name="wednesday">Rabu</string>
+    <string name="thursday">Kamis</string>
+    <string name="friday">Jumat</string>
+    <string name="saturday">Sabtu</string>
+    <string name="sunday">Minggu</string>
+    <string-array name="abbreviated_months">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>Mei</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Agu</item>
+        <item>Sep</item>
+        <item>Okt</item>
+        <item>Nov</item>
+        <item>Des</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Sen</item>
+        <item>Sel</item>
+        <item>Rab</item>
+        <item>Kam</item>
+        <item>Jum</item>
+        <item>Sab</item>
+        <item>Min</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Gaya rentang:</string>
+    <string name="track_widget_configure_no_data_error">Catat beberapa data terlebih dahulu.</string>
+    <string name="track_widget_configure_no_data_selected_error">Anda harus memilih kumpulan data yang valid untuk membuat widget pencatatan.</string>
+    <string name="create">Buat</string>
+    <string name="use_default_value">Tetapkan nilai default</string>
+    <string name="backup_and_restore">Cadangkan dan Pulihkan</string>
+    <string name="backup_hint_text">Cadangan menyimpan semua data aplikasi Anda, termasuk semua data yang dicatat, grafik, dan pengingat. Cadangkan data Anda ke perangkat eksternal atau penyimpanan cloud secara berkala jika perangkat Anda hilang atau rusak.</string>
+    <string name="restore_data">Pulihkan data</string>
+    <string name="backup_successful">Pencadangan Berhasil!</string>
+    <string name="backup_error_could_not_write_to_file">Tidak dapat menemukan atau menulis ke file yang dipilih.</string>
+    <string name="backup_error_could_not_find_database_file">Tidak dapat menemukan atau membaca file database.</string>
+    <string name="backup_error_failed_to_copy_database">Terjadi kesalahan saat menyalin file database.</string>
+    <string name="restore_failed">Pemulihan gagal. %1$s</string>
+    <string name="add_a_longer_description_optional">Tambahkan deskripsi yang lebih panjang (opsional)</string>
+    <string name="no_data_points_history_fragment_hint">Riwayat Anda akan tampil di sini setelah ada beberapa titik data.</string>
+    <string name="data_resolution_error">Terjadi kesalahan saat mencoba menyelesaikan data ini:\n\n%1$s</string>
+    <string name="info">Info</string>
+    <string name="no_description">Tidak ada deskripsi</string>
+    <string name="description">Deskripsi</string>
+    <string name="app_lock_title">Kunci Aplikasi</string>
+    <string name="app_lock_locked_title">Track &amp; Graph terkunci</string>
+    <string name="app_lock_password_label">Kata sandi</string>
+    <string name="app_lock_confirm_password_label">Konfirmasi kata sandi</string>
+    <string name="app_lock_unlock">Buka Kunci</string>
+    <string name="app_lock_use_biometrics">Gunakan biometrik</string>
+    <string name="app_lock_enable">Aktifkan kunci aplikasi</string>
+    <string name="app_lock_enabled">Kunci aplikasi aktif</string>
+    <string name="app_lock_enable_biometric_unlock">Aktifkan buka kunci biometrik</string>
+    <string name="app_lock_no_strong_biometric_available">Tidak ada buka kunci biometrik kuat yang tersedia di perangkat ini.</string>
+    <string name="app_lock_lock_after_background_minutes">Kunci setelah beberapa menit di latar belakang</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Gunakan 0 untuk mengunci segera setelah aplikasi tidak lagi berada di latar depan.</string>
+    <string name="app_lock_change_password">Ubah kata sandi</string>
+    <string name="app_lock_password_changed">Kata sandi diubah</string>
+    <string name="app_lock_disable">Nonaktifkan kunci aplikasi</string>
+    <string name="app_lock_unlock_biometric_title">Buka Kunci Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Gunakan biometrik perangkat Anda untuk melanjutkan</string>
+    <string name="app_lock_use_password">Gunakan kata sandi</string>
+    <string name="app_lock_biometric_not_recognized">Autentikasi biometrik tidak dikenali.</string>
+    <string name="app_lock_error_missing_password">Kunci aplikasi tidak memiliki kata sandi. Nonaktifkan lalu aktifkan kembali kunci aplikasi.</string>
+    <string name="app_lock_error_incorrect_password">Kata sandi salah</string>
+    <string name="app_lock_error_password_hashing_unavailable">Verifikasi kata sandi kunci aplikasi tidak tersedia di perangkat ini.</string>
+    <string name="app_lock_error_enter_password">Masukkan kata sandi.</string>
+    <string name="app_lock_error_passwords_do_not_match">Kata sandi tidak cocok.</string>
+    <string name="note_input_hint">Catatan…</string>
+    <string name="add_a_note">Tambahkan catatan</string>
+    <string name="notes">Catatan</string>
+    <string name="show_global_notes">Global</string>
+    <string name="show_data_point_notes">Titik data</string>
+    <string name="delete_reminder_content_description">Hapus Pengingat</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Format tanggal:</string>
+    <string name="add_data_point_button_content_description">Tombol tambahkan titik data</string>
+    <string name="tracked_data_menu_button_content_description">Tombol menu data yang dicatat</string>
+    <string name="tracked_data_history_button_content_description">Tombol riwayat data yang dicatat</string>
+    <string name="delete_line_button_content_description">Tombol hapus baris</string>
+    <string name="delete_input_button_content_description">Tombol hapus input</string>
+    <string name="delete_data_point_button_content_description">Tombol hapus titik data</string>
+    <string name="edit_data_point_button_content_description">Tombol edit titik data</string>
+    <string name="add_multiple_choice_answer_button_content_description">Tombol tambahkan jawaban pilihan ganda</string>
+    <string name="ending_at_colon">Sampel berakhir pada:</string>
+    <string name="duplicate">Duplikat</string>
+    <string name="no_notes_hint_text">Catatan yang ditambahkan saat mencatat akan tampil di sini. Anda juga dapat menambahkan catatan global menggunakan tombol +.</string>
+    <string name="add_a_global_note">Tambahkan catatan global:</string>
+    <string name="duration">Durasi</string>
+    <string name="weeks">Minggu</string>
+    <string name="months">Bulan</string>
+    <string name="days">Hari</string>
+    <string name="hours">Jam</string>
+    <string name="minutes">Menit</string>
+    <string name="seconds">Detik</string>
+    <string name="hours_suffix">j</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">d</string>
+    <string name="numeric_to_duration_mode_header">Nilai yang sebelumnya dicatat mewakili:</string>
+    <string name="duration_to_numeric_mode_header">Nilai yang sebelumnya dicatat harus dikonversi menjadi:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Anda tidak dapat mencampur durasi waktu dengan jenis data lain. Pertimbangkan untuk memplot jam, menit, atau detik</string>
+    <string name="sum_by_count_checkbox_label">Centang di sini untuk menghitung jumlah titik data yang dicatat, bukan total nilainya.</string>
+    <string name="time_window_size">Ukuran jendela waktu:</string>
+    <string name="hold_to_preview">Tekan lama untuk melihat pratinjau</string>
+    <string name="open">Buka</string>
+    <string name="close">Tutup</string>
+    <string name="filter_by_label">Filter berdasarkan label</string>
+    <string name="filter_by_value">Filter berdasarkan rentang nilai</string>
+    <string name="save_changes">Simpan Perubahan</string>
+    <string name="timer_notification_channel_name">Timer</string>
+    <string name="stop">Berhenti</string>
+    <string name="name_your_function">Beri nama fungsi Anda: </string>
+    <string name="add_some_data_sources">Tambahkan sumber data</string>
+    <string name="value">Nilai</string>
+    <string name="label">Label</string>
+    <string name="continue_word">Lanjutkan</string>
+    <string name="update_all_data_points">Perbarui semua titik data: </string>
+    <string name="where_colon">Dari:</string>
+    <string name="to_colon">Ke:</string>
+    <string name="value_equals">Nilai =</string>
+    <string name="label_equals">Label =</string>
+    <string name="adding_your_first_data_point">Tutorial singkat menambahkan titik data:</string>
+    <string name="next">Berikutnya</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Setiap titik data memiliki stempel waktu dan nilai: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Titik data juga dapat memiliki label dan catatan secara opsional: </string>
+    <string name="data_point_tutorial_page_2_description">Nilainya berupa angka agar Anda dapat melihat perubahan data dari waktu ke waktu</string>
+    <string name="data_point_tutorial_page_2_hint">(Petunjuk: Jika Anda tidak memerlukan nilai, gunakan nilai default 1)</string>
+    <string name="data_point_tutorial_page_3_description">Gunakan label jika ingin mengelompokkan titik data</string>
+    <string name="data_point_tutorial_page_3_hint">(Petunjuk: Jika ingin menambahkan konteks atau deskripsi, gunakan catatan, bukan kolom label)</string>
+    <string name="help">Bantuan</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Opsi lanjutan</string>
+    <string name="type_colon">\"Jenis: \"</string>
+    <string name="order_colon">\"Urutan: \"</string>
+    <string name="value_and_label">Nilai dan label</string>
+    <string name="value_only">Hanya nilai</string>
+    <string name="label_only">Hanya label</string>
+    <string name="none">Tidak ada</string>
+    <string name="value_ascending">Nilai menaik</string>
+    <string name="value_descending">Nilai menurun</string>
+    <string name="label_ascending">Label menaik</string>
+    <string name="label_descending">Label menurun</string>
+    <string name="latest">Terbaru</string>
+    <string name="oldest">Terlama</string>
+    <string name="track_all">Catat semua</string>
+    <string name="more_details">Detail selengkapnya</string>
+    <string name="suggestions">Saran</string>
+    <string name="no_label">Tanpa label</string>
+    <string name="confirm_cancel_notes_will_be_lost">Anda yakin ingin menutup? Semua catatan akan hilang.</string>
+    <string name="add_a_label">Tambahkan label</string>
+    <string name="bar_interval">Interval batang:</string>
+    <string name="y_range_max">Maksimum rentang Y</string>
+    <string name="total_formatted">Total: %s</string>
+    <string name="from_formatted">Dari: %s</string>
+    <string name="to_formatted">Ke: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Detik</string>
+    <string name="minutes_generic">Menit</string>
+    <string name="hours_generic">Jam</string>
+    <string name="days_generic">Hari</string>
+    <string name="weeks_generic">Minggu</string>
+    <string name="months_generic">Bulan</string>
+    <string name="years_generic">Tahun</string>
+    <plurals name="seconds">
+        <item quantity="other">%d detik</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d menit</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d jam</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d hari</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d minggu</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d bulan</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d tahun</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="other">Setiap %d menit</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="other">Setiap %d jam</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="other">Setiap %d hari</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="other">Setiap %d minggu</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="other">Setiap %d bulan</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="other">Setiap %d tahun</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="other">Setelah %d menit</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="other">Setelah %d jam</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="other">Setelah %d hari</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="other">Setelah %d minggu</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="other">Setelah %d bulan</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="other">Setelah %d tahun</item>
+    </plurals>
+    <string name="restore_hint_text">PERINGATAN: Memulihkan dari cadangan akan menghapus semua data dan pengaturan yang saat ini ada di aplikasi. Cadangkan data Anda terlebih dahulu!</string>
+    <string name="backup_now">Cadangkan Sekarang</string>
+    <string name="restore_error_could_not_write_to_database">Pemulihan gagal! Tidak dapat menemukan atau menulis ke database.</string>
+    <string name="restore_error_could_not_read_from_database_file">Pemulihan gagal! Tidak dapat menemukan atau membaca file database yang dipilih.</string>
+    <string name="restore_error_failed_to_copy_database">Pemulihan gagal! Terjadi kesalahan saat memulihkan database.</string>
+    <string name="select_location">Pilih Lokasi…</string>
+    <string name="restore_successful">Pemulihan berhasil! Track &amp; Graph kini harus dimulai ulang.</string>
+    <string name="restore_error_invalid_database_file">Pemulihan gagal! File yang dipilih bukan cadangan yang valid.</string>
+    <string name="auto_backup">Pencadangan otomatis</string>
+    <string name="apply">Terapkan</string>
+    <string name="backup_every">Cadangkan setiap: </string>
+    <string name="next_backup_at">\"Pencadangan berikutnya: \"</string>
+    <string name="backup_notification_channel_name">Notifikasi Pencadangan Otomatis</string>
+    <string name="backup_notification_channel_description">Memberi tahu Anda saat pencadangan otomatis dilakukan dan jika gagal.</string>
+    <string name="backup_notification_title">Pencadangan sedang berlangsung…</string>
+    <string name="backup_failed_notification_title">Pencadangan otomatis gagal</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph tidak dapat menemukan atau mengakses lokasi cadangan Anda.</string>
+    <string name="backup_failed_notification_could_not_copy">Terjadi kesalahan saat mencadangkan data Anda. Cadangan mungkin rusak atau tidak lengkap.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Pilih Lokasi Baru</string>
+    <string name="backup_location">Lokasi Cadangan</string>
+    <string name="enable_auto_backup">Aktifkan Pencadangan Otomatis</string>
+    <string name="last_successful_backup">Pencadangan Berhasil Terakhir</string>
+    <string name="next_scheduled_backup">Pencadangan Terjadwal Berikutnya</string>
+    <string name="notification_permission_prompt">Aktifkan notifikasi untuk Track &amp; Graph agar Anda diberi tahu jika Pencadangan Otomatis gagal karena alasan apa pun.</string>
+    <string name="lua_script_empty">Tambahkan skrip Lua</string>
+    <string name="function_name_empty">Nama fungsi tidak boleh kosong</string>
+    <string name="function_name">Nama fungsi</string>
+    <string name="add_at_least_one_input">Tambahkan setidaknya satu input</string>
+    <string name="output">Output</string>
+    <string name="data_source">Sumber Data</string>
+    <string name="lua_script">Skrip Lua</string>
+    <string name="data_source_description">Node Sumber Data memungkinkan Anda memilih tracker atau fungsi untuk digunakan sebagai input.</string>
+    <string name="lua_script_input_hint">Masukkan skrip Lua…</string>
+    <string name="select_node_type">Pilih Jenis Node</string>
+    <string name="file">File</string>
+    <string name="lua_feature_names_not_unique">Input skrip harus memiliki nama yang unik</string>
+    <string name="graph_stat_type_lua_graph">Skrip Lua</string>
+    <string name="launch_lua_disabled">Peluncuran Lua dinonaktifkan</string>
+    <string name="no_lua">Tidak ada Lua</string>
+    <string name="lua_engine_disabled">Mesin Lua dinonaktifkan</string>
+    <string name="lua_graph_first_time_user_title">Grafik dan statistik skrip Lua</string>
+    <string name="lua_graph_first_time_user_message">Skrip Lua adalah fitur lanjutan yang memungkinkan Anda membuat grafik dan statistik khusus dengan bahasa pemrograman Lua. \n\nAnda dapat memuat skrip sendiri atau memilih dari koleksi GitHub. Memasang skrip dari GitHub akan mengembalikan Anda ke aplikasi dengan skrip yang siap digunakan.</string>
+    <string name="functions_first_time_user_title">Selamat datang di Fungsi</string>
+    <string name="functions_first_time_user_message">Fungsi adalah fitur lanjutan yang memungkinkan Anda menggabungkan, mengagregasikan, dan mengubah data menjadi sumber data turunan baru.</string>
+    <string name="learn_more">Pelajari selengkapnya di sini</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Tempel</string>
+    <string name="failed_to_download_file">Gagal mengunduh file: %s</string>
+    <string name="confirm_deep_link">Anda menerima tautan skrip dari sumber yang tidak dikenal. Instal skrip hanya dari sumber yang Anda percaya. Apakah Anda ingin memasang skrip ini?</string>
+    <string name="graph_stat_info_button_description">Tutorial grafik dan statistik</string>
+    <string name="network_generic_error">Terjadi kesalahan saat mencoba mengakses jaringan. Periksa koneksi Anda dan coba lagi.</string>
+    <string name="function_verification_failure">Gagal memverifikasi tanda tangan fungsi. Pastikan koneksi Anda aman dan Track &amp; Graph sudah diperbarui</string>
+    <string name="function_network_failure">Gagal memuat fungsi. Pastikan Anda terhubung ke internet. Jika masalah berlanjut, pastikan aplikasi sudah diperbarui.</string>
+    <string name="functions_landscape_hint">Tips: Fungsi bekerja paling baik dalam mode lanskap</string>
+    <string name="functions_start_hint">Mulai di sini: Tekan lama lalu pilih Sumber Data</string>
+    <string name="see_whats_new">Lihat yang Baru</string>
+    <string name="home">Beranda</string>
+    <string name="add_group">Tambah Grup: </string>
+    <string name="edit_group">Edit Grup: </string>
+    <string name="group">Grup</string>
+    <string name="tracker">Pelacak</string>
+    <string name="function">Fungsi</string>
+    <string name="graph_or_stat">Grafik atau Statistik</string>
+    <string name="symlink">Symlink</string>
+    <string name="symlinks">Symlink</string>
+    <string name="reminder">Pengingat</string>
+    <string name="add_component">Tambah Komponen</string>
+    <string name="symlink_locations_title">Lokasi \"%1$s\"</string>
+    <string name="add_tracker">Lacak sesuatu:</string>
+    <string name="add">Tambah</string>
+    <string name="group_name">mis. Aktivitas Harian</string>
+    <string name="delete">Hapus</string>
+    <string name="edit">Edit</string>
+    <string name="update">Perbarui</string>
+    <string name="graph_or_stat_name">Nama grafik: </string>
+    <string name="tracker_name">Nama pelacak</string>
+    <string name="this_is_a_time_or_duration">Ini adalah waktu atau durasi</string>
+    <string name="yes">Ya</string>
+    <string name="cancel">Batal</string>
+    <string name="select_file">Pilih File</string>
+    <string name="empty_group_hint">Selamat datang di Track &amp; Graph!\n\n Ketuk + di kanan atas, lalu pilih Pelacak untuk memulai.</string>
+    <string name="no_trackers_graph_stats_hint">Buat Pelacak sebelum membuat grafik apa pun.</string>
+    <string name="no_trackers_functions_hint">Buat Pelacak sebelum membuat fungsi apa pun.</string>
+    <string name="ru_sure_del_group">Yakin ingin menghapus grup ini dan semua isinya? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="ru_sure_del_graph">Yakin ingin menghapus grafik ini? Tindakan ini tidak dapat dibatalkan. Data yang dilacak tidak akan hilang.</string>
+    <string name="ru_sure_del_feature">Yakin ingin menghapus data yang dilacak ini?</string>
+    <string name="item_in_multiple_groups">Item ini ada di beberapa tempat. Anda dapat menghapusnya dari sini atau menghapusnya di semua tempat.</string>
+    <string name="remove_from_this_group">Hapus dari sini</string>
+    <string name="delete_everywhere">Hapus di semua tempat</string>
+    <string name="ru_sure_del_function">Yakin ingin menghapus fungsi ini? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="ru_sure_del_reminder">Yakin ingin menghapus pengingat ini? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="ru_sure_del_data_point">Yakin ingin menghapus titik data ini?</string>
+    <string name="feature_name_cannot_be_null">Tambahkan nama</string>
+    <string name="tracker_with_that_name_exists">Anda sudah melacak sesuatu dengan nama tersebut</string>
+    <string name="data_points">%1$d Titik Data</string>
+    <string name="items_selected">%1$d Dipilih</string>
+    <string name="select_all">Pilih semua</string>
+    <string name="deselect_all">Batalkan semua pilihan</string>
+    <string name="ru_sure_del_data_points">Yakin ingin menghapus titik-titik data ini?</string>
+    <string name="delete_selected_content_description">Hapus item yang dipilih</string>
+    <string name="copy_selected_content_description">Salin item yang dipilih</string>
+    <string name="move_selected_content_description">Pindahkan item yang dipilih</string>
+    <string name="copy_to">Salin ke</string>
+    <string name="no_data">Tidak Ada Data</string>
+    <string name="skip">Lewati</string>
+    <string name="exportButton">Ekspor</string>
+    <string name="importButton">Impor</string>
+    <string name="import_export">Impor/Ekspor</string>
+    <string name="search">Cari</string>
+    <string name="type_to_search">Ketik untuk mencari</string>
+    <string name="no_results">Tidak ada hasil</string>
+    <string name="export_to">Ekspor data yang dilacak dalam grup ini ke CSV:</string>
+    <string name="export_error_message">Ekspor gagal: %1$s</string>
+    <string name="import_from">Impor data yang dilacak ke grup ini dari CSV:</string>
+    <string name="import_warning">Peringatan: Impor tidak dapat dibatalkan. Track &amp; Graph akan mencoba menggabungkan data yang diimpor dengan data yang sudah ada dalam grup ini berdasarkan nama.</string>
+    <string name="add_a_graph_or_stat">Tambah Grafik atau Statistik</string>
+    <string name="graph_type_label">Jenis grafik:</string>
+    <string name="sample_size">Ukuran sampel:</string>
+    <string name="select_a_discrete_feature">Pilih set data dengan label: </string>
+    <string name="no_labels">Set data ini tidak memiliki label</string>
+    <string name="select_a_feature">Pilih set data:</string>
+    <string name="select_a_tracker">Pilih pelacak</string>
+    <string name="offset">Offset:</string>
+    <string name="scale">Skala:</string>
+    <string name="from">Dari:</string>
+    <string name="to">Sampai:</string>
+    <string name="day">Hari</string>
+    <string-array name="time_histogram_windows">
+        <item>Per Jam</item>
+        <item>Harian</item>
+        <item>Mingguan</item>
+        <item>Bulanan</item>
+        <item>Kuartalan</item>
+        <item>Setengah Tahunan</item>
+        <item>Tahunan</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Penghemat Baterai</item>
+        <item>Terang</item>
+        <item>Gelap</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Default Sistem</item>
+        <item>Terang</item>
+        <item>Gelap</item>
+    </string-array>
+    <string name="graph_type_line_graph">Grafik Garis</string>
+    <string name="graph_type_pie_chart">Diagram Lingkaran</string>
+    <string name="graph_type_average_time_between">Rata-rata Waktu Antar</string>
+    <string name="graph_type_time_since">Waktu Sejak</string>
+    <string name="graph_type_time_histogram">Histogram Waktu</string>
+    <string name="graph_type_last_value">Pelacakan Terakhir/Waktu Sejak</string>
+    <string name="graph_type_bar_chart">Diagram Batang</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Tanpa Rata-rata</item>
+        <item>Rata-rata Bergerak Harian</item>
+        <item>Rata-rata Bergerak Tiga Hari</item>
+        <item>Rata-rata Bergerak Mingguan</item>
+        <item>Rata-rata Bergerak Bulanan</item>
+        <item>Rata-rata Bergerak Tiga Bulan</item>
+        <item>Rata-rata Bergerak Enam Bulan</item>
+        <item>Rata-rata Bergerak Tahunan</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Plot Saat Dilacak</item>
+        <item>Plot Total Per Jam</item>
+        <item>Plot Total Harian</item>
+        <item>Plot Total Mingguan</item>
+        <item>Plot Total Bulanan</item>
+        <item>Plot Total Tahunan</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Semua Data</string>
+    <string name="graph_time_durations_a_day">Satu Hari</string>
+    <string name="graph_time_durations_a_week">Satu Minggu</string>
+    <string name="graph_time_durations_a_month">Satu Bulan</string>
+    <string name="graph_time_durations_three_months">Tiga Bulan</string>
+    <string name="graph_time_durations_six_months">Enam Bulan</string>
+    <string name="graph_time_durations_a_year">Satu Tahun</string>
+    <string name="custom">Kustom</string>
+    <string-array name="y_range_styles">
+        <item>Dinamis</item>
+        <item>Tetap</item>
+    </string-array>
+    <string name="ending_at_latest">Titik Data Terakhir</string>
+    <string name="ending_at_now">Sekarang</string>
+    <string name="ending_at_custom_date">Tanggal kustom…</string>
+    <string name="hours_and_minutes_ago">%1$d j %2$d m yang lalu</string>
+    <string name="import_exception_unknown">Impor gagal: Terjadi kesalahan yang tidak diketahui</string>
+    <string name="import_exception_bad_headers">Impor gagal: Header tidak cocok dengan header yang diharapkan: %1$s</string>
+    <string name="import_exception_inconsistent_record">Impor gagal: Rekaman pada baris %1$s tidak konsisten dengan header yang diperlukan</string>
+    <string name="import_exception_bad_timestamp">Impor gagal: Tidak dapat menafsirkan stempel waktu untuk rekaman pada baris: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Impor gagal: Jenis data tidak konsisten diterima pada baris: %1$s</string>
+    <string name="unknown_error_occurred">Terjadi kesalahan yang tidak diketahui</string>
+    <string name="graph_stat_validation_no_name">Berikan nama</string>
+    <string name="graph_stat_validation_no_line_graph_features">Tambahkan sesuatu ke grafik</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Pastikan \"Dari\" lebih kecil atau sama dengan \"Sampai\"</string>
+    <string name="graph_stat_validation_unrecognised_color">Pastikan semua set data memiliki warna</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Set data grafik garis tidak valid terdeteksi</string>
+    <string name="graph_stat_validation_bad_fixed_range">Pastikan \"Dari\" lebih kecil dari \"Sampai\"</string>
+    <string name="graph_stat_view_not_found">Terjadi kesalahan saat menemukan grafik ini</string>
+    <string name="graph_stat_view_not_enough_data_stat">Statistik ini akan ditampilkan setelah data yang dilacak cukup untuk membuatnya.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Grafik ini akan ditampilkan setelah data yang dilacak cukup untuk membuatnya.</string>
+    <string name="pie_chart_mixed_signs_error">Diagram lingkaran ini tidak dapat ditampilkan karena berisi ukuran segmen positif dan negatif.</string>
+    <string name="histogram_mixed_signs_error">Histogram ini tidak dapat ditampilkan karena berisi ukuran bin positif dan negatif.</string>
+    <string name="graph_non_finite_data_error">Grafik ini tidak dapat ditampilkan karena berisi nilai yang bukan bilangan hingga.</string>
+    <string name="graph_inconsistent_series_error">Grafik ini tidak dapat ditampilkan karena seri datanya memiliki ukuran yang tidak konsisten.</string>
+    <string name="graph_invalid_y_range_error">Grafik ini tidak dapat ditampilkan karena rentang sumbu Y-nya tidak valid.</string>
+    <string name="finish">Selesai</string>
+</resources>

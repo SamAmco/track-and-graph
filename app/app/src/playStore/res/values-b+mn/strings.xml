@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Хөгжүүлэгчийг дэмжих</string>
+    <string name="support_unavailable">Одоогоор дэмжлэгийн сонголт байхгүй.</string>
+    <string name="support_payment_failed">Төлбөр амжилтгүй боллоо. Дахин оролдоно уу.</string>
+    <string name="support_payment_pending">Төлбөр хүлээгдэж байна. Төлбөр баталгаажсаны дараа Google Play гүйцээнэ.</string>
+</resources>

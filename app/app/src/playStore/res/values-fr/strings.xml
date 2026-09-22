@@ -3,5 +3,5 @@
     <string name="support_developer">Soutenir le développeur</string>
     <string name="support_unavailable">Aucune option de soutien n’est disponible actuellement.</string>
     <string name="support_payment_failed">Le paiement a échoué. Veuillez réessayer.</string>
-    <string name="support_payment_pending">Le paiement est en attente. Google Play le finalisera après sa confirmation.</string>
+    <string name="support_payment_pending">Le paiement est en attente. Google Play le finalisera après confirmation du paiement.</string>
 </resources>

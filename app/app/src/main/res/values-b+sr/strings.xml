@@ -1,0 +1,544 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Početna</string>
+    <string name="add_group">Dodaj grupu: </string>
+    <string name="edit_group">Izmeni grupu: </string>
+    <string name="group">Grupa</string>
+    <string name="tracker">Praćenje</string>
+    <string name="function">Funkcija</string>
+    <string name="graph_or_stat">Grafikon ili statistika</string>
+    <string name="symlink">Simbolička veza</string>
+    <string name="symlinks">Simboličke veze</string>
+    <string name="reminder">Podsetnik</string>
+    <string name="add_component">Dodaj komponentu</string>
+    <string name="symlink_locations_title">Lokacije za „%1$s“</string>
+    <string name="add_tracker">Pratite nešto:</string>
+    <string name="add">Dodaj</string>
+    <string name="group_name">npr. Dnevne aktivnosti</string>
+    <string name="delete">Obriši</string>
+    <string name="edit">Izmeni</string>
+    <string name="update">Ažuriraj</string>
+    <string name="graph_or_stat_name">Naziv grafikona: </string>
+    <string name="tracker_name">Naziv praćenja</string>
+    <string name="this_is_a_time_or_duration">Ovo je vreme ili trajanje</string>
+    <string name="yes">Da</string>
+    <string name="cancel">Otkaži</string>
+    <string name="select_file">Izaberi datoteku</string>
+    <string name="empty_group_hint">Dobro došli u Track &amp; Graph!\n\n Dodirnite + gore desno i izaberite Praćenje da biste počeli.</string>
+    <string name="no_trackers_graph_stats_hint">Napravite praćenje pre nego što napravite grafikon.</string>
+    <string name="no_trackers_functions_hint">Napravite praćenje pre nego što napravite funkciju.</string>
+    <string name="ru_sure_del_group">Da li ste sigurni da želite da obrišete ovu grupu i sve u njoj? Ovo se ne može poništiti.</string>
+    <string name="ru_sure_del_graph">Da li ste sigurni da želite da obrišete ovaj grafikon? Ovo se ne može poništiti. Praćeni podaci neće biti izgubljeni.</string>
+    <string name="ru_sure_del_feature">Da li ste sigurni da želite da obrišete ove praćene podatke?</string>
+    <string name="item_in_multiple_groups">Ova stavka postoji na više mesta. Možete je ukloniti odavde ili je obrisati svuda.</string>
+    <string name="remove_from_this_group">Ukloni odavde</string>
+    <string name="delete_everywhere">Obriši svuda</string>
+    <string name="ru_sure_del_function">Da li ste sigurni da želite da obrišete ovu funkciju? Ovo se ne može poništiti.</string>
+    <string name="ru_sure_del_reminder">Da li ste sigurni da želite da obrišete ovaj podsetnik? Ovo se ne može poništiti.</string>
+    <string name="ru_sure_del_data_point">Da li ste sigurni da želite da obrišete ovu tačku podataka?</string>
+    <string name="feature_name_cannot_be_null">Dodajte naziv</string>
+    <string name="tracker_with_that_name_exists">Već pratite nešto sa tim nazivom</string>
+    <string name="data_points">%1$d tačaka podataka</string>
+    <string name="items_selected">Izabrano: %1$d</string>
+    <string name="select_all">Izaberi sve</string>
+    <string name="deselect_all">Poništi izbor svega</string>
+    <string name="ru_sure_del_data_points">Da li ste sigurni da želite da obrišete ove tačke podataka?</string>
+    <string name="delete_selected_content_description">Obriši izabrane stavke</string>
+    <string name="copy_selected_content_description">Kopiraj izabrane stavke</string>
+    <string name="move_selected_content_description">Premesti izabrane stavke</string>
+    <string name="copy_to">Kopiraj u</string>
+    <string name="no_data">Nema podataka</string>
+    <string name="skip">Preskoči</string>
+    <string name="exportButton">Izvezi</string>
+    <string name="importButton">Uvezi</string>
+    <string name="import_export">Uvoz/izvoz</string>
+    <string name="search">Pretraži</string>
+    <string name="type_to_search">Unesite tekst za pretragu</string>
+    <string name="no_results">Nema rezultata</string>
+    <string name="export_to">Izvezite praćene podatke iz ove grupe u CSV:</string>
+    <string name="export_error_message">Izvoz nije uspeo: %1$s</string>
+    <string name="import_from">Uvezite praćene podatke iz CSV-a u ovu grupu:</string>
+    <string name="import_warning">Upozorenje: Uvoz se ne može poništiti. Track &amp; Graph će pokušati da objedini uvezene podatke sa postojećim podacima u ovoj grupi prema nazivu.</string>
+    <string name="add_a_graph_or_stat">Dodaj grafikon ili statistiku</string>
+    <string name="graph_type_label">Tip grafikona:</string>
+    <string name="sample_size">Veličina uzorka:</string>
+    <string name="select_a_discrete_feature">Izaberite skup podataka sa oznakama: </string>
+    <string name="no_labels">Ovaj skup podataka nema oznake</string>
+    <string name="select_a_feature">Izaberite skup podataka:</string>
+    <string name="select_a_tracker">Izaberite praćenje</string>
+    <string name="offset">Pomak:</string>
+    <string name="scale">Skala:</string>
+    <string name="from">Od:</string>
+    <string name="to">Do:</string>
+    <string name="day">Dan</string>
+    <string-array name="time_histogram_windows">
+        <item>Po satu</item>
+        <item>Dnevno</item>
+        <item>Nedeljno</item>
+        <item>Mesečno</item>
+        <item>Kvartalno</item>
+        <item>Polugodišnje</item>
+        <item>Godišnje</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Ušteda baterije</item>
+        <item>Svetla</item>
+        <item>Tamna</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Podrazumevano za sistem</item>
+        <item>Svetla</item>
+        <item>Tamna</item>
+    </string-array>
+    <string name="graph_type_line_graph">Linijski grafikon</string>
+    <string name="graph_type_pie_chart">Kružni grafikon</string>
+    <string name="graph_type_average_time_between">Prosečno vreme između</string>
+    <string name="graph_type_time_since">Vreme od</string>
+    <string name="graph_type_time_histogram">Histogram vremena</string>
+    <string name="graph_type_last_value">Poslednja vrednost/Vreme od</string>
+    <string name="graph_type_bar_chart">Stubičasti grafikon</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Bez usrednjavanja</item>
+        <item>Dnevni pokretni prosek</item>
+        <item>Trodnevni pokretni prosek</item>
+        <item>Nedeljni pokretni prosek</item>
+        <item>Mesečni pokretni prosek</item>
+        <item>Tromesečni pokretni prosek</item>
+        <item>Šestomesečni pokretni prosek</item>
+        <item>Godišnji pokretni prosek</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Prikaži pri praćenju</item>
+        <item>Prikaži zbir po satu</item>
+        <item>Prikaži dnevne zbirove</item>
+        <item>Prikaži nedeljne zbirove</item>
+        <item>Prikaži mesečne zbirove</item>
+        <item>Prikaži godišnje zbirove</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Svi podaci</string>
+    <string name="graph_time_durations_a_day">Dan</string>
+    <string name="graph_time_durations_a_week">Nedelja</string>
+    <string name="graph_time_durations_a_month">Mesec</string>
+    <string name="graph_time_durations_three_months">Tri meseca</string>
+    <string name="graph_time_durations_six_months">Šest meseci</string>
+    <string name="graph_time_durations_a_year">Godina</string>
+    <string name="custom">Prilagođeno</string>
+    <string-array name="y_range_styles">
+        <item>Dinamički</item>
+        <item>Fiksni</item>
+    </string-array>
+    <string name="ending_at_latest">Poslednja tačka podataka</string>
+    <string name="ending_at_now">Sada</string>
+    <string name="ending_at_custom_date">Prilagođeni datum…</string>
+    <string name="hours_and_minutes_ago">pre %1$dh %2$dm</string>
+    <string name="import_exception_unknown">Uvoz nije uspeo: Došlo je do nepoznate greške</string>
+    <string name="import_exception_bad_headers">Uvoz nije uspeo: Zaglavlja se ne podudaraju sa očekivanim zaglavljima: %1$s</string>
+    <string name="import_exception_inconsistent_record">Uvoz nije uspeo: Zapis u redu %1$s nije usklađen sa potrebnim zaglavljima</string>
+    <string name="import_exception_bad_timestamp">Uvoz nije uspeo: Nije moguće protumačiti vremensku oznaku zapisa u redu: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Uvoz nije uspeo: Neusklađen tip podataka u redu: %1$s</string>
+    <string name="unknown_error_occurred">Došlo je do nepoznate greške</string>
+    <string name="graph_stat_validation_no_name">Unesite naziv</string>
+    <string name="graph_stat_validation_no_line_graph_features">Dodajte nešto na grafikon</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Uverite se da je „Od“ manje ili jednako vrednosti „Do“</string>
+    <string name="graph_stat_validation_unrecognised_color">Uverite se da svi skupovi podataka imaju boju</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Otkriven je nevažeći skup podataka linijskog grafikona</string>
+    <string name="graph_stat_validation_bad_fixed_range">Uverite se da je „Od“ manje od vrednosti „Do“</string>
+    <string name="graph_stat_view_not_found">Došlo je do greške pri pronalaženju ovog grafikona</string>
+    <string name="graph_stat_view_not_enough_data_stat">Ova statistika će biti prikazana kada se zabeleži dovoljno podataka za njeno generisanje.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Ovaj grafikon će biti prikazan kada se zabeleži dovoljno podataka za njegovo generisanje.</string>
+    <string name="pie_chart_mixed_signs_error">Ovaj kružni grafikon ne može da se prikaže jer sadrži i pozitivne i negativne veličine segmenata.</string>
+    <string name="histogram_mixed_signs_error">Ovaj histogram ne može da se prikaže jer sadrži i pozitivne i negativne veličine intervala.</string>
+    <string name="graph_non_finite_data_error">Ovaj grafikon ne može da se prikaže jer sadrži vrednost koja nije konačan broj.</string>
+    <string name="graph_inconsistent_series_error">Ovaj grafikon ne može da se prikaže jer njegove serije podataka imaju neusklađene veličine.</string>
+    <string name="graph_invalid_y_range_error">Ovaj grafikon ne može da se prikaže jer je opseg Y-ose nevažeći.</string>
+    <string name="finish">Završi</string>
+    <string name="about_description">Track &amp; Graph je besplatan softver otvorenog koda pod licencom GPL 3.0.</string>
+    <string name="about_libraries_message">Korišćene su sledeće biblioteke otvorenog koda:</string>
+    <string name="about">O aplikaciji</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Česta pitanja</string>
+    <string name="tutorial_text_1">Koristite praćenja za praćenje podataka.</string>
+    <string name="tutorial_text_2">Koristite grafikone i statistike za vizuelizaciju podataka.</string>
+    <string name="tutorial_text_3">Koristite grupe da organizujete praćenja, grafikone i statistike.</string>
+    <string name="got_it">Razumem!</string>
+    <string name="move_to_colon">Premesti u:</string>
+    <string name="move_to">Premesti u</string>
+    <string name="ru_sure_update_data">Ovo ažuriranje može nepovratno izmeniti podatke koje ste već pratili. Preporučujemo da napravite rezervnu kopiju postojećih podataka pre nastavka.\n\n Da li želite da nastavite?</string>
+    <string name="ok">U redu</string>
+    <string name="rate_the_app">Ocenite aplikaciju</string>
+    <string name="reminders">Podsetnici</string>
+    <string name="no_reminders_hint">Dodirnite ikonu + da biste napravili novo obaveštenje za podsećanje na praćenje.</string>
+    <string name="mon">Pon</string>
+    <string name="tue">Uto</string>
+    <string name="wed">Sre</string>
+    <string name="thu">Čet</string>
+    <string name="fri">Pet</string>
+    <string name="sat">Sub</string>
+    <string name="sun">Ned</string>
+    <string name="reminders_notifications_channel_name">Podsetnici</string>
+    <string name="reminders_notifications_channel_description">Obaveštenja koja je korisnik kreirao da ga podsete kada da zabeleži podatke</string>
+    <string name="default_reminder_name">Vreme je za praćenje!</string>
+    <string name="missed_reminder_single_content">Podsetnik od %1$s</string>
+    <string name="missed_reminders_multiple_content">Propustili ste %1$d podsetnika</string>
+    <string name="next_reminder_format">Sledeći podsetnik: %1$s</string>
+    <string name="no_upcoming_reminders">Nema predstojećih podsetnika</string>
+    <string name="select_reminder_type">Izaberite tip podsetnika</string>
+    <string name="week_day_reminder">Nedeljni podsetnik</string>
+    <string name="week_day_reminder_description">Određeni dani, kao što su ponedeljak, sreda i petak</string>
+    <string name="periodic_reminder">Periodični podsetnik</string>
+    <string name="periodic_reminder_description">Redovni intervali, kao što je svaka 3 dana</string>
+    <string name="month_day_reminder">Mesečni podsetnik</string>
+    <string name="month_day_reminder_description">Mesečni obrasci, kao što je prvi ponedeljak</string>
+    <string name="time_since_last_reminder">Vreme od poslednjeg podsetnika</string>
+    <string name="time_since_last_reminder_description">Kada neko vreme niste zabeležili podatke</string>
+    <string name="one_time_reminder">Jednokratni podsetnik</string>
+    <string name="one_time_reminder_description">Samostalni podsetnik u određeno vreme ili nakon odlaganja</string>
+    <string name="reminder_name">Naziv podsetnika</string>
+    <string name="reminder_disabled">Podsetnik je onemogućen</string>
+    <string name="repeat_every">Ponavljaj svakih</string>
+    <string name="at_time">U vreme</string>
+    <string name="at_a_specific_time">U određeno vreme</string>
+    <string name="ending_at">Završava se</string>
+    <string name="starting_from">Počev od</string>
+    <string name="repeat_on_week_days">Ponavljaj radnim danima</string>
+    <string name="track_feature">Prati izvor podataka</string>
+    <string name="select_tracker_placeholder">Izaberite praćenje</string>
+    <string name="remind_after">Podseti nakon</string>
+    <string name="then_remind_every">Zatim podsećaj svakih</string>
+    <string name="remind_at_date_and_time">Na datum i u vreme</string>
+    <string name="remind_after_a_delay">Nakon odlaganja</string>
+    <string name="first_reminder">Prvi podsetnik</string>
+    <string name="every_colon">Svakih:</string>
+    <string name="ended_at_format">Završeno: %1$s</string>
+    <string name="starting_at_format">Počinje: %1$s</string>
+    <string name="occurrence_first">Prvi</string>
+    <string name="occurrence_second">Drugi</string>
+    <string name="occurrence_third">Treći</string>
+    <string name="occurrence_fourth">Četvrti</string>
+    <string name="occurrence_last">Poslednji</string>
+    <string name="monday">Ponedeljak</string>
+    <string name="tuesday">Utorak</string>
+    <string name="wednesday">Sreda</string>
+    <string name="thursday">Četvrtak</string>
+    <string name="friday">Petak</string>
+    <string name="saturday">Subota</string>
+    <string name="sunday">Nedelja</string>
+    <string-array name="abbreviated_months">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>Maj</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Avg</item>
+        <item>Sep</item>
+        <item>Okt</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Pon</item>
+        <item>Uto</item>
+        <item>Sre</item>
+        <item>Čet</item>
+        <item>Pet</item>
+        <item>Sub</item>
+        <item>Ned</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Stil opsega:</string>
+    <string name="track_widget_configure_no_data_error">Najpre zabeležite neke podatke.</string>
+    <string name="track_widget_configure_no_data_selected_error">Morate izabrati važeći skup podataka da biste napravili vidžet za praćenje.</string>
+    <string name="create">Napravi</string>
+    <string name="use_default_value">Postavi podrazumevanu vrednost</string>
+    <string name="backup_and_restore">Rezervna kopija i vraćanje</string>
+    <string name="backup_hint_text">Rezervna kopija čuva sve podatke aplikacije, uključujući praćene podatke, grafikone i podsetnike. Redovno pravite rezervnu kopiju na spoljašnjem uređaju ili u skladištu u oblaku, za slučaj da se uređaj izgubi ili pokvari.</string>
+    <string name="restore_data">Vrati podatke</string>
+    <string name="backup_successful">Rezervna kopija je uspešno napravljena!</string>
+    <string name="backup_error_could_not_write_to_file">Izabrana datoteka nije pronađena ili se u nju ne može pisati.</string>
+    <string name="backup_error_could_not_find_database_file">Datoteka baze podataka nije pronađena ili se ne može pročitati.</string>
+    <string name="backup_error_failed_to_copy_database">Došlo je do greške pri kopiranju datoteke baze podataka.</string>
+    <string name="restore_failed">Vraćanje nije uspelo. %1$s</string>
+    <string name="add_a_longer_description_optional">Dodajte duži opis (opciono)</string>
+    <string name="no_data_points_history_fragment_hint">Vaša istorija će se prikazati ovde kada budete imali neke tačke podataka.</string>
+    <string name="data_resolution_error">Došlo je do greške pri pokušaju razrešavanja ovih podataka:\n\n%1$s</string>
+    <string name="info">Informacije</string>
+    <string name="no_description">Nema opisa</string>
+    <string name="description">Opis</string>
+    <string name="app_lock_title">Zaključavanje aplikacije</string>
+    <string name="app_lock_locked_title">Track &amp; Graph je zaključan</string>
+    <string name="app_lock_password_label">Lozinka</string>
+    <string name="app_lock_confirm_password_label">Potvrdite lozinku</string>
+    <string name="app_lock_unlock">Otključaj</string>
+    <string name="app_lock_use_biometrics">Koristi biometriju</string>
+    <string name="app_lock_enable">Omogući zaključavanje aplikacije</string>
+    <string name="app_lock_enabled">Zaključavanje aplikacije je omogućeno</string>
+    <string name="app_lock_enable_biometric_unlock">Omogući biometrijsko otključavanje</string>
+    <string name="app_lock_no_strong_biometric_available">Na ovom uređaju nije dostupno snažno biometrijsko otključavanje.</string>
+    <string name="app_lock_lock_after_background_minutes">Zaključaj nakon minuta u pozadini</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Koristite 0 da biste zaključali aplikaciju čim napusti prvi plan.</string>
+    <string name="app_lock_change_password">Promeni lozinku</string>
+    <string name="app_lock_password_changed">Lozinka je promenjena</string>
+    <string name="app_lock_disable">Onemogući zaključavanje aplikacije</string>
+    <string name="app_lock_unlock_biometric_title">Otključaj Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Koristite biometriju uređaja za nastavak</string>
+    <string name="app_lock_use_password">Koristi lozinku</string>
+    <string name="app_lock_biometric_not_recognized">Biometrijska autentifikacija nije prepoznata.</string>
+    <string name="app_lock_error_missing_password">Lozinka za zaključavanje aplikacije nedostaje. Onemogućite i ponovo omogućite zaključavanje aplikacije.</string>
+    <string name="app_lock_error_incorrect_password">Netačna lozinka</string>
+    <string name="app_lock_error_password_hashing_unavailable">Provera lozinke za zaključavanje aplikacije nije dostupna na ovom uređaju.</string>
+    <string name="app_lock_error_enter_password">Unesite lozinku.</string>
+    <string name="app_lock_error_passwords_do_not_match">Lozinke se ne podudaraju.</string>
+    <string name="note_input_hint">Beleške…</string>
+    <string name="add_a_note">Dodaj belešku</string>
+    <string name="notes">Beleške</string>
+    <string name="show_global_notes">Globalne</string>
+    <string name="show_data_point_notes">Tačke podataka</string>
+    <string name="delete_reminder_content_description">Obriši podsetnik</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Format datuma:</string>
+    <string name="add_data_point_button_content_description">Dugme za dodavanje tačke podataka</string>
+    <string name="tracked_data_menu_button_content_description">Dugme menija praćenih podataka</string>
+    <string name="tracked_data_history_button_content_description">Dugme istorije praćenih podataka</string>
+    <string name="delete_line_button_content_description">Dugme za brisanje linije</string>
+    <string name="delete_input_button_content_description">Dugme za brisanje unosa</string>
+    <string name="delete_data_point_button_content_description">Dugme za brisanje tačke podataka</string>
+    <string name="edit_data_point_button_content_description">Dugme za uređivanje tačke podataka</string>
+    <string name="add_multiple_choice_answer_button_content_description">Dugme za dodavanje odgovora sa više izbora</string>
+    <string name="ending_at_colon">Uzorak se završava:</string>
+    <string name="duplicate">Dupliraj</string>
+    <string name="no_notes_hint_text">Ovde će se prikazati beleške dodate tokom praćenja. Globalne beleške možete dodati i pomoću dugmeta +.</string>
+    <string name="add_a_global_note">Dodajte globalnu belešku:</string>
+    <string name="duration">Trajanje</string>
+    <string name="weeks">Nedelje</string>
+    <string name="months">Meseci</string>
+    <string name="days">Dani</string>
+    <string name="hours">Sati</string>
+    <string name="minutes">Minuti</string>
+    <string name="seconds">Sekunde</string>
+    <string name="hours_suffix">č</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Prethodno praćene vrednosti predstavljaju:</string>
+    <string name="duration_to_numeric_mode_header">U šta treba pretvoriti prethodno praćene vrednosti:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Ne možete mešati trajanja vremena sa drugim vrstama podataka. Razmotrite prikaz sati, minuta ili sekundi</string>
+    <string name="sum_by_count_checkbox_label">Označite ovde da biste prebrojali praćene tačke podataka umesto sabiranja njihovih vrednosti.</string>
+    <string name="time_window_size">Veličina vremenskog prozora:</string>
+    <string name="hold_to_preview">Zadržite za pregled</string>
+    <string name="open">Otvori</string>
+    <string name="close">Zatvori</string>
+    <string name="filter_by_label">Filtriraj prema oznaci</string>
+    <string name="filter_by_value">Filtriraj prema rasponu vrednosti</string>
+    <string name="save_changes">Sačuvaj izmene</string>
+    <string name="timer_notification_channel_name">Tajmeri</string>
+    <string name="stop">Zaustavi</string>
+    <string name="name_your_function">Nazovite funkciju: </string>
+    <string name="add_some_data_sources">Dodaj izvore podataka</string>
+    <string name="value">Vrednost</string>
+    <string name="label">Oznaka</string>
+    <string name="continue_word">Nastavi</string>
+    <string name="update_all_data_points">Ažuriraj sve tačke podataka: </string>
+    <string name="where_colon">Gde:</string>
+    <string name="to_colon">Do:</string>
+    <string name="value_equals">Vrednost =</string>
+    <string name="label_equals">Oznaka =</string>
+    <string name="adding_your_first_data_point">Kratko uputstvo za dodavanje tačaka podataka:</string>
+    <string name="next">Sledeće</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Svaka tačka podataka ima vremensku oznaku i vrednost: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Može imati i oznaku i belešku: </string>
+    <string name="data_point_tutorial_page_2_description">Vrednost je broj, pa možete videti kako se podaci menjaju tokom vremena</string>
+    <string name="data_point_tutorial_page_2_hint">(Savet: Ako vam vrednost nije važna, koristite podrazumevanu vrednost 1)</string>
+    <string name="data_point_tutorial_page_3_description">Koristite oznake ako želite da grupišete tačke podataka</string>
+    <string name="data_point_tutorial_page_3_hint">(Savet: Ako želite da dodate više konteksta ili opis, koristite belešku umesto polja za oznaku)</string>
+    <string name="help">Pomoć</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Napredne opcije</string>
+    <string name="type_colon">„Tip: „</string>
+    <string name="order_colon">„Redosled: „</string>
+    <string name="value_and_label">Vrednost i oznaka</string>
+    <string name="value_only">Samo vrednost</string>
+    <string name="label_only">Samo oznaka</string>
+    <string name="none">Ništa</string>
+    <string name="value_ascending">Vrednost rastuće</string>
+    <string name="value_descending">Vrednost opadajuće</string>
+    <string name="label_ascending">Oznaka rastuće</string>
+    <string name="label_descending">Oznaka opadajuće</string>
+    <string name="latest">Najnovije</string>
+    <string name="oldest">Najstarije</string>
+    <string name="track_all">Prati sve</string>
+    <string name="more_details">Više detalja</string>
+    <string name="suggestions">Predlozi</string>
+    <string name="no_label">Bez oznake</string>
+    <string name="confirm_cancel_notes_will_be_lost">Da li ste sigurni da želite da zatvorite? Sve beleške će biti izgubljene.</string>
+    <string name="add_a_label">Dodaj oznaku</string>
+    <string name="bar_interval">Interval traka:</string>
+    <string name="y_range_max">Maksimum Y opsega</string>
+    <string name="total_formatted">Ukupno: %s</string>
+    <string name="from_formatted">Od: %s</string>
+    <string name="to_formatted">Do: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Sekunda(e)</string>
+    <string name="minutes_generic">Minut(i)</string>
+    <string name="hours_generic">Sat(i)</string>
+    <string name="days_generic">Dan(a)</string>
+    <string name="weeks_generic">Nedelja</string>
+    <string name="months_generic">Mesec(i)</string>
+    <string name="years_generic">Godina</string>
+    <plurals name="seconds">
+        <item quantity="one">%d sekunda</item>
+        <item quantity="few">%d sekunde</item>
+        <item quantity="other">%d sekundi</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minut</item>
+        <item quantity="few">%d minuta</item>
+        <item quantity="other">%d minuta</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d sat</item>
+        <item quantity="few">%d sata</item>
+        <item quantity="other">%d sati</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d dan</item>
+        <item quantity="few">%d dana</item>
+        <item quantity="other">%d dana</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d nedelja</item>
+        <item quantity="few">%d nedelje</item>
+        <item quantity="other">%d nedelja</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d mesec</item>
+        <item quantity="few">%d meseca</item>
+        <item quantity="other">%d meseci</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d godina</item>
+        <item quantity="few">%d godine</item>
+        <item quantity="other">%d godina</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Svaki minut</item>
+        <item quantity="few">Svaka %d minuta</item>
+        <item quantity="other">Svakih %d minuta</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Svaki sat</item>
+        <item quantity="few">Svaka %d sata</item>
+        <item quantity="other">Svakih %d sati</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Svakog dana</item>
+        <item quantity="few">Svaka %d dana</item>
+        <item quantity="other">Svakih %d dana</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Svake nedelje</item>
+        <item quantity="few">Svake %d nedelje</item>
+        <item quantity="other">Svakih %d nedelja</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Svakog meseca</item>
+        <item quantity="few">Svaka %d meseca</item>
+        <item quantity="other">Svakih %d meseci</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Svake godine</item>
+        <item quantity="few">Svake %d godine</item>
+        <item quantity="other">Svakih %d godina</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Nakon 1 minuta</item>
+        <item quantity="few">Nakon %d minuta</item>
+        <item quantity="other">Nakon %d minuta</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Nakon 1 sata</item>
+        <item quantity="few">Nakon %d sata</item>
+        <item quantity="other">Nakon %d sati</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Nakon 1 dana</item>
+        <item quantity="few">Nakon %d dana</item>
+        <item quantity="other">Nakon %d dana</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Nakon 1 nedelje</item>
+        <item quantity="few">Nakon %d nedelje</item>
+        <item quantity="other">Nakon %d nedelja</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Nakon 1 meseca</item>
+        <item quantity="few">Nakon %d meseca</item>
+        <item quantity="other">Nakon %d meseci</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Nakon 1 godine</item>
+        <item quantity="few">Nakon %d godine</item>
+        <item quantity="other">Nakon %d godina</item>
+    </plurals>
+    <string name="restore_hint_text">UPOZORENJE: Vraćanje rezervne kopije obrisaće sve podatke i podešavanja koji se trenutno nalaze u aplikaciji. Najpre napravite rezervnu kopiju podataka!</string>
+    <string name="backup_now">Napravi rezervnu kopiju</string>
+    <string name="restore_error_could_not_write_to_database">Vraćanje nije uspelo! Baza podataka nije pronađena ili se u nju ne može pisati.</string>
+    <string name="restore_error_could_not_read_from_database_file">Vraćanje nije uspelo! Izabrana datoteka baze podataka nije pronađena ili se ne može pročitati.</string>
+    <string name="restore_error_failed_to_copy_database">Vraćanje nije uspelo! Došlo je do greške pri vraćanju baze podataka.</string>
+    <string name="select_location">Izaberite lokaciju…</string>
+    <string name="restore_successful">Vraćanje je uspešno! Track &amp; Graph sada mora da se ponovo pokrene.</string>
+    <string name="restore_error_invalid_database_file">Vraćanje nije uspelo! Izabrana datoteka nije važeća rezervna kopija.</string>
+    <string name="auto_backup">Automatska rezervna kopija</string>
+    <string name="apply">Primeni</string>
+    <string name="backup_every">Pravi rezervnu kopiju na svakih: </string>
+    <string name="next_backup_at">\"Sledeća rezervna kopija: \"</string>
+    <string name="backup_notification_channel_name">Obaveštenja o automatskim rezervnim kopijama</string>
+    <string name="backup_notification_channel_description">Obaveštava vas kada se pravi automatska rezervna kopija i ako pravljenje ne uspe.</string>
+    <string name="backup_notification_title">Pravljenje rezervne kopije je u toku…</string>
+    <string name="backup_failed_notification_title">Automatska rezervna kopija nije uspela</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph nije mogao da pronađe lokaciju rezervne kopije niti da joj pristupi.</string>
+    <string name="backup_failed_notification_could_not_copy">Došlo je do greške pri pravljenju rezervne kopije podataka. Rezervna kopija je možda oštećena ili nepotpuna.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Izaberi novu lokaciju</string>
+    <string name="backup_location">Lokacija rezervne kopije</string>
+    <string name="enable_auto_backup">Omogući automatske rezervne kopije</string>
+    <string name="last_successful_backup">Poslednja uspešna rezervna kopija</string>
+    <string name="next_scheduled_backup">Sledeća zakazana rezervna kopija</string>
+    <string name="notification_permission_prompt">Omogućite obaveštenja za Track &amp; Graph da biste bili obavešteni ako automatska rezervna kopija iz bilo kog razloga ne uspe.</string>
+    <string name="lua_script_empty">Dodajte Lua skriptu</string>
+    <string name="function_name_empty">Naziv funkcije ne može biti prazan</string>
+    <string name="function_name">Naziv funkcije</string>
+    <string name="add_at_least_one_input">Dodajte najmanje jedan ulaz</string>
+    <string name="output">Izlaz</string>
+    <string name="data_source">Izvor podataka</string>
+    <string name="lua_script">Lua skripta</string>
+    <string name="data_source_description">Čvor izvora podataka omogućava vam da izaberete praćenje ili funkciju za korišćenje kao ulaz.</string>
+    <string name="lua_script_input_hint">Unesite Lua skriptu…</string>
+    <string name="select_node_type">Izaberite tip čvora</string>
+    <string name="file">Datoteka</string>
+    <string name="lua_feature_names_not_unique">Ulazi skripte moraju imati jedinstvene nazive</string>
+    <string name="graph_stat_type_lua_graph">Lua skripta</string>
+    <string name="launch_lua_disabled">Pokretanje Lua je onemogućeno</string>
+    <string name="no_lua">Nema Lua</string>
+    <string name="lua_engine_disabled">Lua mehanizam je onemogućen</string>
+    <string name="lua_graph_first_time_user_title">Grafikoni i statistike pomoću Lua skripti</string>
+    <string name="lua_graph_first_time_user_message">Lua skripte su napredna funkcija koja vam omogućava da kreirate prilagođene grafikone i statistike pomoću programskog jezika Lua. \n\nMožete učitati sopstvenu skriptu ili izabrati neku iz kolekcije na GitHub-u. Instaliranje skripte sa GitHub-a vratiće vas u aplikaciju, a skripta će biti spremna za korišćenje.</string>
+    <string name="functions_first_time_user_title">Dobro došli u funkcije</string>
+    <string name="functions_first_time_user_message">Funkcije su napredna funkcija koja vam omogućava da kombinujete, objedinite i transformišete podatke u nove izvedene izvore podataka.</string>
+    <string name="learn_more">Saznajte više ovde</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Nalepi</string>
+    <string name="failed_to_download_file">Preuzimanje datoteke nije uspelo: %s</string>
+    <string name="confirm_deep_link">Primili ste vezu ka skripti iz nepoznatog izvora. Instalirajte skripte samo iz izvora kojima verujete. Da li želite da instalirate ovu skriptu?</string>
+    <string name="graph_stat_info_button_description">Uputstva za grafikone i statistike</string>
+    <string name="network_generic_error">Došlo je do greške pri pokušaju pristupa mreži. Proverite vezu i pokušajte ponovo.</string>
+    <string name="function_verification_failure">Provera potpisa funkcija nije uspela. Uverite se da imate bezbednu vezu i da je Track &amp; Graph ažuriran</string>
+    <string name="function_network_failure">Učitavanje funkcija nije uspelo. Uverite se da ste povezani na internet. Ako problem potraje, proverite da li je aplikacija ažurirana.</string>
+    <string name="functions_landscape_hint">Savet: Funkcije najbolje rade u položenom prikazu</string>
+    <string name="functions_start_hint">Počnite ovde: Dugo pritisnite i izaberite Izvor podataka</string>
+    <string name="see_whats_new">Pogledajte novosti</string>
+</resources>

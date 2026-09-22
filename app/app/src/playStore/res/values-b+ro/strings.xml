@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Susține dezvoltatorul</string>
+    <string name="support_unavailable">Momentan nu există opțiuni de susținere.</string>
+    <string name="support_payment_failed">Plata a eșuat. Încearcă din nou.</string>
+    <string name="support_payment_pending">Plata este în așteptare. Google Play o va finaliza după confirmarea plății.</string>
+</resources>

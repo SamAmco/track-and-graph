@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">ಮುಖಪುಟ</string>
+    <string name="add_group">ಗುಂಪು ಸೇರಿಸಿ: </string>
+    <string name="edit_group">ಗುಂಪು ಸಂಪಾದಿಸಿ: </string>
+    <string name="group">ಗುಂಪು</string>
+    <string name="tracker">ಟ್ರ್ಯಾಕರ್</string>
+    <string name="function">ಫಂಕ್ಷನ್</string>
+    <string name="graph_or_stat">ಗ್ರಾಫ್ ಅಥವಾ ಅಂಕಿಅಂಶ</string>
+    <string name="symlink">ಸಿಂಕ್‌ಲಿಂಕ್</string>
+    <string name="symlinks">ಸಿಂಕ್‌ಲಿಂಕ್‌ಗಳು</string>
+    <string name="reminder">ಜ್ಞಾಪನೆ</string>
+    <string name="add_component">ಘಟಕ ಸೇರಿಸಿ</string>
+    <string name="symlink_locations_title">\"%1$s\" ಇರುವ ಸ್ಥಳಗಳು</string>
+    <string name="add_tracker">ಏನನ್ನಾದರೂ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ:</string>
+    <string name="add">ಸೇರಿಸಿ</string>
+    <string name="group_name">ಉದಾ. ದೈನಂದಿನ ಚಟುವಟಿಕೆಗಳು</string>
+    <string name="delete">ಅಳಿಸಿ</string>
+    <string name="edit">ಸಂಪಾದಿಸಿ</string>
+    <string name="update">ನವೀಕರಿಸಿ</string>
+    <string name="graph_or_stat_name">ಗ್ರಾಫ್ ಹೆಸರು: </string>
+    <string name="tracker_name">ಟ್ರ್ಯಾಕರ್ ಹೆಸರು</string>
+    <string name="this_is_a_time_or_duration">ಇದು ಸಮಯ ಅಥವಾ ಅವಧಿಯಾಗಿದೆ</string>
+    <string name="yes">ಹೌದು</string>
+    <string name="cancel">ರದ್ದುಮಾಡಿ</string>
+    <string name="select_file">ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="empty_group_hint">Track &amp; Graph ಗೆ ಸ್ವಾಗತ!\n\n ಮೇಲಿನ ಬಲಭಾಗದಲ್ಲಿರುವ + ಅನ್ನು ಒತ್ತಿ, ಪ್ರಾರಂಭಿಸಲು ಟ್ರ್ಯಾಕರ್ ಆಯ್ಕೆಮಾಡಿ.</string>
+    <string name="no_trackers_graph_stats_hint">ಯಾವುದೇ ಗ್ರಾಫ್‌ಗಳನ್ನು ರಚಿಸುವ ಮೊದಲು Tracker ರಚಿಸಿ.</string>
+    <string name="no_trackers_functions_hint">ಯಾವುದೇ ಫಂಕ್ಷನ್‌ಗಳನ್ನು ರಚಿಸುವ ಮೊದಲು Tracker ರಚಿಸಿ.</string>
+    <string name="ru_sure_del_group">ಈ ಗುಂಪು ಮತ್ತು ಅದರಲ್ಲಿರುವ ಎಲ್ಲವನ್ನೂ ಅಳಿಸಲು ಖಚಿತವೇ? ಇದನ್ನು ಹಿಂತಿರುಗಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.</string>
+    <string name="ru_sure_del_graph">ಈ ಗ್ರಾಫ್ ಅನ್ನು ಅಳಿಸಲು ಖಚಿತವೇ? ಇದನ್ನು ಹಿಂತಿರುಗಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ನೀವು ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾವನ್ನು ಕಳೆದುಕೊಳ್ಳುವುದಿಲ್ಲ.</string>
+    <string name="ru_sure_del_feature">ಈ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾವನ್ನು ಅಳಿಸಲು ಖಚಿತವೇ?</string>
+    <string name="item_in_multiple_groups">ಈ ಐಟಂ ಹಲವೆಡೆ ಇದೆ. ಇದನ್ನು ಇಲ್ಲಿಂದ ತೆಗೆದುಹಾಕಬಹುದು ಅಥವಾ ಎಲ್ಲೆಡೆಯಿಂದ ಅಳಿಸಬಹುದು.</string>
+    <string name="remove_from_this_group">ಇಲ್ಲಿಂದ ತೆಗೆದುಹಾಕಿ</string>
+    <string name="delete_everywhere">ಎಲ್ಲೆಡೆಯಿಂದ ಅಳಿಸಿ</string>
+    <string name="ru_sure_del_function">ಈ ಫಂಕ್ಷನ್ ಅನ್ನು ಅಳಿಸಲು ಖಚಿತವೇ? ಇದನ್ನು ಹಿಂತಿರುಗಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.</string>
+    <string name="ru_sure_del_reminder">ಈ ಜ್ಞಾಪನೆಯನ್ನು ಅಳಿಸಲು ಖಚಿತವೇ? ಇದನ್ನು ಹಿಂತಿರುಗಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.</string>
+    <string name="ru_sure_del_data_point">ಈ ಡೇಟಾ ಪಾಯಿಂಟ್ ಅನ್ನು ಅಳಿಸಲು ಖಚಿತವೇ?</string>
+    <string name="feature_name_cannot_be_null">ಹೆಸರನ್ನು ಸೇರಿಸಿ</string>
+    <string name="tracker_with_that_name_exists">ಆ ಹೆಸರಿನೊಂದಿಗೆ ನೀವು ಈಗಾಗಲೇ ಯಾವುದನ್ನೋ ಟ್ರ್ಯಾಕ್ ಮಾಡುತ್ತಿದ್ದೀರಿ</string>
+    <string name="data_points">%1$d ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳು</string>
+    <string name="items_selected">%1$d ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ</string>
+    <string name="select_all">ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="deselect_all">ಎಲ್ಲದರ ಆಯ್ಕೆಯನ್ನು ರದ್ದುಮಾಡಿ</string>
+    <string name="ru_sure_del_data_points">ಈ ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳನ್ನು ಅಳಿಸಲು ಖಚಿತವೇ?</string>
+    <string name="delete_selected_content_description">ಆಯ್ಕೆಮಾಡಿದ ಐಟಂಗಳನ್ನು ಅಳಿಸಿ</string>
+    <string name="copy_selected_content_description">ಆಯ್ಕೆಮಾಡಿದ ಐಟಂಗಳನ್ನು ನಕಲಿಸಿ</string>
+    <string name="move_selected_content_description">ಆಯ್ಕೆಮಾಡಿದ ಐಟಂಗಳನ್ನು ಸರಿಸಿ</string>
+    <string name="copy_to">ಇಲ್ಲಿಗೆ ನಕಲಿಸಿ</string>
+    <string name="no_data">ಡೇಟಾ ಇಲ್ಲ</string>
+    <string name="skip">ಬಿಟ್ಟುಬಿಡಿ</string>
+    <string name="exportButton">ರಫ್ತು</string>
+    <string name="importButton">ಆಮದು</string>
+    <string name="import_export">ಆಮದು/ರಫ್ತು</string>
+    <string name="search">ಹುಡುಕಿ</string>
+    <string name="type_to_search">ಹುಡುಕಲು ಟೈಪ್ ಮಾಡಿ</string>
+    <string name="no_results">ಫಲಿತಾಂಶಗಳಿಲ್ಲ</string>
+    <string name="export_to">ಈ ಗುಂಪಿನಲ್ಲಿರುವ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾವನ್ನು CSV ಗೆ ರಫ್ತು ಮಾಡಿ:</string>
+    <string name="export_error_message">ರಫ್ತು ವಿಫಲವಾಗಿದೆ: %1$s</string>
+    <string name="import_from">CSV ಯಿಂದ ಈ ಗುಂಪಿಗೆ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾವನ್ನು ಆಮದು ಮಾಡಿ:</string>
+    <string name="import_warning">ಎಚ್ಚರಿಕೆ: ಆಮದು ಮಾಡಿದುದನ್ನು ಹಿಂತಿರುಗಿಸಲಾಗುವುದಿಲ್ಲ. ಈ ಗುಂಪಿನಲ್ಲಿರುವ ಅಸ್ತಿತ್ವದಲ್ಲಿನ ಡೇಟಾದೊಂದಿಗೆ ಆಮದು ಮಾಡಿದ ಡೇಟಾವನ್ನು ಹೆಸರಿನ ಆಧಾರದ ಮೇಲೆ ವಿಲೀನಗೊಳಿಸಲು Track &amp; Graph ಪ್ರಯತ್ನಿಸುತ್ತದೆ.</string>
+    <string name="add_a_graph_or_stat">ಗ್ರಾಫ್ ಅಥವಾ ಅಂಕಿಅಂಶ ಸೇರಿಸಿ</string>
+    <string name="graph_type_label">ಗ್ರಾಫ್ ಪ್ರಕಾರ:</string>
+    <string name="sample_size">ಮಾದರಿ ಗಾತ್ರ:</string>
+    <string name="select_a_discrete_feature">ಲೇಬಲ್‌ಗಳಿರುವ ಡೇಟಾ ಸೆಟ್ ಆಯ್ಕೆಮಾಡಿ: </string>
+    <string name="no_labels">ಈ ಡೇಟಾ ಸೆಟ್‌ನಲ್ಲಿ ಲೇಬಲ್‌ಗಳಿಲ್ಲ</string>
+    <string name="select_a_feature">ಡೇಟಾ ಸೆಟ್ ಆಯ್ಕೆಮಾಡಿ:</string>
+    <string name="select_a_tracker">ಟ್ರ್ಯಾಕರ್ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="offset">ಆಫ್‌ಸೆಟ್:</string>
+    <string name="scale">ಸ್ಕೇಲ್:</string>
+    <string name="from">ಇಂದ:</string>
+    <string name="to">ವರೆಗೆ:</string>
+    <string name="day">ದಿನ</string>
+    <string-array name="time_histogram_windows">
+        <item>ಗಂಟೆಗೊಮ್ಮೆ</item>
+        <item>ದಿನಗೊಮ್ಮೆ</item>
+        <item>ವಾರಕ್ಕೊಮ್ಮೆ</item>
+        <item>ತಿಂಗಳಿಗೊಮ್ಮೆ</item>
+        <item>ತ್ರೈಮಾಸಿಕ</item>
+        <item>ಅರ್ಧವಾರ್ಷಿಕ</item>
+        <item>ವಾರ್ಷಿಕ</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>ಬ್ಯಾಟರಿ ಉಳಿಸುವಿಕೆ</item>
+        <item>ಬೆಳಕು</item>
+        <item>ಕತ್ತಲೆ</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>ಸಿಸ್ಟಂ ಡೀಫಾಲ್ಟ್</item>
+        <item>ಬೆಳಕು</item>
+        <item>ಕತ್ತಲೆ</item>
+    </string-array>
+    <string name="graph_type_line_graph">ರೇಖಾ ಗ್ರಾಫ್</string>
+    <string name="graph_type_pie_chart">ಪೈ ಚಾರ್ಟ್</string>
+    <string name="graph_type_average_time_between">ನಡುವಿನ ಸರಾಸರಿ ಸಮಯ</string>
+    <string name="graph_type_time_since">ಇಂದಿನವರೆಗಿನ ಸಮಯ</string>
+    <string name="graph_type_time_histogram">ಸಮಯ ಹಿಸ್ಟೋಗ್ರಾಮ್</string>
+    <string name="graph_type_last_value">ಕೊನೆಯ ಟ್ರ್ಯಾಕಿಂಗ್/ಇಂದಿನವರೆಗಿನ ಸಮಯ</string>
+    <string name="graph_type_bar_chart">ಬಾರ್ ಚಾರ್ಟ್</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>ಸರಾಸರಿ ಇಲ್ಲ</item>
+        <item>ದೈನಂದಿನ ಚಲಿಸುವ ಸರಾಸರಿ</item>
+        <item>ಮೂರು ದಿನಗಳ ಚಲಿಸುವ ಸರಾಸರಿ</item>
+        <item>ವಾರದ ಚಲಿಸುವ ಸರಾಸರಿ</item>
+        <item>ಮಾಸಿಕ ಚಲಿಸುವ ಸರಾಸರಿ</item>
+        <item>ಮೂರು ತಿಂಗಳ ಚಲಿಸುವ ಸರಾಸರಿ</item>
+        <item>ಆರು ತಿಂಗಳ ಚಲಿಸುವ ಸರಾಸರಿ</item>
+        <item>ವಾರ್ಷಿಕ ಚಲಿಸುವ ಸರಾಸರಿ</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>ಟ್ರ್ಯಾಕ್ ಮಾಡಿದಾಗ ಪ್ಲಾಟ್ ಮಾಡಿ</item>
+        <item>ಗಂಟೆಯ ಒಟ್ಟುಗಳನ್ನು ಪ್ಲಾಟ್ ಮಾಡಿ</item>
+        <item>ದೈನಂದಿನ ಒಟ್ಟುಗಳನ್ನು ಪ್ಲಾಟ್ ಮಾಡಿ</item>
+        <item>ವಾರದ ಒಟ್ಟುಗಳನ್ನು ಪ್ಲಾಟ್ ಮಾಡಿ</item>
+        <item>ಮಾಸಿಕ ಒಟ್ಟುಗಳನ್ನು ಪ್ಲಾಟ್ ಮಾಡಿ</item>
+        <item>ವಾರ್ಷಿಕ ಒಟ್ಟುಗಳನ್ನು ಪ್ಲಾಟ್ ಮಾಡಿ</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">ಎಲ್ಲಾ ಡೇಟಾ</string>
+    <string name="graph_time_durations_a_day">ಒಂದು ದಿನ</string>
+    <string name="graph_time_durations_a_week">ಒಂದು ವಾರ</string>
+    <string name="graph_time_durations_a_month">ಒಂದು ತಿಂಗಳು</string>
+    <string name="graph_time_durations_three_months">ಮೂರು ತಿಂಗಳು</string>
+    <string name="graph_time_durations_six_months">ಆರು ತಿಂಗಳು</string>
+    <string name="graph_time_durations_a_year">ಒಂದು ವರ್ಷ</string>
+    <string name="custom">ಕಸ್ಟಮ್</string>
+    <string-array name="y_range_styles">
+        <item>ಡೈನಾಮಿಕ್</item>
+        <item>ನಿಗದಿತ</item>
+    </string-array>
+    <string name="ending_at_latest">ಕೊನೆಯ ಡೇಟಾ ಪಾಯಿಂಟ್</string>
+    <string name="ending_at_now">ಈಗ</string>
+    <string name="ending_at_custom_date">ಕಸ್ಟಮ್ ದಿನಾಂಕ…</string>
+    <string name="hours_and_minutes_ago">%1$dಗಂ %2$dನಿ ಹಿಂದೆ</string>
+    <string name="import_exception_unknown">ಆಮದು ವಿಫಲವಾಗಿದೆ: ತಿಳಿಯದ ದೋಷ ಸಂಭವಿಸಿದೆ</string>
+    <string name="import_exception_bad_headers">ಆಮದು ವಿಫಲವಾಗಿದೆ: ಹೆಡರ್‌ಗಳು ನಿರೀಕ್ಷಿತ ಹೆಡರ್‌ಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ: %1$s</string>
+    <string name="import_exception_inconsistent_record">ಆಮದು ವಿಫಲವಾಗಿದೆ: %1$s ಸಾಲಿನ ದಾಖಲೆ ಅಗತ್ಯವಿರುವ ಹೆಡರ್‌ಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುವುದಿಲ್ಲ</string>
+    <string name="import_exception_bad_timestamp">ಆಮದು ವಿಫಲವಾಗಿದೆ: %1$s ಸಾಲಿನ ದಾಖಲೆಯ ಟೈಮ್‌ಸ್ಟ್ಯಾಂಪ್ ಅನ್ನು ಅರ್ಥೈಸಲಾಗಲಿಲ್ಲ</string>
+    <string name="import_exception_inconsistent_data_type">ಆಮದು ವಿಫಲವಾಗಿದೆ: %1$s ಸಾಲಿನಲ್ಲಿ ಅಸಂಗತ ಡೇಟಾ ಪ್ರಕಾರ ಸ್ವೀಕರಿಸಲಾಗಿದೆ</string>
+    <string name="unknown_error_occurred">ತಿಳಿಯದ ದೋಷ ಸಂಭವಿಸಿದೆ</string>
+    <string name="graph_stat_validation_no_name">ಹೆಸರನ್ನು ಒದಗಿಸಿ</string>
+    <string name="graph_stat_validation_no_line_graph_features">ಗ್ರಾಫ್‌ಗೆ ಏನನ್ನಾದರೂ ಸೇರಿಸಿ</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">\"ಇಂದ\" ಎಂಬುದು \"ವರೆಗೆ\"ಗಿಂತ ಚಿಕ್ಕದಾಗಿದೆಯೇ ಅಥವಾ ಸಮನಾಗಿದೆಯೇ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ</string>
+    <string name="graph_stat_validation_unrecognised_color">ಎಲ್ಲಾ ಡೇಟಾ ಸೆಟ್‌ಗಳಿಗೆ ಬಣ್ಣವಿದೆ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">ಅಮಾನ್ಯ ರೇಖಾ ಗ್ರಾಫ್ ಡೇಟಾ ಸೆಟ್ ಪತ್ತೆಯಾಗಿದೆ</string>
+    <string name="graph_stat_validation_bad_fixed_range">\"ಇಂದ\" ಎಂಬುದು \"ವರೆಗೆ\"ಗಿಂತ ಚಿಕ್ಕದಾಗಿದೆ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ</string>
+    <string name="graph_stat_view_not_found">ಈ ಗ್ರಾಫ್ ಹುಡುಕುವಾಗ ದೋಷ ಸಂಭವಿಸಿದೆ</string>
+    <string name="graph_stat_view_not_enough_data_stat">ಇದನ್ನು ರಚಿಸಲು ಸಾಕಷ್ಟು ಡೇಟಾ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದಾಗ ಈ ಅಂಕಿಅಂಶ ಕಾಣಿಸುತ್ತದೆ.</string>
+    <string name="graph_stat_view_not_enough_data_graph">ಇದನ್ನು ರಚಿಸಲು ಸಾಕಷ್ಟು ಡೇಟಾ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದಾಗ ಈ ಗ್ರಾಫ್ ಕಾಣಿಸುತ್ತದೆ.</string>
+    <string name="pie_chart_mixed_signs_error">ಧನಾತ್ಮಕ ಮತ್ತು ಋಣಾತ್ಮಕ ವಿಭಾಗದ ಗಾತ್ರಗಳೆರಡನ್ನೂ ಹೊಂದಿರುವುದರಿಂದ ಈ ಪೈ ಚಾರ್ಟ್ ಅನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗುವುದಿಲ್ಲ.</string>
+    <string name="histogram_mixed_signs_error">ಧನಾತ್ಮಕ ಮತ್ತು ಋಣಾತ್ಮಕ ಬಿನ್ ಗಾತ್ರಗಳೆರಡನ್ನೂ ಹೊಂದಿರುವುದರಿಂದ ಈ ಹಿಸ್ಟೋಗ್ರಾಮ್ ಅನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗುವುದಿಲ್ಲ.</string>
+    <string name="graph_non_finite_data_error">ಸೀಮಿತ ಸಂಖ್ಯೆಯಲ್ಲದ ಮೌಲ್ಯವನ್ನು ಹೊಂದಿರುವುದರಿಂದ ಈ ಗ್ರಾಫ್ ಅನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗುವುದಿಲ್ಲ.</string>
+    <string name="graph_inconsistent_series_error">ಡೇಟಾ ಸರಣಿಗಳ ಗಾತ್ರಗಳು ಅಸಂಗತವಾಗಿರುವುದರಿಂದ ಈ ಗ್ರಾಫ್ ಅನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗುವುದಿಲ್ಲ.</string>
+    <string name="graph_invalid_y_range_error">ಇದರ Y-ಅಕ್ಷದ ವ್ಯಾಪ್ತಿ ಅಮಾನ್ಯವಾಗಿರುವುದರಿಂದ ಈ ಗ್ರಾಫ್ ಅನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗುವುದಿಲ್ಲ.</string>
+    <string name="finish">ಮುಗಿಸಿ</string>
+    <string name="about_description">Track &amp; Graph GPL 3.0 ಪರವಾನಗಿ ಅಡಿಯಲ್ಲಿ ಉಚಿತ ಮತ್ತು ಮುಕ್ತ ಮೂಲದ ಸಾಫ್ಟ್‌ವೇರ್ ಆಗಿದೆ.</string>
+    <string name="about_libraries_message">ಕೆಳಗಿನ ಮುಕ್ತ ಮೂಲದ ಲೈಬ್ರರಿಗಳನ್ನು ಬಳಸಲಾಗಿದೆ:</string>
+    <string name="about">ಇದರ ಕುರಿತು</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">ಪದೇ ಪದೇ ಕೇಳಲಾಗುವ ಪ್ರಶ್ನೆಗಳು</string>
+    <string name="tutorial_text_1">ನಿಮ್ಮ ಡೇಟಾವನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ಟ್ರ್ಯಾಕರ್‌ಗಳನ್ನು ಬಳಸಿ.</string>
+    <string name="tutorial_text_2">ಡೇಟಾವನ್ನು ದೃಶ್ಯೀಕರಿಸಲು ಗ್ರಾಫ್‌ಗಳು ಮತ್ತು ಅಂಕಿಅಂಶಗಳನ್ನು ಬಳಸಿ.</string>
+    <string name="tutorial_text_3">ನಿಮ್ಮ ಟ್ರ್ಯಾಕರ್‌ಗಳು, ಗ್ರಾಫ್‌ಗಳು ಮತ್ತು ಅಂಕಿಅಂಶಗಳನ್ನು ವ್ಯವಸ್ಥಿತಗೊಳಿಸಲು ಗುಂಪುಗಳನ್ನು ಬಳಸಿ.</string>
+    <string name="got_it">ಅರ್ಥವಾಯಿತು!</string>
+    <string name="move_to_colon">ಇಲ್ಲಿಗೆ ಸರಿಸಿ:</string>
+    <string name="move_to">ಇಲ್ಲಿಗೆ ಸರಿಸಿ</string>
+    <string name="ru_sure_update_data">ಈ ನವೀಕರಣವು ನೀವು ಈಗಾಗಲೇ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾವನ್ನು ಹಿಂತಿರುಗಿಸಲಾಗದಂತೆ ಬದಲಾಯಿಸಬಹುದು. ಮುಂದುವರಿಯುವ ಮೊದಲು ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಡೇಟಾದ ಬ್ಯಾಕಪ್ ತೆಗೆದುಕೊಳ್ಳುವುದು ಬಹಳ ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ.\n\n ಮುಂದುವರಿಸಲು ಬಯಸುವಿರಾ?</string>
+    <string name="ok">ಸರಿ</string>
+    <string name="rate_the_app">ಆ್ಯಪ್‌ಗೆ ರೇಟಿಂಗ್ ನೀಡಿ</string>
+    <string name="reminders">ಜ್ಞಾಪನೆಗಳು</string>
+    <string name="no_reminders_hint">ಹೊಸ ಟ್ರ್ಯಾಕಿಂಗ್ ಜ್ಞಾಪನೆ ಅಧಿಸೂಚನೆಯನ್ನು ರಚಿಸಲು + ಐಕಾನ್ ಒತ್ತಿ.</string>
+    <string name="mon">ಸೋಮ</string>
+    <string name="tue">ಮಂಗಳ</string>
+    <string name="wed">ಬುಧ</string>
+    <string name="thu">ಗುರು</string>
+    <string name="fri">ಶುಕ್ರ</string>
+    <string name="sat">ಶನಿ</string>
+    <string name="sun">ಭಾನು</string>
+    <string name="reminders_notifications_channel_name">ಜ್ಞಾಪನೆಗಳು</string>
+    <string name="reminders_notifications_channel_description">ಟ್ರ್ಯಾಕ್ ಮಾಡುವ ಸಮಯವನ್ನು ನೆನಪಿಸಲು ಬಳಕೆದಾರರು ರಚಿಸಿದ ಅಧಿಸೂಚನೆಗಳು</string>
+    <string name="default_reminder_name">ಟ್ರ್ಯಾಕ್ ಮಾಡುವ ಸಮಯ!</string>
+    <string name="missed_reminder_single_content">%1$s ನಿಂದ ಜ್ಞಾಪನೆ</string>
+    <string name="missed_reminders_multiple_content">ನೀವು %1$d ಜ್ಞಾಪನೆಗಳನ್ನು ತಪ್ಪಿಸಿಕೊಂಡಿದ್ದೀರಿ</string>
+    <string name="next_reminder_format">ಮುಂದಿನ ಜ್ಞಾಪನೆ: %1$s</string>
+    <string name="no_upcoming_reminders">ಮುಂಬರುವ ಜ್ಞಾಪನೆಗಳಿಲ್ಲ</string>
+    <string name="select_reminder_type">ಜ್ಞಾಪನೆ ಪ್ರಕಾರವನ್ನು ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="week_day_reminder">ವಾರದ ದಿನಗಳ ಜ್ಞಾಪನೆ</string>
+    <string name="week_day_reminder_description">ಸೋಮವಾರ, ಬುಧವಾರ, ಶುಕ್ರವಾರದಂತಹ ನಿರ್ದಿಷ್ಟ ದಿನಗಳು</string>
+    <string name="periodic_reminder">ಆವರ್ತಕ ಜ್ಞಾಪನೆ</string>
+    <string name="periodic_reminder_description">ಪ್ರತಿ 3 ದಿನಗಳಿಗೊಮ್ಮೆ ಎಂಬಂತಹ ನಿಯಮಿತ ಅಂತರಗಳು</string>
+    <string name="month_day_reminder">ತಿಂಗಳ ದಿನದ ಜ್ಞಾಪನೆ</string>
+    <string name="month_day_reminder_description">ಮೊದಲ ಸೋಮವಾರದಂತಹ ಮಾಸಿಕ ಮಾದರಿಗಳು</string>
+    <string name="time_since_last_reminder">ಕೊನೆಯ ಜ್ಞಾಪನೆಯ ನಂತರದ ಸಮಯ</string>
+    <string name="time_since_last_reminder_description">ಸ್ವಲ್ಪ ಸಮಯದಿಂದ ನೀವು ಯಾವುದನ್ನೂ ಟ್ರ್ಯಾಕ್ ಮಾಡದಿದ್ದಾಗ</string>
+    <string name="one_time_reminder">ಒಮ್ಮೆ ಮಾತ್ರದ ಜ್ಞಾಪನೆ</string>
+    <string name="one_time_reminder_description">ನಿರ್ದಿಷ್ಟ ಸಮಯದಲ್ಲಿ ಅಥವಾ ವಿಳಂಬದ ನಂತರದ ಸ್ವತಂತ್ರ ಜ್ಞಾಪನೆ</string>
+    <string name="reminder_name">ಜ್ಞಾಪನೆಯ ಹೆಸರು</string>
+    <string name="reminder_disabled">ಜ್ಞಾಪನೆ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ</string>
+    <string name="repeat_every">ಪ್ರತಿ ಬಾರಿ</string>
+    <string name="at_time">ಸಮಯದಲ್ಲಿ</string>
+    <string name="at_a_specific_time">ನಿರ್ದಿಷ್ಟ ಸಮಯದಲ್ಲಿ</string>
+    <string name="ending_at">ಅಂತ್ಯಗೊಳ್ಳುವುದು</string>
+    <string name="starting_from">ಪ್ರಾರಂಭವಾಗುವುದು</string>
+    <string name="repeat_on_week_days">ವಾರದ ದಿನಗಳಲ್ಲಿ ಪುನರಾವರ್ತಿಸಿ</string>
+    <string name="track_feature">ಫೀಚರ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ</string>
+    <string name="select_tracker_placeholder">ಟ್ರ್ಯಾಕರ್ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="remind_after">ಇದರ ನಂತರ ಜ್ಞಾಪಿಸಿ</string>
+    <string name="then_remind_every">ನಂತರ ಪ್ರತಿ ಬಾರಿ ಜ್ಞಾಪಿಸಿ</string>
+    <string name="remind_at_date_and_time">ದಿನಾಂಕ ಮತ್ತು ಸಮಯದಲ್ಲಿ</string>
+    <string name="remind_after_a_delay">ವಿಳಂಬದ ನಂತರ</string>
+    <string name="first_reminder">ಮೊದಲ ಜ್ಞಾಪನೆ</string>
+    <string name="every_colon">ಪ್ರತಿ:</string>
+    <string name="ended_at_format">ಅಂತ್ಯಗೊಂಡದ್ದು: %1$s</string>
+    <string name="starting_at_format">ಪ್ರಾರಂಭವಾಗುವುದು: %1$s</string>
+    <string name="occurrence_first">ಮೊದಲ</string>
+    <string name="occurrence_second">ಎರಡನೇ</string>
+    <string name="occurrence_third">ಮೂರನೇ</string>
+    <string name="occurrence_fourth">ನಾಲ್ಕನೇ</string>
+    <string name="occurrence_last">ಕೊನೆಯ</string>
+    <string name="monday">ಸೋಮವಾರ</string>
+    <string name="tuesday">ಮಂಗಳವಾರ</string>
+    <string name="wednesday">ಬುಧವಾರ</string>
+    <string name="thursday">ಗುರುವಾರ</string>
+    <string name="friday">ಶುಕ್ರವಾರ</string>
+    <string name="saturday">ಶನಿವಾರ</string>
+    <string name="sunday">ಭಾನುವಾರ</string>
+    <string-array name="abbreviated_months">
+        <item>ಜನ</item>
+        <item>ಫೆಬ್ರ</item>
+        <item>ಮಾರ್ಚ್</item>
+        <item>ಏಪ್ರಿ</item>
+        <item>ಮೇ</item>
+        <item>ಜೂನ್</item>
+        <item>ಜುಲೈ</item>
+        <item>ಆಗ</item>
+        <item>ಸೆಪ್</item>
+        <item>ಅಕ್ಟೋ</item>
+        <item>ನವೆಂ</item>
+        <item>ಡಿಸೆಂ</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>ಸೋಮ</item>
+        <item>ಮಂಗಳ</item>
+        <item>ಬುಧ</item>
+        <item>ಗುರು</item>
+        <item>ಶುಕ್ರ</item>
+        <item>ಶನಿ</item>
+        <item>ಭಾನು</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">ವ್ಯಾಪ್ತಿ ಶೈಲಿ:</string>
+    <string name="track_widget_configure_no_data_error">ಮೊದಲು ಕೆಲವು ಡೇಟಾವನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.</string>
+    <string name="track_widget_configure_no_data_selected_error">ಟ್ರ್ಯಾಕಿಂಗ್ ವಿಜೆಟ್ ರಚಿಸಲು ಮಾನ್ಯವಾದ ಡೇಟಾ ಸೆಟ್ ಆಯ್ಕೆಮಾಡಬೇಕು.</string>
+    <string name="create">ರಚಿಸಿ</string>
+    <string name="use_default_value">ಡೀಫಾಲ್ಟ್ ಮೌಲ್ಯ ಹೊಂದಿಸಿ</string>
+    <string name="backup_and_restore">ಬ್ಯಾಕಪ್ ಮತ್ತು ಮರುಸ್ಥಾಪನೆ</string>
+    <string name="backup_hint_text">ಬ್ಯಾಕಪ್ ನಿಮ್ಮ ಎಲ್ಲಾ ಆ್ಯಪ್ ಡೇಟಾವನ್ನು, ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾ, ಗ್ರಾಫ್‌ಗಳು ಮತ್ತು ಜ್ಞಾಪನೆಗಳು ಸೇರಿದಂತೆ, ಉಳಿಸುತ್ತದೆ. ನಿಮ್ಮ ಸಾಧನ ಕಳೆದುಹೋದರೆ ಅಥವಾ ಹಾನಿಗೊಳಗಾದರೆ ಬಳಸಲು, ಡೇಟಾವನ್ನು ನಿಯಮಿತವಾಗಿ ಬಾಹ್ಯ ಸಾಧನ ಅಥವಾ ಕ್ಲೌಡ್ ಸಂಗ್ರಹಣೆಗೆ ಬ್ಯಾಕಪ್ ಮಾಡಬೇಕು.</string>
+    <string name="restore_data">ಡೇಟಾ ಮರುಸ್ಥಾಪಿಸಿ</string>
+    <string name="backup_successful">ಬ್ಯಾಕಪ್ ಯಶಸ್ವಿಯಾಗಿದೆ!</string>
+    <string name="backup_error_could_not_write_to_file">ಆಯ್ಕೆಮಾಡಿದ ಫೈಲ್ ಕಂಡುಬಂದಿಲ್ಲ ಅಥವಾ ಅದಕ್ಕೆ ಬರೆಯಲಾಗಲಿಲ್ಲ.</string>
+    <string name="backup_error_could_not_find_database_file">ಡೇಟಾಬೇಸ್ ಫೈಲ್ ಕಂಡುಬಂದಿಲ್ಲ ಅಥವಾ ಓದಲಾಗಲಿಲ್ಲ.</string>
+    <string name="backup_error_failed_to_copy_database">ಡೇಟಾಬೇಸ್ ಫೈಲ್ ನಕಲಿಸುವಾಗ ದೋಷ ಸಂಭವಿಸಿದೆ.</string>
+    <string name="restore_failed">ಮರುಸ್ಥಾಪನೆ ವಿಫಲವಾಗಿದೆ. %1$s</string>
+    <string name="add_a_longer_description_optional">ಉದ್ದವಾದ ವಿವರಣೆ ಸೇರಿಸಿ (ಐಚ್ಛಿಕ)</string>
+    <string name="no_data_points_history_fragment_hint">ನೀವು ಕೆಲವು ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳನ್ನು ಹೊಂದಿದಾಗ ನಿಮ್ಮ ಇತಿಹಾಸ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.</string>
+    <string name="data_resolution_error">ಈ ಡೇಟಾವನ್ನು ಪರಿಹರಿಸಲು ಪ್ರಯತ್ನಿಸುವಾಗ ದೋಷ ಸಂಭವಿಸಿದೆ:\n\n%1$s</string>
+    <string name="info">ಮಾಹಿತಿ</string>
+    <string name="no_description">ವಿವರಣೆ ಇಲ್ಲ</string>
+    <string name="description">ವಿವರಣೆ</string>
+    <string name="app_lock_title">ಆ್ಯಪ್ ಲಾಕ್</string>
+    <string name="app_lock_locked_title">Track &amp; Graph ಲಾಕ್ ಆಗಿದೆ</string>
+    <string name="app_lock_password_label">ಪಾಸ್‌ವರ್ಡ್</string>
+    <string name="app_lock_confirm_password_label">ಪಾಸ್‌ವರ್ಡ್ ದೃಢೀಕರಿಸಿ</string>
+    <string name="app_lock_unlock">ಅನ್‌ಲಾಕ್ ಮಾಡಿ</string>
+    <string name="app_lock_use_biometrics">ಬಯೋಮೆಟ್ರಿಕ್ಸ್ ಬಳಸಿ</string>
+    <string name="app_lock_enable">ಆ್ಯಪ್ ಲಾಕ್ ಸಕ್ರಿಯಗೊಳಿಸಿ</string>
+    <string name="app_lock_enabled">ಆ್ಯಪ್ ಲಾಕ್ ಸಕ್ರಿಯವಾಗಿದೆ</string>
+    <string name="app_lock_enable_biometric_unlock">ಬಯೋಮೆಟ್ರಿಕ್ ಅನ್‌ಲಾಕ್ ಸಕ್ರಿಯಗೊಳಿಸಿ</string>
+    <string name="app_lock_no_strong_biometric_available">ಈ ಸಾಧನದಲ್ಲಿ ಬಲವಾದ ಬಯೋಮೆಟ್ರಿಕ್ ಅನ್‌ಲಾಕ್ ಲಭ್ಯವಿಲ್ಲ.</string>
+    <string name="app_lock_lock_after_background_minutes">ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಇದ್ದ ನಿಮಿಷಗಳ ನಂತರ ಲಾಕ್ ಮಾಡಿ</string>
+    <string name="app_lock_lock_after_background_minutes_hint">ಆ್ಯಪ್ ಮುಂಭಾಗದಿಂದ ಹೊರಬಂದ ತಕ್ಷಣ ಲಾಕ್ ಮಾಡಲು 0 ಬಳಸಿ.</string>
+    <string name="app_lock_change_password">ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ</string>
+    <string name="app_lock_password_changed">ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಲಾಗಿದೆ</string>
+    <string name="app_lock_disable">ಆ್ಯಪ್ ಲಾಕ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿ</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph ಅನ್‌ಲಾಕ್ ಮಾಡಿ</string>
+    <string name="app_lock_unlock_biometric_subtitle">ಮುಂದುವರಿಸಲು ನಿಮ್ಮ ಸಾಧನದ ಬಯೋಮೆಟ್ರಿಕ್ಸ್ ಬಳಸಿ</string>
+    <string name="app_lock_use_password">ಪಾಸ್‌ವರ್ಡ್ ಬಳಸಿ</string>
+    <string name="app_lock_biometric_not_recognized">ಬಯೋಮೆಟ್ರಿಕ್ ದೃಢೀಕರಣವನ್ನು ಗುರುತಿಸಲಾಗಲಿಲ್ಲ.</string>
+    <string name="app_lock_error_missing_password">ಆ್ಯಪ್ ಲಾಕ್‌ನ ಪಾಸ್‌ವರ್ಡ್ ಕಾಣೆಯಾಗಿದೆ. ಆ್ಯಪ್ ಲಾಕ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿ ಮತ್ತೆ ಸಕ್ರಿಯಗೊಳಿಸಿ.</string>
+    <string name="app_lock_error_incorrect_password">ತಪ್ಪಾದ ಪಾಸ್‌ವರ್ಡ್</string>
+    <string name="app_lock_error_password_hashing_unavailable">ಈ ಸಾಧನದಲ್ಲಿ ಆ್ಯಪ್ ಲಾಕ್ ಪಾಸ್‌ವರ್ಡ್ ಪರಿಶೀಲನೆ ಲಭ್ಯವಿಲ್ಲ.</string>
+    <string name="app_lock_error_enter_password">ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ.</string>
+    <string name="app_lock_error_passwords_do_not_match">ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.</string>
+    <string name="note_input_hint">ಟಿಪ್ಪಣಿಗಳು…</string>
+    <string name="add_a_note">ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ</string>
+    <string name="notes">ಟಿಪ್ಪಣಿಗಳು</string>
+    <string name="show_global_notes">ಜಾಗತಿಕ</string>
+    <string name="show_data_point_notes">ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳು</string>
+    <string name="delete_reminder_content_description">ಜ್ಞಾಪನೆ ಅಳಿಸಿ</string>
+    <string name="theme_colon">ಥೀಮ್:</string>
+    <string name="date_format_colon">ದಿನಾಂಕ ಸ್ವರೂಪ:</string>
+    <string name="add_data_point_button_content_description">ಡೇಟಾ ಪಾಯಿಂಟ್ ಸೇರಿಸುವ ಬಟನ್</string>
+    <string name="tracked_data_menu_button_content_description">ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾ ಮೆನು ಬಟನ್</string>
+    <string name="tracked_data_history_button_content_description">ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾ ಇತಿಹಾಸ ಬಟನ್</string>
+    <string name="delete_line_button_content_description">ರೇಖೆ ಅಳಿಸುವ ಬಟನ್</string>
+    <string name="delete_input_button_content_description">ಇನ್‌ಪುಟ್ ಅಳಿಸುವ ಬಟನ್</string>
+    <string name="delete_data_point_button_content_description">ಡೇಟಾ ಪಾಯಿಂಟ್ ಅಳಿಸುವ ಬಟನ್</string>
+    <string name="edit_data_point_button_content_description">ಡೇಟಾ ಪಾಯಿಂಟ್ ಸಂಪಾದಿಸುವ ಬಟನ್</string>
+    <string name="add_multiple_choice_answer_button_content_description">ಬಹು ಆಯ್ಕೆ ಉತ್ತರ ಸೇರಿಸುವ ಬಟನ್</string>
+    <string name="ending_at_colon">ಮುಗಿಯುವ ಮಾದರಿ:</string>
+    <string name="duplicate">ನಕಲು</string>
+    <string name="no_notes_hint_text">ಟ್ರ್ಯಾಕಿಂಗ್ ಮಾಡುವಾಗ ಸೇರಿಸಿದ ಟಿಪ್ಪಣಿಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ. + ಬಟನ್ ಬಳಸಿ ಜಾಗತಿಕ ಟಿಪ್ಪಣಿಗಳನ್ನೂ ಸೇರಿಸಬಹುದು.</string>
+    <string name="add_a_global_note">ಜಾಗತಿಕ ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ:</string>
+    <string name="duration">ಅವಧಿ</string>
+    <string name="weeks">ವಾರಗಳು</string>
+    <string name="months">ತಿಂಗಳುಗಳು</string>
+    <string name="days">ದಿನಗಳು</string>
+    <string name="hours">ಗಂಟೆಗಳು</string>
+    <string name="minutes">ನಿಮಿಷಗಳು</string>
+    <string name="seconds">ಸೆಕೆಂಡುಗಳು</string>
+    <string name="hours_suffix">ಗಂ</string>
+    <string name="minutes_suffix">ನಿ</string>
+    <string name="seconds_suffix">ಸೆ</string>
+    <string name="numeric_to_duration_mode_header">ಹಿಂದೆ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಮೌಲ್ಯಗಳು ಯಾವುದನ್ನು ಪ್ರತಿನಿಧಿಸುತ್ತವೆ:</string>
+    <string name="duration_to_numeric_mode_header">ಹಿಂದೆ ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಮೌಲ್ಯಗಳನ್ನು ಯಾವುದಕ್ಕೆ ಪರಿವರ್ತಿಸಬೇಕು:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">ಸಮಯದ ಅವಧಿಗಳನ್ನು ಇತರ ಡೇಟಾ ಪ್ರಕಾರಗಳೊಂದಿಗೆ ಮಿಶ್ರಣಿಸಲಾಗುವುದಿಲ್ಲ. ಗಂಟೆಗಳು, ನಿಮಿಷಗಳು ಅಥವಾ ಸೆಕೆಂಡುಗಳನ್ನು ಚಿತ್ರಿಸುವುದನ್ನು ಪರಿಗಣಿಸಿ</string>
+    <string name="sum_by_count_checkbox_label">ಮೌಲ್ಯಗಳ ಮೊತ್ತದ ಬದಲು ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳ ಸಂಖ್ಯೆಯನ್ನು ಎಣಿಸಲು ಇಲ್ಲಿ ಗುರುತಿಸಿ.</string>
+    <string name="time_window_size">ಸಮಯ ವಿಂಡೋ ಗಾತ್ರ:</string>
+    <string name="hold_to_preview">ಮುನ್ನೋಟಕ್ಕಾಗಿ ಒತ್ತಿಹಿಡಿಯಿರಿ</string>
+    <string name="open">ತೆರೆಯಿರಿ</string>
+    <string name="close">ಮುಚ್ಚಿರಿ</string>
+    <string name="filter_by_label">ಲೇಬಲ್ ಮೂಲಕ ಫಿಲ್ಟರ್ ಮಾಡಿ</string>
+    <string name="filter_by_value">ಮೌಲ್ಯ ವ್ಯಾಪ್ತಿಯ ಮೂಲಕ ಫಿಲ್ಟರ್ ಮಾಡಿ</string>
+    <string name="save_changes">ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ</string>
+    <string name="timer_notification_channel_name">ಟೈಮರ್‌ಗಳು</string>
+    <string name="stop">ನಿಲ್ಲಿಸಿ</string>
+    <string name="name_your_function">ನಿಮ್ಮ ಫಂಕ್ಷನ್‌ಗೆ ಹೆಸರಿಡಿ: </string>
+    <string name="add_some_data_sources">ಡೇಟಾ ಮೂಲಗಳನ್ನು ಸೇರಿಸಿ</string>
+    <string name="value">ಮೌಲ್ಯ</string>
+    <string name="label">ಲೇಬಲ್</string>
+    <string name="continue_word">ಮುಂದುವರಿಸಿ</string>
+    <string name="update_all_data_points">ಎಲ್ಲಾ ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳನ್ನು ನವೀಕರಿಸಿ: </string>
+    <string name="where_colon">ಎಲ್ಲಿ:</string>
+    <string name="to_colon">ವರೆಗೆ:</string>
+    <string name="value_equals">ಮೌಲ್ಯ =</string>
+    <string name="label_equals">ಲೇಬಲ್ =</string>
+    <string name="adding_your_first_data_point">ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳನ್ನು ಸೇರಿಸುವ ತ್ವರಿತ ಟ್ಯುಟೋರಿಯಲ್:</string>
+    <string name="next">ಮುಂದೆ</string>
+    <string name="each_data_point_has_a_timestamp_and_value">ಪ್ರತಿ ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗೆ ಟೈಮ್‌ಸ್ಟ್ಯಾಂಪ್ ಮತ್ತು ಮೌಲ್ಯ ಇರುತ್ತದೆ: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">ಇದಕ್ಕೆ ಐಚ್ಛಿಕವಾಗಿ ಲೇಬಲ್ ಮತ್ತು ಟಿಪ್ಪಣಿಯೂ ಇರಬಹುದು: </string>
+    <string name="data_point_tutorial_page_2_description">ಕಾಲಕ್ರಮೇಣ ನಿಮ್ಮ ಡೇಟಾ ಹೇಗೆ ಬದಲಾಗುತ್ತದೆ ಎಂಬುದನ್ನು ನೋಡಲು ಮೌಲ್ಯವು ಒಂದು ಸಂಖ್ಯೆಯಾಗಿರುತ್ತದೆ</string>
+    <string name="data_point_tutorial_page_2_hint">(ಸೂಚನೆ: ಮೌಲ್ಯದ ಬಗ್ಗೆ ಕಾಳಜಿ ಇಲ್ಲದಿದ್ದರೆ, ಡೀಫಾಲ್ಟ್ ಮೌಲ್ಯ 1 ಬಳಸಿ)</string>
+    <string name="data_point_tutorial_page_3_description">ಡೇಟಾ ಪಾಯಿಂಟ್‌ಗಳನ್ನು ಗುಂಪು ಮಾಡಲು ಲೇಬಲ್‌ಗಳನ್ನು ಬಳಸಿ</string>
+    <string name="data_point_tutorial_page_3_hint">(ಸೂಚನೆ: ಹೆಚ್ಚಿನ ಸಂದರ್ಭ ಅಥವಾ ವಿವರಣೆ ಸೇರಿಸಬೇಕಾದರೆ, ಲೇಬಲ್ ಕ್ಷೇತ್ರದ ಬದಲು ಟಿಪ್ಪಣಿ ಬಳಸಿ)</string>
+    <string name="help">ಸಹಾಯ</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">ಸುಧಾರಿತ ಆಯ್ಕೆಗಳು</string>
+    <string name="type_colon">\"ಪ್ರಕಾರ: \"</string>
+    <string name="order_colon">\"ಕ್ರಮ: \"</string>
+    <string name="value_and_label">ಮೌಲ್ಯ ಮತ್ತು ಲೇಬಲ್</string>
+    <string name="value_only">ಮೌಲ್ಯ ಮಾತ್ರ</string>
+    <string name="label_only">ಲೇಬಲ್ ಮಾತ್ರ</string>
+    <string name="none">ಯಾವುದೂ ಇಲ್ಲ</string>
+    <string name="value_ascending">ಆರೋಹಣ ಮೌಲ್ಯ</string>
+    <string name="value_descending">ಅವರೋಹಣ ಮೌಲ್ಯ</string>
+    <string name="label_ascending">ಆರೋಹಣ ಲೇಬಲ್</string>
+    <string name="label_descending">ಅವರೋಹಣ ಲೇಬಲ್</string>
+    <string name="latest">ಇತ್ತೀಚಿನದು</string>
+    <string name="oldest">ಹಳೆಯದು</string>
+    <string name="track_all">ಎಲ್ಲವನ್ನೂ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ</string>
+    <string name="more_details">ಹೆಚ್ಚಿನ ವಿವರಗಳು</string>
+    <string name="suggestions">ಸಲಹೆಗಳು</string>
+    <string name="no_label">ಲೇಬಲ್ ಇಲ್ಲ</string>
+    <string name="confirm_cancel_notes_will_be_lost">ಮುಚ್ಚಲು ಖಚಿತವೇ? ಎಲ್ಲಾ ಟಿಪ್ಪಣಿಗಳು ಕಳೆದುಹೋಗುತ್ತವೆ.</string>
+    <string name="add_a_label">ಲೇಬಲ್ ಸೇರಿಸಿ</string>
+    <string name="bar_interval">ಬಾರ್ ಮಧ್ಯಂತರ:</string>
+    <string name="y_range_max">Y ವ್ಯಾಪ್ತಿಯ ಗರಿಷ್ಠ</string>
+    <string name="total_formatted">ಒಟ್ಟು: %s</string>
+    <string name="from_formatted">ಇಂದ: %s</string>
+    <string name="to_formatted">ವರೆಗೆ: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">ಸೆಕೆಂಡು(ಗಳು)</string>
+    <string name="minutes_generic">ನಿಮಿಷ(ಗಳು)</string>
+    <string name="hours_generic">ಗಂಟೆ(ಗಳು)</string>
+    <string name="days_generic">ದಿನ(ಗಳು)</string>
+    <string name="weeks_generic">ವಾರ(ಗಳು)</string>
+    <string name="months_generic">ತಿಂಗಳು(ಗಳು)</string>
+    <string name="years_generic">ವರ್ಷ(ಗಳು)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d ಸೆಕೆಂಡ್</item>
+        <item quantity="other">%d ಸೆಕೆಂಡುಗಳು</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d ನಿಮಿಷ</item>
+        <item quantity="other">%d ನಿಮಿಷಗಳು</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d ಗಂಟೆ</item>
+        <item quantity="other">%d ಗಂಟೆಗಳು</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d ದಿನ</item>
+        <item quantity="other">%d ದಿನಗಳು</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d ವಾರ</item>
+        <item quantity="other">%d ವಾರಗಳು</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d ತಿಂಗಳು</item>
+        <item quantity="other">%d ತಿಂಗಳುಗಳು</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d ವರ್ಷ</item>
+        <item quantity="other">%d ವರ್ಷಗಳು</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">ಪ್ರತಿ ನಿಮಿಷ</item>
+        <item quantity="other">ಪ್ರತಿ %d ನಿಮಿಷಗಳಿಗೆ</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">ಪ್ರತಿ ಗಂಟೆ</item>
+        <item quantity="other">ಪ್ರತಿ %d ಗಂಟೆಗಳಿಗೆ</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">ಪ್ರತಿ ದಿನ</item>
+        <item quantity="other">ಪ್ರತಿ %d ದಿನಗಳಿಗೆ</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">ಪ್ರತಿ ವಾರ</item>
+        <item quantity="other">ಪ್ರತಿ %d ವಾರಗಳಿಗೆ</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">ಪ್ರತಿ ತಿಂಗಳು</item>
+        <item quantity="other">ಪ್ರತಿ %d ತಿಂಗಳುಗಳಿಗೆ</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">ಪ್ರತಿ ವರ್ಷ</item>
+        <item quantity="other">ಪ್ರತಿ %d ವರ್ಷಗಳಿಗೆ</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">1 ನಿಮಿಷದ ನಂತರ</item>
+        <item quantity="other">%d ನಿಮಿಷಗಳ ನಂತರ</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">1 ಗಂಟೆಯ ನಂತರ</item>
+        <item quantity="other">%d ಗಂಟೆಗಳ ನಂತರ</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">1 ದಿನದ ನಂತರ</item>
+        <item quantity="other">%d ದಿನಗಳ ನಂತರ</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">1 ವಾರದ ನಂತರ</item>
+        <item quantity="other">%d ವಾರಗಳ ನಂತರ</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">1 ತಿಂಗಳ ನಂತರ</item>
+        <item quantity="other">%d ತಿಂಗಳುಗಳ ನಂತರ</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">1 ವರ್ಷದ ನಂತರ</item>
+        <item quantity="other">%d ವರ್ಷಗಳ ನಂತರ</item>
+    </plurals>
+    <string name="restore_hint_text">ಎಚ್ಚರಿಕೆ: ಬ್ಯಾಕಪ್‌ನಿಂದ ಮರುಸ್ಥಾಪಿಸುವುದರಿಂದ ಆ್ಯಪ್‌ನಲ್ಲಿರುವ ಎಲ್ಲಾ ಡೇಟಾ ಮತ್ತು ಪ್ರಸ್ತುತ ಸೆಟಪ್ ಅಳಿಸಲ್ಪಡುತ್ತವೆ. ಮೊದಲು ನಿಮ್ಮ ಡೇಟಾವನ್ನು ಬ್ಯಾಕಪ್ ಮಾಡಬೇಕು!</string>
+    <string name="backup_now">ಈಗ ಬ್ಯಾಕಪ್ ಮಾಡಿ</string>
+    <string name="restore_error_could_not_write_to_database">ಮರುಸ್ಥಾಪನೆ ವಿಫಲವಾಗಿದೆ! ಡೇಟಾಬೇಸ್ ಕಂಡುಬಂದಿಲ್ಲ ಅಥವಾ ಅದಕ್ಕೆ ಬರೆಯಲಾಗಲಿಲ್ಲ.</string>
+    <string name="restore_error_could_not_read_from_database_file">ಮರುಸ್ಥಾಪನೆ ವಿಫಲವಾಗಿದೆ! ಆಯ್ಕೆಮಾಡಿದ ಡೇಟಾಬೇಸ್ ಫೈಲ್ ಕಂಡುಬಂದಿಲ್ಲ ಅಥವಾ ಓದಲಾಗಲಿಲ್ಲ.</string>
+    <string name="restore_error_failed_to_copy_database">ಮರುಸ್ಥಾಪನೆ ವಿಫಲವಾಗಿದೆ! ಡೇಟಾಬೇಸ್ ಮರುಸ್ಥಾಪಿಸುವಾಗ ದೋಷ ಸಂಭವಿಸಿದೆ.</string>
+    <string name="select_location">ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ…</string>
+    <string name="restore_successful">ಮರುಸ್ಥಾಪನೆ ಯಶಸ್ವಿಯಾಗಿದೆ! Track &amp; Graph ಅನ್ನು ಈಗ ಮರುಪ್ರಾರಂಭಿಸಬೇಕು.</string>
+    <string name="restore_error_invalid_database_file">ಮರುಸ್ಥಾಪನೆ ವಿಫಲವಾಗಿದೆ! ಆಯ್ಕೆಮಾಡಿದ ಫೈಲ್ ಮಾನ್ಯವಾದ ಬ್ಯಾಕಪ್‌ನಂತೆ ಕಾಣುತ್ತಿಲ್ಲ.</string>
+    <string name="auto_backup">ಸ್ವಯಂ ಬ್ಯಾಕಪ್</string>
+    <string name="apply">ಅನ್ವಯಿಸಿ</string>
+    <string name="backup_every">ಪ್ರತಿ ಬ್ಯಾಕಪ್: </string>
+    <string name="next_backup_at">\"ಮುಂದಿನ ಬ್ಯಾಕಪ್: \"</string>
+    <string name="backup_notification_channel_name">ಸ್ವಯಂ ಬ್ಯಾಕಪ್ ಅಧಿಸೂಚನೆಗಳು</string>
+    <string name="backup_notification_channel_description">ಸ್ವಯಂ ಬ್ಯಾಕಪ್ ನಡೆಯುತ್ತಿರುವಾಗ ಅಥವಾ ವಿಫಲವಾದಾಗ ನಿಮಗೆ ತಿಳಿಸುತ್ತದೆ.</string>
+    <string name="backup_notification_title">ಬ್ಯಾಕಪ್ ನಡೆಯುತ್ತಿದೆ…</string>
+    <string name="backup_failed_notification_title">ಸ್ವಯಂ ಬ್ಯಾಕಪ್ ವಿಫಲವಾಗಿದೆ</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph ನಿಮ್ಮ ಬ್ಯಾಕಪ್ ಸ್ಥಳವನ್ನು ಕಂಡುಹಿಡಿಯಲು ಅಥವಾ ಪ್ರವೇಶಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.</string>
+    <string name="backup_failed_notification_could_not_copy">ನಿಮ್ಮ ಡೇಟಾವನ್ನು ಬ್ಯಾಕಪ್ ಮಾಡುವಾಗ ದೋಷ ಸಂಭವಿಸಿದೆ. ನಿಮ್ಮ ಬ್ಯಾಕಪ್ ಹಾನಿಗೊಳಗಾಗಿರಬಹುದು ಅಥವಾ ಅಪೂರ್ಣವಾಗಿರಬಹುದು.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">ಹೊಸ ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="backup_location">ಬ್ಯಾಕಪ್ ಸ್ಥಳ</string>
+    <string name="enable_auto_backup">ಸ್ವಯಂ ಬ್ಯಾಕಪ್ ಸಕ್ರಿಯಗೊಳಿಸಿ</string>
+    <string name="last_successful_backup">ಕೊನೆಯ ಯಶಸ್ವಿ ಬ್ಯಾಕಪ್</string>
+    <string name="next_scheduled_backup">ಮುಂದಿನ ನಿಗದಿತ ಬ್ಯಾಕಪ್</string>
+    <string name="notification_permission_prompt">ಯಾವುದೇ ಕಾರಣಕ್ಕಾಗಿ ಸ್ವಯಂ ಬ್ಯಾಕಪ್ ವಿಫಲವಾದರೆ ತಿಳಿಯಲು Track &amp; Graph ಗಾಗಿ ಅಧಿಸೂಚನೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.</string>
+    <string name="lua_script_empty">Lua ಸ್ಕ್ರಿಪ್ಟ್ ಸೇರಿಸಿ</string>
+    <string name="function_name_empty">ಫಂಕ್ಷನ್ ಹೆಸರು ಖಾಲಿಯಾಗಿರಬಾರದು</string>
+    <string name="function_name">ಫಂಕ್ಷನ್ ಹೆಸರು</string>
+    <string name="add_at_least_one_input">ಕನಿಷ್ಠ ಒಂದು ಇನ್‌ಪುಟ್ ಸೇರಿಸಿ</string>
+    <string name="output">ಔಟ್‌ಪುಟ್</string>
+    <string name="data_source">ಡೇಟಾ ಮೂಲ</string>
+    <string name="lua_script">Lua ಸ್ಕ್ರಿಪ್ಟ್</string>
+    <string name="data_source_description">ಡೇಟಾ ಮೂಲ ನೋಡ್ ಇನ್‌ಪುಟ್ ಆಗಿ ಬಳಸಲು ಟ್ರ್ಯಾಕರ್ ಅಥವಾ ಫಂಕ್ಷನ್ ಆಯ್ಕೆಮಾಡಲು ಅನುಮತಿಸುತ್ತದೆ.</string>
+    <string name="lua_script_input_hint">Lua ಸ್ಕ್ರಿಪ್ಟ್ ನಮೂದಿಸಿ…</string>
+    <string name="select_node_type">ನೋಡ್ ಪ್ರಕಾರ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="file">ಫೈಲ್</string>
+    <string name="lua_feature_names_not_unique">ಸ್ಕ್ರಿಪ್ಟ್ ಇನ್‌ಪುಟ್‌ಗಳ ಹೆಸರುಗಳು ಅನನ್ಯವಾಗಿರಬೇಕು</string>
+    <string name="graph_stat_type_lua_graph">Lua ಸ್ಕ್ರಿಪ್ಟ್</string>
+    <string name="launch_lua_disabled">Lua ಪ್ರಾರಂಭಿಸುವಿಕೆ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ</string>
+    <string name="no_lua">Lua ಇಲ್ಲ</string>
+    <string name="lua_engine_disabled">Lua ಎಂಜಿನ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ</string>
+    <string name="lua_graph_first_time_user_title">Lua ಸ್ಕ್ರಿಪ್ಟ್ ಗ್ರಾಫ್‌ಗಳು ಮತ್ತು ಅಂಕಿಅಂಶಗಳು</string>
+    <string name="lua_graph_first_time_user_message">Lua ಸ್ಕ್ರಿಪ್ಟ್‌ಗಳು Lua ಪ್ರೋಗ್ರಾಮಿಂಗ್ ಭಾಷೆಯೊಂದಿಗೆ ಕಸ್ಟಮ್ ಗ್ರಾಫ್‌ಗಳು ಮತ್ತು ಅಂಕಿಅಂಶಗಳನ್ನು ರಚಿಸಲು ಅನುಮತಿಸುವ ಸುಧಾರಿತ ವೈಶಿಷ್ಟ್ಯವಾಗಿದೆ. \n\nನಿಮ್ಮದೇ ಸ್ಕ್ರಿಪ್ಟ್ ಲೋಡ್ ಮಾಡಬಹುದು ಅಥವಾ GitHub ಸಂಗ್ರಹದಿಂದ ಒಂದನ್ನು ಆಯ್ಕೆಮಾಡಬಹುದು. GitHub ನಿಂದ ಸ್ಕ್ರಿಪ್ಟ್ ಸ್ಥಾಪಿಸಿದ ನಂತರ, ಸಿದ್ಧವಾಗಿರುವ ಸ್ಕ್ರಿಪ್ಟ್‌ನೊಂದಿಗೆ ನೀವು ಆ್ಯಪ್‌ಗೆ ಮರಳುತ್ತೀರಿ.</string>
+    <string name="functions_first_time_user_title">Functions ಗೆ ಸ್ವಾಗತ</string>
+    <string name="functions_first_time_user_message">ಫಂಕ್ಷನ್‌ಗಳು ನಿಮ್ಮ ಡೇಟಾವನ್ನು ಸಂಯೋಜಿಸಲು, ಒಟ್ಟುಗೂಡಿಸಲು ಮತ್ತು ಪರಿವರ್ತಿಸಿ ಹೊಸ ವ್ಯುತ್ಪನ್ನ ಡೇಟಾ ಮೂಲಗಳಾಗಿ ರೂಪಿಸಲು ಅನುಮತಿಸುವ ಸುಧಾರಿತ ವೈಶಿಷ್ಟ್ಯಗಳಾಗಿವೆ.</string>
+    <string name="learn_more">ಇಲ್ಲಿ ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ</string>
+    <string name="github">GitHub</string>
+    <string name="paste">ಅಂಟಿಸಿ</string>
+    <string name="failed_to_download_file">ಫೈಲ್ ಡೌನ್‌ಲೋಡ್ ವಿಫಲವಾಗಿದೆ: %s</string>
+    <string name="confirm_deep_link">ನೀವು ಅಪರಿಚಿತ ಮೂಲದಿಂದ ಸ್ಕ್ರಿಪ್ಟ್ ಲಿಂಕ್ ಸ್ವೀಕರಿಸಿದ್ದೀರಿ. ನೀವು ನಂಬುವ ಮೂಲಗಳಿಂದ ಮಾತ್ರ ಸ್ಕ್ರಿಪ್ಟ್‌ಗಳನ್ನು ಸ್ಥಾಪಿಸಿ. ಈ ಸ್ಕ್ರಿಪ್ಟ್ ಸ್ಥಾಪಿಸಲು ಬಯಸುವಿರಾ?</string>
+    <string name="graph_stat_info_button_description">ಗ್ರಾಫ್‌ಗಳು ಮತ್ತು ಅಂಕಿಅಂಶಗಳ ಟ್ಯುಟೋರಿಯಲ್‌ಗಳು</string>
+    <string name="network_generic_error">ನೆಟ್‌ವರ್ಕ್ ಪ್ರವೇಶಿಸಲು ಪ್ರಯತ್ನಿಸುವಾಗ ದೋಷ ಸಂಭವಿಸಿದೆ. ನಿಮ್ಮ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="function_verification_failure">ಫಂಕ್ಷನ್ ಸಹಿಗಳನ್ನು ಪರಿಶೀಲಿಸಲು ವಿಫಲವಾಗಿದೆ. ಸುರಕ್ಷಿತ ಸಂಪರ್ಕವಿದೆ ಮತ್ತು Track &amp; Graph ನವೀಕೃತವಾಗಿದೆ ಎಂಬುದನ್ನು ಖಚಿತಪಡಿಸಿ</string>
+    <string name="function_network_failure">ಫಂಕ್ಷನ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ. ನೀವು ಇಂಟರ್‌ನೆಟ್‌ಗೆ ಸಂಪರ್ಕಗೊಂಡಿರುವುದನ್ನು ಖಚಿತಪಡಿಸಿ. ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ, ಆ್ಯಪ್ ನವೀಕೃತವಾಗಿದೆ ಎಂಬುದನ್ನು ಖಚಿತಪಡಿಸಿ.</string>
+    <string name="functions_landscape_hint">ಸಲಹೆ: Functions ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್‌ನಲ್ಲಿ ಉತ್ತಮವಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತವೆ</string>
+    <string name="functions_start_hint">ಇಲ್ಲಿಂದ ಪ್ರಾರಂಭಿಸಿ: ದೀರ್ಘವಾಗಿ ಒತ್ತಿ ಡೇಟಾ ಮೂಲ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="see_whats_new">ಹೊಸದನ್ನು ನೋಡಿ</string>
+</resources>

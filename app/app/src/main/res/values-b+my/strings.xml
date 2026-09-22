@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">ပင်မ</string>
+    <string name="add_group">အုပ်စုထည့်ရန်: </string>
+    <string name="edit_group">အုပ်စုတည်းဖြတ်ရန်: </string>
+    <string name="group">အုပ်စု</string>
+    <string name="tracker">Tracker</string>
+    <string name="function">Function</string>
+    <string name="graph_or_stat">ဂရပ် သို့မဟုတ် စာရင်းအင်း</string>
+    <string name="symlink">Symlink</string>
+    <string name="symlinks">Symlinks</string>
+    <string name="reminder">သတိပေးချက်</string>
+    <string name="add_component">အစိတ်အပိုင်းထည့်ရန်</string>
+    <string name="symlink_locations_title">\"%1$s\" ၏တည်နေရာများ</string>
+    <string name="add_tracker">မှတ်တမ်းတင်လိုသည်မှာ:</string>
+    <string name="add">ထည့်ရန်</string>
+    <string name="group_name">ဥပမာ - နေ့စဉ်လုပ်ဆောင်ချက်များ</string>
+    <string name="delete">ဖျက်ရန်</string>
+    <string name="edit">တည်းဖြတ်ရန်</string>
+    <string name="update">အပ်ဒိတ်လုပ်ရန်</string>
+    <string name="graph_or_stat_name">ဂရပ်အမည်: </string>
+    <string name="tracker_name">Tracker အမည်</string>
+    <string name="this_is_a_time_or_duration">၎င်းသည် အချိန် သို့မဟုတ် ကြာချိန်ဖြစ်သည်</string>
+    <string name="yes">ဟုတ်သည်</string>
+    <string name="cancel">ပယ်ဖျက်ရန်</string>
+    <string name="select_file">ဖိုင်ရွေးရန်</string>
+    <string name="empty_group_hint">Track &amp; Graph မှ ကြိုဆိုပါသည်!\n\n ညာဘက်အပေါ်ရှိ + ကိုနှိပ်ပြီး စတင်ရန် Tracker ကိုရွေးပါ။</string>
+    <string name="no_trackers_graph_stats_hint">ဂရပ်များမဖန်တီးမီ Tracker တစ်ခုဖန်တီးပါ။</string>
+    <string name="no_trackers_functions_hint">Function များမဖန်တီးမီ Tracker တစ်ခုဖန်တီးပါ။</string>
+    <string name="ru_sure_del_group">ဤအုပ်စုနှင့် ၎င်းအတွင်းရှိအရာအားလုံးကို ဖျက်ရန် သေချာပါသလား။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍မရပါ။</string>
+    <string name="ru_sure_del_graph">ဤဂရပ်ကို ဖျက်ရန် သေချာပါသလား။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍မရပါ။ မှတ်တမ်းတင်ထားသောဒေတာများ မဆုံးရှုံးပါ။</string>
+    <string name="ru_sure_del_feature">ဤမှတ်တမ်းတင်ထားသောဒေတာကို ဖျက်ရန် သေချာပါသလား။</string>
+    <string name="item_in_multiple_groups">ဤအရာသည် နေရာများစွာတွင် ရှိပါသည်။ ဤနေရာမှ ဖယ်ရှားနိုင်သလို နေရာတိုင်းမှလည်း ဖျက်နိုင်ပါသည်။</string>
+    <string name="remove_from_this_group">ဤနေရာမှ ဖယ်ရှားရန်</string>
+    <string name="delete_everywhere">နေရာတိုင်းမှ ဖျက်ရန်</string>
+    <string name="ru_sure_del_function">ဤ Function ကို ဖျက်ရန် သေချာပါသလား။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍မရပါ။</string>
+    <string name="ru_sure_del_reminder">ဤသတိပေးချက်ကို ဖျက်ရန် သေချာပါသလား။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍မရပါ။</string>
+    <string name="ru_sure_del_data_point">ဤဒေတာအမှတ်ကို ဖျက်ရန် သေချာပါသလား။</string>
+    <string name="feature_name_cannot_be_null">အမည်ထည့်ပါ</string>
+    <string name="tracker_with_that_name_exists">ထိုအမည်ဖြင့် မှတ်တမ်းတင်ထားပြီးဖြစ်သည်</string>
+    <string name="data_points">ဒေတာအမှတ် %1$d ခု</string>
+    <string name="items_selected">%1$d ခု ရွေးထားသည်</string>
+    <string name="select_all">အားလုံးရွေးရန်</string>
+    <string name="deselect_all">အားလုံးမရွေးရန်</string>
+    <string name="ru_sure_del_data_points">ဤဒေတာအမှတ်များကို ဖျက်ရန် သေချာပါသလား။</string>
+    <string name="delete_selected_content_description">ရွေးထားသောအရာများကို ဖျက်ရန်</string>
+    <string name="copy_selected_content_description">ရွေးထားသောအရာများကို ကူးရန်</string>
+    <string name="move_selected_content_description">ရွေးထားသောအရာများကို ရွှေ့ရန်</string>
+    <string name="copy_to">သို့ ကူးရန်</string>
+    <string name="no_data">ဒေတာမရှိပါ</string>
+    <string name="skip">ကျော်ရန်</string>
+    <string name="exportButton">ထုတ်ရန်</string>
+    <string name="importButton">တင်သွင်းရန်</string>
+    <string name="import_export">တင်သွင်း/ထုတ်ယူရန်</string>
+    <string name="search">ရှာရန်</string>
+    <string name="type_to_search">ရှာရန် ရိုက်ထည့်ပါ</string>
+    <string name="no_results">ရလဒ်မရှိပါ</string>
+    <string name="export_to">ဤအုပ်စုရှိ မှတ်တမ်းတင်ဒေတာများကို CSV သို့ ထုတ်ရန်:</string>
+    <string name="export_error_message">ထုတ်ယူမှု မအောင်မြင်ပါ: %1$s</string>
+    <string name="import_from">CSV မှ ဤအုပ်စုသို့ မှတ်တမ်းတင်ဒေတာများ တင်သွင်းရန်:</string>
+    <string name="import_warning">သတိပေးချက်: တင်သွင်းခြင်းကို ပြန်ပြင်၍မရပါ။ Track &amp; Graph သည် တင်သွင်းသောဒေတာများကို ဤအုပ်စုရှိ အမည်တူဒေတာများနှင့် ပေါင်းစပ်ရန် ကြိုးစားပါမည်။</string>
+    <string name="add_a_graph_or_stat">ဂရပ် သို့မဟုတ် စာရင်းအင်းတစ်ခု ထည့်ရန်</string>
+    <string name="graph_type_label">ဂရပ်အမျိုးအစား:</string>
+    <string name="sample_size">နမူနာအရွယ်အစား:</string>
+    <string name="select_a_discrete_feature">အညွှန်းများပါသော ဒေတာအစုကို ရွေးပါ: </string>
+    <string name="no_labels">ဤဒေတာအစုတွင် အညွှန်းများမရှိပါ</string>
+    <string name="select_a_feature">ဒေတာအစုတစ်ခု ရွေးပါ:</string>
+    <string name="select_a_tracker">Tracker တစ်ခုရွေးပါ</string>
+    <string name="offset">အရွှေ့:</string>
+    <string name="scale">စကေး:</string>
+    <string name="from">မှ:</string>
+    <string name="to">သို့:</string>
+    <string name="day">နေ့</string>
+    <string-array name="time_histogram_windows">
+        <item>နာရီအလိုက်</item>
+        <item>နေ့စဉ်</item>
+        <item>အပတ်စဉ်</item>
+        <item>လစဉ်</item>
+        <item>သုံးလတစ်ကြိမ်</item>
+        <item>ခြောက်လတစ်ကြိမ်</item>
+        <item>နှစ်စဉ်</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>ဘက်ထရီချွေတာမှု</item>
+        <item>အလင်း</item>
+        <item>အမှောင်</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>စနစ်မူရင်း</item>
+        <item>အလင်း</item>
+        <item>အမှောင်</item>
+    </string-array>
+    <string name="graph_type_line_graph">မျဉ်းဂရပ်</string>
+    <string name="graph_type_pie_chart">စက်ဝိုင်းဂရပ်</string>
+    <string name="graph_type_average_time_between">ကြားကာလပျမ်းမျှ</string>
+    <string name="graph_type_time_since">ကြာချိန်</string>
+    <string name="graph_type_time_histogram">အချိန်ဟစ်စတိုဂရမ်</string>
+    <string name="graph_type_last_value">နောက်ဆုံးမှတ်တမ်း/ကြာချိန်</string>
+    <string name="graph_type_bar_chart">ဘားဂရပ်</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>ပျမ်းမျှမတွက်ပါ</item>
+        <item>နေ့စဉ်ရွေ့လျားပျမ်းမျှ</item>
+        <item>သုံးရက်ရွေ့လျားပျမ်းမျှ</item>
+        <item>အပတ်စဉ်ရွေ့လျားပျမ်းမျှ</item>
+        <item>လစဉ်ရွေ့လျားပျမ်းမျှ</item>
+        <item>သုံးလရွေ့လျားပျမ်းမျှ</item>
+        <item>ခြောက်လရွေ့လျားပျမ်းမျှ</item>
+        <item>နှစ်စဉ်ရွေ့လျားပျမ်းမျှ</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>မှတ်တမ်းတင်ချိန်တွင် ပြရန်</item>
+        <item>နာရီအလိုက် စုစုပေါင်းပြရန်</item>
+        <item>နေ့စဉ် စုစုပေါင်းပြရန်</item>
+        <item>အပတ်စဉ် စုစုပေါင်းပြရန်</item>
+        <item>လစဉ် စုစုပေါင်းပြရန်</item>
+        <item>နှစ်စဉ် စုစုပေါင်းပြရန်</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">ဒေတာအားလုံး</string>
+    <string name="graph_time_durations_a_day">တစ်ရက်</string>
+    <string name="graph_time_durations_a_week">တစ်ပတ်</string>
+    <string name="graph_time_durations_a_month">တစ်လ</string>
+    <string name="graph_time_durations_three_months">သုံးလ</string>
+    <string name="graph_time_durations_six_months">ခြောက်လ</string>
+    <string name="graph_time_durations_a_year">တစ်နှစ်</string>
+    <string name="custom">စိတ်ကြိုက်</string>
+    <string-array name="y_range_styles">
+        <item>ပြောင်းလဲနိုင်သော</item>
+        <item>သတ်မှတ်ထားသော</item>
+    </string-array>
+    <string name="ending_at_latest">နောက်ဆုံးဒေတာအမှတ်</string>
+    <string name="ending_at_now">ယခု</string>
+    <string name="ending_at_custom_date">စိတ်ကြိုက်ရက်စွဲ…</string>
+    <string name="hours_and_minutes_ago">လွန်ခဲ့သော %1$d နာရီ %2$d မိနစ်</string>
+    <string name="import_exception_unknown">တင်သွင်းမှု မအောင်မြင်ပါ: မသိသောအမှား ဖြစ်ပွားခဲ့သည်</string>
+    <string name="import_exception_bad_headers">တင်သွင်းမှု မအောင်မြင်ပါ: ခေါင်းစီးများသည် မျှော်မှန်းထားသော ခေါင်းစီးများနှင့် မကိုက်ညီပါ: %1$s</string>
+    <string name="import_exception_inconsistent_record">တင်သွင်းမှု မအောင်မြင်ပါ: လိုင်း %1$s ရှိမှတ်တမ်းသည် လိုအပ်သောခေါင်းစီးများနှင့် မကိုက်ညီပါ</string>
+    <string name="import_exception_bad_timestamp">တင်သွင်းမှု မအောင်မြင်ပါ: လိုင်း %1$s ရှိမှတ်တမ်း၏ အချိန်တံဆိပ်ကို အဓိပ္ပာယ်ဖော်၍မရပါ</string>
+    <string name="import_exception_inconsistent_data_type">တင်သွင်းမှု မအောင်မြင်ပါ: လိုင်း %1$s တွင် ဒေတာအမျိုးအစား မကိုက်ညီပါ</string>
+    <string name="unknown_error_occurred">မသိသောအမှား ဖြစ်ပွားခဲ့သည်</string>
+    <string name="graph_stat_validation_no_name">အမည်တစ်ခု ထည့်ပါ</string>
+    <string name="graph_stat_validation_no_line_graph_features">ဂရပ်တွင် တစ်စုံတစ်ရာ ထည့်ပါ</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">\"မှ\" သည် \"သို့\" ထက်ငယ် သို့မဟုတ် တူညီကြောင်း သေချာပါစေ</string>
+    <string name="graph_stat_validation_unrecognised_color">ဒေတာအစုအားလုံးတွင် အရောင်ရှိကြောင်း သေချာပါစေ</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">မမှန်ကန်သော မျဉ်းဂရပ်ဒေတာအစုကို တွေ့ရှိသည်</string>
+    <string name="graph_stat_validation_bad_fixed_range">\"မှ\" သည် \"သို့\" ထက်ငယ်ကြောင်း သေချာပါစေ</string>
+    <string name="graph_stat_view_not_found">ဤဂရပ်ကို ရှာဖွေနေစဉ် အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်</string>
+    <string name="graph_stat_view_not_enough_data_stat">ထုတ်ပေးရန် လုံလောက်သောဒေတာ မှတ်တမ်းတင်ပြီးသောအခါ ဤစာရင်းအင်းကို ပြပါမည်။</string>
+    <string name="graph_stat_view_not_enough_data_graph">ထုတ်ပေးရန် လုံလောက်သောဒေတာ မှတ်တမ်းတင်ပြီးသောအခါ ဤဂရပ်ကို ပြပါမည်။</string>
+    <string name="pie_chart_mixed_signs_error">အပိုင်းအရွယ်အစားများတွင် အပေါင်းနှင့် အနုတ်တန်ဖိုး နှစ်မျိုးလုံးပါသောကြောင့် ဤစက်ဝိုင်းဂရပ်ကို မပြနိုင်ပါ။</string>
+    <string name="histogram_mixed_signs_error">ဘင်အရွယ်အစားများတွင် အပေါင်းနှင့် အနုတ်တန်ဖိုး နှစ်မျိုးလုံးပါသောကြောင့် ဤဟစ်စတိုဂရမ်ကို မပြနိုင်ပါ။</string>
+    <string name="graph_non_finite_data_error">အကန့်အသတ်ရှိသော ကိန်းဂဏန်းမဟုတ်သည့် တန်ဖိုးပါဝင်သောကြောင့် ဤဂရပ်ကို မပြနိုင်ပါ။</string>
+    <string name="graph_inconsistent_series_error">ဒေတာစီးရီးများ၏ အရွယ်အစားများ မကိုက်ညီသောကြောင့် ဤဂရပ်ကို မပြနိုင်ပါ။</string>
+    <string name="graph_invalid_y_range_error">ဤဂရပ်၏ Y-ဝင်ရိုးအပိုင်းအခြား မမှန်ကန်သောကြောင့် မပြနိုင်ပါ။</string>
+    <string name="finish">ပြီးပါပြီ</string>
+    <string name="about_description">Track &amp; Graph သည် GPL 3.0 လိုင်စင်အောက်ရှိ အခမဲ့ open source ဆော့ဖ်ဝဲဖြစ်သည်။</string>
+    <string name="about_libraries_message">အောက်ပါ open source စာကြည့်တိုက်များကို အသုံးပြုထားသည်။</string>
+    <string name="about">အကြောင်း</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">အမေးများသောမေးခွန်းများ</string>
+    <string name="tutorial_text_1">သင့်ဒေတာများကို မှတ်တမ်းတင်ရန် Tracker များကို အသုံးပြုပါ။</string>
+    <string name="tutorial_text_2">ဒေတာများကို မြင်သာစေရန် ဂရပ်များနှင့် စာရင်းအင်းများကို အသုံးပြုပါ။</string>
+    <string name="tutorial_text_3">Tracker များ၊ ဂရပ်များနှင့် စာရင်းအင်းများကို စုစည်းရန် အုပ်စုများကို အသုံးပြုပါ။</string>
+    <string name="got_it">နားလည်ပါပြီ!</string>
+    <string name="move_to_colon">ရွှေ့ရန်:</string>
+    <string name="move_to">ရွှေ့ရန်</string>
+    <string name="ru_sure_update_data">ဤအပ်ဒိတ်သည် သင်မှတ်တမ်းတင်ထားပြီးသောဒေတာများကို ပြန်ပြင်၍မရအောင် ပြောင်းလဲနိုင်ပါသည်။ ဆက်မလုပ်မီ ရှိပြီးသားဒေတာများကို အရန်ကူးထားရန် အထူးအကြံပြုပါသည်။\n\n ဆက်လုပ်မလား။</string>
+    <string name="ok">အိုကေ</string>
+    <string name="rate_the_app">အက်ပ်ကို အဆင့်သတ်မှတ်ပါ</string>
+    <string name="reminders">သတိပေးချက်များ</string>
+    <string name="no_reminders_hint">မှတ်တမ်းတင်ရန် သတိပေးချက်အသစ်ဖန်တီးရန် + အိုင်ကွန်ကို နှိပ်ပါ။</string>
+    <string name="mon">တနင်္လာ</string>
+    <string name="tue">အင်္ဂါ</string>
+    <string name="wed">ဗုဒ္ဓဟူး</string>
+    <string name="thu">ကြာသပတေး</string>
+    <string name="fri">သောကြာ</string>
+    <string name="sat">စနေ</string>
+    <string name="sun">တနင်္ဂနွေ</string>
+    <string name="reminders_notifications_channel_name">သတိပေးချက်များ</string>
+    <string name="reminders_notifications_channel_description">မှတ်တမ်းတင်ရမည့်အချိန်ကို သတိပေးရန် အသုံးပြုသူဖန်တီးထားသော အသိပေးချက်များ</string>
+    <string name="default_reminder_name">မှတ်တမ်းတင်ရန် အချိန်ရောက်ပါပြီ!</string>
+    <string name="missed_reminder_single_content">%1$s မှ သတိပေးချက်</string>
+    <string name="missed_reminders_multiple_content">သတိပေးချက် %1$d ခု လွတ်သွားပါသည်</string>
+    <string name="next_reminder_format">နောက်သတိပေးချက်: %1$s</string>
+    <string name="no_upcoming_reminders">လာမည့်သတိပေးချက် မရှိပါ</string>
+    <string name="select_reminder_type">သတိပေးချက်အမျိုးအစား ရွေးပါ</string>
+    <string name="week_day_reminder">အပတ်စဉ်နေ့ သတိပေးချက်</string>
+    <string name="week_day_reminder_description">တနင်္လာ၊ ဗုဒ္ဓဟူး၊ သောကြာကဲ့သို့ သတ်မှတ်ထားသောနေ့များ</string>
+    <string name="periodic_reminder">အချိန်ကာလအလိုက် သတိပေးချက်</string>
+    <string name="periodic_reminder_description">၃ ရက်တစ်ကြိမ်ကဲ့သို့ ပုံမှန်အချိန်ကြားကာလများ</string>
+    <string name="month_day_reminder">လအလိုက်နေ့ သတိပေးချက်</string>
+    <string name="month_day_reminder_description">ပထမတနင်္လာကဲ့သို့ လစဉ်ပုံစံများ</string>
+    <string name="time_since_last_reminder">နောက်ဆုံးသတိပေးချက်မှ ကြာချိန်</string>
+    <string name="time_since_last_reminder_description">အချိန်အတော်ကြာ မှတ်တမ်းမတင်ထားသည့်အခါ</string>
+    <string name="one_time_reminder">တစ်ကြိမ်သတိပေးချက်</string>
+    <string name="one_time_reminder_description">သတ်မှတ်ထားသောအချိန် သို့မဟုတ် ကြန့်ကြာချိန်ပြီးနောက် တစ်ကြိမ်သာ သတိပေးချက်</string>
+    <string name="reminder_name">သတိပေးချက်အမည်</string>
+    <string name="reminder_disabled">သတိပေးချက် ပိတ်ထားသည်</string>
+    <string name="repeat_every">ထပ်လုပ်ရန် ကြားကာလ</string>
+    <string name="at_time">အချိန်</string>
+    <string name="at_a_specific_time">သတ်မှတ်ထားသောအချိန်တွင်</string>
+    <string name="ending_at">ပြီးဆုံးမည့်အချိန်</string>
+    <string name="starting_from">စတင်မည့်အချိန်</string>
+    <string name="repeat_on_week_days">အပတ်စဉ်နေ့များတွင် ထပ်လုပ်ရန်</string>
+    <string name="track_feature">Feature မှတ်တမ်းတင်ရန်</string>
+    <string name="select_tracker_placeholder">Tracker ရွေးပါ</string>
+    <string name="remind_after">ပြီးနောက် သတိပေးရန်</string>
+    <string name="then_remind_every">ထို့နောက် ထပ်မံသတိပေးရန် ကြားကာလ</string>
+    <string name="remind_at_date_and_time">ရက်စွဲနှင့်အချိန်တွင်</string>
+    <string name="remind_after_a_delay">ကြန့်ကြာချိန်ပြီးနောက်</string>
+    <string name="first_reminder">ပထမသတိပေးချက်</string>
+    <string name="every_colon">ကြားကာလ:</string>
+    <string name="ended_at_format">ပြီးဆုံးချိန်: %1$s</string>
+    <string name="starting_at_format">စတင်ချိန်: %1$s</string>
+    <string name="occurrence_first">ပထမ</string>
+    <string name="occurrence_second">ဒုတိယ</string>
+    <string name="occurrence_third">တတိယ</string>
+    <string name="occurrence_fourth">စတုတ္ထ</string>
+    <string name="occurrence_last">နောက်ဆုံး</string>
+    <string name="monday">တနင်္လာနေ့</string>
+    <string name="tuesday">အင်္ဂါနေ့</string>
+    <string name="wednesday">ဗုဒ္ဓဟူးနေ့</string>
+    <string name="thursday">ကြာသပတေးနေ့</string>
+    <string name="friday">သောကြာနေ့</string>
+    <string name="saturday">စနေနေ့</string>
+    <string name="sunday">တနင်္ဂနွေနေ့</string>
+    <string-array name="abbreviated_months">
+        <item>ဇန်</item>
+        <item>ဖေ</item>
+        <item>မတ်</item>
+        <item>ဧပြီ</item>
+        <item>မေ</item>
+        <item>ဇွန်</item>
+        <item>ဇူလိုင်</item>
+        <item>ဩဂုတ်</item>
+        <item>စက်</item>
+        <item>အောက်</item>
+        <item>နို</item>
+        <item>ဒီ</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>တနင်္လာ</item>
+        <item>အင်္ဂါ</item>
+        <item>ဗုဒ္ဓဟူး</item>
+        <item>ကြာသပတေး</item>
+        <item>သောကြာ</item>
+        <item>စနေ</item>
+        <item>တနင်္ဂနွေ</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">အပိုင်းအခြားပုံစံ:</string>
+    <string name="track_widget_configure_no_data_error">ဒေတာအချို့ကို ဦးစွာ မှတ်တမ်းတင်ပါ။</string>
+    <string name="track_widget_configure_no_data_selected_error">မှတ်တမ်းတင်ဝစ်ဂျက်ဖန်တီးရန် မှန်ကန်သောဒေတာအစုကို ရွေးရပါမည်။</string>
+    <string name="create">ဖန်တီးရန်</string>
+    <string name="use_default_value">မူလတန်ဖိုး သတ်မှတ်ရန်</string>
+    <string name="backup_and_restore">အရန်ကူးခြင်းနှင့် ပြန်လည်ရယူခြင်း</string>
+    <string name="backup_hint_text">အရန်ကူးခြင်းသည် မှတ်တမ်းတင်ထားသောဒေတာများ၊ ဂရပ်များနှင့် သတိပေးချက်များအပါအဝင် အက်ပ်ဒေတာအားလုံးကို သိမ်းဆည်းပေးသည်။ စက်ပျောက်ဆုံးခြင်း သို့မဟုတ် ပျက်စီးခြင်းအတွက် ဒေတာများကို ပြင်ပစက် သို့မဟုတ် cloud သိုလှောင်မှုသို့ ပုံမှန်အရန်ကူးထားသင့်သည်။</string>
+    <string name="restore_data">ဒေတာ ပြန်လည်ရယူရန်</string>
+    <string name="backup_successful">အရန်ကူးခြင်း အောင်မြင်ပါသည်!</string>
+    <string name="backup_error_could_not_write_to_file">ရွေးထားသောဖိုင်ကို ရှာမတွေ့ပါ သို့မဟုတ် ရေးသား၍မရပါ။</string>
+    <string name="backup_error_could_not_find_database_file">ဒေတာဘေ့စ်ဖိုင်ကို ရှာမတွေ့ပါ သို့မဟုတ် ဖတ်၍မရပါ။</string>
+    <string name="backup_error_failed_to_copy_database">ဒေတာဘေ့စ်ဖိုင်ကို ကူးယူစဉ် တစ်စုံတစ်ရာ မှားယွင်းခဲ့သည်။</string>
+    <string name="restore_failed">ပြန်လည်ရယူခြင်း မအောင်မြင်ပါ။ %1$s</string>
+    <string name="add_a_longer_description_optional">အသေးစိတ်ဖော်ပြချက် ထည့်ရန် (ရွေးချယ်နိုင်သည်)</string>
+    <string name="no_data_points_history_fragment_hint">ဒေတာအမှတ်များ ရှိလာသောအခါ သင့်မှတ်တမ်းကို ဤနေရာတွင် ပြပါမည်။</string>
+    <string name="data_resolution_error">ဤဒေတာကို ဖြေရှင်းရန် ကြိုးစားစဉ် အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်။\n\n%1$s</string>
+    <string name="info">အချက်အလက်</string>
+    <string name="no_description">ဖော်ပြချက် မရှိပါ</string>
+    <string name="description">ဖော်ပြချက်</string>
+    <string name="app_lock_title">အက်ပ်လော့ခ်</string>
+    <string name="app_lock_locked_title">Track &amp; Graph လော့ခ်ချထားသည်</string>
+    <string name="app_lock_password_label">စကားဝှက်</string>
+    <string name="app_lock_confirm_password_label">စကားဝှက် အတည်ပြုပါ</string>
+    <string name="app_lock_unlock">လော့ခ်ဖွင့်ရန်</string>
+    <string name="app_lock_use_biometrics">Biometrics အသုံးပြုရန်</string>
+    <string name="app_lock_enable">အက်ပ်လော့ခ် ဖွင့်ရန်</string>
+    <string name="app_lock_enabled">အက်ပ်လော့ခ် ဖွင့်ထားသည်</string>
+    <string name="app_lock_enable_biometric_unlock">Biometric လော့ခ်ဖွင့်ခြင်း ဖွင့်ရန်</string>
+    <string name="app_lock_no_strong_biometric_available">ဤစက်တွင် ခိုင်မာသော biometric လော့ခ်ဖွင့်ခြင်း မရရှိနိုင်ပါ။</string>
+    <string name="app_lock_lock_after_background_minutes">နောက်ခံတွင်ရှိပြီး မိနစ်မည်မျှကြာလျှင် လော့ခ်ချမည်</string>
+    <string name="app_lock_lock_after_background_minutes_hint">အက်ပ်သည် ရှေ့မျက်နှာပြင်မှ ထွက်သည်နှင့် လော့ခ်ချရန် 0 ကို အသုံးပြုပါ။</string>
+    <string name="app_lock_change_password">စကားဝှက် ပြောင်းရန်</string>
+    <string name="app_lock_password_changed">စကားဝှက် ပြောင်းပြီးပါပြီ</string>
+    <string name="app_lock_disable">အက်ပ်လော့ခ် ပိတ်ရန်</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph လော့ခ်ဖွင့်ရန်</string>
+    <string name="app_lock_unlock_biometric_subtitle">ဆက်လုပ်ရန် သင့်စက်၏ biometrics ကို အသုံးပြုပါ</string>
+    <string name="app_lock_use_password">စကားဝှက် အသုံးပြုရန်</string>
+    <string name="app_lock_biometric_not_recognized">Biometric အတည်ပြုမှုကို မမှတ်မိပါ။</string>
+    <string name="app_lock_error_missing_password">အက်ပ်လော့ခ်၏ စကားဝှက် ပျောက်ဆုံးနေသည်။ အက်ပ်လော့ခ်ကို ပိတ်ပြီး ပြန်ဖွင့်ပါ။</string>
+    <string name="app_lock_error_incorrect_password">စကားဝှက် မမှန်ပါ</string>
+    <string name="app_lock_error_password_hashing_unavailable">ဤစက်တွင် အက်ပ်လော့ခ်စကားဝှက် အတည်ပြုခြင်း မရရှိနိုင်ပါ။</string>
+    <string name="app_lock_error_enter_password">စကားဝှက် ထည့်ပါ။</string>
+    <string name="app_lock_error_passwords_do_not_match">စကားဝှက်များ မကိုက်ညီပါ။</string>
+    <string name="note_input_hint">မှတ်စုများ…</string>
+    <string name="add_a_note">မှတ်စု ထည့်ရန်</string>
+    <string name="notes">မှတ်စုများ</string>
+    <string name="show_global_notes">အထွေထွေ</string>
+    <string name="show_data_point_notes">ဒေတာအမှတ်များ</string>
+    <string name="delete_reminder_content_description">သတိပေးချက် ဖျက်ရန်</string>
+    <string name="theme_colon">အပြင်အဆင်:</string>
+    <string name="date_format_colon">ရက်စွဲပုံစံ:</string>
+    <string name="add_data_point_button_content_description">ဒေတာအမှတ်ထည့်ရန် ခလုတ်</string>
+    <string name="tracked_data_menu_button_content_description">မှတ်တမ်းတင်ထားသောဒေတာ မီနူးခလုတ်</string>
+    <string name="tracked_data_history_button_content_description">မှတ်တမ်းတင်ထားသောဒေတာ မှတ်တမ်းခလုတ်</string>
+    <string name="delete_line_button_content_description">မျဉ်းဖျက်ရန် ခလုတ်</string>
+    <string name="delete_input_button_content_description">ထည့်သွင်းမှုဖျက်ရန် ခလုတ်</string>
+    <string name="delete_data_point_button_content_description">ဒေတာအမှတ်ဖျက်ရန် ခလုတ်</string>
+    <string name="edit_data_point_button_content_description">ဒေတာအမှတ်တည်းဖြတ်ရန် ခလုတ်</string>
+    <string name="add_multiple_choice_answer_button_content_description">ရွေးချယ်စရာအဖြေထည့်ရန် ခလုတ်</string>
+    <string name="ending_at_colon">နမူနာအဆုံးသတ်ချိန်:</string>
+    <string name="duplicate">ပွားယူရန်</string>
+    <string name="no_notes_hint_text">မှတ်တမ်းတင်စဉ် ထည့်ထားသောမှတ်စုများကို ဤနေရာတွင် ပြပါမည်။ + ခလုတ်ဖြင့် အထွေထွေမှတ်စုများလည်း ထည့်နိုင်သည်။</string>
+    <string name="add_a_global_note">အထွေထွေမှတ်စုထည့်ရန်:</string>
+    <string name="duration">ကြာချိန်</string>
+    <string name="weeks">ပတ်</string>
+    <string name="months">လ</string>
+    <string name="days">ရက်</string>
+    <string name="hours">နာရီ</string>
+    <string name="minutes">မိနစ်</string>
+    <string name="seconds">စက္ကန့်</string>
+    <string name="hours_suffix">နာရီ</string>
+    <string name="minutes_suffix">မိနစ်</string>
+    <string name="seconds_suffix">စက္ကန့်</string>
+    <string name="numeric_to_duration_mode_header">ယခင်မှတ်တမ်းတင်ထားသောတန်ဖိုးများသည် ကိုယ်စားပြုသည်:</string>
+    <string name="duration_to_numeric_mode_header">ယခင်မှတ်တမ်းတင်ထားသောတန်ဖိုးများကို မည်သို့ပြောင်းမည်နည်း:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">အချိန်ကြာချိန်ကို အခြားဒေတာအမျိုးအစားများနှင့် ရော၍မရပါ။ နာရီ၊ မိနစ် သို့မဟုတ် စက္ကန့်များကို ပုံဖော်ကြည့်ပါ</string>
+    <string name="sum_by_count_checkbox_label">တန်ဖိုးများစုစုပေါင်းအစား မှတ်တမ်းတင်ထားသော ဒေတာအမှတ်အရေအတွက်ကို ရေတွက်ရန် ဤနေရာတွင် အမှန်ခြစ်ပါ။</string>
+    <string name="time_window_size">အချိန်အပိုင်းအခြားအရွယ်အစား:</string>
+    <string name="hold_to_preview">အစမ်းကြည့်ရန် ဖိထားပါ</string>
+    <string name="open">ဖွင့်ရန်</string>
+    <string name="close">ပိတ်ရန်</string>
+    <string name="filter_by_label">အညွှန်းဖြင့် စစ်ထုတ်ရန်</string>
+    <string name="filter_by_value">တန်ဖိုးအပိုင်းအခြားဖြင့် စစ်ထုတ်ရန်</string>
+    <string name="save_changes">ပြောင်းလဲမှုများ သိမ်းရန်</string>
+    <string name="timer_notification_channel_name">အချိန်တိုင်းကိရိယာများ</string>
+    <string name="stop">ရပ်ရန်</string>
+    <string name="name_your_function">သင့် Function ကို အမည်ပေးပါ: </string>
+    <string name="add_some_data_sources">ဒေတာရင်းမြစ်များ ထည့်ရန်</string>
+    <string name="value">တန်ဖိုး</string>
+    <string name="label">အညွှန်း</string>
+    <string name="continue_word">ဆက်ရန်</string>
+    <string name="update_all_data_points">ဒေတာအမှတ်အားလုံးကို အပ်ဒိတ်လုပ်ရန်: </string>
+    <string name="where_colon">နေရာ:</string>
+    <string name="to_colon">သို့:</string>
+    <string name="value_equals">တန်ဖိုး =</string>
+    <string name="label_equals">အညွှန်း =</string>
+    <string name="adding_your_first_data_point">ဒေတာအမှတ်ထည့်နည်း အမြန်လမ်းညွှန်:</string>
+    <string name="next">ရှေ့သို့</string>
+    <string name="each_data_point_has_a_timestamp_and_value">ဒေတာအမှတ်တိုင်းတွင် အချိန်တံဆိပ်နှင့် တန်ဖိုးရှိသည်: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">အညွှန်းနှင့် မှတ်စုကိုလည်း ရွေးချယ်ထည့်နိုင်သည်: </string>
+    <string name="data_point_tutorial_page_2_description">တန်ဖိုးသည် ကိန်းဂဏန်းဖြစ်သောကြောင့် သင့်ဒေတာအပြောင်းအလဲကို အချိန်နှင့်အမျှ မြင်နိုင်သည်</string>
+    <string name="data_point_tutorial_page_2_hint">(အကြံပြုချက်: တန်ဖိုးကို ဂရုမစိုက်ပါက မူရင်းတန်ဖိုး 1 ကို အသုံးပြုပါ)</string>
+    <string name="data_point_tutorial_page_3_description">ဒေတာအမှတ်များကို အုပ်စုဖွဲ့လိုပါက အညွှန်းများကို အသုံးပြုပါ</string>
+    <string name="data_point_tutorial_page_3_hint">(အကြံပြုချက်: အကြောင်းအရာ သို့မဟုတ် ရှင်းလင်းချက်ထပ်ထည့်လိုပါက အညွှန်းအကွက်အစား မှတ်စုကို အသုံးပြုပါ)</string>
+    <string name="help">အကူအညီ</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">အဆင့်မြင့်ရွေးချယ်စရာများ</string>
+    <string name="type_colon">\"အမျိုးအစား: \"</string>
+    <string name="order_colon">\"အစီအစဉ်: \"</string>
+    <string name="value_and_label">တန်ဖိုးနှင့် အညွှန်း</string>
+    <string name="value_only">တန်ဖိုးသာ</string>
+    <string name="label_only">အညွှန်းသာ</string>
+    <string name="none">မရှိ</string>
+    <string name="value_ascending">တန်ဖိုးအနိမ့်မှအမြင့်</string>
+    <string name="value_descending">တန်ဖိုးအမြင့်မှအနိမ့်</string>
+    <string name="label_ascending">အညွှန်းအက္ခရာစဉ်</string>
+    <string name="label_descending">အညွှန်းအက္ခရာပြန်စဉ်</string>
+    <string name="latest">နောက်ဆုံး</string>
+    <string name="oldest">အဟောင်းဆုံး</string>
+    <string name="track_all">အားလုံးမှတ်တမ်းတင်ရန်</string>
+    <string name="more_details">အသေးစိတ်များ</string>
+    <string name="suggestions">အကြံပြုချက်များ</string>
+    <string name="no_label">အညွှန်းမရှိ</string>
+    <string name="confirm_cancel_notes_will_be_lost">ပိတ်ရန် သေချာပါသလား။ မှတ်စုအားလုံး ပျောက်ဆုံးပါမည်။</string>
+    <string name="add_a_label">အညွှန်းထည့်ရန်</string>
+    <string name="bar_interval">ဘားအကြားကာလ:</string>
+    <string name="y_range_max">Y အပိုင်းအခြား အများဆုံး</string>
+    <string name="total_formatted">စုစုပေါင်း: %s</string>
+    <string name="from_formatted">မှ: %s</string>
+    <string name="to_formatted">သို့: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">စက္ကန့်(များ)</string>
+    <string name="minutes_generic">မိနစ်(များ)</string>
+    <string name="hours_generic">နာရီ(များ)</string>
+    <string name="days_generic">ရက်(များ)</string>
+    <string name="weeks_generic">ပတ်(များ)</string>
+    <string name="months_generic">လ(များ)</string>
+    <string name="years_generic">နှစ်(များ)</string>
+    <plurals name="seconds">
+        <item quantity="other">%d စက္ကန့်</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d မိနစ်</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d နာရီ</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d ရက်</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d ပတ်</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d လ</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d နှစ်</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="other">မိနစ်တိုင်း %d မိနစ်ခြား</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="other">နာရီတိုင်း %d နာရီခြား</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="other">ရက်တိုင်း %d ရက်ခြား</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="other">ပတ်တိုင်း %d ပတ်ခြား</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="other">လတိုင်း %d လခြား</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="other">နှစ်တိုင်း %d နှစ်ခြား</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="other">%d မိနစ်အကြာ</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="other">%d နာရီအကြာ</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="other">%d ရက်အကြာ</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="other">%d ပတ်အကြာ</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="other">%d လအကြာ</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="other">%d နှစ်အကြာ</item>
+    </plurals>
+    <string name="restore_hint_text">သတိပေးချက်: အရန်ကူးမှ ပြန်လည်ရယူခြင်းသည် အက်ပ်အတွင်းရှိ ဒေတာနှင့် လက်ရှိပြင်ဆင်မှုအားလုံးကို ဖျက်ပစ်ပါမည်။ ဒေတာများကို ဦးစွာ အရန်ကူးထားသင့်သည်။</string>
+    <string name="backup_now">ယခု အရန်ကူးရန်</string>
+    <string name="restore_error_could_not_write_to_database">ပြန်လည်ရယူမှု မအောင်မြင်ပါ။ ဒေတာဘေ့စ်ကို ရှာမတွေ့ပါ သို့မဟုတ် ရေးသား၍မရပါ။</string>
+    <string name="restore_error_could_not_read_from_database_file">ပြန်လည်ရယူမှု မအောင်မြင်ပါ။ ရွေးထားသော ဒေတာဘေ့စ်ဖိုင်ကို ရှာမတွေ့ပါ သို့မဟုတ် ဖတ်၍မရပါ။</string>
+    <string name="restore_error_failed_to_copy_database">ပြန်လည်ရယူမှု မအောင်မြင်ပါ။ ဒေတာဘေ့စ်ကို ပြန်လည်ရယူစဉ် တစ်စုံတစ်ရာ မှားယွင်းခဲ့သည်။</string>
+    <string name="select_location">တည်နေရာရွေးရန်…</string>
+    <string name="restore_successful">ပြန်လည်ရယူမှု အောင်မြင်ပါသည်။ Track &amp; Graph ကို ယခုပြန်လည်စတင်ရပါမည်။</string>
+    <string name="restore_error_invalid_database_file">ပြန်လည်ရယူမှု မအောင်မြင်ပါ။ ရွေးထားသောဖိုင်သည် မှန်ကန်သောအရန်ဖိုင် မဟုတ်ပါ။</string>
+    <string name="auto_backup">အလိုအလျောက် အရန်ကူးခြင်း</string>
+    <string name="apply">အသုံးပြုရန်</string>
+    <string name="backup_every">အရန်ကူးရန် ကြားကာလ: </string>
+    <string name="next_backup_at">\"နောက်တစ်ကြိမ် အရန်ကူးမည့်အချိန်: \"</string>
+    <string name="backup_notification_channel_name">အလိုအလျောက် အရန်ကူးခြင်း အသိပေးချက်များ</string>
+    <string name="backup_notification_channel_description">အလိုအလျောက် အရန်ကူးနေချိန်နှင့် မအောင်မြင်ပါက အသိပေးပါမည်။</string>
+    <string name="backup_notification_title">အရန်ကူးနေသည်…</string>
+    <string name="backup_failed_notification_title">အလိုအလျောက် အရန်ကူးခြင်း မအောင်မြင်ပါ</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph သည် သင့်အရန်ကူးမည့်နေရာကို ရှာမတွေ့ပါ သို့မဟုတ် ဝင်ရောက်ခွင့်မရပါ။</string>
+    <string name="backup_failed_notification_could_not_copy">ဒေတာများကို အရန်ကူးစဉ် တစ်စုံတစ်ရာ မှားယွင်းခဲ့သည်။ သင့်အရန်ဖိုင် ပျက်စီးနေခြင်း သို့မဟုတ် မပြည့်စုံခြင်း ဖြစ်နိုင်သည်။</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">နေရာအသစ် ရွေးရန်</string>
+    <string name="backup_location">အရန်ကူးမည့်နေရာ</string>
+    <string name="enable_auto_backup">အလိုအလျောက် အရန်ကူးခြင်း ဖွင့်ရန်</string>
+    <string name="last_successful_backup">နောက်ဆုံးအောင်မြင်သော အရန်ကူးခြင်း</string>
+    <string name="next_scheduled_backup">နောက်တစ်ကြိမ် စီစဉ်ထားသော အရန်ကူးခြင်း</string>
+    <string name="notification_permission_prompt">အလိုအလျောက် အရန်ကူးခြင်း မည်သည့်အကြောင်းကြောင့်မဆို မအောင်မြင်ပါက အသိပေးနိုင်ရန် Track &amp; Graph အတွက် အသိပေးချက်များကို ဖွင့်ထားသင့်သည်။</string>
+    <string name="lua_script_empty">Lua script ထည့်ပါ</string>
+    <string name="function_name_empty">Function အမည် မဖြည့်ထား၍မရပါ</string>
+    <string name="function_name">Function အမည်</string>
+    <string name="add_at_least_one_input">Input တစ်ခုအနည်းဆုံး ထည့်ပါ</string>
+    <string name="output">Output</string>
+    <string name="data_source">ဒေတာရင်းမြစ်</string>
+    <string name="lua_script">Lua Script</string>
+    <string name="data_source_description">ဒေတာရင်းမြစ် node သည် input အဖြစ် အသုံးပြုမည့် tracker သို့မဟုတ် function ကို ရွေးချယ်ခွင့်ပြုသည်။</string>
+    <string name="lua_script_input_hint">Lua script ထည့်ပါ…</string>
+    <string name="select_node_type">Node အမျိုးအစား ရွေးရန်</string>
+    <string name="file">ဖိုင်</string>
+    <string name="lua_feature_names_not_unique">Script input အမည်များသည် တစ်ခုနှင့်တစ်ခု မတူရပါ</string>
+    <string name="graph_stat_type_lua_graph">Lua Script</string>
+    <string name="launch_lua_disabled">Lua ဖွင့်ခြင်း ပိတ်ထားသည်</string>
+    <string name="no_lua">Lua မရှိပါ</string>
+    <string name="lua_engine_disabled">Lua engine ပိတ်ထားသည်</string>
+    <string name="lua_graph_first_time_user_title">Lua script ဂရပ်များနှင့် စာရင်းအင်းများ</string>
+    <string name="lua_graph_first_time_user_message">Lua script များသည် Lua programming language ဖြင့် စိတ်ကြိုက်ဂရပ်များနှင့် စာရင်းအင်းများ ဖန်တီးနိုင်သည့် အဆင့်မြင့်လုပ်ဆောင်ချက်ဖြစ်သည်။ \n\nသင့်ကိုယ်ပိုင် script ကို တင်နိုင်သလို GitHub စုစည်းမှုမှလည်း ရွေးနိုင်သည်။ GitHub မှ script တစ်ခု ထည့်သွင်းပြီးပါက အသုံးပြုရန် အသင့်ဖြစ်နေသော script ဖြင့် အက်ပ်သို့ ပြန်ရောက်လာမည်။</string>
+    <string name="functions_first_time_user_title">Functions မှ ကြိုဆိုပါသည်</string>
+    <string name="functions_first_time_user_message">Functions များသည် သင့်ဒေတာများကို ပေါင်းစပ်၊ စုစည်းကာ ပြောင်းလဲပြီး ဆင်းသက်ဒေတာရင်းမြစ်အသစ်များ ဖန်တီးနိုင်သည့် အဆင့်မြင့်လုပ်ဆောင်ချက်များဖြစ်သည်။</string>
+    <string name="learn_more">ဤနေရာတွင် ထပ်မံလေ့လာရန်</string>
+    <string name="github">GitHub</string>
+    <string name="paste">ကူးထည့်ရန်</string>
+    <string name="failed_to_download_file">ဖိုင်ဒေါင်းလုဒ် မအောင်မြင်ပါ: %s</string>
+    <string name="confirm_deep_link">မသိသောရင်းမြစ်မှ script လင့်ခ်တစ်ခုကို လက်ခံရရှိထားသည်။ ယုံကြည်ရသောရင်းမြစ်များမှသာ script များကို ထည့်သွင်းပါ။ ဤ script ကို ထည့်သွင်းမလား။</string>
+    <string name="graph_stat_info_button_description">ဂရပ်များနှင့် စာရင်းအင်းများ သင်ခန်းစာများ</string>
+    <string name="network_generic_error">ကွန်ရက်ကို ဝင်ရောက်ရန် ကြိုးစားစဉ် အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်။ ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်ကြိုးစားပါ။</string>
+    <string name="function_verification_failure">Function signatures များကို အတည်ပြုရန် မအောင်မြင်ပါ။ လုံခြုံသောချိတ်ဆက်မှုရှိပြီး Track &amp; Graph သည် နောက်ဆုံးဗားရှင်းဖြစ်ကြောင်း သေချာပါစေ</string>
+    <string name="function_network_failure">Functions များကို ဖွင့်ရန် မအောင်မြင်ပါ။ အင်တာနက်ချိတ်ဆက်ထားကြောင်း သေချာပါစေ။ ပြဿနာဆက်ရှိပါက အက်ပ်သည် နောက်ဆုံးဗားရှင်းဖြစ်ကြောင်း သေချာပါစေ။</string>
+    <string name="functions_landscape_hint">အကြံပြုချက်: Functions များသည် အလျားလိုက်မြင်ကွင်းတွင် ပိုကောင်းစွာ အလုပ်လုပ်သည်</string>
+    <string name="functions_start_hint">ဤနေရာမှ စတင်ပါ: ကြာရှည်နှိပ်ပြီး ဒေတာရင်းမြစ်ကို ရွေးပါ</string>
+    <string name="see_whats_new">အသစ်များကို ကြည့်ရန်</string>
+</resources>

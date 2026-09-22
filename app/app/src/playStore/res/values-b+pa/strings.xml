@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ਡਿਵੈਲਪਰ ਦਾ ਸਮਰਥਨ ਕਰੋ</string>
+    <string name="support_unavailable">ਇਸ ਵੇਲੇ ਕੋਈ ਸਮਰਥਨ ਵਿਕਲਪ ਉਪਲਬਧ ਨਹੀਂ ਹਨ।</string>
+    <string name="support_payment_failed">ਭੁਗਤਾਨ ਅਸਫਲ ਹੋਇਆ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।</string>
+    <string name="support_payment_pending">ਭੁਗਤਾਨ ਬਕਾਇਆ ਹੈ। ਭੁਗਤਾਨ ਦੀ ਪੁਸ਼ਟੀ ਹੋਣ ਤੋਂ ਬਾਅਦ Google Play ਇਸਨੂੰ ਪੂਰਾ ਕਰੇਗਾ।</string>
+</resources>

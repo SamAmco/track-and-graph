@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Ana Sayfa</string>
+    <string name="add_group">Grup ekle: </string>
+    <string name="edit_group">Grubu düzenle: </string>
+    <string name="group">Grup</string>
+    <string name="tracker">İzleyici</string>
+    <string name="function">Fonksiyon</string>
+    <string name="graph_or_stat">Grafik veya İstatistik</string>
+    <string name="symlink">Sembolik bağlantı</string>
+    <string name="symlinks">Sembolik bağlantılar</string>
+    <string name="reminder">Hatırlatıcı</string>
+    <string name="add_component">Bileşen ekle</string>
+    <string name="symlink_locations_title">\"%1$s\" konumları</string>
+    <string name="add_tracker">Bir şeyi izleyin:</string>
+    <string name="add">Ekle</string>
+    <string name="group_name">örn. Günlük Aktiviteler</string>
+    <string name="delete">Sil</string>
+    <string name="edit">Düzenle</string>
+    <string name="update">Güncelle</string>
+    <string name="graph_or_stat_name">Grafik adı: </string>
+    <string name="tracker_name">İzleyici adı</string>
+    <string name="this_is_a_time_or_duration">Bu bir zaman veya süredir</string>
+    <string name="yes">Evet</string>
+    <string name="cancel">İptal</string>
+    <string name="select_file">Dosya seç</string>
+    <string name="empty_group_hint">Track &amp; Graph\'a hoş geldiniz!\n\n Başlamak için sağ üstteki + simgesine dokunun ve İzleyici\'yi seçin.</string>
+    <string name="no_trackers_graph_stats_hint">Herhangi bir grafik oluşturmadan önce lütfen bir İzleyici oluşturun.</string>
+    <string name="no_trackers_functions_hint">Herhangi bir fonksiyon oluşturmadan önce lütfen bir İzleyici oluşturun.</string>
+    <string name="ru_sure_del_group">Bu grubu ve içindeki her şeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="ru_sure_del_graph">Bu grafiği silmek istediğinizden emin misiniz? Bu işlem geri alınamaz. İzlenen verileriniz kaybolmaz.</string>
+    <string name="ru_sure_del_feature">Bu izlenen veriyi silmek istediğinizden emin misiniz?</string>
+    <string name="item_in_multiple_groups">Bu öğe birden fazla yerde mevcut. Buradan kaldırabilir veya her yerden silebilirsiniz.</string>
+    <string name="remove_from_this_group">Buradan kaldır</string>
+    <string name="delete_everywhere">Her yerden sil</string>
+    <string name="ru_sure_del_function">Bu fonksiyonu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="ru_sure_del_reminder">Bu hatırlatıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="ru_sure_del_data_point">Bu veri noktasını silmek istediğinizden emin misiniz?</string>
+    <string name="feature_name_cannot_be_null">Lütfen bir ad ekleyin</string>
+    <string name="tracker_with_that_name_exists">Bu ada sahip bir şeyi zaten izliyorsunuz</string>
+    <string name="data_points">%1$d veri noktası</string>
+    <string name="items_selected">%1$d seçildi</string>
+    <string name="select_all">Tümünü seç</string>
+    <string name="deselect_all">Tümünün seçimini kaldır</string>
+    <string name="ru_sure_del_data_points">Bu veri noktalarını silmek istediğinizden emin misiniz?</string>
+    <string name="delete_selected_content_description">Seçili öğeleri sil</string>
+    <string name="copy_selected_content_description">Seçili öğeleri kopyala</string>
+    <string name="move_selected_content_description">Seçili öğeleri taşı</string>
+    <string name="copy_to">Şuraya kopyala</string>
+    <string name="no_data">Veri yok</string>
+    <string name="skip">Atla</string>
+    <string name="exportButton">Dışa aktar</string>
+    <string name="importButton">İçe aktar</string>
+    <string name="import_export">İçe/Dışa Aktar</string>
+    <string name="search">Ara</string>
+    <string name="type_to_search">Aramak için yazın</string>
+    <string name="no_results">Sonuç yok</string>
+    <string name="export_to">Bu gruptaki izlenen verileri CSV\'ye aktar:</string>
+    <string name="export_error_message">Dışa aktarma başarısız: %1$s</string>
+    <string name="import_from">İzlenen verileri CSV\'den bu gruba aktar:</string>
+    <string name="import_warning">Uyarı: İçe aktarma geri alınamaz. Track &amp; Graph, içe aktarılan verileri bu gruptaki mevcut verilerle ada göre birleştirmeyi deneyecek.</string>
+    <string name="add_a_graph_or_stat">Grafik veya İstatistik ekle</string>
+    <string name="graph_type_label">Grafik türü:</string>
+    <string name="sample_size">Örneklem boyutu:</string>
+    <string name="select_a_discrete_feature">Etiketli bir veri kümesi seçin: </string>
+    <string name="no_labels">Bu veri kümesinde etiket yok</string>
+    <string name="select_a_feature">Bir veri kümesi seçin:</string>
+    <string name="select_a_tracker">Bir izleyici seçin</string>
+    <string name="offset">Ofset:</string>
+    <string name="scale">Ölçek:</string>
+    <string name="from">Başlangıç:</string>
+    <string name="to">Bitiş:</string>
+    <string name="day">Gün</string>
+    <string-array name="time_histogram_windows">
+        <item>Saatlik</item>
+        <item>Günlük</item>
+        <item>Haftalık</item>
+        <item>Aylık</item>
+        <item>Üç aylık</item>
+        <item>Altı aylık</item>
+        <item>Yıllık</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Pil tasarrufu</item>
+        <item>Açık</item>
+        <item>Koyu</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Sistem varsayılanı</item>
+        <item>Açık</item>
+        <item>Koyu</item>
+    </string-array>
+    <string name="graph_type_line_graph">Çizgi grafik</string>
+    <string name="graph_type_pie_chart">Pasta grafik</string>
+    <string name="graph_type_average_time_between">Ortalama süre</string>
+    <string name="graph_type_time_since">Geçen süre</string>
+    <string name="graph_type_time_histogram">Zaman histogramı</string>
+    <string name="graph_type_last_value">Son izleme/Geçen süre</string>
+    <string name="graph_type_bar_chart">Çubuk grafik</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Ortalama yok</item>
+        <item>Günlük hareketli ortalama</item>
+        <item>Üç günlük hareketli ortalama</item>
+        <item>Haftalık hareketli ortalama</item>
+        <item>Aylık hareketli ortalama</item>
+        <item>Üç aylık hareketli ortalama</item>
+        <item>Altı aylık hareketli ortalama</item>
+        <item>Yıllık hareketli ortalama</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>İzleme sırasında çiz</item>
+        <item>Saatlik toplamları çiz</item>
+        <item>Günlük toplamları çiz</item>
+        <item>Haftalık toplamları çiz</item>
+        <item>Aylık toplamları çiz</item>
+        <item>Yıllık toplamları çiz</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Tüm veriler</string>
+    <string name="graph_time_durations_a_day">Bir gün</string>
+    <string name="graph_time_durations_a_week">Bir hafta</string>
+    <string name="graph_time_durations_a_month">Bir ay</string>
+    <string name="graph_time_durations_three_months">Üç ay</string>
+    <string name="graph_time_durations_six_months">Altı ay</string>
+    <string name="graph_time_durations_a_year">Bir yıl</string>
+    <string name="custom">Özel</string>
+    <string-array name="y_range_styles">
+        <item>Dinamik</item>
+        <item>Sabit</item>
+    </string-array>
+    <string name="ending_at_latest">Son veri noktası</string>
+    <string name="ending_at_now">Şimdi</string>
+    <string name="ending_at_custom_date">Özel tarih…</string>
+    <string name="hours_and_minutes_ago">%1$ds %2$dd önce</string>
+    <string name="import_exception_unknown">İçe aktarma başarısız: Bilinmeyen bir hata oluştu</string>
+    <string name="import_exception_bad_headers">İçe aktarma başarısız: Başlıklar beklenen başlıklarla eşleşmiyor: %1$s</string>
+    <string name="import_exception_inconsistent_record">İçe aktarma başarısız: %1$s. satırdaki kayıt gerekli başlıklarla tutarlı değil</string>
+    <string name="import_exception_bad_timestamp">İçe aktarma başarısız: %1$s. satırdaki kaydın zaman damgası yorumlanamadı</string>
+    <string name="import_exception_inconsistent_data_type">İçe aktarma başarısız: %1$s. satırda tutarsız veri türü alındı</string>
+    <string name="unknown_error_occurred">Bilinmeyen bir hata oluştu</string>
+    <string name="graph_stat_validation_no_name">Lütfen bir ad girin</string>
+    <string name="graph_stat_validation_no_line_graph_features">Lütfen grafiğe bir şey ekleyin</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Lütfen \"Başlangıç\" değerinin \"Bitiş\" değerinden küçük veya ona eşit olduğundan emin olun</string>
+    <string name="graph_stat_validation_unrecognised_color">Lütfen tüm veri kümelerinin bir rengi olduğundan emin olun</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Geçersiz çizgi grafik veri kümesi algılandı</string>
+    <string name="graph_stat_validation_bad_fixed_range">Lütfen \"Başlangıç\" değerinin \"Bitiş\" değerinden küçük olduğundan emin olun</string>
+    <string name="graph_stat_view_not_found">Bu grafik bulunurken bir hata oluştu</string>
+    <string name="graph_stat_view_not_enough_data_stat">Bu istatistik, oluşturulması için yeterli veri izlendiğinde gösterilecek.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Bu grafik, oluşturulması için yeterli veri izlendiğinde gösterilecek.</string>
+    <string name="pie_chart_mixed_signs_error">Bu pasta grafik, hem pozitif hem de negatif dilim boyutları içerdiği için oluşturulamıyor.</string>
+    <string name="histogram_mixed_signs_error">Bu histogram, hem pozitif hem de negatif sütun boyutları içerdiği için oluşturulamıyor.</string>
+    <string name="graph_non_finite_data_error">Bu grafik, sonlu olmayan bir değer içerdiği için oluşturulamıyor.</string>
+    <string name="graph_inconsistent_series_error">Bu grafik, veri serilerinin boyutları tutarsız olduğu için oluşturulamıyor.</string>
+    <string name="graph_invalid_y_range_error">Bu grafik, Y ekseni aralığı geçersiz olduğu için oluşturulamıyor.</string>
+    <string name="finish">Bitir</string>
+    <string name="about_description">Track &amp; Graph, GPL 3.0 Lisansı kapsamında ücretsiz ve açık kaynaklı bir yazılımdır.</string>
+    <string name="about_libraries_message">Aşağıdaki açık kaynaklı kütüphaneler kullanılmıştır:</string>
+    <string name="about">Hakkında</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">SSS</string>
+    <string name="tutorial_text_1">Verilerinizi izlemek için izleyicileri kullanın.</string>
+    <string name="tutorial_text_2">Verileri görselleştirmek için grafikleri ve istatistikleri kullanın.</string>
+    <string name="tutorial_text_3">İzleyicilerinizi, grafiklerinizi ve istatistiklerinizi düzenlemek için grupları kullanın.</string>
+    <string name="got_it">Anladım!</string>
+    <string name="move_to_colon">Şuraya taşı:</string>
+    <string name="move_to">Şuraya taşı</string>
+    <string name="ru_sure_update_data">Bu güncelleme, daha önce izlediğiniz verileri geri alınamaz şekilde değiştirebilir. Devam etmeden önce mevcut verilerinizi yedeklemeniz önemle tavsiye edilir.\n\n Devam etmek istiyor musunuz?</string>
+    <string name="ok">Tamam</string>
+    <string name="rate_the_app">Uygulamayı değerlendirin</string>
+    <string name="reminders">Hatırlatıcılar</string>
+    <string name="no_reminders_hint">Yeni bir izleme hatırlatıcı bildirimi oluşturmak için + simgesine dokunun.</string>
+    <string name="mon">Pzt</string>
+    <string name="tue">Sal</string>
+    <string name="wed">Çar</string>
+    <string name="thu">Per</string>
+    <string name="fri">Cum</string>
+    <string name="sat">Cmt</string>
+    <string name="sun">Paz</string>
+    <string name="reminders_notifications_channel_name">Hatırlatıcılar</string>
+    <string name="reminders_notifications_channel_description">Ne zaman izleme yapmanız gerektiğini hatırlatan kullanıcı bildirimleri</string>
+    <string name="default_reminder_name">İzleme zamanı!</string>
+    <string name="missed_reminder_single_content">%1$s tarihinden hatırlatıcı</string>
+    <string name="missed_reminders_multiple_content">%1$d hatırlatıcıyı kaçırdınız</string>
+    <string name="next_reminder_format">Sonraki hatırlatıcı: %1$s</string>
+    <string name="no_upcoming_reminders">Yaklaşan hatırlatıcı yok</string>
+    <string name="select_reminder_type">Hatırlatıcı türü seçin</string>
+    <string name="week_day_reminder">Haftanın Günü Hatırlatıcısı</string>
+    <string name="week_day_reminder_description">Pazartesi, Çarşamba, Cuma gibi belirli günler</string>
+    <string name="periodic_reminder">Periyodik Hatırlatıcı</string>
+    <string name="periodic_reminder_description">3 günde bir gibi düzenli aralıklar</string>
+    <string name="month_day_reminder">Ayın Günü Hatırlatıcısı</string>
+    <string name="month_day_reminder_description">İlk pazartesi gibi aylık düzenler</string>
+    <string name="time_since_last_reminder">Son Hatırlatıcıdan Beri Geçen Süre</string>
+    <string name="time_since_last_reminder_description">Bir şeyi bir süredir izlemediğinizde</string>
+    <string name="one_time_reminder">Tek Seferlik Hatırlatıcı</string>
+    <string name="one_time_reminder_description">Belirli bir zamanda veya gecikme sonrasında gösterilen bağımsız hatırlatıcı</string>
+    <string name="reminder_name">Hatırlatıcı adı</string>
+    <string name="reminder_disabled">Hatırlatıcı devre dışı</string>
+    <string name="repeat_every">Tekrarlama sıklığı</string>
+    <string name="at_time">Saat</string>
+    <string name="at_a_specific_time">Belirli bir saatte</string>
+    <string name="ending_at">Bitiş</string>
+    <string name="starting_from">Başlangıç</string>
+    <string name="repeat_on_week_days">Haftanın Günlerinde Tekrarla</string>
+    <string name="track_feature">Veri kaynağını izle</string>
+    <string name="select_tracker_placeholder">Bir izleyici seçin</string>
+    <string name="remind_after">Şu süre sonra hatırlat</string>
+    <string name="then_remind_every">Ardından şu sıklıkta hatırlat</string>
+    <string name="remind_at_date_and_time">Belirli bir tarih ve saatte</string>
+    <string name="remind_after_a_delay">Bir gecikme sonrasında</string>
+    <string name="first_reminder">İlk hatırlatıcı</string>
+    <string name="every_colon">Her:</string>
+    <string name="ended_at_format">Bitiş: %1$s</string>
+    <string name="starting_at_format">Başlangıç: %1$s</string>
+    <string name="occurrence_first">İlk</string>
+    <string name="occurrence_second">İkinci</string>
+    <string name="occurrence_third">Üçüncü</string>
+    <string name="occurrence_fourth">Dördüncü</string>
+    <string name="occurrence_last">Son</string>
+    <string name="monday">Pazartesi</string>
+    <string name="tuesday">Salı</string>
+    <string name="wednesday">Çarşamba</string>
+    <string name="thursday">Perşembe</string>
+    <string name="friday">Cuma</string>
+    <string name="saturday">Cumartesi</string>
+    <string name="sunday">Pazar</string>
+    <string-array name="abbreviated_months">
+        <item>Oca</item>
+        <item>Şub</item>
+        <item>Mar</item>
+        <item>Nis</item>
+        <item>May</item>
+        <item>Haz</item>
+        <item>Tem</item>
+        <item>Ağu</item>
+        <item>Eyl</item>
+        <item>Eki</item>
+        <item>Kas</item>
+        <item>Ara</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Pzt</item>
+        <item>Sal</item>
+        <item>Çar</item>
+        <item>Per</item>
+        <item>Cum</item>
+        <item>Cmt</item>
+        <item>Paz</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Aralık stili:</string>
+    <string name="track_widget_configure_no_data_error">Önce bazı verileri izleyin.</string>
+    <string name="track_widget_configure_no_data_selected_error">İzleme widget\'ı oluşturmak için geçerli bir veri kümesi seçmelisiniz.</string>
+    <string name="create">Oluştur</string>
+    <string name="use_default_value">Varsayılan değer belirle</string>
+    <string name="backup_and_restore">Yedekleme ve Geri Yükleme</string>
+    <string name="backup_hint_text">Yedekleme; izlenen tüm veriler, grafikler ve hatırlatıcılar dahil olmak üzere tüm uygulama verilerinizi kaydeder. Cihazınızın kaybolması veya bozulması ihtimaline karşı verilerinizi düzenli olarak harici bir cihaza veya bulut depolama alanına yedeklemelisiniz.</string>
+    <string name="restore_data">Verileri geri yükle</string>
+    <string name="backup_successful">Yedekleme başarılı!</string>
+    <string name="backup_error_could_not_write_to_file">Seçilen dosya bulunamadı veya dosyaya yazılamadı.</string>
+    <string name="backup_error_could_not_find_database_file">Veritabanı dosyası bulunamadı veya okunamadı.</string>
+    <string name="backup_error_failed_to_copy_database">Veritabanı dosyası kopyalanırken bir sorun oluştu.</string>
+    <string name="restore_failed">Geri yükleme başarısız. %1$s</string>
+    <string name="add_a_longer_description_optional">Daha uzun bir açıklama ekleyin (isteğe bağlı)</string>
+    <string name="no_data_points_history_fragment_hint">Bazı veri noktalarınız olduğunda geçmişiniz burada görünecek.</string>
+    <string name="data_resolution_error">Bu veriler çözülmeye çalışılırken bir hata oluştu:\n\n%1$s</string>
+    <string name="info">Bilgi</string>
+    <string name="no_description">Açıklama yok</string>
+    <string name="description">Açıklama</string>
+    <string name="app_lock_title">Uygulama Kilidi</string>
+    <string name="app_lock_locked_title">Track &amp; Graph kilitli</string>
+    <string name="app_lock_password_label">Şifre</string>
+    <string name="app_lock_confirm_password_label">Şifreyi onayla</string>
+    <string name="app_lock_unlock">Kilidi aç</string>
+    <string name="app_lock_use_biometrics">Biyometri kullan</string>
+    <string name="app_lock_enable">Uygulama kilidini etkinleştir</string>
+    <string name="app_lock_enabled">Uygulama kilidi etkin</string>
+    <string name="app_lock_enable_biometric_unlock">Biyometrik kilit açmayı etkinleştir</string>
+    <string name="app_lock_no_strong_biometric_available">Bu cihazda güçlü biyometrik kilit açma kullanılamıyor.</string>
+    <string name="app_lock_lock_after_background_minutes">Arka planda şu kadar dakika sonra kilitle</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Uygulama ön plandan çıktığı anda kilitlemek için 0 kullanın.</string>
+    <string name="app_lock_change_password">Şifreyi değiştir</string>
+    <string name="app_lock_password_changed">Şifre değiştirildi</string>
+    <string name="app_lock_disable">Uygulama kilidini devre dışı bırak</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph kilidini aç</string>
+    <string name="app_lock_unlock_biometric_subtitle">Devam etmek için cihazınızın biyometrisini kullanın</string>
+    <string name="app_lock_use_password">Şifre kullan</string>
+    <string name="app_lock_biometric_not_recognized">Biyometrik kimlik doğrulama tanınmadı.</string>
+    <string name="app_lock_error_missing_password">Uygulama kilidinin şifresi eksik. Uygulama kilidini devre dışı bırakıp yeniden etkinleştirin.</string>
+    <string name="app_lock_error_incorrect_password">Yanlış şifre</string>
+    <string name="app_lock_error_password_hashing_unavailable">Uygulama kilidi şifresi doğrulaması bu cihazda kullanılamıyor.</string>
+    <string name="app_lock_error_enter_password">Bir şifre girin.</string>
+    <string name="app_lock_error_passwords_do_not_match">Şifreler eşleşmiyor.</string>
+    <string name="note_input_hint">Notlar…</string>
+    <string name="add_a_note">Not ekle</string>
+    <string name="notes">Notlar</string>
+    <string name="show_global_notes">Genel</string>
+    <string name="show_data_point_notes">Veri noktaları</string>
+    <string name="delete_reminder_content_description">Hatırlatıcıyı sil</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Tarih biçimi:</string>
+    <string name="add_data_point_button_content_description">Veri noktası ekle düğmesi</string>
+    <string name="tracked_data_menu_button_content_description">İzlenen veriler menüsü düğmesi</string>
+    <string name="tracked_data_history_button_content_description">İzlenen veriler geçmişi düğmesi</string>
+    <string name="delete_line_button_content_description">Çizgiyi sil düğmesi</string>
+    <string name="delete_input_button_content_description">Girdiyi sil düğmesi</string>
+    <string name="delete_data_point_button_content_description">Veri noktasını sil düğmesi</string>
+    <string name="edit_data_point_button_content_description">Veri noktasını düzenle düğmesi</string>
+    <string name="add_multiple_choice_answer_button_content_description">Çoktan seçmeli yanıt ekle düğmesi</string>
+    <string name="ending_at_colon">Örnek bitişi:</string>
+    <string name="duplicate">Çoğalt</string>
+    <string name="no_notes_hint_text">İzleme sırasında eklenen notlar burada görünür. Ayrıca + düğmesini kullanarak genel notlar ekleyebilirsiniz.</string>
+    <string name="add_a_global_note">Genel not ekle:</string>
+    <string name="duration">Süre</string>
+    <string name="weeks">Hafta</string>
+    <string name="months">Ay</string>
+    <string name="days">Gün</string>
+    <string name="hours">Saat</string>
+    <string name="minutes">Dakika</string>
+    <string name="seconds">Saniye</string>
+    <string name="hours_suffix">s</string>
+    <string name="minutes_suffix">dk</string>
+    <string name="seconds_suffix">sn</string>
+    <string name="numeric_to_duration_mode_header">Daha önce izlenen değerler şunu temsil ediyor:</string>
+    <string name="duration_to_numeric_mode_header">Daha önce izlenen değerler neye dönüştürülsün:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Zaman sürelerini diğer veri türleriyle karıştıramazsınız. Saat, dakika veya saniye cinsinden çizmeyi deneyin</string>
+    <string name="sum_by_count_checkbox_label">Değerlerinin toplamı yerine izlenen veri noktalarının sayısını hesaplamak için burayı işaretleyin.</string>
+    <string name="time_window_size">Zaman aralığı boyutu:</string>
+    <string name="hold_to_preview">Önizlemek için basılı tutun</string>
+    <string name="open">Aç</string>
+    <string name="close">Kapat</string>
+    <string name="filter_by_label">Etikete göre filtrele</string>
+    <string name="filter_by_value">Değer aralığına göre filtrele</string>
+    <string name="save_changes">Değişiklikleri kaydet</string>
+    <string name="timer_notification_channel_name">Zamanlayıcılar</string>
+    <string name="stop">Durdur</string>
+    <string name="name_your_function">Fonksiyonunuzu adlandırın: </string>
+    <string name="add_some_data_sources">Veri kaynakları ekle</string>
+    <string name="value">Değer</string>
+    <string name="label">Etiket</string>
+    <string name="continue_word">Devam</string>
+    <string name="update_all_data_points">Tüm veri noktalarını güncelle: </string>
+    <string name="where_colon">Nerede:</string>
+    <string name="to_colon">Bitiş:</string>
+    <string name="value_equals">Değer =</string>
+    <string name="label_equals">Etiket =</string>
+    <string name="adding_your_first_data_point">Veri noktası eklemeyle ilgili kısa bir eğitim:</string>
+    <string name="next">İleri</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Her veri noktasının bir zaman damgası ve değeri vardır: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">İsteğe bağlı olarak bir etiketi ve notu da olabilir: </string>
+    <string name="data_point_tutorial_page_2_description">Değer bir sayıdır; böylece verilerinizin zaman içindeki değişimini görebilirsiniz</string>
+    <string name="data_point_tutorial_page_2_hint">(İpucu: Değeri önemsemiyorsanız varsayılan 1 değerini kullanın)</string>
+    <string name="data_point_tutorial_page_3_description">Veri noktalarını gruplamak istiyorsanız etiketleri kullanın</string>
+    <string name="data_point_tutorial_page_3_hint">(İpucu: Daha fazla bağlam veya açıklama eklemek istiyorsanız etiket alanı yerine notu kullanın)</string>
+    <string name="help">Yardım</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Gelişmiş seçenekler</string>
+    <string name="type_colon">\"Tür: \"</string>
+    <string name="order_colon">\"Sıralama: \"</string>
+    <string name="value_and_label">Değer ve etiket</string>
+    <string name="value_only">Yalnızca değer</string>
+    <string name="label_only">Yalnızca etiket</string>
+    <string name="none">Yok</string>
+    <string name="value_ascending">Değere göre artan</string>
+    <string name="value_descending">Değere göre azalan</string>
+    <string name="label_ascending">Etikete göre artan</string>
+    <string name="label_descending">Etikete göre azalan</string>
+    <string name="latest">En yeni</string>
+    <string name="oldest">En eski</string>
+    <string name="track_all">Tümünü izle</string>
+    <string name="more_details">Daha fazla ayrıntı</string>
+    <string name="suggestions">Öneriler</string>
+    <string name="no_label">Etiket yok</string>
+    <string name="confirm_cancel_notes_will_be_lost">Kapatmak istediğinizden emin misiniz? Tüm notlar kaybolacak.</string>
+    <string name="add_a_label">Etiket ekle</string>
+    <string name="bar_interval">Çubuk aralığı:</string>
+    <string name="y_range_max">Y aralığı üst sınırı</string>
+    <string name="total_formatted">Toplam: %s</string>
+    <string name="from_formatted">Başlangıç: %s</string>
+    <string name="to_formatted">Bitiş: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Saniye</string>
+    <string name="minutes_generic">Dakika</string>
+    <string name="hours_generic">Saat</string>
+    <string name="days_generic">Gün</string>
+    <string name="weeks_generic">Hafta</string>
+    <string name="months_generic">Ay</string>
+    <string name="years_generic">Yıl</string>
+    <plurals name="seconds">
+        <item quantity="other">%d saniye</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d dakika</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d saat</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d gün</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d hafta</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d ay</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d yıl</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="other">Her %d dakikada bir</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="other">Her %d saatte bir</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="other">Her %d günde bir</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="other">Her %d haftada bir</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="other">Her %d ayda bir</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="other">Her %d yılda bir</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="other">%d dakika sonra</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="other">%d saat sonra</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="other">%d gün sonra</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="other">%d hafta sonra</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="other">%d ay sonra</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="other">%d yıl sonra</item>
+    </plurals>
+    <string name="restore_hint_text">UYARI: Yedekten geri yüklemek, uygulamadaki tüm verileri ve mevcut kurulumu silecektir. Önce verilerinizi yedeklemelisiniz!</string>
+    <string name="backup_now">Şimdi yedekle</string>
+    <string name="restore_error_could_not_write_to_database">Geri yükleme başarısız! Veritabanı bulunamadı veya veritabanına yazılamadı.</string>
+    <string name="restore_error_could_not_read_from_database_file">Geri yükleme başarısız! Seçilen veritabanı dosyası bulunamadı veya okunamadı.</string>
+    <string name="restore_error_failed_to_copy_database">Geri yükleme başarısız! Veritabanı geri yüklenirken bir sorun oluştu.</string>
+    <string name="select_location">Konum seç…</string>
+    <string name="restore_successful">Geri yükleme başarılı! Track &amp; Graph şimdi yeniden başlatılmalıdır.</string>
+    <string name="restore_error_invalid_database_file">Geri yükleme başarısız! Seçilen dosya geçerli bir yedek değil.</string>
+    <string name="auto_backup">Otomatik yedekleme</string>
+    <string name="apply">Uygula</string>
+    <string name="backup_every">Yedekleme sıklığı: </string>
+    <string name="next_backup_at">\"Sonraki yedekleme: \"</string>
+    <string name="backup_notification_channel_name">Otomatik Yedekleme Bildirimleri</string>
+    <string name="backup_notification_channel_description">Otomatik yedekleme yapılırken veya başarısız olduğunda sizi bilgilendirir.</string>
+    <string name="backup_notification_title">Yedekleme sürüyor…</string>
+    <string name="backup_failed_notification_title">Otomatik yedekleme başarısız oldu</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph yedekleme konumunuzu bulamadı veya bu konuma erişemedi.</string>
+    <string name="backup_failed_notification_could_not_copy">Verileriniz yedeklenirken bir sorun oluştu. Yedeğiniz bozuk veya eksik olabilir.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Yeni Konum Seç</string>
+    <string name="backup_location">Yedekleme Konumu</string>
+    <string name="enable_auto_backup">Otomatik Yedeklemeyi Etkinleştir</string>
+    <string name="last_successful_backup">Son Başarılı Yedekleme</string>
+    <string name="next_scheduled_backup">Planlanan Sonraki Yedekleme</string>
+    <string name="notification_permission_prompt">Otomatik yedekleme herhangi bir nedenle başarısız olursa haberdar edilmek için Track &amp; Graph bildirimlerini etkinleştirmelisiniz.</string>
+    <string name="lua_script_empty">Lütfen bir Lua betiği ekleyin</string>
+    <string name="function_name_empty">Fonksiyon adı boş olamaz</string>
+    <string name="function_name">Fonksiyon adı</string>
+    <string name="add_at_least_one_input">Lütfen en az bir girdi ekleyin</string>
+    <string name="output">Çıktı</string>
+    <string name="data_source">Veri Kaynağı</string>
+    <string name="lua_script">Lua Betiği</string>
+    <string name="data_source_description">Veri Kaynağı düğümü, girdi olarak kullanılacak bir izleyici veya fonksiyon seçmenizi sağlar.</string>
+    <string name="lua_script_input_hint">Bir Lua betiği girin…</string>
+    <string name="select_node_type">Düğüm Türünü Seç</string>
+    <string name="file">Dosya</string>
+    <string name="lua_feature_names_not_unique">Beti girdilerinin adları benzersiz olmalıdır</string>
+    <string name="graph_stat_type_lua_graph">Lua Betiği</string>
+    <string name="launch_lua_disabled">Lua\'yı başlatma devre dışı</string>
+    <string name="no_lua">Lua yok</string>
+    <string name="lua_engine_disabled">Lua motoru devre dışı</string>
+    <string name="lua_graph_first_time_user_title">Lua betiği grafikleri ve istatistikleri</string>
+    <string name="lua_graph_first_time_user_message">Lua betikleri, Lua programlama diliyle özel grafikler ve istatistikler oluşturmanızı sağlayan gelişmiş bir özelliktir. \n\nKendi betiğinizi yükleyebilir veya GitHub koleksiyonundan birini seçebilirsiniz. GitHub\'dan bir betik yüklediğinizde, kullanıma hazır betikle uygulamaya geri dönersiniz.</string>
+    <string name="functions_first_time_user_title">Fonksiyonlara Hoş Geldiniz</string>
+    <string name="functions_first_time_user_message">Fonksiyonlar, verilerinizi birleştirmenizi, toplamanızı ve dönüştürerek yeni türetilmiş veri kaynakları oluşturmanızı sağlayan gelişmiş bir özelliktir.</string>
+    <string name="learn_more">Buradan daha fazla bilgi edinin</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Yapıştır</string>
+    <string name="failed_to_download_file">Dosya indirilemedi: %s</string>
+    <string name="confirm_deep_link">Bilinmeyen bir kaynaktan betik bağlantısı aldınız. Yalnızca güvendiğiniz kaynaklardan betik yükleyin. Bu betiği yüklemek istiyor musunuz?</string>
+    <string name="graph_stat_info_button_description">Grafik ve istatistik eğitimleri</string>
+    <string name="network_generic_error">Ağa erişmeye çalışırken bir hata oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="function_verification_failure">Fonksiyon imzaları doğrulanamadı. Lütfen güvenli bir bağlantınız olduğundan ve Track &amp; Graph\'ın güncel olduğundan emin olun</string>
+    <string name="function_network_failure">Fonksiyonlar yüklenemedi. Lütfen internete bağlı olduğunuzdan emin olun. Sorun devam ederse uygulamanın güncel olduğundan emin olun.</string>
+    <string name="functions_landscape_hint">İpucu: Fonksiyonlar yatay modda en iyi şekilde çalışır</string>
+    <string name="functions_start_hint">Buradan başlayın: Uzun basıp Veri Kaynağı\'nı seçin</string>
+    <string name="see_whats_new">Yenilikleri Gör</string>
+</resources>

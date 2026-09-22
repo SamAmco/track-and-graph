@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Hem</string>
+    <string name="add_group">Lägg till grupp: </string>
+    <string name="edit_group">Redigera grupp: </string>
+    <string name="group">Grupp</string>
+    <string name="tracker">Tracker</string>
+    <string name="function">Funktion</string>
+    <string name="graph_or_stat">Diagram eller statistik</string>
+    <string name="symlink">Symbolisk länk</string>
+    <string name="symlinks">Symboliska länkar</string>
+    <string name="reminder">Påminnelse</string>
+    <string name="add_component">Lägg till komponent</string>
+    <string name="symlink_locations_title">Platser för \"%1$s\"</string>
+    <string name="add_tracker">Spåra något:</string>
+    <string name="add">Lägg till</string>
+    <string name="group_name">t.ex. Dagliga aktiviteter</string>
+    <string name="delete">Ta bort</string>
+    <string name="edit">Redigera</string>
+    <string name="update">Uppdatera</string>
+    <string name="graph_or_stat_name">Diagramnamn: </string>
+    <string name="tracker_name">Trackernamn</string>
+    <string name="this_is_a_time_or_duration">Detta är en tid eller varaktighet</string>
+    <string name="yes">Ja</string>
+    <string name="cancel">Avbryt</string>
+    <string name="select_file">Välj fil</string>
+    <string name="empty_group_hint">Välkommen till Track &amp; Graph!\n\n Tryck på + längst upp till höger och välj Tracker för att komma igång.</string>
+    <string name="no_trackers_graph_stats_hint">Skapa en Tracker innan du skapar diagram.</string>
+    <string name="no_trackers_functions_hint">Skapa en Tracker innan du skapar funktioner.</string>
+    <string name="ru_sure_del_group">Vill du ta bort den här gruppen och allt i den? Detta går inte att ångra.</string>
+    <string name="ru_sure_del_graph">Vill du ta bort det här diagrammet? Detta går inte att ångra. Du förlorar inga spårade data.</string>
+    <string name="ru_sure_del_feature">Vill du ta bort dessa spårade data?</string>
+    <string name="item_in_multiple_groups">Det här objektet finns på flera platser. Du kan ta bort det härifrån eller ta bort det överallt.</string>
+    <string name="remove_from_this_group">Ta bort härifrån</string>
+    <string name="delete_everywhere">Ta bort överallt</string>
+    <string name="ru_sure_del_function">Vill du ta bort den här funktionen? Detta går inte att ångra.</string>
+    <string name="ru_sure_del_reminder">Vill du ta bort den här påminnelsen? Detta går inte att ångra.</string>
+    <string name="ru_sure_del_data_point">Vill du ta bort den här datapunkten?</string>
+    <string name="feature_name_cannot_be_null">Lägg till ett namn</string>
+    <string name="tracker_with_that_name_exists">Du spårar redan något med det namnet</string>
+    <string name="data_points">%1$d datapunkter</string>
+    <string name="items_selected">%1$d valda</string>
+    <string name="select_all">Markera alla</string>
+    <string name="deselect_all">Avmarkera alla</string>
+    <string name="ru_sure_del_data_points">Vill du ta bort dessa datapunkter?</string>
+    <string name="delete_selected_content_description">Ta bort valda objekt</string>
+    <string name="copy_selected_content_description">Kopiera valda objekt</string>
+    <string name="move_selected_content_description">Flytta valda objekt</string>
+    <string name="copy_to">Kopiera till</string>
+    <string name="no_data">Inga data</string>
+    <string name="skip">Hoppa över</string>
+    <string name="exportButton">Exportera</string>
+    <string name="importButton">Importera</string>
+    <string name="import_export">Importera/exportera</string>
+    <string name="search">Sök</string>
+    <string name="type_to_search">Skriv för att söka</string>
+    <string name="no_results">Inga resultat</string>
+    <string name="export_to">Exportera spårade data i den här gruppen till CSV:</string>
+    <string name="export_error_message">Exporten misslyckades: %1$s</string>
+    <string name="import_from">Importera spårade data till den här gruppen från CSV:</string>
+    <string name="import_warning">Varning: Importering kan inte ångras. Track &amp; Graph försöker slå ihop importerade data med befintliga data i gruppen efter namn.</string>
+    <string name="add_a_graph_or_stat">Lägg till diagram eller statistik</string>
+    <string name="graph_type_label">Diagramtyp:</string>
+    <string name="sample_size">Urvalsstorlek:</string>
+    <string name="select_a_discrete_feature">Välj en datamängd med etiketter: </string>
+    <string name="no_labels">Den här datamängden har inga etiketter</string>
+    <string name="select_a_feature">Välj en datamängd:</string>
+    <string name="select_a_tracker">Välj en Tracker</string>
+    <string name="offset">Förskjutning:</string>
+    <string name="scale">Skala:</string>
+    <string name="from">Från:</string>
+    <string name="to">Till:</string>
+    <string name="day">Dag</string>
+    <string-array name="time_histogram_windows">
+        <item>Varje timme</item>
+        <item>Dagligen</item>
+        <item>Veckovis</item>
+        <item>Månadsvis</item>
+        <item>Kvartalsvis</item>
+        <item>Halvårsvis</item>
+        <item>Årsvis</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Batterisparläge</item>
+        <item>Ljust</item>
+        <item>Mörkt</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Systemstandard</item>
+        <item>Ljust</item>
+        <item>Mörkt</item>
+    </string-array>
+    <string name="graph_type_line_graph">Linjediagram</string>
+    <string name="graph_type_pie_chart">Cirkeldiagram</string>
+    <string name="graph_type_average_time_between">Genomsnittlig tid mellan</string>
+    <string name="graph_type_time_since">Tid sedan</string>
+    <string name="graph_type_time_histogram">Tidshistogram</string>
+    <string name="graph_type_last_value">Senast spårat/tid sedan</string>
+    <string name="graph_type_bar_chart">Stapeldiagram</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Inget medelvärde</item>
+        <item>Glidande dagligt medelvärde</item>
+        <item>Glidande tredagarsmedelvärde</item>
+        <item>Glidande veckomedelvärde</item>
+        <item>Glidande månadsmedelvärde</item>
+        <item>Glidande tremånadersmedelvärde</item>
+        <item>Glidande sexmånadersmedelvärde</item>
+        <item>Glidande årsmedelvärde</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Visa när data spåras</item>
+        <item>Visa timtotaler</item>
+        <item>Visa dagtotaler</item>
+        <item>Visa veckototaler</item>
+        <item>Visa månadstotaler</item>
+        <item>Visa årstotaler</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Alla data</string>
+    <string name="graph_time_durations_a_day">En dag</string>
+    <string name="graph_time_durations_a_week">En vecka</string>
+    <string name="graph_time_durations_a_month">En månad</string>
+    <string name="graph_time_durations_three_months">Tre månader</string>
+    <string name="graph_time_durations_six_months">Sex månader</string>
+    <string name="graph_time_durations_a_year">Ett år</string>
+    <string name="custom">Anpassad</string>
+    <string-array name="y_range_styles">
+        <item>Dynamisk</item>
+        <item>Fast</item>
+    </string-array>
+    <string name="ending_at_latest">Senaste datapunkt</string>
+    <string name="ending_at_now">Nu</string>
+    <string name="ending_at_custom_date">Anpassat datum…</string>
+    <string name="hours_and_minutes_ago">%1$dt %2$dm sedan</string>
+    <string name="import_exception_unknown">Importen misslyckades: Ett okänt fel inträffade</string>
+    <string name="import_exception_bad_headers">Importen misslyckades: Rubrikerna stämde inte med de förväntade rubrikerna: %1$s</string>
+    <string name="import_exception_inconsistent_record">Importen misslyckades: Posten på rad %1$s stämmer inte med de obligatoriska rubrikerna</string>
+    <string name="import_exception_bad_timestamp">Importen misslyckades: Kunde inte tolka tidsstämpeln för posten på rad %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Importen misslyckades: Inkonsekvent datatyp på rad %1$s</string>
+    <string name="unknown_error_occurred">Ett okänt fel inträffade</string>
+    <string name="graph_stat_validation_no_name">Ange ett namn</string>
+    <string name="graph_stat_validation_no_line_graph_features">Lägg till något i diagrammet</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Kontrollera att \"Från\" är mindre än eller lika med \"Till\"</string>
+    <string name="graph_stat_validation_unrecognised_color">Kontrollera att alla datamängder har en färg</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Ogiltig datamängd i linjediagrammet</string>
+    <string name="graph_stat_validation_bad_fixed_range">Kontrollera att \"Från\" är mindre än \"Till\"</string>
+    <string name="graph_stat_view_not_found">Ett fel inträffade när diagrammet skulle hittas</string>
+    <string name="graph_stat_view_not_enough_data_stat">Den här statistiken visas när tillräckligt med data har spårats för att skapa den.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Det här diagrammet visas när tillräckligt med data har spårats för att skapa det.</string>
+    <string name="pie_chart_mixed_signs_error">Det här cirkeldiagrammet kan inte visas eftersom det innehåller både positiva och negativa segmentstorlekar.</string>
+    <string name="histogram_mixed_signs_error">Det här histogrammet kan inte visas eftersom det innehåller både positiva och negativa stapelstorlekar.</string>
+    <string name="graph_non_finite_data_error">Det här diagrammet kan inte visas eftersom det innehåller ett värde som inte är ett ändligt tal.</string>
+    <string name="graph_inconsistent_series_error">Det här diagrammet kan inte visas eftersom dataserierna har olika storlek.</string>
+    <string name="graph_invalid_y_range_error">Det här diagrammet kan inte visas eftersom Y-axelns intervall är ogiltigt.</string>
+    <string name="finish">Slutför</string>
+    <string name="about_description">Track &amp; Graph är gratis programvara med öppen källkod under GPL 3.0-licensen.</string>
+    <string name="about_libraries_message">Följande bibliotek med öppen källkod användes:</string>
+    <string name="about">Om</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Vanliga frågor</string>
+    <string name="tutorial_text_1">Använd Trackers för att spåra dina data.</string>
+    <string name="tutorial_text_2">Använd diagram och statistik för att visualisera data.</string>
+    <string name="tutorial_text_3">Använd grupper för att organisera dina Trackers, diagram och statistik.</string>
+    <string name="got_it">Jag förstår!</string>
+    <string name="move_to_colon">Flytta till:</string>
+    <string name="move_to">Flytta till</string>
+    <string name="ru_sure_update_data">Den här uppdateringen kan ändra data som du redan har spårat på ett sätt som inte går att ångra. Vi rekommenderar starkt att du säkerhetskopierar befintliga data innan du fortsätter.\n\n Vill du fortsätta?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Betygsätt appen</string>
+    <string name="reminders">Påminnelser</string>
+    <string name="no_reminders_hint">Tryck på +-ikonen för att skapa en ny påminnelse om att spåra.</string>
+    <string name="mon">Mån</string>
+    <string name="tue">Tis</string>
+    <string name="wed">Ons</string>
+    <string name="thu">Tor</string>
+    <string name="fri">Fre</string>
+    <string name="sat">Lör</string>
+    <string name="sun">Sön</string>
+    <string name="reminders_notifications_channel_name">Påminnelser</string>
+    <string name="reminders_notifications_channel_description">Användarskapade aviseringar som påminner dig när det är dags att spåra</string>
+    <string name="default_reminder_name">Dags att spåra!</string>
+    <string name="missed_reminder_single_content">Påminnelse från %1$s</string>
+    <string name="missed_reminders_multiple_content">Du missade %1$d påminnelser</string>
+    <string name="next_reminder_format">Nästa påminnelse: %1$s</string>
+    <string name="no_upcoming_reminders">Inga kommande påminnelser</string>
+    <string name="select_reminder_type">Välj typ av påminnelse</string>
+    <string name="week_day_reminder">Veckodagspåminnelse</string>
+    <string name="week_day_reminder_description">Specifika dagar som måndag, onsdag och fredag</string>
+    <string name="periodic_reminder">Periodisk påminnelse</string>
+    <string name="periodic_reminder_description">Regelbundna intervall, till exempel var tredje dag</string>
+    <string name="month_day_reminder">Månadsdagspåminnelse</string>
+    <string name="month_day_reminder_description">Månadsmönster som första måndagen</string>
+    <string name="time_since_last_reminder">Tid sedan senaste påminnelsen</string>
+    <string name="time_since_last_reminder_description">När du inte har spårat något på ett tag</string>
+    <string name="one_time_reminder">Engångspåminnelse</string>
+    <string name="one_time_reminder_description">En fristående påminnelse vid en viss tid eller efter en fördröjning</string>
+    <string name="reminder_name">Påminnelsens namn</string>
+    <string name="reminder_disabled">Påminnelsen är inaktiverad</string>
+    <string name="repeat_every">Upprepa var</string>
+    <string name="at_time">Vid tidpunkten</string>
+    <string name="at_a_specific_time">Vid en viss tid</string>
+    <string name="ending_at">Slutar</string>
+    <string name="starting_from">Börjar från</string>
+    <string name="repeat_on_week_days">Upprepa på veckodagar</string>
+    <string name="track_feature">Spåra datakälla</string>
+    <string name="select_tracker_placeholder">Välj en Tracker</string>
+    <string name="remind_after">Påminn efter</string>
+    <string name="then_remind_every">Påminn sedan var</string>
+    <string name="remind_at_date_and_time">Vid ett datum och en tid</string>
+    <string name="remind_after_a_delay">Efter en fördröjning</string>
+    <string name="first_reminder">Första påminnelsen</string>
+    <string name="every_colon">Var:</string>
+    <string name="ended_at_format">Slutade: %1$s</string>
+    <string name="starting_at_format">Börjar: %1$s</string>
+    <string name="occurrence_first">Första</string>
+    <string name="occurrence_second">Andra</string>
+    <string name="occurrence_third">Tredje</string>
+    <string name="occurrence_fourth">Fjärde</string>
+    <string name="occurrence_last">Sista</string>
+    <string name="monday">Måndag</string>
+    <string name="tuesday">Tisdag</string>
+    <string name="wednesday">Onsdag</string>
+    <string name="thursday">Torsdag</string>
+    <string name="friday">Fredag</string>
+    <string name="saturday">Lördag</string>
+    <string name="sunday">Söndag</string>
+    <string-array name="abbreviated_months">
+        <item>jan</item>
+        <item>feb</item>
+        <item>mar</item>
+        <item>apr</item>
+        <item>maj</item>
+        <item>jun</item>
+        <item>jul</item>
+        <item>aug</item>
+        <item>sep</item>
+        <item>okt</item>
+        <item>nov</item>
+        <item>dec</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Mån</item>
+        <item>Tis</item>
+        <item>Ons</item>
+        <item>Tor</item>
+        <item>Fre</item>
+        <item>Lör</item>
+        <item>Sön</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Intervallstil:</string>
+    <string name="track_widget_configure_no_data_error">Spåra data först.</string>
+    <string name="track_widget_configure_no_data_selected_error">Du måste välja en giltig datamängd för att skapa en spårningswidget.</string>
+    <string name="create">Skapa</string>
+    <string name="use_default_value">Ange ett standardvärde</string>
+    <string name="backup_and_restore">Säkerhetskopiera och återställa</string>
+    <string name="backup_hint_text">Säkerhetskopian sparar alla dina appdata, inklusive alla spårade data, diagram och påminnelser. Du bör regelbundet säkerhetskopiera dina data till en extern enhet eller molnlagring ifall enheten försvinner eller går sönder.</string>
+    <string name="restore_data">Återställ data</string>
+    <string name="backup_successful">Säkerhetskopieringen lyckades!</string>
+    <string name="backup_error_could_not_write_to_file">Den valda filen kunde inte hittas eller skrivas till.</string>
+    <string name="backup_error_could_not_find_database_file">Databasfilen kunde inte hittas eller läsas.</string>
+    <string name="backup_error_failed_to_copy_database">Något gick fel när databasfilen kopierades.</string>
+    <string name="restore_failed">Återställningen misslyckades. %1$s</string>
+    <string name="add_a_longer_description_optional">Lägg till en längre beskrivning (valfritt)</string>
+    <string name="no_data_points_history_fragment_hint">Din historik visas här när du har några datapunkter.</string>
+    <string name="data_resolution_error">Ett fel inträffade när dessa data skulle tolkas:\n\n%1$s</string>
+    <string name="info">Info</string>
+    <string name="no_description">Ingen beskrivning</string>
+    <string name="description">Beskrivning</string>
+    <string name="app_lock_title">Applås</string>
+    <string name="app_lock_locked_title">Track &amp; Graph är låst</string>
+    <string name="app_lock_password_label">Lösenord</string>
+    <string name="app_lock_confirm_password_label">Bekräfta lösenord</string>
+    <string name="app_lock_unlock">Lås upp</string>
+    <string name="app_lock_use_biometrics">Använd biometrik</string>
+    <string name="app_lock_enable">Aktivera applås</string>
+    <string name="app_lock_enabled">Applås är aktiverat</string>
+    <string name="app_lock_enable_biometric_unlock">Aktivera biometrisk upplåsning</string>
+    <string name="app_lock_no_strong_biometric_available">Ingen stark biometrisk upplåsning är tillgänglig på den här enheten.</string>
+    <string name="app_lock_lock_after_background_minutes">Lås efter minuter i bakgrunden</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Använd 0 för att låsa så snart appen lämnar förgrunden.</string>
+    <string name="app_lock_change_password">Ändra lösenord</string>
+    <string name="app_lock_password_changed">Lösenordet har ändrats</string>
+    <string name="app_lock_disable">Inaktivera applås</string>
+    <string name="app_lock_unlock_biometric_title">Lås upp Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Använd enhetens biometrik för att fortsätta</string>
+    <string name="app_lock_use_password">Använd lösenord</string>
+    <string name="app_lock_biometric_not_recognized">Den biometriska autentiseringen kändes inte igen.</string>
+    <string name="app_lock_error_missing_password">Applåsets lösenord saknas. Inaktivera och aktivera applåset igen.</string>
+    <string name="app_lock_error_incorrect_password">Felaktigt lösenord</string>
+    <string name="app_lock_error_password_hashing_unavailable">Verifiering av applåsets lösenord är inte tillgänglig på den här enheten.</string>
+    <string name="app_lock_error_enter_password">Ange ett lösenord.</string>
+    <string name="app_lock_error_passwords_do_not_match">Lösenorden stämmer inte överens.</string>
+    <string name="note_input_hint">Anteckningar…</string>
+    <string name="add_a_note">Lägg till en anteckning</string>
+    <string name="notes">Anteckningar</string>
+    <string name="show_global_notes">Globala</string>
+    <string name="show_data_point_notes">Datapunkter</string>
+    <string name="delete_reminder_content_description">Ta bort påminnelse</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Datumformat:</string>
+    <string name="add_data_point_button_content_description">Knapp för att lägga till datapunkt</string>
+    <string name="tracked_data_menu_button_content_description">Menyknapp för spårade data</string>
+    <string name="tracked_data_history_button_content_description">Knapp för historik över spårade data</string>
+    <string name="delete_line_button_content_description">Knapp för att ta bort rad</string>
+    <string name="delete_input_button_content_description">Knapp för att ta bort inmatning</string>
+    <string name="delete_data_point_button_content_description">Knapp för att ta bort datapunkt</string>
+    <string name="edit_data_point_button_content_description">Knapp för att redigera datapunkt</string>
+    <string name="add_multiple_choice_answer_button_content_description">Knapp för att lägga till flervalsalternativ</string>
+    <string name="ending_at_colon">Exempel som slutar:</string>
+    <string name="duplicate">Duplicera</string>
+    <string name="no_notes_hint_text">Anteckningar som läggs till vid spårning visas här. Du kan också lägga till globala anteckningar med knappen +.</string>
+    <string name="add_a_global_note">Lägg till en global anteckning:</string>
+    <string name="duration">Varaktighet</string>
+    <string name="weeks">Veckor</string>
+    <string name="months">Månader</string>
+    <string name="days">Dagar</string>
+    <string name="hours">Timmar</string>
+    <string name="minutes">Minuter</string>
+    <string name="seconds">Sekunder</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Representerar tidigare spårade värden:</string>
+    <string name="duration_to_numeric_mode_header">Vad ska tidigare spårade värden konverteras till:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Du kan inte blanda tidsvaraktigheter med andra datatyper. Överväg att visa timmar, minuter eller sekunder</string>
+    <string name="sum_by_count_checkbox_label">Markera här för att räkna antalet spårade datapunkter i stället för summan av deras värden.</string>
+    <string name="time_window_size">Tidsfönstrets storlek:</string>
+    <string name="hold_to_preview">Håll ned för att förhandsvisa</string>
+    <string name="open">Öppna</string>
+    <string name="close">Stäng</string>
+    <string name="filter_by_label">Filtrera efter etikett</string>
+    <string name="filter_by_value">Filtrera efter värdeintervall</string>
+    <string name="save_changes">Spara ändringar</string>
+    <string name="timer_notification_channel_name">Tidtagare</string>
+    <string name="stop">Stoppa</string>
+    <string name="name_your_function">Namnge funktionen: </string>
+    <string name="add_some_data_sources">Lägg till datakällor</string>
+    <string name="value">Värde</string>
+    <string name="label">Etikett</string>
+    <string name="continue_word">Fortsätt</string>
+    <string name="update_all_data_points">Uppdatera alla datapunkter: </string>
+    <string name="where_colon">Var:</string>
+    <string name="to_colon">Till:</string>
+    <string name="value_equals">Värde =</string>
+    <string name="label_equals">Etikett =</string>
+    <string name="adding_your_first_data_point">En snabb introduktion till att lägga till datapunkter:</string>
+    <string name="next">Nästa</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Varje datapunkt har en tidsstämpel och ett värde: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Den kan också ha en etikett och en anteckning: </string>
+    <string name="data_point_tutorial_page_2_description">Värdet är ett tal så att du kan se hur dina data förändras över tid</string>
+    <string name="data_point_tutorial_page_2_hint">(Tips: Om du inte bryr dig om värdet använder du standardvärdet 1)</string>
+    <string name="data_point_tutorial_page_3_description">Använd etiketter om du vill gruppera datapunkterna</string>
+    <string name="data_point_tutorial_page_3_hint">(Tips: Om du vill lägga till mer sammanhang eller en beskrivning använder du anteckningsfältet i stället för etikettfältet)</string>
+    <string name="help">Hjälp</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Avancerade alternativ</string>
+    <string name="type_colon">\"Typ: \"</string>
+    <string name="order_colon">\"Ordning: \"</string>
+    <string name="value_and_label">Värde och etikett</string>
+    <string name="value_only">Endast värde</string>
+    <string name="label_only">Endast etikett</string>
+    <string name="none">Inget</string>
+    <string name="value_ascending">Värde stigande</string>
+    <string name="value_descending">Värde fallande</string>
+    <string name="label_ascending">Etikett stigande</string>
+    <string name="label_descending">Etikett fallande</string>
+    <string name="latest">Senaste</string>
+    <string name="oldest">Äldsta</string>
+    <string name="track_all">Spåra alla</string>
+    <string name="more_details">Mer information</string>
+    <string name="suggestions">Förslag</string>
+    <string name="no_label">Ingen etikett</string>
+    <string name="confirm_cancel_notes_will_be_lost">Vill du stänga? Alla anteckningar går förlorade.</string>
+    <string name="add_a_label">Lägg till en etikett</string>
+    <string name="bar_interval">Stapেলintervall:</string>
+    <string name="y_range_max">Maximalt Y-intervall</string>
+    <string name="total_formatted">Totalt: %s</string>
+    <string name="from_formatted">Från: %s</string>
+    <string name="to_formatted">Till: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Sekund(er)</string>
+    <string name="minutes_generic">Minut(er)</string>
+    <string name="hours_generic">Timme/timmar</string>
+    <string name="days_generic">Dag(ar)</string>
+    <string name="weeks_generic">Vecka/veckor</string>
+    <string name="months_generic">Månad(er)</string>
+    <string name="years_generic">År</string>
+    <plurals name="seconds">
+        <item quantity="one">%d sekund</item>
+        <item quantity="other">%d sekunder</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minut</item>
+        <item quantity="other">%d minuter</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d timme</item>
+        <item quantity="other">%d timmar</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dagar</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d vecka</item>
+        <item quantity="other">%d veckor</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d månad</item>
+        <item quantity="other">%d månader</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d år</item>
+        <item quantity="other">%d år</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Varje minut</item>
+        <item quantity="other">Var %d:e minut</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Varje timme</item>
+        <item quantity="other">Var %d:e timme</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Varje dag</item>
+        <item quantity="other">Var %d:e dag</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Varje vecka</item>
+        <item quantity="other">Var %d:e vecka</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Varje månad</item>
+        <item quantity="other">Var %d:e månad</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Varje år</item>
+        <item quantity="other">Var %d:e år</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Efter 1 minut</item>
+        <item quantity="other">Efter %d minuter</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Efter 1 timme</item>
+        <item quantity="other">Efter %d timmar</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Efter 1 dag</item>
+        <item quantity="other">Efter %d dagar</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Efter 1 vecka</item>
+        <item quantity="other">Efter %d veckor</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Efter 1 månad</item>
+        <item quantity="other">Efter %d månader</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Efter 1 år</item>
+        <item quantity="other">Efter %d år</item>
+    </plurals>
+    <string name="restore_hint_text">VARNING: Om du återställer från en säkerhetskopia raderas alla data och all konfiguration som finns i appen. Du bör säkerhetskopiera dina data först!</string>
+    <string name="backup_now">Säkerhetskopiera nu</string>
+    <string name="restore_error_could_not_write_to_database">Återställningen misslyckades! Databasen kunde inte hittas eller skrivas till.</string>
+    <string name="restore_error_could_not_read_from_database_file">Återställningen misslyckades! Den valda databasfilen kunde inte hittas eller läsas.</string>
+    <string name="restore_error_failed_to_copy_database">Återställningen misslyckades! Något gick fel när databasen återställdes.</string>
+    <string name="select_location">Välj plats…</string>
+    <string name="restore_successful">Återställningen lyckades! Track &amp; Graph måste nu startas om.</string>
+    <string name="restore_error_invalid_database_file">Återställningen misslyckades! Den valda filen verkar inte vara en giltig säkerhetskopia.</string>
+    <string name="auto_backup">Automatisk säkerhetskopiering</string>
+    <string name="apply">Använd</string>
+    <string name="backup_every">Säkerhetskopiera var: </string>
+    <string name="next_backup_at">\"Nästa säkerhetskopiering: \"</string>
+    <string name="backup_notification_channel_name">Aviseringar om automatisk säkerhetskopiering</string>
+    <string name="backup_notification_channel_description">Meddelar när en automatisk säkerhetskopiering utförs och om den misslyckas.</string>
+    <string name="backup_notification_title">Säkerhetskopiering pågår…</string>
+    <string name="backup_failed_notification_title">Automatisk säkerhetskopiering misslyckades</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph kunde inte hitta eller få åtkomst till din säkerhetskopieringsplats.</string>
+    <string name="backup_failed_notification_could_not_copy">Något gick fel när dina data säkerhetskopierades. Säkerhetskopian kan vara skadad eller ofullständig.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Välj ny plats</string>
+    <string name="backup_location">Säkerhetskopieringsplats</string>
+    <string name="enable_auto_backup">Aktivera automatisk säkerhetskopiering</string>
+    <string name="last_successful_backup">Senaste lyckade säkerhetskopiering</string>
+    <string name="next_scheduled_backup">Nästa schemalagda säkerhetskopiering</string>
+    <string name="notification_permission_prompt">Du bör aktivera aviseringar för Track &amp; Graph för att få veta om den automatiska säkerhetskopieringen misslyckas.</string>
+    <string name="lua_script_empty">Lägg till ett Lua-skript</string>
+    <string name="function_name_empty">Funktionsnamnet får inte vara tomt</string>
+    <string name="function_name">Funktionsnamn</string>
+    <string name="add_at_least_one_input">Lägg till minst en indata</string>
+    <string name="output">Utdata</string>
+    <string name="data_source">Datakälla</string>
+    <string name="lua_script">Lua-skript</string>
+    <string name="data_source_description">Med en datakällenod kan du välja en tracker eller funktion att använda som indata.</string>
+    <string name="lua_script_input_hint">Ange ett Lua-skript…</string>
+    <string name="select_node_type">Välj nodtyp</string>
+    <string name="file">Fil</string>
+    <string name="lua_feature_names_not_unique">Skriptindata måste ha unika namn</string>
+    <string name="graph_stat_type_lua_graph">Lua-skript</string>
+    <string name="launch_lua_disabled">Starta Lua inaktiverat</string>
+    <string name="no_lua">Ingen Lua</string>
+    <string name="lua_engine_disabled">Lua-motorn är inaktiverad</string>
+    <string name="lua_graph_first_time_user_title">Lua-skript för diagram och statistik</string>
+    <string name="lua_graph_first_time_user_message">Lua-skript är en avancerad funktion som låter dig skapa anpassade diagram och statistik med programmeringsspråket Lua. \n\nDu kan läsa in ett eget skript eller välja ett från GitHub-samlingen. När du installerar ett skript från GitHub återgår du till appen med skriptet klart att användas.</string>
+    <string name="functions_first_time_user_title">Välkommen till Funktioner</string>
+    <string name="functions_first_time_user_message">Funktioner är en avancerad funktion som låter dig kombinera, sammanställa och omvandla dina data till nya härledda datakällor.</string>
+    <string name="learn_more">Läs mer här</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Klistra in</string>
+    <string name="failed_to_download_file">Det gick inte att ladda ner filen: %s</string>
+    <string name="confirm_deep_link">Du har fått en skriptlänk från en okänd källa. Installera endast skript från källor du litar på. Vill du installera det här skriptet?</string>
+    <string name="graph_stat_info_button_description">Handledningar om diagram och statistik</string>
+    <string name="network_generic_error">Ett fel uppstod när nätverket skulle nås. Kontrollera anslutningen och försök igen.</string>
+    <string name="function_verification_failure">Det gick inte att verifiera funktionssignaturerna. Kontrollera att du har en säker anslutning och att Track &amp; Graph är uppdaterat</string>
+    <string name="function_network_failure">Det gick inte att läsa in funktionerna. Kontrollera att du är ansluten till internet. Om problemet kvarstår bör du kontrollera att appen är uppdaterad.</string>
+    <string name="functions_landscape_hint">Tips: Funktioner fungerar bäst i liggande läge</string>
+    <string name="functions_start_hint">Börja här: Tryck länge och välj Datakälla</string>
+    <string name="see_whats_new">Se nyheterna</string>
+</resources>

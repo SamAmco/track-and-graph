@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Нэмэх</string>
+    <string name="add_a_note">Тэмдэглэл нэмэх</string>
+    <string name="cancel">Цуцлах</string>
+    <string name="continue_word">Үргэлжлүүлэх</string>
+    <string name="create">Үүсгэх</string>
+    <string name="label">Шошго</string>
+    <string name="release_notes_support_text">Таны дэмжлэг Track &amp; Graph-ийг хөгжүүлж, ажиллуулахад тусална 🌱</string>
+    <string name="release_notes_maybe_later">Дараа болъё</string>
+    <string name="release_notes_support_development">Хөгжүүлэлтийг дэмжих</string>
+    <string name="release_notes_thank_you">Баярлалаа! ❤️\n\nТаны бүх дэмжлэг Track &amp; Graph-ийг хүн бүрт илүү сайн болгоход зарцуулагдана 🌱</string>
+    <string name="support_close">Хаах</string>
+    <string name="search">Хайх</string>
+    <string name="update">Шинэчлэх</string>
+    <string name="value">Утга</string>
+</resources>

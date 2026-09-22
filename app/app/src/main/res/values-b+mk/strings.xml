@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Почетна</string>
+    <string name="add_group">Додај група: </string>
+    <string name="edit_group">Уреди група: </string>
+    <string name="group">Група</string>
+    <string name="tracker">Следач</string>
+    <string name="function">Функција</string>
+    <string name="graph_or_stat">Графикон или статистика</string>
+    <string name="symlink">Симболичка врска</string>
+    <string name="symlinks">Симболички врски</string>
+    <string name="reminder">Потсетник</string>
+    <string name="add_component">Додај компонента</string>
+    <string name="symlink_locations_title">Локации на \"%1$s\"</string>
+    <string name="add_tracker">Следи нешто:</string>
+    <string name="add">Додај</string>
+    <string name="group_name">на пр. Дневни активности</string>
+    <string name="delete">Избриши</string>
+    <string name="edit">Уреди</string>
+    <string name="update">Ажурирај</string>
+    <string name="graph_or_stat_name">Име на графиконот: </string>
+    <string name="tracker_name">Име на следачот</string>
+    <string name="this_is_a_time_or_duration">Ова е време или времетраење</string>
+    <string name="yes">Да</string>
+    <string name="cancel">Откажи</string>
+    <string name="select_file">Избери датотека</string>
+    <string name="empty_group_hint">Добредојдовте во Track &amp; Graph!\n\n Допрете + горе десно и изберете Следач за да започнете.</string>
+    <string name="no_trackers_graph_stats_hint">Создадете следач пред да креирате графикони.</string>
+    <string name="no_trackers_functions_hint">Создадете следач пред да креирате функции.</string>
+    <string name="ru_sure_del_group">Дали сте сигурни дека сакате да ја избришете оваа група и сè во неа? Ова не може да се врати.</string>
+    <string name="ru_sure_del_graph">Дали сте сигурни дека сакате да го избришете овој графикон? Ова не може да се врати. Следените податоци нема да бидат изгубени.</string>
+    <string name="ru_sure_del_feature">Дали сте сигурни дека сакате да ги избришете овие следени податоци?</string>
+    <string name="item_in_multiple_groups">Оваа ставка постои на повеќе места. Може да ја отстраните одовде или да ја избришете насекаде.</string>
+    <string name="remove_from_this_group">Отстрани одовде</string>
+    <string name="delete_everywhere">Избриши насекаде</string>
+    <string name="ru_sure_del_function">Дали сте сигурни дека сакате да ја избришете оваа функција? Ова не може да се врати.</string>
+    <string name="ru_sure_del_reminder">Дали сте сигурни дека сакате да го избришете овој потсетник? Ова не може да се врати.</string>
+    <string name="ru_sure_del_data_point">Дали сте сигурни дека сакате да ја избришете оваа точка со податоци?</string>
+    <string name="feature_name_cannot_be_null">Додајте име</string>
+    <string name="tracker_with_that_name_exists">Веќе следите нешто со тоа име</string>
+    <string name="data_points">%1$d точки со податоци</string>
+    <string name="items_selected">Избрани: %1$d</string>
+    <string name="select_all">Избери сè</string>
+    <string name="deselect_all">Откажи го изборот на сè</string>
+    <string name="ru_sure_del_data_points">Дали сте сигурни дека сакате да ги избришете овие точки со податоци?</string>
+    <string name="delete_selected_content_description">Избриши ги избраните ставки</string>
+    <string name="copy_selected_content_description">Копирај ги избраните ставки</string>
+    <string name="move_selected_content_description">Премести ги избраните ставки</string>
+    <string name="copy_to">Копирај во</string>
+    <string name="no_data">Нема податоци</string>
+    <string name="skip">Прескокни</string>
+    <string name="exportButton">Извези</string>
+    <string name="importButton">Увези</string>
+    <string name="import_export">Увоз/извоз</string>
+    <string name="search">Пребарај</string>
+    <string name="type_to_search">Внесете за пребарување</string>
+    <string name="no_results">Нема резултати</string>
+    <string name="export_to">Извези ги следените податоци во оваа група во CSV:</string>
+    <string name="export_error_message">Извозот не успеа: %1$s</string>
+    <string name="import_from">Увези следени податоци во оваа група од CSV:</string>
+    <string name="import_warning">Предупредување: Увозот не може да се врати. Track &amp; Graph ќе се обиде да ги спои увезените податоци со постојните податоци во оваа група според името.</string>
+    <string name="add_a_graph_or_stat">Додај графикон или статистика</string>
+    <string name="graph_type_label">Тип на графикон:</string>
+    <string name="sample_size">Големина на примерокот:</string>
+    <string name="select_a_discrete_feature">Изберете збир податоци со ознаки: </string>
+    <string name="no_labels">Овој збир податоци нема ознаки</string>
+    <string name="select_a_feature">Изберете збир податоци:</string>
+    <string name="select_a_tracker">Изберете следач</string>
+    <string name="offset">Поместување:</string>
+    <string name="scale">Размер:</string>
+    <string name="from">Од:</string>
+    <string name="to">До:</string>
+    <string name="day">Ден</string>
+    <string-array name="time_histogram_windows">
+        <item>Часовно</item>
+        <item>Дневно</item>
+        <item>Неделно</item>
+        <item>Месечно</item>
+        <item>Тримесечно</item>
+        <item>Полугодишно</item>
+        <item>Годишно</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Штедење батерија</item>
+        <item>Светла</item>
+        <item>Темна</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Системски стандардно</item>
+        <item>Светла</item>
+        <item>Темна</item>
+    </string-array>
+    <string name="graph_type_line_graph">Линиски графикон</string>
+    <string name="graph_type_pie_chart">Кружен графикон</string>
+    <string name="graph_type_average_time_between">Просечно време меѓу</string>
+    <string name="graph_type_time_since">Време од</string>
+    <string name="graph_type_time_histogram">Хистограм на време</string>
+    <string name="graph_type_last_value">Последно следење/време од</string>
+    <string name="graph_type_bar_chart">Столбест графикон</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Без просек</item>
+        <item>Дневен подвижен просек</item>
+        <item>Тридневен подвижен просек</item>
+        <item>Неделен подвижен просек</item>
+        <item>Месечен подвижен просек</item>
+        <item>Тримесечен подвижен просек</item>
+        <item>Шестмесечен подвижен просек</item>
+        <item>Годишен подвижен просек</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Прикажи кога се следи</item>
+        <item>Прикажи часовни збирови</item>
+        <item>Прикажи дневни збирови</item>
+        <item>Прикажи неделни збирови</item>
+        <item>Прикажи месечни збирови</item>
+        <item>Прикажи годишни збирови</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Сите податоци</string>
+    <string name="graph_time_durations_a_day">Еден ден</string>
+    <string name="graph_time_durations_a_week">Една недела</string>
+    <string name="graph_time_durations_a_month">Еден месец</string>
+    <string name="graph_time_durations_three_months">Три месеци</string>
+    <string name="graph_time_durations_six_months">Шест месеци</string>
+    <string name="graph_time_durations_a_year">Една година</string>
+    <string name="custom">Прилагодено</string>
+    <string-array name="y_range_styles">
+        <item>Динамички</item>
+        <item>Фиксен</item>
+    </string-array>
+    <string name="ending_at_latest">Последна точка со податоци</string>
+    <string name="ending_at_now">Сега</string>
+    <string name="ending_at_custom_date">Прилагоден датум…</string>
+    <string name="hours_and_minutes_ago">пред %1$dh %2$dm</string>
+    <string name="import_exception_unknown">Увозот не успеа: Се појави непозната грешка</string>
+    <string name="import_exception_bad_headers">Увозот не успеа: Заглавијата не се совпаѓаат со очекуваните заглавија: %1$s</string>
+    <string name="import_exception_inconsistent_record">Увозот не успеа: Записот на линија %1$s не е усогласен со потребните заглавија</string>
+    <string name="import_exception_bad_timestamp">Увозот не успеа: Не може да се протолкува временската ознака за записот на линија: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Увозот не успеа: Применет е неусогласен тип податоци на линија: %1$s</string>
+    <string name="unknown_error_occurred">Се појави непозната грешка</string>
+    <string name="graph_stat_validation_no_name">Наведете име</string>
+    <string name="graph_stat_validation_no_line_graph_features">Додајте нешто на графиконот</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Проверете дали „Од“ е помало или еднакво на „До“</string>
+    <string name="graph_stat_validation_unrecognised_color">Проверете дали сите збирки податоци имаат боја</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Откриен е неважечки збир податоци за линискиот графикон</string>
+    <string name="graph_stat_validation_bad_fixed_range">Проверете дали „Од“ е помало од „До“</string>
+    <string name="graph_stat_view_not_found">Се појави грешка при наоѓањето на овој графикон</string>
+    <string name="graph_stat_view_not_enough_data_stat">Оваа статистика ќе се прикаже кога ќе се следат доволно податоци за нејзино создавање.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Овој графикон ќе се прикаже кога ќе се следат доволно податоци за негово создавање.</string>
+    <string name="pie_chart_mixed_signs_error">Овој кружен графикон не може да се прикаже бидејќи содржи и позитивни и негативни големини на сегменти.</string>
+    <string name="histogram_mixed_signs_error">Овој хистограм не може да се прикаже бидејќи содржи и позитивни и негативни големини на интервали.</string>
+    <string name="graph_non_finite_data_error">Овој графикон не може да се прикаже бидејќи содржи вредност што не е конечен број.</string>
+    <string name="graph_inconsistent_series_error">Овој графикон не може да се прикаже бидејќи неговите серии податоци имаат неусогласени големини.</string>
+    <string name="graph_invalid_y_range_error">Овој графикон не може да се прикаже бидејќи опсегот на неговата Y-оска е неважечки.</string>
+    <string name="finish">Заврши</string>
+    <string name="about_description">Track &amp; Graph е бесплатен софтвер со отворен код под лиценцата GPL 3.0.</string>
+    <string name="about_libraries_message">Користени се следниве библиотеки со отворен код:</string>
+    <string name="about">За апликацијата</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">ЧПП</string>
+    <string name="tutorial_text_1">Користете следачи за да ги следите вашите податоци.</string>
+    <string name="tutorial_text_2">Користете графикони и статистики за визуелизација на податоците.</string>
+    <string name="tutorial_text_3">Користете групи за организирање на следачите, графиконите и статистиките.</string>
+    <string name="got_it">Разбрав!</string>
+    <string name="move_to_colon">Премести во:</string>
+    <string name="move_to">Премести во</string>
+    <string name="ru_sure_update_data">Ова ажурирање може неповратно да ги измени податоците што веќе сте ги следеле. Силно се препорачува да направите резервна копија на постојните податоци пред да продолжите.\n\n Дали сакате да продолжите?</string>
+    <string name="ok">Во ред</string>
+    <string name="rate_the_app">Оценете ја апликацијата</string>
+    <string name="reminders">Потсетници</string>
+    <string name="no_reminders_hint">Допрете ја иконата + за да создадете ново известување за потсетување за следење.</string>
+    <string name="mon">Пон</string>
+    <string name="tue">Вто</string>
+    <string name="wed">Сре</string>
+    <string name="thu">Чет</string>
+    <string name="fri">Пет</string>
+    <string name="sat">Саб</string>
+    <string name="sun">Нед</string>
+    <string name="reminders_notifications_channel_name">Потсетници</string>
+    <string name="reminders_notifications_channel_description">Известувања создадени од корисникот за потсетување кога да следите</string>
+    <string name="default_reminder_name">Време е за следење!</string>
+    <string name="missed_reminder_single_content">Потсетник од %1$s</string>
+    <string name="missed_reminders_multiple_content">Пропуштивте %1$d потсетници</string>
+    <string name="next_reminder_format">Следен потсетник: %1$s</string>
+    <string name="no_upcoming_reminders">Нема претстојни потсетници</string>
+    <string name="select_reminder_type">Изберете тип потсетник</string>
+    <string name="week_day_reminder">Потсетник за денови во неделата</string>
+    <string name="week_day_reminder_description">Одредени денови, како понеделник, среда и петок</string>
+    <string name="periodic_reminder">Периодичен потсетник</string>
+    <string name="periodic_reminder_description">Редовни интервали, како на секои 3 дена</string>
+    <string name="month_day_reminder">Потсетник за ден во месецот</string>
+    <string name="month_day_reminder_description">Месечни обрасци, како првиот понеделник</string>
+    <string name="time_since_last_reminder">Време од последниот потсетник</string>
+    <string name="time_since_last_reminder_description">Кога не сте следеле нешто извесно време</string>
+    <string name="one_time_reminder">Еднократен потсетник</string>
+    <string name="one_time_reminder_description">Самостоен потсетник во одредено време или по одложување</string>
+    <string name="reminder_name">Име на потсетникот</string>
+    <string name="reminder_disabled">Потсетникот е оневозможен</string>
+    <string name="repeat_every">Повторувај на секои</string>
+    <string name="at_time">Во време</string>
+    <string name="at_a_specific_time">Во одредено време</string>
+    <string name="ending_at">Завршува на</string>
+    <string name="starting_from">Почнувајќи од</string>
+    <string name="repeat_on_week_days">Повторувај во деновите од неделата</string>
+    <string name="track_feature">Следи извор на податоци</string>
+    <string name="select_tracker_placeholder">Изберете следач</string>
+    <string name="remind_after">Потсети по</string>
+    <string name="then_remind_every">Потоа потсетувај на секои</string>
+    <string name="remind_at_date_and_time">На датум и време</string>
+    <string name="remind_after_a_delay">По одложување</string>
+    <string name="first_reminder">Прв потсетник</string>
+    <string name="every_colon">Секои:</string>
+    <string name="ended_at_format">Заврши на: %1$s</string>
+    <string name="starting_at_format">Почнува на: %1$s</string>
+    <string name="occurrence_first">Прв</string>
+    <string name="occurrence_second">Втор</string>
+    <string name="occurrence_third">Трет</string>
+    <string name="occurrence_fourth">Четврти</string>
+    <string name="occurrence_last">Последен</string>
+    <string name="monday">Понеделник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четврток</string>
+    <string name="friday">Петок</string>
+    <string name="saturday">Сабота</string>
+    <string name="sunday">Недела</string>
+    <string-array name="abbreviated_months">
+        <item>Јан</item>
+        <item>Фев</item>
+        <item>Мар</item>
+        <item>Апр</item>
+        <item>Мај</item>
+        <item>Јун</item>
+        <item>Јул</item>
+        <item>Авг</item>
+        <item>Сеп</item>
+        <item>Окт</item>
+        <item>Ное</item>
+        <item>Дек</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Пон</item>
+        <item>Вто</item>
+        <item>Сре</item>
+        <item>Чет</item>
+        <item>Пет</item>
+        <item>Саб</item>
+        <item>Нед</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Стил на опсег:</string>
+    <string name="track_widget_configure_no_data_error">Прво следете некои податоци.</string>
+    <string name="track_widget_configure_no_data_selected_error">Мора да изберете важечки збир податоци за да создадете графичка контрола за следење.</string>
+    <string name="create">Создај</string>
+    <string name="use_default_value">Постави стандардна вредност</string>
+    <string name="backup_and_restore">Резервна копија и обновување</string>
+    <string name="backup_hint_text">Резервната копија ги зачувува сите податоци од апликацијата, вклучувајќи ги следените податоци, графиконите и потсетниците. Редовно правете резервна копија на надворешен уред или во облачно складиште, во случај уредот да се изгуби или оштети.</string>
+    <string name="restore_data">Обнови податоци</string>
+    <string name="backup_successful">Резервната копија е успешна!</string>
+    <string name="backup_error_could_not_write_to_file">Избраната датотека не може да се најде или запише.</string>
+    <string name="backup_error_could_not_find_database_file">Датотеката со базата на податоци не може да се најде или прочита.</string>
+    <string name="backup_error_failed_to_copy_database">Се појави проблем при копирањето на датотеката со базата на податоци.</string>
+    <string name="restore_failed">Обновувањето не успеа. %1$s</string>
+    <string name="add_a_longer_description_optional">Додајте подолг опис (опционално)</string>
+    <string name="no_data_points_history_fragment_hint">Историјата ќе се прикаже тука кога ќе имате точки со податоци.</string>
+    <string name="data_resolution_error">Се појави грешка при обидот да се разрешат овие податоци:\n\n%1$s</string>
+    <string name="info">Информации</string>
+    <string name="no_description">Нема опис</string>
+    <string name="description">Опис</string>
+    <string name="app_lock_title">Заклучување на апликацијата</string>
+    <string name="app_lock_locked_title">Track &amp; Graph е заклучен</string>
+    <string name="app_lock_password_label">Лозинка</string>
+    <string name="app_lock_confirm_password_label">Потврдете ја лозинката</string>
+    <string name="app_lock_unlock">Отклучи</string>
+    <string name="app_lock_use_biometrics">Користи биометрија</string>
+    <string name="app_lock_enable">Овозможи заклучување на апликацијата</string>
+    <string name="app_lock_enabled">Заклучувањето на апликацијата е овозможено</string>
+    <string name="app_lock_enable_biometric_unlock">Овозможи биометриско отклучување</string>
+    <string name="app_lock_no_strong_biometric_available">На овој уред нема достапно силно биометриско отклучување.</string>
+    <string name="app_lock_lock_after_background_minutes">Заклучи по минути во заднина</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Користете 0 за заклучување веднаш штом апликацијата ја напушти предната површина.</string>
+    <string name="app_lock_change_password">Промени ја лозинката</string>
+    <string name="app_lock_password_changed">Лозинката е променета</string>
+    <string name="app_lock_disable">Оневозможи заклучување на апликацијата</string>
+    <string name="app_lock_unlock_biometric_title">Отклучи Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Користете биометрија на уредот за да продолжите</string>
+    <string name="app_lock_use_password">Користи лозинка</string>
+    <string name="app_lock_biometric_not_recognized">Биометриската автентикација не е препознаена.</string>
+    <string name="app_lock_error_missing_password">На заклучувањето на апликацијата му недостасува лозинка. Оневозможете го и повторно овозможете го заклучувањето.</string>
+    <string name="app_lock_error_incorrect_password">Неточна лозинка</string>
+    <string name="app_lock_error_password_hashing_unavailable">Потврдата на лозинката за заклучување на апликацијата не е достапна на овој уред.</string>
+    <string name="app_lock_error_enter_password">Внесете лозинка.</string>
+    <string name="app_lock_error_passwords_do_not_match">Лозинките не се совпаѓаат.</string>
+    <string name="note_input_hint">Белешки…</string>
+    <string name="add_a_note">Додај белешка</string>
+    <string name="notes">Белешки</string>
+    <string name="show_global_notes">Глобално</string>
+    <string name="show_data_point_notes">Точки со податоци</string>
+    <string name="delete_reminder_content_description">Избриши потсетник</string>
+    <string name="theme_colon">Тема:</string>
+    <string name="date_format_colon">Формат на датум:</string>
+    <string name="add_data_point_button_content_description">Копче за додавање точка со податоци</string>
+    <string name="tracked_data_menu_button_content_description">Копче за мени на следени податоци</string>
+    <string name="tracked_data_history_button_content_description">Копче за историја на следени податоци</string>
+    <string name="delete_line_button_content_description">Копче за бришење линија</string>
+    <string name="delete_input_button_content_description">Копче за бришење внес</string>
+    <string name="delete_data_point_button_content_description">Копче за бришење точка со податоци</string>
+    <string name="edit_data_point_button_content_description">Копче за уредување точка со податоци</string>
+    <string name="add_multiple_choice_answer_button_content_description">Копче за додавање одговор со повеќекратен избор</string>
+    <string name="ending_at_colon">Примерокот завршува во:</string>
+    <string name="duplicate">Дуплирај</string>
+    <string name="no_notes_hint_text">Белешките додадени при следење ќе се прикажат тука. Можете да додадете и глобални белешки со копчето +.</string>
+    <string name="add_a_global_note">Додај глобална белешка:</string>
+    <string name="duration">Времетраење</string>
+    <string name="weeks">Недели</string>
+    <string name="months">Месеци</string>
+    <string name="days">Денови</string>
+    <string name="hours">Часови</string>
+    <string name="minutes">Минути</string>
+    <string name="seconds">Секунди</string>
+    <string name="hours_suffix">ч</string>
+    <string name="minutes_suffix">м</string>
+    <string name="seconds_suffix">с</string>
+    <string name="numeric_to_duration_mode_header">Претходно следените вредности претставуваат:</string>
+    <string name="duration_to_numeric_mode_header">Во што да се претворат претходно следените вредности:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Не можете да мешате временски траења со други видови податоци. Обидете се да прикажете часови, минути или секунди</string>
+    <string name="sum_by_count_checkbox_label">Означете овде за да го броите бројот на следени точки со податоци наместо збирот на нивните вредности.</string>
+    <string name="time_window_size">Големина на временскиот прозорец:</string>
+    <string name="hold_to_preview">Задржете за преглед</string>
+    <string name="open">Отвори</string>
+    <string name="close">Затвори</string>
+    <string name="filter_by_label">Филтрирај според ознака</string>
+    <string name="filter_by_value">Филтрирај според опсег на вредности</string>
+    <string name="save_changes">Зачувај ги промените</string>
+    <string name="timer_notification_channel_name">Тајмери</string>
+    <string name="stop">Стоп</string>
+    <string name="name_your_function">Именувајте ја функцијата: </string>
+    <string name="add_some_data_sources">Додај извори на податоци</string>
+    <string name="value">Вредност</string>
+    <string name="label">Ознака</string>
+    <string name="continue_word">Продолжи</string>
+    <string name="update_all_data_points">Ажурирај ги сите точки со податоци: </string>
+    <string name="where_colon">Каде:</string>
+    <string name="to_colon">До:</string>
+    <string name="value_equals">Вредност =</string>
+    <string name="label_equals">Ознака =</string>
+    <string name="adding_your_first_data_point">Кратко упатство за додавање точки со податоци:</string>
+    <string name="next">Следно</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Секоја точка со податоци има временска ознака и вредност: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Може да има и ознака и белешка: </string>
+    <string name="data_point_tutorial_page_2_description">Вредноста е број за да можете да видите како се менуваат вашите податоци со текот на времето</string>
+    <string name="data_point_tutorial_page_2_hint">(Совет: Ако вредноста не ви е важна, користете ја стандардната вредност 1)</string>
+    <string name="data_point_tutorial_page_3_description">Користете ознаки ако сакате да ги групирате точките со податоци</string>
+    <string name="data_point_tutorial_page_3_hint">(Совет: Ако сакате да додадете повеќе контекст или опис, користете ја белешката наместо полето за ознака)</string>
+    <string name="help">Помош</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Напредни опции</string>
+    <string name="type_colon">\"Тип: \"</string>
+    <string name="order_colon">\"Редослед: \"</string>
+    <string name="value_and_label">Вредност и ознака</string>
+    <string name="value_only">Само вредност</string>
+    <string name="label_only">Само ознака</string>
+    <string name="none">Нема</string>
+    <string name="value_ascending">Вредност растечки</string>
+    <string name="value_descending">Вредност опаѓачки</string>
+    <string name="label_ascending">Ознака растечки</string>
+    <string name="label_descending">Ознака опаѓачки</string>
+    <string name="latest">Најнови</string>
+    <string name="oldest">Најстари</string>
+    <string name="track_all">Следи ги сите</string>
+    <string name="more_details">Повеќе детали</string>
+    <string name="suggestions">Предлози</string>
+    <string name="no_label">Без ознака</string>
+    <string name="confirm_cancel_notes_will_be_lost">Дали сте сигурни дека сакате да затворите? Сите белешки ќе бидат изгубени.</string>
+    <string name="add_a_label">Додај ознака</string>
+    <string name="bar_interval">Интервал на столб:</string>
+    <string name="y_range_max">Максимум на опсегот Y</string>
+    <string name="total_formatted">Вкупно: %s</string>
+    <string name="from_formatted">Од: %s</string>
+    <string name="to_formatted">До: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Секунда(и)</string>
+    <string name="minutes_generic">Минута(и)</string>
+    <string name="hours_generic">Час(ови)</string>
+    <string name="days_generic">Ден(ови)</string>
+    <string name="weeks_generic">Недела(и)</string>
+    <string name="months_generic">Месец(и)</string>
+    <string name="years_generic">Година(и)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d секунда</item>
+        <item quantity="other">%d секунди</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d минута</item>
+        <item quantity="other">%d минути</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d час</item>
+        <item quantity="other">%d часа</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d ден</item>
+        <item quantity="other">%d дена</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d недела</item>
+        <item quantity="other">%d недели</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d месец</item>
+        <item quantity="other">%d месеци</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d година</item>
+        <item quantity="other">%d години</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Секоја минута</item>
+        <item quantity="other">На секои %d минути</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Секој час</item>
+        <item quantity="other">На секои %d часа</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Секој ден</item>
+        <item quantity="other">На секои %d дена</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Секоја недела</item>
+        <item quantity="other">На секои %d недели</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Секој месец</item>
+        <item quantity="other">На секои %d месеци</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Секоја година</item>
+        <item quantity="other">На секои %d години</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">По 1 минута</item>
+        <item quantity="other">По %d минути</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">По 1 час</item>
+        <item quantity="other">По %d часа</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">По 1 ден</item>
+        <item quantity="other">По %d дена</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">По 1 недела</item>
+        <item quantity="other">По %d недели</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">По 1 месец</item>
+        <item quantity="other">По %d месеци</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">По 1 година</item>
+        <item quantity="other">По %d години</item>
+    </plurals>
+    <string name="restore_hint_text">ПРЕДУПРЕДУВАЊЕ: Враќањето од резервна копија ќе ги избрише сите податоци и тековното поставување во апликацијата. Прво направете резервна копија на податоците!</string>
+    <string name="backup_now">Направи резервна копија сега</string>
+    <string name="restore_error_could_not_write_to_database">Враќањето не успеа! Базата на податоци не може да се најде или запише.</string>
+    <string name="restore_error_could_not_read_from_database_file">Враќањето не успеа! Избраната датотека со базата на податоци не може да се најде или прочита.</string>
+    <string name="restore_error_failed_to_copy_database">Враќањето не успеа! Се појави проблем при враќањето на базата на податоци.</string>
+    <string name="select_location">Изберете локација…</string>
+    <string name="restore_successful">Враќањето беше успешно! Track &amp; Graph сега мора да се рестартира.</string>
+    <string name="restore_error_invalid_database_file">Враќањето не успеа! Избраната датотека не е валидна резервна копија.</string>
+    <string name="auto_backup">Автоматска резервна копија</string>
+    <string name="apply">Примени</string>
+    <string name="backup_every">Резервна копија на секои: </string>
+    <string name="next_backup_at">„Следна резервна копија: „</string>
+    <string name="backup_notification_channel_name">Известувања за автоматска резервна копија</string>
+    <string name="backup_notification_channel_description">Ве известува кога се прави автоматска резервна копија и ако не успее.</string>
+    <string name="backup_notification_title">Резервната копија се прави…</string>
+    <string name="backup_failed_notification_title">Автоматската резервна копија не успеа</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph не може да ја најде локацијата за резервни копии или да пристапи до неа.</string>
+    <string name="backup_failed_notification_could_not_copy">Се појави проблем при правењето резервна копија на податоците. Резервната копија можеби е оштетена или нецелосна.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Изберете нова локација</string>
+    <string name="backup_location">Локација на резервната копија</string>
+    <string name="enable_auto_backup">Овозможи автоматска резервна копија</string>
+    <string name="last_successful_backup">Последна успешна резервна копија</string>
+    <string name="next_scheduled_backup">Следна закажана резервна копија</string>
+    <string name="notification_permission_prompt">Овозможете известувања за Track &amp; Graph за да бидете известени ако автоматската резервна копија не успее.</string>
+    <string name="lua_script_empty">Додајте Lua скрипта</string>
+    <string name="function_name_empty">Името на функцијата не може да биде празно</string>
+    <string name="function_name">Име на функцијата</string>
+    <string name="add_at_least_one_input">Додајте најмалку еден влез</string>
+    <string name="output">Излез</string>
+    <string name="data_source">Извор на податоци</string>
+    <string name="lua_script">Lua скрипта</string>
+    <string name="data_source_description">Јазол за извор на податоци ви овозможува да изберете следач или функција за користење како влез.</string>
+    <string name="lua_script_input_hint">Внесете Lua скрипта…</string>
+    <string name="select_node_type">Изберете тип на јазол</string>
+    <string name="file">Датотека</string>
+    <string name="lua_feature_names_not_unique">Влезовите на скриптата мора да имаат единствени имиња</string>
+    <string name="graph_stat_type_lua_graph">Lua скрипта</string>
+    <string name="launch_lua_disabled">Стартувањето на Lua е оневозможено</string>
+    <string name="no_lua">Нема Lua</string>
+    <string name="lua_engine_disabled">Lua-енџинот е оневозможен</string>
+    <string name="lua_graph_first_time_user_title">Графикони и статистики со Lua скрипти</string>
+    <string name="lua_graph_first_time_user_message">Lua скриптите се напредна функција што ви овозможува да создавате приспособени графикони и статистики со програмскиот јазик Lua. \n\nМожете да вчитате сопствена скрипта или да изберете една од колекцијата на GitHub. Инсталирањето скрипта од GitHub ќе ве врати во апликацијата со подготвена скрипта за користење.</string>
+    <string name="functions_first_time_user_title">Добредојдовте во Функции</string>
+    <string name="functions_first_time_user_message">Функциите се напредна функција што ви овозможува да ги комбинирате, собирате и трансформирате податоците во нови изведени извори на податоци.</string>
+    <string name="learn_more">Дознајте повеќе тука</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Залепи</string>
+    <string name="failed_to_download_file">Преземањето на датотеката не успеа: %s</string>
+    <string name="confirm_deep_link">Добивте врска до скрипта од непознат извор. Инсталирајте скрипти само од извори на кои им верувате. Дали сакате да ја инсталирате оваа скрипта?</string>
+    <string name="graph_stat_info_button_description">Упатства за графикони и статистики</string>
+    <string name="network_generic_error">Се појави грешка при обидот за пристап до мрежата. Проверете ја врската и обидете се повторно.</string>
+    <string name="function_verification_failure">Потврдувањето на потписите на функцијата не успеа. Проверете дали имате безбедна врска и дали Track &amp; Graph е ажуриран</string>
+    <string name="function_network_failure">Вчитувањето на функциите не успеа. Проверете дали сте поврзани на интернет. Ако проблемот продолжи, проверете дали апликацијата е ажурирана.</string>
+    <string name="functions_landscape_hint">Совет: Функциите најдобро работат во пејзажна ориентација</string>
+    <string name="functions_start_hint">Започнете тука: Долго притиснете и изберете Извор на податоци</string>
+    <string name="see_whats_new">Погледнете што е ново</string>
+</resources>

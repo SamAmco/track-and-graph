@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Suportahan ang developer</string>
+    <string name="support_unavailable">Walang kasalukuyang available na opsyon sa suporta.</string>
+    <string name="support_payment_failed">Nabigo ang pagbabayad. Subukan muli.</string>
+    <string name="support_payment_pending">Nakabinbin ang pagbabayad. Kukumpletuhin ito ng Google Play kapag nakumpirma na ang bayad.</string>
+</resources>

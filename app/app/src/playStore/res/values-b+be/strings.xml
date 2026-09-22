@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Падтрымаць распрацоўшчыка</string>
+    <string name="support_unavailable">Варыянты падтрымкі зараз недаступныя.</string>
+    <string name="support_payment_failed">Плацёж не ўдаўся. Паспрабуйце зноў.</string>
+    <string name="support_payment_pending">Плацёж чакае пацвярджэння. Google Play завершыць яго пасля пацвярджэння плацяжу.</string>
+</resources>

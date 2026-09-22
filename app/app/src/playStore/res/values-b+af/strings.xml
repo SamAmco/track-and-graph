@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Ondersteun die ontwikkelaar</string>
+    <string name="support_unavailable">Geen ondersteuningsopsies is tans beskikbaar nie.</string>
+    <string name="support_payment_failed">Betaling het misluk. Probeer asseblief weer.</string>
+    <string name="support_payment_pending">Betaling hangende. Google Play sal dit voltooi nadat die betaling bevestig is.</string>
+</resources>

@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="about_description">Track &amp; Graph-ը անվճար և բաց կոդով ծրագրակազմ է՝ GPL 3.0 լիցենզիայով։</string>
+    <string name="about_libraries_message">Օգտագործվել են հետևյալ բաց կոդով գրադարանները՝</string>
+    <string name="about">Մեր մասին</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">ՀՏՀ</string>
+    <string name="tutorial_text_1">Օգտագործեք թրեքերները՝ ձեր տվյալներին հետևելու համար։</string>
+    <string name="tutorial_text_2">Օգտագործեք գրաֆիկներն ու վիճակագրությունը՝ տվյալները պատկերավորելու համար։</string>
+    <string name="tutorial_text_3">Օգտագործեք խմբերը՝ ձեր թրեքերները, գրաֆիկներն ու վիճակագրությունը կազմակերպելու համար։</string>
+    <string name="got_it">Հասկացա։</string>
+    <string name="move_to_colon">Տեղափոխել՝</string>
+    <string name="move_to">Տեղափոխել</string>
+    <string name="ru_sure_update_data">Այս թարմացումը կարող է անդառնալիորեն փոփոխել ձեր արդեն գրանցած տվյալները։ Շարունակելուց առաջ խստորեն խորհուրդ է տրվում պահուստավորել առկա տվյալները։\n\nՇարունակե՞լ։</string>
+    <string name="ok">Լավ</string>
+    <string name="rate_the_app">Գնահատել հավելվածը</string>
+    <string name="reminders">Հիշեցումներ</string>
+    <string name="no_reminders_hint">Սեղմեք + պատկերակը՝ հետևելու նոր հիշեցման ծանուցում ստեղծելու համար։</string>
+    <string name="mon">Երկ</string>
+    <string name="tue">Երք</string>
+    <string name="wed">Չոր</string>
+    <string name="thu">Հնգ</string>
+    <string name="fri">Ուրբ</string>
+    <string name="sat">Շբթ</string>
+    <string name="sun">Կիր</string>
+    <string name="reminders_notifications_channel_name">Հիշեցումներ</string>
+    <string name="reminders_notifications_channel_description">Օգտատիրոջ ստեղծած ծանուցումներ՝ հետևելու ժամանակը հիշեցնելու համար</string>
+    <string name="default_reminder_name">Ժամանակն է հետևելու։</string>
+    <string name="missed_reminder_single_content">Հիշեցում՝ %1$s-ից</string>
+    <string name="missed_reminders_multiple_content">Դուք բաց եք թողել %1$d հիշեցում</string>
+    <string name="next_reminder_format">Հաջորդ հիշեցումը՝ %1$s</string>
+    <string name="no_upcoming_reminders">Առաջիկա հիշեցումներ չկան</string>
+    <string name="select_reminder_type">Ընտրեք հիշեցման տեսակը</string>
+    <string name="week_day_reminder">Շաբաթվա օրվա հիշեցում</string>
+    <string name="week_day_reminder_description">Որոշակի օրեր, օրինակ՝ երկուշաբթի, չորեքշաբթի, ուրբաթ</string>
+    <string name="periodic_reminder">Պարբերական հիշեցում</string>
+    <string name="periodic_reminder_description">Կանոնավոր ընդմիջումներ, օրինակ՝ յուրաքանչյուր 3 օրը մեկ</string>
+    <string name="month_day_reminder">Ամսվա օրվա հիշեցում</string>
+    <string name="month_day_reminder_description">Ամսական ձևաչափեր, օրինակ՝ առաջին երկուշաբթի</string>
+    <string name="time_since_last_reminder">Վերջին հիշեցումից անցած ժամանակը</string>
+    <string name="time_since_last_reminder_description">Երբ որոշ ժամանակ որևէ բան չեք գրանցել</string>
+    <string name="one_time_reminder">Մեկանգամյա հիշեցում</string>
+    <string name="one_time_reminder_description">Առանձին հիշեցում՝ որոշակի ժամի կամ ուշացումից հետո</string>
+    <string name="reminder_name">Հիշեցման անունը</string>
+    <string name="reminder_disabled">Հիշեցումն անջատված է</string>
+    <string name="repeat_every">Կրկնել յուրաքանչյուր</string>
+    <string name="at_time">Ժամը</string>
+    <string name="at_a_specific_time">Որոշակի ժամին</string>
+    <string name="ending_at">Ավարտը՝</string>
+    <string name="starting_from">Սկսած՝</string>
+    <string name="repeat_on_week_days">Կրկնել շաբաթվա օրերին</string>
+    <string name="track_feature">Գրանցվող տվյալների աղբյուրը</string>
+    <string name="select_tracker_placeholder">Ընտրեք թրեքեր</string>
+    <string name="remind_after">Հիշեցնել այսքան ժամանակ անց</string>
+    <string name="then_remind_every">Այնուհետև հիշեցնել յուրաքանչյուր</string>
+    <string name="remind_at_date_and_time">Ամսաթվի և ժամի դեպքում</string>
+    <string name="remind_after_a_delay">Ուշացումից հետո</string>
+    <string name="first_reminder">Առաջին հիշեցումը</string>
+    <string name="every_colon">Յուրաքանչյուր՝</string>
+    <string name="ended_at_format">Ավարտվել է՝ %1$s</string>
+    <string name="starting_at_format">Սկսվում է՝ %1$s</string>
+    <string name="occurrence_first">Առաջին</string>
+    <string name="occurrence_second">Երկրորդ</string>
+    <string name="occurrence_third">Երրորդ</string>
+    <string name="occurrence_fourth">Չորրորդ</string>
+    <string name="occurrence_last">Վերջին</string>
+    <string name="monday">Երկուշաբթի</string>
+    <string name="tuesday">Երեքշաբթի</string>
+    <string name="wednesday">Չորեքշաբթի</string>
+    <string name="thursday">Հինգշաբթի</string>
+    <string name="friday">Ուրբաթ</string>
+    <string name="saturday">Շաբաթ</string>
+    <string name="sunday">Կիրակի</string>
+    <string-array name="abbreviated_months">
+        <item>Հնվ</item>
+        <item>Փտր</item>
+        <item>Մրտ</item>
+        <item>Ապր</item>
+        <item>Մյս</item>
+        <item>Հնս</item>
+        <item>Հլս</item>
+        <item>Օգս</item>
+        <item>Սեպ</item>
+        <item>Հկտ</item>
+        <item>Նոյ</item>
+        <item>Դեկ</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Երկ</item>
+        <item>Երք</item>
+        <item>Չոր</item>
+        <item>Հնգ</item>
+        <item>Ուրբ</item>
+        <item>Շբթ</item>
+        <item>Կիր</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s․%2$s</string>
+    <string name="range_style">Միջակայքի ոճը՝</string>
+    <string name="track_widget_configure_no_data_error">Սկզբում գրանցեք որոշ տվյալներ։</string>
+    <string name="track_widget_configure_no_data_selected_error">Հետևելու վիջեթ ստեղծելու համար պետք է ընտրեք տվյալների վավեր հավաքածու։</string>
+    <string name="create">Ստեղծել</string>
+    <string name="use_default_value">Սահմանել լռելյայն արժեք</string>
+    <string name="backup_and_restore">Պահուստավորում և վերականգնում</string>
+    <string name="backup_hint_text">Պահուստավորումը պահպանում է հավելվածի բոլոր տվյալները, ներառյալ գրանցված տվյալները, գրաֆիկներն ու հիշեցումները։ Պարբերաբար պահուստավորեք տվյալներն արտաքին սարքում կամ ամպային պահոցում՝ սարքը կորելու կամ վնասվելու դեպքում։</string>
+    <string name="restore_data">Վերականգնել տվյալները</string>
+    <string name="backup_successful">Պահուստավորումը հաջողությամբ ավարտվեց։</string>
+    <string name="backup_error_could_not_write_to_file">Չհաջողվեց գտնել ընտրված ֆայլը կամ գրել դրանում։</string>
+    <string name="backup_error_could_not_find_database_file">Չհաջողվեց գտնել կամ կարդալ տվյալների բազայի ֆայլը։</string>
+    <string name="backup_error_failed_to_copy_database">Տվյալների բազայի ֆայլը պատճենելիս սխալ տեղի ունեցավ։</string>
+    <string name="restore_failed">Վերականգնումը ձախողվեց։ %1$s</string>
+    <string name="add_a_longer_description_optional">Ավելացնել ավելի երկար նկարագրություն (ըստ ցանկության)</string>
+    <string name="no_data_points_history_fragment_hint">Ձեր պատմությունն այստեղ կհայտնվի, երբ ունենաք տվյալների կետեր։</string>
+    <string name="data_resolution_error">Այս տվյալները լուծելիս սխալ տեղի ունեցավ՝\n\n%1$s</string>
+    <string name="info">Տեղեկություն</string>
+    <string name="no_description">Նկարագրություն չկա</string>
+    <string name="description">Նկարագրություն</string>
+    <string name="app_lock_title">Հավելվածի կողպում</string>
+    <string name="app_lock_locked_title">Track &amp; Graph-ը կողպված է</string>
+    <string name="app_lock_password_label">Գաղտնաբառ</string>
+    <string name="app_lock_confirm_password_label">Հաստատեք գաղտնաբառը</string>
+    <string name="app_lock_unlock">Ապակողպել</string>
+    <string name="app_lock_use_biometrics">Օգտագործել կենսաչափական տվյալները</string>
+    <string name="app_lock_enable">Միացնել հավելվածի կողպումը</string>
+    <string name="app_lock_enabled">Հավելվածի կողպումը միացված է</string>
+    <string name="app_lock_enable_biometric_unlock">Միացնել կենսաչափական ապակողպումը</string>
+    <string name="app_lock_no_strong_biometric_available">Այս սարքում հասանելի չէ ուժեղ կենսաչափական ապակողպում։</string>
+    <string name="app_lock_lock_after_background_minutes">Կողպել ֆոնային ռեժիմում այսքան րոպե անց</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Օգտագործեք 0՝ հավելվածը առաջին պլանից դուրս գալուն պես կողպելու համար։</string>
+    <string name="app_lock_change_password">Փոխել գաղտնաբառը</string>
+    <string name="app_lock_password_changed">Գաղտնաբառը փոխվեց</string>
+    <string name="app_lock_disable">Անջատել հավելվածի կողպումը</string>
+    <string name="app_lock_unlock_biometric_title">Ապակողպել Track &amp; Graph-ը</string>
+    <string name="app_lock_unlock_biometric_subtitle">Շարունակելու համար օգտագործեք սարքի կենսաչափական տվյալները</string>
+    <string name="app_lock_use_password">Օգտագործել գաղտնաբառը</string>
+    <string name="app_lock_biometric_not_recognized">Կենսաչափական նույնականացումը չճանաչվեց։</string>
+    <string name="app_lock_error_missing_password">Հավելվածի կողպման գաղտնաբառը բացակայում է։ Անջատեք և կրկին միացրեք հավելվածի կողպումը։</string>
+    <string name="app_lock_error_incorrect_password">Սխալ գաղտնաբառ</string>
+    <string name="app_lock_error_password_hashing_unavailable">Այս սարքում հավելվածի կողպման գաղտնաբառի ստուգումը հասանելի չէ։</string>
+    <string name="app_lock_error_enter_password">Մուտքագրեք գաղտնաբառ։</string>
+    <string name="app_lock_error_passwords_do_not_match">Գաղտնաբառերը չեն համընկնում։</string>
+    <string name="note_input_hint">Նշումներ…</string>
+    <string name="add_a_note">Ավելացնել նշում</string>
+    <string name="notes">Նշումներ</string>
+    <string name="show_global_notes">Ընդհանուր</string>
+    <string name="show_data_point_notes">Տվյալների կետեր</string>
+    <string name="delete_reminder_content_description">Ջնջել հիշեցումը</string>
+    <string name="theme_colon">Թեմա՝</string>
+    <string name="date_format_colon">Ամսաթվի ձևաչափ՝</string>
+    <string name="add_data_point_button_content_description">Տվյալների կետ ավելացնելու կոճակ</string>
+    <string name="tracked_data_menu_button_content_description">Գրանցված տվյալների ընտրացանկի կոճակ</string>
+    <string name="tracked_data_history_button_content_description">Գրանցված տվյալների պատմության կոճակ</string>
+    <string name="delete_line_button_content_description">Գիծը ջնջելու կոճակ</string>
+    <string name="delete_input_button_content_description">Մուտքագրումը ջնջելու կոճակ</string>
+    <string name="delete_data_point_button_content_description">Տվյալների կետը ջնջելու կոճակ</string>
+    <string name="edit_data_point_button_content_description">Տվյալների կետը խմբագրելու կոճակ</string>
+    <string name="add_multiple_choice_answer_button_content_description">Բազմակի ընտրության պատասխան ավելացնելու կոճակ</string>
+    <string name="ending_at_colon">Նմուշի ավարտը՝</string>
+    <string name="duplicate">Կրկնօրինակել</string>
+    <string name="no_notes_hint_text">Գրանցման ընթացքում ավելացված նշումները կհայտնվեն այստեղ։ Կարող եք նաև գլոբալ նշումներ ավելացնել + կոճակի միջոցով։</string>
+    <string name="add_a_global_note">Ավելացնել գլոբալ նշում՝</string>
+    <string name="duration">Տևողություն</string>
+    <string name="weeks">Շաբաթներ</string>
+    <string name="months">Ամիսներ</string>
+    <string name="days">Օրեր</string>
+    <string name="hours">Ժամեր</string>
+    <string name="minutes">Րոպեներ</string>
+    <string name="seconds">Վայրկյաններ</string>
+    <string name="hours_suffix">ժ</string>
+    <string name="minutes_suffix">ր</string>
+    <string name="seconds_suffix">վ</string>
+    <string name="numeric_to_duration_mode_header">Նախկինում գրանցված արժեքները ներկայացնում են՝</string>
+    <string name="duration_to_numeric_mode_header">Ինչի՞ պետք է փոխարկվեն նախկինում գրանցված արժեքները՝</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Չեք կարող ժամանակային տևողությունները խառնել տվյալների այլ տեսակների հետ։ Փորձեք պատկերել ժամերը, րոպեները կամ վայրկյանները</string>
+    <string name="sum_by_count_checkbox_label">Նշեք այստեղ՝ արժեքների գումարի փոխարեն գրանցված տվյալների կետերի քանակը հաշվելու համար։</string>
+    <string name="time_window_size">Ժամանակային պատուհանի չափը՝</string>
+    <string name="hold_to_preview">Պահեք՝ նախադիտելու համար</string>
+    <string name="open">Բացել</string>
+    <string name="close">Փակել</string>
+    <string name="filter_by_label">Զտել ըստ պիտակի</string>
+    <string name="filter_by_value">Զտել ըստ արժեքների միջակայքի</string>
+    <string name="save_changes">Պահպանել փոփոխությունները</string>
+    <string name="timer_notification_channel_name">Ժամաչափեր</string>
+    <string name="stop">Դադարեցնել</string>
+    <string name="name_your_function">Անվանեք ձեր ֆունկցիան՝ </string>
+    <string name="add_some_data_sources">Ավելացնել տվյալների աղբյուրներ</string>
+    <string name="value">Արժեք</string>
+    <string name="label">Պիտակ</string>
+    <string name="continue_word">Շարունակել</string>
+    <string name="update_all_data_points">Թարմացնել բոլոր տվյալների կետերը՝ </string>
+    <string name="where_colon">Որտեղ՝</string>
+    <string name="to_colon">Դեպի՝</string>
+    <string name="value_equals">Արժեք =</string>
+    <string name="label_equals">Պիտակ =</string>
+    <string name="adding_your_first_data_point">Տվյալների կետեր ավելացնելու արագ ուսուցում՝</string>
+    <string name="next">Հաջորդը</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Յուրաքանչյուր տվյալների կետ ունի ժամանակային դրոշմ և արժեք՝ </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Այն կարող է նաև ունենալ պիտակ և նշում՝ </string>
+    <string name="data_point_tutorial_page_2_description">Արժեքը թիվ է, այնպես որ կարող եք տեսնել, թե ինչպես են ձեր տվյալները փոխվում ժամանակի ընթացքում</string>
+    <string name="data_point_tutorial_page_2_hint">(Հուշում․ եթե արժեքը կարևոր չէ, օգտագործեք 1-ի լռելյայն արժեքը)</string>
+    <string name="data_point_tutorial_page_3_description">Օգտագործեք պիտակներ, եթե ցանկանում եք խմբավորել տվյալների կետերը</string>
+    <string name="data_point_tutorial_page_3_hint">(Հուշում․ եթե ցանկանում եք ավելացնել լրացուցիչ ենթատեքստ կամ նկարագրություն, պիտակի դաշտի փոխարեն օգտագործեք նշումը)</string>
+    <string name="help">Օգնություն</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Ընդլայնված ընտրանքներ</string>
+    <string name="type_colon">\"Տեսակ՝ \"</string>
+    <string name="order_colon">\"Դասավորություն՝ \"</string>
+    <string name="value_and_label">Արժեք և պիտակ</string>
+    <string name="value_only">Միայն արժեք</string>
+    <string name="label_only">Միայն պիտակ</string>
+    <string name="none">Ոչ մեկը</string>
+    <string name="value_ascending">Արժեքի աճման կարգով</string>
+    <string name="value_descending">Արժեքի նվազման կարգով</string>
+    <string name="label_ascending">Պիտակի աճման կարգով</string>
+    <string name="label_descending">Պիտակի նվազման կարգով</string>
+    <string name="latest">Վերջին</string>
+    <string name="oldest">Ամենահին</string>
+    <string name="track_all">Գրանցել բոլորը</string>
+    <string name="more_details">Լրացուցիչ մանրամասներ</string>
+    <string name="suggestions">Առաջարկներ</string>
+    <string name="no_label">Առանց պիտակի</string>
+    <string name="confirm_cancel_notes_will_be_lost">Վստա՞հ եք, որ ցանկանում եք փակել։ Բոլոր նշումները կկորչեն։</string>
+    <string name="add_a_label">Ավելացնել պիտակ</string>
+    <string name="bar_interval">Սյան միջակայքը՝</string>
+    <string name="y_range_max">Y միջակայքի առավելագույնը</string>
+    <string name="total_formatted">Ընդամենը՝ %s</string>
+    <string name="from_formatted">Սկսած՝ %s</string>
+    <string name="to_formatted">Մինչև՝ %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s՝ %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d՝ %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Վայրկյան(ներ)</string>
+    <string name="minutes_generic">Րոպե(ներ)</string>
+    <string name="hours_generic">Ժամ(եր)</string>
+    <string name="days_generic">Օր(եր)</string>
+    <string name="weeks_generic">Շաբաթ(ներ)</string>
+    <string name="months_generic">Ամիս(ներ)</string>
+    <string name="years_generic">Տարի(ներ)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d վայրկյան</item>
+        <item quantity="other">%d վայրկյան</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d րոպե</item>
+        <item quantity="other">%d րոպե</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d ժամ</item>
+        <item quantity="other">%d ժամ</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d օր</item>
+        <item quantity="other">%d օր</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d շաբաթ</item>
+        <item quantity="other">%d շաբաթ</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d ամիս</item>
+        <item quantity="other">%d ամիս</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d տարի</item>
+        <item quantity="other">%d տարի</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Յուրաքանչյուր րոպե</item>
+        <item quantity="other">Յուրաքանչյուր %d րոպեն մեկ</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Յուրաքանչյուր ժամ</item>
+        <item quantity="other">Յուրաքանչյուր %d ժամը մեկ</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Յուրաքանչյուր օր</item>
+        <item quantity="other">Յուրաքանչյուր %d օրը մեկ</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Յուրաքանչյուր շաբաթ</item>
+        <item quantity="other">Յուրաքանչյուր %d շաբաթը մեկ</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Յուրաքանչյուր ամիս</item>
+        <item quantity="other">Յուրաքանչյուր %d ամիսը մեկ</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Յուրաքանչյուր տարի</item>
+        <item quantity="other">Յուրաքանչյուր %d տարին մեկ</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">1 րոպե անց</item>
+        <item quantity="other">%d րոպե անց</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">1 ժամ անց</item>
+        <item quantity="other">%d ժամ անց</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">1 օր անց</item>
+        <item quantity="other">%d օր անց</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">1 շաբաթ անց</item>
+        <item quantity="other">%d շաբաթ անց</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">1 ամիս անց</item>
+        <item quantity="other">%d ամիս անց</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">1 տարի անց</item>
+        <item quantity="other">%d տարի անց</item>
+    </plurals>
+    <string name="restore_hint_text">ԶԳՈՒՇԱՑՈՒՄ․ պահուստից վերականգնելը կջնջի հավելվածում առկա բոլոր տվյալներն ու կարգավորումները։ Նախ պետք է պահուստավորեք ձեր տվյալները։</string>
+    <string name="backup_now">Պահուստավորել հիմա</string>
+    <string name="restore_error_could_not_write_to_database">Վերականգնումը ձախողվեց։ Չհաջողվեց գտնել տվյալների բազան կամ գրել դրանում։</string>
+    <string name="restore_error_could_not_read_from_database_file">Վերականգնումը ձախողվեց։ Չհաջողվեց գտնել կամ կարդալ ընտրված տվյալների բազայի ֆայլը։</string>
+    <string name="restore_error_failed_to_copy_database">Վերականգնումը ձախողվեց։ Տվյալների բազան վերականգնելիս սխալ տեղի ունեցավ։</string>
+    <string name="select_location">Ընտրել տեղադրությունը…</string>
+    <string name="restore_successful">Վերականգնումը հաջողությամբ ավարտվեց։ Այժմ Track &amp; Graph-ը պետք է վերագործարկել։</string>
+    <string name="restore_error_invalid_database_file">Վերականգնումը ձախողվեց։ Ընտրված ֆայլը վավեր պահուստային պատճեն չէ։</string>
+    <string name="auto_backup">Ավտոմատ պահուստավորում</string>
+    <string name="apply">Կիրառել</string>
+    <string name="backup_every">Պահուստավորել յուրաքանչյուր՝ </string>
+    <string name="next_backup_at">«Հաջորդ պահուստավորումը՝»</string>
+    <string name="backup_notification_channel_name">Ավտոմատ պահուստավորման ծանուցումներ</string>
+    <string name="backup_notification_channel_description">Տեղեկացնում է, երբ կատարվում է ավտոմատ պահուստավորում և երբ այն ձախողվում է։</string>
+    <string name="backup_notification_title">Պահուստավորում 진행ում…</string>
+    <string name="backup_failed_notification_title">Ավտոմատ պահուստավորումը ձախողվեց</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph-ը չկարողացավ գտնել կամ հասանելիություն ստանալ ձեր պահուստավորման վայրին։</string>
+    <string name="backup_failed_notification_could_not_copy">Տվյալները պահուստավորելիս սխալ տեղի ունեցավ։ Ձեր պահուստային պատճենը կարող է վնասված կամ թերի լինել։</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Ընտրել նոր վայր</string>
+    <string name="backup_location">Պահուստավորման վայր</string>
+    <string name="enable_auto_backup">Միացնել ավտոմատ պահուստավորումը</string>
+    <string name="last_successful_backup">Վերջին հաջող պահուստավորում</string>
+    <string name="next_scheduled_backup">Հաջորդ պլանավորված պահուստավորում</string>
+    <string name="notification_permission_prompt">Միացրեք Track &amp; Graph-ի ծանուցումները, որպեսզի տեղեկանաք, եթե ավտոմատ պահուստավորումը որևէ պատճառով ձախողի։</string>
+    <string name="lua_script_empty">Ավելացրեք Lua սկրիպտ</string>
+    <string name="function_name_empty">Function-ի անունը չի կարող դատարկ լինել</string>
+    <string name="function_name">Function-ի անունը</string>
+    <string name="add_at_least_one_input">Ավելացրեք առնվազն մեկ մուտք</string>
+    <string name="output">Ելք</string>
+    <string name="data_source">Տվյալների աղբյուր</string>
+    <string name="lua_script">Lua սկրիպտ</string>
+    <string name="data_source_description">Տվյալների աղբյուրի հանգույցը թույլ է տալիս ընտրել tracker կամ function՝ որպես մուտք օգտագործելու համար։</string>
+    <string name="lua_script_input_hint">Մուտքագրեք Lua սկրիպտ…</string>
+    <string name="select_node_type">Ընտրել հանգույցի տեսակը</string>
+    <string name="file">Ֆայլ</string>
+    <string name="lua_feature_names_not_unique">Սկրիպտի մուտքերը պետք է ունենան եզակի անուններ</string>
+    <string name="graph_stat_type_lua_graph">Lua սկրիպտ</string>
+    <string name="launch_lua_disabled">Lua-ի գործարկումն անջատված է</string>
+    <string name="no_lua">Lua չկա</string>
+    <string name="lua_engine_disabled">Lua շարժիչն անջատված է</string>
+    <string name="lua_graph_first_time_user_title">Lua սկրիպտների գրաֆիկներ և վիճակագրություն</string>
+    <string name="lua_graph_first_time_user_message">Lua սկրիպտները առաջադեմ հնարավորություն են, որոնք թույլ են տալիս Lua ծրագրավորման լեզվով ստեղծել անհատական գրաֆիկներ և վիճակագրություն։ \n\nԿարող եք բեռնել ձեր սեփական սկրիպտը կամ ընտրել մեկը GitHub-ի հավաքածուից։ GitHub-ից սկրիպտ տեղադրելուց հետո կվերադառնաք հավելված՝ պատրաստ օգտագործման սկրիպտով։</string>
+    <string name="functions_first_time_user_title">Բարի գալուստ Functions</string>
+    <string name="functions_first_time_user_message">Functions-ը առաջադեմ հնարավորություն է, որը թույլ է տալիս համադրել, համախմբել և փոխակերպել ձեր տվյալները նոր ածանցյալ տվյալների աղբյուրների։</string>
+    <string name="learn_more">Իմանալ ավելին այստեղ</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Տեղադրել</string>
+    <string name="failed_to_download_file">Չհաջողվեց ներբեռնել ֆայլը՝ %s</string>
+    <string name="confirm_deep_link">Դուք ստացել եք սկրիպտի հղում անհայտ աղբյուրից։ Տեղադրեք սկրիպտներ միայն վստահելի աղբյուրներից։ Տեղադրե՞լ այս սկրիպտը։</string>
+    <string name="graph_stat_info_button_description">Գրաֆիկների և վիճակագրության ուղեցույցներ</string>
+    <string name="network_generic_error">Ցանց մուտք գործելիս սխալ տեղի ունեցավ։ Ստուգեք կապը և կրկին փորձեք։</string>
+    <string name="function_verification_failure">Չհաջողվեց ստուգել Function-ի ստորագրությունները։ Համոզվեք, որ ունեք անվտանգ կապ, և Track &amp; Graph-ը թարմացված է։</string>
+    <string name="function_network_failure">Չհաջողվեց բեռնել Functions-ը։ Համոզվեք, որ միացված եք ինտերնետին։ Եթե խնդիրը շարունակվի, ստուգեք, որ հավելվածը թարմացված է։</string>
+    <string name="functions_landscape_hint">Հուշում․ Functions-ը լավագույնս աշխատում է հորիզոնական դիրքում</string>
+    <string name="functions_start_hint">Սկսեք այստեղից․ երկար սեղմեք և ընտրեք «Տվյալների աղբյուր»</string>
+    <string name="see_whats_new">Տեսնել նորությունները</string>
+    <string name="home">Գլխավոր</string>
+    <string name="add_group">Ավելացնել խումբ՝ </string>
+    <string name="edit_group">Խմբագրել խումբը՝ </string>
+    <string name="group">Խումբ</string>
+    <string name="tracker">Թրեքեր</string>
+    <string name="function">Ֆունկցիա</string>
+    <string name="graph_or_stat">Գրաֆիկ կամ վիճակագրություն</string>
+    <string name="symlink">Սիմհղում</string>
+    <string name="symlinks">Սիմհղումներ</string>
+    <string name="reminder">Հիշեցում</string>
+    <string name="add_component">Ավելացնել բաղադրիչ</string>
+    <string name="symlink_locations_title">«%1$s»-ի տեղադրությունները</string>
+    <string name="add_tracker">Հետևել որևէ բանի՝</string>
+    <string name="add">Ավելացնել</string>
+    <string name="group_name">օր.՝ Ամենօրյա գործողություններ</string>
+    <string name="delete">Ջնջել</string>
+    <string name="edit">Խմբագրել</string>
+    <string name="update">Թարմացնել</string>
+    <string name="graph_or_stat_name">Գրաֆիկի անունը՝ </string>
+    <string name="tracker_name">Թրեքերի անունը</string>
+    <string name="this_is_a_time_or_duration">Սա ժամանակ է կամ տևողություն</string>
+    <string name="yes">Այո</string>
+    <string name="cancel">Չեղարկել</string>
+    <string name="select_file">Ընտրել ֆայլ</string>
+    <string name="empty_group_hint">Բարի գալուստ Track &amp; Graph։\n\n Հպեք վերևի աջ անկյունում գտնվող + նշանին և սկսելու համար ընտրեք «Թրեքեր»։</string>
+    <string name="no_trackers_graph_stats_hint">Գրաֆիկներ ստեղծելուց առաջ ստեղծեք թրեքեր։</string>
+    <string name="no_trackers_functions_hint">Ֆունկցիաներ ստեղծելուց առաջ ստեղծեք թրեքեր։</string>
+    <string name="ru_sure_del_group">Վստա՞հ եք, որ ցանկանում եք ջնջել այս խումբը և դրա ամբողջ պարունակությունը։ Այս գործողությունը հնարավոր չէ չեղարկել։</string>
+    <string name="ru_sure_del_graph">Վստա՞հ եք, որ ցանկանում եք ջնջել այս գրաֆիկը։ Այս գործողությունը հնարավոր չէ չեղարկել։ Ձեր հետևած տվյալները չեն կորչի։</string>
+    <string name="ru_sure_del_feature">Վստա՞հ եք, որ ցանկանում եք ջնջել այս հետևված տվյալները։</string>
+    <string name="item_in_multiple_groups">Այս տարրը գտնվում է մի քանի վայրերում։ Կարող եք հեռացնել այն այստեղից կամ ջնջել ամենուր։</string>
+    <string name="remove_from_this_group">Հեռացնել այստեղից</string>
+    <string name="delete_everywhere">Ջնջել ամենուր</string>
+    <string name="ru_sure_del_function">Վստա՞հ եք, որ ցանկանում եք ջնջել այս ֆունկցիան։ Այս գործողությունը հնարավոր չէ չեղարկել։</string>
+    <string name="ru_sure_del_reminder">Վստա՞հ եք, որ ցանկանում եք ջնջել այս հիշեցումը։ Այս գործողությունը հնարավոր չէ չեղարկել։</string>
+    <string name="ru_sure_del_data_point">Վստա՞հ եք, որ ցանկանում եք ջնջել տվյալների այս կետը։</string>
+    <string name="feature_name_cannot_be_null">Ավելացրեք անուն</string>
+    <string name="tracker_with_that_name_exists">Այդ անունով ինչ-որ բանի արդեն հետևում եք</string>
+    <string name="data_points">%1$d տվյալների կետ</string>
+    <string name="items_selected">Ընտրված է՝ %1$d</string>
+    <string name="select_all">Ընտրել բոլորը</string>
+    <string name="deselect_all">Չեղարկել բոլորի ընտրությունը</string>
+    <string name="ru_sure_del_data_points">Վստա՞հ եք, որ ցանկանում եք ջնջել տվյալների այս կետերը։</string>
+    <string name="delete_selected_content_description">Ջնջել ընտրված տարրերը</string>
+    <string name="copy_selected_content_description">Պատճենել ընտրված տարրերը</string>
+    <string name="move_selected_content_description">Տեղափոխել ընտրված տարրերը</string>
+    <string name="copy_to">Պատճենել այստեղ</string>
+    <string name="no_data">Տվյալներ չկան</string>
+    <string name="skip">Բաց թողնել</string>
+    <string name="exportButton">Արտահանել</string>
+    <string name="importButton">Ներմուծել</string>
+    <string name="import_export">Ներմուծում/արտահանում</string>
+    <string name="search">Որոնել</string>
+    <string name="type_to_search">Մուտքագրեք որոնման բառը</string>
+    <string name="no_results">Արդյունքներ չկան</string>
+    <string name="export_to">Արտահանել այս խմբի հետևված տվյալները CSV՝</string>
+    <string name="export_error_message">Արտահանումը ձախողվեց՝ %1$s</string>
+    <string name="import_from">Ներմուծել հետևված տվյալները CSV-ից այս խումբ՝</string>
+    <string name="import_warning">Զգուշացում․ ներմուծումն անդառնալի է։ Track &amp; Graph-ը կփորձի ներմուծված տվյալները միավորել այս խմբի առկա տվյալների հետ՝ ըստ անվան։</string>
+    <string name="add_a_graph_or_stat">Ավելացնել գրաֆիկ կամ վիճակագրություն</string>
+    <string name="graph_type_label">Գրաֆիկի տեսակը՝</string>
+    <string name="sample_size">Նմուշի չափը՝</string>
+    <string name="select_a_discrete_feature">Ընտրեք պիտակներով տվյալների հավաքածու՝ </string>
+    <string name="no_labels">Այս տվյալների հավաքածուն պիտակներ չունի</string>
+    <string name="select_a_feature">Ընտրեք տվյալների հավաքածու՝</string>
+    <string name="select_a_tracker">Ընտրեք թրեքեր</string>
+    <string name="offset">Շեղում՝</string>
+    <string name="scale">Մասշտաբ՝</string>
+    <string name="from">Սկսած՝</string>
+    <string name="to">Մինչև՝</string>
+    <string name="day">Օր</string>
+    <string-array name="time_histogram_windows">
+        <item>Ժամային</item>
+        <item>Օրական</item>
+        <item>Շաբաթական</item>
+        <item>Ամսական</item>
+        <item>Եռամսյակային</item>
+        <item>Կիսամյակային</item>
+        <item>Տարեկան</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Մարտկոցի խնայողություն</item>
+        <item>Բաց</item>
+        <item>Մուգ</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Համակարգի լռելյայնը</item>
+        <item>Բաց</item>
+        <item>Մուգ</item>
+    </string-array>
+    <string name="graph_type_line_graph">Գծային գրաֆիկ</string>
+    <string name="graph_type_pie_chart">Շրջանաձև դիագրամ</string>
+    <string name="graph_type_average_time_between">Միջին ժամանակը միջև</string>
+    <string name="graph_type_time_since">Անցած ժամանակը</string>
+    <string name="graph_type_time_histogram">Ժամանակի հիստոգրամ</string>
+    <string name="graph_type_last_value">Վերջին հետևումը/անցած ժամանակը</string>
+    <string name="graph_type_bar_chart">Սյունակային գրաֆիկ</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Առանց միջինացման</item>
+        <item>Օրական շարժական միջին</item>
+        <item>Եռօրյա շարժական միջին</item>
+        <item>Շաբաթական շարժական միջին</item>
+        <item>Ամսական շարժական միջին</item>
+        <item>Եռամսյա շարժական միջին</item>
+        <item>Վեցամսյա շարժական միջին</item>
+        <item>Տարեկան շարժական միջին</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Գծապատկերել հետևելիս</item>
+        <item>Գծապատկերել ժամային հանրագումարները</item>
+        <item>Գծապատկերել օրական հանրագումարները</item>
+        <item>Գծապատկերել շաբաթական հանրագումարները</item>
+        <item>Գծապատկերել ամսական հանրագումարները</item>
+        <item>Գծապատկերել տարեկան հանրագումարները</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Բոլոր տվյալները</string>
+    <string name="graph_time_durations_a_day">Մեկ օր</string>
+    <string name="graph_time_durations_a_week">Մեկ շաբաթ</string>
+    <string name="graph_time_durations_a_month">Մեկ ամիս</string>
+    <string name="graph_time_durations_three_months">Երեք ամիս</string>
+    <string name="graph_time_durations_six_months">Վեց ամիս</string>
+    <string name="graph_time_durations_a_year">Մեկ տարի</string>
+    <string name="custom">Հատուկ</string>
+    <string-array name="y_range_styles">
+        <item>Դինամիկ</item>
+        <item>Ֆիքսված</item>
+    </string-array>
+    <string name="ending_at_latest">Վերջին տվյալների կետը</string>
+    <string name="ending_at_now">Հիմա</string>
+    <string name="ending_at_custom_date">Հատուկ ամսաթիվ…</string>
+    <string name="hours_and_minutes_ago">%1$d ժ %2$d ր առաջ</string>
+    <string name="import_exception_unknown">Ներմուծումը ձախողվեց․ անհայտ սխալ տեղի ունեցավ</string>
+    <string name="import_exception_bad_headers">Ներմուծումը ձախողվեց․ վերնագրերը չեն համապատասխանում ակնկալվող վերնագրերին՝ %1$s</string>
+    <string name="import_exception_inconsistent_record">Ներմուծումը ձախողվեց․ %1$s տողի գրառումը չի համապատասխանում պահանջվող վերնագրերին</string>
+    <string name="import_exception_bad_timestamp">Ներմուծումը ձախողվեց․ չհաջողվեց մեկնաբանել %1$s տողի գրառման ժամանակային դրոշմը</string>
+    <string name="import_exception_inconsistent_data_type">Ներմուծումը ձախողվեց․ %1$s տողում ստացվել է անհամապատասխան տվյալների տեսակ</string>
+    <string name="unknown_error_occurred">Անհայտ սխալ տեղի ունեցավ</string>
+    <string name="graph_stat_validation_no_name">Տրամադրեք անուն</string>
+    <string name="graph_stat_validation_no_line_graph_features">Գրաֆիկին ավելացրեք որևէ բան</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Համոզվեք, որ «Սկսած»-ը փոքր է կամ հավասար «Մինչև»-ին</string>
+    <string name="graph_stat_validation_unrecognised_color">Համոզվեք, որ բոլոր տվյալների հավաքածուներն ունեն գույն</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Հայտնաբերվել է գծային գրաֆիկի անվավեր տվյալների հավաքածու</string>
+    <string name="graph_stat_validation_bad_fixed_range">Համոզվեք, որ «Սկսած»-ը փոքր է «Մինչև»-ից</string>
+    <string name="graph_stat_view_not_found">Այս գրաֆիկը գտնելիս սխալ տեղի ունեցավ</string>
+    <string name="graph_stat_view_not_enough_data_stat">Այս վիճակագրությունը կցուցադրվի, երբ այն ստեղծելու համար բավարար տվյալներ հետևված լինեն։</string>
+    <string name="graph_stat_view_not_enough_data_graph">Այս գրաֆիկը կցուցադրվի, երբ այն ստեղծելու համար բավարար տվյալներ հետևված լինեն։</string>
+    <string name="pie_chart_mixed_signs_error">Այս շրջանաձև դիագրամը չի կարող ցուցադրվել, քանի որ պարունակում է և՛ դրական, և՛ բացասական հատվածների չափեր։</string>
+    <string name="histogram_mixed_signs_error">Այս հիստոգրամը չի կարող ցուցադրվել, քանի որ պարունակում է և՛ դրական, և՛ բացասական սյուների չափեր։</string>
+    <string name="graph_non_finite_data_error">Այս գրաֆիկը չի կարող ցուցադրվել, քանի որ պարունակում է վերջավոր թիվ չհանդիսացող արժեք։</string>
+    <string name="graph_inconsistent_series_error">Այս գրաֆիկը չի կարող ցուցադրվել, քանի որ տվյալների շարքերն ունեն անհամապատասխան չափեր։</string>
+    <string name="graph_invalid_y_range_error">Այս գրաֆիկը չի կարող ցուցադրվել, քանի որ Y առանցքի միջակայքն անվավեր է։</string>
+    <string name="finish">Ավարտել</string>
+</resources>

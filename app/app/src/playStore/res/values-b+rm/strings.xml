@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Sustegna il sviluppader</string>
+    <string name="support_unavailable">Actualmain n\'èn naginas opziuns da sustegn disponiblas.</string>
+    <string name="support_payment_failed">Pajament fallì. Emprova danovamain.</string>
+    <string name="support_payment_pending">Il pajament è en pendent. Google Play al cumplettescha suenter la conferma dal pajament.</string>
+</resources>

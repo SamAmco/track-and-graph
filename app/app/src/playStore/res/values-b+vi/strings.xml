@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Ủng hộ nhà phát triển</string>
+    <string name="support_unavailable">Hiện không có tùy chọn ủng hộ nào.</string>
+    <string name="support_payment_failed">Thanh toán thất bại. Vui lòng thử lại.</string>
+    <string name="support_payment_pending">Thanh toán đang chờ xử lý. Google Play sẽ hoàn tất sau khi thanh toán được xác nhận.</string>
+</resources>

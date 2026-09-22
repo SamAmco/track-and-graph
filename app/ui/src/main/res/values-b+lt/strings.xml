@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Pridėti</string>
+    <string name="add_a_note">Pridėti užrašą</string>
+    <string name="cancel">Atšaukti</string>
+    <string name="continue_word">Tęsti</string>
+    <string name="create">Sukurti</string>
+    <string name="label">Etiketė</string>
+    <string name="release_notes_support_text">Jūsų parama padeda Track &amp; Graph gyvuoti ir augti 🌱</string>
+    <string name="release_notes_maybe_later">Gal vėliau</string>
+    <string name="release_notes_support_development">Paaukoti kūrimui paremti</string>
+    <string name="release_notes_thank_you">Ačiū! ❤️\n\nKiekviena parama padeda tobulinti Track &amp; Graph visiems 🌱</string>
+    <string name="support_close">Uždaryti</string>
+    <string name="search">Ieškoti</string>
+    <string name="update">Atnaujinti</string>
+    <string name="value">Reikšmė</string>
+</resources>

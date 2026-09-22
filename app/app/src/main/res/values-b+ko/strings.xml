@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">홈</string>
+    <string name="add_group">그룹 추가: </string>
+    <string name="edit_group">그룹 수정: </string>
+    <string name="group">그룹</string>
+    <string name="tracker">트래커</string>
+    <string name="function">함수</string>
+    <string name="graph_or_stat">그래프 또는 통계</string>
+    <string name="symlink">심볼릭 링크</string>
+    <string name="symlinks">심볼릭 링크</string>
+    <string name="reminder">알림</string>
+    <string name="add_component">구성 요소 추가</string>
+    <string name="symlink_locations_title">\"%1$s\"의 위치</string>
+    <string name="add_tracker">기록할 항목:</string>
+    <string name="add">추가</string>
+    <string name="group_name">예: 일상 활동</string>
+    <string name="delete">삭제</string>
+    <string name="edit">수정</string>
+    <string name="update">업데이트</string>
+    <string name="graph_or_stat_name">그래프 이름: </string>
+    <string name="tracker_name">트래커 이름</string>
+    <string name="this_is_a_time_or_duration">시간 또는 기간입니다</string>
+    <string name="yes">예</string>
+    <string name="cancel">취소</string>
+    <string name="select_file">파일 선택</string>
+    <string name="empty_group_hint">Track &amp; Graph에 오신 것을 환영합니다!\n\n 오른쪽 상단의 +를 누르고 트래커를 선택하여 시작하세요.</string>
+    <string name="no_trackers_graph_stats_hint">그래프를 만들기 전에 트래커를 만들어 주세요.</string>
+    <string name="no_trackers_functions_hint">함수를 만들기 전에 트래커를 만들어 주세요.</string>
+    <string name="ru_sure_del_group">이 그룹과 그룹 안의 모든 항목을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="ru_sure_del_graph">이 그래프를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다. 기록된 데이터는 삭제되지 않습니다.</string>
+    <string name="ru_sure_del_feature">이 기록 데이터를 삭제하시겠습니까?</string>
+    <string name="item_in_multiple_groups">이 항목은 여러 위치에 있습니다. 여기에서만 제거하거나 모든 위치에서 삭제할 수 있습니다.</string>
+    <string name="remove_from_this_group">여기에서 제거</string>
+    <string name="delete_everywhere">모든 위치에서 삭제</string>
+    <string name="ru_sure_del_function">이 함수를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="ru_sure_del_reminder">이 알림을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="ru_sure_del_data_point">이 데이터 포인트를 삭제하시겠습니까?</string>
+    <string name="feature_name_cannot_be_null">이름을 입력해 주세요</string>
+    <string name="tracker_with_that_name_exists">같은 이름으로 이미 기록 중인 항목이 있습니다</string>
+    <string name="data_points">데이터 포인트 %1$d개</string>
+    <string name="items_selected">%1$d개 선택됨</string>
+    <string name="select_all">모두 선택</string>
+    <string name="deselect_all">모두 선택 해제</string>
+    <string name="ru_sure_del_data_points">이 데이터 포인트들을 삭제하시겠습니까?</string>
+    <string name="delete_selected_content_description">선택한 항목 삭제</string>
+    <string name="copy_selected_content_description">선택한 항목 복사</string>
+    <string name="move_selected_content_description">선택한 항목 이동</string>
+    <string name="copy_to">다음으로 복사</string>
+    <string name="no_data">데이터 없음</string>
+    <string name="skip">건너뛰기</string>
+    <string name="exportButton">내보내기</string>
+    <string name="importButton">가져오기</string>
+    <string name="import_export">가져오기/내보내기</string>
+    <string name="search">검색</string>
+    <string name="type_to_search">검색어 입력</string>
+    <string name="no_results">결과 없음</string>
+    <string name="export_to">이 그룹의 기록 데이터를 CSV로 내보내기:</string>
+    <string name="export_error_message">내보내기 실패: %1$s</string>
+    <string name="import_from">CSV에서 이 그룹으로 기록 데이터 가져오기:</string>
+    <string name="import_warning">경고: 가져오기는 되돌릴 수 없습니다. Track &amp; Graph는 이름을 기준으로 가져온 데이터를 이 그룹의 기존 데이터와 병합하려고 합니다.</string>
+    <string name="add_a_graph_or_stat">그래프 또는 통계 추가</string>
+    <string name="graph_type_label">그래프 유형:</string>
+    <string name="sample_size">표본 크기:</string>
+    <string name="select_a_discrete_feature">라벨이 있는 데이터 세트 선택: </string>
+    <string name="no_labels">이 데이터 세트에는 라벨이 없습니다</string>
+    <string name="select_a_feature">데이터 세트 선택:</string>
+    <string name="select_a_tracker">트래커 선택</string>
+    <string name="offset">오프셋:</string>
+    <string name="scale">배율:</string>
+    <string name="from">시작:</string>
+    <string name="to">끝:</string>
+    <string name="day">일</string>
+    <string-array name="time_histogram_windows">
+        <item>시간별</item>
+        <item>일별</item>
+        <item>주별</item>
+        <item>월별</item>
+        <item>분기별</item>
+        <item>반기별</item>
+        <item>연별</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>배터리 절약 모드</item>
+        <item>밝게</item>
+        <item>어둡게</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>시스템 기본값</item>
+        <item>밝게</item>
+        <item>어둡게</item>
+    </string-array>
+    <string name="graph_type_line_graph">선 그래프</string>
+    <string name="graph_type_pie_chart">원형 차트</string>
+    <string name="graph_type_average_time_between">평균 간격</string>
+    <string name="graph_type_time_since">경과 시간</string>
+    <string name="graph_type_time_histogram">시간 히스토그램</string>
+    <string name="graph_type_last_value">마지막 기록/경과 시간</string>
+    <string name="graph_type_bar_chart">막대 차트</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>평균 없음</item>
+        <item>일일 이동 평균</item>
+        <item>3일 이동 평균</item>
+        <item>주간 이동 평균</item>
+        <item>월간 이동 평균</item>
+        <item>3개월 이동 평균</item>
+        <item>6개월 이동 평균</item>
+        <item>연간 이동 평균</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>기록 시 표시</item>
+        <item>시간별 합계 표시</item>
+        <item>일별 합계 표시</item>
+        <item>주별 합계 표시</item>
+        <item>월별 합계 표시</item>
+        <item>연별 합계 표시</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">전체 데이터</string>
+    <string name="graph_time_durations_a_day">하루</string>
+    <string name="graph_time_durations_a_week">일주일</string>
+    <string name="graph_time_durations_a_month">한 달</string>
+    <string name="graph_time_durations_three_months">3개월</string>
+    <string name="graph_time_durations_six_months">6개월</string>
+    <string name="graph_time_durations_a_year">1년</string>
+    <string name="custom">맞춤</string>
+    <string-array name="y_range_styles">
+        <item>동적</item>
+        <item>고정</item>
+    </string-array>
+    <string name="ending_at_latest">마지막 데이터 포인트</string>
+    <string name="ending_at_now">현재</string>
+    <string name="ending_at_custom_date">맞춤 날짜…</string>
+    <string name="hours_and_minutes_ago">%1$d시간 %2$d분 전</string>
+    <string name="import_exception_unknown">가져오기 실패: 알 수 없는 오류가 발생했습니다</string>
+    <string name="import_exception_bad_headers">가져오기 실패: 헤더가 예상한 헤더와 일치하지 않습니다: %1$s</string>
+    <string name="import_exception_inconsistent_record">가져오기 실패: %1$s번째 줄의 레코드가 필수 헤더와 일치하지 않습니다</string>
+    <string name="import_exception_bad_timestamp">가져오기 실패: 다음 줄의 레코드 타임스탬프를 해석할 수 없습니다: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">가져오기 실패: 다음 줄에서 일관되지 않은 데이터 유형을 받았습니다: %1$s</string>
+    <string name="unknown_error_occurred">알 수 없는 오류가 발생했습니다</string>
+    <string name="graph_stat_validation_no_name">이름을 입력해 주세요</string>
+    <string name="graph_stat_validation_no_line_graph_features">그래프에 항목을 추가해 주세요</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">\"시작\"이 \"끝\"보다 작거나 같은지 확인해 주세요</string>
+    <string name="graph_stat_validation_unrecognised_color">모든 데이터 세트에 색상이 있는지 확인해 주세요</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">잘못된 선 그래프 데이터 세트가 감지되었습니다</string>
+    <string name="graph_stat_validation_bad_fixed_range">\"시작\"이 \"끝\"보다 작은지 확인해 주세요</string>
+    <string name="graph_stat_view_not_found">이 그래프를 찾는 중 오류가 발생했습니다</string>
+    <string name="graph_stat_view_not_enough_data_stat">통계를 생성할 만큼 데이터가 기록되면 표시됩니다.</string>
+    <string name="graph_stat_view_not_enough_data_graph">그래프를 생성할 만큼 데이터가 기록되면 표시됩니다.</string>
+    <string name="pie_chart_mixed_signs_error">양수와 음수 조각 크기가 모두 포함되어 있어 이 원형 차트를 렌더링할 수 없습니다.</string>
+    <string name="histogram_mixed_signs_error">양수와 음수 구간 크기가 모두 포함되어 있어 이 히스토그램을 렌더링할 수 없습니다.</string>
+    <string name="graph_non_finite_data_error">유한한 숫자가 아닌 값이 포함되어 있어 이 그래프를 렌더링할 수 없습니다.</string>
+    <string name="graph_inconsistent_series_error">데이터 계열의 크기가 일치하지 않아 이 그래프를 렌더링할 수 없습니다.</string>
+    <string name="graph_invalid_y_range_error">Y축 범위가 잘못되어 이 그래프를 렌더링할 수 없습니다.</string>
+    <string name="finish">완료</string>
+    <string name="about_description">Track &amp; Graph는 GPL 3.0 라이선스로 제공되는 무료 오픈 소스 소프트웨어입니다.</string>
+    <string name="about_libraries_message">다음 오픈 소스 라이브러리가 사용되었습니다:</string>
+    <string name="about">정보</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">FAQ</string>
+    <string name="tutorial_text_1">트래커를 사용해 데이터를 기록하세요.</string>
+    <string name="tutorial_text_2">그래프와 통계를 사용해 데이터를 시각화하세요.</string>
+    <string name="tutorial_text_3">그룹을 사용해 트래커, 그래프와 통계를 정리하세요.</string>
+    <string name="got_it">알겠습니다!</string>
+    <string name="move_to_colon">이동 위치:</string>
+    <string name="move_to">이동</string>
+    <string name="ru_sure_update_data">이 업데이트로 이미 기록한 데이터가 되돌릴 수 없게 변경될 수 있습니다. 계속하기 전에 기존 데이터를 백업하는 것을 적극 권장합니다.\n\n 계속하시겠습니까?</string>
+    <string name="ok">확인</string>
+    <string name="rate_the_app">앱 평가</string>
+    <string name="reminders">알림</string>
+    <string name="no_reminders_hint">+ 아이콘을 눌러 새 기록 알림을 만드세요.</string>
+    <string name="mon">월</string>
+    <string name="tue">화</string>
+    <string name="wed">수</string>
+    <string name="thu">목</string>
+    <string name="fri">금</string>
+    <string name="sat">토</string>
+    <string name="sun">일</string>
+    <string name="reminders_notifications_channel_name">알림</string>
+    <string name="reminders_notifications_channel_description">기록할 시간을 알려 주기 위해 사용자가 만든 알림</string>
+    <string name="default_reminder_name">기록할 시간입니다!</string>
+    <string name="missed_reminder_single_content">%1$s의 알림</string>
+    <string name="missed_reminders_multiple_content">알림 %1$d개를 놓쳤습니다</string>
+    <string name="next_reminder_format">다음 알림: %1$s</string>
+    <string name="no_upcoming_reminders">예정된 알림 없음</string>
+    <string name="select_reminder_type">알림 유형 선택</string>
+    <string name="week_day_reminder">요일별 알림</string>
+    <string name="week_day_reminder_description">월요일, 수요일, 금요일과 같은 특정 요일</string>
+    <string name="periodic_reminder">주기적 알림</string>
+    <string name="periodic_reminder_description">3일마다와 같은 일정한 간격</string>
+    <string name="month_day_reminder">월별 알림</string>
+    <string name="month_day_reminder_description">첫 번째 월요일과 같은 월별 패턴</string>
+    <string name="time_since_last_reminder">마지막 알림 후 경과 시간</string>
+    <string name="time_since_last_reminder_description">한동안 기록하지 않았을 때</string>
+    <string name="one_time_reminder">일회성 알림</string>
+    <string name="one_time_reminder_description">특정 시간 또는 지연 후 한 번 표시되는 알림</string>
+    <string name="reminder_name">알림 이름</string>
+    <string name="reminder_disabled">알림 사용 중지됨</string>
+    <string name="repeat_every">반복 주기</string>
+    <string name="at_time">시간</string>
+    <string name="at_a_specific_time">특정 시간</string>
+    <string name="ending_at">종료 시간</string>
+    <string name="starting_from">시작일</string>
+    <string name="repeat_on_week_days">반복 요일</string>
+    <string name="track_feature">기능 기록</string>
+    <string name="select_tracker_placeholder">트래커 선택</string>
+    <string name="remind_after">다음 시간 후 알림</string>
+    <string name="then_remind_every">그 후 알림 주기</string>
+    <string name="remind_at_date_and_time">날짜 및 시간에 알림</string>
+    <string name="remind_after_a_delay">지연 후 알림</string>
+    <string name="first_reminder">첫 알림</string>
+    <string name="every_colon">반복:</string>
+    <string name="ended_at_format">종료: %1$s</string>
+    <string name="starting_at_format">시작: %1$s</string>
+    <string name="occurrence_first">첫 번째</string>
+    <string name="occurrence_second">두 번째</string>
+    <string name="occurrence_third">세 번째</string>
+    <string name="occurrence_fourth">네 번째</string>
+    <string name="occurrence_last">마지막</string>
+    <string name="monday">월요일</string>
+    <string name="tuesday">화요일</string>
+    <string name="wednesday">수요일</string>
+    <string name="thursday">목요일</string>
+    <string name="friday">금요일</string>
+    <string name="saturday">토요일</string>
+    <string name="sunday">일요일</string>
+    <string-array name="abbreviated_months">
+        <item>1월</item>
+        <item>2월</item>
+        <item>3월</item>
+        <item>4월</item>
+        <item>5월</item>
+        <item>6월</item>
+        <item>7월</item>
+        <item>8월</item>
+        <item>9월</item>
+        <item>10월</item>
+        <item>11월</item>
+        <item>12월</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>월</item>
+        <item>화</item>
+        <item>수</item>
+        <item>목</item>
+        <item>금</item>
+        <item>토</item>
+        <item>일</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">범위 스타일:</string>
+    <string name="track_widget_configure_no_data_error">먼저 데이터를 기록해 주세요.</string>
+    <string name="track_widget_configure_no_data_selected_error">기록 위젯을 만들려면 유효한 데이터 세트를 선택해야 합니다.</string>
+    <string name="create">만들기</string>
+    <string name="use_default_value">기본값 설정</string>
+    <string name="backup_and_restore">백업 및 복원</string>
+    <string name="backup_hint_text">백업하면 기록한 모든 데이터, 그래프와 알림을 포함한 앱 데이터가 저장됩니다. 기기를 잃어버리거나 고장 날 경우에 대비해 데이터를 외부 기기나 클라우드 저장소에 정기적으로 백업하세요.</string>
+    <string name="restore_data">데이터 복원</string>
+    <string name="backup_successful">백업 완료!</string>
+    <string name="backup_error_could_not_write_to_file">선택한 파일을 찾거나 쓸 수 없습니다.</string>
+    <string name="backup_error_could_not_find_database_file">데이터베이스 파일을 찾거나 읽을 수 없습니다.</string>
+    <string name="backup_error_failed_to_copy_database">데이터베이스 파일을 복사하는 중 문제가 발생했습니다.</string>
+    <string name="restore_failed">복원 실패. %1$s</string>
+    <string name="add_a_longer_description_optional">더 긴 설명 추가(선택사항)</string>
+    <string name="no_data_points_history_fragment_hint">데이터 포인트가 있으면 여기에 기록이 표시됩니다.</string>
+    <string name="data_resolution_error">이 데이터를 확인하는 중 오류가 발생했습니다:\n\n%1$s</string>
+    <string name="info">정보</string>
+    <string name="no_description">설명 없음</string>
+    <string name="description">설명</string>
+    <string name="app_lock_title">앱 잠금</string>
+    <string name="app_lock_locked_title">Track &amp; Graph 잠김</string>
+    <string name="app_lock_password_label">비밀번호</string>
+    <string name="app_lock_confirm_password_label">비밀번호 확인</string>
+    <string name="app_lock_unlock">잠금 해제</string>
+    <string name="app_lock_use_biometrics">생체 인증 사용</string>
+    <string name="app_lock_enable">앱 잠금 사용</string>
+    <string name="app_lock_enabled">앱 잠금 사용 중</string>
+    <string name="app_lock_enable_biometric_unlock">생체 인증 잠금 해제 사용</string>
+    <string name="app_lock_no_strong_biometric_available">이 기기에서는 강력한 생체 인증 잠금 해제를 사용할 수 없습니다.</string>
+    <string name="app_lock_lock_after_background_minutes">백그라운드 전환 후 잠금 시간(분)</string>
+    <string name="app_lock_lock_after_background_minutes_hint">앱이 포그라운드를 벗어나는 즉시 잠그려면 0을 사용하세요.</string>
+    <string name="app_lock_change_password">비밀번호 변경</string>
+    <string name="app_lock_password_changed">비밀번호가 변경되었습니다</string>
+    <string name="app_lock_disable">앱 잠금 사용 중지</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph 잠금 해제</string>
+    <string name="app_lock_unlock_biometric_subtitle">계속하려면 기기의 생체 인증을 사용하세요</string>
+    <string name="app_lock_use_password">비밀번호 사용</string>
+    <string name="app_lock_biometric_not_recognized">생체 인증을 인식하지 못했습니다.</string>
+    <string name="app_lock_error_missing_password">앱 잠금 비밀번호가 없습니다. 앱 잠금을 사용 중지했다가 다시 사용 설정하세요.</string>
+    <string name="app_lock_error_incorrect_password">잘못된 비밀번호</string>
+    <string name="app_lock_error_password_hashing_unavailable">이 기기에서는 앱 잠금 비밀번호를 확인할 수 없습니다.</string>
+    <string name="app_lock_error_enter_password">비밀번호를 입력하세요.</string>
+    <string name="app_lock_error_passwords_do_not_match">비밀번호가 일치하지 않습니다.</string>
+    <string name="note_input_hint">메모…</string>
+    <string name="add_a_note">메모 추가</string>
+    <string name="notes">메모</string>
+    <string name="show_global_notes">전체</string>
+    <string name="show_data_point_notes">데이터 포인트</string>
+    <string name="delete_reminder_content_description">알림 삭제</string>
+    <string name="theme_colon">테마:</string>
+    <string name="date_format_colon">날짜 형식:</string>
+    <string name="add_data_point_button_content_description">데이터 포인트 추가 버튼</string>
+    <string name="tracked_data_menu_button_content_description">기록된 데이터 메뉴 버튼</string>
+    <string name="tracked_data_history_button_content_description">기록된 데이터 기록 버튼</string>
+    <string name="delete_line_button_content_description">선 삭제 버튼</string>
+    <string name="delete_input_button_content_description">입력 삭제 버튼</string>
+    <string name="delete_data_point_button_content_description">데이터 포인트 삭제 버튼</string>
+    <string name="edit_data_point_button_content_description">데이터 포인트 수정 버튼</string>
+    <string name="add_multiple_choice_answer_button_content_description">객관식 답변 추가 버튼</string>
+    <string name="ending_at_colon">샘플 종료 시점:</string>
+    <string name="duplicate">복제</string>
+    <string name="no_notes_hint_text">기록할 때 추가한 메모가 여기에 표시됩니다. + 버튼으로 전역 메모를 추가할 수도 있습니다.</string>
+    <string name="add_a_global_note">전역 메모 추가:</string>
+    <string name="duration">기간</string>
+    <string name="weeks">주</string>
+    <string name="months">개월</string>
+    <string name="days">일</string>
+    <string name="hours">시간</string>
+    <string name="minutes">분</string>
+    <string name="seconds">초</string>
+    <string name="hours_suffix">시간</string>
+    <string name="minutes_suffix">분</string>
+    <string name="seconds_suffix">초</string>
+    <string name="numeric_to_duration_mode_header">이전에 기록한 값의 의미:</string>
+    <string name="duration_to_numeric_mode_header">이전에 기록한 값을 무엇으로 변환할까요:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">시간 기간은 다른 유형의 데이터와 함께 사용할 수 없습니다. 시간, 분 또는 초 단위로 표시해 보세요</string>
+    <string name="sum_by_count_checkbox_label">값의 합계 대신 기록된 데이터 포인트 수를 세려면 여기를 선택하세요.</string>
+    <string name="time_window_size">시간 범위 크기:</string>
+    <string name="hold_to_preview">길게 눌러 미리보기</string>
+    <string name="open">열기</string>
+    <string name="close">닫기</string>
+    <string name="filter_by_label">라벨로 필터링</string>
+    <string name="filter_by_value">값 범위로 필터링</string>
+    <string name="save_changes">변경사항 저장</string>
+    <string name="timer_notification_channel_name">타이머</string>
+    <string name="stop">중지</string>
+    <string name="name_your_function">함수 이름 지정: </string>
+    <string name="add_some_data_sources">데이터 소스 추가</string>
+    <string name="value">값</string>
+    <string name="label">라벨</string>
+    <string name="continue_word">계속</string>
+    <string name="update_all_data_points">모든 데이터 포인트 업데이트: </string>
+    <string name="where_colon">위치:</string>
+    <string name="to_colon">끝:</string>
+    <string name="value_equals">값 =</string>
+    <string name="label_equals">라벨 =</string>
+    <string name="adding_your_first_data_point">데이터 포인트 추가 빠른 튜토리얼:</string>
+    <string name="next">다음</string>
+    <string name="each_data_point_has_a_timestamp_and_value">각 데이터 포인트에는 타임스탬프와 값이 있습니다: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">선택적으로 라벨과 메모를 추가할 수도 있습니다: </string>
+    <string name="data_point_tutorial_page_2_description">값은 숫자이므로 시간에 따른 데이터 변화를 확인할 수 있습니다</string>
+    <string name="data_point_tutorial_page_2_hint">(힌트: 값이 중요하지 않다면 기본값 1을 사용하세요)</string>
+    <string name="data_point_tutorial_page_3_description">데이터 포인트를 그룹화하려면 라벨을 사용하세요</string>
+    <string name="data_point_tutorial_page_3_hint">(힌트: 더 많은 맥락이나 설명을 추가하려면 라벨 대신 메모 필드를 사용하세요)</string>
+    <string name="help">도움말</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">고급 옵션</string>
+    <string name="type_colon">\"유형: \"</string>
+    <string name="order_colon">\"순서: \"</string>
+    <string name="value_and_label">값 및 라벨</string>
+    <string name="value_only">값만</string>
+    <string name="label_only">라벨만</string>
+    <string name="none">없음</string>
+    <string name="value_ascending">값 오름차순</string>
+    <string name="value_descending">값 내림차순</string>
+    <string name="label_ascending">라벨 오름차순</string>
+    <string name="label_descending">라벨 내림차순</string>
+    <string name="latest">최신</string>
+    <string name="oldest">최고</string>
+    <string name="track_all">모두 기록</string>
+    <string name="more_details">세부정보 더보기</string>
+    <string name="suggestions">추천</string>
+    <string name="no_label">라벨 없음</string>
+    <string name="confirm_cancel_notes_will_be_lost">닫으시겠습니까? 모든 메모가 삭제됩니다.</string>
+    <string name="add_a_label">라벨 추가</string>
+    <string name="bar_interval">막대 간격:</string>
+    <string name="y_range_max">Y축 범위 최댓값</string>
+    <string name="total_formatted">합계: %s</string>
+    <string name="from_formatted">시작: %s</string>
+    <string name="to_formatted">끝: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">초</string>
+    <string name="minutes_generic">분</string>
+    <string name="hours_generic">시간</string>
+    <string name="days_generic">일</string>
+    <string name="weeks_generic">주</string>
+    <string name="months_generic">개월</string>
+    <string name="years_generic">년</string>
+    <plurals name="seconds">
+        <item quantity="other">%d초</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d분</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d시간</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d일</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d주</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d개월</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d년</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="other">매 %d분</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="other">매 %d시간</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="other">매 %d일</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="other">매 %d주</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="other">매 %d개월</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="other">매 %d년</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="other">%d분 후</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="other">%d시간 후</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="other">%d일 후</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="other">%d주 후</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="other">%d개월 후</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="other">%d년 후</item>
+    </plurals>
+    <string name="restore_hint_text">경고: 백업에서 복원하면 현재 앱의 모든 데이터와 설정이 삭제됩니다. 먼저 데이터를 백업하세요!</string>
+    <string name="backup_now">지금 백업</string>
+    <string name="restore_error_could_not_write_to_database">복원 실패! 데이터베이스를 찾거나 쓸 수 없습니다.</string>
+    <string name="restore_error_could_not_read_from_database_file">복원 실패! 선택한 데이터베이스 파일을 찾거나 읽을 수 없습니다.</string>
+    <string name="restore_error_failed_to_copy_database">복원 실패! 데이터베이스를 복원하는 중 문제가 발생했습니다.</string>
+    <string name="select_location">위치 선택…</string>
+    <string name="restore_successful">복원되었습니다! 이제 Track &amp; Graph를 다시 시작해야 합니다.</string>
+    <string name="restore_error_invalid_database_file">복원 실패! 선택한 파일이 유효한 백업 파일이 아닙니다.</string>
+    <string name="auto_backup">자동 백업</string>
+    <string name="apply">적용</string>
+    <string name="backup_every">백업 주기: </string>
+    <string name="next_backup_at">\"다음 백업 시간: \"</string>
+    <string name="backup_notification_channel_name">자동 백업 알림</string>
+    <string name="backup_notification_channel_description">자동 백업이 진행 중이거나 실패했을 때 알려줍니다.</string>
+    <string name="backup_notification_title">백업 진행 중…</string>
+    <string name="backup_failed_notification_title">자동 백업 실패</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph가 백업 위치를 찾거나 액세스할 수 없습니다.</string>
+    <string name="backup_failed_notification_could_not_copy">데이터를 백업하는 중 문제가 발생했습니다. 백업이 손상되었거나 불완전할 수 있습니다.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">새 위치 선택</string>
+    <string name="backup_location">백업 위치</string>
+    <string name="enable_auto_backup">자동 백업 사용</string>
+    <string name="last_successful_backup">마지막 성공한 백업</string>
+    <string name="next_scheduled_backup">다음 예약 백업</string>
+    <string name="notification_permission_prompt">어떤 이유로든 자동 백업이 실패했을 때 알림을 받으려면 Track &amp; Graph의 알림을 사용 설정하세요.</string>
+    <string name="lua_script_empty">Lua 스크립트를 추가해 주세요</string>
+    <string name="function_name_empty">함수 이름은 비워 둘 수 없습니다</string>
+    <string name="function_name">함수 이름</string>
+    <string name="add_at_least_one_input">입력을 하나 이상 추가해 주세요</string>
+    <string name="output">출력</string>
+    <string name="data_source">데이터 소스</string>
+    <string name="lua_script">Lua 스크립트</string>
+    <string name="data_source_description">데이터 소스 노드를 사용하면 입력으로 사용할 트래커 또는 함수를 선택할 수 있습니다.</string>
+    <string name="lua_script_input_hint">Lua 스크립트를 입력하세요…</string>
+    <string name="select_node_type">노드 유형 선택</string>
+    <string name="file">파일</string>
+    <string name="lua_feature_names_not_unique">스크립트 입력 이름은 서로 달라야 합니다</string>
+    <string name="graph_stat_type_lua_graph">Lua 스크립트</string>
+    <string name="launch_lua_disabled">Lua 실행 사용 중지</string>
+    <string name="no_lua">Lua 없음</string>
+    <string name="lua_engine_disabled">Lua 엔진 사용 중지</string>
+    <string name="lua_graph_first_time_user_title">Lua 스크립트 그래프 및 통계</string>
+    <string name="lua_graph_first_time_user_message">Lua 스크립트는 Lua 프로그래밍 언어로 맞춤 그래프와 통계를 만들 수 있는 고급 기능입니다. \n\n직접 만든 스크립트를 불러오거나 GitHub 컬렉션에서 선택할 수 있습니다. GitHub에서 스크립트를 설치하면 앱으로 돌아와 바로 사용할 수 있습니다.</string>
+    <string name="functions_first_time_user_title">함수에 오신 것을 환영합니다</string>
+    <string name="functions_first_time_user_message">함수는 데이터를 결합, 집계, 변환하여 새로운 파생 데이터 소스로 만들 수 있는 고급 기능입니다.</string>
+    <string name="learn_more">여기에서 자세히 알아보기</string>
+    <string name="github">GitHub</string>
+    <string name="paste">붙여넣기</string>
+    <string name="failed_to_download_file">파일을 다운로드하지 못했습니다: %s</string>
+    <string name="confirm_deep_link">알 수 없는 출처에서 스크립트 링크를 받았습니다. 신뢰할 수 있는 출처의 스크립트만 설치하세요. 이 스크립트를 설치하시겠습니까?</string>
+    <string name="graph_stat_info_button_description">그래프 및 통계 튜토리얼</string>
+    <string name="network_generic_error">네트워크에 액세스하는 중 오류가 발생했습니다. 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="function_verification_failure">함수 서명을 확인하지 못했습니다. 보안 연결을 사용하고 있으며 Track &amp; Graph가 최신 버전인지 확인해 주세요</string>
+    <string name="function_network_failure">함수를 불러오지 못했습니다. 인터넷에 연결되어 있는지 확인해 주세요. 문제가 계속되면 앱이 최신 버전인지 확인해 주세요.</string>
+    <string name="functions_landscape_hint">팁: 함수는 가로 모드에서 가장 잘 작동합니다</string>
+    <string name="functions_start_hint">여기서 시작: 길게 누른 후 데이터 소스를 선택하세요</string>
+    <string name="see_whats_new">새로운 기능 보기</string>
+</resources>

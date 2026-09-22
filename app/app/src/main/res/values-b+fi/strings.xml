@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Etusivu</string>
+    <string name="add_group">Lisää ryhmä: </string>
+    <string name="edit_group">Muokkaa ryhmää: </string>
+    <string name="group">Ryhmä</string>
+    <string name="tracker">Seuranta</string>
+    <string name="function">Funktio</string>
+    <string name="graph_or_stat">Kaavio tai tilasto</string>
+    <string name="symlink">Symbolinen linkki</string>
+    <string name="symlinks">Symboliset linkit</string>
+    <string name="reminder">Muistutus</string>
+    <string name="add_component">Lisää komponentti</string>
+    <string name="symlink_locations_title">Kohteen \"%1$s\" sijainnit</string>
+    <string name="add_tracker">Mitä haluat seurata:</string>
+    <string name="add">Lisää</string>
+    <string name="group_name">esim. Päivittäiset toiminnot</string>
+    <string name="delete">Poista</string>
+    <string name="edit">Muokkaa</string>
+    <string name="update">Päivitä</string>
+    <string name="graph_or_stat_name">Kaavion nimi: </string>
+    <string name="tracker_name">Seurannan nimi</string>
+    <string name="this_is_a_time_or_duration">Tämä on aika tai kesto</string>
+    <string name="yes">Kyllä</string>
+    <string name="cancel">Peruuta</string>
+    <string name="select_file">Valitse tiedosto</string>
+    <string name="empty_group_hint">Tervetuloa Track &amp; Graphiin!\n\n Napauta oikean yläkulman +-painiketta ja aloita valitsemalla Seuranta.</string>
+    <string name="no_trackers_graph_stats_hint">Luo Seuranta ennen kaavioiden luomista.</string>
+    <string name="no_trackers_functions_hint">Luo Seuranta ennen funktioiden luomista.</string>
+    <string name="ru_sure_del_group">Haluatko varmasti poistaa tämän ryhmän ja kaiken sen sisällön? Tätä ei voi kumota.</string>
+    <string name="ru_sure_del_graph">Haluatko varmasti poistaa tämän kaavion? Tätä ei voi kumota. Et menetä seurattuja tietoja.</string>
+    <string name="ru_sure_del_feature">Haluatko varmasti poistaa nämä seuratut tiedot?</string>
+    <string name="item_in_multiple_groups">Tämä kohde on useassa paikassa. Voit poistaa sen täältä tai kaikkialta.</string>
+    <string name="remove_from_this_group">Poista täältä</string>
+    <string name="delete_everywhere">Poista kaikkialta</string>
+    <string name="ru_sure_del_function">Haluatko varmasti poistaa tämän funktion? Tätä ei voi kumota.</string>
+    <string name="ru_sure_del_reminder">Haluatko varmasti poistaa tämän muistutuksen? Tätä ei voi kumota.</string>
+    <string name="ru_sure_del_data_point">Haluatko varmasti poistaa tämän datapisteen?</string>
+    <string name="feature_name_cannot_be_null">Lisää nimi</string>
+    <string name="tracker_with_that_name_exists">Seuraat jo jotain tällä nimellä</string>
+    <string name="data_points">%1$d datapistettä</string>
+    <string name="items_selected">%1$d valittu</string>
+    <string name="select_all">Valitse kaikki</string>
+    <string name="deselect_all">Poista kaikkien valinta</string>
+    <string name="ru_sure_del_data_points">Haluatko varmasti poistaa nämä datapisteet?</string>
+    <string name="delete_selected_content_description">Poista valitut kohteet</string>
+    <string name="copy_selected_content_description">Kopioi valitut kohteet</string>
+    <string name="move_selected_content_description">Siirrä valitut kohteet</string>
+    <string name="copy_to">Kopioi kohteeseen</string>
+    <string name="no_data">Ei tietoja</string>
+    <string name="skip">Ohita</string>
+    <string name="exportButton">Vie</string>
+    <string name="importButton">Tuo</string>
+    <string name="import_export">Tuonti/vienti</string>
+    <string name="search">Hae</string>
+    <string name="type_to_search">Kirjoita hakusana</string>
+    <string name="no_results">Ei tuloksia</string>
+    <string name="export_to">Vie tämän ryhmän seuratut tiedot CSV-tiedostoon:</string>
+    <string name="export_error_message">Vienti epäonnistui: %1$s</string>
+    <string name="import_from">Tuo tämän ryhmän seuratun tiedot CSV-tiedostosta:</string>
+    <string name="import_warning">Varoitus: Tuontia ei voi kumota. Track &amp; Graph yrittää yhdistää tuodut tiedot tämän ryhmän olemassa oleviin tietoihin nimen perusteella.</string>
+    <string name="add_a_graph_or_stat">Lisää kaavio tai tilasto</string>
+    <string name="graph_type_label">Kaavion tyyppi:</string>
+    <string name="sample_size">Otoskoko:</string>
+    <string name="select_a_discrete_feature">Valitse tietojoukko, jolla on tunnisteita: </string>
+    <string name="no_labels">Tällä tietojoukolla ei ole tunnisteita</string>
+    <string name="select_a_feature">Valitse tietojoukko:</string>
+    <string name="select_a_tracker">Valitse seuranta</string>
+    <string name="offset">Siirtymä:</string>
+    <string name="scale">Asteikko:</string>
+    <string name="from">Alkaen:</string>
+    <string name="to">Päättyen:</string>
+    <string name="day">Päivä</string>
+    <string-array name="time_histogram_windows">
+        <item>Tunneittain</item>
+        <item>Päivittäin</item>
+        <item>Viikoittain</item>
+        <item>Kuukausittain</item>
+        <item>Neljännesvuosittain</item>
+        <item>Puolivuosittain</item>
+        <item>Vuosittain</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Virransäästö</item>
+        <item>Vaalea</item>
+        <item>Tumma</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Järjestelmän oletus</item>
+        <item>Vaalea</item>
+        <item>Tumma</item>
+    </string-array>
+    <string name="graph_type_line_graph">Viivakaavio</string>
+    <string name="graph_type_pie_chart">Ympyräkaavio</string>
+    <string name="graph_type_average_time_between">Keskimääräinen aika välillä</string>
+    <string name="graph_type_time_since">Aika edellisestä</string>
+    <string name="graph_type_time_histogram">Aikahistogrammi</string>
+    <string name="graph_type_last_value">Viimeisin seuranta / aika edellisestä</string>
+    <string name="graph_type_bar_chart">Pylväskaavio</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Ei keskiarvoa</item>
+        <item>Päivittäinen liukuva keskiarvo</item>
+        <item>Kolmen päivän liukuva keskiarvo</item>
+        <item>Viikoittainen liukuva keskiarvo</item>
+        <item>Kuukausittainen liukuva keskiarvo</item>
+        <item>Kolmen kuukauden liukuva keskiarvo</item>
+        <item>Kuuden kuukauden liukuva keskiarvo</item>
+        <item>Vuosittainen liukuva keskiarvo</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Piirrä seurattaessa</item>
+        <item>Piirrä tuntikohtaiset summat</item>
+        <item>Piirrä päiväkohtaiset summat</item>
+        <item>Piirrä viikkokohtaiset summat</item>
+        <item>Piirrä kuukausikohtaiset summat</item>
+        <item>Piirrä vuosikohtaiset summat</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Kaikki tiedot</string>
+    <string name="graph_time_durations_a_day">Päivä</string>
+    <string name="graph_time_durations_a_week">Viikko</string>
+    <string name="graph_time_durations_a_month">Kuukausi</string>
+    <string name="graph_time_durations_three_months">Kolme kuukautta</string>
+    <string name="graph_time_durations_six_months">Kuusi kuukautta</string>
+    <string name="graph_time_durations_a_year">Vuosi</string>
+    <string name="custom">Mukautettu</string>
+    <string-array name="y_range_styles">
+        <item>Dynaaminen</item>
+        <item>Kiinteä</item>
+    </string-array>
+    <string name="ending_at_latest">Viimeisin datapiste</string>
+    <string name="ending_at_now">Nyt</string>
+    <string name="ending_at_custom_date">Mukautettu päivämäärä…</string>
+    <string name="hours_and_minutes_ago">%1$dh %2$dm sitten</string>
+    <string name="import_exception_unknown">Tuonti epäonnistui: Tuntematon virhe</string>
+    <string name="import_exception_bad_headers">Tuonti epäonnistui: Otsakkeet eivät vastanneet odotettuja otsakkeita: %1$s</string>
+    <string name="import_exception_inconsistent_record">Tuonti epäonnistui: Rivin %1$s tietue ei vastaa vaadittuja otsakkeita</string>
+    <string name="import_exception_bad_timestamp">Tuonti epäonnistui: Rivin %1$s tietueen aikaleimaa ei voitu tulkita</string>
+    <string name="import_exception_inconsistent_data_type">Tuonti epäonnistui: Rivillä %1$s vastaanotettiin epäyhtenäinen tietotyyppi</string>
+    <string name="unknown_error_occurred">Tuntematon virhe</string>
+    <string name="graph_stat_validation_no_name">Anna nimi</string>
+    <string name="graph_stat_validation_no_line_graph_features">Lisää jotain kaavioon</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Varmista, että \"Alkaen\" on pienempi tai yhtä suuri kuin \"Päättyen\"</string>
+    <string name="graph_stat_validation_unrecognised_color">Varmista, että kaikilla tietojoukoilla on väri</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Virheellinen viivakaavion tietojoukko</string>
+    <string name="graph_stat_validation_bad_fixed_range">Varmista, että \"Alkaen\" on pienempi kuin \"Päättyen\"</string>
+    <string name="graph_stat_view_not_found">Kaaviota etsittäessä tapahtui virhe</string>
+    <string name="graph_stat_view_not_enough_data_stat">Tämä tilasto näytetään, kun sen muodostamiseen on seurattu riittävästi tietoja.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Tämä kaavio näytetään, kun sen muodostamiseen on seurattu riittävästi tietoja.</string>
+    <string name="pie_chart_mixed_signs_error">Tätä ympyräkaaviota ei voi näyttää, koska se sisältää sekä positiivisia että negatiivisia segmenttikokoja.</string>
+    <string name="histogram_mixed_signs_error">Tätä histogrammia ei voi näyttää, koska se sisältää sekä positiivisia että negatiivisia luokkakokoja.</string>
+    <string name="graph_non_finite_data_error">Tätä kaaviota ei voi näyttää, koska se sisältää arvon, joka ei ole äärellinen luku.</string>
+    <string name="graph_inconsistent_series_error">Tätä kaaviota ei voi näyttää, koska sen tietosarjojen koot eivät täsmää.</string>
+    <string name="graph_invalid_y_range_error">Tätä kaaviota ei voi näyttää, koska sen Y-akselin alue on virheellinen.</string>
+    <string name="finish">Valmis</string>
+    <string name="about_description">Track &amp; Graph on ilmaista ja avoimen lähdekoodin ohjelmistoa GPL 3.0 -lisenssillä.</string>
+    <string name="about_libraries_message">Seuraavia avoimen lähdekoodin kirjastoja käytetään:</string>
+    <string name="about">Tietoja</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">UKK</string>
+    <string name="tutorial_text_1">Seuraa tietojasi seurantojen avulla.</string>
+    <string name="tutorial_text_2">Visualisoi tietoja kaavioiden ja tilastojen avulla.</string>
+    <string name="tutorial_text_3">Järjestä seurannat, kaaviot ja tilastot ryhmien avulla.</string>
+    <string name="got_it">Selvä!</string>
+    <string name="move_to_colon">Siirrä kohteeseen:</string>
+    <string name="move_to">Siirrä kohteeseen</string>
+    <string name="ru_sure_update_data">Tämä päivitys saattaa muuttaa peruuttamattomasti aiemmin seurattuja tietoja. On erittäin suositeltavaa varmuuskopioida olemassa olevat tiedot ennen jatkamista.\n\n Haluatko jatkaa?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Arvioi sovellus</string>
+    <string name="reminders">Muistutukset</string>
+    <string name="no_reminders_hint">Napauta +-kuvaketta luodaksesi uuden seurannan muistutusilmoituksen.</string>
+    <string name="mon">Ma</string>
+    <string name="tue">Ti</string>
+    <string name="wed">Ke</string>
+    <string name="thu">To</string>
+    <string name="fri">Pe</string>
+    <string name="sat">La</string>
+    <string name="sun">Su</string>
+    <string name="reminders_notifications_channel_name">Muistutukset</string>
+    <string name="reminders_notifications_channel_description">Käyttäjän luomat ilmoitukset muistuttamaan seurannasta</string>
+    <string name="default_reminder_name">Aika seurata!</string>
+    <string name="missed_reminder_single_content">Muistutus kohteesta %1$s</string>
+    <string name="missed_reminders_multiple_content">Olet ohittanut %1$d muistutusta</string>
+    <string name="next_reminder_format">Seuraava muistutus: %1$s</string>
+    <string name="no_upcoming_reminders">Ei tulevia muistutuksia</string>
+    <string name="select_reminder_type">Valitse muistutuksen tyyppi</string>
+    <string name="week_day_reminder">Viikonpäivämuistutus</string>
+    <string name="week_day_reminder_description">Tietyt päivät, kuten maanantai, keskiviikko ja perjantai</string>
+    <string name="periodic_reminder">Jaksottainen muistutus</string>
+    <string name="periodic_reminder_description">Säännöllisin väliajoin, kuten 3 päivän välein</string>
+    <string name="month_day_reminder">Kuukaudenpäivämuistutus</string>
+    <string name="month_day_reminder_description">Kuukausittaiset toistot, kuten kuukauden ensimmäinen maanantai</string>
+    <string name="time_since_last_reminder">Aika edellisestä muistutuksesta</string>
+    <string name="time_since_last_reminder_description">Kun et ole seurannut jotain hetkeen</string>
+    <string name="one_time_reminder">Kertamuistutus</string>
+    <string name="one_time_reminder_description">Erillinen muistutus tiettynä aikana tai viiveen jälkeen</string>
+    <string name="reminder_name">Muistutuksen nimi</string>
+    <string name="reminder_disabled">Muistutus poistettu käytöstä</string>
+    <string name="repeat_every">Toistoväli</string>
+    <string name="at_time">Kellonaika</string>
+    <string name="at_a_specific_time">Tiettynä kellonaikana</string>
+    <string name="ending_at">Päättyy</string>
+    <string name="starting_from">Alkaen</string>
+    <string name="repeat_on_week_days">Toista viikonpäivinä</string>
+    <string name="track_feature">Seuraa ominaisuutta</string>
+    <string name="select_tracker_placeholder">Valitse seuranta</string>
+    <string name="remind_after">Muistuta tämän jälkeen</string>
+    <string name="then_remind_every">Muistuta sitten aina</string>
+    <string name="remind_at_date_and_time">Tiettynä päivänä ja kellonaikana</string>
+    <string name="remind_after_a_delay">Viiveen jälkeen</string>
+    <string name="first_reminder">Ensimmäinen muistutus</string>
+    <string name="every_colon">Joka:</string>
+    <string name="ended_at_format">Päättyi: %1$s</string>
+    <string name="starting_at_format">Alkaa: %1$s</string>
+    <string name="occurrence_first">Ensimmäinen</string>
+    <string name="occurrence_second">Toinen</string>
+    <string name="occurrence_third">Kolmas</string>
+    <string name="occurrence_fourth">Neljäs</string>
+    <string name="occurrence_last">Viimeinen</string>
+    <string name="monday">Maanantai</string>
+    <string name="tuesday">Tiistai</string>
+    <string name="wednesday">Keskiviikko</string>
+    <string name="thursday">Torstai</string>
+    <string name="friday">Perjantai</string>
+    <string name="saturday">Lauantai</string>
+    <string name="sunday">Sunnuntai</string>
+    <string-array name="abbreviated_months">
+        <item>Tammi</item>
+        <item>Helmi</item>
+        <item>Maalis</item>
+        <item>Huhti</item>
+        <item>Touko</item>
+        <item>Kesä</item>
+        <item>Heinä</item>
+        <item>Elo</item>
+        <item>Syys</item>
+        <item>Loka</item>
+        <item>Marras</item>
+        <item>Joulu</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Ma</item>
+        <item>Ti</item>
+        <item>Ke</item>
+        <item>To</item>
+        <item>Pe</item>
+        <item>La</item>
+        <item>Su</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Alueen tyyli:</string>
+    <string name="track_widget_configure_no_data_error">Seuraa ensin tietoja.</string>
+    <string name="track_widget_configure_no_data_selected_error">Sinun on valittava kelvollinen tietojoukko seurannan pienoisohjelman luomiseksi.</string>
+    <string name="create">Luo</string>
+    <string name="use_default_value">Aseta oletusarvo</string>
+    <string name="backup_and_restore">Varmuuskopiointi ja palautus</string>
+    <string name="backup_hint_text">Varmuuskopio tallentaa kaikki sovelluksen tiedot, mukaan lukien seuratun datan, kaaviot ja muistutukset. Varmuuskopioi tiedot säännöllisesti ulkoiseen laitteeseen tai pilvitallennustilaan siltä varalta, että laite katoaa tai rikkoutuu.</string>
+    <string name="restore_data">Palauta tiedot</string>
+    <string name="backup_successful">Varmuuskopiointi onnistui!</string>
+    <string name="backup_error_could_not_write_to_file">Valittua tiedostoa ei löytynyt tai siihen ei voitu kirjoittaa.</string>
+    <string name="backup_error_could_not_find_database_file">Tietokantatiedostoa ei löytynyt tai sitä ei voitu lukea.</string>
+    <string name="backup_error_failed_to_copy_database">Tietokantatiedoston kopioinnissa tapahtui virhe.</string>
+    <string name="restore_failed">Palautus epäonnistui. %1$s</string>
+    <string name="add_a_longer_description_optional">Lisää pidempi kuvaus (valinnainen)</string>
+    <string name="no_data_points_history_fragment_hint">Historiasi näkyy täällä, kun sinulla on datapisteitä.</string>
+    <string name="data_resolution_error">Näiden tietojen selvittämisessä tapahtui virhe:\n\n%1$s</string>
+    <string name="info">Tiedot</string>
+    <string name="no_description">Ei kuvausta</string>
+    <string name="description">Kuvaus</string>
+    <string name="app_lock_title">Sovelluksen lukitus</string>
+    <string name="app_lock_locked_title">Track &amp; Graph on lukittu</string>
+    <string name="app_lock_password_label">Salasana</string>
+    <string name="app_lock_confirm_password_label">Vahvista salasana</string>
+    <string name="app_lock_unlock">Avaa lukitus</string>
+    <string name="app_lock_use_biometrics">Käytä biometriikkaa</string>
+    <string name="app_lock_enable">Ota sovelluksen lukitus käyttöön</string>
+    <string name="app_lock_enabled">Sovelluksen lukitus on käytössä</string>
+    <string name="app_lock_enable_biometric_unlock">Ota biometrinen avaus käyttöön</string>
+    <string name="app_lock_no_strong_biometric_available">Tässä laitteessa ei ole käytettävissä vahvaa biometristä avausta.</string>
+    <string name="app_lock_lock_after_background_minutes">Lukitse taustalla olon jälkeen minuutteina</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Käytä arvoa 0, jos haluat lukita sovelluksen heti, kun se poistuu etualalta.</string>
+    <string name="app_lock_change_password">Vaihda salasana</string>
+    <string name="app_lock_password_changed">Salasana vaihdettu</string>
+    <string name="app_lock_disable">Poista sovelluksen lukitus käytöstä</string>
+    <string name="app_lock_unlock_biometric_title">Avaa Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Jatka käyttämällä laitteen biometriikkaa</string>
+    <string name="app_lock_use_password">Käytä salasanaa</string>
+    <string name="app_lock_biometric_not_recognized">Biometristä tunnistusta ei tunnistettu.</string>
+    <string name="app_lock_error_missing_password">Sovelluksen lukituksesta puuttuu salasana. Poista lukitus käytöstä ja ota se uudelleen käyttöön.</string>
+    <string name="app_lock_error_incorrect_password">Väärä salasana</string>
+    <string name="app_lock_error_password_hashing_unavailable">Sovelluksen lukituksen salasanan vahvistus ei ole käytettävissä tässä laitteessa.</string>
+    <string name="app_lock_error_enter_password">Anna salasana.</string>
+    <string name="app_lock_error_passwords_do_not_match">Salasanat eivät täsmää.</string>
+    <string name="note_input_hint">Muistiinpanot…</string>
+    <string name="add_a_note">Lisää muistiinpano</string>
+    <string name="notes">Muistiinpanot</string>
+    <string name="show_global_notes">Yleiset</string>
+    <string name="show_data_point_notes">Datapisteet</string>
+    <string name="delete_reminder_content_description">Poista muistutus</string>
+    <string name="theme_colon">Teema:</string>
+    <string name="date_format_colon">Päivämäärämuoto:</string>
+    <string name="add_data_point_button_content_description">Lisää datapiste -painike</string>
+    <string name="tracked_data_menu_button_content_description">Seuratut tiedot -valikkopainike</string>
+    <string name="tracked_data_history_button_content_description">Seurattujen tietojen historia -painike</string>
+    <string name="delete_line_button_content_description">Poista viiva -painike</string>
+    <string name="delete_input_button_content_description">Poista syöte -painike</string>
+    <string name="delete_data_point_button_content_description">Poista datapiste -painike</string>
+    <string name="edit_data_point_button_content_description">Muokkaa datapistettä -painike</string>
+    <string name="add_multiple_choice_answer_button_content_description">Lisää monivalintavastaus -painike</string>
+    <string name="ending_at_colon">Näyte päättyy:</string>
+    <string name="duplicate">Monista</string>
+    <string name="no_notes_hint_text">Seurannan yhteydessä lisätyt muistiinpanot näkyvät täällä. Voit myös lisätä yleisiä muistiinpanoja +-painikkeella.</string>
+    <string name="add_a_global_note">Lisää yleinen muistiinpano:</string>
+    <string name="duration">Kesto</string>
+    <string name="weeks">Viikot</string>
+    <string name="months">Kuukaudet</string>
+    <string name="days">Päivät</string>
+    <string name="hours">Tunnit</string>
+    <string name="minutes">Minuutit</string>
+    <string name="seconds">Sekunnit</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">min</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Aiemmin seuratut arvot tarkoittavat:</string>
+    <string name="duration_to_numeric_mode_header">Miksi aiemmin seuratut arvot muunnetaan:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Aikakestoja ei voi yhdistää muuntyyppisiin tietoihin. Harkitse tuntien, minuuttien tai sekuntien piirtämistä</string>
+    <string name="sum_by_count_checkbox_label">Valitse tämä laskeaksesi seurattujen datapisteiden määrän niiden arvojen summan sijaan.</string>
+    <string name="time_window_size">Aikaikkunan koko:</string>
+    <string name="hold_to_preview">Pidä painettuna esikatselua varten</string>
+    <string name="open">Avaa</string>
+    <string name="close">Sulje</string>
+    <string name="filter_by_label">Suodata tunnisteen mukaan</string>
+    <string name="filter_by_value">Suodata arvoalueen mukaan</string>
+    <string name="save_changes">Tallenna muutokset</string>
+    <string name="timer_notification_channel_name">Ajastimet</string>
+    <string name="stop">Pysäytä</string>
+    <string name="name_your_function">Nimeä funktio: </string>
+    <string name="add_some_data_sources">Lisää tietolähteitä</string>
+    <string name="value">Arvo</string>
+    <string name="label">Tunniste</string>
+    <string name="continue_word">Jatka</string>
+    <string name="update_all_data_points">Päivitä kaikki datapisteet: </string>
+    <string name="where_colon">Missä:</string>
+    <string name="to_colon">Päättyen:</string>
+    <string name="value_equals">Arvo =</string>
+    <string name="label_equals">Tunniste =</string>
+    <string name="adding_your_first_data_point">Lyhyt opastus datapisteiden lisäämiseen:</string>
+    <string name="next">Seuraava</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Jokaisella datapisteellä on aikaleima ja arvo: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Sillä voi olla myös tunniste ja muistiinpano: </string>
+    <string name="data_point_tutorial_page_2_description">Arvo on luku, joten näet, miten tietosi muuttuvat ajan kuluessa</string>
+    <string name="data_point_tutorial_page_2_hint">(Vinkki: jos arvolla ei ole väliä, käytä oletusarvoa 1)</string>
+    <string name="data_point_tutorial_page_3_description">Käytä tunnisteita, jos haluat ryhmitellä datapisteet</string>
+    <string name="data_point_tutorial_page_3_hint">(Vinkki: jos haluat lisätä asiayhteyttä tai kuvauksen, käytä muistiinpanokenttää tunnistekentän sijaan)</string>
+    <string name="help">Ohje</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Lisäasetukset</string>
+    <string name="type_colon">\"Tyyppi: \"</string>
+    <string name="order_colon">\"Järjestys: \"</string>
+    <string name="value_and_label">Arvo ja tunniste</string>
+    <string name="value_only">Vain arvo</string>
+    <string name="label_only">Vain tunniste</string>
+    <string name="none">Ei mitään</string>
+    <string name="value_ascending">Arvo nousevasti</string>
+    <string name="value_descending">Arvo laskevasti</string>
+    <string name="label_ascending">Tunniste nousevasti</string>
+    <string name="label_descending">Tunniste laskevasti</string>
+    <string name="latest">Uusin</string>
+    <string name="oldest">Vanhin</string>
+    <string name="track_all">Seuraa kaikkia</string>
+    <string name="more_details">Lisätietoja</string>
+    <string name="suggestions">Ehdotukset</string>
+    <string name="no_label">Ei tunnistetta</string>
+    <string name="confirm_cancel_notes_will_be_lost">Haluatko varmasti sulkea? Kaikki muistiinpanot menetetään.</string>
+    <string name="add_a_label">Lisää tunniste</string>
+    <string name="bar_interval">Pylväsjakso:</string>
+    <string name="y_range_max">Y-alueen enimmäisarvo</string>
+    <string name="total_formatted">Yhteensä: %s</string>
+    <string name="from_formatted">Alkaen: %s</string>
+    <string name="to_formatted">Päättyen: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Sekunti(a)</string>
+    <string name="minutes_generic">Minuutti(a)</string>
+    <string name="hours_generic">Tunti(a)</string>
+    <string name="days_generic">Päivä(ä)</string>
+    <string name="weeks_generic">Viikko(a)</string>
+    <string name="months_generic">Kuukausi(a)</string>
+    <string name="years_generic">Vuosi(a)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d sekunti</item>
+        <item quantity="other">%d sekuntia</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minuutti</item>
+        <item quantity="other">%d minuuttia</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d tunti</item>
+        <item quantity="other">%d tuntia</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d viikko</item>
+        <item quantity="other">%d viikkoa</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d kuukausi</item>
+        <item quantity="other">%d kuukautta</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d vuosi</item>
+        <item quantity="other">%d vuotta</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Joka minuutti</item>
+        <item quantity="other">Joka %d. minuutti</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Joka tunti</item>
+        <item quantity="other">Joka %d. tunti</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Joka päivä</item>
+        <item quantity="other">Joka %d. päivä</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Joka viikko</item>
+        <item quantity="other">Joka %d. viikko</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Joka kuukausi</item>
+        <item quantity="other">Joka %d. kuukausi</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Joka vuosi</item>
+        <item quantity="other">Joka %d. vuosi</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">1 minuutin kuluttua</item>
+        <item quantity="other">%d minuutin kuluttua</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">1 tunnin kuluttua</item>
+        <item quantity="other">%d tunnin kuluttua</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">1 päivän kuluttua</item>
+        <item quantity="other">%d päivän kuluttua</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">1 viikon kuluttua</item>
+        <item quantity="other">%d viikon kuluttua</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">1 kuukauden kuluttua</item>
+        <item quantity="other">%d kuukauden kuluttua</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">1 vuoden kuluttua</item>
+        <item quantity="other">%d vuoden kuluttua</item>
+    </plurals>
+    <string name="restore_hint_text">VAROITUS: Varmuuskopion palauttaminen poistaa kaikki sovelluksessa olevat tiedot ja asetukset. Varmuuskopioi tietosi ensin!</string>
+    <string name="backup_now">Varmuuskopioi nyt</string>
+    <string name="restore_error_could_not_write_to_database">Palautus epäonnistui! Tietokantaa ei löytynyt tai siihen ei voitu kirjoittaa.</string>
+    <string name="restore_error_could_not_read_from_database_file">Palautus epäonnistui! Valittua tietokantatiedostoa ei löytynyt tai sitä ei voitu lukea.</string>
+    <string name="restore_error_failed_to_copy_database">Palautus epäonnistui! Tietokannan palautuksessa tapahtui virhe.</string>
+    <string name="select_location">Valitse sijainti…</string>
+    <string name="restore_successful">Palautus onnistui! Track &amp; Graph on nyt käynnistettävä uudelleen.</string>
+    <string name="restore_error_invalid_database_file">Palautus epäonnistui! Valittu tiedosto ei vaikuta kelvolliselta varmuuskopiolta.</string>
+    <string name="auto_backup">Automaattinen varmuuskopiointi</string>
+    <string name="apply">Käytä</string>
+    <string name="backup_every">Varmuuskopiointiväli: </string>
+    <string name="next_backup_at">\"Seuraava varmuuskopiointi: \"</string>
+    <string name="backup_notification_channel_name">Automaattisen varmuuskopioinnin ilmoitukset</string>
+    <string name="backup_notification_channel_description">Ilmoittaa, kun automaattinen varmuuskopiointi on käynnissä tai epäonnistuu.</string>
+    <string name="backup_notification_title">Varmuuskopiointi käynnissä…</string>
+    <string name="backup_failed_notification_title">Automaattinen varmuuskopiointi epäonnistui</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph ei löytänyt varmuuskopiointisijaintia tai saanut siihen käyttöoikeutta.</string>
+    <string name="backup_failed_notification_could_not_copy">Tietojen varmuuskopioinnissa tapahtui virhe. Varmuuskopio saattaa olla vioittunut tai puutteellinen.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Valitse uusi sijainti</string>
+    <string name="backup_location">Varmuuskopion sijainti</string>
+    <string name="enable_auto_backup">Ota automaattinen varmuuskopiointi käyttöön</string>
+    <string name="last_successful_backup">Viimeisin onnistunut varmuuskopiointi</string>
+    <string name="next_scheduled_backup">Seuraava ajoitettu varmuuskopiointi</string>
+    <string name="notification_permission_prompt">Ota Track &amp; Graphin ilmoitukset käyttöön, jotta saat ilmoituksen automaattisen varmuuskopioinnin epäonnistuessa.</string>
+    <string name="lua_script_empty">Lisää Lua-skripti</string>
+    <string name="function_name_empty">Funktion nimi ei voi olla tyhjä</string>
+    <string name="function_name">Funktion nimi</string>
+    <string name="add_at_least_one_input">Lisää vähintään yksi syöte</string>
+    <string name="output">Tuloste</string>
+    <string name="data_source">Tietolähde</string>
+    <string name="lua_script">Lua-skripti</string>
+    <string name="data_source_description">Tietolähdesolmulla voit valita syötteenä käytettävän seurannan tai funktion.</string>
+    <string name="lua_script_input_hint">Kirjoita Lua-skripti…</string>
+    <string name="select_node_type">Valitse solmun tyyppi</string>
+    <string name="file">Tiedosto</string>
+    <string name="lua_feature_names_not_unique">Skriptin syötteillä on oltava yksilölliset nimet</string>
+    <string name="graph_stat_type_lua_graph">Lua-skripti</string>
+    <string name="launch_lua_disabled">Laukaise Lua käytöstä</string>
+    <string name="no_lua">Ei Luaa</string>
+    <string name="lua_engine_disabled">Lua-moottori ei ole käytössä</string>
+    <string name="lua_graph_first_time_user_title">Lua-skriptikaaviot ja -tilastot</string>
+    <string name="lua_graph_first_time_user_message">Lua-skriptit ovat edistyksellinen ominaisuus, jolla voit luoda mukautettuja kaavioita ja tilastoja Lua-ohjelmointikielellä. \n\nVoit ladata oman skriptisi tai valita skriptin GitHub-kokoelmasta. GitHubista asennetun skriptin jälkeen palaat sovellukseen, jossa skripti on valmis käytettäväksi.</string>
+    <string name="functions_first_time_user_title">Tervetuloa funktioihin</string>
+    <string name="functions_first_time_user_message">Funktiot ovat edistyksellinen ominaisuus, jolla voit yhdistää, koostaa ja muuntaa tietojasi uusiksi johdetuiksi tietolähteiksi.</string>
+    <string name="learn_more">Lue lisää täältä</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Liitä</string>
+    <string name="failed_to_download_file">Tiedoston lataaminen epäonnistui: %s</string>
+    <string name="confirm_deep_link">Olet saanut skriptilinkin tuntemattomasta lähteestä. Asenna skriptejä vain luotettavista lähteistä. Haluatko asentaa tämän skriptin?</string>
+    <string name="graph_stat_info_button_description">Kaavioiden ja tilastojen opetusohjelmat</string>
+    <string name="network_generic_error">Verkon käytössä tapahtui virhe. Tarkista yhteytesi ja yritä uudelleen.</string>
+    <string name="function_verification_failure">Funktion allekirjoitusten vahvistaminen epäonnistui. Varmista suojattu yhteys ja että Track &amp; Graph on ajan tasalla</string>
+    <string name="function_network_failure">Funktioiden lataaminen epäonnistui. Varmista, että olet yhteydessä internetiin. Jos ongelma jatkuu, varmista, että sovellus on ajan tasalla.</string>
+    <string name="functions_landscape_hint">Vinkki: Funktiot toimivat parhaiten vaakanäkymässä</string>
+    <string name="functions_start_hint">Aloita tästä: paina pitkään ja valitse Tietolähde</string>
+    <string name="see_whats_new">Katso uudet ominaisuudet</string>
+</resources>

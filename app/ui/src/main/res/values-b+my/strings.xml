@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">ထည့်ရန်</string>
+    <string name="add_a_note">မှတ်စု ထည့်ရန်</string>
+    <string name="cancel">ပယ်ဖျက်ရန်</string>
+    <string name="continue_word">ဆက်ရန်</string>
+    <string name="create">ဖန်တီးရန်</string>
+    <string name="label">အညွှန်း</string>
+    <string name="release_notes_support_text">သင့်ပံ့ပိုးမှုက Track &amp; Graph ကို ဆက်လက်တိုးတက်စေပါသည် 🌱</string>
+    <string name="release_notes_maybe_later">နောက်မှ</string>
+    <string name="release_notes_support_development">ဖွံ့ဖြိုးတိုးတက်မှုကို ပံ့ပိုးရန် လှူဒါန်းပါ</string>
+    <string name="release_notes_thank_you">ကျေးဇူးတင်ပါသည်! ❤️\n\nပံ့ပိုးမှုတိုင်းသည် Track &amp; Graph ကို လူတိုင်းအတွက် ပိုကောင်းစေရန် အသုံးဝင်ပါသည် 🌱</string>
+    <string name="support_close">ပိတ်ရန်</string>
+    <string name="search">ရှာရန်</string>
+    <string name="update">အပ်ဒိတ်လုပ်ရန်</string>
+    <string name="value">တန်ဖိုး</string>
+</resources>

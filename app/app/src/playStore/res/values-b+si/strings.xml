@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">සංවර්ධකයාට සහාය වන්න</string>
+    <string name="support_unavailable">දැනට සහාය විකල්ප නොමැත.</string>
+    <string name="support_payment_failed">ගෙවීම අසාර්ථකයි. නැවත උත්සාහ කරන්න.</string>
+    <string name="support_payment_pending">ගෙවීම පොරොත්තුවෙන් පවතී. ගෙවීම තහවුරු වූ පසු Google Play එය සම්පූර්ණ කරනු ඇත.</string>
+</resources>

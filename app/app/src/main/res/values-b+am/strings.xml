@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">መነሻ</string>
+    <string name="add_group">ቡድን አክል፦ </string>
+    <string name="edit_group">ቡድን አርትዕ፦ </string>
+    <string name="group">ቡድን</string>
+    <string name="tracker">መከታተያ</string>
+    <string name="function">ፋንክሽን</string>
+    <string name="graph_or_stat">ግራፍ ወይም ስታቲስቲክ</string>
+    <string name="symlink">Symlink</string>
+    <string name="symlinks">Symlinks</string>
+    <string name="reminder">አስታዋሽ</string>
+    <string name="add_component">ክፍል አክል</string>
+    <string name="symlink_locations_title">የ\"%1$s\" ቦታዎች</string>
+    <string name="add_tracker">የሆነ ነገር ይከታተሉ፦</string>
+    <string name="add">አክል</string>
+    <string name="group_name">ለምሳሌ፦ የዕለት ተግባራት</string>
+    <string name="delete">ሰርዝ</string>
+    <string name="edit">አርትዕ</string>
+    <string name="update">አዘምን</string>
+    <string name="graph_or_stat_name">የግራፍ ስም፦ </string>
+    <string name="tracker_name">የመከታተያ ስም</string>
+    <string name="this_is_a_time_or_duration">ይህ ጊዜ ወይም የጊዜ ቆይታ ነው</string>
+    <string name="yes">አዎ</string>
+    <string name="cancel">ሰርዝ</string>
+    <string name="select_file">ፋይል ይምረጡ</string>
+    <string name="empty_group_hint">ወደ Track &amp; Graph እንኳን በደህና መጡ!\n\n ለመጀመር ከላይ በቀኝ ያለውን + ይንኩ እና መከታተያን ይምረጡ።</string>
+    <string name="no_trackers_graph_stats_hint">ማንኛውንም ግራፍ ከመፍጠርዎ በፊት መከታተያ ይፍጠሩ።</string>
+    <string name="no_trackers_functions_hint">ማንኛውንም ፋንክሽን ከመፍጠርዎ በፊት መከታተያ ይፍጠሩ።</string>
+    <string name="ru_sure_del_group">ይህን ቡድንና በውስጡ ያለውን ሁሉ መሰረዝ እንደሚፈልጉ እርግጠኛ ነዎት? ይህን መቀልበስ አይችሉም።</string>
+    <string name="ru_sure_del_graph">ይህን ግራፍ መሰረዝ እንደሚፈልጉ እርግጠኛ ነዎት? ይህን መቀልበስ አይችሉም። የተከታተሉት ውሂብ አይጠፋም።</string>
+    <string name="ru_sure_del_feature">ይህን የተከታተለ ውሂብ መሰረዝ እንደሚፈልጉ እርግጠኛ ነዎት?</string>
+    <string name="item_in_multiple_groups">ይህ ንጥል በብዙ ቦታዎች አለ። ከዚህ ማስወገድ ወይም በሁሉም ቦታ መሰረዝ ይችላሉ።</string>
+    <string name="remove_from_this_group">ከዚህ አስወግድ</string>
+    <string name="delete_everywhere">በሁሉም ቦታ ሰርዝ</string>
+    <string name="ru_sure_del_function">ይህን ፋንክሽን መሰረዝ እንደሚፈልጉ እርግጠኛ ነዎት? ይህን መቀልበስ አይችሉም።</string>
+    <string name="ru_sure_del_reminder">ይህን አስታዋሽ መሰረዝ እንደሚፈልጉ እርግጠኛ ነዎት? ይህን መቀልበስ አይችሉም።</string>
+    <string name="ru_sure_del_data_point">ይህን የውሂብ ነጥብ መሰረዝ እንደሚፈልጉ እርግጠኛ ነዎት?</string>
+    <string name="feature_name_cannot_be_null">እባክዎ ስም ያክሉ</string>
+    <string name="tracker_with_that_name_exists">በዚያ ስም የሆነ ነገር አስቀድመው እየተከታተሉ ነው</string>
+    <string name="data_points">%1$d የውሂብ ነጥቦች</string>
+    <string name="items_selected">%1$d ተመርጠዋል</string>
+    <string name="select_all">ሁሉንም ምረጥ</string>
+    <string name="deselect_all">ሁሉንም ከምርጫ አስወግድ</string>
+    <string name="ru_sure_del_data_points">እነዚህን የውሂብ ነጥቦች መሰረዝ እንደሚፈልጉ እርግጠኛ ነዎት?</string>
+    <string name="delete_selected_content_description">የተመረጡ ንጥሎችን ሰርዝ</string>
+    <string name="copy_selected_content_description">የተመረጡ ንጥሎችን ቅዳ</string>
+    <string name="move_selected_content_description">የተመረጡ ንጥሎችን አንቀሳቅስ</string>
+    <string name="copy_to">ወደ ቅዳ</string>
+    <string name="no_data">ምንም ውሂብ የለም</string>
+    <string name="skip">ዝለል</string>
+    <string name="exportButton">ላክ</string>
+    <string name="importButton">አስመጣ</string>
+    <string name="import_export">አስመጣ/ላክ</string>
+    <string name="search">ፈልግ</string>
+    <string name="type_to_search">ለመፈለግ ይተይቡ</string>
+    <string name="no_results">ምንም ውጤት የለም</string>
+    <string name="export_to">በዚህ ቡድን ውስጥ የተከታተለውን ውሂብ ወደ CSV ላክ፦</string>
+    <string name="export_error_message">መላክ አልተሳካም፦ %1$s</string>
+    <string name="import_from">የተከታተለውን ውሂብ ከ CSV ወደዚህ ቡድን አስመጣ፦</string>
+    <string name="import_warning">ማስጠንቀቂያ፦ ማስመጣት መቀልበስ አይችልም። Track &amp; Graph የመጣውን ውሂብ በስም መሠረት አሁን ካለው የዚህ ቡድን ውሂብ ጋር ለማዋሃድ ይሞክራል።</string>
+    <string name="add_a_graph_or_stat">ግራፍ ወይም ስታቲስቲክ አክል</string>
+    <string name="graph_type_label">የግራፍ ዓይነት፦</string>
+    <string name="sample_size">የናሙና መጠን፦</string>
+    <string name="select_a_discrete_feature">መለያዎች ያሉትን የውሂብ ስብስብ ይምረጡ፦ </string>
+    <string name="no_labels">ይህ የውሂብ ስብስብ መለያዎች የሉትም</string>
+    <string name="select_a_feature">የውሂብ ስብስብ ይምረጡ፦</string>
+    <string name="select_a_tracker">መከታተያ ይምረጡ</string>
+    <string name="offset">ማካካሻ፦</string>
+    <string name="scale">ሚዛን፦</string>
+    <string name="from">ከ፦</string>
+    <string name="to">እስከ፦</string>
+    <string name="day">ቀን</string>
+    <string-array name="time_histogram_windows">
+        <item>በየሰዓቱ</item>
+        <item>በየቀኑ</item>
+        <item>በየሳምንቱ</item>
+        <item>በየወሩ</item>
+        <item>በየሩብ ዓመቱ</item>
+        <item>በየሁለት ዓመቱ</item>
+        <item>በየዓመቱ</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>ባትሪ ቆጣቢ</item>
+        <item>ብርሃን</item>
+        <item>ጨለማ</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>የስርዓቱ ነባሪ</item>
+        <item>ብርሃን</item>
+        <item>ጨለማ</item>
+    </string-array>
+    <string name="graph_type_line_graph">የመስመር ግራፍ</string>
+    <string name="graph_type_pie_chart">የክብ ግራፍ</string>
+    <string name="graph_type_average_time_between">መካከለኛ ጊዜ በመካከል</string>
+    <string name="graph_type_time_since">ከዚያ ጀምሮ ያለው ጊዜ</string>
+    <string name="graph_type_time_histogram">የጊዜ ሂስቶግራም</string>
+    <string name="graph_type_last_value">የመጨረሻ ክትትል/ከዚያ ጀምሮ ያለው ጊዜ</string>
+    <string name="graph_type_bar_chart">የአሞሌ ግራፍ</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>አማካይ የለም</item>
+        <item>ዕለታዊ ተንቀሳቃሽ አማካይ</item>
+        <item>የሦስት ቀን ተንቀሳቃሽ አማካይ</item>
+        <item>ሳምንታዊ ተንቀሳቃሽ አማካይ</item>
+        <item>ወርሃዊ ተንቀሳቃሽ አማካይ</item>
+        <item>የሦስት ወር ተንቀሳቃሽ አማካይ</item>
+        <item>የስድስት ወር ተንቀሳቃሽ አማካይ</item>
+        <item>ዓመታዊ ተንቀሳቃሽ አማካይ</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>ሲከታተል አሳይ</item>
+        <item>የሰዓት ድምሮችን አሳይ</item>
+        <item>የቀን ድምሮችን አሳይ</item>
+        <item>የሳምንት ድምሮችን አሳይ</item>
+        <item>የወር ድምሮችን አሳይ</item>
+        <item>የዓመት ድምሮችን አሳይ</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">ሁሉም ውሂብ</string>
+    <string name="graph_time_durations_a_day">አንድ ቀን</string>
+    <string name="graph_time_durations_a_week">አንድ ሳምንት</string>
+    <string name="graph_time_durations_a_month">አንድ ወር</string>
+    <string name="graph_time_durations_three_months">ሦስት ወራት</string>
+    <string name="graph_time_durations_six_months">ስድስት ወራት</string>
+    <string name="graph_time_durations_a_year">አንድ ዓመት</string>
+    <string name="custom">ብጁ</string>
+    <string-array name="y_range_styles">
+        <item>ተለዋዋጭ</item>
+        <item>ቋሚ</item>
+    </string-array>
+    <string name="ending_at_latest">የመጨረሻ የውሂብ ነጥብ</string>
+    <string name="ending_at_now">አሁን</string>
+    <string name="ending_at_custom_date">ብጁ ቀን…</string>
+    <string name="hours_and_minutes_ago">%1$d ሰ %2$d ደቂቃ በፊት</string>
+    <string name="import_exception_unknown">ማስመጣት አልተሳካም፦ ያልታወቀ ስህተት ተከስቷል</string>
+    <string name="import_exception_bad_headers">ማስመጣት አልተሳካም፦ ራስጌዎቹ ከሚጠበቁት ራስጌዎች ጋር አልተዛመዱም፦ %1$s</string>
+    <string name="import_exception_inconsistent_record">ማስመጣት አልተሳካም፦ በመስመር %1$s ላይ ያለው መዝገብ ከሚያስፈልጉት ራስጌዎች ጋር አይጣጣምም</string>
+    <string name="import_exception_bad_timestamp">ማስመጣት አልተሳካም፦ በመስመር %1$s ላይ ላለው መዝገብ የጊዜ ማህተሙን መተርጎም አልተቻለም</string>
+    <string name="import_exception_inconsistent_data_type">ማስመጣት አልተሳካም፦ በመስመር %1$s ላይ የማይጣጣም የውሂብ ዓይነት ተቀብለናል</string>
+    <string name="unknown_error_occurred">ያልታወቀ ስህተት ተከስቷል</string>
+    <string name="graph_stat_validation_no_name">እባክዎ ስም ያቅርቡ</string>
+    <string name="graph_stat_validation_no_line_graph_features">እባክዎ ወደ ግራፉ አንድ ነገር ያክሉ</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">እባክዎ \"ከ\" ከ\"እስከ\" ያነሰ ወይም እኩል መሆኑን ያረጋግጡ</string>
+    <string name="graph_stat_validation_unrecognised_color">እባክዎ ሁሉም የውሂብ ስብስቦች ቀለም እንዳላቸው ያረጋግጡ</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">ልክ ያልሆነ የመስመር ግራፍ የውሂብ ስብስብ ተገኝቷል</string>
+    <string name="graph_stat_validation_bad_fixed_range">እባክዎ \"ከ\" ከ\"እስከ\" ያነሰ መሆኑን ያረጋግጡ</string>
+    <string name="graph_stat_view_not_found">ይህን ግራፍ በማግኘት ላይ ስህተት ተከስቷል</string>
+    <string name="graph_stat_view_not_enough_data_stat">ይህ ስታቲስቲክ ለመፍጠር በቂ ውሂብ እስኪከታተል ድረስ ይታያል።</string>
+    <string name="graph_stat_view_not_enough_data_graph">ይህ ግራፍ ለመፍጠር በቂ ውሂብ እስኪከታተል ድረስ ይታያል።</string>
+    <string name="pie_chart_mixed_signs_error">ይህ የክብ ግራፍ ሊሳል አይችልም፤ አዎንታዊና አሉታዊ የክፍል መጠኖችን ይዟል።</string>
+    <string name="histogram_mixed_signs_error">ይህ ሂስቶግራም ሊሳል አይችልም፤ አዎንታዊና አሉታዊ የቢን መጠኖችን ይዟል።</string>
+    <string name="graph_non_finite_data_error">ይህ ግራፍ ሊሳል አይችልም፤ የተወሰነ ዋጋ ውሱን ቁጥር አይደለም።</string>
+    <string name="graph_inconsistent_series_error">ይህ ግራፍ ሊሳል አይችልም፤ የውሂብ ተከታታዮቹ መጠን አይጣጣምም።</string>
+    <string name="graph_invalid_y_range_error">ይህ ግራፍ ሊሳል አይችልም፤ የY-ዘንግ ክልሉ ልክ አይደለም።</string>
+    <string name="finish">ጨርስ</string>
+    <string name="about_description">Track &amp; Graph በGPL 3.0 ፈቃድ ስር ያለ ነፃ እና ክፍት ምንጭ ሶፍትዌር ነው።</string>
+    <string name="about_libraries_message">የሚከተሉት ክፍት ምንጭ ቤተ-መጻሕፍት ጥቅም ላይ ውለዋል፦</string>
+    <string name="about">ስለ</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">ተደጋጋሚ ጥያቄዎች</string>
+    <string name="tutorial_text_1">ውሂብዎን ለመከታተል መከታተያዎችን ይጠቀሙ።</string>
+    <string name="tutorial_text_2">ውሂብን ለማሳየት ግራፎችን እና ስታቲስቲክስን ይጠቀሙ።</string>
+    <string name="tutorial_text_3">መከታተያዎችዎን፣ ግራፎችዎን እና ስታቲስቲክስዎን ለማደራጀት ቡድኖችን ይጠቀሙ።</string>
+    <string name="got_it">ገባኝ!</string>
+    <string name="move_to_colon">ወደ አንቀሳቅስ፦</string>
+    <string name="move_to">ወደ አንቀሳቅስ</string>
+    <string name="ru_sure_update_data">ይህ ዝማኔ አስቀድመው የተከታተሉትን ውሂብ በማይቀለበስ ሁኔታ ሊቀይረው ይችላል። ከመቀጠልዎ በፊት ነባሩን ውሂብ ምትኬ እንዲያደርጉ በጣም ይመከራል።\n\n መቀጠል ይፈልጋሉ?</string>
+    <string name="ok">እሺ</string>
+    <string name="rate_the_app">መተግበሪያውን ይገምግሙ</string>
+    <string name="reminders">አስታዋሾች</string>
+    <string name="no_reminders_hint">አዲስ የክትትል አስታዋሽ ማሳወቂያ ለመፍጠር + አዶውን ይንኩ።</string>
+    <string name="mon">ሰኞ</string>
+    <string name="tue">ማክ</string>
+    <string name="wed">ረቡ</string>
+    <string name="thu">ሐሙ</string>
+    <string name="fri">ዓርብ</string>
+    <string name="sat">ቅዳ</string>
+    <string name="sun">እሑድ</string>
+    <string name="reminders_notifications_channel_name">አስታዋሾች</string>
+    <string name="reminders_notifications_channel_description">መቼ እንደሚከታተሉ ለማስታወስ ተጠቃሚው የፈጠራቸው ማሳወቂያዎች</string>
+    <string name="default_reminder_name">ለመከታተል ጊዜው ነው!</string>
+    <string name="missed_reminder_single_content">ከ%1$s የመጣ አስታዋሽ</string>
+    <string name="missed_reminders_multiple_content">%1$d አስታዋሾችን አምልጠዋል</string>
+    <string name="next_reminder_format">ቀጣዩ አስታዋሽ፦ %1$s</string>
+    <string name="no_upcoming_reminders">በቅርቡ የሚመጣ አስታዋሽ የለም</string>
+    <string name="select_reminder_type">የአስታዋሽ አይነት ይምረጡ</string>
+    <string name="week_day_reminder">የሳምንቱ ቀን አስታዋሽ</string>
+    <string name="week_day_reminder_description">እንደ ሰኞ፣ ረቡዕ እና ዓርብ ያሉ የተወሰኑ ቀናት</string>
+    <string name="periodic_reminder">የወቅታዊ አስታዋሽ</string>
+    <string name="periodic_reminder_description">እንደ በየ3 ቀናት ያሉ መደበኛ ክፍተቶች</string>
+    <string name="month_day_reminder">የወሩ ቀን አስታዋሽ</string>
+    <string name="month_day_reminder_description">እንደ የመጀመሪያው ሰኞ ያሉ ወርሃዊ ቅጦች</string>
+    <string name="time_since_last_reminder">ከመጨረሻው አስታዋሽ ጀምሮ ያለው ጊዜ</string>
+    <string name="time_since_last_reminder_description">ለተወሰነ ጊዜ ምንም ነገር ካልተከታተሉ</string>
+    <string name="one_time_reminder">የአንድ ጊዜ አስታዋሽ</string>
+    <string name="one_time_reminder_description">በተወሰነ ጊዜ ወይም ከመዘግየት በኋላ የሚሰጥ ነጠላ አስታዋሽ</string>
+    <string name="reminder_name">የአስታዋሽ ስም</string>
+    <string name="reminder_disabled">አስታዋሹ ተሰናክሏል</string>
+    <string name="repeat_every">በየ</string>
+    <string name="at_time">በሰዓት</string>
+    <string name="at_a_specific_time">በተወሰነ ሰዓት</string>
+    <string name="ending_at">የሚያበቃው በ</string>
+    <string name="starting_from">የሚጀምረው ከ</string>
+    <string name="repeat_on_week_days">በሳምንቱ ቀናት ይደገም</string>
+    <string name="track_feature">ባህሪ ይከታተሉ</string>
+    <string name="select_tracker_placeholder">መከታተያ ይምረጡ</string>
+    <string name="remind_after">ከዚህ በኋላ አስታውስ</string>
+    <string name="then_remind_every">ከዚያ በየ</string>
+    <string name="remind_at_date_and_time">በቀን እና ሰዓት</string>
+    <string name="remind_after_a_delay">ከመዘግየት በኋላ</string>
+    <string name="first_reminder">የመጀመሪያ አስታዋሽ</string>
+    <string name="every_colon">በየ፦</string>
+    <string name="ended_at_format">ያበቃው በ፦ %1$s</string>
+    <string name="starting_at_format">የሚጀምረው በ፦ %1$s</string>
+    <string name="occurrence_first">የመጀመሪያ</string>
+    <string name="occurrence_second">ሁለተኛ</string>
+    <string name="occurrence_third">ሦስተኛ</string>
+    <string name="occurrence_fourth">አራተኛ</string>
+    <string name="occurrence_last">የመጨረሻ</string>
+    <string name="monday">ሰኞ</string>
+    <string name="tuesday">ማክሰኞ</string>
+    <string name="wednesday">ረቡዕ</string>
+    <string name="thursday">ሐሙስ</string>
+    <string name="friday">ዓርብ</string>
+    <string name="saturday">ቅዳሜ</string>
+    <string name="sunday">እሑድ</string>
+    <string-array name="abbreviated_months">
+        <item>ጃን</item>
+        <item>ፌብ</item>
+        <item>ማር</item>
+        <item>ኤፕ</item>
+        <item>ሜይ</item>
+        <item>ጁን</item>
+        <item>ጁላ</item>
+        <item>ኦገስ</item>
+        <item>ሴፕ</item>
+        <item>ኦክቶ</item>
+        <item>ኖቬ</item>
+        <item>ዲሴ</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>ሰኞ</item>
+        <item>ማክ</item>
+        <item>ረቡ</item>
+        <item>ሐሙ</item>
+        <item>ዓርብ</item>
+        <item>ቅዳ</item>
+        <item>እሑድ</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">የክልል ዘይቤ፦</string>
+    <string name="track_widget_configure_no_data_error">መጀመሪያ አንዳንድ ውሂብ ይከታተሉ።</string>
+    <string name="track_widget_configure_no_data_selected_error">የክትትል ዊጅት ለመፍጠር ትክክለኛ የውሂብ ስብስብ መምረጥ አለብዎት።</string>
+    <string name="create">ፍጠር</string>
+    <string name="use_default_value">ነባሪ ዋጋ ያዘጋጁ</string>
+    <string name="backup_and_restore">ምትኬ እና መልሶ ማግኛ</string>
+    <string name="backup_hint_text">ምትኬ ሁሉንም የመተግበሪያዎን ውሂብ፣ የተከታተሉትን ውሂብ፣ ግራፎችን እና አስታዋሾችን ያስቀምጣል። መሣሪያዎ ቢጠፋ ወይም ቢበላሽ ውሂብዎን በየጊዜው ወደ ውጫዊ መሣሪያ ወይም የደመና ማከማቻ ምትኬ ያድርጉ።</string>
+    <string name="restore_data">ውሂብ መልስ</string>
+    <string name="backup_successful">ምትኬ ተሳክቷል!</string>
+    <string name="backup_error_could_not_write_to_file">የተመረጠውን ፋይል ማግኘት ወይም መጻፍ አልተቻለም።</string>
+    <string name="backup_error_could_not_find_database_file">የውሂብ ጎታ ፋይሉን ማግኘት ወይም ማንበብ አልተቻለም።</string>
+    <string name="backup_error_failed_to_copy_database">የውሂብ ጎታ ፋይሉን በመቅዳት ላይ ስህተት ተከስቷል።</string>
+    <string name="restore_failed">መልሶ ማግኘት አልተሳካም። %1$s</string>
+    <string name="add_a_longer_description_optional">ረዘም ያለ መግለጫ ያክሉ (አማራጭ)</string>
+    <string name="no_data_points_history_fragment_hint">አንዳንድ የውሂብ ነጥቦች ሲኖሩዎት ታሪክዎ እዚህ ይታያል።</string>
+    <string name="data_resolution_error">ይህን ውሂብ ለመፍታት ሲሞከር ስህተት ተከስቷል፦\n\n%1$s</string>
+    <string name="info">መረጃ</string>
+    <string name="no_description">መግለጫ የለም</string>
+    <string name="description">መግለጫ</string>
+    <string name="app_lock_title">የመተግበሪያ መቆለፊያ</string>
+    <string name="app_lock_locked_title">Track &amp; Graph ተቆልፏል</string>
+    <string name="app_lock_password_label">የይለፍ ቃል</string>
+    <string name="app_lock_confirm_password_label">የይለፍ ቃል ያረጋግጡ</string>
+    <string name="app_lock_unlock">ክፈት</string>
+    <string name="app_lock_use_biometrics">ባዮሜትሪክስን ተጠቀም</string>
+    <string name="app_lock_enable">የመተግበሪያ መቆለፊያን አንቃ</string>
+    <string name="app_lock_enabled">የመተግበሪያ መቆለፊያ ነቅቷል</string>
+    <string name="app_lock_enable_biometric_unlock">በባዮሜትሪክ መክፈቻን አንቃ</string>
+    <string name="app_lock_no_strong_biometric_available">በዚህ መሣሪያ ላይ ጠንካራ ባዮሜትሪክ መክፈቻ አይገኝም።</string>
+    <string name="app_lock_lock_after_background_minutes">ከጀርባ ከቆየ በኋላ የሚቆለፍበት ደቂቃ</string>
+    <string name="app_lock_lock_after_background_minutes_hint">መተግበሪያው ከፊት ገጽ እንደወጣ ለመቆለፍ 0 ይጠቀሙ።</string>
+    <string name="app_lock_change_password">የይለፍ ቃል ቀይር</string>
+    <string name="app_lock_password_changed">የይለፍ ቃል ተቀይሯል</string>
+    <string name="app_lock_disable">የመተግበሪያ መቆለፊያን አሰናክል</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph ይክፈቱ</string>
+    <string name="app_lock_unlock_biometric_subtitle">ለመቀጠል የመሣሪያዎን ባዮሜትሪክስ ይጠቀሙ</string>
+    <string name="app_lock_use_password">የይለፍ ቃል ተጠቀም</string>
+    <string name="app_lock_biometric_not_recognized">ባዮሜትሪክ ማረጋገጫ አልታወቀም።</string>
+    <string name="app_lock_error_missing_password">የመተግበሪያ መቆለፊያ የይለፍ ቃሉ የለውም። የመተግበሪያ መቆለፊያን አሰናክለው እንደገና ያንቁ።</string>
+    <string name="app_lock_error_incorrect_password">የተሳሳተ የይለፍ ቃል</string>
+    <string name="app_lock_error_password_hashing_unavailable">የመተግበሪያ መቆለፊያ የይለፍ ቃል ማረጋገጫ በዚህ መሣሪያ ላይ አይገኝም።</string>
+    <string name="app_lock_error_enter_password">የይለፍ ቃል ያስገቡ።</string>
+    <string name="app_lock_error_passwords_do_not_match">የይለፍ ቃሎቹ አይዛመዱም።</string>
+    <string name="note_input_hint">ማስታወሻዎች…</string>
+    <string name="add_a_note">ማስታወሻ ያክሉ</string>
+    <string name="notes">ማስታወሻዎች</string>
+    <string name="show_global_notes">አጠቃላይ</string>
+    <string name="show_data_point_notes">የውሂብ ነጥቦች</string>
+    <string name="delete_reminder_content_description">አስታዋሽ ሰርዝ</string>
+    <string name="theme_colon">ገጽታ፦</string>
+    <string name="date_format_colon">የቀን ቅርጸት፦</string>
+    <string name="add_data_point_button_content_description">የውሂብ ነጥብ ማከያ ቁልፍ</string>
+    <string name="tracked_data_menu_button_content_description">የተከታተለ ውሂብ ምናሌ ቁልፍ</string>
+    <string name="tracked_data_history_button_content_description">የተከታተለ ውሂብ ታሪክ ቁልፍ</string>
+    <string name="delete_line_button_content_description">መስመር ሰርዝ ቁልፍ</string>
+    <string name="delete_input_button_content_description">ግቤት ሰርዝ ቁልፍ</string>
+    <string name="delete_data_point_button_content_description">የውሂብ ነጥብ ሰርዝ ቁልፍ</string>
+    <string name="edit_data_point_button_content_description">የውሂብ ነጥብ አርትዕ ቁልፍ</string>
+    <string name="add_multiple_choice_answer_button_content_description">ባለብዙ ምርጫ መልስ ማከያ ቁልፍ</string>
+    <string name="ending_at_colon">ናሙናው የሚያበቃው በ፦</string>
+    <string name="duplicate">አባዛ</string>
+    <string name="no_notes_hint_text">በክትትል ጊዜ የታከሉ ማስታወሻዎች እዚህ ይታያሉ። እንዲሁም + ቁልፍን በመጠቀም አጠቃላይ ማስታወሻዎችን ማከል ይችላሉ።</string>
+    <string name="add_a_global_note">አጠቃላይ ማስታወሻ ያክሉ፦</string>
+    <string name="duration">የጊዜ ቆይታ</string>
+    <string name="weeks">ሳምንታት</string>
+    <string name="months">ወራት</string>
+    <string name="days">ቀናት</string>
+    <string name="hours">ሰዓታት</string>
+    <string name="minutes">ደቂቃዎች</string>
+    <string name="seconds">ሰከንዶች</string>
+    <string name="hours_suffix">ሰ</string>
+    <string name="minutes_suffix">ደ</string>
+    <string name="seconds_suffix">ሴ</string>
+    <string name="numeric_to_duration_mode_header">ቀደም ሲል የተከታተሉ እሴቶች የሚወክሉት፦</string>
+    <string name="duration_to_numeric_mode_header">ቀደም ሲል የተከታተሉ እሴቶች ወደ ምን መቀየር አለባቸው፦</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">የጊዜ ቆይታዎችን ከሌሎች የውሂብ ዓይነቶች ጋር ማደባለቅ አይችሉም። ሰዓታትን፣ ደቂቃዎችን ወይም ሰከንዶችን በግራፍ ላይ ማሳየት ያስቡበት</string>
+    <string name="sum_by_count_checkbox_label">ከእሴቶቻቸው ድምር ይልቅ የተከታተሉ የውሂብ ነጥቦችን ብዛት ለመቁጠር እዚህ ላይ ምልክት ያድርጉ።</string>
+    <string name="time_window_size">የጊዜ መስኮት መጠን፦</string>
+    <string name="hold_to_preview">ለቅድመ እይታ ተጭነው ይያዙ</string>
+    <string name="open">ክፈት</string>
+    <string name="close">ዝጋ</string>
+    <string name="filter_by_label">በመለያ አጣራ</string>
+    <string name="filter_by_value">በእሴት ክልል አጣራ</string>
+    <string name="save_changes">ለውጦችን አስቀምጥ</string>
+    <string name="timer_notification_channel_name">ቆጣሪዎች</string>
+    <string name="stop">አቁም</string>
+    <string name="name_your_function">ፋንክሽኑን ይሰይሙ፦ </string>
+    <string name="add_some_data_sources">የውሂብ ምንጮችን ያክሉ</string>
+    <string name="value">እሴት</string>
+    <string name="label">መለያ</string>
+    <string name="continue_word">ቀጥል</string>
+    <string name="update_all_data_points">ሁሉንም የውሂብ ነጥቦች አዘምን፦ </string>
+    <string name="where_colon">የት፦</string>
+    <string name="to_colon">እስከ፦</string>
+    <string name="value_equals">እሴት =</string>
+    <string name="label_equals">መለያ =</string>
+    <string name="adding_your_first_data_point">የውሂብ ነጥቦችን ስለመጨመር አጭር መመሪያ፦</string>
+    <string name="next">ቀጣይ</string>
+    <string name="each_data_point_has_a_timestamp_and_value">እያንዳንዱ የውሂብ ነጥብ የጊዜ ማህተም እና እሴት አለው፦ </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">እንዲሁም እንደ አማራጭ መለያ እና ማስታወሻ ሊኖረው ይችላል፦ </string>
+    <string name="data_point_tutorial_page_2_description">ዋጋው ቁጥር ስለሆነ ውሂብዎ በጊዜ ሂደት እንዴት እየተለወጠ እንደሆነ ማየት ይችላሉ</string>
+    <string name="data_point_tutorial_page_2_hint">(ምክር፦ ስለ እሴቱ ግድ ከሌለዎት ነባሪውን እሴት 1 ብቻ ይጠቀሙ)</string>
+    <string name="data_point_tutorial_page_3_description">የውሂብ ነጥቦቹን መቧደን ከፈለጉ መለያዎችን ይጠቀሙ</string>
+    <string name="data_point_tutorial_page_3_hint">(ምክር፦ ተጨማሪ አውድ ወይም መግለጫ ማከል ከፈለጉ ከመለያ መስኩ ይልቅ ማስታወሻውን ይጠቀሙ)</string>
+    <string name="help">እገዛ</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">የላቁ አማራጮች</string>
+    <string name="type_colon">\"ዓይነት፦ \"</string>
+    <string name="order_colon">\"ቅደም ተከተል፦ \"</string>
+    <string name="value_and_label">እሴት እና መለያ</string>
+    <string name="value_only">እሴት ብቻ</string>
+    <string name="label_only">መለያ ብቻ</string>
+    <string name="none">ምንም</string>
+    <string name="value_ascending">እሴት ከትንሽ ወደ ትልቅ</string>
+    <string name="value_descending">እሴት ከትልቅ ወደ ትንሽ</string>
+    <string name="label_ascending">መለያ በሚወጣ ቅደም ተከተል</string>
+    <string name="label_descending">መለያ በሚወርድ ቅደም ተከተል</string>
+    <string name="latest">አዲሱ</string>
+    <string name="oldest">አሮጌው</string>
+    <string name="track_all">ሁሉንም ተከታተል</string>
+    <string name="more_details">ተጨማሪ ዝርዝሮች</string>
+    <string name="suggestions">ጥቆማዎች</string>
+    <string name="no_label">መለያ የለም</string>
+    <string name="confirm_cancel_notes_will_be_lost">መዝጋት እንደሚፈልጉ እርግጠኛ ነዎት? ሁሉም ማስታወሻዎች ይጠፋሉ።</string>
+    <string name="add_a_label">መለያ ያክሉ</string>
+    <string name="bar_interval">የባር ክፍተት፦</string>
+    <string name="y_range_max">የY ክልል ከፍተኛ</string>
+    <string name="total_formatted">ድምር፦ %s</string>
+    <string name="from_formatted">ከ፦ %s</string>
+    <string name="to_formatted">እስከ፦ %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s፦ %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d፦ %2$s (%3$s%%)</string>
+    <string name="seconds_generic">ሰከንድ(ዎች)</string>
+    <string name="minutes_generic">ደቂቃ(ዎች)</string>
+    <string name="hours_generic">ሰዓት(ዎች)</string>
+    <string name="days_generic">ቀን(ዎች)</string>
+    <string name="weeks_generic">ሳምንት(ዎች)</string>
+    <string name="months_generic">ወር(ዎች)</string>
+    <string name="years_generic">ዓመት(ዎች)</string>
+    <plurals name="seconds">
+        <item quantity="one">%d ሰከንድ</item>
+        <item quantity="other">%d ሰከንዶች</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d ደቂቃ</item>
+        <item quantity="other">%d ደቂቃዎች</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d ሰዓት</item>
+        <item quantity="other">%d ሰዓታት</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d ቀን</item>
+        <item quantity="other">%d ቀናት</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d ሳምንት</item>
+        <item quantity="other">%d ሳምንታት</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d ወር</item>
+        <item quantity="other">%d ወራት</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d ዓመት</item>
+        <item quantity="other">%d ዓመታት</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">በየደቂቃው</item>
+        <item quantity="other">በየ%d ደቂቃዎች</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">በየሰዓቱ</item>
+        <item quantity="other">በየ%d ሰዓታት</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">በየቀኑ</item>
+        <item quantity="other">በየ%d ቀናት</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">በየሳምንቱ</item>
+        <item quantity="other">በየ%d ሳምንታት</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">በየወሩ</item>
+        <item quantity="other">በየ%d ወራት</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">በየዓመቱ</item>
+        <item quantity="other">በየ%d ዓመታት</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">ከ1 ደቂቃ በኋላ</item>
+        <item quantity="other">ከ%d ደቂቃዎች በኋላ</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">ከ1 ሰዓት በኋላ</item>
+        <item quantity="other">ከ%d ሰዓታት በኋላ</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">ከ1 ቀን በኋላ</item>
+        <item quantity="other">ከ%d ቀናት በኋላ</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">ከ1 ሳምንት በኋላ</item>
+        <item quantity="other">ከ%d ሳምንታት በኋላ</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">ከ1 ወር በኋላ</item>
+        <item quantity="other">ከ%d ወራት በኋላ</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">ከ1 ዓመት በኋላ</item>
+        <item quantity="other">ከ%d ዓመታት በኋላ</item>
+    </plurals>
+    <string name="restore_hint_text">ማስጠንቀቂያ፦ ከምትኬ መመለስ በመተግበሪያው ውስጥ ያለውን ሁሉንም ውሂብ እና ቅንብር ያጠፋል። መጀመሪያ ውሂብዎን ምትኬ ያድርጉ!</string>
+    <string name="backup_now">አሁን ምትኬ አድርግ</string>
+    <string name="restore_error_could_not_write_to_database">መመለስ አልተሳካም! የውሂብ ጎታውን ማግኘት ወይም መጻፍ አልተቻለም።</string>
+    <string name="restore_error_could_not_read_from_database_file">መመለስ አልተሳካም! የተመረጠውን የውሂብ ጎታ ፋይል ማግኘት ወይም ማንበብ አልተቻለም።</string>
+    <string name="restore_error_failed_to_copy_database">መመለስ አልተሳካም! የውሂብ ጎታውን በሚመልሱበት ጊዜ ስህተት ተከስቷል።</string>
+    <string name="select_location">ቦታ ይምረጡ…</string>
+    <string name="restore_successful">መመለስ ተሳክቷል! Track &amp; Graph አሁን እንደገና መነሳት አለበት።</string>
+    <string name="restore_error_invalid_database_file">መመለስ አልተሳካም! የተመረጠው ፋይል ትክክለኛ ምትኬ አይመስልም።</string>
+    <string name="auto_backup">ራስ-ሰር ምትኬ</string>
+    <string name="apply">ተግብር</string>
+    <string name="backup_every">ምትኬ የሚደረገው በየ፦ </string>
+    <string name="next_backup_at">\"ቀጣዩ ምትኬ በ፦ \"</string>
+    <string name="backup_notification_channel_name">የራስ-ሰር ምትኬ ማሳወቂያዎች</string>
+    <string name="backup_notification_channel_description">ራስ-ሰር ምትኬ ሲደረግ እና ካልተሳካ ያሳውቅዎታል።</string>
+    <string name="backup_notification_title">ምትኬ በሂደት ላይ…</string>
+    <string name="backup_failed_notification_title">ራስ-ሰር ምትኬ አልተሳካም</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph የምትኬ ቦታዎን ማግኘት ወይም መድረስ አልቻለም።</string>
+    <string name="backup_failed_notification_could_not_copy">ውሂብዎን በምትኬ ላይ ሲያስቀምጡ ስህተት ተከስቷል። ምትኬዎ ሊበላሽ ወይም ሊሟላ አይችልም።</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">አዲስ ቦታ ይምረጡ</string>
+    <string name="backup_location">የምትኬ ቦታ</string>
+    <string name="enable_auto_backup">ራስ-ሰር ምትኬን አንቃ</string>
+    <string name="last_successful_backup">የመጨረሻው የተሳካ ምትኬ</string>
+    <string name="next_scheduled_backup">ቀጣዩ የታቀደ ምትኬ</string>
+    <string name="notification_permission_prompt">ራስ-ሰር ምትኬ በማንኛውም ምክንያት ካልተሳካ Track &amp; Graph እንዲያሳውቅዎት ማሳወቂያዎችን ማንቃት ይመከራል።</string>
+    <string name="lua_script_empty">እባክዎ Lua ስክሪፕት ያክሉ</string>
+    <string name="function_name_empty">የፋንክሽን ስም ባዶ ሊሆን አይችልም</string>
+    <string name="function_name">የፋንክሽን ስም</string>
+    <string name="add_at_least_one_input">እባክዎ ቢያንስ አንድ ግቤት ያክሉ</string>
+    <string name="output">ውጤት</string>
+    <string name="data_source">የውሂብ ምንጭ</string>
+    <string name="lua_script">Lua ስክሪፕት</string>
+    <string name="data_source_description">የውሂብ ምንጭ ኖድ እንደ ግቤት የሚጠቀሙበትን መከታተያ ወይም ፋንክሽን እንዲመርጡ ያስችልዎታል።</string>
+    <string name="lua_script_input_hint">Lua ስክሪፕት ያስገቡ…</string>
+    <string name="select_node_type">የኖድ አይነት ይምረጡ</string>
+    <string name="file">ፋይል</string>
+    <string name="lua_feature_names_not_unique">የስክሪፕት ግቤቶች ልዩ ስሞች ሊኖራቸው ይገባል</string>
+    <string name="graph_stat_type_lua_graph">Lua ስክሪፕት</string>
+    <string name="launch_lua_disabled">Lua ማስነሳት ተሰናክሏል</string>
+    <string name="no_lua">Lua የለም</string>
+    <string name="lua_engine_disabled">የLua ሞተር ተሰናክሏል</string>
+    <string name="lua_graph_first_time_user_title">የLua ስክሪፕት ግራፎች እና ስታቲስቲክስ</string>
+    <string name="lua_graph_first_time_user_message">Lua ስክሪፕቶች የLua ፕሮግራሚንግ ቋንቋን በመጠቀም ብጁ ግራፎች እና ስታቲስቲክስ እንዲፈጥሩ የሚያስችሉ የላቁ ባህሪያት ናቸው። \n\nየራስዎን መጫን ወይም ከGitHub ስብስብ አንዱን መምረጥ ይችላሉ። ከGitHub ስክሪፕት መጫን ስክሪፕቱ ለመጠቀም ዝግጁ ሆኖ ወደ መተግበሪያው ይመልስዎታል።</string>
+    <string name="functions_first_time_user_title">ወደ ፋንክሽኖች እንኳን በደህና መጡ</string>
+    <string name="functions_first_time_user_message">ፋንክሽኖች ውሂብዎን ወደ አዲስ የተዋጡ የውሂብ ምንጮች እንዲያጣምሩ፣ እንዲያጠቃልሉ እና እንዲቀይሩ የሚያስችሉ የላቁ ባህሪያት ናቸው።</string>
+    <string name="learn_more">እዚህ ተጨማሪ ይወቁ</string>
+    <string name="github">GitHub</string>
+    <string name="paste">ለጥፍ</string>
+    <string name="failed_to_download_file">ፋይሉን ማውረድ አልተሳካም፦ %s</string>
+    <string name="confirm_deep_link">ከማይታወቅ ምንጭ የስክሪፕት አገናኝ ደርሶዎታል። ስክሪፕቶችን የሚያምኗቸው ምንጮች ብቻ ይጫኑ። ይህን ስክሪፕት መጫን ይፈልጋሉ?</string>
+    <string name="graph_stat_info_button_description">የግራፍ እና ስታቲስቲክስ መማሪያዎች</string>
+    <string name="network_generic_error">አውታረ መረቡን ለመድረስ ሲሞክሩ ስህተት ተከስቷል። እባክዎ ግንኙነትዎን ያረጋግጡና እንደገና ይሞክሩ።</string>
+    <string name="function_verification_failure">የፋንክሽን ፊርማዎችን ማረጋገጥ አልተሳካም። እባክዎ ደህንነቱ የተጠበቀ ግንኙነት እንዳለዎት እና Track &amp; Graph የቅርብ ጊዜ ስሪት መሆኑን ያረጋግጡ</string>
+    <string name="function_network_failure">ፋንክሽኖችን መጫን አልተሳካም። እባክዎ ከኢንተርኔት ጋር መገናኘትዎን ያረጋግጡ። ችግሩ ከቀጠለ መተግበሪያው የቅርብ ጊዜ ስሪት መሆኑን ያረጋግጡ።</string>
+    <string name="functions_landscape_hint">ምክር፦ ፋንክሽኖች በአግድም አቀማመጥ በተሻለ ይሰራሉ</string>
+    <string name="functions_start_hint">ከዚህ ይጀምሩ፦ ረጅም ተጭነው የውሂብ ምንጭን ይምረጡ</string>
+    <string name="see_whats_new">አዲስ የሆነውን ይመልከቱ</string>
+</resources>

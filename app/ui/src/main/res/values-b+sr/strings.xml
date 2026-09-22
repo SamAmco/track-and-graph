@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Dodaj</string>
+    <string name="add_a_note">Dodaj belešku</string>
+    <string name="cancel">Otkaži</string>
+    <string name="continue_word">Nastavi</string>
+    <string name="create">Napravi</string>
+    <string name="label">Oznaka</string>
+    <string name="release_notes_support_text">Vaša podrška pomaže da Track &amp; Graph opstane i nastavi da raste 🌱</string>
+    <string name="release_notes_maybe_later">Možda kasnije</string>
+    <string name="release_notes_support_development">Doniraj za podršku razvoju</string>
+    <string name="release_notes_thank_you">Hvala! ❤️\n\nSvaka podrška doprinosi tome da Track &amp; Graph bude bolji za sve 🌱</string>
+    <string name="support_close">Zatvori</string>
+    <string name="search">Pretraži</string>
+    <string name="update">Ažuriraj</string>
+    <string name="value">Vrednost</string>
+</resources>

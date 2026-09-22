@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">मुख्यपृष्ठ</string>
+    <string name="add_group">गट जोडा: </string>
+    <string name="edit_group">गट संपादित करा: </string>
+    <string name="group">गट</string>
+    <string name="tracker">ट्रॅकर</string>
+    <string name="function">फंक्शन</string>
+    <string name="graph_or_stat">आलेख किंवा सांख्यिकी</string>
+    <string name="symlink">सिमलिंक</string>
+    <string name="symlinks">सिमलिंक्स</string>
+    <string name="reminder">स्मरणपत्र</string>
+    <string name="add_component">घटक जोडा</string>
+    <string name="symlink_locations_title">\"%1$s\" ची ठिकाणे</string>
+    <string name="add_tracker">काहीतरी ट्रॅक करा:</string>
+    <string name="add">जोडा</string>
+    <string name="group_name">उदा. दैनंदिन उपक्रम</string>
+    <string name="delete">हटवा</string>
+    <string name="edit">संपादित करा</string>
+    <string name="update">अपडेट करा</string>
+    <string name="graph_or_stat_name">आलेखाचे नाव: </string>
+    <string name="tracker_name">ट्रॅकरचे नाव</string>
+    <string name="this_is_a_time_or_duration">हा वेळ किंवा कालावधी आहे</string>
+    <string name="yes">होय</string>
+    <string name="cancel">रद्द करा</string>
+    <string name="select_file">फाइल निवडा</string>
+    <string name="empty_group_hint">Track &amp; Graph मध्ये स्वागत आहे!\n\n वरच्या उजवीकडे + वर टॅप करा आणि सुरुवात करण्यासाठी ट्रॅकर निवडा.</string>
+    <string name="no_trackers_graph_stats_hint">आलेख तयार करण्यापूर्वी कृपया Tracker तयार करा.</string>
+    <string name="no_trackers_functions_hint">फंक्शन तयार करण्यापूर्वी कृपया Tracker तयार करा.</string>
+    <string name="ru_sure_del_group">तुम्हाला हा गट आणि त्यातील सर्वकाही हटवायचे आहे का? ही कृती पूर्ववत करता येणार नाही.</string>
+    <string name="ru_sure_del_graph">तुम्हाला हा आलेख हटवायचा आहे का? ही कृती पूर्ववत करता येणार नाही. तुमचा ट्रॅक केलेला डेटा गमावला जाणार नाही.</string>
+    <string name="ru_sure_del_feature">तुम्हाला हा ट्रॅक केलेला डेटा हटवायचा आहे का?</string>
+    <string name="item_in_multiple_groups">हा घटक अनेक ठिकाणी आहे. तुम्ही तो येथून काढू शकता किंवा सर्वत्र हटवू शकता.</string>
+    <string name="remove_from_this_group">येथून काढा</string>
+    <string name="delete_everywhere">सर्वत्र हटवा</string>
+    <string name="ru_sure_del_function">तुम्हाला हे फंक्शन हटवायचे आहे का? ही कृती पूर्ववत करता येणार नाही.</string>
+    <string name="ru_sure_del_reminder">तुम्हाला हे स्मरणपत्र हटवायचे आहे का? ही कृती पूर्ववत करता येणार नाही.</string>
+    <string name="ru_sure_del_data_point">तुम्हाला हा डेटा पॉइंट हटवायचा आहे का?</string>
+    <string name="feature_name_cannot_be_null">कृपया नाव जोडा</string>
+    <string name="tracker_with_that_name_exists">त्या नावाने तुम्ही आधीपासून काहीतरी ट्रॅक करत आहात</string>
+    <string name="data_points">%1$d डेटा पॉइंट्स</string>
+    <string name="items_selected">%1$d निवडले</string>
+    <string name="select_all">सर्व निवडा</string>
+    <string name="deselect_all">सर्वांची निवड रद्द करा</string>
+    <string name="ru_sure_del_data_points">तुम्हाला हे डेटा पॉइंट्स हटवायचे आहेत का?</string>
+    <string name="delete_selected_content_description">निवडलेले घटक हटवा</string>
+    <string name="copy_selected_content_description">निवडलेले घटक कॉपी करा</string>
+    <string name="move_selected_content_description">निवडलेले घटक हलवा</string>
+    <string name="copy_to">येथे कॉपी करा</string>
+    <string name="no_data">डेटा नाही</string>
+    <string name="skip">वगळा</string>
+    <string name="exportButton">एक्सपोर्ट</string>
+    <string name="importButton">इम्पोर्ट</string>
+    <string name="import_export">इम्पोर्ट/एक्सपोर्ट</string>
+    <string name="search">शोधा</string>
+    <string name="type_to_search">शोधण्यासाठी टाइप करा</string>
+    <string name="no_results">परिणाम नाहीत</string>
+    <string name="export_to">या गटातील ट्रॅक केलेला डेटा CSV मध्ये एक्सपोर्ट करा:</string>
+    <string name="export_error_message">एक्सपोर्ट अयशस्वी: %1$s</string>
+    <string name="import_from">CSV मधून या गटात ट्रॅक केलेला डेटा इम्पोर्ट करा:</string>
+    <string name="import_warning">चेतावणी: इम्पोर्ट पूर्ववत करता येत नाही. या गटातील विद्यमान डेटासोबत इम्पोर्ट केलेला डेटा नावानुसार विलीन करण्याचा Track &amp; Graph प्रयत्न करेल.</string>
+    <string name="add_a_graph_or_stat">आलेख किंवा सांख्यिकी जोडा</string>
+    <string name="graph_type_label">आलेखाचा प्रकार:</string>
+    <string name="sample_size">नमुना आकार:</string>
+    <string name="select_a_discrete_feature">लेबल असलेला डेटा संच निवडा: </string>
+    <string name="no_labels">या डेटा संचाला लेबले नाहीत</string>
+    <string name="select_a_feature">डेटा संच निवडा:</string>
+    <string name="select_a_tracker">Tracker निवडा</string>
+    <string name="offset">ऑफसेट:</string>
+    <string name="scale">स्केल:</string>
+    <string name="from">पासून:</string>
+    <string name="to">पर्यंत:</string>
+    <string name="day">दिवस</string>
+    <string-array name="time_histogram_windows">
+        <item>तासानुसार</item>
+        <item>दिवसानुसार</item>
+        <item>आठवड्यानुसार</item>
+        <item>महिन्यानुसार</item>
+        <item>त्रैमासिक</item>
+        <item>सहामाही</item>
+        <item>वर्षानुसार</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>बॅटरी सेव्हर</item>
+        <item>फिकट</item>
+        <item>गडद</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>सिस्टम डीफॉल्ट</item>
+        <item>फिकट</item>
+        <item>गडद</item>
+    </string-array>
+    <string name="graph_type_line_graph">रेषा आलेख</string>
+    <string name="graph_type_pie_chart">पाय आलेख</string>
+    <string name="graph_type_average_time_between">मधील सरासरी वेळ</string>
+    <string name="graph_type_time_since">तेव्हापासूनचा वेळ</string>
+    <string name="graph_type_time_histogram">वेळेचा हिस्टोग्राम</string>
+    <string name="graph_type_last_value">शेवटचे ट्रॅकिंग/तेव्हापासूनचा वेळ</string>
+    <string name="graph_type_bar_chart">बार आलेख</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>सरासरी नाही</item>
+        <item>दैनंदिन चलत सरासरी</item>
+        <item>तीन दिवसांची चलत सरासरी</item>
+        <item>साप्ताहिक चलत सरासरी</item>
+        <item>मासिक चलत सरासरी</item>
+        <item>तीन महिन्यांची चलत सरासरी</item>
+        <item>सहा महिन्यांची चलत सरासरी</item>
+        <item>वार्षिक चलत सरासरी</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>ट्रॅक केल्यावर प्लॉट करा</item>
+        <item>तासाच्या एकूणांची प्लॉट करा</item>
+        <item>दिवसाच्या एकूणांची प्लॉट करा</item>
+        <item>आठवड्याच्या एकूणांची प्लॉट करा</item>
+        <item>महिन्याच्या एकूणांची प्लॉट करा</item>
+        <item>वर्षाच्या एकूणांची प्लॉट करा</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">सर्व डेटा</string>
+    <string name="graph_time_durations_a_day">एक दिवस</string>
+    <string name="graph_time_durations_a_week">एक आठवडा</string>
+    <string name="graph_time_durations_a_month">एक महिना</string>
+    <string name="graph_time_durations_three_months">तीन महिने</string>
+    <string name="graph_time_durations_six_months">सहा महिने</string>
+    <string name="graph_time_durations_a_year">एक वर्ष</string>
+    <string name="custom">सानुकूल</string>
+    <string-array name="y_range_styles">
+        <item>डायनॅमिक</item>
+        <item>निश्चित</item>
+    </string-array>
+    <string name="ending_at_latest">शेवटचा डेटा पॉइंट</string>
+    <string name="ending_at_now">आत्ता</string>
+    <string name="ending_at_custom_date">सानुकूल तारीख…</string>
+    <string name="hours_and_minutes_ago">%1$dh %2$dm पूर्वी</string>
+    <string name="import_exception_unknown">इम्पोर्ट अयशस्वी: अज्ञात त्रुटी आली</string>
+    <string name="import_exception_bad_headers">इम्पोर्ट अयशस्वी: हेडर्स अपेक्षित हेडर्सशी जुळले नाहीत: %1$s</string>
+    <string name="import_exception_inconsistent_record">इम्पोर्ट अयशस्वी: %1$s ओळीवरील रेकॉर्ड आवश्यक हेडर्सशी सुसंगत नाही</string>
+    <string name="import_exception_bad_timestamp">इम्पोर्ट अयशस्वी: %1$s ओळीवरील रेकॉर्डचा टाइमस्टॅम्प समजला नाही</string>
+    <string name="import_exception_inconsistent_data_type">इम्पोर्ट अयशस्वी: %1$s ओळीवर विसंगत डेटा प्रकार मिळाला</string>
+    <string name="unknown_error_occurred">अज्ञात त्रुटी आली</string>
+    <string name="graph_stat_validation_no_name">कृपया नाव द्या</string>
+    <string name="graph_stat_validation_no_line_graph_features">कृपया आलेखात काहीतरी जोडा</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">\"पासून\" हे \"पर्यंत\"पेक्षा लहान किंवा समान आहे याची खात्री करा</string>
+    <string name="graph_stat_validation_unrecognised_color">सर्व डेटा संचांना रंग आहे याची खात्री करा</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">अवैध रेषा आलेख डेटा संच आढळला</string>
+    <string name="graph_stat_validation_bad_fixed_range">\"पासून\" हे \"पर्यंत\"पेक्षा लहान आहे याची खात्री करा</string>
+    <string name="graph_stat_view_not_found">हा आलेख शोधताना त्रुटी आली</string>
+    <string name="graph_stat_view_not_enough_data_stat">तो तयार करण्यासाठी पुरेसा डेटा ट्रॅक केल्यावर ही सांख्यिकी दिसेल.</string>
+    <string name="graph_stat_view_not_enough_data_graph">तो तयार करण्यासाठी पुरेसा डेटा ट्रॅक केल्यावर हा आलेख दिसेल.</string>
+    <string name="pie_chart_mixed_signs_error">या पाय आलेखात सकारात्मक आणि नकारात्मक दोन्ही विभाग आकार असल्यामुळे तो रेंडर करता येत नाही.</string>
+    <string name="histogram_mixed_signs_error">या हिस्टोग्राममध्ये सकारात्मक आणि नकारात्मक दोन्ही बिन आकार असल्यामुळे तो रेंडर करता येत नाही.</string>
+    <string name="graph_non_finite_data_error">यात मर्यादित संख्या नसलेले मूल्य असल्यामुळे हा आलेख रेंडर करता येत नाही.</string>
+    <string name="graph_inconsistent_series_error">डेटा मालिकांचे आकार विसंगत असल्यामुळे हा आलेख रेंडर करता येत नाही.</string>
+    <string name="graph_invalid_y_range_error">या आलेखाची Y-अक्ष श्रेणी अवैध असल्यामुळे तो रेंडर करता येत नाही.</string>
+    <string name="finish">पूर्ण करा</string>
+    <string name="about_description">Track &amp; Graph हे GPL 3.0 परवान्याअंतर्गत मोफत आणि मुक्त स्रोत सॉफ्टवेअर आहे.</string>
+    <string name="about_libraries_message">खालील मुक्त स्रोत लायब्ररी वापरण्यात आल्या आहेत:</string>
+    <string name="about">याबद्दल</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">वारंवार विचारले जाणारे प्रश्न</string>
+    <string name="tutorial_text_1">तुमचा डेटा ट्रॅक करण्यासाठी Tracker वापरा.</string>
+    <string name="tutorial_text_2">डेटाचे दृश्यीकरण करण्यासाठी आलेख आणि सांख्यिकी वापरा.</string>
+    <string name="tutorial_text_3">तुमचे Tracker, आलेख आणि सांख्यिकी व्यवस्थित ठेवण्यासाठी गट वापरा.</string>
+    <string name="got_it">समजले!</string>
+    <string name="move_to_colon">येथे हलवा:</string>
+    <string name="move_to">येथे हलवा</string>
+    <string name="ru_sure_update_data">या अपडेटमुळे तुम्ही आधीच ट्रॅक केलेला डेटा कायमचा बदलू शकतो. पुढे जाण्यापूर्वी विद्यमान डेटाचा बॅकअप घेण्याची जोरदार शिफारस केली जाते.\n\n तुम्हाला पुढे जायचे आहे का?</string>
+    <string name="ok">ठीक आहे</string>
+    <string name="rate_the_app">अॅपला रेटिंग द्या</string>
+    <string name="reminders">स्मरणपत्रे</string>
+    <string name="no_reminders_hint">नवीन ट्रॅकिंग स्मरणपत्र सूचना तयार करण्यासाठी + चिन्हावर टॅप करा.</string>
+    <string name="mon">सोम</string>
+    <string name="tue">मंगळ</string>
+    <string name="wed">बुध</string>
+    <string name="thu">गुरु</string>
+    <string name="fri">शुक्र</string>
+    <string name="sat">शनि</string>
+    <string name="sun">रवि</string>
+    <string name="reminders_notifications_channel_name">स्मरणपत्रे</string>
+    <string name="reminders_notifications_channel_description">कधी ट्रॅक करायचे याची आठवण करून देण्यासाठी वापरकर्त्याने तयार केलेल्या सूचना</string>
+    <string name="default_reminder_name">ट्रॅक करण्याची वेळ झाली!</string>
+    <string name="missed_reminder_single_content">%1$s कडून स्मरणपत्र</string>
+    <string name="missed_reminders_multiple_content">तुमची %1$d स्मरणपत्रे चुकली</string>
+    <string name="next_reminder_format">पुढील स्मरणपत्र: %1$s</string>
+    <string name="no_upcoming_reminders">आगामी स्मरणपत्रे नाहीत</string>
+    <string name="select_reminder_type">स्मरणपत्राचा प्रकार निवडा</string>
+    <string name="week_day_reminder">आठवड्याच्या दिवसांचे स्मरणपत्र</string>
+    <string name="week_day_reminder_description">सोमवार, बुधवार, शुक्रवार यांसारखे विशिष्ट दिवस</string>
+    <string name="periodic_reminder">नियतकालिक स्मरणपत्र</string>
+    <string name="periodic_reminder_description">दर 3 दिवसांनी यांसारखे नियमित अंतर</string>
+    <string name="month_day_reminder">महिन्याच्या दिवसाचे स्मरणपत्र</string>
+    <string name="month_day_reminder_description">पहिला सोमवार यांसारखे मासिक नमुने</string>
+    <string name="time_since_last_reminder">शेवटच्या स्मरणपत्रापासूनचा वेळ</string>
+    <string name="time_since_last_reminder_description">तुम्ही काही काळ काहीतरी ट्रॅक केलेले नसताना</string>
+    <string name="one_time_reminder">एकदाचे स्मरणपत्र</string>
+    <string name="one_time_reminder_description">ठरावीक वेळी किंवा विलंबानंतरचे स्वतंत्र स्मरणपत्र</string>
+    <string name="reminder_name">स्मरणपत्राचे नाव</string>
+    <string name="reminder_disabled">स्मरणपत्र अक्षम केले</string>
+    <string name="repeat_every">पुनरावृत्तीचे अंतर</string>
+    <string name="at_time">वेळ</string>
+    <string name="at_a_specific_time">ठरावीक वेळी</string>
+    <string name="ending_at">समाप्ती</string>
+    <string name="starting_from">सुरुवात</string>
+    <string name="repeat_on_week_days">आठवड्याच्या दिवशी पुनरावृत्ती</string>
+    <string name="track_feature">Feature ट्रॅक करा</string>
+    <string name="select_tracker_placeholder">Tracker निवडा</string>
+    <string name="remind_after">यानंतर स्मरण द्या</string>
+    <string name="then_remind_every">त्यानंतर प्रत्येक वेळी स्मरण द्या</string>
+    <string name="remind_at_date_and_time">तारीख आणि वेळी</string>
+    <string name="remind_after_a_delay">विलंबानंतर</string>
+    <string name="first_reminder">पहिले स्मरणपत्र</string>
+    <string name="every_colon">प्रत्येक:</string>
+    <string name="ended_at_format">समाप्ती: %1$s</string>
+    <string name="starting_at_format">सुरुवात: %1$s</string>
+    <string name="occurrence_first">पहिला</string>
+    <string name="occurrence_second">दुसरा</string>
+    <string name="occurrence_third">तिसरा</string>
+    <string name="occurrence_fourth">चौथा</string>
+    <string name="occurrence_last">शेवटचा</string>
+    <string name="monday">सोमवार</string>
+    <string name="tuesday">मंगळवार</string>
+    <string name="wednesday">बुधवार</string>
+    <string name="thursday">गुरुवार</string>
+    <string name="friday">शुक्रवार</string>
+    <string name="saturday">शनिवार</string>
+    <string name="sunday">रविवार</string>
+    <string-array name="abbreviated_months">
+        <item>जाने</item>
+        <item>फेब्रु</item>
+        <item>मार्च</item>
+        <item>एप्रि</item>
+        <item>मे</item>
+        <item>जून</item>
+        <item>जुलै</item>
+        <item>ऑग</item>
+        <item>सप्टें</item>
+        <item>ऑक्टो</item>
+        <item>नोव्हें</item>
+        <item>डिसें</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>सोम</item>
+        <item>मंगळ</item>
+        <item>बुध</item>
+        <item>गुरु</item>
+        <item>शुक्र</item>
+        <item>शनि</item>
+        <item>रवि</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">श्रेणीची शैली:</string>
+    <string name="track_widget_configure_no_data_error">प्रथम काही डेटा ट्रॅक करा.</string>
+    <string name="track_widget_configure_no_data_selected_error">ट्रॅकिंग विजेट तयार करण्यासाठी वैध डेटा संच निवडणे आवश्यक आहे.</string>
+    <string name="create">तयार करा</string>
+    <string name="use_default_value">डीफॉल्ट मूल्य सेट करा</string>
+    <string name="backup_and_restore">बॅकअप आणि पुनर्संचयित करा</string>
+    <string name="backup_hint_text">बॅकअप तुमच्या अॅपमधील सर्व डेटा, त्यात ट्रॅक केलेला डेटा, आलेख आणि स्मरणपत्रे यांचा समावेश करून, जतन करतो. तुमचे डिव्हाइस हरवले किंवा खराब झाले तर उपयोगी पडण्यासाठी डेटाचा नियमितपणे बाह्य डिव्हाइसवर किंवा क्लाउड स्टोरेजमध्ये बॅकअप घ्या.</string>
+    <string name="restore_data">डेटा पुनर्संचयित करा</string>
+    <string name="backup_successful">बॅकअप यशस्वी!</string>
+    <string name="backup_error_could_not_write_to_file">निवडलेली फाइल सापडली नाही किंवा त्यात लिहिता आले नाही.</string>
+    <string name="backup_error_could_not_find_database_file">डेटाबेस फाइल सापडली नाही किंवा वाचता आली नाही.</string>
+    <string name="backup_error_failed_to_copy_database">डेटाबेस फाइल कॉपी करताना काहीतरी चूक झाली.</string>
+    <string name="restore_failed">पुनर्संचयित करणे अयशस्वी. %1$s</string>
+    <string name="add_a_longer_description_optional">अधिक सविस्तर वर्णन जोडा (पर्यायी)</string>
+    <string name="no_data_points_history_fragment_hint">काही डेटा पॉइंट्स असल्यावर तुमचा इतिहास येथे दिसेल.</string>
+    <string name="data_resolution_error">हा डेटा सोडवण्याचा प्रयत्न करताना त्रुटी आली:\n\n%1$s</string>
+    <string name="info">माहिती</string>
+    <string name="no_description">वर्णन नाही</string>
+    <string name="description">वर्णन</string>
+    <string name="app_lock_title">अॅप लॉक</string>
+    <string name="app_lock_locked_title">Track &amp; Graph लॉक केले आहे</string>
+    <string name="app_lock_password_label">पासवर्ड</string>
+    <string name="app_lock_confirm_password_label">पासवर्डाची पुष्टी करा</string>
+    <string name="app_lock_unlock">अनलॉक करा</string>
+    <string name="app_lock_use_biometrics">बायोमेट्रिक्स वापरा</string>
+    <string name="app_lock_enable">अॅप लॉक सक्षम करा</string>
+    <string name="app_lock_enabled">अॅप लॉक सक्षम आहे</string>
+    <string name="app_lock_enable_biometric_unlock">बायोमेट्रिक अनलॉक सक्षम करा</string>
+    <string name="app_lock_no_strong_biometric_available">या डिव्हाइसवर मजबूत बायोमेट्रिक अनलॉक उपलब्ध नाही.</string>
+    <string name="app_lock_lock_after_background_minutes">बॅकग्राउंडमध्ये गेल्यानंतर लॉक होण्याचा कालावधी</string>
+    <string name="app_lock_lock_after_background_minutes_hint">अॅप फोरग्राउंडमधून बाहेर पडताच लॉक करण्यासाठी 0 वापरा.</string>
+    <string name="app_lock_change_password">पासवर्ड बदला</string>
+    <string name="app_lock_password_changed">पासवर्ड बदलला</string>
+    <string name="app_lock_disable">अॅप लॉक अक्षम करा</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph अनलॉक करा</string>
+    <string name="app_lock_unlock_biometric_subtitle">पुढे जाण्यासाठी तुमच्या डिव्हाइसचे बायोमेट्रिक्स वापरा</string>
+    <string name="app_lock_use_password">पासवर्ड वापरा</string>
+    <string name="app_lock_biometric_not_recognized">बायोमेट्रिक प्रमाणीकरण ओळखले गेले नाही.</string>
+    <string name="app_lock_error_missing_password">अॅप लॉकचा पासवर्ड गहाळ आहे. अॅप लॉक अक्षम करून पुन्हा सक्षम करा.</string>
+    <string name="app_lock_error_incorrect_password">चुकीचा पासवर्ड</string>
+    <string name="app_lock_error_password_hashing_unavailable">या डिव्हाइसवर अॅप लॉक पासवर्ड पडताळणी उपलब्ध नाही.</string>
+    <string name="app_lock_error_enter_password">पासवर्ड प्रविष्ट करा.</string>
+    <string name="app_lock_error_passwords_do_not_match">पासवर्ड जुळत नाहीत.</string>
+    <string name="note_input_hint">नोंदी…</string>
+    <string name="add_a_note">नोंद जोडा</string>
+    <string name="notes">नोंदी</string>
+    <string name="show_global_notes">जागतिक</string>
+    <string name="show_data_point_notes">डेटा पॉइंट्स</string>
+    <string name="delete_reminder_content_description">स्मरणपत्र हटवा</string>
+    <string name="theme_colon">थीम:</string>
+    <string name="date_format_colon">तारीख स्वरूप:</string>
+    <string name="add_data_point_button_content_description">डेटा पॉइंट जोडण्याचे बटण</string>
+    <string name="tracked_data_menu_button_content_description">ट्रॅक केलेल्या डेटाचे मेनू बटण</string>
+    <string name="tracked_data_history_button_content_description">ट्रॅक केलेल्या डेटाच्या इतिहासाचे बटण</string>
+    <string name="delete_line_button_content_description">रेषा हटवण्याचे बटण</string>
+    <string name="delete_input_button_content_description">इनपुट हटवण्याचे बटण</string>
+    <string name="delete_data_point_button_content_description">डेटा पॉइंट हटवण्याचे बटण</string>
+    <string name="edit_data_point_button_content_description">डेटा पॉइंट संपादित करण्याचे बटण</string>
+    <string name="add_multiple_choice_answer_button_content_description">बहुपर्यायी उत्तर जोडण्याचे बटण</string>
+    <string name="ending_at_colon">नमुना येथे समाप्त:</string>
+    <string name="duplicate">प्रत बनवा</string>
+    <string name="no_notes_hint_text">ट्रॅकिंगदरम्यान जोडलेल्या नोंदी येथे दिसतील. + बटण वापरून जागतिक नोंदीही जोडू शकता.</string>
+    <string name="add_a_global_note">जागतिक नोंद जोडा:</string>
+    <string name="duration">कालावधी</string>
+    <string name="weeks">आठवडे</string>
+    <string name="months">महिने</string>
+    <string name="days">दिवस</string>
+    <string name="hours">तास</string>
+    <string name="minutes">मिनिटे</string>
+    <string name="seconds">सेकंद</string>
+    <string name="hours_suffix">ता</string>
+    <string name="minutes_suffix">मि</string>
+    <string name="seconds_suffix">से</string>
+    <string name="numeric_to_duration_mode_header">यापूर्वी ट्रॅक केलेली मूल्ये दर्शवतात:</string>
+    <string name="duration_to_numeric_mode_header">यापूर्वी ट्रॅक केलेली मूल्ये कशात रूपांतरित करावीत:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">तुम्ही कालावधी इतर डेटा प्रकारांसोबत मिसळू शकत नाही. तास, मिनिटे किंवा सेकंदांचा आलेख काढण्याचा विचार करा</string>
+    <string name="sum_by_count_checkbox_label">मूल्यांची बेरीज करण्याऐवजी ट्रॅक केलेल्या डेटा पॉइंट्सची संख्या मोजण्यासाठी येथे निवडा.</string>
+    <string name="time_window_size">कालावधी विंडोचा आकार:</string>
+    <string name="hold_to_preview">पूर्वावलोकनासाठी धरून ठेवा</string>
+    <string name="open">उघडा</string>
+    <string name="close">बंद करा</string>
+    <string name="filter_by_label">लेबलनुसार फिल्टर करा</string>
+    <string name="filter_by_value">मूल्य श्रेणीनुसार फिल्टर करा</string>
+    <string name="save_changes">बदल जतन करा</string>
+    <string name="timer_notification_channel_name">टायमर</string>
+    <string name="stop">थांबवा</string>
+    <string name="name_your_function">तुमच्या फंक्शनचे नाव द्या: </string>
+    <string name="add_some_data_sources">डेटा स्रोत जोडा</string>
+    <string name="value">मूल्य</string>
+    <string name="label">लेबल</string>
+    <string name="continue_word">पुढे चला</string>
+    <string name="update_all_data_points">सर्व डेटा पॉइंट्स अपडेट करा: </string>
+    <string name="where_colon">कोठे:</string>
+    <string name="to_colon">पर्यंत:</string>
+    <string name="value_equals">मूल्य =</string>
+    <string name="label_equals">लेबल =</string>
+    <string name="adding_your_first_data_point">डेटा पॉइंट्स जोडण्याचे छोटे ट्युटोरियल:</string>
+    <string name="next">पुढे</string>
+    <string name="each_data_point_has_a_timestamp_and_value">प्रत्येक डेटा पॉइंटला टाइमस्टॅम्प आणि मूल्य असते: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">याला ऐच्छिकरित्या लेबल आणि नोंदही असू शकते: </string>
+    <string name="data_point_tutorial_page_2_description">मूल्य ही संख्या असल्याने तुमचा डेटा कालांतराने कसा बदलतो ते पाहू शकता</string>
+    <string name="data_point_tutorial_page_2_hint">(सूचना: मूल्याची गरज नसल्यास डीफॉल्ट मूल्य 1 वापरा)</string>
+    <string name="data_point_tutorial_page_3_description">डेटा पॉइंट्स गटबद्ध करायचे असल्यास लेबल वापरा</string>
+    <string name="data_point_tutorial_page_3_hint">(सूचना: अधिक संदर्भ किंवा वर्णन जोडायचे असल्यास लेबलऐवजी नोंद फील्ड वापरा)</string>
+    <string name="help">मदत</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">प्रगत पर्याय</string>
+    <string name="type_colon">\"प्रकार: \"</string>
+    <string name="order_colon">\"क्रम: \"</string>
+    <string name="value_and_label">मूल्य आणि लेबल</string>
+    <string name="value_only">फक्त मूल्य</string>
+    <string name="label_only">फक्त लेबल</string>
+    <string name="none">काहीही नाही</string>
+    <string name="value_ascending">वाढत्या मूल्यानुसार</string>
+    <string name="value_descending">घटत्या मूल्यानुसार</string>
+    <string name="label_ascending">वाढत्या लेबेलनुसार</string>
+    <string name="label_descending">घटत्या लेबेलनुसार</string>
+    <string name="latest">नवीनतम</string>
+    <string name="oldest">जुने</string>
+    <string name="track_all">सर्व ट्रॅक करा</string>
+    <string name="more_details">अधिक तपशील</string>
+    <string name="suggestions">सूचना</string>
+    <string name="no_label">लेबल नाही</string>
+    <string name="confirm_cancel_notes_will_be_lost">तुम्हाला बंद करायचे आहे का? सर्व नोंदी गमावल्या जातील.</string>
+    <string name="add_a_label">लेबल जोडा</string>
+    <string name="bar_interval">बार अंतर:</string>
+    <string name="y_range_max">Y श्रेणीची कमाल मर्यादा</string>
+    <string name="total_formatted">एकूण: %s</string>
+    <string name="from_formatted">पासून: %s</string>
+    <string name="to_formatted">पर्यंत: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">सेकंद</string>
+    <string name="minutes_generic">मिनिटे</string>
+    <string name="hours_generic">तास</string>
+    <string name="days_generic">दिवस</string>
+    <string name="weeks_generic">आठवडे</string>
+    <string name="months_generic">महिने</string>
+    <string name="years_generic">वर्षे</string>
+    <plurals name="seconds">
+        <item quantity="one">%d सेकंद</item>
+        <item quantity="other">%d सेकंद</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d मिनिट</item>
+        <item quantity="other">%d मिनिटे</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d तास</item>
+        <item quantity="other">%d तास</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d दिवस</item>
+        <item quantity="other">%d दिवस</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d आठवडा</item>
+        <item quantity="other">%d आठवडे</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d महिना</item>
+        <item quantity="other">%d महिने</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d वर्ष</item>
+        <item quantity="other">%d वर्षे</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">दर मिनिटाला</item>
+        <item quantity="other">दर %d मिनिटांनी</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">दर तासाला</item>
+        <item quantity="other">दर %d तासांनी</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">दररोज</item>
+        <item quantity="other">दर %d दिवसांनी</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">दर आठवड्याला</item>
+        <item quantity="other">दर %d आठवड्यांनी</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">दर महिन्याला</item>
+        <item quantity="other">दर %d महिन्यांनी</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">दरवर्षी</item>
+        <item quantity="other">दर %d वर्षांनी</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">1 मिनिटानंतर</item>
+        <item quantity="other">%d मिनिटांनंतर</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">1 तासानंतर</item>
+        <item quantity="other">%d तासांनंतर</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">1 दिवसानंतर</item>
+        <item quantity="other">%d दिवसांनंतर</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">1 आठवड्यानंतर</item>
+        <item quantity="other">%d आठवड्यांनंतर</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">1 महिन्यानंतर</item>
+        <item quantity="other">%d महिन्यांनंतर</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">1 वर्षानंतर</item>
+        <item quantity="other">%d वर्षांनंतर</item>
+    </plurals>
+    <string name="restore_hint_text">चेतावणी: बॅकअपमधून पुनर्संचयित केल्यास अॅपमधील सध्याचा सर्व डेटा आणि सेटअप मिटवला जाईल. प्रथम तुमच्या डेटाचा बॅकअप घ्या!</string>
+    <string name="backup_now">आता बॅकअप घ्या</string>
+    <string name="restore_error_could_not_write_to_database">पुनर्संचयित करणे अयशस्वी! डेटाबेस सापडला नाही किंवा त्यात लिहिता आले नाही.</string>
+    <string name="restore_error_could_not_read_from_database_file">पुनर्संचयित करणे अयशस्वी! निवडलेली डेटाबेस फाइल सापडली नाही किंवा वाचता आली नाही.</string>
+    <string name="restore_error_failed_to_copy_database">पुनर्संचयित करणे अयशस्वी! डेटाबेस पुनर्संचयित करताना काहीतरी चूक झाली.</string>
+    <string name="select_location">स्थान निवडा…</string>
+    <string name="restore_successful">पुनर्संचयित करणे यशस्वी झाले! Track &amp; Graph आता पुन्हा सुरू करणे आवश्यक आहे.</string>
+    <string name="restore_error_invalid_database_file">पुनर्संचयित करणे अयशस्वी! निवडलेली फाइल वैध बॅकअप असल्याचे दिसत नाही.</string>
+    <string name="auto_backup">स्वयंचलित बॅकअप</string>
+    <string name="apply">लागू करा</string>
+    <string name="backup_every">बॅकअप दर: </string>
+    <string name="next_backup_at">\"पुढील बॅकअप: \"</string>
+    <string name="backup_notification_channel_name">स्वयंचलित बॅकअप सूचना</string>
+    <string name="backup_notification_channel_description">स्वयंचलित बॅकअप सुरू झाल्यावर आणि तो अयशस्वी झाल्यास तुम्हाला कळवते.</string>
+    <string name="backup_notification_title">बॅकअप सुरू आहे…</string>
+    <string name="backup_failed_notification_title">स्वयंचलित बॅकअप अयशस्वी</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph ला तुमचे बॅकअप स्थान सापडले नाही किंवा त्यात प्रवेश मिळाला नाही.</string>
+    <string name="backup_failed_notification_could_not_copy">डेटाचा बॅकअप घेताना काहीतरी चूक झाली. तुमचा बॅकअप खराब किंवा अपूर्ण असू शकतो.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">नवीन स्थान निवडा</string>
+    <string name="backup_location">बॅकअप स्थान</string>
+    <string name="enable_auto_backup">स्वयंचलित बॅकअप सुरू करा</string>
+    <string name="last_successful_backup">शेवटचा यशस्वी बॅकअप</string>
+    <string name="next_scheduled_backup">पुढील नियोजित बॅकअप</string>
+    <string name="notification_permission_prompt">कोणत्याही कारणाने स्वयंचलित बॅकअप अयशस्वी झाल्यास सूचना मिळण्यासाठी Track &amp; Graph साठी सूचना सुरू करा.</string>
+    <string name="lua_script_empty">कृपया Lua स्क्रिप्ट जोडा</string>
+    <string name="function_name_empty">फंक्शनचे नाव रिक्त ठेवता येणार नाही</string>
+    <string name="function_name">फंक्शनचे नाव</string>
+    <string name="add_at_least_one_input">कृपया किमान एक इनपुट जोडा</string>
+    <string name="output">आउटपुट</string>
+    <string name="data_source">डेटा स्रोत</string>
+    <string name="lua_script">Lua स्क्रिप्ट</string>
+    <string name="data_source_description">डेटा स्रोत नोड इनपुट म्हणून वापरण्यासाठी Tracker किंवा Function निवडण्याची सुविधा देतो.</string>
+    <string name="lua_script_input_hint">Lua स्क्रिप्ट एंटर करा…</string>
+    <string name="select_node_type">नोड प्रकार निवडा</string>
+    <string name="file">फाइल</string>
+    <string name="lua_feature_names_not_unique">स्क्रिप्ट इनपुटची नावे अद्वितीय असणे आवश्यक आहे</string>
+    <string name="graph_stat_type_lua_graph">Lua स्क्रिप्ट</string>
+    <string name="launch_lua_disabled">Lua सुरू करणे अक्षम</string>
+    <string name="no_lua">Lua नाही</string>
+    <string name="lua_engine_disabled">Lua इंजिन अक्षम</string>
+    <string name="lua_graph_first_time_user_title">Lua स्क्रिप्ट आलेख आणि आकडेवारी</string>
+    <string name="lua_graph_first_time_user_message">Lua स्क्रिप्ट हे Lua प्रोग्रामिंग भाषेचा वापर करून सानुकूल आलेख आणि आकडेवारी तयार करण्यासाठीचे प्रगत वैशिष्ट्य आहे. \n\nतुमची स्वतःची स्क्रिप्ट लोड करा किंवा GitHub संग्रहातून एक निवडा. GitHub वरून स्क्रिप्ट इंस्टॉल केल्यावर तुम्ही वापरण्यास तयार स्क्रिप्टसह अॅपमध्ये परत याल.</string>
+    <string name="functions_first_time_user_title">Functions मध्ये स्वागत आहे</string>
+    <string name="functions_first_time_user_message">Functions हे तुमचा डेटा एकत्र करून, त्याचे संकलन करून आणि रूपांतरित करून नवीन व्युत्पन्न डेटा स्रोत तयार करण्याचे प्रगत वैशिष्ट्य आहे.</string>
+    <string name="learn_more">येथे अधिक जाणून घ्या</string>
+    <string name="github">GitHub</string>
+    <string name="paste">पेस्ट करा</string>
+    <string name="failed_to_download_file">फाइल डाउनलोड अयशस्वी: %s</string>
+    <string name="confirm_deep_link">तुम्हाला अज्ञात स्रोताकडून स्क्रिप्टची लिंक मिळाली आहे. केवळ विश्वासू स्रोतांकडूनच स्क्रिप्ट इंस्टॉल करा. तुम्हाला ही स्क्रिप्ट इंस्टॉल करायची आहे का?</string>
+    <string name="graph_stat_info_button_description">आलेख आणि आकडेवारीची ट्यूटोरियल्स</string>
+    <string name="network_generic_error">नेटवर्कमध्ये प्रवेश करण्याचा प्रयत्न करताना त्रुटी आली. तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.</string>
+    <string name="function_verification_failure">फंक्शन स्वाक्षऱ्या पडताळता आल्या नाहीत. सुरक्षित कनेक्शन असल्याची आणि Track &amp; Graph अद्ययावत असल्याची खात्री करा</string>
+    <string name="function_network_failure">Functions लोड करता आले नाहीत. इंटरनेटशी कनेक्ट असल्याची खात्री करा. समस्या कायम राहिल्यास अॅप अद्ययावत असल्याची खात्री करा.</string>
+    <string name="functions_landscape_hint">सूचना: Functions लँडस्केप मोडमध्ये उत्तम काम करतात</string>
+    <string name="functions_start_hint">येथून सुरू करा: दीर्घकाळ दाबा आणि डेटा स्रोत निवडा</string>
+    <string name="see_whats_new">नवीन काय आहे ते पहा</string>
+</resources>

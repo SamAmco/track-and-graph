@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">አክል</string>
+    <string name="add_a_note">ማስታወሻ ያክሉ</string>
+    <string name="cancel">ሰርዝ</string>
+    <string name="continue_word">ቀጥል</string>
+    <string name="create">ፍጠር</string>
+    <string name="label">መለያ</string>
+    <string name="release_notes_support_text">ድጋፍዎ Track &amp; Graph እንዲቀጥል እና እንዲያድግ ይረዳል 🌱</string>
+    <string name="release_notes_maybe_later">ምናልባት በኋላ</string>
+    <string name="release_notes_support_development">ልማቱን ለመደገፍ ይለግሱ</string>
+    <string name="release_notes_thank_you">እናመሰግናለን! ❤️\n\nእያንዳንዱ ድጋፍ Track &amp; Graph ለሁሉም የተሻለ እንዲሆን ይረዳል 🌱</string>
+    <string name="support_close">ዝጋ</string>
+    <string name="search">ፈልግ</string>
+    <string name="update">አዘምን</string>
+    <string name="value">ዋጋ</string>
+</resources>

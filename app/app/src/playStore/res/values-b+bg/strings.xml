@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Подкрепете разработчика</string>
+    <string name="support_unavailable">В момента няма налични опции за подкрепа.</string>
+    <string name="support_payment_failed">Плащането не бе успешно. Опитайте отново.</string>
+    <string name="support_payment_pending">Плащането е изчакващо. Google Play ще го завърши след потвърждаване на плащането.</string>
+</resources>

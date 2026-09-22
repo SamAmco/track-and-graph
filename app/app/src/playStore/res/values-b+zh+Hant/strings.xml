@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">支持開發者</string>
+    <string name="support_unavailable">目前沒有可用的支持選項。</string>
+    <string name="support_payment_failed">付款失敗。請再試一次。</string>
+    <string name="support_payment_pending">付款處理中。確認付款後，Google Play 將完成交易。</string>
+</resources>

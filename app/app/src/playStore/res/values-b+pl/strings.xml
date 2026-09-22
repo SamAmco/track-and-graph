@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Wesprzyj twórcę</string>
+    <string name="support_unavailable">Obecnie nie są dostępne żadne opcje wsparcia.</string>
+    <string name="support_payment_failed">Płatność nie powiodła się. Spróbuj ponownie.</string>
+    <string name="support_payment_pending">Płatność oczekuje na realizację. Google Play sfinalizuje ją po potwierdzeniu płatności.</string>
+</resources>

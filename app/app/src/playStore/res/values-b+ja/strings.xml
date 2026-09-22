@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">開発者を支援する</string>
+    <string name="support_unavailable">現在利用できる支援方法はありません。</string>
+    <string name="support_payment_failed">支払いに失敗しました。もう一度お試しください。</string>
+    <string name="support_payment_pending">支払いは保留中です。支払いが確認されるとGoogle Playが処理を完了します。</string>
+</resources>

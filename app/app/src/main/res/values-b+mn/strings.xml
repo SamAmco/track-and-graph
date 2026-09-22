@@ -1,0 +1,518 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Нүүр хуудас</string>
+    <string name="add_group">Бүлэг нэмэх: </string>
+    <string name="edit_group">Бүлэг засах: </string>
+    <string name="group">Бүлэг</string>
+    <string name="tracker">Трекер</string>
+    <string name="function">Функц</string>
+    <string name="graph_or_stat">График эсвэл статистик</string>
+    <string name="symlink">Холбоос</string>
+    <string name="symlinks">Холбоосууд</string>
+    <string name="reminder">Сануулагч</string>
+    <string name="add_component">Бүрэлдэхүүн нэмэх</string>
+    <string name="symlink_locations_title">\"%1$s\"-ын байрлалууд</string>
+    <string name="add_tracker">Юуг хянах вэ:</string>
+    <string name="add">Нэмэх</string>
+    <string name="group_name">ж. Өдөр тутмын үйл ажиллагаа</string>
+    <string name="delete">Устгах</string>
+    <string name="edit">Засах</string>
+    <string name="update">Шинэчлэх</string>
+    <string name="graph_or_stat_name">Графикийн нэр: </string>
+    <string name="tracker_name">Трекерийн нэр</string>
+    <string name="this_is_a_time_or_duration">Энэ нь цаг эсвэл үргэлжлэх хугацаа</string>
+    <string name="yes">Тийм</string>
+    <string name="cancel">Цуцлах</string>
+    <string name="select_file">Файл сонгох</string>
+    <string name="empty_group_hint">Track &amp; Graph-д тавтай морил!\n\n Баруун дээд талын + дээр товшоод эхлэхийн тулд Трекерийг сонгоно уу.</string>
+    <string name="no_trackers_graph_stats_hint">График үүсгэхийн өмнө Трекер үүсгэнэ үү.</string>
+    <string name="no_trackers_functions_hint">Функц үүсгэхийн өмнө Трекер үүсгэнэ үү.</string>
+    <string name="ru_sure_del_group">Энэ бүлэг болон доторх бүх зүйлийг устгахдаа итгэлтэй байна уу? Үүнийг буцаах боломжгүй.</string>
+    <string name="ru_sure_del_graph">Энэ графикийг устгахдаа итгэлтэй байна уу? Үүнийг буцаах боломжгүй. Хянасан өгөгдөл устахгүй.</string>
+    <string name="ru_sure_del_feature">Энэ хянасан өгөгдлийг устгахдаа итгэлтэй байна уу?</string>
+    <string name="item_in_multiple_groups">Энэ зүйл олон байршилд байна. Эндээс хасах эсвэл хаа сайгүй устгах боломжтой.</string>
+    <string name="remove_from_this_group">Эндээс хасах</string>
+    <string name="delete_everywhere">Хаа сайгүй устгах</string>
+    <string name="ru_sure_del_function">Энэ функцийг устгахдаа итгэлтэй байна уу? Үүнийг буцаах боломжгүй.</string>
+    <string name="ru_sure_del_reminder">Энэ сануулагчийг устгахдаа итгэлтэй байна уу? Үүнийг буцаах боломжгүй.</string>
+    <string name="ru_sure_del_data_point">Энэ өгөгдлийн цэгийг устгахдаа итгэлтэй байна уу?</string>
+    <string name="feature_name_cannot_be_null">Нэр оруулна уу</string>
+    <string name="tracker_with_that_name_exists">Ийм нэртэй зүйлийг та аль хэдийн хянаж байна</string>
+    <string name="data_points">%1$d өгөгдлийн цэг</string>
+    <string name="items_selected">%1$d сонгосон</string>
+    <string name="select_all">Бүгдийг сонгох</string>
+    <string name="deselect_all">Бүгдийн сонголтыг цуцлах</string>
+    <string name="ru_sure_del_data_points">Эдгээр өгөгдлийн цэгүүдийг устгахдаа итгэлтэй байна уу?</string>
+    <string name="delete_selected_content_description">Сонгосон зүйлсийг устгах</string>
+    <string name="copy_selected_content_description">Сонгосон зүйлсийг хуулах</string>
+    <string name="move_selected_content_description">Сонгосон зүйлсийг зөөх</string>
+    <string name="copy_to">Хуулах газар</string>
+    <string name="no_data">Өгөгдөл байхгүй</string>
+    <string name="skip">Алгасах</string>
+    <string name="exportButton">Экспортлох</string>
+    <string name="importButton">Импортлох</string>
+    <string name="import_export">Импорт/Экспорт</string>
+    <string name="search">Хайх</string>
+    <string name="type_to_search">Хайхын тулд бичнэ үү</string>
+    <string name="no_results">Үр дүн алга</string>
+    <string name="export_to">Энэ бүлгийн хянасан өгөгдлийг CSV рүү экспортлох:</string>
+    <string name="export_error_message">Экспорт амжилтгүй: %1$s</string>
+    <string name="import_from">CSV-ээс энэ бүлэгт хянасан өгөгдөл импортлох:</string>
+    <string name="import_warning">Анхааруулга: Импортыг буцаах боломжгүй. Track &amp; Graph энэ бүлгийн импортолсон өгөгдлийг нэрээр нь одоо байгаа өгөгдөлтэй нэгтгэхийг оролдоно.</string>
+    <string name="add_a_graph_or_stat">График эсвэл статистик нэмэх</string>
+    <string name="graph_type_label">Графикийн төрөл:</string>
+    <string name="sample_size">Түүврийн хэмжээ:</string>
+    <string name="select_a_discrete_feature">Шошготой өгөгдлийн багц сонгох: </string>
+    <string name="no_labels">Энэ өгөгдлийн багц шошгогүй</string>
+    <string name="select_a_feature">Өгөгдлийн багц сонгох:</string>
+    <string name="select_a_tracker">Трекер сонгох</string>
+    <string name="offset">Шилжүүлэлт:</string>
+    <string name="scale">Масштаб:</string>
+    <string name="from">Эхлэх:</string>
+    <string name="to">Дуусах:</string>
+    <string name="day">Өдөр</string>
+    <string-array name="time_histogram_windows">
+        <item>Цаг тутам</item>
+        <item>Өдөр тутам</item>
+        <item>Долоо хоног тутам</item>
+        <item>Сар тутам</item>
+        <item>Улирал тутам</item>
+        <item>Хагас жил тутам</item>
+        <item>Жил тутам</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Батарей хэмнэх</item>
+        <item>Цайвар</item>
+        <item>Бараан</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Системийн өгөгдмөл</item>
+        <item>Цайвар</item>
+        <item>Бараан</item>
+    </string-array>
+    <string name="graph_type_line_graph">Шугаман график</string>
+    <string name="graph_type_pie_chart">Дугуй диаграмм</string>
+    <string name="graph_type_average_time_between">Хоорондын дундаж хугацаа</string>
+    <string name="graph_type_time_since">Өнгөрсөн хугацаа</string>
+    <string name="graph_type_time_histogram">Хугацааны гистограмм</string>
+    <string name="graph_type_last_value">Сүүлд хянасан/Өнгөрсөн хугацаа</string>
+    <string name="graph_type_bar_chart">Баганан диаграмм</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Дундажлахгүй</item>
+        <item>Өдрийн хөдөлгөөнт дундаж</item>
+        <item>3 өдрийн хөдөлгөөнт дундаж</item>
+        <item>Долоо хоногийн хөдөлгөөнт дундаж</item>
+        <item>Сарын хөдөлгөөнт дундаж</item>
+        <item>3 сарын хөдөлгөөнт дундаж</item>
+        <item>6 сарын хөдөлгөөнт дундаж</item>
+        <item>Жилийн хөдөлгөөнт дундаж</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Хянасан үед дүрслэх</item>
+        <item>Цагийн нийлбэрийг дүрслэх</item>
+        <item>Өдрийн нийлбэрийг дүрслэх</item>
+        <item>Долоо хоногийн нийлбэрийг дүрслэх</item>
+        <item>Сарын нийлбэрийг дүрслэх</item>
+        <item>Жилийн нийлбэрийг дүрслэх</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Бүх өгөгдөл</string>
+    <string name="graph_time_durations_a_day">1 өдөр</string>
+    <string name="graph_time_durations_a_week">1 долоо хоног</string>
+    <string name="graph_time_durations_a_month">1 сар</string>
+    <string name="graph_time_durations_three_months">3 сар</string>
+    <string name="graph_time_durations_six_months">6 сар</string>
+    <string name="graph_time_durations_a_year">1 жил</string>
+    <string name="custom">Тусгай</string>
+    <string-array name="y_range_styles">
+        <item>Динамик</item>
+        <item>Тогтмол</item>
+    </string-array>
+    <string name="ending_at_latest">Сүүлийн өгөгдлийн цэг</string>
+    <string name="ending_at_now">Одоо</string>
+    <string name="ending_at_custom_date">Тусгай огноо…</string>
+    <string name="hours_and_minutes_ago">%1$dц %2$dм өмнө</string>
+    <string name="import_exception_unknown">Импорт амжилтгүй: Үл мэдэгдэх алдаа гарлаа</string>
+    <string name="import_exception_bad_headers">Импорт амжилтгүй: Толгой хэсгүүд хүлээгдсэнтэй тохирохгүй байна: %1$s</string>
+    <string name="import_exception_inconsistent_record">Импорт амжилтгүй: %1$s-р мөрийн бичлэг шаардлагатай толгой хэсгүүдтэй нийцэхгүй байна</string>
+    <string name="import_exception_bad_timestamp">Импорт амжилтгүй: %1$s-р мөрийн бичлэгийн цагийн тэмдэглэгээг тайлж чадсангүй</string>
+    <string name="import_exception_inconsistent_data_type">Импорт амжилтгүй: %1$s-р мөрөнд нийцгүй өгөгдлийн төрөл хүлээн авлаа</string>
+    <string name="unknown_error_occurred">Үл мэдэгдэх алдаа гарлаа</string>
+    <string name="graph_stat_validation_no_name">Нэр оруулна уу</string>
+    <string name="graph_stat_validation_no_line_graph_features">Графикт зүйл нэмнэ үү</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">\"Эхлэх\" нь \"Дуусах\"-аас бага эсвэл тэнцүү эсэхийг шалгана уу</string>
+    <string name="graph_stat_validation_unrecognised_color">Бүх өгөгдлийн багц өнгөтэй эсэхийг шалгана уу</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Буруу шугаман графикийн өгөгдлийн багц илэрлээ</string>
+    <string name="graph_stat_validation_bad_fixed_range">\"Эхлэх\" нь \"Дуусах\"-аас бага эсэхийг шалгана уу</string>
+    <string name="graph_stat_view_not_found">Энэ графикийг олох явцад алдаа гарлаа</string>
+    <string name="graph_stat_view_not_enough_data_stat">Үүнийг үүсгэхэд хангалттай өгөгдөл хянагдсаны дараа энэ статистик харагдана.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Үүнийг үүсгэхэд хангалттай өгөгдөл хянагдсаны дараа энэ график харагдана.</string>
+    <string name="pie_chart_mixed_signs_error">Эерэг болон сөрөг хэсгийн хэмжээг агуулж байгаа тул энэ дугуй диаграммыг дүрслэх боломжгүй.</string>
+    <string name="histogram_mixed_signs_error">Эерэг болон сөрөг баганын хэмжээг агуулж байгаа тул энэ гистограммыг дүрслэх боломжгүй.</string>
+    <string name="graph_non_finite_data_error">Хязгаарлагдмал бус тоон утга агуулж байгаа тул энэ графикийг дүрслэх боломжгүй.</string>
+    <string name="graph_inconsistent_series_error">Өгөгдлийн цуваануудын хэмжээ нийцэхгүй байгаа тул энэ графикийг дүрслэх боломжгүй.</string>
+    <string name="graph_invalid_y_range_error">Y тэнхлэгийн муж буруу байгаа тул энэ графикийг дүрслэх боломжгүй.</string>
+    <string name="finish">Дуусгах</string>
+    <string name="about_description">Track &amp; Graph нь GPL 3.0 лицензийн дагуу түгээгддэг үнэгүй, нээлттэй эхийн программ хангамж юм.</string>
+    <string name="about_libraries_message">Дараах нээлттэй эхийн сангуудыг ашигласан:</string>
+    <string name="about">Тухай</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Түгээмэл асуулт</string>
+    <string name="tutorial_text_1">Өгөгдлөө хянахын тулд трекер ашиглана уу.</string>
+    <string name="tutorial_text_2">Өгөгдлийг дүрслэхийн тулд график болон статистик ашиглана уу.</string>
+    <string name="tutorial_text_3">Трекер, график болон статистикаа зохион байгуулахын тулд бүлэг ашиглана уу.</string>
+    <string name="got_it">Ойлголоо!</string>
+    <string name="move_to_colon">Зөөх газар:</string>
+    <string name="move_to">Зөөх</string>
+    <string name="ru_sure_update_data">Энэ шинэчлэлт таны өмнө нь хянасан өгөгдлийг буцаах боломжгүйгээр өөрчилж болзошгүй. Үргэлжлүүлэхийн өмнө одоо байгаа өгөгдлөө нөөцлөхийг зөвлөж байна.\n\n Үргэлжлүүлэх үү?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Аппыг үнэлэх</string>
+    <string name="reminders">Сануулагчид</string>
+    <string name="no_reminders_hint">Шинэ хяналтын сануулагчийн мэдэгдэл үүсгэхийн тулд + дүрс дээр товшино уу.</string>
+    <string name="mon">Да</string>
+    <string name="tue">Мя</string>
+    <string name="wed">Лх</string>
+    <string name="thu">Пү</string>
+    <string name="fri">Ба</string>
+    <string name="sat">Бя</string>
+    <string name="sun">Ня</string>
+    <string name="reminders_notifications_channel_name">Сануулагчид</string>
+    <string name="reminders_notifications_channel_description">Хэзээ хянахыг сануулах зорилгоор хэрэглэгчийн үүсгэсэн мэдэгдлүүд</string>
+    <string name="default_reminder_name">Хянах цаг боллоо!</string>
+    <string name="missed_reminder_single_content">%1$s-ээс ирсэн сануулагч</string>
+    <string name="missed_reminders_multiple_content">Та %1$d сануулагчийг алгассан байна</string>
+    <string name="next_reminder_format">Дараагийн сануулагч: %1$s</string>
+    <string name="no_upcoming_reminders">Удахгүй болох сануулагч алга</string>
+    <string name="select_reminder_type">Сануулагчийн төрөл сонгох</string>
+    <string name="week_day_reminder">Гарагийн сануулагч</string>
+    <string name="week_day_reminder_description">Даваа, Лхагва, Баасан зэрэг тодорхой өдрүүд</string>
+    <string name="periodic_reminder">Давтамжит сануулагч</string>
+    <string name="periodic_reminder_description">3 өдөр тутам зэрэг тогтмол давтамж</string>
+    <string name="month_day_reminder">Сарын өдрийн сануулагч</string>
+    <string name="month_day_reminder_description">Эхний Даваа гараг зэрэг сарын давтамж</string>
+    <string name="time_since_last_reminder">Сүүлийн сануулагчаас хойших хугацаа</string>
+    <string name="time_since_last_reminder_description">Хэсэг хугацаанд ямар нэг зүйл хянаагүй үед</string>
+    <string name="one_time_reminder">Нэг удаагийн сануулагч</string>
+    <string name="one_time_reminder_description">Тодорхой цагт эсвэл хүлээлтийн дараа өгөх дан сануулагч</string>
+    <string name="reminder_name">Сануулагчийн нэр</string>
+    <string name="reminder_disabled">Сануулагч идэвхгүй</string>
+    <string name="repeat_every">Давтах давтамж</string>
+    <string name="at_time">Цагт</string>
+    <string name="at_a_specific_time">Тодорхой цагт</string>
+    <string name="ending_at">Дуусах цаг</string>
+    <string name="starting_from">Эхлэх хугацаа</string>
+    <string name="repeat_on_week_days">Гарагуудад давтах</string>
+    <string name="track_feature">Өгөгдлийн эх үүсвэр хянах</string>
+    <string name="select_tracker_placeholder">Трекер сонгох</string>
+    <string name="remind_after">Дараа нь сануулах</string>
+    <string name="then_remind_every">Дараа нь давтамж бүрд сануулах</string>
+    <string name="remind_at_date_and_time">Огноо, цагт</string>
+    <string name="remind_after_a_delay">Хүлээлтийн дараа</string>
+    <string name="first_reminder">Эхний сануулагч</string>
+    <string name="every_colon">Давтамж:</string>
+    <string name="ended_at_format">Дууссан: %1$s</string>
+    <string name="starting_at_format">Эхлэх: %1$s</string>
+    <string name="occurrence_first">Эхний</string>
+    <string name="occurrence_second">Хоёр дахь</string>
+    <string name="occurrence_third">Гурав дахь</string>
+    <string name="occurrence_fourth">Дөрөв дэх</string>
+    <string name="occurrence_last">Сүүлийн</string>
+    <string name="monday">Даваа гараг</string>
+    <string name="tuesday">Мягмар гараг</string>
+    <string name="wednesday">Лхагва гараг</string>
+    <string name="thursday">Пүрэв гараг</string>
+    <string name="friday">Баасан гараг</string>
+    <string name="saturday">Бямба гараг</string>
+    <string name="sunday">Ням гараг</string>
+    <string-array name="abbreviated_months">
+        <item>1-р сар</item>
+        <item>2-р сар</item>
+        <item>3-р сар</item>
+        <item>4-р сар</item>
+        <item>5-р сар</item>
+        <item>6-р сар</item>
+        <item>7-р сар</item>
+        <item>8-р сар</item>
+        <item>9-р сар</item>
+        <item>10-р сар</item>
+        <item>11-р сар</item>
+        <item>12-р сар</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Да</item>
+        <item>Мя</item>
+        <item>Лх</item>
+        <item>Пү</item>
+        <item>Ба</item>
+        <item>Бя</item>
+        <item>Ня</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Мужийн хэлбэр:</string>
+    <string name="track_widget_configure_no_data_error">Эхлээд өгөгдөл хянана уу.</string>
+    <string name="track_widget_configure_no_data_selected_error">Хяналтын виджет үүсгэхийн тулд хүчинтэй өгөгдлийн багц сонгоно уу.</string>
+    <string name="create">Үүсгэх</string>
+    <string name="use_default_value">Өгөгдмөл утга тохируулах</string>
+    <string name="backup_and_restore">Нөөцлөх ба сэргээх</string>
+    <string name="backup_hint_text">Нөөцлөлтөд таны бүх аппын өгөгдөл, үүнд хянасан өгөгдөл, график болон сануулагчид багтана. Төхөөрөмжөө гээх эсвэл эвдэхээс сэргийлж өгөгдлөө тогтмол гадаад төхөөрөмж эсвэл үүлэн хадгалалтад нөөцлөөрэй.</string>
+    <string name="restore_data">Өгөгдөл сэргээх</string>
+    <string name="backup_successful">Нөөцлөлт амжилттай!</string>
+    <string name="backup_error_could_not_write_to_file">Сонгосон файлыг олж эсвэл бичиж чадсангүй.</string>
+    <string name="backup_error_could_not_find_database_file">Өгөгдлийн сангийн файлыг олж эсвэл уншиж чадсангүй.</string>
+    <string name="backup_error_failed_to_copy_database">Өгөгдлийн сангийн файлыг хуулах явцад алдаа гарлаа.</string>
+    <string name="restore_failed">Сэргээж чадсангүй. %1$s</string>
+    <string name="add_a_longer_description_optional">Дэлгэрэнгүй тайлбар нэмэх (заавал биш)</string>
+    <string name="no_data_points_history_fragment_hint">Өгөгдлийн цэг нэмсний дараа таны түүх энд харагдана.</string>
+    <string name="data_resolution_error">Энэ өгөгдлийг шийдвэрлэх явцад алдаа гарлаа:\n\n%1$s</string>
+    <string name="info">Мэдээлэл</string>
+    <string name="no_description">Тайлбар алга</string>
+    <string name="description">Тайлбар</string>
+    <string name="app_lock_title">Апп түгжих</string>
+    <string name="app_lock_locked_title">Track &amp; Graph түгжигдсэн</string>
+    <string name="app_lock_password_label">Нууц үг</string>
+    <string name="app_lock_confirm_password_label">Нууц үг баталгаажуулах</string>
+    <string name="app_lock_unlock">Түгжээ тайлах</string>
+    <string name="app_lock_use_biometrics">Биометр ашиглах</string>
+    <string name="app_lock_enable">Апп түгжээг идэвхжүүлэх</string>
+    <string name="app_lock_enabled">Апп түгжээ идэвхжсэн</string>
+    <string name="app_lock_enable_biometric_unlock">Биометрээр тайлахыг идэвхжүүлэх</string>
+    <string name="app_lock_no_strong_biometric_available">Энэ төхөөрөмжид хүчтэй биометрийн түгжээ тайлах боломжгүй.</string>
+    <string name="app_lock_lock_after_background_minutes">Арын горимд орсноос хойш түгжих минут</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Апп нүүрэн хэсгээс гармагц түгжихийн тулд 0 утгыг ашиглана уу.</string>
+    <string name="app_lock_change_password">Нууц үг өөрчлөх</string>
+    <string name="app_lock_password_changed">Нууц үг өөрчлөгдлөө</string>
+    <string name="app_lock_disable">Апп түгжээг идэвхгүй болгох</string>
+    <string name="app_lock_unlock_biometric_title">Track &amp; Graph-ийн түгжээ тайлах</string>
+    <string name="app_lock_unlock_biometric_subtitle">Үргэлжлүүлэхийн тулд төхөөрөмжийнхөө биометрийг ашиглана уу</string>
+    <string name="app_lock_use_password">Нууц үг ашиглах</string>
+    <string name="app_lock_biometric_not_recognized">Биометрийн баталгаажуулалт танигдсангүй.</string>
+    <string name="app_lock_error_missing_password">Апп түгжээний нууц үг алга байна. Апп түгжээг идэвхгүй болгож, дахин идэвхжүүлнэ үү.</string>
+    <string name="app_lock_error_incorrect_password">Нууц үг буруу</string>
+    <string name="app_lock_error_password_hashing_unavailable">Энэ төхөөрөмжид апп түгжээний нууц үгийг баталгаажуулах боломжгүй.</string>
+    <string name="app_lock_error_enter_password">Нууц үг оруулна уу.</string>
+    <string name="app_lock_error_passwords_do_not_match">Нууц үгс таарахгүй байна.</string>
+    <string name="note_input_hint">Тэмдэглэл…</string>
+    <string name="add_a_note">Тэмдэглэл нэмэх</string>
+    <string name="notes">Тэмдэглэлүүд</string>
+    <string name="show_global_notes">Ерөнхий</string>
+    <string name="show_data_point_notes">Өгөгдлийн цэгүүд</string>
+    <string name="delete_reminder_content_description">Сануулагч устгах</string>
+    <string name="theme_colon">Загвар:</string>
+    <string name="date_format_colon">Огнооны формат:</string>
+    <string name="add_data_point_button_content_description">Өгөгдлийн цэг нэмэх товч</string>
+    <string name="tracked_data_menu_button_content_description">Хянасан өгөгдлийн цэсний товч</string>
+    <string name="tracked_data_history_button_content_description">Хянасан өгөгдлийн түүхийн товч</string>
+    <string name="delete_line_button_content_description">Мөр устгах товч</string>
+    <string name="delete_input_button_content_description">Оролт устгах товч</string>
+    <string name="delete_data_point_button_content_description">Өгөгдлийн цэг устгах товч</string>
+    <string name="edit_data_point_button_content_description">Өгөгдлийн цэг засах товч</string>
+    <string name="add_multiple_choice_answer_button_content_description">Олон сонголтын хариулт нэмэх товч</string>
+    <string name="ending_at_colon">Түүврийн төгсгөл:</string>
+    <string name="duplicate">Хувилах</string>
+    <string name="no_notes_hint_text">Хянах үед нэмсэн тэмдэглэл энд харагдана. Мөн + товчоор ерөнхий тэмдэглэл нэмж болно.</string>
+    <string name="add_a_global_note">Ерөнхий тэмдэглэл нэмэх:</string>
+    <string name="duration">Үргэлжлэх хугацаа</string>
+    <string name="weeks">Долоо хоног</string>
+    <string name="months">Сар</string>
+    <string name="days">Өдөр</string>
+    <string name="hours">Цаг</string>
+    <string name="minutes">Минут</string>
+    <string name="seconds">Секунд</string>
+    <string name="hours_suffix">ц</string>
+    <string name="minutes_suffix">м</string>
+    <string name="seconds_suffix">с</string>
+    <string name="numeric_to_duration_mode_header">Өмнө нь хянасан утгуудыг дараах байдлаар илэрхийлэх:</string>
+    <string name="duration_to_numeric_mode_header">Өмнө нь хянасан утгуудыг юунд хөрвүүлэх вэ:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Хугацааны үргэлжлэх хугацааг бусад төрлийн өгөгдөлтэй хольж болохгүй. Цаг, минут эсвэл секундийг графикаар үзүүлнэ үү</string>
+    <string name="sum_by_count_checkbox_label">Утгуудын нийлбэрийн оронд хянасан өгөгдлийн цэгийн тоог тоолохын тулд энд чагтална уу.</string>
+    <string name="time_window_size">Хугацааны цонхны хэмжээ:</string>
+    <string name="hold_to_preview">Урьдчилан харахын тулд удаан дарна уу</string>
+    <string name="open">Нээх</string>
+    <string name="close">Хаах</string>
+    <string name="filter_by_label">Шошгоор шүүх</string>
+    <string name="filter_by_value">Утгын хүрээгээр шүүх</string>
+    <string name="save_changes">Өөрчлөлтийг хадгалах</string>
+    <string name="timer_notification_channel_name">Цаг хэмжигчид</string>
+    <string name="stop">Зогсоох</string>
+    <string name="name_your_function">Функцдээ нэр өгнө үү: </string>
+    <string name="add_some_data_sources">Өгөгдлийн эх үүсвэр нэмэх</string>
+    <string name="value">Утга</string>
+    <string name="label">Шошго</string>
+    <string name="continue_word">Үргэлжлүүлэх</string>
+    <string name="update_all_data_points">Бүх өгөгдлийн цэгийг шинэчлэх: </string>
+    <string name="where_colon">Хаана:</string>
+    <string name="to_colon">Хүртэл:</string>
+    <string name="value_equals">Утга =</string>
+    <string name="label_equals">Шошго =</string>
+    <string name="adding_your_first_data_point">Өгөгдлийн цэг нэмэх богино заавар:</string>
+    <string name="next">Дараах</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Өгөгдлийн цэг бүр цагийн тэмдэглэгээ болон утгатай: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Мөн сонголтоор шошго болон тэмдэглэлтэй байж болно: </string>
+    <string name="data_point_tutorial_page_2_description">Утга нь тоо тул өгөгдөл тань цаг хугацааны явцад хэрхэн өөрчлөгдөж байгааг харж болно</string>
+    <string name="data_point_tutorial_page_2_hint">(Зөвлөмж: Утга чухал биш бол өгөгдмөл 1 утгыг ашиглана уу)</string>
+    <string name="data_point_tutorial_page_3_description">Өгөгдлийн цэгүүдийг бүлэглэхийг хүсвэл шошго ашиглана уу</string>
+    <string name="data_point_tutorial_page_3_hint">(Зөвлөмж: Нэмэлт тайлбар хэрэгтэй бол шошгоны оронд тэмдэглэлийн талбарыг ашиглана уу)</string>
+    <string name="help">Тусламж</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Нарийвчилсан сонголтууд</string>
+    <string name="type_colon">\"Төрөл: \"</string>
+    <string name="order_colon">\"Эрэмбэ: \"</string>
+    <string name="value_and_label">Утга ба шошго</string>
+    <string name="value_only">Зөвхөн утга</string>
+    <string name="label_only">Зөвхөн шошго</string>
+    <string name="none">Байхгүй</string>
+    <string name="value_ascending">Утга өсөхөөр</string>
+    <string name="value_descending">Утга буурахаар</string>
+    <string name="label_ascending">Шошго өсөхөөр</string>
+    <string name="label_descending">Шошго буурахаар</string>
+    <string name="latest">Сүүлийнх</string>
+    <string name="oldest">Хамгийн хуучин</string>
+    <string name="track_all">Бүгдийг хянах</string>
+    <string name="more_details">Дэлгэрэнгүй</string>
+    <string name="suggestions">Санал</string>
+    <string name="no_label">Шошгогүй</string>
+    <string name="confirm_cancel_notes_will_be_lost">Хаахдаа итгэлтэй байна уу? Бүх тэмдэглэл устна.</string>
+    <string name="add_a_label">Шошго нэмэх</string>
+    <string name="bar_interval">Баганын интервал:</string>
+    <string name="y_range_max">Y хүрээний дээд хязгаар</string>
+    <string name="total_formatted">Нийт: %s</string>
+    <string name="from_formatted">Эхлэх: %s</string>
+    <string name="to_formatted">Дуусах: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Секунд</string>
+    <string name="minutes_generic">Минут</string>
+    <string name="hours_generic">Цаг</string>
+    <string name="days_generic">Өдөр</string>
+    <string name="weeks_generic">Долоо хоног</string>
+    <string name="months_generic">Сар</string>
+    <string name="years_generic">Жил</string>
+    <plurals name="seconds">
+        <item quantity="other">%d секунд</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="other">%d минут</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="other">%d цаг</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="other">%d өдөр</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="other">%d долоо хоног</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="other">%d сар</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">%d жил</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Минут тутамд</item>
+        <item quantity="other">%d минут тутамд</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Цаг тутамд</item>
+        <item quantity="other">%d цаг тутамд</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Өдөр бүр</item>
+        <item quantity="other">%d өдөр тутамд</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Долоо хоног бүр</item>
+        <item quantity="other">%d долоо хоног тутамд</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Сар бүр</item>
+        <item quantity="other">%d сар тутамд</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Жил бүр</item>
+        <item quantity="other">%d жил тутамд</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">1 минутын дараа</item>
+        <item quantity="other">%d минутын дараа</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">1 цагийн дараа</item>
+        <item quantity="other">%d цагийн дараа</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">1 өдрийн дараа</item>
+        <item quantity="other">%d өдрийн дараа</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">1 долоо хоногийн дараа</item>
+        <item quantity="other">%d долоо хоногийн дараа</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">1 сарын дараа</item>
+        <item quantity="other">%d сарын дараа</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">1 жилийн дараа</item>
+        <item quantity="other">%d жилийн дараа</item>
+    </plurals>
+    <string name="restore_hint_text">АНХААРУУЛГА: Нөөцөөс сэргээснээр апп доторх бүх өгөгдөл болон тохиргоо устна. Эхлээд өгөгдлөө нөөцлөөрэй!</string>
+    <string name="backup_now">Одоо нөөцлөх</string>
+    <string name="restore_error_could_not_write_to_database">Сэргээж чадсангүй! Өгөгдлийн санг олж эсвэл бичиж чадсангүй.</string>
+    <string name="restore_error_could_not_read_from_database_file">Сэргээж чадсангүй! Сонгосон өгөгдлийн сангийн файлыг олж эсвэл уншиж чадсангүй.</string>
+    <string name="restore_error_failed_to_copy_database">Сэргээж чадсангүй! Өгөгдлийн санг сэргээх явцад алдаа гарлаа.</string>
+    <string name="select_location">Байршил сонгох…</string>
+    <string name="restore_successful">Амжилттай сэргээгдлээ! Track &amp; Graph-ийг одоо дахин эхлүүлэх шаардлагатай.</string>
+    <string name="restore_error_invalid_database_file">Сэргээж чадсангүй! Сонгосон файл хүчинтэй нөөц файл биш байна.</string>
+    <string name="auto_backup">Автомат нөөцлөлт</string>
+    <string name="apply">Хэрэглэх</string>
+    <string name="backup_every">Нөөцлөх давтамж: </string>
+    <string name="next_backup_at">\"Дараагийн нөөцлөлт: \"</string>
+    <string name="backup_notification_channel_name">Автомат нөөцлөлтийн мэдэгдэл</string>
+    <string name="backup_notification_channel_description">Автомат нөөцлөлт хийгдэж байгаа эсэх болон амжилтгүй болсон эсэхийг мэдэгдэнэ.</string>
+    <string name="backup_notification_title">Нөөцлөж байна…</string>
+    <string name="backup_failed_notification_title">Автомат нөөцлөлт амжилтгүй боллоо</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph таны нөөцлөлтийн байршлыг олж эсвэл хандаж чадсангүй.</string>
+    <string name="backup_failed_notification_could_not_copy">Өгөгдлийг нөөцлөх явцад алдаа гарлаа. Нөөцлөлт гэмтсэн эсвэл дутуу байж болзошгүй.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Шинэ байршил сонгох</string>
+    <string name="backup_location">Нөөцлөлтийн байршил</string>
+    <string name="enable_auto_backup">Автомат нөөцлөлтийг идэвхжүүлэх</string>
+    <string name="last_successful_backup">Сүүлд амжилттай нөөцөлсөн</string>
+    <string name="next_scheduled_backup">Дараагийн товлосон нөөцлөлт</string>
+    <string name="notification_permission_prompt">Автомат нөөцлөлт ямар нэг шалтгаанаар амжилтгүй болсныг мэдэхийн тулд Track &amp; Graph-ийн мэдэгдлийг идэвхжүүлнэ үү.</string>
+    <string name="lua_script_empty">Lua скрипт нэмнэ үү</string>
+    <string name="function_name_empty">Функцийн нэр хоосон байж болохгүй</string>
+    <string name="function_name">Функцийн нэр</string>
+    <string name="add_at_least_one_input">Дор хаяж нэг оролт нэмнэ үү</string>
+    <string name="output">Гаралт</string>
+    <string name="data_source">Өгөгдлийн эх үүсвэр</string>
+    <string name="lua_script">Lua скрипт</string>
+    <string name="data_source_description">Өгөгдлийн эх үүсвэрийн зангилаа нь оролт болгон ашиглах трекер эсвэл функцийг сонгох боломж олгоно.</string>
+    <string name="lua_script_input_hint">Lua скрипт оруулна уу…</string>
+    <string name="select_node_type">Зангилааны төрөл сонгох</string>
+    <string name="file">Файл</string>
+    <string name="lua_feature_names_not_unique">Скриптийн оролтууд давтагдашгүй нэртэй байх ёстой</string>
+    <string name="graph_stat_type_lua_graph">Lua скрипт</string>
+    <string name="launch_lua_disabled">Lua ажиллуулахыг идэвхгүй болгосон</string>
+    <string name="no_lua">Lua байхгүй</string>
+    <string name="lua_engine_disabled">Lua хөдөлгүүрийг идэвхгүй болгосон</string>
+    <string name="lua_graph_first_time_user_title">Lua скриптийн график ба статистик</string>
+    <string name="lua_graph_first_time_user_message">Lua скрипт нь Lua програмчлалын хэлээр өөрийн график, статистик үүсгэх боломжтой дэвшилтэт функц юм. \n\nТа өөрийн скриптийг ачаалах эсвэл GitHub-ийн цуглуулгаас сонгох боломжтой. GitHub-ээс скрипт суулгасны дараа апп руу буцаж, скриптийг ашиглахад бэлэн болгоно.</string>
+    <string name="functions_first_time_user_title">Functions-д тавтай морил</string>
+    <string name="functions_first_time_user_message">Functions нь өгөгдлийг нэгтгэх, нийлбэрлэх болон хувиргаж шинэ үүсмэл өгөгдлийн эх үүсвэр болгох дэвшилтэт функц юм.</string>
+    <string name="learn_more">Эндээс дэлгэрэнгүй үзэх</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Буулгах</string>
+    <string name="failed_to_download_file">Файлыг татаж чадсангүй: %s</string>
+    <string name="confirm_deep_link">Та үл мэдэгдэх эх сурвалжаас скриптийн холбоос хүлээн авлаа. Зөвхөн итгэдэг эх сурвалжаасаа скрипт суулгана уу. Энэ скриптийг суулгах уу?</string>
+    <string name="graph_stat_info_button_description">График ба статистикийн заавар</string>
+    <string name="network_generic_error">Сүлжээнд хандах явцад алдаа гарлаа. Холболтоо шалгаад дахин оролдоно уу.</string>
+    <string name="function_verification_failure">Функцийн гарын үсгийг шалгаж чадсангүй. Аюулгүй холболттой бөгөөд Track &amp; Graph шинэчлэгдсэн эсэхийг шалгана уу</string>
+    <string name="function_network_failure">Функцуудыг ачаалж чадсангүй. Интернэтэд холбогдсон эсэхээ шалгана уу. Асуудал үргэлжилбэл апп шинэчлэгдсэн эсэхийг шалгана уу.</string>
+    <string name="functions_landscape_hint">Зөвлөмж: Functions-ийг дэлгэцийг хөндлөн байрлуулж ашиглахад тохиромжтой</string>
+    <string name="functions_start_hint">Эндээс эхэл: Удаан дарж, Өгөгдлийн эх үүсвэрийг сонго</string>
+    <string name="see_whats_new">Шинэ зүйлсийг үзэх</string>
+</resources>

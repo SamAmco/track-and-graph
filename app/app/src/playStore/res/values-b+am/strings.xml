@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ገንቢውን ይደግፉ</string>
+    <string name="support_unavailable">በአሁኑ ጊዜ ምንም የድጋፍ አማራጮች የሉም።</string>
+    <string name="support_payment_failed">ክፍያው አልተሳካም። እባክዎ እንደገና ይሞክሩ።</string>
+    <string name="support_payment_pending">ክፍያው በመጠባበቅ ላይ ነው። ክፍያው ከተረጋገጠ በኋላ Google Play ያጠናቅቀዋል።</string>
+</resources>

@@ -21,14 +21,14 @@
     <string name="reminder">Erinnerung</string>
     <string name="add_component">Komponente hinzufügen</string>
     <string name="symlink_locations_title">Standorte von \"%1$s\"</string>
-    <string name="add_tracker">Etwas tracken:</string>
+    <string name="add_tracker">Etwas erfassen:</string>
     <string name="add">Hinzufügen</string>
     <string name="group_name">z.B. Tägliche Aktivitäten</string>
     <string name="delete">Löschen</string>
     <string name="edit">Bearbeiten</string>
     <string name="update">Aktualisieren</string>
     <string name="graph_or_stat_name">Name des Diagramms: </string>
-    <string name="tracker_name">Was möchten Sie tracken?</string>
+    <string name="tracker_name">Was möchten Sie erfassen?</string>
     <string name="this_is_a_time_or_duration">Dies ist eine Zeit oder Dauer</string>
     <string name="yes">Ja</string>
     <string name="cancel">Abbrechen</string>
@@ -37,7 +37,7 @@
     <string name="no_trackers_graph_stats_hint">Bitte erstellen Sie einen Tracker, bevor Sie Diagramme erstellen.</string>
     <string name="no_trackers_functions_hint">Bitte erstellen Sie einen Tracker, bevor Sie Funktionen erstellen.</string>
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
-    <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
+    <string name="ru_sure_del_feature">Möchten Sie diese erfassten Daten wirklich löschen?</string>
     <string name="item_in_multiple_groups">Dieses Element existiert an mehreren Stellen. Sie können es von hier entfernen oder überall löschen.</string>
     <string name="remove_from_this_group">Von hier entfernen</string>
     <string name="delete_everywhere">Überall löschen</string>
@@ -45,7 +45,7 @@
     <string name="ru_sure_del_reminder">Sind Sie sicher, dass Sie diese Erinnerung löschen möchten? Sie können dies nicht rückgängig machen.</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
     <string name="feature_name_cannot_be_null">Bitte einen Namen angeben</string>
-    <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
+    <string name="tracker_with_that_name_exists">Sie erfassen bereits etwas mit diesem Namen</string>
     <string name="data_points">%1$d Datenpunkte</string>
     <string name="items_selected">%1$d Ausgewählt</string>
     <string name="select_all">Alle auswählen</string>
@@ -62,9 +62,9 @@
     <string name="search">Suchen</string>
     <string name="type_to_search">Zum Suchen tippen</string>
     <string name="no_results">Keine Ergebnisse</string>
-    <string name="export_to">Exportieren Sie getrackte Daten in dieser Gruppe nach CSV:</string>
+    <string name="export_to">Erfasste Daten in dieser Gruppe als CSV exportieren:</string>
     <string name="export_error_message">Export fehlgeschlagen: %1$s</string>
-    <string name="import_from">Importieren Sie getrackte Daten von CSV in diese Gruppe:</string>
+    <string name="import_from">Erfasste Daten aus einer CSV-Datei in diese Gruppe importieren:</string>
     <string name="import_warning">Achtung: Der Import ist irreversibel. Track &amp; Graph versucht, alle importierten Daten mit vorhandenen Daten in dieser Gruppe nach Namen zusammenzuführen.</string>
     <string name="add_a_graph_or_stat">Ein Diagramm oder eine Statistik hinzufügen</string>
     <string name="graph_type_label">Diagrammtyp:</string>
@@ -102,7 +102,7 @@
     <string name="graph_type_pie_chart">Tortendiagramm</string>
     <string name="graph_type_average_time_between">Durchschnittszeit zwischen</string>
     <string name="graph_type_time_since">Zeit seitdem</string>
-    <string name="graph_type_time_histogram">Histogramm Zeit</string>
+    <string name="graph_type_time_histogram">Zeithistogramm</string>
     <string-array name="line_graph_averaging_mode_names">
         <item>Keine Durchschnittsermittlung</item>
         <item>Dynamischer Tagesdurchschnitt</item>
@@ -114,14 +114,14 @@
         <item>Dynamischer jährlicher Durchschnitt</item>
     </string-array>
     <string-array name="line_graph_plot_mode_names">
-        <item>Gesamtanzahl wenn getrackt</item>
+        <item>Bei Erfassung darstellen</item>
         <item>Gesamtanzahl stündlich</item>
         <item>Gesamtanzahl täglich</item>
         <item>Gesamtanzahl wöchentlich</item>
         <item>Gesamtanzahl monatlich</item>
         <item>Gesamtanzahl jährlich</item>
     </string-array>
-    <string name="graph_type_last_value">Zuletzt getrackt/Zeit seitdem</string>
+    <string name="graph_type_last_value">Zuletzt erfasst/Zeit seitdem</string>
     <string name="graph_time_durations_all_data">Alle Daten</string>
     <string name="graph_time_durations_a_day">Einen Tag</string>
     <string name="graph_time_durations_a_week">Eine Woche</string>
@@ -172,7 +172,7 @@
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
     <string name="faq">FAQ</string>
-    <string name="tutorial_text_1">Verwenden Sie Tracker, um Ihre Daten zu tracken.</string>
+    <string name="tutorial_text_1">Verwenden Sie Tracker, um Ihre Daten zu erfassen.</string>
     <string name="tutorial_text_2">Verwenden Sie Diagramme und Statistiken, um Daten zu visualisieren.</string>
     <string name="tutorial_text_3">Verwenden Sie Gruppen, um Ihre Tracker, Diagramme und Statistiken zu organisieren.</string>
     <string name="got_it">Ich habs!</string>
@@ -180,12 +180,12 @@
     <string name="move_to">Verschieben nach</string>
     <string name="copy_to">Kopieren nach</string>
 
-    <string name="ru_sure_update_data">Diese Aktualisierung kann die Daten, die Sie bereits getrackt haben, unwiderruflich verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\n Möchten Sie fortfahren?</string>
+    <string name="ru_sure_update_data">Diese Aktualisierung kann die bereits erfassten Daten unwiderruflich verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\nMöchten Sie fortfahren?</string>
     <string name="ok">OK</string>
 
     <string name="rate_the_app">Bewerten Sie die App</string>
     <string name="reminders">Erinnerungen</string>
-    <string name="no_reminders_hint">Tippen Sie auf das + Symbol, um eine neue Tracking-Erinnerungsbenachrichtigung zu erstellen.</string>
+    <string name="no_reminders_hint">Tippen Sie auf das +-Symbol, um eine neue Erinnerung für die Datenerfassung zu erstellen.</string>
     <string name="mon">Mo</string>
     <string name="tue">Di</string>
     <string name="wed">Mi</string>
@@ -194,16 +194,16 @@
     <string name="sat">Sa</string>
     <string name="sun">So</string>
     <string name="reminders_notifications_channel_name">Erinnerungen</string>
-    <string name="reminders_notifications_channel_description">Benutzerdefinierte Benachrichtigungen um Sie daran zu erinnern, wenn etwas getrackt werden soll</string>
-    <string name="default_reminder_name">Zeit loszulegen!</string>
+    <string name="reminders_notifications_channel_description">Benutzerdefinierte Benachrichtigungen, die Sie an die Datenerfassung erinnern</string>
+    <string name="default_reminder_name">Zeit, Daten zu erfassen!</string>
     <string name="range_style">Bereichsstil:</string>
 
-    <string name="track_widget_configure_no_data_error">Bitte tracken Sie zuerst einige Daten.</string>
-    <string name="track_widget_configure_no_data_selected_error">Sie müssen einen gültigen Datensatz auswählen, um ein Tracking-Widget zu erstellen.</string>
+    <string name="track_widget_configure_no_data_error">Bitte erfassen Sie zuerst einige Daten.</string>
+    <string name="track_widget_configure_no_data_selected_error">Sie müssen einen gültigen Datensatz auswählen, um ein Erfassungs-Widget zu erstellen.</string>
     <string name="create">Erstellen</string>
     <string name="use_default_value">Einen Standardwert festlegen</string>
     <string name="backup_and_restore">Sichern und Wiederherstellen</string>
-    <string name="backup_hint_text">Die Sicherung sichert alle Anwendungsdaten einschließlich aller getrackten Daten, Diagramme und Erinnerungen. Sie sollten Ihre Daten regelmäßig auf ein externes Gerät oder einen Cloudspeicher sichern, für den Fall, dass Ihr Gerät verloren geht oder beschädigt wird.</string>
+    <string name="backup_hint_text">Die Sicherung enthält alle App-Daten einschließlich aller erfassten Daten, Diagramme und Erinnerungen. Sichern Sie Ihre Daten regelmäßig auf einem externen Gerät oder in einem Cloudspeicher, falls Ihr Gerät verloren geht oder beschädigt wird.</string>
     <string name="restore_data">Wiederherstellung</string>
     <string name="backup_successful">Sicherung war erfolgreich!</string>
     <string name="backup_error_could_not_write_to_file">Ausgewählte Datei konnte nicht gefunden werden oder kann nicht beschrieben werden.</string>
@@ -252,8 +252,8 @@
     <string name="theme_colon">Thema:</string>
     <string name="date_format_colon">Datumsformat:</string>
     <string name="add_data_point_button_content_description">Button zum Hinzufügen eines Datenpunktes</string>
-    <string name="tracked_data_menu_button_content_description">Button für getrackte Daten</string>
-    <string name="tracked_data_history_button_content_description">Button Verlauf getrackter Daten</string>
+    <string name="tracked_data_menu_button_content_description">Menüschaltfläche für erfasste Daten</string>
+    <string name="tracked_data_history_button_content_description">Verlaufsschaltfläche für erfasste Daten</string>
     <string name="delete_line_button_content_description">Zeile löschen Button</string>
     <string name="delete_input_button_content_description">Eingabe löschen Button</string>
     <string name="delete_data_point_button_content_description">Lösche Datenpunkt Button</string>
@@ -261,7 +261,7 @@
     <string name="add_multiple_choice_answer_button_content_description">Multiple Choice Antwort Button hinzufügen</string>
     <string name="ending_at_colon">Beispiel endet bei:</string>
     <string name="duplicate">Kopie</string>
-    <string name="no_notes_hint_text">Beim Tracking hinzugefügte Notizen werden hier angezeigt. Sie können auch globale Notizen mit der + Taste hinzufügen.</string>
+    <string name="no_notes_hint_text">Bei der Datenerfassung hinzugefügte Notizen werden hier angezeigt. Sie können mit der +-Taste auch globale Notizen hinzufügen.</string>
     <string name="add_a_global_note">Globale Notiz hinzufügen:</string>
     <string name="duration">Dauer</string>
     <string name="weeks">Wochen</string>
@@ -273,10 +273,10 @@
     <string name="hours_suffix">h</string>
     <string name="minutes_suffix">m</string>
     <string name="seconds_suffix">s</string>
-    <string name="numeric_to_duration_mode_header">Zuvor getrackte Werte darstellen:</string>
-    <string name="duration_to_numeric_mode_header">In was sollen zuvor getrackte Werte konvertiert werden:</string>
+    <string name="numeric_to_duration_mode_header">Zuvor erfasste Werte stellen Folgendes dar:</string>
+    <string name="duration_to_numeric_mode_header">In was sollen zuvor erfasste Werte konvertiert werden:</string>
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">Sie können die Zeitdauer nicht mit anderen Datentypen mischen. Beachten Sie die alternative Darstellung von Stunden, Minuten oder Sekunden.</string>
-    <string name="sum_by_count_checkbox_label">Klicken Sie hier, um die Anzahl der getrackten Datenpunkte zu zählen und nicht die Summe ihrer Werte.</string>
+    <string name="sum_by_count_checkbox_label">Wählen Sie diese Option, um die Anzahl der erfassten Datenpunkte statt der Summe ihrer Werte zu verwenden.</string>
     <string name="time_window_size">Größe des Zeitfensters:</string>
     <string name="hold_to_preview">Vorschau</string>
     <string name="add_group">Gruppe hinzufügen:</string>
@@ -284,7 +284,7 @@
     <string name="group">Gruppe</string>
     <string name="tracker">Tracker</string>
     <string name="graph_or_stat">Diagramm oder Statistik</string>
-    <string name="ru_sure_del_graph">Möchten Sie dieses Diagramm wirklich löschen? Sie können dies nicht rückgängig machen. Sie werden keine getrackten Daten verlieren.</string>
+    <string name="ru_sure_del_graph">Möchten Sie dieses Diagramm wirklich löschen? Sie können dies nicht rückgängig machen. Sie werden keine erfassten Daten verlieren.</string>
     <string name="open">Öffnen</string>
     <string name="function">Funktion</string>
     <string name="close">Schließen</string>
@@ -327,7 +327,7 @@
     <string name="label_descending">Label absteigend</string>
     <string name="latest">Neueste</string>
     <string name="oldest">Älteste</string>
-    <string name="track_all">Alle tracken</string>
+    <string name="track_all">Alle erfassen</string>
     <string name="more_details">Mehr Details</string>
     <string name="suggestions">Anmerkungen</string>
     <string name="no_label">Kein Label</string>
@@ -467,7 +467,7 @@
     <string name="enable_auto_backup">Aktivieren Sie die automatische Sicherung</string>
     <string name="last_successful_backup">Letzte erfolgreiche Sicherung</string>
     <string name="next_scheduled_backup">Nächste geplante Sicherung</string>
-    <string name="notification_permission_prompt">Sie sollten Benachrichtigungen für Track &amp; Graph zulassen um benachrichigt zu werden, wenn die automatische Sicherung aus irgendeinem Grund fehlschlägt.</string>
+    <string name="notification_permission_prompt">Aktivieren Sie Benachrichtigungen für Track &amp; Graph, damit Sie informiert werden, falls die automatische Sicherung fehlschlägt.</string>
     <string name="restore_hint_text">ACHTUNG: Bei der Wiederherstellung aus einem Backup werden alle derzeit in der App vorhandenen Daten und Einstellungen gelöscht. Sie sollten zuerst Ihre Daten sichern!</string>
     <string name="default_auto_backup_file_name">SicherungTrackUndGraph.db</string>
 
@@ -490,8 +490,8 @@
     <string name="lua_engine_disabled">Lua-Engine deaktiviert</string>
     <string name="lua_graph_first_time_user_title">Lua-Skript-Diagramme und -Statistiken</string>
     <string name="lua_graph_first_time_user_message">Lua-Skripte sind eine erweiterte Funktion, mit der Sie benutzerdefinierte Diagramme und Statistiken mit der Programmiersprache Lua erstellen können. \n\nSie können Ihr eigenes laden oder eines aus der GitHub-Sammlung auswählen. Das Installieren eines Skripts von GitHub bringt Sie zurück zur App, mit dem Skript bereit zur Verwendung.</string>
-    <string name="functions_first_time_user_title">Willkommen bei Funktionen</string>
-    <string name="functions_first_time_user_message">Funktionen sind eine erweiterte Funktion, mit der Sie Ihre Daten kombinieren, aggregieren und in neue abgeleitete Datenquellen transformieren können.</string>    <string name="learn_more">Erfahren Sie mehr hier</string>
+    <string name="functions_first_time_user_title">Willkommen bei den Funktionen</string>
+    <string name="functions_first_time_user_message">Mit Funktionen können Sie Daten kombinieren, aggregieren und in neue abgeleitete Datenquellen umwandeln.</string>    <string name="learn_more">Erfahren Sie hier mehr</string>
     <string name="github">GitHub</string>
     <string name="paste">Einfügen</string>
     <string name="failed_to_download_file">Fehler beim Herunterladen der Datei: %s</string>
@@ -500,7 +500,7 @@
     <string name="network_generic_error">Beim Versuch, auf das Netzwerk zuzugreifen, ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
     <string name="function_verification_failure">Fehler beim Überprüfen der Funktionssignaturen. Bitte stellen Sie sicher, dass Sie eine sichere Verbindung haben und Track &amp; Graph auf dem neuesten Stand ist</string>
     <string name="function_network_failure">Fehler beim Laden der Funktionen. Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind. Falls das Problem weiterhin besteht, stellen Sie bitte sicher, dass die App auf dem neuesten Stand ist.</string>
-    <string name="functions_landscape_hint">Tipp: Funktionen funktionieren am besten im Querformat</string>
+    <string name="functions_landscape_hint">Tipp: Funktionen lassen sich am besten im Querformat verwenden</string>
     <string name="functions_start_hint">Hier starten: Lange drücken und Datenquelle wählen</string>
     <string name="see_whats_new">Neuigkeiten ansehen</string>
     <string name="missed_reminder_single_content">Erinnerung von %1$s</string>
@@ -530,7 +530,7 @@
     <string name="ending_at">Endet am</string>
     <string name="starting_from">Beginnend ab</string>
     <string name="repeat_on_week_days">An Wochentagen wiederholen</string>
-    <string name="track_feature">Tracker auswählen</string>
+    <string name="track_feature">Daten erfassen</string>
     <string name="select_tracker_placeholder">Tracker auswählen</string>
     <string name="remind_after">Erinnern nach</string>
     <string name="then_remind_every">Dann erinnern alle</string>

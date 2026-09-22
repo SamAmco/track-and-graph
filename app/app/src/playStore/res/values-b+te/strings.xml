@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">డెవలపర్‌కు మద్దతు ఇవ్వండి</string>
+    <string name="support_unavailable">ప్రస్తుతం మద్దతు ఎంపికలు అందుబాటులో లేవు.</string>
+    <string name="support_payment_failed">చెల్లింపు విఫలమైంది. మళ్లీ ప్రయత్నించండి.</string>
+    <string name="support_payment_pending">చెల్లింపు పెండింగ్‌లో ఉంది. చెల్లింపు నిర్ధారించిన తర్వాత Google Play దాన్ని పూర్తి చేస్తుంది.</string>
+</resources>

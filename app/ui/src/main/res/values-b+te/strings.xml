@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">జోడించు</string>
+    <string name="add_a_note">గమనికను జోడించు</string>
+    <string name="cancel">రద్దు చేయి</string>
+    <string name="continue_word">కొనసాగించు</string>
+    <string name="create">సృష్టించు</string>
+    <string name="label">లేబుల్</string>
+    <string name="release_notes_support_text">మీ మద్దతు Track &amp; Graph‌ను కొనసాగిస్తూ అభివృద్ధి చెందడానికి సహాయపడుతుంది 🌱</string>
+    <string name="release_notes_maybe_later">తర్వాత కావచ్చు</string>
+    <string name="release_notes_support_development">అభివృద్ధికి మద్దతుగా విరాళం ఇవ్వండి</string>
+    <string name="release_notes_thank_you">ధన్యవాదాలు! ❤️\n\nమీ ప్రతి మద్దతు Track &amp; Graph‌ను అందరికీ మరింత మెరుగ్గా చేయడానికి ఉపయోగపడుతుంది 🌱</string>
+    <string name="support_close">మూసివేయి</string>
+    <string name="search">శోధించు</string>
+    <string name="update">నవీకరించు</string>
+    <string name="value">విలువ</string>
+</resources>

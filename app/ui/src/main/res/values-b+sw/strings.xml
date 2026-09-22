@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Ongeza</string>
+    <string name="add_a_note">Ongeza dokezo</string>
+    <string name="cancel">Ghairi</string>
+    <string name="continue_word">Endelea</string>
+    <string name="create">Unda</string>
+    <string name="label">Lebo</string>
+    <string name="release_notes_support_text">Msaada wako husaidia Track &amp; Graph kuendelea kuwepo na kukua 🌱</string>
+    <string name="release_notes_maybe_later">Labda baadaye</string>
+    <string name="release_notes_support_development">Changia kusaidia maendeleo</string>
+    <string name="release_notes_thank_you">Asante! ❤️\n\nKila msaada husaidia kuifanya Track &amp; Graph iwe bora kwa kila mtu 🌱</string>
+    <string name="support_close">Funga</string>
+    <string name="search">Tafuta</string>
+    <string name="update">Sasisha</string>
+    <string name="value">Thamani</string>
+</resources>

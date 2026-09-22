@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ડેવલપરને સહાય કરો</string>
+    <string name="support_unavailable">હાલમાં કોઈ સહાય વિકલ્પ ઉપલબ્ધ નથી.</string>
+    <string name="support_payment_failed">ચુકવણી નિષ્ફળ થઈ. કૃપા કરીને ફરી પ્રયાસ કરો.</string>
+    <string name="support_payment_pending">ચુકવણી બાકી છે. ચુકવણીની પુષ્ટિ થયા પછી Google Play તેને પૂર્ણ કરશે.</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Pievienot</string>
+    <string name="add_a_note">Pievienot piezīmi</string>
+    <string name="cancel">Atcelt</string>
+    <string name="continue_word">Turpināt</string>
+    <string name="create">Izveidot</string>
+    <string name="label">Etiķete</string>
+    <string name="release_notes_support_text">Jūsu atbalsts palīdz Track &amp; Graph turpināt darboties un attīstīties 🌱</string>
+    <string name="release_notes_maybe_later">Varbūt vēlāk</string>
+    <string name="release_notes_support_development">Ziedot izstrādes atbalstam</string>
+    <string name="release_notes_thank_you">Paldies! ❤️\n\nIkviens atbalsts palīdz padarīt Track &amp; Graph labāku visiem 🌱</string>
+    <string name="support_close">Aizvērt</string>
+    <string name="search">Meklēt</string>
+    <string name="update">Atjaunināt</string>
+    <string name="value">Vērtība</string>
+</resources>

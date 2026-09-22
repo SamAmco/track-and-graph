@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">டெவலப்பரை ஆதரிக்கவும்</string>
+    <string name="support_unavailable">தற்போது ஆதரவு விருப்பங்கள் எதுவும் இல்லை.</string>
+    <string name="support_payment_failed">பணம் செலுத்துதல் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="support_payment_pending">பணம் செலுத்துதல் நிலுவையில் உள்ளது. பணம் உறுதிசெய்யப்பட்டதும் Google Play அதை நிறைவு செய்யும்.</string>
+</resources>

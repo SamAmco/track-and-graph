@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="home">Tuis</string>
+    <string name="add_group">Voeg groep by: </string>
+    <string name="edit_group">Wysig groep: </string>
+    <string name="group">Groep</string>
+    <string name="tracker">Nasporer</string>
+    <string name="function">Funksie</string>
+    <string name="graph_or_stat">Grafiek of statistiek</string>
+    <string name="symlink">Simboliese skakel</string>
+    <string name="symlinks">Simboliese skakels</string>
+    <string name="reminder">Herinnering</string>
+    <string name="add_component">Voeg komponent by</string>
+    <string name="symlink_locations_title">Ligging van \"%1$s\"</string>
+    <string name="add_tracker">Spoor iets na:</string>
+    <string name="add">Voeg by</string>
+    <string name="group_name">bv. Daaglikse aktiwiteite</string>
+    <string name="delete">Skrap</string>
+    <string name="edit">Wysig</string>
+    <string name="update">Werk by</string>
+    <string name="graph_or_stat_name">Grafieknaam: </string>
+    <string name="tracker_name">Nasporernaam</string>
+    <string name="this_is_a_time_or_duration">Dit is ’n tyd of tydsduur</string>
+    <string name="yes">Ja</string>
+    <string name="cancel">Kanselleer</string>
+    <string name="select_file">Kies lêer</string>
+    <string name="empty_group_hint">Welkom by Track &amp; Graph!\n\n Tik op + regs bo en kies Nasporer om te begin.</string>
+    <string name="no_trackers_graph_stats_hint">Skep asseblief ’n nasporer voordat jy grafieke skep.</string>
+    <string name="no_trackers_functions_hint">Skep asseblief ’n nasporer voordat jy funksies skep.</string>
+    <string name="ru_sure_del_group">Is jy seker jy wil hierdie groep en alles daarin skrap? Dit kan nie omgekeer word nie.</string>
+    <string name="ru_sure_del_graph">Is jy seker jy wil hierdie grafiek skrap? Dit kan nie omgekeer word nie. Jy sal geen nagespoorde data verloor nie.</string>
+    <string name="ru_sure_del_feature">Is jy seker jy wil hierdie nagespoorde data skrap?</string>
+    <string name="item_in_multiple_groups">Hierdie item bestaan op verskeie plekke. Jy kan dit hiervandaan verwyder of dit oral skrap.</string>
+    <string name="remove_from_this_group">Verwyder hiervandaan</string>
+    <string name="delete_everywhere">Skrap oral</string>
+    <string name="ru_sure_del_function">Is jy seker jy wil hierdie funksie skrap? Dit kan nie omgekeer word nie.</string>
+    <string name="ru_sure_del_reminder">Is jy seker jy wil hierdie herinnering skrap? Dit kan nie omgekeer word nie.</string>
+    <string name="ru_sure_del_data_point">Is jy seker jy wil hierdie datapunt skrap?</string>
+    <string name="feature_name_cannot_be_null">Voeg asseblief ’n naam by</string>
+    <string name="tracker_with_that_name_exists">Jy spoor reeds iets met daardie naam na</string>
+    <string name="data_points">%1$d datapunte</string>
+    <string name="items_selected">%1$d gekies</string>
+    <string name="select_all">Kies alles</string>
+    <string name="deselect_all">Kies niks</string>
+    <string name="ru_sure_del_data_points">Is jy seker jy wil hierdie datapunte skrap?</string>
+    <string name="delete_selected_content_description">Skrap gekose items</string>
+    <string name="copy_selected_content_description">Kopieer gekose items</string>
+    <string name="move_selected_content_description">Skuif gekose items</string>
+    <string name="copy_to">Kopieer na</string>
+    <string name="no_data">Geen data</string>
+    <string name="skip">Slaan oor</string>
+    <string name="exportButton">Voer uit</string>
+    <string name="importButton">Voer in</string>
+    <string name="import_export">Invoer/uitvoer</string>
+    <string name="search">Soek</string>
+    <string name="type_to_search">Tik om te soek</string>
+    <string name="no_results">Geen resultate nie</string>
+    <string name="export_to">Voer nagespoorde data in hierdie groep uit na CSV:</string>
+    <string name="export_error_message">Uitvoer het misluk: %1$s</string>
+    <string name="import_from">Voer nagespoorde data vanaf CSV in hierdie groep in:</string>
+    <string name="import_warning">Waarskuwing: Invoer kan nie omgekeer word nie. Track &amp; Graph sal probeer om ingevoerde data volgens naam met bestaande data in hierdie groep saam te voeg.</string>
+    <string name="add_a_graph_or_stat">Voeg ’n grafiek of statistiek by</string>
+    <string name="graph_type_label">Grafiektipe:</string>
+    <string name="sample_size">Steekproefgrootte:</string>
+    <string name="select_a_discrete_feature">Kies ’n datastel met etikette: </string>
+    <string name="no_labels">Hierdie datastel het geen etikette nie</string>
+    <string name="select_a_feature">Kies ’n datastel:</string>
+    <string name="select_a_tracker">Kies ’n nasporer</string>
+    <string name="offset">Verskuiwing:</string>
+    <string name="scale">Skaal:</string>
+    <string name="from">Van:</string>
+    <string name="to">Tot:</string>
+    <string name="day">Dag</string>
+    <string-array name="time_histogram_windows">
+        <item>Uurliks</item>
+        <item>Daagliks</item>
+        <item>Weekliks</item>
+        <item>Maandeliks</item>
+        <item>Kwartaalliks</item>
+        <item>Halfjaarliks</item>
+        <item>Jaarliks</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Batterybesparing</item>
+        <item>Lig</item>
+        <item>Donker</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>Stelselverstek</item>
+        <item>Lig</item>
+        <item>Donker</item>
+    </string-array>
+    <string name="graph_type_line_graph">Lyngrafiek</string>
+    <string name="graph_type_pie_chart">Sirkeldiagram</string>
+    <string name="graph_type_average_time_between">Gemiddelde tyd tussenin</string>
+    <string name="graph_type_time_since">Tyd sedert</string>
+    <string name="graph_type_time_histogram">Tydhistogram</string>
+    <string name="graph_type_last_value">Laaste nagespoorde/tyd sedert</string>
+    <string name="graph_type_bar_chart">Staafgrafiek</string>
+    <string-array name="line_graph_averaging_mode_names">
+        <item>Geen gemiddeldes</item>
+        <item>Daaglikse bewegende gemiddelde</item>
+        <item>Drie-dae bewegende gemiddelde</item>
+        <item>Weeklikse bewegende gemiddelde</item>
+        <item>Maandelikse bewegende gemiddelde</item>
+        <item>Drie-maande bewegende gemiddelde</item>
+        <item>Ses-maande bewegende gemiddelde</item>
+        <item>Jaarlikse bewegende gemiddelde</item>
+    </string-array>
+    <string-array name="line_graph_plot_mode_names">
+        <item>Teken wanneer nagespoor</item>
+        <item>Teken uurtotale</item>
+        <item>Teken dagtotale</item>
+        <item>Teken weektotale</item>
+        <item>Teken maandtotale</item>
+        <item>Teken jaartotale</item>
+    </string-array>
+    <string name="graph_time_durations_all_data">Alle data</string>
+    <string name="graph_time_durations_a_day">’n Dag</string>
+    <string name="graph_time_durations_a_week">’n Week</string>
+    <string name="graph_time_durations_a_month">’n Maand</string>
+    <string name="graph_time_durations_three_months">Drie maande</string>
+    <string name="graph_time_durations_six_months">Ses maande</string>
+    <string name="graph_time_durations_a_year">’n Jaar</string>
+    <string name="custom">Pasgemaak</string>
+    <string-array name="y_range_styles">
+        <item>Dinamies</item>
+        <item>Vas</item>
+    </string-array>
+    <string name="ending_at_latest">Laaste datapunt</string>
+    <string name="ending_at_now">Nou</string>
+    <string name="ending_at_custom_date">Pasgemaakte datum…</string>
+    <string name="hours_and_minutes_ago">%1$du %2$dm gelede</string>
+    <string name="import_exception_unknown">Invoer het misluk: ’n Onbekende fout het voorgekom</string>
+    <string name="import_exception_bad_headers">Invoer het misluk: Opskrifte stem nie met die verwagte opskrifte ooreen nie: %1$s</string>
+    <string name="import_exception_inconsistent_record">Invoer het misluk: Rekord op reël %1$s stem nie met die vereiste opskrifte ooreen nie</string>
+    <string name="import_exception_bad_timestamp">Invoer het misluk: Kon nie die tydstempel vir rekord op reël %1$s interpreteer nie</string>
+    <string name="import_exception_inconsistent_data_type">Invoer het misluk: Inkonsekwente datatipe op reël %1$s ontvang</string>
+    <string name="unknown_error_occurred">’n Onbekende fout het voorgekom</string>
+    <string name="graph_stat_validation_no_name">Verskaf asseblief ’n naam</string>
+    <string name="graph_stat_validation_no_line_graph_features">Voeg asseblief iets by die grafiek</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Maak asseblief seker dat \"Van\" kleiner as of gelyk aan \"Tot\" is</string>
+    <string name="graph_stat_validation_unrecognised_color">Maak asseblief seker alle datastelle het ’n kleur</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Ongeldige lyngrafiekdatastel bespeur</string>
+    <string name="graph_stat_validation_bad_fixed_range">Maak asseblief seker dat \"Van\" kleiner as \"Tot\" is</string>
+    <string name="graph_stat_view_not_found">’n Fout het voorgekom tydens die vind van hierdie grafiek</string>
+    <string name="graph_stat_view_not_enough_data_stat">Hierdie statistiek sal verskyn wanneer genoeg data nagespoor is om dit te genereer.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Hierdie grafiek sal verskyn wanneer genoeg data nagespoor is om dit te genereer.</string>
+    <string name="pie_chart_mixed_signs_error">Hierdie sirkeldiagram kan nie weergegee word nie omdat dit beide positiewe en negatiewe segmentgroottes bevat.</string>
+    <string name="histogram_mixed_signs_error">Hierdie histogram kan nie weergegee word nie omdat dit beide positiewe en negatiewe bakgroottes bevat.</string>
+    <string name="graph_non_finite_data_error">Hierdie grafiek kan nie weergegee word nie omdat dit ’n waarde bevat wat nie ’n eindige getal is nie.</string>
+    <string name="graph_inconsistent_series_error">Hierdie grafiek kan nie weergegee word nie omdat sy dat reekse inkonsekwente groottes het.</string>
+    <string name="graph_invalid_y_range_error">Hierdie grafiek kan nie weergegee word nie omdat sy Y-as-reeks ongeldig is.</string>
+    <string name="finish">Voltooi</string>
+    <string name="about_description">Track &amp; Graph is gratis en oopbronsagteware onder die GPL 3.0-lisensie.</string>
+    <string name="about_libraries_message">Die volgende oopbronbiblioteke is gebruik:</string>
+    <string name="about">Meer oor</string>
+    <string name="nav_header_title">Track &amp; Graph</string>
+    <string name="faq">Gereelde vrae</string>
+    <string name="tutorial_text_1">Gebruik nasporers om jou data na te spoor.</string>
+    <string name="tutorial_text_2">Gebruik grafieke en statistieke om data te visualiseer.</string>
+    <string name="tutorial_text_3">Gebruik groepe om jou nasporers, grafieke en statistieke te organiseer.</string>
+    <string name="got_it">Verstaan!</string>
+    <string name="move_to_colon">Skuif na:</string>
+    <string name="move_to">Skuif na</string>
+    <string name="ru_sure_update_data">Hierdie opdatering kan die data wat jy reeds nagespoor het, onomkeerbaar wysig. Dit word sterk aanbeveel dat jy bestaande data rugsteun voordat jy voortgaan.\n\n Wil jy voortgaan?</string>
+    <string name="ok">OK</string>
+    <string name="rate_the_app">Beoordeel die toepassing</string>
+    <string name="reminders">Herinnerings</string>
+    <string name="no_reminders_hint">Tik op die +-ikoon om ’n nuwe kennisgewing vir ’n nasporingsherinnering te skep.</string>
+    <string name="mon">Ma.</string>
+    <string name="tue">Di.</string>
+    <string name="wed">Wo.</string>
+    <string name="thu">Do.</string>
+    <string name="fri">Vr.</string>
+    <string name="sat">Sa.</string>
+    <string name="sun">So.</string>
+    <string name="reminders_notifications_channel_name">Herinnerings</string>
+    <string name="reminders_notifications_channel_description">Kennisgewings wat deur die gebruiker geskep is om jou te herinner wanneer om na te spoor</string>
+    <string name="default_reminder_name">Tyd om na te spoor!</string>
+    <string name="missed_reminder_single_content">Herinnering van %1$s</string>
+    <string name="missed_reminders_multiple_content">Jy het %1$d herinnerings gemis</string>
+    <string name="next_reminder_format">Volgende herinnering: %1$s</string>
+    <string name="no_upcoming_reminders">Geen komende herinnerings nie</string>
+    <string name="select_reminder_type">Kies ’n herinneringstipe</string>
+    <string name="week_day_reminder">Weekdagherinnering</string>
+    <string name="week_day_reminder_description">Spesifieke dae soos Maandag, Woensdag en Vrydag</string>
+    <string name="periodic_reminder">Periodieke herinnering</string>
+    <string name="periodic_reminder_description">Gereelde intervalle soos elke 3 dae</string>
+    <string name="month_day_reminder">Maanddagherinnering</string>
+    <string name="month_day_reminder_description">Maandelikse patrone soos die eerste Maandag</string>
+    <string name="time_since_last_reminder">Tyd sedert laaste herinnering</string>
+    <string name="time_since_last_reminder_description">Wanneer jy ’n ruk lank niks nagespoor het nie</string>
+    <string name="one_time_reminder">Eenmalige herinnering</string>
+    <string name="one_time_reminder_description">’n Selfstandige herinnering op ’n spesifieke tyd of ná ’n vertraging</string>
+    <string name="reminder_name">Herinneringnaam</string>
+    <string name="reminder_disabled">Herinnering gedeaktiveer</string>
+    <string name="repeat_every">Herhaal elke</string>
+    <string name="at_time">Om tyd</string>
+    <string name="at_a_specific_time">Op ’n spesifieke tyd</string>
+    <string name="ending_at">Eindig op</string>
+    <string name="starting_from">Begin vanaf</string>
+    <string name="repeat_on_week_days">Herhaal op weeksdae</string>
+    <string name="track_feature">Spoor datastel na</string>
+    <string name="select_tracker_placeholder">Kies ’n nasporer</string>
+    <string name="remind_after">Herinner ná</string>
+    <string name="then_remind_every">Herinner daarna elke</string>
+    <string name="remind_at_date_and_time">Op ’n datum en tyd</string>
+    <string name="remind_after_a_delay">Ná ’n vertraging</string>
+    <string name="first_reminder">Eerste herinnering</string>
+    <string name="every_colon">Elke:</string>
+    <string name="ended_at_format">Geëindig op: %1$s</string>
+    <string name="starting_at_format">Begin op: %1$s</string>
+    <string name="occurrence_first">Eerste</string>
+    <string name="occurrence_second">Tweede</string>
+    <string name="occurrence_third">Derde</string>
+    <string name="occurrence_fourth">Vierde</string>
+    <string name="occurrence_last">Laaste</string>
+    <string name="monday">Maandag</string>
+    <string name="tuesday">Dinsdag</string>
+    <string name="wednesday">Woensdag</string>
+    <string name="thursday">Donderdag</string>
+    <string name="friday">Vrydag</string>
+    <string name="saturday">Saterdag</string>
+    <string name="sunday">Sondag</string>
+    <string-array name="abbreviated_months">
+        <item>Jan.</item>
+        <item>Feb.</item>
+        <item>Mrt.</item>
+        <item>Apr.</item>
+        <item>Mei</item>
+        <item>Jun.</item>
+        <item>Jul.</item>
+        <item>Aug.</item>
+        <item>Sep.</item>
+        <item>Okt.</item>
+        <item>Nov.</item>
+        <item>Des.</item>
+    </string-array>
+    <string-array name="abbreviated_weekdays">
+        <item>Ma.</item>
+        <item>Di.</item>
+        <item>Wo.</item>
+        <item>Do.</item>
+        <item>Vr.</item>
+        <item>Sa.</item>
+        <item>So.</item>
+    </string-array>
+    <string name="compact_weekday_day_format">%1$s %2$s</string>
+    <string name="compact_day_month_format">%1$s %2$s</string>
+    <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="range_style">Reekstyl:</string>
+    <string name="track_widget_configure_no_data_error">Spoor eers data na.</string>
+    <string name="track_widget_configure_no_data_selected_error">Jy moet ’n geldige datastel kies om ’n nasporingslegstuk te skep.</string>
+    <string name="create">Skep</string>
+    <string name="use_default_value">Stel ’n verstekwaarde in</string>
+    <string name="backup_and_restore">Rugsteun en herstel</string>
+    <string name="backup_hint_text">Rugsteun stoor al jou toepassingdata, insluitend alle nagespoorde data, grafieke en herinnerings. Jy behoort jou data gereeld na ’n eksterne toestel of wolkberging te rugsteun ingeval jou toestel verlore raak of breek.</string>
+    <string name="restore_data">Herstel data</string>
+    <string name="backup_successful">Rugsteun suksesvol!</string>
+    <string name="backup_error_could_not_write_to_file">Kon nie die gekose lêer vind of daarin skryf nie.</string>
+    <string name="backup_error_could_not_find_database_file">Kon nie die databasislêer vind of lees nie.</string>
+    <string name="backup_error_failed_to_copy_database">Iets het verkeerd geloop tydens die kopiëring van die databasislêer.</string>
+    <string name="restore_failed">Herstel het misluk. %1$s</string>
+    <string name="add_a_longer_description_optional">Voeg ’n langer beskrywing by (opsioneel)</string>
+    <string name="no_data_points_history_fragment_hint">Jou geskiedenis sal hier verskyn wanneer jy datapunte het.</string>
+    <string name="data_resolution_error">’n Fout het voorgekom tydens die poging om hierdie data op te los:\n\n%1$s</string>
+    <string name="info">Inligting</string>
+    <string name="no_description">Geen beskrywing nie</string>
+    <string name="description">Beskrywing</string>
+    <string name="app_lock_title">Toepassingslot</string>
+    <string name="app_lock_locked_title">Track &amp; Graph is gesluit</string>
+    <string name="app_lock_password_label">Wagwoord</string>
+    <string name="app_lock_confirm_password_label">Bevestig wagwoord</string>
+    <string name="app_lock_unlock">Ontsluit</string>
+    <string name="app_lock_use_biometrics">Gebruik biometrie</string>
+    <string name="app_lock_enable">Aktiveer toepassingslot</string>
+    <string name="app_lock_enabled">Toepassingslot is geaktiveer</string>
+    <string name="app_lock_enable_biometric_unlock">Aktiveer biometriese ontsluiting</string>
+    <string name="app_lock_no_strong_biometric_available">Geen sterk biometriese ontsluiting is op hierdie toestel beskikbaar nie.</string>
+    <string name="app_lock_lock_after_background_minutes">Sluit ná minute in die agtergrond</string>
+    <string name="app_lock_lock_after_background_minutes_hint">Gebruik 0 om te sluit sodra die toepassing die voorgrond verlaat.</string>
+    <string name="app_lock_change_password">Verander wagwoord</string>
+    <string name="app_lock_password_changed">Wagwoord verander</string>
+    <string name="app_lock_disable">Deaktiveer toepassingslot</string>
+    <string name="app_lock_unlock_biometric_title">Ontsluit Track &amp; Graph</string>
+    <string name="app_lock_unlock_biometric_subtitle">Gebruik jou toestel se biometrie om voort te gaan</string>
+    <string name="app_lock_use_password">Gebruik wagwoord</string>
+    <string name="app_lock_biometric_not_recognized">Biometriese verifikasie is nie herken nie.</string>
+    <string name="app_lock_error_missing_password">Die toepassingslot se wagwoord ontbreek. Deaktiveer en aktiveer die toepassingslot weer.</string>
+    <string name="app_lock_error_incorrect_password">Verkeerde wagwoord</string>
+    <string name="app_lock_error_password_hashing_unavailable">Verifikasie van die toepassingslot se wagwoord is nie op hierdie toestel beskikbaar nie.</string>
+    <string name="app_lock_error_enter_password">Voer ’n wagwoord in.</string>
+    <string name="app_lock_error_passwords_do_not_match">Wagwoorde stem nie ooreen nie.</string>
+    <string name="note_input_hint">Notas…</string>
+    <string name="add_a_note">Voeg ’n nota by</string>
+    <string name="notes">Notas</string>
+    <string name="show_global_notes">Globaal</string>
+    <string name="show_data_point_notes">Datapunte</string>
+    <string name="delete_reminder_content_description">Skrap herinnering</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Datumformaat:</string>
+    <string name="add_data_point_button_content_description">Knoppie om ’n datapunt by te voeg</string>
+    <string name="tracked_data_menu_button_content_description">Kieslysknoppie vir nagespoorde data</string>
+    <string name="tracked_data_history_button_content_description">Geskiedenisknoppie vir nagespoorde data</string>
+    <string name="delete_line_button_content_description">Knoppie om lyn te skrap</string>
+    <string name="delete_input_button_content_description">Knoppie om invoer te skrap</string>
+    <string name="delete_data_point_button_content_description">Knoppie om datapunt te skrap</string>
+    <string name="edit_data_point_button_content_description">Knoppie om datapunt te wysig</string>
+    <string name="add_multiple_choice_answer_button_content_description">Knoppie om veelkeuseantwoord by te voeg</string>
+    <string name="ending_at_colon">Voorbeeld eindig op:</string>
+    <string name="duplicate">Dupliseer</string>
+    <string name="no_notes_hint_text">Notas wat tydens nasporing bygevoeg word, sal hier verskyn. Jy kan ook globale notas met die +-knoppie byvoeg.</string>
+    <string name="add_a_global_note">Voeg ’n globale nota by:</string>
+    <string name="duration">Duur</string>
+    <string name="weeks">Weke</string>
+    <string name="months">Maande</string>
+    <string name="days">Dae</string>
+    <string name="hours">Ure</string>
+    <string name="minutes">Minute</string>
+    <string name="seconds">Sekondes</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="numeric_to_duration_mode_header">Voorheen nagespoorde waardes stel voor:</string>
+    <string name="duration_to_numeric_mode_header">Waarna moet voorheen nagespoorde waardes omgeskakel word:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Jy kan nie tydsdure met ander datatipes meng nie. Oorweeg dit om ure, minute of sekondes te teken</string>
+    <string name="sum_by_count_checkbox_label">Merk hier om die aantal nagespoorde datapunte te tel eerder as die totaal van hul waardes.</string>
+    <string name="time_window_size">Grootte van tydvenster:</string>
+    <string name="hold_to_preview">Hou vas om ’n voorskou te sien</string>
+    <string name="open">Maak oop</string>
+    <string name="close">Sluit</string>
+    <string name="filter_by_label">Filter volgens etiket</string>
+    <string name="filter_by_value">Filter volgens waardereeks</string>
+    <string name="save_changes">Stoor veranderinge</string>
+    <string name="timer_notification_channel_name">Aftellers</string>
+    <string name="stop">Stop</string>
+    <string name="name_your_function">Gee jou funksie ’n naam: </string>
+    <string name="add_some_data_sources">Voeg databronne by</string>
+    <string name="value">Waarde</string>
+    <string name="label">Etiket</string>
+    <string name="continue_word">Gaan voort</string>
+    <string name="update_all_data_points">Werk alle datapunte by: </string>
+    <string name="where_colon">Waar:</string>
+    <string name="to_colon">Tot:</string>
+    <string name="value_equals">Waarde =</string>
+    <string name="label_equals">Etiket =</string>
+    <string name="adding_your_first_data_point">’n Kort tutoriaal oor hoe om datapunte by te voeg:</string>
+    <string name="next">Volgende</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Elke datapunt het ’n tydstempel en ’n waarde: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Dit kan ook opsioneel ’n etiket en ’n nota hê: </string>
+    <string name="data_point_tutorial_page_2_description">Die waarde is ’n getal sodat jy kan sien hoe jou data met verloop van tyd verander</string>
+    <string name="data_point_tutorial_page_2_hint">(Wenk: As jy nie omgee oor die waarde nie, gebruik net die verstekwaarde 1)</string>
+    <string name="data_point_tutorial_page_3_description">Gebruik etikette as jy die datapunte wil groepeer</string>
+    <string name="data_point_tutorial_page_3_hint">(Wenk: As jy meer konteks of ’n beskrywing wil byvoeg, gebruik eerder die nota as die etiketveld)</string>
+    <string name="help">Hulp</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="advanced_options">Gevorderde opsies</string>
+    <string name="type_colon">\"Tipe: \"</string>
+    <string name="order_colon">\"Volgorde: \"</string>
+    <string name="value_and_label">Waarde en etiket</string>
+    <string name="value_only">Slegs waarde</string>
+    <string name="label_only">Slegs etiket</string>
+    <string name="none">Geen</string>
+    <string name="value_ascending">Waarde oplopend</string>
+    <string name="value_descending">Waarde aflopend</string>
+    <string name="label_ascending">Etiket oplopend</string>
+    <string name="label_descending">Etiket aflopend</string>
+    <string name="latest">Nuutste</string>
+    <string name="oldest">Oudste</string>
+    <string name="track_all">Spoor alles na</string>
+    <string name="more_details">Meer besonderhede</string>
+    <string name="suggestions">Voorstelle</string>
+    <string name="no_label">Geen etiket</string>
+    <string name="confirm_cancel_notes_will_be_lost">Is jy seker jy wil sluit? Alle notas sal verlore gaan.</string>
+    <string name="add_a_label">Voeg ’n etiket by</string>
+    <string name="bar_interval">Staafinterval:</string>
+    <string name="y_range_max">Maksimum Y-reeks</string>
+    <string name="total_formatted">Totaal: %s</string>
+    <string name="from_formatted">Van: %s</string>
+    <string name="to_formatted">Tot: %s</string>
+    <string name="bar_chart_series_breakdown_format">%1$s: %2$s (%3$s%%)</string>
+    <string name="pie_chart_legend_format">%1$s (%2$s%%)</string>
+    <string name="pie_chart_indexed_legend_format">%1$d: %2$s (%3$s%%)</string>
+    <string name="seconds_generic">Sekonde(s)</string>
+    <string name="minutes_generic">Minuut(e)</string>
+    <string name="hours_generic">Uur(e)</string>
+    <string name="days_generic">Dag(e)</string>
+    <string name="weeks_generic">Week/weke</string>
+    <string name="months_generic">Maand(e)</string>
+    <string name="years_generic">Jaar/jare</string>
+    <plurals name="seconds">
+        <item quantity="one">%d sekonde</item>
+        <item quantity="other">%d sekondes</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minuut</item>
+        <item quantity="other">%d minute</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%d uur</item>
+        <item quantity="other">%d ure</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dae</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weke</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">%d maand</item>
+        <item quantity="other">%d maande</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">%d jaar</item>
+        <item quantity="other">%d jaar</item>
+    </plurals>
+    <plurals name="every_x_minutes">
+        <item quantity="one">Elke minuut</item>
+        <item quantity="other">Elke %d minute</item>
+    </plurals>
+    <plurals name="every_x_hours">
+        <item quantity="one">Elke uur</item>
+        <item quantity="other">Elke %d ure</item>
+    </plurals>
+    <plurals name="every_x_days">
+        <item quantity="one">Elke dag</item>
+        <item quantity="other">Elke %d dae</item>
+    </plurals>
+    <plurals name="every_x_weeks">
+        <item quantity="one">Elke week</item>
+        <item quantity="other">Elke %d weke</item>
+    </plurals>
+    <plurals name="every_x_months">
+        <item quantity="one">Elke maand</item>
+        <item quantity="other">Elke %d maande</item>
+    </plurals>
+    <plurals name="every_x_years">
+        <item quantity="one">Elke jaar</item>
+        <item quantity="other">Elke %d jaar</item>
+    </plurals>
+    <plurals name="after_x_minutes">
+        <item quantity="one">Na 1 minuut</item>
+        <item quantity="other">Na %d minute</item>
+    </plurals>
+    <plurals name="after_x_hours">
+        <item quantity="one">Na 1 uur</item>
+        <item quantity="other">Na %d ure</item>
+    </plurals>
+    <plurals name="after_x_days">
+        <item quantity="one">Na 1 dag</item>
+        <item quantity="other">Na %d dae</item>
+    </plurals>
+    <plurals name="after_x_weeks">
+        <item quantity="one">Na 1 week</item>
+        <item quantity="other">Na %d weke</item>
+    </plurals>
+    <plurals name="after_x_months">
+        <item quantity="one">Na 1 maand</item>
+        <item quantity="other">Na %d maande</item>
+    </plurals>
+    <plurals name="after_x_years">
+        <item quantity="one">Na 1 jaar</item>
+        <item quantity="other">Na %d jaar</item>
+    </plurals>
+    <string name="restore_hint_text">WAARSKUWING: Herstel vanaf ’n rugsteun sal alle data en opstelling wat tans in die toepassing is, uitvee. Jy behoort eers jou data te rugsteun!</string>
+    <string name="backup_now">Rugsteun nou</string>
+    <string name="restore_error_could_not_write_to_database">Herstel het misluk! Kon nie die databasis vind of daarin skryf nie.</string>
+    <string name="restore_error_could_not_read_from_database_file">Herstel het misluk! Kon nie die gekose databasislêer vind of lees nie.</string>
+    <string name="restore_error_failed_to_copy_database">Herstel het misluk! Iets het verkeerd geloop tydens die herstel van die databasis.</string>
+    <string name="select_location">Kies ligging…</string>
+    <string name="restore_successful">Herstel was suksesvol! Track &amp; Graph moet nou herbegin word.</string>
+    <string name="restore_error_invalid_database_file">Herstel het misluk! Die gekose lêer blyk nie ’n geldige rugsteun te wees nie.</string>
+    <string name="auto_backup">Outomatiese rugsteun</string>
+    <string name="apply">Pas toe</string>
+    <string name="backup_every">Rugsteun elke: </string>
+    <string name="next_backup_at">\"Volgende rugsteun op: \"</string>
+    <string name="backup_notification_channel_name">Kennisgewings oor outomatiese rugsteun</string>
+    <string name="backup_notification_channel_description">Laat jou weet wanneer ’n outomatiese rugsteun uitgevoer word en of dit misluk het.</string>
+    <string name="backup_notification_title">Rugsteun tans…</string>
+    <string name="backup_failed_notification_title">Outomatiese rugsteun het misluk</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph kon nie jou rugsteunligging vind of toegang daartoe verkry nie.</string>
+    <string name="backup_failed_notification_could_not_copy">Iets het verkeerd geloop tydens die rugsteun van jou data. Jou rugsteun kan korrup of onvolledig wees.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Kies nuwe ligging</string>
+    <string name="backup_location">Rugsteunligging</string>
+    <string name="enable_auto_backup">Aktiveer outomatiese rugsteun</string>
+    <string name="last_successful_backup">Laaste suksesvolle rugsteun</string>
+    <string name="next_scheduled_backup">Volgende geskeduleerde rugsteun</string>
+    <string name="notification_permission_prompt">Jy behoort kennisgewings vir Track &amp; Graph te aktiveer om in kennis gestel te word indien outomatiese rugsteun om enige rede misluk.</string>
+    <string name="lua_script_empty">Voeg asseblief ’n Lua-skrip by</string>
+    <string name="function_name_empty">Funksienaam kan nie leeg wees nie</string>
+    <string name="function_name">Funksienaam</string>
+    <string name="add_at_least_one_input">Voeg asseblief minstens een invoer by</string>
+    <string name="output">Uitset</string>
+    <string name="data_source">Databron</string>
+    <string name="lua_script">Lua-skrip</string>
+    <string name="data_source_description">Met ’n databronnodus kan jy ’n nasporer of funksie kies om as invoer te gebruik.</string>
+    <string name="lua_script_input_hint">Voer ’n Lua-skrip in…</string>
+    <string name="select_node_type">Kies nodustipe</string>
+    <string name="file">Lêer</string>
+    <string name="lua_feature_names_not_unique">Skripinvoere moet unieke name hê</string>
+    <string name="graph_stat_type_lua_graph">Lua-skrip</string>
+    <string name="launch_lua_disabled">Begin Lua is gedeaktiveer</string>
+    <string name="no_lua">Geen Lua</string>
+    <string name="lua_engine_disabled">Lua-enjin is gedeaktiveer</string>
+    <string name="lua_graph_first_time_user_title">Lua-skripgrafieke en -statistieke</string>
+    <string name="lua_graph_first_time_user_message">Lua-skripte is ’n gevorderde funksie waarmee jy pasgemaakte grafieke en statistieke met die Lua-programmeertaal kan skep. \n\nJy kan jou eie laai of een uit die GitHub-versameling kies. As jy ’n skrip van GitHub installeer, word jy na die toepassing teruggeneem met die skrip gereed vir gebruik.</string>
+    <string name="functions_first_time_user_title">Welkom by Funksies</string>
+    <string name="functions_first_time_user_message">Funksies is ’n gevorderde funksie waarmee jy jou data kan kombineer, saamvoeg en transformeer tot nuwe afgeleide databronne.</string>
+    <string name="learn_more">Leer hier meer</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Plak</string>
+    <string name="failed_to_download_file">Kon nie lêer aflaai nie: %s</string>
+    <string name="confirm_deep_link">Jy het ’n skripskakel van ’n onbekende bron ontvang. Installeer slegs skripte van bronne wat jy vertrou. Wil jy hierdie skrip installeer?</string>
+    <string name="graph_stat_info_button_description">Tutoriale oor grafieke en statistieke</string>
+    <string name="network_generic_error">Daar het ’n fout voorgekom tydens toegang tot die netwerk. Gaan jou verbinding na en probeer weer.</string>
+    <string name="function_verification_failure">Kon nie funksiehandtekeninge verifieer nie. Maak seker jy het ’n veilige verbinding en dat Track &amp; Graph op datum is</string>
+    <string name="function_network_failure">Kon nie funksies laai nie. Maak seker jy is aan die internet gekoppel. As die probleem voortduur, maak seker die toepassing is op datum.</string>
+    <string name="functions_landscape_hint">Wenk: Funksies werk die beste in landskapmodus</string>
+    <string name="functions_start_hint">Begin hier: Druk lank en kies Databron</string>
+    <string name="see_whats_new">Sien wat nuut is</string>
+</resources>

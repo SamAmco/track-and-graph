@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Idagdag</string>
+    <string name="add_a_note">Magdagdag ng tala</string>
+    <string name="cancel">Kanselahin</string>
+    <string name="continue_word">Magpatuloy</string>
+    <string name="create">Gumawa</string>
+    <string name="label">Label</string>
+    <string name="release_notes_support_text">Nakakatulong ang iyong suporta upang manatiling buhay at patuloy na umunlad ang Track &amp; Graph 🌱</string>
+    <string name="release_notes_maybe_later">Siguro Mamaya</string>
+    <string name="release_notes_support_development">Mag-donate para Suportahan ang Pag-develop</string>
+    <string name="release_notes_thank_you">Salamat! ❤️\n\nAng bawat suporta ay nakakatulong upang mapahusay ang Track &amp; Graph para sa lahat 🌱</string>
+    <string name="support_close">Isara</string>
+    <string name="search">Maghanap</string>
+    <string name="update">I-update</string>
+    <string name="value">Halaga</string>
+</resources>

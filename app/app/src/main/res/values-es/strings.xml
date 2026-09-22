@@ -21,23 +21,23 @@
     <string name="reminder">Recordatorio</string>
     <string name="add_component">Añadir un componente</string>
     <string name="symlink_locations_title">Ubicaciones de \"%1$s\"</string>
-    <string name="add_tracker">Añadir trazas:</string>
+    <string name="add_tracker">Registrar algo:</string>
     <string name="add">Añadir</string>
     <string name="group_name">Por ejemplo, las actividades diarias</string>
     <string name="delete">Borrar</string>
     <string name="edit">Editar</string>
     <string name="update">Actualizar</string>
     <string name="graph_or_stat_name">Nombre del gráfico: </string>
-    <string name="tracker_name">¿Qué le gustaría rastrear?</string>
+    <string name="tracker_name">¿Qué te gustaría registrar?</string>
     <string name="this_is_a_time_or_duration">Este es un tiempo o duración</string>
     <string name="yes">Sí</string>
     <string name="cancel">Cancelar</string>
     <string name="select_file">Seleccionar archivo</string>
-    <string name="empty_group_hint">Bienvenido a Track &amp; ¡Grafico!\n\nToque + en la parte superior derecha y seleccione Rastreador para comenzar. </string>
-    <string name="no_trackers_graph_stats_hint">Cree un rastreador antes de crear cualquier gráfico.</string>
-    <string name="no_trackers_functions_hint">Cree un rastreador antes de crear cualquier función.</string>
+    <string name="empty_group_hint">¡Te damos la bienvenida a Track &amp; Graph!\n\nToca + en la parte superior derecha y selecciona Rastreador para comenzar.</string>
+    <string name="no_trackers_graph_stats_hint">Crea un rastreador antes de crear cualquier gráfico.</string>
+    <string name="no_trackers_functions_hint">Crea un rastreador antes de crear cualquier función.</string>
     <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
-    <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
+    <string name="ru_sure_del_feature">¿Seguro que quieres eliminar estos datos registrados?</string>
     <string name="item_in_multiple_groups">Este elemento existe en varios lugares. Puedes eliminarlo de aquí o eliminarlo en todas partes.</string>
     <string name="remove_from_this_group">Eliminar de aquí</string>
     <string name="delete_everywhere">Eliminar en todas partes</string>
@@ -62,9 +62,9 @@
     <string name="search">Buscar</string>
     <string name="type_to_search">Escribe para buscar</string>
     <string name="no_results">Sin resultados</string>
-    <string name="export_to">Exportar datos de seguimiento en este grupo a CSV:</string>
+    <string name="export_to">Exportar los datos registrados de este grupo a CSV:</string>
     <string name="export_error_message">Exportación falló: %1$s</string>
-    <string name="import_from">Importe datos de seguimiento a este grupo desde CSV:</string>
+    <string name="import_from">Importar datos registrados a este grupo desde CSV:</string>
     <string name="import_warning">Advertencia: la importación es irreversible. Track &amp; Graph intentará fusionar los datos importados con los datos existentes en este grupo por nombre.</string>
     <string name="add_a_graph_or_stat">Añadir un gráfico o estadística</string>
     <string name="graph_type_label">Tipo de gráfico:</string>
@@ -114,14 +114,14 @@
         <item>Media móvil anual</item>
     </string-array>
     <string-array name="line_graph_plot_mode_names">
-        <item>Generar cuando se hace un registro</item>
+        <item>Generar al registrar</item>
         <item>Generar totales por hora</item>
         <item>Generar totales diarios</item>
         <item>Generar totales semanales</item>
         <item>Generar totales mensuales</item>
         <item>Generar los totales anuales</item>
     </string-array>
-    <string name="graph_type_last_value">Último seguimiento/Tiempo desde</string>
+    <string name="graph_type_last_value">Último registro/Tiempo transcurrido</string>
     <string name="graph_time_durations_all_data">Todos los datos</string>
     <string name="graph_time_durations_a_day">Un día</string>
     <string name="graph_time_durations_a_week">Una semana</string>
@@ -143,8 +143,8 @@
 
     <string name="import_exception_unknown">Error de importación: Se ha producido un error desconocido</string>
     <string name="import_exception_bad_headers">Error de importación: Las cabeceras no coinciden con las esperadas: %1$s</string>
-    <string name="import_exception_inconsistent_record">Error de importación: Lq traza de la línea %1$s no es consistente con las cabeceras requeridas</string>
-    <string name="import_exception_bad_timestamp">Error de importación: No se pudo interpretar la marca de tiempo para la traza en la línea: %1$s</string>
+    <string name="import_exception_inconsistent_record">Error de importación: El registro de la línea %1$s no coincide con los encabezados requeridos</string>
+    <string name="import_exception_bad_timestamp">Error de importación: No se pudo interpretar la marca de tiempo del registro en la línea %1$s</string>
     <string name="import_exception_inconsistent_data_type">Error de importación: Se ha recibido un tipo de datos inconsistente en la línea: %1$s</string>
 
     <string name="unknown_error_occurred">Se ha producido un error desconocido</string>
@@ -157,7 +157,7 @@
 
     <string name="graph_stat_view_not_found">Se ha producido un error al encontrar este gráfico</string>
     <string name="graph_stat_view_not_enough_data_stat">Esta estadística se mostrará cuando se hayan registrado suficientes datos para generarla.</string>
-    <string name="graph_stat_view_not_enough_data_graph">Este gráfico mostrará cuando se hayan registrado suficientes datos para generarlo.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Este gráfico se mostrará cuando se hayan registrado suficientes datos para generarlo.</string>
     <string name="pie_chart_mixed_signs_error">Este gráfico circular no se puede representar porque contiene tamaños de segmento tanto positivos como negativos.</string>
     <string name="histogram_mixed_signs_error">Este histograma no se puede representar porque contiene tamaños de intervalo tanto positivos como negativos.</string>
     <string name="graph_non_finite_data_error">Este gráfico no se puede representar porque contiene un valor que no es un número finito.</string>
@@ -171,20 +171,20 @@
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
     <string name="faq">FAQ</string>
-    <string name="tutorial_text_1">Utilice trazar para rastrear sus datos.</string>
+    <string name="tutorial_text_1">Usa rastreadores para registrar tus datos.</string>
     <string name="tutorial_text_2">Utilice gráficos y estadísticas para visualizar datos.</string>
-    <string name="tutorial_text_3">Utilice grupos para organizar sus rastreadores, gráficos y estadísticas.</string>
+    <string name="tutorial_text_3">Usa grupos para organizar tus rastreadores, gráficos y estadísticas.</string>
     <string name="got_it">Aceptar!</string>
     <string name="move_to_colon">Mover a:</string>
     <string name="move_to">Mover a</string>
     <string name="copy_to">Copiar a</string>
 
-    <string name="ru_sure_update_data">Esta actualización puede modificar irreversiblemente los datos que ya has trazado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar. ¿Desea continuar?</string>
+    <string name="ru_sure_update_data">Esta actualización puede modificar irreversiblemente los datos que ya has registrado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar.\n\n¿Quieres continuar?</string>
     <string name="ok">Aceptar</string>
 
     <string name="rate_the_app">Calificar la aplicación</string>
     <string name="reminders">Recordatorios</string>
-    <string name="no_reminders_hint">Toca el icono + para crear una nueva notificación de recordatorio de traza.</string>
+    <string name="no_reminders_hint">Toca el icono + para crear una nueva notificación de recordatorio de registro.</string>
     <string name="mon">Lun</string>
     <string name="tue">Mar</string>
     <string name="wed">Mie</string>
@@ -193,16 +193,16 @@
     <string name="sat">Sab</string>
     <string name="sun">Dom</string>
     <string name="reminders_notifications_channel_name">Recordatorios</string>
-    <string name="reminders_notifications_channel_description">Notificaciones creadas por el usuario para recordarle cuándo debe trazar</string>
-    <string name="default_reminder_name">¡Hora de hacer la traza!</string>
+    <string name="reminders_notifications_channel_description">Notificaciones creadas por el usuario para recordarte cuándo registrar datos</string>
+    <string name="default_reminder_name">¡Hora de registrar datos!</string>
     <string name="range_style">Estilo de rango:</string>
 
-    <string name="track_widget_configure_no_data_error">Primero, realice un seguimiento de algunos datos.</string>
-    <string name="track_widget_configure_no_data_selected_error">Debes seleccionar un grupo de datos válido para crear un widget de traza.</string>
+    <string name="track_widget_configure_no_data_error">Primero, registra algunos datos.</string>
+    <string name="track_widget_configure_no_data_selected_error">Debes seleccionar un conjunto de datos válido para crear un widget de registro.</string>
     <string name="create">Crear</string>
     <string name="use_default_value">Establece un valor por defecto</string>
     <string name="backup_and_restore">Respaldo y restauración</string>
-    <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
+    <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluidos los datos registrados, los gráficos y los recordatorios. Haz regularmente una copia de seguridad en un dispositivo externo o en la nube por si pierdes o se estropea tu dispositivo.</string>
     <string name="restore_data">Restaurar datos</string>
     <string name="backup_successful">¡Respaldado con éxito!</string>
     <string name="backup_error_could_not_write_to_file">No se pudo encontrar o escribir en el archivo seleccionado.</string>
@@ -251,8 +251,8 @@
     <string name="theme_colon">Tema:</string>
     <string name="date_format_colon">Formato de fecha:</string>
     <string name="add_data_point_button_content_description">Añadir un botón de punto de datos</string>
-    <string name="tracked_data_menu_button_content_description">Botón de menú de datos trazados</string>
-    <string name="tracked_data_history_button_content_description">Botón de historial de datos rastreados</string>
+    <string name="tracked_data_menu_button_content_description">Botón de menú de datos registrados</string>
+    <string name="tracked_data_history_button_content_description">Botón de historial de datos registrados</string>
     <string name="delete_line_button_content_description">Botón para borrar línea</string>
     <string name="delete_input_button_content_description">Botón de eliminación de entrada</string>
     <string name="delete_data_point_button_content_description">Botón para borrar punto de datos</string>
@@ -260,7 +260,7 @@
     <string name="add_multiple_choice_answer_button_content_description">Añadir botón de respuesta de opción múltiple</string>
     <string name="ending_at_colon">Ejemplo que termina en:</string>
     <string name="duplicate">Duplicar</string>
-    <string name="no_notes_hint_text">Las notas añadidas durante la traza aparecerán aquí. También puedes añadir notas globales usando el botón +.</string>
+    <string name="no_notes_hint_text">Las notas añadidas al registrar datos aparecerán aquí. También puedes añadir notas globales con el botón +.</string>
     <string name="add_a_global_note">Añadir una nota global:</string>
     <string name="duration">Duración</string>
     <string name="weeks">Semanas</string>
@@ -272,19 +272,19 @@
     <string name="hours_suffix">h</string>
     <string name="minutes_suffix">m</string>
     <string name="seconds_suffix">s</string>
-    <string name="numeric_to_duration_mode_header">Los valores trazados anteriormente representan:</string>
-    <string name="duration_to_numeric_mode_header">Los valores trazados anteriormente deben convertirse en:</string>
+    <string name="numeric_to_duration_mode_header">Los valores registrados anteriormente representan:</string>
+    <string name="duration_to_numeric_mode_header">Los valores registrados anteriormente deben convertirse en:</string>
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">No puede mezclar duraciones de tiempo con otros tipos de datos. Considera la posibilidad de trazar horas, minutos o segundos</string>
-    <string name="sum_by_count_checkbox_label">Marca aquí para contar el número de puntos de datos trazados en lugar del total de sus valores.</string>
+    <string name="sum_by_count_checkbox_label">Marca aquí para contar los puntos de datos registrados en lugar de sumar sus valores.</string>
     <string name="time_window_size">Tamaño de la ventana de tiempo:</string>
     <string name="hold_to_preview">Avance</string>
     <string name="add_group">Añadir grupo:</string>
     <string name="edit_group">Editar grupo:</string>
     <string name="group">Grupo</string>
-    <string name="tracker">Trazar</string>
+    <string name="tracker">Rastreador</string>
     <string name="function">Función</string>
     <string name="graph_or_stat">Gráfico o estadística</string>
-    <string name="ru_sure_del_graph">¿Está seguro de que desea eliminar este gráfico? No puedes revertir esto. No perderá ningún dato rastreado.</string>
+    <string name="ru_sure_del_graph">¿Seguro que quieres eliminar este gráfico? No puedes deshacer esta acción. No perderás ningún dato registrado.</string>
     <string name="open">Abierta</string>
     <string name="close">cerca</string>
     <string name="save_changes">guardar cambios</string>
@@ -326,7 +326,7 @@
     <string name="label_descending">Etiqueta descendente</string>
     <string name="latest">Último</string>
     <string name="oldest">Más antiguo</string>
-    <string name="track_all">Seguimiento de todo</string>
+    <string name="track_all">Registrar todo</string>
     <string name="more_details">Más detalles</string>
     <string name="suggestions">Sugerencias</string>
     <string name="no_label">Sin etiqueta</string>
@@ -529,8 +529,8 @@
     <string name="ending_at">Termina el</string>
     <string name="starting_from">Comenzando desde</string>
     <string name="repeat_on_week_days">Repetir en días de la semana</string>
-    <string name="track_feature">Seleccionar tracker</string>
-    <string name="select_tracker_placeholder">Seleccionar un tracker</string>
+    <string name="track_feature">Registrar datos</string>
+    <string name="select_tracker_placeholder">Seleccionar un rastreador</string>
     <string name="remind_after">Recordar después de</string>
     <string name="then_remind_every">Luego recordar cada</string>
     <string name="remind_at_date_and_time">En una fecha y hora</string>

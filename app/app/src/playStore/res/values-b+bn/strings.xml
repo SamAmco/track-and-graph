@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">ডেভেলপারকে সহায়তা করুন</string>
+    <string name="support_unavailable">এই মুহূর্তে কোনো সহায়তার বিকল্প উপলভ্য নেই।</string>
+    <string name="support_payment_failed">পেমেন্ট ব্যর্থ হয়েছে। আবার চেষ্টা করুন।</string>
+    <string name="support_payment_pending">পেমেন্ট অপেক্ষমাণ। পেমেন্ট নিশ্চিত হওয়ার পর Google Play এটি সম্পন্ন করবে।</string>
+</resources>

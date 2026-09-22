@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Atbalstīt izstrādātāju</string>
+    <string name="support_unavailable">Pašlaik nav pieejamas atbalsta iespējas.</string>
+    <string name="support_payment_failed">Maksājums neizdevās. Lūdzu, mēģiniet vēlreiz.</string>
+    <string name="support_payment_pending">Maksājums tiek apstrādāts. Google Play to pabeigs pēc maksājuma apstiprināšanas.</string>
+</resources>

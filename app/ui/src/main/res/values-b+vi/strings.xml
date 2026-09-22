@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Thêm</string>
+    <string name="add_a_note">Thêm ghi chú</string>
+    <string name="cancel">Hủy</string>
+    <string name="continue_word">Tiếp tục</string>
+    <string name="create">Tạo</string>
+    <string name="label">Nhãn</string>
+    <string name="release_notes_support_text">Sự ủng hộ của bạn giúp Track &amp; Graph tiếp tục phát triển 🌱</string>
+    <string name="release_notes_maybe_later">Để sau</string>
+    <string name="release_notes_support_development">Quyên góp để hỗ trợ phát triển</string>
+    <string name="release_notes_thank_you">Cảm ơn bạn! ❤️\n\nMọi sự ủng hộ đều góp phần giúp Track &amp; Graph tốt hơn cho mọi người 🌱</string>
+    <string name="support_close">Đóng</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="update">Cập nhật</string>
+    <string name="value">Giá trị</string>
+</resources>

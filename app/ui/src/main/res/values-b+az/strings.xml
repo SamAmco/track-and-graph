@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Əlavə et</string>
+    <string name="add_a_note">Qeyd əlavə et</string>
+    <string name="cancel">Ləğv et</string>
+    <string name="continue_word">Davam et</string>
+    <string name="create">Yarat</string>
+    <string name="label">Etiket</string>
+    <string name="release_notes_support_text">Dəstəyiniz Track &amp; Graph-ın fəaliyyətini davam etdirməsinə və inkişafına kömək edir 🌱</string>
+    <string name="release_notes_maybe_later">Bəlkə sonra</string>
+    <string name="release_notes_support_development">İnkişafı dəstəkləmək üçün ianə edin</string>
+    <string name="release_notes_thank_you">Təşəkkür edirik! ❤️\n\nHər bir dəstək Track &amp; Graph-ı hər kəs üçün daha yaxşı etməyə yönəldilir 🌱</string>
+    <string name="support_close">Bağla</string>
+    <string name="search">Axtar</string>
+    <string name="update">Yenilə</string>
+    <string name="value">Dəyər</string>
+</resources>

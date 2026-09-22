@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">Agiuntar</string>
+    <string name="add_a_note">Agiuntar ina remartga</string>
+    <string name="cancel">Interrumper</string>
+    <string name="continue_word">Cuntinuar</string>
+    <string name="create">Crear</string>
+    <string name="label">Etichetta</string>
+    <string name="release_notes_support_text">Tes sustegn gida a mantegnair e sviluppar Track &amp; Graph 🌱</string>
+    <string name="release_notes_maybe_later">Forsa pli tard</string>
+    <string name="release_notes_support_development">Far ina donaziun per sustegnair il svilup</string>
+    <string name="release_notes_thank_you">Grazia fitg! ❤️\n\nMintga sustegn gida a meglierar Track &amp; Graph per tuts 🌱</string>
+    <string name="support_close">Serrar</string>
+    <string name="search">Tschertgar</string>
+    <string name="update">Actualisar</string>
+    <string name="value">Valur</string>
+</resources>

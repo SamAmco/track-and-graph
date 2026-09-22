@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="add">ചേർക്കുക</string>
+    <string name="add_a_note">ഒരു കുറിപ്പ് ചേർക്കുക</string>
+    <string name="cancel">റദ്ദാക്കുക</string>
+    <string name="continue_word">തുടരുക</string>
+    <string name="create">സൃഷ്ടിക്കുക</string>
+    <string name="label">ലേബൽ</string>
+    <string name="release_notes_support_text">നിങ്ങളുടെ പിന്തുണ Track &amp; Graph-നെ നിലനിർത്താനും വളരാനും സഹായിക്കുന്നു 🌱</string>
+    <string name="release_notes_maybe_later">ഒരുപക്ഷേ പിന്നീട്</string>
+    <string name="release_notes_support_development">വികസനത്തെ പിന്തുണയ്ക്കാൻ സംഭാവന ചെയ്യുക</string>
+    <string name="release_notes_thank_you">നന്ദി! ❤️\n\nനിങ്ങളുടെ ഓരോ പിന്തുണയും എല്ലാവർക്കുമായി Track &amp; Graph മെച്ചപ്പെടുത്താൻ സഹായിക്കുന്നു 🌱</string>
+    <string name="support_close">അടയ്ക്കുക</string>
+    <string name="search">തിരയുക</string>
+    <string name="update">പുതുക്കുക</string>
+    <string name="value">മൂല്യം</string>
+</resources>

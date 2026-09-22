@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Paremkite kūrėją</string>
+    <string name="support_unavailable">Šiuo metu nėra galimų palaikymo parinkčių.</string>
+    <string name="support_payment_failed">Mokėjimas nepavyko. Bandykite dar kartą.</string>
+    <string name="support_payment_pending">Mokėjimas laukia patvirtinimo. Google Play jį užbaigs patvirtinus mokėjimą.</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Աջակցել մշակողին</string>
+    <string name="support_unavailable">Այս պահին աջակցության տարբերակներ չկան։</string>
+    <string name="support_payment_failed">Վճարումը ձախողվեց։ Կրկին փորձեք։</string>
+    <string name="support_payment_pending">Վճարումը սպասման մեջ է։ Google Play-ը կավարտի այն վճարումը հաստատելուց հետո։</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Msaidie msanidi</string>
+    <string name="support_unavailable">Hakuna chaguo za usaidizi zinazopatikana kwa sasa.</string>
+    <string name="support_payment_failed">Malipo yameshindikana. Tafadhali jaribu tena.</string>
+    <string name="support_payment_pending">Malipo yanasubiri. Google Play yatayakamilisha baada ya malipo kuthibitishwa.</string>
+</resources>

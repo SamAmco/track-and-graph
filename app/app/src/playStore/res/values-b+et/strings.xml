@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Toeta arendajat</string>
+    <string name="support_unavailable">Praegu pole toetamise võimalusi saadaval.</string>
+    <string name="support_payment_failed">Makse nurjus. Proovi uuesti.</string>
+    <string name="support_payment_pending">Makse on ootel. Google Play lõpetab selle pärast makse kinnitamist.</string>
+</resources>

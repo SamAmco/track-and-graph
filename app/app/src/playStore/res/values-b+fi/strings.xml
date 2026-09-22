@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="support_developer">Tue kehittäjää</string>
+    <string name="support_unavailable">Tukivaihtoehtoja ei ole tällä hetkellä saatavilla.</string>
+    <string name="support_payment_failed">Maksu epäonnistui. Yritä uudelleen.</string>
+    <string name="support_payment_pending">Maksu on odottamassa. Google Play suorittaa sen, kun maksu on vahvistettu.</string>
+</resources>
