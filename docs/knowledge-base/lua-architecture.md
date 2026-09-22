@@ -242,6 +242,19 @@ Community catalog functions use `_`-prefixed strings as shared translation keys 
 2. **Load existing node**: `FunctionGraphDecoder` reads `graphNode.translations`, deserializes it, and passes it back to `runLuaFunction` — so translations still resolve correctly after save/reload.
 3. **Custom paste (no translations)**: if a user pastes a catalog script into a custom Lua Script node, `translations` is null. `_`-prefixed config names display as raw keys (e.g. `_period`). Enum options that are bare `_` strings must still be added as `EnumOption(key, TranslatedString.Simple(key))` — the adapter used to silently drop them, which is a bug.
 
+Lua translation tables are parsed without a locale allowlist. The UI resolves
+their BCP 47 keys against the app's current locale preferences using
+language-and-script matching (for example `zh-CN` to `zh-Hans`) and falls back
+explicitly to English. Do not rely on Lua table or Kotlin map iteration order
+for fallback selection.
+
+The persisted `translations` map is stored per Lua script node inside the
+function graph JSON. It contains only shared translation keys used by that
+node, but each key retains its complete locale map. Inline title, description,
+and config-name tables remain in the persisted Lua script itself. Consequently,
+an existing node retains the catalog copy and shared translations captured when
+it was created until a future catalog-update mechanism replaces them.
+
 ### `version` field and catalog mode
 
 If a script sets `version`, `LuaScriptNodeProvider` sets `showEditTools = false`, hiding the script editor. This is intentional for catalog functions (users interact via config UI only), but means a pasted catalog script also hides its own editor.

@@ -20,6 +20,7 @@ import android.os.LocaleList
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.core.os.LocaleListCompat
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import java.util.Locale
 
@@ -60,26 +61,35 @@ private fun TranslatedString.Translations?.resolveTranslated(): String? {
  */
 fun TranslatedString.Translations?.resolveTranslated(locales: LocaleList): String? {
     if (this == null) return null
+    val preferredLocales = List(locales.size()) { locales[it] }
+    return resolveTranslated(preferredLocales, LocaleListCompat::matchesLanguageAndScript)
+}
+
+/**
+ * Selects the value belonging to the supported locale which matches the user's preferences.
+ * The matching locale may have a different but equivalent tag, such as zh-CN and zh-Hans.
+ */
+internal fun TranslatedString.Translations.resolveTranslated(
+    preferredLocales: List<Locale>,
+    matchesLanguageAndScript: (supported: Locale, preferred: Locale) -> Boolean
+): String? {
     if (values.isEmpty()) return ""
 
-    // Normalize keys to BCP-47 tags for matching
-    val supported = values.keys
-        .map { Locale.forLanguageTag(it).toLanguageTag() }
-        .toTypedArray()
-
-    // Ask Android for the best match given user's locale prefs
-    val best: Locale? = locales.getFirstMatch(supported)
-
-    // Exact match?
-    best?.toLanguageTag()?.let { tag ->
-        values[tag]?.let { return it }
+    val supported = values.mapNotNull { (tag, value) ->
+        val locale = Locale.forLanguageTag(tag)
+        locale.takeIf { it.language.isNotEmpty() }?.let { SupportedTranslation(locale, value) }
     }
 
-    // Language-only fallback
-    best?.language?.let { lang ->
-        values[lang]?.let { return it }
+    for (preferred in preferredLocales) {
+        supported.firstOrNull { it.locale == preferred }?.let { return it.value }
+        supported.firstOrNull { matchesLanguageAndScript(it.locale, preferred) }
+            ?.let { return it.value }
     }
 
-    // Last-ditch fallback
-    return values.values.firstOrNull()
+    return values["en"] ?: supported.firstOrNull()?.value
 }
+
+private data class SupportedTranslation(
+    val locale: Locale,
+    val value: String
+)
