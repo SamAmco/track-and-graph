@@ -63,7 +63,9 @@ python3 -B scripts/translations/translate_app_resources.py audit
 
 `scripts/translations/translate_app_resources.py translate` is a paid operation
 and deliberately requires either repeated `--target LOCALE=LANGUAGE` arguments
-or `--all-targets`. It parses English XML, skips `translatable="false"`, sends
+or `--all-targets`. The `make translations-generate` proxy supplies
+`--all-targets` by default. It parses English XML, skips
+`translatable="false"`, sends
 bounded structured batches with `domain_brief.md`, validates the response, and
 merges only valid translations. It never asks a model to rewrite raw XML.
 Each batch includes a bounded sample of existing or earlier-batch translations
@@ -110,9 +112,10 @@ is retained at the bottom of the artifact for manual reference.
 Generate translations through the explicit paid target:
 
 ```bash
+# Full suite (the Make target defaults to all supported locales):
+make translations-generate
+# Optional targeted run:
 make translations-generate TRANSLATION_ARGS="--target fi=Finnish"
-# Full suite, deliberately explicit:
-make translations-generate TRANSLATION_ARGS="--all-targets"
 ```
 
 Shared infrastructure lives under `scripts/translations/`: `languages.py`,

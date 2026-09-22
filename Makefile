@@ -31,6 +31,7 @@ translations-apply-failure:
 translations-baseline:
 	@python3 -B scripts/translations/translate_app_resources.py baseline $(TRANSLATION_ARGS)
 
+translations-generate: TRANSLATION_ARGS ?= --all-targets
 translations-generate:
 	@python3 -B scripts/translations/translate_app_resources.py translate $(TRANSLATION_ARGS)
 

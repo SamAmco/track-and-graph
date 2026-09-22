@@ -53,13 +53,16 @@ make translations-baseline
 Baselining says that the current target values correspond to the current
 English values, so it must not be used to silence genuinely stale translations.
 
-Translation is incremental and requires an explicit paid-operation command plus
-either one or more targets or `--all-targets`:
+Translation is incremental. Direct script use requires either one or more
+targets or `--all-targets`; the explicit paid-operation Make target defaults to
+all supported locales:
 
 ```bash
+make translations-generate
+
 python3 -B scripts/translations/translate_app_resources.py translate \
   --target fi=Finnish
-# Equivalent:
+# Targeted Make run overrides the all-targets default:
 make translations-generate TRANSLATION_ARGS="--target fi=Finnish"
 
 python3 -B scripts/translations/translate_app_resources.py translate \
