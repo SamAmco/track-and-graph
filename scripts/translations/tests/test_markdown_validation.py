@@ -16,7 +16,6 @@ TRANSLATIONS_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TRANSLATIONS_DIR))
 
 from markdown_validation import validate_markdown  # noqa: E402
-from languages import SUPPORTED_TARGETS  # noqa: E402
 from providers.base import TranslationResult  # noqa: E402
 import translate_release_notes as release_notes  # noqa: E402
 from translate_release_notes import _instructions  # noqa: E402
@@ -43,15 +42,6 @@ class MarkdownValidationTest(unittest.TestCase):
         self.assertIn("Core context — do not remove", brief)
         self.assertIn("A Tracker stores", brief)
         self.assertIn("A Function is a derived data source", brief)
-
-    def test_supported_language_list_is_complete_unique_and_ltr(self) -> None:
-        locales = [target.locale for target in SUPPORTED_TARGETS]
-        self.assertEqual(66, len(locales))
-        self.assertEqual(len(locales), len(set(locales)))
-        self.assertTrue(
-            {"de", "es", "fr", "pt", "zh-Hans", "zh-Hant"}.issubset(locales)
-        )
-        self.assertTrue({"ar", "fa", "he", "ur"}.isdisjoint(locales))
 
     def test_retry_prompt_includes_failed_structure_details(self) -> None:
         instructions = _instructions(

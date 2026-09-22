@@ -124,7 +124,19 @@ make translations-generate
 make translations-generate TRANSLATION_ARGS="--target fi=Finnish"
 ```
 
-Shared infrastructure lives under `scripts/translations/`: `languages.py`,
-`domain_brief.md`, provider adapters, and `translation_runtime.py`. Release
-notes and future Lua function translation reuse those pieces but keep their own
-format-specific parsing and validation.
+`configuration/translation-languages.tsv` is the sole language manifest.
+Python reads it through `scripts/translations/languages.py`; Lua reads the same
+file through `lua/tools/lib/languages.lua`. Do not duplicate the expected list
+in code or tests. Other shared infrastructure lives under
+`scripts/translations/`: `domain_brief.md`, provider adapters, and
+`translation_runtime.py`. Release notes, Android resources, and Lua catalog
+copy reuse those pieces but keep format-specific extraction and validation.
+
+Lua translation is also an explicitly requested paid operation. Use
+`make lua-translations-function FUNCTION=<id>` for the normal one-function
+workflow, `make lua-translations-shared` for incomplete shared records, or the
+plural/all-shared targets only for a deliberate migration. Functions regenerate
+every inline field and requested locale because there is no source-hash state.
+Responses are retained, structurally validated, and rendered as paste-ready
+Lua. Invalid batches get a `.failure.lua` with recovered values and marked
+English fallbacks. Source application is a separate reviewed command.

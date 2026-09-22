@@ -12,6 +12,7 @@ Verified: 2026-09-18
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -20,71 +21,32 @@ class TranslationTarget:
     language: str
 
 
-SUPPORTED_TARGETS = (
-    TranslationTarget("af", "Afrikaans"),
-    TranslationTarget("sq", "Albanian"),
-    TranslationTarget("am", "Amharic"),
-    TranslationTarget("hy", "Armenian"),
-    TranslationTarget("az", "Azerbaijani"),
-    TranslationTarget("bn", "Bangla"),
-    TranslationTarget("eu", "Basque"),
-    TranslationTarget("be", "Belarusian"),
-    TranslationTarget("bg", "Bulgarian"),
-    TranslationTarget("my", "Burmese"),
-    TranslationTarget("ca", "Catalan"),
-    TranslationTarget("zh-Hans", "Chinese (Simplified)"),
-    TranslationTarget("zh-Hant", "Chinese (Traditional)"),
-    TranslationTarget("hr", "Croatian"),
-    TranslationTarget("cs", "Czech"),
-    TranslationTarget("da", "Danish"),
-    TranslationTarget("nl", "Dutch"),
-    TranslationTarget("et", "Estonian"),
-    TranslationTarget("fil", "Filipino"),
-    TranslationTarget("fi", "Finnish"),
-    TranslationTarget("fr", "French"),
-    TranslationTarget("gl", "Galician"),
-    TranslationTarget("ka", "Georgian"),
-    TranslationTarget("de", "German"),
-    TranslationTarget("el", "Greek"),
-    TranslationTarget("gu", "Gujarati"),
-    TranslationTarget("hi", "Hindi"),
-    TranslationTarget("hu", "Hungarian"),
-    TranslationTarget("is", "Icelandic"),
-    TranslationTarget("id", "Indonesian"),
-    TranslationTarget("it", "Italian"),
-    TranslationTarget("ja", "Japanese"),
-    TranslationTarget("kn", "Kannada"),
-    TranslationTarget("kk", "Kazakh"),
-    TranslationTarget("km", "Khmer"),
-    TranslationTarget("ko", "Korean"),
-    TranslationTarget("ky", "Kyrgyz"),
-    TranslationTarget("lo", "Lao"),
-    TranslationTarget("lv", "Latvian"),
-    TranslationTarget("lt", "Lithuanian"),
-    TranslationTarget("mk", "Macedonian"),
-    TranslationTarget("ms", "Malay"),
-    TranslationTarget("ml", "Malayalam"),
-    TranslationTarget("mr", "Marathi"),
-    TranslationTarget("mn", "Mongolian"),
-    TranslationTarget("ne", "Nepali"),
-    TranslationTarget("no", "Norwegian"),
-    TranslationTarget("pl", "Polish"),
-    TranslationTarget("pt", "Portuguese"),
-    TranslationTarget("pa", "Punjabi"),
-    TranslationTarget("ro", "Romanian"),
-    TranslationTarget("rm", "Romansh"),
-    TranslationTarget("ru", "Russian"),
-    TranslationTarget("sr", "Serbian"),
-    TranslationTarget("si", "Sinhala"),
-    TranslationTarget("sk", "Slovak"),
-    TranslationTarget("sl", "Slovenian"),
-    TranslationTarget("es", "Spanish"),
-    TranslationTarget("sw", "Swahili"),
-    TranslationTarget("sv", "Swedish"),
-    TranslationTarget("ta", "Tamil"),
-    TranslationTarget("te", "Telugu"),
-    TranslationTarget("th", "Thai"),
-    TranslationTarget("tr", "Turkish"),
-    TranslationTarget("uk", "Ukrainian"),
-    TranslationTarget("vi", "Vietnamese"),
-)
+LANGUAGES_FILE = Path(__file__).resolve().parents[2] / "configuration" / "translation-languages.tsv"
+
+
+def load_languages(path: Path = LANGUAGES_FILE) -> tuple[TranslationTarget, ...]:
+    languages: list[TranslationTarget] = []
+    seen: set[str] = set()
+    for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            locale, language = line.split("\t", 1)
+        except ValueError as error:
+            raise ValueError(f"{path}:{line_number}: expected tab-separated locale and name") from error
+        locale = locale.strip()
+        language = language.strip()
+        if not locale or not language:
+            raise ValueError(f"{path}:{line_number}: locale and name must be non-empty")
+        if locale in seen:
+            raise ValueError(f"{path}:{line_number}: duplicate locale {locale}")
+        seen.add(locale)
+        languages.append(TranslationTarget(locale, language))
+    if not languages or languages[0] != TranslationTarget("en", "English"):
+        raise ValueError(f"{path}: first language must be en<TAB>English")
+    return tuple(languages)
+
+
+ALL_LANGUAGES = load_languages()
+SUPPORTED_TARGETS = tuple(target for target in ALL_LANGUAGES if target.locale != "en")

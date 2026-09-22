@@ -21,7 +21,7 @@ endif
 validate-remote-config:
 	@./scripts/validate-remote-config.sh
 
-.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate
+.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate lua-translations-function lua-translations-shared lua-translations-apply
 translations-audit:
 	@python3 -B scripts/translations/translate_app_resources.py audit $(TRANSLATION_ARGS)
 
@@ -40,6 +40,17 @@ translations-test:
 
 translations-validate:
 	@python3 -B scripts/translations/translate_app_resources.py audit --fail-on-issues
+
+lua-translations-function:
+	@test -n "$(FUNCTION)" || (echo "Usage: make lua-translations-function FUNCTION=<id> [TRANSLATION_ARGS=...]" && exit 1)
+	@python3 -B scripts/translations/translate_lua_catalog.py --function "$(FUNCTION)" $(TRANSLATION_ARGS)
+
+lua-translations-shared:
+	@python3 -B scripts/translations/translate_lua_catalog.py --shared $(TRANSLATION_ARGS)
+
+lua-translations-apply:
+	@test -n "$(DRAFT)" || (echo "Usage: make lua-translations-apply DRAFT=<draft.json>" && exit 1)
+	@python3 -B scripts/translations/apply_lua_catalog_draft.py "$(DRAFT)"
 
 .PHONY: run-community-tests
 run-community-tests: run-community-functions-tests run-community-graph-tests

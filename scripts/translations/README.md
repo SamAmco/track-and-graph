@@ -5,7 +5,8 @@ inside the Android app.
 
 ## Shared infrastructure
 
-`languages.py` is the checked-in target list. It contains the 66 non-English,
+`configuration/translation-languages.tsv` is the single checked-in language
+manifest shared by Python and Lua. `languages.py` parses it for Python. It contains the 66 non-English,
 non-RTL written-language targets from Google Play's supported localization list.
 Regional variants are collapsed where they share a script; Chinese remains split
 into Simplified (`zh-Hans`) and Traditional (`zh-Hant`).
@@ -145,9 +146,49 @@ python3 scripts/translations/markdown_validation.py \
   /tmp/release-note-translations/*.md
 ```
 
-Function-file translation is intentionally separate from this release-note
-workflow. It should operate on each source function file, not the generated
-catalog, then write translations back in the Lua format expected by that file.
+## Lua community copy
+
+`translate_lua_catalog.py` executes source function modules and the editable
+shared-copy data module. It translates function titles, Markdown descriptions,
+and inline configuration names; categories and enum options remain shared-key
+references. A selected function is always regenerated in full, so changed
+English cannot leave an old target translation looking current. Shared mode is
+incremental by default and selects records missing at least one requested
+locale; `--all-shared` deliberately regenerates everything.
+
+Every locale receives bounded JSON batches with the same domain brief used by
+the other workflows. Exact IDs, non-empty values, and Markdown structure are
+validated. Results are written below `build/translation-drafts/lua` as raw
+responses, a machine-readable draft, and paste-ready Lua. A malformed response
+also produces a readable `.failure.lua` containing every recoverable value and
+clearly marked English fallbacks, so simple damage can be repaired without
+another paid request. A unique one-character JSON syntax error is repaired
+locally after full validation.
+
+Interrupted suites retain raw responses and completed draft locales.
+`--reuse-responses` accepts retained full-locale or individual batch responses
+only after they pass current validation, then makes paid calls only for invalid
+or missing batches. This is useful when retrying with a smaller batch size after
+a large response was truncated, or after repairing a failure locally.
+
+```bash
+make lua-translations-function FUNCTION=duration-in-units
+make lua-translations-shared
+
+# Deliberate full regeneration of shared copy:
+make lua-translations-shared TRANSLATION_ARGS=--all-shared
+```
+
+These are explicit paid operations and produce reviewable drafts. After review,
+a complete 66-locale draft can be applied without another API call:
+
+```bash
+make lua-translations-apply DRAFT=build/translation-drafts/lua/duration-in-units/draft.json
+```
+
+Application is deliberately separate from generation. It refuses partial
+locale sets or partial functions, then replaces only the corresponding Lua
+translation tables.
 
 ## Tests
 

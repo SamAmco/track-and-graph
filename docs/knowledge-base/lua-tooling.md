@@ -41,11 +41,22 @@ lua tools/pack-functions.lua
 ```
 Output: `catalog/community-functions.lua`
 
-Translation tooling must operate on the individual files under
-`lua/src/community/functions/`, never on this generated catalog. A future
-function translation wrapper should reuse `scripts/translations/languages.py`
-and the provider adapters while independently handling Lua source extraction,
-validation, and writing translations back to each source file.
+Translation tooling operates on the individual files under
+`lua/src/community/functions/`, never on this generated catalog.
+`lua/tools/export-translatable-copy.lua` executes source modules and exports
+their inline copy. `scripts/translations/translate_lua_catalog.py` regenerates
+one explicitly selected function at a time, reusing the shared language
+manifest, domain brief, and provider adapter, then emits validated drafts under
+`build/translation-drafts/lua`. Generation is paid but does not edit source.
+Apply a reviewed, complete draft separately with
+`make lua-translations-apply DRAFT=…`; partial language suites and partial
+functions are rejected.
+
+Shared copy is stored as editable records in
+`lua/src/community/shared-translations-data.lua`. The normal
+`shared-translations.lua` wrapper indexes and strictly validates those records.
+This separation lets draft tooling inspect a newly added English-only record
+without weakening runtime or release validation.
 
 Prefer the `make` targets when publishing. `make lua-publish-debug` and `make lua-publish-prod` depend on `lua-pack-functions`, so they rebuild `lua/catalog/community-functions.lua` before signing. Running `lua tools/publish-functions-debug.lua` or `lua tools/publish-functions-prod.lua` directly only signs/copies the existing catalog file; if you skip packing first, you can publish stale catalog content.
 
