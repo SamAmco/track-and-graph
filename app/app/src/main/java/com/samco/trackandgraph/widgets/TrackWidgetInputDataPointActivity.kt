@@ -33,7 +33,6 @@ import androidx.glance.action.actionStartActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
@@ -54,6 +53,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.OffsetDateTime
@@ -81,9 +81,8 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
         viewModel.initFromFeatureId(featureId, isStopTimer)
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                observeDialogData()
-            }
+            lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
+            observeDialogData()
         }
 
         val composeView = ComposeView(this).apply {
@@ -101,30 +100,29 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
         setContentView(composeView)
     }
 
-    private suspend fun observeDialogData() = viewModel.dialogData
-        .filterNotNull().collect { data ->
-            when (data) {
-                is DialogData.Invalid -> finish()
+    private suspend fun observeDialogData() {
+        when (val data = viewModel.dialogData.filterNotNull().first()) {
+            is DialogData.Invalid -> finish()
 
-                is DialogData.Valid -> {
-                    val tracker = data.tracker
-                    when {
-                        tracker.hasDefaultValue && data.customInitialValue == null -> {
-                            viewModel.addDefaultDataPoint()
-                            performTrackHapticFeedback()
-                            finish()
-                        }
+            is DialogData.Valid -> {
+                val tracker = data.tracker
+                when {
+                    tracker.hasDefaultValue && data.customInitialValue == null -> {
+                        viewModel.addDefaultDataPoint()
+                        performTrackHapticFeedback()
+                        finish()
+                    }
 
-                        else -> {
-                            addDataPointDialogViewModel.showAddDataPointDialog(
-                                trackerId = data.trackerId,
-                                customInitialValue = data.customInitialValue
-                            )
-                        }
+                    else -> {
+                        addDataPointDialogViewModel.showAddDataPointDialog(
+                            trackerId = data.trackerId,
+                            customInitialValue = data.customInitialValue
+                        )
                     }
                 }
             }
         }
+    }
 
     private fun performTrackHapticFeedback() {
         val feedbackConstant = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -222,20 +220,18 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
         }
     }
 
-    fun addDefaultDataPoint() {
+    suspend fun addDefaultDataPoint() = withContext(io) {
         val currentData = _dialogData.value
         if (currentData is DialogData.Valid) {
             val tracker = currentData.tracker
-            viewModelScope.launch(io) {
-                val newDataPoint = DataPoint(
-                    timestamp = OffsetDateTime.now(),
-                    featureId = tracker.featureId,
-                    value = tracker.defaultValue,
-                    label = tracker.defaultLabel,
-                    note = ""
-                )
-                dataInteractor.insertDataPoint(newDataPoint)
-            }
+            val newDataPoint = DataPoint(
+                timestamp = OffsetDateTime.now(),
+                featureId = tracker.featureId,
+                value = tracker.defaultValue,
+                label = tracker.defaultLabel,
+                note = ""
+            )
+            dataInteractor.insertDataPoint(newDataPoint)
         }
     }
 }
