@@ -3,9 +3,18 @@
 -- Simple tests for the validation library
 
 local validation = require("tools.lib.validation")
+local required_languages = require("tools.lib.languages").codes()
 
 local test_count = 0
 local passed_count = 0
+
+local function translations(value)
+	local result = {}
+	for _, language in ipairs(required_languages) do
+		result[language] = value
+	end
+	return result
+end
 
 local function errors_contain(errors, expected)
 	for _, error_message in ipairs(errors) do
@@ -33,7 +42,7 @@ print("Testing validation library...\n")
 -- Test validate_translations
 test("validate_translations accepts valid translations", function()
 	local ok, errors = validation.validate_translations(
-		{en="English", de="Deutsch", es="Español", fr="Français"},
+		translations("Example"),
 		"test",
 		"test.lua"
 	)
@@ -42,8 +51,10 @@ test("validate_translations accepts valid translations", function()
 end)
 
 test("validate_translations rejects missing language", function()
+	local values = translations("Example")
+	values[required_languages[#required_languages]] = nil
 	local ok, errors = validation.validate_translations(
-		{en="English", de="Deutsch", es="Español"},
+		values,
 		"test",
 		"test.lua"
 	)
@@ -52,8 +63,10 @@ test("validate_translations rejects missing language", function()
 end)
 
 test("validate_translations rejects empty string", function()
+	local values = translations("Example")
+	values[required_languages[#required_languages]] = ""
 	local ok, errors = validation.validate_translations(
-		{en="English", de="", es="Español", fr="Français"},
+		values,
 		"test",
 		"test.lua"
 	)
@@ -71,12 +84,7 @@ test("validate_config accepts valid config", function()
 		{
 			id = "param1",
 			type = "number",
-			name = {
-				en = "Parameter 1",
-				de = "Parameter 1",
-				es = "Parámetro 1",
-				fr = "Paramètre 1"
-			}
+			name = translations("Parameter 1")
 		}
 	}
 	local ok, errors = validation.validate_config(config, "test.lua")
@@ -93,7 +101,7 @@ test("validate_config rejects missing id", function()
 	local config = {
 		{
 			type = "number",
-			name = {en="A", de="B", es="C", fr="D"}
+			name = translations("A")
 		}
 	}
 	local ok, errors = validation.validate_config(config, "test.lua")
@@ -116,7 +124,7 @@ test("validate_config explains inline enum option restriction", function()
 	local config = {{
 		id = "mode",
 		type = "enum",
-		name = {en="Mode", de="Modus", es="Modo", fr="Mode"},
+		name = translations("Mode"),
 		options = {{id="one", name={en="One", de="Eins", es="Uno", fr="Un"}}},
 	}}
 	local ok, errors = validation.validate_config(config, "test.lua")
@@ -128,7 +136,7 @@ test("validate_config rejects undefined enum shared key", function()
 	local config = {{
 		id = "mode",
 		type = "enum",
-		name = {en="Mode", de="Modus", es="Modo", fr="Mode"},
+		name = translations("Mode"),
 		options = {"_missing"},
 	}}
 	local ok, errors = validation.validate_config(config, "test.lua", {})
@@ -143,8 +151,8 @@ test("validate_function accepts valid module", function()
 		version = "1.0.0",
 		inputCount = 1,
 		categories = {"_filter"},
-		title = {en="Test", de="Test", es="Test", fr="Test"},
-		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		title = translations("Test"),
+		description = translations("Desc"),
 		generator = function() end
 	}
 	local ok, errors = validation.validate_function(module, "test.lua")
@@ -155,8 +163,8 @@ test("validate_function rejects missing id", function()
 	local module = {
 		version = "1.0.0",
 		inputCount = 1,
-		title = {en="Test", de="Test", es="Test", fr="Test"},
-		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		title = translations("Test"),
+		description = translations("Desc"),
 		generator = function() end
 	}
 	local ok, errors = validation.validate_function(module, "test.lua")
@@ -168,8 +176,8 @@ test("validate_function rejects invalid semver", function()
 		id = "test",
 		version = "1.0",
 		inputCount = 1,
-		title = {en="Test", de="Test", es="Test", fr="Test"},
-		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		title = translations("Test"),
+		description = translations("Desc"),
 		generator = function() end
 	}
 	local ok, errors = validation.validate_function(module, "test.lua")
@@ -182,7 +190,7 @@ test("validate_function rejects missing title translations", function()
 		version = "1.0.0",
 		inputCount = 1,
 		title = {en="Test", de="Test"},
-		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		description = translations("Desc"),
 		generator = function() end
 	}
 	local ok, errors = validation.validate_function(module, "test.lua")
@@ -194,8 +202,8 @@ test("validate_function rejects non-function generator", function()
 		id = "test",
 		version = "1.0.0",
 		inputCount = 1,
-		title = {en="Test", de="Test", es="Test", fr="Test"},
-		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		title = translations("Test"),
+		description = translations("Desc"),
 		generator = "not a function"
 	}
 	local ok, errors = validation.validate_function(module, "test.lua")
@@ -207,8 +215,8 @@ test("validate_function explains inline category restriction", function()
 		id = "test",
 		version = "1.0.0",
 		categories = {{en="Filter", de="Filter", es="Filtro", fr="Filtre"}},
-		title = {en="Test", de="Test", es="Test", fr="Test"},
-		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		title = translations("Test"),
+		description = translations("Desc"),
 		generator = function() end,
 	}
 	local ok, errors = validation.validate_function(module, "test.lua")
@@ -221,8 +229,8 @@ test("validate_function rejects undefined category shared key", function()
 		id = "test",
 		version = "1.0.0",
 		categories = {"_missing"},
-		title = {en="Test", de="Test", es="Test", fr="Test"},
-		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		title = translations("Test"),
+		description = translations("Desc"),
 		generator = function() end,
 	}
 	local ok, errors = validation.validate_function(module, "test.lua", {})

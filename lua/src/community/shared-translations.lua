@@ -1,7 +1,7 @@
 -- Strict runtime view of the editable shared translation records.
 
 local records = require("community.shared-translations-data")
-local required_languages = { "en", "de", "es", "fr" }
+local required_languages = require("tools.lib.languages").codes()
 local translations_by_id = {}
 
 for _, record in ipairs(records) do

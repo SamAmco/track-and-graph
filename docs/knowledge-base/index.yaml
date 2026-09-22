@@ -109,7 +109,7 @@ docs:
 
   - file: lua-community-functions.md
     title: Writing Lua function scripts and contributing to the community catalog
-    description: How to write Lua function scripts (generator/iterator pattern, data point fields, 8 config types, multiple inputs, filtering); catalog contribution requirements (version, 4-language localization, categories, tests).
+    description: How to write Lua function scripts (generator/iterator pattern, data point fields, 8 config types, multiple inputs, filtering); catalog contribution requirements (version, complete localization, categories, tests).
     keywords: [lua, function, script, generator, iterator, datapoint, config, community, catalog, localization, tests, tng.config, inputCount, version]
 
   - file: lua-graph-scripts.md

@@ -1,12 +1,12 @@
 ---
 title: Writing Lua function scripts and contributing to the community catalog
-description: How to write Lua function scripts (generator/iterator pattern, data point fields, 8 config types, multiple inputs, filtering); catalog contribution requirements (version field, 4-language localization, categories, tests).
+description: How to write Lua function scripts (generator/iterator pattern, data point fields, 8 config types, multiple inputs, filtering); catalog contribution requirements (version field, complete localization, categories, tests).
 topics:
   - Pattern: script → generator function(source, config) → iterator function → yields data points
   - Data point fields: timestamp (ms), value, label, note, offset
   - Config types (from tng.config): text, number, checkbox, enum, uint, duration, localtime, instant
   - Multiple inputs: inputCount > 1, first param becomes table of sources
-  - Catalog mode: requires version, id, 4-language translations (en/de/es/fr), categories
+  - Catalog mode: requires version, id, every configured language, categories
   - Tests: config values are actual Lua types; sources is array of arrays; run with make run-community-functions-tests
 keywords: [lua, function, script, generator, iterator, datapoint, config, community, catalog, localization, tests, tng.config, inputCount, version, categories]
 ---
@@ -220,7 +220,9 @@ return {
 
 ## Localization
 
-Catalog functions require translations in 4 languages (en, de, es, fr):
+Catalog functions require English plus every target in
+`configuration/translation-languages.tsv`. Both inline copy and shared
+translations are checked against that single manifest by the release gate.
 
 **Inline:**
 ```lua

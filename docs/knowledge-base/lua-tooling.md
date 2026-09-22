@@ -68,7 +68,7 @@ Run from `lua/` directory:
 |------|---------|
 | `lua tools/verify-api-specs.lua` | Ensures TNG API exports have API level specs |
 | `lua tools/get-max-api-level.lua` | Returns highest API level across specs |
-| `lua tools/validate-functions.lua` | Validates required fields, inline translation structure, and every shared translation reference |
+| `lua tools/validate-functions.lua` | Validates required fields, every manifest language in inline/shared copy, title uniqueness in every language, and every shared translation reference |
 | `lua tools/pack-functions.lua` | Performs publish-time validation, including resolving category, config-name, and enum-option shared translation keys |
 | `lua tools/detect-changes.lua` | Compares functions against published catalog |
 

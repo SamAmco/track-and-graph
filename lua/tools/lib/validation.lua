@@ -2,11 +2,11 @@
 -- Validation functions for community Lua functions
 
 local semver = require("tools.lib.semver")
+local languages = require("tools.lib.languages")
 
 local M = {}
 
--- Required language codes
-local REQUIRED_LANGUAGES = {"en", "de", "es", "fr"}
+local REQUIRED_LANGUAGES = languages.codes()
 
 local function validate_shared_translation_key(value, field_name, file_path, valid_translations, reason)
 	if type(value) ~= "string" or not value:match("^_") then
