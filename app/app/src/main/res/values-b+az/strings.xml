@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">İpucu: Funksiyalar üfüqi rejimdə daha yaxşı işləyir</string>
     <string name="functions_start_hint">Buradan başlayın: Uzun basın və Məlumat mənbəyini seçin</string>
     <string name="see_whats_new">Yeniliklərə baxın</string>
+    <string name="app_language">Tətbiq dili</string>
 </resources>

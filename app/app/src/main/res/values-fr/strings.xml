@@ -1,19 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ This file is part of Track & Graph
-  ~ 
-  ~ Track & Graph is free software : you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~ 
-  ~ Track & Graph is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~ 
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-  -->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="home">Accueil</string>
     <string name="symlink">Lien symbolique</string>
@@ -78,7 +63,6 @@
     <string name="from">De : </string>
     <string name="to">Jusqu\'à : </string>
     <string name="day">Jour</string>
-
     <string-array name="time_histogram_windows">
         <item>Horaire</item>
         <item>Quotidien</item>
@@ -133,20 +117,16 @@
         <item>Dynamique</item>
         <item>Fixe</item>
     </string-array>
-
     <string name="custom">Personnalisé</string>
     <string name="ending_at_latest">Dernier point de données</string>
     <string name="ending_at_now">Maintenant</string>
     <string name="ending_at_custom_date">Date personnalisée…</string>
-
     <string name="hours_and_minutes_ago">il y a %1$dh %2$dmin</string>
-
     <string name="import_exception_unknown">L\'importation a échoué : une erreur inconnue s\'est produite</string>
     <string name="import_exception_bad_headers">L\'importation a échoué : les en-têtes ne correspondent pas aux en-têtes attendus : %1$s</string>
     <string name="import_exception_inconsistent_record">L\'importation a échoué : l\'enregistrement sur la ligne %1$s ne correspond pas aux en-têtes requis</string>
     <string name="import_exception_bad_timestamp">L\'importation a échoué : impossible d\'interpréter l\'horodatage pour l\'enregistrement sur la ligne : %1$s</string>
     <string name="import_exception_inconsistent_data_type">L\'importation a échoué : type de données incohérent sur la ligne : %1$s</string>
-
     <string name="unknown_error_occurred">Une erreur inconnue s\'est produite</string>
     <string name="graph_stat_validation_no_name">Veuillez fournir un nom</string>
     <string name="graph_stat_validation_no_line_graph_features">Veuillez ajouter quelque chose au graphique</string>
@@ -166,12 +146,11 @@
     <string name="graph_inconsistent_series_error">Ce graphique ne peut pas être affiché, car ses séries de données ont des tailles différentes.</string>
     <string name="graph_invalid_y_range_error">Ce graphique ne peut pas être affiché, car la plage de son axe Y n’est pas valide.</string>
     <string name="finish">Terminer</string>
-    <string name="about_description"><![CDATA[Track & Graph est un logiciel gratuit et open source sous licence GPL 3.0.]]></string>
+    <string name="about_description">Track &amp; Graph est un logiciel gratuit et open source sous licence GPL 3.0.</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Les bibliothèques open source suivantes ont été utilisées : </string>
     <string name="about">À propos</string>
-    <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
-
+    <string name="nav_header_title">Track &amp; Graph</string>
     <string name="faq">FAQ</string>
     <string name="tutorial_text_1">Utilisez des suivis pour suivre vos données.</string>
     <string name="tutorial_text_2">Utilisez des graphiques et des statistiques pour visualiser les données.</string>
@@ -180,10 +159,8 @@
     <string name="move_to_colon">Déplacer vers : </string>
     <string name="move_to">Déplacer vers</string>
     <string name="copy_to">Copier vers</string>
-
     <string name="ru_sure_update_data">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.\n\nVoulez-vous continuer ?</string>
     <string name="ok">OK</string>
-
     <string name="rate_the_app">Notez l\'application</string>
     <string name="reminders">Notifications de rappel</string>
     <string name="no_reminders_hint">Touchez l\'icône + pour créer une nouvelle notification de rappel de suivi.</string>
@@ -198,7 +175,6 @@
     <string name="reminders_notifications_channel_description">Notifications créées par l\'utilisateur pour vous rappeler quand effectuer un suivi</string>
     <string name="default_reminder_name">C\'est l\'heure du suivi !</string>
     <string name="range_style">Style de plage : </string>
-
     <string name="track_widget_configure_no_data_error">Veuillez d\'abord ajouter quelques entrées.</string>
     <string name="track_widget_configure_no_data_selected_error">Vous devez sélectionner un ensemble de données valide pour créer un widget de suivi.</string>
     <string name="create">Créer</string>
@@ -217,7 +193,6 @@
     <string name="info">Info</string>
     <string name="no_description">Aucune description</string>
     <string name="description">Description</string>
-
     <!-- App lock -->
     <string name="app_lock_title">Verrouillage de l’appli</string>
     <string name="app_lock_locked_title">Track &amp; Graph est verrouillé</string>
@@ -243,7 +218,6 @@
     <string name="app_lock_error_password_hashing_unavailable">La vérification du mot de passe du verrouillage de l’appli n’est pas disponible sur cet appareil.</string>
     <string name="app_lock_error_enter_password">Saisissez un mot de passe.</string>
     <string name="app_lock_error_passwords_do_not_match">Les mots de passe ne correspondent pas.</string>
-
     <string name="note_input_hint">Notes…</string>
     <string name="add_a_note">Ajouter une note</string>
     <string name="notes">Notes</string>
@@ -294,7 +268,6 @@
     <string name="save_changes">Sauvegarder les modifications</string>
     <string name="timer_notification_channel_name">Minuteries</string>
     <string name="stop">Arrêt</string>
-
     <string name="name_your_function">Nommez votre fonction :</string>
     <string name="add_some_data_sources">Ajouter des sources de données</string>
     <string name="value">Valeur</string>
@@ -314,7 +287,6 @@
     <string name="data_point_tutorial_page_3_description">Utilisez des étiquettes si vous souhaitez regrouper les entrées</string>
     <string name="data_point_tutorial_page_3_hint">(Astuce : si vous souhaitez ajouter plus de contexte ou de description, utilisez la note au lieu du champ d\'étiquette)</string>
     <string name="help">Aide</string>
-    
     <string name="advanced_options">Options avancées</string>
     <string name="type_colon">\"Type : \"</string>
     <string name="order_colon">\"Ordre : \"</string>
@@ -350,121 +322,101 @@
     <string name="weeks_generic">Semaine(s)</string>
     <string name="months_generic">Mois</string>
     <string name="years_generic">Année(s)</string>
-
     <plurals name="seconds">
         <item quantity="one">%d seconde</item>
         <item quantity="many">%d secondes</item>
         <item quantity="other">%d secondes</item>
     </plurals>
-
     <plurals name="minutes">
         <item quantity="one">%d minute</item>
         <item quantity="many">%d minutes</item>
         <item quantity="other">%d minutes</item>
     </plurals>
-
     <plurals name="hours">
         <item quantity="one">%d heure</item>
         <item quantity="many">%d heures</item>
         <item quantity="other">%d heures</item>
     </plurals>
-
     <plurals name="days">
         <item quantity="one">%d jour</item>
         <item quantity="many">%d jours</item>
         <item quantity="other">%d jours</item>
     </plurals>
-
     <plurals name="weeks">
         <item quantity="one">%d semaine</item>
         <item quantity="many">%d semaines</item>
         <item quantity="other">%d semaines</item>
     </plurals>
-
     <plurals name="months">
         <item quantity="one">%d mois</item>
         <item quantity="many">%d mois</item>
         <item quantity="other">%d mois</item>
     </plurals>
-
     <plurals name="years">
         <item quantity="one">%d an</item>
         <item quantity="many">%d années</item>
         <item quantity="other">%d années</item>
     </plurals>
-
     <plurals name="every_x_minutes">
         <item quantity="one">Chaque minute</item>
         <item quantity="many">Toutes les %d minutes</item>
         <item quantity="other">Toutes les %d minutes</item>
     </plurals>
-
     <plurals name="every_x_hours">
         <item quantity="one">Chaque heure</item>
         <item quantity="many">Toutes les %d heures</item>
         <item quantity="other">Toutes les %d heures</item>
     </plurals>
-
     <plurals name="every_x_days">
         <item quantity="one">Chaque jour</item>
         <item quantity="many">Tous les %d jours</item>
         <item quantity="other">Tous les %d jours</item>
     </plurals>
-
     <plurals name="every_x_weeks">
         <item quantity="one">Chaque semaine</item>
         <item quantity="many">Toutes les %d semaines</item>
         <item quantity="other">Toutes les %d semaines</item>
     </plurals>
-
     <plurals name="every_x_months">
         <item quantity="one">Chaque mois</item>
         <item quantity="many">Tous les %d mois</item>
         <item quantity="other">Tous les %d mois</item>
     </plurals>
-
     <plurals name="every_x_years">
         <item quantity="one">Chaque année</item>
         <item quantity="many">Toutes les %d années</item>
         <item quantity="other">Toutes les %d années</item>
     </plurals>
-
     <plurals name="after_x_minutes">
         <item quantity="one">Après 1 minute</item>
         <item quantity="many">Après %d minutes</item>
         <item quantity="other">Après %d minutes</item>
     </plurals>
-
     <plurals name="after_x_hours">
         <item quantity="one">Après 1 heure</item>
         <item quantity="many">Après %d heures</item>
         <item quantity="other">Après %d heures</item>
     </plurals>
-
     <plurals name="after_x_days">
         <item quantity="one">Après 1 jour</item>
         <item quantity="many">Après %d jours</item>
         <item quantity="other">Après %d jours</item>
     </plurals>
-
     <plurals name="after_x_weeks">
         <item quantity="one">Après 1 semaine</item>
         <item quantity="many">Après %d semaines</item>
         <item quantity="other">Après %d semaines</item>
     </plurals>
-
     <plurals name="after_x_months">
         <item quantity="one">Après 1 mois</item>
         <item quantity="many">Après %d mois</item>
         <item quantity="other">Après %d mois</item>
     </plurals>
-
     <plurals name="after_x_years">
         <item quantity="one">Après 1 an</item>
         <item quantity="many">Après %d ans</item>
         <item quantity="other">Après %d ans</item>
     </plurals>
-
     <string name="backup_now">Sauvegarder maintenant</string>
     <string name="restore_error_could_not_write_to_database">La restauration a échoué ! Impossible de trouver ou d\'écrire dans la base de données.</string>
     <string name="restore_error_could_not_read_from_database_file">La restauration a échoué ! Impossible de trouver ou de lire le fichier de base de données sélectionné.</string>
@@ -490,7 +442,6 @@
     <string name="notification_permission_prompt">Vous devez activer les notifications pour Track &amp; Graph pour être averti si la sauvegarde automatique échoue pour une raison quelconque.</string>
     <string name="restore_hint_text">AVERTISSEMENT : la restauration à partir d\'une sauvegarde effacera toutes les données et la configuration actuellement présentes dans l\'application. Vous devriez d\'abord sauvegarder vos données !</string>
     <string name="default_auto_backup_file_name">SauvegardeTrackEtGraph.db</string>
-
     <string name="lua_script_empty">Veuillez ajouter un script Lua</string>
     <string name="function_name_empty">Le nom de la fonction ne peut pas être vide</string>
     <string name="function_name">Nom de fonction</string>
@@ -499,7 +450,6 @@
     <string name="data_source">Source de Données</string>
     <string name="data_source_description">Un nœud Source de données vous permet de sélectionner un suivi ou une fonction à utiliser comme entrée.</string>
     <string name="lua_script">Script Lua</string>
-
     <string name="lua_script_input_hint">Entrez un script Lua…</string>
     <string name="select_node_type">Sélectionner le Type de Nœud</string>
     <string name="file">Fichier</string>
@@ -511,7 +461,8 @@
     <string name="lua_graph_first_time_user_title">Graphiques et statistiques des scripts Lua</string>
     <string name="lua_graph_first_time_user_message">Les scripts Lua sont une fonctionnalité avancée qui vous permet de créer des graphiques et des statistiques personnalisés avec le langage de programmation Lua. \n\nVous pouvez charger le vôtre, ou en choisir un dans la collection GitHub. L\'installation d\'un script depuis GitHub vous ramènera à l\'application avec le script prêt à l\'emploi.</string>
     <string name="functions_first_time_user_title">Bienvenue dans les fonctions</string>
-    <string name="functions_first_time_user_message">Les fonctions sont une fonctionnalité avancée qui vous permet de combiner, agréger et transformer vos données en nouvelles sources de données dérivées.</string>    <string name="learn_more">En savoir plus ici</string>
+    <string name="functions_first_time_user_message">Les fonctions sont une fonctionnalité avancée qui vous permet de combiner, agréger et transformer vos données en nouvelles sources de données dérivées.</string>
+    <string name="learn_more">En savoir plus ici</string>
     <string name="github">GitHub</string>
     <string name="paste">Coller</string>
     <string name="failed_to_download_file">Échec du téléchargement du fichier : %s</string>
@@ -527,7 +478,6 @@
     <string name="missed_reminders_multiple_content">Vous avez manqué %1$d rappels</string>
     <string name="next_reminder_format">Prochain Rappel : %1$s</string>
     <string name="no_upcoming_reminders">Aucun Rappel À Venir</string>
-
     <!-- Reminder type selection -->
     <string name="select_reminder_type">Sélectionner un type de rappel</string>
     <string name="week_day_reminder">Rappel hebdomadaire</string>
@@ -540,7 +490,6 @@
     <string name="time_since_last_reminder_description">Quand vous n\'avez pas suivi quelque chose depuis un moment</string>
     <string name="one_time_reminder">Rappel ponctuel</string>
     <string name="one_time_reminder_description">Un rappel indépendant à une date précise ou après un délai</string>
-
     <!-- Reminder configuration -->
     <string name="reminder_name">Nom du rappel</string>
     <string name="reminder_disabled">Rappel désactivé</string>
@@ -560,14 +509,12 @@
     <string name="every_colon">Chaque :</string>
     <string name="ended_at_format">Terminé le : %1$s</string>
     <string name="starting_at_format">Commence le : %1$s</string>
-
     <!-- Month day occurrence -->
     <string name="occurrence_first">Premier</string>
     <string name="occurrence_second">Deuxième</string>
     <string name="occurrence_third">Troisième</string>
     <string name="occurrence_fourth">Quatrième</string>
     <string name="occurrence_last">Dernier</string>
-
     <!-- Full day names -->
     <string name="monday">Lundi</string>
     <string name="tuesday">Mardi</string>
@@ -576,7 +523,6 @@
     <string name="friday">Vendredi</string>
     <string name="saturday">Samedi</string>
     <string name="sunday">Dimanche</string>
-
     <!-- Dates compactes -->
     <string-array name="abbreviated_months">
         <item>Janv</item>
@@ -604,4 +550,5 @@
     <string name="compact_weekday_day_format">%1$s %2$s</string>
     <string name="compact_day_month_format">%1$s %2$s</string>
     <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="app_language">Langue de l’appli</string>
 </resources>

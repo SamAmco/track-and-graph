@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Совет: Функциите најдобро работат во пејзажна ориентација</string>
     <string name="functions_start_hint">Започнете тука: Долго притиснете и изберете Извор на податоци</string>
     <string name="see_whats_new">Погледнете што е ново</string>
+    <string name="app_language">Јазик на апликацијата</string>
 </resources>

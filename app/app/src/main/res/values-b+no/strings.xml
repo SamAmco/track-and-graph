@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Tips: Funksjoner fungerer best i liggende visning</string>
     <string name="functions_start_hint">Start her: Trykk lenge og velg Datakilde</string>
     <string name="see_whats_new">Se hva som er nytt</string>
+    <string name="app_language">Appspråk</string>
 </resources>

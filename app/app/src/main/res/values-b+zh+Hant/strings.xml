@@ -503,4 +503,5 @@
     <string name="functions_landscape_hint">提示：函數在橫向模式下效果最佳</string>
     <string name="functions_start_hint">從這裡開始：長按並選取「資料來源」</string>
     <string name="see_whats_new">查看最新內容</string>
+    <string name="app_language">應用程式語言</string>
 </resources>

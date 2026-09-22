@@ -560,4 +560,5 @@
     <string name="functions_landscape_hint">Wskazówka: funkcje działają najlepiej w orientacji poziomej</string>
     <string name="functions_start_hint">Zacznij tutaj: naciśnij i przytrzymaj, a następnie wybierz Źródło danych</string>
     <string name="see_whats_new">Zobacz nowości</string>
+    <string name="app_language">Język aplikacji</string>
 </resources>

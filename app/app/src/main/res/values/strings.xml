@@ -355,6 +355,7 @@
     <string name="delete_reminder_content_description">Delete Reminder</string>
     <string name="theme_colon">Theme:</string>
     <string name="date_format_colon">Date format:</string>
+    <string name="app_language">App language</string>
     <string name="add_data_point_button_content_description">Add a data point button</string>
     <string name="tracked_data_menu_button_content_description">Tracked data menu button</string>
     <string name="tracked_data_history_button_content_description">Tracked data history button</string>

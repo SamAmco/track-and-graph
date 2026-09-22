@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Consello: as funcións funcionan mellor en horizontal</string>
     <string name="functions_start_hint">Comeza aquí: mantén premido e selecciona Fonte de datos</string>
     <string name="see_whats_new">Ver as novidades</string>
+    <string name="app_language">Idioma da aplicación</string>
 </resources>

@@ -12,6 +12,21 @@ keywords: [localization, translation, strings.xml, Android resources, values, tr
 
 # Localization and translation automation
 
+## Do not translate during ordinary feature work
+
+**Never run translation generation while implementing or iterating on a feature
+unless the user specifically asks to translate the copy.** Adding or changing
+English resources is normal feature work; leave the resulting translations
+missing or stale until the wording is settled. Translation is a distinct,
+explicitly requested step because it is slow, costs money, creates a large
+diff, and premature runs may have to be repeated after copy changes.
+
+The read-only audit is safe to run during feature work to report the impact.
+Do not run `translate`, `translations-generate`, `translations-baseline`, or
+`translations-apply-failure`, and do not manually fill every locale, merely to
+make a feature's translation audit clean. An instruction to build, test, or
+install a feature does not imply permission to translate its new copy.
+
 English resources in unqualified `values/` directories are the sole source of
 truth. Never copy a resource found only in a translated file into English.
 Target-only resources and translated overrides of an English resource marked
@@ -30,6 +45,14 @@ lives in that module's `strings.xml`, and every resource there must always
 declare `translatable="false"`. Do not introduce hard-coded user-visible Compose
 text. Shared `app/ui` strings rendered by the viewer still belong to the shared
 UI module and remain translatable for the production apps.
+
+The main app opts into Android's generated per-app locale configuration with
+`androidResources.generateLocaleConfig = true`. Its source locale is declared
+as `en` in `app/app/src/main/res/resources.properties`; do not add a hand-written
+`localeConfig` manifest attribute or locale XML alongside it. On Android 13 and
+newer, the navigation drawer exposes an **App language** row that opens this
+package's system language screen. It is intentionally absent on older Android
+versions rather than providing an AndroidX language-picker backport.
 
 Run the read-only audit without credentials or API calls:
 

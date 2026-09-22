@@ -560,4 +560,5 @@
     <string name="functions_landscape_hint">Парада: функцыі лепш працуюць у альбомнай арыентацыі</string>
     <string name="functions_start_hint">Пачніце тут: утрымлівайце націск і выберыце «Крыніца даных»</string>
     <string name="see_whats_new">Даведацца пра новае</string>
+    <string name="app_language">Мова праграмы</string>
 </resources>

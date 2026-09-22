@@ -522,4 +522,5 @@
     <string name="graph_inconsistent_series_error">දත්ත ශ්‍රේණිවල ප්‍රමාණ නොගැළපෙන බැවින් මෙම ප්‍රස්තාරය පෙන්විය නොහැක.</string>
     <string name="graph_invalid_y_range_error">මෙම ප්‍රස්තාරයේ Y-අක්ෂ පරාසය වලංගු නොවන බැවින් එය පෙන්විය නොහැක.</string>
     <string name="finish">අවසන් කරන්න</string>
+    <string name="app_language">යෙදුම් භාෂාව</string>
 </resources>

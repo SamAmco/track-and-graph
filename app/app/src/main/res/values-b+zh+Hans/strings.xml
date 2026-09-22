@@ -503,4 +503,5 @@
     <string name="functions_landscape_hint">提示：函数在横屏模式下效果最佳</string>
     <string name="functions_start_hint">从这里开始：长按并选择“数据源”</string>
     <string name="see_whats_new">查看新内容</string>
+    <string name="app_language">应用语言</string>
 </resources>

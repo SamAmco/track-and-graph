@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">ਸੰਕੇਤ: Functions ਲੈਂਡਸਕੇਪ ਮੋਡ ਵਿੱਚ ਸਭ ਤੋਂ ਵਧੀਆ ਕੰਮ ਕਰਦੇ ਹਨ</string>
     <string name="functions_start_hint">ਇੱਥੋਂ ਸ਼ੁਰੂ ਕਰੋ: ਲੰਮਾ ਦਬਾਓ ਅਤੇ Data Source ਚੁਣੋ</string>
     <string name="see_whats_new">ਨਵਾਂ ਕੀ ਹੈ, ਵੇਖੋ</string>
+    <string name="app_language">ਐਪ ਦੀ ਭਾਸ਼ਾ</string>
 </resources>

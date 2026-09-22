@@ -503,4 +503,5 @@
     <string name="functions_landscape_hint">ヒント: 関数は横向きでの使用に適しています</string>
     <string name="functions_start_hint">ここから開始: 長押しして「データソース」を選択</string>
     <string name="see_whats_new">新機能を見る</string>
+    <string name="app_language">アプリの言語</string>
 </resources>

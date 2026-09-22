@@ -25,6 +25,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -166,6 +167,7 @@ class MainActivity : AppCompatActivity() {
                                 MainScreen(
                                     urlNavigator = urlNavigator,
                                     onNavigateToBrowser = ::onNavigateToBrowser,
+                                    onNavigateToAppLanguageSettings = ::onNavigateToAppLanguageSettings,
                                     currentTheme = currentTheme,
                                     onThemeSelected = ::onThemeSelected,
                                     currentDateFormat = currentDateFormat,
@@ -246,6 +248,19 @@ class MainActivity : AppCompatActivity() {
             DrawerMenuBrowserLocation.SUPPORT_PROJECT -> urlNavigator
                 .triggerNavigation(this, UrlNavigator.Location.DONATE)
         }
+    }
+
+    private fun onNavigateToAppLanguageSettings() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+
+        val appLocaleIntent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        val intent = appLocaleIntent.takeIf { it.resolveActivity(packageManager) != null }
+            ?: Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", packageName, null)
+            }
+        startActivity(intent)
     }
 
     private fun getThemeFromPrefs() =

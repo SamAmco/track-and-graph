@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Wenk: Funksies werk die beste in landskapmodus</string>
     <string name="functions_start_hint">Begin hier: Druk lank en kies Databron</string>
     <string name="see_whats_new">Sien wat nuut is</string>
+    <string name="app_language">Toepassingstaal</string>
 </resources>

@@ -44,8 +44,8 @@ docs:
 
   - file: localization.md
     title: Localization and translation automation
-    description: English-authoritative Android resource localization, shared translation infrastructure, incremental state, validation, paid-call safety, and locale ownership across app source sets.
-    keywords: [localization, translation, strings.xml, Android resources, values, translatable, domain-brief, app_translation_state, translate_app_resources, incremental, source-of-truth, provider, OpenAI]
+    description: Required reading before adding, removing, or editing user-visible copy or string resources; translations require a separate explicit request. English-authoritative Android localization, automation, state, validation, paid-call safety, and locale ownership.
+    keywords: [copy, wording, text, label, message, user-visible, UI string, string resource, R.string, strings.xml, localization, translation, Android resources, values, translatable, domain-brief, app_translation_state, translate_app_resources, incremental, source-of-truth, provider, OpenAI]
 
   - file: build-commands.md
     title: Build, test, and screenshot commands

@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">చిట్కా: Functions ల్యాండ్‌స్కేప్‌లో ఉత్తమంగా పనిచేస్తాయి</string>
     <string name="functions_start_hint">ఇక్కడ ప్రారంభించండి: ఎక్కువసేపు నొక్కి Data Source ఎంచుకోండి</string>
     <string name="see_whats_new">కొత్తవి చూడండి</string>
+    <string name="app_language">యాప్ భాష</string>
 </resources>

@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Vinkki: Funktiot toimivat parhaiten vaakanäkymässä</string>
     <string name="functions_start_hint">Aloita tästä: paina pitkään ja valitse Tietolähde</string>
     <string name="see_whats_new">Katso uudet ominaisuudet</string>
+    <string name="app_language">Sovelluksen kieli</string>
 </resources>

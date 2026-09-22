@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">পরামর্শ: ল্যান্ডস্কেপ মোডে Functions সবচেয়ে ভালো কাজ করে</string>
     <string name="functions_start_hint">এখান থেকে শুরু করুন: দীর্ঘক্ষণ চাপ দিয়ে Data Source নির্বাচন করুন</string>
     <string name="see_whats_new">নতুন কী দেখুন</string>
+    <string name="app_language">অ্যাপের ভাষা</string>
 </resources>

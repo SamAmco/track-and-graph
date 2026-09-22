@@ -522,4 +522,5 @@
     <string name="show_global_notes">Globaal</string>
     <string name="show_data_point_notes">Gegevenspunten</string>
     <string name="delete_reminder_content_description">Herinnering verwijderen</string>
+    <string name="app_language">App-taal</string>
 </resources>

@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">सूचना: Functions लँडस्केप मोडमध्ये उत्तम काम करतात</string>
     <string name="functions_start_hint">येथून सुरू करा: दीर्घकाळ दाबा आणि डेटा स्रोत निवडा</string>
     <string name="see_whats_new">नवीन काय आहे ते पहा</string>
+    <string name="app_language">अॅपची भाषा</string>
 </resources>

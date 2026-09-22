@@ -503,4 +503,5 @@
     <string name="restore_error_failed_to_copy_database">ការស្តារបានបរាជ័យ! មានបញ្ហាអំឡុងពេលស្តារមូលដ្ឋានទិន្នន័យ។</string>
     <string name="select_location">ជ្រើសរើសទីតាំង…</string>
     <string name="restore_successful">ការស្តារបានជោគជ័យ! ឥឡូវនេះ Track &amp; Graph ត្រូវចាប់ផ្តើមឡើងវិញ។</string>
+    <string name="app_language">ភាសាកម្មវិធី</string>
 </resources>

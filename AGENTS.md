@@ -8,6 +8,13 @@ NEVER create personal memory files (e.g. MEMORY.md). If something is worth remem
 
 ALWAYS ALWAYS ALWAYS consult the knowledge base FIRST!
 
+Whenever work adds, removes, or changes user-visible copy or Android string
+resources, ALWAYS read `docs/knowledge-base/localization.md` before making the
+change. NEVER generate, apply, baseline, or manually populate non-English
+translations during ordinary feature work unless the user specifically asks
+for translation. A request to implement, build, test, or install a feature is
+not a request to translate its copy.
+
 All technical documentation is in `docs/knowledge-base/`. The correct workflow is:
 
 ### Step 1 — Grep the index for relevant keywords

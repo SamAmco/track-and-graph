@@ -541,4 +541,5 @@
     <string name="functions_landscape_hint">Savet: Funkcije najbolje rade u položenom prikazu</string>
     <string name="functions_start_hint">Počnite ovde: Dugo pritisnite i izaberite Izvor podataka</string>
     <string name="see_whats_new">Pogledajte novosti</string>
+    <string name="app_language">Jezik aplikacije</string>
 </resources>

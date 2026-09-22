@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">സൂചന: Functions ലാൻഡ്‌സ്‌കേപ്പ് മോഡിൽ മികച്ച രീതിയിൽ പ്രവർത്തിക്കുന്നു</string>
     <string name="functions_start_hint">ഇവിടെ തുടങ്ങുക: ദീർഘനേരം അമർത്തി Data Source തിരഞ്ഞെടുക്കുക</string>
     <string name="see_whats_new">പുതിയതെന്തെന്ന് കാണുക</string>
+    <string name="app_language">ആപ്പ് ഭാഷ</string>
 </resources>

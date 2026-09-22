@@ -541,4 +541,5 @@
     <string name="functions_landscape_hint">Tip: Funkcie fungujú najlepšie v režime na šírku</string>
     <string name="functions_start_hint">Začnite tu: Dlho stlačte a vyberte Zdroj údajov</string>
     <string name="see_whats_new">Pozrieť, čo je nové</string>
+    <string name="app_language">Jazyk aplikácie</string>
 </resources>

@@ -515,4 +515,5 @@
     <string name="functions_landscape_hint">Кеңес: функциялар экран көлденең орналасқанда жақсы жұмыс істейді</string>
     <string name="functions_start_hint">Осы жерден бастаңыз: ұзақ басып, «Дереккөз» таңдаңыз</string>
     <string name="see_whats_new">Жаңалықтарды көру</string>
+    <string name="app_language">Қолданба тілі</string>
 </resources>

@@ -503,4 +503,5 @@
     <string name="restore_error_failed_to_copy_database">ການກູ້ຄືນລົ້ມເຫຼວ! ເກີດບັນຫາຂະນະກູ້ຄືນຖານຂໍ້ມູນ.</string>
     <string name="select_location">ເລືອກບ່ອນເກັບ…</string>
     <string name="restore_successful">ກູ້ຄືນສຳເລັດ! ຕອນນີ້ຕ້ອງເລີ່ມ Track &amp; Graph ໃໝ່.</string>
+    <string name="app_language">ພາສາຂອງແອັບ</string>
 </resources>

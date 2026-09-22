@@ -38,6 +38,10 @@ val localProps = Properties().apply {
 android {
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.samco.trackandgraph"
         //If the backup file is not backwards compatible after this update, upgrade the major version number!

@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Кеңеш: Функциялар экран туурасынан турганда жакшы иштейт</string>
     <string name="functions_start_hint">Ушул жерден баштаңыз: узак басып, «Маалымат булагын» тандаңыз</string>
     <string name="see_whats_new">Жаңылыктарды көрүү</string>
+    <string name="app_language">Тиркеменин тили</string>
 </resources>

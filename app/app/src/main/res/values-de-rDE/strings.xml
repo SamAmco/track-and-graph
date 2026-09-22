@@ -1,19 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ This file is part of Track & Graph
-  ~ 
-  ~ Track & Graph is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~ 
-  ~ Track & Graph is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~ 
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-  -->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="home">Startseite</string>
     <string name="symlink">Symlink</string>
@@ -78,7 +63,6 @@
     <string name="from">Von:</string>
     <string name="to">Bis:</string>
     <string name="day">Tag</string>
-
     <string-array name="time_histogram_windows">
         <item>Stündlich</item>
         <item>Täglich</item>
@@ -133,21 +117,16 @@
         <item>Dynamisch</item>
         <item>Fixiert</item>
     </string-array>
-
-
     <string name="custom">Benutzerdefiniert</string>
     <string name="ending_at_latest">Letzter Datenpunkt</string>
     <string name="ending_at_now">Jetzt</string>
     <string name="ending_at_custom_date">Benutzerdefiniertes Datum…</string>
-
     <string name="hours_and_minutes_ago">vor %1$d Std. %2$d Min.</string>
-
     <string name="import_exception_unknown">Import fehlgeschlagen: Ein unbekannter Fehler ist aufgetreten</string>
     <string name="import_exception_bad_headers">Import fehlgeschlagen: Kopfzeilen stimmten nicht mit den erwarteten Kopfzeilen überein: %1$s</string>
     <string name="import_exception_inconsistent_record">Import fehlgeschlagen: Datensatz in Zeile %1$s stimmt nicht mit den erforderlichen Kopfzeilen überein</string>
     <string name="import_exception_bad_timestamp">Import fehlgeschlagen: Konnte den Zeitstempel für Eintrag in Zeile %1$s nicht interpretieren</string>
     <string name="import_exception_inconsistent_data_type">Import fehlgeschlagen: Inkonsistenter Datentyp in Zeile %1$s enthalten</string>
-
     <string name="unknown_error_occurred">Ein unbekannter Fehler ist aufgetreten</string>
     <string name="graph_stat_validation_no_name">Bitte geben Sie einen Namen an</string>
     <string name="graph_stat_validation_no_line_graph_features">Bitte fügen Sie dem Diagramm etwas hinzu</string>
@@ -155,7 +134,6 @@
     <string name="graph_stat_validation_unrecognised_color">Bitte stellen Sie sicher, dass alle Datensätze eine Farbe haben</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Ungültiger Liniendiagramm-Datensatz entdeckt</string>
     <string name="graph_stat_validation_bad_fixed_range">Bitte stellen Sie sicher, dass „Von“ kleiner als „Bis“ ist.</string>
-
     <string name="graph_stat_view_not_found">Beim Auswerten dieses Diagramms ist ein Fehler aufgetreten.</string>
     <string name="graph_stat_view_not_enough_data_stat">Diese Statistik wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
     <string name="graph_stat_view_not_enough_data_graph">Dieses Diagramm wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
@@ -165,12 +143,11 @@
     <string name="graph_inconsistent_series_error">Dieses Diagramm kann nicht dargestellt werden, weil seine Datenreihen unterschiedliche Größen haben.</string>
     <string name="graph_invalid_y_range_error">Dieses Diagramm kann nicht dargestellt werden, weil der Wertebereich seiner Y-Achse ungültig ist.</string>
     <string name="finish">Beenden</string>
-    <string name="about_description"><![CDATA[Track & Graph ist freie und quelloffene Software unter der GPL 3.0-Lizenz.]]></string>
+    <string name="about_description">Track &amp; Graph ist freie und quelloffene Software unter der GPL 3.0-Lizenz.</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Folgende Open-Source-Bibliotheken wurden verwendet:</string>
     <string name="about">Über</string>
-    <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
-
+    <string name="nav_header_title">Track &amp; Graph</string>
     <string name="faq">FAQ</string>
     <string name="tutorial_text_1">Verwenden Sie Tracker, um Ihre Daten zu erfassen.</string>
     <string name="tutorial_text_2">Verwenden Sie Diagramme und Statistiken, um Daten zu visualisieren.</string>
@@ -179,10 +156,8 @@
     <string name="move_to_colon">Verschieben nach:</string>
     <string name="move_to">Verschieben nach</string>
     <string name="copy_to">Kopieren nach</string>
-
     <string name="ru_sure_update_data">Diese Aktualisierung kann die bereits erfassten Daten unwiderruflich verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\nMöchten Sie fortfahren?</string>
     <string name="ok">OK</string>
-
     <string name="rate_the_app">Bewerten Sie die App</string>
     <string name="reminders">Erinnerungen</string>
     <string name="no_reminders_hint">Tippen Sie auf das +-Symbol, um eine neue Erinnerung für die Datenerfassung zu erstellen.</string>
@@ -197,7 +172,6 @@
     <string name="reminders_notifications_channel_description">Benutzerdefinierte Benachrichtigungen, die Sie an die Datenerfassung erinnern</string>
     <string name="default_reminder_name">Zeit, Daten zu erfassen!</string>
     <string name="range_style">Bereichsstil:</string>
-
     <string name="track_widget_configure_no_data_error">Bitte erfassen Sie zuerst einige Daten.</string>
     <string name="track_widget_configure_no_data_selected_error">Sie müssen einen gültigen Datensatz auswählen, um ein Erfassungs-Widget zu erstellen.</string>
     <string name="create">Erstellen</string>
@@ -216,7 +190,6 @@
     <string name="info">Info</string>
     <string name="no_description">Keine Beschreibung</string>
     <string name="description">Beschreibung</string>
-
     <!-- App lock -->
     <string name="app_lock_title">App-Sperre</string>
     <string name="app_lock_locked_title">Track &amp; Graph ist gesperrt</string>
@@ -242,7 +215,6 @@
     <string name="app_lock_error_password_hashing_unavailable">Die Passwortprüfung für die App-Sperre ist auf diesem Gerät nicht verfügbar.</string>
     <string name="app_lock_error_enter_password">Geben Sie ein Passwort ein.</string>
     <string name="app_lock_error_passwords_do_not_match">Die Passwörter stimmen nicht überein.</string>
-
     <string name="note_input_hint">Notizen…</string>
     <string name="add_a_note">Notiz hinzufügen</string>
     <string name="notes">Notizen</string>
@@ -293,7 +265,6 @@
     <string name="save_changes">Änderungen speichern</string>
     <string name="timer_notification_channel_name">Timer</string>
     <string name="stop">Halt</string>
-
     <string name="name_your_function">Benennen Sie Ihre Funktion:</string>
     <string name="add_some_data_sources">Fügen Sie einige Datenquellen hinzu</string>
     <string name="value">Wert</string>
@@ -313,7 +284,6 @@
     <string name="data_point_tutorial_page_3_description">Verwenden Sie Label, wenn Sie die Datenpunkte gruppieren möchten</string>
     <string name="data_point_tutorial_page_3_hint">(Hinweis: Wenn Sie mehr Kontext oder eine Beschreibung hinzufügen möchten, verwenden Sie Notizen anstelle des Labelfeldes)</string>
     <string name="help">Hilfe</string>
-    
     <string name="advanced_options">Erweiterte Optionen</string>
     <string name="type_colon">\"Typ: \"</string>
     <string name="order_colon">\"Reihenfolge: \"</string>
@@ -349,102 +319,82 @@
     <string name="weeks_generic">Woche(n)</string>
     <string name="months_generic">Monat(e)</string>
     <string name="years_generic">Jahr(e)</string>
-
     <plurals name="seconds">
         <item quantity="one">%d Sekunde</item>
         <item quantity="other">%d Sekunden</item>
     </plurals>
-
     <plurals name="minutes">
         <item quantity="one">%d Minute</item>
         <item quantity="other">%d Minuten</item>
     </plurals>
-
     <plurals name="hours">
         <item quantity="one">%d Stunde</item>
         <item quantity="other">%d Stunden</item>
     </plurals>
-
     <plurals name="days">
         <item quantity="one">%d Tag</item>
         <item quantity="other">%d Tage</item>
     </plurals>
-
     <plurals name="weeks">
         <item quantity="one">%d Woche</item>
         <item quantity="other">%d Wochen</item>
     </plurals>
-
     <plurals name="months">
         <item quantity="one">%d Monat</item>
         <item quantity="other">%d Monate</item>
     </plurals>
-
     <plurals name="years">
         <item quantity="one">%d Jahr</item>
         <item quantity="other">%d Jahre</item>
     </plurals>
-
     <plurals name="every_x_minutes">
         <item quantity="one">Jede Minute</item>
         <item quantity="other">Alle %d Minuten</item>
     </plurals>
-
     <plurals name="every_x_hours">
         <item quantity="one">Jede Stunde</item>
         <item quantity="other">Alle %d Stunden</item>
     </plurals>
-
     <plurals name="every_x_days">
         <item quantity="one">Jeden Tag</item>
         <item quantity="other">Alle %d Tage</item>
     </plurals>
-
     <plurals name="every_x_weeks">
         <item quantity="one">Jede Woche</item>
         <item quantity="other">Alle %d Wochen</item>
     </plurals>
-
     <plurals name="every_x_months">
         <item quantity="one">Jeden Monat</item>
         <item quantity="other">Alle %d Monate</item>
     </plurals>
-
     <plurals name="every_x_years">
         <item quantity="one">Jedes Jahr</item>
         <item quantity="other">Alle %d Jahre</item>
     </plurals>
-
     <plurals name="after_x_minutes">
         <item quantity="one">Nach 1 Minute</item>
         <item quantity="other">Nach %d Minuten</item>
     </plurals>
-
     <plurals name="after_x_hours">
         <item quantity="one">Nach 1 Stunde</item>
         <item quantity="other">Nach %d Stunden</item>
     </plurals>
-
     <plurals name="after_x_days">
         <item quantity="one">Nach 1 Tag</item>
         <item quantity="other">Nach %d Tagen</item>
     </plurals>
-
     <plurals name="after_x_weeks">
         <item quantity="one">Nach 1 Woche</item>
         <item quantity="other">Nach %d Wochen</item>
     </plurals>
-
     <plurals name="after_x_months">
         <item quantity="one">Nach 1 Monat</item>
         <item quantity="other">Nach %d Monaten</item>
     </plurals>
-
     <plurals name="after_x_years">
         <item quantity="one">Nach 1 Jahr</item>
         <item quantity="other">Nach %d Jahren</item>
     </plurals>
-
     <string name="backup_now">Jetzt sichern</string>
     <string name="restore_error_could_not_write_to_database">Wiederherstellung fehlgeschlagen! Die Datenbank konnte nicht gefunden oder beschrieben werden.</string>
     <string name="restore_error_could_not_read_from_database_file">Wiederherstellung fehlgeschlagen! Die ausgewählte Datenbankdatei konnte nicht gefunden oder gelesen werden.</string>
@@ -470,7 +420,6 @@
     <string name="notification_permission_prompt">Aktivieren Sie Benachrichtigungen für Track &amp; Graph, damit Sie informiert werden, falls die automatische Sicherung fehlschlägt.</string>
     <string name="restore_hint_text">ACHTUNG: Bei der Wiederherstellung aus einem Backup werden alle derzeit in der App vorhandenen Daten und Einstellungen gelöscht. Sie sollten zuerst Ihre Daten sichern!</string>
     <string name="default_auto_backup_file_name">SicherungTrackUndGraph.db</string>
-
     <string name="lua_script_empty">Bitte fügen Sie ein Lua-Skript hinzu</string>
     <string name="function_name_empty">Funktionsname darf nicht leer sein</string>
     <string name="function_name">Funktionsname</string>
@@ -479,7 +428,6 @@
     <string name="data_source">Datenquelle</string>
     <string name="data_source_description">Ein Datenquellen-Knoten ermöglicht es Ihnen, einen Tracker oder eine Funktion als Eingabe auszuwählen.</string>
     <string name="lua_script">Lua-Skript</string>
-
     <string name="lua_script_input_hint">Geben Sie ein Lua-Skript ein...</string>
     <string name="select_node_type">Knotentyp auswählen</string>
     <string name="file">Datei</string>
@@ -491,7 +439,8 @@
     <string name="lua_graph_first_time_user_title">Lua-Skript-Diagramme und -Statistiken</string>
     <string name="lua_graph_first_time_user_message">Lua-Skripte sind eine erweiterte Funktion, mit der Sie benutzerdefinierte Diagramme und Statistiken mit der Programmiersprache Lua erstellen können. \n\nSie können Ihr eigenes laden oder eines aus der GitHub-Sammlung auswählen. Das Installieren eines Skripts von GitHub bringt Sie zurück zur App, mit dem Skript bereit zur Verwendung.</string>
     <string name="functions_first_time_user_title">Willkommen bei den Funktionen</string>
-    <string name="functions_first_time_user_message">Mit Funktionen können Sie Daten kombinieren, aggregieren und in neue abgeleitete Datenquellen umwandeln.</string>    <string name="learn_more">Erfahren Sie hier mehr</string>
+    <string name="functions_first_time_user_message">Mit Funktionen können Sie Daten kombinieren, aggregieren und in neue abgeleitete Datenquellen umwandeln.</string>
+    <string name="learn_more">Erfahren Sie hier mehr</string>
     <string name="github">GitHub</string>
     <string name="paste">Einfügen</string>
     <string name="failed_to_download_file">Fehler beim Herunterladen der Datei: %s</string>
@@ -507,7 +456,6 @@
     <string name="missed_reminders_multiple_content">Sie haben %1$d Erinnerungen verpasst</string>
     <string name="next_reminder_format">Nächste Erinnerung: %1$s</string>
     <string name="no_upcoming_reminders">Keine anstehenden Erinnerungen</string>
-
     <!-- Reminder type selection -->
     <string name="select_reminder_type">Erinnerungstyp auswählen</string>
     <string name="week_day_reminder">Wochentag-Erinnerung</string>
@@ -520,7 +468,6 @@
     <string name="time_since_last_reminder_description">Wenn Sie etwas eine Weile nicht erfasst haben</string>
     <string name="one_time_reminder">Einmalige Erinnerung</string>
     <string name="one_time_reminder_description">Eine eigenständige Erinnerung zu einem bestimmten Zeitpunkt oder nach einer Wartezeit</string>
-
     <!-- Reminder configuration -->
     <string name="reminder_name">Erinnerungsname</string>
     <string name="reminder_disabled">Erinnerung deaktiviert</string>
@@ -540,14 +487,12 @@
     <string name="every_colon">Jeden:</string>
     <string name="ended_at_format">Beendet am: %1$s</string>
     <string name="starting_at_format">Beginnend am: %1$s</string>
-
     <!-- Month day occurrence -->
     <string name="occurrence_first">Ersten</string>
     <string name="occurrence_second">Zweiten</string>
     <string name="occurrence_third">Dritten</string>
     <string name="occurrence_fourth">Vierten</string>
     <string name="occurrence_last">Letzten</string>
-
     <!-- Full day names -->
     <string name="monday">Montag</string>
     <string name="tuesday">Dienstag</string>
@@ -556,7 +501,6 @@
     <string name="friday">Freitag</string>
     <string name="saturday">Samstag</string>
     <string name="sunday">Sonntag</string>
-
     <!-- Kompakte Datumsangaben -->
     <string-array name="abbreviated_months">
         <item>Jan</item>
@@ -584,4 +528,5 @@
     <string name="compact_weekday_day_format">%1$s %2$s</string>
     <string name="compact_day_month_format">%1$s %2$s</string>
     <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="app_language">App-Sprache</string>
 </resources>

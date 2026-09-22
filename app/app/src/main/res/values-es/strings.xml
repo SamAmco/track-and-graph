@@ -1,19 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ This file is part of Track & Graph
-  ~ 
-  ~ Track & Graph is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~ 
-  ~ Track & Graph is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~ 
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-  -->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="home">Inicio</string>
     <string name="symlink">Enlace simbólico</string>
@@ -78,7 +63,6 @@
     <string name="from">Desde:</string>
     <string name="to">Hasta:</string>
     <string name="day">Día</string>
-
     <string-array name="time_histogram_windows">
         <item>Hora</item>
         <item>Diario</item>
@@ -133,20 +117,16 @@
         <item>Dinámico</item>
         <item>Fijo</item>
     </string-array>
-
     <string name="custom">Costumbre</string>
     <string name="ending_at_latest">Último punto de datos</string>
     <string name="ending_at_now">Ahora</string>
     <string name="ending_at_custom_date">Fecha personalizada…</string>
-
     <string name="hours_and_minutes_ago">%1$d h %2$d min hace</string>
-
     <string name="import_exception_unknown">Error de importación: Se ha producido un error desconocido</string>
     <string name="import_exception_bad_headers">Error de importación: Las cabeceras no coinciden con las esperadas: %1$s</string>
     <string name="import_exception_inconsistent_record">Error de importación: El registro de la línea %1$s no coincide con los encabezados requeridos</string>
     <string name="import_exception_bad_timestamp">Error de importación: No se pudo interpretar la marca de tiempo del registro en la línea %1$s</string>
     <string name="import_exception_inconsistent_data_type">Error de importación: Se ha recibido un tipo de datos inconsistente en la línea: %1$s</string>
-
     <string name="unknown_error_occurred">Se ha producido un error desconocido</string>
     <string name="graph_stat_validation_no_name">Por favor, proporciona un nombre</string>
     <string name="graph_stat_validation_no_line_graph_features">Por favor, añade este detalle al gráfico</string>
@@ -154,7 +134,6 @@
     <string name="graph_stat_validation_unrecognised_color">Asegúrate de que todos los conjuntos de datos tienen un color</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Se ha detectado un conjunto inválido de datos de gráfico de líneas</string>
     <string name="graph_stat_validation_bad_fixed_range">Asegúrate de que "Desde" tiene menor valor que "Hasta"</string>
-
     <string name="graph_stat_view_not_found">Se ha producido un error al encontrar este gráfico</string>
     <string name="graph_stat_view_not_enough_data_stat">Esta estadística se mostrará cuando se hayan registrado suficientes datos para generarla.</string>
     <string name="graph_stat_view_not_enough_data_graph">Este gráfico se mostrará cuando se hayan registrado suficientes datos para generarlo.</string>
@@ -164,12 +143,11 @@
     <string name="graph_inconsistent_series_error">Este gráfico no se puede representar porque sus series de datos tienen tamaños distintos.</string>
     <string name="graph_invalid_y_range_error">Este gráfico no se puede representar porque el intervalo de su eje Y no es válido.</string>
     <string name="finish">Finalizar</string>
-    <string name="about_description"><![CDATA[Track & Graph es un software libre y de código abierto bajo la licencia GPL 3.0.]]></string>
+    <string name="about_description">Track &amp; Graph es un software libre y de código abierto bajo la licencia GPL 3.0.</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Se han utilizado las siguientes bibliotecas de código abierto:</string>
     <string name="about">Acerca de</string>
-    <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
-
+    <string name="nav_header_title">Track &amp; Graph</string>
     <string name="faq">FAQ</string>
     <string name="tutorial_text_1">Usa rastreadores para registrar tus datos.</string>
     <string name="tutorial_text_2">Utilice gráficos y estadísticas para visualizar datos.</string>
@@ -178,10 +156,8 @@
     <string name="move_to_colon">Mover a:</string>
     <string name="move_to">Mover a</string>
     <string name="copy_to">Copiar a</string>
-
     <string name="ru_sure_update_data">Esta actualización puede modificar irreversiblemente los datos que ya has registrado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar.\n\n¿Quieres continuar?</string>
     <string name="ok">Aceptar</string>
-
     <string name="rate_the_app">Calificar la aplicación</string>
     <string name="reminders">Recordatorios</string>
     <string name="no_reminders_hint">Toca el icono + para crear una nueva notificación de recordatorio de registro.</string>
@@ -196,7 +172,6 @@
     <string name="reminders_notifications_channel_description">Notificaciones creadas por el usuario para recordarte cuándo registrar datos</string>
     <string name="default_reminder_name">¡Hora de registrar datos!</string>
     <string name="range_style">Estilo de rango:</string>
-
     <string name="track_widget_configure_no_data_error">Primero, registra algunos datos.</string>
     <string name="track_widget_configure_no_data_selected_error">Debes seleccionar un conjunto de datos válido para crear un widget de registro.</string>
     <string name="create">Crear</string>
@@ -215,7 +190,6 @@
     <string name="info">Info</string>
     <string name="no_description">Sin descripción</string>
     <string name="description">Descripción</string>
-
     <!-- App lock -->
     <string name="app_lock_title">Bloqueo de la app</string>
     <string name="app_lock_locked_title">Track &amp; Graph está bloqueada</string>
@@ -241,7 +215,6 @@
     <string name="app_lock_error_password_hashing_unavailable">La verificación de la contraseña del bloqueo de la app no está disponible en este dispositivo.</string>
     <string name="app_lock_error_enter_password">Introduce una contraseña.</string>
     <string name="app_lock_error_passwords_do_not_match">Las contraseñas no coinciden.</string>
-
     <string name="note_input_hint">Notas…</string>
     <string name="add_a_note">Añadir una nota</string>
     <string name="notes">Notas</string>
@@ -292,7 +265,6 @@
     <string name="filter_by_value">filtrar por valor</string>
     <string name="timer_notification_channel_name">Temporizadores</string>
     <string name="stop">Deténgase</string>
-
     <string name="name_your_function">Nombra tu función:</string>
     <string name="add_some_data_sources">Agregar algunas fuentes de datos</string>
     <string name="value">Valor</string>
@@ -312,7 +284,6 @@
     <string name="data_point_tutorial_page_3_description">Utilice etiquetas si desea agrupar los puntos de datos</string>
     <string name="data_point_tutorial_page_3_hint">(Sugerencia: si desea agregar más contexto o descripción, use la nota en lugar del campo de etiqueta)</string>
     <string name="help">Ayudar</string>
-
     <string name="advanced_options">Opciones avanzadas</string>
     <string name="type_colon">\"Escribe: \"</string>
     <string name="order_colon">\"Ordenar: \"</string>
@@ -348,102 +319,82 @@
     <string name="weeks_generic">Semana(s)</string>
     <string name="months_generic">Mes(es)</string>
     <string name="years_generic">Año(s)</string>
-
     <plurals name="seconds">
         <item quantity="one">%d segundo</item>
         <item quantity="other">%d segundos</item>
     </plurals>
-
     <plurals name="minutes">
         <item quantity="one">%d minuto</item>
         <item quantity="other">%d minutos</item>
     </plurals>
-
     <plurals name="hours">
         <item quantity="one">%d hora</item>
         <item quantity="other">%d horas</item>
     </plurals>
-
     <plurals name="days">
         <item quantity="one">%d día</item>
         <item quantity="other">%d días</item>
     </plurals>
-
     <plurals name="weeks">
         <item quantity="one">%d semana</item>
         <item quantity="other">%d semanas</item>
     </plurals>
-
     <plurals name="months">
         <item quantity="one">%d mes</item>
         <item quantity="other">%d meses</item>
     </plurals>
-
     <plurals name="years">
         <item quantity="one">%d año</item>
         <item quantity="other">%d años</item>
     </plurals>
-
     <plurals name="every_x_minutes">
         <item quantity="one">Cada minuto</item>
         <item quantity="other">Cada %d minutos</item>
     </plurals>
-
     <plurals name="every_x_hours">
         <item quantity="one">Cada hora</item>
         <item quantity="other">Cada %d horas</item>
     </plurals>
-
     <plurals name="every_x_days">
         <item quantity="one">Cada día</item>
         <item quantity="other">Cada %d días</item>
     </plurals>
-
     <plurals name="every_x_weeks">
         <item quantity="one">Cada semana</item>
         <item quantity="other">Cada %d semanas</item>
     </plurals>
-
     <plurals name="every_x_months">
         <item quantity="one">Cada mes</item>
         <item quantity="other">Cada %d meses</item>
     </plurals>
-
     <plurals name="every_x_years">
         <item quantity="one">Cada año</item>
         <item quantity="other">Cada %d años</item>
     </plurals>
-
     <plurals name="after_x_minutes">
         <item quantity="one">Después de 1 minuto</item>
         <item quantity="other">Después de %d minutos</item>
     </plurals>
-
     <plurals name="after_x_hours">
         <item quantity="one">Después de 1 hora</item>
         <item quantity="other">Después de %d horas</item>
     </plurals>
-
     <plurals name="after_x_days">
         <item quantity="one">Después de 1 día</item>
         <item quantity="other">Después de %d días</item>
     </plurals>
-
     <plurals name="after_x_weeks">
         <item quantity="one">Después de 1 semana</item>
         <item quantity="other">Después de %d semanas</item>
     </plurals>
-
     <plurals name="after_x_months">
         <item quantity="one">Después de 1 mes</item>
         <item quantity="other">Después de %d meses</item>
     </plurals>
-
     <plurals name="after_x_years">
         <item quantity="one">Después de 1 año</item>
         <item quantity="other">Después de %d años</item>
     </plurals>
-
     <string name="backup_now">Copia ahora</string>
     <string name="restore_error_could_not_write_to_database">¡La restauración falló! No se pudo encontrar ni escribir en la base de datos.</string>
     <string name="restore_error_could_not_read_from_database_file">¡La restauración falló! No se pudo encontrar ni leer el archivo de base de datos seleccionado.</string>
@@ -469,7 +420,6 @@
     <string name="notification_permission_prompt">Debes habilitar las notificaciones para Track &amp; Graph para recibir notificaciones si la copia de seguridad automática falla por algún motivo.</string>
     <string name="restore_hint_text">ADVERTENCIA: La restauración desde una copia de seguridad borrará todos los datos y la configuración actual en la aplicación. ¡Primero debes hacer una copia de seguridad de tus datos!</string>
     <string name="default_auto_backup_file_name">RespaldoTrackYGraph.db</string>
-
     <string name="lua_script_empty">Por favor, añade un script Lua</string>
     <string name="function_name_empty">El nombre de la función no puede estar vacío</string>
     <string name="function_name">Nombre de función</string>
@@ -478,7 +428,6 @@
     <string name="data_source">Fuente de Datos</string>
     <string name="data_source_description">Un nodo de Fuente de Datos te permite seleccionar un rastreador o función para usar como entrada.</string>
     <string name="lua_script">Script Lua</string>
-
     <string name="lua_script_input_hint">Introduce un script Lua…</string>
     <string name="select_node_type">Seleccionar Tipo de Nodo</string>
     <string name="file">Archivo</string>
@@ -490,7 +439,8 @@
     <string name="lua_graph_first_time_user_title">Gráficos y estadísticas de scripts Lua</string>
     <string name="lua_graph_first_time_user_message">Los scripts Lua son una función avanzada que te permite crear gráficos y estadísticas personalizados con el lenguaje de programación Lua. \n\nPuedes cargar el tuyo propio, o elegir uno de la colección de GitHub. Instalar un script desde GitHub te devolverá a la aplicación con el script listo para usar.</string>
     <string name="functions_first_time_user_title">Bienvenido a Funciones</string>
-    <string name="functions_first_time_user_message">Las funciones son una característica avanzada que te permite combinar, agregar y transformar tus datos en nuevas fuentes de datos derivadas.</string>    <string name="learn_more">Aprende más aquí</string>
+    <string name="functions_first_time_user_message">Las funciones son una característica avanzada que te permite combinar, agregar y transformar tus datos en nuevas fuentes de datos derivadas.</string>
+    <string name="learn_more">Aprende más aquí</string>
     <string name="github">GitHub</string>
     <string name="paste">Pegar</string>
     <string name="failed_to_download_file">Error al descargar el archivo: %s</string>
@@ -506,7 +456,6 @@
     <string name="missed_reminders_multiple_content">Perdiste %1$d recordatorios</string>
     <string name="next_reminder_format">Próximo Recordatorio: %1$s</string>
     <string name="no_upcoming_reminders">No Hay Recordatorios Próximos</string>
-
     <!-- Reminder type selection -->
     <string name="select_reminder_type">Seleccionar tipo de recordatorio</string>
     <string name="week_day_reminder">Recordatorio semanal</string>
@@ -519,7 +468,6 @@
     <string name="time_since_last_reminder_description">Cuando no has registrado algo por un tiempo</string>
     <string name="one_time_reminder">Recordatorio único</string>
     <string name="one_time_reminder_description">Un recordatorio independiente en una fecha concreta o después de un plazo</string>
-
     <!-- Reminder configuration -->
     <string name="reminder_name">Nombre del recordatorio</string>
     <string name="reminder_disabled">Recordatorio desactivado</string>
@@ -539,14 +487,12 @@
     <string name="every_colon">Cada:</string>
     <string name="ended_at_format">Terminó el: %1$s</string>
     <string name="starting_at_format">Comienza el: %1$s</string>
-
     <!-- Month day occurrence -->
     <string name="occurrence_first">Primer</string>
     <string name="occurrence_second">Segundo</string>
     <string name="occurrence_third">Tercer</string>
     <string name="occurrence_fourth">Cuarto</string>
     <string name="occurrence_last">Último</string>
-
     <!-- Full day names -->
     <string name="monday">Lunes</string>
     <string name="tuesday">Martes</string>
@@ -555,7 +501,6 @@
     <string name="friday">Viernes</string>
     <string name="saturday">Sábado</string>
     <string name="sunday">Domingo</string>
-
     <!-- Fechas compactas -->
     <string-array name="abbreviated_months">
         <item>Ene</item>
@@ -583,4 +528,5 @@
     <string name="compact_weekday_day_format">%1$s %2$s</string>
     <string name="compact_day_month_format">%1$s %2$s</string>
     <string name="compact_month_year_format">%1$s’%2$s</string>
+    <string name="app_language">Idioma de la app</string>
 </resources>

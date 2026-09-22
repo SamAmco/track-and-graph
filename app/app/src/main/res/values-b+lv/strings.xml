@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Padoms: funkcijas vislabāk darbojas ainavas režīmā</string>
     <string name="functions_start_hint">Sāciet šeit: turiet nospiestu un atlasiet Datu avots</string>
     <string name="see_whats_new">Skatīt jaunumus</string>
+    <string name="app_language">Lietotnes valoda</string>
 </resources>

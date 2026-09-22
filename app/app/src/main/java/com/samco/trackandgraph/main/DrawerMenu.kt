@@ -78,6 +78,7 @@ enum class DrawerMenuBrowserLocation {
 fun MenuDrawerContent(
     onNavigate: (NavKey) -> Unit = {},
     onNavigateToBrowser: (DrawerMenuBrowserLocation) -> Unit = {},
+    onNavigateToAppLanguageSettings: () -> Unit = {},
     currentTheme: State<ThemeSelection>,
     onThemeSelected: (ThemeSelection) -> Unit = {},
     currentDateFormat: State<Int>,
@@ -147,8 +148,16 @@ fun MenuDrawerContent(
         ) { onNavigate(AboutNavKey) }
 
         Divider(
-            modifier = Modifier.padding(top = inputSpacingLarge)
+            modifier = Modifier.padding(vertical = inputSpacingLarge / 2)
         )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            MenuItem(
+                title = stringResource(R.string.app_language),
+                icon = painterResource(R.drawable.language_icon),
+                onClick = onNavigateToAppLanguageSettings,
+            )
+        }
 
         ThemeMenuSpinner(
             currentTheme = currentTheme,
@@ -171,7 +180,11 @@ private fun ThemeMenuSpinner(
         .fillMaxWidth()
         .padding(
             start = inputSpacingLarge,
-            top = dialogInputSpacing,
+            top = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                0.dp
+            } else {
+                dialogInputSpacing
+            },
             end = inputSpacingLarge
         ),
     verticalAlignment = Alignment.CenterVertically,

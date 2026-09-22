@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">ምክር፦ ፋንክሽኖች በአግድም አቀማመጥ በተሻለ ይሰራሉ</string>
     <string name="functions_start_hint">ከዚህ ይጀምሩ፦ ረጅም ተጭነው የውሂብ ምንጭን ይምረጡ</string>
     <string name="see_whats_new">አዲስ የሆነውን ይመልከቱ</string>
+    <string name="app_language">የመተግበሪያ ቋንቋ</string>
 </resources>

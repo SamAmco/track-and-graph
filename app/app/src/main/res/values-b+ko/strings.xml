@@ -503,4 +503,5 @@
     <string name="functions_landscape_hint">팁: 함수는 가로 모드에서 가장 잘 작동합니다</string>
     <string name="functions_start_hint">여기서 시작: 길게 누른 후 데이터 소스를 선택하세요</string>
     <string name="see_whats_new">새로운 기능 보기</string>
+    <string name="app_language">앱 언어</string>
 </resources>

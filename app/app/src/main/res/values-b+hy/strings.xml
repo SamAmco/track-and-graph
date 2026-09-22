@@ -522,4 +522,5 @@
     <string name="graph_inconsistent_series_error">Այս գրաֆիկը չի կարող ցուցադրվել, քանի որ տվյալների շարքերն ունեն անհամապատասխան չափեր։</string>
     <string name="graph_invalid_y_range_error">Այս գրաֆիկը չի կարող ցուցադրվել, քանի որ Y առանցքի միջակայքն անվավեր է։</string>
     <string name="finish">Ավարտել</string>
+    <string name="app_language">Հավելվածի լեզու</string>
 </resources>

@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">உதவிக்குறிப்பு: Functions நிலப்பரப்பு பயன்முறையில் சிறப்பாகச் செயல்படும்</string>
     <string name="functions_start_hint">இங்கே தொடங்கவும்: நீண்ட நேரம் அழுத்தி தரவு மூலம் என்பதைத் தேர்ந்தெடுக்கவும்</string>
     <string name="see_whats_new">புதியவற்றைப் பார்க்கவும்</string>
+    <string name="app_language">ஆப்ஸ் மொழி</string>
 </resources>

@@ -522,4 +522,5 @@
     <string name="graph_inconsistent_series_error">Hindi ma-render ang graph na ito dahil hindi pare-pareho ang laki ng mga data series nito.</string>
     <string name="graph_invalid_y_range_error">Hindi ma-render ang graph na ito dahil hindi wasto ang saklaw ng Y-axis nito.</string>
     <string name="finish">Tapos</string>
+    <string name="app_language">Wika ng app</string>
 </resources>

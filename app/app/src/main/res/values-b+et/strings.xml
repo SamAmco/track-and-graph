@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Vihje: funktsioonid töötavad kõige paremini horisontaalpaigutuses</string>
     <string name="functions_start_hint">Alusta siit: vajuta pikalt ja vali Andmeallikas</string>
     <string name="see_whats_new">Vaata, mis on uut</string>
+    <string name="app_language">Rakenduse keel</string>
 </resources>

@@ -503,4 +503,5 @@
     <string name="graph_inconsistent_series_error">Grafik ini tidak dapat ditampilkan karena seri datanya memiliki ukuran yang tidak konsisten.</string>
     <string name="graph_invalid_y_range_error">Grafik ini tidak dapat ditampilkan karena rentang sumbu Y-nya tidak valid.</string>
     <string name="finish">Selesai</string>
+    <string name="app_language">Bahasa aplikasi</string>
 </resources>

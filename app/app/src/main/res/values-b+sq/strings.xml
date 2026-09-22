@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Këshillë: Funksionet funksionojnë më mirë në pamjen horizontale</string>
     <string name="functions_start_hint">Filloni këtu: Shtypni gjatë dhe zgjidhni Burimi i të dhënave</string>
     <string name="see_whats_new">Shihni çfarë ka të re</string>
+    <string name="app_language">Gjuha e aplikacionit</string>
 </resources>

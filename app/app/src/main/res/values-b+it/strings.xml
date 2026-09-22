@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Suggerimento: le funzioni funzionano meglio in modalità orizzontale</string>
     <string name="functions_start_hint">Inizia qui: tieni premuto e seleziona Origine dati</string>
     <string name="see_whats_new">Scopri le novità</string>
+    <string name="app_language">Lingua dell’app</string>
 </resources>

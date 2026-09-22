@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Consell: les funcions funcionen millor en mode apaïsat</string>
     <string name="functions_start_hint">Comença aquí: mantén premut i selecciona Font de dades</string>
     <string name="see_whats_new">Descobreix les novetats</string>
+    <string name="app_language">Idioma de l\'aplicació</string>
 </resources>

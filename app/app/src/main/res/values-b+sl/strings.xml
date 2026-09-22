@@ -560,4 +560,5 @@
     <string name="restore_error_failed_to_copy_database">Obnovitev ni uspela! Pri obnavljanju zbirke podatkov je prišlo do napake.</string>
     <string name="select_location">Izberite mesto …</string>
     <string name="restore_successful">Obnovitev je uspela! Track &amp; Graph je zdaj treba znova zagnati.</string>
+    <string name="app_language">Jezik aplikacije</string>
 </resources>

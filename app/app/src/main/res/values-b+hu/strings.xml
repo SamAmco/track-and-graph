@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Tipp: A függvények fekvő módban működnek a legjobban</string>
     <string name="functions_start_hint">Kezdd itt: tartsd hosszan lenyomva, majd válaszd az Adatforrás lehetőséget</string>
     <string name="see_whats_new">Újdonságok megtekintése</string>
+    <string name="app_language">Alkalmazás nyelve</string>
 </resources>

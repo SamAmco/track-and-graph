@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">ಸಲಹೆ: Functions ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್‌ನಲ್ಲಿ ಉತ್ತಮವಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತವೆ</string>
     <string name="functions_start_hint">ಇಲ್ಲಿಂದ ಪ್ರಾರಂಭಿಸಿ: ದೀರ್ಘವಾಗಿ ಒತ್ತಿ ಡೇಟಾ ಮೂಲ ಆಯ್ಕೆಮಾಡಿ</string>
     <string name="see_whats_new">ಹೊಸದನ್ನು ನೋಡಿ</string>
+    <string name="app_language">ಆ್ಯಪ್ ಭಾಷೆ</string>
 </resources>

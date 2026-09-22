@@ -541,4 +541,5 @@
     <string name="functions_landscape_hint">Съвет: Функциите работят най-добре в пейзажен режим</string>
     <string name="functions_start_hint">Започнете оттук: Натиснете продължително и изберете „Източник на данни“</string>
     <string name="see_whats_new">Вижте какво ново</string>
+    <string name="app_language">Език на приложението</string>
 </resources>

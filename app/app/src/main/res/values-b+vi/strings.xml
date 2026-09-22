@@ -503,4 +503,5 @@
     <string name="functions_landscape_hint">Mẹo: Hàm hoạt động tốt nhất ở chế độ ngang</string>
     <string name="functions_start_hint">Bắt đầu tại đây: Nhấn giữ và chọn Nguồn dữ liệu</string>
     <string name="see_whats_new">Xem nội dung mới</string>
+    <string name="app_language">Ngôn ngữ ứng dụng</string>
 </resources>

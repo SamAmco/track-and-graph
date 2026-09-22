@@ -541,4 +541,5 @@
     <string name="functions_landscape_hint">Sugestie: Funcțiile funcționează cel mai bine în orientarea peisaj</string>
     <string name="functions_start_hint">Începe aici: apasă lung și selectează Sursă de date</string>
     <string name="see_whats_new">Vezi noutățile</string>
+    <string name="app_language">Limba aplicației</string>
 </resources>

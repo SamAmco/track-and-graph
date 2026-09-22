@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">Συμβουλή: Οι συναρτήσεις λειτουργούν καλύτερα σε οριζόντιο προσανατολισμό</string>
     <string name="functions_start_hint">Ξεκινήστε εδώ: Πατήστε παρατεταμένα και επιλέξτε Πηγή δεδομένων</string>
     <string name="see_whats_new">Δείτε τι νέο υπάρχει</string>
+    <string name="app_language">Γλώσσα εφαρμογής</string>
 </resources>

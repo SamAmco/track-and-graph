@@ -522,4 +522,5 @@
     <string name="graph_inconsistent_series_error">ამ გრაფიკის აგება შეუძლებელია, რადგან მონაცემთა სერიებს არათანმიმდევრული ზომები აქვს.</string>
     <string name="graph_invalid_y_range_error">ამ გრაფიკის აგება შეუძლებელია, რადგან Y-ღერძის დიაპაზონი არასწორია.</string>
     <string name="finish">დასრულება</string>
+    <string name="app_language">აპის ენა</string>
 </resources>

@@ -503,4 +503,5 @@
     <string name="functions_landscape_hint">İpucu: Fonksiyonlar yatay modda en iyi şekilde çalışır</string>
     <string name="functions_start_hint">Buradan başlayın: Uzun basıp Veri Kaynağı\'nı seçin</string>
     <string name="see_whats_new">Yenilikleri Gör</string>
+    <string name="app_language">Uygulama dili</string>
 </resources>

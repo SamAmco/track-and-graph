@@ -541,4 +541,5 @@
     <string name="functions_landscape_hint">Patarimas: funkcijos geriausiai veikia gulsčiajame režime</string>
     <string name="functions_start_hint">Pradėkite čia: ilgai paspauskite ir pasirinkite „Duomenų šaltinis“</string>
     <string name="see_whats_new">Sužinokite, kas naujo</string>
+    <string name="app_language">Programėlės kalba</string>
 </resources>

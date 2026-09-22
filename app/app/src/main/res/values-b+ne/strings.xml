@@ -522,4 +522,5 @@
     <string name="functions_landscape_hint">सुझाव: Functions ल्यान्डस्केप मोडमा राम्रोसँग काम गर्छन्</string>
     <string name="functions_start_hint">यहाँबाट सुरु गर्नुहोस्: लामो थिचेर डेटा स्रोत चयन गर्नुहोस्</string>
     <string name="see_whats_new">नयाँ के छ हेर्नुहोस्</string>
+    <string name="app_language">एपको भाषा</string>
 </resources>

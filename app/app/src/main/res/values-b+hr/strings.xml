@@ -541,4 +541,5 @@
     <string name="functions_landscape_hint">Savjet: Funkcije najbolje rade u vodoravnom prikazu</string>
     <string name="functions_start_hint">Započnite ovdje: Dugo pritisnite i odaberite Izvor podataka</string>
     <string name="see_whats_new">Pogledajte novosti</string>
+    <string name="app_language">Jezik aplikacije</string>
 </resources>
