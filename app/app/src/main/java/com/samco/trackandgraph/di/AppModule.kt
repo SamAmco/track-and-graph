@@ -33,6 +33,8 @@ import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.downloader.FileDownloaderImpl
 import com.samco.trackandgraph.graphstatview.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.graphstatview.functions.helpers.TimeHelper
+import com.samco.trackandgraph.localisation.AndroidAppLocaleProvider
+import com.samco.trackandgraph.localisation.AppLocaleProvider
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
 import com.samco.trackandgraph.reminders.ReminderInteractor
@@ -134,6 +136,9 @@ class AppModule {
     @Provides
     @Singleton
     fun provideFunctionsRepository(impl: FunctionsRepositoryImpl): FunctionsRepository = impl
+
+    @Provides
+    fun provideAppLocaleProvider(impl: AndroidAppLocaleProvider): AppLocaleProvider = impl
 
     @Provides
     internal fun getAlarmInteractor(impl: ReminderInteractorImpl): ReminderInteractor = impl

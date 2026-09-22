@@ -20,9 +20,8 @@ import android.os.LocaleList
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.core.os.LocaleListCompat
 import com.samco.trackandgraph.data.localisation.TranslatedString
-import java.util.Locale
+import com.samco.trackandgraph.localisation.selectLocalizedValue
 
 /**
  * Extension function to resolve a TranslatedString to the best matching localized text
@@ -62,34 +61,6 @@ private fun TranslatedString.Translations?.resolveTranslated(): String? {
 fun TranslatedString.Translations?.resolveTranslated(locales: LocaleList): String? {
     if (this == null) return null
     val preferredLocales = List(locales.size()) { locales[it] }
-    return resolveTranslated(preferredLocales, LocaleListCompat::matchesLanguageAndScript)
-}
-
-/**
- * Selects the value belonging to the supported locale which matches the user's preferences.
- * The matching locale may have a different but equivalent tag, such as zh-CN and zh-Hans.
- */
-internal fun TranslatedString.Translations.resolveTranslated(
-    preferredLocales: List<Locale>,
-    matchesLanguageAndScript: (supported: Locale, preferred: Locale) -> Boolean
-): String? {
     if (values.isEmpty()) return ""
-
-    val supported = values.mapNotNull { (tag, value) ->
-        val locale = Locale.forLanguageTag(tag)
-        locale.takeIf { it.language.isNotEmpty() }?.let { SupportedTranslation(locale, value) }
-    }
-
-    for (preferred in preferredLocales) {
-        supported.firstOrNull { it.locale == preferred }?.let { return it.value }
-        supported.firstOrNull { matchesLanguageAndScript(it.locale, preferred) }
-            ?.let { return it.value }
-    }
-
-    return values["en"] ?: supported.firstOrNull()?.value
+    return values.selectLocalizedValue(preferredLocales)?.value
 }
-
-private data class SupportedTranslation(
-    val locale: Locale,
-    val value: String
-)

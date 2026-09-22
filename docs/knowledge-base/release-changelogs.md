@@ -126,3 +126,10 @@ When translating changelogs, check string resources for official translations of
 ## index.json
 
 Located at `changelogs/index.json`, maps version names to locale-specific markdown paths for in-app release notes. Updated automatically by the lua script when `publish = true`. Validated against `changelogs/index.schema.json`.
+
+The app downloads the index, selects the best available locale for each
+release using the current app locale preference order and BCP 47
+language-and-script matching, and downloads only that Markdown file. English
+is the explicit fallback when no preferred locale is available. Each selected
+locale is cached separately with its ETag; the app does not download every
+locale listed in the index.

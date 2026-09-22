@@ -20,9 +20,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.interactor.DataInteractor
-import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.downloader.DownloadResult
 import com.samco.trackandgraph.downloader.FileDownloader
+import com.samco.trackandgraph.localisation.AppLocaleProvider
+import com.samco.trackandgraph.localisation.selectLocalizedValue
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.storage.FileCache
 import com.samco.trackandgraph.storage.PrefsPersistenceProvider
@@ -42,7 +43,7 @@ import javax.inject.Inject
 
 data class ReleaseNote(
     val version: Version,
-    val text: TranslatedString,
+    val text: String,
 )
 
 interface ReleaseNotesRepository {
@@ -59,6 +60,7 @@ class ReleaseNotesRepositoryImpl @Inject constructor(
     private val json: Json,
     private val fileCache: FileCache,
     private val remoteConfigProvider: RemoteConfigProvider,
+    private val appLocaleProvider: AppLocaleProvider,
 ) : ReleaseNotesRepository {
     private val metadataStore =
         persistenceProvider.getDataStore("$RELEASE_NOTES_DATA_ROOT/metadata")
@@ -105,12 +107,12 @@ class ReleaseNotesRepositoryImpl @Inject constructor(
         val releaseNotes = mutableListOf<ReleaseNote>()
         for ((versionString, localeMap) in index.changelogs) {
             val version = versionString.toVersion()
-            val translations = downloadReleaseNotesForVersion(versionString, localeMap)
-            if (translations.isNotEmpty()) {
+            val releaseNote = downloadReleaseNoteForVersion(versionString, localeMap)
+            if (releaseNote != null) {
                 releaseNotes.add(
                     ReleaseNote(
                         version = version,
-                        text = TranslatedString.Translations(translations)
+                        text = releaseNote
                     )
                 )
             }
@@ -129,12 +131,12 @@ class ReleaseNotesRepositoryImpl @Inject constructor(
             val version = versionString.toVersion()
             // Only include versions newer than the last seen version
             if (version > lastSeenVersion && version <= currentVersion) {
-                val translations = downloadReleaseNotesForVersion(versionString, localeMap)
-                if (translations.isNotEmpty()) {
+                val releaseNote = downloadReleaseNoteForVersion(versionString, localeMap)
+                if (releaseNote != null) {
                     releaseNotes.add(
                         ReleaseNote(
                             version = version,
-                            text = TranslatedString.Translations(translations)
+                            text = releaseNote
                         )
                     )
                 }
@@ -199,37 +201,29 @@ class ReleaseNotesRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun downloadReleaseNotesForVersion(
+    private suspend fun downloadReleaseNoteForVersion(
         versionString: String,
         localeMap: Map<String, String>
-    ): Map<String, String> {
-        val translations = mutableMapOf<String, String>()
+    ): String? {
+        val selected = localeMap.selectLocalizedValue(appLocaleProvider.getPreferredLocales())
+            ?: return null
+        val remoteConfig = remoteConfigProvider.getRemoteConfiguration() ?: return null
+        val fileUrl = "${remoteConfig.changelogsRoot}/${selected.value}"
+        val cacheKey = "$RELEASE_NOTES_DATA_ROOT/$versionString/${selected.localeTag}"
 
-        for ((locale, relativePath) in localeMap) {
-            val remoteConfig = remoteConfigProvider.getRemoteConfiguration() ?: continue
-            val fileUrl = "${remoteConfig.changelogsRoot}/$relativePath"
-            val cacheKey = "$RELEASE_NOTES_DATA_ROOT/$versionString/$locale"
-
-            // Try to download with ETag support
-            val cachedETag = fileCache.getETag(cacheKey)
-            when (val result = downloader.downloadFileWithETag(URI(fileUrl), cachedETag)) {
-                is DownloadResult.Downloaded -> {
-                    // Store the new data and ETag
-                    fileCache.storeFile(cacheKey, result.data, result.etag)
-                    translations[locale] = String(result.data)
-                }
-
-                is DownloadResult.UseCache -> {
-                    // Use cached version
-                    val cachedFile = fileCache.getFile(cacheKey)
-                    cachedFile?.let { translations[locale] = String(it.data) }
-                }
-
-                null -> throw IllegalStateException("Failed to download release note: $fileUrl")
+        val cachedETag = fileCache.getETag(cacheKey)
+        return when (val result = downloader.downloadFileWithETag(URI(fileUrl), cachedETag)) {
+            is DownloadResult.Downloaded -> {
+                fileCache.storeFile(cacheKey, result.data, result.etag)
+                String(result.data)
             }
-        }
 
-        return translations
+            is DownloadResult.UseCache -> {
+                fileCache.getFile(cacheKey)?.let { String(it.data) }
+            }
+
+            null -> throw IllegalStateException("Failed to download release note: $fileUrl")
+        }
     }
 
     @Serializable

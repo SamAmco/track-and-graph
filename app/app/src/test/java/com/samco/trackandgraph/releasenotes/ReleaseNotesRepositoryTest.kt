@@ -17,9 +17,9 @@
 package com.samco.trackandgraph.releasenotes
 
 import com.samco.trackandgraph.data.interactor.DataInteractor
-import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.downloader.DownloadResult
 import com.samco.trackandgraph.downloader.FileDownloader
+import com.samco.trackandgraph.localisation.AppLocaleProvider
 import com.samco.trackandgraph.remoteconfig.FakeRemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.testRemoteConfig
 import com.samco.trackandgraph.storage.FakeFileCache
@@ -36,8 +36,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.net.URI
+import java.util.Locale
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReleaseNotesRepositoryTest {
@@ -49,6 +52,7 @@ class ReleaseNotesRepositoryTest {
     private val dataInteractor: DataInteractor = mock()
     private val downloader: FileDownloader = mock()
     private val remoteConfigProvider: FakeRemoteConfigProvider = FakeRemoteConfigProvider()
+    private val appLocaleProvider: AppLocaleProvider = mock()
 
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
     private val json = Json { ignoreUnknownKeys = false }
@@ -83,6 +87,7 @@ class ReleaseNotesRepositoryTest {
 
     @Before
     fun setup() {
+        whenever(appLocaleProvider.getPreferredLocales()).thenReturn(listOf(Locale.ENGLISH))
         repository = ReleaseNotesRepositoryImpl(
             io = testDispatcher,
             persistenceProvider = persistenceProvider,
@@ -91,7 +96,8 @@ class ReleaseNotesRepositoryTest {
             downloader = downloader,
             json = json,
             fileCache = fileCache,
-            remoteConfigProvider = remoteConfigProvider
+            remoteConfigProvider = remoteConfigProvider,
+            appLocaleProvider = appLocaleProvider
         )
     }
 
@@ -208,18 +214,9 @@ class ReleaseNotesRepositoryTest {
         assertEquals("8.1.0".toVersion(), result[1].version)
         assertEquals("8.0.0".toVersion(), result[2].version)
 
-        // Verify translations are present
-        val release820 = result[0].text as TranslatedString.Translations
-        assertEquals(testReleaseNote820En, release820.values["en"])
-        assertEquals(testReleaseNote820De, release820.values["de"])
-
-        val release810 = result[1].text as TranslatedString.Translations
-        assertEquals(testReleaseNote810En, release810.values["en"])
-        assertEquals(testReleaseNote810De, release810.values["de"])
-
-        val release800 = result[2].text as TranslatedString.Translations
-        assertEquals(testReleaseNote800En, release800.values["en"])
-        assertEquals(testReleaseNote800De, release800.values["de"])
+        assertEquals(testReleaseNote820En, result[0].text)
+        assertEquals(testReleaseNote810En, result[1].text)
+        assertEquals(testReleaseNote800En, result[2].text)
     }
 
     @Test
@@ -270,9 +267,7 @@ class ReleaseNotesRepositoryTest {
             assertEquals(1, result.size) // Only 8.1.0 should be included (8.2.0 > current version)
             assertEquals("8.1.0".toVersion(), result[0].version)
 
-            val release810 = result[0].text as TranslatedString.Translations
-            assertEquals(testReleaseNote810En, release810.values["en"])
-            assertEquals(testReleaseNote810De, release810.values["de"])
+            assertEquals(testReleaseNote810En, result[0].text)
         }
 
     @Test
@@ -361,70 +356,64 @@ class ReleaseNotesRepositoryTest {
     }
 
     @Test
-    fun `uses cached release notes after partial download failure`() = runTest {
-        // Given: User upgraded from 8.0.0 to 8.1.5, first attempt partially succeeds
+    fun `downloads and caches only the best available locale`() = runTest {
         versionProvider.setCurrentVersion("8.1.5".toVersion())
         val metadataStore = persistenceProvider.getDataStoreForPath("release-notes/metadata")
         metadataStore.setPreference("last_seen", "8.0.0")
-        
-        // Setup successful index download (first attempt)
+        whenever(appLocaleProvider.getPreferredLocales()).thenReturn(listOf(Locale.GERMAN))
+
         whenever(downloader.downloadFileWithETag(URI("https://changelogs.com/index.json"), null))
             .thenReturn(DownloadResult.Downloaded(testIndexJson.toByteArray(), "index-etag"))
-        
-        // First attempt: English downloads successfully, German fails
-        whenever(
-            downloader.downloadFileWithETag(
-                URI("https://changelogs.com/changelogs/8.1.0/en.md"),
-                null
-            )
-        ).thenReturn(DownloadResult.Downloaded(testReleaseNote810En.toByteArray(), "810-en-etag"))
-        
-        whenever(
-            downloader.downloadFileWithETag(
-                URI("https://changelogs.com/changelogs/8.1.0/de.md"),
-                null
-            )
-        ).thenReturn(null) // First attempt fails
-        
-        // First attempt should fail and return empty
-        val firstResult = repository.getNewReleaseNotes()
-        assertTrue(firstResult.isEmpty())
-        
-        // Second attempt: English uses cache (ETag match), German downloads successfully
-        whenever(
-            downloader.downloadFileWithETag(
-                URI("https://changelogs.com/changelogs/8.1.0/en.md"),
-                "810-en-etag"
-            )
-        ).thenReturn(DownloadResult.UseCache)
-        
-        // Setup the cached file that will be retrieved
-        fileCache.preloadFile(
-            "release-notes/8.1.0/en",
-            testReleaseNote810En.toByteArray(),
-            "810-en-etag"
-        )
-        // Setup successful index download (first attempt)
-        whenever(downloader.downloadFileWithETag(URI("https://changelogs.com/index.json"), "index-etag"))
-            .thenReturn(DownloadResult.UseCache)
-
         whenever(
             downloader.downloadFileWithETag(
                 URI("https://changelogs.com/changelogs/8.1.0/de.md"),
                 null
             )
         ).thenReturn(DownloadResult.Downloaded(testReleaseNote810De.toByteArray(), "810-de-etag"))
-        
-        // When: Second attempt should succeed using cached English + new German
+
+        val firstResult = repository.getNewReleaseNotes()
+        assertEquals(testReleaseNote810De, firstResult.single().text)
+        verify(downloader, never()).downloadFileWithETag(
+            URI("https://changelogs.com/changelogs/8.1.0/en.md"),
+            null
+        )
+
+        fileCache.preloadFile(
+            "release-notes/8.1.0/de",
+            testReleaseNote810De.toByteArray(),
+            "810-de-etag"
+        )
+        whenever(downloader.downloadFileWithETag(URI("https://changelogs.com/index.json"), "index-etag"))
+            .thenReturn(DownloadResult.UseCache)
+        whenever(
+            downloader.downloadFileWithETag(
+                URI("https://changelogs.com/changelogs/8.1.0/de.md"),
+                "810-de-etag"
+            )
+        ).thenReturn(DownloadResult.UseCache)
+
         val secondResult = repository.getNewReleaseNotes()
-        
-        // Then: Should get complete release notes
-        assertEquals(1, secondResult.size)
-        assertEquals("8.1.0".toVersion(), secondResult[0].version)
-        
-        val release810 = secondResult[0].text as TranslatedString.Translations
-        assertEquals(testReleaseNote810En, release810.values["en"]) // From cache
-        assertEquals(testReleaseNote810De, release810.values["de"]) // Fresh download
+        assertEquals(testReleaseNote810De, secondResult.single().text)
+    }
+
+    @Test
+    fun `falls back to English when preferred locales are unavailable`() = runTest {
+        versionProvider.setCurrentVersion("8.1.5".toVersion())
+        val metadataStore = persistenceProvider.getDataStoreForPath("release-notes/metadata")
+        metadataStore.setPreference("last_seen", "8.0.0")
+        whenever(appLocaleProvider.getPreferredLocales()).thenReturn(listOf(Locale.FRENCH))
+        whenever(downloader.downloadFileWithETag(URI("https://changelogs.com/index.json"), null))
+            .thenReturn(DownloadResult.Downloaded(testIndexJson.toByteArray(), "index-etag"))
+        whenever(
+            downloader.downloadFileWithETag(
+                URI("https://changelogs.com/changelogs/8.1.0/en.md"),
+                null
+            )
+        ).thenReturn(DownloadResult.Downloaded(testReleaseNote810En.toByteArray(), "810-en-etag"))
+
+        val result = repository.getNewReleaseNotes()
+
+        assertEquals(testReleaseNote810En, result.single().text)
     }
 
     @Test

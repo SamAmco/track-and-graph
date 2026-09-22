@@ -22,11 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.ui.ChangelogDialogContent
 import com.samco.trackandgraph.ui.ui.ChangelogReleaseNote
-import com.samco.trackandgraph.ui.ui.resolve
 
 @Composable
 fun ReleaseNotesDialog(
@@ -59,7 +57,7 @@ private fun ReleaseNotesDialogContent(
         releaseNotes = releaseNotes.map {
             ChangelogReleaseNote(
                 version = it.version,
-                markdown = it.text.resolve() ?: "Failed to resolve release note text.. Sorry :/",
+                markdown = it.text,
             )
         },
         onDismissRequest = handleDismiss,
@@ -87,11 +85,11 @@ private fun ReleaseNotesDialogPreview() {
             releaseNotes = listOf(
                 ReleaseNoteViewData(
                     version = "v1.2.0",
-                    text = TranslatedString.Simple("## New Features\n- Added release notes dialog\n- Improved UI animations\n\n## Bug Fixes\n- Fixed crash on startup")
+                    text = "## New Features\n- Added release notes dialog\n- Improved UI animations\n\n## Bug Fixes\n- Fixed crash on startup"
                 ),
                 ReleaseNoteViewData(
                     version = "v1.1.5",
-                    text = TranslatedString.Simple("## Bug Fixes\n- Fixed data export issue\n- Improved performance")
+                    text = "## Bug Fixes\n- Fixed data export issue\n- Improved performance"
                 )
             ),
             onDismissRequest = {}

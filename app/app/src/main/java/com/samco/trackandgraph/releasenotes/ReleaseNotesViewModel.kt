@@ -19,7 +19,6 @@ package com.samco.trackandgraph.releasenotes
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,7 +50,7 @@ interface ReleaseNotesViewModel {
 
 data class ReleaseNoteViewData(
     val version: String,
-    val text: TranslatedString,
+    val text: String,
 )
 
 @HiltViewModel
