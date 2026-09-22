@@ -34,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -104,6 +105,20 @@ internal enum class TrackerType {
     NUMERICAL, DURATION
 }
 
+internal enum class TrackerPageFocusTarget { Value, Label, Note }
+
+internal data class TrackerPageFocusRequesters(
+    val value: FocusRequester,
+    val label: FocusRequester,
+    val note: FocusRequester,
+) {
+    fun forTarget(target: TrackerPageFocusTarget) = when (target) {
+        TrackerPageFocusTarget.Value -> value
+        TrackerPageFocusTarget.Label -> label
+        TrackerPageFocusTarget.Note -> note
+    }
+}
+
 @Composable
 private fun LockToggleButton(
     isLocked: Boolean,
@@ -148,9 +163,10 @@ internal interface TrackerPageCallbacks {
 internal fun TrackerPage(
     modifier: Modifier,
     viewModel: AddDataPointViewModel,
-    currentPage: Boolean,
     suggestedValuesState: SuggestedValuesViewState,
-    valueFocusRequester: FocusRequester? = null,
+    focusRequesters: TrackerPageFocusRequesters? = null,
+    onFocusTargetChanged: (TrackerPageFocusTarget) -> Unit = {},
+    onAvailableFocusTargetsChanged: (Set<TrackerPageFocusTarget>) -> Unit = {},
 ) {
     // Extract state from ViewModel
     val name by viewModel.name.observeAsState("")
@@ -243,9 +259,10 @@ internal fun TrackerPage(
     TrackerPageView(
         modifier = modifier,
         state = state,
-        isCurrentPage = currentPage,
         callbacks = callbacks,
-        valueFocusRequester = valueFocusRequester,
+        focusRequesters = focusRequesters,
+        onFocusTargetChanged = onFocusTargetChanged,
+        onAvailableFocusTargetsChanged = onAvailableFocusTargetsChanged,
     )
 }
 
@@ -253,17 +270,20 @@ internal fun TrackerPage(
 internal fun TrackerPageView(
     modifier: Modifier = Modifier,
     state: TrackerPageState,
-    isCurrentPage: Boolean,
     callbacks: TrackerPageCallbacks,
-    valueFocusRequester: FocusRequester? = null,
+    focusRequesters: TrackerPageFocusRequesters? = null,
+    onFocusTargetChanged: (TrackerPageFocusTarget) -> Unit = {},
+    onAvailableFocusTargetsChanged: (Set<TrackerPageFocusTarget>) -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
-
-    val shouldFocusValue = remember(state.suggestedValues, state.suggestedValuesLoaded) {
-        state.suggestedValuesLoaded &&
-            state.suggestedValues != null &&
-            state.suggestedValues.all { it.value == null }
+    val defaultFocusRequesters = remember {
+        TrackerPageFocusRequesters(
+            value = FocusRequester(),
+            label = FocusRequester(),
+            note = FocusRequester(),
+        )
     }
+    val pageFocusRequesters = focusRequesters ?: defaultFocusRequesters
 
     Column(
         modifier = modifier,
@@ -315,11 +335,14 @@ internal fun TrackerPageView(
                 ValueInputTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = inputSpacingLarge),
+                        .padding(horizontal = inputSpacingLarge)
+                        .onFocusEvent {
+                            if (it.isFocused) onFocusTargetChanged(TrackerPageFocusTarget.Value)
+                        },
                     textFieldValue = state.value,
                     onValueChange = callbacks::onValueChanged,
                     focusManager = focusManager,
-                    focusRequester = if (shouldFocusValue) valueFocusRequester else null,
+                    focusRequester = pageFocusRequesters.value,
                     onNextOverride = {
                         if (labelFieldAdded || noteFieldAdded) focusManager.moveFocus(FocusDirection.Down)
                         else callbacks.onAddDataPoint()
@@ -339,7 +362,10 @@ internal fun TrackerPageView(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = inputSpacingLarge),
+                        .padding(horizontal = inputSpacingLarge)
+                        .onFocusEvent {
+                            if (it.hasFocus) onFocusTargetChanged(TrackerPageFocusTarget.Value)
+                        },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     DurationInputView(
@@ -355,7 +381,7 @@ internal fun TrackerPageView(
                             if (labelFieldAdded || noteFieldAdded) focusManager.moveFocus(FocusDirection.Down)
                             else callbacks.onAddDataPoint()
                         },
-                        focusRequester = if (shouldFocusValue) valueFocusRequester else null
+                        focusRequester = pageFocusRequesters.value
                     )
                     if (!state.isUpdateMode) {
                         LockToggleButton(
@@ -367,24 +393,26 @@ internal fun TrackerPageView(
             }
         }
 
-        if (isCurrentPage) {
-            LabelAndNoteInputsView(
-                label = state.label,
-                note = state.note,
-                labelAdded = labelFieldAdded,
-                noteAdded = noteFieldAdded,
-                onLabelAdded = { labelFieldAdded = true },
-                onNoteAdded = { noteFieldAdded = true },
-                onLabelChanged = callbacks::onLabelChanged,
-                onNoteChanged = callbacks::onNoteChanged,
-                onAddDataPoint = callbacks::onAddDataPoint,
-                labelLocked = state.lockState.labelLocked,
-                noteLocked = state.lockState.noteLocked,
-                onToggleLabelLock = callbacks::onToggleLabelLock,
-                onToggleNoteLock = callbacks::onToggleNoteLock,
-                isUpdateMode = state.isUpdateMode
-            )
-        }
+        LabelAndNoteInputsView(
+            label = state.label,
+            note = state.note,
+            labelAdded = labelFieldAdded,
+            noteAdded = noteFieldAdded,
+            onLabelAdded = { labelFieldAdded = true },
+            onNoteAdded = { noteFieldAdded = true },
+            onLabelChanged = callbacks::onLabelChanged,
+            onNoteChanged = callbacks::onNoteChanged,
+            onAddDataPoint = callbacks::onAddDataPoint,
+            labelLocked = state.lockState.labelLocked,
+            noteLocked = state.lockState.noteLocked,
+            onToggleLabelLock = callbacks::onToggleLabelLock,
+            onToggleNoteLock = callbacks::onToggleNoteLock,
+            isUpdateMode = state.isUpdateMode,
+            labelInputFocusRequester = pageFocusRequesters.label,
+            noteInputFocusRequester = pageFocusRequesters.note,
+            onFocusTargetChanged = onFocusTargetChanged,
+            onAvailableFocusTargetsChanged = onAvailableFocusTargetsChanged,
+        )
     }
 }
 
@@ -405,15 +433,28 @@ private fun LabelAndNoteInputsView(
     noteLocked: Boolean,
     onToggleLabelLock: () -> Unit,
     onToggleNoteLock: () -> Unit,
-    isUpdateMode: Boolean
+    isUpdateMode: Boolean,
+    labelInputFocusRequester: FocusRequester,
+    noteInputFocusRequester: FocusRequester,
+    onFocusTargetChanged: (TrackerPageFocusTarget) -> Unit,
+    onAvailableFocusTargetsChanged: (Set<TrackerPageFocusTarget>) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
     val coroutineScope = rememberCoroutineScope()
-    val noteInputFocusRequester = remember { FocusRequester() }
-    val labelInputFocusRequester = remember { FocusRequester() }
 
     var pendingFocus by remember { mutableStateOf<PendingFocus?>(null) }
+
+    DisposableEffect(labelAdded, noteAdded) {
+        onAvailableFocusTargetsChanged(
+            buildSet {
+                add(TrackerPageFocusTarget.Value)
+                if (labelAdded) add(TrackerPageFocusTarget.Label)
+                if (noteAdded) add(TrackerPageFocusTarget.Note)
+            }
+        )
+        onDispose { }
+    }
 
     // Consume pending focus once the field is visible
     LaunchedEffect(labelAdded, noteAdded, pendingFocus) {
@@ -444,6 +485,7 @@ private fun LabelAndNoteInputsView(
                 .padding(horizontal = inputSpacingLarge)
                 .onFocusEvent { state ->
                     if (state.isFocused) {
+                        onFocusTargetChanged(TrackerPageFocusTarget.Label)
                         coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
                     }
                 },
@@ -492,6 +534,9 @@ private fun LabelAndNoteInputsView(
                 .padding(horizontal = inputSpacingLarge)
                 .onFocusEvent { focusState ->
                     noteFieldFocused = focusState.isFocused
+                    if (focusState.isFocused) {
+                        onFocusTargetChanged(TrackerPageFocusTarget.Note)
+                    }
                 },
             textFieldValue = note,
             onValueChange = onNoteChanged,
@@ -640,7 +685,6 @@ fun TrackerPageViewPreview() {
 
             TrackerPageView(
                 state = sampleState,
-                isCurrentPage = true,
                 callbacks = sampleCallbacks
             )
         }
@@ -684,7 +728,6 @@ fun TrackerPageViewPreviewWithChips() {
 
             TrackerPageView(
                 state = sampleState,
-                isCurrentPage = true,
                 callbacks = sampleCallbacks
             )
         }

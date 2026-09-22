@@ -27,9 +27,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.SnapPosition
-import androidx.compose.foundation.gestures.snapping.snapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -46,9 +43,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerSnapDistance
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,8 +56,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,11 +68,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -80,6 +83,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -311,7 +315,6 @@ private fun DataPointInputView(
         BottomButtons(
             skipButtonVisible = state.skipButtonVisible,
             updateMode = state.updateMode,
-            anyFieldLocked = state.anyFieldLocked,
             onCancelClicked = callbacks::onCancelClicked,
             onSkipClicked = callbacks::onSkipClicked,
             onAddClicked = callbacks::onAddClicked
@@ -323,12 +326,10 @@ private fun DataPointInputView(
 private fun BottomButtons(
     skipButtonVisible: Boolean,
     updateMode: Boolean,
-    anyFieldLocked: Boolean,
     onCancelClicked: () -> Unit,
     onSkipClicked: () -> Unit,
     onAddClicked: () -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -343,10 +344,7 @@ private fun BottomButtons(
         if (skipButtonVisible) {
             SmallTextButton(
                 stringRes = R.string.skip,
-                onClick = {
-                    focusManager.clearFocus()
-                    onSkipClicked()
-                },
+                onClick = onSkipClicked,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.tngColors.onSurface
                 )
@@ -355,13 +353,7 @@ private fun BottomButtons(
         val addButtonRes = if (updateMode) R.string.update else R.string.add
         SmallTextButton(
             stringRes = addButtonRes,
-            onClick = {
-                // Keep keyboard open when fields are locked for rapid data entry
-                if (!anyFieldLocked) {
-                    focusManager.clearFocus()
-                }
-                onAddClicked()
-            }
+            onClick = onAddClicked
         )
     }
 }
@@ -395,6 +387,28 @@ fun Modifier.blockDescendantHandoff(): Modifier = composed {
     this.then(Modifier.nestedScroll(connection))
 }
 
+/**
+ * Makes every composed pager page report the target page's height. The child is
+ * still measured at its natural height so adjacent pages can be cached without
+ * allowing them to determine the pager's cross-axis size.
+ */
+private fun Modifier.pagerTargetHeight(
+    isTargetPage: Boolean,
+    targetHeight: Int?,
+    onNaturalHeightChanged: (Int) -> Unit,
+) = layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    val reportedHeight = when {
+        isTargetPage -> placeable.height
+        targetHeight != null -> targetHeight
+        else -> 0
+    }
+
+    layout(placeable.width, reportedHeight.coerceIn(constraints.minHeight, constraints.maxHeight)) {
+        placeable.placeRelative(0, 0)
+    }
+}.onSizeChanged { onNaturalHeightChanged(it.height) }
+
 @Composable
 private fun TrackerPager(
     modifier: Modifier = Modifier,
@@ -402,99 +416,254 @@ private fun TrackerPager(
     trackerPages: List<AddDataPointViewModel>,
     onPageChanged: (Int) -> Unit
 ) {
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentPageIndex)
+    if (trackerPages.isEmpty()) return
+
+    val pagerState = rememberPagerState(
+        initialPage = currentPageIndex,
+        pageCount = trackerPages::size,
+    )
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    // 1) Snap layout info
-    val snapInfo = remember(listState) {
-        SnapLayoutInfoProvider(
-            lazyListState = listState,
-            snapPosition = SnapPosition.Center
-        )
-    }
-
-    // 2) “Heavier” physics:
-    //    - Higher friction in the decay spec -> the fling dies out sooner (less page skipping)
-    //    - Stiffer, well-damped spring for the final snap -> firm settle
-    val heavyFling = remember(snapInfo) {
-        val heavyDecay = exponentialDecay<Float>(
-            frictionMultiplier = 4.5f
-        )
-        val firmSnap = spring<Float>(
+    val firmSnap = remember {
+        spring<Float>(
             dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessHigh
-        )
-
-        snapFlingBehavior(
-            snapLayoutInfoProvider = snapInfo,
-            decayAnimationSpec = heavyDecay,
-            snapAnimationSpec = firmSnap
+            stiffness = Spring.StiffnessMedium,
         )
     }
+    val heavyFling = PagerDefaults.flingBehavior(
+        state = pagerState,
+        pagerSnapDistance = PagerSnapDistance.atMost(1),
+        decayAnimationSpec = exponentialDecay(frictionMultiplier = 4.5f),
+        snapAnimationSpec = firmSnap,
+    )
 
-    val pageFocusRequester = remember { FocusRequester() }
-    var autoFocusPages by remember { mutableStateOf(emptySet<Int>()) }
+    val pageFocusRequesters = remember(trackerPages) {
+        List(trackerPages.size) {
+            TrackerPageFocusRequesters(
+                value = FocusRequester(),
+                label = FocusRequester(),
+                note = FocusRequester(),
+            )
+        }
+    }
+    var availableFocusTargets by remember {
+        mutableStateOf(emptyMap<Int, Set<TrackerPageFocusTarget>>())
+    }
+    var activeField by remember { mutableStateOf(TrackerPageFocusTarget.Value) }
+    val naturalPageHeights = remember(trackerPages) { mutableStateMapOf<Int, Int>() }
 
-    LazyRow(
-        state = listState,
-        modifier = modifier
-            .fillMaxWidth()
-            .animateContentSize(), // Smooth height transitions
-        flingBehavior = heavyFling,
-    ) {
-        itemsIndexed(trackerPages, key = { idx, _ -> idx }) { index, viewModel ->
-            val suggestedValuesState by viewModel.suggestedValues.observeAsState(
+    val heightTargetPage = when {
+        currentPageIndex != pagerState.settledPage -> currentPageIndex
+        pagerState.isScrollInProgress -> pagerState.targetPage
+        else -> pagerState.currentPage
+    }
+    val targetPageHeight = naturalPageHeights[heightTargetPage]
+
+    // Suggested values are loaded lazily. Observe the current page and its
+    // neighbours here so their keyboard policy is known before a swipe starts.
+    val keyboardIntents = mutableMapOf<Int, KeyboardIntent>()
+    val preloadRange = (currentPageIndex - 1..currentPageIndex + 1)
+        .filter { it in trackerPages.indices }
+    preloadRange.forEach { index ->
+        key(trackerPages[index]) {
+            val suggestedValuesState by trackerPages[index].suggestedValues.observeAsState(
                 SuggestedValuesViewState()
             )
-            TrackerPage(
-                modifier = Modifier
-                    .blockDescendantHandoff()
-                    .fillParentMaxWidth(),
-                viewModel = viewModel,
-                currentPage = index == currentPageIndex,
-                suggestedValuesState = suggestedValuesState,
-                valueFocusRequester = if (index == currentPageIndex) pageFocusRequester else null
-            )
-            LaunchedEffect(suggestedValuesState) {
-                if (suggestedValuesState.isLoaded) {
-                    val shouldAutoFocus = suggestedValuesState.values?.all { it.value == null } == true
-                    autoFocusPages = if (shouldAutoFocus) {
-                        autoFocusPages + index
-                    } else {
-                        autoFocusPages - index
-                    }
+            keyboardIntents[index] = suggestedValuesState.keyboardIntent
+        }
+    }
+
+    HorizontalPager(
+        state = pagerState,
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize()
+            .clipToBounds(),
+        flingBehavior = heavyFling,
+        beyondViewportPageCount = 1,
+        key = { it },
+    ) { index ->
+        val viewModel = trackerPages[index]
+        val suggestedValuesState by viewModel.suggestedValues.observeAsState(
+            SuggestedValuesViewState()
+        )
+        TrackerPage(
+            modifier = Modifier
+                .blockDescendantHandoff()
+                .fillMaxWidth()
+                .pagerTargetHeight(
+                    isTargetPage = index == heightTargetPage,
+                    targetHeight = targetPageHeight,
+                    onNaturalHeightChanged = { height ->
+                        naturalPageHeights[index] = height
+                    },
+            ),
+            viewModel = viewModel,
+            suggestedValuesState = suggestedValuesState,
+            focusRequesters = pageFocusRequesters[index],
+            onFocusTargetChanged = { activeField = it },
+            onAvailableFocusTargetsChanged = { targets ->
+                availableFocusTargets = availableFocusTargets + (index to targets)
+            },
+        )
+    }
+
+    var lastAppliedKeyboardIntent by remember { mutableStateOf<KeyboardIntent?>(null) }
+    var focusOwnerPage by remember { mutableIntStateOf(-1) }
+    var destinationPage by remember { mutableIntStateOf(currentPageIndex) }
+
+    // targetPage lets the IME react to a swipe destination before the pager settles.
+    LaunchedEffect(pagerState) {
+        snapshotFlow {
+            if (pagerState.isScrollInProgress) pagerState.targetPage
+            else pagerState.settledPage
+        }
+            .distinctUntilChanged()
+            .collect { destinationPage = it }
+    }
+    val destinationKeyboardIntent =
+        keyboardIntents[destinationPage] ?: KeyboardIntent.Unknown
+
+    LaunchedEffect(
+        destinationPage,
+        destinationKeyboardIntent,
+        pagerState.isScrollInProgress,
+        availableFocusTargets,
+    ) {
+        when (val action = planPagerInputAction(
+            destinationPage = destinationPage,
+            destinationKeyboardIntent = destinationKeyboardIntent,
+            isScrollInProgress = pagerState.isScrollInProgress,
+            availableTargets = availableFocusTargets[destinationPage],
+            activeField = activeField,
+            lastAppliedKeyboardIntent = lastAppliedKeyboardIntent,
+            focusOwnerPage = focusOwnerPage,
+        )) {
+            PagerInputAction.None -> Unit
+
+            is PagerInputAction.FocusDestination -> {
+                pageFocusRequesters[action.page]
+                    .forTarget(action.field)
+                    .requestFocus()
+                if (action.showKeyboard) keyboardController?.show()
+                lastAppliedKeyboardIntent = KeyboardIntent.Show
+                focusOwnerPage = action.page
+            }
+
+            is PagerInputAction.Hide -> {
+                if (action.hideKeyboard) {
+                    keyboardController?.hide()
+                    lastAppliedKeyboardIntent = KeyboardIntent.Hide
+                }
+                if (action.clearFocus) {
+                    focusManager.clearFocus()
+                    focusOwnerPage = destinationPage
                 }
             }
         }
     }
 
-    // Only request focus once the current page's complete suggestion set proves
-    // there are no quick-track values that should keep the keyboard hidden.
-    LaunchedEffect(listState.isScrollInProgress, currentPageIndex, autoFocusPages) {
-        if (currentPageIndex in autoFocusPages && !listState.isScrollInProgress) {
-            pageFocusRequester.requestFocus()
-        }
-    }
-
-    // Bidirectional synchronization between ViewModel and LazyRow
-
-    // 1) LazyRow scroll position -> ViewModel
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.firstVisibleItemIndex }
+    // User-driven pager position -> ViewModel. settledPage changes only after
+    // the snap completes, so it cannot cancel an in-flight programmatic move.
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
             .distinctUntilChanged()
             .collect { page ->
-                focusManager.clearFocus()
                 onPageChanged(page)
             }
     }
 
-    // 2) ViewModel currentPageIndex -> LazyRow scroll position
+    // Button-driven ViewModel position -> pager.
     LaunchedEffect(currentPageIndex) {
-        if (currentPageIndex != listState.firstVisibleItemIndex) {
-            listState.animateScrollToItem(currentPageIndex)
+        // Announce the destination before animateScrollToPage starts so the
+        // keyboard transition begins in the same frame as a button press.
+        destinationPage = currentPageIndex
+        if (currentPageIndex != pagerState.settledPage) {
+            pagerState.animateScrollToPage(
+                page = currentPageIndex,
+                animationSpec = firmSnap,
+            )
         }
     }
 }
+
+internal enum class KeyboardIntent { Unknown, Show, Hide }
+
+internal sealed interface PagerInputAction {
+    data object None : PagerInputAction
+
+    data class FocusDestination(
+        val page: Int,
+        val field: TrackerPageFocusTarget,
+        val showKeyboard: Boolean,
+    ) : PagerInputAction
+
+    data class Hide(
+        val hideKeyboard: Boolean,
+        val clearFocus: Boolean,
+    ) : PagerInputAction
+}
+
+internal fun planPagerInputAction(
+    destinationPage: Int,
+    destinationKeyboardIntent: KeyboardIntent,
+    isScrollInProgress: Boolean,
+    availableTargets: Set<TrackerPageFocusTarget>?,
+    activeField: TrackerPageFocusTarget,
+    lastAppliedKeyboardIntent: KeyboardIntent?,
+    focusOwnerPage: Int,
+): PagerInputAction = when (destinationKeyboardIntent) {
+    KeyboardIntent.Unknown -> PagerInputAction.None
+
+    KeyboardIntent.Show -> {
+        val focusBelongsToAnotherPage = destinationPage != focusOwnerPage
+        val keyboardNeedsShowing = lastAppliedKeyboardIntent != KeyboardIntent.Show
+        val shouldReconcileAfterSettling =
+            !isScrollInProgress && focusBelongsToAnotherPage
+        val shouldTransferSupplementalFocus =
+            isScrollInProgress &&
+                focusBelongsToAnotherPage &&
+                activeField != TrackerPageFocusTarget.Value
+        val shouldFocusDestination =
+            keyboardNeedsShowing ||
+                shouldReconcileAfterSettling ||
+                shouldTransferSupplementalFocus
+
+        if (availableTargets == null || !shouldFocusDestination) {
+            PagerInputAction.None
+        } else {
+            PagerInputAction.FocusDestination(
+                page = destinationPage,
+                field = activeField.takeIf { it in availableTargets }
+                    ?: TrackerPageFocusTarget.Value,
+                showKeyboard = keyboardNeedsShowing,
+            )
+        }
+    }
+
+    KeyboardIntent.Hide -> {
+        val keyboardNeedsHiding = lastAppliedKeyboardIntent != KeyboardIntent.Hide
+        val shouldClearFocus =
+            !isScrollInProgress && destinationPage != focusOwnerPage
+
+        if (!keyboardNeedsHiding && !shouldClearFocus) {
+            PagerInputAction.None
+        } else {
+            PagerInputAction.Hide(
+                hideKeyboard = keyboardNeedsHiding,
+                clearFocus = shouldClearFocus,
+            )
+        }
+    }
+}
+
+private val SuggestedValuesViewState.keyboardIntent: KeyboardIntent
+    get() = when {
+        !isLoaded -> KeyboardIntent.Unknown
+        values?.all { it.value == null } == true -> KeyboardIntent.Show
+        else -> KeyboardIntent.Hide
+    }
 
 @Composable
 private fun HintHeader(
