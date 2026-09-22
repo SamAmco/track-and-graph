@@ -136,6 +136,10 @@ tutorial-record:
 changelog:
 	@lua scripts/new_changelog.lua
 
+.PHONY: snapshot-release
+snapshot-release:
+	@python3 scripts/snapshot_release.py
+
 .PHONY: commit-version
 commit-version:
 	@python3 scripts/commit_version_bump_jj.py

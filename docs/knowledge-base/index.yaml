@@ -129,8 +129,8 @@ docs:
 
   - file: release-changelogs.md
     title: Release changelogs — workflow, structure, and Play Store limits
-    description: Public and Play Store changelogs, creation and preview workflows, localization tooling with a domain brief and Markdown validation, limits, and index.json maintenance.
-    keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, mock-support, billing, fastlane, play-store, make-changelog, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
+    description: Snapshot version revisions; public and Play Store changelogs; creation, preview, and localization workflows; limits; and index.json maintenance.
+    keywords: [changelog, release, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, mock-support, billing, fastlane, play-store, make-changelog, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
 
   - file: deep-link-navigation.md
     title: Deep-link navigation — DeepLink, descent-relative paths, navigator, back-stack append

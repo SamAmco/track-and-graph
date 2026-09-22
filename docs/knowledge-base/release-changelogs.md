@@ -1,7 +1,8 @@
 ---
 title: Release changelogs — workflow, structure, and Play Store limits
-description: Public and Play Store changelogs, creation and preview workflows, localization tooling, limits, and index.json maintenance.
+description: Snapshot version revisions; public and Play Store changelogs; creation, preview, and localization workflows; limits; and index.json maintenance.
 topics:
+  - Snapshot releases: guarded make target increments snapshots or interactively starts a major, minor, or patch snapshot in a dedicated jj revision
   - make changelog: lua script creates temp file, opens in nvim, processes output
   - Public changelogs: changelogs/{versionName}/{locale}.md with index.json
   - publish flag: controls whether public markdown and changelogs/index.json are created for in-app release dialog visibility
@@ -12,10 +13,28 @@ topics:
   - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
   - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
   - API translation: full Markdown per locale, domain brief, deterministic validation, explicit invocation only
-keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
+keywords: [changelog, release, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
 ---
 
 # Release Changelogs
+
+## Snapshot Releases
+
+`make snapshot-release` creates the next snapshot revision. It increments both
+the Android `versionCode` and the numeric suffix in a version such as
+`10.5.0-SNAPSHOT11`, then commits the isolated Gradle change with a message such
+as `Snapshot release 10.5.0-SNAPSHOT12` using `jj`.
+
+The target intentionally refuses to run when the current working copy contains
+changes, preventing unrelated work from being included in the snapshot
+revision. When the current `versionName` is a stable semantic version, the
+target asks whether the next release is major, minor, or patch, applies that
+semantic-version bump, and starts it at `-SNAPSHOT1`. For example, selecting
+minor after `10.4.0` produces `10.5.0-SNAPSHOT1`. An existing numbered snapshot
+is incremented without prompting. Use `python3 scripts/snapshot_release.py
+--dry-run` to preview the next values without changing the working copy, or
+pass `--release-type major|minor|patch` to make the initial choice
+non-interactively.
 
 ## Dual Changelog System
 
