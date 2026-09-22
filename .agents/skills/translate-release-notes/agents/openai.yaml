@@ -1,0 +1,5 @@
+interface:
+  display_name: "Translate Release Notes"
+  short_description: "Translate and review Track & Graph release notes"
+policy:
+  allow_implicit_invocation: false

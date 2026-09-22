@@ -1,6 +1,6 @@
 ---
 title: Release changelogs — workflow, structure, and Play Store limits
-description: Dual changelog system (public markdown for in-app/website, fastlane .txt for Play Store), changelog viewer app, the make changelog lua workflow, Play Store 500-character limit, 4-language localization requirement, and index.json maintenance.
+description: Public and Play Store changelogs, creation and preview workflows, localization tooling, limits, and index.json maintenance.
 topics:
   - make changelog: lua script creates temp file, opens in nvim, processes output
   - Public changelogs: changelogs/{versionName}/{locale}.md with index.json
@@ -11,7 +11,8 @@ topics:
   - Changelog viewer app: paste markdown and preview the shared dialog plus FOSS and mock Play support flows
   - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
   - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
-keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, 500-char, index.json, versionCode, versionName]
+  - API translation: full Markdown per locale, domain brief, deterministic validation, explicit invocation only
+keywords: [changelog, release, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
 ---
 
 # Release Changelogs
@@ -56,6 +57,38 @@ The footer layout, localized support copy, support assets, thank-you content, di
 When iterating on public changelog copy, treat the English markdown as the source text. Finalize wording there before translating the other locale files; this avoids doing the same copy edits four times. Locale files may exist as placeholders before translation.
 
 When translating, check string resources for official UI terms before choosing feature names or labels. This matters for both old features and newly released UI, not only for terms called out in this document.
+
+### API translation workflow
+
+The explicitly invoked `.agents/skills/translate-release-notes` workflow uses
+`scripts/translations/translate_release_notes.py`. It sends the complete English
+Markdown and `domain_brief.md` in one request per locale through a swappable
+provider adapter. Locales run concurrently. Deterministic validation protects
+URLs, link targets, code, identifiers, and Markdown structure. Returned results
+are always written and the final JSON summary lists invalid locales and checks.
+The default is one paid request per locale; repair small structural failures
+locally and rerun `markdown_validation.py` before considering an API retry.
+
+`scripts/translations/languages.py` is the shared source of truth for translation
+targets. It contains 65 non-English, non-RTL Google Play languages; regional
+variants are collapsed to avoid paying for duplicate translations. With no
+`--target` arguments the script uses the full list. Explicit targets select a
+smaller test or retry set. Function translation should reuse this list and the
+provider adapters, but have its own source and output wrapper.
+
+The domain brief preserves stable core terminology and may grow to an
+8,000-character safety ceiling. If review exposes a domain misunderstanding,
+refine the brief and rerun only affected locales once. Live calls require an
+explicit user request, and initial results stay under `/tmp` until reviewed.
+
+The complex Markdown fixture is intentionally harsher than normal release
+notes. A 2026-09-18 full GPT-5.6 Luna run produced structurally valid output for
+61 of 65 languages after bounded retries. The four rejected locales repeatedly
+dropped one bold span; valid lower-resource outputs also showed occasional
+untranslated terminology or mixed-script text. All four structural failures
+were repaired locally by restoring the missing emphasis, then passed validation
+without another API call. Keep deterministic validation and manually spot-check
+meaning and script consistency before publishing.
 
 ## Locales
 

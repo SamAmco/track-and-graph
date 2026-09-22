@@ -41,6 +41,12 @@ lua tools/pack-functions.lua
 ```
 Output: `catalog/community-functions.lua`
 
+Translation tooling must operate on the individual files under
+`lua/src/community/functions/`, never on this generated catalog. A future
+function translation wrapper should reuse `scripts/translations/languages.py`
+and the provider adapters while independently handling Lua source extraction,
+validation, and writing translations back to each source file.
+
 Prefer the `make` targets when publishing. `make lua-publish-debug` and `make lua-publish-prod` depend on `lua-pack-functions`, so they rebuild `lua/catalog/community-functions.lua` before signing. Running `lua tools/publish-functions-debug.lua` or `lua tools/publish-functions-prod.lua` directly only signs/copies the existing catalog file; if you skip packing first, you can publish stale catalog content.
 
 ## Validation Tools

@@ -1,0 +1,1 @@
+"""Translation provider adapters."""
