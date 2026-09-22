@@ -61,6 +61,12 @@ python3 -B scripts/translations/translate_app_resources.py audit
 # or: make translations-audit
 ```
 
+`make translations-validate` is the strict release form: it exits non-zero for
+missing or stale translations, unresolved failure artifacts, or target-only
+deletion candidates. `make validate-all` runs both this production audit and
+the offline `translations-test` tooling suite. Keep both checks in the release
+gate.
+
 `scripts/translations/translate_app_resources.py translate` is a paid operation
 and deliberately requires either repeated `--target LOCALE=LANGUAGE` arguments
 or `--all-targets`. The `make translations-generate` proxy supplies

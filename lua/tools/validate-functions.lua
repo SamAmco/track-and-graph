@@ -5,20 +5,27 @@
 local validation = require("tools.lib.validation")
 local traversal = require("tools.lib.file-traversal")
 
+local TRANSLATIONS_PATH = "src/community/shared-translations.lua"
+
 -- Validate a single function file
-local function validate_file(file_path)
+local function validate_file(file_path, valid_translations)
 	local ok, module = traversal.read_and_load(file_path)
 	if not ok then
 		return false, { module } -- module contains error message
 	end
 
 	-- Validate structure
-	return validation.validate_function(module, file_path)
+	return validation.validate_function(module, file_path, valid_translations)
 end
 
 -- Main function
 local function main()
 	print("Validating community functions...")
+
+	local translations_ok, valid_translations = traversal.read_and_load(TRANSLATIONS_PATH)
+	if not translations_ok then
+		error("Failed to load shared translations: " .. valid_translations)
+	end
 
 	local files = traversal.find_scripts(traversal.SCRIPT_TYPE.FUNCTIONS)
 
@@ -34,7 +41,7 @@ local function main()
 
 	-- Validate each file
 	for _, file_path in ipairs(files) do
-		local ok, errors = validate_file(file_path)
+		local ok, errors = validate_file(file_path, valid_translations)
 
 		if ok then
 			print("✓ " .. file_path)

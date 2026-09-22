@@ -218,6 +218,10 @@ def _audit_json(audit: LocaleAudit) -> dict[str, object]:
     }
 
 
+def _audit_has_issues(audit: LocaleAudit) -> bool:
+    return bool(audit.pending or audit.deletion_candidates or audit.failure_artifacts)
+
+
 def _translate_locale(
     *,
     audit: LocaleAudit,
@@ -396,6 +400,11 @@ def _parser() -> argparse.ArgumentParser:
 
     audit = subparsers.add_parser("audit", help="report missing, stale, and target-only resources")
     _add_target_argument(audit)
+    audit.add_argument(
+        "--fail-on-issues",
+        action="store_true",
+        help="exit non-zero if any locale has missing/stale copy, deletion candidates, or failure artifacts",
+    )
 
     baseline = subparsers.add_parser(
         "baseline",
@@ -449,7 +458,8 @@ def main() -> int:
             for target in _targets_for_audit(args.target)
         ]
         for audit in audits:
-            print(json.dumps(_audit_json(audit), ensure_ascii=False))
+            if not args.fail_on_issues or _audit_has_issues(audit):
+                print(json.dumps(_audit_json(audit), ensure_ascii=False))
         print(
             json.dumps(
                 {
@@ -467,7 +477,7 @@ def main() -> int:
                 ensure_ascii=False,
             )
         )
-        return 0
+        return int(args.fail_on_issues and any(_audit_has_issues(audit) for audit in audits))
 
     if args.command == "baseline":
         targets = _targets_for_audit(args.target)

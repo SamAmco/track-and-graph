@@ -21,7 +21,7 @@ endif
 validate-remote-config:
 	@./scripts/validate-remote-config.sh
 
-.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test
+.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate
 translations-audit:
 	@python3 -B scripts/translations/translate_app_resources.py audit $(TRANSLATION_ARGS)
 
@@ -37,6 +37,9 @@ translations-generate:
 
 translations-test:
 	@python3 -B -m unittest discover -s scripts/translations/tests -p 'test_*.py' -v
+
+translations-validate:
+	@python3 -B scripts/translations/translate_app_resources.py audit --fail-on-issues
 
 .PHONY: run-community-tests
 run-community-tests: run-community-functions-tests run-community-graph-tests
@@ -94,7 +97,7 @@ lua-test-tools:
 	cd lua && lua tools/test/test_all.lua
 
 .PHONY: validate-all
-validate-all: lua-test-api validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
+validate-all: translations-test translations-validate lua-test-api lua-test-tools validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
 	@echo "All validations passed."
 
 .PHONY: assemble-release

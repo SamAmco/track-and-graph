@@ -7,6 +7,15 @@ local validation = require("tools.lib.validation")
 local test_count = 0
 local passed_count = 0
 
+local function errors_contain(errors, expected)
+	for _, error_message in ipairs(errors) do
+		if error_message:find(expected, 1, true) then
+			return true
+		end
+	end
+	return false
+end
+
 local function test(name, fn)
 	test_count = test_count + 1
 	local ok, err = pcall(fn)
@@ -103,6 +112,30 @@ test("validate_config rejects missing translations in name", function()
 	assert(ok == false)
 end)
 
+test("validate_config explains inline enum option restriction", function()
+	local config = {{
+		id = "mode",
+		type = "enum",
+		name = {en="Mode", de="Modus", es="Modo", fr="Mode"},
+		options = {{id="one", name={en="One", de="Eins", es="Uno", fr="Un"}}},
+	}}
+	local ok, errors = validation.validate_config(config, "test.lua")
+	assert(ok == false)
+	assert(errors_contain(errors, "Android app supports inline { id, name } option tables"))
+end)
+
+test("validate_config rejects undefined enum shared key", function()
+	local config = {{
+		id = "mode",
+		type = "enum",
+		name = {en="Mode", de="Modus", es="Modo", fr="Mode"},
+		options = {"_missing"},
+	}}
+	local ok, errors = validation.validate_config(config, "test.lua", {})
+	assert(ok == false)
+	assert(errors_contain(errors, "undefined shared translation key"))
+end)
+
 -- Test validate_function
 test("validate_function accepts valid module", function()
 	local module = {
@@ -167,6 +200,34 @@ test("validate_function rejects non-function generator", function()
 	}
 	local ok, errors = validation.validate_function(module, "test.lua")
 	assert(ok == false)
+end)
+
+test("validate_function explains inline category restriction", function()
+	local module = {
+		id = "test",
+		version = "1.0.0",
+		categories = {{en="Filter", de="Filter", es="Filtro", fr="Filtre"}},
+		title = {en="Test", de="Test", es="Test", fr="Test"},
+		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		generator = function() end,
+	}
+	local ok, errors = validation.validate_function(module, "test.lua")
+	assert(ok == false)
+	assert(errors_contain(errors, "not supported by the Android category parser"))
+end)
+
+test("validate_function rejects undefined category shared key", function()
+	local module = {
+		id = "test",
+		version = "1.0.0",
+		categories = {"_missing"},
+		title = {en="Test", de="Test", es="Test", fr="Test"},
+		description = {en="Desc", de="Desc", es="Desc", fr="Desc"},
+		generator = function() end,
+	}
+	local ok, errors = validation.validate_function(module, "test.lua", {})
+	assert(ok == false)
+	assert(errors_contain(errors, "undefined shared translation key"))
 end)
 
 -- Test check_uniqueness

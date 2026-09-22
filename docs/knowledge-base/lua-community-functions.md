@@ -248,6 +248,14 @@ categories = { "_filter" },
 
 Convention: Only `_` prefixed keys in shared-translations.lua.
 
+Categories must currently be `_`-prefixed shared keys because the Android
+category parser only accepts strings, not inline translation tables. Enum
+options must also use shared keys in community functions. The Android enum
+parser can represent an inline `{ id, name }` option, but the catalog validation
+and translation workflow deliberately do not support that form yet. Validation
+errors explain this distinction rather than presenting either restriction as a
+fundamental translation-model limitation.
+
 ## Function Structure (Full)
 
 ```lua

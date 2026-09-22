@@ -19,6 +19,7 @@ sys.path.insert(0, str(TRANSLATIONS_DIR))
 
 from android_resources import (  # noqa: E402
     AndroidResource,
+    LocaleAudit,
     ResourceSet,
     ResourceValidationError,
     android_resource_qualifier,
@@ -39,7 +40,7 @@ from android_resources import (  # noqa: E402
 from languages import TranslationTarget  # noqa: E402
 from providers.base import TranslationResult  # noqa: E402
 import translate_app_resources as app_translations  # noqa: E402
-from translate_app_resources import _select_reference_payload, _source_text  # noqa: E402
+from translate_app_resources import _audit_has_issues, _select_reference_payload, _source_text  # noqa: E402
 
 
 SOURCE_XML = """<?xml version="1.0" encoding="utf-8"?>
@@ -104,6 +105,19 @@ class AndroidResourcesTest(unittest.TestCase):
             (self.resource_set,),
             state or {"version": 2, "translations": {}},
         )
+
+    def test_strict_audit_fails_for_missing_or_stale_production_copy(self) -> None:
+        self.assertTrue(_audit_has_issues(self.audit()))
+        complete = LocaleAudit(
+            target=self.target,
+            pending=(),
+            references=(),
+            missing=(),
+            stale=(),
+            deletion_candidates=(),
+            failure_artifacts=(),
+        )
+        self.assertFalse(_audit_has_issues(complete))
 
     def test_audit_uses_english_as_authority_and_lists_target_only_resources(self) -> None:
         audit = self.audit()

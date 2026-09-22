@@ -8,6 +8,28 @@ local M = {}
 -- Required language codes
 local REQUIRED_LANGUAGES = {"en", "de", "es", "fr"}
 
+local function validate_shared_translation_key(value, field_name, file_path, valid_translations, reason)
+	if type(value) ~= "string" or not value:match("^_") then
+		return false, string.format(
+			"%s - '%s' must be an _-prefixed shared translation key. %s",
+			file_path,
+			field_name,
+			reason
+		)
+	end
+
+	if valid_translations and not valid_translations[value] then
+		return false, string.format(
+			"%s - '%s' references undefined shared translation key: %s",
+			file_path,
+			field_name,
+			value
+		)
+	end
+
+	return true, nil
+end
+
 --- Validate that a field contains all required translations
 --- @param field string|table: The field to validate (string for translation key lookup, table for inline translations)
 --- @param field_name string: Name of the field for error messages
@@ -91,13 +113,17 @@ function M.validate_config(config, file_path, valid_translations)
 				table.insert(errors, string.format("%s - config[%d].options must be a table for enum type", file_path, i))
 			elseif #item.options == 0 then
 				table.insert(errors, string.format("%s - config[%d].options must contain at least one option", file_path, i))
-			elseif valid_translations then
-				-- Validate each option exists in valid_translations (enum options are translation keys)
+			else
 				for j, option in ipairs(item.options) do
-					if type(option) ~= "string" then
-						table.insert(errors, string.format("%s - config[%d].options[%d] must be a string", file_path, i, j))
-					elseif not valid_translations[option] then
-						table.insert(errors, string.format("%s - config[%d] undefined translation key for enum option '%s'", file_path, i, option))
+					local option_ok, option_error = validate_shared_translation_key(
+						option,
+						string.format("config[%d].options[%d]", i, j),
+						file_path,
+						valid_translations,
+						"The Android app supports inline { id, name } option tables, but community catalog validation and translation tooling currently require shared keys."
+					)
+					if not option_ok then
+						table.insert(errors, option_error)
 					end
 				end
 			end
@@ -166,11 +192,17 @@ function M.validate_function(module, file_path, valid_translations)
 	elseif #module.categories == 0 then
 		table.insert(errors, file_path .. " - 'categories' must contain at least one category")
 	else
-		-- Validate each category is a string
+		-- Categories are currently represented as shared translation keys.
 		for i, category in ipairs(module.categories) do
-			if type(category) ~= "string" then
-				table.insert(errors, string.format("%s - categories[%d] must be a string, got %s",
-					file_path, i, type(category)))
+			local category_ok, category_error = validate_shared_translation_key(
+				category,
+				string.format("categories[%d]", i),
+				file_path,
+				valid_translations,
+				"Inline translated category tables are not supported by the Android category parser."
+			)
+			if not category_ok then
+				table.insert(errors, category_error)
 			end
 		end
 	end
