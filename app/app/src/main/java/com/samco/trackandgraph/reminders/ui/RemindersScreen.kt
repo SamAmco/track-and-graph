@@ -224,8 +224,11 @@ fun RemindersScreen(
 
         // Keep the host composed so destination ViewModels are released by real back-stack pops.
         AddReminderDialog(
-            visible = showAddReminderDialog,
-            editReminderId = editReminderId,
+            visible = showAddReminderDialog && editReminderId == null,
+            onDismiss = onHideAddReminderDialog,
+        )
+        EditReminderDialog(
+            editReminderId = editReminderId.takeIf { showAddReminderDialog },
             onDismiss = onHideAddReminderDialog,
         )
 

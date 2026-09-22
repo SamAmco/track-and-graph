@@ -18,9 +18,14 @@
 package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,10 +41,35 @@ import com.samco.trackandgraph.ui.ui.inputSpacingLarge
 @Composable
 fun AddReminderDialog(
     visible: Boolean,
-    editReminderId: Long?,
     onDismiss: () -> Unit
 ) {
     if (!visible) return
+
+    val dialogOwner = rememberViewModelStoreOwner()
+
+    CompositionLocalProvider(LocalViewModelStoreOwner provides dialogOwner) {
+        CustomDialog(
+            onDismissRequest = onDismiss,
+            scrollContent = false,
+            supportSmoothHeightAnimation = true,
+            paddingValues = PaddingValues(
+                start = inputSpacingLarge,
+                end = inputSpacingLarge,
+                bottom = halfDialogInputSpacing,
+                top = inputSpacingLarge,
+            )
+        ) {
+            AddReminderDestination(onDismiss = onDismiss)
+        }
+    }
+}
+
+@Composable
+fun EditReminderDialog(
+    editReminderId: Long?,
+    onDismiss: () -> Unit,
+) {
+    if (editReminderId == null) return
 
     val dialogOwner = rememberViewModelStoreOwner()
 
@@ -54,7 +84,7 @@ fun AddReminderDialog(
                 top = inputSpacingLarge,
             )
         ) {
-            AddReminderSessionDestination(
+            EditReminderDestination(
                 editReminderId = editReminderId,
                 onDismiss = onDismiss,
             )
@@ -63,11 +93,30 @@ fun AddReminderDialog(
 }
 
 @Composable
-private fun AddReminderSessionDestination(
-    editReminderId: Long?,
+private fun AddReminderDestination(onDismiss: () -> Unit) {
+    val viewModel = hiltViewModel<AddReminderViewModelImpl>()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadStateForReminder(null)
+    }
+    LaunchedEffect(viewModel.onComplete) {
+        for (event in viewModel.onComplete) onDismiss()
+    }
+
+    AddReminderDialogContent(
+        onConfirm = viewModel::saveReminder,
+        onDismiss = onDismiss,
+        hasAnyFeatures = viewModel.hasAnyFeatures.collectAsStateWithLifecycle().value,
+    )
+}
+
+@Composable
+private fun EditReminderDestination(
+    editReminderId: Long,
     onDismiss: () -> Unit,
 ) {
     val viewModel = hiltViewModel<AddReminderViewModelImpl>()
+    val sessionState = viewModel.sessionState.collectAsStateWithLifecycle().value
 
     LaunchedEffect(editReminderId) {
         viewModel.loadStateForReminder(editReminderId)
@@ -75,62 +124,67 @@ private fun AddReminderSessionDestination(
     LaunchedEffect(viewModel.onComplete) {
         for (event in viewModel.onComplete) onDismiss()
     }
+    when (val state = sessionState) {
+        ReminderSessionState.Loading,
+        ReminderSessionState.Creating -> ReminderLoadingIndicator()
 
-    AddReminderDialogBody(
-        onConfirm = viewModel::saveReminder,
-        onDismiss = onDismiss,
-        editMode = viewModel.editMode.collectAsStateWithLifecycle().value,
-        editingReminder = viewModel.editingReminder.collectAsStateWithLifecycle().value,
-        hasAnyFeatures = viewModel.hasAnyFeatures.collectAsStateWithLifecycle().value,
-    )
+        ReminderSessionState.Missing -> {
+            LaunchedEffect(Unit) { onDismiss() }
+            ReminderLoadingIndicator()
+        }
+
+        is ReminderSessionState.Editing -> EditReminderDialogBody(
+            editingReminder = state.reminder,
+            onConfirm = viewModel::saveReminder,
+            onDismiss = onDismiss,
+        )
+    }
 }
 
 @Composable
-private fun AddReminderDialogBody(
+private fun ReminderLoadingIndicator() = Box(
+    modifier = Modifier.fillMaxWidth(),
+    contentAlignment = Alignment.Center,
+) {
+    CircularProgressIndicator()
+}
+
+@Composable
+private fun EditReminderDialogBody(
+    editingReminder: Reminder,
     onConfirm: (ReminderInput) -> Unit,
     onDismiss: () -> Unit,
-    editMode: Boolean,
-    editingReminder: Reminder? = null,
-    hasAnyFeatures: Boolean = false,
 ) {
-    if (editMode && editingReminder != null) {
-        when (val params = editingReminder.params) {
-            is ReminderParams.WeekDayParams -> WeekDayReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss,
-            )
-            is ReminderParams.PeriodicParams -> PeriodicReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss,
-            )
-            is ReminderParams.MonthDayParams -> MonthDayReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss,
-            )
-            is ReminderParams.TimeSinceLastParams -> TimeSinceLastReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss,
-            )
-            is ReminderParams.OneTimeParams -> OneTimeReminderConfigurationScreen(
-                editReminder = editingReminder,
-                editParams = params,
-                onUpsertReminder = onConfirm,
-                onDismiss = onDismiss,
-            )
-        }
-    } else {
-        AddReminderDialogContent(
-            onConfirm = onConfirm,
+    when (val params = editingReminder.params) {
+        is ReminderParams.WeekDayParams -> WeekDayReminderConfigurationScreen(
+            editReminder = editingReminder,
+            editParams = params,
+            onUpsertReminder = onConfirm,
             onDismiss = onDismiss,
-            hasAnyFeatures = hasAnyFeatures,
+        )
+        is ReminderParams.PeriodicParams -> PeriodicReminderConfigurationScreen(
+            editReminder = editingReminder,
+            editParams = params,
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+        is ReminderParams.MonthDayParams -> MonthDayReminderConfigurationScreen(
+            editReminder = editingReminder,
+            editParams = params,
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+        is ReminderParams.TimeSinceLastParams -> TimeSinceLastReminderConfigurationScreen(
+            editReminder = editingReminder,
+            editParams = params,
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
+        )
+        is ReminderParams.OneTimeParams -> OneTimeReminderConfigurationScreen(
+            editReminder = editingReminder,
+            editParams = params,
+            onUpsertReminder = onConfirm,
+            onDismiss = onDismiss,
         )
     }
 }
@@ -139,9 +193,8 @@ private fun AddReminderDialogBody(
 @Preview
 @Composable
 private fun AddReminderDialogPreview() {
-    AddReminderDialogBody(
+    AddReminderDialogContent(
         onConfirm = {},
         onDismiss = {},
-        editMode = false,
     )
 }

@@ -78,6 +78,7 @@ import com.samco.trackandgraph.importexport.ImportExportDialog
 import com.samco.trackandgraph.permissions.rememberAlarmAndNotificationPermissionRequester
 import com.samco.trackandgraph.permissions.rememberNotificationPermissionRequester
 import com.samco.trackandgraph.reminders.ui.AddReminderDialog
+import com.samco.trackandgraph.reminders.ui.EditReminderDialog
 import com.samco.trackandgraph.reminders.ui.LoadingReminder
 import com.samco.trackandgraph.reminders.ui.Reminder
 import com.samco.trackandgraph.reminders.ui.ReminderViewData
@@ -221,8 +222,7 @@ fun GroupScreen(
         )
     }
 
-    AddReminderDialog(
-        visible = editReminderId != null,
+    EditReminderDialog(
         editReminderId = editReminderId,
         onDismiss = { editReminderId = null },
     )

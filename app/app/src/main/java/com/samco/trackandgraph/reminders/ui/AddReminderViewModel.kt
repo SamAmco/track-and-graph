@@ -33,11 +33,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -54,12 +51,18 @@ interface AddReminderViewModel {
     fun loadStateForReminder(editReminderId: Long?, groupId: Long? = null)
 
     val loading: StateFlow<Boolean>
-    val editMode: StateFlow<Boolean>
-    val editingReminder: StateFlow<Reminder?>
+    val sessionState: StateFlow<ReminderSessionState>
     val hasAnyFeatures: StateFlow<Boolean>
     val onComplete: ReceiveChannel<Unit>
 
     fun saveReminder(input: ReminderInput)
+}
+
+sealed interface ReminderSessionState {
+    data object Loading : ReminderSessionState
+    data object Creating : ReminderSessionState
+    data object Missing : ReminderSessionState
+    data class Editing(val reminder: Reminder) : ReminderSessionState
 }
 
 @HiltViewModel
@@ -70,17 +73,14 @@ class AddReminderViewModelImpl @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
 ) : ViewModel(), AddReminderViewModel {
 
-    private val _loading = MutableStateFlow(false)
+    private val _loading = MutableStateFlow(true)
     override val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
     private var currentLoadingJob: Job? = null
-    private val _editingReminder = MutableStateFlow<Reminder?>(null)
+    private val _sessionState = MutableStateFlow<ReminderSessionState>(ReminderSessionState.Loading)
     private var createGroupId: Long? = null
 
-    override val editingReminder: StateFlow<Reminder?> = _editingReminder.asStateFlow()
-    override val editMode: StateFlow<Boolean> = _editingReminder
-        .map { it != null }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    override val sessionState: StateFlow<ReminderSessionState> = _sessionState.asStateFlow()
 
     private val _hasAnyFeatures = MutableStateFlow(false)
     override val hasAnyFeatures: StateFlow<Boolean> = _hasAnyFeatures.asStateFlow()
@@ -95,15 +95,18 @@ class AddReminderViewModelImpl @Inject constructor(
 
     override fun loadStateForReminder(editReminderId: Long?, groupId: Long?) {
         currentLoadingJob?.cancel()
+        _sessionState.value = ReminderSessionState.Loading
         currentLoadingJob = viewModelScope.launch(io) {
             withContext(ui) { _loading.value = true }
             if (editReminderId == null) {
-                _editingReminder.value = null
                 createGroupId = groupId
+                _sessionState.value = ReminderSessionState.Creating
                 withContext(ui) { _loading.value = false }
                 return@launch
             }
-            _editingReminder.value = dataInteractor.getReminderById(editReminderId)
+            _sessionState.value = dataInteractor.getReminderById(editReminderId)
+                ?.let(ReminderSessionState::Editing)
+                ?: ReminderSessionState.Missing
             createGroupId = null // Not used when editing
             withContext(ui) { _loading.value = false }
         }
@@ -115,12 +118,11 @@ class AddReminderViewModelImpl @Inject constructor(
                 currentLoadingJob?.join()
                 withContext(ui) { _loading.value = true }
 
-                val editingReminder = _editingReminder.value
-
-                if (editingReminder != null) {
-                    updateReminder(editingReminder, input)
-                } else {
-                    createReminder(input)
+                when (val state = _sessionState.value) {
+                    is ReminderSessionState.Editing -> updateReminder(state.reminder, input)
+                    ReminderSessionState.Creating -> createReminder(input)
+                    ReminderSessionState.Loading,
+                    ReminderSessionState.Missing -> error("Reminder session is not ready to save")
                 }
             } catch (t: Throwable) {
                 Timber.e(t)
