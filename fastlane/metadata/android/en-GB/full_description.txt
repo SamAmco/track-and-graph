@@ -6,4 +6,4 @@ Visualize your data through line graphs, pie charts, and statistical reports tha
 
 Track & Graph now embeds a Lua scripting API, allowing you to create custom calculations (like cumulative totals, differentials, or financial metrics).
 
-Track & Graph is completely free and open source with no ads, accounts, or in-app purchases. Your data remains private—stored only on your device—and can be easily backed up at any time.
+Track & Graph is completely free and open source, with no ads or accounts, and no features are paywalled. Your data remains private—stored only on your device—and can be easily backed up at any time.
