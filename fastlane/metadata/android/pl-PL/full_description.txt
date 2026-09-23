@@ -1,0 +1,9 @@
+Track & Graph: Panele do śledzenia życia
+
+Track & Graph pomaga rejestrować, wizualizować i rozumieć wzorce w codziennym życiu. Zapisuj wartości liczbowe lub proste zdarzenia, aby tworzyć osobiste panele z informacjami o swoich nawykach, zachowaniach i aktywnościach.
+
+Wizualizuj dane za pomocą wykresów liniowych, kołowych i raportów statystycznych pokazujących trendy, średnie kroczące oraz odstępy między zdarzeniami. Organizuj śledzone elementy w konfigurowalne grupy dopasowane do Twoich potrzeb.
+
+Track & Graph zawiera teraz interfejs API skryptów Lua, który pozwala tworzyć własne obliczenia, takie jak sumy skumulowane, różnice lub wskaźniki finansowe.
+
+Track & Graph jest całkowicie darmowy i ma otwarty kod źródłowy: nie zawiera reklam ani kont, a żadna funkcja nie jest płatna. Twoje dane pozostają prywatne — są przechowywane wyłącznie na Twoim urządzeniu i można je łatwo zarchiwizować w dowolnym momencie.

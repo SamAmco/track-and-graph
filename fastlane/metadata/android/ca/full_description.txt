@@ -1,0 +1,9 @@
+Track & Graph: Taulers per a la teva vida
+
+Track & Graph t’ajuda a registrar, visualitzar i entendre els patrons de la teva vida quotidiana. Registra valors numèrics o ocurrències senzilles per crear taulers personals que ofereixen informació útil sobre els teus hàbits, comportaments i activitats.
+
+Visualitza les teves dades amb gràfics de línies, gràfics circulars i informes estadístics que mostren tendències, mitjanes mòbils i intervals entre esdeveniments. Organitza els elements de seguiment en grups personalitzables adaptats a les teves necessitats.
+
+Track & Graph incorpora ara una API de scripts Lua que et permet crear càlculs personalitzats, com ara totals acumulats, diferencials o mètriques financeres.
+
+Track & Graph és completament gratuït i de codi obert, sense anuncis ni comptes, i cap funció està subjecta a pagament. Les teves dades es mantenen privades: només s’emmagatzemen al teu dispositiu i es poden desar fàcilment en còpies de seguretat en qualsevol moment.

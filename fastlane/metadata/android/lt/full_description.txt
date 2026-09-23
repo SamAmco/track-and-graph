@@ -1,0 +1,9 @@
+Track & Graph: Gyvenimo duomenų skydeliai
+
+Track & Graph padeda fiksuoti, vizualizuoti ir suprasti kasdienio gyvenimo dėsningumus. Fiksuokite skaitines reikšmes ar paprastus įvykius ir kurkite asmeninius skydelius, padedančius geriau suprasti savo įpročius, elgseną ir veiklą.
+
+Vizualizuokite duomenis linijinėmis diagramomis, skritulinėmis diagramomis ir statistinėmis ataskaitomis, kuriose rodomos tendencijos, slankieji vidurkiai ir intervalai tarp įvykių. Suskirstykite sekamus elementus į pagal savo poreikius pritaikomas grupes.
+
+Track & Graph dabar turi integruotą Lua scenarijų API, leidžiančią kurti pasirinktinius skaičiavimus, pavyzdžiui, kaupiamąsias sumas, skirtumus ar finansinius rodiklius.
+
+Track & Graph yra visiškai nemokama atvirojo kodo programa: joje nėra reklamų ar paskyrų, o jokios funkcijos nėra mokamos. Jūsų duomenys lieka privatūs – saugomi tik jūsų įrenginyje – ir bet kada gali būti lengvai sukurti jų atsarginės kopijos.

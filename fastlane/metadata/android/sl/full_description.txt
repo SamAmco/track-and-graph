@@ -1,0 +1,9 @@
+Track & Graph: Nadzorne plošče za vsakdanje življenje
+
+Track & Graph vam pomaga beležiti, vizualizirati in razumeti vzorce v vsakdanjem življenju. Beležite številčne vrednosti ali preproste dogodke ter ustvarite osebne nadzorne plošče, ki vam pomagajo bolje razumeti svoje navade, vedenje in dejavnosti.
+
+Svoje podatke vizualizirajte z linijskimi grafikoni, tortnimi grafikoni in statističnimi poročili, ki prikazujejo trende, drseča povprečja in časovne razmake med dogodki. Elemente sledenja razporedite v skupine, ki jih lahko prilagodite svojim potrebam.
+
+Track & Graph zdaj vključuje skriptni API Lua, ki vam omogoča ustvarjanje izračunov po meri, kot so kumulativni seštevki, diferenciali ali finančni kazalniki.
+
+Track & Graph je popolnoma brezplačen in odprtokoden, brez oglasov in računov, nobena funkcija pa ni plačljiva. Vaši podatki ostanejo zasebni – shranjeni so samo v vaši napravi – in jih lahko kadar koli preprosto varnostno kopirate.

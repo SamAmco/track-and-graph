@@ -1,0 +1,9 @@
+Track & Graph: Panouri de control pentru viața ta
+
+Track & Graph te ajută să înregistrezi, să vizualizezi și să înțelegi tiparele din viața ta de zi cu zi. Înregistrează valori numerice sau evenimente simple pentru a crea panouri personale care îți oferă informații despre obiceiurile, comportamentele și activitățile tale.
+
+Vizualizează-ți datele prin grafice liniare, diagrame circulare și rapoarte statistice care afișează tendințe, medii mobile și intervale între evenimente. Organizează elementele urmărite în grupuri personalizabile, adaptate nevoilor tale.
+
+Track & Graph include acum un API de scripting Lua, care îți permite să creezi calcule personalizate (precum totaluri cumulative, diferențiale sau indicatori financiari).
+
+Track & Graph este complet gratuit și open source, fără reclame sau conturi și fără funcții contra cost. Datele tale rămân private — sunt stocate doar pe dispozitivul tău — și pot fi salvate cu ușurință oricând.

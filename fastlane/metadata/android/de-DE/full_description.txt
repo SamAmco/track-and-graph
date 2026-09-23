@@ -1,9 +1,9 @@
-Track & Graph: Dashboards fürs Leben
+Track & Graph: Dashboards für dein Leben
 
-Track & Graph hilft dir, Muster in deinem Alltag zu erfassen, zu visualisieren und zu verstehen. Zeichne numerische Werte oder einfache Ereignisse auf, um persönliche Dashboards zu erstellen, die dir Einblicke in deine Gewohnheiten, Verhaltensweisen und Aktivitäten geben.
+Mit Track & Graph kannst du Muster in deinem Alltag aufzeichnen, visualisieren und verstehen. Erfasse numerische Werte oder einfache Ereignisse und erstelle persönliche Dashboards, die dir Einblicke in deine Gewohnheiten, Verhaltensweisen und Aktivitäten geben.
 
-Visualisiere deine Daten mit Liniendiagrammen, Kreisdiagrammen und statistischen Berichten, die Trends, gleitende Durchschnitte und Intervalle zwischen Ereignissen anzeigen. Organisiere deine Tracking-Elemente in anpassbaren Gruppen, die zu deinen Bedürfnissen passen.
+Visualisiere deine Daten mit Liniendiagrammen, Kreisdiagrammen und statistischen Berichten, die Trends, gleitende Durchschnitte und Zeitabstände zwischen Ereignissen zeigen. Organisiere deine Aufzeichnungen in anpassbaren Gruppen, die zu deinen Bedürfnissen passen.
 
-Track & Graph bietet jetzt eine Lua-Scripting-API, mit der du eigene Berechnungen erstellen kannst (wie kumulierte Summen, Differenzen oder Finanzmetriken).
+Track & Graph enthält jetzt eine Lua-Scripting-API, mit der du eigene Berechnungen erstellen kannst, etwa kumulative Summen, Differenzen oder Finanzkennzahlen.
 
-Track & Graph ist komplett kostenlos und Open Source – ohne Werbung, Konten oder In-App-Käufe. Deine Daten bleiben privat – sie werden nur auf deinem Gerät gespeichert und können jederzeit einfach gesichert werden.
+Track & Graph ist vollständig kostenlos und Open Source – ohne Werbung oder Konten, und keine Funktionen sind kostenpflichtig. Deine Daten bleiben privat, werden ausschließlich auf deinem Gerät gespeichert und können jederzeit einfach gesichert werden.

@@ -1,0 +1,9 @@
+Track & Graph: Dashboards vir jou lewe
+
+Track & Graph help jou om patrone in jou daaglikse lewe aan te teken, te visualiseer en te verstaan. Teken numeriese waardes of eenvoudige gebeurtenisse aan om persoonlike dashboards te bou wat insig in jou gewoontes, gedrag en aktiwiteite bied.
+
+Visualiseer jou data met lyngrafieke, sirkeldiagramme en statistiese verslae wat tendense, bewegende gemiddeldes en tussenposes tussen gebeurtenisse wys. Organiseer nasporingsitems in aanpasbare groepe wat by jou behoeftes pas.
+
+Track & Graph bevat nou ’n Lua-skrip-API, waarmee jy pasgemaakte berekeninge kan skep, soos kumulatiewe totale, verskille of finansiële maatstawwe.
+
+Track & Graph is heeltemal gratis en oopbron, sonder advertensies of rekeninge, en geen kenmerke is betaalmure toe nie. Jou data bly privaat—dit word slegs op jou toestel gestoor—en kan enige tyd maklik gerugsteun word.

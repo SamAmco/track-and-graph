@@ -1,0 +1,9 @@
+Track & Graph: Həyatınız üçün idarə panelləri
+
+Track & Graph gündəlik həyatınızdakı nümunələri qeyd etməyə, vizuallaşdırmağa və anlamağa kömək edir. Vərdişləriniz, davranışlarınız və fəaliyyətləriniz barədə məlumat verən şəxsi idarə panelləri yaratmaq üçün ədədi dəyərləri və ya sadə hadisələri qeyd edin.
+
+Məlumatlarınızı xətt qrafikləri, dairəvi diaqramlar və trendləri, hərəkətli ortalamaları və hadisələr arasındakı intervalları göstərən statistik hesabatlarla vizuallaşdırın. İzləmə elementlərini ehtiyaclarınıza uyğun fərdiləşdirilə bilən qruplarda təşkil edin.
+
+Track & Graph indi Lua skript API-sini özündə birləşdirir və məcmu cəmlər, fərqlər və ya maliyyə göstəriciləri kimi fərdi hesablamalar yaratmağa imkan verir.
+
+Track & Graph tamamilə pulsuz və açıq mənbəlidir; reklamsızdır, hesab tələb etmir və heç bir xüsusiyyət ödəniş arxasında deyil. Məlumatlarınız məxfi qalır — yalnız cihazınızda saxlanılır və istənilən vaxt asanlıqla ehtiyat nüsxəsi yaradıla bilər.

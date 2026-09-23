@@ -1,0 +1,9 @@
+Track & Graph: Hayatınız için panolar
+
+Track & Graph, günlük yaşamınızdaki örüntüleri kaydetmenize, görselleştirmenize ve anlamanıza yardımcı olur. Kişisel panolar oluşturarak alışkanlıklarınız, davranışlarınız ve etkinlikleriniz hakkında içgörüler elde etmek için sayısal değerleri veya basit olayları kaydedin.
+
+Verilerinizi; eğilimleri, hareketli ortalamaları ve olaylar arasındaki aralıkları gösteren çizgi grafikler, pasta grafikler ve istatistiksel raporlarla görselleştirin. Takip öğelerini ihtiyaçlarınıza uygun, özelleştirilebilir gruplar hâlinde düzenleyin.
+
+Track & Graph artık bir Lua betik API'si içeriyor; böylece özel hesaplamalar (kümülatif toplamlar, farklar veya finansal ölçümler gibi) oluşturabilirsiniz.
+
+Track & Graph tamamen ücretsiz ve açık kaynaklıdır; reklam, hesap veya ücretli özellik yoktur. Verileriniz gizli kalır; yalnızca cihazınızda saklanır ve istediğiniz zaman kolayca yedeklenebilir.

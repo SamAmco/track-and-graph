@@ -7,6 +7,7 @@ topics:
   - English source hashes support safe incremental updates
   - Domain brief, languages, and provider adapters are shared across workflows
   - App, shared UI, and Play-only resources retain separate ownership
+  - Google Play listing metadata has a separate explicit paid translation command
 keywords: [localization, translation, strings.xml, Android resources, values, translatable, domain-brief, app_translation_state, translate_app_resources, incremental, source-of-truth, provider, OpenAI]
 ---
 
@@ -131,6 +132,30 @@ in code or tests. Other shared infrastructure lives under
 `scripts/translations/`: `domain_brief.md`, provider adapters, and
 `translation_runtime.py`. Release notes, Android resources, and Lua catalog
 copy reuse those pieces but keep format-specific extraction and validation.
+
+Google Play listing metadata under `fastlane/metadata/android/` uses the same
+language manifest, domain brief, and provider adapter through
+`translate_fastlane_metadata.py`. Run `make fastlane-translations-generate`
+only when explicitly asked to translate finalized English store copy. It sends
+the title, short description, and full description together once per written
+language so their terminology remains consistent, and maps general manifest
+locales to Play's regional metadata directory names without duplicating the
+language list. `Track & Graph` and `Lua`, Play character limits, and the full
+description's block structure are validated before a locale is written.
+Those deterministic checks do not establish linguistic fidelity; review the
+generated meaning separately, with extra attention to lower-resource languages
+and the no-ads, no-accounts, no-paywalls, on-device-only, and backup claims.
+The offline translation test suite, and therefore `make validate-all`, checks
+that every manifest locale has all three listing files and that these same
+deterministic constraints continue to pass.
+
+This workflow deliberately has no incremental state: listing copy changes
+rarely, and a requested run regenerates every selected locale from English.
+Raw provider responses are retained under
+`/tmp/track-and-graph-fastlane-translations` for local repair if JSON or a
+validation rule fails. Valid locales are still written, failures are listed in
+the final summary, and the script does not make automatic paid retry calls.
+Use `TRANSLATION_ARGS="--target de=German"` for a targeted rerun.
 
 Lua translation is also an explicitly requested paid operation. Use
 `make lua-translations-function FUNCTION=<id>` for the normal one-function

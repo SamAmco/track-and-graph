@@ -1,0 +1,9 @@
+Track & Graph: Irányítópultok az életedhez!
+
+A Track & Graph segít rögzíteni, megjeleníteni és megérteni a mindennapjaid mintázatait. Rögzíts számszerű értékeket vagy egyszerű eseményeket, és készíts személyes irányítópultokat, amelyek betekintést nyújtanak szokásaidba, viselkedésedbe és tevékenységeidbe.
+
+Jelenítsd meg adataidat vonaldiagramokon, kördiagramokon és statisztikai jelentésekben, amelyek trendeket, mozgóátlagokat és az események közötti időközöket mutatnak. Szervezd követési elemeidet igényeidnek megfelelő, testreszabható csoportokba.
+
+A Track & Graph most Lua-szkriptelési API-t is tartalmaz, amellyel egyéni számításokat készíthetsz (például kumulatív összegeket, különbségeket vagy pénzügyi mutatókat).
+
+A Track & Graph teljesen ingyenes és nyílt forráskódú: nincsenek benne hirdetések vagy fiókok, és egyetlen funkció sincs fizetőfal mögött. Adataid privátak maradnak — kizárólag az eszközödön tárolódnak —, és bármikor egyszerűen biztonsági mentést készíthetsz róluk.

@@ -1,0 +1,9 @@
+Track & Graph: Dashibodi za maisha yako
+
+Track & Graph hukusaidia kurekodi, kuonyesha na kuelewa mifumo katika maisha yako ya kila siku. Rekodi thamani za nambari au matukio rahisi ili kuunda dashibodi zako zinazokupa maarifa kuhusu mazoea, mienendo na shughuli zako.
+
+Tazama data yako kupitia grafu za mistari, chati za pai na ripoti za takwimu zinazoonyesha mienendo, wastani unaosogea na vipindi kati ya matukio. Panga vipengee vya ufuatiliaji katika vikundi vinavyoweza kubinafsishwa kulingana na mahitaji yako.
+
+Track & Graph sasa ina API ya uandishi wa Lua iliyojengewa ndani, inayokuwezesha kuunda hesabu maalum (kama jumla limbikizi, tofauti au vipimo vya kifedha).
+
+Track & Graph ni bure kabisa na ni programu huria, bila matangazo wala akaunti, na hakuna vipengele vilivyofungwa kwa malipo. Data yako hubaki ya faragha—huhifadhiwa kwenye kifaa chako pekee—na inaweza kuhifadhiwa nakala kwa urahisi wakati wowote.

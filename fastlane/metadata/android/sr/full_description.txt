@@ -1,0 +1,9 @@
+Track & Graph: Kontrolne table za svakodnevni život
+
+Track & Graph vam pomaže da beležite, vizuelizujete i razumete obrasce u svakodnevnom životu. Beležite numeričke vrednosti ili jednostavne događaje i napravite lične kontrolne table koje pružaju uvid u vaše navike, ponašanje i aktivnosti.
+
+Vizuelizujte podatke pomoću linijskih grafikona, tortnih dijagrama i statističkih izveštaja koji prikazuju trendove, pokretne proseke i intervale između događaja. Organizujte stavke za praćenje u prilagodljive grupe koje odgovaraju vašim potrebama.
+
+Track & Graph sada sadrži Lua API za skriptovanje, što vam omogućava da pravite prilagođene proračune, kao što su kumulativni zbirovi, diferencijali ili finansijski pokazatelji.
+
+Track & Graph je potpuno besplatan softver otvorenog koda, bez oglasa i naloga, a nijedna funkcija nije zaključana iza plaćanja. Vaši podaci ostaju privatni — čuvaju se samo na vašem uređaju — i u svakom trenutku ih možete lako napraviti rezervnu kopiju.

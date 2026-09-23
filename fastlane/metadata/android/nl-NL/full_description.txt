@@ -1,0 +1,9 @@
+Track & Graph: Dashboards voor je leven
+
+Met Track & Graph leg je patronen in je dagelijks leven vast, visualiseer je ze en krijg je er inzicht in. Registreer numerieke waarden of eenvoudige gebeurtenissen en maak persoonlijke dashboards die inzicht geven in je gewoonten, gedrag en activiteiten.
+
+Visualiseer je gegevens met lijngrafieken, cirkeldiagrammen en statistische rapporten die trends, voortschrijdende gemiddelden en intervallen tussen gebeurtenissen tonen. Organiseer registratie-items in aanpasbare groepen die aansluiten bij jouw behoeften.
+
+Track & Graph bevat nu een Lua-scripting-API, waarmee je aangepaste berekeningen kunt maken, zoals cumulatieve totalen, verschillen of financiële kengetallen.
+
+Track & Graph is volledig gratis en opensource, zonder advertenties of accounts, en zonder betaalde functies. Je gegevens blijven privé: ze worden alleen op je apparaat opgeslagen en kunnen op elk moment eenvoudig worden geback-upt.

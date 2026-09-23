@@ -1,0 +1,9 @@
+Track & Graph: Bizitzako aginte-panelak
+
+Track & Graph aplikazioak eguneroko bizitzako ereduak erregistratu, ikusi eta ulertzen laguntzen dizu. Erregistratu zenbakizko balioak edo gertaera soilak, eta sortu zure ohiturei, jokabideei eta jarduerei buruzko ikuspegiak eskaintzen dituzten aginte-panel pertsonalak.
+
+Ikusi zure datuak lerro-grafiko, sektore-diagrama eta txosten estatistikoen bidez; horiek joerak, batezbesteko mugikorrak eta gertaeren arteko tarteak erakusten dituzte. Antolatu jarraipen-elementuak zure beharretara egokitzen diren talde pertsonalizagarrietan.
+
+Track & Graph aplikazioak Lua scriptetarako API bat txertatzen du orain, kalkulu pertsonalizatuak sortzeko aukera emanez (adibidez, metatutako guztizkoak, diferentzialak edo finantza-metrikak).
+
+Track & Graph guztiz doakoa eta kode irekikoa da; ez du iragarkirik edo konturik, eta ez dago ordainpeko eginbiderik. Zure datuak pribatu mantentzen dira: zure gailuan soilik gordetzen dira, eta edozein unetan erraz egin dezakezu haien babeskopia.

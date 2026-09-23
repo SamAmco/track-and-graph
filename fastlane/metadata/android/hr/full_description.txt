@@ -1,0 +1,9 @@
+Track & Graph: Nadzorne ploče za vaš život
+
+Track & Graph pomaže vam bilježiti, vizualizirati i razumjeti obrasce u svakodnevnom životu. Bilježite brojčane vrijednosti ili jednostavne pojave kako biste izradili osobne nadzorne ploče koje pružaju uvid u vaše navike, ponašanja i aktivnosti.
+
+Vizualizirajte podatke pomoću linijskih grafikona, tortnih grafikona i statističkih izvješća koja prikazuju trendove, pomične prosjeke i razmake između događaja. Organizirajte stavke praćenja u prilagodljive grupe koje odgovaraju vašim potrebama.
+
+Track & Graph sada uključuje Lua API za skriptiranje, što vam omogućuje izradu prilagođenih izračuna (poput kumulativnih zbrojeva, diferencijala ili financijskih pokazatelja).
+
+Track & Graph potpuno je besplatan softver otvorenog koda, bez oglasa i računa te bez značajki zaključanih iza plaćanja. Vaši podaci ostaju privatni — pohranjuju se samo na vašem uređaju — i u svakom ih trenutku možete jednostavno sigurnosno kopirati.

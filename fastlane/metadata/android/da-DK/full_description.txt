@@ -1,0 +1,9 @@
+Track & Graph: Instrumentbrætter til livet
+
+Track & Graph hjælper dig med at registrere, visualisere og forstå mønstre i din hverdag. Registrer numeriske værdier eller enkle hændelser for at opbygge personlige instrumentbrætter, der giver indsigt i dine vaner, adfærd og aktiviteter.
+
+Visualiser dine data med linjediagrammer, cirkeldiagrammer og statistiske rapporter, der viser tendenser, glidende gennemsnit og intervaller mellem hændelser. Organiser registreringselementer i grupper, der kan tilpasses efter dine behov.
+
+Track & Graph indeholder nu en Lua-script-API, som giver dig mulighed for at oprette brugerdefinerede beregninger (f.eks. kumulative totaler, differenser eller økonomiske nøgletal).
+
+Track & Graph er helt gratis og open source uden reklamer eller konti, og ingen funktioner kræver betaling. Dine data forbliver private – de gemmes kun på din enhed – og kan nemt sikkerhedskopieres når som helst.

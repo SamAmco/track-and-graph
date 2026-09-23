@@ -21,7 +21,7 @@ endif
 validate-remote-config:
 	@./scripts/validate-remote-config.sh
 
-.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate lua-translations-function lua-translations-shared lua-translations-apply
+.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate fastlane-translations-generate lua-translations-function lua-translations-shared lua-translations-apply
 translations-audit:
 	@python3 -B scripts/translations/translate_app_resources.py audit $(TRANSLATION_ARGS)
 
@@ -40,6 +40,10 @@ translations-test:
 
 translations-validate:
 	@python3 -B scripts/translations/translate_app_resources.py audit --fail-on-issues
+
+fastlane-translations-generate: TRANSLATION_ARGS ?= --all-targets
+fastlane-translations-generate:
+	@python3 -B scripts/translations/translate_fastlane_metadata.py $(TRANSLATION_ARGS)
 
 lua-translations-function:
 	@test -n "$(FUNCTION)" || (echo "Usage: make lua-translations-function FUNCTION=<id> [TRANSLATION_ARGS=...]" && exit 1)

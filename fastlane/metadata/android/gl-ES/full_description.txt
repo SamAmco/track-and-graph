@@ -1,0 +1,9 @@
+Track & Graph: Cadros de mando para a túa vida
+
+Track & Graph axúdache a rexistrar, visualizar e comprender os patróns da túa vida diaria. Rexistra valores numéricos ou ocorrencias sinxelas para crear cadros de mando persoais que ofrecen información útil sobre os teus hábitos, comportamentos e actividades.
+
+Visualiza os teus datos mediante gráficos de liñas, gráficos de sectores e informes estatísticos que mostran tendencias, medias móbiles e intervalos entre eventos. Organiza os elementos de seguimento en grupos personalizables que se adapten ás túas necesidades.
+
+Track & Graph agora incorpora unha API de scripts de Lua que che permite crear cálculos personalizados (como totais acumulados, diferenciais ou métricas financeiras).
+
+Track & Graph é totalmente gratuíto e de código aberto, sen anuncios nin contas, e sen funcións de pago. Os teus datos permanecen privados: almacénanse unicamente no teu dispositivo e podes facer copias de seguridade facilmente en calquera momento.

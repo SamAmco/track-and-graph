@@ -1,0 +1,9 @@
+Track & Graph: Panely pre váš život
+
+Track & Graph vám pomáha zaznamenávať, vizualizovať a chápať vzorce vo vašom každodennom živote. Zaznamenávajte číselné hodnoty alebo jednoduché udalosti a vytvárajte osobné panely, ktoré prinášajú prehľad o vašich návykoch, správaní a aktivitách.
+
+Vizualizujte svoje údaje pomocou čiarových grafov, koláčových grafov a štatistických prehľadov, ktoré zobrazujú trendy, kĺzavé priemery a intervaly medzi udalosťami. Usporiadajte položky sledovania do prispôsobiteľných skupín podľa svojich potrieb.
+
+Track & Graph teraz obsahuje skriptovacie API Lua, ktoré vám umožňuje vytvárať vlastné výpočty, napríklad kumulatívne súčty, diferenciály alebo finančné ukazovatele.
+
+Track & Graph je úplne bezplatný a open source, bez reklám a účtov, pričom žiadne funkcie nie sú spoplatnené. Vaše údaje zostávajú súkromné – ukladajú sa iba vo vašom zariadení a kedykoľvek ich môžete jednoducho zálohovať.

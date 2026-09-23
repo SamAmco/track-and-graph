@@ -1,0 +1,9 @@
+Track & Graph: Elämän koontinäytöt
+
+Track & Graph auttaa kirjaamaan, visualisoimaan ja ymmärtämään jokapäiväisen elämäsi kaavoja. Kirjaa numeerisia arvoja tai yksinkertaisia tapahtumia ja luo henkilökohtaisia koontinäyttöjä, jotka tarjoavat tietoa tavoistasi, käyttäytymisestäsi ja toiminnastasi.
+
+Visualisoi tietosi viivakaavioilla, ympyräkaavioilla ja tilastoraporteilla, jotka näyttävät trendit, liukuvat keskiarvot ja tapahtumien väliset aikavälit. Järjestä seurattavat kohteet tarpeisiisi sopiviin mukautettaviin ryhmiin.
+
+Track & Graph sisältää nyt Lua-komentosarja-APIn, jonka avulla voit luoda mukautettuja laskelmia, kuten kumulatiivisia summia, erotuksia tai talousmittareita.
+
+Track & Graph on täysin maksuton ja avoimen lähdekoodin sovellus: siinä ei ole mainoksia tai tilejä, eikä mitään ominaisuuksia ole maksumuurin takana. Tietosi pysyvät yksityisinä – ne tallennetaan vain laitteellesi – ja niistä voi helposti tehdä varmuuskopion milloin tahansa.

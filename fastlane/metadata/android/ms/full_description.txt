@@ -1,0 +1,9 @@
+Track & Graph: Papan pemuka untuk kehidupan
+
+Track & Graph membantu anda merekod, menggambarkan dan memahami corak dalam kehidupan harian. Rekod nilai berangka atau kejadian ringkas untuk membina papan pemuka peribadi yang memberikan cerapan tentang tabiat, tingkah laku dan aktiviti anda.
+
+Gambarkan data anda melalui graf garis, carta pai dan laporan statistik yang memaparkan arah aliran, purata bergerak serta selang antara kejadian. Susun item penjejakan ke dalam kumpulan yang boleh disesuaikan mengikut keperluan anda.
+
+Track & Graph kini menyertakan API penskripan Lua, yang membolehkan anda mencipta pengiraan tersuai seperti jumlah terkumpul, perbezaan atau metrik kewangan.
+
+Track & Graph sepenuhnya percuma dan sumber terbuka, tanpa iklan atau akaun, serta tiada ciri yang dikunci di sebalik bayaran. Data anda kekal peribadi—disimpan hanya pada peranti anda—dan boleh disandarkan dengan mudah pada bila-bila masa.

@@ -1,0 +1,9 @@
+Track & Graph: Përmbledhje për jetën
+
+Track & Graph ju ndihmon të regjistroni, vizualizoni dhe kuptoni modelet e jetës suaj të përditshme. Regjistroni vlera numerike ose ngjarje të thjeshta për të krijuar përmbledhje personale që ofrojnë njohuri mbi zakonet, sjelljet dhe aktivitetet tuaja.
+
+Vizualizoni të dhënat tuaja përmes grafikëve linearë, diagrameve rrethore dhe raporteve statistikore që tregojnë prirjet, mesataret lëvizëse dhe intervalet ndërmjet ngjarjeve. Organizoni elementet e gjurmimit në grupe të personalizueshme që përshtaten me nevojat tuaja.
+
+Track & Graph tani përfshin një API skriptimi Lua, që ju lejon të krijoni llogaritje të personalizuara (si totale kumulative, diferenca ose tregues financiarë).
+
+Track & Graph është plotësisht falas dhe me kod burimor të hapur, pa reklama ose llogari, dhe asnjë veçori nuk është me pagesë. Të dhënat tuaja mbeten private—ruhen vetëm në pajisjen tuaj—dhe mund të krijoni lehtësisht kopje rezervë në çdo kohë.

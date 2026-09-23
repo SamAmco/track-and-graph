@@ -1,9 +1,9 @@
-Track & Graph : Tableaux de bord pour la vie
+Track & Graph : des tableaux de bord pour votre vie
 
-Track & Graph vous aide à enregistrer, visualiser et comprendre les schémas de votre vie quotidienne. Enregistrez des valeurs numériques ou de simples occurrences pour créer des tableaux de bord personnels qui vous donnent des informations sur vos habitudes, comportements et activités.
+Track & Graph vous aide à enregistrer, visualiser et comprendre les tendances de votre quotidien. Enregistrez des valeurs numériques ou de simples occurrences pour créer des tableaux de bord personnels qui vous aident à mieux comprendre vos habitudes, comportements et activités.
 
-Visualisez vos données à l’aide de graphiques linéaires, de graphiques circulaires et de rapports statistiques qui montrent les tendances, les moyennes mobiles et les intervalles entre les événements. Organisez les éléments de suivi en groupes personnalisables adaptés à vos besoins.
+Visualisez vos données grâce à des graphiques linéaires, des diagrammes circulaires et des rapports statistiques présentant les tendances, les moyennes mobiles et les intervalles entre les événements. Organisez vos éléments de suivi en groupes personnalisables adaptés à vos besoins.
 
-Track & Graph inclut désormais une API de scripting Lua, qui vous permet de créer des calculs personnalisés (comme des totaux cumulés, des différences ou des métriques financières).
+Track & Graph intègre désormais une API de scripts Lua, qui vous permet de créer des calculs personnalisés (comme des totaux cumulés, des différences ou des indicateurs financiers).
 
-Track & Graph est entièrement gratuit et open source, sans publicité, compte ni achat intégré. Vos données restent privées : elles sont stockées uniquement sur votre appareil et peuvent être sauvegardées facilement à tout moment.
+Track & Graph est entièrement gratuit et open source : aucune publicité ni aucun compte, et aucune fonctionnalité payante. Vos données restent privées : elles sont stockées uniquement sur votre appareil et peuvent être sauvegardées facilement à tout moment.

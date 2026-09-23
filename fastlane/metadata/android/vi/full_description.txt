@@ -1,0 +1,9 @@
+Track & Graph: Bảng điều khiển cho cuộc sống
+
+Track & Graph giúp bạn ghi lại, trực quan hóa và hiểu các xu hướng trong cuộc sống hằng ngày. Ghi lại các giá trị số hoặc những lần xảy ra đơn giản để xây dựng bảng điều khiển cá nhân, cung cấp thông tin chi tiết về thói quen, hành vi và hoạt động của bạn.
+
+Trực quan hóa dữ liệu bằng biểu đồ đường, biểu đồ tròn và báo cáo thống kê, cho thấy xu hướng, đường trung bình động và khoảng thời gian giữa các sự kiện. Sắp xếp các mục theo dõi vào những nhóm có thể tùy chỉnh, phù hợp với nhu cầu của bạn.
+
+Track & Graph nay tích hợp API lập trình Lua, cho phép bạn tạo các phép tính tùy chỉnh (như tổng lũy kế, sai phân hoặc chỉ số tài chính).
+
+Track & Graph hoàn toàn miễn phí và là phần mềm mã nguồn mở, không có quảng cáo hay tài khoản, và không có tính năng nào bị khóa sau hình thức trả phí. Dữ liệu của bạn luôn riêng tư—chỉ được lưu trên thiết bị của bạn—và có thể dễ dàng sao lưu bất cứ lúc nào.

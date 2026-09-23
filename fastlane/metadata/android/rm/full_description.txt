@@ -1,0 +1,9 @@
+Track & Graph: Dashboards per la vita
+
+Track & Graph ta gida a registrar, visualisar e chapir ils patterns da tia vita quotidiana. Registra valurs numericas u simplas occurrenzas per crear dashboards persunals che dattan invistas en tes disads, cumportaments ed activitads.
+
+Visualisescha tes datas cun grafics linears, diagrams circulars e rapports statistics che mussan tendenzas, medias moviblas ed intervals tranter eveniments. Organisescha ils elements da registraziun en gruppas persunalisablas che correspundan a tes basegns.
+
+Track & Graph cuntegna ussa in'API da scripting Lua, che ta permetta da crear calculaziuns persunalisadas (sco totals cumulativs, differenzials u metrics finanzials).
+
+Track & Graph è cumplettamain gratuit e open source, senza reclamas u contos, e naginas funcziuns n'èn pajablas. Tes datas restan privatas—vegnan memorisadas mo sin tes apparat—e pon vegnir segiradas facilmain en mintga mument.

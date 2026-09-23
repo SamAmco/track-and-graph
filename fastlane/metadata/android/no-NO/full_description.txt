@@ -1,0 +1,9 @@
+Track & Graph: Dashbord for livet
+
+Track & Graph hjelper deg med å registrere, visualisere og forstå mønstre i hverdagen. Registrer numeriske verdier eller enkle hendelser for å lage personlige dashbord som gir innsikt i vanene, atferden og aktivitetene dine.
+
+Visualiser dataene dine med linjediagrammer, sektordiagrammer og statistiske rapporter som viser trender, glidende gjennomsnitt og intervaller mellom hendelser. Organiser det du følger med på, i tilpassbare grupper som passer behovene dine.
+
+Track & Graph har nå et innebygd Lua-skript-API som lar deg lage egendefinerte beregninger, for eksempel kumulative totaler, differanser eller økonomiske nøkkeltall.
+
+Track & Graph er helt gratis og åpen kildekode, uten reklame eller kontoer, og ingen funksjoner er betalingslåst. Dataene dine forblir private – de lagres bare på enheten din – og kan enkelt sikkerhetskopieres når som helst.

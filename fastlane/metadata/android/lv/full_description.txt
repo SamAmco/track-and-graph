@@ -1,0 +1,9 @@
+Track & Graph: Informācijas paneļi tavai dzīvei!
+
+Track & Graph palīdz reģistrēt, vizualizēt un izprast ikdienas dzīves tendences. Reģistrē skaitliskas vērtības vai vienkāršus notikumus, lai izveidotu personiskus informācijas paneļus, kas sniedz ieskatu tavos ieradumos, uzvedībā un aktivitātēs.
+
+Vizualizē savus datus līniju diagrammās, sektoru diagrammās un statistikas pārskatos, kuros redzamas tendences, slīdošie vidējie rādītāji un intervāli starp notikumiem. Organizē uzskaites vienumus pielāgojamās grupās, kas atbilst tavām vajadzībām.
+
+Track & Graph tagad ietver Lua skriptēšanas API, kas ļauj izveidot pielāgotus aprēķinus, piemēram, kumulatīvās kopsummas, izmaiņu aprēķinus vai finanšu rādītājus.
+
+Track & Graph ir pilnībā bezmaksas un atvērtā pirmkoda lietotne bez reklāmām un kontiem; neviena funkcija nav pieejama tikai par maksu. Tavi dati paliek privāti — tie tiek glabāti tikai tavā ierīcē, un tos jebkurā laikā var viegli dublēt.

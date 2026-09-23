@@ -1,0 +1,9 @@
+Track & Graph: Mælaborð fyrir lífið
+
+Track & Graph hjálpar þér að skrá, sjá og skilja mynstur í daglegu lífi þínu. Skráðu tölugildi eða einfaldar uppákomur til að byggja persónuleg mælaborð sem veita innsýn í venjur, hegðun og athafnir.
+
+Skoðaðu gögnin þín með línuritum, kökuritum og tölfræðiskýrslum sem sýna þróun, hreyfanleg meðaltöl og bil milli atburða. Skipuleggðu skráningar í sérsniðna hópa sem henta þínum þörfum.
+
+Track & Graph inniheldur nú Lua-forritaskil sem gera þér kleift að búa til sérsniðna útreikninga, svo sem uppsafnaðar heildartölur, mismunareikninga eða fjármálamælikvarða.
+
+Track & Graph er algjörlega ókeypis og opinn hugbúnaður, án auglýsinga eða aðgangsreikninga, og engir eiginleikar eru læstir á bak við greiðslu. Gögnin þín eru áfram einkamál — þau eru aðeins geymd í tækinu þínu — og auðvelt er að taka afrit af þeim hvenær sem er.

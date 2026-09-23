@@ -1,0 +1,9 @@
+Track & Graph: Přehledy pro váš život
+
+Track & Graph vám pomáhá zaznamenávat, vizualizovat a chápat vzorce ve vašem každodenním životě. Zaznamenávejte číselné hodnoty nebo jednoduché události a vytvářejte osobní přehledy, které vám pomohou lépe porozumět vašim návykům, chování a aktivitám.
+
+Vizualizujte svá data pomocí spojnicových grafů, koláčových grafů a statistických přehledů, které zobrazují trendy, klouzavé průměry a intervaly mezi událostmi. Uspořádejte sledované položky do přizpůsobitelných skupin podle svých potřeb.
+
+Track & Graph nyní obsahuje skriptovací API Lua, které vám umožňuje vytvářet vlastní výpočty, například kumulativní součty, diference nebo finanční metriky.
+
+Track & Graph je zcela zdarma a open source, bez reklam a účtů a bez funkcí uzamčených za platbou. Vaše data zůstávají soukromá — ukládají se pouze ve vašem zařízení — a kdykoli je lze snadno zálohovat.

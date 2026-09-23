@@ -1,0 +1,9 @@
+Track & Graph: Armatuurlauad sinu elu jaoks!
+
+Track & Graph aitab sul igapäevaelu mustreid salvestada, visualiseerida ja mõista. Salvesta arvväärtusi või lihtsaid sündmusi, et koostada isiklikke armatuurlaudu, mis annavad ülevaate sinu harjumustest, käitumisest ja tegevustest.
+
+Visualiseeri oma andmeid joondiagrammide, sektordiagrammide ja statistiliste aruannete abil, mis näitavad trende, libisevaid keskmisi ja sündmuste vahelisi ajavahemikke. Korralda jälgitavad üksused kohandatavatesse rühmadesse vastavalt oma vajadustele.
+
+Track & Graph sisaldab nüüd Lua skriptimis-API-t, mis võimaldab luua kohandatud arvutusi (nt kumulatiivseid kogusummasid, diferentsiaale või finantsnäitajaid).
+
+Track & Graph on täiesti tasuta ja avatud lähtekoodiga: selles pole reklaame ega kontosid ning ükski funktsioon pole tasuline. Sinu andmed jäävad privaatseks – neid säilitatakse ainult sinu seadmes ning neid saab igal ajal hõlpsalt varundada.

@@ -1,0 +1,9 @@
+Track & Graph: Dasbor untuk kehidupan Anda
+
+Track & Graph membantu Anda mencatat, memvisualisasikan, dan memahami pola dalam kehidupan sehari-hari. Catat nilai numerik atau kejadian sederhana untuk membuat dasbor pribadi yang memberikan wawasan tentang kebiasaan, perilaku, dan aktivitas Anda.
+
+Visualisasikan data Anda melalui grafik garis, diagram lingkaran, dan laporan statistik yang menampilkan tren, rata-rata bergerak, serta interval antar-kejadian. Atur item pelacakan ke dalam grup yang dapat disesuaikan sesuai kebutuhan Anda.
+
+Track & Graph kini menyertakan API skrip Lua, sehingga Anda dapat membuat perhitungan khusus (seperti total kumulatif, diferensial, atau metrik keuangan).
+
+Track & Graph sepenuhnya gratis dan bersumber terbuka, tanpa iklan atau akun, serta tanpa fitur berbayar. Data Anda tetap pribadi—disimpan hanya di perangkat Anda—dan dapat dicadangkan dengan mudah kapan saja.

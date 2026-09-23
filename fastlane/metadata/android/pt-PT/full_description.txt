@@ -1,0 +1,9 @@
+Track & Graph: Painéis para a sua vida
+
+Track & Graph ajuda a registar, visualizar e compreender padrões do seu dia a dia. Registe valores numéricos ou ocorrências simples para criar painéis pessoais que oferecem insights sobre os seus hábitos, comportamentos e atividades.
+
+Visualize os seus dados através de gráficos de linhas, gráficos circulares e relatórios estatísticos que mostram tendências, médias móveis e intervalos entre eventos. Organize os itens de acompanhamento em grupos personalizáveis que façam sentido para as suas necessidades.
+
+Track & Graph inclui agora uma API de scripts Lua, permitindo criar cálculos personalizados (como totais acumulados, diferenciais ou métricas financeiras).
+
+Track & Graph é totalmente gratuito e de código aberto, sem anúncios nem contas, e sem funcionalidades pagas. Os seus dados permanecem privados — armazenados apenas no seu dispositivo — e podem ser facilmente salvaguardados a qualquer momento.

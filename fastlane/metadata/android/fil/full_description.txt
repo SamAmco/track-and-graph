@@ -1,0 +1,9 @@
+Track & Graph: Mga dashboard para sa buhay
+
+Tinutulungan ka ng Track & Graph na itala, gawing biswal, at unawain ang mga pattern sa iyong pang-araw-araw na buhay. Magtala ng mga numerikal na halaga o simpleng pangyayari upang bumuo ng mga personal na dashboard na nagbibigay ng mga insight tungkol sa iyong mga gawi, kilos, at aktibidad.
+
+I-visualize ang iyong data gamit ang mga line graph, pie chart, at ulat na estadistikal na nagpapakita ng mga trend, moving average, at mga pagitan ng mga kaganapan. Ayusin ang mga item sa pagsubaybay sa mga nako-customize na grupo na angkop sa iyong mga pangangailangan.
+
+May naka-embed na ngayong Lua scripting API ang Track & Graph, na nagbibigay-daan sa iyong gumawa ng mga custom na kalkulasyon (gaya ng pinagsama-samang kabuuan, mga differential, o mga panukat sa pananalapi).
+
+Ganap na libre at open source ang Track & Graph, walang mga ad o account, at walang feature na naka-paywall. Mananatiling pribado ang iyong data—nakaimbak lamang sa iyong device—at madali itong mai-back up anumang oras.
