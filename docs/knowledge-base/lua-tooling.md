@@ -1,12 +1,12 @@
 ---
 title: Lua tooling, build process, publishing, and adding new config types
-description: Directory structure for lua/, building the function catalog (pack-functions.lua), validation and inspection tools, debug/prod catalog publishing, and the complete list of 7 implementation + 5 test files to update when adding a new configuration type.
+description: Directory structure for lua/, building the function catalog (pack-functions.lua), validation and inspection tools, debug/prod catalog publishing, and the complete list of 8 implementation + 5 test files to update when adding a new configuration type.
 topics:
   - Directory: lua/src/community/functions/, lua/catalog/, lua/tools/, lua/src/tng/
   - Build catalog: lua tools/pack-functions.lua → catalog/community-functions.lua
   - Validation tools: verify-api-specs, validate-functions, pack-functions, detect-changes
   - Catalog publish: make lua-publish-debug / make lua-publish-prod rebuild before signing; direct Lua publish scripts only sign existing catalog
-  - Adding config types: 7 implementation files + 5 test files must ALL be updated
+  - Adding config types: 8 implementation files + 5 test files must ALL be updated
 keywords: [lua, tooling, build, pack-functions, catalog, luarocks, serpent, validation, config-types, debug-publish, prod-publish, publish-functions-prod, api-specs, make]
 ---
 
@@ -48,15 +48,30 @@ their inline copy. `scripts/translations/translate_lua_catalog.py` regenerates
 one explicitly selected function at a time, reusing the shared language
 manifest, domain brief, and provider adapter, then emits validated drafts under
 `build/translation-drafts/lua`. Generation is paid but does not edit source.
-Apply a reviewed, complete draft separately with
-`make lua-translations-apply DRAFT=…`; partial language suites and partial
-functions are rejected.
+It writes both machine-readable `draft.json` and paste-ready `draft.lua`.
+Reviewers can copy the Lua manually or apply the JSON separately with
+`make lua-translations-apply DRAFT=…`; the apply command makes no API call and
+rejects partial language suites or partial functions. Draft JSON contains
+translation IDs and values, not writable paths. The apply step re-executes the
+current source modules, maps IDs back to their source files, and replaces only
+the expected title, description, and inline config-name tables (or selected
+shared records).
+
+The exporter uses `tools/lib/json.lua`, a small dependency-free, encode-only
+JSON bridge to Python. It is tooling-only: it is not shipped in the Android app,
+does not parse provider responses, and is not part of the published catalog.
 
 Shared copy is stored as editable records in
 `lua/src/community/shared-translations-data.lua`. The normal
 `shared-translations.lua` wrapper indexes and strictly validates those records.
 This separation lets draft tooling inspect a newly added English-only record
 without weakening runtime or release validation.
+
+The shared language manifest must begin with English, and both its Python and
+Lua readers reject it otherwise. Generated function tables list English first;
+shared records list `_id`, then English, then the remaining manifest languages.
+This source order is for review and navigation only—Lua tables and the parsed
+Kotlin maps are unordered at runtime.
 
 Prefer the `make` targets when publishing. `make lua-publish-debug` and `make lua-publish-prod` depend on `lua-pack-functions`, so they rebuild `lua/catalog/community-functions.lua` before signing. Running `lua tools/publish-functions-debug.lua` or `lua tools/publish-functions-prod.lua` directly only signs/copies the existing catalog file; if you skip packing first, you can publish stale catalog content.
 
@@ -114,7 +129,7 @@ Commit the catalog and signature together. Production clients fetch those files 
 
 ## Adding New Configuration Types
 
-7 files + 5 test files to update when adding new config types (text, number, checkbox, enum, etc.):
+8 files + 5 test files to update when adding new config types (text, number, checkbox, enum, etc.):
 
 **Core Implementation:**
 1. `LuaFunctionConfigSpec` - Data DTO (what Lua defines)

@@ -134,9 +134,10 @@ copy reuse those pieces but keep format-specific extraction and validation.
 
 Lua translation is also an explicitly requested paid operation. Use
 `make lua-translations-function FUNCTION=<id>` for the normal one-function
-workflow, `make lua-translations-shared` for incomplete shared records, or the
-plural/all-shared targets only for a deliberate migration. Functions regenerate
-every inline field and requested locale because there is no source-hash state.
-Responses are retained, structurally validated, and rendered as paste-ready
-Lua. Invalid batches get a `.failure.lua` with recovered values and marked
-English fallbacks. Source application is a separate reviewed command.
+workflow or `make lua-translations-shared` for incomplete shared records.
+`--all-shared` exists only for deliberate full regeneration; there is no bulk
+all-functions command. Functions regenerate every inline field and requested
+locale because there is no source-hash state. Responses are retained,
+structurally validated, and rendered as paste-ready Lua. Invalid batches get a
+`.failure.lua` with recovered values and marked English fallbacks. Source
+application is a separate reviewed command.

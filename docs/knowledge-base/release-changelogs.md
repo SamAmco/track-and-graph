@@ -1,6 +1,6 @@
 ---
 title: Release changelogs — workflow, structure, and Play Store limits
-description: Snapshot version revisions; public and Play Store changelogs; creation, preview, and localization workflows; limits; and index.json maintenance.
+description: Snapshot version revisions; public and Play Store changelogs; creation, preview, translation, locale-aware in-app download, limits, and index.json maintenance.
 topics:
   - Snapshot releases: guarded make target increments snapshots or interactively starts a major, minor, or patch snapshot in a dedicated jj revision
   - make changelog: lua script creates temp file, opens in nvim, processes output
@@ -10,7 +10,8 @@ topics:
   - Play Store limit: 500 characters per language for "What's new" text
   - GitHub releases: prefer public English markdown via gh --notes-file, fall back to English Fastlane text for patches
   - Changelog viewer app: paste markdown and preview the shared dialog plus FOSS and mock Play support flows
-  - Locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
+  - make changelog seed locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
+  - Runtime locale selection: BCP 47 language-and-script match, one Markdown download per release, English fallback
   - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
   - API translation: full Markdown per locale, domain brief, deterministic validation, explicit invocation only
 keywords: [changelog, release, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
@@ -61,7 +62,13 @@ Runs `scripts/new_changelog.lua` which:
    - Public changelogs + `changelogs/index.json` update (only if `publish = true`)
 6. Validates `index.json` against `changelogs/index.schema.json` when public changelogs are published
 
-The lua template has entries for all 4 locales with `regional` (e.g. `en-GB`) and `general` (e.g. `en`) locale codes. Regional codes are used for fastlane directory paths, general codes for public changelog filenames.
+The Lua template seeds English, Spanish, French, and German entries with
+`regional` (e.g. `en-GB`) and `general` (e.g. `en`) locale codes. Regional codes
+are used for Fastlane directory paths; general codes are used for public
+changelog filenames. This four-locale seed set belongs to changelog creation,
+not the translation target list. The API translation workflow uses the shared
+language manifest, and every published locale path must be added to the public
+changelog index.
 
 The `publish` flag controls whether full public markdown is created and listed in `changelogs/index.json`, which is what makes the full-screen in-app release notes available to users after update. Patch releases can use `publish = false` to avoid the in-app dialog and reuse the short English Fastlane changelog for GitHub.
 
@@ -73,7 +80,7 @@ The footer layout, localized support copy, support assets, thank-you content, di
 
 ## Copy Editing and Translation
 
-When iterating on public changelog copy, treat the English markdown as the source text. Finalize wording there before translating the other locale files; this avoids doing the same copy edits four times. Locale files may exist as placeholders before translation.
+When iterating on public changelog copy, treat the English markdown as the source text. Finalize wording there before translating the target locale files; this avoids repeating copy edits across the full suite. Locale files may exist as placeholders before translation.
 
 When translating, check string resources for official UI terms before choosing feature names or labels. This matters for both old features and newly released UI, not only for terms called out in this document.
 
@@ -112,7 +119,7 @@ were repaired locally by restoring the missing emphasis, then passed validation
 without another API call. Keep deterministic validation and manually spot-check
 meaning and script consistency before publishing.
 
-## Locales
+## `make changelog` seed locales
 
 | Regional | General | String resources dir |
 |----------|---------|---------------------|
@@ -127,9 +134,14 @@ When translating changelogs, check string resources for official translations of
 
 Located at `changelogs/index.json`, maps version names to locale-specific markdown paths for in-app release notes. Updated automatically by the lua script when `publish = true`. Validated against `changelogs/index.schema.json`.
 
+The schema requires English for every release and accepts other BCP 47 locale
+keys; it does not contain a four-language allowlist.
+
 The app downloads the index, selects the best available locale for each
 release using the current app locale preference order and BCP 47
 language-and-script matching, and downloads only that Markdown file. English
 is the explicit fallback when no preferred locale is available. Each selected
 locale is cached separately with its ETag; the app does not download every
-locale listed in the index.
+locale listed in the index. Locale selection happens in the repository, so the
+repository and view-model release-note contracts carry the already-localized
+Markdown as a plain string rather than a multi-locale `TranslatedString`.
