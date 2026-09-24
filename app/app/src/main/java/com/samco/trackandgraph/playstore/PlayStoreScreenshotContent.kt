@@ -26,9 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.addcomponent.ComponentTypeSelectionScreen
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.functions.FunctionsScreenContent
 import com.samco.trackandgraph.graphstatview.ui.LocalLastValueCurrentTime
 import com.samco.trackandgraph.group.FunctionClickListeners
@@ -107,7 +109,7 @@ internal fun PlayStoreDailyGroupScreenshotContent() {
 internal fun PlayStoreExerciseScreenshotContent() {
     TnGComposeTheme {
         PlayStorePreviewEnvironment {
-            PlayStoreGroupFrame(title = "Exercise") {
+            PlayStoreGroupFrame(title = stringResource(R.string.play_store_fixture_exercise)) {
                 GroupScreenView(
                     lazyGridState = rememberLazyGridState(),
                     isLoading = false,
@@ -152,7 +154,7 @@ internal fun PlayStoreRestDayStatisticsScreenshotContent() {
     TnGComposeTheme {
         CompositionLocalProvider(LocalLastValueCurrentTime provides playStorePreviewCurrentTime) {
             PlayStorePreviewEnvironment {
-                PlayStoreGroupFrame(title = "Rest day statistics") {
+                PlayStoreGroupFrame(title = stringResource(R.string.play_store_fixture_rest_day_statistics)) {
                     GroupScreenView(
                         lazyGridState = rememberLazyGridState(),
                         isLoading = false,
@@ -177,7 +179,7 @@ internal fun PlayStoreFlexibleOrganisationScreenshotContent() {
     TnGComposeTheme {
         PlayStorePreviewEnvironment {
             Box(modifier = Modifier.fillMaxSize()) {
-                PlayStoreGroupFrame(title = "Push / Pull Workout") {
+                PlayStoreGroupFrame(title = stringResource(R.string.play_store_fixture_push_pull_workout)) {
                     GroupScreenView(
                         lazyGridState = rememberLazyGridState(),
                         isLoading = false,
@@ -256,7 +258,12 @@ internal fun PlayStoreRemindersScreenshotContent() {
 internal fun PlayStoreFunctionEditorScreenshotContent() {
     TnGComposeTheme {
         PlayStorePreviewEnvironment {
-            val state = remember { PlayStoreFunctionEditorState() }
+            val exercise = stringResource(R.string.play_store_fixture_exercise)
+            val running = stringResource(R.string.play_store_fixture_running)
+            val cycling = stringResource(R.string.play_store_fixture_cycling)
+            val state = remember(exercise, running, cycling) {
+                PlayStoreFunctionEditorState(exercise, running, cycling)
+            }
 
             FunctionsScreenContent(
                 onPopBack = {},
@@ -294,7 +301,7 @@ internal fun PlayStoreFunctionEditorScreenshotContent() {
 
 @Composable
 internal fun PlayStoreDailyGroup() {
-    PlayStoreGroupFrame(title = "Daily") {
+    PlayStoreGroupFrame(title = stringResource(R.string.play_store_fixture_daily)) {
         GroupScreenView(
             lazyGridState = rememberLazyGridState(),
             isLoading = false,

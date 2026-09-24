@@ -18,10 +18,12 @@ package com.samco.trackandgraph.playstore
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointTutorialViewModel
 import com.samco.trackandgraph.adddatapoint.AddDataPointViewModel
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
@@ -41,7 +43,11 @@ import org.threeten.bp.OffsetDateTime
 
 @Composable
 internal fun PlayStoreAddStressDialogOverlay() {
-    val viewModel = remember { PlayStoreAddStressDialogViewModel() }
+    val dailyChildren = playStoreDailyChildren()
+    val stressSuggestions = playStoreStressSuggestions()
+    val viewModel = remember(dailyChildren, stressSuggestions) {
+        PlayStoreAddStressDialogViewModel(dailyChildren, stressSuggestions)
+    }
     AddDataPointsDialog(
         viewModel = viewModel,
         dialogWidth = 330.dp,
@@ -49,7 +55,10 @@ internal fun PlayStoreAddStressDialogOverlay() {
     )
 }
 
-internal class PlayStoreAddStressDialogViewModel : AddDataPointsViewModel {
+internal class PlayStoreAddStressDialogViewModel(
+    dailyChildren: List<GroupChild>,
+    stressSuggestions: List<SuggestedValueViewData>,
+) : AddDataPointsViewModel {
     override val hidden: LiveData<Boolean> = MutableLiveData(false)
     override val showTutorial: LiveData<Boolean> = MutableLiveData(false)
     override val updateMode: LiveData<Boolean> = MutableLiveData(false)
@@ -60,13 +69,13 @@ internal class PlayStoreAddStressDialogViewModel : AddDataPointsViewModel {
     override val showCancelConfirmDialog: LiveData<Boolean> = MutableLiveData(false)
     override val dismissEvents: Flow<Unit> = emptyFlow()
     override val pageViewModels: StateFlow<List<AddDataPointViewModel>> = MutableStateFlow(
-        playStoreDailyChildren()
+        dailyChildren
             .filterIsInstance<GroupChild.ChildTracker>()
             .map { child ->
                 PlayStoreAddDataPointViewModel(
                     name = child.displayTracker.name,
                     tracker = child.displayTracker.toTracker(),
-                    suggestedValues = if (child.displayTracker.name == "Stress") playStoreStressSuggestions()
+                    suggestedValues = if (child.id == PLAY_STORE_STRESS_TRACKER_ID) stressSuggestions
                     else emptyList(),
                 )
             }
@@ -138,9 +147,12 @@ internal fun DisplayTracker.toTracker() = Tracker(
     defaultLabel = defaultLabel,
 )
 
+private const val PLAY_STORE_STRESS_TRACKER_ID = 9L
+
+@Composable
 internal fun playStoreStressSuggestions() = listOf(
-    SuggestedValueViewData(value = 0.0, valueStr = "0", label = "None"),
-    SuggestedValueViewData(value = 1.0, valueStr = "1", label = "Low"),
-    SuggestedValueViewData(value = 2.0, valueStr = "2", label = "Medium"),
-    SuggestedValueViewData(value = 3.0, valueStr = "3", label = "High"),
+    SuggestedValueViewData(value = 0.0, valueStr = "0", label = stringResource(R.string.play_store_fixture_none)),
+    SuggestedValueViewData(value = 1.0, valueStr = "1", label = stringResource(R.string.play_store_fixture_low)),
+    SuggestedValueViewData(value = 2.0, valueStr = "2", label = stringResource(R.string.play_store_fixture_medium)),
+    SuggestedValueViewData(value = 3.0, valueStr = "3", label = stringResource(R.string.play_store_fixture_high)),
 )

@@ -16,9 +16,12 @@
  */
 package com.samco.trackandgraph.playstore
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.TextFieldValue
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.DataPoint
@@ -49,18 +52,19 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
+@Composable
 internal fun playStoreDailyChildren(): List<GroupChild> {
     val trackedAt = OffsetDateTime.of(2026, 5, 7, 22, 0, 0, 0, ZoneOffset.UTC)
     val trackerSpecs = listOf(
-        TrackerSpec("Sleep", DataType.DURATION, false, ""),
-        TrackerSpec("Productivity", DataType.CONTINUOUS, false, ""),
-        TrackerSpec("Alcohol", DataType.CONTINUOUS, false, ""),
-        TrackerSpec("Meditation", DataType.DURATION, false, ""),
-        TrackerSpec("Work", DataType.DURATION, false, ""),
-        TrackerSpec("Weight", DataType.CONTINUOUS, false, ""),
-        TrackerSpec("Exercise", DataType.CONTINUOUS, true, "1"),
-        TrackerSpec("Studying", DataType.DURATION, false, ""),
-        TrackerSpec("Stress", DataType.CONTINUOUS, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_sleep), DataType.DURATION, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_productivity), DataType.CONTINUOUS, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_alcohol), DataType.CONTINUOUS, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_meditation), DataType.DURATION, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_work), DataType.DURATION, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_weight), DataType.CONTINUOUS, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_exercise), DataType.CONTINUOUS, true, "1"),
+        TrackerSpec(stringResource(R.string.play_store_fixture_studying), DataType.DURATION, false, ""),
+        TrackerSpec(stringResource(R.string.play_store_fixture_stress), DataType.CONTINUOUS, false, ""),
     )
 
     return trackerSpecs.mapIndexed { index, spec ->
@@ -77,7 +81,7 @@ internal fun playStoreDailyChildren(): List<GroupChild> {
                 defaultValue = if (spec.hasDefaultValue) 1.0 else 0.0,
                 defaultLabel = spec.defaultLabel,
                 timestamp = trackedAt.minusHours(index.toLong()),
-                description = "Just random data",
+                description = stringResource(R.string.play_store_fixture_random_data_description),
                 timerStartInstant = null,
                 unique = true,
             )
@@ -85,6 +89,7 @@ internal fun playStoreDailyChildren(): List<GroupChild> {
     }
 }
 
+@Composable
 internal fun playStoreExerciseChildren(): List<GroupChild> =
     exerciseWavePoints().let { exercise ->
         val illness = illnessWavePoints()
@@ -96,10 +101,10 @@ internal fun playStoreExerciseChildren(): List<GroupChild> =
                     time = 0L,
                     viewData = lineGraphViewData(
                         id = 1L,
-                        name = "Exercise weekly totals in the last 6 months",
+                        name = stringResource(R.string.play_store_fixture_exercise_weekly_totals),
                         lines = listOf(
                             PreviewLine(
-                                name = "Exercise",
+                                name = stringResource(R.string.play_store_fixture_exercise),
                                 colorIndex = 0,
                                 pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
                                 values = weeklyTotals(exercise, numberOfWeeks = 26)
@@ -115,28 +120,28 @@ internal fun playStoreExerciseChildren(): List<GroupChild> =
                     time = 0L,
                     viewData = lineGraphViewData(
                         id = 2L,
-                        name = "Exercise Vs illness moving averages in the last 6 months",
+                        name = stringResource(R.string.play_store_fixture_exercise_vs_illness),
                         lines = listOf(
                             PreviewLine(
-                                name = "Weekly",
+                                name = stringResource(R.string.play_store_fixture_weekly),
                                 colorIndex = 7,
                                 pointStyle = LineGraphPointStyle.NONE,
                                 values = sampledMovingAverage(exercise, windowDays = 7, numberOfWeeks = 26)
                             ),
                             PreviewLine(
-                                name = "Monthly",
+                                name = stringResource(R.string.play_store_fixture_monthly),
                                 colorIndex = 0,
                                 pointStyle = LineGraphPointStyle.NONE,
                                 values = sampledMovingAverage(exercise, windowDays = 30, numberOfWeeks = 26)
                             ),
                             PreviewLine(
-                                name = "Yearly",
+                                name = stringResource(R.string.play_store_fixture_yearly),
                                 colorIndex = 3,
                                 pointStyle = LineGraphPointStyle.NONE,
                                 values = sampledMovingAverage(exercise, windowDays = 365, numberOfWeeks = 26)
                             ),
                             PreviewLine(
-                                name = "Sick day (weekly)",
+                                name = stringResource(R.string.play_store_fixture_sick_day_weekly),
                                 colorIndex = 11,
                                 pointStyle = LineGraphPointStyle.NONE,
                                 values = sampledMovingAverage(illness, windowDays = 7, numberOfWeeks = 26)
@@ -149,9 +154,11 @@ internal fun playStoreExerciseChildren(): List<GroupChild> =
         )
     }
 
+@Composable
 internal fun playStoreWorkoutChildren(): List<GroupChild> {
     val trackedAt = OffsetDateTime.of(2026, 5, 8, 8, 30, 0, 0, ZoneOffset.UTC)
 
+    @Composable
     fun tracker(id: Long, name: String, defaultValue: Double) = GroupChild.ChildTracker(
         groupItemId = id,
         id = id,
@@ -162,9 +169,9 @@ internal fun playStoreWorkoutChildren(): List<GroupChild> {
             dataType = DataType.CONTINUOUS,
             hasDefaultValue = true,
             defaultValue = defaultValue,
-            defaultLabel = "reps",
+            defaultLabel = stringResource(R.string.play_store_fixture_reps),
             timestamp = trackedAt.minusDays(2),
-            description = "Workout repetitions",
+            description = stringResource(R.string.play_store_fixture_workout_repetitions),
             timerStartInstant = null,
             unique = true,
         )
@@ -183,22 +190,22 @@ internal fun playStoreWorkoutChildren(): List<GroupChild> {
         )
 
     return listOf(
-        tracker(id = 2L, name = "Push-ups", defaultValue = 20.0),
-        tracker(id = 3L, name = "Pull-ups", defaultValue = 8.0),
+        tracker(id = 2L, name = stringResource(R.string.play_store_fixture_push_ups), defaultValue = 20.0),
+        tracker(id = 3L, name = stringResource(R.string.play_store_fixture_pull_ups), defaultValue = 8.0),
         graphChild(
             id = 4L,
             viewData = lineGraphViewData(
                 id = 4L,
-                name = "Push / pull progress",
+                name = stringResource(R.string.play_store_fixture_push_pull_progress),
                 lines = listOf(
                     PreviewLine(
-                        name = "Push-ups",
+                        name = stringResource(R.string.play_store_fixture_push_ups),
                         colorIndex = 0,
                         pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
                         values = listOf(12.0, 14.0, 15.0, 17.0, 16.0, 19.0, 20.0),
                     ),
                     PreviewLine(
-                        name = "Pull-ups",
+                        name = stringResource(R.string.play_store_fixture_pull_ups),
                         colorIndex = 7,
                         pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
                         values = listOf(4.0, 5.0, 5.0, 6.0, 7.0, 7.0, 8.0),
@@ -207,15 +214,15 @@ internal fun playStoreWorkoutChildren(): List<GroupChild> {
                 yTo = 24.0,
             )
         ),
-        group(id = 5L, name = "Push exercises", colorIndex = 11),
-        group(id = 6L, name = "Pull exercises", colorIndex = 6),
+        group(id = 5L, name = stringResource(R.string.play_store_fixture_push_exercises), colorIndex = 11),
+        group(id = 6L, name = stringResource(R.string.play_store_fixture_pull_exercises), colorIndex = 6),
         GroupChild.ChildReminder(
             groupItemId = 1L,
             id = 1L,
             reminder = ReminderViewData.WeekDayReminderViewData(
                 id = 1L,
                 groupItemId = 1L,
-                name = "Push / pull workout",
+                name = stringResource(R.string.play_store_fixture_push_pull_workout),
                 enabled = true,
                 nextScheduled = LocalDateTime.of(2026, 5, 8, 18, 0),
                 checkedDays = CheckedDays(
@@ -233,17 +240,18 @@ internal fun playStoreWorkoutChildren(): List<GroupChild> {
     )
 }
 
+@Composable
 internal fun playStoreRestDayStatisticsChildren(): List<GroupChild> = listOf(
     graphChild(
         id = 1L,
         viewData = pieChartViewData(
             id = 1L,
-            name = "Stress pie chart",
+            name = stringResource(R.string.play_store_fixture_stress_pie_chart),
             segments = listOf(
-                IPieChartViewData.Segment(21.0, "None", ColorSpec.ColorIndex(0)),
-                IPieChartViewData.Segment(34.0, "Low", ColorSpec.ColorIndex(7)),
-                IPieChartViewData.Segment(30.0, "Medium", ColorSpec.ColorIndex(3)),
-                IPieChartViewData.Segment(15.0, "High", ColorSpec.ColorIndex(11)),
+                IPieChartViewData.Segment(21.0, stringResource(R.string.play_store_fixture_none), ColorSpec.ColorIndex(0)),
+                IPieChartViewData.Segment(34.0, stringResource(R.string.play_store_fixture_low), ColorSpec.ColorIndex(7)),
+                IPieChartViewData.Segment(30.0, stringResource(R.string.play_store_fixture_medium), ColorSpec.ColorIndex(3)),
+                IPieChartViewData.Segment(15.0, stringResource(R.string.play_store_fixture_high), ColorSpec.ColorIndex(11)),
             )
         )
     ),
@@ -251,7 +259,7 @@ internal fun playStoreRestDayStatisticsChildren(): List<GroupChild> = listOf(
         id = 2L,
         viewData = lastValueViewData(
             id = 2L,
-            name = "Time since taking a day off",
+            name = stringResource(R.string.play_store_fixture_time_since_day_off),
             dataPoint = DataPoint(
                 timestamp = PREVIEW_END_TIME.minusDays(2).minusHours(2).minusMinutes(43),
                 featureId = 200L,
@@ -265,17 +273,18 @@ internal fun playStoreRestDayStatisticsChildren(): List<GroupChild> = listOf(
         id = 3L,
         viewData = timeHistogramViewData(
             id = 3L,
-            name = "Most stressful days",
+            name = stringResource(R.string.play_store_fixture_most_stressful_days),
             barValues = listOf(
-                ITimeHistogramViewData.BarValue("None", listOf(14.0, 8.0, 5.0, 11.0, 6.0, 18.0, 16.0)),
-                ITimeHistogramViewData.BarValue("Low", listOf(28.0, 26.0, 22.0, 30.0, 24.0, 20.0, 18.0)),
-                ITimeHistogramViewData.BarValue("Medium", listOf(18.0, 25.0, 28.0, 20.0, 26.0, 14.0, 12.0)),
-                ITimeHistogramViewData.BarValue("High", listOf(10.0, 16.0, 22.0, 11.0, 19.0, 8.0, 6.0)),
+                ITimeHistogramViewData.BarValue(stringResource(R.string.play_store_fixture_none), listOf(14.0, 8.0, 5.0, 11.0, 6.0, 18.0, 16.0)),
+                ITimeHistogramViewData.BarValue(stringResource(R.string.play_store_fixture_low), listOf(28.0, 26.0, 22.0, 30.0, 24.0, 20.0, 18.0)),
+                ITimeHistogramViewData.BarValue(stringResource(R.string.play_store_fixture_medium), listOf(18.0, 25.0, 28.0, 20.0, 26.0, 14.0, 12.0)),
+                ITimeHistogramViewData.BarValue(stringResource(R.string.play_store_fixture_high), listOf(10.0, 16.0, 22.0, 11.0, 19.0, 8.0, 6.0)),
             )
         )
     ),
 )
 
+@Composable
 internal fun playStoreReminders(): List<ReminderViewData> {
     val now = LocalDateTime.of(2026, 5, 8, 12, 0)
 
@@ -283,7 +292,7 @@ internal fun playStoreReminders(): List<ReminderViewData> {
         ReminderViewData.WeekDayReminderViewData(
             id = 1L,
             groupItemId = 1L,
-            name = "Tracking dailies",
+            name = stringResource(R.string.play_store_fixture_tracking_dailies),
             enabled = true,
             nextScheduled = now.withHour(22).withMinute(0),
             checkedDays = CheckedDays.all(),
@@ -292,7 +301,7 @@ internal fun playStoreReminders(): List<ReminderViewData> {
         ReminderViewData.PeriodicReminderViewData(
             id = 2L,
             groupItemId = 2L,
-            name = "Weekly review",
+            name = stringResource(R.string.play_store_fixture_weekly_review),
             enabled = true,
             nextScheduled = now.plusDays(3).withHour(10).withMinute(0),
             starts = now.minusWeeks(2).withHour(10).withMinute(0),
@@ -306,7 +315,7 @@ internal fun playStoreReminders(): List<ReminderViewData> {
         ReminderViewData.MonthDayReminderViewData(
             id = 3L,
             groupItemId = 3L,
-            name = "Monthly goals",
+            name = stringResource(R.string.play_store_fixture_monthly_goals),
             enabled = true,
             nextScheduled = LocalDateTime.of(2026, 6, 1, 9, 0),
             occurrence = MonthDayOccurrence.FIRST,
@@ -317,7 +326,7 @@ internal fun playStoreReminders(): List<ReminderViewData> {
         ReminderViewData.TimeSinceLastReminderViewData(
             id = 4L,
             groupItemId = 4L,
-            name = "2 days without Exercise",
+            name = stringResource(R.string.play_store_fixture_two_days_without_exercise),
             enabled = true,
             nextScheduled = now.plusHours(6),
             reminderDto = null,
@@ -328,15 +337,19 @@ internal fun playStoreReminders(): List<ReminderViewData> {
     )
 }
 
-internal class PlayStoreFunctionEditorState {
+internal class PlayStoreFunctionEditorState(
+    exercise: String,
+    running: String,
+    cycling: String,
+) {
     internal val featurePathMap = mapOf(
-        1L to "Exercise / Running",
-        2L to "Exercise / Cycling",
+        1L to "$exercise / $running",
+        2L to "$exercise / $cycling",
     )
 
     internal val outputNode = Node.Output(
         id = 1,
-        name = mutableStateOf(TextFieldValue("Exercise")),
+        name = mutableStateOf(TextFieldValue(exercise)),
         description = mutableStateOf(TextFieldValue("")),
         isDuration = mutableStateOf(false),
         isUpdateMode = false,

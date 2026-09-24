@@ -605,4 +605,45 @@
     <string name="functions_landscape_hint">Tip: Functions work best in landscape</string>
     <string name="functions_start_hint">Start here: Long press and select Data Source</string>
     <string name="see_whats_new">See What\'s New</string>
+
+    <!-- Deterministic sample data rendered in localized Play Store screenshots. -->
+    <string name="play_store_fixture_daily">Daily</string>
+    <string name="play_store_fixture_sleep">Sleep</string>
+    <string name="play_store_fixture_productivity">Productivity</string>
+    <string name="play_store_fixture_alcohol">Alcohol</string>
+    <string name="play_store_fixture_meditation">Meditation</string>
+    <string name="play_store_fixture_work">Work</string>
+    <string name="play_store_fixture_weight">Weight</string>
+    <string name="play_store_fixture_exercise">Exercise</string>
+    <string name="play_store_fixture_studying">Studying</string>
+    <string name="play_store_fixture_stress">Stress</string>
+    <string name="play_store_fixture_random_data_description">Just random data</string>
+    <string name="play_store_fixture_exercise_weekly_totals">Exercise weekly totals in the last 6 months</string>
+    <string name="play_store_fixture_exercise_vs_illness">Exercise vs illness moving averages in the last 6 months</string>
+    <string name="play_store_fixture_weekly">Weekly</string>
+    <string name="play_store_fixture_monthly">Monthly</string>
+    <string name="play_store_fixture_yearly">Yearly</string>
+    <string name="play_store_fixture_sick_day_weekly">Sick day (weekly)</string>
+    <string name="play_store_fixture_reps">reps</string>
+    <string name="play_store_fixture_workout_repetitions">Workout repetitions</string>
+    <string name="play_store_fixture_push_ups">Push-ups</string>
+    <string name="play_store_fixture_pull_ups">Pull-ups</string>
+    <string name="play_store_fixture_push_pull_progress">Push / pull progress</string>
+    <string name="play_store_fixture_push_exercises">Push exercises</string>
+    <string name="play_store_fixture_pull_exercises">Pull exercises</string>
+    <string name="play_store_fixture_push_pull_workout">Push / Pull Workout</string>
+    <string name="play_store_fixture_rest_day_statistics">Rest day statistics</string>
+    <string name="play_store_fixture_stress_pie_chart">Stress pie chart</string>
+    <string name="play_store_fixture_none">None</string>
+    <string name="play_store_fixture_low">Low</string>
+    <string name="play_store_fixture_medium">Medium</string>
+    <string name="play_store_fixture_high">High</string>
+    <string name="play_store_fixture_time_since_day_off">Time since taking a day off</string>
+    <string name="play_store_fixture_most_stressful_days">Most stressful days</string>
+    <string name="play_store_fixture_tracking_dailies">Tracking dailies</string>
+    <string name="play_store_fixture_weekly_review">Weekly review</string>
+    <string name="play_store_fixture_monthly_goals">Monthly goals</string>
+    <string name="play_store_fixture_two_days_without_exercise">2 days without Exercise</string>
+    <string name="play_store_fixture_running">Running</string>
+    <string name="play_store_fixture_cycling">Cycling</string>
 </resources>
