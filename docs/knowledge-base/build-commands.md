@@ -106,6 +106,19 @@ make tutorial-record     # Render Compose tutorial previews and resize app tutor
 
 The Play Store path does not use an emulator or Shot. `make playstore-record` renders Compose previews via the `screenshotTest` source set, copies the generated reference PNGs into `fastlane/frameit/screenshots/`, then runs frameit. The screenshot content and fixtures live in `app/app/src/main/java/com/samco/trackandgraph/playstore/` so Android Studio previews can render them. Thin `@PreviewTest` wrappers live in `app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/playstore/`.
 
+The Play Store screenshot wrappers are generated from
+`scripts/translations/templates/PlayStoreScreenshotTests.kt.template` by
+`scripts/translations/generate_playstore_screenshot_tests.py`. A custom
+multi-preview annotation expands each of the eight screenshots across the
+deliberate subset in `configuration/play-store-screenshot-languages.txt`. Each
+tab-separated entry maps a canonical app locale to its Google Play locale and
+must reference a locale in the canonical
+`configuration/translation-languages.tsv` manifest; do not edit the generated
+Kotlin file directly. Code generation, screenshot selection, and Frameit all
+consume this one subset. `make playstore-record` regenerates it automatically,
+while `make playstore-screenshot-tests-check` and `make validate-all` fail when
+it is stale.
+
 Use AGP 9.3.1 or newer with Gradle 9.5.0 or newer for screenshot tests. AGP 9.1.1 created `GenerateTestConfig` without configuring its required merged-manifest input unless Android resources were manually enabled through the incubating host-test API. AGP 9.3.1 generates and processes the screenshot-test manifest correctly without that workaround. When changing this setup, verify both `generateFossDebugScreenshotTestConfig` and `generatePlayStoreDebugScreenshotTestConfig` because the tasks are flavor-specific.
 
 Keep screenshot-only app data in the playstore package rather than reusing old emulator demo-data generators. The screenshot fixtures are deterministic and can call the real production composables directly, including graph cards and other `AndroidView`-backed content, as long as the fixture provides the state that a ViewModel would normally load from the database.

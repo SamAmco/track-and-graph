@@ -132,6 +132,11 @@ in code or tests. Other shared infrastructure lives under
 `scripts/translations/`: `domain_brief.md`, provider adapters, and
 `translation_runtime.py`. Release notes, Android resources, and Lua catalog
 copy reuse those pieces but keep format-specific extraction and validation.
+The generated Play Store Compose screenshot-test matrix selects its smaller,
+deliberately maintained locale subset from
+`configuration/play-store-screenshot-languages.txt`. Every selection is
+validated against this manifest, so the subset does not duplicate language
+names or translation configuration.
 
 Google Play listing metadata under `fastlane/metadata/android/` uses the same
 language manifest, domain brief, and provider adapter through

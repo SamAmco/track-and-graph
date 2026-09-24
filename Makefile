@@ -112,7 +112,7 @@ lua-test-tools:
 	cd lua && lua tools/test/test_all.lua
 
 .PHONY: validate-all
-validate-all: translations-test translations-validate lua-test-api lua-test-tools validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
+validate-all: translations-test translations-validate playstore-screenshot-tests-check lua-test-api lua-test-tools validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
 	@echo "All validations passed."
 
 .PHONY: assemble-release
@@ -142,8 +142,15 @@ assemble-bundle-release:
 	cd app && ./gradlew clean :app:assemblePlayStoreRelease :app:bundlePlayStoreRelease
 
 # ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
+.PHONY: playstore-screenshot-tests-generate playstore-screenshot-tests-check
+playstore-screenshot-tests-generate:
+	@python3 -B scripts/translations/generate_playstore_screenshot_tests.py
+
+playstore-screenshot-tests-check:
+	@python3 -B scripts/translations/generate_playstore_screenshot_tests.py --check
+
 .PHONY: playstore-record
-playstore-record:
+playstore-record: playstore-screenshot-tests-generate
 	@./scripts/playstore-record.sh
 
 .PHONY: tutorial-record

@@ -8,6 +8,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 REFERENCE_DIR="$ROOT_DIR/app/app/src/screenshotTestPlayStoreDebug/reference"
 
+source "$SCRIPT_DIR/lib/playstore-screenshot-languages.sh"
+load_playstore_screenshot_languages
+
 cd "$ROOT_DIR"
 
 cleanup() {
@@ -27,28 +30,27 @@ echo "==> Rendering Compose previews"
 rm -rf "$REFERENCE_DIR"
 (cd "$ROOT_DIR/app" && ./gradlew :app:updatePlayStoreDebugScreenshotTest --rerun-tasks)
 
-# Define supported languages
-LANGUAGES=("en-GB" "es-ES" "de-DE" "fr-FR")
-
 # Create frameit directories for all languages
-for lang in "${LANGUAGES[@]}"; do
+for lang in "${SCREENSHOT_PLAY_LOCALES[@]}"; do
     mkdir -p "fastlane/frameit/screenshots/$lang"
     mkdir -p "fastlane/metadata/android/$lang/images/phoneScreenshots"
 done
 
 # Copy raw screenshots to frameit directories for all languages
-for lang in "${LANGUAGES[@]}"; do
-    echo "Copying screenshots for language: $lang"
+for index in "${!SCREENSHOT_LOCALES[@]}"; do
+    locale="${SCREENSHOT_LOCALES[$index]}"
+    play_locale="${SCREENSHOT_PLAY_LOCALES[$index]}"
+    echo "Copying screenshots for language: $play_locale"
     for i in {1..8}; do
         screenshot_number="$(printf "%02d" "$i")"
-        source_file="$(find "$REFERENCE_DIR" -type f -name "*PlayStoreScreenshot${screenshot_number}_*.png" | sort | head -n 1)"
+        source_file="$(find "$REFERENCE_DIR" -type f -name "*PlayStoreScreenshot${screenshot_number}_${locale}_*.png" | sort | head -n 1)"
 
         if [ -z "$source_file" ]; then
             echo "ERROR: Could not find rendered screenshot $i in $REFERENCE_DIR"
             exit 1
         fi
 
-        cp "$source_file" "fastlane/frameit/screenshots/$lang/$i.png"
+        cp "$source_file" "fastlane/frameit/screenshots/$play_locale/$i.png"
     done
 done
 

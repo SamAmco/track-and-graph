@@ -5,8 +5,11 @@
 
 set -e
 
-# Define supported languages
-LANGUAGES=("en-GB" "es-ES" "de-DE" "fr-FR")
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+source "$SCRIPT_DIR/lib/playstore-screenshot-languages.sh"
+load_playstore_screenshot_languages
 
 echo "==> Running frameit to add frames and captions"
 
@@ -24,7 +27,7 @@ echo "==> Copying framed screenshots to fastlane directories for all languages"
 
 # Verify at least one language has framed screenshots
 framed_found=false
-for lang in "${LANGUAGES[@]}"; do
+for lang in "${SCREENSHOT_PLAY_LOCALES[@]}"; do
     if ls "fastlane/frameit/screenshots/$lang"/*_framed.png >/dev/null 2>&1; then
         framed_found=true
         break
@@ -37,7 +40,7 @@ if [ "$framed_found" = false ]; then
 fi
 
 # Copy framed screenshots for each language
-for lang in "${LANGUAGES[@]}"; do
+for lang in "${SCREENSHOT_PLAY_LOCALES[@]}"; do
     echo "Processing framed screenshots for language: $lang"
     
     # Check if framed files exist for this language
