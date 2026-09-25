@@ -5,10 +5,11 @@ return {
 -- Lua Function to take absolute value
 -- Converts all data point values to their absolute value
 
+
 return {
 	-- Configuration metadata
 	id = "absolute-value",
-	version = "1.0.1",
+	version = "1.0.2",
 	inputCount = 1,
 	categories = {"_arithmetic"},
 	title = {
@@ -301,7 +302,7 @@ Chuyển đổi giá trị của từng điểm dữ liệu thành giá trị tu
 	end,
 }
 ]=],
-			version="1.0.1",
+			version="1.0.2",
 		},
 		["adaptve-clustering-aggregation"]={
 			deprecated=4,
@@ -29305,7 +29306,7 @@ Tính chênh lệch giữa giá trị của mỗi điểm dữ liệu và điể
 			version="1.0.1",
 		},
 	},
-	published_at="2026-09-19T19:38:27Z",
+	published_at="2026-09-25T18:27:01Z",
 	translations={
 		_addition={
 			af="Optelling",
