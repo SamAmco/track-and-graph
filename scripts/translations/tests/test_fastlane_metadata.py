@@ -41,7 +41,8 @@ class FastlaneMetadataTest(unittest.TestCase):
             }
             self.assertEqual((), validate_translation(source, translated), target.locale)
 
-    def test_uses_play_region_override_or_manifest_locale(self) -> None:
+    def test_uses_explicit_play_locale_from_manifest(self) -> None:
+        self.assertEqual("en-GB", play_locale("en"))
         self.assertEqual("de-DE", play_locale("de"))
         self.assertEqual("zh-CN", play_locale("zh-Hans"))
         self.assertEqual("es-ES", play_locale("es"))

@@ -9,7 +9,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from languages import SUPPORTED_TARGETS, TranslationTarget
+from languages import SUPPORTED_TARGETS, TranslationTarget, play_locale
 from translation_runtime import (
     DEFAULT_DOMAIN_BRIEF,
     add_provider_arguments,
@@ -26,23 +26,6 @@ DEFAULT_RAW_OUTPUT_DIR = Path("/tmp/track-and-graph-fastlane-translations")
 FIELDS = ("title", "short_description", "full_description")
 CHARACTER_LIMITS = {"title": 30, "short_description": 80, "full_description": 4000}
 
-# Google Play/Fastlane uses regional tags for some listing directories. Keep
-# only exceptions here; the shared manifest locale is used for everything else.
-PLAY_LOCALE_OVERRIDES = {
-    "hy": "hy-AM", "az": "az-AZ", "bn": "bn-BD", "eu": "eu-ES",
-    "my": "my-MM", "zh-Hans": "zh-CN", "zh-Hant": "zh-TW",
-    "cs": "cs-CZ", "da": "da-DK", "nl": "nl-NL", "fi": "fi-FI",
-    "fr": "fr-FR", "gl": "gl-ES", "ka": "ka-GE", "de": "de-DE",
-    "el": "el-GR", "hi": "hi-IN", "hu": "hu-HU", "is": "is-IS",
-    "it": "it-IT", "ja": "ja-JP", "kn": "kn-IN", "km": "km-KH",
-    "ko": "ko-KR", "ky": "ky-KG", "lo": "lo-LA", "mk": "mk-MK",
-    "ml": "ml-IN", "mr": "mr-IN", "mn": "mn-MN", "ne": "ne-NP",
-    "no": "no-NO", "pl": "pl-PL", "pt": "pt-PT", "ru": "ru-RU",
-    "si": "si-LK", "sv": "sv-SE", "ta": "ta-IN", "te": "te-IN",
-    "tr": "tr-TR", "es": "es-ES",
-}
-
-
 @dataclass(frozen=True)
 class TranslationOutcome:
     target: TranslationTarget
@@ -50,10 +33,6 @@ class TranslationOutcome:
     issues: tuple[str, ...]
     usage: dict[str, object]
     raw_path: Path
-
-
-def play_locale(locale: str) -> str:
-    return PLAY_LOCALE_OVERRIDES.get(locale, locale)
 
 
 def load_source(metadata_root: Path, source_locale: str) -> dict[str, str]:

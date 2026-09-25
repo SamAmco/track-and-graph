@@ -1,5 +1,0 @@
-# Canonical locale<TAB>Google Play locale
-en	en-GB
-de	de-DE
-es	es-ES
-fr	fr-FR

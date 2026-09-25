@@ -61,6 +61,8 @@ fastlane/Preview.html
 fastlane/test_output
 fastlane/readme.md
 fastlane/frameit/screenshots/**/*.png
+fastlane/metadata/android/*/images/phoneScreenshots/*.png
+!fastlane/metadata/android/en-GB/images/phoneScreenshots/*.png
 
 # Version control
 vcs.xml
@@ -89,6 +91,8 @@ lua/local
 
 # Screenshot test related files
 tmp/
+app/app/src/screenshotTestPlayStoreDebug/reference/
+app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/playstore/PlayStoreScreenshotTests.kt
 
 configuration/venv
 

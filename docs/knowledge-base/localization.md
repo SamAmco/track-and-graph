@@ -127,16 +127,14 @@ make translations-generate TRANSLATION_ARGS="--target fi=Finnish"
 
 `configuration/translation-languages.tsv` is the sole language manifest.
 Python reads it through `scripts/translations/languages.py`; Lua reads the same
-file through `lua/tools/lib/languages.lua`. Do not duplicate the expected list
-in code or tests. Other shared infrastructure lives under
+file through `lua/tools/lib/languages.lua`. Each row records the canonical app
+locale, English language name, and the exact Google Play locale. Google Play's
+mix of language-only and language-region identifiers is therefore explicit
+rather than inferred through a separate override map. Do not duplicate the
+expected list in code or tests. Other shared infrastructure lives under
 `scripts/translations/`: `domain_brief.md`, provider adapters, and
 `translation_runtime.py`. Release notes, Android resources, and Lua catalog
 copy reuse those pieces but keep format-specific extraction and validation.
-The generated Play Store Compose screenshot-test matrix selects its smaller,
-deliberately maintained locale subset from
-`configuration/play-store-screenshot-languages.txt`. Every selection is
-validated against this manifest, so the subset does not duplicate language
-names or translation configuration.
 
 Google Play listing metadata under `fastlane/metadata/android/` uses the same
 language manifest, domain brief, and provider adapter through
@@ -153,6 +151,13 @@ and the no-ads, no-accounts, no-paywalls, on-device-only, and backup claims.
 The offline translation test suite, and therefore `make validate-all`, checks
 that every manifest locale has all three listing files and that these same
 deterministic constraints continue to pass.
+
+Play Store screenshot wrappers are generated for one canonical locale at a
+time and are deliberately not checked in. Raw screenshots, screenshot-test
+references, and non-English framed metadata images are also generated files.
+The English framed metadata images remain tracked because external project
+documentation uses them. Snapshot and Frameit stages are separate so a failed
+frame can be retried without rerendering Compose previews.
 
 This workflow deliberately has no incremental state: listing copy changes
 rarely, and a requested run regenerates every selected locale from English.

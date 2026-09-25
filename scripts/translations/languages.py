@@ -6,7 +6,7 @@ written language. Chinese is split into Simplified and Traditional because one
 translation cannot serve both scripts.
 
 Source: https://support.google.com/googleplay/android-developer/answer/9844778
-Verified: 2026-09-18
+Verified: 2026-09-26
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ from pathlib import Path
 class TranslationTarget:
     locale: str
     language: str
+    play_store_locale: str | None = None
 
 
 LANGUAGES_FILE = Path(__file__).resolve().parents[2] / "configuration" / "translation-languages.tsv"
@@ -32,21 +33,34 @@ def load_languages(path: Path = LANGUAGES_FILE) -> tuple[TranslationTarget, ...]
         if not line or line.startswith("#"):
             continue
         try:
-            locale, language = line.split("\t", 1)
+            locale, language, play_store_locale = line.split("\t")
         except ValueError as error:
-            raise ValueError(f"{path}:{line_number}: expected tab-separated locale and name") from error
+            raise ValueError(
+                f"{path}:{line_number}: expected tab-separated locale, name, and Google Play locale"
+            ) from error
         locale = locale.strip()
         language = language.strip()
-        if not locale or not language:
-            raise ValueError(f"{path}:{line_number}: locale and name must be non-empty")
+        play_store_locale = play_store_locale.strip()
+        if not locale or not language or not play_store_locale:
+            raise ValueError(
+                f"{path}:{line_number}: locale, name, and Google Play locale must be non-empty"
+            )
         if locale in seen:
             raise ValueError(f"{path}:{line_number}: duplicate locale {locale}")
         seen.add(locale)
-        languages.append(TranslationTarget(locale, language))
-    if not languages or languages[0] != TranslationTarget("en", "English"):
-        raise ValueError(f"{path}: first language must be en<TAB>English")
+        languages.append(TranslationTarget(locale, language, play_store_locale))
+    if not languages or languages[0] != TranslationTarget("en", "English", "en-GB"):
+        raise ValueError(f"{path}: first language must be en<TAB>English<TAB>en-GB")
     return tuple(languages)
 
 
 ALL_LANGUAGES = load_languages()
 SUPPORTED_TARGETS = tuple(target for target in ALL_LANGUAGES if target.locale != "en")
+
+def play_locale(locale: str) -> str:
+    try:
+        target = next(target for target in ALL_LANGUAGES if target.locale == locale)
+    except StopIteration as error:
+        raise ValueError(f"Unsupported canonical locale {locale!r}") from error
+    assert target.play_store_locale is not None
+    return target.play_store_locale

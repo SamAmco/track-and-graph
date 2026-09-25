@@ -12,7 +12,7 @@ topics:
   - build-logic convention plugins tng.android.application and tng.android.library
   - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
-  - Screenshots: make playstore-record, make tutorial-record
+  - Screenshots: make playstore-screenshots-english, make playstore-screenshots-english-framed, make tutorial-record
   - Play Store screenshots: Compose screenshot test previews, no emulator, fake status bar
   - Tutorial screenshots: Compose screenshot test previews, no emulator
   - AGP 9.3 fixes screenshot-test manifest generation that failed under AGP 9.1
@@ -97,27 +97,41 @@ The screenshot config tasks are the compatibility check for the AGP/plugin integ
 Play Store screenshots use Compose preview screenshot tests plus frameit:
 
 ```bash
-make playstore-record    # Render Compose screenshot previews and process them through frameit
-make tutorial-record     # Render Compose tutorial previews and resize app tutorial images
+make playstore-screenshots-english         # Render raw English screenshots
+make playstore-screenshots-english-framed  # Render and frame English screenshots
+make tutorial-record                       # Render and resize tutorial images
 ```
 
 ### Prerequisites
 - Ruby + bundler + fastlane (`bundle install` from project root)
 
-The Play Store path does not use an emulator or Shot. `make playstore-record` renders Compose previews via the `screenshotTest` source set, copies the generated reference PNGs into `fastlane/frameit/screenshots/`, then runs frameit. The screenshot content and fixtures live in `app/app/src/main/java/com/samco/trackandgraph/playstore/` so Android Studio previews can render them. Thin `@PreviewTest` wrappers live in `app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/playstore/`.
+The Play Store path does not use an emulator or Shot. The screenshot content
+and fixtures live in
+`app/app/src/main/java/com/samco/trackandgraph/playstore/` so Android Studio
+previews can render them. Thin `@PreviewTest` wrappers are generated into
+`app/app/src/screenshotTest/kotlin/com/samco/trackandgraph/playstore/` and are
+ignored by version control.
 
 The Play Store screenshot wrappers are generated from
 `scripts/translations/templates/PlayStoreScreenshotTests.kt.template` by
-`scripts/translations/generate_playstore_screenshot_tests.py`. A custom
-multi-preview annotation expands each of the eight screenshots across the
-deliberate subset in `configuration/play-store-screenshot-languages.txt`. Each
-tab-separated entry maps a canonical app locale to its Google Play locale and
-must reference a locale in the canonical
-`configuration/translation-languages.tsv` manifest; do not edit the generated
-Kotlin file directly. Code generation, screenshot selection, and Frameit all
-consume this one subset. `make playstore-record` regenerates it automatically,
-while `make playstore-screenshot-tests-check` and `make validate-all` fail when
-it is stale.
+`scripts/translations/generate_playstore_screenshot_tests.py`. The Python
+orchestrator regenerates the wrappers for the requested canonical locale before
+every snapshot run. Do not edit or commit the generated Kotlin file.
+
+Rendering and framing are independently retryable:
+
+```bash
+make playstore-screenshots-snapshot LANGUAGE=de
+make playstore-screenshots-frame LANGUAGE=de
+```
+
+The snapshot stage writes persistent raw images beneath
+`fastlane/frameit/screenshots/<Play locale>/`. The frame stage consumes those
+existing images, leaves Frameit's `_framed.png` outputs beside them, and copies
+the upload-ready names into
+`fastlane/metadata/android/<Play locale>/images/phoneScreenshots/`. Generated
+images are ignored except for the English metadata screenshots, which remain
+tracked for use by the README and F-Droid metadata.
 
 Use AGP 9.3.1 or newer with Gradle 9.5.0 or newer for screenshot tests. AGP 9.1.1 created `GenerateTestConfig` without configuring its required merged-manifest input unless Android resources were manually enabled through the incubating host-test API. AGP 9.3.1 generates and processes the screenshot-test manifest correctly without that workaround. When changing this setup, verify both `generateFossDebugScreenshotTestConfig` and `generatePlayStoreDebugScreenshotTestConfig` because the tasks are flavor-specific.
 

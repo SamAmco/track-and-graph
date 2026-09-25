@@ -1,68 +1,68 @@
-# Locale	English language name
-en	English
-af	Afrikaans
-sq	Albanian
-am	Amharic
-hy	Armenian
-az	Azerbaijani
-bn	Bangla
-eu	Basque
-be	Belarusian
-bg	Bulgarian
-my	Burmese
-ca	Catalan
-zh-Hans	Chinese (Simplified)
-zh-Hant	Chinese (Traditional)
-hr	Croatian
-cs	Czech
-da	Danish
-nl	Dutch
-et	Estonian
-fil	Filipino
-fi	Finnish
-fr	French
-gl	Galician
-ka	Georgian
-de	German
-el	Greek
-gu	Gujarati
-hi	Hindi
-hu	Hungarian
-is	Icelandic
-id	Indonesian
-it	Italian
-ja	Japanese
-kn	Kannada
-kk	Kazakh
-km	Khmer
-ko	Korean
-ky	Kyrgyz
-lo	Lao
-lv	Latvian
-lt	Lithuanian
-mk	Macedonian
-ms	Malay
-ml	Malayalam
-mr	Marathi
-mn	Mongolian
-ne	Nepali
-no	Norwegian
-pl	Polish
-pt	Portuguese
-pa	Punjabi
-ro	Romanian
-rm	Romansh
-ru	Russian
-sr	Serbian
-si	Sinhala
-sk	Slovak
-sl	Slovenian
-es	Spanish
-sw	Swahili
-sv	Swedish
-ta	Tamil
-te	Telugu
-th	Thai
-tr	Turkish
-uk	Ukrainian
-vi	Vietnamese
+# Locale	English language name	Google Play locale
+en	English	en-GB
+af	Afrikaans	af
+sq	Albanian	sq
+am	Amharic	am
+hy	Armenian	hy-AM
+az	Azerbaijani	az-AZ
+bn	Bangla	bn-BD
+eu	Basque	eu-ES
+be	Belarusian	be
+bg	Bulgarian	bg
+my	Burmese	my-MM
+ca	Catalan	ca
+zh-Hans	Chinese (Simplified)	zh-CN
+zh-Hant	Chinese (Traditional)	zh-TW
+hr	Croatian	hr
+cs	Czech	cs-CZ
+da	Danish	da-DK
+nl	Dutch	nl-NL
+et	Estonian	et
+fil	Filipino	fil
+fi	Finnish	fi-FI
+fr	French	fr-FR
+gl	Galician	gl-ES
+ka	Georgian	ka-GE
+de	German	de-DE
+el	Greek	el-GR
+gu	Gujarati	gu
+hi	Hindi	hi-IN
+hu	Hungarian	hu-HU
+is	Icelandic	is-IS
+id	Indonesian	id
+it	Italian	it-IT
+ja	Japanese	ja-JP
+kn	Kannada	kn-IN
+kk	Kazakh	kk
+km	Khmer	km-KH
+ko	Korean	ko-KR
+ky	Kyrgyz	ky-KG
+lo	Lao	lo-LA
+lv	Latvian	lv
+lt	Lithuanian	lt
+mk	Macedonian	mk-MK
+ms	Malay	ms
+ml	Malayalam	ml-IN
+mr	Marathi	mr-IN
+mn	Mongolian	mn-MN
+ne	Nepali	ne-NP
+no	Norwegian	no-NO
+pl	Polish	pl-PL
+pt	Portuguese	pt-PT
+pa	Punjabi	pa
+ro	Romanian	ro
+rm	Romansh	rm
+ru	Russian	ru-RU
+sr	Serbian	sr
+si	Sinhala	si-LK
+sk	Slovak	sk
+sl	Slovenian	sl
+es	Spanish	es-ES
+sw	Swahili	sw
+sv	Swedish	sv-SE
+ta	Tamil	ta-IN
+te	Telugu	te-IN
+th	Thai	th
+tr	Turkish	tr-TR
+uk	Ukrainian	uk
+vi	Vietnamese	vi

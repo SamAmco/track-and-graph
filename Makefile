@@ -148,7 +148,7 @@ lua-test-tools:
 
 .PHONY: validate-all
 ## validate-all: Run the complete pre-release validation suite.
-validate-all: translations-test translations-validate playstore-screenshot-tests-check lua-test-api lua-test-tools validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
+validate-all: translations-test translations-validate lua-test-api lua-test-tools validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
 	@echo "All validations passed."
 
 .PHONY: assemble-release
@@ -220,19 +220,24 @@ playstore-upload-production:
 		--skip_upload_screenshots $(PLAYSTORE_UPLOAD_ARGS)
 
 # ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
-.PHONY: playstore-screenshot-tests-generate playstore-screenshot-tests-check
-## playstore-screenshot-tests-generate: Regenerate the localized Play Store Compose screenshot wrappers.
-playstore-screenshot-tests-generate:
-	@python3 -B scripts/translations/generate_playstore_screenshot_tests.py
+.PHONY: playstore-screenshots-snapshot playstore-screenshots-frame playstore-screenshots-english playstore-screenshots-english-framed
+## playstore-screenshots-snapshot: Render raw screenshots for LANGUAGE without framing them.
+playstore-screenshots-snapshot:
+	@test -n "$(LANGUAGE)" || (echo "Usage: make playstore-screenshots-snapshot LANGUAGE=<locale>" && exit 1)
+	@python3 -B scripts/play_store_screenshots.py snapshot "$(LANGUAGE)"
 
-## playstore-screenshot-tests-check: Fail when the generated Play Store screenshot wrappers are stale.
-playstore-screenshot-tests-check:
-	@python3 -B scripts/translations/generate_playstore_screenshot_tests.py --check
+## playstore-screenshots-frame: Frame existing raw screenshots for LANGUAGE without rerendering them.
+playstore-screenshots-frame:
+	@test -n "$(LANGUAGE)" || (echo "Usage: make playstore-screenshots-frame LANGUAGE=<locale>" && exit 1)
+	@python3 -B scripts/play_store_screenshots.py frame "$(LANGUAGE)"
 
-.PHONY: playstore-record
-## playstore-record: Render and frame the configured Play Store screenshot locales.
-playstore-record: playstore-screenshot-tests-generate
-	@./scripts/playstore-record.sh
+## playstore-screenshots-english: Render the eight raw English Play Store screenshots for local review.
+playstore-screenshots-english:
+	@python3 -B scripts/play_store_screenshots.py snapshot en
+
+## playstore-screenshots-english-framed: Render and frame English screenshots, updating the committed metadata images.
+playstore-screenshots-english-framed: playstore-screenshots-english
+	@python3 -B scripts/play_store_screenshots.py frame en
 
 .PHONY: tutorial-record
 ## tutorial-record: Render and resize the Compose tutorial screenshots into Android density buckets.

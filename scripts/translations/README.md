@@ -9,7 +9,9 @@ inside the Android app.
 manifest shared by Python and Lua. `languages.py` parses it for Python. It contains the 66 non-English,
 non-RTL written-language targets from Google Play's supported localization list.
 Regional variants are collapsed where they share a script; Chinese remains split
-into Simplified (`zh-Hans`) and Traditional (`zh-Hant`).
+into Simplified (`zh-Hans`) and Traditional (`zh-Hant`). Each row also records
+the exact Google Play listing locale so Play's mixture of language-only and
+language-region identifiers is explicit without a second mapping.
 
 `providers/base.py` defines the provider-neutral interface;
 `providers/openai_responses.py` contains the OpenAI implementation.

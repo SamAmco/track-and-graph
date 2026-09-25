@@ -18,23 +18,27 @@ function M.load()
 		line_number = line_number + 1
 		local line = raw_line:match("^%s*(.-)%s*$")
 		if line ~= "" and not line:match("^#") then
-			local locale, language = line:match("^([^\t]+)\t(.+)$")
-			if not locale or not language then
+			local locale, language, play_store_locale = line:match("^([^\t]+)\t([^\t]+)\t([^\t]+)$")
+			if not locale or not language or not play_store_locale then
 				file:close()
-				error(string.format("%s:%d: expected tab-separated locale and name", languages_path, line_number))
+				error(string.format("%s:%d: expected tab-separated locale, name, and Google Play locale", languages_path, line_number))
 			end
 			if seen[locale] then
 				file:close()
 				error(string.format("%s:%d: duplicate locale %s", languages_path, line_number, locale))
 			end
 			seen[locale] = true
-			table.insert(languages, { locale = locale, language = language })
+			table.insert(languages, {
+				locale = locale,
+				language = language,
+				play_store_locale = play_store_locale,
+			})
 		end
 	end
 	file:close()
 
 	if not languages[1] or languages[1].locale ~= "en" or languages[1].language ~= "English" then
-		error(languages_path .. ": first language must be en<TAB>English")
+		error(languages_path .. ": first language must be en<TAB>English<TAB>en-GB")
 	end
 	return languages
 end
