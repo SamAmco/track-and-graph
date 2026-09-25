@@ -184,6 +184,41 @@ bundle-foss-release:
 assemble-bundle-release:
 	cd app && ./gradlew clean :app:assemblePlayStoreRelease :app:bundlePlayStoreRelease
 
+.PHONY: playstore-upload-alpha playstore-upload-beta playstore-upload-production
+PLAYSTORE_AAB ?= app/app/build/outputs/bundle/playStoreRelease/app-playStore-release.aab
+
+## playstore-upload-alpha: Upload the release AAB and its available changelogs to the Play alpha track.
+playstore-upload-alpha:
+	@bundle exec fastlane supply \
+		--aab "$(PLAYSTORE_AAB)" \
+		--track alpha \
+		--skip_upload_apk \
+		--skip_upload_metadata \
+		--skip_upload_images \
+		--skip_upload_screenshots $(PLAYSTORE_UPLOAD_ARGS)
+
+## playstore-upload-beta: Upload the release AAB and its available changelogs to the Play beta track.
+playstore-upload-beta:
+	@bundle exec fastlane supply \
+		--aab "$(PLAYSTORE_AAB)" \
+		--track beta \
+		--skip_upload_apk \
+		--skip_upload_metadata \
+		--skip_upload_images \
+		--skip_upload_screenshots $(PLAYSTORE_UPLOAD_ARGS)
+
+## playstore-upload-production: Upload the release AAB and changelogs to production; requires ROLLOUT (for example 0.5 or 1).
+playstore-upload-production:
+	@test -n "$(ROLLOUT)" || (echo "Usage: make playstore-upload-production ROLLOUT=<0..1> [PLAYSTORE_UPLOAD_ARGS=...]" && exit 1)
+	@bundle exec fastlane supply \
+		--aab "$(PLAYSTORE_AAB)" \
+		--track production \
+		--rollout "$(ROLLOUT)" \
+		--skip_upload_apk \
+		--skip_upload_metadata \
+		--skip_upload_images \
+		--skip_upload_screenshots $(PLAYSTORE_UPLOAD_ARGS)
+
 # ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
 .PHONY: playstore-screenshot-tests-generate playstore-screenshot-tests-check
 ## playstore-screenshot-tests-generate: Regenerate the localized Play Store Compose screenshot wrappers.

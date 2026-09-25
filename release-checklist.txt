@@ -14,17 +14,18 @@
 
 adb install app/app/build/outputs/apk/playStore/release/app-playStore-release.apk
 
-- Use fastlane to upload the new aab to the play store e.g. for alpha:
+- Upload the new AAB and its release notes to exactly one Play Store track. These
+  targets deliberately skip listing copy, store graphics, and screenshots:
 
-bundle exec fastlane supply --aab app/app/build/outputs/bundle/playStoreRelease/app-playStore-release.aab --track alpha
+make playstore-upload-alpha
 
-for beta:
+or for beta:
 
-bundle exec fastlane supply --aab app/app/build/outputs/bundle/playStoreRelease/app-playStore-release.aab --track beta
+make playstore-upload-beta
 
-or for release:
+or for a staged production rollout (use 1 to complete the rollout immediately):
 
-bundle exec fastlane supply --aab app/app/build/outputs/bundle/playStoreRelease/app-playStore-release.aab --rollout 0.5
+make playstore-upload-production ROLLOUT=0.5
 
 - Run `make assemble-foss-release` to generate the F-Droid/GitHub release APK from a full clean
 
