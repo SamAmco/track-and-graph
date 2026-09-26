@@ -1,6 +1,6 @@
 ---
 title: Build, test, and screenshot commands
-description: Gradle commands for building and running tests; Play Store vs FOSS release flavor intent, including distribution-specific support payments; Compose screenshot-test setup for Play Store and tutorial image capture.
+description: Gradle commands for building and running tests; Play Store vs FOSS release flavor intent; scoped Play Store publishing; Compose screenshot-test setup for Play Store and tutorial image capture.
 topics:
   - Build: cd app && ./gradlew assembleDebug
   - Benchmark install: cd app && ./gradlew :app:installFossBenchmark
@@ -12,12 +12,13 @@ topics:
   - build-logic convention plugins tng.android.application and tng.android.library
   - Filter: --tests "fully.qualified.ClassName" to run a single test class
   - Test results: data/build/test-results/testDebugUnitTest/
+  - Play Store uploads: separate bundle/release-note, listing-copy, and screenshot targets
   - Screenshots: make playstore-screenshots-english, make playstore-screenshots-english-framed, make tutorial-record
   - Play Store screenshots: Compose screenshot test previews, no emulator, fake status bar
   - Tutorial screenshots: Compose screenshot test previews, no emulator
   - AGP 9.3 fixes screenshot-test manifest generation that failed under AGP 9.1
   - Kotlin and Kotlin Gradle plugin versions stay aligned; Kotlin 2.4 + AGP 9.3 requires explicit build and screenshot verification
-keywords: [build, gradle, dependency, version-catalog, Kotlin, KGP, AGP, compatibility, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, benchmark, profileable, installFossBenchmark, variant, flavor, playStore, foss, F-Droid, fdroid, donation, bmc, screenshots, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
+keywords: [build, gradle, dependency, version-catalog, Kotlin, KGP, AGP, compatibility, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, benchmark, profileable, installFossBenchmark, variant, flavor, playStore, supply, upload, metadata, foss, F-Droid, fdroid, donation, bmc, screenshots, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
 ---
 
 # Build Commands
@@ -76,6 +77,31 @@ Shared Android build defaults live in the included build `app/build-logic`, not 
 - `tng.android.library`
 
 Use these for Android app/library modules so SDK versions, Java compatibility, Kotlin toolchain, JVM target, and common Kotlin compiler flags stay centralized. Keep module-specific behavior in the module build file: application IDs, versioning, signing, build types, Compose/Hilt/KSP/Room plugins, and dependencies.
+
+## Play Store Uploads
+
+Play Store publishing commands are split by intent so routine releases do not
+replace listing copy or screenshots:
+
+```bash
+make playstore-upload-alpha
+make playstore-upload-beta
+make playstore-upload-production ROLLOUT=0.5
+
+make playstore-upload-copy
+```
+
+The three track targets upload the release AAB and its available changelogs,
+while skipping listing copy and images. `playstore-upload-copy` uploads the
+localized title, short description, and full description already stored under
+`fastlane/metadata/android/`; it skips binaries, changelogs, graphics, and
+screenshots. Screenshot publishing has its own independently retryable target
+described below.
+
+These are live publishing commands. Tests and validation may inspect their
+construction, but must never execute a Play upload. Pass additional Supply
+options through `PLAYSTORE_UPLOAD_ARGS` or `PLAYSTORE_SCREENSHOT_ARGS` as
+appropriate.
 
 ## Dependency Upgrade Verification
 

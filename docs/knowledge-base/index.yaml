@@ -49,8 +49,8 @@ docs:
 
   - file: build-commands.md
     title: Build, test, and screenshot commands
-    description: Gradle commands for building and running tests; release flavor intent; build-logic conventions; Compose asset capture and persisted graph screenshot regression tests.
-    keywords: [build, gradle, AGP, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, benchmark, profileable, installFossBenchmark, variant, flavor, playStore, foss, F-Droid, fdroid, support, billing, bmc, screenshots, regression, golden, reference, playstore, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
+    description: Gradle build/test commands; release flavors and scoped Play Store uploads; build logic; sequential localized Play Store capture; persisted graph screenshot regression tests.
+    keywords: [build, gradle, AGP, test, build-logic, convention-plugin, tng.android.application, tng.android.library, assembleDebug, commands, gradlew, testDebugUnitTest, release, benchmark, profileable, installFossBenchmark, variant, flavor, playStore, supply, upload, metadata, foss, F-Droid, fdroid, support, billing, bmc, screenshots, regression, golden, reference, frameit, fastlane, tutorial, screenshotTest, compose-screenshot, mergedManifest, host-test, status-bar, showSystemUi]
 
   - file: play-billing.md
     title: Play Store developer support billing
