@@ -159,6 +159,15 @@ The English framed metadata images remain tracked because external project
 documentation uses them. Snapshot and Frameit stages are separate so a failed
 frame can be retried without rerendering Compose previews.
 
+Frameit captions live in
+`fastlane/frameit/screenshots/<Play locale>/title.strings`. English is the
+source of truth, and `translate_frameit_captions.py` regenerates all eight
+captions for each explicitly requested target while validating the file shape
+and protected `Lua` term. `make frameit-translations-generate` defaults to all
+targets and makes paid API calls, so never run it during normal screenshot or
+feature work without an explicit translation request. The offline translation
+suite validates that every manifest locale has a complete caption file.
+
 This workflow deliberately has no incremental state: listing copy changes
 rarely, and a requested run regenerates every selected locale from English.
 Raw provider responses are retained under

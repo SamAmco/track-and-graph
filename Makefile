@@ -32,7 +32,7 @@ endif
 validate-remote-config:
 	@./scripts/validate-remote-config.sh
 
-.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate fastlane-translations-generate lua-translations-function lua-translations-shared lua-translations-apply
+.PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate fastlane-translations-generate frameit-translations-generate lua-translations-function lua-translations-shared lua-translations-apply
 ## translations-audit: Report missing, stale, and target-only Android translations without modifying files.
 translations-audit:
 	@python3 -B scripts/translations/translate_app_resources.py audit $(TRANSLATION_ARGS)
@@ -62,6 +62,11 @@ translations-validate:
 fastlane-translations-generate: TRANSLATION_ARGS ?= --all-targets
 fastlane-translations-generate:
 	@python3 -B scripts/translations/translate_fastlane_metadata.py $(TRANSLATION_ARGS)
+
+## frameit-translations-generate: Regenerate translated Play Store screenshot captions for all locales by default (paid API calls).
+frameit-translations-generate: TRANSLATION_ARGS ?= --all-targets
+frameit-translations-generate:
+	@python3 -B scripts/translations/translate_frameit_captions.py $(TRANSLATION_ARGS)
 
 ## lua-translations-function: Generate reviewed Lua translation draft code for FUNCTION (paid API calls).
 lua-translations-function:

@@ -20,6 +20,22 @@ domain-brief validation. Release-note, Android-resource, and future
 function-file workflows share this infrastructure while retaining format-aware
 source extraction, validation, and output wrappers.
 
+## Frameit captions
+
+`translate_frameit_captions.py` translates the eight English Play Store
+screenshot headings in `fastlane/frameit/screenshots/en-GB/title.strings` and
+writes one `title.strings` file per Google Play locale. It validates the exact
+caption keys, one-line values, and preservation of `Lua`. Raw provider outputs
+are retained under `/tmp/track-and-graph-frameit-translations` for inspection.
+
+This is an explicit paid operation. Do not run it merely because screenshots
+are being generated:
+
+```bash
+make frameit-translations-generate
+make frameit-translations-generate TRANSLATION_ARGS="--target de=German"
+```
+
 ## Android app resources
 
 `translate_app_resources.py` treats unqualified English resource files as the
