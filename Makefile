@@ -225,7 +225,7 @@ playstore-upload-production:
 		--skip_upload_screenshots $(PLAYSTORE_UPLOAD_ARGS)
 
 # ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
-.PHONY: playstore-screenshots-snapshot playstore-screenshots-frame playstore-screenshots-english playstore-screenshots-english-framed
+.PHONY: playstore-screenshots-snapshot playstore-screenshots-frame playstore-screenshots-upload playstore-screenshots-english playstore-screenshots-english-framed
 ## playstore-screenshots-snapshot: Render raw screenshots for LANGUAGE without framing them.
 playstore-screenshots-snapshot:
 	@test -n "$(LANGUAGE)" || (echo "Usage: make playstore-screenshots-snapshot LANGUAGE=<locale>" && exit 1)
@@ -235,6 +235,10 @@ playstore-screenshots-snapshot:
 playstore-screenshots-frame:
 	@test -n "$(LANGUAGE)" || (echo "Usage: make playstore-screenshots-frame LANGUAGE=<locale>" && exit 1)
 	@python3 -B scripts/play_store_screenshots.py frame "$(LANGUAGE)"
+
+## playstore-screenshots-upload: Upload LANGUAGE, or every locale with a complete framed screenshot set, sequentially.
+playstore-screenshots-upload:
+	@python3 -B scripts/upload_play_store_screenshots.py $(if $(LANGUAGE),--language "$(LANGUAGE)") $(PLAYSTORE_SCREENSHOT_ARGS)
 
 ## playstore-screenshots-english: Render the eight raw English Play Store screenshots for local review.
 playstore-screenshots-english:

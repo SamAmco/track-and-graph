@@ -133,6 +133,26 @@ the upload-ready names into
 images are ignored except for the English metadata screenshots, which remain
 tracked for use by the README and F-Droid metadata.
 
+Uploading is a separate external operation and never renders or frames images:
+
+```bash
+make playstore-screenshots-upload LANGUAGE=de
+make playstore-screenshots-upload
+```
+
+With `LANGUAGE`, the upload target requires that locale's complete eight-image
+set. Without it, the target scans the language manifest in order and uploads
+each locale that has all eight upload-ready images, stopping on partial sets.
+Each locale is a separate Supply invocation, so a failed locale can be retried
+without repeating snapshot or Frameit work. Supply has no locale filter, so the
+script builds an ignored, persistent per-locale metadata view from symlinks
+under `fastlane/generated/screenshot-upload/`; the real images stay in place.
+The default is the production track and the current Gradle `versionCode`.
+Override those when necessary with, for example,
+`PLAYSTORE_SCREENSHOT_ARGS="--track beta --version-code 123"`. Use
+`PLAYSTORE_SCREENSHOT_ARGS="--dry-run"` to inspect the scoped commands without
+contacting Google Play.
+
 Use AGP 9.3.1 or newer with Gradle 9.5.0 or newer for screenshot tests. AGP 9.1.1 created `GenerateTestConfig` without configuring its required merged-manifest input unless Android resources were manually enabled through the incubating host-test API. AGP 9.3.1 generates and processes the screenshot-test manifest correctly without that workaround. When changing this setup, verify both `generateFossDebugScreenshotTestConfig` and `generatePlayStoreDebugScreenshotTestConfig` because the tasks are flavor-specific.
 
 Keep screenshot-only app data in the playstore package rather than reusing old emulator demo-data generators. The screenshot fixtures are deterministic and can call the real production composables directly, including graph cards and other `AndroidView`-backed content, as long as the fixture provides the state that a ViewModel would normally load from the database.
