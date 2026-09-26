@@ -224,6 +224,17 @@ playstore-upload-production:
 		--skip_upload_images \
 		--skip_upload_screenshots $(PLAYSTORE_UPLOAD_ARGS)
 
+.PHONY: playstore-upload-copy
+## playstore-upload-copy: Upload all localized Play Store titles, short descriptions, and full descriptions.
+playstore-upload-copy:
+	@bundle exec fastlane supply \
+		--track production \
+		--skip_upload_apk \
+		--skip_upload_aab \
+		--skip_upload_changelogs \
+		--skip_upload_images \
+		--skip_upload_screenshots $(PLAYSTORE_UPLOAD_ARGS)
+
 # ---------- RECORD HIGH-RES PLAY STORE SHOTS ----------
 .PHONY: playstore-screenshots-snapshot playstore-screenshots-frame playstore-screenshots-upload playstore-screenshots-english playstore-screenshots-english-framed
 ## playstore-screenshots-snapshot: Render raw screenshots for LANGUAGE without framing them.
