@@ -1,13 +1,14 @@
 ---
 title: Lua tooling, build process, publishing, and adding new config types
-description: Directory structure for lua/, building the function catalog (pack-functions.lua), validation and inspection tools, debug/prod catalog publishing, and the complete list of 8 implementation + 5 test files to update when adding a new configuration type.
+description: Directory structure for lua/, building the function catalog (pack-functions.lua), validation and API test tooling, debug/prod catalog publishing, and the complete list of 8 implementation + 5 test files to update when adding a new configuration type.
 topics:
   - Directory: lua/src/community/functions/, lua/catalog/, lua/tools/, lua/src/tng/
   - Build catalog: lua tools/pack-functions.lua → catalog/community-functions.lua
   - Validation tools: verify-api-specs, validate-functions, pack-functions, detect-changes
+  - Lua API tests: caught assertions require finish_tests; the suite runner provides a finalization fallback
   - Catalog publish: make lua-publish-debug / make lua-publish-prod rebuild before signing; direct Lua publish scripts only sign existing catalog
   - Adding config types: 8 implementation files + 5 test files must ALL be updated
-keywords: [lua, tooling, build, pack-functions, catalog, luarocks, serpent, validation, config-types, debug-publish, prod-publish, publish-functions-prod, api-specs, make]
+keywords: [lua, tooling, build, pack-functions, catalog, luarocks, serpent, validation, tests, test runner, finish_tests, config-types, debug-publish, prod-publish, publish-functions-prod, api-specs, make]
 ---
 
 # Lua Tooling and Project Structure
@@ -90,6 +91,20 @@ Run from `lua/` directory:
 `make validate-all` is the release gate. Keep new validation and its tests
 reachable from this target; a check that only runs from an ad-hoc command can
 otherwise be missed before publishing.
+
+### Lua API test finalization
+
+`make lua-test-api` runs the suites under `lua/src/tng/test/`. Their shared
+`test(...)` helper catches assertion errors so later tests can still run. Each
+suite must therefore end with `helpers.finish_tests()`, which prints the
+summary and exits nonzero if any caught test failed; without finalization, a
+directly executed suite can print failures and still return success.
+
+The aggregate runner executes each suite through a wrapper that calls
+`finish_tests()` after the suite returns. This is a safety net for an omitted
+explicit call. It does not finalize twice because an explicit `finish_tests()`
+terminates that suite process. Keep the explicit call so individual suite files
+remain safe to run directly.
 
 ## Catalog Inspection
 

@@ -119,8 +119,8 @@ docs:
 
   - file: lua-tooling.md
     title: Lua tooling, build process, publishing, and adding new config types
-    description: Directory structure for lua/, per-function and shared-copy translation drafts/application, generated catalog handling, validation tools, publishing, and adding new configuration types.
-    keywords: [lua, tooling, build, pack-functions, catalog, translation, draft.json, draft.lua, apply, languages, provider, luarocks, serpent, validation, config-types, debug-publish, prod-publish, publish-functions-prod, api-specs]
+    description: Directory structure for lua/, per-function and shared-copy translation drafts/application, generated catalog handling, validation and API test tooling, publishing, and adding new configuration types.
+    keywords: [lua, tooling, build, pack-functions, catalog, translation, draft.json, draft.lua, apply, languages, provider, luarocks, serpent, validation, tests, test runner, finish_tests, config-types, debug-publish, prod-publish, publish-functions-prod, api-specs]
 
   - file: remote-config-and-urls.md
     title: Remote configuration and URL navigation

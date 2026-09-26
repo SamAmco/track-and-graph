@@ -22,7 +22,7 @@ local function run_test(file_path)
 	print("\n" .. string.rep("=", 60))
 	print("Running: " .. file_path)
 	print(string.rep("=", 60))
-	local exit_code = os.execute("lua " .. file_path)
+	local exit_code = os.execute("lua src/tng/test/run_test.lua " .. file_path)
 	return exit_code == 0 or exit_code == true
 end
 

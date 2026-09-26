@@ -40,7 +40,7 @@ end)
 
 -- Test "end" placement uses most recent data point (chronologically last)
 test("window_point end placement uses most recent data point", function()
-  local count_agg = aggregation.count_aggregator("end")
+  local count_agg = aggregation.count_aggregator2("end")
   count_agg:push(create_data_point(1000, 1, 0, "label1", "note1"))
   count_agg:push(create_data_point(500, 1, 1, "label2", "note2"))
 
@@ -54,7 +54,7 @@ end)
 
 -- Test "start" placement uses oldest data point (chronologically first)
 test("window_point start placement uses oldest data point", function()
-  local count_agg = aggregation.count_aggregator("start")
+  local count_agg = aggregation.count_aggregator2("start")
   count_agg:push(create_data_point(1000, 1, 0, "label1", "note1"))
   count_agg:push(create_data_point(500, 1, 1, "label2", "note2"))
 
@@ -65,3 +65,6 @@ test("window_point start placement uses oldest data point", function()
   assert(curr.note == "note1")   -- note always from newest
   assert(curr.offset == 1)       -- offset from oldest (start)
 end)
+
+-- Summary
+helpers.finish_tests()
