@@ -26,6 +26,6 @@ private const val PLAY_STORE_DEVICE = "spec:width=1080px,height=2340px,dpi=420"
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.BINARY)
 $locale_previews
-private annotation class PlayStoreLocalesPreview
+private annotation class PlayStoreLocalePreview
 
 $screenshot_tests

@@ -61,7 +61,7 @@ def render(target: TranslationTarget) -> str:
         "\n".join(
             (
                 "@PreviewTest",
-                "@PlayStoreLocalesPreview",
+                "@PlayStoreLocalePreview",
                 "@Composable",
                 f"fun PlayStoreScreenshot{screenshot.number:02d}() {{",
                 f"    {screenshot.content_function}()",
