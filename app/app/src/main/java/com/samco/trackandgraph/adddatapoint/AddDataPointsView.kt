@@ -330,6 +330,7 @@ private fun BottomButtons(
     onSkipClicked: () -> Unit,
     onAddClicked: () -> Unit
 ) {
+    val compactButtonPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -337,6 +338,7 @@ private fun BottomButtons(
         SmallTextButton(
             stringRes = R.string.cancel,
             onClick = onCancelClicked,
+            contentPadding = compactButtonPadding,
             colors = ButtonDefaults.textButtonColors(
                 contentColor = MaterialTheme.tngColors.onSurface
             )
@@ -345,6 +347,7 @@ private fun BottomButtons(
             SmallTextButton(
                 stringRes = R.string.skip,
                 onClick = onSkipClicked,
+                contentPadding = compactButtonPadding,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.tngColors.onSurface
                 )
@@ -353,7 +356,8 @@ private fun BottomButtons(
         val addButtonRes = if (updateMode) R.string.update else R.string.add
         SmallTextButton(
             stringRes = addButtonRes,
-            onClick = onAddClicked
+            onClick = onAddClicked,
+            contentPadding = compactButtonPadding
         )
     }
 }

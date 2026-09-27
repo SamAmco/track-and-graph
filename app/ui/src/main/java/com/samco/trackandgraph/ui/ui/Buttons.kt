@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,6 +77,7 @@ fun SmallTextButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = SmallTextButton(
     text = stringResource(stringRes),
@@ -83,6 +85,7 @@ fun SmallTextButton(
     modifier = modifier,
     enabled = enabled,
     colors = colors,
+    contentPadding = contentPadding,
     interactionSource = interactionSource,
 )
 
@@ -93,17 +96,19 @@ fun SmallTextButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = TextButton(
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
     colors = colors,
+    contentPadding = contentPadding,
     interactionSource = interactionSource,
 ) {
     Text(
         text = text,
-        style = MaterialTheme.typography.labelLarge
+        style = MaterialTheme.typography.labelLarge.copy(hyphens = Hyphens.Auto)
     )
 }
 
