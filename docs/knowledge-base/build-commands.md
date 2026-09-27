@@ -130,6 +130,7 @@ make tutorial-record                       # Render and resize tutorial images
 
 ### Prerequisites
 - Ruby + bundler + fastlane (`bundle install` from project root)
+- Fontconfig plus Google Noto fonts for non-Latin Frameit captions
 
 The Play Store path does not use an emulator or Shot. The screenshot content
 and fixtures live in
@@ -158,6 +159,14 @@ the upload-ready names into
 `fastlane/metadata/android/<Play locale>/images/phoneScreenshots/`. Generated
 images are ignored except for the English metadata screenshots, which remain
 tracked for use by the README and F-Droid metadata.
+
+Before invoking Frameit, the Python orchestrator asks fontconfig for a bold font
+covering the actual caption characters. Latin captions retain the bundled
+Roboto font; scripts it cannot represent use an installed Noto or other
+fontconfig fallback that covers the complete caption. A temporary
+locale-scoped Framefile applies that font and is removed after framing. If
+selection fails, install fontconfig and the Google Noto font families rather
+than accepting blank caption glyphs.
 
 Uploading is a separate external operation and never renders or frames images:
 

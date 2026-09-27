@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import shutil
 import subprocess
 import sys
@@ -21,6 +23,8 @@ GENERATOR = TRANSLATIONS_DIR / "generate_playstore_screenshot_tests.py"
 REFERENCE_DIR = PROJECT_ROOT / "app/app/src/screenshotTestPlayStoreDebug/reference"
 FRAMEIT_ROOT = PROJECT_ROOT / "fastlane/frameit"
 FRAMEIT_SCREENSHOTS = FRAMEIT_ROOT / "screenshots"
+FRAMEIT_CONFIG = FRAMEIT_SCREENSHOTS / "Framefile.json"
+FRAMEIT_BUNDLED_FONT = FRAMEIT_SCREENSHOTS / "fonts/Roboto-Bold.ttf"
 METADATA_ROOT = PROJECT_ROOT / "fastlane/metadata/android"
 SCREENSHOT_COUNT = 8
 
@@ -70,7 +74,6 @@ def render_screenshots(target: TranslationTarget, output_dir: Path) -> list[Path
         [
             "./gradlew",
             ":app:updatePlayStoreDebugScreenshotTest",
-            "--rerun-tasks",
         ],
         cwd=PROJECT_ROOT / "app",
         check=True,
@@ -101,6 +104,54 @@ def raw_screenshots(
     return paths
 
 
+def caption_font(captions: Path) -> Path:
+    caption_text = captions.read_text(encoding="utf-8")
+    characters = sorted(
+        {character for character in caption_text if not character.isspace()},
+        key=ord,
+    )
+    charset = " ".join(f"{ord(character):04x}" for character in characters)
+    try:
+        matches = subprocess.run(
+            [
+                "fc-match",
+                "-f",
+                "%{family}\t%{file}\n",
+                f"Roboto:charset={charset}:weight=bold",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+        family, filename = matches[0].split("\t", 1)
+    except (
+        FileNotFoundError,
+        IndexError,
+        subprocess.CalledProcessError,
+        ValueError,
+    ) as error:
+        raise RuntimeError(
+            "Could not select a font for the translated Frameit captions. "
+            "Install fontconfig and the Google Noto fonts."
+        ) from error
+    font = FRAMEIT_BUNDLED_FONT if "Roboto" in family else Path(filename)
+    if not font.is_file():
+        raise FileNotFoundError(f"Matched caption font does not exist: {font}")
+    return font.resolve()
+
+
+def write_scoped_frameit_config(raw_dir: Path, font: Path) -> Path:
+    config = json.loads(FRAMEIT_CONFIG.read_text(encoding="utf-8"))
+    for text_style in ("keyword", "title"):
+        config["default"][text_style]["font"] = os.path.relpath(font, raw_dir)
+    config["default"]["background"] = os.path.relpath(
+        (FRAMEIT_ROOT / "background.jpg").resolve(), raw_dir
+    )
+    destination = raw_dir / "Framefile.json"
+    destination.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+    return destination
+
+
 def frame_screenshots(raw_images: list[Path], locale: str, destination: Path) -> list[Path]:
     raw_dir = raw_images[0].parent
     captions = raw_dir / "title.strings"
@@ -112,18 +163,24 @@ def frame_screenshots(raw_images: list[Path], locale: str, destination: Path) ->
     ]
     for framed_source in framed_sources:
         framed_source.unlink(missing_ok=True)
-    subprocess.run(
-        [
-            "bundle",
-            "exec",
-            "fastlane",
-            "run",
-            "frameit",
-            f"path:{raw_dir}",
-        ],
-        cwd=PROJECT_ROOT,
-        check=True,
-    )
+    font = caption_font(captions)
+    scoped_config = write_scoped_frameit_config(raw_dir, font)
+    print(f"Using {font.name} for {locale} captions", flush=True)
+    try:
+        subprocess.run(
+            [
+                "bundle",
+                "exec",
+                "fastlane",
+                "run",
+                "frameit",
+                f"path:{raw_dir}",
+            ],
+            cwd=PROJECT_ROOT,
+            check=True,
+        )
+    finally:
+        scoped_config.unlink(missing_ok=True)
     destination.mkdir(parents=True, exist_ok=True)
     outputs: list[Path] = []
     for number, source in enumerate(framed_sources, 1):

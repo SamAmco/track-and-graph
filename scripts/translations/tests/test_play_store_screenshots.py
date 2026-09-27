@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 SCRIPT = Path(__file__).resolve().parents[2] / "play_store_screenshots.py"
@@ -58,6 +60,64 @@ class PlayStoreScreenshotsTest(unittest.TestCase):
             self.assertEqual(
                 play_store_screenshots.SCREENSHOT_COUNT,
                 len(play_store_screenshots.raw_screenshots("de-DE", root)),
+            )
+
+    def test_caption_font_uses_fontconfig_fallback_for_non_latin_text(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            captions = Path(temp) / "title.strings"
+            captions.write_text('"1" = "日本語";\n', encoding="utf-8")
+            fallback = Path(temp) / "NotoSansCJK-Bold.ttc"
+            fallback.touch()
+            completed = unittest.mock.Mock(stdout=f"Noto Sans CJK JP\t{fallback}\n")
+
+            with patch.object(
+                play_store_screenshots.subprocess,
+                "run",
+                return_value=completed,
+            ) as run:
+                selected = play_store_screenshots.caption_font(captions)
+
+            self.assertEqual(fallback.resolve(), selected)
+            pattern = run.call_args.args[0][-1]
+            self.assertIn("65e5", pattern)
+            self.assertIn("672c", pattern)
+
+    def test_scoped_frameit_config_uses_relative_font_and_background(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            config_path = root / "Framefile.json"
+            font = root / "font.ttf"
+            font.touch()
+            raw_dir = root / "ja-JP"
+            raw_dir.mkdir()
+
+            with (
+                patch.object(play_store_screenshots, "FRAMEIT_CONFIG", config_path),
+                patch.object(play_store_screenshots, "FRAMEIT_ROOT", root),
+            ):
+                config_path.write_text(
+                    json.dumps(
+                        {
+                            "default": {
+                                "keyword": {"font": "old"},
+                                "title": {"font": "old"},
+                                "background": "old",
+                            }
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                destination = play_store_screenshots.write_scoped_frameit_config(
+                    raw_dir, font.resolve()
+                )
+
+            generated = json.loads(destination.read_text(encoding="utf-8"))
+            self.assertEqual(
+                "../font.ttf", generated["default"]["title"]["font"]
+            )
+            self.assertEqual(
+                "../background.jpg",
+                generated["default"]["background"],
             )
 
 
