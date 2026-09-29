@@ -17,8 +17,8 @@ sys.path.insert(0, str(TRANSLATIONS_DIR))
 
 from markdown_validation import validate_markdown  # noqa: E402
 from providers.base import TranslationResult  # noqa: E402
-import translate_release_notes as release_notes  # noqa: E402
-from translate_release_notes import _instructions  # noqa: E402
+import translate_in_app_changelogs as release_notes  # noqa: E402
+from translate_in_app_changelogs import _instructions  # noqa: E402
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "complex_release_note.md"
@@ -66,7 +66,7 @@ class MarkdownValidationTest(unittest.TestCase):
         fake = FakeTranslator()
         with tempfile.TemporaryDirectory() as output_dir:
             arguments = [
-                "translate_release_notes.py",
+                "translate_in_app_changelogs.py",
                 str(FIXTURE),
                 "--target", "xx=Test",
                 "--output-dir", output_dir,

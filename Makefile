@@ -264,10 +264,14 @@ playstore-screenshots-english-framed: playstore-screenshots-english
 tutorial-record:
 	@./scripts/tutorial-record.sh
 
-.PHONY: changelog
-## changelog: Interactively create Play Store and optional public release notes for the current version.
-changelog:
-	@lua scripts/new_changelog.lua
+.PHONY: release-notes release-notes-validate
+## release-notes: Draft and translate concise Play Store/GitHub release notes (paid API calls).
+release-notes:
+	@python3 -B scripts/translations/prepare_release_notes.py create $(TRANSLATION_ARGS)
+
+## release-notes-validate: Offline validation for every localized release note for the current version.
+release-notes-validate:
+	@python3 -B scripts/translations/prepare_release_notes.py validate
 
 .PHONY: snapshot-release
 ## snapshot-release: Create the next isolated snapshot-version revision.
@@ -275,17 +279,17 @@ snapshot-release:
 	@python3 scripts/snapshot_release.py
 
 .PHONY: commit-version
-## commit-version: Commit the version bump and changelog using jj.
+## commit-version: Commit the version bump and concise release notes using jj.
 commit-version:
 	@python3 scripts/commit_version_bump_jj.py
 
 .PHONY: commit-version-git
-## commit-version-git: Legacy git-based version/changelog commit helper.
+## commit-version-git: Legacy git-based version/release-notes commit helper.
 commit-version-git:
 	@python3 scripts/commit_version_bump.py
 
 .PHONY: github-release
-## github-release: Create a GitHub release from the current version and changelog using jj history.
+## github-release: Create a GitHub release using the current version and concise English release notes.
 github-release:
 	@python3 scripts/create_release_jj.py
 

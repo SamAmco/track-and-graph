@@ -1,24 +1,25 @@
 ---
-name: translate-release-notes
-description: Translate Track & Graph release notes with the local Markdown-safe API workflow, including domain-context maintenance and translation spot checks. Use when preparing or evaluating localized public changelogs; do not use for Lua function-file translation.
+name: translate-in-app-changelogs
+description: Translate Track & Graph's long in-app Markdown changelogs with structural validation, domain-context maintenance, and translation spot checks. Do not use for concise Play Store and GitHub release notes.
 ---
 
-# Translate Release Notes
+# Translate In-App Changelogs
 
-Use this skill only when the user explicitly requests `$translate-release-notes`
-or explicitly asks to run release-note translation. Do not invoke it merely
-because release notes are being drafted, edited, reviewed, or prepared. Those
-activities do not authorize paid API calls.
+Use this skill only when the user explicitly requests
+`$translate-in-app-changelogs` or explicitly asks to translate the long in-app
+changelog. Do not invoke it for the concise Play Store/GitHub release notes, or
+merely because changelog copy is being drafted or reviewed. Those activities do
+not authorize paid API calls.
 
-Translate from the finalized English public changelog. Keep generated output out
-of production locale files until it has passed validation and review.
+Translate from the finalized English in-app changelog. Keep generated output
+out of production locale files until it has passed validation and review.
 
 ## Before translating
 
 1. Read `docs/knowledge-base/release-changelogs.md` and inspect the relevant
    `changelogs/<version>/en.md`.
 2. Identify the previous published app release from `changelogs/index.json`.
-   Review the new English release note and, where needed, the changes since that
+   Review the new English changelog and, where needed, the changes since that
    release to find new app concepts or changed meanings. Use `jj`, never Git.
 3. Read `scripts/translations/domain_brief.md`. Add English context for new or
    ambiguous app concepts. This is an app-domain explanation, not a release
@@ -38,8 +39,8 @@ python3 -B -m unittest discover \
   -p 'test_*.py' -v
 ```
 
-Use `scripts/translations/translate_release_notes.py` without `--target` for the
-full list in `languages.py`. Use repeated `--target` arguments only
+Use `scripts/translations/translate_in_app_changelogs.py` without `--target`
+for the full list in `languages.py`. Use repeated `--target` arguments only
 for tests or selective reruns. Write the first pass to a version-specific
 directory under `/tmp`; do not overwrite checked-in translations during
 evaluation. The script sends one complete Markdown file per locale, runs locales
@@ -48,7 +49,7 @@ with exact structural failures in its final JSON summary.
 
 Only make live API calls after the user specifically requests the translation
 run or API test and the required provider credentials are available. Confirm
-that the English release-note copy is considered ready unless the user's request
+that the English in-app changelog is considered ready unless the user's request
 already makes that clear. A retry is expected for a transient or rejected
 response only when explicitly requested with `--retries`; the default makes one
 paid request per locale. Do not weaken validation to make output pass.

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Translate In-App Changelogs"
+  short_description: "Translate and review long in-app changelogs"
+policy:
+  allow_implicit_invocation: false

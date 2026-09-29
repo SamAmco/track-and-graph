@@ -132,13 +132,29 @@ and removes the resolved artifact.
 The script preserves target-only entries while reporting them. Deletion is a
 separate, deliberate cleanup step.
 
-## Release notes
+## Concise release notes
 
-`translate_release_notes.py` sends the complete Markdown file in one request per
-locale. It runs locales concurrently, validates that protected content and
-Markdown structure survived, and reports exact failures. Every returned
-translation is written so small structural defects can be repaired locally.
-Paid retries are opt-in with `--retries`; the default is zero.
+`prepare_release_notes.py create` opens an English Markdown-subset draft with
+the commits since the latest release tag appended below a protected reference
+marker. Only the text between the release-note markers is published. It writes
+English and every returned translation directly to the current versionCode's
+Fastlane changelog path. Google Play and the GitHub release both consume the
+English file from this suite; the workflow never writes under `changelogs/`.
+
+The prompt asks for at most 500 characters and results are checked for both that
+limit and preserved Markdown structure. Invalid translations are still written
+and listed in the JSON summary. Repair those files locally, then rerun the
+offline `prepare_release_notes.py validate` command until all manifest locales
+pass. The Make proxies are `make release-notes` and
+`make release-notes-validate`.
+
+## In-app changelogs
+
+`translate_in_app_changelogs.py` sends a complete long-form Markdown changelog
+in one request per locale. It runs locales concurrently, validates that
+protected content and Markdown structure survived, and reports exact failures.
+Every returned translation is written so small structural defects can be
+repaired locally. Paid retries are opt-in with `--retries`; the default is zero.
 
 `domain_brief.md` is compact English context explaining the app's stable domain
 model and ambiguous terminology. It is included in every translation request.
@@ -146,9 +162,9 @@ Its core section must not be removed. The 8,000-character ceiling is a generous
 safety limit, not a target: retain useful context when adding new concepts.
 
 ```bash
-python3 scripts/translations/translate_release_notes.py \
+python3 scripts/translations/translate_in_app_changelogs.py \
   changelogs/10.0.0/en.md \
-  --output-dir /tmp/release-note-translations
+  --output-dir /tmp/in-app-changelog-translations
 ```
 
 The command translates every supported target by default. Use repeated
@@ -161,7 +177,7 @@ repairs, validate the outputs without making API calls:
 ```bash
 python3 scripts/translations/markdown_validation.py \
   changelogs/10.0.0/en.md \
-  /tmp/release-note-translations/*.md
+  /tmp/in-app-changelog-translations/*.md
 ```
 
 ## Lua community copy

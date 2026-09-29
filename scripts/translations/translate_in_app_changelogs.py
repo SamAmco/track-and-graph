@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Translate one complete Markdown release note per target locale."""
+"""Translate one complete in-app Markdown changelog per target locale."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ def _instructions(
             + "\nCorrect those problems in this attempt.\n"
             + "\n".join(details)
         )
-    return f"""Translate this complete Markdown release-note file from English into {target_language}.
+    return f"""Translate this complete in-app Markdown changelog from English into {target_language}.
 
 Return only the translated Markdown file. Do not wrap it in a code fence and do not add commentary.
 

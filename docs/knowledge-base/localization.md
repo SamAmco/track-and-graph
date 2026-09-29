@@ -133,8 +133,17 @@ mix of language-only and language-region identifiers is therefore explicit
 rather than inferred through a separate override map. Do not duplicate the
 expected list in code or tests. Other shared infrastructure lives under
 `scripts/translations/`: `domain_brief.md`, provider adapters, and
-`translation_runtime.py`. Release notes, Android resources, and Lua catalog
-copy reuse those pieces but keep format-specific extraction and validation.
+`translation_runtime.py`. Concise Play Store/GitHub release notes, long in-app
+changelogs, Android resources, and Lua catalog copy reuse those pieces but keep
+format-specific extraction and validation.
+
+`make release-notes` is an explicitly paid workflow for the current
+`versionCode`. It opens one English Markdown-subset draft with jj commits below
+an excluded reference marker, then writes English and every returned locale to
+Fastlane's changelog directories. Results over Google's 500-character limit or
+with damaged Markdown structure are retained and reported. Repair them locally
+and rerun the offline `make release-notes-validate`; the concise workflow must
+never write to the separate `changelogs/` in-app tree.
 
 Google Play listing metadata under `fastlane/metadata/android/` uses the same
 language manifest, domain brief, and provider adapter through

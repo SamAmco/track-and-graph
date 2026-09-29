@@ -1,23 +1,19 @@
 ---
-title: Release changelogs — workflow, structure, and Play Store limits
-description: Snapshot version revisions; public and Play Store changelogs; creation, preview, translation, locale-aware in-app download, limits, and index.json maintenance.
+title: Release notes and in-app changelogs
+description: Separate workflows for concise Play Store/GitHub release notes and long localized in-app Markdown changelogs.
 topics:
   - Snapshot releases: guarded make target increments snapshots or interactively starts a major, minor, or patch snapshot in a dedicated jj revision
-  - make changelog: lua script creates temp file, opens in nvim, processes output
-  - Public changelogs: changelogs/{versionName}/{locale}.md with index.json
-  - publish flag: controls whether public markdown and changelogs/index.json are created for in-app release dialog visibility
-  - Fastlane changelogs: fastlane/metadata/android/{regional-locale}/changelogs/{versionCode}.txt
-  - Play Store limit: 500 characters per language for "What's new" text
-  - GitHub releases: prefer public English markdown via gh --notes-file, fall back to English Fastlane text for patches
+  - Concise release notes: translated Fastlane changelogs shared by Google Play and GitHub releases
+  - make release-notes: Markdown editor buffer with excluded jj commit reference, then paid parallel translation
+  - make release-notes-validate: offline completeness, structure, and 500-character validation
+  - In-app changelogs: changelogs/{versionName}/{locale}.md with index.json
   - Changelog viewer app: paste markdown and preview the shared dialog plus FOSS and mock Play support flows
-  - make changelog seed locales: en-GB/en, es-ES/es, fr-FR/fr, de-DE/de
   - Runtime locale selection: BCP 47 language-and-script match, one Markdown download per release, English fallback
-  - Public changelog copy-editing: finalize English first, then translate locale markdown using app string resources for terms
-  - API translation: full Markdown per locale, domain brief, deterministic validation, explicit invocation only
-keywords: [changelog, release, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, fastlane, play-store, make-changelog, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
+  - In-app changelog translation: full Markdown per locale, domain brief, deterministic validation, explicit invocation only
+keywords: [changelog, release, release-notes, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, fastlane, play-store, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
 ---
 
-# Release Changelogs
+# Release Notes and In-App Changelogs
 
 ## Snapshot Releases
 
@@ -37,63 +33,78 @@ is incremented without prompting. Use `python3 scripts/snapshot_release.py
 pass `--release-type major|minor|patch` to make the initial choice
 non-interactively.
 
-## Dual Changelog System
+## Two independent outputs
 
-There are two separate changelog outputs for each release:
+There are two deliberately independent kinds of release copy:
 
-1. **Public changelogs** — full-length markdown in `changelogs/{versionName}/` (e.g. `changelogs/10.0.0/en.md`). These are referenced by the app and website via `changelogs/index.json`. No character limit — can include images, headers, detailed descriptions.
+- **Release notes** are concise Markdown-subset/plain text in
+  `fastlane/metadata/android/{Play locale}/changelogs/{versionCode}.txt`.
+  Google Play displays each localized file in What's New; GitHub releases use
+  the same English file. Every locale has a strict 500-character limit.
+- **In-app changelogs** are optional long-form Markdown in
+  `changelogs/{versionName}/{locale}.md`, referenced through
+  `changelogs/index.json`. These can contain images, headings, and detailed
+  explanations and are downloaded by the app after release.
 
-2. **Fastlane changelogs** — short plain text in `fastlane/metadata/android/{regional-locale}/changelogs/{versionCode}.txt` (e.g. `fastlane/metadata/android/en-GB/changelogs/800010.txt`). These are uploaded to the Google Play Store's "What's new" section.
+Never have the concise release-note workflow write to `changelogs/` or update
+its index. Publishing an in-app changelog is a later, separate decision.
 
-**Play Store limit: 500 characters per language.** Fastlane changelogs must stay under this. Use `wc -m` (not `wc -c`) to count characters accurately for multi-byte/emoji content. The full public changelogs are typically 2500-3000+ characters, so fastlane versions need to be heavily condensed summaries.
+## Concise release-note workflow
 
-GitHub releases prefer the public English markdown changelog and fall back to the English Fastlane changelog when public markdown was not published. The release scripts pass whichever file exists to `gh release create` with `--notes-file`, so feature releases can render rich markdown while patch releases can reuse the short bullet list written for Play Store.
+Run `make release-notes` after setting the release version. It invokes
+`scripts/translations/prepare_release_notes.py create`, which:
 
-## Workflow: `make changelog`
+- Reads `versionCode` and `versionName` from the app Gradle configuration.
+- Uses `jj` to find the highest semantic release tag and list commits since it.
+- Opens a temporary Markdown file. Only text between explicit release-note
+  markers is published; commented commits below the end marker are reference.
+- Writes the English note to its Fastlane path.
+- Sends the complete note and shared domain brief once per non-English locale,
+  concurrently, through the standard provider adapter.
+- Writes every returned translation to its exact Play-locale Fastlane path,
+  even when it fails structure or length validation.
+- Prints a JSON summary containing paths, character counts, validation issues,
+  provider failures, and usage.
 
-Runs `scripts/new_changelog.lua` which:
+The translation prompt explicitly requires at most 500 Unicode characters,
+including spaces and line breaks, while preserving all release-note items. The
+validator checks the actual Python character count and Markdown structure. A
+failure makes the command exit non-zero but never discards returned copy.
 
-1. Reads `versionCode` and `versionName` from `app/app/build.gradle.kts`
-2. Finds the most recent git tag and generates a git log since that tag
-3. Creates a temp lua file with a template data structure and the git log as comments
-4. Opens the file in neovim for editing
-5. On save, processes the lua structure to write:
-   - Fastlane changelogs (always)
-   - Public changelogs + `changelogs/index.json` update (only if `publish = true`)
-6. Validates `index.json` against `changelogs/index.schema.json` when public changelogs are published
+Repair flagged `.txt` files directly without another paid request, then run
+`make release-notes-validate`. This offline command requires every locale in
+`configuration/translation-languages.tsv`, rechecks Markdown structure against
+English, and reports missing or over-limit files with their exact paths and
+character counts. Iterate until it succeeds before describing the suite as
+complete. The release runbook contains both steps.
 
-The Lua template seeds English, Spanish, French, and German entries with
-`regional` (e.g. `en-GB`) and `general` (e.g. `en`) locale codes. Regional codes
-are used for Fastlane directory paths; general codes are used for public
-changelog filenames. This four-locale seed set belongs to changelog creation,
-not the translation target list. The API translation workflow uses the shared
-language manifest, and every published locale path must be added to the public
-changelog index.
-
-The `publish` flag controls whether full public markdown is created and listed in `changelogs/index.json`, which is what makes the full-screen in-app release notes available to users after update. Patch releases can use `publish = false` to avoid the in-app dialog and reuse the short English Fastlane changelog for GitHub.
+GitHub release creation always passes the concise English Fastlane file to
+`gh release create --notes-file`; it never reads or falls back to an in-app
+changelog.
 
 ## Previewing In-App Markdown
 
-Use the `changelog-viewer` Android module to preview public changelog markdown before publishing it. The viewer lets you paste or clear markdown text and opens the same shared changelog dialog content used by the production app. Its support footer displays both distribution variants together: the Buy Me a Coffee action opens the shared thank-you state directly, while the Play action exercises the animated mock price-options flow, back navigation, and simulated purchase result. It does not open an external support link or include the Billing SDK.
+Use the `changelog-viewer` Android module to preview in-app changelog Markdown before publishing it. The viewer lets you paste or clear markdown text and opens the same shared changelog dialog content used by the production app. Its support footer displays both distribution variants together: the Buy Me a Coffee action opens the shared thank-you state directly, while the Play action exercises the animated mock price-options flow, back navigation, and simulated purchase result. It does not open an external support link or include the Billing SDK.
 
 The footer layout, localized support copy, support assets, thank-you content, dialog UI, and price-options body live in the shared UI module. Each production flavor supplies only its own support action; the viewer supplies both actions to the same footer component. Only the viewer's Play product data and purchase result are fake.
 
 ## Copy Editing and Translation
 
-When iterating on public changelog copy, treat the English markdown as the source text. Finalize wording there before translating the target locale files; this avoids repeating copy edits across the full suite. Locale files may exist as placeholders before translation.
+When iterating on in-app changelog copy, treat the English Markdown as the source text. Finalize wording there before translating the target locale files; this avoids repeating copy edits across the full suite. Locale files may exist as placeholders before translation.
 
 When translating, check string resources for official UI terms before choosing feature names or labels. This matters for both old features and newly released UI, not only for terms called out in this document.
 
 ### API translation workflow
 
-The explicitly invoked `.agents/skills/translate-release-notes` workflow uses
-`scripts/translations/translate_release_notes.py`. It sends the complete English
-Markdown and `domain_brief.md` in one request per locale through a swappable
-provider adapter. Locales run concurrently. Deterministic validation protects
-URLs, link targets, code, identifiers, and Markdown structure. Returned results
-are always written and the final JSON summary lists invalid locales and checks.
-The default is one paid request per locale; repair small structural failures
-locally and rerun `markdown_validation.py` before considering an API retry.
+The explicitly invoked `.agents/skills/translate-in-app-changelogs` workflow
+uses `scripts/translations/translate_in_app_changelogs.py`. It sends the
+complete English Markdown and `domain_brief.md` in one request per locale
+through a swappable provider adapter. Locales run concurrently. Deterministic
+validation protects URLs, link targets, code, identifiers, and Markdown
+structure. Returned results are always written and the final JSON summary lists
+invalid locales and checks. The default is one paid request per locale; repair
+small structural failures locally and rerun `markdown_validation.py` before
+considering an API retry.
 
 `scripts/translations/languages.py` is the shared source of truth for translation
 targets. It contains 66 non-English, non-RTL written-language targets from
@@ -110,8 +121,8 @@ The domain brief preserves stable core terminology and may grow to an
 refine the brief and rerun only affected locales once. Live calls require an
 explicit user request, and initial results stay under `/tmp` until reviewed.
 
-The complex Markdown fixture is intentionally harsher than normal release
-notes. A 2026-09-18 full GPT-5.6 Luna run produced structurally valid output for
+The complex Markdown fixture is intentionally harsher than normal in-app
+changelogs. A 2026-09-18 full GPT-5.6 Luna run produced structurally valid output for
 61 of 65 languages after bounded retries. The four rejected locales repeatedly
 dropped one bold span; valid lower-resource outputs also showed occasional
 untranslated terminology or mixed-script text. All four structural failures
@@ -119,20 +130,13 @@ were repaired locally by restoring the missing emphasis, then passed validation
 without another API call. Keep deterministic validation and manually spot-check
 meaning and script consistency before publishing.
 
-## `make changelog` seed locales
-
-| Regional | General | String resources dir |
-|----------|---------|---------------------|
-| en-GB    | en      | values/             |
-| es-ES    | es      | values-es/          |
-| fr-FR    | fr      | values-fr/          |
-| de-DE    | de      | values-de-rDE/      |
-
-When translating changelogs, check string resources for official translations of feature names (e.g. "Symlink" is "Enlace simbólico" in Spanish, "Lien symbolique" in French, but stays "Symlink" in German).
+When translating in-app changelogs, check string resources for official translations of feature names (e.g. "Symlink" is "Enlace simbólico" in Spanish, "Lien symbolique" in French, but stays "Symlink" in German).
 
 ## index.json
 
-Located at `changelogs/index.json`, maps version names to locale-specific markdown paths for in-app release notes. Updated automatically by the lua script when `publish = true`. Validated against `changelogs/index.schema.json`.
+Located at `changelogs/index.json`, maps version names to locale-specific
+Markdown paths for in-app changelogs. It is maintained only by the independent
+in-app changelog workflow and validated against `changelogs/index.schema.json`.
 
 The schema requires English for every release and accepts other BCP 47 locale
 keys; it does not contain a four-language allowlist.

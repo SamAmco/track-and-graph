@@ -5,7 +5,7 @@ Create a GitHub release with the current version.
 - Asks if pre-release or latest
 - Creates appropriate tag (rc-vX.Y.Z or vX.Y.Z)
 - Pushes branch and tag
-- Creates GitHub release with changelog and APK
+- Creates GitHub release with concise English release notes and APK
 """
 
 import re
@@ -55,24 +55,15 @@ def check_tag_exists(tag):
     return bool(result.stdout.strip())
 
 
-def get_changelog_file(version_name, version_code):
-    """Get release notes, preferring public markdown and falling back to Fastlane text."""
+def get_release_notes_file(version_code):
+    """Get the concise English release notes shared with Google Play."""
     root_dir = Path(__file__).parent.parent
-    public_changelog_file = root_dir / "changelogs" / version_name / "en.md"
-
-    if public_changelog_file.exists():
-        print("✓ Using public markdown changelog for GitHub release")
-        return public_changelog_file
-
-    fastlane_changelog_file = root_dir / "fastlane" / "metadata" / \
+    release_notes_file = root_dir / "fastlane" / "metadata" / \
         "android" / "en-GB" / "changelogs" / f"{version_code}.txt"
-
-    if fastlane_changelog_file.exists():
-        print("✓ Public markdown changelog not found; using Fastlane changelog for GitHub release")
-        return fastlane_changelog_file
-
-    print(f"Error: Changelog file not found: {public_changelog_file}")
-    print(f"Error: Fallback changelog file not found: {fastlane_changelog_file}")
+    if release_notes_file.exists():
+        print("✓ Using concise English release notes for GitHub release")
+        return release_notes_file
+    print(f"Error: Release notes not found: {release_notes_file}")
     sys.exit(1)
 
 
@@ -140,9 +131,9 @@ def main():
         sys.exit(1)
     print(f"✓ Tag '{tag}' does not exist")
 
-    # Get changelog
-    changelog_file = get_changelog_file(version_name, version_code)
-    print(f"✓ Found changelog: {changelog_file}")
+    # Get release notes
+    release_notes_file = get_release_notes_file(version_code)
+    print(f"✓ Found release notes: {release_notes_file}")
 
     # Find APK
     apk_path = find_apk()
@@ -187,7 +178,7 @@ def main():
         "gh", "release", "create", tag,
         str(apk_path),
         "--title", tag,
-        "--notes-file", str(changelog_file)
+        "--notes-file", str(release_notes_file)
     ]
 
     if is_prerelease:
