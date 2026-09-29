@@ -118,9 +118,10 @@ complete English Markdown and `domain_brief.md` in one request per locale
 through a swappable provider adapter. Locales run concurrently. Deterministic
 validation protects URLs, link targets, code, identifiers, and Markdown
 structure. Returned results are always written and the final JSON summary lists
-invalid locales and checks. The default is one paid request per locale; repair
-small structural failures locally and rerun `markdown_validation.py` before
-considering an API retry.
+invalid locales and checks. By default, each result is written directly beside
+the English source in `changelogs/<version>/`, including invalid output. The
+default is one paid request per locale; repair small structural failures in
+place and rerun `markdown_validation.py` before considering an API retry.
 
 `scripts/translations/languages.py` is the shared source of truth for translation
 targets. It contains 66 non-English, non-RTL written-language targets from
@@ -135,7 +136,8 @@ provider adapters, but have its own source and output wrapper.
 The domain brief preserves stable core terminology and may grow to an
 8,000-character safety ceiling. If review exposes a domain misunderstanding,
 refine the brief and rerun only affected locales once. Live calls require an
-explicit user request, and initial results stay under `/tmp` until reviewed.
+explicit user request. They write directly to the version directory so there is
+no separate copy/finalization step.
 
 The complex Markdown fixture is intentionally harsher than normal in-app
 changelogs. A 2026-09-18 full GPT-5.6 Luna run produced structurally valid output for

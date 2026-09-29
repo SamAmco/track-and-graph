@@ -163,13 +163,14 @@ safety limit, not a target: retain useful context when adding new concepts.
 
 ```bash
 python3 scripts/translations/translate_in_app_changelogs.py \
-  changelogs/10.0.0/en.md \
-  --output-dir /tmp/in-app-changelog-translations
+  changelogs/10.0.0/en.md
 ```
 
 The command translates every supported target by default. Use repeated
 `--target es=Spanish` arguments for a test or selective rerun. It reads
-`OPENAI_API_KEY` from the environment and never writes it.
+`OPENAI_API_KEY` from the environment and never writes it. By default, each
+returned locale is written directly beside the English source. An explicit
+`--output-dir` remains available for isolated tests.
 
 The final JSON line lists invalid locales and their failed checks. After local
 repairs, validate the outputs without making API calls:
@@ -177,7 +178,15 @@ repairs, validate the outputs without making API calls:
 ```bash
 python3 scripts/translations/markdown_validation.py \
   changelogs/10.0.0/en.md \
-  /tmp/in-app-changelog-translations/*.md
+  changelogs/10.0.0/*.md
+```
+
+After reviewing and repairing the locale files in place, rebuild and validate
+the index instead of editing its locale object manually:
+
+```bash
+make in-app-changelog-index-update VERSION=10.0.0
+make in-app-changelog-validate
 ```
 
 ## Lua community copy

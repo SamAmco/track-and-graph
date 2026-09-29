@@ -11,13 +11,17 @@ changelog. Do not invoke it for the concise Play Store/GitHub release notes, or
 merely because changelog copy is being drafted or reviewed. Those activities do
 not authorize paid API calls.
 
-Translate from the finalized English in-app changelog. Keep generated output
-out of production locale files until it has passed validation and review.
+Translate from the finalized English in-app changelog. Write every returned
+locale directly beside it in `changelogs/<version>/`, including invalid output,
+so failures can be inspected and repaired in place.
 
 ## Before translating
 
 1. Read `docs/knowledge-base/release-changelogs.md` and inspect the relevant
    `changelogs/<version>/en.md`.
+   Refuse to translate while it contains the
+   `REVIEW-ONLY-COMMITS` marker; that private commit inventory must be removed
+   after English review and before any paid calls.
 2. Identify the previous published app release from `changelogs/index.json`.
    Review the new English changelog and, where needed, the changes since that
    release to find new app concepts or changed meanings. Use `jj`, never Git.
@@ -41,11 +45,13 @@ python3 -B -m unittest discover \
 
 Use `scripts/translations/translate_in_app_changelogs.py` without `--target`
 for the full list in `languages.py`. Use repeated `--target` arguments only
-for tests or selective reruns. Write the first pass to a version-specific
-directory under `/tmp`; do not overwrite checked-in translations during
-evaluation. The script sends one complete Markdown file per locale, runs locales
-concurrently, writes every returned translation, and reports invalid locales
-with exact structural failures in its final JSON summary.
+for tests or selective reruns. Run it against `changelogs/<version>/en.md` and
+use its default output directory, which is the source file's directory. The
+script sends one complete Markdown file per locale, runs locales concurrently,
+writes every returned translation immediately to
+`changelogs/<version>/<locale>.md`, and reports invalid locales with exact
+structural failures in its final JSON summary. A selective rerun overwrites
+only its selected locale files.
 
 Only make live API calls after the user specifically requests the translation
 run or API test and the required provider credentials are available. Confirm
@@ -76,8 +82,21 @@ scope warrants it. Check:
 
 Compare against existing human translations where possible. Report concrete
 quality problems, rejected/retried locales, token usage, approximate cost, and
-the temporary output paths. Copy results into `changelogs/<version>/` only when
-the user requests that finalization.
+the exact in-place output paths. Repair flagged locale files directly in
+`changelogs/<version>/`.
+
+After finalizing locale files, never edit `changelogs/index.json` by hand. Run:
+
+```bash
+make in-app-changelog-index-update VERSION=<version>
+make in-app-changelog-validate
+```
+
+The updater discovers the Markdown files, orders locales from the shared
+language manifest, and replaces that version's index entry. Validation checks
+the schema, ordering, exact paths, referenced files, unindexed locale files,
+and publication-blocking review markers. Do not describe the changelog as
+publishable until validation succeeds.
 
 If review finds a domain misunderstanding, improve the domain brief and rerun
 only affected locales. The user's explicit request for the translation session

@@ -88,6 +88,54 @@ class MarkdownValidationTest(unittest.TestCase):
                 summary["invalid"][0]["issues"],
             )
 
+    def test_translation_defaults_to_source_directory(self) -> None:
+        source_text = "## Feature\n\nDescription.\n"
+
+        class FakeTranslator:
+            def translate(self, **_kwargs: object) -> TranslationResult:
+                return TranslationResult(text=source_text, usage={})
+
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "en.md"
+            source.write_text(source_text, encoding="utf-8")
+            arguments = [
+                "translate_in_app_changelogs.py",
+                str(source),
+                "--target", "xx=Test",
+            ]
+            with (
+                patch.object(release_notes, "create_translator", return_value=FakeTranslator()),
+                patch.object(sys, "argv", arguments),
+                redirect_stdout(io.StringIO()),
+            ):
+                self.assertEqual(0, release_notes.main())
+
+            self.assertEqual(source_text, (Path(temp) / "xx.md").read_text())
+
+    def test_review_only_commit_inventory_is_rejected_before_provider_creation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "en.md"
+            source.write_text(
+                "## Feature\n\n"
+                "<!-- REVIEW-ONLY-COMMITS: remove before translation/publishing -->\n"
+                "- abc123 Internal change\n",
+                encoding="utf-8",
+            )
+            arguments = [
+                "translate_in_app_changelogs.py",
+                str(source),
+                "--target", "xx=Test",
+                "--output-dir", str(Path(temp) / "output"),
+            ]
+            with (
+                patch.object(release_notes, "create_translator") as create_translator,
+                patch.object(sys, "argv", arguments),
+                self.assertRaises(SystemExit),
+            ):
+                release_notes.main()
+
+            create_translator.assert_not_called()
+
     def test_rejects_changed_url(self) -> None:
         self.assert_rejected("https://example.com/releases", "https://invalid.example/releases", "urls_exact")
 

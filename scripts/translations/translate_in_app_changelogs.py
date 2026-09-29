@@ -9,6 +9,9 @@ import json
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from in_app_changelog_index import REVIEW_ONLY_MARKER
 from markdown_validation import validate_markdown
 from providers.base import Translator, TranslatorError
 from languages import SUPPORTED_TARGETS, TranslationTarget
@@ -66,7 +69,11 @@ def main() -> int:
         action="append",
         help="translate only LOCALE=LANGUAGE; repeat as needed (default: all supported languages)",
     )
-    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        help="output directory (default: directory containing the source Markdown)",
+    )
     add_provider_arguments(parser)
     parser.add_argument(
         "--retries", type=int, default=0,
@@ -76,18 +83,23 @@ def main() -> int:
     if args.retries < 0:
         parser.error("--retries cannot be negative")
 
+    targets = tuple(args.target) if args.target else SUPPORTED_TARGETS
+
+    source = args.markdown.read_text(encoding="utf-8")
+    if REVIEW_ONLY_MARKER in source:
+        parser.error(
+            "remove the review-only commit inventory before translating this changelog"
+        )
     try:
         translator = create_translator(args.provider, args.model)
     except ValueError as error:
         parser.error(str(error))
-    targets = tuple(args.target) if args.target else SUPPORTED_TARGETS
-
-    source = args.markdown.read_text(encoding="utf-8")
     try:
         domain_context = load_domain_brief(args.domain_brief)
     except ValueError as error:
         parser.error(str(error))
-    args.output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = args.output_dir or args.markdown.parent
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     def translate(
         target: TranslationTarget,
@@ -108,7 +120,7 @@ def main() -> int:
             validation = validate_markdown(source, result.text)
             feedback = validation.failures
             if validation.is_valid or attempt == args.retries:
-                destination = args.output_dir / f"{target.locale}.md"
+                destination = output_dir / f"{target.locale}.md"
                 destination.write_text(result.text, encoding="utf-8")
                 return destination, usages, feedback
         raise AssertionError("retry loop did not return or raise")
