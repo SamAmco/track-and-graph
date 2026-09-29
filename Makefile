@@ -27,10 +27,20 @@ ifndef FILE
 endif
 	@./scripts/deep-link-inject.sh $(FILE)
 
-.PHONY: validate-remote-config
+.PHONY: validate-remote-config in-app-changelog-index-update in-app-changelog-validate
 ## validate-remote-config: Validate the checked-in remote configuration and referenced assets.
 validate-remote-config:
 	@./scripts/validate-remote-config.sh
+
+## in-app-changelog-index-update: Discover VERSION's Markdown locales and update the in-app changelog index.
+in-app-changelog-index-update:
+	@test -n "$(VERSION)" || (echo "Usage: make in-app-changelog-index-update VERSION=<version>" && exit 1)
+	@python3 -B scripts/in_app_changelog_index.py update "$(VERSION)"
+
+## in-app-changelog-validate: Validate the in-app changelog index schema, ordering, paths, and files.
+in-app-changelog-validate:
+	@jsonschema-cli validate changelogs/index.schema.json -i changelogs/index.json
+	@python3 -B scripts/in_app_changelog_index.py validate
 
 .PHONY: translations-audit translations-apply-failure translations-baseline translations-generate translations-test translations-validate fastlane-translations-generate frameit-translations-generate lua-translations-function lua-translations-shared lua-translations-apply
 ## translations-audit: Report missing, stale, and target-only Android translations without modifying files.
@@ -153,7 +163,7 @@ lua-test-tools:
 
 .PHONY: validate-all
 ## validate-all: Run the complete pre-release validation suite.
-validate-all: translations-test translations-validate lua-test-api lua-test-tools validate-remote-config run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
+validate-all: translations-test translations-validate lua-test-api lua-test-tools validate-remote-config in-app-changelog-validate run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
 	@echo "All validations passed."
 
 .PHONY: assemble-release
