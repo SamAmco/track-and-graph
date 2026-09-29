@@ -12,7 +12,7 @@ from pathlib import Path
 SCRIPTS_DIR = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-from in_app_changelog_index import update_version, validation_issues
+from in_app_changelog_index import REVIEW_ONLY_MARKER, update_version, validation_issues
 
 
 class InAppChangelogIndexTest(unittest.TestCase):
@@ -91,6 +91,30 @@ class InAppChangelogIndexTest(unittest.TestCase):
         self.assertIn(
             "3.0.0: English changelog exists but version is missing from index", issues
         )
+
+    def test_validation_rejects_review_only_commit_inventory(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            changelogs, index = self.make_repo(Path(temp))
+            directory = changelogs / "1.0.0"
+            directory.mkdir()
+            (directory / "en.md").write_text(
+                f"## Feature\n\n{REVIEW_ONLY_MARKER}\n- abc123 Internal change\n",
+                encoding="utf-8",
+            )
+            update_version(
+                "1.0.0",
+                changelog_root=changelogs,
+                index_path=index,
+                locales=("en",),
+            )
+
+            issues = validation_issues(
+                changelog_root=changelogs,
+                index_path=index,
+                locales=("en",),
+            )
+
+        self.assertTrue(any("review-only commit inventory" in issue for issue in issues))
 
 
 if __name__ == "__main__":

@@ -129,8 +129,8 @@ docs:
 
   - file: release-changelogs.md
     title: Release notes and in-app changelogs
-    description: Separate concise Play Store/GitHub release-note and long in-app Markdown changelog workflows, translation, validation, locale-aware download, and limits.
-    keywords: [changelog, in-app-changelog, release, release-notes, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, mock-support, billing, fastlane, play-store, make-release-notes, localization, locale-selection, BCP-47, translation, domain-brief, cache, ETag, 500-char, index.json, versionCode, versionName]
+    description: Separate concise Play Store/GitHub release-note and long in-app Markdown changelog workflows, authoring skills, translation, deterministic index maintenance, validation, locale-aware download, and limits.
+    keywords: [changelog, in-app-changelog, release, release-notes, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, mock-support, billing, fastlane, play-store, make-release-notes, author-in-app-changelog, translate-in-app-changelogs, localization, locale-selection, BCP-47, translation, domain-brief, cache, ETag, 500-char, index.json, versionCode, versionName]
 
   - file: deep-link-navigation.md
     title: Deep-link navigation — DeepLink, descent-relative paths, navigator, back-stack append

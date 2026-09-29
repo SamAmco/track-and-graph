@@ -10,6 +10,7 @@ topics:
   - Changelog viewer app: paste markdown and preview the shared dialog plus FOSS and mock Play support flows
   - Runtime locale selection: BCP 47 language-and-script match, one Markdown download per release, English fallback
   - In-app changelog translation: full Markdown per locale, domain brief, deterministic validation, explicit invocation only
+  - In-app changelog authoring: commit-range review, user-facing filtering, review-only inventory, deterministic index update
 keywords: [changelog, release, release-notes, snapshot, snapshot-release, jj, changelog-viewer, markdown, preview, dialog, fastlane, play-store, localization, translation, domain-brief, 500-char, index.json, versionCode, versionName]
 ---
 
@@ -94,6 +95,21 @@ When iterating on in-app changelog copy, treat the English Markdown as the sourc
 
 When translating, check string resources for official UI terms before choosing feature names or labels. This matters for both old features and newly released UI, not only for terms called out in this document.
 
+### English authoring workflow
+
+The `.agents/skills/author-in-app-changelog` skill drafts the next English
+changelog from every commit since the previous indexed release. It follows the
+previous changelog's broad structure, converts technical work into supported
+user-facing outcomes, and excludes remotely distributed Lua function/graph
+changes. Fixes and redesigns to features first introduced within the same
+release are folded into the final feature description rather than announced as
+separate defects.
+
+The draft ends with a complete, unfiltered commit inventory marked
+`REVIEW-ONLY-COMMITS` so it can be audited against history. That section is not
+public copy and must be removed after review. Index validation deliberately
+fails while the marker exists.
+
 ### API translation workflow
 
 The explicitly invoked `.agents/skills/translate-in-app-changelogs` workflow
@@ -138,8 +154,16 @@ Located at `changelogs/index.json`, maps version names to locale-specific
 Markdown paths for in-app changelogs. It is maintained only by the independent
 in-app changelog workflow and validated against `changelogs/index.schema.json`.
 
-The schema requires English for every release and accepts other BCP 47 locale
-keys; it does not contain a four-language allowlist.
+Never maintain its locale objects manually. Run
+`make in-app-changelog-index-update VERSION=<version>` to discover the Markdown
+files for one version and deterministically rebuild its entry. Run
+`make in-app-changelog-validate` to check the JSON schema, newest-first version
+ordering, manifest locale order, exact paths, referenced and unindexed files,
+and review-only markers. This validation is part of `make validate-all`.
+
+The schema requires English for every release and accepts BCP 47 locale keys;
+the updater and filesystem validator additionally restrict new entries to the
+shared translation language manifest.
 
 The app downloads the index, selects the best available locale for each
 release using the current app locale preference order and BCP 47

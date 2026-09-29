@@ -22,6 +22,7 @@ INDEX_PATH = CHANGELOG_ROOT / "index.json"
 DEFAULT_LOCALES = tuple(target.locale for target in ALL_LANGUAGES)
 VERSION_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$")
 LOCALE_RE = re.compile(r"^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$")
+REVIEW_ONLY_MARKER = "<!-- REVIEW-ONLY-COMMITS: remove before translation/publishing -->"
 
 
 class IndexError(ValueError):
@@ -152,6 +153,13 @@ def validation_issues(
                 continue
             if not (changelog_root / expected_path).is_file():
                 issues.append(f"{version}/{locale}: missing {changelog_root / expected_path}")
+                continue
+            if REVIEW_ONLY_MARKER in (changelog_root / expected_path).read_text(
+                encoding="utf-8"
+            ):
+                issues.append(
+                    f"{version}/{locale}: remove the review-only commit inventory before publishing"
+                )
 
         directory = changelog_root / version
         if directory.is_dir():

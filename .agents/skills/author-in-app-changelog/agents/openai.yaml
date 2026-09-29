@@ -1,0 +1,4 @@
+interface:
+  display_name: "Author In-App Changelog"
+  short_description: "Draft a user-facing English changelog"
+  default_prompt: "Use $author-in-app-changelog to draft the English in-app changelog for the next release."
