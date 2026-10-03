@@ -14,4 +14,6 @@
     <string name="search">Otsi</string>
     <string name="update">Uuenda</string>
     <string name="value">Väärtus</string>
+    <string name="show_password">Näita parooli</string>
+    <string name="hide_password">Peida parool</string>
 </resources>

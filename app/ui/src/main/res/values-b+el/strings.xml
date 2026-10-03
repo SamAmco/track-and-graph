@@ -14,4 +14,6 @@
     <string name="search">Αναζήτηση</string>
     <string name="update">Ενημέρωση</string>
     <string name="value">Τιμή</string>
+    <string name="show_password">Εμφάνιση κωδικού πρόσβασης</string>
+    <string name="hide_password">Απόκρυψη κωδικού πρόσβασης</string>
 </resources>

@@ -555,4 +555,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 өдөр дасгалгүй</string>
     <string name="play_store_fixture_running">Гүйх</string>
     <string name="play_store_fixture_cycling">Дугуй унах</string>
+    <string name="configure_widget">Виджет тохируулах</string>
+    <string name="widget_disabled">Виджет идэвхгүй</string>
+    <string name="lock_field">Талбарыг түгжих</string>
+    <string name="unlock_field">Талбарын түгжээ тайлах</string>
 </resources>

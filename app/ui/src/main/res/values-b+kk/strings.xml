@@ -14,4 +14,6 @@
     <string name="search">Іздеу</string>
     <string name="update">Жаңарту</string>
     <string name="value">Мән</string>
+    <string name="show_password">Құпиясөзді көрсету</string>
+    <string name="hide_password">Құпиясөзді жасыру</string>
 </resources>

@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 päivää ilman liikuntaa</string>
     <string name="play_store_fixture_running">Juoksu</string>
     <string name="play_store_fixture_cycling">Pyöräily</string>
+    <string name="configure_widget">Määritä pienoisohjelma</string>
+    <string name="widget_disabled">Pienoisohjelma ei ole käytössä</string>
+    <string name="lock_field">Lukitse kenttä</string>
+    <string name="unlock_field">Avaa kentän lukitus</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="search">Cari</string>
     <string name="update">Perbarui</string>
     <string name="value">Nilai</string>
+    <string name="show_password">Tampilkan kata sandi</string>
+    <string name="hide_password">Sembunyikan kata sandi</string>
 </resources>

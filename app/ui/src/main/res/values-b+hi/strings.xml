@@ -14,4 +14,6 @@
     <string name="search">खोजें</string>
     <string name="update">अपडेट करें</string>
     <string name="value">मान</string>
+    <string name="show_password">पासवर्ड दिखाएँ</string>
+    <string name="hide_password">पासवर्ड छिपाएँ</string>
 </resources>

@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">Siku 2 bila mazoezi</string>
     <string name="play_store_fixture_running">Kukimbia</string>
     <string name="play_store_fixture_cycling">Kuendesha baiskeli</string>
+    <string name="configure_widget">Sanidi wijeti</string>
+    <string name="widget_disabled">Wijeti imezimwa</string>
+    <string name="lock_field">Funga sehemu</string>
+    <string name="unlock_field">Fungua sehemu</string>
 </resources>

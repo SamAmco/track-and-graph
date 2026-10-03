@@ -14,4 +14,6 @@
     <string name="search">Tìm kiếm</string>
     <string name="update">Cập nhật</string>
     <string name="value">Giá trị</string>
+    <string name="show_password">Hiện mật khẩu</string>
+    <string name="hide_password">Ẩn mật khẩu</string>
 </resources>

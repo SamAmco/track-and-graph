@@ -14,4 +14,6 @@
     <string name="search">Leita</string>
     <string name="update">Uppfæra</string>
     <string name="value">Gildi</string>
+    <string name="show_password">Sýna lykilorð</string>
+    <string name="hide_password">Fela lykilorð</string>
 </resources>

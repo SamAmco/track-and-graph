@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">വ്യായാമമില്ലാതെ 2 ദിവസം</string>
     <string name="play_store_fixture_running">ഓട്ടം</string>
     <string name="play_store_fixture_cycling">സൈക്കിൾ ഓട്ടം</string>
+    <string name="configure_widget">വിജറ്റ് ക്രമീകരിക്കുക</string>
+    <string name="widget_disabled">വിജറ്റ് പ്രവർത്തനരഹിതമാണ്</string>
+    <string name="lock_field">ഫീൽഡ് ലോക്ക് ചെയ്യുക</string>
+    <string name="unlock_field">ഫീൽഡ് അൺലോക്ക് ചെയ്യുക</string>
 </resources>

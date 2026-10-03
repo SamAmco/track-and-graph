@@ -14,4 +14,6 @@
     <string name="search">தேடு</string>
     <string name="update">புதுப்பி</string>
     <string name="value">மதிப்பு</string>
+    <string name="show_password">கடவுச்சொல்லைக் காட்டவும்</string>
+    <string name="hide_password">கடவுச்சொல்லை மறைக்கவும்</string>
 </resources>

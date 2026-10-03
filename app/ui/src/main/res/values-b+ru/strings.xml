@@ -14,4 +14,6 @@
     <string name="search">Поиск</string>
     <string name="update">Обновить</string>
     <string name="value">Значение</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="hide_password">Скрыть пароль</string>
 </resources>

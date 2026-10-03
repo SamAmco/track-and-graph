@@ -14,4 +14,6 @@
     <string name="search">Kërko</string>
     <string name="update">Përditëso</string>
     <string name="value">Vlerë</string>
+    <string name="show_password">Shfaq fjalëkalimin</string>
+    <string name="hide_password">Fshih fjalëkalimin</string>
 </resources>

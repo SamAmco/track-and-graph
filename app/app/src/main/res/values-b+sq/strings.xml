@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 ditë pa ushtrime</string>
     <string name="play_store_fixture_running">Vrapim</string>
     <string name="play_store_fixture_cycling">Çiklizëm</string>
+    <string name="configure_widget">Konfiguro miniaplikacionin</string>
+    <string name="widget_disabled">Miniaplikacioni është çaktivizuar</string>
+    <string name="lock_field">Kyçe fushën</string>
+    <string name="unlock_field">Shkyçe fushën</string>
 </resources>

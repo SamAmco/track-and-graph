@@ -555,4 +555,8 @@
     <string name="play_store_fixture_two_days_without_exercise">Жаттығусыз 2 күн</string>
     <string name="play_store_fixture_running">Жүгіру</string>
     <string name="play_store_fixture_cycling">Велосипед тебу</string>
+    <string name="configure_widget">Виджетті реттеу</string>
+    <string name="widget_disabled">Виджет өшірілген</string>
+    <string name="lock_field">Өрісті құлыптау</string>
+    <string name="unlock_field">Өріс құлпын ашу</string>
 </resources>

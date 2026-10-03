@@ -14,4 +14,6 @@
     <string name="search">Pretraži</string>
     <string name="update">Ažuriraj</string>
     <string name="value">Vrednost</string>
+    <string name="show_password">Prikaži lozinku</string>
+    <string name="hide_password">Sakrij lozinku</string>
 </resources>

@@ -581,4 +581,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dana bez vježbanja</string>
     <string name="play_store_fixture_running">Trčanje</string>
     <string name="play_store_fixture_cycling">Biciklizam</string>
+    <string name="configure_widget">Konfiguriraj widget</string>
+    <string name="widget_disabled">Widget je onemogućen</string>
+    <string name="lock_field">Zaključaj polje</string>
+    <string name="unlock_field">Otključaj polje</string>
 </resources>

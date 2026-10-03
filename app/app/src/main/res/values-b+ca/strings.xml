@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dies sense fer exercici</string>
     <string name="play_store_fixture_running">Córrer</string>
     <string name="play_store_fixture_cycling">Ciclisme</string>
+    <string name="configure_widget">Configura el giny</string>
+    <string name="widget_disabled">Giny desactivat</string>
+    <string name="lock_field">Bloqueja el camp</string>
+    <string name="unlock_field">Desbloqueja el camp</string>
 </resources>

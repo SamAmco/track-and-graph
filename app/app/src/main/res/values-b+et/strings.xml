@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 päeva ilma treeninguta</string>
     <string name="play_store_fixture_running">Jooksmine</string>
     <string name="play_store_fixture_cycling">Jalgrattasõit</string>
+    <string name="configure_widget">Seadista vidin</string>
+    <string name="widget_disabled">Vidin on keelatud</string>
+    <string name="lock_field">Lukusta väli</string>
+    <string name="unlock_field">Ava väli</string>
 </resources>

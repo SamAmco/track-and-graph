@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dae sonder oefening</string>
     <string name="play_store_fixture_running">Hardloop</string>
     <string name="play_store_fixture_cycling">Fietsry</string>
+    <string name="configure_widget">Konfigureer legstuk</string>
+    <string name="widget_disabled">Legstuk gedeaktiveer</string>
+    <string name="lock_field">Sluit veld</string>
+    <string name="unlock_field">Ontsluit veld</string>
 </resources>

@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 நாட்கள் உடற்பயிற்சி இல்லாமல்</string>
     <string name="play_store_fixture_running">ஓட்டம்</string>
     <string name="play_store_fixture_cycling">மிதிவண்டி ஓட்டம்</string>
+    <string name="configure_widget">விட்ஜெட்டை உள்ளமைக்கவும்</string>
+    <string name="widget_disabled">விட்ஜெட் முடக்கப்பட்டது</string>
+    <string name="lock_field">புலத்தைப் பூட்டவும்</string>
+    <string name="unlock_field">புலத்தைத் திறக்கவும்</string>
 </resources>

@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 ມື້ທີ່ບໍ່ໄດ້ອອກກຳລັງກາຍ</string>
     <string name="play_store_fixture_running">ແລ່ນ</string>
     <string name="play_store_fixture_cycling">ປັ່ນລົດຖີບ</string>
+    <string name="configure_widget">ຕັ້ງຄ່າວິດເຈັດ</string>
+    <string name="widget_disabled">ປິດໃຊ້ງານວິດເຈັດແລ້ວ</string>
+    <string name="lock_field">ລັອກຊ່ອງຂໍ້ມູນ</string>
+    <string name="unlock_field">ປົດລັອກຊ່ອງຂໍ້ມູນ</string>
 </resources>

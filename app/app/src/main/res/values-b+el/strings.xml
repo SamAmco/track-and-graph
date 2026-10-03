@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 ημέρες χωρίς άσκηση</string>
     <string name="play_store_fixture_running">Τρέξιμο</string>
     <string name="play_store_fixture_cycling">Ποδηλασία</string>
+    <string name="configure_widget">Διαμόρφωση widget</string>
+    <string name="widget_disabled">Το widget είναι απενεργοποιημένο</string>
+    <string name="lock_field">Κλείδωμα πεδίου</string>
+    <string name="unlock_field">Ξεκλείδωμα πεδίου</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="search">Buscar</string>
     <string name="update">Actualizar</string>
     <string name="value">Valor</string>
+    <string name="show_password">Amosar contrasinal</string>
+    <string name="hide_password">Ocultar contrasinal</string>
 </resources>

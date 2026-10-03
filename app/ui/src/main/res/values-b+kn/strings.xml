@@ -14,4 +14,6 @@
     <string name="search">ಹುಡುಕಿ</string>
     <string name="update">ನವೀಕರಿಸಿ</string>
     <string name="value">ಮೌಲ್ಯ</string>
+    <string name="show_password">ಪಾಸ್‌ವರ್ಡ್ ತೋರಿಸಿ</string>
+    <string name="hide_password">ಪಾಸ್‌ವರ್ಡ್ ಮರೆಮಾಡಿ</string>
 </resources>

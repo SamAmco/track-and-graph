@@ -14,4 +14,6 @@
     <string name="search">搜尋</string>
     <string name="update">更新</string>
     <string name="value">值</string>
+    <string name="show_password">顯示密碼</string>
+    <string name="hide_password">隱藏密碼</string>
 </resources>

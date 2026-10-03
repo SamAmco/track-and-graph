@@ -14,4 +14,6 @@
     <string name="search">Ieškoti</string>
     <string name="update">Atnaujinti</string>
     <string name="value">Reikšmė</string>
+    <string name="show_password">Rodyti slaptažodį</string>
+    <string name="hide_password">Slėpti slaptažodį</string>
 </resources>

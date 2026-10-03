@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 დღე ვარჯიშის გარეშე</string>
     <string name="play_store_fixture_running">სირბილი</string>
     <string name="play_store_fixture_cycling">ველოსიპედით სიარული</string>
+    <string name="configure_widget">ვიჯეტის კონფიგურაცია</string>
+    <string name="widget_disabled">ვიჯეტი გამორთულია</string>
+    <string name="lock_field">ველის დაბლოკვა</string>
+    <string name="unlock_field">ველის განბლოკვა</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="search">Издөө</string>
     <string name="update">Жаңыртуу</string>
     <string name="value">Маани</string>
+    <string name="show_password">Сырсөздү көрсөтүү</string>
+    <string name="hide_password">Сырсөздү жашыруу</string>
 </resources>

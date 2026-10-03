@@ -600,4 +600,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dni bez ćwiczeń</string>
     <string name="play_store_fixture_running">Bieganie</string>
     <string name="play_store_fixture_cycling">Jazda na rowerze</string>
+    <string name="configure_widget">Skonfiguruj widżet</string>
+    <string name="widget_disabled">Widżet wyłączony</string>
+    <string name="lock_field">Zablokuj pole</string>
+    <string name="unlock_field">Odblokuj pole</string>
 </resources>

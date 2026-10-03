@@ -14,4 +14,6 @@
     <string name="search">Търсене</string>
     <string name="update">Актуализиране</string>
     <string name="value">Стойност</string>
+    <string name="show_password">Показване на паролата</string>
+    <string name="hide_password">Скриване на паролата</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="search">Maghanap</string>
     <string name="update">I-update</string>
     <string name="value">Halaga</string>
+    <string name="show_password">Ipakita ang password</string>
+    <string name="hide_password">Itago ang password</string>
 </resources>

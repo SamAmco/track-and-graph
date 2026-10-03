@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">ያለ የአካል ብቃት ልምምድ 2 ቀናት</string>
     <string name="play_store_fixture_running">ሩጫ</string>
     <string name="play_store_fixture_cycling">ብስክሌት መንዳት</string>
+    <string name="configure_widget">ዊጅት አዋቅር</string>
+    <string name="widget_disabled">ዊጅት ተሰናክሏል</string>
+    <string name="lock_field">መስኩን ቆልፍ</string>
+    <string name="unlock_field">መስኩን ክፈት</string>
 </resources>

@@ -581,4 +581,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dienos be mankštos</string>
     <string name="play_store_fixture_running">Bėgimas</string>
     <string name="play_store_fixture_cycling">Važiavimas dviračiu</string>
+    <string name="configure_widget">Konfigūruoti valdiklį</string>
+    <string name="widget_disabled">Valdiklis išjungtas</string>
+    <string name="lock_field">Užrakinti lauką</string>
+    <string name="unlock_field">Atrakinti lauką</string>
 </resources>

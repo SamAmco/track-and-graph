@@ -14,4 +14,6 @@
     <string name="search">Cerca</string>
     <string name="update">Actualitza</string>
     <string name="value">Valor</string>
+    <string name="show_password">Mostra la contrasenya</string>
+    <string name="hide_password">Amaga la contrasenya</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="search">Axtar</string>
     <string name="update">Yenilə</string>
     <string name="value">Dəyər</string>
+    <string name="show_password">Şifrəni göstər</string>
+    <string name="hide_password">Şifrəni gizlət</string>
 </resources>

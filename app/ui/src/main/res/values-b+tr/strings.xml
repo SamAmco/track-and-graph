@@ -14,4 +14,6 @@
     <string name="search">Ara</string>
     <string name="update">Güncelle</string>
     <string name="value">Değer</string>
+    <string name="show_password">Şifreyi göster</string>
+    <string name="hide_password">Şifreyi gizle</string>
 </resources>

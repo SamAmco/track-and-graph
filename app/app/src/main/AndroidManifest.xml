@@ -110,7 +110,7 @@
         <activity
             android:name=".widgets.TrackWidgetConfigureActivity"
             android:exported="true"
-            android:label="Configure widget"
+            android:label="@string/configure_widget"
             android:theme="@style/TransparentTheme"
             >
             <intent-filter>

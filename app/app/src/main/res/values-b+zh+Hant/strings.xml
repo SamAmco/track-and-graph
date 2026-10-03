@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">兩天未運動</string>
     <string name="play_store_fixture_running">跑步</string>
     <string name="play_store_fixture_cycling">騎自行車</string>
+    <string name="configure_widget">設定小工具</string>
+    <string name="widget_disabled">小工具已停用</string>
+    <string name="lock_field">鎖定欄位</string>
+    <string name="unlock_field">解除欄位鎖定</string>
 </resources>

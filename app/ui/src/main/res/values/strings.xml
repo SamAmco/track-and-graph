@@ -11,6 +11,8 @@
     <string name="release_notes_thank_you"><![CDATA[Thank You! ❤️\n\nEvery bit of support goes toward making Track & Graph better for everyone 🌱]]></string>
     <string name="support_close">Close</string>
     <string name="search">Search</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
     <string name="update">Update</string>
     <string name="value">Value</string>
 </resources>

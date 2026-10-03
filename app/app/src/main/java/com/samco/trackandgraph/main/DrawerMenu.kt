@@ -122,7 +122,7 @@ fun MenuDrawerContent(
         ) { onNavigate(BackupAndRestoreNavKey) }
 
         MenuItem(
-            title = "App Lock",
+            title = stringResource(R.string.app_lock_title),
             icon = painterResource(R.drawable.ic_lock)
         ) { onNavigate(AppLockNavKey) }
 

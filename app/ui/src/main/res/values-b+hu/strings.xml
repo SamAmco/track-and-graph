@@ -14,4 +14,6 @@
     <string name="search">Keresés</string>
     <string name="update">Frissítés</string>
     <string name="value">Érték</string>
+    <string name="show_password">Jelszó megjelenítése</string>
+    <string name="hide_password">Jelszó elrejtése</string>
 </resources>

@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">ව්‍යායාම නොකර දින 2ක්</string>
     <string name="play_store_fixture_running">දිවීම</string>
     <string name="play_store_fixture_cycling">පාපැදි පැදීම</string>
+    <string name="configure_widget">විජට්ටුව වින්‍යාස කරන්න</string>
+    <string name="widget_disabled">විජට්ටුව අබල කර ඇත</string>
+    <string name="lock_field">ක්ෂේත්‍රය අගුළු දමන්න</string>
+    <string name="unlock_field">ක්ෂේත්‍රය අගුළු හරින්න</string>
 </resources>

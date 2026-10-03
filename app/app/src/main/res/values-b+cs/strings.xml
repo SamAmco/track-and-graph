@@ -581,4 +581,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dny bez cvičení</string>
     <string name="play_store_fixture_running">Běh</string>
     <string name="play_store_fixture_cycling">Jízda na kole</string>
+    <string name="configure_widget">Nastavit widget</string>
+    <string name="widget_disabled">Widget je deaktivován</string>
+    <string name="lock_field">Uzamknout pole</string>
+    <string name="unlock_field">Odemknout pole</string>
 </resources>

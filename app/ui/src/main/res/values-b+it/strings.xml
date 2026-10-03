@@ -14,4 +14,6 @@
     <string name="search">Cerca</string>
     <string name="update">Aggiorna</string>
     <string name="value">Valore</string>
+    <string name="show_password">Mostra password</string>
+    <string name="hide_password">Nascondi password</string>
 </resources>

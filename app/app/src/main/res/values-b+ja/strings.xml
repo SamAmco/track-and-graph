@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">運動なしで2日</string>
     <string name="play_store_fixture_running">ランニング</string>
     <string name="play_store_fixture_cycling">サイクリング</string>
+    <string name="configure_widget">ウィジェットを設定</string>
+    <string name="widget_disabled">ウィジェットは無効です</string>
+    <string name="lock_field">入力欄をロック</string>
+    <string name="unlock_field">入力欄のロックを解除</string>
 </resources>

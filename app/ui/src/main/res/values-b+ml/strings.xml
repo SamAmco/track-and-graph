@@ -14,4 +14,6 @@
     <string name="search">തിരയുക</string>
     <string name="update">പുതുക്കുക</string>
     <string name="value">മൂല്യം</string>
+    <string name="show_password">പാസ്‌വേഡ് കാണിക്കുക</string>
+    <string name="hide_password">പാസ്‌വേഡ് മറയ്ക്കുക</string>
 </resources>

@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 hari tanpa Senaman</string>
     <string name="play_store_fixture_running">Berlari</string>
     <string name="play_store_fixture_cycling">Berbasikal</string>
+    <string name="configure_widget">Konfigurasikan widget</string>
+    <string name="widget_disabled">Widget dilumpuhkan</string>
+    <string name="lock_field">Kunci medan</string>
+    <string name="unlock_field">Buka kunci medan</string>
 </resources>

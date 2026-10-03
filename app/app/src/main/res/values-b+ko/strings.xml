@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">운동하지 않은 지 2일</string>
     <string name="play_store_fixture_running">달리기</string>
     <string name="play_store_fixture_cycling">자전거 타기</string>
+    <string name="configure_widget">위젯 구성</string>
+    <string name="widget_disabled">위젯 사용 중지됨</string>
+    <string name="lock_field">필드 잠금</string>
+    <string name="unlock_field">필드 잠금 해제</string>
 </resources>

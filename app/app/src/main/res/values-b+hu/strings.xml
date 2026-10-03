@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 nap testmozgás nélkül</string>
     <string name="play_store_fixture_running">Futás</string>
     <string name="play_store_fixture_cycling">Kerékpározás</string>
+    <string name="configure_widget">Widget konfigurálása</string>
+    <string name="widget_disabled">Widget letiltva</string>
+    <string name="lock_field">Mező zárolása</string>
+    <string name="unlock_field">Mező feloldása</string>
 </resources>

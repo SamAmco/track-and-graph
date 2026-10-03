@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dagar utan träning</string>
     <string name="play_store_fixture_running">Löpning</string>
     <string name="play_store_fixture_cycling">Cykling</string>
+    <string name="configure_widget">Konfigurera widget</string>
+    <string name="widget_disabled">Widgeten är inaktiverad</string>
+    <string name="lock_field">Lås fält</string>
+    <string name="unlock_field">Lås upp fält</string>
 </resources>

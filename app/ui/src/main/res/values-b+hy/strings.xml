@@ -14,4 +14,6 @@
     <string name="search">Որոնել</string>
     <string name="update">Թարմացնել</string>
     <string name="value">Արժեք</string>
+    <string name="show_password">Ցուցադրել գաղտնաբառը</string>
+    <string name="hide_password">Թաքցնել գաղտնաբառը</string>
 </resources>

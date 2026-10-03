@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 օր առանց մարզանքի</string>
     <string name="play_store_fixture_running">Վազք</string>
     <string name="play_store_fixture_cycling">Հեծանվավարություն</string>
+    <string name="configure_widget">Կարգավորել վիջեթը</string>
+    <string name="widget_disabled">Վիջեթն անջատված է</string>
+    <string name="lock_field">Կողպել դաշտը</string>
+    <string name="unlock_field">Ապակողպել դաշտը</string>
 </resources>

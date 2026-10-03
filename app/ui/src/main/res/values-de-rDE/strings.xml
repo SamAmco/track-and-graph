@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="add">Hinzufügen</string>
     <string name="add_a_note">Notiz hinzufügen</string>
@@ -8,9 +9,11 @@
     <string name="release_notes_support_text">Ihre Unterstützung hilft dabei, Track &amp; Graph am Leben zu erhalten und wachsen zu lassen 🌱</string>
     <string name="release_notes_maybe_later">Vielleicht später</string>
     <string name="release_notes_support_development">Spenden zur Entwicklungsunterstützung</string>
-    <string name="release_notes_thank_you"><![CDATA[Vielen Dank! ❤️\n\nJede Unterstützung trägt dazu bei, Track & Graph für alle zu verbessern 🌱]]></string>
+    <string name="release_notes_thank_you">Vielen Dank! ❤️\n\nJede Unterstützung trägt dazu bei, Track &amp; Graph für alle zu verbessern 🌱</string>
     <string name="support_close">Schließen</string>
     <string name="search">Suchen</string>
     <string name="update">Aktualisieren</string>
     <string name="value">Wert</string>
+    <string name="show_password">Passwort anzeigen</string>
+    <string name="hide_password">Passwort ausblenden</string>
 </resources>

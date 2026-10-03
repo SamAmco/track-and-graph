@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dagar án hreyfingar</string>
     <string name="play_store_fixture_running">Hlaup</string>
     <string name="play_store_fixture_cycling">Hjólreiðar</string>
+    <string name="configure_widget">Stilltu græju</string>
+    <string name="widget_disabled">Græja óvirk</string>
+    <string name="lock_field">Læsa reit</string>
+    <string name="unlock_field">Aflæsa reit</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="search">ค้นหา</string>
     <string name="update">อัปเดต</string>
     <string name="value">ค่า</string>
+    <string name="show_password">แสดงรหัสผ่าน</string>
+    <string name="hide_password">ซ่อนรหัสผ่าน</string>
 </resources>

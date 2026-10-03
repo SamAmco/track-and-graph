@@ -590,4 +590,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 jours sans exercice</string>
     <string name="play_store_fixture_running">Course à pied</string>
     <string name="play_store_fixture_cycling">Cyclisme</string>
+    <string name="configure_widget">Configurer le widget</string>
+    <string name="widget_disabled">Widget désactivé</string>
+    <string name="lock_field">Verrouiller le champ</string>
+    <string name="unlock_field">Déverrouiller le champ</string>
 </resources>

@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 gün egzersiz yapmadan</string>
     <string name="play_store_fixture_running">Koşu</string>
     <string name="play_store_fixture_cycling">Bisiklet sürme</string>
+    <string name="configure_widget">Widget\'ı yapılandır</string>
+    <string name="widget_disabled">Widget devre dışı</string>
+    <string name="lock_field">Alanı kilitle</string>
+    <string name="unlock_field">Alan kilidini aç</string>
 </resources>

@@ -568,4 +568,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 Tage ohne Training</string>
     <string name="play_store_fixture_running">Laufen</string>
     <string name="play_store_fixture_cycling">Radfahren</string>
+    <string name="configure_widget">Widget konfigurieren</string>
+    <string name="widget_disabled">Widget deaktiviert</string>
+    <string name="lock_field">Feld sperren</string>
+    <string name="unlock_field">Feld entsperren</string>
 </resources>

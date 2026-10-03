@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 gün məşqsiz</string>
     <string name="play_store_fixture_running">Qaçış</string>
     <string name="play_store_fixture_cycling">Velosiped sürmə</string>
+    <string name="configure_widget">Vidceti konfiqurasiya et</string>
+    <string name="widget_disabled">Vidcet deaktiv edilib</string>
+    <string name="lock_field">Sahəni kilidlə</string>
+    <string name="unlock_field">Sahənin kilidini aç</string>
 </resources>

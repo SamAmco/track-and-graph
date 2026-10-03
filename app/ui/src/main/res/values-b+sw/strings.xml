@@ -14,4 +14,6 @@
     <string name="search">Tafuta</string>
     <string name="update">Sasisha</string>
     <string name="value">Thamani</string>
+    <string name="show_password">Onyesha nenosiri</string>
+    <string name="hide_password">Ficha nenosiri</string>
 </resources>

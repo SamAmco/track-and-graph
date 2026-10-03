@@ -14,4 +14,6 @@
     <string name="search">অনুসন্ধান</string>
     <string name="update">হালনাগাদ করুন</string>
     <string name="value">মান</string>
+    <string name="show_password">পাসওয়ার্ড দেখান</string>
+    <string name="hide_password">পাসওয়ার্ড লুকান</string>
 </resources>

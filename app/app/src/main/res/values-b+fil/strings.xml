@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 araw na walang ehersisyo</string>
     <string name="play_store_fixture_running">Pagtatakbo</string>
     <string name="play_store_fixture_cycling">Pagbibisikleta</string>
+    <string name="configure_widget">I-configure ang widget</string>
+    <string name="widget_disabled">Naka-disable ang widget</string>
+    <string name="lock_field">I-lock ang field</string>
+    <string name="unlock_field">I-unlock ang field</string>
 </resources>

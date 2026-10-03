@@ -133,7 +133,9 @@ private fun LockToggleButton(
             painter = painterResource(
                 id = if (isLocked) R.drawable.ic_lock else R.drawable.ic_lock_open
             ),
-            contentDescription = if (isLocked) "Unlock field" else "Lock field",
+            contentDescription = stringResource(
+                if (isLocked) R.string.unlock_field else R.string.lock_field
+            ),
             tint = MaterialTheme.tngColors.onSurface,
             modifier = Modifier.alpha(
                 if (isLocked) 1f else MaterialTheme.tngColors.disabledAlpha

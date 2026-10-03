@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 วันที่ไม่ได้ออกกำลังกาย</string>
     <string name="play_store_fixture_running">การวิ่ง</string>
     <string name="play_store_fixture_cycling">การปั่นจักรยาน</string>
+    <string name="configure_widget">กำหนดค่าวิดเจ็ต</string>
+    <string name="widget_disabled">ปิดใช้วิดเจ็ตแล้ว</string>
+    <string name="lock_field">ล็อกช่อง</string>
+    <string name="unlock_field">ปลดล็อกช่อง</string>
 </resources>

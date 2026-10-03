@@ -14,4 +14,6 @@
     <string name="search">Sök</string>
     <string name="update">Uppdatera</string>
     <string name="value">Värde</string>
+    <string name="show_password">Visa lösenord</string>
+    <string name="hide_password">Dölj lösenord</string>
 </resources>

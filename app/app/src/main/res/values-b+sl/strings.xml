@@ -600,4 +600,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dni brez vadbe</string>
     <string name="play_store_fixture_running">Tek</string>
     <string name="play_store_fixture_cycling">Kolesarjenje</string>
+    <string name="configure_widget">Nastavi pripomoček</string>
+    <string name="widget_disabled">Pripomoček je onemogočen</string>
+    <string name="lock_field">Zakleni polje</string>
+    <string name="unlock_field">Odkleni polje</string>
 </resources>

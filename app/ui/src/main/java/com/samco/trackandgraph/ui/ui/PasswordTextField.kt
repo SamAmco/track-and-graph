@@ -32,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -80,9 +81,9 @@ fun PasswordTextField(
                         if (passwordVisible) hidePasswordIconRes else showPasswordIconRes
                     ),
                     contentDescription = if (passwordVisible) {
-                        "Hide password"
+                        stringResource(R.string.hide_password)
                     } else {
-                        "Show password"
+                        stringResource(R.string.show_password)
                     },
                 )
             }

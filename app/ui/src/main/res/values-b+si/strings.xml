@@ -14,4 +14,6 @@
     <string name="search">සොයන්න</string>
     <string name="update">යාවත්කාලීන කරන්න</string>
     <string name="value">අගය</string>
+    <string name="show_password">මුරපදය පෙන්වන්න</string>
+    <string name="hide_password">මුරපදය සඟවන්න</string>
 </resources>

@@ -96,7 +96,7 @@ private fun TrackWidgetContent(
 ) {
     when (widgetData) {
         is TrackWidgetState.WidgetData.Disabled -> {
-            DisabledWidgetContent()
+            DisabledWidgetContent(context.getString(R.string.widget_disabled))
         }
 
         is TrackWidgetState.WidgetData.Enabled -> {
@@ -115,7 +115,7 @@ private fun TrackWidgetContent(
 }
 
 @Composable
-private fun DisabledWidgetContent() {
+private fun DisabledWidgetContent(contentDescription: String) {
     Column(
         modifier = GlanceModifier
             .background(ImageProvider(R.drawable.track_widget_card))
@@ -125,7 +125,7 @@ private fun DisabledWidgetContent() {
     ) {
         Image(
             provider = ImageProvider(R.drawable.warning_icon),
-            contentDescription = "Widget disabled",
+            contentDescription = contentDescription,
             modifier = GlanceModifier.size(buttonSize),
             colorFilter = ColorFilter.tint(GlanceTheme.colors.error)
         )
@@ -293,7 +293,7 @@ fun TrackWidgetEnabledTimerRunningPreview() {
 @Composable
 fun TrackWidgetDisabledPreview() {
     TrackWidgetTheme {
-        DisabledWidgetContent()
+        DisabledWidgetContent("Widget disabled")
     }
 }
 

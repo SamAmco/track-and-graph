@@ -14,4 +14,6 @@
     <string name="search">Zoeken</string>
     <string name="update">Bijwerken</string>
     <string name="value">Waarde</string>
+    <string name="show_password">Wachtwoord tonen</string>
+    <string name="hide_password">Wachtwoord verbergen</string>
 </resources>

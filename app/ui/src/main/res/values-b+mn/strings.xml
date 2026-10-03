@@ -14,4 +14,6 @@
     <string name="search">Хайх</string>
     <string name="update">Шинэчлэх</string>
     <string name="value">Утга</string>
+    <string name="show_password">Нууц үг харуулах</string>
+    <string name="hide_password">Нууц үг нуух</string>
 </resources>

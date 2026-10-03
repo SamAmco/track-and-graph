@@ -14,4 +14,6 @@
     <string name="search">Bilatu</string>
     <string name="update">Eguneratu</string>
     <string name="value">Balioa</string>
+    <string name="show_password">Erakutsi pasahitza</string>
+    <string name="hide_password">Ezkutatu pasahitza</string>
 </resources>

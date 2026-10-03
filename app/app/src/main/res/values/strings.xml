@@ -303,6 +303,10 @@
 
     <string name="track_widget_configure_no_data_error">Please track some data first.</string>
     <string name="track_widget_configure_no_data_selected_error">You must select a valid data set to create a tracking widget.</string>
+    <string name="configure_widget">Configure widget</string>
+    <string name="widget_disabled">Widget disabled</string>
+    <string name="lock_field">Lock field</string>
+    <string name="unlock_field">Unlock field</string>
     <string name="create">Create</string>
     <string name="use_default_value">Set a default value</string>
     <string name="backup_and_restore">Backup and Restore</string>

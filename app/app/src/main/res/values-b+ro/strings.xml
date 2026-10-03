@@ -581,4 +581,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 zile fără exerciții fizice</string>
     <string name="play_store_fixture_running">Alergare</string>
     <string name="play_store_fixture_cycling">Ciclism</string>
+    <string name="configure_widget">Configurează widgetul</string>
+    <string name="widget_disabled">Widget dezactivat</string>
+    <string name="lock_field">Blochează câmpul</string>
+    <string name="unlock_field">Deblochează câmpul</string>
 </resources>

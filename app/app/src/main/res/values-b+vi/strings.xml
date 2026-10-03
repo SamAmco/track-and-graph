@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 ngày không tập thể dục</string>
     <string name="play_store_fixture_running">Chạy bộ</string>
     <string name="play_store_fixture_cycling">Đạp xe</string>
+    <string name="configure_widget">Cấu hình tiện ích</string>
+    <string name="widget_disabled">Tiện ích đã tắt</string>
+    <string name="lock_field">Khóa trường</string>
+    <string name="unlock_field">Mở khóa trường</string>
 </resources>

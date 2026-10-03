@@ -14,4 +14,6 @@
     <string name="search">శోధించు</string>
     <string name="update">నవీకరించు</string>
     <string name="value">విలువ</string>
+    <string name="show_password">పాస్‌వర్డ్‌ను చూపించండి</string>
+    <string name="hide_password">పాస్‌వర్డ్‌ను దాచండి</string>
 </resources>

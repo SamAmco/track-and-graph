@@ -14,4 +14,6 @@
     <string name="search">Søk</string>
     <string name="update">Oppdater</string>
     <string name="value">Verdi</string>
+    <string name="show_password">Vis passord</string>
+    <string name="hide_password">Skjul passord</string>
 </resources>

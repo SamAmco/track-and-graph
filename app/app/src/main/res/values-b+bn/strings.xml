@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">ব্যায়াম ছাড়া ২ দিন</string>
     <string name="play_store_fixture_running">দৌড়ানো</string>
     <string name="play_store_fixture_cycling">সাইকেল চালানো</string>
+    <string name="configure_widget">উইজেট কনফিগার করুন</string>
+    <string name="widget_disabled">উইজেট নিষ্ক্রিয়</string>
+    <string name="lock_field">ফিল্ড লক করুন</string>
+    <string name="unlock_field">ফিল্ড আনলক করুন</string>
 </resources>

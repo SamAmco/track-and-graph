@@ -14,4 +14,6 @@
     <string name="search">検索</string>
     <string name="update">更新</string>
     <string name="value">値</string>
+    <string name="show_password">パスワードを表示</string>
+    <string name="hide_password">パスワードを非表示</string>
 </resources>

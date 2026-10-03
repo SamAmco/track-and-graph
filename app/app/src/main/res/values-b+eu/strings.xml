@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 egun ariketarik gabe</string>
     <string name="play_store_fixture_running">Korrika egitea</string>
     <string name="play_store_fixture_cycling">Txirrindularitza</string>
+    <string name="configure_widget">Konfiguratu widgeta</string>
+    <string name="widget_disabled">Widgeta desgaituta</string>
+    <string name="lock_field">Blokeatu eremua</string>
+    <string name="unlock_field">Desblokeatu eremua</string>
 </resources>

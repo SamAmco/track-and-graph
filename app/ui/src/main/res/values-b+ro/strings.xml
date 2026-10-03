@@ -14,4 +14,6 @@
     <string name="search">Caută</string>
     <string name="update">Actualizează</string>
     <string name="value">Valoare</string>
+    <string name="show_password">Afișează parola</string>
+    <string name="hide_password">Ascunde parola</string>
 </resources>

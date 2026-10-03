@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">व्यायाम नगरेका २ दिन</string>
     <string name="play_store_fixture_running">दौड</string>
     <string name="play_store_fixture_cycling">साइकल चलाउने</string>
+    <string name="configure_widget">विजेट कन्फिगर गर्नुहोस्</string>
+    <string name="widget_disabled">विजेट असक्षम छ</string>
+    <string name="lock_field">फिल्ड लक गर्नुहोस्</string>
+    <string name="unlock_field">फिल्ड अनलक गर्नुहोस्</string>
 </resources>

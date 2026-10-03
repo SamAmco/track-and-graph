@@ -600,4 +600,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 дні без фізичних вправ</string>
     <string name="play_store_fixture_running">Біг</string>
     <string name="play_store_fixture_cycling">Велоспорт</string>
+    <string name="configure_widget">Налаштувати віджет</string>
+    <string name="widget_disabled">Віджет вимкнено</string>
+    <string name="lock_field">Заблокувати поле</string>
+    <string name="unlock_field">Розблокувати поле</string>
 </resources>

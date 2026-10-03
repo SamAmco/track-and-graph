@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 дена без вежбање</string>
     <string name="play_store_fixture_running">Трчање</string>
     <string name="play_store_fixture_cycling">Возење велосипед</string>
+    <string name="configure_widget">Конфигурирај графичка контрола</string>
+    <string name="widget_disabled">Графичката контрола е оневозможена</string>
+    <string name="lock_field">Заклучи го полето</string>
+    <string name="unlock_field">Отклучи го полето</string>
 </resources>

@@ -581,4 +581,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 дни без упражнения</string>
     <string name="play_store_fixture_running">Бягане</string>
     <string name="play_store_fixture_cycling">Колоездене</string>
+    <string name="configure_widget">Конфигуриране на джаджата</string>
+    <string name="widget_disabled">Джаджата е деактивирана</string>
+    <string name="lock_field">Заключване на полето</string>
+    <string name="unlock_field">Отключване на полето</string>
 </resources>

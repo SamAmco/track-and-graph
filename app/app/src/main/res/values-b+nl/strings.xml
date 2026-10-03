@@ -562,4 +562,8 @@
     <string name="play_store_fixture_two_days_without_exercise">2 dagen zonder beweging</string>
     <string name="play_store_fixture_running">Hardlopen</string>
     <string name="play_store_fixture_cycling">Fietsen</string>
+    <string name="configure_widget">Widget configureren</string>
+    <string name="widget_disabled">Widget uitgeschakeld</string>
+    <string name="lock_field">Veld vergrendelen</string>
+    <string name="unlock_field">Veld ontgrendelen</string>
 </resources>

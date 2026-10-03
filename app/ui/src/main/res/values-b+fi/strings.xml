@@ -14,4 +14,6 @@
     <string name="search">Haku</string>
     <string name="update">Päivitä</string>
     <string name="value">Arvo</string>
+    <string name="show_password">Näytä salasana</string>
+    <string name="hide_password">Piilota salasana</string>
 </resources>

@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">២ ថ្ងៃដោយគ្មានការហាត់ប្រាណ</string>
     <string name="play_store_fixture_running">ការរត់</string>
     <string name="play_store_fixture_cycling">ការជិះកង់</string>
+    <string name="configure_widget">កំណត់រចនាសម្ព័ន្ធធាតុក្រាហ្វិក</string>
+    <string name="widget_disabled">ធាតុក្រាហ្វិកត្រូវបានបិទ</string>
+    <string name="lock_field">ចាក់សោវាល</string>
+    <string name="unlock_field">ដោះសោវាល</string>
 </resources>

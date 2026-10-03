@@ -14,4 +14,6 @@
     <string name="search">Tschertgar</string>
     <string name="update">Actualisar</string>
     <string name="value">Valur</string>
+    <string name="show_password">Mussar il pled-clav</string>
+    <string name="hide_password">Zuppentar il pled-clav</string>
 </resources>

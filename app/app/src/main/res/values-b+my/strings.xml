@@ -543,4 +543,8 @@
     <string name="play_store_fixture_two_days_without_exercise">လေ့ကျင့်ခန်းမလုပ်ဘဲ ၂ ရက်</string>
     <string name="play_store_fixture_running">ပြေးခြင်း</string>
     <string name="play_store_fixture_cycling">စက်ဘီးစီးခြင်း</string>
+    <string name="configure_widget">ဝစ်ဂျက် ပြင်ဆင်ရန်</string>
+    <string name="widget_disabled">ဝစ်ဂျက် ပိတ်ထားသည်</string>
+    <string name="lock_field">အကွက် လော့ခ်ချရန်</string>
+    <string name="unlock_field">အကွက် လော့ခ်ဖွင့်ရန်</string>
 </resources>

@@ -14,4 +14,6 @@
     <string name="search">ፈልግ</string>
     <string name="update">አዘምን</string>
     <string name="value">ዋጋ</string>
+    <string name="show_password">የይለፍ ቃል አሳይ</string>
+    <string name="hide_password">የይለፍ ቃል ደብቅ</string>
 </resources>
