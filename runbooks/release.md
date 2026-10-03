@@ -14,6 +14,7 @@
    - Production: `make playstore-upload-production ROLLOUT=0.5` (use `1` for a
      complete rollout)
 - Run `make assemble-foss-release` and optionally install the FOSS APK: `adb install app/app/build/outputs/apk/foss/release/app-foss-release.apk`
+- Run `jj bookmark move master -t @-`
 - Run `make github-release`.
 
 Store copy and screenshots are not changed by the release upload targets; use
