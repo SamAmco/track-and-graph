@@ -1,0 +1,4 @@
+- Track & Graph on nüüd saadaval 66 lisakeeles ning toetatud Androidi versioonides saab valida rakenduse keelt.
+- Graafikud on ümber ehitatud sujuvamaks kasutuseks, selgemate siltide ja töökindlama paigutusega.
+- Lisatud on eraldiseisvad ühekordsed meeldetuletused ja kellaaja juhtelemendid möödunud aja meeldetuletustele.
+- Parandatud meeldetuletuste kokkujooksmised ja mitu andmesisestuse animatsiooniprobleemi.

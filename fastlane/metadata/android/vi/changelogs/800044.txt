@@ -1,0 +1,4 @@
+- Track & Graph hiện có thêm 66 ngôn ngữ, cùng cài đặt ngôn ngữ ứng dụng trên các phiên bản Android được hỗ trợ.
+- Đã xây dựng lại Graph để tương tác mượt hơn, nhãn rõ hơn và bố cục ổn định hơn.
+- Thêm nhắc nhở một lần độc lập và tùy chọn thời điểm trong ngày cho nhắc nhở thời gian kể từ.
+- Đã sửa lỗi nhắc nhở bị treo và một số lỗi hoạt ảnh khi nhập dữ liệu.

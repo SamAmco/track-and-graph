@@ -1,0 +1,4 @@
+- Track & Graph ist jetzt in 66 weiteren Sprachen verfügbar, mit einer Spracheinstellung für unterstützte Android-Versionen.
+- Diagramme wurden für flüssigere Interaktion, klarere Beschriftungen und zuverlässigere Layouts überarbeitet.
+- Einmalige Erinnerungen sowie Tageszeitsteuerungen für „Zeit seit“-Erinnerungen hinzugefügt.
+- Abstürze bei Erinnerungen und mehrere Animationsprobleme bei der Dateneingabe behoben.

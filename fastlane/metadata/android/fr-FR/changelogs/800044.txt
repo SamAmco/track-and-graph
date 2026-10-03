@@ -1,0 +1,4 @@
+- Track & Graph est désormais disponible dans 66 langues supplémentaires, avec un réglage de langue de l’application sur les versions Android compatibles.
+- Les graphes ont été reconstruits pour une interaction plus fluide, des libellés plus clairs et des mises en page plus fiables.
+- Ajout de rappels ponctuels autonomes et de réglages d’heure pour les rappels de temps écoulé.
+- Correction de plantages des rappels et de plusieurs problèmes d’animation lors de la saisie de données.

@@ -1,0 +1,4 @@
+- „Track & Graph“ dabar pasiekiama dar 66 kalbomis; palaikomose „Android“ versijose galima pasirinkti programėlės kalbą.
+- Grafikai pertvarkyti, kad sąveika būtų sklandesnė, etiketės aiškesnės, o išdėstymas patikimesnis.
+- Pridėti atskiri vienkartiniai priminimai ir paros meto valdikliai priminimams „laikas nuo“.
+- Ištaisytos priminimų strigtis ir kelios duomenų įvedimo animacijų klaidos.

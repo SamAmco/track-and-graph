@@ -45,8 +45,8 @@ android {
     defaultConfig {
         applicationId = "com.samco.trackandgraph"
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
-        versionCode = 800043
-        versionName = "10.5.0-SNAPSHOT13"
+        versionCode = 800044
+        versionName = "10.5.0"
         // Default manifest placeholder for RecreateAlarms receiver
         manifestPlaceholders["recreateAlarmsEnabled"] = "true"
 

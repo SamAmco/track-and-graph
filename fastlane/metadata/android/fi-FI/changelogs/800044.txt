@@ -1,0 +1,4 @@
+- Track & Graph on nyt saatavilla 66 lisäkielellä, ja tuetuissa Android-versioissa on sovelluskieliasetus.
+- Graafit on uudistettu sujuvampaa käyttöä, selkeämpiä tunnisteita ja luotettavampaa asettelua varten.
+- Lisätty erilliset kertaluonteiset muistutukset ja kellonaika-asetukset aikamuistutuksille.
+- Korjattu muistutusten kaatumiset ja useita tietojen syöttöön liittyviä animaatio-ongelmia.

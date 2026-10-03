@@ -1,0 +1,4 @@
+- Track & Graph tani ofrohet në 66 gjuhë shtesë, me cilësim të gjuhës së aplikacionit në versionet e mbështetura të Android.
+- Grafikët janë rindërtuar për ndërveprim më të butë, etiketa më të qarta dhe paraqitje më të besueshme.
+- U shtuan rikujtues të pavarur njëherësh dhe kontrolle të orarit për rikujtuesit e kohës së kaluar.
+- U rregulluan dështimet e rikujtuesve dhe disa probleme me animacionet e futjes së të dhënave.

@@ -1,0 +1,4 @@
+- Track & Graph kini tersedia dalam 66 bahasa tambahan, dengan tetapan bahasa apl pada versi Android yang disokong.
+- Graph dibina semula untuk interaksi lebih lancar, label lebih jelas dan susun atur lebih andal.
+- Menambah peringatan sekali sahaja dan kawalan waktu untuk peringatan tempoh berlalu.
+- Membetulkan ranap peringatan dan beberapa isu animasi kemasukan data.

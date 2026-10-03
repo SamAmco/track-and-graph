@@ -1,0 +1,4 @@
+- Track & Graph is nu beschikbaar in 66 extra talen, met een app-taalinstelling op ondersteunde Android-versies.
+- Grafieken zijn vernieuwd voor soepelere interactie, duidelijkere labels en betrouwbaardere indelingen.
+- Losse eenmalige herinneringen en tijdstipinstellingen voor sinds-tijd-herinneringen toegevoegd.
+- Crashes bij herinneringen en diverse animatieproblemen bij gegevensinvoer opgelost.

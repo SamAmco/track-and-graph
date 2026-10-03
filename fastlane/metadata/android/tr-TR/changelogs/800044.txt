@@ -1,0 +1,4 @@
+- Track & Graph artık 66 ek dilde, desteklenen Android sürümlerinde uygulama dili ayarıyla kullanılabilir.
+- Grafikler daha akıcı etkileşim, net etiketler ve güvenilir yerleşimler için yeniden oluşturuldu.
+- Bağımsız tek seferlik hatırlatıcılar ve geçen süre hatırlatıcıları için gün içi saat kontrolleri eklendi.
+- Hatırlatıcı çökmeleri ve veri girişi animasyonlarındaki bazı sorunlar düzeltildi.

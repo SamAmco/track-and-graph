@@ -1,0 +1,4 @@
+- O Track & Graph está disponível em mais 66 idiomas, com definição de idioma do app nas versões compatíveis do Android.
+- Os gráficos foram reconstruídos para interação mais fluida, rótulos mais claros e layouts mais confiáveis.
+- Adicionados lembretes avulsos e controles de horário para lembretes de tempo decorrido.
+- Corrigidos travamentos de lembretes e problemas de animação na entrada de dados.

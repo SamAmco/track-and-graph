@@ -1,0 +1,4 @@
+- Track & Graph sasa inapatikana katika lugha 66 zaidi, ikiwa na mipangilio ya lugha ya programu kwenye matoleo yanayotumika ya Android.
+- Graphs zimejengwa upya kwa mwingiliano laini, lebo wazi na mpangilio wa kuaminika zaidi.
+- Tumeongeza vikumbusho vya mara moja na vidhibiti vya saa za siku kwa vikumbusho vya muda tangu.
+- Tumesahihisha kuacha kufanya kazi kwa vikumbusho na matatizo kadhaa ya uhuishaji wa kuingiza data.

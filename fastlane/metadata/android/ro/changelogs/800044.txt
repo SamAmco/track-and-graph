@@ -1,0 +1,4 @@
+- Track & Graph este acum disponibil în 66 de limbi suplimentare, cu o setare pentru limba aplicației pe versiunile Android compatibile.
+- Graficele au fost refăcute pentru interacțiuni mai fluide, etichete mai clare și aspecte mai fiabile.
+- Au fost adăugate mementouri independente, unice, și controale pentru ora din zi la mementourile „timp de la”.
+- Au fost remediate blocările mementourilor și mai multe probleme de animație la introducerea datelor.

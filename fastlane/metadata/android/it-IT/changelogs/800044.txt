@@ -1,0 +1,4 @@
+- Track & Graph è ora disponibile in altre 66 lingue, con un’impostazione della lingua dell’app nelle versioni Android supportate.
+- I grafici sono stati ricostruiti per un’interazione più fluida, etichette più chiare e layout più affidabili.
+- Aggiunti promemoria una tantum indipendenti e controlli dell’ora del giorno per i promemoria «tempo trascorso».
+- Risolti arresti anomali dei promemoria e diversi problemi nelle animazioni dell’inserimento dati.

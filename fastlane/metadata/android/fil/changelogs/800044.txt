@@ -1,0 +1,4 @@
+- Available na ang Track & Graph sa 66 karagdagang wika, na may setting ng wika ng app sa mga sinusuportahang bersyon ng Android.
+- Muling binuo ang Graphs para sa mas maayos na pakikipag-ugnayan, mas malinaw na label at mas maaasahang layout.
+- Idinagdag ang standalone na minsanang paalala at kontrol sa oras ng araw para sa mga paalalang batay sa tagal mula noong isang pangyayari.
+- Inayos ang pag-crash ng mga paalala at ilang isyu sa animation sa paglalagay ng data.

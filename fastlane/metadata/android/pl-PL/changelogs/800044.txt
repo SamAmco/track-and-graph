@@ -1,0 +1,4 @@
+- Track & Graph jest teraz dostępne w 66 dodatkowych językach, z ustawieniem języka aplikacji w obsługiwanych wersjach Androida.
+- Przebudowano wykresy, zapewniając płynniejszą obsługę, czytelniejsze etykiety i bardziej niezawodne układy.
+- Dodano samodzielne przypomnienia jednorazowe oraz ustawianie pory dnia dla przypomnień „czas od”.
+- Naprawiono awarie przypomnień i kilka problemów z animacjami podczas wprowadzania danych.

@@ -1,0 +1,4 @@
+- Track & Graph tagad pieejams vēl 66 valodās; atbalstītās Android versijās pieejams lietotnes valodas iestatījums.
+- Grafiki pārveidoti vienmērīgākai mijiedarbībai, skaidrākām etiķetēm un uzticamākam izkārtojumam.
+- Pievienoti atsevišķi vienreizēji atgādinājumi un diennakts laika vadīklas kopš laika atgādinājumiem.
+- Novērstas atgādinājumu avārijas un vairākas datu ievades animāciju problēmas.

@@ -1,0 +1,4 @@
+- A Track & Graph mostantól 66 további nyelven érhető el, támogatott Android-verziókon alkalmazásnyelv-beállítással.
+- A grafikonokat újraépítettük a gördülékenyebb interakció, az áttekinthetőbb címkék és a megbízhatóbb elrendezések érdekében.
+- Önálló, egyszeri emlékeztetők és napszakvezérlők kerültek a „mióta” emlékeztetőkhöz.
+- Javítottuk az emlékeztetők összeomlásait és több adatbevitel-animációs hibát.

@@ -1,0 +1,4 @@
+- Track & Graph is now available in 66 additional languages, with an app-language setting on supported Android versions.
+- Graphs have been rebuilt for smoother interaction, clearer labels and more reliable layouts.
+- Added standalone one-time reminders and time-of-day controls for time-since reminders.
+- Fixed reminder crashes and several data-entry animation issues.

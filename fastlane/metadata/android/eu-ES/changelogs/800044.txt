@@ -1,0 +1,4 @@
+- Track & Graph beste 66 hizkuntzatan dago eskuragarri, Android bertsio bateragarrietan aplikazioaren hizkuntza ezartzeko aukerarekin.
+- Grafikoak berreraiki dira interakzio leunagoa, etiketa argiagoak eta diseinu fidagarriagoak eskaintzeko.
+- Behin bakarreko abisu independenteak eta denboratik-aurrerako abisuetarako eguneko orduaren kontrolak gehitu dira.
+- Abisuetako hutsegiteak eta datuak sartzeko hainbat animazio-arazo konpondu dira.

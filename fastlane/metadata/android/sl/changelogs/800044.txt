@@ -1,0 +1,4 @@
+- Track & Graph je zdaj na voljo v 66 dodatnih jezikih, z nastavitvijo jezika aplikacije v podprtih različicah Androida.
+- Grafi so bili prenovljeni za bolj gladko uporabo, jasnejše oznake in zanesljivejše postavitve.
+- Dodani so samostojni enkratni opomniki in nastavitve časa dneva za opomnike »čas od«.
+- Odpravljeni so zrušitve opomnikov in številne težave z animacijami pri vnosu podatkov.

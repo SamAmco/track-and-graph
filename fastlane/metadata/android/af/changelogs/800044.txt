@@ -1,0 +1,4 @@
+- Track & Graph is nou beskikbaar in 66 bykomende tale, met ’n toepassingstaalinstelling op ondersteunde Android-weergawes.
+- Grafieke is herbou vir gladder interaksie, duideliker byskrifte en meer betroubare uitlegte.
+- Selfstandige eenmalige aanmanings en tyd-van-dag-kontroles vir tyd-sedert-aanmanings is bygevoeg.
+- Aanmaning-omvalle en verskeie data-invoer-animasieprobleme is reggestel.

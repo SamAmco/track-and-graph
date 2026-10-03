@@ -1,0 +1,4 @@
+- Track & Graph è ussa disponibel en 66 linguas supplementaras, cun in parameter da lingua da l’app sin versiuns Android cumpatiblas.
+- Ils graphs èn vegnids reconstruids per in’interacziun pli fluida, etichettas pli cleras e layouts pli fidaivels.
+- Agiuntà promemorias unicas independentas e controlls da l’ura per promemorias dal temp dapi.
+- Curregids crashes da promemorias e plirs problems d’animaziun durant l’inserziun da datas.

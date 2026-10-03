@@ -1,0 +1,4 @@
+- Track & Graph er nú fálegt á 66 nýjum tungumálum, með stillingu fyrir tungumál appsins á studdum Android-útgáfum.
+- Línurit hafa verið endurbyggð fyrir mýkri notkun, skýrari merkingar og áreiðanlegri uppsetningu.
+- Bætt við sjálfstæðum einu sinni-áminningum og tímastýringum fyrir áminningar um tíma frá.
+- Lagað hrun í áminningum og ýmis vandamál með hreyfimyndir við gagnaskráningu.

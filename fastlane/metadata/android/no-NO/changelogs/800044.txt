@@ -1,0 +1,4 @@
+- Track & Graph er nå tilgjengelig på 66 flere språk, med språkinnstilling i appen på støttede Android-versjoner.
+- Grafer er bygget om for jevnere interaksjon, tydeligere etiketter og mer pålitelige oppsett.
+- Lagt til frittstående engangspåminnelser og klokkeslettstyring for siden-sist-påminnelser.
+- Rettet krasj i påminnelser og flere animasjonsproblemer ved dataregistrering.

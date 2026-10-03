@@ -1,0 +1,4 @@
+- Track & Graph je sada dostupan na 66 dodatnih jezika, uz podešavanje jezika aplikacije na podržanim verzijama Androida.
+- Grafici su unapređeni za glatkiju interakciju, jasnije oznake i pouzdaniji raspored.
+- Dodati su samostalni jednokratni podsetnici i kontrole doba dana za podsetnike „vreme od“.
+- Ispravljeni su padovi podsetnika i problemi s animacijama pri unosu podataka.
