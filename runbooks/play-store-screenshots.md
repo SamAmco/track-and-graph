@@ -1,17 +1,12 @@
 # Update Play Store screenshots
 
 - Finalize the screenshot fixtures and English captions in `fastlane/frameit/screenshots/en-GB/title.strings`.
-- If captions changed, run `make frameit-translations-generate`. If visible app strings changed, run `make translations-generate`. Both make paid API calls.
+- Render English with `make playstore-screenshots-english`, review the raw images in `fastlane/frameit/screenshots/en-GB/`
+- Frame them with `make playstore-screenshots-frame LANGUAGE=en`. review in `fastlane/metadata/android/en-GB/images/phoneScreenshots/`. 
+- If captions changed, run `make frameit-translations-generate`. (paid API calls)
+- If visible app strings changed, run `make translations-generate`. (paid API calls)
 - Run `make translations-test translations-validate`.
-- Generate and review English before processing the full suite:
-   - Raw: `make playstore-screenshots-english`
-   - Framed: `make playstore-screenshots-english-framed`
-- Publish the release bundle to the intended Play track before uploading any screenshots. Fastlane requires the current version code to exist on that track; screenshot uploads default to the production track and current version.
-- Upload the reviewed English screenshots:
-   - Upload: `make playstore-screenshots-upload LANGUAGE=en`
-- For each remaining locale, run and review each independently retryable stage:
-   - `make playstore-screenshots-snapshot LANGUAGE=de`
-   - `make playstore-screenshots-frame LANGUAGE=de`
-   - `make playstore-screenshots-upload LANGUAGE=de`
-
-After generating several locales, omit `LANGUAGE` from the upload command to upload every complete set sequentially.
+- Generate and frame every remaining locale sequentially with `make playstore-screenshots-generate`. 
+- If needed retry broken locales with `make playstore-screenshots-snapshot LANGUAGE=<locale>` and `make playstore-screenshots-frame LANGUAGE=<locale>`.
+- Get an agent review: Please review the latest screenshots at `fastlane/metadata/android/*/images/phoneScreenshots/` for anything that looks incorrect or broken.
+- Upload every complete locale sequentially with `make playstore-screenshots-upload`.

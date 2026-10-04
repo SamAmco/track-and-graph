@@ -16,7 +16,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TRANSLATIONS_DIR = PROJECT_ROOT / "scripts/translations"
 sys.path.insert(0, str(TRANSLATIONS_DIR))
 
-from languages import ALL_LANGUAGES, TranslationTarget, play_locale  # noqa: E402
+from languages import (  # noqa: E402
+    ALL_LANGUAGES,
+    SUPPORTED_TARGETS,
+    TranslationTarget,
+    play_locale,
+)
 
 
 GENERATOR = TRANSLATIONS_DIR / "generate_playstore_screenshot_tests.py"
@@ -192,15 +197,57 @@ def frame_screenshots(raw_images: list[Path], locale: str, destination: Path) ->
     return outputs
 
 
+def snapshot_target(target: TranslationTarget) -> None:
+    store_locale = play_locale(target.locale)
+    raw_dir = FRAMEIT_SCREENSHOTS / store_locale
+    raw_images = render_screenshots(target, raw_dir)
+    print(f"Rendered {len(raw_images)} {store_locale} screenshots in {raw_dir}")
+
+
+def frame_target(target: TranslationTarget) -> None:
+    store_locale = play_locale(target.locale)
+    raw_images = raw_screenshots(store_locale)
+    destination = METADATA_ROOT / store_locale / "images/phoneScreenshots"
+    framed = frame_screenshots(raw_images, store_locale, destination)
+    print(f"Framed {len(framed)} {store_locale} screenshots in {destination}")
+
+
+def generate_localized_screenshots() -> int:
+    failures: list[tuple[str, Exception]] = []
+    for index, target in enumerate(SUPPORTED_TARGETS, 1):
+        store_locale = play_locale(target.locale)
+        print(
+            f"==> [{index}/{len(SUPPORTED_TARGETS)}] Generating {store_locale}",
+            flush=True,
+        )
+        try:
+            snapshot_target(target)
+            frame_target(target)
+        except Exception as error:  # Continue so one locale does not lose the rest.
+            failures.append((store_locale, error))
+            print(f"FAILED {store_locale}: {error}", file=sys.stderr, flush=True)
+
+    if failures:
+        print("\nFailed locales:", file=sys.stderr)
+        for locale, error in failures:
+            print(f"- {locale}: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "stage",
-        choices=("snapshot", "frame"),
-        help="snapshot renders raw images; frame consumes existing raw images",
+        choices=("snapshot", "frame", "generate-localized"),
+        help=(
+            "snapshot renders one locale; frame consumes one locale's raw images; "
+            "generate-localized renders and frames every non-English locale"
+        ),
     )
     parser.add_argument(
         "locale",
+        nargs="?",
         help="canonical app locale (en, de, zh-Hans, ...) or matching Play locale",
     )
     return parser.parse_args()
@@ -208,17 +255,17 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    if args.stage == "generate-localized":
+        if args.locale is not None:
+            raise SystemExit("generate-localized does not accept a locale")
+        return generate_localized_screenshots()
+    if args.locale is None:
+        raise SystemExit(f"{args.stage} requires a locale")
     target = target_for_locale(args.locale)
-    store_locale = play_locale(target.locale)
-    raw_dir = FRAMEIT_SCREENSHOTS / store_locale
     if args.stage == "snapshot":
-        raw_images = render_screenshots(target, raw_dir)
-        print(f"Rendered {len(raw_images)} {store_locale} screenshots in {raw_dir}")
+        snapshot_target(target)
     else:
-        raw_images = raw_screenshots(store_locale)
-        destination = METADATA_ROOT / store_locale / "images/phoneScreenshots"
-        framed = frame_screenshots(raw_images, store_locale, destination)
-        print(f"Framed {len(framed)} {store_locale} screenshots in {destination}")
+        frame_target(target)
     return 0
 
 

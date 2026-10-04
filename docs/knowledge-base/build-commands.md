@@ -148,9 +148,15 @@ every snapshot run. Do not edit or commit the generated Kotlin file.
 Rendering and framing are independently retryable:
 
 ```bash
+make playstore-screenshots-generate
 make playstore-screenshots-snapshot LANGUAGE=de
 make playstore-screenshots-frame LANGUAGE=de
 ```
+
+`playstore-screenshots-generate` renders and frames every non-English locale
+sequentially, continuing after locale-specific failures and reporting them
+together at the end. The single-locale targets remain available to retry a
+failed snapshot or frame without repeating the full suite.
 
 The snapshot stage writes persistent raw images beneath
 `fastlane/frameit/screenshots/<Play locale>/`. The frame stage consumes those
@@ -182,9 +188,9 @@ Each locale is a separate Supply invocation, so a failed locale can be retried
 without repeating snapshot or Frameit work. Supply has no locale filter, so the
 script builds an ignored, persistent per-locale metadata view from symlinks
 under `fastlane/generated/screenshot-upload/`; the real images stay in place.
-The default is the production track and the current Gradle `versionCode`.
-Override those when necessary with, for example,
-`PLAYSTORE_SCREENSHOT_ARGS="--track beta --version-code 123"`. Use
+Play Store screenshots are global listing assets, not track- or release-scoped
+assets. The upload command therefore does not accept a track or version code.
+Delay the upload itself until the listing should change. Use
 `PLAYSTORE_SCREENSHOT_ARGS="--dry-run"` to inspect the scoped commands without
 contacting Google Play.
 

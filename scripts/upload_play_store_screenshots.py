@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Upload existing Play Store screenshots one locale at a time."""
+"""Upload existing Play Store listing screenshots one locale at a time."""
 
 from __future__ import annotations
 
 import argparse
-import re
 import shlex
 import subprocess
 import sys
@@ -21,9 +20,7 @@ from languages import ALL_LANGUAGES, TranslationTarget, play_locale  # noqa: E40
 
 METADATA_ROOT = PROJECT_ROOT / "fastlane/metadata/android"
 STAGING_ROOT = PROJECT_ROOT / "fastlane/generated/screenshot-upload"
-BUILD_GRADLE = PROJECT_ROOT / "app/app/build.gradle.kts"
 SCREENSHOT_COUNT = 8
-VERSION_CODE_RE = re.compile(r"^\s*versionCode\s*=\s*(\d+)\s*$", re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -98,13 +95,6 @@ def select_screenshot_sets(
     return complete
 
 
-def current_version_code(build_gradle: Path = BUILD_GRADLE) -> str:
-    matches = VERSION_CODE_RE.findall(build_gradle.read_text(encoding="utf-8"))
-    if len(matches) != 1:
-        raise ValueError(f"Expected exactly one versionCode in {build_gradle}")
-    return matches[0]
-
-
 def stage_screenshot_set(screenshots: ScreenshotSet, staging_root: Path) -> Path:
     metadata_root = staging_root / screenshots.store_locale
     destination = (
@@ -126,9 +116,7 @@ def stage_screenshot_set(screenshots: ScreenshotSet, staging_root: Path) -> Path
     return metadata_root
 
 
-def supply_command(
-    metadata_root: Path, *, track: str, version_code: str
-) -> list[str]:
+def supply_command(metadata_root: Path) -> list[str]:
     return [
         "bundle",
         "exec",
@@ -136,10 +124,6 @@ def supply_command(
         "supply",
         "--metadata_path",
         str(metadata_root),
-        "--track",
-        track,
-        "--version_code",
-        version_code,
         "--skip_upload_apk",
         "--skip_upload_aab",
         "--skip_upload_metadata",
@@ -155,8 +139,6 @@ def parse_args() -> argparse.Namespace:
         "--language",
         help="canonical app locale or Play locale; defaults to every complete set",
     )
-    parser.add_argument("--track", default="production")
-    parser.add_argument("--version-code", default=None)
     parser.add_argument("--metadata-root", type=Path, default=METADATA_ROOT)
     parser.add_argument("--staging-root", type=Path, default=STAGING_ROOT)
     parser.add_argument(
@@ -170,12 +152,9 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     screenshots = select_screenshot_sets(args.metadata_root, args.language)
-    version_code = args.version_code or current_version_code()
     for index, item in enumerate(screenshots, 1):
         scoped_metadata = stage_screenshot_set(item, args.staging_root)
-        command = supply_command(
-            scoped_metadata, track=args.track, version_code=version_code
-        )
+        command = supply_command(scoped_metadata)
         print(
             f"==> [{index}/{len(screenshots)}] Uploading {item.store_locale}",
             flush=True,

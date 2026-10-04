@@ -68,9 +68,7 @@ class PlayStoreScreenshotUploadTest(unittest.TestCase):
             )
 
     def test_supply_command_uploads_only_screenshots(self) -> None:
-        command = upload.supply_command(
-            Path("/tmp/scoped-metadata"), track="beta", version_code="123"
-        )
+        command = upload.supply_command(Path("/tmp/scoped-metadata"))
         for flag in (
             "--skip_upload_apk",
             "--skip_upload_aab",
@@ -80,8 +78,8 @@ class PlayStoreScreenshotUploadTest(unittest.TestCase):
         ):
             self.assertIn(flag, command)
         self.assertNotIn("--skip_upload_screenshots", command)
-        self.assertEqual("beta", command[command.index("--track") + 1])
-        self.assertEqual("123", command[command.index("--version_code") + 1])
+        self.assertNotIn("--track", command)
+        self.assertNotIn("--version_code", command)
 
 
 if __name__ == "__main__":

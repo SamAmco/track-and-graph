@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -119,6 +121,28 @@ class PlayStoreScreenshotsTest(unittest.TestCase):
                 "../background.jpg",
                 generated["default"]["background"],
             )
+
+    def test_generate_localized_continues_after_a_locale_fails(self) -> None:
+        targets = play_store_screenshots.SUPPORTED_TARGETS[:2]
+        with (
+            patch.object(play_store_screenshots, "SUPPORTED_TARGETS", targets),
+            patch.object(
+                play_store_screenshots,
+                "snapshot_target",
+                side_effect=(RuntimeError("render failed"), None),
+            ) as snapshot,
+            patch.object(play_store_screenshots, "frame_target") as frame,
+            redirect_stdout(io.StringIO()),
+            redirect_stderr(io.StringIO()),
+        ):
+            result = play_store_screenshots.generate_localized_screenshots()
+
+        self.assertEqual(1, result)
+        self.assertEqual(
+            list(targets),
+            [call.args[0] for call in snapshot.call_args_list],
+        )
+        frame.assert_called_once_with(targets[1])
 
 
 if __name__ == "__main__":
