@@ -18,20 +18,27 @@
 package com.samco.trackandgraph.reminders.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.util.Locale
+
+@Composable
+private fun formatLocalizedDateTime(dateTime: LocalDateTime): String {
+    val locale = LocalConfiguration.current.locales[0]
+    return dateTime.format(
+        DateTimeFormatter
+            .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+            .withLocale(locale)
+    )
+}
 
 @Composable
 fun formatNextScheduled(nextScheduled: LocalDateTime?): String {
     return if (nextScheduled != null) {
-        val formatter = DateTimeFormatter
-            .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-            .withLocale(Locale.getDefault())
-        val dateTime = nextScheduled.format(formatter)
+        val dateTime = formatLocalizedDateTime(nextScheduled)
         stringResource(R.string.next_reminder_format, dateTime)
     } else {
         stringResource(R.string.no_upcoming_reminders)
@@ -40,18 +47,12 @@ fun formatNextScheduled(nextScheduled: LocalDateTime?): String {
 
 @Composable
 fun formatEndedAt(endDateTime: LocalDateTime): String {
-    val formatter = DateTimeFormatter
-        .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-        .withLocale(Locale.getDefault())
-    val dateTime = endDateTime.format(formatter)
+    val dateTime = formatLocalizedDateTime(endDateTime)
     return stringResource(R.string.ended_at_format, dateTime)
 }
 
 @Composable
 fun formatStartingAt(startDateTime: LocalDateTime): String {
-    val formatter = DateTimeFormatter
-        .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-        .withLocale(Locale.getDefault())
-    val dateTime = startDateTime.format(formatter)
+    val dateTime = formatLocalizedDateTime(startDateTime)
     return stringResource(R.string.starting_at_format, dateTime)
 }
