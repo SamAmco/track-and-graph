@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Upload existing Play Store listing screenshots one locale at a time."""
+"""Upload existing Play Store listing screenshots in retryable locale batches."""
 
 from __future__ import annotations
 
 import argparse
 import shlex
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -21,6 +22,7 @@ from languages import ALL_LANGUAGES, TranslationTarget, play_locale  # noqa: E40
 METADATA_ROOT = PROJECT_ROOT / "fastlane/metadata/android"
 STAGING_ROOT = PROJECT_ROOT / "fastlane/generated/screenshot-upload"
 SCREENSHOT_COUNT = 8
+DEFAULT_BATCH_SIZE = 10
 
 
 @dataclass(frozen=True)
@@ -73,8 +75,12 @@ def screenshot_set(
 
 
 def select_screenshot_sets(
-    metadata_root: Path, requested_locale: str | None
+    metadata_root: Path,
+    requested_locale: str | None,
+    start_locale: str | None = None,
 ) -> tuple[ScreenshotSet, ...]:
+    if requested_locale is not None and start_locale is not None:
+        raise ValueError("--language and --from-language cannot be used together")
     if requested_locale is not None:
         target = target_for_locale(requested_locale)
         selected = screenshot_set(metadata_root, target)
@@ -92,27 +98,64 @@ def select_screenshot_sets(
         raise FileNotFoundError(
             f"No complete screenshot sets found beneath {metadata_root}"
         )
+    if start_locale is not None:
+        start_target = target_for_locale(start_locale)
+        try:
+            start_index = next(
+                index
+                for index, value in enumerate(complete)
+                if value.target == start_target
+            )
+        except StopIteration as error:
+            raise FileNotFoundError(
+                f"No upload-ready screenshots found for {play_locale(start_target.locale)}"
+            ) from error
+        complete = complete[start_index:]
     return complete
 
 
-def stage_screenshot_set(screenshots: ScreenshotSet, staging_root: Path) -> Path:
-    metadata_root = staging_root / screenshots.store_locale
-    destination = (
-        metadata_root
-        / screenshots.store_locale
-        / "images/phoneScreenshots"
+def screenshot_batches(
+    screenshots: tuple[ScreenshotSet, ...], batch_size: int
+) -> tuple[tuple[ScreenshotSet, ...], ...]:
+    if batch_size < 1:
+        raise ValueError("batch size must be at least 1")
+    return tuple(
+        screenshots[index : index + batch_size]
+        for index in range(0, len(screenshots), batch_size)
     )
-    destination.mkdir(parents=True, exist_ok=True)
-    expected_names = {image.name for image in screenshots.images}
-    for existing in destination.iterdir():
-        if existing.name not in expected_names:
-            existing.unlink()
-    for source in screenshots.images:
-        link = destination / source.name
-        if link.is_symlink() and link.resolve() == source.resolve():
-            continue
-        link.unlink(missing_ok=True)
-        link.symlink_to(source.resolve())
+
+
+def stage_screenshot_batch(
+    screenshots: tuple[ScreenshotSet, ...], staging_root: Path
+) -> Path:
+    if not screenshots:
+        raise ValueError("cannot stage an empty screenshot batch")
+    batch_name = f"{screenshots[0].store_locale}--{screenshots[-1].store_locale}"
+    metadata_root = staging_root / batch_name
+    expected_locales = {item.store_locale for item in screenshots}
+    if metadata_root.is_dir():
+        for existing in metadata_root.iterdir():
+            if existing.name not in expected_locales:
+                if existing.is_dir() and not existing.is_symlink():
+                    shutil.rmtree(existing)
+                else:
+                    existing.unlink()
+
+    for item in screenshots:
+        destination = (
+            metadata_root / item.store_locale / "images/phoneScreenshots"
+        )
+        destination.mkdir(parents=True, exist_ok=True)
+        expected_names = {image.name for image in item.images}
+        for existing in destination.iterdir():
+            if existing.name not in expected_names:
+                existing.unlink()
+        for source in item.images:
+            link = destination / source.name
+            if link.is_symlink() and link.resolve() == source.resolve():
+                continue
+            link.unlink(missing_ok=True)
+            link.symlink_to(source.resolve())
     return metadata_root
 
 
@@ -139,6 +182,16 @@ def parse_args() -> argparse.Namespace:
         "--language",
         help="canonical app locale or Play locale; defaults to every complete set",
     )
+    parser.add_argument(
+        "--from-language",
+        help="resume the full upload at this canonical app locale or Play locale",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=DEFAULT_BATCH_SIZE,
+        help=f"locales committed per Play edit (default: {DEFAULT_BATCH_SIZE})",
+    )
     parser.add_argument("--metadata-root", type=Path, default=METADATA_ROOT)
     parser.add_argument("--staging-root", type=Path, default=STAGING_ROOT)
     parser.add_argument(
@@ -151,18 +204,33 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    screenshots = select_screenshot_sets(args.metadata_root, args.language)
-    for index, item in enumerate(screenshots, 1):
-        scoped_metadata = stage_screenshot_set(item, args.staging_root)
+    screenshots = select_screenshot_sets(
+        args.metadata_root, args.language, args.from_language
+    )
+    batches = screenshot_batches(screenshots, args.batch_size)
+    for index, batch in enumerate(batches, 1):
+        scoped_metadata = stage_screenshot_batch(batch, args.staging_root)
         command = supply_command(scoped_metadata)
+        locale_summary = ", ".join(item.store_locale for item in batch)
         print(
-            f"==> [{index}/{len(screenshots)}] Uploading {item.store_locale}",
+            f"==> Batch [{index}/{len(batches)}] Uploading: {locale_summary}",
             flush=True,
         )
         if args.dry_run:
             print(shlex.join(command), flush=True)
         else:
-            subprocess.run(command, cwd=PROJECT_ROOT, check=True)
+            try:
+                subprocess.run(command, cwd=PROJECT_ROOT, check=True)
+            except subprocess.CalledProcessError as error:
+                resume_locale = batch[0].target.locale
+                print(
+                    "Screenshot batch failed. Retry this batch and everything after "
+                    "with:\n"
+                    "  make playstore-screenshots-upload "
+                    f"FROM_LANGUAGE={shlex.quote(resume_locale)}",
+                    file=sys.stderr,
+                )
+                return error.returncode
     return 0
 
 

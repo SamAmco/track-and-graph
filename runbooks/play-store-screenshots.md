@@ -9,4 +9,5 @@
 - Generate and frame every remaining locale sequentially with `make playstore-screenshots-generate`. 
 - If needed retry broken locales with `make playstore-screenshots-snapshot LANGUAGE=<locale>` and `make playstore-screenshots-frame LANGUAGE=<locale>`.
 - Get an agent review: Please review the latest screenshots at `fastlane/metadata/android/*/images/phoneScreenshots/` for anything that looks incorrect or broken.
-- Upload every complete locale sequentially with `make playstore-screenshots-upload`.
+- Upload every complete locale in retryable ten-locale batches with `make playstore-screenshots-upload`. Fastlane skips screenshots whose remote checksums already match.
+- If a batch fails, use the printed `make playstore-screenshots-upload FROM_LANGUAGE=<locale>` command to resume at that batch without revisiting committed batches. Language order is as listed in `configuration/translation-languages.tsv``

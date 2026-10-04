@@ -261,9 +261,9 @@ playstore-screenshots-frame:
 playstore-screenshots-generate:
 	@python3 -B scripts/play_store_screenshots.py generate-localized
 
-## playstore-screenshots-upload: Upload LANGUAGE, or every complete framed locale sequentially.
+## playstore-screenshots-upload: Upload LANGUAGE, or all complete framed locales in retryable batches; FROM_LANGUAGE resumes a failed batch.
 playstore-screenshots-upload:
-	@python3 -B scripts/upload_play_store_screenshots.py $(if $(LANGUAGE),--language "$(LANGUAGE)") $(PLAYSTORE_SCREENSHOT_ARGS)
+	@python3 -B scripts/upload_play_store_screenshots.py $(if $(LANGUAGE),--language "$(LANGUAGE)") $(if $(FROM_LANGUAGE),--from-language "$(FROM_LANGUAGE)") $(if $(BATCH_SIZE),--batch-size "$(BATCH_SIZE)") $(PLAYSTORE_SCREENSHOT_ARGS)
 
 ## playstore-screenshots-english: Render the eight raw English Play Store screenshots for local review.
 playstore-screenshots-english:

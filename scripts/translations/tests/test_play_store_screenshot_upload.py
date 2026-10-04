@@ -39,6 +39,19 @@ class PlayStoreScreenshotUploadTest(unittest.TestCase):
 
             self.assertEqual(["en", "de"], [item.target.locale for item in selected])
 
+    def test_resumes_from_requested_locale_in_manifest_order(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.create_complete_set(root, "en")
+            self.create_complete_set(root, "af")
+            self.create_complete_set(root, "sq")
+
+            selected = upload.select_screenshot_sets(root, None, "af")
+
+            self.assertEqual(
+                ["af", "sq"], [item.target.locale for item in selected]
+            )
+
     def test_rejects_a_partial_set_instead_of_silently_skipping_it(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -49,21 +62,42 @@ class PlayStoreScreenshotUploadTest(unittest.TestCase):
             with self.assertRaisesRegex(FileNotFoundError, "Partial screenshot set"):
                 upload.select_screenshot_sets(root, None)
 
-    def test_staging_view_contains_only_one_locale_and_uses_symlinks(self) -> None:
+    def test_batches_preserve_order_and_limit(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            images = self.create_complete_set(root / "metadata", "de")
-            screenshots = upload.ScreenshotSet(
-                upload.target_for_locale("de"), images
+            selected = tuple(
+                upload.ScreenshotSet(
+                    upload.target_for_locale(locale),
+                    self.create_complete_set(root, locale),
+                )
+                for locale in ("en", "af", "sq")
             )
 
-            scoped = upload.stage_screenshot_set(screenshots, root / "staging")
+            batches = upload.screenshot_batches(selected, 2)
+
+            self.assertEqual(
+                [["en", "af"], ["sq"]],
+                [[item.target.locale for item in batch] for batch in batches],
+            )
+
+    def test_staging_view_contains_only_batch_locales_and_uses_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            screenshots = tuple(
+                upload.ScreenshotSet(
+                    upload.target_for_locale(locale),
+                    self.create_complete_set(root / "metadata", locale),
+                )
+                for locale in ("de", "fr")
+            )
+
+            scoped = upload.stage_screenshot_batch(screenshots, root / "staging")
 
             staged = sorted(scoped.rglob("*.png"))
-            self.assertEqual(upload.SCREENSHOT_COUNT, len(staged))
+            self.assertEqual(upload.SCREENSHOT_COUNT * 2, len(staged))
             self.assertTrue(all(path.is_symlink() for path in staged))
             self.assertEqual(
-                {"de-DE"},
+                {"de-DE", "fr-FR"},
                 {path.relative_to(scoped).parts[0] for path in staged},
             )
 

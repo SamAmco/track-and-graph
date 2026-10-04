@@ -183,11 +183,17 @@ make playstore-screenshots-upload
 
 With `LANGUAGE`, the upload target requires that locale's complete eight-image
 set. Without it, the target scans the language manifest in order and uploads
-each locale that has all eight upload-ready images, stopping on partial sets.
-Each locale is a separate Supply invocation, so a failed locale can be retried
-without repeating snapshot or Frameit work. Supply has no locale filter, so the
-script builds an ignored, persistent per-locale metadata view from symlinks
-under `fastlane/generated/screenshot-upload/`; the real images stay in place.
+every locale that has all eight upload-ready images, stopping on partial sets.
+Locales are committed in batches of ten so transient failures only repeat a
+bounded amount of work without exhausting Google Play's daily save quota.
+Fastlane's checksum sync still skips screenshots that already match the remote
+listing. A failed batch prints a `FROM_LANGUAGE` command that resumes at the
+first locale in that batch without revisiting earlier committed batches.
+`BATCH_SIZE` can override the default when diagnosing an upload.
+
+Supply has no locale filter, so the script builds ignored, persistent
+batch-scoped metadata views from symlinks under
+`fastlane/generated/screenshot-upload/`; the real images stay in place.
 Play Store screenshots are global listing assets, not track- or release-scoped
 assets. The upload command therefore does not accept a track or version code.
 Delay the upload itself until the listing should change. Use
