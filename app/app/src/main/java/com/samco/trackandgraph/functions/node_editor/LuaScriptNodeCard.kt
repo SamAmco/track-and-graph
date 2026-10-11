@@ -89,6 +89,7 @@ internal fun LuaScriptNode(
     onDeleteNode: () -> Unit = {},
     onUpdateScript: (String) -> Unit = {},
     onUpdateScriptFromFile: (Uri?) -> Unit = {},
+    onOpenCustomFunctionsDocs: () -> Unit = {},
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
@@ -130,22 +131,21 @@ internal fun LuaScriptNode(
             InputSpacingLarge()
 
             Row {
-                // Show info button if metadata has title and description
-                if (node.metadata != null &&
-                    node.metadata.title != null &&
+                val hasDescription = node.metadata?.title != null &&
                     node.metadata.description != null
-                ) {
-                    IconButton(
-                        modifier = Modifier.size(buttonSize),
-                        onClick = { showInfoDialog = true }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.about_icon),
-                            contentDescription = stringResource(R.string.info),
-                            modifier = Modifier.size(smallIconSize),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                IconButton(
+                    modifier = Modifier.size(buttonSize),
+                    onClick = {
+                        if (hasDescription) showInfoDialog = true
+                        else onOpenCustomFunctionsDocs()
                     }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.about_icon),
+                        contentDescription = stringResource(R.string.info),
+                        modifier = Modifier.size(smallIconSize),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
 
                 IconButton(

@@ -60,6 +60,7 @@ internal fun NodeCard(
     onCreateOrUpdateFunction: () -> Unit = {},
     onUpdateScriptForNodeId: (Int, String) -> Unit = { _, _ -> },
     onUpdateScriptFromFileForNodeId: (Int, Uri?) -> Unit = { _, _ -> },
+    onOpenCustomFunctionsDocs: () -> Unit = {},
     onRegisterNodeBounds: (Int, Rect) -> Unit = { _, _ -> },
 ) {
     val minConnectorSpacing = 24.dp
@@ -97,7 +98,8 @@ internal fun NodeCard(
                     onCreateOrUpdateFunction,
                     onDeleteNode,
                     onUpdateScriptForNodeId,
-                    onUpdateScriptFromFileForNodeId
+                    onUpdateScriptFromFileForNodeId,
+                    onOpenCustomFunctionsDocs,
                 )
             }
         }
@@ -126,7 +128,8 @@ private fun NodeCardContent(
     onCreateOrUpdateFunction: () -> Unit,
     onDeleteNode: (Node) -> Unit,
     onUpdateScriptForNodeId: (Int, String) -> Unit,
-    onUpdateScriptFromFileForNodeId: (Int, Uri?) -> Unit
+    onUpdateScriptFromFileForNodeId: (Int, Uri?) -> Unit,
+    onOpenCustomFunctionsDocs: () -> Unit,
 ) = when (node) {
     is Node.Output -> OutputNode(
         node = node,
@@ -146,7 +149,8 @@ private fun NodeCardContent(
         },
         onUpdateScriptFromFile = { uri ->
             onUpdateScriptFromFileForNodeId(node.id, uri)
-        }
+        },
+        onOpenCustomFunctionsDocs = onOpenCustomFunctionsDocs,
     )
 }
 
@@ -271,4 +275,3 @@ private fun LuaScriptNodePreview() {
         )
     }
 }
-

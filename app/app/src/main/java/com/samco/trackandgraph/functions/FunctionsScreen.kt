@@ -149,6 +149,7 @@ fun FunctionsScreen(
         showFirstTimeUserDialog = showFirstTimeUserDialog,
         onDismissFirstTimeUserDialog = viewModel::dismissFirstTimeUserDialog,
         onOpenFunctionsTutorial = viewModel::onOpenFunctionsTutorial,
+        onOpenCustomFunctionsDocs = viewModel::onOpenCustomFunctionsDocs,
     )
 }
 
@@ -200,6 +201,7 @@ internal fun FunctionsScreenContent(
     showFirstTimeUserDialog: Boolean,
     onDismissFirstTimeUserDialog: () -> Unit,
     onOpenFunctionsTutorial: () -> Unit,
+    onOpenCustomFunctionsDocs: () -> Unit = {},
     overlayPadding: PaddingValues? = null,
 ) = TnGComposeTheme {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -288,6 +290,7 @@ internal fun FunctionsScreenContent(
                             onCreateOrUpdateFunction = onCreateOrUpdateFunction,
                             onUpdateScriptForNodeId = onUpdateScriptForNodeId,
                             onUpdateScriptFromFileForNodeId = onUpdateScriptFromFileForNodeId,
+                            onOpenCustomFunctionsDocs = onOpenCustomFunctionsDocs,
                             onRegisterNodeBounds = onRegisterNodeBounds,
                         )
                     }

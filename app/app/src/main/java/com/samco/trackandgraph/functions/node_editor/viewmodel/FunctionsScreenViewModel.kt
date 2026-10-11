@@ -157,6 +157,7 @@ internal interface FunctionsScreenViewModel {
     val showFirstTimeUserDialog: StateFlow<Boolean>
     fun dismissFirstTimeUserDialog()
     fun onOpenFunctionsTutorial()
+    fun onOpenCustomFunctionsDocs()
 
     val nodes: StateFlow<List<Node>>
     val edges: StateFlow<List<Edge>>
@@ -274,6 +275,12 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     override fun onOpenFunctionsTutorial() {
         viewModelScope.launch {
             urlNavigator.navigateTo(context, UrlNavigator.Location.FUNCTIONS_DOCS)
+        }
+    }
+
+    override fun onOpenCustomFunctionsDocs() {
+        viewModelScope.launch {
+            urlNavigator.navigateTo(context, UrlNavigator.Location.LUA_CUSTOM_FUNCTIONS_DOCS)
         }
     }
 
