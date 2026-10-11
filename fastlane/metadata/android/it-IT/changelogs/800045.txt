@@ -1,0 +1,2 @@
+- Risolto il ritaglio delle annotazioni dei punti nei grafici a linee
+- Aggiunto il link alla documentazione sulla scrittura di funzioni Lua personalizzate nella UI dei nodi Function

@@ -1,0 +1,2 @@
+- Inayos ang pagkaputol ng anotasyon ng mga punto sa line graph
+- Idinagdag ang link ng dokumentasyon sa custom Lua function node UI

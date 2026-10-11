@@ -1,0 +1,2 @@
+- Korjattu viivakaavion pistehuomautusten leikkautuminen
+- Lisätty linkki funktioiden kirjoitusohjeisiin mukautetun Lua-funktiosolmun käyttöliittymään

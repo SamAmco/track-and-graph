@@ -1,0 +1,2 @@
+- U rregullua prerja e shënimeve të pikave në grafikun vijor
+- U shtua lidhja e dokumentacionit për funksionet e personalizuara Lua në ndërfaqen e nyjës së funksionit

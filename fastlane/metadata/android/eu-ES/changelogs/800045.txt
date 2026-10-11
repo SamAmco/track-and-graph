@@ -1,0 +1,2 @@
+- Lerro-grafikoko puntuen oharpenak mozten zituen akatsa konponduta
+- Lua funtzio pertsonalizatuaren nodoaren interfazean funtzioak idazteko dokumentaziorako esteka gehitu da

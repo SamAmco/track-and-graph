@@ -1,0 +1,2 @@
+- Ištaisyta klaida: linijinės diagramos taškų anotacijos buvo apkarpomos
+- Pridėta funkcijų rašymo dokumentacijos nuoroda pasirinktinės Lua funkcijos mazgo lange

@@ -1,0 +1,2 @@
+- Fout reggestel waar punt-aantekeninge op lyngrafieke afgesny is
+- Skakel na dokumentasie oor die skryf van funksies by die pasgemaakte Lua-funksienodus gevoeg

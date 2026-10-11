@@ -1,0 +1,2 @@
+- Memperbaiki bug anotasi titik pada grafik garis terpotong
+- Menambahkan tautan dokumentasi penulisan fungsi ke UI node fungsi Lua kustom

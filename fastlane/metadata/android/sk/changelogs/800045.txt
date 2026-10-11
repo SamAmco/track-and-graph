@@ -1,0 +1,2 @@
+- Opravené orezávanie popisov bodov na čiarovom grafe
+- Pridaný odkaz na dokumentáciu k zapisovaniu funkcií v používateľskom rozhraní vlastného uzla Lua funkcie

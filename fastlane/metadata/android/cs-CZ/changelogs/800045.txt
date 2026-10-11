@@ -1,0 +1,2 @@
+- Opravena chyba ořezávání popisků bodů v čárovém grafu
+- Přidán odkaz na dokumentaci k funkcím do UI vlastního uzlu Lua funkce

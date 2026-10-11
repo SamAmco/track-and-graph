@@ -1,0 +1,2 @@
+- Bug reparà: annotaziuns dals puncts dal graf linear vegnivan tagliadas
+- Agiunta il link als documents davart la funcziun che scriva en l’interfatscha dal node Lua persunalisà

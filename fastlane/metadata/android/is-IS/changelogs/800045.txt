@@ -1,0 +1,2 @@
+- Lagað vandamál þar sem punktaskýringar á línuritum klipptust
+- Bætti við tengli á skjöl um að skrifa sérsniðnar Lua-föll í hnútaviðmót sérsniðinna Lua-falla

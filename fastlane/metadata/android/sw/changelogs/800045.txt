@@ -1,0 +1,2 @@
+- Imerekebisha maelezo ya nukta kwenye grafu ya mistari yasikatwe
+- Imeongeza kiungo cha nyaraka za kuandika functions kwenye UI ya nodi maalum ya Lua

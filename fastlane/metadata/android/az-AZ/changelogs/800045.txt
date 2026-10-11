@@ -1,0 +1,2 @@
+- Xətti qrafikdə nöqtə annotasiyalarının kəsilməsi xətası düzəldildi
+- Fərdi Lua funksiya qovşağının interfeysinə funksiya yazma sənədlərinin linki əlavə edildi

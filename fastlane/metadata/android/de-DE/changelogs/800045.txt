@@ -1,0 +1,2 @@
+- Fehler behoben: Punktbeschriftungen im Liniendiagramm wurden abgeschnitten
+- Dokumentationslink zum Erstellen benutzerdefinierter Lua-Funktionen in der UI des Funktionsknotens hinzugefügt

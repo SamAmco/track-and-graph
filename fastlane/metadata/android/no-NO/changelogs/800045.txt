@@ -1,0 +1,2 @@
+- Rettet feil der punktannotasjoner i linjediagrammer ble beskåret
+- La til lenke til dokumentasjon for funksjoner i grensesnittet for egendefinerte Lua-funksjonsnoder

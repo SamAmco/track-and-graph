@@ -1,0 +1,2 @@
+- Fixed bug line graph point annotations clipped 
+- Add function writing docs link to custom Lua function node UI

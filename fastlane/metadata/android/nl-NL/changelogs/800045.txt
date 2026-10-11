@@ -1,0 +1,2 @@
+- Bug opgelost waarbij puntannotaties in lijngrafieken werden afgeknipt
+- Link naar documentatie voor het schrijven van functies toegevoegd aan de interface van aangepaste Lua-functies

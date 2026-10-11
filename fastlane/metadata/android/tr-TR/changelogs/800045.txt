@@ -1,0 +1,2 @@
+- Çizgi grafiğindeki nokta açıklamalarının kırpılması düzeltildi
+- Özel Lua işlevi düğümü arayüzüne işlev yazma belgeleri bağlantısı eklendi

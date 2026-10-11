@@ -1,0 +1,2 @@
+- Naprawiono przycinanie adnotacji punktów na wykresie liniowym
+- Dodano link do dokumentacji tworzenia funkcji w interfejsie węzła niestandardowej funkcji Lua

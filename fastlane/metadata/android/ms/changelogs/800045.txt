@@ -1,0 +1,2 @@
+- Pepijat anotasi titik graf garis terpotong dibetulkan
+- Tambah pautan dokumentasi penulisan fungsi ke UI nod fungsi Lua tersuai

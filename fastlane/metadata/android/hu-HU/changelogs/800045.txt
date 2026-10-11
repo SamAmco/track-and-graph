@@ -1,0 +1,2 @@
+- Javítva: a vonaldiagram pontfeliratai levágódtak
+- Dokumentációs hivatkozás hozzáadva az egyéni Lua-függvény csomóponti felületéhez

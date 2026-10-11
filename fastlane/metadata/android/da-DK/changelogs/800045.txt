@@ -1,0 +1,2 @@
+- Rettede en fejl, hvor punktannoteringer i linjegrafer blev beskåret
+- Tilføjede et link til dokumentation om funktionsskrivning i brugerfladen for brugerdefinerede Lua-funktionsnoder

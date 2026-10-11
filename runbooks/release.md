@@ -3,8 +3,8 @@
 - Run `make validate-all`.
 - Update `versionCode` and `versionName` in `app/app/build.gradle.kts`.
 - Run `make release-notes` to draft and translate the concise Play Store/GitHub release notes. This makes paid API calls.
-- Get an agent to review and fix up broken translation files.
 - Run `make release-notes-validate` until every locale is present, structurally valid, and within the 500-character Play limit. This step is offline.
+- Get an agent to review and fix up broken translation files if needed.
 - Run `make commit-version`.
 - Run `make assemble-bundle-release`.
 - Install and sanity-check the Play Store APK: `adb install app/app/build/outputs/apk/playStore/release/app-playStore-release.apk`

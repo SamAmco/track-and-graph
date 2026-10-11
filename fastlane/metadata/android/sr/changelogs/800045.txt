@@ -1,0 +1,2 @@
+- Ispravljena greška zbog koje su oznake tačaka na linijskom grafikonu bile odsečene
+- Dodat link ka dokumentaciji za pisanje funkcija u korisničkom Lua čvoru funkcije

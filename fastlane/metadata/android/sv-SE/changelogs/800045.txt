@@ -1,0 +1,2 @@
+- Fixade att punktanteckningar i linjediagram klipptes
+- Lade till länk till dokumentation om funktionsskrivning i gränssnittet för anpassade Lua-funktionsnoder

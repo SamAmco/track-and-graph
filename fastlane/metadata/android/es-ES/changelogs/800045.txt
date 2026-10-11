@@ -1,0 +1,2 @@
+- Se corrigió el recorte de anotaciones de puntos en gráficos de líneas
+- Añadido enlace a la documentación de funciones en Lua personalizadas en la interfaz del nodo de función

@@ -1,0 +1,2 @@
+- S’ha corregit el retall de les anotacions dels punts dels gràfics de línies
+- Afegit un enllaç a la documentació d’escriptura de funcions a la interfície del node de funció Lua personalitzada

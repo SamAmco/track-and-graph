@@ -1,0 +1,2 @@
+- Novērsta līniju grafika punktu anotāciju apgriešana
+- Pievienota saite uz funkciju rakstīšanas dokumentāciju pielāgotas Lua funkcijas mezgla saskarnē

@@ -1,0 +1,2 @@
+- Correction d’un bug où les annotations des points des graphiques linéaires étaient tronquées
+- Ajout d’un lien vers la documentation des fonctions dans l’interface des nœuds Lua personnalisés

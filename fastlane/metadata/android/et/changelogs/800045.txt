@@ -1,0 +1,2 @@
+- Parandatud viga, mille tõttu joongraafiku punktimärkused lõigati ära
+- Lisatud kohandatud Lua funktsiooni sõlme kasutajaliidesesse funktsiooni kirjutamise dokumentatsiooni link

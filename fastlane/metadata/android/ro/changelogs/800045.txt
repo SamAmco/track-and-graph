@@ -1,0 +1,2 @@
+- S-a remediat problema cu etichetele punctelor tăiate în graficele liniare
+- Adăugat link către documentația funcțiilor în Lua personalizate, în interfața nodului de funcție

@@ -1,0 +1,2 @@
+- Đã sửa lỗi chú thích điểm trên biểu đồ đường bị cắt
+- Thêm liên kết tài liệu viết hàm vào giao diện nút hàm Lua tùy chỉnh

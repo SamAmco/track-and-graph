@@ -1,0 +1,2 @@
+- Ispravljena obrezanost oznaka točaka na linijskom grafikonu
+- Dodana poveznica na dokumentaciju za pisanje prilagođenih Lua funkcija u sučelju čvora funkcije

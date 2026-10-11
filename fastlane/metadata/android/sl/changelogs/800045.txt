@@ -1,0 +1,2 @@
+- Odpravljena napaka, zaradi katere so bile oznake točk na linijskem grafu odrezane
+- Dodana povezava do dokumentacije za funkcije v uporabniškem vmesniku vozlišča funkcije Lua
