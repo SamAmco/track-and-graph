@@ -78,6 +78,12 @@ internal val lineGraphCases: List<ILineGraphViewData> = listOf(
     lineGraphData(
         line(values = listOf(950_000.0, 1_200_000.0), spacing = Duration.ofDays(365)),
     ),
+    lineGraphData(
+        line(
+            values = listOf(98_765.0, 40_000.0, 55_000.0, 70_000.0),
+            pointStyle = LineGraphPointStyle.CIRCLES_AND_NUMBERS,
+        ),
+    ),
 )
 
 internal val barChartCases: List<IBarChartViewData> = listOf(

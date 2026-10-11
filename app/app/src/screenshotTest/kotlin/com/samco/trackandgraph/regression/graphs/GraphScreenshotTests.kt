@@ -53,6 +53,9 @@ fun LineSmallDecimalRange() = LineGraphSnapshot(6)
 fun LineTwoPointsLargeValues() = LineGraphSnapshot(7)
 
 @PreviewTest @GraphPreview @Composable
+fun LineAnnotatedPointAtPlotEdges() = LineGraphSnapshot(8)
+
+@PreviewTest @GraphPreview @Composable
 fun BarDailySingleSeries() = BarChartSnapshot(0)
 
 @PreviewTest @GraphLocalesPreview @Composable

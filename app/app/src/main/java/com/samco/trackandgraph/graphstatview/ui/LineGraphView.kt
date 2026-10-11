@@ -354,9 +354,11 @@ private fun LineGraphBodyView(
                                 drawText(
                                     textMeasurer,
                                     label,
-                                    Offset(
-                                        pointOffset.x - measured.size.width - pointLabelPadding.toPx(),
-                                        pointOffset.y - measured.size.height,
+                                    lineGraphPointLabelOffset(
+                                        point = pointOffset,
+                                        labelSize = measured.size,
+                                        plot = plot,
+                                        horizontalPadding = pointLabelPadding.toPx(),
                                     ),
                                     pointTextStyle.copy(
                                         color = pointTextStyle.color.copy(alpha = graphAlpha)
@@ -381,6 +383,24 @@ private fun LineGraphBodyView(
 
     GraphLegend(
         items = lines.map { GraphLegendItem(color = getColor(it.color), label = it.name) }
+    )
+}
+
+internal fun lineGraphPointLabelOffset(
+    point: Offset,
+    labelSize: IntSize,
+    plot: Rect,
+    horizontalPadding: Float,
+): Offset {
+    val maximumX = max(plot.left, plot.right - labelSize.width)
+    val maximumY = max(plot.top, plot.bottom - labelSize.height)
+    val preferredX = point.x - labelSize.width - horizontalPadding
+    val preferredY = point.y - labelSize.height
+    return Offset(
+        x = (if (preferredX >= plot.left) preferredX else point.x + horizontalPadding)
+            .coerceIn(plot.left, maximumX),
+        y = (if (preferredY >= plot.top) preferredY else point.y + horizontalPadding)
+            .coerceIn(plot.top, maximumY),
     )
 }
 

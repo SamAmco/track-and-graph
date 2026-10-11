@@ -9,6 +9,8 @@
 
 package com.samco.trackandgraph.graphstatview.ui
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.IntSize
 import com.samco.trackandgraph.graphstatview.factories.viewdto.LineGraphPoint
 import junit.framework.TestCase.assertEquals
@@ -22,6 +24,32 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 
 class LineGraphViewTest {
+
+    @Test
+    fun `point label flips below-right at the top-left plot boundary`() {
+        assertEquals(
+            Offset(23f, 13f),
+            lineGraphPointLabelOffset(
+                point = Offset(20f, 10f),
+                labelSize = IntSize(40, 12),
+                plot = Rect(left = 20f, top = 10f, right = 200f, bottom = 100f),
+                horizontalPadding = 3f,
+            ),
+        )
+    }
+
+    @Test
+    fun `point label retains its above-left placement away from plot boundaries`() {
+        assertEquals(
+            Offset(57f, 38f),
+            lineGraphPointLabelOffset(
+                point = Offset(100f, 50f),
+                labelSize = IntSize(40, 12),
+                plot = Rect(left = 20f, top = 10f, right = 200f, bottom = 100f),
+                horizontalPadding = 3f,
+            ),
+        )
+    }
 
     @Test
     fun `dynamic y ticks use clear rounded intervals around the data`() {

@@ -33,6 +33,8 @@ Every rendered line-graph instance emits one `LineGraphPerf` info-level Logcat e
 
 The full-screen graph ViewModel shares its expensive combined view-data calculation with `SharingStarted.Lazily`. Once first displayed, that calculation remains active for the lifetime of the navigation destination's ViewModel, even while lifecycle-aware Compose collectors stop in the background. Keep downstream UI state lifecycle-aware. Using zero-timeout `WhileSubscribed` for the root calculation makes returning to the app restart it and replace the ready graph with a loading state; process death still recreates and reloads the graph normally.
 
+Point-value annotations retain their usual above-left placement when space permits. At the top or left boundary they flip below or right of the point before their measured bounds are clamped inside the plot rectangle. This keeps boundary annotations fully visible and clear of their marker without changing the graph's data scale or axis range.
+
 ## Bar-chart boundary
 
 Bar charts are drawn directly with Compose Canvas. `IBarChartViewData` exposes:
