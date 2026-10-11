@@ -74,8 +74,8 @@ internal class GraphScriptTestRunner : CommunityTestRunner() {
             val resolvedScript = daggerComponent.provideLuaScriptResolver()
                 .resolveLuaScript(overriddenScript, vmLease)
 
-            // Use LuaGraphAdapter to execute the script (reuses the same logic)
-            val scriptResult = daggerComponent.provideLuaGraphAdapter()
+            // Use LuaGraphScriptAdapter to execute the script (reuses the same logic)
+            val scriptResult = daggerComponent.provideLuaGraphScriptAdapter()
                 .executeScript(resolvedScript, testDataSources.addDataSourceFunctions())
             testStructure["assertions"].checkfunction()!!.call(scriptResult)
             println("Test passed: $testName.$key")

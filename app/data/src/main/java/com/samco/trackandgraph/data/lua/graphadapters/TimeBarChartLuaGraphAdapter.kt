@@ -31,7 +31,7 @@ import javax.inject.Inject
 internal class TimeBarChartLuaGraphAdapter @Inject constructor(
     private val colorParser: ColorParser,
     private val dateTimeParser: DateTimeParser,
-) : LuaGraphAdaptor<LuaGraphResultData.TimeBarChartData> {
+) : LuaGraphDataAdapter<LuaGraphResultData.TimeBarChartData> {
     companion object {
         const val BAR_DURATION = "bar_duration"
         const val BAR_PERIOD = "bar_period"

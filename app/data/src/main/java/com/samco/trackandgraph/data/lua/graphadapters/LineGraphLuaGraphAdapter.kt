@@ -29,7 +29,7 @@ import javax.inject.Inject
 internal class LineGraphLuaGraphAdapter @Inject constructor(
     private val dateTimeParser: DateTimeParser,
     private val colorParser: ColorParser,
-) : LuaGraphAdaptor<LuaGraphResultData.LineGraphData> {
+) : LuaGraphDataAdapter<LuaGraphResultData.LineGraphData> {
 
     companion object {
         const val DURATION_BASED_RANGE = "duration_based_range"

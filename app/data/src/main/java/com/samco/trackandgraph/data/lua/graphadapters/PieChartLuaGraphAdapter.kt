@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 internal class PieChartLuaGraphAdapter @Inject constructor(
     private val colorParser: ColorParser
-) : LuaGraphAdaptor<LuaGraphResultData.PieChartData> {
+) : LuaGraphDataAdapter<LuaGraphResultData.PieChartData> {
 
     companion object {
         const val VALUE = "value"

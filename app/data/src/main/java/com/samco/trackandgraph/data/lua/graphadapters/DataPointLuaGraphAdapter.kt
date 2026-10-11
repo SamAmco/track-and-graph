@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 internal class DataPointLuaGraphAdapter @Inject constructor(
     private val dataPointParser: DataPointParser,
-) : LuaGraphAdaptor<LuaGraphResultData.DataPointData> {
+) : LuaGraphDataAdapter<LuaGraphResultData.DataPointData> {
 
     companion object {
         const val IS_DURATION = "isduration"

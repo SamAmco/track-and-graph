@@ -22,7 +22,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
-internal class LuaGraphAdapter @Inject constructor(
+internal class LuaGraphScriptAdapter @Inject constructor(
     private val luaDataSourceProviderImpl: LuaDataSourceProviderImpl,
     private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter,
     private val textLuaGraphAdapter: TextLuaGraphAdapter,

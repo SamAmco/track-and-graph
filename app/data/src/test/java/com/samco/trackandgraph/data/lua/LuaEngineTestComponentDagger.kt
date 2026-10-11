@@ -22,7 +22,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.lua.apiimpl.DataPointParser
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
-import com.samco.trackandgraph.data.lua.graphadapters.LuaGraphAdapter
+import com.samco.trackandgraph.data.lua.graphadapters.LuaGraphScriptAdapter
 import com.samco.trackandgraph.data.time.TimeProvider
 import dagger.Binds
 import dagger.BindsInstance
@@ -51,7 +51,7 @@ internal interface LuaEngineTestComponent {
 
     fun provideLuaScriptResolver(): LuaScriptResolver
 
-    fun provideLuaGraphAdapter(): LuaGraphAdapter
+    fun provideLuaGraphScriptAdapter(): LuaGraphScriptAdapter
 
     fun provideDataPointParser(): DataPointParser
 

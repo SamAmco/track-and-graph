@@ -20,7 +20,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionDataSourceAdapter
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionMetadataAdapter
-import com.samco.trackandgraph.data.lua.graphadapters.LuaGraphAdapter
+import com.samco.trackandgraph.data.lua.graphadapters.LuaGraphScriptAdapter
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
@@ -33,7 +33,7 @@ import org.luaj.vm2.LuaError
 import javax.inject.Inject
 
 internal class LuaEngineImpl @Inject constructor(
-    private val luaGraphAdapter: LuaGraphAdapter,
+    private val luaGraphScriptAdapter: LuaGraphScriptAdapter,
     private val luaScriptResolver: LuaScriptResolver,
     private val luaFunctionDataSourceAdapter: LuaFunctionDataSourceAdapter,
     private val luaFunctionMetadataAdapter: LuaFunctionMetadataAdapter,
@@ -52,7 +52,7 @@ internal class LuaEngineImpl @Inject constructor(
     ): LuaGraphResult {
         return try {
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
-            luaGraphAdapter.process(resolvedScript, params)
+            luaGraphScriptAdapter.process(resolvedScript, params)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
                 message = luaError.message ?: "",

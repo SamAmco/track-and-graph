@@ -6,7 +6,7 @@ import com.samco.trackandgraph.data.lua.dto.TextSize
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
-internal class TextLuaGraphAdapter @Inject constructor() : LuaGraphAdaptor<LuaGraphResultData.TextData> {
+internal class TextLuaGraphAdapter @Inject constructor() : LuaGraphDataAdapter<LuaGraphResultData.TextData> {
 
     companion object {
         const val TEXT = "text"
