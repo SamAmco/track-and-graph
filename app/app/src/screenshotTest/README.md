@@ -8,19 +8,24 @@ This source set has two distinct uses:
 - `playstore/` and `tutorial/` are asset-generation previews. The recording scripts select
   those packages and copy their output into the appropriate published resource locations.
 
-Update all FOSS debug references after an intentional visual change:
+Update the graph references after an intentional visual change:
 
 ```bash
 cd app
-./gradlew :app:updateFossDebugScreenshotTest
+./gradlew :app:updateFossDebugScreenshotTest \
+  --tests "com.samco.trackandgraph.regression.graphs.GraphScreenshotTestsKt"
 ```
 
 Validate the committed references without replacing them:
 
 ```bash
-cd app
-./gradlew :app:validateFossDebugScreenshotTest
+make graph-screenshots-validate
 ```
+
+Graph screenshot validation is also part of `make validate-all`. Both commands filter the shared
+screenshot-test source set so asset-generation previews do not require FOSS reference images. The
+Make target forces the validation task to run instead of accepting Gradle's up-to-date result,
+while leaving unchanged build prerequisites cached.
 
 Graph regression previews render production graph composables in list mode at a representative
 380dp card-content width. Preview height is deliberately unspecified, so each golden captures the

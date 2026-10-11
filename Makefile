@@ -161,9 +161,13 @@ lua-test-api:
 lua-test-tools:
 	cd lua && lua tools/test/test_all.lua
 
-.PHONY: validate-all
+.PHONY: graph-screenshots-validate validate-all
+## graph-screenshots-validate: Validate the committed graph screenshot regression references.
+graph-screenshots-validate:
+	cd app && ./gradlew :app:validateFossDebugScreenshotTest --tests "com.samco.trackandgraph.regression.graphs.GraphScreenshotTestsKt" --rerun
+
 ## validate-all: Run the complete pre-release validation suite.
-validate-all: translations-test translations-validate lua-test-api lua-test-tools validate-remote-config in-app-changelog-validate run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes
+validate-all: translations-test translations-validate lua-test-api lua-test-tools validate-remote-config in-app-changelog-validate run-community-tests lua-verify-api-specs lua-validate-functions lua-detect-changes graph-screenshots-validate
 	@echo "All validations passed."
 
 .PHONY: assemble-release
