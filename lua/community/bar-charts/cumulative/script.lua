@@ -37,14 +37,14 @@ local get_accumulation = function(datapoints, cutoff)
 	end
 
 	local index = #datapoints
-	local current_bar_start = cutoff or datapoints[#datapoints].timestamp
-	local current_bar_end = core.time(core.get_end_of_period(totalling_period, current_bar_start)).timestamp
-	current_bar_start = core.shift(current_bar_start, totalling_period, -1).timestamp
+	local current_bar_start = cutoff or datapoints[#datapoints]
+	local current_bar_end = core.time(core.get_end_of_period(totalling_period, current_bar_start))
+	current_bar_start = core.shift(current_bar_start, totalling_period, -1)
 
 	while index > 0 do
 		local dp = datapoints[index]
 
-		while dp.timestamp < current_bar_end do
+		while dp.timestamp < current_bar_end.timestamp do
 			local key = dp.label or ""
 			local this_value = count_by_label and 1 or dp.value
 			current_totals[key] = (current_totals[key] or 0) + this_value
@@ -68,7 +68,7 @@ local get_accumulation = function(datapoints, cutoff)
 		table.insert(bars, segments)
 
 		current_bar_start = current_bar_end
-		current_bar_end = core.shift(current_bar_end, totalling_period, 1).timestamp
+		current_bar_end = core.shift(current_bar_end, totalling_period, 1)
 	end
 
 	local bars_sorted_reversed = {}
@@ -115,9 +115,9 @@ return function(sources)
 
 	local end_date = nil
 	if from_now then
-		end_date = core.get_end_of_period(totalling_period, core.time().timestamp)
+		end_date = core.get_end_of_period(totalling_period, core.time())
 	else
-		end_date = core.get_end_of_period(totalling_period, datapoints[1].timestamp)
+		end_date = core.get_end_of_period(totalling_period, datapoints[1])
 	end
 
 	end_time = core.time(end_date)
