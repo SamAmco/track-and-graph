@@ -2,6 +2,15 @@
 
 This guide covers writing your own Lua functions for the node editor. If you're looking for how to use the visual node editor with existing functions, see [Functions](../../tutorial/functions.md).
 
+<div class="docs-banner" markdown>
+## Create a function with an AI assistant
+
+Give your AI coding assistant the Track & Graph function-writing skill, then describe the function you want it to create.
+
+[View the skill on GitHub](https://github.com/SamAmco/track-and-graph/blob/master/docs/skills/write-track-and-graph-function/SKILL.md){ .md-button .md-button--primary }
+[Open the raw `SKILL.md`](https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/skills/write-track-and-graph-function/SKILL.md){ .md-button }
+</div>
+
 ## What Are Custom Functions?
 
 When you long-press in the node editor, you can select functions from the catalog. But you can also write your own! A custom function is a Lua script that transforms data points - it takes data in, processes it, and outputs transformed data.
