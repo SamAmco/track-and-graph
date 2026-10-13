@@ -58,6 +58,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCanvasGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
@@ -287,10 +288,13 @@ private fun UnwrappedLuaGraphView(
 
     val unwrapped = graphStatViewData.wrapped ?: return
 
-    if (unwrapped is ITextViewData) {
-        LuaTextView(textData = unwrapped)
-    } else {
-        GraphStatInnerView(
+    when (unwrapped) {
+        is ITextViewData -> LuaTextView(textData = unwrapped)
+        is ILuaCanvasGraphViewData -> LuaCanvasGraphView(
+            modifier = modifier,
+            viewData = unwrapped,
+        )
+        else -> GraphStatInnerView(
             graphStatViewData = unwrapped,
             graphViewMode = graphViewMode,
             graphBackgroundColor = graphBackgroundColor,

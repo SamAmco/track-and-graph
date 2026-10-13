@@ -19,6 +19,10 @@ package com.samco.trackandgraph.data.lua.graphadapters
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaGraphContext
+import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
@@ -34,7 +38,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
     fun process(resolvedScript: LuaValue, params: LuaGraphEngineParams): LuaGraphResult {
         val dataSources = luaDataSourceProviderImpl.createDataSourceTable(params.dataSources)
         val scriptResult = executeScript(resolvedScript, dataSources)
-        return processLuaGraphResult(scriptResult)
+        return processLuaGraphResult(scriptResult, dataSources)
     }
 
     fun executeScript(resolvedScript: LuaValue, dataSources: LuaValue): LuaValue {
@@ -45,7 +49,19 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         }
     }
 
-    private fun processLuaGraphResult(resolvedResult: LuaValue): LuaGraphResult {
+    fun render(
+        resolvedScript: LuaValue,
+        renderData: LuaValueReference,
+        context: LuaGraphContext,
+    ): LuaValueAccessor {
+        val luaRenderData = (renderData as LuaValueReferenceImpl).value
+        TODO("Call descriptor.render(luaRenderData, context) and expose its result for indexing")
+    }
+
+    private fun processLuaGraphResult(
+        resolvedResult: LuaValue,
+        dataSources: LuaValue,
+    ): LuaGraphResult {
         if (resolvedResult.isnil()) return LuaGraphResult(data = null)
 
         val type = resolvedResult[TYPE].checkjstring()
@@ -57,10 +73,19 @@ internal class LuaGraphScriptAdapter @Inject constructor(
             PIE_CHART -> pieChartLuaGraphAdapter.process(resolvedResult)
             LINE_GRAPH -> lineGraphLuaGraphAdapter.process(resolvedResult)
             TIME_BARCHART -> timeBarChartLuaGraphAdapter.process(resolvedResult)
+            CANVAS -> processCanvasGraph(resolvedResult, dataSources)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
         return LuaGraphResult(data = data, error = null)
+    }
+
+    private fun processCanvasGraph(
+        descriptor: LuaValue,
+        dataSources: LuaValue,
+    ): LuaGraphResultData.CanvasData {
+        val renderData = descriptor[DATA].checkfunction()!!.call(dataSources)
+        return LuaGraphResultData.CanvasData(LuaValueReferenceImpl(renderData))
     }
 
     companion object {
@@ -70,5 +95,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         const val TIME_BARCHART = "TIME_BARCHART"
         const val TYPE = "type"
         const val DATA_POINT = "DATA_POINT"
+        const val CANVAS = "CANVAS"
+        const val DATA = "data"
     }
 }

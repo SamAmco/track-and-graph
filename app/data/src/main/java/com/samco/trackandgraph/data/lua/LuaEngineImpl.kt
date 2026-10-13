@@ -28,6 +28,9 @@ import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
+import com.samco.trackandgraph.data.lua.dto.LuaGraphContext
+import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionCatalogueAdapter
 import org.luaj.vm2.LuaError
 import javax.inject.Inject
@@ -62,6 +65,16 @@ internal class LuaEngineImpl @Inject constructor(
         } catch (t: Throwable) {
             LuaGraphResult(error = t)
         }
+    }
+
+    override fun renderLuaGraph(
+        vmLock: LuaVMLock,
+        script: String,
+        renderData: LuaValueReference,
+        context: LuaGraphContext,
+    ): LuaValueAccessor {
+        val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
+        return luaGraphScriptAdapter.render(resolvedScript, renderData, context)
     }
 
     override fun runLuaFunction(
