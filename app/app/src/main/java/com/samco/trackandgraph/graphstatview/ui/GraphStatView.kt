@@ -202,14 +202,18 @@ private fun LuaIcon(modifier: Modifier = Modifier) = Icon(
 private fun GraphError(
     modifier: Modifier,
     graphStatViewData: IGraphStatViewData,
+) = GraphThrowableError(modifier, graphStatViewData.error)
+
+@Composable
+private fun GraphThrowableError(
+    modifier: Modifier = Modifier,
+    error: Throwable?,
 ) {
-    when (val error = graphStatViewData.error) {
+    when (error) {
         is GraphStatInitException -> {
             GraphErrorView(
                 modifier = modifier,
-                error = (graphStatViewData.error as? GraphStatInitException)
-                    ?.errorTextId
-                    ?: R.string.unknown_error_occurred
+                error = error.errorTextId
             )
         }
 
@@ -226,7 +230,7 @@ private fun GraphError(
         else -> {
             GraphErrorView(
                 modifier = modifier,
-                error = graphStatViewData.error?.message
+                error = error?.message
                     ?: stringResource(R.string.unknown_error_occurred)
             )
         }
@@ -294,6 +298,7 @@ private fun UnwrappedLuaGraphView(
         is ILuaCustomGraphViewData -> LuaUiHost(
             modifier = modifier,
             content = unwrapped.content,
+            errorContent = { GraphThrowableError(error = it) },
         )
         else -> GraphStatInnerView(
             graphStatViewData = unwrapped,

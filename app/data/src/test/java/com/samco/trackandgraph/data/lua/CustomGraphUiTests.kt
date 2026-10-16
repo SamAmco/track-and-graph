@@ -18,15 +18,80 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 internal class CustomGraphUiTests : LuaEngineImplTest() {
+    @Test
+    fun `custom UI render and callback failures are reported as Lua script exceptions`() = runBlocking {
+        val engine = uut()
+        val script = """
+            return {
+                type = "CUSTOM",
+                data = function() return {} end,
+                render = function(_, context)
+                    if context.theme == "DARK" then error("render failed") end
+                    return {
+                        type = "CANVAS",
+                        draw = function() error("draw failed") end,
+                    }
+                end,
+            }
+        """.trimIndent()
+        val initialLock = engine.acquireVM()
+        val customData = try {
+            engine.runLuaGraph(initialLock, script, LuaGraphEngineParams(emptyMap())).data
+                as LuaGraphResultData.CustomData
+        } finally {
+            engine.releaseVM(initialLock)
+        }
+
+        val renderLock = engine.acquireVM(customData.renderFunction.affinity)
+        val renderError = try {
+            assertThrows(LuaScriptException::class.java) {
+                engine.renderLuaGraph(
+                    renderLock,
+                    customData.renderFunction,
+                    customData.renderData,
+                    context(LuaUiContext.Theme.DARK),
+                )
+            }
+        } finally {
+            engine.releaseVM(renderLock)
+        }
+        assertTrue(renderError.message.orEmpty().contains("render failed"))
+
+        val successfulRenderLock = engine.acquireVM(customData.renderFunction.affinity)
+        val tree = try {
+            engine.renderLuaGraph(
+                successfulRenderLock,
+                customData.renderFunction,
+                customData.renderData,
+                context(LuaUiContext.Theme.LIGHT),
+            )
+        } finally {
+            engine.releaseVM(successfulRenderLock)
+        }
+        val draw = requireNotNull(tree["draw"]?.asFunction())
+        val drawLock = engine.acquireVM(draw.affinity)
+        val drawError = try {
+            assertThrows(LuaScriptException::class.java) {
+                engine.callLuaUiFunction(drawLock, draw, LuaValueData.Nil)
+            }
+        } finally {
+            engine.releaseVM(drawLock)
+        }
+        assertTrue(drawError.message.orEmpty().contains("draw failed"))
+        Unit
+    }
+
     @Test
     fun `engine rejects a released VM lease`() = runBlocking {
         val engine = uut()
@@ -129,4 +194,12 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
 
         assertEquals(100.0, instructions["instructions"]?.get(1)?.get("radius")?.asDouble() ?: 0.0, 0.0)
     }
+
+    private fun context(theme: LuaUiContext.Theme) = LuaUiContext(
+        constraints = LuaUiContext.Constraints(0, 1080, 0, 600),
+        density = 3f,
+        fontScale = 1.2f,
+        layoutDirection = LuaUiContext.LayoutDirection.LTR,
+        theme = theme,
+    )
 }

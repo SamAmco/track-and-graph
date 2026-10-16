@@ -77,7 +77,11 @@ internal class LuaEngineImpl @Inject constructor(
         context: LuaUiContext,
     ): LuaValueAccessor {
         vmLock.requireActiveLease()
-        return luaGraphScriptAdapter.render(vmLock, renderFunction, renderData, context)
+        return try {
+            luaGraphScriptAdapter.render(vmLock, renderFunction, renderData, context)
+        } catch (luaError: LuaError) {
+            throw luaError.toLuaScriptException()
+        }
     }
 
     override fun callLuaUiFunction(
@@ -86,7 +90,11 @@ internal class LuaEngineImpl @Inject constructor(
         argument: LuaValueData,
     ): LuaValueAccessor {
         vmLock.requireActiveLease()
-        return luaGraphScriptAdapter.call(vmLock, function, argument)
+        return try {
+            luaGraphScriptAdapter.call(vmLock, function, argument)
+        } catch (luaError: LuaError) {
+            throw luaError.toLuaScriptException()
+        }
     }
 
     override fun runLuaFunction(
@@ -150,3 +158,8 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 }
+
+private fun LuaError.toLuaScriptException() = LuaScriptException(
+    message = message ?: "",
+    luaCauseStackTrace = luaCause?.stackTraceToString(),
+)

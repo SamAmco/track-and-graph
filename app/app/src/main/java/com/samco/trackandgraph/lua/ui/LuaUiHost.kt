@@ -31,12 +31,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,9 +58,18 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.ui.theming.tngColors
+import kotlinx.coroutines.CancellationException
+
+private val LocalLuaUiErrorHandler = staticCompositionLocalOf<(Throwable) -> Unit> {
+    { throw it }
+}
 
 @Composable
-internal fun LuaUiHost(modifier: Modifier, content: LuaUiContent) {
+internal fun LuaUiHost(
+    modifier: Modifier,
+    content: LuaUiContent,
+    errorContent: @Composable (Throwable) -> Unit,
+) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
     val darkTheme = MaterialTheme.tngColors.isDark
@@ -75,10 +86,22 @@ internal fun LuaUiHost(modifier: Modifier, content: LuaUiContent) {
             } else LuaUiContext.LayoutDirection.RTL,
             theme = if (darkTheme) LuaUiContext.Theme.DARK else LuaUiContext.Theme.LIGHT,
         )
-        val tree by produceState<LuaValueAccessor?>(null, content, context) {
-            value = runCatching { content.render(context) }.getOrNull()
+        var callbackError by remember(content, context) { mutableStateOf<Throwable?>(null) }
+        val renderResult by produceState<Result<LuaValueAccessor>?>(null, content, context) {
+            value = captureLuaUiResult { content.render(context) }
         }
-        tree?.let { LuaNode(it, content) }
+        val error = callbackError ?: renderResult?.exceptionOrNull()
+        if (error != null) {
+            errorContent(error)
+        } else {
+            renderResult?.getOrNull()?.let { tree ->
+                CompositionLocalProvider(
+                    LocalLuaUiErrorHandler provides { callbackError = it },
+                ) {
+                    LuaNode(tree, content)
+                }
+            }
+        }
     }
 }
 
@@ -185,24 +208,38 @@ private fun LuaSurface(node: LuaValueAccessor, content: LuaUiContent, modifier: 
 @Composable
 private fun LuaCanvas(node: LuaValueAccessor, content: LuaUiContent, modifier: Modifier) {
     val draw = node["draw"]?.asFunction() ?: return
+    val onError = LocalLuaUiErrorHandler.current
     var size by remember(draw) { mutableStateOf(IntSize.Zero) }
     val result by produceState<LuaValueAccessor?>(null, content, draw, size) {
-        value = if (size == IntSize.Zero) null else runCatching {
-            content.call(
-                draw,
-                LuaValueData.TableValue(mapOf(
-                    "bounds" to LuaValueData.TableValue(mapOf(
-                        "width" to LuaValueData.NumberValue(size.width.toDouble()),
-                        "height" to LuaValueData.NumberValue(size.height.toDouble()),
+        value = if (size == IntSize.Zero) null else {
+            captureLuaUiResult {
+                content.call(
+                    draw,
+                    LuaValueData.TableValue(mapOf(
+                        "bounds" to LuaValueData.TableValue(mapOf(
+                            "width" to LuaValueData.NumberValue(size.width.toDouble()),
+                            "height" to LuaValueData.NumberValue(size.height.toDouble()),
+                        )),
                     )),
-                )),
+                )
+            }.fold(
+                onSuccess = { it },
+                onFailure = { onError(it); null },
             )
-        }.getOrNull()
+        }
     }
     val colors = luaThemeColors()
     Canvas(modifier.onSizeChanged { size = it }) {
         result?.get("instructions")?.let { LuaCanvasInstructionParser.draw(this, it, colors) }
     }
+}
+
+private suspend fun <T> captureLuaUiResult(block: suspend () -> T): Result<T> = try {
+    Result.success(block())
+} catch (cancellation: CancellationException) {
+    throw cancellation
+} catch (throwable: Throwable) {
+    Result.failure(throwable)
 }
 
 internal fun luaChildren(value: LuaValueAccessor?): List<LuaValueAccessor> =
