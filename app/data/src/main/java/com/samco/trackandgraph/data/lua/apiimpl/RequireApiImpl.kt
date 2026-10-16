@@ -43,6 +43,9 @@ internal class RequireApiImpl @Inject constructor(
                 "tng.graphext" to lazyPureLuaModule(globals, "graphext"),
                 "tng.config" to lazyPureLuaModule(globals, "config"),
                 "tng.aggregation" to lazyPureLuaModule(globals, "aggregation"),
+                "tng.canvas" to lazyPureLuaModule(globals, "canvas"),
+                "tng.theme" to lazyPureLuaModule(globals, "theme"),
+                "tng.ui" to lazyPureLuaModule(globals, "ui"),
                 "tng.random" to lazyRandom(globals),
                 "test.core" to lazyTest(globals),
             )

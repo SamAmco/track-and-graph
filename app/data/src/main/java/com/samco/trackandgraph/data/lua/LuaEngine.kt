@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 
 interface LuaEngine {
 
@@ -51,6 +52,12 @@ interface LuaEngine {
         renderFunction: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaUiContext,
+    ): LuaValueAccessor
+
+    fun callLuaUiFunction(
+        vmLock: LuaVMLock,
+        function: LuaValueReference,
+        argument: LuaValueData,
     ): LuaValueAccessor
 
     fun runLuaFunction(

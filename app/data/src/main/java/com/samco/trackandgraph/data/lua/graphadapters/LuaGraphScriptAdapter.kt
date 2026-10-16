@@ -25,6 +25,8 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
@@ -62,8 +64,17 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         context: LuaUiContext,
     ): LuaValueAccessor {
         val luaRenderFunction = renderFunction.valueFor(vmLock)
-        val luaRenderData = renderData.valueFor(vmLock)
-        TODO("Call luaRenderFunction(luaRenderData, context) and expose its result for indexing")
+        val result = luaRenderFunction.call(renderData.valueFor(vmLock), context.toLuaValue())
+        return LuaValueAccessorImpl(result, vmLock.affinity)
+    }
+
+    fun call(
+        vmLock: LuaVMLock,
+        function: LuaValueReference,
+        argument: LuaValueData,
+    ): LuaValueAccessor {
+        val result = function.valueFor(vmLock).call(argument.toLuaValue())
+        return LuaValueAccessorImpl(result, vmLock.affinity)
     }
 
     private fun processLuaGraphResult(
@@ -112,5 +123,31 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         const val CUSTOM = "CUSTOM"
         const val DATA = "data"
         const val RENDER = "render"
+    }
+}
+
+private fun LuaUiContext.toLuaValue(): LuaValue = LuaTable().apply {
+    set("constraints", LuaTable().apply {
+        set("min_width", constraints.minWidth)
+        set("max_width", constraints.maxWidth)
+        set("min_height", constraints.minHeight)
+        set("max_height", constraints.maxHeight)
+    })
+    set("density", density.toDouble())
+    set("font_scale", fontScale.toDouble())
+    set("layout_direction", layoutDirection.name)
+    set("theme", theme.name)
+}
+
+private fun LuaValueData.toLuaValue(): LuaValue = when (this) {
+    LuaValueData.Nil -> LuaValue.NIL
+    is LuaValueData.BooleanValue -> LuaValue.valueOf(value)
+    is LuaValueData.NumberValue -> LuaValue.valueOf(value)
+    is LuaValueData.StringValue -> LuaValue.valueOf(value)
+    is LuaValueData.ArrayValue -> LuaTable().also { table ->
+        values.forEachIndexed { index, value -> table.set(index + 1, value.toLuaValue()) }
+    }
+    is LuaValueData.TableValue -> LuaTable().also { table ->
+        values.forEach { (key, value) -> table.set(key, value.toLuaValue()) }
     }
 }

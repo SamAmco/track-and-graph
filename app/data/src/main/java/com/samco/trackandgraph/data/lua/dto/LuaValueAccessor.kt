@@ -24,4 +24,6 @@ interface LuaValueAccessor {
     val arraySize: Int?
     fun asDouble(): Double?
     fun asString(): String?
+    fun asBoolean(): Boolean?
+    fun asFunction(): LuaValueReference?
 }

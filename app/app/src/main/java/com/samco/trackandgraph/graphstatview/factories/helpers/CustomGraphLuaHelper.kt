@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCustomGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
@@ -36,8 +37,12 @@ class CustomGraphLuaHelper @Inject constructor(
         graphOrStat: GraphOrStat,
     ): ILuaGraphViewData = object : ILuaGraphViewData {
         override val wrapped = object : ILuaCustomGraphViewData {
-            override val content = LuaUiContent { context ->
-                render(customData.renderFunction, customData.renderData, context)
+            override val content = object : LuaUiContent {
+                override suspend fun render(context: LuaUiContext) =
+                    render(customData.renderFunction, customData.renderData, context)
+
+                override suspend fun call(function: LuaValueReference, argument: LuaValueData) =
+                    callFunction(function, argument)
             }
             override val state = IGraphStatViewData.State.READY
             override val graphOrStat = graphOrStat
@@ -54,6 +59,18 @@ class CustomGraphLuaHelper @Inject constructor(
         val vmLock = luaEngine.acquireVM(renderFunction.affinity)
         return try {
             luaEngine.renderLuaGraph(vmLock, renderFunction, renderData, context)
+        } finally {
+            luaEngine.releaseVM(vmLock)
+        }
+    }
+
+    private suspend fun callFunction(
+        function: LuaValueReference,
+        argument: LuaValueData,
+    ): LuaValueAccessor {
+        val vmLock = luaEngine.acquireVM(function.affinity)
+        return try {
+            luaEngine.callLuaUiFunction(vmLock, function, argument)
         } finally {
             luaEngine.releaseVM(vmLock)
         }

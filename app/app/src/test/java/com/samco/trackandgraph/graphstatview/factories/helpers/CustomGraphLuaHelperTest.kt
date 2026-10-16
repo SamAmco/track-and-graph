@@ -24,6 +24,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCustomGraphViewData
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertSame
@@ -56,6 +57,25 @@ class CustomGraphLuaHelperTest {
         assertSame(result, viewData.content.render(context))
         verify(luaEngine).acquireVM(vmLock.affinity)
         verify(luaEngine).renderLuaGraph(vmLock, renderFunction, renderData, context)
+        verify(luaEngine).releaseVM(vmLock)
+    }
+
+    @Test
+    fun `callback reacquires the VM that owns the retained function`() = runTest {
+        val callback: LuaValueReference = mock()
+        val argument = LuaValueData.NumberValue(4.0)
+        whenever(callback.affinity).thenReturn(vmLock.affinity)
+        whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
+        whenever(luaEngine.callLuaUiFunction(vmLock, callback, argument)).thenReturn(result)
+
+        val viewData = CustomGraphLuaHelper(luaEngine)(
+            customData = LuaGraphResultData.CustomData(renderData, renderFunction),
+            graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
+        ).wrapped as ILuaCustomGraphViewData
+
+        assertSame(result, viewData.content.call(callback, argument))
+        verify(luaEngine).acquireVM(vmLock.affinity)
+        verify(luaEngine).callLuaUiFunction(vmLock, callback, argument)
         verify(luaEngine).releaseVM(vmLock)
     }
 }
