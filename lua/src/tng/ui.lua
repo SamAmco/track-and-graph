@@ -1,9 +1,5 @@
 local M = {}
 
---- Custom UI graph type.
---- @since (API level 2)
-M.TYPE = "CUSTOM"
-
 --- @since (API level 2)
 --- @enum UNIT
 M.UNIT = { PX = "PX", DP = "DP", SP = "SP" }

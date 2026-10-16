@@ -1,5 +1,9 @@
 local M = {}
 
+--- Custom UI graph type.
+--- @since (API level 2)
+M.TYPE = "GRAPH"
+
 --- Graph types enum
 --- @since v5.1.0 (API level 1)
 --- @enum GRAPH_TYPE
@@ -9,6 +13,7 @@ M.GRAPH_TYPE = {
 	PIE_CHART = "PIE_CHART",
 	TIME_BARCHART = "TIME_BARCHART",
 	LINE_GRAPH = "LINE_GRAPH",
+	CUSTOM = "CUSTOM",
 }
 
 --- @since v5.1.0 (API level 1)

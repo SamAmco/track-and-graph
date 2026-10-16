@@ -1,3 +1,4 @@
+local graph = require("tng.graph")
 local canvas = require("tng.canvas")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
@@ -41,7 +42,8 @@ local function first_source(sources)
 end
 
 return {
-	type = ui.TYPE,
+	purpose = graph.TYPE,
+	type = graph.GRAPH_TYPE.CUSTOM,
 	version = "2.0.0",
 	data = function(sources)
 		return {
