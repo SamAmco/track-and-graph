@@ -70,7 +70,16 @@ test("custom graph example renders a canvas component", function()
 	assert(#graph_data.values == 3)
 
 	local result = script.render(graph_data, {
-		bounds = { width = 1000, height = 600 },
+		constraints = {
+			min_width = 0,
+			max_width = 1000,
+			min_height = 0,
+			max_height = 600,
+		},
+		density = 3,
+		font_scale = 1,
+		layout_direction = "LTR",
+		theme = "LIGHT",
 	})
 
 	-- Rendering uses the gathered graph data and does not touch the source again.

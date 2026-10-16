@@ -22,10 +22,11 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCustomGraphVi
 
 /**
  * Planned flow:
- * 1. Obtain the runtime UI context, including exact pixel bounds.
+ * 1. Obtain the runtime UI context, including the root layout constraints.
  * 2. Call renderer.render(viewData.renderData, context) outside Compose drawing callbacks.
  * 3. Retain the returned custom UI description as Compose state.
- * 4. Render its component tree; canvas components delegate to LuaCanvasInstructionParser.
+ * 4. Render its component tree; each canvas receives its own measured size and delegates to
+ *    LuaCanvasInstructionParser.
  */
 @Composable
 internal fun LuaCustomGraphView(

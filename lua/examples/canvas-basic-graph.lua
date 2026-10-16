@@ -48,7 +48,7 @@ return {
 			values = read_values(first_source(sources)),
 		}
 	end,
-	render = function(data, _context)
+	render = function(data, context)
 		local values = data.values
 		local summary_children = {}
 		if #values == 0 then
