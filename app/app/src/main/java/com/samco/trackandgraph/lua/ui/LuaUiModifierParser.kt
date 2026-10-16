@@ -49,7 +49,7 @@ internal object LuaUiModifierParser {
     @Composable
     fun parse(initial: Modifier, modifiers: LuaValueAccessor?): Modifier {
         var result = initial
-        luaChildren(modifiers).forEach { item ->
+        modifiers.toList().forEach { item ->
             result = when (item["type"]?.asString()) {
                 "WIDTH" -> dimension(item["value"])?.let(result::width) ?: result
                 "HEIGHT" -> dimension(item["value"])?.let(result::height) ?: result
@@ -142,7 +142,7 @@ internal object LuaUiModifierParser {
     }
 
     private fun entry(node: LuaValueAccessor, type: String): LuaValueAccessor? =
-        luaChildren(node["modifier"]).firstOrNull { it["type"]?.asString() == type }
+        node["modifier"].toList().firstOrNull { it["type"]?.asString() == type }
 
     private fun spacing(token: String?): Dp? = when (token) {
         "SPACING_X_SMALL" -> 4.dp

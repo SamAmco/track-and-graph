@@ -121,7 +121,7 @@ private fun LuaNode(node: LuaValueAccessor, content: LuaUiContent, parentModifie
                 horizontalAlignment = horizontalAlignment(node["alignment"]?.asString()),
             ) { LuaColumnChildren(node["children"], node["alignment"]?.asString(), content) }
             "BOX" -> Box(modifier, contentAlignment = boxAlignment(node["alignment"]?.asString())) {
-                luaChildren(node["children"]).forEach { child ->
+                node["children"].toList().forEach { child ->
                     LuaNode(child, content, LuaUiModifierParser.boxChild(this, child))
                 }
             }
@@ -139,7 +139,7 @@ private fun RowScope.LuaRowChildren(
     alignment: String?,
     content: LuaUiContent,
 ) {
-    luaChildren(children).forEach {
+    children.toList().forEach {
         var parentModifier = LuaUiModifierParser.rowChild(this, it)
         if (alignment == "STRETCH") parentModifier = parentModifier.fillMaxHeight()
         LuaNode(it, content, parentModifier)
@@ -152,7 +152,7 @@ private fun ColumnScope.LuaColumnChildren(
     alignment: String?,
     content: LuaUiContent,
 ) {
-    luaChildren(children).forEach {
+    children.toList().forEach {
         var parentModifier = LuaUiModifierParser.columnChild(this, it)
         if (alignment == "STRETCH") parentModifier = parentModifier.fillMaxWidth()
         LuaNode(it, content, parentModifier)
@@ -241,9 +241,6 @@ private suspend fun <T> captureLuaUiResult(block: suspend () -> T): Result<T> = 
 } catch (throwable: Throwable) {
     Result.failure(throwable)
 }
-
-internal fun luaChildren(value: LuaValueAccessor?): List<LuaValueAccessor> =
-    (1..(value?.arraySize ?: 0)).mapNotNull { value?.get(it) }
 
 @Composable
 private fun horizontalArrangement(node: LuaValueAccessor): Arrangement.Horizontal {
