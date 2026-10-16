@@ -8,8 +8,8 @@ topics:
   - Config value types: text, number, checkbox, enum, uint, duration (→ms), localtime (→ms), instant
   - LuaEngine: 4 modes — runLuaFunction, runLuaFunctionGenerator, runLuaGraph, runLuaCatalogue
   - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
-  - Lua VM affinity, execution-lock ownership, and cancellation cleanup
-keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+  - Lua VM affinity, validated execution-lock ownership, and cancellation cleanup
+keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
 ---
 
 # Lua Functions Architecture
@@ -195,9 +195,13 @@ Return: Iterator function yielding data points until nil.
 
 `LuaVMAffinity` is the stable identity of a Lua runtime. It can be retained alongside Lua tables and functions without keeping that runtime locked. `LuaVMLock` is short-lived exclusive access to the runtime identified by its `affinity`. `LuaEngine.acquireVM()` chooses an available runtime; `LuaEngine.acquireVM(affinity)` waits for that particular runtime. Both return an execution lock that must be released with `LuaEngine.releaseVM(lock)`.
 
+Each acquired lock is a one-use lease with its own mutex owner token. Engine entry points verify that the lease has not been released and that its token still owns the runtime mutex. Release atomically invalidates the lease before unlocking. Consequently, double release and use-after-release fail immediately, and an old lease cannot accidentally unlock a newer holder of the same runtime. Do not manufacture, cache for reuse, or share a released `LuaVMLock`; retain `LuaVMAffinity` when long-lived runtime identity is required.
+
 Function and graph execution can be recursive: a Lua function can read a function-backed data source, which may execute more Lua. To avoid deadlocks and excess VM consumption, a recursive operation should pass the same execution lock down through `DataSampler.getRawDataSampleForFeatureId(..., vmLock)` / `getDataSampleForFeatureId(..., vmLock)`. Stateful UI sessions may retain the affinity between calls, but must release the execution lock after each call and reacquire against that affinity for the next call.
 
 `LuaValueReference` pairs every retained Lua table or function with the affinity of the runtime that owns it. A custom graph retains both the result of its `data` function and the original `render` closure; it does not reload the script before rendering. `CustomGraphLuaHelper` binds those references into the view-layer renderer callback, reacquires an execution lock using the render function's affinity, and then invokes the retained values. Any future canvas or action callback exposed through `LuaValueAccessor` must follow the same rule. Never use a retained Lua value with an arbitrary execution lock; the data-layer adapter rejects mismatched affinities.
+
+See [Lua custom UI](lua-custom-ui.md) for the graph contract and view-layer callback lifecycle built on this affinity model.
 
 If `DataSampler` is called with `vmLock = null` for a function-backed feature, `FunctionGraphDataSample.create()` owns the acquired lease and releases it from `dispose()`. That ownership starts before the sample object is returned, so construction must be cancellation-safe: if building nested input samples throws or is cancelled, any partially-created input samples must be disposed and the owned VM lease must be released in the construction catch path. This matters most in search and graph previews, where many function-backed graph calculations may be started and cancelled in quick succession.
 

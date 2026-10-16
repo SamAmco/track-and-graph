@@ -104,8 +104,13 @@ docs:
 
   - file: lua-architecture.md
     title: Lua functions — app architecture and data model
-    description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), 8 configuration value types, serialization pipeline, LuaEngine execution flow with 4 modes, Lua VM lease ownership/cancellation cleanup, and the translation-key mechanism for catalog functions (how _-prefixed keys resolve, how usedTranslations are stored/restored, catalog-mode showEditTools behaviour).
-    keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, translations, LocalizationsTable, usedTranslations, catalog-mode, showEditTools, LuaFunctionMetadataAdapter, TranslatedStringParser, LuaVMProvider, LuaVMAffinity, LuaVMLock, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+    description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types, 8 configuration value types, serialization pipeline, LuaEngine execution modes, Lua VM affinity and validated lease ownership, cancellation cleanup, and catalog translation keys.
+    keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, translations, LocalizationsTable, usedTranslations, catalog-mode, showEditTools, LuaFunctionMetadataAdapter, TranslatedStringParser, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+
+  - file: lua-custom-ui.md
+    title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
+    description: Custom graph data/render split, opaque affinity-bound Lua values, Lua UI context, declarative components and modifiers, deferred Canvas instruction recording, theme tokens, runtime error handling, and compatibility boundaries.
+    keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, Compose, constraints, density, theme, modifier, callback, state, error]
 
   - file: lua-community-functions.md
     title: Writing Lua function scripts and contributing to the community catalog
@@ -114,8 +119,8 @@ docs:
 
   - file: lua-graph-scripts.md
     title: Writing Lua graph scripts and contributing graph scripts
-    description: Graph scripts return graph data structures (not data streams); 5 graph types (text, data_point, line, time_bar, pie), DataSource API, script configuration with local variables, DURATION vs PERIOD distinction, and the graph test framework.
-    keywords: [lua, graph, script, visualization, line, pie, bar, text, data_point, DataSource, DURATION, PERIOD, tests, tng.graph, community]
+    description: Graph scripts return graph data structures (not data streams); built-in graph types plus custom Lua UI, DataSource API, script configuration with local variables, DURATION vs PERIOD distinction, and the graph test framework.
+    keywords: [lua, graph, script, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, community]
 
   - file: lua-tooling.md
     title: Lua tooling, build process, publishing, and adding new config types

@@ -1,14 +1,15 @@
 ---
 title: Writing Lua graph scripts and contributing graph scripts
-description: Graph scripts return graph data structures (not data streams); covers 5 graph types (text, data_point, line, time_bar, pie), DataSource API, script configuration with local variables, DURATION vs PERIOD distinction, and the graph test framework (config as Lua code strings, named sources).
+description: Graph scripts return graph data structures (not data streams); covers built-in graph types and custom Lua UI, DataSource API, script configuration with local variables, DURATION vs PERIOD distinction, and the graph test framework (config as Lua code strings, named sources).
 topics:
   - Graph types: graph.text, graph.data_point, graph.line, graph.time_bar, graph.pie
+  - Custom UI graphs: separate data and deferred render functions
   - DataSource API: sources["name"].dp() iterates data points in reverse chronological order
   - Script config: local variables modified directly by users; PREVIEW_START/END for collapsed view
   - core.DURATION (ms, arithmetic ok) vs core.PERIOD (variable length — NO arithmetic)
   - Graph tests DIFFER from function tests: config values are Lua code strings (regex replacement); sources are named table
   - File structure: lua/src/community/graphs/<category>/<script-name>/
-keywords: [lua, graph, script, visualization, line, pie, bar, text, data_point, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, sync-lua-to-docs]
+keywords: [lua, graph, script, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, sync-lua-to-docs]
 ---
 
 # Lua Graph Scripts
@@ -37,6 +38,8 @@ Returns a table that Track & Graph renders:
 | Pie Chart | `graph.pie(params)` | Pie chart |
 
 See `tng/graph.lua` for full parameter definitions.
+
+Custom UI is an additional graph result type with separate data preparation and deferred rendering phases. It can describe layouts and Compose Canvas drawing rather than selecting a built-in chart. See [Lua custom UI](lua-custom-ui.md) for that contract and its runtime constraints.
 
 ## Using Data Sources
 
