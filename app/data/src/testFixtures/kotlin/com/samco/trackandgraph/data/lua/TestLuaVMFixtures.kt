@@ -28,13 +28,15 @@ object TestLuaVMFixtures {
     
     /**
      * Creates a test LuaVMLock instance for use in unit tests.
-     * This creates a minimal VMLease with empty globals and an unlocked mutex.
+     * This creates a minimal VMLease with empty globals and a locked mutex.
      */
     fun createTestLuaVMLock(): LuaVMLock {
         return VMLease(
-            globals = Globals(),
-            lock = Mutex(),
-            name = "TestVM"
+            LuaVMRuntime(
+                globals = Globals(),
+                lock = Mutex(locked = true),
+                name = "TestVM"
+            )
         )
     }
 }

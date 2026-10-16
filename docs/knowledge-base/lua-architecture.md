@@ -8,8 +8,8 @@ topics:
   - Config value types: text, number, checkbox, enum, uint, duration (→ms), localtime (→ms), instant
   - LuaEngine: 4 modes — runLuaFunction, runLuaFunctionGenerator, runLuaGraph, runLuaCatalogue
   - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
-  - Lua VM lease ownership and cancellation cleanup
-keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMLock, VMLease, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+  - Lua VM affinity, execution-lock ownership, and cancellation cleanup
+keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
 ---
 
 # Lua Functions Architecture
@@ -191,13 +191,17 @@ Functions receive:
 
 Return: Iterator function yielding data points until nil.
 
-### Lua VM Lease Ownership
+### Lua VM Affinity and Execution Locks
 
-Lua VM access is guarded by `LuaVMLock` / `VMLease`, acquired through `LuaEngine.acquireVM()` and released with `LuaEngine.releaseVM(lock)`. Function and graph execution can be recursive: a Lua function can read a function-backed data source, which may execute more Lua. To avoid deadlocks and excess VM consumption, top-level graph/function work should normally acquire one VM lease and pass that same lock down through `DataSampler.getRawDataSampleForFeatureId(..., vmLock)` / `getDataSampleForFeatureId(..., vmLock)`.
+`LuaVMAffinity` is the stable identity of a Lua runtime. It can be retained alongside Lua tables and functions without keeping that runtime locked. `LuaVMLock` is short-lived exclusive access to the runtime identified by its `affinity`. `LuaEngine.acquireVM()` chooses an available runtime; `LuaEngine.acquireVM(affinity)` waits for that particular runtime. Both return an execution lock that must be released with `LuaEngine.releaseVM(lock)`.
+
+Function and graph execution can be recursive: a Lua function can read a function-backed data source, which may execute more Lua. To avoid deadlocks and excess VM consumption, a recursive operation should pass the same execution lock down through `DataSampler.getRawDataSampleForFeatureId(..., vmLock)` / `getDataSampleForFeatureId(..., vmLock)`. Stateful UI sessions may retain the affinity between calls, but must release the execution lock after each call and reacquire against that affinity for the next call.
+
+`LuaValueReference` pairs every retained Lua table or function with the affinity of the runtime that owns it. A custom graph retains both the result of its `data` function and the original `render` closure; it does not reload the script before rendering. `CustomGraphLuaHelper` binds those references into the view-layer renderer callback, reacquires an execution lock using the render function's affinity, and then invokes the retained values. Any future canvas or action callback exposed through `LuaValueAccessor` must follow the same rule. Never use a retained Lua value with an arbitrary execution lock; the data-layer adapter rejects mismatched affinities.
 
 If `DataSampler` is called with `vmLock = null` for a function-backed feature, `FunctionGraphDataSample.create()` owns the acquired lease and releases it from `dispose()`. That ownership starts before the sample object is returned, so construction must be cancellation-safe: if building nested input samples throws or is cancelled, any partially-created input samples must be disposed and the owned VM lease must be released in the construction catch path. This matters most in search and graph previews, where many function-backed graph calculations may be started and cancelled in quick succession.
 
-`LuaEngineSwitch` / `GuardedLuaEngineWrapper` block new Lua work when Lua is disabled, but `releaseVM(lock)` is cleanup for an already-acquired lease and must still release unconditionally. Do not guard release on the enabled flag: if the flag is flipped after acquisition but before a `finally` block runs, throwing from release would leave the underlying VM mutex locked.
+`LuaEngineSwitch` / `GuardedLuaEngineWrapper` block new Lua work when Lua is disabled, but `releaseVM(lock)` is cleanup for an already-acquired execution lock and must still release unconditionally. Do not guard release on the enabled flag: if the flag is flipped after acquisition but before a `finally` block runs, throwing from release would leave the underlying VM mutex locked.
 
 `LuaVMProvider` currently waits on a specific round-robin VM when the pool is at capacity. A leaked or never-released lease can therefore do more than reduce parallelism: a waiter may suspend behind the leaked VM even if another VM becomes free later. Do not rely on "some VM is still available" as proof that lease leaks are harmless; repeated cancellation can still cause graph batches to stall.
 

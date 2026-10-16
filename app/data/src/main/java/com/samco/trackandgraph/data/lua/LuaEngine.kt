@@ -30,8 +30,14 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 
 interface LuaEngine {
 
-    suspend fun acquireVM(): LuaVMLock
+    /**
+     * Acquires short-lived exclusive access to a Lua runtime. With no [affinity], an available
+     * runtime is selected from the pool. Supplying a retained affinity waits for that runtime so
+     * its Lua values, closures, and local state can be used again.
+     */
+    suspend fun acquireVM(affinity: LuaVMAffinity? = null): LuaVMLock
 
+    /** Releases execution access without invalidating the lock's stable runtime affinity. */
     fun releaseVM(vmLock: LuaVMLock)
 
     fun runLuaGraph(
@@ -42,7 +48,7 @@ interface LuaEngine {
 
     fun renderLuaGraph(
         vmLock: LuaVMLock,
-        script: String,
+        renderFunction: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaGraphContext,
     ): LuaValueAccessor

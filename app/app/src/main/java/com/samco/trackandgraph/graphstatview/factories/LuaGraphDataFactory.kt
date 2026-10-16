@@ -132,7 +132,7 @@ class LuaGraphDataFactory @Inject constructor(
             is LuaGraphResultData.LineGraphData ->
                 lineGraphLuaHelper(data, graphOrStat) ?: noData(graphOrStat)
             is LuaGraphResultData.CustomData ->
-                customGraphLuaHelper(data, config.script, graphOrStat)
+                customGraphLuaHelper(data, graphOrStat)
 
             null -> noData(graphOrStat)
         }

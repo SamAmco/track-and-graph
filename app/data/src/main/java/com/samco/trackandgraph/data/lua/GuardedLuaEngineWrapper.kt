@@ -35,8 +35,8 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
     private val luaEngineSwitch: LuaEngineSwitch
 ) : LuaEngine {
 
-    override suspend fun acquireVM(): LuaVMLock {
-        if (luaEngineSwitch.enabled) return luaEngine.acquireVM()
+    override suspend fun acquireVM(affinity: LuaVMAffinity?): LuaVMLock {
+        if (luaEngineSwitch.enabled) return luaEngine.acquireVM(affinity)
         throw LuaEngineDisabledException()
     }
 
@@ -56,11 +56,11 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
 
     override fun renderLuaGraph(
         vmLock: LuaVMLock,
-        script: String,
+        renderFunction: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaGraphContext,
     ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
-        luaEngine.renderLuaGraph(vmLock, script, renderData, context)
+        luaEngine.renderLuaGraph(vmLock, renderFunction, renderData, context)
     } else throw LuaEngineDisabledException()
 
     override fun runLuaFunction(

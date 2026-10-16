@@ -33,13 +33,12 @@ class CustomGraphLuaHelper @Inject constructor(
 ) {
     operator fun invoke(
         customData: LuaGraphResultData.CustomData,
-        script: String,
         graphOrStat: GraphOrStat,
     ): ILuaGraphViewData = object : ILuaGraphViewData {
         override val wrapped = object : ILuaCustomGraphViewData {
             override val renderData = customData.renderData
             override val renderer = LuaCustomGraphRenderer { renderData, context ->
-                render(script, renderData, context)
+                render(customData.renderFunction, renderData, context)
             }
             override val state = IGraphStatViewData.State.READY
             override val graphOrStat = graphOrStat
@@ -49,13 +48,13 @@ class CustomGraphLuaHelper @Inject constructor(
     }
 
     private suspend fun render(
-        script: String,
+        renderFunction: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaGraphContext,
     ): LuaValueAccessor {
-        val vmLock = luaEngine.acquireVM()
+        val vmLock = luaEngine.acquireVM(renderFunction.affinity)
         return try {
-            luaEngine.renderLuaGraph(vmLock, script, renderData, context)
+            luaEngine.renderLuaGraph(vmLock, renderFunction, renderData, context)
         } finally {
             luaEngine.releaseVM(vmLock)
         }

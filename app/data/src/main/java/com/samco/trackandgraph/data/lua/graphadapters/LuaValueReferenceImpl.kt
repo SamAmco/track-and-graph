@@ -16,10 +16,18 @@
  */
 package com.samco.trackandgraph.data.lua.graphadapters
 
+import com.samco.trackandgraph.data.lua.LuaVMAffinity
+import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import org.luaj.vm2.LuaValue
 
 /** Data-layer implementation; the value is deliberately not decoded between Lua calls. */
 internal class LuaValueReferenceImpl(
     val value: LuaValue,
+    override val affinity: LuaVMAffinity,
 ) : LuaValueReference
+
+internal fun LuaValueReference.valueFor(vmLock: LuaVMLock): LuaValue {
+    require(affinity === vmLock.affinity) { "Lua value used with the wrong VM" }
+    return (this as LuaValueReferenceImpl).value
+}

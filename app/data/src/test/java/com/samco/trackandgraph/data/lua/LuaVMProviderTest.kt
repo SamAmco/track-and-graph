@@ -25,8 +25,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -66,6 +68,39 @@ class LuaVMProviderTest {
         assertEquals("VM-0", vm2.name)
         
         provider.release(vm2)
+    }
+
+    @Test
+    fun `affinity reacquires execution access to the same VM`() = runTest {
+        val provider = createVMProvider()
+        val firstLock = provider.acquire()
+        val affinity = firstLock.affinity
+        val vmName = firstLock.name
+        provider.release(firstLock)
+
+        val secondLock = provider.acquire(affinity)
+
+        assertSame(affinity, secondLock.affinity)
+        assertEquals(vmName, secondLock.name)
+        provider.release(secondLock)
+    }
+
+    @Test
+    fun `affinity waits for its VM even when another VM is free`() = runTest {
+        val provider = createVMProvider()
+        val affinityLock = provider.acquire()
+        val otherLock = provider.acquire()
+        provider.release(otherLock)
+
+        val waitingLock = async { provider.acquire(affinityLock.affinity) }
+        runCurrent()
+
+        assertFalse(waitingLock.isCompleted)
+        provider.release(affinityLock)
+
+        val reacquiredLock = waitingLock.await()
+        assertEquals("VM-0", reacquiredLock.name)
+        provider.release(reacquiredLock)
     }
 
     @Test

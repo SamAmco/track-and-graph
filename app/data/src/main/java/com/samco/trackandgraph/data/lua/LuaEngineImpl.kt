@@ -44,7 +44,8 @@ internal class LuaEngineImpl @Inject constructor(
     private val luaFunctionCatalogueAdapter: LuaFunctionCatalogueAdapter,
 ) : LuaEngine {
 
-    override suspend fun acquireVM(): LuaVMLock = luaVMProvider.acquire()
+    override suspend fun acquireVM(affinity: LuaVMAffinity?): LuaVMLock =
+        luaVMProvider.acquire(affinity)
 
     override fun releaseVM(vmLock: LuaVMLock) = luaVMProvider.release(vmLock.asLease())
 
@@ -55,7 +56,7 @@ internal class LuaEngineImpl @Inject constructor(
     ): LuaGraphResult {
         return try {
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
-            luaGraphScriptAdapter.process(resolvedScript, params)
+            luaGraphScriptAdapter.process(resolvedScript, params, vmLock.affinity)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
                 message = luaError.message ?: "",
@@ -69,12 +70,11 @@ internal class LuaEngineImpl @Inject constructor(
 
     override fun renderLuaGraph(
         vmLock: LuaVMLock,
-        script: String,
+        renderFunction: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaGraphContext,
     ): LuaValueAccessor {
-        val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
-        return luaGraphScriptAdapter.render(resolvedScript, renderData, context)
+        return luaGraphScriptAdapter.render(vmLock, renderFunction, renderData, context)
     }
 
     override fun runLuaFunction(
