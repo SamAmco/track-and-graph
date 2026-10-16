@@ -120,6 +120,7 @@ fun LuaGraphConfigView(
         script = viewModel.script,
         scriptPreview = viewModel.scriptPreview
             .collectAsStateWithLifecycle().value,
+        packageLabel = viewModel.packageLabel,
         featureUiDataList = viewModel.featureUiDataList,
         onUpdateFeatureName = viewModel::onUpdateFeatureName,
         onRemoveFeatureClicked = viewModel::onRemoveFeatureClicked,
@@ -142,6 +143,7 @@ private fun showErrorToast(context: Context, networkError: NetworkError) {
     val text = when (networkError) {
         is NetworkError.Uri -> context.getString(R.string.failed_to_download_file, networkError.uri)
         is NetworkError.Generic -> context.getString(R.string.network_generic_error)
+        is NetworkError.InvalidPackage -> context.getString(R.string.invalid_lua_graph_package)
     }
     Toast.makeText(context, text, Toast.LENGTH_LONG).show()
 }
@@ -151,6 +153,7 @@ private fun LuaGraphConfigView(
     scrollState: ScrollState,
     script: TextFieldValue,
     scriptPreview: TextFieldValue,
+    packageLabel: String?,
     featureUiDataList: List<LuaGraphFeatureUiData>,
     onUpdateFeatureName: (Int, TextFieldValue) -> Unit,
     onRemoveFeatureClicked: (Int) -> Unit,
@@ -185,9 +188,15 @@ private fun LuaGraphConfigView(
 
     InputSpacingLarge()
 
+    packageLabel?.let {
+        Text(text = stringResource(R.string.lua_graph_package_installed, it))
+        InputSpacingLarge()
+    }
+
     ScriptTextInputPreview(
         scriptPreview = scriptPreview,
         script = script,
+        editable = packageLabel == null,
         onScriptPreviewClicked = {
             showEditScriptDialog.value = true
             onClickInPreview(it)
@@ -355,6 +364,7 @@ private fun LuaGraphFeatureInputView(
 private fun ScriptTextInputPreview(
     scriptPreview: TextFieldValue,
     script: TextFieldValue,
+    editable: Boolean,
     onScriptPreviewClicked: (TextFieldValue) -> Unit,
 ) = Box {
     val interactionSource = remember { MutableInteractionSource() }
@@ -388,9 +398,10 @@ private fun ScriptTextInputPreview(
         ),
         value = scriptPreviewText,
         onValueChange = {
-            onScriptPreviewClicked(it)
+            if (editable) onScriptPreviewClicked(it)
             localFocusManager.clearFocus()
         },
+        enabled = editable,
         placeholder = {
             Text(
                 text = stringResource(R.string.lua_script_input_hint),
@@ -449,11 +460,11 @@ private fun Buttons(
     DialogInputSpacing()
 
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.OpenDocument()
     ) { onReadFile(it) }
 
     IconTextButton(
-        onClick = { launcher.launch("*/*") },
+        onClick = { launcher.launch(arrayOf("text/*", "application/zip", "application/octet-stream")) },
         icon = R.drawable.folder_open,
         text = stringResource(R.string.file)
     )
@@ -481,6 +492,7 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
                 end
             """.trimIndent()
             ),
+            packageLabel = null,
             featureUiDataList = listOf(
                 LuaGraphFeatureUiData(
                     nameTextField = remember { mutableStateOf(TextFieldValue("Feature 1")) },

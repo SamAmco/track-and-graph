@@ -84,3 +84,7 @@ val MIGRATION_59_60 = object : Migration(59, 60) {
 ```
 
 The `GroupItem` entity annotation retains only two indices: `(group_id)` and `(child_id, type)`. The old triple-column index is gone entirely.
+
+## Migration 60 → 61 (versioned Lua graph packages)
+
+This migration creates `lua_graph_packages_table`, keyed by (`package_id`, `version`), with the original ZIP-compatible package in an `archive` BLOB. It rebuilds `lua_graphs_table` so `script` is nullable and adds an optional composite package foreign key. Existing rows retain their inline script and receive null package columns; legacy scripts are not repackaged.

@@ -650,4 +650,6 @@
     <string name="play_store_fixture_two_days_without_exercise">2 days without Exercise</string>
     <string name="play_store_fixture_running">Running</string>
     <string name="play_store_fixture_cycling">Cycling</string>
+    <string name="invalid_lua_graph_package">Could not import this Lua graph package</string>
+    <string name="lua_graph_package_installed">Package: %1$s</string>
 </resources>

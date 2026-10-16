@@ -220,11 +220,23 @@ internal class GraphHelperImpl @Inject constructor(
         transactionHelper.withTransaction {
             val created =
                 insertGraphOrStat(request.name, request.groupId, GraphStatType.LUA_SCRIPT)
+            request.config.packageData?.let { packageData ->
+                ensureLuaGraphPackage(
+                    com.samco.trackandgraph.data.database.entity.LuaGraphPackage(
+                        packageId = packageData.packageId,
+                        version = packageData.version,
+                        label = packageData.label,
+                        archive = packageData.archive,
+                    )
+                )
+            }
             val luaGraphId = graphDao.insertLuaGraph(
                 com.samco.trackandgraph.data.database.entity.LuaGraph(
                     id = 0L,
                     graphStatId = created.componentId,
-                    script = request.config.script
+                    script = request.config.script.takeIf { request.config.packageData == null },
+                    packageId = request.config.packageData?.packageId,
+                    packageVersion = request.config.packageData?.version,
                 )
             )
             val features = request.config.features.map { config ->
@@ -427,9 +439,21 @@ internal class GraphHelperImpl @Inject constructor(
             }
 
             if (request.config != null) {
+                request.config.packageData?.let { packageData ->
+                    ensureLuaGraphPackage(
+                        com.samco.trackandgraph.data.database.entity.LuaGraphPackage(
+                            packageId = packageData.packageId,
+                            version = packageData.version,
+                            label = packageData.label,
+                            archive = packageData.archive,
+                        )
+                    )
+                }
                 graphDao.updateLuaGraph(
                     existingLuaGraph.toLuaGraph().copy(
-                        script = request.config.script
+                        script = request.config.script.takeIf { request.config.packageData == null },
+                        packageId = request.config.packageData?.packageId,
+                        packageVersion = request.config.packageData?.version,
                     )
                 )
                 graphDao.deleteFeaturesForLuaGraph(existingLuaGraph.id)
@@ -443,6 +467,20 @@ internal class GraphHelperImpl @Inject constructor(
                 }
                 graphDao.insertLuaGraphFeatures(features)
             }
+        }
+    }
+
+    private fun ensureLuaGraphPackage(
+        packageData: com.samco.trackandgraph.data.database.entity.LuaGraphPackage,
+    ) {
+        if (graphDao.insertLuaGraphPackage(packageData) != -1L) return
+        val existing = graphDao.getLuaGraphPackage(packageData.packageId, packageData.version)
+        require(
+            existing != null &&
+                existing.label == packageData.label &&
+                existing.archive.contentEquals(packageData.archive)
+        ) {
+            "Lua graph package ${packageData.packageId} ${packageData.version} already exists with different content"
         }
     }
 

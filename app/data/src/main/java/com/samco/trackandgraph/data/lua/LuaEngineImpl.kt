@@ -34,6 +34,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionCatalogueAdapter
 import org.luaj.vm2.LuaError
+import io.github.z4kn4fein.semver.toVersion
 import javax.inject.Inject
 
 internal class LuaEngineImpl @Inject constructor(
@@ -53,11 +54,21 @@ internal class LuaEngineImpl @Inject constructor(
     override fun runLuaGraph(
         vmLock: LuaVMLock,
         script: String,
+        params: LuaGraphEngineParams,
+    ): LuaGraphResult = runLuaGraphFromAccessor(
+        vmLock = vmLock,
+        scriptAccessor = InlineLuaGraphScriptAccessor(script),
+        params = params,
+    )
+
+    override fun runLuaGraphFromAccessor(
+        vmLock: LuaVMLock,
+        scriptAccessor: LuaGraphScriptAccessor,
         params: LuaGraphEngineParams
     ): LuaGraphResult {
         val vmLease = vmLock.requireActiveLease()
         return try {
-            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
+            val resolvedScript = luaScriptResolver.resolveLuaGraphScript(scriptAccessor, vmLease)
             luaGraphScriptAdapter.process(resolvedScript, params, vmLock.affinity)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
@@ -67,6 +78,34 @@ internal class LuaEngineImpl @Inject constructor(
             LuaGraphResult(error = luaScriptException)
         } catch (t: Throwable) {
             LuaGraphResult(error = t)
+        }
+    }
+
+    override fun readLuaGraphPackageMetadata(
+        vmLock: LuaVMLock,
+        scriptAccessor: LuaGraphScriptAccessor,
+    ): LuaGraphPackageMetadata {
+        val vmLease = vmLock.requireActiveLease()
+        try {
+            val descriptor = luaScriptResolver.resolveLuaGraphScript(scriptAccessor, vmLease)
+            require(descriptor.istable()) { "A packaged Lua graph must return a table" }
+            require(descriptor["purpose"].checkjstring() == "GRAPH") {
+                "A packaged Lua graph must declare purpose = 'GRAPH'"
+            }
+            return LuaGraphPackageMetadata(
+                packageId = descriptor["id"].checkjstring()!!,
+                version = descriptor["version"].checkjstring()!!,
+                label = descriptor["label"].checkjstring()!!,
+            ).also {
+                require(it.packageId.isNotBlank()) { "Lua graph package id must not be blank" }
+                require(it.version.isNotBlank()) { "Lua graph package version must not be blank" }
+                require(it.label.isNotBlank()) { "Lua graph package label must not be blank" }
+                require(it.packageId.length <= 200) { "Lua graph package id is too long" }
+                require(it.label.length <= 200) { "Lua graph package label is too long" }
+                it.version.toVersion()
+            }
+        } catch (luaError: LuaError) {
+            throw luaError.toLuaScriptException()
         }
     }
 

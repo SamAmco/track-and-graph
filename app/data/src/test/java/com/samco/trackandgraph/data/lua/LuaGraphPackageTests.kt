@@ -1,0 +1,170 @@
+/*
+ * This file is part of Track & Graph
+ *
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+package com.samco.trackandgraph.data.lua
+
+import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
+import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaUiContext
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
+import org.junit.Test
+import java.io.ByteArrayOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+internal class LuaGraphPackageTests : LuaEngineImplTest() {
+    @Test
+    fun `zip accessor resolves dotted modules and init modules`() {
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to "return {}",
+            "chart/renderer.lua" to "return 1",
+            "helpers/init.lua" to "return 2",
+        ))
+
+        assertEquals("return {}", accessor.mainScript())
+        assertEquals("return 1", accessor.moduleScript("chart.renderer"))
+        assertEquals("return 2", accessor.moduleScript("helpers"))
+        assertEquals(null, accessor.moduleScript("missing"))
+    }
+
+    @Test
+    fun `zip accessor rejects traversal entries`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            ZipLuaGraphScriptAccessor(zip(
+                "main.lua" to "return {}",
+                "../escape.lua" to "return {}",
+            ))
+        }
+    }
+
+    @Test
+    fun `package metadata and graph can use required modules`() = runBlocking {
+        val engine = uut()
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to """
+                local renderer = require("renderer")
+                return {
+                    id = "example.package",
+                    version = "1.2.3",
+                    label = "Example package",
+                    purpose = "GRAPH",
+                    type = "CUSTOM",
+                    data = function() return { value = 41 } end,
+                    render = renderer,
+                }
+            """.trimIndent(),
+            "renderer.lua" to """
+                return function(data)
+                    return { type = "TEXT", text = tostring(data.value + 1) }
+                end
+            """.trimIndent(),
+        ))
+
+        val metadataLock = engine.acquireVM()
+        val metadata = try {
+            engine.readLuaGraphPackageMetadata(metadataLock, accessor)
+        } finally {
+            engine.releaseVM(metadataLock)
+        }
+        assertEquals("example.package", metadata.packageId)
+        assertEquals("1.2.3", metadata.version)
+        assertEquals("Example package", metadata.label)
+
+        val graphLock = engine.acquireVM()
+        val data = try {
+            engine.runLuaGraphFromAccessor(
+                graphLock,
+                accessor,
+                LuaGraphEngineParams(emptyMap()),
+            ).data as LuaGraphResultData.CustomData
+        } finally {
+            engine.releaseVM(graphLock)
+        }
+        val renderLock = engine.acquireVM(data.renderFunction.affinity)
+        val rendered = try {
+            engine.renderLuaGraph(
+                renderLock,
+                data.renderFunction,
+                data.renderData,
+                LuaUiContext(
+                    constraints = LuaUiContext.Constraints(0, 100, 0, 100),
+                    density = 1f,
+                    fontScale = 1f,
+                    layoutDirection = LuaUiContext.LayoutDirection.LTR,
+                    theme = LuaUiContext.Theme.LIGHT,
+                ),
+            )
+        } finally {
+            engine.releaseVM(renderLock)
+        }
+        assertEquals("42", rendered["text"]?.asString())
+    }
+
+    @Test
+    fun `retained render uses its own package after another graph runs on the VM`() = runBlocking {
+        val engine = uut()
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to """
+                return {
+                    type = "CUSTOM",
+                    data = function() return {} end,
+                    render = function() return require("renderer") end,
+                }
+            """.trimIndent(),
+            "renderer.lua" to "return { type = 'TEXT', text = 'package renderer' }",
+        ))
+        val initialLock = engine.acquireVM()
+        val data = try {
+            engine.runLuaGraphFromAccessor(
+                initialLock,
+                accessor,
+                LuaGraphEngineParams(emptyMap()),
+            ).data as LuaGraphResultData.CustomData
+        } finally {
+            engine.releaseVM(initialLock)
+        }
+
+        val retainedLock = engine.acquireVM(data.renderFunction.affinity)
+        val rendered = try {
+            engine.runLuaGraph(
+                retainedLock,
+                "return { type = 'TEXT', text = 'another graph' }",
+                LuaGraphEngineParams(emptyMap()),
+            )
+            engine.renderLuaGraph(
+                retainedLock,
+                data.renderFunction,
+                data.renderData,
+                LuaUiContext(
+                    LuaUiContext.Constraints(0, 100, 0, 100),
+                    1f,
+                    1f,
+                    LuaUiContext.LayoutDirection.LTR,
+                    LuaUiContext.Theme.LIGHT,
+                ),
+            )
+        } finally {
+            engine.releaseVM(retainedLock)
+        }
+        assertEquals("package renderer", rendered["text"]?.asString())
+    }
+
+    private fun zip(vararg entries: Pair<String, String>): ByteArray {
+        val output = ByteArrayOutputStream()
+        ZipOutputStream(output).use { zip ->
+            entries.forEach { (name, contents) ->
+                zip.putNextEntry(ZipEntry(name))
+                zip.write(contents.toByteArray(Charsets.UTF_8))
+                zip.closeEntry()
+            }
+        }
+        return output.toByteArray()
+    }
+}

@@ -21,6 +21,7 @@ import androidx.room.Relation
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
+import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
 
 internal data class LuaGraphWithFeatures(
 
@@ -34,18 +35,43 @@ internal data class LuaGraphWithFeatures(
     val features: List<LuaGraphFeature>,
 
     @ColumnInfo(name = "script")
-    val script: String
+    val script: String?,
+
+    @ColumnInfo(name = "package_id")
+    val packageId: String?,
+
+    @ColumnInfo(name = "package_version")
+    val packageVersion: String?,
+
+    @ColumnInfo(name = "package_label")
+    val packageLabel: String?,
+
+    @ColumnInfo(name = "package_archive")
+    val packageArchive: ByteArray?,
 ) {
-    fun toDto() = LuaGraphWithFeatures(
-        id = id,
-        graphStatId = graphStatId,
-        features = features.map { it.toDto() },
-        script = script
-    )
+    fun toDto(): LuaGraphWithFeatures {
+        val packageData = packageArchive?.let { archive ->
+            com.samco.trackandgraph.data.database.dto.LuaGraphPackage(
+                packageId = requireNotNull(packageId),
+                version = requireNotNull(packageVersion),
+                label = requireNotNull(packageLabel),
+                archive = archive,
+            )
+        }
+        return LuaGraphWithFeatures(
+            id = id,
+            graphStatId = graphStatId,
+            features = features.map { it.toDto() },
+            script = script ?: ZipLuaGraphScriptAccessor(requireNotNull(packageArchive)).mainScript(),
+            packageData = packageData,
+        )
+    }
 
     fun toLuaGraph(): LuaGraph = LuaGraph(
         id = id,
         graphStatId = graphStatId,
-        script = script
+        script = script,
+        packageId = packageId,
+        packageVersion = packageVersion,
     )
 }

@@ -59,6 +59,7 @@ internal class FakeGraphDao : GraphDao {
     private val barCharts = mutableMapOf<Long, BarChart>()
     private val luaGraphs = mutableMapOf<Long, LuaGraph>()
     private val luaGraphFeatures = mutableMapOf<Long, MutableList<LuaGraphFeature>>()
+    private val luaGraphPackages = mutableMapOf<Pair<String, String>, com.samco.trackandgraph.data.database.entity.LuaGraphPackage>()
 
     // =========================================================================
     // GraphOrStat operations
@@ -250,6 +251,19 @@ internal class FakeGraphDao : GraphDao {
         return id
     }
 
+    override fun insertLuaGraphPackage(luaGraphPackage: com.samco.trackandgraph.data.database.entity.LuaGraphPackage): Long {
+        val key = luaGraphPackage.packageId to luaGraphPackage.version
+        if (key in luaGraphPackages) return -1L
+        luaGraphPackages[key] = luaGraphPackage
+        return 1L
+    }
+
+    override fun getLuaGraphPackage(
+        packageId: String,
+        version: String,
+    ): com.samco.trackandgraph.data.database.entity.LuaGraphPackage? =
+        luaGraphPackages[packageId to version]
+
     override fun updateLuaGraph(luaGraph: LuaGraph) {
         luaGraphs[luaGraph.id] = luaGraph
     }
@@ -257,11 +271,18 @@ internal class FakeGraphDao : GraphDao {
     override fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures? {
         val luaGraph = luaGraphs.values.find { it.graphStatId == graphStatId } ?: return null
         val features = luaGraphFeatures[luaGraph.id] ?: emptyList()
+        val packageData = luaGraph.packageId?.let { packageId ->
+            luaGraph.packageVersion?.let { version -> luaGraphPackages[packageId to version] }
+        }
         return LuaGraphWithFeatures(
             id = luaGraph.id,
             graphStatId = luaGraph.graphStatId,
             script = luaGraph.script,
-            features = features
+            features = features,
+            packageId = luaGraph.packageId,
+            packageVersion = luaGraph.packageVersion,
+            packageLabel = packageData?.label,
+            packageArchive = packageData?.archive,
         )
     }
 

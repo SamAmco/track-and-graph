@@ -29,8 +29,17 @@ import androidx.room.PrimaryKey
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("graph_stat_id"),
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = LuaGraphPackage::class,
+            parentColumns = arrayOf("package_id", "version"),
+            childColumns = arrayOf("package_id", "package_version"),
+            onDelete = ForeignKey.RESTRICT,
         )
-    ]
+    ],
+    indices = [
+        androidx.room.Index(value = ["package_id", "package_version"]),
+    ],
 )
 internal data class LuaGraph(
     @PrimaryKey(autoGenerate = true)
@@ -41,5 +50,11 @@ internal data class LuaGraph(
     val graphStatId: Long,
 
     @ColumnInfo(name = "script")
-    val script: String
+    val script: String?,
+
+    @ColumnInfo(name = "package_id")
+    val packageId: String? = null,
+
+    @ColumnInfo(name = "package_version")
+    val packageVersion: String? = null,
 )

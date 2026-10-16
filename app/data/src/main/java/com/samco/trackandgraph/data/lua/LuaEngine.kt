@@ -47,6 +47,17 @@ interface LuaEngine {
         params: LuaGraphEngineParams,
     ): LuaGraphResult
 
+    fun runLuaGraphFromAccessor(
+        vmLock: LuaVMLock,
+        scriptAccessor: LuaGraphScriptAccessor,
+        params: LuaGraphEngineParams,
+    ): LuaGraphResult
+
+    fun readLuaGraphPackageMetadata(
+        vmLock: LuaVMLock,
+        scriptAccessor: LuaGraphScriptAccessor,
+    ): LuaGraphPackageMetadata
+
     fun renderLuaGraph(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,

@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
+import com.samco.trackandgraph.data.database.entity.LuaGraphPackage
 import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
 import com.samco.trackandgraph.data.database.entity.queryresponse.LineGraphWithFeatures
@@ -128,6 +129,10 @@ internal interface GraphDao {
     // =========================================================================
 
     fun insertLuaGraph(luaGraph: LuaGraph): Long
+
+    fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage): Long
+
+    fun getLuaGraphPackage(packageId: String, version: String): LuaGraphPackage?
 
     fun updateLuaGraph(luaGraph: LuaGraph)
 

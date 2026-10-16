@@ -261,7 +261,14 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     @Transaction
     override fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
-    @Query("SELECT * FROM lua_graphs_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Query("""
+        SELECT lg.*, p.label AS package_label, p.archive AS package_archive
+        FROM lua_graphs_table lg
+        LEFT JOIN lua_graph_packages_table p
+            ON p.package_id = lg.package_id AND p.version = lg.package_version
+        WHERE lg.graph_stat_id = :graphStatId
+        LIMIT 1
+    """)
     @Transaction
     override fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures?
 
@@ -444,6 +451,12 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertLuaGraph(luaGraph: LuaGraph): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    override fun insertLuaGraphPackage(luaGraphPackage: com.samco.trackandgraph.data.database.entity.LuaGraphPackage): Long
+
+    @Query("SELECT * FROM lua_graph_packages_table WHERE package_id = :packageId AND version = :version LIMIT 1")
+    override fun getLuaGraphPackage(packageId: String, version: String): com.samco.trackandgraph.data.database.entity.LuaGraphPackage?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertLuaGraphFeatures(luaGraphFeatures: List<LuaGraphFeature>)

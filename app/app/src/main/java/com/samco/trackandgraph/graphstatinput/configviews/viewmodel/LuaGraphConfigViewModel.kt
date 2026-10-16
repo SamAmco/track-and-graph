@@ -30,12 +30,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
+import com.samco.trackandgraph.data.database.dto.LuaGraphPackage
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
+import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
@@ -55,8 +58,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import java.io.ByteArrayOutputStream
 import java.net.URI
 import javax.inject.Inject
 
@@ -78,6 +80,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
+    private val luaEngine: LuaEngine,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LuaConfigData>(
     io = io,
     default = default,
@@ -90,6 +93,9 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
+
+    val packageLabel: String?
+        get() = luaGraph.packageData?.let { "${it.label} ${it.version}" }
 
     private data class ScriptPreviewData(
         val text: String,
@@ -148,6 +154,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     sealed interface NetworkError {
         data class Uri(val uri: String) : NetworkError
         data object Generic : NetworkError
+        data object InvalidPackage : NetworkError
     }
 
     private val networkErrorEvents = Channel<NetworkError>()
@@ -196,6 +203,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         if (scriptText == null) {
             networkErrorEvents.send(NetworkError.Uri(uri.toString()))
         } else {
+            luaGraph = luaGraph.copy(packageData = null)
             script = TextFieldValue(scriptText)
             onUpdate()
         }
@@ -231,15 +239,58 @@ class LuaGraphConfigViewModel @Inject constructor(
     fun readFile(uri: Uri?) {
         if (uri == null) return
         viewModelScope.launch(io) {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                val scriptText = BufferedReader(InputStreamReader(inputStream)).readText()
-                script = TextFieldValue(scriptText)
+            try {
+                val bytes = context.contentResolver.openInputStream(uri)?.use { input ->
+                    val output = ByteArrayOutputStream()
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    var total = 0
+                    while (true) {
+                        val read = input.read(buffer)
+                        if (read < 0) break
+                        total += read
+                        require(total <= ZipLuaGraphScriptAccessor.MAX_ARCHIVE_BYTES) {
+                            "Imported Lua graph file is too large"
+                        }
+                        output.write(buffer, 0, read)
+                    }
+                    output.toByteArray()
+                } ?: return@launch
+
+                if (bytes.size >= 4 && bytes[0] == 'P'.code.toByte() && bytes[1] == 'K'.code.toByte()) {
+                    installPackage(bytes)
+                } else {
+                    luaGraph = luaGraph.copy(packageData = null)
+                    script = TextFieldValue(bytes.toString(Charsets.UTF_8))
+                }
                 onUpdate()
+            } catch (t: Throwable) {
+                Timber.e(t, "Failed to import Lua graph file")
+                networkErrorEvents.send(NetworkError.InvalidPackage)
             }
         }
     }
 
+    private suspend fun installPackage(archive: ByteArray) {
+        val accessor = ZipLuaGraphScriptAccessor(archive)
+        val vmLock = luaEngine.acquireVM()
+        val metadata = try {
+            luaEngine.readLuaGraphPackageMetadata(vmLock, accessor)
+        } finally {
+            luaEngine.releaseVM(vmLock)
+        }
+        luaGraph = luaGraph.copy(
+            packageData = LuaGraphPackage(
+                packageId = metadata.packageId,
+                version = metadata.version,
+                label = metadata.label,
+                archive = archive,
+            )
+        )
+        script = TextFieldValue(accessor.mainScript())
+    }
+
     fun setScriptText(text: TextFieldValue) {
+        luaGraph = luaGraph.copy(packageData = null)
         script = text
         onUpdate()
     }
@@ -311,6 +362,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
 
     fun updateScriptFromClipboard(text: String) {
+        luaGraph = luaGraph.copy(packageData = null)
         script = TextFieldValue(text)
         onUpdate()
     }
@@ -325,6 +377,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
             pendingScriptInstall.value?.let {
                 pendingScriptInstall.emit(null)
+                luaGraph = luaGraph.copy(packageData = null)
                 script = TextFieldValue(it)
                 onUpdate()
                 return@launch

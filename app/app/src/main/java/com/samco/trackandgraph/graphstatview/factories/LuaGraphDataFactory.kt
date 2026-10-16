@@ -35,6 +35,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaVMLock
+import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import kotlinx.coroutines.CoroutineDispatcher
@@ -113,10 +114,16 @@ class LuaGraphDataFactory @Inject constructor(
     ): ILuaGraphViewData {
         val luaEngineParams = LuaGraphEngineParams(dataSources = dataSamples)
 
-        val luaGraphResult = luaEngine.runLuaGraph(
+        val luaGraphResult = config.packageData?.let {
+            luaEngine.runLuaGraphFromAccessor(
+                vmLock = vmLock,
+                scriptAccessor = ZipLuaGraphScriptAccessor(it.archive),
+                params = luaEngineParams,
+            )
+        } ?: luaEngine.runLuaGraph(
             vmLock = vmLock,
             script = config.script,
-            params = luaEngineParams
+            params = luaEngineParams,
         )
         val error = luaGraphResult.error
 

@@ -54,6 +54,7 @@ import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
+import com.samco.trackandgraph.data.database.entity.LuaGraphPackage
 import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.Reminder
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
@@ -72,7 +73,7 @@ import java.io.FileOutputStream
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-const val TNG_DATABASE_VERSION = 60
+const val TNG_DATABASE_VERSION = 61
 
 private const val TNG_DATABASE_NAME = "trackandgraph_database"
 private const val TNG_RESTORE_VALIDATION_DATABASE_NAME = "trackandgraph_restore_validation"
@@ -97,6 +98,7 @@ private const val TNG_RESTORE_VALIDATION_DATABASE_NAME = "trackandgraph_restore_
         BarChart::class,
         LuaGraph::class,
         LuaGraphFeature::class,
+        LuaGraphPackage::class,
         Function::class,
         FunctionInputFeature::class,
     ],

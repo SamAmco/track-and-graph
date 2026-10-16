@@ -56,6 +56,12 @@ Function-specific configuration (Lua graph definitions). References features_tab
 ### graphs_and_stats_table
 Graph/statistic configurations.
 
+Lua graph instances live in `lua_graphs_table`. A row contains either a legacy inline `script`, or the nullable composite reference (`package_id`, `package_version`) to `lua_graph_packages_table`.
+
+### lua_graph_packages_table
+
+Normalized multi-file Lua graph packages. The composite primary key is (`package_id`, `version`); `label` is display metadata and `archive` is the original ZIP-compatible `.tng` BLOB. Package content is immutable for a given identity/version, so changed content must use a new semantic version.
+
 ### reminders_table
 Reminder configurations.
 
@@ -76,6 +82,8 @@ groups_table
     |-- group_items_table (many:many junction)
 
 group_items_table --> trackers/functions/graphs/reminders/groups (polymorphic via type + child_id)
+
+lua_graphs_table --> lua_graph_packages_table (optional composite reference for packaged graphs)
 ```
 
 ## Important Notes

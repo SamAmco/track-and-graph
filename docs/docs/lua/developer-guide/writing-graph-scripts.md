@@ -64,6 +64,35 @@ return {
 
 Whenever Track & Graph needs to generate the view data for your Lua graph it will call the script and use the returned table to create the graph. For example your script is run to generate the preview in the Lua graph configuration screen, and whenever you open the group that contains your Lua graph.
 
+## Multi-file graph packages
+
+Larger graphs can be distributed as `.tng` packages. This is a normal ZIP archive with `main.lua` at its root. The generic package extension allows other package purposes in future; when imported here, the main script must return a graph descriptor with `purpose = graph.TYPE` and package metadata:
+
+```lua
+local graph = require("tng.graph")
+local renderer = require("renderer")
+
+return {
+  id = "com.example.my-graph",
+  version = "1.0.0",
+  label = "My graph",
+  purpose = graph.TYPE,
+  type = graph.GRAPH_TYPE.CUSTOM,
+  data = function(sources) return {} end,
+  render = renderer,
+}
+```
+
+`require("renderer")` loads `renderer.lua`; dotted names such as `require("chart.renderer")` load `chart/renderer.lua`. A module can also use `<module>/init.lua`. Package IDs and semantic versions identify stored packages, so change the version whenever the package contents change.
+
+Create the archive from inside the package directory so `main.lua` is not nested below another folder:
+
+```bash
+zip -r my-graph.tng main.lua renderer.lua
+```
+
+The app still supports importing and editing legacy single-file `.lua` scripts.
+
 ## What graphs can I create?
 
 Returning to the tng/graph.lua file notice the params object references the class name TextGraphParams. If you look further up the file you will find the definition of that class:

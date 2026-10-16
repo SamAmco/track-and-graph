@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.data.lua.apiimpl
 
 import com.samco.trackandgraph.data.assetreader.AssetReader
+import com.samco.trackandgraph.data.lua.LuaGraphScriptAccessor
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -35,22 +36,60 @@ internal class RequireApiImpl @Inject constructor(
     }
 
     fun installIn(globals: Globals) {
-        globals[REQUIRE] = getRequireLuaFunction(
-            globals = globals,
-            installedApis = mapOf(
-                "tng.core" to lazyCore(globals),
-                "tng.graph" to lazyPureLuaModule(globals, "graph"),
-                "tng.graphext" to lazyPureLuaModule(globals, "graphext"),
-                "tng.config" to lazyPureLuaModule(globals, "config"),
-                "tng.aggregation" to lazyPureLuaModule(globals, "aggregation"),
-                "tng.canvas" to lazyPureLuaModule(globals, "canvas"),
-                "tng.theme" to lazyPureLuaModule(globals, "theme"),
-                "tng.ui" to lazyPureLuaModule(globals, "ui"),
-                "tng.random" to lazyRandom(globals),
-                "test.core" to lazyTest(globals),
-            )
-        )
+        val installedApis = installedApis(globals)
+        val loadedModules = mutableMapOf<String, LuaValue>()
+        globals[REQUIRE] = oneArgFunction { arg ->
+            val moduleName = arg.checkjstring()!!
+            loadedModules[moduleName] ?: installedApis[moduleName]?.value
+                ?.let { moduleLoadInterceptor.onModuleLoad(globals, moduleName, it) }
+                ?.also { loadedModules[moduleName] = it }
+                ?: throw LuaError("module '$moduleName' not found")
+        }
     }
+
+    fun createRequireFunction(
+        globals: Globals,
+        environment: LuaTable,
+        scriptAccessor: LuaGraphScriptAccessor,
+    ): LuaValue {
+        val loadedModules = mutableMapOf<String, LuaValue>()
+        val loadingModules = mutableSetOf<String>()
+        val installedRequire = globals[REQUIRE]
+        return oneArgFunction { arg: LuaValue ->
+            val moduleName = arg.checkjstring()!!
+            loadedModules[moduleName]?.let { return@oneArgFunction it }
+            if (moduleName.startsWith("tng.") || moduleName.startsWith("test.")) {
+                return@oneArgFunction installedRequire.call(arg)
+            }
+
+            val moduleScript = scriptAccessor.moduleScript(moduleName)
+                ?: throw LuaError("module '$moduleName' not found")
+            if (!loadingModules.add(moduleName)) {
+                throw LuaError("circular require for module '$moduleName'")
+            }
+            try {
+                val result = globals.load(moduleScript, "@$moduleName.lua", environment).call()
+                    .let { if (it.isnil()) LuaValue.valueOf(true) else it }
+                loadedModules[moduleName] = result
+                result
+            } finally {
+                loadingModules.remove(moduleName)
+            }
+        }
+    }
+
+    private fun installedApis(globals: Globals): Map<String, Lazy<LuaTable>> = mapOf(
+        "tng.core" to lazyCore(globals),
+        "tng.graph" to lazyPureLuaModule(globals, "graph"),
+        "tng.graphext" to lazyPureLuaModule(globals, "graphext"),
+        "tng.config" to lazyPureLuaModule(globals, "config"),
+        "tng.aggregation" to lazyPureLuaModule(globals, "aggregation"),
+        "tng.canvas" to lazyPureLuaModule(globals, "canvas"),
+        "tng.theme" to lazyPureLuaModule(globals, "theme"),
+        "tng.ui" to lazyPureLuaModule(globals, "ui"),
+        "tng.random" to lazyRandom(globals),
+        "test.core" to lazyTest(globals),
+    )
 
     private fun lazyRandom(globals: Globals) = lazy {
         try {
@@ -96,18 +135,4 @@ internal class RequireApiImpl @Inject constructor(
         }
     }
 
-    private fun getRequireLuaFunction(
-        globals: Globals,
-        installedApis: Map<String, Lazy<LuaTable>>,
-    ): LuaValue =
-        oneArgFunction { arg: LuaValue ->
-            val moduleName = arg.tojstring()
-            if (moduleName in installedApis) {
-                return@oneArgFunction installedApis[moduleName]?.value
-                    ?.let { moduleLoadInterceptor.onModuleLoad(globals, moduleName, it) }
-                    ?: LuaValue.NIL
-            } else {
-                throw LuaError("module '$moduleName' not found")
-            }
-        }
 }

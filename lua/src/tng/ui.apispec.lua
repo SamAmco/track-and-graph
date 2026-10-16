@@ -1,4 +1,6 @@
 return {
+	TYPE = 2,
+
 	UNIT = 2,
 	["UNIT.PX"] = 2,
 	["UNIT.DP"] = 2,

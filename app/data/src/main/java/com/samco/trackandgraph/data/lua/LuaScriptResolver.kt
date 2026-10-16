@@ -17,13 +17,32 @@
 
 package com.samco.trackandgraph.data.lua
 
+import com.samco.trackandgraph.data.lua.apiimpl.RequireApiImpl
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
-internal class LuaScriptResolver @Inject constructor() {
+internal class LuaScriptResolver @Inject constructor(
+    private val requireApi: RequireApiImpl,
+) {
     fun resolveLuaScript(script: String, vmLease: VMLease): LuaValue {
         val cleanedScript = script.cleanLuaScript()
         return vmLease.globals.load(cleanedScript).call()
+    }
+
+    fun resolveLuaGraphScript(accessor: LuaGraphScriptAccessor, vmLease: VMLease): LuaValue {
+        val environment = LuaTable().apply {
+            setmetatable(LuaTable().apply { set("__index", vmLease.globals) })
+            set("_G", this)
+        }
+        environment[RequireApiImpl.REQUIRE] = requireApi.createRequireFunction(
+            globals = vmLease.globals,
+            environment = environment,
+            scriptAccessor = accessor,
+        )
+        return vmLease.globals
+            .load(accessor.mainScript().cleanLuaScript(), "@main.lua", environment)
+            .call()
     }
 
     private fun String.cleanLuaScript(): String {

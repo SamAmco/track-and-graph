@@ -26,6 +26,9 @@ import com.samco.trackandgraph.data.database.dto.LineGraphConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphFeatureConfig
 import com.samco.trackandgraph.data.database.dto.LineGraphUpdateRequest
+import com.samco.trackandgraph.data.database.dto.LuaGraphConfig
+import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
+import com.samco.trackandgraph.data.database.dto.LuaGraphPackage
 import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.PieChartConfig
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
@@ -48,6 +51,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GraphHelperImplTest {
@@ -85,6 +91,40 @@ class GraphHelperImplTest {
     // =========================================================================
     // Create tests
     // =========================================================================
+
+    @Test
+    fun `create Lua graph normalizes package and references it`() = runTest(dispatcher) {
+        val archive = ByteArrayOutputStream().also { output ->
+            ZipOutputStream(output).use { zip ->
+                zip.putNextEntry(ZipEntry("main.lua"))
+                zip.write("return {}".toByteArray())
+                zip.closeEntry()
+            }
+        }.toByteArray()
+        val packageData = LuaGraphPackage(
+            packageId = "example.graph",
+            version = "1.0.0",
+            label = "Example graph",
+            archive = archive,
+        )
+
+        val graphStatId = uut.createLuaGraph(
+            LuaGraphCreateRequest(
+                name = "Packaged",
+                groupId = 1L,
+                config = LuaGraphConfig(
+                    features = emptyList(),
+                    script = "return {}",
+                    packageData = packageData,
+                ),
+            )
+        ).componentId
+
+        val stored = uut.getLuaGraphByGraphStatId(graphStatId)
+        assertNotNull(stored)
+        assertEquals(packageData, stored?.packageData)
+        assertEquals("return {}", stored?.script)
+    }
 
     @Test
     fun `createLineGraph inserts GraphOrStat and LineGraph and returns graphStatId`() =

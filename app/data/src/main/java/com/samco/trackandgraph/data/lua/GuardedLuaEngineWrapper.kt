@@ -55,6 +55,23 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
         } else throw LuaEngineDisabledException()
     }
 
+    override fun runLuaGraphFromAccessor(
+        vmLock: LuaVMLock,
+        scriptAccessor: LuaGraphScriptAccessor,
+        params: LuaGraphEngineParams
+    ): LuaGraphResult {
+        return if (luaEngineSwitch.enabled) {
+            luaEngine.runLuaGraphFromAccessor(vmLock, scriptAccessor, params)
+        } else throw LuaEngineDisabledException()
+    }
+
+    override fun readLuaGraphPackageMetadata(
+        vmLock: LuaVMLock,
+        scriptAccessor: LuaGraphScriptAccessor,
+    ): LuaGraphPackageMetadata = if (luaEngineSwitch.enabled) {
+        luaEngine.readLuaGraphPackageMetadata(vmLock, scriptAccessor)
+    } else throw LuaEngineDisabledException()
+
     override fun renderLuaGraph(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,

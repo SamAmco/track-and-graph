@@ -78,4 +78,4 @@ There is no Lua/Compose ping-pong for individual drawing operations. Lua records
 
 Initial graph execution errors already flow through `LuaGraphResult` and the normal graph error view. Failures thrown later by `render` or a retained canvas callback are converted to `LuaScriptException` and routed to the same presentation rather than silently producing an empty component. Coroutine cancellation is rethrown: constraint/content changes may cancel and restart `produceState`, and that control flow must not appear as a script failure.
 
-The worked contract example is under `lua/src/examples/canvas-basic-graph.lua`. API compatibility is declared in the `tng.ui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.
+The worked contract example is a multi-file package under `lua/src/examples/canvas-basic-graph/`. API compatibility is declared in the `tng.ui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.

@@ -41,6 +41,20 @@ See `tng/graph.lua` for full parameter definitions.
 
 Custom UI is an additional graph result type with separate data preparation and deferred rendering phases. It can describe layouts and Compose Canvas drawing rather than selecting a built-in chart. See [Lua custom UI](lua-custom-ui.md) for that contract and its runtime constraints.
 
+## Multi-file graph packages
+
+The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"` and include stable `id`, semantic `version`, and `label` strings. Package identity is the `(id, version)` pair; the label is display metadata. The generic extension leaves room for packages with other purposes in future.
+
+Lua modules use the conventional mapping: `require("renderer")` loads `renderer.lua`, while `require("chart.renderer")` loads `chart/renderer.lua`. `<module>/init.lua` is also supported. Modules are decoded on demand through a package accessor, and each graph execution has an isolated module cache so retained custom-render closures continue to resolve the correct package.
+
+Packages are stored as normalized BLOBs in SQLite and graph instances reference them. Existing single-file scripts remain supported and are not converted by the database migration. Package limits are 5 MiB compressed, 1 MiB per loaded script, and 256 entries; names must be relative safe paths and scripts must be UTF-8.
+
+To build one with common ZIP tooling, run the command from inside the package directory so `main.lua` is at the archive root:
+
+```bash
+zip -r my-graph.tng main.lua renderer.lua
+```
+
 ## Using Data Sources
 
 Return a function to receive configured data sources:
