@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.graphstatview.ui
+package com.samco.trackandgraph.lua.ui
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor

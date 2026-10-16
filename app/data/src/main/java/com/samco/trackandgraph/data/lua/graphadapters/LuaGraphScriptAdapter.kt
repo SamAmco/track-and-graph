@@ -22,7 +22,7 @@ import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.data.lua.dto.LuaGraphContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import org.luaj.vm2.LuaValue
@@ -59,7 +59,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
         renderData: LuaValueReference,
-        context: LuaGraphContext,
+        context: LuaUiContext,
     ): LuaValueAccessor {
         val luaRenderFunction = renderFunction.valueFor(vmLock)
         val luaRenderData = renderData.valueFor(vmLock)

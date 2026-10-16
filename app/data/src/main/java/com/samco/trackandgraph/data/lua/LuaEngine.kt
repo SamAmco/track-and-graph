@@ -24,7 +24,7 @@ import com.samco.trackandgraph.data.lua.dto.LocalizationsTable
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
-import com.samco.trackandgraph.data.lua.dto.LuaGraphContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 
@@ -50,7 +50,7 @@ interface LuaEngine {
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
         renderData: LuaValueReference,
-        context: LuaGraphContext,
+        context: LuaUiContext,
     ): LuaValueAccessor
 
     fun runLuaFunction(

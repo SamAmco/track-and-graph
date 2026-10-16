@@ -20,7 +20,7 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
-import com.samco.trackandgraph.data.lua.dto.LuaGraphContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
@@ -39,7 +39,7 @@ class CustomGraphLuaHelperTest {
     private val renderData: LuaValueReference = mock()
     private val renderFunction: LuaValueReference = mock()
     private val result: LuaValueAccessor = mock()
-    private val context: LuaGraphContext = mock()
+    private val context: LuaUiContext = mock()
 
     @Test
     fun `renderer reacquires the VM that owns the retained render function`() = runTest {
@@ -53,7 +53,7 @@ class CustomGraphLuaHelperTest {
             graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
         ).wrapped as ILuaCustomGraphViewData
 
-        assertSame(result, viewData.renderer.render(viewData.renderData, context))
+        assertSame(result, viewData.content.render(context))
         verify(luaEngine).acquireVM(vmLock.affinity)
         verify(luaEngine).renderLuaGraph(vmLock, renderFunction, renderData, context)
         verify(luaEngine).releaseVM(vmLock)

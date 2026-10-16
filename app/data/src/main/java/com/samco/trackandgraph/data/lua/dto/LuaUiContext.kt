@@ -17,7 +17,7 @@
 package com.samco.trackandgraph.data.lua.dto
 
 /**
- * The root Compose environment passed to a custom graph's Lua `render(data, context)` function.
+ * The root Compose environment passed to a Lua UI render function.
  *
  * A render function may return callbacks which close over this context, so environment values do
  * not need to be copied into callback-specific scopes. In particular, a canvas draw scope supplies
@@ -27,8 +27,8 @@ package com.samco.trackandgraph.data.lua.dto
  * UI descriptions use stable theme tokens which the app resolves when rendering. [theme] exposes
  * only the current light/dark mode for code which needs to vary its behaviour between them.
  */
-data class LuaGraphContext(
-    /** The size range, in physical pixels, available to the root custom UI component. */
+data class LuaUiContext(
+    /** The size range, in physical pixels, available to the root Lua UI component. */
     val constraints: Constraints,
 
     /** Physical pixels per density-independent pixel. */
@@ -37,15 +37,15 @@ data class LuaGraphContext(
     /** The user's preferred font scaling factor. */
     val fontScale: Float,
 
-    /** The layout direction inherited by the custom UI tree. */
+    /** The layout direction inherited by the Lua UI tree. */
     val layoutDirection: LayoutDirection,
 
-    /** The light/dark theme in effect for this custom UI tree. */
+    /** The light/dark theme in effect for the Lua UI tree. */
     val theme: Theme,
 ) {
     /**
      * Root layout constraints rather than a promised final size. A child such as a canvas receives
-     * its own exact measured size only after the custom component tree has been laid out.
+     * its own exact measured size only after the component tree has been laid out.
      */
     data class Constraints(
         val minWidth: Int,

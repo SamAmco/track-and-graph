@@ -14,11 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.data.lua.dto
+package com.samco.trackandgraph.lua.ui
 
-fun interface LuaCustomGraphRenderer {
-    suspend fun render(
-        renderData: LuaValueReference,
-        context: LuaGraphContext,
-    ): LuaValueAccessor
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.samco.trackandgraph.data.lua.dto.LuaUiContent
+
+/**
+ * Planned flow:
+ * 1. Obtain the runtime UI context, including the root layout constraints.
+ * 2. Call content.render(context) outside Compose drawing callbacks.
+ * 3. Retain the returned Lua UI description as Compose state.
+ * 4. Render its component tree; each canvas receives its own measured size and delegates to
+ *    LuaCanvasInstructionParser.
+ */
+@Composable
+internal fun LuaUiHost(
+    modifier: Modifier,
+    content: LuaUiContent,
+) {
+    TODO("Compose context, content callback, state, and Lua component wiring")
 }
