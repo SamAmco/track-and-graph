@@ -55,8 +55,9 @@ internal class LuaEngineImpl @Inject constructor(
         script: String,
         params: LuaGraphEngineParams
     ): LuaGraphResult {
+        val vmLease = vmLock.requireActiveLease()
         return try {
-            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
+            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaGraphScriptAdapter.process(resolvedScript, params, vmLock.affinity)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
@@ -75,6 +76,7 @@ internal class LuaEngineImpl @Inject constructor(
         renderData: LuaValueReference,
         context: LuaUiContext,
     ): LuaValueAccessor {
+        vmLock.requireActiveLease()
         return luaGraphScriptAdapter.render(vmLock, renderFunction, renderData, context)
     }
 
@@ -82,7 +84,10 @@ internal class LuaEngineImpl @Inject constructor(
         vmLock: LuaVMLock,
         function: LuaValueReference,
         argument: LuaValueData,
-    ): LuaValueAccessor = luaGraphScriptAdapter.call(vmLock, function, argument)
+    ): LuaValueAccessor {
+        vmLock.requireActiveLease()
+        return luaGraphScriptAdapter.call(vmLock, function, argument)
+    }
 
     override fun runLuaFunction(
         vmLock: LuaVMLock,
@@ -90,7 +95,8 @@ internal class LuaEngineImpl @Inject constructor(
         translations: LocalizationsTable?
     ): LuaFunctionMetadata {
         return try {
-            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLock.asLease())
+            val vmLease = vmLock.requireActiveLease()
+            val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaFunctionMetadataAdapter.process(resolvedScript, script, translations)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
@@ -108,7 +114,7 @@ internal class LuaEngineImpl @Inject constructor(
         configuration: List<LuaScriptConfigurationValue>,
     ): Sequence<DataPoint> {
         return try {
-            val vmLease = vmLock.asLease()
+            val vmLease = vmLock.requireActiveLease()
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaFunctionDataSourceAdapter.createDataPointSequence(
                 resolvedScript = resolvedScript,
@@ -133,7 +139,7 @@ internal class LuaEngineImpl @Inject constructor(
         script: String
     ): LuaFunctionCatalogue {
         return try {
-            val vmLease = vmLock.asLease()
+            val vmLease = vmLock.requireActiveLease()
             val resolvedScript = luaScriptResolver.resolveLuaScript(script, vmLease)
             luaFunctionCatalogueAdapter.parseCatalogue(vmLease, resolvedScript)
         } catch (luaError: LuaError) {

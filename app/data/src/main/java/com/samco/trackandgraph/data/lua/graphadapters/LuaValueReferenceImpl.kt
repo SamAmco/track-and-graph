@@ -18,6 +18,7 @@ package com.samco.trackandgraph.data.lua.graphadapters
 
 import com.samco.trackandgraph.data.lua.LuaVMAffinity
 import com.samco.trackandgraph.data.lua.LuaVMLock
+import com.samco.trackandgraph.data.lua.requireActiveLease
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import org.luaj.vm2.LuaValue
 
@@ -28,6 +29,7 @@ internal class LuaValueReferenceImpl(
 ) : LuaValueReference
 
 internal fun LuaValueReference.valueFor(vmLock: LuaVMLock): LuaValue {
+    vmLock.requireActiveLease()
     require(affinity === vmLock.affinity) { "Lua value used with the wrong VM" }
     return (this as LuaValueReferenceImpl).value
 }

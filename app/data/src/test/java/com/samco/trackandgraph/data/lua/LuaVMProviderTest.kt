@@ -30,6 +30,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.mockito.kotlin.mock
 
@@ -83,6 +84,39 @@ class LuaVMProviderTest {
         assertSame(affinity, secondLock.affinity)
         assertEquals(vmName, secondLock.name)
         provider.release(secondLock)
+    }
+
+    @Test
+    fun `released lease is no longer active`() = runTest {
+        val provider = createVMProvider()
+        val lease = provider.acquire()
+
+        provider.release(lease)
+
+        assertThrows(IllegalStateException::class.java) { lease.requireActive() }
+    }
+
+    @Test
+    fun `lease cannot be released twice`() = runTest {
+        val provider = createVMProvider()
+        val lease = provider.acquire()
+
+        provider.release(lease)
+
+        assertThrows(IllegalStateException::class.java) { provider.release(lease) }
+    }
+
+    @Test
+    fun `stale lease cannot unlock a newer holder`() = runTest {
+        val provider = createVMProvider()
+        val staleLease = provider.acquire()
+        provider.release(staleLease)
+        val currentLease = provider.acquire(staleLease.affinity)
+
+        assertThrows(IllegalStateException::class.java) { provider.release(staleLease) }
+        currentLease.requireActive()
+
+        provider.release(currentLease)
     }
 
     @Test
@@ -187,7 +221,7 @@ class LuaVMProviderTest {
         val waitingTasks = (1..3).map { taskIndex ->
             async {
                 val vm = provider.acquire()
-                vm.name to taskIndex
+                vm to taskIndex
             }
         }
 
@@ -203,11 +237,13 @@ class LuaVMProviderTest {
         val completedResults = waitingTasks.awaitAll()
 
         // Verify that different VMs were assigned (round-robin behavior)
-        val assignedVMs = completedResults.map { it.first }.toSet()
+        val assignedVMs = completedResults.map { it.first.name }.toSet()
         assertTrue("Should assign different VMs via round-robin", assignedVMs.size > 1)
 
-        // Clean up all VMs
-        vms.forEach { provider.release(it) }
+        // The first three original leases were released to satisfy the waiters. Release the
+        // remaining original leases and the newly acquired leases exactly once each.
+        vms.drop(3).forEach { provider.release(it) }
+        completedResults.forEach { provider.release(it.first) }
     }
 
     @Test

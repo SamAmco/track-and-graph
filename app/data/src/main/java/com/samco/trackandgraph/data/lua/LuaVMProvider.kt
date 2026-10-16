@@ -15,6 +15,7 @@ import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.jse.JseBaseLib
 import org.luaj.vm2.lib.jse.JseMathLib
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,17 +34,36 @@ internal class LuaVMRuntime(
     val name: String,
 ) : LuaVMAffinity
 
-internal data class VMLease(
+internal class VMLease(
     val runtime: LuaVMRuntime,
 ) : LuaVMLock {
+    internal val owner = Any()
+    private val released = AtomicBoolean(false)
+
     override val affinity: LuaVMAffinity get() = runtime
-    val globals: Globals get() = runtime.globals
+    val globals: Globals
+        get() {
+            requireActive()
+            return runtime.globals
+        }
     val name: String get() = runtime.name
+
+    internal fun requireActive() {
+        check(!released.get()) { "Lua VM lease has already been released" }
+        check(runtime.lock.holdsLock(owner)) { "Lua VM lease does not own the runtime lock" }
+    }
+
+    internal fun release() {
+        check(released.compareAndSet(false, true)) { "Lua VM lease has already been released" }
+        runtime.lock.unlock(owner)
+    }
 }
 
 internal fun LuaVMLock.asLease(): VMLease = when (this) {
     is VMLease -> this
 }
+
+internal fun LuaVMLock.requireActiveLease(): VMLease = asLease().also(VMLease::requireActive)
 
 internal fun LuaVMAffinity.asRuntime(): LuaVMRuntime = when (this) {
     is LuaVMRuntime -> this
@@ -82,12 +102,14 @@ internal class LuaVMProvider @Inject constructor(
     suspend fun acquire(affinity: LuaVMAffinity? = null): VMLease {
         if (affinity != null) {
             val runtime = affinity.asRuntime()
-            runtime.lock.lock()
-            return VMLease(runtime)
+            return acquire(runtime)
         }
 
         // 1) Try to grab any free VM without blocking writers
-        vmPool.firstOrNull { it.lock.tryLock() }?.let { return VMLease(it) }
+        vmPool.forEach { runtime ->
+            val lease = VMLease(runtime)
+            if (runtime.lock.tryLock(lease.owner)) return lease
+        }
 
         // 2) Grow the pool if we still have capacity
         if (vmPool.size < MAX_VMS) {
@@ -99,14 +121,12 @@ internal class LuaVMProvider @Inject constructor(
                         name = "VM-${vmPool.size}",
                     )
                     vmPool += newVM
-                    newVM.lock.lock()
-                    VMLease(newVM)
+                    acquire(newVM)
                 } else {
                     // capacity filled while we waited → fall through to round-robin
                     val idx = nextVMIndex.getAndIncrement()
                     val vm = vmPool[idx % vmPool.size]
-                    vm.lock.lock()
-                    VMLease(vm)
+                    acquire(vm)
                 }
             }
         }
@@ -114,12 +134,15 @@ internal class LuaVMProvider @Inject constructor(
         // 3) Nothing free and at capacity → pick next round-robin and suspend on its lock
         val idx = nextVMIndex.getAndIncrement()
         val vm = vmPool[idx % vmPool.size]
-        vm.lock.lock()
-        return VMLease(vm)
+        return acquire(vm)
     }
 
-    fun release(vmLease: VMLease) {
-        if (vmLease.runtime.lock.isLocked) vmLease.runtime.lock.unlock()
+    fun release(vmLease: VMLease) = vmLease.release()
+
+    private suspend fun acquire(runtime: LuaVMRuntime): VMLease {
+        val lease = VMLease(runtime)
+        runtime.lock.lock(lease.owner)
+        return lease
     }
 
     private fun buildGlobals(): Globals {

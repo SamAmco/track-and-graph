@@ -31,12 +31,13 @@ object TestLuaVMFixtures {
      * This creates a minimal VMLease with empty globals and a locked mutex.
      */
     fun createTestLuaVMLock(): LuaVMLock {
-        return VMLease(
-            LuaVMRuntime(
-                globals = Globals(),
-                lock = Mutex(locked = true),
-                name = "TestVM"
-            )
+        val runtime = LuaVMRuntime(
+            globals = Globals(),
+            lock = Mutex(),
+            name = "TestVM"
         )
+        return VMLease(runtime).also { lease ->
+            check(runtime.lock.tryLock(lease.owner))
+        }
     }
 }

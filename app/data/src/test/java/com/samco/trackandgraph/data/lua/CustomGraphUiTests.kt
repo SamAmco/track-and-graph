@@ -23,9 +23,26 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 internal class CustomGraphUiTests : LuaEngineImplTest() {
+    @Test
+    fun `engine rejects a released VM lease`() = runBlocking {
+        val engine = uut()
+        val lease = engine.acquireVM()
+        engine.releaseVM(lease)
+
+        assertThrows(IllegalStateException::class.java) {
+            engine.runLuaGraph(
+                lease,
+                "return { type = 'TEXT', text = 'invalid' }",
+                LuaGraphEngineParams(emptyMap()),
+            )
+        }
+        Unit
+    }
+
     @Test
     fun `custom UI render and retained callback stay on their owning VM`() = runBlocking {
         val engine = uut()
