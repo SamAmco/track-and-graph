@@ -58,7 +58,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCanvasGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCustomGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
@@ -290,7 +290,7 @@ private fun UnwrappedLuaGraphView(
 
     when (unwrapped) {
         is ITextViewData -> LuaTextView(textData = unwrapped)
-        is ILuaCanvasGraphViewData -> LuaCanvasGraphView(
+        is ILuaCustomGraphViewData -> LuaCustomGraphView(
             modifier = modifier,
             viewData = unwrapped,
         )

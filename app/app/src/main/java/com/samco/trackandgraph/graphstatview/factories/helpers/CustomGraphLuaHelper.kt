@@ -18,27 +18,27 @@ package com.samco.trackandgraph.graphstatview.factories.helpers
 
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.dto.LuaCanvasGraphRenderer
+import com.samco.trackandgraph.data.lua.dto.LuaCustomGraphRenderer
 import com.samco.trackandgraph.data.lua.dto.LuaGraphContext
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCanvasGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCustomGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import javax.inject.Inject
 
-class CanvasGraphLuaHelper @Inject constructor(
+class CustomGraphLuaHelper @Inject constructor(
     private val luaEngine: LuaEngine,
 ) {
     operator fun invoke(
-        canvasData: LuaGraphResultData.CanvasData,
+        customData: LuaGraphResultData.CustomData,
         script: String,
         graphOrStat: GraphOrStat,
     ): ILuaGraphViewData = object : ILuaGraphViewData {
-        override val wrapped = object : ILuaCanvasGraphViewData {
-            override val renderData = canvasData.renderData
-            override val renderer = LuaCanvasGraphRenderer { renderData, context ->
+        override val wrapped = object : ILuaCustomGraphViewData {
+            override val renderData = customData.renderData
+            override val renderer = LuaCustomGraphRenderer { renderData, context ->
                 render(script, renderData, context)
             }
             override val state = IGraphStatViewData.State.READY

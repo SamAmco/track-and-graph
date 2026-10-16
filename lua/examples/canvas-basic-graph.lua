@@ -1,4 +1,5 @@
 local canvas = require("tng.canvas")
+local custom = require("tng.custom")
 
 local padding = 70
 
@@ -38,7 +39,7 @@ local function first_source(sources)
 end
 
 return {
-	type = canvas.TYPE,
+	type = custom.TYPE,
 	version = "2.0.0",
 	data = function(sources)
 		return {

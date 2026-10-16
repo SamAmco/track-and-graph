@@ -1,6 +1,7 @@
 #!/usr/bin/env lua
 
 local canvas = require("src.tng.canvas")
+local custom = require("src.tng.custom")
 local helpers = require("src.tng.test.test_helpers")
 local test = helpers.test
 
@@ -41,7 +42,7 @@ test("canvas records Compose-like draw calls in paint order", function()
 	assert(circle.style == canvas.DRAW_STYLE.FILL)
 end)
 
-test("canvas graph example converts source values into axes, lines, and points", function()
+test("custom graph example renders a canvas component", function()
 	package.path = package.path .. ";src/?.lua;src/?/init.lua"
 	local script = dofile("examples/canvas-basic-graph.lua")
 	local data_points = {
@@ -51,7 +52,7 @@ test("canvas graph example converts source values into axes, lines, and points",
 	}
 	local index = 0
 	assert(script.version == "2.0.0")
-	assert(script.type == canvas.TYPE)
+	assert(script.type == custom.TYPE)
 
 	local graph_data = script.data({
 		values = {

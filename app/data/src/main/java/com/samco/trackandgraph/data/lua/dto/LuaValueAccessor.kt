@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.data.lua.dto
 
-/** Read-only access to the canvas instructions returned by the Lua render function. */
+/** Read-only access to the custom UI description returned by the Lua render function. */
 interface LuaValueAccessor {
     operator fun get(key: String): LuaValueAccessor?
     operator fun get(index: Int): LuaValueAccessor?

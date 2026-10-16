@@ -17,7 +17,7 @@
 package com.samco.trackandgraph.data.lua.dto
 
 /**
- * Opaque reference to the value returned by a canvas graph's data function.
+ * Opaque reference to the value returned by a custom graph's data function.
  *
  * It is passed unchanged through the view-data layer and back to Lua. The data-layer
  * implementation wraps the original LuaJ value, so rendering requires no DTO conversion.

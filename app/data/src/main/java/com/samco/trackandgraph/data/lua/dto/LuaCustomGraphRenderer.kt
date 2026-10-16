@@ -14,23 +14,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.graphstatview.ui
+package com.samco.trackandgraph.data.lua.dto
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCanvasGraphViewData
-
-/**
- * Planned flow:
- * 1. Obtain exact pixel bounds.
- * 2. Call renderer.render(viewData.renderData, context) outside Canvas.onDraw.
- * 3. Retain the returned instruction accessor as Compose state.
- * 4. Replay it from Canvas.onDraw through LuaCanvasInstructionParser.
- */
-@Composable
-internal fun LuaCanvasGraphView(
-    modifier: Modifier,
-    viewData: ILuaCanvasGraphViewData,
-) {
-    TODO("Compose size, render callback, state, and Canvas wiring")
+fun interface LuaCustomGraphRenderer {
+    suspend fun render(
+        renderData: LuaValueReference,
+        context: LuaGraphContext,
+    ): LuaValueAccessor
 }

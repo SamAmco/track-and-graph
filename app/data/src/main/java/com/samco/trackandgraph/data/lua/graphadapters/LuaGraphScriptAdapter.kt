@@ -73,19 +73,19 @@ internal class LuaGraphScriptAdapter @Inject constructor(
             PIE_CHART -> pieChartLuaGraphAdapter.process(resolvedResult)
             LINE_GRAPH -> lineGraphLuaGraphAdapter.process(resolvedResult)
             TIME_BARCHART -> timeBarChartLuaGraphAdapter.process(resolvedResult)
-            CANVAS -> processCanvasGraph(resolvedResult, dataSources)
+            CUSTOM -> processCustomGraph(resolvedResult, dataSources)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
         return LuaGraphResult(data = data, error = null)
     }
 
-    private fun processCanvasGraph(
+    private fun processCustomGraph(
         descriptor: LuaValue,
         dataSources: LuaValue,
-    ): LuaGraphResultData.CanvasData {
+    ): LuaGraphResultData.CustomData {
         val renderData = descriptor[DATA].checkfunction()!!.call(dataSources)
-        return LuaGraphResultData.CanvasData(LuaValueReferenceImpl(renderData))
+        return LuaGraphResultData.CustomData(LuaValueReferenceImpl(renderData))
     }
 
     companion object {
@@ -95,7 +95,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         const val TIME_BARCHART = "TIME_BARCHART"
         const val TYPE = "type"
         const val DATA_POINT = "DATA_POINT"
-        const val CANVAS = "CANVAS"
+        const val CUSTOM = "CUSTOM"
         const val DATA = "data"
     }
 }

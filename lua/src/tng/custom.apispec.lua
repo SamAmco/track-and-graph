@@ -1,0 +1,3 @@
+return {
+	TYPE = 2,
+}

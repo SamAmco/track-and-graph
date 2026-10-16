@@ -25,7 +25,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelper
-import com.samco.trackandgraph.graphstatview.factories.helpers.CanvasGraphLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.CustomGraphLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.ErrorLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.LineGraphLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.PieChartLuaHelper
@@ -49,7 +49,7 @@ class LuaGraphDataFactory @Inject constructor(
     private val errorLuaHelper: ErrorLuaHelper,
     private val lineGraphLuaHelper: LineGraphLuaHelper,
     private val timeBarChartLuaHelper: TimeBarchartLuaHelper,
-    private val canvasGraphLuaHelper: CanvasGraphLuaHelper,
+    private val customGraphLuaHelper: CustomGraphLuaHelper,
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
     @IODispatcher ioDispatcher: CoroutineDispatcher
@@ -131,8 +131,8 @@ class LuaGraphDataFactory @Inject constructor(
             is LuaGraphResultData.TimeBarChartData -> timeBarChartLuaHelper(data, graphOrStat)
             is LuaGraphResultData.LineGraphData ->
                 lineGraphLuaHelper(data, graphOrStat) ?: noData(graphOrStat)
-            is LuaGraphResultData.CanvasData ->
-                canvasGraphLuaHelper(data, config.script, graphOrStat)
+            is LuaGraphResultData.CustomData ->
+                customGraphLuaHelper(data, config.script, graphOrStat)
 
             null -> noData(graphOrStat)
         }

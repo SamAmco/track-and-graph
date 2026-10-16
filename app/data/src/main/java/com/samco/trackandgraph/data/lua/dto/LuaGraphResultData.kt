@@ -21,7 +21,7 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
 sealed interface LuaGraphResultData {
-    data class CanvasData(
+    data class CustomData(
         val renderData: LuaValueReference,
     ) : LuaGraphResultData
 

@@ -89,10 +89,10 @@ CanvasDrawScope.drawCircle = function(self, params)
 	})
 end
 
---- Creates a canvas graph by recording draw calls in order.
+--- Creates a canvas component by recording draw calls in order.
 --- @since (API level 2)
 --- @param draw fun(draw_scope): A callback that issues draw calls on the supplied scope.
---- @return table: A serializable canvas graph containing the recorded draw instructions.
+--- @return table: A serializable canvas component containing the recorded draw instructions.
 M.create = function(draw)
 	assert(type(draw) == "function", "canvas draw callback must be a function")
 
