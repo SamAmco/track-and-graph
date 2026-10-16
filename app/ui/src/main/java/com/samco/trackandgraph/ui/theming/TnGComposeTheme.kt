@@ -59,6 +59,7 @@ val white = Color(0xFFFFFFFF)
 val black = Color(0xFF000000)
 
 data class TngColors(
+    val isDark: Boolean,
     val colorScheme: ColorScheme,
     val selectorButtonColor: Color,
     val textColorSecondary: Color,
@@ -198,6 +199,7 @@ val DarkColorScheme = darkColorScheme(
 )
 
 private val LightTngColors = TngColors(
+    isDark = false,
     colorScheme = LightColorScheme,
     selectorButtonColor = lightGray,
     textColorSecondary = darkGray,
@@ -207,6 +209,7 @@ private val LightTngColors = TngColors(
 )
 
 private val DarkTngColors = TngColors(
+    isDark = true,
     colorScheme = DarkColorScheme,
     selectorButtonColor = darkGray,
     textColorSecondary = midGray,
