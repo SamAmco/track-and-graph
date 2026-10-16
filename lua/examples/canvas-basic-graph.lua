@@ -48,9 +48,8 @@ return {
 			values = read_values(first_source(sources)),
 		}
 	end,
-	render = function(data, context)
+	render = function(data, _context)
 		local values = data.values
-		local width = context.bounds.width
 		local summary_children = {}
 		if #values == 0 then
 			table.insert(summary_children, ui.text({ text = "No data" }))
@@ -97,10 +96,12 @@ return {
 							ui.background(theme.color.surface_variant)
 						),
 						draw = function(drawScope)
+							local width = drawScope.size.width
+							local height = drawScope.size.height
 							local left = padding
 							local right = width - padding
 							local top = padding
-							local bottom = canvas_height - padding
+							local bottom = height - padding
 
 							-- Axes
 							drawScope:drawLine({

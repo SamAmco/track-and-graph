@@ -136,7 +136,7 @@ M.SurfaceParams = {}
 --- @class CanvasParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
---- @field draw fun(draw_scope): Callback that records canvas draw instructions.
+--- @field draw fun(draw_scope): Callback invoked after the canvas has been measured.
 M.CanvasParams = {}
 
 local dimension = function(unit, value)
@@ -317,9 +317,9 @@ end
 
 M.canvas = function(params)
 	assert(type(params) == "table", "canvas params must be a table")
-	local result = require("tng.canvas").create(params.draw)
-	result.key = params.key
-	result.modifier = params.modifier or {}
+	local canvas = require("tng.canvas")
+	local result = component(canvas.TYPE, params)
+	result.draw = canvas.create(params.draw)
 	return result
 end
 

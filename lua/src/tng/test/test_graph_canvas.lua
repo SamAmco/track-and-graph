@@ -7,7 +7,9 @@ local test = helpers.test
 
 test("canvas records Compose-like draw calls in paint order", function()
 	local start = { x = 10, y = 20 }
-	local result = canvas.create(function(drawScope)
+	local render = canvas.create(function(drawScope)
+		assert(drawScope.size.width == 200)
+		assert(drawScope.size.height == 100)
 		drawScope:drawLine({
 			color = "#112233",
 			start = start,
@@ -21,6 +23,8 @@ test("canvas records Compose-like draw calls in paint order", function()
 			radius = 25,
 		})
 	end)
+	assert(type(render) == "function")
+	local result = render({ bounds = { width = 200, height = 100 } })
 
 	start.x = 999
 	assert(result.type == canvas.TYPE)
@@ -92,12 +96,16 @@ test("custom graph example renders a canvas component", function()
 	assert(canvas_component.key == "graph_canvas")
 	assert(canvas_component.modifier[2].type == ui.MODIFIER_TYPE.HEIGHT)
 	assert(canvas_component.modifier[2].value.value == 360)
+	assert(type(canvas_component.draw) == "function")
+	local canvas_result = canvas_component.draw({
+		bounds = { width = 1000, height = 360 },
+	})
 	-- Two axes + two connecting lines + three point markers.
-	assert(#canvas_component.instructions == 7)
-	assert(canvas_component.instructions[3].type == canvas.INSTRUCTION_TYPE.LINE)
-	assert(canvas_component.instructions[5].type == canvas.INSTRUCTION_TYPE.CIRCLE)
+	assert(#canvas_result.instructions == 7)
+	assert(canvas_result.instructions[3].type == canvas.INSTRUCTION_TYPE.LINE)
+	assert(canvas_result.instructions[5].type == canvas.INSTRUCTION_TYPE.CIRCLE)
 	-- Source values arrive newest-first; the example reverses them for left-to-right time order.
-	assert(canvas_component.instructions[5].center.y > canvas_component.instructions[7].center.y)
+	assert(canvas_result.instructions[5].center.y > canvas_result.instructions[7].center.y)
 end)
 
 helpers.finish_tests()

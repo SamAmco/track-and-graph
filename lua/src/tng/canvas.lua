@@ -89,22 +89,31 @@ CanvasDrawScope.drawCircle = function(self, params)
 	})
 end
 
---- Creates a canvas component by recording draw calls in order.
+--- Creates a deferred canvas renderer. The returned function records draw calls once bounds are known.
 --- @since (API level 2)
 --- @param draw fun(draw_scope): A callback that issues draw calls on the supplied scope.
---- @return table: A serializable canvas component containing the recorded draw instructions.
+--- @return fun(context: table): table: A function returning recorded draw instructions for a canvas context.
 M.create = function(draw)
 	assert(type(draw) == "function", "canvas draw callback must be a function")
 
-	local result = {
-		type = M.TYPE,
-		instructions = {},
-	}
-	local draw_scope = setmetatable({
-		instructions = result.instructions,
-	}, CanvasDrawScope)
-	draw(draw_scope)
-	return result
+	return function(context)
+		assert(type(context) == "table", "canvas context must be a table")
+		assert(type(context.bounds) == "table", "canvas context must contain bounds")
+
+		local result = {
+			type = M.TYPE,
+			instructions = {},
+		}
+		local draw_scope = setmetatable({
+			instructions = result.instructions,
+			size = {
+				width = context.bounds.width,
+				height = context.bounds.height,
+			},
+		}, CanvasDrawScope)
+		draw(draw_scope)
+		return result
+	end
 end
 
 return M
