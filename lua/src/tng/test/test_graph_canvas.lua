@@ -71,13 +71,23 @@ test("custom graph example renders a canvas component", function()
 
 	-- Rendering uses the gathered graph data and does not touch the source again.
 	assert(index == 4)
-	assert(result.type == canvas.TYPE)
+	assert(result.type == custom.COMPONENT_TYPE.COLUMN)
+	assert(result.spacing == 24)
+	assert(#result.children == 3)
+	assert(result.children[1].type == custom.COMPONENT_TYPE.TEXT)
+	assert(result.children[1].text == "Basic graph")
+	assert(result.children[2].type == custom.COMPONENT_TYPE.ROW)
+	assert(#result.children[2].children == 2)
+
+	local canvas_component = result.children[3]
+	assert(canvas_component.type == canvas.TYPE)
+	assert(canvas_component.height == 360)
 	-- Two axes + two connecting lines + three point markers.
-	assert(#result.instructions == 7)
-	assert(result.instructions[3].type == canvas.INSTRUCTION_TYPE.LINE)
-	assert(result.instructions[5].type == canvas.INSTRUCTION_TYPE.CIRCLE)
+	assert(#canvas_component.instructions == 7)
+	assert(canvas_component.instructions[3].type == canvas.INSTRUCTION_TYPE.LINE)
+	assert(canvas_component.instructions[5].type == canvas.INSTRUCTION_TYPE.CIRCLE)
 	-- Source values arrive newest-first; the example reverses them for left-to-right time order.
-	assert(result.instructions[5].center.y > result.instructions[7].center.y)
+	assert(canvas_component.instructions[5].center.y > canvas_component.instructions[7].center.y)
 end)
 
 helpers.finish_tests()
