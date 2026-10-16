@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 
 local canvas = require("src.tng.canvas")
-local custom = require("src.tng.custom")
+local ui = require("src.tng.ui")
 local helpers = require("src.tng.test.test_helpers")
 local test = helpers.test
 
@@ -52,7 +52,7 @@ test("custom graph example renders a canvas component", function()
 	}
 	local index = 0
 	assert(script.version == "2.0.0")
-	assert(script.type == custom.TYPE)
+	assert(script.type == ui.TYPE)
 
 	local graph_data = script.data({
 		values = {
@@ -71,17 +71,27 @@ test("custom graph example renders a canvas component", function()
 
 	-- Rendering uses the gathered graph data and does not touch the source again.
 	assert(index == 4)
-	assert(result.type == custom.COMPONENT_TYPE.COLUMN)
-	assert(result.spacing == 24)
-	assert(#result.children == 3)
-	assert(result.children[1].type == custom.COMPONENT_TYPE.TEXT)
-	assert(result.children[1].text == "Basic graph")
-	assert(result.children[2].type == custom.COMPONENT_TYPE.ROW)
-	assert(#result.children[2].children == 2)
+	assert(result.type == ui.COMPONENT_TYPE.SURFACE)
+	assert(result.key == "graph_surface")
+	assert(result.shape == "SHAPE_MEDIUM")
+	assert(result.shadow_elevation.unit == ui.UNIT.DP)
+	assert(result.shadow_elevation.value == 4)
 
-	local canvas_component = result.children[3]
+	local column = result.child
+	assert(column.type == ui.COMPONENT_TYPE.COLUMN)
+	assert(column.spacing == "SPACING_LARGE")
+	assert(#column.children == 3)
+	assert(column.children[1].type == ui.COMPONENT_TYPE.TEXT)
+	assert(column.children[1].text == "Basic graph")
+	assert(column.children[1].font_size.unit == ui.UNIT.SP)
+	assert(column.children[2].type == ui.COMPONENT_TYPE.ROW)
+	assert(#column.children[2].children == 2)
+
+	local canvas_component = column.children[3]
 	assert(canvas_component.type == canvas.TYPE)
-	assert(canvas_component.height == 360)
+	assert(canvas_component.key == "graph_canvas")
+	assert(canvas_component.modifier[2].type == ui.MODIFIER_TYPE.HEIGHT)
+	assert(canvas_component.modifier[2].value.value == 360)
 	-- Two axes + two connecting lines + three point markers.
 	assert(#canvas_component.instructions == 7)
 	assert(canvas_component.instructions[3].type == canvas.INSTRUCTION_TYPE.LINE)
