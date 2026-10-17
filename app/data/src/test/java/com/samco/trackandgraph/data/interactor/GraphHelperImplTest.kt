@@ -144,6 +144,29 @@ class GraphHelperImplTest {
     }
 
     @Test
+    fun `create Lua graph keeps stored package when incoming content has the same identity`() =
+        runTest(dispatcher) {
+            val storedPackage = luaGraphPackage(
+                packageId = "example.graph",
+                version = "1.0.0",
+                script = "return { stored = true }",
+            )
+            val conflictingPackage = luaGraphPackage(
+                packageId = "example.graph",
+                version = "1.0.0",
+                script = "return { stored = false }",
+            )
+            createLuaGraph("First", storedPackage)
+
+            val secondGraphId = createLuaGraph("Second", conflictingPackage)
+
+            assertEquals(
+                LuaGraphSource.Package(storedPackage),
+                uut.getLuaGraphByGraphStatId(secondGraphId)?.source,
+            )
+        }
+
+    @Test
     fun `update Lua graph removes package after its last reference is replaced`() =
         runTest(dispatcher) {
             val oldPackage = luaGraphPackage("example.graph", "1.0.0")
@@ -985,11 +1008,15 @@ class GraphHelperImplTest {
         assertEquals(false, result!!.unique)
     }
 
-    private fun luaGraphPackage(packageId: String, version: String): LuaGraphPackage {
+    private fun luaGraphPackage(
+        packageId: String,
+        version: String,
+        script: String = "return {}",
+    ): LuaGraphPackage {
         val archive = ByteArrayOutputStream().also { output ->
             ZipOutputStream(output).use { zip ->
                 zip.putNextEntry(ZipEntry("main.lua"))
-                zip.write("return {}".toByteArray())
+                zip.write(script.toByteArray())
                 zip.closeEntry()
             }
         }.toByteArray()

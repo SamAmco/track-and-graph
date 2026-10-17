@@ -130,7 +130,7 @@ internal interface GraphDao : LuaGraphPackageCleanupDao {
 
     fun insertLuaGraph(luaGraph: LuaGraph): Long
 
-    fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage): Long
+    fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage)
 
     fun getLuaGraphPackage(packageId: String, version: String): LuaGraphPackage?
 

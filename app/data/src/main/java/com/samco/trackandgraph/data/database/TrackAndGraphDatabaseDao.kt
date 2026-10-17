@@ -454,7 +454,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     override fun insertLuaGraph(luaGraph: LuaGraph): Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    override fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage): Long
+    override fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage)
 
     @Query("SELECT * FROM lua_graph_packages_table WHERE package_id = :packageId AND version = :version LIMIT 1")
     override fun getLuaGraphPackage(packageId: String, version: String): LuaGraphPackage?

@@ -467,14 +467,7 @@ internal class GraphHelperImpl @Inject constructor(
     private fun ensureLuaGraphPackage(
         packageData: LuaGraphPackage,
     ) {
-        if (graphDao.insertLuaGraphPackage(packageData) != -1L) return
-        val existing = graphDao.getLuaGraphPackage(packageData.packageId, packageData.version)
-        require(
-            existing != null &&
-                existing.archive.contentEquals(packageData.archive)
-        ) {
-            "Lua graph package ${packageData.packageId} ${packageData.version} already exists with different content"
-        }
+        graphDao.insertLuaGraphPackage(packageData)
     }
 
     // =========================================================================

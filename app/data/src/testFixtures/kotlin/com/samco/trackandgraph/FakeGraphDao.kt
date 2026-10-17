@@ -252,11 +252,9 @@ internal class FakeGraphDao : GraphDao {
         return id
     }
 
-    override fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage): Long {
+    override fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage) {
         val key = luaGraphPackage.packageId to luaGraphPackage.version
-        if (key in luaGraphPackages) return -1L
-        luaGraphPackages[key] = luaGraphPackage
-        return 1L
+        luaGraphPackages.putIfAbsent(key, luaGraphPackage)
     }
 
     override fun getLuaGraphPackage(
