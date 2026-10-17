@@ -10,6 +10,7 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import kotlinx.coroutines.runBlocking
@@ -54,6 +55,62 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                 "../escape.lua" to "return {}",
             ))
         }
+    }
+
+    @Test
+    fun `circular require is detected before looking up the module again`() = runBlocking {
+        var moduleLookups = 0
+        val accessor = object : LuaGraphScriptAccessor {
+            override fun mainScript() = "return require('loop')"
+
+            override fun moduleScript(moduleName: String): String {
+                moduleLookups++
+                return "return require('loop')"
+            }
+        }
+        val engine = uut()
+        val lock = engine.acquireVM()
+
+        val error = try {
+            assertThrows(LuaScriptException::class.java) {
+                engine.readLuaGraphPackageMetadata(lock, accessor)
+            }
+        } finally {
+            engine.releaseVM(lock)
+        }
+
+        assertEquals("circular require for module 'loop'", error.message)
+        assertEquals(1, moduleLookups)
+    }
+
+    @Test
+    fun `failed module lookup does not remain marked as loading`() = runBlocking {
+        val accessor = object : LuaGraphScriptAccessor {
+            override fun mainScript() = """
+                pcall(require, "missing")
+                local _, second_error = pcall(require, "missing")
+                return {
+                    purpose = "GRAPH",
+                    id = "missing-module-test",
+                    version = "1.0.0",
+                    title = string.find(second_error, "not found", 1, true)
+                        and "not found"
+                        or second_error,
+                }
+            """.trimIndent()
+
+            override fun moduleScript(moduleName: String): String? = null
+        }
+        val engine = uut()
+        val lock = engine.acquireVM()
+
+        val metadata = try {
+            engine.readLuaGraphPackageMetadata(lock, accessor)
+        } finally {
+            engine.releaseVM(lock)
+        }
+
+        assertEquals(TranslatedString.Simple("not found"), metadata.title)
     }
 
     @Test

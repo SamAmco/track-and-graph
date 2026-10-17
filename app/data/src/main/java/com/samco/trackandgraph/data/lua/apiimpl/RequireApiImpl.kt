@@ -62,12 +62,12 @@ internal class RequireApiImpl @Inject constructor(
                 return@oneArgFunction installedRequire.call(arg)
             }
 
-            val moduleScript = scriptAccessor.moduleScript(moduleName)
-                ?: throw LuaError("module '$moduleName' not found")
             if (!loadingModules.add(moduleName)) {
                 throw LuaError("circular require for module '$moduleName'")
             }
             try {
+                val moduleScript = scriptAccessor.moduleScript(moduleName)
+                    ?: throw LuaError("module '$moduleName' not found")
                 val result = globals.load(moduleScript, "@$moduleName.lua", environment).call()
                     .let { if (it.isnil()) LuaValue.valueOf(true) else it }
                 loadedModules[moduleName] = result
