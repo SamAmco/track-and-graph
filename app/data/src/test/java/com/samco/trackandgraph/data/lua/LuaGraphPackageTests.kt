@@ -35,6 +35,17 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
     }
 
     @Test
+    fun `zip accessor permits entries larger than one MiB`() {
+        val largeModule = "-".repeat(2 * 1024 * 1024)
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to "return {}",
+            "large.lua" to largeModule,
+        ))
+
+        assertEquals(largeModule, accessor.moduleScript("large"))
+    }
+
+    @Test
     fun `zip accessor rejects traversal entries`() {
         assertThrows(IllegalArgumentException::class.java) {
             ZipLuaGraphScriptAccessor(zip(

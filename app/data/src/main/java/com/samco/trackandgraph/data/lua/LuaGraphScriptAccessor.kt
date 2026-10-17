@@ -59,15 +59,10 @@ class ZipLuaGraphScriptAccessor(private val archive: ByteArray) : LuaGraphScript
                 count++
                 require(count <= MAX_ENTRIES) { "Lua graph package contains too many entries" }
                 if (!entry.isDirectory) {
-                    var entryBytes = 0
                     while (true) {
                         val read = zip.read(buffer)
                         if (read < 0) break
-                        entryBytes += read
                         totalBytes += read
-                        require(entryBytes <= MAX_SCRIPT_BYTES) {
-                            "Lua package entry is too large: ${entry.name}"
-                        }
                         require(totalBytes <= MAX_UNCOMPRESSED_BYTES) {
                             "Lua graph package expands to too much data"
                         }
@@ -86,12 +81,9 @@ class ZipLuaGraphScriptAccessor(private val archive: ByteArray) : LuaGraphScript
                 if (!entry.isDirectory && entry.name == name) {
                     val output = ByteArrayOutputStream()
                     val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                    var total = 0
                     while (true) {
                         val read = zip.read(buffer)
                         if (read < 0) break
-                        total += read
-                        require(total <= MAX_SCRIPT_BYTES) { "Lua package entry is too large: $name" }
                         output.write(buffer, 0, read)
                     }
                     return decodeUtf8(output.toByteArray(), name)
@@ -125,7 +117,6 @@ class ZipLuaGraphScriptAccessor(private val archive: ByteArray) : LuaGraphScript
         const val FILE_EXTENSION = "tng"
         const val MIME_TYPE = "application/zip"
         const val MAX_ARCHIVE_BYTES = 5 * 1024 * 1024
-        const val MAX_SCRIPT_BYTES = 1024 * 1024
         const val MAX_UNCOMPRESSED_BYTES = 8 * 1024 * 1024
         const val MAX_ENTRIES = 256
         private const val MAIN_SCRIPT = "main.lua"
