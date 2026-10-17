@@ -38,7 +38,7 @@ SQLite doesn't support dropping columns, so to alter a table:
 4. `ALTER TABLE new_name RENAME TO old_name`
 5. Recreate all indices
 
-When you `DROP TABLE`, **no cascade deletes fire** on child tables — `ON DELETE CASCADE` only applies to row-level `DELETE` operations, not `DROP TABLE`. Foreign key constraints in child tables resolve by name, so they'll point correctly to the rebuilt table after the rename.
+Do not assume child rows will survive `DROP TABLE`. With foreign keys enabled, SQLite can apply foreign-key actions while dropping the parent table. Before rebuilding a referenced table, back up and explicitly drop its child table, then recreate the child from the target schema and restore its rows after the parent has been replaced.
 
 ### Structure migrations with sub-functions
 
@@ -88,3 +88,5 @@ The `GroupItem` entity annotation retains only two indices: `(group_id)` and `(c
 ## Migration 60 → 61 (versioned Lua graph packages)
 
 This migration creates `lua_graph_packages_table`, keyed by (`package_id`, `version`), with the original ZIP-compatible package in an `archive` BLOB. It rebuilds `lua_graphs_table` so `script` is nullable and adds an optional composite package foreign key. Existing rows retain their inline script and receive null package columns; legacy scripts are not repackaged.
+
+Because `lua_graph_features_table` has a cascading foreign key to `lua_graphs_table`, its rows are copied to a temporary backup and the child table is explicitly rebuilt around the parent-table replacement. The migration test must include a feature mapping so schema validation alone cannot conceal accidental child-row loss.

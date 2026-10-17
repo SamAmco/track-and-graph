@@ -80,6 +80,10 @@ javaCompileOptions {
         enable = true
     }
 
+    sourceSets {
+        getByName("androidTest").assets.directories.add("$projectDir/schemas")
+    }
+
     namespace = "com.samco.trackandgraph.data"
 
     lint {

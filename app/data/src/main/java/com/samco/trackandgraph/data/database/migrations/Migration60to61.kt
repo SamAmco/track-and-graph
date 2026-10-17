@@ -39,6 +39,14 @@ val MIGRATION_60_61 = object : Migration(60, 61) {
         )
         db.execSQL(
             """
+            CREATE TEMP TABLE `lua_graph_features_table_backup` AS
+            SELECT `id`, `lua_graph_id`, `feature_id`, `name`
+            FROM `lua_graph_features_table`
+            """.trimIndent()
+        )
+        db.execSQL("DROP TABLE `lua_graph_features_table`")
+        db.execSQL(
+            """
             INSERT INTO `lua_graphs_table_new` (`id`, `graph_stat_id`, `script`)
             SELECT `id`, `graph_stat_id`, `script` FROM `lua_graphs_table`
             """.trimIndent()
@@ -48,5 +56,28 @@ val MIGRATION_60_61 = object : Migration(60, 61) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_lua_graphs_table_id` ON `lua_graphs_table` (`id`)")
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_lua_graphs_table_graph_stat_id` ON `lua_graphs_table` (`graph_stat_id`)")
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_lua_graphs_table_package_id_package_version` ON `lua_graphs_table` (`package_id`, `package_version`)")
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `lua_graph_features_table` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `lua_graph_id` INTEGER NOT NULL,
+                `feature_id` INTEGER NOT NULL,
+                `name` TEXT NOT NULL,
+                FOREIGN KEY(`lua_graph_id`) REFERENCES `lua_graphs_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE,
+                FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        db.execSQL(
+            """
+            INSERT INTO `lua_graph_features_table` (`id`, `lua_graph_id`, `feature_id`, `name`)
+            SELECT `id`, `lua_graph_id`, `feature_id`, `name`
+            FROM `lua_graph_features_table_backup`
+            """.trimIndent()
+        )
+        db.execSQL("DROP TABLE `lua_graph_features_table_backup`")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_lua_graph_features_table_id` ON `lua_graph_features_table` (`id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_lua_graph_features_table_lua_graph_id` ON `lua_graph_features_table` (`lua_graph_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_lua_graph_features_table_feature_id` ON `lua_graph_features_table` (`feature_id`)")
     }
 }

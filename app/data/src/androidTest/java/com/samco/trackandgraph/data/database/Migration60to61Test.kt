@@ -26,13 +26,19 @@ class Migration60to61Test {
     )
 
     @Test
-    fun preservesLegacyInlineLuaGraphs() {
+    fun preservesLegacyInlineLuaGraphsAndFeatures() {
         helper.createDatabase(TEST_DATABASE, 60).apply {
+            execSQL(
+                "INSERT INTO features_table (id, name, feature_description) VALUES (9, 'Input', 'Legacy input')"
+            )
             execSQL(
                 "INSERT INTO graphs_and_stats_table2 (id, name, graph_stat_type) VALUES (42, 'Legacy', 'LUA_SCRIPT')"
             )
             execSQL(
                 "INSERT INTO lua_graphs_table (id, graph_stat_id, script) VALUES (7, 42, 'return function() end')"
+            )
+            execSQL(
+                "INSERT INTO lua_graph_features_table (id, lua_graph_id, feature_id, name) VALUES (3, 7, 9, 'source')"
             )
             close()
         }
@@ -50,6 +56,16 @@ class Migration60to61Test {
             assertEquals("return function() end", cursor.getString(0))
             assertEquals(true, cursor.isNull(1))
             assertEquals(true, cursor.isNull(2))
+        }
+        migrated.query(
+            "SELECT id, lua_graph_id, feature_id, name FROM lua_graph_features_table"
+        ).use { cursor ->
+            assertEquals(1, cursor.count)
+            cursor.moveToFirst()
+            assertEquals(3L, cursor.getLong(0))
+            assertEquals(7L, cursor.getLong(1))
+            assertEquals(9L, cursor.getLong(2))
+            assertEquals("source", cursor.getString(3))
         }
         migrated.close()
     }
