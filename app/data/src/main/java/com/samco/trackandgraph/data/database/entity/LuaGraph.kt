@@ -19,6 +19,7 @@ package com.samco.trackandgraph.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -38,7 +39,7 @@ import androidx.room.PrimaryKey
         )
     ],
     indices = [
-        androidx.room.Index(value = ["package_id", "package_version"]),
+        Index(value = ["package_id", "package_version"]),
     ],
 )
 internal data class LuaGraph(

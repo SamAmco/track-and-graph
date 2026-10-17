@@ -27,6 +27,7 @@ import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
+import com.samco.trackandgraph.data.database.entity.LuaGraphPackage
 import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
 import com.samco.trackandgraph.data.database.entity.queryresponse.LineGraphWithFeatures
@@ -59,7 +60,7 @@ internal class FakeGraphDao : GraphDao {
     private val barCharts = mutableMapOf<Long, BarChart>()
     private val luaGraphs = mutableMapOf<Long, LuaGraph>()
     private val luaGraphFeatures = mutableMapOf<Long, MutableList<LuaGraphFeature>>()
-    private val luaGraphPackages = mutableMapOf<Pair<String, String>, com.samco.trackandgraph.data.database.entity.LuaGraphPackage>()
+    private val luaGraphPackages = mutableMapOf<Pair<String, String>, LuaGraphPackage>()
 
     // =========================================================================
     // GraphOrStat operations
@@ -251,7 +252,7 @@ internal class FakeGraphDao : GraphDao {
         return id
     }
 
-    override fun insertLuaGraphPackage(luaGraphPackage: com.samco.trackandgraph.data.database.entity.LuaGraphPackage): Long {
+    override fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage): Long {
         val key = luaGraphPackage.packageId to luaGraphPackage.version
         if (key in luaGraphPackages) return -1L
         luaGraphPackages[key] = luaGraphPackage
@@ -261,7 +262,7 @@ internal class FakeGraphDao : GraphDao {
     override fun getLuaGraphPackage(
         packageId: String,
         version: String,
-    ): com.samco.trackandgraph.data.database.entity.LuaGraphPackage? =
+    ): LuaGraphPackage? =
         luaGraphPackages[packageId to version]
 
     override fun deleteUnreferencedLuaGraphPackages() {

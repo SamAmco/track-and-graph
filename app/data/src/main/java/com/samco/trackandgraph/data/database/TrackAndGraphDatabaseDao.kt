@@ -39,6 +39,7 @@ import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
+import com.samco.trackandgraph.data.database.entity.LuaGraphPackage
 import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.Reminder
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
@@ -453,10 +454,10 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     override fun insertLuaGraph(luaGraph: LuaGraph): Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    override fun insertLuaGraphPackage(luaGraphPackage: com.samco.trackandgraph.data.database.entity.LuaGraphPackage): Long
+    override fun insertLuaGraphPackage(luaGraphPackage: LuaGraphPackage): Long
 
     @Query("SELECT * FROM lua_graph_packages_table WHERE package_id = :packageId AND version = :version LIMIT 1")
-    override fun getLuaGraphPackage(packageId: String, version: String): com.samco.trackandgraph.data.database.entity.LuaGraphPackage?
+    override fun getLuaGraphPackage(packageId: String, version: String): LuaGraphPackage?
 
     @Query(
         """

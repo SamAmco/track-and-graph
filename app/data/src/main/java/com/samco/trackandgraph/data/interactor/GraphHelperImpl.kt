@@ -49,6 +49,7 @@ import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
 import com.samco.trackandgraph.data.database.dto.toEntity
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
+import com.samco.trackandgraph.data.database.entity.LuaGraphPackage
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.time.TimeProvider
 import kotlinx.coroutines.CoroutineDispatcher
@@ -455,7 +456,7 @@ internal class GraphHelperImpl @Inject constructor(
         if (source !is LuaGraphSource.Package) return
         val packageData = source.packageData
         ensureLuaGraphPackage(
-            com.samco.trackandgraph.data.database.entity.LuaGraphPackage(
+            LuaGraphPackage(
                 packageId = packageData.packageId,
                 version = packageData.version,
                 archive = packageData.archive,
@@ -464,7 +465,7 @@ internal class GraphHelperImpl @Inject constructor(
     }
 
     private fun ensureLuaGraphPackage(
-        packageData: com.samco.trackandgraph.data.database.entity.LuaGraphPackage,
+        packageData: LuaGraphPackage,
     ) {
         if (graphDao.insertLuaGraphPackage(packageData) != -1L) return
         val existing = graphDao.getLuaGraphPackage(packageData.packageId, packageData.version)

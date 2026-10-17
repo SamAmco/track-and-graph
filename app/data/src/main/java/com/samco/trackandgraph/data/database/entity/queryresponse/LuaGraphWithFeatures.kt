@@ -18,6 +18,7 @@ package com.samco.trackandgraph.data.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
 import androidx.room.Relation
+import com.samco.trackandgraph.data.database.dto.LuaGraphPackage
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.entity.LuaGraph
@@ -53,7 +54,7 @@ internal data class LuaGraphWithFeatures(
             }
             LuaGraphSource.Inline(it)
         } ?: LuaGraphSource.Package(
-            com.samco.trackandgraph.data.database.dto.LuaGraphPackage(
+            LuaGraphPackage(
                 packageId = requireNotNull(packageId),
                 version = requireNotNull(packageVersion),
                 archive = requireNotNull(packageArchive),
