@@ -199,13 +199,18 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     private fun downloadAndInstallScriptFromUri(uri: URI) = withUpdate {
-        val scriptText = fileDownloader.downloadFileToString(uri)
-        if (scriptText == null) {
+        val bytes = fileDownloader.downloadFileToBytes(uri)
+        if (bytes == null) {
             networkErrorEvents.send(NetworkError.Uri(uri.toString()))
-        } else {
-            luaGraph = luaGraph.copy(packageData = null)
-            script = TextFieldValue(scriptText)
-            onUpdate()
+            return@withUpdate
+        }
+
+        try {
+            installImportedFile(bytes)
+            updateConfig()
+        } catch (t: Throwable) {
+            Timber.e(t, "Failed to import downloaded Lua graph file")
+            networkErrorEvents.send(NetworkError.InvalidPackage)
         }
     }
 
@@ -256,12 +261,7 @@ class LuaGraphConfigViewModel @Inject constructor(
                     output.toByteArray()
                 } ?: return@launch
 
-                if (bytes.size >= 4 && bytes[0] == 'P'.code.toByte() && bytes[1] == 'K'.code.toByte()) {
-                    installPackage(bytes)
-                } else {
-                    luaGraph = luaGraph.copy(packageData = null)
-                    script = TextFieldValue(bytes.toString(Charsets.UTF_8))
-                }
+                installImportedFile(bytes)
                 onUpdate()
             } catch (t: Throwable) {
                 Timber.e(t, "Failed to import Lua graph file")
@@ -269,6 +269,25 @@ class LuaGraphConfigViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun installImportedFile(bytes: ByteArray) {
+        require(bytes.size <= ZipLuaGraphScriptAccessor.MAX_ARCHIVE_BYTES) {
+            "Imported Lua graph file is too large"
+        }
+        if (bytes.isZipArchive()) {
+            installPackage(bytes)
+        } else {
+            luaGraph = luaGraph.copy(packageData = null)
+            script = TextFieldValue(bytes.toString(Charsets.UTF_8))
+        }
+    }
+
+    private fun ByteArray.isZipArchive(): Boolean =
+        size >= 4 &&
+            this[0] == 'P'.code.toByte() &&
+            this[1] == 'K'.code.toByte() &&
+            this[2] == 3.toByte() &&
+            this[3] == 4.toByte()
 
     private suspend fun installPackage(archive: ByteArray) {
         val accessor = ZipLuaGraphScriptAccessor(archive)
