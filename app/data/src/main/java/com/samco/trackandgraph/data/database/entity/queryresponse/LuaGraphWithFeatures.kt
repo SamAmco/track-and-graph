@@ -19,9 +19,9 @@ package com.samco.trackandgraph.data.database.entity.queryresponse
 import androidx.room.ColumnInfo
 import androidx.room.Relation
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
+import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
-import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
 
 internal data class LuaGraphWithFeatures(
 
@@ -50,20 +50,24 @@ internal data class LuaGraphWithFeatures(
     val packageArchive: ByteArray?,
 ) {
     fun toDto(): LuaGraphWithFeatures {
-        val packageData = packageArchive?.let { archive ->
+        val source = script?.let {
+            require(packageId == null && packageVersion == null && packageLabel == null && packageArchive == null) {
+                "Lua graph cannot contain both an inline script and a package reference"
+            }
+            LuaGraphSource.Inline(it)
+        } ?: LuaGraphSource.Package(
             com.samco.trackandgraph.data.database.dto.LuaGraphPackage(
                 packageId = requireNotNull(packageId),
                 version = requireNotNull(packageVersion),
                 label = requireNotNull(packageLabel),
-                archive = archive,
+                archive = requireNotNull(packageArchive),
             )
-        }
+        )
         return LuaGraphWithFeatures(
             id = id,
             graphStatId = graphStatId,
             features = features.map { it.toDto() },
-            script = script ?: ZipLuaGraphScriptAccessor(requireNotNull(packageArchive)).mainScript(),
-            packageData = packageData,
+            source = source,
         )
     }
 

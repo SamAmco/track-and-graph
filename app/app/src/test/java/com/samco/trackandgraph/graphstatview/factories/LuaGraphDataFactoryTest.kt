@@ -24,6 +24,7 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
+import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.interactor.DataInteractor
@@ -774,7 +775,7 @@ class LuaGraphDataFactoryTest {
     ) = LuaGraphWithFeatures(
         id = 1,
         graphStatId = 1,
-        script = script,
+        source = LuaGraphSource.Inline(script),
         features = features
     )
 

@@ -31,6 +31,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.data.database.dto.LuaGraphPackage
+import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
@@ -95,7 +96,9 @@ class LuaGraphConfigViewModel @Inject constructor(
         private set
 
     val packageLabel: String?
-        get() = luaGraph.packageData?.let { "${it.label} ${it.version}" }
+        get() = (luaGraph.source as? LuaGraphSource.Package)
+            ?.packageData
+            ?.let { "${it.label} ${it.version}" }
 
     private data class ScriptPreviewData(
         val text: String,
@@ -137,7 +140,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     private var luaGraph = LuaGraphWithFeatures(
         id = 0,
         graphStatId = 0,
-        script = "",
+        source = LuaGraphSource.Inline(""),
         features = emptyList()
     )
 
@@ -216,7 +219,10 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     override fun updateConfig() {
         luaGraph = luaGraph.copy(
-            script = script.text,
+            source = when (val source = luaGraph.source) {
+                is LuaGraphSource.Inline -> source.copy(script = script.text)
+                is LuaGraphSource.Package -> source
+            },
             features = selectedFeatures.mapIndexed { idx, ft ->
                 ft.copy(name = featureTextFields[idx].value.text)
             }
@@ -277,8 +283,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         if (bytes.isZipArchive()) {
             installPackage(bytes)
         } else {
-            luaGraph = luaGraph.copy(packageData = null)
-            script = TextFieldValue(bytes.toString(Charsets.UTF_8))
+            setInlineScript(TextFieldValue(bytes.toString(Charsets.UTF_8)))
         }
     }
 
@@ -298,20 +303,26 @@ class LuaGraphConfigViewModel @Inject constructor(
             luaEngine.releaseVM(vmLock)
         }
         luaGraph = luaGraph.copy(
-            packageData = LuaGraphPackage(
-                packageId = metadata.packageId,
-                version = metadata.version,
-                label = metadata.label,
-                archive = archive,
+            source = LuaGraphSource.Package(
+                LuaGraphPackage(
+                    packageId = metadata.packageId,
+                    version = metadata.version,
+                    label = metadata.label,
+                    archive = archive,
+                )
             )
         )
         script = TextFieldValue(accessor.mainScript())
     }
 
     fun setScriptText(text: TextFieldValue) {
-        luaGraph = luaGraph.copy(packageData = null)
-        script = text
+        setInlineScript(text)
         onUpdate()
+    }
+
+    private fun setInlineScript(text: TextFieldValue) {
+        luaGraph = luaGraph.copy(source = LuaGraphSource.Inline(text.text))
+        script = text
     }
 
     fun onAddFeatureClicked() {
@@ -381,8 +392,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
 
     fun updateScriptFromClipboard(text: String) {
-        luaGraph = luaGraph.copy(packageData = null)
-        script = TextFieldValue(text)
+        setInlineScript(TextFieldValue(text))
         onUpdate()
     }
 
@@ -396,8 +406,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
             pendingScriptInstall.value?.let {
                 pendingScriptInstall.emit(null)
-                luaGraph = luaGraph.copy(packageData = null)
-                script = TextFieldValue(it)
+                setInlineScript(TextFieldValue(it))
                 onUpdate()
                 return@launch
             }
@@ -417,7 +426,15 @@ class LuaGraphConfigViewModel @Inject constructor(
     override fun onDataLoaded(config: Any?) {
         val lgConfig = config as? LuaGraphWithFeatures
         lgConfig?.let { luaGraph = it }
-        lgConfig?.script?.let { script = TextFieldValue(it) }
+        lgConfig?.source?.let { source ->
+            script = TextFieldValue(
+                when (source) {
+                    is LuaGraphSource.Inline -> source.script
+                    is LuaGraphSource.Package ->
+                        ZipLuaGraphScriptAccessor(source.packageData.archive).mainScript()
+                }
+            )
+        }
         lgConfig?.features?.let { features ->
             selectedFeatures = features
             featureTextFields.clear()

@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
+import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.sampling.DataSampler
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -114,17 +115,18 @@ class LuaGraphDataFactory @Inject constructor(
     ): ILuaGraphViewData {
         val luaEngineParams = LuaGraphEngineParams(dataSources = dataSamples)
 
-        val luaGraphResult = config.packageData?.let {
-            luaEngine.runLuaGraphFromAccessor(
+        val luaGraphResult = when (val source = config.source) {
+            is LuaGraphSource.Package -> luaEngine.runLuaGraphFromAccessor(
                 vmLock = vmLock,
-                scriptAccessor = ZipLuaGraphScriptAccessor(it.archive),
+                scriptAccessor = ZipLuaGraphScriptAccessor(source.packageData.archive),
                 params = luaEngineParams,
             )
-        } ?: luaEngine.runLuaGraph(
-            vmLock = vmLock,
-            script = config.script,
-            params = luaEngineParams,
-        )
+            is LuaGraphSource.Inline -> luaEngine.runLuaGraph(
+                vmLock = vmLock,
+                script = source.script,
+                params = luaEngineParams,
+            )
+        }
         val error = luaGraphResult.error
 
         if (error != null) return errorLuaHelper(graphOrStat, error)

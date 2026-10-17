@@ -138,8 +138,7 @@ data class BarChartConfig(
  */
 data class LuaGraphConfig(
     val features: List<LuaGraphFeatureConfig>,
-    val script: String,
-    val packageData: LuaGraphPackage? = null,
+    val source: LuaGraphSource,
 )
 
 // =============================================================================

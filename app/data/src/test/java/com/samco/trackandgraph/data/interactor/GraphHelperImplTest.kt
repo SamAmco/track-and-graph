@@ -29,6 +29,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphConfig
 import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphPackage
+import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.PieChartConfig
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
@@ -93,6 +94,24 @@ class GraphHelperImplTest {
     // =========================================================================
 
     @Test
+    fun `create Lua graph stores inline source`() = runTest(dispatcher) {
+        val source = LuaGraphSource.Inline("return {}")
+
+        val graphStatId = uut.createLuaGraph(
+            LuaGraphCreateRequest(
+                name = "Inline",
+                groupId = 1L,
+                config = LuaGraphConfig(
+                    features = emptyList(),
+                    source = source,
+                ),
+            )
+        ).componentId
+
+        assertEquals(source, uut.getLuaGraphByGraphStatId(graphStatId)?.source)
+    }
+
+    @Test
     fun `create Lua graph normalizes package and references it`() = runTest(dispatcher) {
         val archive = ByteArrayOutputStream().also { output ->
             ZipOutputStream(output).use { zip ->
@@ -114,16 +133,14 @@ class GraphHelperImplTest {
                 groupId = 1L,
                 config = LuaGraphConfig(
                     features = emptyList(),
-                    script = "return {}",
-                    packageData = packageData,
+                    source = LuaGraphSource.Package(packageData),
                 ),
             )
         ).componentId
 
         val stored = uut.getLuaGraphByGraphStatId(graphStatId)
         assertNotNull(stored)
-        assertEquals(packageData, stored?.packageData)
-        assertEquals("return {}", stored?.script)
+        assertEquals(LuaGraphSource.Package(packageData), stored?.source)
     }
 
     @Test

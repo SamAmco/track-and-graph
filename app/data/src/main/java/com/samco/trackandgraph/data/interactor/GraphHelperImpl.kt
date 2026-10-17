@@ -37,6 +37,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
+import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.dto.LuaGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.PieChart
@@ -45,6 +46,7 @@ import com.samco.trackandgraph.data.database.dto.PieChartUpdateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.TimeHistogramCreateRequest
 import com.samco.trackandgraph.data.database.dto.TimeHistogramUpdateRequest
+import com.samco.trackandgraph.data.database.dto.toEntity
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
 import com.samco.trackandgraph.data.di.IODispatcher
@@ -220,23 +222,11 @@ internal class GraphHelperImpl @Inject constructor(
         transactionHelper.withTransaction {
             val created =
                 insertGraphOrStat(request.name, request.groupId, GraphStatType.LUA_SCRIPT)
-            request.config.packageData?.let { packageData ->
-                ensureLuaGraphPackage(
-                    com.samco.trackandgraph.data.database.entity.LuaGraphPackage(
-                        packageId = packageData.packageId,
-                        version = packageData.version,
-                        label = packageData.label,
-                        archive = packageData.archive,
-                    )
-                )
-            }
+            ensureLuaGraphPackage(request.config.source)
             val luaGraphId = graphDao.insertLuaGraph(
-                com.samco.trackandgraph.data.database.entity.LuaGraph(
+                request.config.source.toEntity(
                     id = 0L,
                     graphStatId = created.componentId,
-                    script = request.config.script.takeIf { request.config.packageData == null },
-                    packageId = request.config.packageData?.packageId,
-                    packageVersion = request.config.packageData?.version,
                 )
             )
             val features = request.config.features.map { config ->
@@ -439,21 +429,11 @@ internal class GraphHelperImpl @Inject constructor(
             }
 
             if (request.config != null) {
-                request.config.packageData?.let { packageData ->
-                    ensureLuaGraphPackage(
-                        com.samco.trackandgraph.data.database.entity.LuaGraphPackage(
-                            packageId = packageData.packageId,
-                            version = packageData.version,
-                            label = packageData.label,
-                            archive = packageData.archive,
-                        )
-                    )
-                }
+                ensureLuaGraphPackage(request.config.source)
                 graphDao.updateLuaGraph(
-                    existingLuaGraph.toLuaGraph().copy(
-                        script = request.config.script.takeIf { request.config.packageData == null },
-                        packageId = request.config.packageData?.packageId,
-                        packageVersion = request.config.packageData?.version,
+                    request.config.source.toEntity(
+                        id = existingLuaGraph.id,
+                        graphStatId = existingLuaGraph.graphStatId,
                     )
                 )
                 graphDao.deleteFeaturesForLuaGraph(existingLuaGraph.id)
@@ -468,6 +448,19 @@ internal class GraphHelperImpl @Inject constructor(
                 graphDao.insertLuaGraphFeatures(features)
             }
         }
+    }
+
+    private fun ensureLuaGraphPackage(source: LuaGraphSource) {
+        if (source !is LuaGraphSource.Package) return
+        val packageData = source.packageData
+        ensureLuaGraphPackage(
+            com.samco.trackandgraph.data.database.entity.LuaGraphPackage(
+                packageId = packageData.packageId,
+                version = packageData.version,
+                label = packageData.label,
+                archive = packageData.archive,
+            )
+        )
     }
 
     private fun ensureLuaGraphPackage(

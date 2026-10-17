@@ -22,14 +22,22 @@ import com.samco.trackandgraph.data.database.entity.LuaGraph
 data class LuaGraph(
     val id: Long,
     val graphStatId: Long,
-    val script: String,
-    val packageData: LuaGraphPackage? = null,
+    val source: LuaGraphSource,
 ) {
-    internal fun toEntity() = LuaGraph(
-        id,
-        graphStatId,
-        script.takeIf { packageData == null },
-        packageData?.packageId,
-        packageData?.version,
+    internal fun toEntity() = source.toEntity(id, graphStatId)
+}
+
+internal fun LuaGraphSource.toEntity(id: Long, graphStatId: Long) = when (this) {
+    is LuaGraphSource.Inline -> LuaGraph(
+        id = id,
+        graphStatId = graphStatId,
+        script = script,
+    )
+    is LuaGraphSource.Package -> LuaGraph(
+        id = id,
+        graphStatId = graphStatId,
+        script = null,
+        packageId = packageData.packageId,
+        packageVersion = packageData.version,
     )
 }

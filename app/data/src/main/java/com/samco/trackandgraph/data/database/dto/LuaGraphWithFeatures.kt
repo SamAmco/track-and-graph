@@ -21,12 +21,10 @@ data class LuaGraphWithFeatures(
     val id: Long,
     val graphStatId: Long,
     val features: List<LuaGraphFeature>,
-    val script: String,
-    val packageData: LuaGraphPackage? = null,
+    val source: LuaGraphSource,
 ) {
     fun toConfig() = LuaGraphConfig(
         features = features.map { it.toFeatureConfig() },
-        script = script,
-        packageData = packageData,
+        source = source,
     )
 }

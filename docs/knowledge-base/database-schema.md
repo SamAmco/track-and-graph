@@ -58,6 +58,8 @@ Graph/statistic configurations.
 
 Lua graph instances live in `lua_graphs_table`. A row contains either a legacy inline `script`, or the nullable composite reference (`package_id`, `package_version`) to `lua_graph_packages_table`.
 
+Room represents that storage union with nullable columns, but the public DTO layer uses the sealed `LuaGraphSource` type: `Inline(script)` or `Package(packageData)`. Query mapping rejects rows that contain both sources or neither. Package `main.lua` is not copied into the DTO's script field; callers that need a preview extract it explicitly from the package accessor.
+
 ### lua_graph_packages_table
 
 Normalized multi-file Lua graph packages. The composite primary key is (`package_id`, `version`); `label` is display metadata and `archive` is the original ZIP-compatible `.tng` BLOB. Package content is immutable for a given identity/version, so changed content must use a new semantic version.
