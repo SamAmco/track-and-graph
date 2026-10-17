@@ -112,6 +112,7 @@ internal class DataInteractorImpl @Inject constructor(
                 dao.deleteGraphOrStat(graphStatId)
                 dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
             }
+            dao.deleteUnreferencedLuaGraphPackages()
 
             dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
             for (reminderId in deletedGroupInfo.deletedReminderIds) {
@@ -227,6 +228,7 @@ internal class DataInteractorImpl @Inject constructor(
             dao.deleteGraphOrStat(graphStatId)
             dataUpdateEvents.emit(DataUpdateType.GraphOrStatDeleted)
         }
+        dao.deleteUnreferencedLuaGraphPackages()
 
         val graphsNeedingUpdate = dependentGraphIds - orphanedGraphs.graphStatIds
         for (graphStatId in graphsNeedingUpdate) {

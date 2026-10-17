@@ -458,6 +458,19 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     @Query("SELECT * FROM lua_graph_packages_table WHERE package_id = :packageId AND version = :version LIMIT 1")
     override fun getLuaGraphPackage(packageId: String, version: String): com.samco.trackandgraph.data.database.entity.LuaGraphPackage?
 
+    @Query(
+        """
+        DELETE FROM lua_graph_packages_table
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM lua_graphs_table
+            WHERE lua_graphs_table.package_id = lua_graph_packages_table.package_id
+                AND lua_graphs_table.package_version = lua_graph_packages_table.version
+        )
+        """
+    )
+    override fun deleteUnreferencedLuaGraphPackages()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertLuaGraphFeatures(luaGraphFeatures: List<LuaGraphFeature>)
 

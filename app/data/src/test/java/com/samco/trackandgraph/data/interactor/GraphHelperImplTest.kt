@@ -30,6 +30,7 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphConfig
 import com.samco.trackandgraph.data.database.dto.LuaGraphCreateRequest
 import com.samco.trackandgraph.data.database.dto.LuaGraphPackage
 import com.samco.trackandgraph.data.database.dto.LuaGraphSource
+import com.samco.trackandgraph.data.database.dto.LuaGraphUpdateRequest
 import com.samco.trackandgraph.data.database.dto.ComponentDeleteRequest
 import com.samco.trackandgraph.data.database.dto.PieChartConfig
 import com.samco.trackandgraph.data.database.dto.PieChartCreateRequest
@@ -141,6 +142,28 @@ class GraphHelperImplTest {
         assertNotNull(stored)
         assertEquals(LuaGraphSource.Package(packageData), stored?.source)
     }
+
+    @Test
+    fun `update Lua graph removes package after its last reference is replaced`() =
+        runTest(dispatcher) {
+            val oldPackage = luaGraphPackage("example.graph", "1.0.0")
+            val newPackage = luaGraphPackage("example.graph", "2.0.0")
+            val graphStatId = createLuaGraph("Packaged", oldPackage)
+
+            uut.updateLuaGraph(
+                LuaGraphUpdateRequest(
+                    graphStatId = graphStatId,
+                    name = null,
+                    config = LuaGraphConfig(
+                        features = emptyList(),
+                        source = LuaGraphSource.Package(newPackage),
+                    ),
+                )
+            )
+
+            assertNull(fakeGraphDao.getLuaGraphPackage(oldPackage.packageId, oldPackage.version))
+            assertNotNull(fakeGraphDao.getLuaGraphPackage(newPackage.packageId, newPackage.version))
+        }
 
     @Test
     fun `createLineGraph inserts GraphOrStat and LineGraph and returns graphStatId`() =
@@ -444,6 +467,21 @@ class GraphHelperImplTest {
 
         // VERIFY
         assertNull(fakeGraphDao.tryGetGraphStatById(graphStatId))
+    }
+
+    @Test
+    fun `deleteGraph keeps shared package until its last graph is deleted`() = runTest(dispatcher) {
+        val packageData = luaGraphPackage("shared.graph", "1.0.0")
+        val firstGraphId = createLuaGraph("First", packageData)
+        val secondGraphId = createLuaGraph("Second", packageData)
+
+        deleteGraph(firstGraphId)
+
+        assertNotNull(fakeGraphDao.getLuaGraphPackage(packageData.packageId, packageData.version))
+
+        deleteGraph(secondGraphId)
+
+        assertNull(fakeGraphDao.getLuaGraphPackage(packageData.packageId, packageData.version))
     }
 
     @Test
@@ -945,5 +983,36 @@ class GraphHelperImplTest {
         val result = uut.tryGetGraphStatById(graphId)
         assertNotNull(result)
         assertEquals(false, result!!.unique)
+    }
+
+    private fun luaGraphPackage(packageId: String, version: String): LuaGraphPackage {
+        val archive = ByteArrayOutputStream().also { output ->
+            ZipOutputStream(output).use { zip ->
+                zip.putNextEntry(ZipEntry("main.lua"))
+                zip.write("return {}".toByteArray())
+                zip.closeEntry()
+            }
+        }.toByteArray()
+        return LuaGraphPackage(packageId = packageId, version = version, archive = archive)
+    }
+
+    private suspend fun createLuaGraph(name: String, packageData: LuaGraphPackage): Long =
+        uut.createLuaGraph(
+            LuaGraphCreateRequest(
+                name = name,
+                groupId = 1L,
+                config = LuaGraphConfig(
+                    features = emptyList(),
+                    source = LuaGraphSource.Package(packageData),
+                ),
+            )
+        ).componentId
+
+    private suspend fun deleteGraph(graphStatId: Long) {
+        val groupItemId = fakeGroupItemDao
+            .getGroupItemsForChild(graphStatId, GroupItemType.GRAPH)
+            .single()
+            .id
+        uut.deleteGraph(ComponentDeleteRequest(groupItemId = groupItemId))
     }
 }

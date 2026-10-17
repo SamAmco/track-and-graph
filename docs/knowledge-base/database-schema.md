@@ -64,6 +64,8 @@ Room represents that storage union with nullable columns, but the public DTO lay
 
 Normalized multi-file Lua graph packages. The composite primary key is (`package_id`, `version`), and `archive` is the original ZIP-compatible `.tng` BLOB. Human-readable metadata such as the translated title remains inside the archive and is decoded when needed. Package content is immutable for a given identity/version, so changed content must use a new semantic version.
 
+Packages may be shared by multiple Lua graphs. After a Lua graph reference is replaced or a graph is deleted (including recursive group and dependency-driven deletion), the data layer deletes package rows for which no matching `lua_graphs_table` reference remains. This cleanup must happen after the graph mutation; deleting a symlink alone must not remove the package.
+
 ### reminders_table
 Reminder configurations.
 

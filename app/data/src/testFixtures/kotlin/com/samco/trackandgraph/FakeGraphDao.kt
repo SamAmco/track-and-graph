@@ -264,6 +264,15 @@ internal class FakeGraphDao : GraphDao {
     ): com.samco.trackandgraph.data.database.entity.LuaGraphPackage? =
         luaGraphPackages[packageId to version]
 
+    override fun deleteUnreferencedLuaGraphPackages() {
+        val referencedPackages = luaGraphs.values.mapNotNull { luaGraph ->
+            val packageId = luaGraph.packageId ?: return@mapNotNull null
+            val packageVersion = luaGraph.packageVersion ?: return@mapNotNull null
+            packageId to packageVersion
+        }.toSet()
+        luaGraphPackages.keys.retainAll(referencedPackages)
+    }
+
     override fun updateLuaGraph(luaGraph: LuaGraph) {
         luaGraphs[luaGraph.id] = luaGraph
     }
@@ -312,6 +321,7 @@ internal class FakeGraphDao : GraphDao {
         barCharts.clear()
         luaGraphs.clear()
         luaGraphFeatures.clear()
+        luaGraphPackages.clear()
 
         nextGraphStatId = 1L
         nextLineGraphId = 1L

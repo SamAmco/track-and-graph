@@ -106,6 +106,7 @@ internal class GroupHelperImpl @Inject constructor(
                 // Perform deletions - delete group item entries first, then entities
                 itemsToDelete.groupItemIds.forEach { groupItemDao.deleteGroupItem(it) }
                 itemsToDelete.graphIds.forEach { groupDao.deleteGraphOrStat(it) }
+                groupDao.deleteUnreferencedLuaGraphPackages()
                 itemsToDelete.reminderIds.forEach { groupDao.deleteReminder(it) }
                 itemsToDelete.featureIds.forEach { groupDao.deleteFeature(it) }
                 itemsToDelete.groupIds.forEach { groupDao.deleteGroup(it) }

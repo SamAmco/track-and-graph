@@ -446,6 +446,7 @@ internal class GraphHelperImpl @Inject constructor(
                     )
                 }
                 graphDao.insertLuaGraphFeatures(features)
+                graphDao.deleteUnreferencedLuaGraphPackages()
             }
         }
     }
@@ -497,6 +498,7 @@ internal class GraphHelperImpl @Inject constructor(
 
             groupItems.forEach { groupItemDao.deleteGroupItem(it.id) }
             graphDao.deleteGraphOrStat(graphStatId)
+            graphDao.deleteUnreferencedLuaGraphPackages()
         }
     }
 

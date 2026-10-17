@@ -39,6 +39,7 @@ internal class FakeGroupDao : GroupDao {
     val deletedFeatureIds = mutableSetOf<Long>()
     val deletedGraphIds = mutableSetOf<Long>()
     val deletedReminderIds = mutableSetOf<Long>()
+    var unreferencedLuaGraphPackageCleanupCount = 0
 
     // =========================================================================
     // Test helper methods
@@ -76,6 +77,7 @@ internal class FakeGroupDao : GroupDao {
         deletedFeatureIds.clear()
         deletedGraphIds.clear()
         deletedReminderIds.clear()
+        unreferencedLuaGraphPackageCleanupCount = 0
         nextGroupId = 1L
     }
 
@@ -120,6 +122,10 @@ internal class FakeGroupDao : GroupDao {
 
     override fun deleteGraphOrStat(id: Long) {
         deletedGraphIds.add(id)
+    }
+
+    override fun deleteUnreferencedLuaGraphPackages() {
+        unreferencedLuaGraphPackageCleanupCount++
     }
 
     override fun deleteReminder(id: Long) {

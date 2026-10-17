@@ -352,6 +352,7 @@ class GroupHelperImplTest {
 
             // VERIFY
             assertTrue(fakeGroupDao.deletedGraphIds.contains(graphId))
+            assertEquals(1, fakeGroupDao.unreferencedLuaGraphPackageCleanupCount)
         }
 
     @Test

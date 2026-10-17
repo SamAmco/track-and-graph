@@ -36,7 +36,7 @@ import com.samco.trackandgraph.data.database.entity.queryresponse.LuaGraphWithFe
  * This interface abstracts the database operations needed by GraphHelper,
  * allowing for different implementations (Room, fake for testing, etc.)
  */
-internal interface GraphDao {
+internal interface GraphDao : LuaGraphPackageCleanupDao {
 
     // =========================================================================
     // GraphOrStat operations

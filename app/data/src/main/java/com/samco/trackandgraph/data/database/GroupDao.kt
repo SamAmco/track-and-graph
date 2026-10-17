@@ -26,7 +26,7 @@ import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFea
  * This interface abstracts the database operations needed by GroupHelper,
  * allowing for different implementations (Room, fake for testing, etc.)
  */
-internal interface GroupDao {
+internal interface GroupDao : LuaGraphPackageCleanupDao {
 
     // =========================================================================
     // Group CRUD operations
