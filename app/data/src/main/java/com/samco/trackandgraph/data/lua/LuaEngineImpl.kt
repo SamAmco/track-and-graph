@@ -57,13 +57,13 @@ internal class LuaEngineImpl @Inject constructor(
         vmLock: LuaVMLock,
         script: String,
         params: LuaGraphEngineParams,
-    ): LuaGraphResult = runLuaGraphFromAccessor(
+    ): LuaGraphResult = runLuaGraph(
         vmLock = vmLock,
         scriptAccessor = InlineLuaGraphScriptAccessor(script),
         params = params,
     )
 
-    override fun runLuaGraphFromAccessor(
+    override fun runLuaGraph(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
         params: LuaGraphEngineParams

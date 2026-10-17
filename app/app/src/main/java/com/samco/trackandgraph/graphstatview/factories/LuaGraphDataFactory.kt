@@ -116,7 +116,7 @@ class LuaGraphDataFactory @Inject constructor(
         val luaEngineParams = LuaGraphEngineParams(dataSources = dataSamples)
 
         val luaGraphResult = when (val source = config.source) {
-            is LuaGraphSource.Package -> luaEngine.runLuaGraphFromAccessor(
+            is LuaGraphSource.Package -> luaEngine.runLuaGraph(
                 vmLock = vmLock,
                 scriptAccessor = ZipLuaGraphScriptAccessor(source.packageData.archive),
                 params = luaEngineParams,

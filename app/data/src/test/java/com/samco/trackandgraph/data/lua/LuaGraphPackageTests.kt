@@ -159,7 +159,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
         val graphLock = engine.acquireVM()
         val data = try {
-            engine.runLuaGraphFromAccessor(
+            engine.runLuaGraph(
                 graphLock,
                 accessor,
                 LuaGraphEngineParams(emptyMap()),
@@ -202,7 +202,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         ))
         val initialLock = engine.acquireVM()
         val data = try {
-            engine.runLuaGraphFromAccessor(
+            engine.runLuaGraph(
                 initialLock,
                 accessor,
                 LuaGraphEngineParams(emptyMap()),

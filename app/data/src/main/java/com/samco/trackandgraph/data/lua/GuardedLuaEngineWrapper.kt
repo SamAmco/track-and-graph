@@ -55,13 +55,13 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
         } else throw LuaEngineDisabledException()
     }
 
-    override fun runLuaGraphFromAccessor(
+    override fun runLuaGraph(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
         params: LuaGraphEngineParams
     ): LuaGraphResult {
         return if (luaEngineSwitch.enabled) {
-            luaEngine.runLuaGraphFromAccessor(vmLock, scriptAccessor, params)
+            luaEngine.runLuaGraph(vmLock, scriptAccessor, params)
         } else throw LuaEngineDisabledException()
     }
 
