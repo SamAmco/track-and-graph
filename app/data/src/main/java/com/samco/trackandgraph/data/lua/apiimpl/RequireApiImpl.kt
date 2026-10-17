@@ -30,6 +30,7 @@ internal class RequireApiImpl @Inject constructor(
     private val assetReader: AssetReader,
     private val moduleLoadInterceptor: ModuleLoadInterceptor,
     private val coreApiImpl: CoreApiImpl,
+    private val randomApiImpl: RandomApiImpl,
 ) {
     companion object {
         const val REQUIRE = "require"
@@ -95,7 +96,7 @@ internal class RequireApiImpl @Inject constructor(
         try {
             val fileContents = assetReader.readAssetToString("generated/lua-api/random.lua")
             val random = globals.load(fileContents).call().checktable()!!
-            RandomApiImpl().installIn(random)
+            randomApiImpl.installIn(random)
             return@lazy random
         } catch (t: Throwable) {
             Timber.e(t, "Failed to load random module")
