@@ -71,6 +71,7 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel.NetworkError
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphFeatureUiData
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphPackageUiData
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -88,6 +89,7 @@ import com.samco.trackandgraph.ui.ui.buttonSize
 import com.samco.trackandgraph.ui.ui.cardElevation
 import com.samco.trackandgraph.ui.ui.cardPadding
 import com.samco.trackandgraph.ui.ui.luaCodeVisualTransformation
+import com.samco.trackandgraph.ui.ui.resolve
 import com.samco.trackandgraph.ui.ui.slimOutlinedTextField
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -120,7 +122,7 @@ fun LuaGraphConfigView(
         script = viewModel.script,
         scriptPreview = viewModel.scriptPreview
             .collectAsStateWithLifecycle().value,
-        packageLabel = viewModel.packageLabel,
+        packageUiData = viewModel.packageUiData,
         featureUiDataList = viewModel.featureUiDataList,
         onUpdateFeatureName = viewModel::onUpdateFeatureName,
         onRemoveFeatureClicked = viewModel::onRemoveFeatureClicked,
@@ -153,7 +155,7 @@ private fun LuaGraphConfigView(
     scrollState: ScrollState,
     script: TextFieldValue,
     scriptPreview: TextFieldValue,
-    packageLabel: String?,
+    packageUiData: LuaGraphPackageUiData?,
     featureUiDataList: List<LuaGraphFeatureUiData>,
     onUpdateFeatureName: (Int, TextFieldValue) -> Unit,
     onRemoveFeatureClicked: (Int) -> Unit,
@@ -188,15 +190,16 @@ private fun LuaGraphConfigView(
 
     InputSpacingLarge()
 
-    packageLabel?.let {
-        Text(text = stringResource(R.string.lua_graph_package_installed, it))
+    packageUiData?.let {
+        val title = it.title.resolve() ?: it.packageId
+        Text(text = stringResource(R.string.lua_graph_package_installed, "$title ${it.version}"))
         InputSpacingLarge()
     }
 
     ScriptTextInputPreview(
         scriptPreview = scriptPreview,
         script = script,
-        editable = packageLabel == null,
+        editable = packageUiData == null,
         onScriptPreviewClicked = {
             showEditScriptDialog.value = true
             onClickInPreview(it)
@@ -492,7 +495,7 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
                 end
             """.trimIndent()
             ),
-            packageLabel = null,
+            packageUiData = null,
             featureUiDataList = listOf(
                 LuaGraphFeatureUiData(
                     nameTextField = remember { mutableStateOf(TextFieldValue("Feature 1")) },

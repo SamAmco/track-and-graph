@@ -62,7 +62,7 @@ Room represents that storage union with nullable columns, but the public DTO lay
 
 ### lua_graph_packages_table
 
-Normalized multi-file Lua graph packages. The composite primary key is (`package_id`, `version`); `label` is display metadata and `archive` is the original ZIP-compatible `.tng` BLOB. Package content is immutable for a given identity/version, so changed content must use a new semantic version.
+Normalized multi-file Lua graph packages. The composite primary key is (`package_id`, `version`), and `archive` is the original ZIP-compatible `.tng` BLOB. Human-readable metadata such as the translated title remains inside the archive and is decoded when needed. Package content is immutable for a given identity/version, so changed content must use a new semantic version.
 
 ### reminders_table
 Reminder configurations.

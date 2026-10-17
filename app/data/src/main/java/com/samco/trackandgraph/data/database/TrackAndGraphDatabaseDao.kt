@@ -262,7 +262,7 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
     override fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
     @Query("""
-        SELECT lg.*, p.label AS package_label, p.archive AS package_archive
+        SELECT lg.*, p.archive AS package_archive
         FROM lua_graphs_table lg
         LEFT JOIN lua_graph_packages_table p
             ON p.package_id = lg.package_id AND p.version = lg.package_version

@@ -8,6 +8,7 @@
  */
 package com.samco.trackandgraph.data.lua
 
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -127,5 +128,5 @@ class ZipLuaGraphScriptAccessor(private val archive: ByteArray) : LuaGraphScript
 data class LuaGraphPackageMetadata(
     val packageId: String,
     val version: String,
-    val label: String,
+    val title: TranslatedString,
 )

@@ -32,6 +32,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.apiimpl.TranslatedStringParser
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionCatalogueAdapter
 import org.luaj.vm2.LuaError
 import io.github.z4kn4fein.semver.toVersion
@@ -44,6 +45,7 @@ internal class LuaEngineImpl @Inject constructor(
     private val luaFunctionMetadataAdapter: LuaFunctionMetadataAdapter,
     private val luaVMProvider: LuaVMProvider,
     private val luaFunctionCatalogueAdapter: LuaFunctionCatalogueAdapter,
+    private val translatedStringParser: TranslatedStringParser,
 ) : LuaEngine {
 
     override suspend fun acquireVM(affinity: LuaVMAffinity?): LuaVMLock =
@@ -95,13 +97,13 @@ internal class LuaEngineImpl @Inject constructor(
             return LuaGraphPackageMetadata(
                 packageId = descriptor["id"].checkjstring()!!,
                 version = descriptor["version"].checkjstring()!!,
-                label = descriptor["label"].checkjstring()!!,
+                title = requireNotNull(translatedStringParser.parse(descriptor["title"])) {
+                    "A packaged Lua graph must declare a string or translated table title"
+                },
             ).also {
                 require(it.packageId.isNotBlank()) { "Lua graph package id must not be blank" }
                 require(it.version.isNotBlank()) { "Lua graph package version must not be blank" }
-                require(it.label.isNotBlank()) { "Lua graph package label must not be blank" }
                 require(it.packageId.length <= 200) { "Lua graph package id is too long" }
-                require(it.label.length <= 200) { "Lua graph package label is too long" }
                 it.version.toVersion()
             }
         } catch (luaError: LuaError) {

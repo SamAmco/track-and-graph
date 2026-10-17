@@ -457,7 +457,6 @@ internal class GraphHelperImpl @Inject constructor(
             com.samco.trackandgraph.data.database.entity.LuaGraphPackage(
                 packageId = packageData.packageId,
                 version = packageData.version,
-                label = packageData.label,
                 archive = packageData.archive,
             )
         )
@@ -470,7 +469,6 @@ internal class GraphHelperImpl @Inject constructor(
         val existing = graphDao.getLuaGraphPackage(packageData.packageId, packageData.version)
         require(
             existing != null &&
-                existing.label == packageData.label &&
                 existing.archive.contentEquals(packageData.archive)
         ) {
             "Lua graph package ${packageData.packageId} ${packageData.version} already exists with different content"

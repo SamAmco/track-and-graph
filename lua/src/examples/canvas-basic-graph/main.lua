@@ -26,7 +26,9 @@ end
 return {
 	id = "com.samco.trackandgraph.examples.canvas-basic",
 	version = "2.0.0",
-	label = "Basic canvas graph",
+	title = {
+		en = "Basic canvas graph",
+	},
 	purpose = graph.TYPE,
 	type = graph.GRAPH_TYPE.CUSTOM,
 	data = function(sources)

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 61,
-    "identityHash": "05b9fe4e00d828d793110cb6387fafbc",
+    "identityHash": "a97111063c2f7dd1ed91aed372d752dd",
     "entities": [
       {
         "tableName": "features_table",
@@ -1543,7 +1543,7 @@
       },
       {
         "tableName": "lua_graph_packages_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`package_id` TEXT NOT NULL, `version` TEXT NOT NULL, `label` TEXT NOT NULL, `archive` BLOB NOT NULL, PRIMARY KEY(`package_id`, `version`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`package_id` TEXT NOT NULL, `version` TEXT NOT NULL, `archive` BLOB NOT NULL, PRIMARY KEY(`package_id`, `version`))",
         "fields": [
           {
             "fieldPath": "packageId",
@@ -1554,12 +1554,6 @@
           {
             "fieldPath": "version",
             "columnName": "version",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "label",
-            "columnName": "label",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1727,7 +1721,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '05b9fe4e00d828d793110cb6387fafbc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a97111063c2f7dd1ed91aed372d752dd')"
     ]
   }
 }

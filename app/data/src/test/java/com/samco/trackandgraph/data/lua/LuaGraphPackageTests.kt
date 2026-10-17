@@ -11,6 +11,7 @@ package com.samco.trackandgraph.data.lua
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
@@ -64,7 +65,10 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                 return {
                     id = "example.package",
                     version = "1.2.3",
-                    label = "Example package",
+                    title = {
+                        en = "Example package",
+                        es = "Paquete de ejemplo",
+                    },
                     purpose = "GRAPH",
                     type = "CUSTOM",
                     data = function() return { value = 41 } end,
@@ -86,7 +90,15 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         }
         assertEquals("example.package", metadata.packageId)
         assertEquals("1.2.3", metadata.version)
-        assertEquals("Example package", metadata.label)
+        assertEquals(
+            TranslatedString.Translations(
+                mapOf(
+                    "en" to "Example package",
+                    "es" to "Paquete de ejemplo",
+                )
+            ),
+            metadata.title,
+        )
 
         val graphLock = engine.acquireVM()
         val data = try {

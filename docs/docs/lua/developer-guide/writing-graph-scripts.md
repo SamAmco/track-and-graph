@@ -75,13 +75,18 @@ local renderer = require("renderer")
 return {
   id = "com.example.my-graph",
   version = "1.0.0",
-  label = "My graph",
+  title = {
+    en = "My graph",
+    de = "Mein Diagramm",
+  },
   purpose = graph.TYPE,
   type = graph.GRAPH_TYPE.CUSTOM,
   data = function(sources) return {} end,
   render = renderer,
 }
 ```
+
+`title` accepts either a plain string or the same language-code-to-string table used by Lua function metadata. The app selects the best available translation for the user's current language.
 
 `require("renderer")` loads `renderer.lua`; dotted names such as `require("chart.renderer")` load `chart/renderer.lua`. A module can also use `<module>/init.lua`. Package IDs and semantic versions identify stored packages, so change the version whenever the package contents change.
 

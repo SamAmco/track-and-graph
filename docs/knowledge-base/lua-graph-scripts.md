@@ -43,7 +43,7 @@ Custom UI is an additional graph result type with separate data preparation and 
 
 ## Multi-file graph packages
 
-The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"` and include stable `id`, semantic `version`, and `label` strings. Package identity is the `(id, version)` pair; the label is display metadata. The generic extension leaves room for packages with other purposes in future.
+The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"`, stable `id` and semantic `version` strings, and a `title` that uses the same string-or-localized-table format as Lua function metadata. Package identity is the `(id, version)` pair. The title remains authoritative inside the archive, is parsed as a `TranslatedString`, and is resolved for the current locale only when displayed; it is not duplicated in SQLite. The generic extension leaves room for packages with other purposes in future.
 
 Lua modules use the conventional mapping: `require("renderer")` loads `renderer.lua`, while `require("chart.renderer")` loads `chart/renderer.lua`. `<module>/init.lua` is also supported. Modules are decoded on demand through a package accessor, and each graph execution has an isolated module cache so retained custom-render closures continue to resolve the correct package.
 

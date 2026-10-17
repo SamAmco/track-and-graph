@@ -12,20 +12,17 @@ package com.samco.trackandgraph.data.database.dto
 data class LuaGraphPackage(
     val packageId: String,
     val version: String,
-    val label: String,
     val archive: ByteArray,
 ) {
     override fun equals(other: Any?): Boolean =
         other is LuaGraphPackage &&
             packageId == other.packageId &&
             version == other.version &&
-            label == other.label &&
             archive.contentEquals(other.archive)
 
     override fun hashCode(): Int {
         var result = packageId.hashCode()
         result = 31 * result + version.hashCode()
-        result = 31 * result + label.hashCode()
         return 31 * result + archive.contentHashCode()
     }
 }

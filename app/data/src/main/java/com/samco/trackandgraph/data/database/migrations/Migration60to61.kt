@@ -19,7 +19,6 @@ val MIGRATION_60_61 = object : Migration(60, 61) {
             CREATE TABLE IF NOT EXISTS `lua_graph_packages_table` (
                 `package_id` TEXT NOT NULL,
                 `version` TEXT NOT NULL,
-                `label` TEXT NOT NULL,
                 `archive` BLOB NOT NULL,
                 PRIMARY KEY(`package_id`, `version`)
             )

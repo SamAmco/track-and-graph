@@ -43,15 +43,12 @@ internal data class LuaGraphWithFeatures(
     @ColumnInfo(name = "package_version")
     val packageVersion: String?,
 
-    @ColumnInfo(name = "package_label")
-    val packageLabel: String?,
-
     @ColumnInfo(name = "package_archive")
     val packageArchive: ByteArray?,
 ) {
     fun toDto(): LuaGraphWithFeatures {
         val source = script?.let {
-            require(packageId == null && packageVersion == null && packageLabel == null && packageArchive == null) {
+            require(packageId == null && packageVersion == null && packageArchive == null) {
                 "Lua graph cannot contain both an inline script and a package reference"
             }
             LuaGraphSource.Inline(it)
@@ -59,7 +56,6 @@ internal data class LuaGraphWithFeatures(
             com.samco.trackandgraph.data.database.dto.LuaGraphPackage(
                 packageId = requireNotNull(packageId),
                 version = requireNotNull(packageVersion),
-                label = requireNotNull(packageLabel),
                 archive = requireNotNull(packageArchive),
             )
         )

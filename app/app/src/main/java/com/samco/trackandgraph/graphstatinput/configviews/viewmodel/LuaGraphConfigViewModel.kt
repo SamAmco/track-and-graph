@@ -39,7 +39,9 @@ import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaGraphPackageMetadata
 import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
@@ -66,6 +68,12 @@ import javax.inject.Inject
 data class LuaGraphFeatureUiData(
     val nameTextField: MutableState<TextFieldValue>,
     val selectedFeatureText: String
+)
+
+data class LuaGraphPackageUiData(
+    val packageId: String,
+    val version: String,
+    val title: TranslatedString?,
 )
 
 @HiltViewModel
@@ -95,10 +103,16 @@ class LuaGraphConfigViewModel @Inject constructor(
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
 
-    val packageLabel: String?
-        get() = (luaGraph.source as? LuaGraphSource.Package)
-            ?.packageData
-            ?.let { "${it.label} ${it.version}" }
+    private var packageTitle: TranslatedString? by mutableStateOf(null)
+
+    val packageUiData: LuaGraphPackageUiData?
+        get() = (luaGraph.source as? LuaGraphSource.Package)?.packageData?.let {
+            LuaGraphPackageUiData(
+                packageId = it.packageId,
+                version = it.version,
+                title = packageTitle,
+            )
+        }
 
     private data class ScriptPreviewData(
         val text: String,
@@ -296,23 +310,29 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     private suspend fun installPackage(archive: ByteArray) {
         val accessor = ZipLuaGraphScriptAccessor(archive)
-        val vmLock = luaEngine.acquireVM()
-        val metadata = try {
-            luaEngine.readLuaGraphPackageMetadata(vmLock, accessor)
-        } finally {
-            luaEngine.releaseVM(vmLock)
-        }
+        val metadata = readPackageMetadata(accessor)
         luaGraph = luaGraph.copy(
             source = LuaGraphSource.Package(
                 LuaGraphPackage(
                     packageId = metadata.packageId,
                     version = metadata.version,
-                    label = metadata.label,
                     archive = archive,
                 )
             )
         )
+        packageTitle = metadata.title
         script = TextFieldValue(accessor.mainScript())
+    }
+
+    private suspend fun readPackageMetadata(
+        accessor: ZipLuaGraphScriptAccessor,
+    ): LuaGraphPackageMetadata {
+        val vmLock = luaEngine.acquireVM()
+        return try {
+            luaEngine.readLuaGraphPackageMetadata(vmLock, accessor)
+        } finally {
+            luaEngine.releaseVM(vmLock)
+        }
     }
 
     fun setScriptText(text: TextFieldValue) {
@@ -322,6 +342,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     private fun setInlineScript(text: TextFieldValue) {
         luaGraph = luaGraph.copy(source = LuaGraphSource.Inline(text.text))
+        packageTitle = null
         script = text
     }
 
@@ -427,13 +448,34 @@ class LuaGraphConfigViewModel @Inject constructor(
         val lgConfig = config as? LuaGraphWithFeatures
         lgConfig?.let { luaGraph = it }
         lgConfig?.source?.let { source ->
-            script = TextFieldValue(
-                when (source) {
-                    is LuaGraphSource.Inline -> source.script
-                    is LuaGraphSource.Package ->
-                        ZipLuaGraphScriptAccessor(source.packageData.archive).mainScript()
+            when (source) {
+                is LuaGraphSource.Inline -> {
+                    packageTitle = null
+                    script = TextFieldValue(source.script)
                 }
-            )
+                is LuaGraphSource.Package -> {
+                    val accessor = ZipLuaGraphScriptAccessor(source.packageData.archive)
+                    packageTitle = null
+                    script = TextFieldValue(accessor.mainScript())
+                    viewModelScope.launch(default) {
+                        try {
+                            val metadata = readPackageMetadata(accessor)
+                            val currentPackage =
+                                (luaGraph.source as? LuaGraphSource.Package)?.packageData
+                            if (
+                                currentPackage?.packageId == metadata.packageId &&
+                                currentPackage.version == metadata.version &&
+                                currentPackage.archive.contentEquals(source.packageData.archive)
+                            ) {
+                                packageTitle = metadata.title
+                            }
+                        } catch (t: Throwable) {
+                            Timber.e(t, "Failed to read installed Lua graph package metadata")
+                            networkErrorEvents.send(NetworkError.InvalidPackage)
+                        }
+                    }
+                }
+            }
         }
         lgConfig?.features?.let { features ->
             selectedFeatures = features

@@ -123,7 +123,6 @@ class GraphHelperImplTest {
         val packageData = LuaGraphPackage(
             packageId = "example.graph",
             version = "1.0.0",
-            label = "Example graph",
             archive = archive,
         )
 

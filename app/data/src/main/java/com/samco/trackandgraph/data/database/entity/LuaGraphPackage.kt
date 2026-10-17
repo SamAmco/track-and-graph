@@ -22,9 +22,6 @@ internal data class LuaGraphPackage(
     @ColumnInfo(name = "version")
     val version: String,
 
-    @ColumnInfo(name = "label")
-    val label: String,
-
     @ColumnInfo(name = "archive", typeAffinity = ColumnInfo.BLOB)
     val archive: ByteArray,
 )
