@@ -114,8 +114,6 @@ class ZipLuaGraphScriptAccessor(private val archive: ByteArray) : LuaGraphScript
     }
 
     companion object {
-        const val FILE_EXTENSION = "tng"
-        const val MIME_TYPE = "application/zip"
         const val MAX_ARCHIVE_BYTES = 5 * 1024 * 1024
         const val MAX_UNCOMPRESSED_BYTES = 8 * 1024 * 1024
         const val MAX_ENTRIES = 256
