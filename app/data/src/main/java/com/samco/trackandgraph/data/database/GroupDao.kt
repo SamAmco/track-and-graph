@@ -26,7 +26,7 @@ import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFea
  * This interface abstracts the database operations needed by GroupHelper,
  * allowing for different implementations (Room, fake for testing, etc.)
  */
-internal interface GroupDao : LuaGraphPackageCleanupDao {
+internal interface GroupDao {
 
     // =========================================================================
     // Group CRUD operations
@@ -59,4 +59,6 @@ internal interface GroupDao : LuaGraphPackageCleanupDao {
     fun deleteGraphOrStat(id: Long)
 
     fun deleteReminder(id: Long)
+
+    fun deleteUnreferencedLuaGraphPackages()
 }
