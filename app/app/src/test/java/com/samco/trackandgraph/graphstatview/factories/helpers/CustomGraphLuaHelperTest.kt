@@ -66,7 +66,7 @@ class CustomGraphLuaHelperTest {
         val argument = LuaValueData.NumberValue(4.0)
         whenever(callback.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
-        whenever(luaEngine.callLuaUiFunction(vmLock, callback, argument)).thenReturn(result)
+        whenever(luaEngine.callLuaFunction(vmLock, callback, argument)).thenReturn(result)
 
         val viewData = CustomGraphLuaHelper(luaEngine)(
             customData = LuaGraphResultData.CustomData(renderData, renderFunction),
@@ -75,7 +75,7 @@ class CustomGraphLuaHelperTest {
 
         assertSame(result, viewData.content.call(callback, argument))
         verify(luaEngine).acquireVM(vmLock.affinity)
-        verify(luaEngine).callLuaUiFunction(vmLock, callback, argument)
+        verify(luaEngine).callLuaFunction(vmLock, callback, argument)
         verify(luaEngine).releaseVM(vmLock)
     }
 }

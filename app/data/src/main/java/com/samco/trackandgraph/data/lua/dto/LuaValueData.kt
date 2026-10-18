@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.data.lua.dto
 
-/** Values Kotlin may pass into a retained Lua UI callback. */
+/** Values Kotlin may pass into a retained Lua function. */
 sealed interface LuaValueData {
     data object Nil : LuaValueData
     data class BooleanValue(val value: Boolean) : LuaValueData

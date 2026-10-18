@@ -33,8 +33,8 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionCatalogueAdapter
-import com.samco.trackandgraph.data.lua.graphadapters.LuaValueAccessorImpl
 import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
 internal class LuaEngineImpl @Inject constructor(
@@ -110,14 +110,19 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 
-    override fun callLuaUiFunction(
+    override fun callLuaFunction(
         vmLock: LuaVMLock,
         function: LuaValueReference,
-        argument: LuaValueData,
+        vararg arguments: LuaValueData,
     ): LuaValueAccessor {
         vmLock.requireActiveLease()
         return try {
-            luaGraphScriptAdapter.call(vmLock, function, argument)
+            LuaValueAccessorImpl(
+                function.valueFor(vmLock)
+                    .invoke(LuaValue.varargsOf(arguments.map { it.toLuaValue() }.toTypedArray()))
+                    .arg1(),
+                vmLock.affinity,
+            )
         } catch (luaError: LuaError) {
             throw luaError.toLuaScriptException()
         }

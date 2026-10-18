@@ -81,12 +81,12 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
         luaEngine.renderLuaGraph(vmLock, renderFunction, renderData, context)
     } else throw LuaEngineDisabledException()
 
-    override fun callLuaUiFunction(
+    override fun callLuaFunction(
         vmLock: LuaVMLock,
         function: LuaValueReference,
-        argument: LuaValueData,
+        vararg arguments: LuaValueData,
     ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
-        luaEngine.callLuaUiFunction(vmLock, function, argument)
+        luaEngine.callLuaFunction(vmLock, function, *arguments)
     } else throw LuaEngineDisabledException()
 
     override fun runLuaFunction(

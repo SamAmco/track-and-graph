@@ -30,6 +30,39 @@ import org.junit.Test
 
 internal class CustomGraphUiTests : LuaEngineImplTest() {
     @Test
+    fun `retained Lua functions accept arbitrary argument counts`() = runBlocking {
+        val engine = uut()
+        val lock = engine.acquireVM()
+        try {
+            val function = requireNotNull(
+                engine.runLuaScript(
+                    lock,
+                    InlineLuaGraphScriptAccessor(
+                        "return function(...) return { count = select('#', ...), values = {...} } end"
+                    ),
+                ).asFunction()
+            )
+
+            val noArguments = engine.callLuaFunction(lock, function)
+            assertEquals(0.0, noArguments["count"]?.asDouble() ?: -1.0, 0.0)
+
+            val threeArguments = engine.callLuaFunction(
+                lock,
+                function,
+                LuaValueData.StringValue("first"),
+                LuaValueData.NumberValue(2.0),
+                LuaValueData.BooleanValue(true),
+            )
+            assertEquals(3.0, threeArguments["count"]?.asDouble() ?: -1.0, 0.0)
+            assertEquals("first", threeArguments["values"]?.get(1)?.asString())
+            assertEquals(2.0, threeArguments["values"]?.get(2)?.asDouble() ?: 0.0, 0.0)
+            assertEquals(true, threeArguments["values"]?.get(3)?.asBoolean())
+        } finally {
+            engine.releaseVM(lock)
+        }
+    }
+
+    @Test
     fun `custom UI render and callback failures are reported as Lua script exceptions`() = runBlocking {
         val engine = uut()
         val script = """
@@ -83,7 +116,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         val drawLock = engine.acquireVM(draw.affinity)
         val drawError = try {
             assertThrows(LuaScriptException::class.java) {
-                engine.callLuaUiFunction(drawLock, draw, LuaValueData.Nil)
+                engine.callLuaFunction(drawLock, draw, LuaValueData.Nil)
             }
         } finally {
             engine.releaseVM(drawLock)
@@ -179,7 +212,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         val draw = requireNotNull(tree["draw"]?.asFunction())
         val drawLock = engine.acquireVM(draw.affinity)
         val instructions = try {
-            engine.callLuaUiFunction(
+            engine.callLuaFunction(
                 drawLock,
                 draw,
                 LuaValueData.TableValue(mapOf(

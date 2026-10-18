@@ -70,7 +70,7 @@ class CustomGraphLuaHelper @Inject constructor(
     ): LuaValueAccessor {
         val vmLock = luaEngine.acquireVM(function.affinity)
         return try {
-            luaEngine.callLuaUiFunction(vmLock, function, argument)
+            luaEngine.callLuaFunction(vmLock, function, argument)
         } finally {
             luaEngine.releaseVM(vmLock)
         }

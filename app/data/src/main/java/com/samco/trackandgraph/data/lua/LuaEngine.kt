@@ -66,10 +66,11 @@ interface LuaEngine {
         context: LuaUiContext,
     ): LuaValueAccessor
 
-    fun callLuaUiFunction(
+    /** Calls an affinity-bound Lua function with zero or more Kotlin-owned values. */
+    fun callLuaFunction(
         vmLock: LuaVMLock,
         function: LuaValueReference,
-        argument: LuaValueData,
+        vararg arguments: LuaValueData,
     ): LuaValueAccessor
 
     fun runLuaFunction(

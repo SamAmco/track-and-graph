@@ -18,6 +18,9 @@ package com.samco.trackandgraph.data.lua.graphadapters
 
 import com.samco.trackandgraph.data.lua.LuaVMAffinity
 import com.samco.trackandgraph.data.lua.LuaVMLock
+import com.samco.trackandgraph.data.lua.LuaValueAccessorImpl
+import com.samco.trackandgraph.data.lua.LuaValueReferenceImpl
+import com.samco.trackandgraph.data.lua.valueFor
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
@@ -25,7 +28,6 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -65,15 +67,6 @@ internal class LuaGraphScriptAdapter @Inject constructor(
     ): LuaValueAccessor {
         val luaRenderFunction = renderFunction.valueFor(vmLock)
         val result = luaRenderFunction.call(renderData.valueFor(vmLock), context.toLuaValue())
-        return LuaValueAccessorImpl(result, vmLock.affinity)
-    }
-
-    fun call(
-        vmLock: LuaVMLock,
-        function: LuaValueReference,
-        argument: LuaValueData,
-    ): LuaValueAccessor {
-        val result = function.valueFor(vmLock).call(argument.toLuaValue())
         return LuaValueAccessorImpl(result, vmLock.affinity)
     }
 
@@ -137,17 +130,4 @@ private fun LuaUiContext.toLuaValue(): LuaValue = LuaTable().apply {
     set("font_scale", fontScale.toDouble())
     set("layout_direction", layoutDirection.name)
     set("theme", theme.name)
-}
-
-private fun LuaValueData.toLuaValue(): LuaValue = when (this) {
-    LuaValueData.Nil -> LuaValue.NIL
-    is LuaValueData.BooleanValue -> LuaValue.valueOf(value)
-    is LuaValueData.NumberValue -> LuaValue.valueOf(value)
-    is LuaValueData.StringValue -> LuaValue.valueOf(value)
-    is LuaValueData.ArrayValue -> LuaTable().also { table ->
-        values.forEachIndexed { index, value -> table.set(index + 1, value.toLuaValue()) }
-    }
-    is LuaValueData.TableValue -> LuaTable().also { table ->
-        values.forEach { (key, value) -> table.set(key, value.toLuaValue()) }
-    }
 }
