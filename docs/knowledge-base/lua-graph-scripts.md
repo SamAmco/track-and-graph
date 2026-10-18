@@ -47,12 +47,14 @@ The app imports multi-file Track & Graph packages as ZIP-compatible files with a
 
 Lua modules use the conventional mapping: `require("renderer")` loads `renderer.lua`, while `require("chart.renderer")` loads `chart/renderer.lua`. `<module>/init.lua` is also supported. Modules are decoded on demand through a package accessor, and each graph execution has an isolated module cache so retained custom-render closures continue to resolve the correct package.
 
+Keep every translated string table in a package-root `strings.lua` module, keyed by its purpose, and reference those values from implementation modules. For example, `strings.lua` can return `{ title = { en = "My graph" } }`, while `main.lua` uses `local strings = require("strings")` and sets `title = strings.title`. This keeps language data out of graph logic and gives translation tooling one conventional file per package to inspect and update.
+
 Packages are stored as normalized BLOBs in SQLite and graph instances reference them. Existing single-file scripts remain supported and are not converted by the database migration. Package limits are 5 MiB compressed, 8 MiB expanded in total, and 256 entries; names must be relative safe paths and scripts must be UTF-8. There is no separate per-entry size limit.
 
 To build one with common ZIP tooling, run the command from inside the package directory so `main.lua` is at the archive root:
 
 ```bash
-zip -r my-graph.tng main.lua renderer.lua
+zip -r my-graph.tng main.lua data.lua renderer.lua strings.lua
 ```
 
 ## Using Data Sources
