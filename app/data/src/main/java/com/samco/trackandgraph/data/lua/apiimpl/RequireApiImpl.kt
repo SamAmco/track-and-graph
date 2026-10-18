@@ -58,7 +58,9 @@ internal class RequireApiImpl @Inject constructor(
         val installedRequire = globals[REQUIRE]
         return oneArgFunction { arg: LuaValue ->
             val moduleName = arg.checkjstring()!!
-            loadedModules[moduleName]?.let { return@oneArgFunction it }
+            loadedModules[moduleName]
+                ?.takeIf { it.toboolean() }
+                ?.let { return@oneArgFunction it }
             if (moduleName.startsWith("tng.") || moduleName.startsWith("test.")) {
                 return@oneArgFunction installedRequire.call(arg)
             }

@@ -113,6 +113,102 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
     }
 
     @Test
+    fun `require executes a module once and returns the same table`() = runBlocking {
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to """
+                _G.module_loads = 0
+                local first = require("stateful")
+                local second = require("stateful")
+                return {
+                    module_loads = _G.module_loads,
+                    same_result = rawequal(first, second),
+                }
+            """.trimIndent(),
+            "stateful.lua" to """
+                _G.module_loads = _G.module_loads + 1
+                return {}
+            """.trimIndent(),
+        ))
+
+        val result = runScript(accessor)
+
+        assertEquals(1.0, result["module_loads"]?.asDouble())
+        assertEquals(true, result["same_result"]?.asBoolean())
+    }
+
+    @Test
+    fun `require caches true when a module returns nil`() = runBlocking {
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to """
+                _G.module_loads = 0
+                local first = require("no_result")
+                local second = require("no_result")
+                return {
+                    module_loads = _G.module_loads,
+                    first = first,
+                    second = second,
+                }
+            """.trimIndent(),
+            "no_result.lua" to "_G.module_loads = _G.module_loads + 1",
+        ))
+
+        val result = runScript(accessor)
+
+        assertEquals(1.0, result["module_loads"]?.asDouble())
+        assertEquals(true, result["first"]?.asBoolean())
+        assertEquals(true, result["second"]?.asBoolean())
+    }
+
+    @Test
+    fun `require reloads a module that returns false`() = runBlocking {
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to """
+                _G.module_loads = 0
+                local first = require("false_result")
+                local second = require("false_result")
+                return {
+                    module_loads = _G.module_loads,
+                    first = first,
+                    second = second,
+                }
+            """.trimIndent(),
+            "false_result.lua" to """
+                _G.module_loads = _G.module_loads + 1
+                return false
+            """.trimIndent(),
+        ))
+
+        val result = runScript(accessor)
+
+        assertEquals(2.0, result["module_loads"]?.asDouble())
+        assertEquals(false, result["first"]?.asBoolean())
+        assertEquals(false, result["second"]?.asBoolean())
+    }
+
+    @Test
+    fun `module results are isolated between script executions on the same VM`() = runBlocking {
+        val accessor = ZipLuaGraphScriptAccessor(zip(
+            "main.lua" to """
+                _G.module_loads = 0
+                require("stateful")
+                return { module_loads = _G.module_loads }
+            """.trimIndent(),
+            "stateful.lua" to "_G.module_loads = _G.module_loads + 1; return {}",
+        ))
+        val engine = uut()
+        val lock = engine.acquireVM()
+
+        val (first, second) = try {
+            engine.runLuaScript(lock, accessor) to engine.runLuaScript(lock, accessor)
+        } finally {
+            engine.releaseVM(lock)
+        }
+
+        assertEquals(1.0, first["module_loads"]?.asDouble())
+        assertEquals(1.0, second["module_loads"]?.asDouble())
+    }
+
+    @Test
     fun `package entry point and graph can use required modules`() = runBlocking {
         val engine = uut()
         val accessor = ZipLuaGraphScriptAccessor(zip(
@@ -238,5 +334,14 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
             }
         }
         return output.toByteArray()
+    }
+
+    private suspend fun runScript(accessor: LuaGraphScriptAccessor) = uut().let { engine ->
+        val lock = engine.acquireVM()
+        try {
+            engine.runLuaScript(lock, accessor)
+        } finally {
+            engine.releaseVM(lock)
+        }
     }
 }
