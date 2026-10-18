@@ -14,13 +14,22 @@ import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 internal class LuaGraphPackageTests : LuaEngineImplTest() {
+    @Test
+    fun `ZIP archive detection recognizes a complete local file signature`() {
+        assertTrue(zip("main.lua" to "return {}").isZipArchive())
+        assertFalse(byteArrayOf('P'.code.toByte(), 'K'.code.toByte(), 3).isZipArchive())
+        assertFalse("return {}".toByteArray().isZipArchive())
+    }
+
     @Test
     fun `zip accessor resolves dotted modules and init modules`() {
         val accessor = ZipLuaGraphScriptAccessor(zip(

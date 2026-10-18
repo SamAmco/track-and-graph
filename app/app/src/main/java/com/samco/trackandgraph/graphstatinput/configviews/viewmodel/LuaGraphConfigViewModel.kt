@@ -40,6 +40,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
+import com.samco.trackandgraph.data.lua.isZipArchive
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
@@ -295,13 +296,6 @@ class LuaGraphConfigViewModel @Inject constructor(
             setInlineScript(TextFieldValue(bytes.toString(Charsets.UTF_8)))
         }
     }
-
-    private fun ByteArray.isZipArchive(): Boolean =
-        size >= 4 &&
-            this[0] == 'P'.code.toByte() &&
-            this[1] == 'K'.code.toByte() &&
-            this[2] == 3.toByte() &&
-            this[3] == 4.toByte()
 
     private suspend fun installPackage(archive: ByteArray) {
         val accessor = ZipLuaGraphScriptAccessor(archive)
