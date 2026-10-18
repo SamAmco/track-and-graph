@@ -5,8 +5,8 @@
 docs:
   - file: project-map.md
     title: Project map — directory structure
-    description: Top-level directory layout of the repository — app/app, app/ui, app/data, app/build-logic, changelog-viewer, docs/, lua/, schemas/ — with notes on each folder's purpose.
-    keywords: [project-map, directory, structure, modules, app, data, ui, shared-ui, build-logic, changelog-viewer, docs, lua, schemas, layout]
+    description: Top-level repository layout and directory-specific rules, including explicit permission for Lua developer-guide edits.
+    keywords: [project-map, directory, structure, modules, app, data, ui, shared-ui, build-logic, changelog-viewer, docs, lua, developer-guide, documentation-permission, schemas, layout]
 
   - file: compose-ui-patterns.md
     title: Compose UI patterns — ViewModel binding, pure UI, preview defaults, and chip state

@@ -15,6 +15,10 @@ translations during ordinary feature work unless the user specifically asks
 for translation. A request to implement, build, test, or install a feature is
 not a request to translate its copy.
 
+Do not modify files under `docs/docs/lua/developer-guide/` unless the user
+explicitly asks for or authorizes changes to the Lua developer guide. Feature
+implementation and knowledge-base updates do not imply permission to edit it.
+
 All technical documentation is in `docs/knowledge-base/`. The correct workflow is:
 
 ### Step 1 — Grep the index for relevant keywords

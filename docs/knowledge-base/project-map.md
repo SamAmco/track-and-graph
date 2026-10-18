@@ -1,7 +1,7 @@
 ---
 title: Project map — directory structure
-description: Top-level directory layout of the Track & Graph repository, with notes on each module, build logic, and folder's purpose.
-topics: [project-structure, modules, directories, build-logic]
+description: Top-level repository layout, with notes on each module, build logic, folder purpose, and documentation permissions.
+topics: [project-structure, modules, directories, build-logic, documentation-permissions]
 ---
 
 # Project Map
@@ -41,3 +41,7 @@ lua/
 └── tools/                      # Build and validation scripts (pack-functions.lua, etc.)
 scripts/                        # Misc build/utility scripts
 ```
+
+Files under `docs/docs/lua/developer-guide/` require explicit user permission to
+change. Implementing Lua features or updating the technical knowledge base does
+not authorize edits to that user-facing developer guide.
