@@ -1,9 +1,5 @@
 local M = {}
 
---- Graph result type for a custom declarative UI.
---- @since (API level 2)
-M.TYPE = "CUSTOM"
-
 --- @since (API level 2)
 --- @enum UNIT
 M.UNIT = { PX = "PX", DP = "DP", SP = "SP" }

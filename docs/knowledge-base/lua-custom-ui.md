@@ -20,13 +20,16 @@ The custom UI path is a general declarative Lua-to-Compose boundary. Graphs are 
 A custom graph returns a descriptor with `type = "CUSTOM"`, a `data` function, and a `render` function:
 
 ```lua
+local graph = require("tng.graph")
+local ui = require("tng.ui")
+
 return {
-    type = require("tng.ui").TYPE,
+    type = graph.GRAPH_TYPE.CUSTOM,
     data = function(sources)
         return { values = read_values(sources["source"]) }
     end,
     render = function(data, context)
-        return require("tng.ui").text({ text = tostring(#data.values) })
+        return ui.text({ text = tostring(#data.values) })
     end,
 }
 ```
@@ -80,4 +83,4 @@ There is no Lua/Compose ping-pong for individual drawing operations. Lua records
 
 Initial graph execution errors already flow through `LuaGraphResult` and the normal graph error view. Failures thrown later by `render` or a retained canvas callback are converted to `LuaScriptException` and routed to the same presentation rather than silently producing an empty component. Coroutine cancellation is rethrown: constraint/content changes may cancel and restart `produceState`, and that control flow must not appear as a script failure.
 
-The worked contract example is a multi-file package under `lua/src/examples/canvas-basic-graph/`. API compatibility is declared in the `tng.ui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.
+The worked contract example is a multi-file package under `lua/src/examples/canvas-basic-graph/`. The graph result type belongs to `tng.graph`; `tng.ui` only describes the returned layout. API compatibility is declared in the `tng.graph`, `tng.ui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.

@@ -113,11 +113,12 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         val engine = uut()
         val script = """
             local canvas = require("tng.canvas")
+            local graph = require("tng.graph")
             local theme = require("tng.theme")
             local ui = require("tng.ui")
 
             return {
-                type = ui.TYPE,
+                type = graph.GRAPH_TYPE.CUSTOM,
                 data = function() return { value = 7 } end,
                 render = function(data, context)
                     return setmetatable({
