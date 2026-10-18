@@ -24,7 +24,7 @@ local function read_values(source)
 end
 
 return {
-	id = "com.samco.trackandgraph.examples.canvas-basic",
+	id = "canvas-basic",
 	version = "2.0.0",
 	title = {
 		en = "Basic canvas graph",
