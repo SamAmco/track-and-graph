@@ -15,7 +15,7 @@ import androidx.room.Entity
     tableName = "lua_graph_packages_table",
     primaryKeys = ["package_id", "version"],
 )
-internal data class LuaGraphPackage(
+internal class LuaGraphPackage(
     @ColumnInfo(name = "package_id")
     val packageId: String,
 

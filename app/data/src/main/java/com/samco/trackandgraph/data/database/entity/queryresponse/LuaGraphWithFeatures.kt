@@ -24,7 +24,7 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
 
-internal data class LuaGraphWithFeatures(
+internal class LuaGraphWithFeatures(
 
     @ColumnInfo(name = "id", index = true)
     val id: Long,
