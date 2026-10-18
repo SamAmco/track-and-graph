@@ -53,10 +53,11 @@ interface LuaEngine {
         params: LuaGraphEngineParams,
     ): LuaGraphResult
 
-    fun readLuaGraphPackageMetadata(
+    /** Executes a packaged script's entry point and exposes its returned Lua value. */
+    fun runLuaScript(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
-    ): LuaGraphPackageMetadata
+    ): LuaValueAccessor
 
     fun renderLuaGraph(
         vmLock: LuaVMLock,

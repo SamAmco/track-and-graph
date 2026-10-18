@@ -62,6 +62,8 @@ Stable component keys preserve identity across renders and become especially imp
 
 Kotlin deliberately parses the returned table in place through `LuaValueAccessor` instead of copying the entire UI tree into DTOs. Accessors use raw Lua table lookup, which avoids triggering the `__index` metatables used by API compatibility tests. Lua arrays retain one-based indexing at the accessor boundary and are converted to Kotlin lists only where the renderer needs iteration.
 
+`LuaValueAccessor` is a retained, read-only view rather than an execution capability. Plain values and tables that the script treats as immutable may be traversed after releasing the VM lock, as the Compose renderer already does. A function obtained with `asFunction()` is instead represented by an affinity-bound `LuaValueReference`; invoking it requires reacquiring a short-lived lock for that same affinity. Do not read a retained table concurrently with Lua code that may mutate it.
+
 ## Deferred Canvas Rendering
 
 A canvas cannot know its exact bounds during root UI generation. `ui.canvas` therefore stores a Lua callback rather than immediate instructions. After Compose measures that canvas:

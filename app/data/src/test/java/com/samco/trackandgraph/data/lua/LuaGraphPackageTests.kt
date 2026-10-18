@@ -12,7 +12,6 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.localisation.TranslatedString
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
@@ -73,7 +72,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
         val error = try {
             assertThrows(LuaScriptException::class.java) {
-                engine.readLuaGraphPackageMetadata(lock, accessor)
+                engine.runLuaScript(lock, accessor)
             }
         } finally {
             engine.releaseVM(lock)
@@ -104,17 +103,17 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         val engine = uut()
         val lock = engine.acquireVM()
 
-        val metadata = try {
-            engine.readLuaGraphPackageMetadata(lock, accessor)
+        val result = try {
+            engine.runLuaScript(lock, accessor)
         } finally {
             engine.releaseVM(lock)
         }
 
-        assertEquals(TranslatedString.Simple("not found"), metadata.title)
+        assertEquals("not found", result["title"]?.asString())
     }
 
     @Test
-    fun `package metadata and graph can use required modules`() = runBlocking {
+    fun `package entry point and graph can use required modules`() = runBlocking {
         val engine = uut()
         val accessor = ZipLuaGraphScriptAccessor(zip(
             "main.lua" to """
@@ -139,23 +138,16 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
             """.trimIndent(),
         ))
 
-        val metadataLock = engine.acquireVM()
-        val metadata = try {
-            engine.readLuaGraphPackageMetadata(metadataLock, accessor)
+        val scriptLock = engine.acquireVM()
+        val descriptor = try {
+            engine.runLuaScript(scriptLock, accessor)
         } finally {
-            engine.releaseVM(metadataLock)
+            engine.releaseVM(scriptLock)
         }
-        assertEquals("example.package", metadata.packageId)
-        assertEquals("1.2.3", metadata.version)
-        assertEquals(
-            TranslatedString.Translations(
-                mapOf(
-                    "en" to "Example package",
-                    "es" to "Paquete de ejemplo",
-                )
-            ),
-            metadata.title,
-        )
+        assertEquals("example.package", descriptor["id"]?.asString())
+        assertEquals("1.2.3", descriptor["version"]?.asString())
+        assertEquals("Example package", descriptor["title"]?.get("en")?.asString())
+        assertEquals("Paquete de ejemplo", descriptor["title"]?.get("es")?.asString())
 
         val graphLock = engine.acquireVM()
         val data = try {

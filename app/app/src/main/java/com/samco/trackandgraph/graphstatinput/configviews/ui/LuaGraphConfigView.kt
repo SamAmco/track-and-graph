@@ -191,8 +191,7 @@ private fun LuaGraphConfigView(
     InputSpacingLarge()
 
     packageUiData?.let {
-        val title = it.title.resolve() ?: it.packageId
-        Text(text = stringResource(R.string.lua_graph_package_installed, "$title ${it.version}"))
+        Text(text = stringResource(R.string.lua_graph_package_installed, "${it.packageId} ${it.version}"))
         InputSpacingLarge()
     }
 

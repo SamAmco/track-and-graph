@@ -65,11 +65,11 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
         } else throw LuaEngineDisabledException()
     }
 
-    override fun readLuaGraphPackageMetadata(
+    override fun runLuaScript(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
-    ): LuaGraphPackageMetadata = if (luaEngineSwitch.enabled) {
-        luaEngine.readLuaGraphPackageMetadata(vmLock, scriptAccessor)
+    ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
+        luaEngine.runLuaScript(vmLock, scriptAccessor)
     } else throw LuaEngineDisabledException()
 
     override fun renderLuaGraph(

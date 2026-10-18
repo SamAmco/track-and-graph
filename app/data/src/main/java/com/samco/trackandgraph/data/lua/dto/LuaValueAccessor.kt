@@ -16,7 +16,18 @@
  */
 package com.samco.trackandgraph.data.lua.dto
 
-/** Read-only access to the custom UI description returned by the Lua render function. */
+/**
+ * A read-only view of a Lua value retained by its originating VM.
+ *
+ * Plain values and tables that Lua treats as immutable may be traversed after the VM execution
+ * lock has been released. Access uses raw table lookup and never invokes Lua metamethods. Callers
+ * must not read a table while Lua code could be mutating that same table on another thread.
+ *
+ * Functions are different: [asFunction] returns an affinity-bound [LuaValueReference]. Invoking
+ * one requires acquiring a new execution lock for that reference's affinity and passing both the
+ * lock and reference back to [com.samco.trackandgraph.data.lua.LuaEngine]. The accessor itself
+ * must never be used as a way to invoke Lua without the originating VM's execution lock.
+ */
 interface LuaValueAccessor {
     operator fun get(key: String): LuaValueAccessor?
     operator fun get(index: Int): LuaValueAccessor?

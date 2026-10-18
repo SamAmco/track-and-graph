@@ -1,12 +1,12 @@
 ---
 title: Lua functions — app architecture and data model
-description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), configuration value types (8 types), serialization pipeline, LuaEngine execution flow with 4 modes, and Lua VM lease ownership/cancellation rules.
+description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), configuration value types (8 types), serialization pipeline, LuaEngine execution modes, and Lua VM lease ownership/cancellation rules.
 topics:
   - Functions: derived data sources using Lua; stored as Features in features_table
   - Visual node editor: FeatureNode → LuaScriptNode → OutputNode; data flows left to right
   - FunctionGraph DTO and JSON serialization via FunctionGraphSerializer (kotlinx.serialization)
   - Config value types: text, number, checkbox, enum, uint, duration (→ms), localtime (→ms), instant
-  - LuaEngine: 4 modes — runLuaFunction, runLuaFunctionGenerator, runLuaGraph, runLuaCatalogue
+  - LuaEngine execution APIs, including generic package entry-point evaluation through runLuaScript
   - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
   - Lua VM affinity, validated execution-lock ownership, and cancellation cleanup
 keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
@@ -167,11 +167,12 @@ Complete UI state with metadata
 ### LuaEngine Interface
 `app/data/.../lua/LuaEngine.kt`
 
-Four modes:
+Primary modes:
 1. `runLuaFunction()` - Parse script → metadata
 2. `runLuaFunctionGenerator()` - Execute with data → `Sequence<DataPoint>`
 3. `runLuaGraph()` - Execute graph script → render result
 4. `runLuaCatalogue()` - Parse function library
+5. `runLuaScript()` - Execute an accessor-backed entry point → read-only `LuaValueAccessor`
 
 ### Execution Flow
 
