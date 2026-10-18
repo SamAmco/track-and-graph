@@ -26,15 +26,13 @@ internal class LuaScriptResolver @Inject constructor(
     private val requireApi: RequireApiImpl,
 ) {
     fun resolveLuaScript(script: String, vmLease: VMLease): LuaValue {
-        val cleanedScript = script.cleanLuaScript()
-        return vmLease.globals.load(cleanedScript).call()
+        return vmLease.globals
+            .load(script.cleanLuaScript(), "=script", createEnvironment(vmLease))
+            .call()
     }
 
-    fun resolveLuaGraphScript(accessor: LuaGraphScriptAccessor, vmLease: VMLease): LuaValue {
-        val environment = LuaTable().apply {
-            setmetatable(LuaTable().apply { set("__index", vmLease.globals) })
-            set("_G", this)
-        }
+    fun resolveLuaScript(accessor: LuaGraphScriptAccessor, vmLease: VMLease): LuaValue {
+        val environment = createEnvironment(vmLease)
         environment[RequireApiImpl.REQUIRE] = requireApi.createRequireFunction(
             globals = vmLease.globals,
             environment = environment,
@@ -43,6 +41,11 @@ internal class LuaScriptResolver @Inject constructor(
         return vmLease.globals
             .load(accessor.mainScript().cleanLuaScript(), "@main.lua", environment)
             .call()
+    }
+
+    private fun createEnvironment(vmLease: VMLease) = LuaTable().apply {
+        setmetatable(LuaTable().apply { set("__index", vmLease.globals) })
+        set("_G", this)
     }
 
     private fun String.cleanLuaScript(): String {

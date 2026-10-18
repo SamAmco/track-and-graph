@@ -68,7 +68,7 @@ internal class LuaEngineImpl @Inject constructor(
     ): LuaGraphResult {
         val vmLease = vmLock.requireActiveLease()
         return try {
-            val resolvedScript = luaScriptResolver.resolveLuaGraphScript(scriptAccessor, vmLease)
+            val resolvedScript = luaScriptResolver.resolveLuaScript(scriptAccessor, vmLease)
             luaGraphScriptAdapter.process(resolvedScript, params, vmLock.affinity)
         } catch (luaError: LuaError) {
             val luaScriptException = LuaScriptException(
@@ -88,7 +88,7 @@ internal class LuaEngineImpl @Inject constructor(
         val vmLease = vmLock.requireActiveLease()
         return try {
             LuaValueAccessorImpl(
-                luaScriptResolver.resolveLuaGraphScript(scriptAccessor, vmLease),
+                luaScriptResolver.resolveLuaScript(scriptAccessor, vmLease),
                 vmLock.affinity,
             )
         } catch (luaError: LuaError) {

@@ -164,6 +164,14 @@ Complete UI state with metadata
 
 ## Runtime Execution
 
+Every user script executes in a fresh environment table whose `__index` falls back to the pooled
+VM's globals and whose `_G` points back to that fresh table. Ordinary global assignments therefore
+cannot leak into later work on the same VM, while standard Lua functions and installed `tng.*`
+modules remain available. Functions returned by the script retain that environment, so intentional
+state in locals or execution-local globals survives for the lifetime of the returned closure.
+Accessor-backed package entry points additionally install a package-aware `require` in the fresh
+environment; plain scripts inherit the built-in-module `require` from the VM globals.
+
 ### LuaEngine Interface
 `app/data/.../lua/LuaEngine.kt`
 
