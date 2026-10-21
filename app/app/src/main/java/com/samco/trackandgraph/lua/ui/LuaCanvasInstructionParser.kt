@@ -370,12 +370,7 @@ internal object LuaCanvasInstructionParser {
         textMeasurer: TextMeasurer,
     ) {
         val requestedSize = instruction["size"]?.let(::size)
-        val constraints = requestedSize?.let {
-            Constraints(
-                maxWidth = it.width.toInt().coerceAtLeast(0),
-                maxHeight = it.height.toInt().coerceAtLeast(0),
-            )
-        } ?: Constraints()
+        val constraints = textConstraints(requestedSize)
         val baseStyle = TextStyle(
             fontSize = instruction["font_size"]?.asDouble()?.toFloat()?.toSp()
                 ?: TextStyle.Default.fontSize,
@@ -721,6 +716,16 @@ internal object LuaCanvasInstructionParser {
     private fun LuaValueAccessor.float(key: String, default: Float = 0f) =
         this[key]?.asDouble()?.toFloat() ?: default
 
+}
+
+internal fun textConstraints(requestedSize: Size?): Constraints {
+    if (requestedSize == null) return Constraints()
+    val width = requestedSize.width.toInt().coerceAtLeast(0)
+    return Constraints(
+        minWidth = width,
+        maxWidth = width,
+        maxHeight = requestedSize.height.toInt().coerceAtLeast(0),
+    )
 }
 
 internal fun verticalTextOffset(

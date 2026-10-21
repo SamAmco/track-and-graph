@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.DrawTransform
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Constraints
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -53,6 +54,17 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class LuaCanvasInstructionParserTest {
+    @Test
+    fun `uses requested text width as alignment bounds without forcing height`() {
+        val constraints = textConstraints(Size(40f, 20f))
+
+        assertEquals(40, constraints.minWidth)
+        assertEquals(40, constraints.maxWidth)
+        assertEquals(0, constraints.minHeight)
+        assertEquals(20, constraints.maxHeight)
+        assertEquals(Constraints(), textConstraints(null))
+    }
+
     @Test
     fun `vertically aligns measured text within its requested bounds`() {
         assertEquals(0f, verticalTextOffset(30f, 10, "top"), 0f)
