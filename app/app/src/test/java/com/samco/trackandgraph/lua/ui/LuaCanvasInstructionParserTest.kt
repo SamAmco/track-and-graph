@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.ui.dataVisColorList
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -71,7 +72,7 @@ class LuaCanvasInstructionParserTest {
                 "stroke_width" to 5.0, "cap" to "round", "alpha" to 0.5,
             ),
             mapOf(
-                "type" to "CIRCLE", "color" to "#FF0000",
+                "type" to "CIRCLE", "color" to 7.0,
                 "center" to mapOf("x" to 6.0, "y" to 7.0), "radius" to 8.0,
             ),
         ))
@@ -83,7 +84,7 @@ class LuaCanvasInstructionParserTest {
             eq(StrokeCap.Round), isNull(), eq(0.5f), isNull(), eq(BlendMode.SrcOver),
         )
         verify(scope).drawCircle(
-            eq(Color.Red), eq(8f), eq(Offset(6f, 7f)), eq(1f), eq(Fill),
+            eq(dataVisColorList[7]), eq(8f), eq(Offset(6f, 7f)), eq(1f), eq(Fill),
             isNull(), eq(BlendMode.SrcOver),
         )
     }

@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,7 +60,10 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.ui.theming.TngColors
+import com.samco.trackandgraph.ui.theming.TngTypography
 import com.samco.trackandgraph.ui.theming.tngColors
+import com.samco.trackandgraph.ui.theming.tngTypography
 import kotlinx.coroutines.CancellationException
 
 private val LocalLuaUiErrorHandler = staticCompositionLocalOf<(Throwable) -> Unit> {
@@ -167,12 +172,18 @@ private fun LuaText(node: LuaValueAccessor, modifier: Modifier) {
     Text(
         text = node["text"]?.asString().orEmpty(),
         modifier = modifier,
-        color = luaColor(node["color"]?.asString()) ?: Color.Unspecified,
+        color = luaColor(node["color"]) ?: Color.Unspecified,
+        style = luaTextStyle(
+            node["style"]?.asString(),
+            MaterialTheme.tngTypography,
+            LocalTextStyle.current,
+        ),
         fontSize = textDimension(node["font_size"]),
         fontWeight = when (node["font_weight"]?.asString()) {
+            "NORMAL" -> FontWeight.Normal
             "MEDIUM" -> FontWeight.Medium
             "BOLD" -> FontWeight.Bold
-            else -> FontWeight.Normal
+            else -> null
         },
         textAlign = when (node["text_align"]?.asString()) {
             "CENTER" -> TextAlign.Center
@@ -184,6 +195,30 @@ private fun LuaText(node: LuaValueAccessor, modifier: Modifier) {
             TextOverflow.Ellipsis
         } else TextOverflow.Clip,
     )
+}
+
+internal fun luaTextStyle(
+    token: String?,
+    typography: TngTypography,
+    fallback: TextStyle,
+): TextStyle = when (token) {
+    "TEXT_STYLE_DISPLAY_LARGE" -> typography.materialTypography.displayLarge
+    "TEXT_STYLE_DISPLAY_MEDIUM" -> typography.materialTypography.displayMedium
+    "TEXT_STYLE_DISPLAY_SMALL" -> typography.materialTypography.displaySmall
+    "TEXT_STYLE_HEADLINE_LARGE" -> typography.materialTypography.headlineLarge
+    "TEXT_STYLE_HEADLINE_MEDIUM" -> typography.materialTypography.headlineMedium
+    "TEXT_STYLE_HEADLINE_SMALL" -> typography.materialTypography.headlineSmall
+    "TEXT_STYLE_TITLE_LARGE" -> typography.materialTypography.titleLarge
+    "TEXT_STYLE_TITLE_MEDIUM" -> typography.materialTypography.titleMedium
+    "TEXT_STYLE_TITLE_SMALL" -> typography.materialTypography.titleSmall
+    "TEXT_STYLE_BODY_LARGE" -> typography.materialTypography.bodyLarge
+    "TEXT_STYLE_BODY_MEDIUM" -> typography.materialTypography.bodyMedium
+    "TEXT_STYLE_BODY_SMALL" -> typography.materialTypography.bodySmall
+    "TEXT_STYLE_LABEL_LARGE" -> typography.materialTypography.labelLarge
+    "TEXT_STYLE_LABEL_MEDIUM" -> typography.materialTypography.labelMedium
+    "TEXT_STYLE_LABEL_SMALL" -> typography.materialTypography.labelSmall
+    "TEXT_STYLE_CODE" -> typography.code
+    else -> fallback
 }
 
 @Composable
@@ -200,8 +235,8 @@ private fun textDimension(value: LuaValueAccessor?): TextUnit {
 private fun LuaSurface(node: LuaValueAccessor, content: LuaUiContent, modifier: Modifier) {
     Surface(
         modifier = modifier,
-        color = luaColor(node["color"]?.asString()) ?: MaterialTheme.colorScheme.surface,
-        contentColor = luaColor(node["content_color"]?.asString()) ?: MaterialTheme.colorScheme.onSurface,
+        color = luaColor(node["color"]) ?: MaterialTheme.colorScheme.surface,
+        contentColor = luaColor(node["content_color"]) ?: MaterialTheme.colorScheme.onSurface,
         shape = LuaUiModifierParser.shape(node["shape"]?.asString()),
         tonalElevation = LuaUiModifierParser.dimension(node["tonal_elevation"]) ?: 0.dp,
         shadowElevation = LuaUiModifierParser.dimension(node["shadow_elevation"]) ?: 0.dp,
@@ -243,7 +278,7 @@ private fun LuaCanvas(node: LuaValueAccessor, content: LuaUiContent, modifier: M
             )
         }
     }
-    val colors = luaThemeColors()
+    val colors = luaThemeColors(MaterialTheme.tngColors)
     Canvas(modifier.onSizeChanged { size = it }) {
         result?.get("instructions")?.let {
             LuaCanvasInstructionParser.draw(this, it, colors, textMeasurer)
@@ -314,10 +349,10 @@ internal fun boxAlignment(value: String?) = when (value) {
 }
 
 @Composable
-internal fun luaColor(value: String?): Color? = value?.let { luaThemeColors()[it] ?: parseColor(it) }
+internal fun luaColor(value: LuaValueAccessor?): Color? =
+    resolveLuaColor(value, luaThemeColors(MaterialTheme.tngColors))
 
-@Composable
-private fun luaThemeColors(): Map<String, Color> = MaterialTheme.tngColors.let {
+internal fun luaThemeColors(colors: TngColors): Map<String, Color> = colors.let {
     mapOf(
         "THEME_PRIMARY" to it.primary, "THEME_ON_PRIMARY" to it.onPrimary,
         "THEME_SECONDARY" to it.secondary, "THEME_ON_SECONDARY" to it.onSecondary,
@@ -329,8 +364,3 @@ private fun luaThemeColors(): Map<String, Color> = MaterialTheme.tngColors.let {
         "THEME_GOOD" to it.goodColor,
     )
 }
-
-private fun parseColor(value: String): Color? = runCatching {
-    val hex = value.removePrefix("#")
-    Color((if (hex.length == 6) "FF$hex" else hex).toLong(16))
-}.getOrNull()

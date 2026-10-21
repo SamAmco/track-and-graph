@@ -108,6 +108,7 @@ M.BoxParams = {}
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
 --- @field text string: Text to display.
+--- @field style? string: Text style token from `tng.theme.text_style`.
 --- @field color? Color|string: Raw or theme color token.
 --- @field font_size? Dimension: Text size, normally expressed in sp.
 --- @field font_weight? FONT_WEIGHT
@@ -290,6 +291,7 @@ M.text = function(params)
 	assert(type(params.text) == "string", "text must be a string")
 	local result = component(M.COMPONENT_TYPE.TEXT, params)
 	result.text = params.text
+	result.style = params.style
 	result.color = params.color
 	result.font_size = params.font_size
 	result.font_weight = params.font_weight

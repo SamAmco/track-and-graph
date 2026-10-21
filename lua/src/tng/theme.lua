@@ -25,6 +25,28 @@ M.color = {
 	good = theme_color("GOOD"),
 }
 
+--- Track & Graph text styles, resolved by the app at render time.
+--- Individual text properties supplied to `ui.text` override the selected style.
+--- @since (API level 2)
+M.text_style = {
+	display_large = "TEXT_STYLE_DISPLAY_LARGE",
+	display_medium = "TEXT_STYLE_DISPLAY_MEDIUM",
+	display_small = "TEXT_STYLE_DISPLAY_SMALL",
+	headline_large = "TEXT_STYLE_HEADLINE_LARGE",
+	headline_medium = "TEXT_STYLE_HEADLINE_MEDIUM",
+	headline_small = "TEXT_STYLE_HEADLINE_SMALL",
+	title_large = "TEXT_STYLE_TITLE_LARGE",
+	title_medium = "TEXT_STYLE_TITLE_MEDIUM",
+	title_small = "TEXT_STYLE_TITLE_SMALL",
+	body_large = "TEXT_STYLE_BODY_LARGE",
+	body_medium = "TEXT_STYLE_BODY_MEDIUM",
+	body_small = "TEXT_STYLE_BODY_SMALL",
+	label_large = "TEXT_STYLE_LABEL_LARGE",
+	label_medium = "TEXT_STYLE_LABEL_MEDIUM",
+	label_small = "TEXT_STYLE_LABEL_SMALL",
+	code = "TEXT_STYLE_CODE",
+}
+
 --- Track & Graph spacing tokens: 4dp, 5dp, 10dp, 20dp, and 50dp.
 --- @since (API level 2)
 M.spacing = {

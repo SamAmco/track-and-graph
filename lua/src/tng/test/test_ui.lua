@@ -66,6 +66,7 @@ test("layout components retain keys, layout policies, and surface styling", func
 				ui.text({
 					key = "title",
 					text = "Calendar",
+					style = theme.text_style.headline_small,
 					font_size = ui.sp(20),
 					font_weight = ui.FONT_WEIGHT.BOLD,
 					text_align = ui.TEXT_ALIGN.CENTER,
@@ -94,6 +95,7 @@ test("layout components retain keys, layout policies, and surface styling", func
 	assert(tree.child.arrangement == ui.ARRANGEMENT.CENTER)
 	assert(tree.child.alignment == ui.ALIGNMENT.STRETCH)
 	assert(tree.child.children[1].key == "title")
+	assert(tree.child.children[1].style == "TEXT_STYLE_HEADLINE_SMALL")
 	assert(tree.child.children[2].type == ui.COMPONENT_TYPE.ROW)
 	assert(tree.child.children[2].children[1].type == ui.COMPONENT_TYPE.BOX)
 	assert(tree.child.children[2].children[1].alignment == ui.BOX_ALIGNMENT.CENTER)

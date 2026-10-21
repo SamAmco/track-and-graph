@@ -554,7 +554,7 @@ internal object LuaCanvasInstructionParser {
         colors: Map<String, Color>,
     ): PaintSource? = instruction["brush"]?.let { brush(it, colors) }
         ?.let(PaintSource::BrushValue)
-        ?: color(instruction["color"]?.asString(), colors)?.let(PaintSource::ColorValue)
+        ?: resolveLuaColor(instruction["color"], colors)?.let(PaintSource::ColorValue)
 
     private fun DrawScope.brush(value: LuaValueAccessor, colors: Map<String, Color>): Brush? {
         val colorStops = gradientStops(value["color_stops"] ?: value["stops"], colors)
@@ -615,14 +615,14 @@ internal object LuaCanvasInstructionParser {
         if (value == null) return null
         return (1..(value.arraySize ?: 0)).mapNotNull { index ->
             val stop = value[index] ?: return@mapNotNull null
-            val color = color(stop["color"]?.asString(), colors) ?: return@mapNotNull null
+            val color = resolveLuaColor(stop["color"], colors) ?: return@mapNotNull null
             stop.float("offset") to color
         }.toTypedArray()
     }
 
     private fun colors(value: LuaValueAccessor?, colors: Map<String, Color>): List<Color> {
         if (value == null) return emptyList()
-        return (1..(value.arraySize ?: 0)).mapNotNull { color(value[it]?.asString(), colors) }
+        return (1..(value.arraySize ?: 0)).mapNotNull { resolveLuaColor(value[it], colors) }
     }
 
     private fun tileMode(value: String?) = when (value) {
@@ -636,15 +636,15 @@ internal object LuaCanvasInstructionParser {
         value: LuaValueAccessor?,
         colors: Map<String, Color>,
     ): ColorFilter? = when (value?.get("type")?.asString()) {
-        "TINT" -> color(value["color"]?.asString(), colors)?.let {
+        "TINT" -> resolveLuaColor(value["color"], colors)?.let {
             ColorFilter.tint(it, blendMode(value["blend_mode"]?.asString(), BlendMode.SrcIn))
         }
         "COLOR_MATRIX" -> floatArray(value["values"], 20)?.let {
             ColorFilter.colorMatrix(ColorMatrix(it))
         }
         "LIGHTING" -> {
-            val multiply = color(value["multiply"]?.asString(), colors)
-            val add = color(value["add"]?.asString(), colors)
+            val multiply = resolveLuaColor(value["multiply"], colors)
+            val add = resolveLuaColor(value["add"], colors)
             if (multiply != null && add != null) ColorFilter.lighting(multiply, add) else null
         }
         else -> null
@@ -721,12 +721,6 @@ internal object LuaCanvasInstructionParser {
     private fun LuaValueAccessor.float(key: String, default: Float = 0f) =
         this[key]?.asDouble()?.toFloat() ?: default
 
-    private fun color(value: String?, colors: Map<String, Color>): Color? = value?.let {
-        colors[it] ?: runCatching {
-            val hex = it.removePrefix("#")
-            Color((if (hex.length == 6) "FF$hex" else hex).toLong(16))
-        }.getOrNull()
-    }
 }
 
 internal fun verticalTextOffset(

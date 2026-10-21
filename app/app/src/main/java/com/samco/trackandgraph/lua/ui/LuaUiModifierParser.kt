@@ -63,10 +63,10 @@ internal object LuaUiModifierParser {
                 "MAX_HEIGHT" -> result.heightIn(max = dimension(item["value"]) ?: Dp.Unspecified)
                 "ASPECT_RATIO" -> result.aspectRatio(item["value"]?.asDouble()?.toFloat() ?: 1f)
                 "PADDING" -> padding(result, item)
-                "BACKGROUND" -> luaColor(item["color"]?.asString())?.let {
+                "BACKGROUND" -> luaColor(item["color"])?.let {
                     result.background(it, shape(item["shape"]?.asString()))
                 } ?: result
-                "BORDER" -> luaColor(item["color"]?.asString())?.let {
+                "BORDER" -> luaColor(item["color"])?.let {
                     result.border(dimension(item["width"]) ?: 0.dp, it, shape(item["shape"]?.asString()))
                 } ?: result
                 "CLIP" -> result.clip(shape(item["shape"]?.asString()))
