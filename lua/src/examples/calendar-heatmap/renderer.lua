@@ -198,16 +198,17 @@ end
 
 return function(context, state, data)
 	local available_width_dp = context.constraints.max_width / context.density
-	local wide_layout = available_width_dp >= wide_layout_min_width_dp
+	local layout = state and state.layout or "AUTO"
+	local wide_layout = layout == "WIDE"
+		or (layout == "AUTO" and available_width_dp >= wide_layout_min_width_dp)
+	local children = { calendar(data, wide_layout) }
+	if state == nil or state.show_legend ~= false then table.insert(children, legend(data)) end
 	return {
 		ui = ui.column({
 			key = "calendar_heatmap",
 			spacing = theme.spacing.small,
 			modifier = ui.modifier(ui.fill_width()),
-			children = {
-				calendar(data, wide_layout),
-				legend(data),
-			},
+			children = children,
 		}),
 		state = state,
 	}

@@ -1,6 +1,5 @@
 local core = require("tng.core")
 
-local weeks = 53
 local days_per_week = 7
 
 local data_vis_color_count = 12
@@ -36,7 +35,7 @@ local function ordered_sources(sources)
 	return result
 end
 
-local function calendar_days(today)
+local function calendar_days(today, weeks)
 	local start = core.shift(
 		start_of_day(today),
 		core.PERIOD.DAY,
@@ -113,9 +112,11 @@ local function read_source(source, source_index, index_by_date, start)
 	}
 end
 
-return function(sources)
+return function(sources, state)
+	local weeks = state and state.weeks or 53
 	local today = core.date()
-	local days, index_by_date, weekday_labels, month_labels, start, today_index = calendar_days(today)
+	local days, index_by_date, weekday_labels, month_labels, start, today_index =
+		calendar_days(today, weeks)
 	local source_data = {}
 
 	for index, source in ipairs(ordered_sources(sources)) do
