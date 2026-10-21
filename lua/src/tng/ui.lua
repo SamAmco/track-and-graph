@@ -8,6 +8,7 @@ M.UNIT = { PX = "PX", DP = "DP", SP = "SP" }
 --- @enum COMPONENT_TYPE
 M.COMPONENT_TYPE = {
 	ROW = "ROW",
+	FLOW_ROW = "FLOW_ROW",
 	COLUMN = "COLUMN",
 	BOX = "BOX",
 	SPACER = "SPACER",
@@ -22,6 +23,7 @@ M.MODIFIER_TYPE = {
 	HEIGHT = "HEIGHT",
 	FILL_WIDTH = "FILL_WIDTH",
 	FILL_HEIGHT = "FILL_HEIGHT",
+	FILL_MAX_ROW_HEIGHT = "FILL_MAX_ROW_HEIGHT",
 	WRAP_WIDTH = "WRAP_WIDTH",
 	WRAP_HEIGHT = "WRAP_HEIGHT",
 	WEIGHT = "WEIGHT",
@@ -94,6 +96,20 @@ M.Dimension = {}
 --- @field arrangement? ARRANGEMENT: Main-axis arrangement.
 --- @field alignment? ALIGNMENT: Cross-axis alignment.
 M.LayoutParams = {}
+
+--- @since (API level 2)
+--- @class FlowRowParams
+--- @field key? string: Stable identity across renders.
+--- @field modifier? table[]: Ordered modifiers.
+--- @field children? table[]: Child components in display order.
+--- @field horizontal_arrangement? ARRANGEMENT
+--- @field vertical_arrangement? ARRANGEMENT
+--- @field horizontal_spacing? Dimension|string: Space between items in a row.
+--- @field vertical_spacing? Dimension|string: Space between rows.
+--- @field item_vertical_alignment? ALIGNMENT
+--- @field max_items_in_each_row? integer
+--- @field max_lines? integer
+M.FlowRowParams = {}
 
 --- @since (API level 2)
 --- @class BoxParams
@@ -176,6 +192,13 @@ end
 
 M.fill_height = function(fraction)
 	return { type = M.MODIFIER_TYPE.FILL_HEIGHT, fraction = fraction or 1 }
+end
+
+--- Makes a FlowRow child fill a fraction of the tallest item in its row.
+M.fill_max_row_height = function(fraction)
+	fraction = fraction or 1
+	assert(type(fraction) == "number" and fraction >= 0 and fraction <= 1, "fraction must be between 0 and 1")
+	return { type = M.MODIFIER_TYPE.FILL_MAX_ROW_HEIGHT, fraction = fraction }
 end
 
 M.wrap_width = function()
@@ -268,6 +291,36 @@ end
 
 M.row = function(params)
 	return layout(M.COMPONENT_TYPE.ROW, params)
+end
+
+--- Creates a wrapping row. Items flow onto a new row when horizontal space is exhausted.
+--- @param params FlowRowParams
+M.flow_row = function(params)
+	params = params or {}
+	if params.max_items_in_each_row ~= nil then
+		assert(
+			type(params.max_items_in_each_row) == "number"
+				and params.max_items_in_each_row > 0
+				and params.max_items_in_each_row % 1 == 0,
+			"max_items_in_each_row must be a positive integer"
+		)
+	end
+	if params.max_lines ~= nil then
+		assert(
+			type(params.max_lines) == "number" and params.max_lines > 0 and params.max_lines % 1 == 0,
+			"max_lines must be a positive integer"
+		)
+	end
+	local result = component(M.COMPONENT_TYPE.FLOW_ROW, params)
+	result.children = params.children or {}
+	result.horizontal_arrangement = params.horizontal_arrangement or M.ARRANGEMENT.START
+	result.vertical_arrangement = params.vertical_arrangement or M.ARRANGEMENT.START
+	result.horizontal_spacing = params.horizontal_spacing or M.dp(0)
+	result.vertical_spacing = params.vertical_spacing or M.dp(0)
+	result.item_vertical_alignment = params.item_vertical_alignment or M.ALIGNMENT.START
+	result.max_items_in_each_row = params.max_items_in_each_row
+	result.max_lines = params.max_lines
+	return result
 end
 
 M.column = function(params)

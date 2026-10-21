@@ -6,6 +6,7 @@ return {
 
 	COMPONENT_TYPE = 2,
 	["COMPONENT_TYPE.ROW"] = 2,
+	["COMPONENT_TYPE.FLOW_ROW"] = 2,
 	["COMPONENT_TYPE.COLUMN"] = 2,
 	["COMPONENT_TYPE.BOX"] = 2,
 	["COMPONENT_TYPE.SPACER"] = 2,
@@ -17,6 +18,7 @@ return {
 	["MODIFIER_TYPE.HEIGHT"] = 2,
 	["MODIFIER_TYPE.FILL_WIDTH"] = 2,
 	["MODIFIER_TYPE.FILL_HEIGHT"] = 2,
+	["MODIFIER_TYPE.FILL_MAX_ROW_HEIGHT"] = 2,
 	["MODIFIER_TYPE.WRAP_WIDTH"] = 2,
 	["MODIFIER_TYPE.WRAP_HEIGHT"] = 2,
 	["MODIFIER_TYPE.WEIGHT"] = 2,
@@ -73,6 +75,7 @@ return {
 
 	Dimension = 2,
 	LayoutParams = 2,
+	FlowRowParams = 2,
 	BoxParams = 2,
 	TextParams = 2,
 	SurfaceParams = 2,
@@ -86,6 +89,7 @@ return {
 	height = 2,
 	fill_width = 2,
 	fill_height = 2,
+	fill_max_row_height = 2,
 	wrap_width = 2,
 	wrap_height = 2,
 	weight = 2,
@@ -102,6 +106,7 @@ return {
 	align = 2,
 
 	row = 2,
+	flow_row = 2,
 	column = 2,
 	box = 2,
 	spacer = 2,

@@ -20,6 +20,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -89,6 +91,24 @@ internal object LuaUiModifierParser {
             "STRETCH" -> result.fillMaxHeight()
             else -> result
         }
+    }
+
+    @OptIn(ExperimentalLayoutApi::class)
+    fun flowRowChild(scope: FlowRowScope, node: LuaValueAccessor): Modifier = with(scope) {
+        var result: Modifier = Modifier
+        entry(node, "WEIGHT")?.let {
+            result = result.weight(it["value"]?.asDouble()?.toFloat() ?: 1f, it["fill"]?.asBoolean() ?: true)
+        }
+        when (entry(node, "ALIGN")?.get("value")?.asString()) {
+            "START" -> result = result.align(Alignment.Top)
+            "CENTER" -> result = result.align(Alignment.CenterVertically)
+            "END" -> result = result.align(Alignment.Bottom)
+            "STRETCH" -> result = result.fillMaxRowHeight()
+        }
+        entry(node, "FILL_MAX_ROW_HEIGHT")?.let {
+            result = result.fillMaxRowHeight(it["fraction"]?.asDouble()?.toFloat() ?: 1f)
+        }
+        result
     }
 
     fun columnChild(scope: ColumnScope, node: LuaValueAccessor): Modifier = with(scope) {

@@ -22,8 +22,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -123,6 +126,14 @@ private fun LuaNode(node: LuaValueAccessor, content: LuaUiContent, parentModifie
                 horizontalArrangement = horizontalArrangement(node),
                 verticalAlignment = verticalAlignment(node["alignment"]?.asString()),
             ) { LuaRowChildren(node["children"], node["alignment"]?.asString(), content) }
+            "FLOW_ROW" -> FlowRow(
+                modifier = modifier,
+                horizontalArrangement = flowHorizontalArrangement(node),
+                verticalArrangement = flowVerticalArrangement(node),
+                itemVerticalAlignment = verticalAlignment(node["item_vertical_alignment"]?.asString()),
+                maxItemsInEachRow = node["max_items_in_each_row"]?.asDouble()?.toInt() ?: Int.MAX_VALUE,
+                maxLines = node["max_lines"]?.asDouble()?.toInt() ?: Int.MAX_VALUE,
+            ) { LuaFlowRowChildren(node["children"], content) }
             "COLUMN" -> Column(
                 modifier = modifier,
                 verticalArrangement = verticalArrangement(node),
@@ -138,6 +149,17 @@ private fun LuaNode(node: LuaValueAccessor, content: LuaUiContent, parentModifie
             "SURFACE" -> LuaSurface(node, content, modifier)
             "CANVAS" -> LuaCanvas(node, content, modifier)
         }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FlowRowScope.LuaFlowRowChildren(
+    children: LuaValueAccessor?,
+    content: LuaUiContent,
+) {
+    children.toList().forEach {
+        LuaNode(it, content, LuaUiModifierParser.flowRowChild(this, it))
     }
 }
 
@@ -299,14 +321,38 @@ private fun horizontalArrangement(node: LuaValueAccessor): Arrangement.Horizonta
     LuaUiModifierParser.dimension(node["spacing"])?.let {
         if (it > 0.dp) return Arrangement.spacedBy(it)
     }
-    return when (node["arrangement"]?.asString()) {
-        "CENTER" -> Arrangement.Center
-        "END" -> Arrangement.End
-        "SPACE_BETWEEN" -> Arrangement.SpaceBetween
-        "SPACE_AROUND" -> Arrangement.SpaceAround
-        "SPACE_EVENLY" -> Arrangement.SpaceEvenly
-        else -> Arrangement.Start
+    return horizontalArrangement(node["arrangement"]?.asString())
+}
+
+@Composable
+private fun flowHorizontalArrangement(node: LuaValueAccessor): Arrangement.Horizontal {
+    val arrangement = node["horizontal_arrangement"]?.asString()
+    val spacing = LuaUiModifierParser.dimension(node["horizontal_spacing"])
+    if (spacing != null && spacing > 0.dp && arrangement !in spaceDistributionArrangements) {
+        return Arrangement.spacedBy(spacing, horizontalAlignment(arrangement))
     }
+    return horizontalArrangement(arrangement)
+}
+
+@Composable
+private fun flowVerticalArrangement(node: LuaValueAccessor): Arrangement.Vertical {
+    val arrangement = node["vertical_arrangement"]?.asString()
+    val spacing = LuaUiModifierParser.dimension(node["vertical_spacing"])
+    if (spacing != null && spacing > 0.dp && arrangement !in spaceDistributionArrangements) {
+        return Arrangement.spacedBy(spacing, verticalAlignment(arrangement))
+    }
+    return verticalArrangement(arrangement)
+}
+
+private val spaceDistributionArrangements = setOf("SPACE_BETWEEN", "SPACE_AROUND", "SPACE_EVENLY")
+
+private fun horizontalArrangement(value: String?): Arrangement.Horizontal = when (value) {
+    "CENTER" -> Arrangement.Center
+    "END" -> Arrangement.End
+    "SPACE_BETWEEN" -> Arrangement.SpaceBetween
+    "SPACE_AROUND" -> Arrangement.SpaceAround
+    "SPACE_EVENLY" -> Arrangement.SpaceEvenly
+    else -> Arrangement.Start
 }
 
 @Composable
@@ -314,14 +360,16 @@ private fun verticalArrangement(node: LuaValueAccessor): Arrangement.Vertical {
     LuaUiModifierParser.dimension(node["spacing"])?.let {
         if (it > 0.dp) return Arrangement.spacedBy(it)
     }
-    return when (node["arrangement"]?.asString()) {
-        "CENTER" -> Arrangement.Center
-        "END" -> Arrangement.Bottom
-        "SPACE_BETWEEN" -> Arrangement.SpaceBetween
-        "SPACE_AROUND" -> Arrangement.SpaceAround
-        "SPACE_EVENLY" -> Arrangement.SpaceEvenly
-        else -> Arrangement.Top
-    }
+    return verticalArrangement(node["arrangement"]?.asString())
+}
+
+private fun verticalArrangement(value: String?): Arrangement.Vertical = when (value) {
+    "CENTER" -> Arrangement.Center
+    "END" -> Arrangement.Bottom
+    "SPACE_BETWEEN" -> Arrangement.SpaceBetween
+    "SPACE_AROUND" -> Arrangement.SpaceAround
+    "SPACE_EVENLY" -> Arrangement.SpaceEvenly
+    else -> Arrangement.Top
 }
 
 private fun verticalAlignment(value: String?) = when (value) {

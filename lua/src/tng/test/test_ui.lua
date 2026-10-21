@@ -22,6 +22,10 @@ test("nested UI constants are available through the API level gate", function()
 	local gated = api_gate.gate(ui, spec)
 
 	assert(gated.BOX_ALIGNMENT.BOTTOM_END == "BOTTOM_END")
+	assert(gated.COMPONENT_TYPE.FLOW_ROW == "FLOW_ROW")
+	assert(gated.MODIFIER_TYPE.FILL_MAX_ROW_HEIGHT == "FILL_MAX_ROW_HEIGHT")
+	assert(gated.fill_max_row_height(0.5).fraction == 0.5)
+	assert(gated.flow_row({}).type == "FLOW_ROW")
 	api_gate.validate(2)
 end)
 
@@ -48,6 +52,37 @@ test("modifier order and values are preserved", function()
 	assert(modifiers[7].shape == "SHAPE_MEDIUM")
 	assert(modifiers[8].value.value == 4)
 	assert(modifiers[9].value == ui.ALIGNMENT.CENTER)
+end)
+
+test("flow row preserves wrapping policy and child modifiers", function()
+	local flow = ui.flow_row({
+		key = "legend",
+		horizontal_arrangement = ui.ARRANGEMENT.CENTER,
+		vertical_arrangement = ui.ARRANGEMENT.SPACE_BETWEEN,
+		horizontal_spacing = ui.dp(4),
+		vertical_spacing = theme.spacing.small,
+		item_vertical_alignment = ui.ALIGNMENT.CENTER,
+		max_items_in_each_row = 3,
+		max_lines = 2,
+		children = {
+			ui.text({
+				text = "Item",
+				modifier = ui.modifier(ui.weight(1), ui.fill_max_row_height(0.5)),
+			}),
+		},
+	})
+
+	assert(flow.type == ui.COMPONENT_TYPE.FLOW_ROW)
+	assert(flow.key == "legend")
+	assert(flow.horizontal_arrangement == ui.ARRANGEMENT.CENTER)
+	assert(flow.vertical_arrangement == ui.ARRANGEMENT.SPACE_BETWEEN)
+	assert(flow.horizontal_spacing.value == 4)
+	assert(flow.vertical_spacing == theme.spacing.small)
+	assert(flow.item_vertical_alignment == ui.ALIGNMENT.CENTER)
+	assert(flow.max_items_in_each_row == 3)
+	assert(flow.max_lines == 2)
+	assert(flow.children[1].modifier[2].type == ui.MODIFIER_TYPE.FILL_MAX_ROW_HEIGHT)
+	assert(flow.children[1].modifier[2].fraction == 0.5)
 end)
 
 test("layout components retain keys, layout policies, and surface styling", function()
