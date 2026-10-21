@@ -1,6 +1,6 @@
 ---
 title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
-description: Custom graph data/render split, opaque affinity-bound Lua values, Lua UI context, declarative components and modifiers, deferred Canvas instruction recording, theme tokens, runtime error handling, and compatibility boundaries.
+description: Custom graph data/render split, opaque affinity-bound Lua values, Lua UI context, declarative components and modifiers, deferred Canvas instruction recording and unit conversion, parser testing boundaries, theme tokens, runtime error handling, and compatibility boundaries.
 topics:
   - CUSTOM graph descriptor separates data preparation from view-dependent rendering
   - Lua values and callbacks remain opaque and bound to their originating VM affinity
@@ -8,7 +8,7 @@ topics:
   - tng.ui describes layout; tng.canvas records instructions for later Compose DrawScope replay
   - Theme values use stable tokens resolved by the active TnG Compose theme
   - Render and callback failures use the existing graph error presentation
-keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, Compose, constraints, density, theme, modifier, callback, state, error]
+keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, density, font-scale, sp, Path, pathFactory, testing, vertical-align, theme, modifier, callback, state, error]
 ---
 
 # Lua Custom UI
@@ -72,7 +72,7 @@ Kotlin deliberately parses the returned table in place through `LuaValueAccessor
 A canvas cannot know its exact bounds during root UI generation. `ui.canvas` therefore stores a Lua callback rather than immediate instructions. After Compose measures that canvas:
 
 1. Kotlin calls the retained callback with `context.bounds.width` and `height` in pixels.
-2. `tng.canvas` creates a Lua `CanvasDrawScope` containing the exact `size` and `center`. Bare numbers are physical pixels; its `dp` and `sp` helpers convert those units to numeric physical pixels for canvas arithmetic. The host supplies Compose density plus a font-scale conversion table so `sp` follows Android's non-linear accessibility scaling rather than assuming `density * fontScale`.
+2. `tng.canvas` creates a Lua `CanvasDrawScope` containing the exact `size` and `center`. Bare numbers are physical pixels; its `dp` and `sp` helpers convert those units to numeric physical pixels for canvas arithmetic. The host samples Compose's real `sp` conversion at several sizes and supplies those points with the density. Lua interpolates between them, preserving Android's non-linear accessibility scaling while keeping conversion synchronous and usable in arithmetic. It falls back to `density * fontScale` only when the sampled conversion table is absent.
 3. Draw calls append plain instruction tables. The color-based API supports lines, rectangles, rounded rectangles, circles, ovals, arcs, paths, points, and measured text. Nested callbacks support translation, rotation, scaling, insets, and rectangle/path clipping.
 4. The callback returns the completed instruction list.
 5. Kotlin parses and replays that list into the Compose `DrawScope` in paint order.
@@ -84,6 +84,10 @@ Standard linear, horizontal, vertical, radial, and sweep gradients are represent
 Canvas text uses Compose's native horizontal `TextAlign`. Track & Graph additionally provides `vertical_align` for positioning measured text at the top, center, or bottom of an explicitly supplied `size` rectangle. It has no effect when `size` is absent because there is no vertical region to align within.
 
 The bridge intentionally does not yet expose image drawing, graphics layers, arbitrary shader brushes, or raw `drawIntoCanvas`. Images first need a package-asset contract, while stateful or live Compose objects cannot cross the retained-data boundary.
+
+### Canvas testing boundary
+
+Test the Lua instruction recorder in `lua/src/tng/test/test_canvas.lua`, and test Kotlin instruction-to-Compose mapping in `LuaCanvasInstructionParserTest`. Compose's Android-backed `Path` methods throw "not mocked" in ordinary local JVM tests. The parser therefore accepts an internal `pathFactory`; parser tests should supply a mocked `Path` and verify the mapped calls rather than requiring Robolectric merely to exercise path commands. This seam also needs to be passed recursively when testing `add_path`.
 
 ## Errors and Cancellation
 

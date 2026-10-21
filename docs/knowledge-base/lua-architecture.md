@@ -1,6 +1,6 @@
 ---
 title: Lua functions — app architecture and data model
-description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), configuration value types (8 types), serialization pipeline, LuaEngine execution modes, and Lua VM lease ownership/cancellation rules.
+description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), configuration value types (8 types), serialization pipeline, LuaEngine execution and retained-value APIs, and Lua VM lease ownership/cancellation rules.
 topics:
   - Functions: derived data sources using Lua; stored as Features in features_table
   - Visual node editor: FeatureNode → LuaScriptNode → OutputNode; data flows left to right
@@ -9,7 +9,7 @@ topics:
   - LuaEngine execution APIs, including generic package entry-point evaluation through runLuaScript
   - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
   - Lua VM affinity, validated execution-lock ownership, and cancellation cleanup
-keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, runLuaGraph, runLuaScript, callLuaFunction, LuaValueAccessor, LuaValueReference, overload, Mockito, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
 ---
 
 # Lua Functions Architecture
@@ -178,9 +178,12 @@ environment; plain scripts inherit the built-in-module `require` from the VM glo
 Primary modes:
 1. `runLuaFunction()` - Parse script → metadata
 2. `runLuaFunctionGenerator()` - Execute with data → `Sequence<DataPoint>`
-3. `runLuaGraph()` - Execute graph script → render result
+3. `runLuaGraph()` - Execute either an inline graph script or an accessor-backed package entry point → render result
 4. `runLuaCatalogue()` - Parse function library
 5. `runLuaScript()` - Execute an accessor-backed entry point → read-only `LuaValueAccessor`
+6. `callLuaFunction()` - Invoke an affinity-bound `LuaValueReference` with zero or more `LuaValueData` arguments → read-only `LuaValueAccessor`
+
+`runLuaGraph` is overloaded on its second argument (`String` versus `LuaGraphScriptAccessor`). In Mockito-Kotlin tests, three untyped `any()` matchers make calls and stubs ambiguous. Use named arguments such as `runLuaGraph(vmLock = any(), script = any(), params = any())` or name `scriptAccessor` to select the intended overload explicitly.
 
 ### Execution Flow
 
