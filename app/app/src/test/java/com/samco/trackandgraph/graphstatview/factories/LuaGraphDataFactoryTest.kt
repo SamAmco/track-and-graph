@@ -119,7 +119,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `test return error`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any()))
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any()))
             .thenReturn(LuaGraphResult(error = Exception("error")))
 
         val result = callGetViewData()
@@ -131,7 +131,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `test return null data point`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.DataPointData(
                     dataPoint = null,
@@ -160,7 +160,7 @@ class LuaGraphDataFactoryTest {
             note = "note"
         )
 
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.DataPointData(
                     dataPoint = dataPoint,
@@ -189,7 +189,7 @@ class LuaGraphDataFactoryTest {
             note = "note"
         )
 
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.DataPointData(
                     dataPoint = dataPoint,
@@ -210,7 +210,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `test return text`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TextData(
                     text = "text",
@@ -233,7 +233,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `pie chart returns pie chart`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.PieChartData(
                     segments = listOf(
@@ -271,7 +271,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `mixed-sign Lua pie segments return a specific graph error`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.PieChartData(
                     segments = listOf(
@@ -295,7 +295,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `line graph returns line graph`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.LineGraphData(
                     lines = listOf(
@@ -354,7 +354,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `invalid Lua line range returns a specific graph error`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.LineGraphData(
                     lines = listOf(
@@ -384,7 +384,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `non-finite Lua line values return a specific graph error`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.LineGraphData(
                     lines = listOf(
@@ -416,7 +416,7 @@ class LuaGraphDataFactoryTest {
     fun `bar chart returns bar chart`() = runTest {
         val endTime = ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
 
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TimeBarChartData(
                     barDuration = Period.ofDays(2),
@@ -462,7 +462,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `all-zero bar chart gets nonzero y range`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TimeBarChartData(
                     barDuration = Period.ofDays(1),
@@ -483,7 +483,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `non-finite Lua bar values return a specific graph error`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TimeBarChartData(
                     barDuration = Period.ofDays(1),
@@ -507,7 +507,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `explicit zero bar chart maximum gets nonzero y range`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TimeBarChartData(
                     barDuration = Period.ofDays(1),
@@ -528,7 +528,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `mixed-sign Lua stacks use separate positive and negative axis extents`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TimeBarChartData(
                     barDuration = Period.ofDays(1),
@@ -556,7 +556,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `bar chart with non-unique labels`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TimeBarChartData(
                     barDuration = Period.ofDays(1),
@@ -618,7 +618,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `bar chart preserves first seen segment order`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.TimeBarChartData(
                     barDuration = Period.ofDays(1),
@@ -662,7 +662,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `null data and error shows no data`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = null,
                 error = null,
@@ -707,7 +707,7 @@ class LuaGraphDataFactoryTest {
             getRawDataPoints = { dataPoints },
             onDispose = { }
         )
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenAnswer {
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenAnswer {
             LuaGraphResult(
                 data = LuaGraphResultData.DataPointData(
                     dataPoint = null,
@@ -729,7 +729,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `closes data sample after script`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any())).thenReturn(
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any())).thenReturn(
             LuaGraphResult(
                 data = LuaGraphResultData.DataPointData(
                     dataPoint = null,
@@ -753,7 +753,7 @@ class LuaGraphDataFactoryTest {
 
     @Test
     fun `closes data sample after script error`() = runTest {
-        whenever(luaEngine.runLuaGraph(any(), any(), any()))
+        whenever(luaEngine.runLuaGraph(vmLock = any(), script = any(), params = any()))
             .thenThrow(RuntimeException("error"))
 
         callGetViewData(
