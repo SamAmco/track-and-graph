@@ -180,8 +180,10 @@ Primary modes:
 2. `runLuaFunctionGenerator()` - Execute with data → `Sequence<DataPoint>`
 3. `runLuaGraph()` - Execute either an inline graph script or an accessor-backed package entry point → render result
 4. `runLuaCatalogue()` - Parse function library
-5. `runLuaScript()` - Execute an accessor-backed entry point → read-only `LuaValueAccessor`
-6. `callLuaFunction()` - Invoke an affinity-bound `LuaValueReference` with zero or more `LuaValueData` arguments → read-only `LuaValueAccessor`
+5. `runLuaScript()` - Execute an inline or accessor-backed entry point → read-only `LuaValueAccessor`
+6. `renderLuaUi()` - Invoke a retained UI renderer with context, state, and optional affinity-bound arguments → UI/state result
+7. `decodeLuaState()` - Decode persisted JSON into a table retained on the locked runtime
+8. `callLuaFunction()` - Invoke an affinity-bound `LuaValueReference` with zero or more `LuaValueData` arguments → read-only `LuaValueAccessor`
 
 `runLuaGraph` is overloaded on its second argument (`String` versus `LuaGraphScriptAccessor`). In Mockito-Kotlin tests, three untyped `any()` matchers make calls and stubs ambiguous. Use named arguments such as `runLuaGraph(vmLock = any(), script = any(), params = any())` or name `scriptAccessor` to select the intended overload explicitly.
 
@@ -211,7 +213,7 @@ Each acquired lock is a one-use lease with its own mutex owner token. Engine ent
 
 Function and graph execution can be recursive: a Lua function can read a function-backed data source, which may execute more Lua. To avoid deadlocks and excess VM consumption, a recursive operation should pass the same execution lock down through `DataSampler.getRawDataSampleForFeatureId(..., vmLock)` / `getDataSampleForFeatureId(..., vmLock)`. Stateful UI sessions may retain the affinity between calls, but must release the execution lock after each call and reacquire against that affinity for the next call.
 
-`LuaValueReference` pairs every retained Lua table or function with the affinity of the runtime that owns it. A custom graph retains both the result of its `data` function and the original `render` closure; it does not reload the script before rendering. `CustomGraphLuaHelper` binds those references into the view-layer renderer callback, reacquires an execution lock using the render function's affinity, and then invokes the retained values. Any future canvas or action callback exposed through `LuaValueAccessor` must follow the same rule. Never use a retained Lua value with an arbitrary execution lock; the data-layer adapter rejects mismatched affinities.
+`LuaValueReference` pairs every retained Lua table or function with the affinity of the runtime that owns it. A custom graph retains both the result of `prepare_data` and the original `render_graph` closure; it does not reload the script before rendering. `RetainedLuaUiContent` binds renderer, state, and optional arguments into a generic session, reacquires an execution lock using the renderer's affinity, and invokes retained values. Configuration UI uses the same session with `render_configuration` and no graph-data argument. Canvas and click callbacks follow the same affinity rule. Never use a retained Lua value with an arbitrary execution lock; the data-layer adapter rejects mismatched affinities.
 
 See [Lua custom UI](lua-custom-ui.md) for the graph contract and view-layer callback lifecycle built on this affinity model.
 

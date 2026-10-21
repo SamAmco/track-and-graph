@@ -69,13 +69,13 @@ docs:
 
   - file: database-schema.md
     title: Database tables and relationships
-    description: Room/SQLite schema — all core tables, including normalized versioned Lua graph package BLOBs, their columns, and foreign key relationships.
-    keywords: [database, schema, Room, SQLite, tables, columns, foreign-key, groups, features, trackers, functions, data_points, lua_graph_packages, BLOB, cascade]
+    description: Room/SQLite schema — all core tables, including normalized Lua package BLOBs and per-graph JSON configuration state.
+    keywords: [database, schema, Room, SQLite, tables, columns, foreign-key, groups, features, trackers, functions, data_points, lua_graph_packages, lua_graphs, configuration, JSON, BLOB, cascade]
 
   - file: database-migrations.md
     title: Writing Room database migrations
-    description: How to write Room migrations safely — schema JSON, table rebuilds, cascade pitfalls, group-items migrations, and migration 60→61 for versioned Lua graph packages.
-    keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 59-60, 60-61, lua_graph_packages, unique-constraint]
+    description: How to write Room migrations safely — schema JSON, table rebuilds, cascade pitfalls, normalized Lua packages, and graph configuration state.
+    keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 59-60, 60-61, 61-62, lua_graph_packages, configuration, unique-constraint]
 
   - file: database-backup-restore.md
     title: Database backup and restore lifecycle
@@ -109,8 +109,8 @@ docs:
 
   - file: lua-custom-ui.md
     title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
-    description: Custom graph data/render split, opaque affinity-bound Lua values, responsive declarative layout, FlowRow and graph UI helpers, deferred Canvas instruction recording and text/unit semantics, theme tokens, testing boundaries, and runtime errors.
-    keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.graphui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, state, error]
+    description: Custom graph preparation/rendering, retained stateful configuration UI, affinity locking, responsive layout, translated text, FlowRow, Canvas, and theme tokens.
+    keywords: [lua, custom-ui, CUSTOM, prepare_data, render_graph, render_configuration, configuration, JSON, state, on_click, RetainedLuaUiContent, tng.ui, tng.graphui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, translation, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, error]
 
   - file: lua-community-functions.md
     title: Writing Lua function scripts and contributing to the community catalog
@@ -119,8 +119,8 @@ docs:
 
   - file: lua-graph-scripts.md
     title: Writing Lua graph scripts and contributing graph scripts
-    description: Graph scripts, ZIP-compatible multi-file .tng packages and require resolution, built-in graph types plus custom Lua UI, DataSource API, configuration, and tests.
-    keywords: [lua, graph, script, package, archive, ZIP, tng, require, visualization, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, community]
+    description: Graph scripts, ZIP-compatible .tng packages, source-neutral descriptors, custom graph/configuration renderers, per-instance state, DataSource API, and tests.
+    keywords: [lua, graph, script, package, archive, ZIP, tng, require, configuration, render_configuration, prepare_data, render_graph, JSON, state, translation, visualization, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, community]
 
   - file: lua-tooling.md
     title: Lua tooling, build process, publishing, and adding new config types

@@ -7,7 +7,7 @@ topics:
   - DROP TABLE does NOT trigger ON DELETE CASCADE on child tables
   - child_id must be tracker/function primary key, NOT features_table.id (use JOIN)
   - Migration 58→59: introduced group_items_table, migrated group_id/display_index columns
-keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 58-59, 59-60, unique-constraint]
+keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 58-59, 59-60, 60-61, 61-62, lua_graph_packages, configuration, unique-constraint]
 ---
 
 # Database Migrations
@@ -90,3 +90,7 @@ The `GroupItem` entity annotation retains only two indices: `(group_id)` and `(c
 This migration creates `lua_graph_packages_table`, keyed by (`package_id`, `version`), with the original ZIP-compatible package in an `archive` BLOB. It rebuilds `lua_graphs_table` so `script` is nullable and adds an optional composite package foreign key. Existing rows retain their inline script and receive null package columns; legacy scripts are not repackaged.
 
 Because `lua_graph_features_table` has a cascading foreign key to `lua_graphs_table`, its rows are copied to a temporary backup and the child table is explicitly rebuilt around the parent-table replacement. The migration test must include a feature mapping so schema validation alone cannot conceal accidental child-row loss.
+
+## Migration 61 → 62 (Lua graph instance configuration)
+
+This migration adds nullable `configuration TEXT` to `lua_graphs_table`. It stores JSON state per graph instance rather than on `lua_graph_packages_table`, because several graphs may share the same package while using different configuration. As with every Room migration, the migration SQL and committed schema snapshot must match Room's generated schema exactly, and the instrumentation migration test should verify both inline and package-backed rows retain their source fields while configuration begins null.

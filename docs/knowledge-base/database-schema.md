@@ -56,7 +56,7 @@ Function-specific configuration (Lua graph definitions). References features_tab
 ### graphs_and_stats_table
 Graph/statistic configurations.
 
-Lua graph instances live in `lua_graphs_table`. A row contains either a legacy inline `script`, or the nullable composite reference (`package_id`, `package_version`) to `lua_graph_packages_table`.
+Lua graph instances live in `lua_graphs_table`. A row contains either a legacy inline `script`, or the nullable composite reference (`package_id`, `package_version`) to `lua_graph_packages_table`. Its nullable `configuration` column stores JSON-encoded instance state for descriptor-based graphs; this state is independent of the shared package archive.
 
 Room represents that storage union with nullable columns, but the public DTO layer uses the sealed `LuaGraphSource` type: `Inline(script)` or `Package(packageData)`. Query mapping rejects rows that contain both sources or neither. Package `main.lua` is not copied into the DTO's script field; callers that need a preview extract it explicitly from the package accessor.
 

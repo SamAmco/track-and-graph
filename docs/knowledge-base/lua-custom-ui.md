@@ -1,6 +1,6 @@
 ---
 title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
-description: Custom graph data/render split, opaque affinity-bound Lua values, responsive declarative layout, FlowRow and graph UI helpers, deferred Canvas instruction recording and text/unit semantics, theme tokens, testing boundaries, and runtime errors.
+description: Custom graph preparation/rendering, stateful configuration UI sessions, affinity-bound Lua values, responsive declarative layout, deferred Canvas drawing, theme and translation tokens, testing boundaries, and runtime errors.
 topics:
   - CUSTOM graph descriptor separates data preparation from view-dependent rendering
   - Lua values and callbacks remain opaque and bound to their originating VM affinity
@@ -9,16 +9,17 @@ topics:
   - tng.canvas records instructions for later Compose DrawScope replay
   - Theme values and data-visualization colors resolve consistently across declarative UI and Canvas
   - Render and callback failures use the existing graph error presentation
-keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.graphui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, state, error]
+  - Configuration renderers retain JSON-serializable Lua table state across interactions and graph execution
+keywords: [lua, custom-ui, CUSTOM, prepare_data, render_graph, render_configuration, configuration, JSON, state, on_click, RetainedLuaUiContent, tng.ui, tng.graphui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, translation, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, error]
 ---
 
 # Lua Custom UI
 
-The custom UI path is a general declarative Lua-to-Compose boundary. Graphs are its first consumer, but the contract deliberately separates UI content from graph-specific rendering so it can later support screens such as Lua-driven graph configuration.
+The custom UI path is a general declarative Lua-to-Compose boundary shared by graph rendering and Lua-driven graph configuration. The contract deliberately separates UI content from graph-specific data preparation.
 
 ## Graph Contract and Lifecycle
 
-A custom graph returns a descriptor with `type = "CUSTOM"`, a `data` function, and a `render` function:
+A custom graph returns a descriptor with `type = "CUSTOM"`, `prepare_data`, and `render_graph`. It may additionally expose `render_configuration`:
 
 ```lua
 local graph = require("tng.graph")
@@ -26,27 +27,30 @@ local ui = require("tng.ui")
 
 return {
     type = graph.GRAPH_TYPE.CUSTOM,
-    data = function(sources)
+    prepare_data = function(sources, state)
         return { values = read_values(sources["source"]) }
     end,
-    render = function(data, context)
-        return ui.text({ text = tostring(#data.values) })
+    render_graph = function(context, state, data)
+        return {
+            ui = ui.text({ text = tostring(#data.values) }),
+            state = state,
+        }
     end,
 }
 ```
 
 The split matches the existing graph architecture:
 
-1. The data/view-model phase invokes `data(sources)` while sampled data sources are available.
+1. The data/view-model phase decodes the graph instance's nullable JSON configuration and invokes `prepare_data(sources, state)` while sampled data sources are available.
 2. Its result stays as an opaque Lua value; Kotlin does not decode it into an intermediate domain model.
-3. The view phase invokes `render(data, context)` after Compose knows the root constraints.
-4. The returned UI table is read through `LuaValueAccessor` and mapped directly to Compose components.
+3. The view phase invokes `render_graph(context, state, data)` after Compose knows the root constraints.
+4. Every UI renderer returns `{ ui = <component>, state = <table-or-nil> }`. The returned UI is read through `LuaValueAccessor`; returned state becomes the session's state for the next render.
 
 The original render closure and data result are retained as `LuaValueReference`s tied to their originating `LuaVMAffinity`. Each render or UI callback reacquires a short-lived execution lock for that affinity and releases it in `finally`. This preserves Lua closures and VM-local state without holding one of the pooled VMs locked for the lifetime of a screen. See [Lua functions architecture](lua-architecture.md#lua-vm-affinity-and-execution-locks) for lease invariants.
 
 ## Render Context
 
-`render` receives a context containing:
+A UI renderer receives a context containing:
 
 - `constraints`: root `min_width`, `max_width`, `min_height`, and `max_height` in physical pixels. These are constraints, not a promised final size.
 - `density`: physical pixels per dp.
@@ -68,11 +72,23 @@ For coarse responsive decisions such as changing a graph's orientation, compare 
 
 `tng.graphui` is a pure-Lua convenience layer built only from `tng.ui` and `tng.theme`; it introduces no Android bridge types. Its legend helpers reproduce the native graph convention—a centered, wrapping full-width FlowRow containing 20dp circular swatches, a 2dp label gap, body-medium text, and 10dp item spacing. Put reusable graph presentation conventions here so native and packaged graphs do not drift visually.
 
-Stable component keys preserve identity across renders and become especially important once components contain state or actions. The DSL currently has no clickable modifier or general input/action component; do not document planned interactive APIs as already supported.
+Stable component keys preserve identity across renders and are especially important for interactive trees. `ui.on_click(callback)` is valid on every node through its modifier list. The host calls the callback and rerenders the root UI before releasing the one VM execution lock acquired for that interaction. This makes the callback mutation and resulting tree/state snapshot one serialized Lua operation; do not add a separate UI mutex around it.
+
+`ui.text` accepts either a direct string or the same `{ language_tag = text }` translation table used by package metadata. Kotlin resolves translation tables against the current Android locale preferences, including English fallback. Keep package translations in `strings.lua` and pass the table through unchanged; renderers should not choose a locale themselves.
 
 Kotlin deliberately parses the returned table in place through `LuaValueAccessor` instead of copying the entire UI tree into DTOs. Accessors use raw Lua table lookup, which avoids triggering the `__index` metatables used by API compatibility tests. Lua arrays retain one-based indexing at the accessor boundary and are converted to Kotlin lists only where the renderer needs iteration.
 
 `LuaValueAccessor` is a retained, read-only view rather than an execution capability. Plain values and tables that the script treats as immutable may be traversed after releasing the VM lock, as the Compose renderer already does. A function obtained with `asFunction()` is instead represented by an affinity-bound `LuaValueReference`; invoking it requires reacquiring a short-lived lock for that same affinity. Do not read a retained table concurrently with Lua code that may mutate it.
+
+## Stateful Configuration UI
+
+The graph configuration screen evaluates either an inline script or package `main.lua` through the same script-accessor boundary. A table containing `render_configuration` replaces all source and feature controls below the graph-type selector with its Lua UI. Back returns to those source controls. Legacy scripts that return a function, and descriptor tables without this hook, keep the old configuration experience.
+
+`render_configuration(context, state)` uses the same renderer contract and retained session as `render_graph`. On first render, `state` is the graph instance's decoded configuration table or nil. Click handlers normally capture and mutate that table. After each root render, the host serializes the returned state and passes the JSON to the configuration ViewModel for persistence. Unsupported values and functions are omitted; numbers must be finite; dense integer-keyed tables encode as arrays, string-keyed tables as objects, and cyclic branches are omitted. An empty table is encoded as an object.
+
+The graph instance owns configuration; it is not package metadata and is not stored in the normalized package row. `prepare_data(sources, state)` and `render_graph(context, state, data)` receive independently decoded values from that same persisted JSON when the graph is displayed. Source replacement clears prior configuration so state from one script cannot leak into another.
+
+`RetainedLuaUiContent` is the generic app-layer session used by both graph rendering and configuration. It retains the renderer, current state, optional extra arguments, and VM affinity. `interact` acquires one affinity lock, calls the handler synchronously, rerenders, updates the retained state, serializes it, and releases in `finally`. Canvas callbacks also reacquire the owning VM but do not rerender the root.
 
 ## Deferred Canvas Rendering
 
@@ -102,4 +118,4 @@ Test the Lua instruction recorder in `lua/src/tng/test/test_canvas.lua`, and tes
 
 Initial graph execution errors already flow through `LuaGraphResult` and the normal graph error view. Failures thrown later by `render` or a retained canvas callback are converted to `LuaScriptException` and routed to the same presentation rather than silently producing an empty component. Coroutine cancellation is rethrown: constraint/content changes may cancel and restart `produceState`, and that control flow must not appear as a script failure.
 
-The worked contract example is a multi-file package under `lua/src/examples/canvas-basic-graph/`. The graph result type belongs to `tng.graph`; `tng.ui` only describes the returned layout. API compatibility is declared in the `tng.graph`, `tng.ui`, `tng.graphui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.
+The worked stateful example is the multi-file calendar heatmap package under `lua/src/examples/`; it configures its data range, layout, and legend. Examples are disposable demonstrations, not runtime dependencies. The graph result type belongs to `tng.graph`; `tng.ui` only describes the returned layout. API compatibility is declared in the `tng.graph`, `tng.ui`, `tng.graphui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.

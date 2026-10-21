@@ -1,15 +1,15 @@
 ---
 title: Writing Lua graph scripts and contributing graph scripts
-description: Graph scripts return graph data structures (not data streams); covers built-in graph types and custom Lua UI, DataSource API, script configuration with local variables, DURATION vs PERIOD distinction, and the graph test framework (config as Lua code strings, named sources).
+description: Graph scripts and packages, including legacy built-in results, custom prepare/render hooks, stateful configuration UI, normalized package storage, DataSource API, and graph testing.
 topics:
   - Graph types: graph.text, graph.data_point, graph.line, graph.time_bar, graph.pie
-  - Custom UI graphs: separate data and deferred render functions
+  - Custom UI graphs: prepare_data, render_graph, and optional render_configuration hooks
   - DataSource API: sources["name"].dp() iterates data points in reverse chronological order
   - Script config: local variables modified directly by users; PREVIEW_START/END for collapsed view
   - core.DURATION (ms, arithmetic ok) vs core.PERIOD (variable length — NO arithmetic)
   - Graph tests DIFFER from function tests: config values are Lua code strings (regex replacement); sources are named table
   - File structure: lua/src/community/graphs/<category>/<script-name>/
-keywords: [lua, graph, script, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, sync-lua-to-docs]
+keywords: [lua, graph, script, package, tng, ZIP, configuration, render_configuration, prepare_data, render_graph, JSON, state, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, sync-lua-to-docs]
 ---
 
 # Lua Graph Scripts
@@ -43,13 +43,15 @@ Custom UI is an additional graph result type with separate data preparation and 
 
 ## Multi-file graph packages
 
-The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"` plus stable `id` and semantic `version` strings. Package IDs use concise descriptive kebab-case names, matching community Lua function IDs; reverse-domain names are not the convention. Package identity is the `(id, version)` pair. The entry point is evaluated through the generic Lua script accessor API; graph import reads only the identity required for storage. The configuration screen identifies an installed package using its stored ID and version and shows an immutable preview of `main.lua`; it does not re-execute the package to extract display metadata. The generic extension and evaluation API leave room for packages with other purposes and richer configuration UI in future.
+The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"` plus stable `id` and semantic `version` strings. Package IDs use concise descriptive kebab-case names, matching community Lua function IDs; reverse-domain names are not the convention. Package identity is the `(id, version)` pair. Storage format does not determine capability: inline text and package `main.lua` are evaluated identically. A legacy returned function keeps the old graph behavior. A returned descriptor table may expose package metadata, custom graph hooks, and `render_configuration`. When that hook exists, its Lua UI replaces the source preview and feature inputs until the user navigates back to the source controls.
 
 Lua modules use the conventional mapping: `require("renderer")` loads `renderer.lua`, while `require("chart.renderer")` loads `chart/renderer.lua`. `<module>/init.lua` is also supported. Modules are decoded on demand through a package accessor, and each graph execution has an isolated module cache so retained custom-render closures continue to resolve the correct package.
 
-Keep every translated string table in a package-root `strings.lua` module, keyed by its purpose, and reference those values from implementation modules. For example, `strings.lua` can return `{ title = { en = "My graph" } }`, while `main.lua` uses `local strings = require("strings")` and sets `title = strings.title`. This keeps language data out of graph logic and gives translation tooling one conventional file per package to inspect and update.
+Keep every translated string table in a package-root `strings.lua` module, keyed by its purpose, and reference those values from implementation modules. For example, `strings.lua` can return `{ title = { en = "My graph" } }`, while `main.lua` uses `local strings = require("strings")` and sets `title = strings.title`. `ui.text` also accepts these translation tables directly; locale selection remains an app responsibility. This keeps language data out of graph logic and gives translation tooling one conventional file per package to inspect and update.
 
 Packages are stored as normalized BLOBs in SQLite and graph instances reference them. Existing single-file scripts remain supported and are not converted by the database migration. Package limits are 5 MiB compressed, 8 MiB expanded in total, and 256 entries; names must be relative safe paths and scripts must be UTF-8. There is no separate per-entry size limit.
+
+Each graph instance separately stores nullable JSON configuration. Package rows contain only package identity/version and archive bytes, so multiple graphs can share one immutable package while retaining different state. See [Lua custom UI](lua-custom-ui.md#stateful-configuration-ui) for the renderer and serialization contract.
 
 To build one with common ZIP tooling, run the command from inside the package directory so `main.lua` is at the archive root:
 
@@ -82,9 +84,9 @@ sources["name"].dp()  -- Next data point (reverse chronological)
 
 Data points iterate until `dp()` returns nil.
 
-## Script Configuration
+## Legacy Script Configuration
 
-Graph scripts use local variables for configuration:
+Legacy single-file graph scripts use local variables for configuration:
 
 ```lua
 local core = require("tng.core")
@@ -99,7 +101,7 @@ return function(sources)
 end
 ```
 
-Users modify these variables directly in the script editor.
+Users modify these variables directly in the script editor. Descriptor-based scripts can instead provide `render_configuration(context, state)` and return interactive Lua UI plus persistent state; packages are not required for that capability.
 
 ### Script Previews
 
