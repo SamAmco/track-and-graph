@@ -40,11 +40,13 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.isZipArchive
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.lua.ui.LuaGraphConfigurationProvider
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,6 +62,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.net.URI
@@ -89,6 +92,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     dataInteractor: DataInteractor,
     dataSampler: DataSampler,
     private val luaEngine: LuaEngine,
+    private val luaGraphConfigurationProvider: LuaGraphConfigurationProvider,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LuaConfigData>(
     io = io,
     default = default,
@@ -100,6 +104,12 @@ class LuaGraphConfigViewModel @Inject constructor(
 
 
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
+        private set
+
+    var configurationContent: LuaUiContent? by mutableStateOf(null)
+        private set
+
+    var showingConfiguration by mutableStateOf(false)
         private set
 
     val packageUiData: LuaGraphPackageUiData?
@@ -295,6 +305,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         } else {
             setInlineScript(TextFieldValue(bytes.toString(Charsets.UTF_8)))
         }
+        refreshConfiguration(autoShow = true)
     }
 
     private suspend fun installPackage(archive: ByteArray) {
@@ -307,7 +318,8 @@ class LuaGraphConfigViewModel @Inject constructor(
                     version = version,
                     archive = archive,
                 )
-            )
+            ),
+            configuration = null,
         )
         script = TextFieldValue(accessor.mainScript())
     }
@@ -342,8 +354,17 @@ class LuaGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
+    fun onScriptEditFinished() {
+        viewModelScope.launch { refreshConfiguration(autoShow = true) }
+    }
+
     private fun setInlineScript(text: TextFieldValue) {
-        luaGraph = luaGraph.copy(source = LuaGraphSource.Inline(text.text))
+        luaGraph = luaGraph.copy(
+            source = LuaGraphSource.Inline(text.text),
+            configuration = null,
+        )
+        configurationContent = null
+        showingConfiguration = false
         script = text
     }
 
@@ -416,6 +437,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     fun updateScriptFromClipboard(text: String) {
         setInlineScript(TextFieldValue(text))
         onUpdate()
+        viewModelScope.launch { refreshConfiguration(autoShow = true) }
     }
 
     fun onUserConfirmDeepLink() {
@@ -430,6 +452,7 @@ class LuaGraphConfigViewModel @Inject constructor(
                 pendingScriptInstall.emit(null)
                 setInlineScript(TextFieldValue(it))
                 onUpdate()
+                refreshConfiguration(autoShow = true)
                 return@launch
             }
         }
@@ -467,6 +490,35 @@ class LuaGraphConfigViewModel @Inject constructor(
                     TextFieldValue(it.name, TextRange(it.name.length))
                 )
             })
+        }
+        viewModelScope.launch { refreshConfiguration(autoShow = true) }
+    }
+
+    fun showSourceControls() {
+        showingConfiguration = false
+    }
+
+    fun onConfigurationChanged(configuration: String?) {
+        if (luaGraph.configuration == configuration) return
+        luaGraph = luaGraph.copy(configuration = configuration)
+        onUpdate()
+    }
+
+    private suspend fun refreshConfiguration(autoShow: Boolean) {
+        val source = luaGraph.source
+        val configuration = luaGraph.configuration
+        val content = try {
+            withContext(default) {
+                luaGraphConfigurationProvider(source, configuration)
+            }
+        } catch (t: Throwable) {
+            Timber.e(t, "Failed to resolve Lua graph configuration UI")
+            null
+        }
+        withContext(ui) {
+            if (luaGraph.source != source) return@withContext
+            configurationContent = content
+            if (autoShow) showingConfiguration = content != null
         }
     }
 

@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.ui
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ScrollState
@@ -33,6 +34,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -67,11 +70,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel.NetworkError
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphFeatureUiData
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphPackageUiData
+import com.samco.trackandgraph.graphstatview.ui.GraphErrorView
+import com.samco.trackandgraph.lua.ui.LuaUiHost
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
@@ -117,28 +123,63 @@ fun LuaGraphConfigView(
 
     val showEditScriptDialog = rememberSaveable { mutableStateOf(false) }
 
-    LuaGraphConfigView(
-        scrollState = scrollState,
-        script = viewModel.script,
-        scriptPreview = viewModel.scriptPreview
-            .collectAsStateWithLifecycle().value,
-        packageUiData = viewModel.packageUiData,
-        featureUiDataList = viewModel.featureUiDataList,
-        onUpdateFeatureName = viewModel::onUpdateFeatureName,
-        onRemoveFeatureClicked = viewModel::onRemoveFeatureClicked,
-        onSelectFeatureClicked = viewModel::onSelectFeatureClicked,
-        onAddFeatureClicked = viewModel::onAddFeatureClicked,
-        setScriptText = viewModel::setScriptText,
-        onReadFile = viewModel::readFile,
-        onUpdateScriptFromClipboard = viewModel::updateScriptFromClipboard,
-        onOpenCommunityScripts = viewModel::openCommunityScripts,
-        onUserConfirmDeepLink = viewModel::onUserConfirmDeepLink,
-        onUserCancelDeepLink = viewModel::onUserCancelDeepLink,
-        showEditScriptDialog = showEditScriptDialog,
-        onClickInPreview = viewModel::onClickInPreview,
-        showUserConfirmDeepLinkDialog = viewModel.showUserConfirmDeepLink
-            .collectAsStateWithLifecycle(),
-    )
+    val configurationContent = viewModel.configurationContent
+    if (viewModel.showingConfiguration && configurationContent != null) {
+        LuaGraphConfigurationView(
+            content = configurationContent,
+            onBack = viewModel::showSourceControls,
+            onStateChanged = viewModel::onConfigurationChanged,
+        )
+    } else {
+        LuaGraphConfigView(
+            scrollState = scrollState,
+            script = viewModel.script,
+            scriptPreview = viewModel.scriptPreview
+                .collectAsStateWithLifecycle().value,
+            packageUiData = viewModel.packageUiData,
+            featureUiDataList = viewModel.featureUiDataList,
+            onUpdateFeatureName = viewModel::onUpdateFeatureName,
+            onRemoveFeatureClicked = viewModel::onRemoveFeatureClicked,
+            onSelectFeatureClicked = viewModel::onSelectFeatureClicked,
+            onAddFeatureClicked = viewModel::onAddFeatureClicked,
+            setScriptText = viewModel::setScriptText,
+            onScriptEditFinished = viewModel::onScriptEditFinished,
+            onReadFile = viewModel::readFile,
+            onUpdateScriptFromClipboard = viewModel::updateScriptFromClipboard,
+            onOpenCommunityScripts = viewModel::openCommunityScripts,
+            onUserConfirmDeepLink = viewModel::onUserConfirmDeepLink,
+            onUserCancelDeepLink = viewModel::onUserCancelDeepLink,
+            showEditScriptDialog = showEditScriptDialog,
+            onClickInPreview = viewModel::onClickInPreview,
+            showUserConfirmDeepLinkDialog = viewModel.showUserConfirmDeepLink
+                .collectAsStateWithLifecycle(),
+        )
+    }
+}
+
+@Composable
+private fun LuaGraphConfigurationView(
+    content: LuaUiContent,
+    onBack: () -> Unit,
+    onStateChanged: (String?) -> Unit,
+) {
+    BackHandler(onBack = onBack)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        IconButton(onClick = onBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                contentDescription = null,
+            )
+        }
+        LuaUiHost(
+            modifier = Modifier.fillMaxWidth(),
+            content = content,
+            errorContent = { error ->
+                GraphErrorView(error = error.message ?: stringResource(R.string.unknown_error_occurred))
+            },
+            onStateChanged = onStateChanged,
+        )
+    }
 }
 
 private fun showErrorToast(context: Context, networkError: NetworkError) {
@@ -162,6 +203,7 @@ private fun LuaGraphConfigView(
     onSelectFeatureClicked: (Int, Long) -> Unit,
     onAddFeatureClicked: () -> Unit,
     setScriptText: (TextFieldValue) -> Unit,
+    onScriptEditFinished: () -> Unit,
     onReadFile: (Uri?) -> Unit,
     onUpdateScriptFromClipboard: (String) -> Unit,
     onOpenCommunityScripts: () -> Unit,
@@ -175,6 +217,7 @@ private fun LuaGraphConfigView(
         showEditScriptDialog = showEditScriptDialog,
         script = script,
         setScriptText = setScriptText,
+        onScriptEditFinished = onScriptEditFinished,
         showUserConfirmDeepLink = showUserConfirmDeepLinkDialog.value,
         onUserConfirmDeepLink = onUserConfirmDeepLink,
         onUserCancelDeepLink = onUserCancelDeepLink,
@@ -226,6 +269,7 @@ private fun Dialogs(
     showEditScriptDialog: MutableState<Boolean>,
     script: TextFieldValue,
     setScriptText: (TextFieldValue) -> Unit,
+    onScriptEditFinished: () -> Unit,
     showUserConfirmDeepLink: Boolean,
     onUserConfirmDeepLink: () -> Unit,
     onUserCancelDeepLink: () -> Unit,
@@ -233,7 +277,10 @@ private fun Dialogs(
     if (showEditScriptDialog.value) {
         LuaScriptEditDialog(
             script = script,
-            onDismiss = { showEditScriptDialog.value = false },
+            onDismiss = {
+                showEditScriptDialog.value = false
+                onScriptEditFinished()
+            },
             onValueChanged = { setScriptText(it) }
         )
     }
@@ -510,6 +557,7 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
             onSelectFeatureClicked = { _, _ -> },
             onAddFeatureClicked = {},
             setScriptText = {},
+            onScriptEditFinished = {},
             onReadFile = {},
             onUpdateScriptFromClipboard = {},
             onOpenCommunityScripts = {},
