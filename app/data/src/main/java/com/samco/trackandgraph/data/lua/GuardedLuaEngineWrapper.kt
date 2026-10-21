@@ -68,20 +68,32 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
 
     override fun runLuaScript(
         vmLock: LuaVMLock,
+        script: String,
+    ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
+        luaEngine.runLuaScript(vmLock, script)
+    } else throw LuaEngineDisabledException()
+
+    override fun runLuaScript(
+        vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
     ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
         luaEngine.runLuaScript(vmLock, scriptAccessor)
     } else throw LuaEngineDisabledException()
 
-    override fun renderLuaGraph(
+    override fun renderLuaUi(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
         renderState: LuaValueReference,
-        renderData: LuaValueReference,
         context: LuaUiContext,
+        vararg arguments: LuaValueReference,
     ): LuaUiRenderResult = if (luaEngineSwitch.enabled) {
-        luaEngine.renderLuaGraph(vmLock, renderFunction, renderState, renderData, context)
+        luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, *arguments)
     } else throw LuaEngineDisabledException()
+
+    override fun decodeLuaState(vmLock: LuaVMLock, encoded: String?): LuaValueReference =
+        if (luaEngineSwitch.enabled) {
+            luaEngine.decodeLuaState(vmLock, encoded)
+        } else throw LuaEngineDisabledException()
 
     override fun callLuaFunction(
         vmLock: LuaVMLock,

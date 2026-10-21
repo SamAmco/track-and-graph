@@ -269,11 +269,10 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         }
         val renderLock = engine.acquireVM(data.renderFunction.affinity)
         val rendered = try {
-            engine.renderLuaGraph(
+            engine.renderLuaUi(
                 renderLock,
                 data.renderFunction,
                 data.renderState,
-                data.renderData,
                 LuaUiContext(
                     constraints = LuaUiContext.Constraints(0, 100, 0, 100),
                     density = 1f,
@@ -281,6 +280,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                     layoutDirection = LuaUiContext.LayoutDirection.LTR,
                     theme = LuaUiContext.Theme.LIGHT,
                 ),
+                data.renderData,
             )
         } finally {
             engine.releaseVM(renderLock)
@@ -321,11 +321,10 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                 "return { type = 'TEXT', text = 'another graph' }",
                 LuaGraphEngineParams(emptyMap()),
             )
-            engine.renderLuaGraph(
+            engine.renderLuaUi(
                 retainedLock,
                 data.renderFunction,
                 data.renderState,
-                data.renderData,
                 LuaUiContext(
                     LuaUiContext.Constraints(0, 100, 0, 100),
                     1f,
@@ -333,6 +332,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                     LuaUiContext.LayoutDirection.LTR,
                     LuaUiContext.Theme.LIGHT,
                 ),
+                data.renderData,
             )
         } finally {
             engine.releaseVM(retainedLock)

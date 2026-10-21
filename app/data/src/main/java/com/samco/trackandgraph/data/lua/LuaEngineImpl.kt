@@ -21,6 +21,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionDataSourceAdapter
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionMetadataAdapter
 import com.samco.trackandgraph.data.lua.graphadapters.LuaGraphScriptAdapter
+import com.samco.trackandgraph.data.lua.LuaUiScriptAdapter
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import com.samco.trackandgraph.data.database.dto.DataPoint
 import com.samco.trackandgraph.data.database.dto.LuaScriptConfigurationValue
@@ -40,6 +41,7 @@ import javax.inject.Inject
 
 internal class LuaEngineImpl @Inject constructor(
     private val luaGraphScriptAdapter: LuaGraphScriptAdapter,
+    private val luaUiScriptAdapter: LuaUiScriptAdapter,
     private val luaScriptResolver: LuaScriptResolver,
     private val luaFunctionDataSourceAdapter: LuaFunctionDataSourceAdapter,
     private val luaFunctionMetadataAdapter: LuaFunctionMetadataAdapter,
@@ -84,6 +86,11 @@ internal class LuaEngineImpl @Inject constructor(
 
     override fun runLuaScript(
         vmLock: LuaVMLock,
+        script: String,
+    ): LuaValueAccessor = runLuaScript(vmLock, InlineLuaGraphScriptAccessor(script))
+
+    override fun runLuaScript(
+        vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
     ): LuaValueAccessor {
         val vmLease = vmLock.requireActiveLease()
@@ -97,19 +104,24 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 
-    override fun renderLuaGraph(
+    override fun renderLuaUi(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
         renderState: LuaValueReference,
-        renderData: LuaValueReference,
         context: LuaUiContext,
+        vararg arguments: LuaValueReference,
     ): LuaUiRenderResult {
         vmLock.requireActiveLease()
         return try {
-            luaGraphScriptAdapter.render(vmLock, renderFunction, renderState, renderData, context)
+            luaUiScriptAdapter.render(vmLock, renderFunction, renderState, context, *arguments)
         } catch (luaError: LuaError) {
             throw luaError.toLuaScriptException()
         }
+    }
+
+    override fun decodeLuaState(vmLock: LuaVMLock, encoded: String?): LuaValueReference {
+        vmLock.requireActiveLease()
+        return LuaValueReferenceImpl(LuaStateJsonCodec.decode(encoded), vmLock.affinity)
     }
 
     override fun callLuaFunction(

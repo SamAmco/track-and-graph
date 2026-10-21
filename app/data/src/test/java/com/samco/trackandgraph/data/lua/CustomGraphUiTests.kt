@@ -121,12 +121,12 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         val renderLock = engine.acquireVM(customData.renderFunction.affinity)
         val renderError = try {
             assertThrows(LuaScriptException::class.java) {
-                engine.renderLuaGraph(
+                engine.renderLuaUi(
                     renderLock,
                     customData.renderFunction,
                     customData.renderState,
-                    customData.renderData,
                     context(LuaUiContext.Theme.DARK),
+                    customData.renderData,
                 )
             }
         } finally {
@@ -136,12 +136,12 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
 
         val successfulRenderLock = engine.acquireVM(customData.renderFunction.affinity)
         val tree = try {
-            engine.renderLuaGraph(
+            engine.renderLuaUi(
                 successfulRenderLock,
                 customData.renderFunction,
                 customData.renderState,
-                customData.renderData,
                 context(LuaUiContext.Theme.LIGHT),
+                customData.renderData,
             )
         } finally {
             engine.releaseVM(successfulRenderLock)
@@ -229,11 +229,10 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
 
         val renderLock = engine.acquireVM(customData.renderFunction.affinity)
         val tree = try {
-            engine.renderLuaGraph(
+            engine.renderLuaUi(
                 renderLock,
                 customData.renderFunction,
                 customData.renderState,
-                customData.renderData,
                 LuaUiContext(
                     LuaUiContext.Constraints(0, 1080, 0, 600),
                     density = 3f,
@@ -241,6 +240,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
                     layoutDirection = LuaUiContext.LayoutDirection.LTR,
                     theme = LuaUiContext.Theme.DARK,
                 ),
+                customData.renderData,
             )
         } finally {
             engine.releaseVM(renderLock)

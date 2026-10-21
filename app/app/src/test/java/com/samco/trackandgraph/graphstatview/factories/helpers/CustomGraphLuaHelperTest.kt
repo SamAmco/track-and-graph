@@ -50,7 +50,7 @@ class CustomGraphLuaHelperTest {
     fun `renderer reacquires the VM that owns the retained render function`() = runTest {
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
-        whenever(luaEngine.renderLuaGraph(vmLock, renderFunction, renderState, renderData, context))
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
             .thenReturn(renderResult)
 
         val viewData = CustomGraphLuaHelper(luaEngine)(
@@ -60,7 +60,7 @@ class CustomGraphLuaHelperTest {
 
         assertSame(renderResult, viewData.content.render(context))
         verify(luaEngine).acquireVM(vmLock.affinity)
-        verify(luaEngine).renderLuaGraph(vmLock, renderFunction, renderState, renderData, context)
+        verify(luaEngine).renderLuaUi(vmLock, renderFunction, renderState, context, renderData)
         verify(luaEngine).releaseVM(vmLock)
     }
 
@@ -88,7 +88,7 @@ class CustomGraphLuaHelperTest {
         val callback: LuaValueReference = mock()
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
-        whenever(luaEngine.renderLuaGraph(vmLock, renderFunction, renderState, renderData, context))
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
             .thenReturn(renderResult)
 
         val content = (CustomGraphLuaHelper(luaEngine)(
@@ -101,12 +101,12 @@ class CustomGraphLuaHelperTest {
         inOrder(luaEngine) {
             verify(luaEngine).acquireVM(vmLock.affinity)
             verify(luaEngine).callLuaFunction(vmLock, callback)
-            verify(luaEngine).renderLuaGraph(
+            verify(luaEngine).renderLuaUi(
                 vmLock,
                 renderFunction,
                 renderState,
-                renderData,
                 context,
+                renderData,
             )
             verify(luaEngine).releaseVM(vmLock)
         }

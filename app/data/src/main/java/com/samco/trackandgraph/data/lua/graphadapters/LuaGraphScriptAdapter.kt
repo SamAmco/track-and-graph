@@ -17,20 +17,12 @@
 package com.samco.trackandgraph.data.lua.graphadapters
 
 import com.samco.trackandgraph.data.lua.LuaVMAffinity
-import com.samco.trackandgraph.data.lua.LuaVMLock
-import com.samco.trackandgraph.data.lua.LuaValueAccessorImpl
 import com.samco.trackandgraph.data.lua.LuaValueReferenceImpl
 import com.samco.trackandgraph.data.lua.LuaStateJsonCodec
-import com.samco.trackandgraph.data.lua.valueFor
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
-import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
-import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
@@ -59,37 +51,6 @@ internal class LuaGraphScriptAdapter @Inject constructor(
             resolvedScript.istable() -> resolvedScript
             else -> throw IllegalArgumentException("Invalid lua graph script result. Must be a function or table")
         }
-    }
-
-    fun render(
-        vmLock: LuaVMLock,
-        renderFunction: LuaValueReference,
-        renderState: LuaValueReference,
-        renderData: LuaValueReference,
-        context: LuaUiContext,
-    ): LuaUiRenderResult {
-        val luaRenderFunction = renderFunction.valueFor(vmLock)
-        val luaRenderState = renderState.valueFor(vmLock)
-        val result = luaRenderFunction.invoke(
-            LuaValue.varargsOf(
-                arrayOf(
-                    context.toLuaValue(),
-                    luaRenderState,
-                    renderData.valueFor(vmLock),
-                )
-            )
-        ).arg1()
-        require(result.istable()) { "A Lua UI renderer must return a table" }
-        val ui = result.rawget(UI)
-        require(!ui.isnil()) { "A Lua UI renderer must return a ui value" }
-        val returnedState = result.rawget(STATE)
-        val nextState = if (returnedState.isnil()) luaRenderState else returnedState
-        require(nextState.isnil() || nextState.istable()) { "Lua UI state must be a table or nil" }
-        return LuaUiRenderResult(
-            ui = LuaValueAccessorImpl(ui, vmLock.affinity),
-            state = LuaValueReferenceImpl(nextState, vmLock.affinity),
-            serializedState = if (nextState.istable()) LuaStateJsonCodec.encode(nextState) else null,
-        )
     }
 
     private fun processLuaGraphResult(
@@ -142,20 +103,5 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         const val CUSTOM = "CUSTOM"
         const val PREPARE_DATA = "prepare_data"
         const val RENDER_GRAPH = "render_graph"
-        const val UI = "ui"
-        const val STATE = "state"
     }
-}
-
-private fun LuaUiContext.toLuaValue(): LuaValue = LuaTable().apply {
-    set("constraints", LuaTable().apply {
-        set("min_width", constraints.minWidth)
-        set("max_width", constraints.maxWidth)
-        set("min_height", constraints.minHeight)
-        set("max_height", constraints.maxHeight)
-    })
-    set("density", density.toDouble())
-    set("font_scale", fontScale.toDouble())
-    set("layout_direction", layoutDirection.name)
-    set("theme", theme.name)
 }

@@ -54,19 +54,27 @@ interface LuaEngine {
         params: LuaGraphEngineParams,
     ): LuaGraphResult
 
-    /** Executes a packaged script's entry point and exposes its returned Lua value. */
+    /** Executes a script entry point and exposes its returned Lua value. */
+    fun runLuaScript(
+        vmLock: LuaVMLock,
+        script: String,
+    ): LuaValueAccessor
+
     fun runLuaScript(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
     ): LuaValueAccessor
 
-    fun renderLuaGraph(
+    fun renderLuaUi(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
         renderState: LuaValueReference,
-        renderData: LuaValueReference,
         context: LuaUiContext,
+        vararg arguments: LuaValueReference,
     ): LuaUiRenderResult
+
+    /** Decodes persisted JSON state into a retained value owned by [vmLock]'s runtime. */
+    fun decodeLuaState(vmLock: LuaVMLock, encoded: String?): LuaValueReference
 
     /** Calls an affinity-bound Lua function with zero or more Kotlin-owned values. */
     fun callLuaFunction(
