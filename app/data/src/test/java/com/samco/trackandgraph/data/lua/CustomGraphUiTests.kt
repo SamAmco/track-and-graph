@@ -30,6 +30,35 @@ import org.junit.Test
 
 internal class CustomGraphUiTests : LuaEngineImplTest() {
     @Test
+    fun `graph UI legend is available as an installed pure Lua module`() = runBlocking {
+        val engine = uut()
+        val lock = engine.acquireVM()
+        try {
+            val legend = engine.runLuaScript(
+                lock,
+                InlineLuaGraphScriptAccessor(
+                    """
+                    local core = require("tng.core")
+                    local graphui = require("tng.graphui")
+                    return graphui.legend({
+                        items = {{ color = core.COLOR.BLUE, label = "Steps" }},
+                    })
+                    """.trimIndent(),
+                ),
+            )
+
+            assertEquals("FLOW_ROW", legend["type"]?.asString())
+            assertEquals("CENTER", legend["horizontal_arrangement"]?.asString())
+            assertEquals(7.0, legend["children"]?.get(1)?.get("children")?.get(1)
+                ?.get("modifier")?.get(3)?.get("color")?.asDouble() ?: -1.0, 0.0)
+            assertEquals("Steps", legend["children"]?.get(1)?.get("children")?.get(3)
+                ?.get("text")?.asString())
+        } finally {
+            engine.releaseVM(lock)
+        }
+    }
+
+    @Test
     fun `retained Lua functions accept arbitrary argument counts`() = runBlocking {
         val engine = uut()
         val lock = engine.acquireVM()
