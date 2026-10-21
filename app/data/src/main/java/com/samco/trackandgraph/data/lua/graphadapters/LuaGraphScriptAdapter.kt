@@ -66,7 +66,15 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         context: LuaUiContext,
     ): LuaValueAccessor {
         val luaRenderFunction = renderFunction.valueFor(vmLock)
-        val result = luaRenderFunction.call(renderData.valueFor(vmLock), context.toLuaValue())
+        val result = luaRenderFunction.invoke(
+            LuaValue.varargsOf(
+                arrayOf(
+                    context.toLuaValue(),
+                    LuaValue.NIL,
+                    renderData.valueFor(vmLock),
+                )
+            )
+        ).arg1()
         return LuaValueAccessorImpl(result, vmLock.affinity)
     }
 
@@ -98,8 +106,8 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         dataSources: LuaValue,
         affinity: LuaVMAffinity,
     ): LuaGraphResultData.CustomData {
-        val renderData = descriptor[DATA].checkfunction()!!.call(dataSources)
-        val renderFunction = descriptor[RENDER].checkfunction()!!
+        val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(dataSources, LuaValue.NIL)
+        val renderFunction = descriptor[RENDER_GRAPH].checkfunction()!!
         return LuaGraphResultData.CustomData(
             renderData = LuaValueReferenceImpl(renderData, affinity),
             renderFunction = LuaValueReferenceImpl(renderFunction, affinity),
@@ -114,8 +122,8 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         const val TYPE = "type"
         const val DATA_POINT = "DATA_POINT"
         const val CUSTOM = "CUSTOM"
-        const val DATA = "data"
-        const val RENDER = "render"
+        const val PREPARE_DATA = "prepare_data"
+        const val RENDER_GRAPH = "render_graph"
     }
 }
 

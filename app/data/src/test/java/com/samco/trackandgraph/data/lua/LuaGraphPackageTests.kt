@@ -232,12 +232,12 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                     },
                     purpose = "GRAPH",
                     type = "CUSTOM",
-                    data = function() return { value = 41 } end,
-                    render = renderer,
+                    prepare_data = function() return { value = 41 } end,
+                    render_graph = renderer,
                 }
             """.trimIndent(),
             "renderer.lua" to """
-                return function(data)
+                return function(context, state, data)
                     return { type = "TEXT", text = tostring(data.value + 1) }
                 end
             """.trimIndent(),
@@ -291,8 +291,8 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
             "main.lua" to """
                 return {
                     type = "CUSTOM",
-                    data = function() return {} end,
-                    render = function() return require("renderer") end,
+                    prepare_data = function() return {} end,
+                    render_graph = function() return require("renderer") end,
                 }
             """.trimIndent(),
             "renderer.lua" to "return { type = 'TEXT', text = 'package renderer' }",

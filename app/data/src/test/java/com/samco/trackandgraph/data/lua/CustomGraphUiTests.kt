@@ -97,8 +97,8 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         val script = """
             return {
                 type = "CUSTOM",
-                data = function() return {} end,
-                render = function(_, context)
+                prepare_data = function() return {} end,
+                render_graph = function(context)
                     if context.theme == "DARK" then error("render failed") end
                     return {
                         type = "CANVAS",
@@ -181,8 +181,8 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
 
             return {
                 type = graph.GRAPH_TYPE.CUSTOM,
-                data = function() return { value = 7 } end,
-                render = function(data, context)
+                prepare_data = function() return { value = 7 } end,
+                render_graph = function(context, state, data)
                     return setmetatable({
                         type = canvas.TYPE,
                         value = data.value,

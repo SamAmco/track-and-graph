@@ -29,7 +29,7 @@ local function summary(values)
 	}
 end
 
-return function(data, context)
+return function(context, state, data)
 	local values = data.values
 	return ui.surface({
 		key = "graph_surface",

@@ -9,6 +9,6 @@ return {
 	title = strings.title,
 	purpose = graph.TYPE,
 	type = graph.GRAPH_TYPE.CUSTOM,
-	data = data,
-	render = renderer,
+	prepare_data = data,
+	render_graph = renderer,
 }

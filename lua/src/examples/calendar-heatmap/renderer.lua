@@ -196,7 +196,7 @@ local function legend(data)
 	return graphui.legend({ key = "legend", items = items })
 end
 
-return function(data, context)
+return function(context, state, data)
 	local available_width_dp = context.constraints.max_width / context.density
 	local wide_layout = available_width_dp >= wide_layout_min_width_dp
 	return ui.column({
