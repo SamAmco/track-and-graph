@@ -58,4 +58,7 @@ internal data class LuaGraph(
 
     @ColumnInfo(name = "package_version")
     val packageVersion: String? = null,
+
+    @ColumnInfo(name = "configuration")
+    val configuration: String? = null,
 )

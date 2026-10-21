@@ -97,6 +97,7 @@ class GraphHelperImplTest {
     @Test
     fun `create Lua graph stores inline source`() = runTest(dispatcher) {
         val source = LuaGraphSource.Inline("return {}")
+        val configuration = "{\"show_labels\":true}"
 
         val graphStatId = uut.createLuaGraph(
             LuaGraphCreateRequest(
@@ -105,11 +106,14 @@ class GraphHelperImplTest {
                 config = LuaGraphConfig(
                     features = emptyList(),
                     source = source,
+                    configuration = configuration,
                 ),
             )
         ).componentId
 
-        assertEquals(source, uut.getLuaGraphByGraphStatId(graphStatId)?.source)
+        val stored = uut.getLuaGraphByGraphStatId(graphStatId)
+        assertEquals(source, stored?.source)
+        assertEquals(configuration, stored?.configuration)
     }
 
     @Test

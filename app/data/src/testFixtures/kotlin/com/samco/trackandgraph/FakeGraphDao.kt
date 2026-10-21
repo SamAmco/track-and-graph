@@ -291,6 +291,7 @@ internal class FakeGraphDao : GraphDao {
             features = features,
             packageId = luaGraph.packageId,
             packageVersion = luaGraph.packageVersion,
+            configuration = luaGraph.configuration,
             packageArchive = packageData?.archive,
         )
     }

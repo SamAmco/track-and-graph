@@ -23,15 +23,21 @@ data class LuaGraph(
     val id: Long,
     val graphStatId: Long,
     val source: LuaGraphSource,
+    val configuration: String? = null,
 ) {
-    internal fun toEntity() = source.toEntity(id, graphStatId)
+    internal fun toEntity() = source.toEntity(id, graphStatId, configuration)
 }
 
-internal fun LuaGraphSource.toEntity(id: Long, graphStatId: Long) = when (this) {
+internal fun LuaGraphSource.toEntity(
+    id: Long,
+    graphStatId: Long,
+    configuration: String? = null,
+) = when (this) {
     is LuaGraphSource.Inline -> LuaGraph(
         id = id,
         graphStatId = graphStatId,
         script = script,
+        configuration = configuration,
     )
     is LuaGraphSource.Package -> LuaGraph(
         id = id,
@@ -39,5 +45,6 @@ internal fun LuaGraphSource.toEntity(id: Long, graphStatId: Long) = when (this) 
         script = null,
         packageId = packageData.packageId,
         packageVersion = packageData.version,
+        configuration = configuration,
     )
 }

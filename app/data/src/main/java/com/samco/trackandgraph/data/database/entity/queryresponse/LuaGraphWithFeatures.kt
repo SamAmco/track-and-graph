@@ -44,6 +44,9 @@ internal class LuaGraphWithFeatures(
     @ColumnInfo(name = "package_version")
     val packageVersion: String?,
 
+    @ColumnInfo(name = "configuration")
+    val configuration: String?,
+
     @ColumnInfo(name = "package_archive")
     val packageArchive: ByteArray?,
 ) {
@@ -65,6 +68,7 @@ internal class LuaGraphWithFeatures(
             graphStatId = graphStatId,
             features = features.map { it.toDto() },
             source = source,
+            configuration = configuration,
         )
     }
 
@@ -74,5 +78,6 @@ internal class LuaGraphWithFeatures(
         script = script,
         packageId = packageId,
         packageVersion = packageVersion,
+        configuration = configuration,
     )
 }

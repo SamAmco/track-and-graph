@@ -228,6 +228,7 @@ internal class GraphHelperImpl @Inject constructor(
                 request.config.source.toEntity(
                     id = 0L,
                     graphStatId = created.componentId,
+                    configuration = request.config.configuration,
                 )
             )
             val features = request.config.features.map { config ->
@@ -435,6 +436,7 @@ internal class GraphHelperImpl @Inject constructor(
                     request.config.source.toEntity(
                         id = existingLuaGraph.id,
                         graphStatId = existingLuaGraph.graphStatId,
+                        configuration = request.config.configuration,
                     )
                 )
                 graphDao.deleteFeaturesForLuaGraph(existingLuaGraph.id)

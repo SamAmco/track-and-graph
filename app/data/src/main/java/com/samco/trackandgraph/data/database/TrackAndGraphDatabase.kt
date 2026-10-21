@@ -73,7 +73,7 @@ import java.io.FileOutputStream
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-const val TNG_DATABASE_VERSION = 61
+const val TNG_DATABASE_VERSION = 62
 
 private const val TNG_DATABASE_NAME = "trackandgraph_database"
 private const val TNG_RESTORE_VALIDATION_DATABASE_NAME = "trackandgraph_restore_validation"
