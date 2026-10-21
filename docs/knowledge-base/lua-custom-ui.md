@@ -1,14 +1,15 @@
 ---
 title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
-description: Custom graph data/render split, opaque affinity-bound Lua values, Lua UI context, declarative components and modifiers, deferred Canvas instruction recording and unit conversion, parser testing boundaries, theme tokens, runtime error handling, and compatibility boundaries.
+description: Custom graph data/render split, opaque affinity-bound Lua values, responsive declarative layout, FlowRow and graph UI helpers, deferred Canvas instruction recording and text/unit semantics, theme tokens, testing boundaries, and runtime errors.
 topics:
   - CUSTOM graph descriptor separates data preparation from view-dependent rendering
   - Lua values and callbacks remain opaque and bound to their originating VM affinity
   - LuaUiContext supplies root constraints, density, font scale, layout direction, and light/dark mode
-  - tng.ui describes layout; tng.canvas records instructions for later Compose DrawScope replay
-  - Theme values use stable tokens resolved by the active TnG Compose theme
+  - tng.ui describes responsive layout; tng.graphui composes host-free graph conventions from it
+  - tng.canvas records instructions for later Compose DrawScope replay
+  - Theme values and data-visualization colors resolve consistently across declarative UI and Canvas
   - Render and callback failures use the existing graph error presentation
-keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, density, font-scale, sp, Path, pathFactory, testing, vertical-align, theme, modifier, callback, state, error]
+keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.graphui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, state, error]
 ---
 
 # Lua Custom UI
@@ -57,9 +58,15 @@ Theme mode comes from the explicit `TnGComposeTheme` selection, not from guessin
 
 The initial context fields are intended to be dependable. Future optional fields must be additive; scripts targeting them should nil-check so they can degrade gracefully on older app versions.
 
+For coarse responsive decisions such as changing a graph's orientation, compare `constraints.max_width / density` to a dp breakpoint during `render`. The constraints choose the component tree; the measured canvas callback remains the source of truth for exact drawing geometry. Do not treat root constraints as the final canvas bounds.
+
 ## Declarative UI Boundary
 
-`tng.ui` API level 2 currently describes rows, columns, boxes, spacers, text, surfaces, and canvases. Dimensions carry a `PX`, `DP`, or `SP` unit. Ordered modifier tables cover sizing, weight, constraints, aspect ratio, padding, background, border, clipping, elevation, and child alignment. `tng.theme` supplies stable color, spacing, and shape tokens rather than exposing Compose objects to Lua.
+`tng.ui` API level 2 currently describes rows, wrapping flow rows, columns, boxes, spacers, text, surfaces, and canvases. Dimensions carry a `PX`, `DP`, or `SP` unit. Ordered modifier tables cover sizing, weight, constraints, aspect ratio, padding, background, border, clipping, elevation, and child alignment. `flow_row` maps Compose's horizontal and vertical arrangements, independent inter-item and inter-row spacing, item vertical alignment, maximum items per row, maximum lines, and `fill_max_row_height` child behavior. Explicit spacing combines with start/center/end alignment; space-between/around/evenly arrangements define their own gaps, so explicit spacing is ignored for those modes. Keep FlowRow-specific child modifiers in the same ordered modifier list as ordinary modifiers.
+
+`tng.theme` supplies stable color, spacing, shape, and text-style tokens rather than exposing Compose objects to Lua. Its text styles cover the complete Material display/headline/title/body/label set plus Track & Graph's code style. A color accepted by Lua UI or Canvas may be a theme token, a hex string, or a zero-based `tng.core.COLOR` data-visualization palette index; both rendering paths deliberately share the same resolver.
+
+`tng.graphui` is a pure-Lua convenience layer built only from `tng.ui` and `tng.theme`; it introduces no Android bridge types. Its legend helpers reproduce the native graph convention—a centered, wrapping full-width FlowRow containing 20dp circular swatches, a 2dp label gap, body-medium text, and 10dp item spacing. Put reusable graph presentation conventions here so native and packaged graphs do not drift visually.
 
 Stable component keys preserve identity across renders and become especially important once components contain state or actions. The DSL currently has no clickable modifier or general input/action component; do not document planned interactive APIs as already supported.
 
@@ -81,7 +88,9 @@ There is no Lua/Compose ping-pong for individual drawing operations. Lua records
 
 Standard linear, horizontal, vertical, radial, and sweep gradients are represented as serializable brush descriptions. The same boundary models Compose blend modes, tint/color-matrix/lighting filters, common path effects, and scoped or batched transforms. Paths support ordinary segment construction plus non-returning additions and mutations; operations that synchronously return computed geometry are not exposed.
 
-Canvas text uses Compose's native horizontal `TextAlign`. Track & Graph additionally provides `vertical_align` for positioning measured text at the top, center, or bottom of an explicitly supplied `size` rectangle. It has no effect when `size` is absent because there is no vertical region to align within.
+Canvas text uses Compose's native horizontal `TextAlign`. When an instruction supplies `size`, the bridge fixes the measured paragraph width to `size.width`; merely applying a maximum width leaves short labels at their intrinsic width and makes center/end alignment appear left-aligned. Height is intentionally different: `size.height` remains only the maximum measurement height so the result retains its natural text height.
+
+Track & Graph's additional `vertical_align` then positions that naturally measured text at the top, center, or bottom of the requested height. It has no effect when `size` is absent because there is no vertical region to align within. Do not force the minimum text height to `size.height`: doing so makes the measured height equal the container height, leaves no remainder to offset, and breaks this vertical-alignment abstraction.
 
 The bridge intentionally does not yet expose image drawing, graphics layers, arbitrary shader brushes, or raw `drawIntoCanvas`. Images first need a package-asset contract, while stateful or live Compose objects cannot cross the retained-data boundary.
 
@@ -93,4 +102,4 @@ Test the Lua instruction recorder in `lua/src/tng/test/test_canvas.lua`, and tes
 
 Initial graph execution errors already flow through `LuaGraphResult` and the normal graph error view. Failures thrown later by `render` or a retained canvas callback are converted to `LuaScriptException` and routed to the same presentation rather than silently producing an empty component. Coroutine cancellation is rethrown: constraint/content changes may cancel and restart `produceState`, and that control flow must not appear as a script failure.
 
-The worked contract example is a multi-file package under `lua/src/examples/canvas-basic-graph/`. The graph result type belongs to `tng.graph`; `tng.ui` only describes the returned layout. API compatibility is declared in the `tng.graph`, `tng.ui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.
+The worked contract example is a multi-file package under `lua/src/examples/canvas-basic-graph/`. The graph result type belongs to `tng.graph`; `tng.ui` only describes the returned layout. API compatibility is declared in the `tng.graph`, `tng.ui`, `tng.graphui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.

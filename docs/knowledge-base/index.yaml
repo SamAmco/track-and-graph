@@ -109,8 +109,8 @@ docs:
 
   - file: lua-custom-ui.md
     title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
-    description: Custom graph data/render split, opaque affinity-bound Lua values, Lua UI context, declarative components and modifiers, deferred Canvas instruction recording and unit conversion, parser testing boundaries, theme tokens, runtime error handling, and compatibility boundaries.
-    keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, density, font-scale, sp, Path, pathFactory, testing, vertical-align, theme, modifier, callback, state, error]
+    description: Custom graph data/render split, opaque affinity-bound Lua values, responsive declarative layout, FlowRow and graph UI helpers, deferred Canvas instruction recording and text/unit semantics, theme tokens, testing boundaries, and runtime errors.
+    keywords: [lua, custom-ui, CUSTOM, tng.ui, tng.graphui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueReference, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, state, error]
 
   - file: lua-community-functions.md
     title: Writing Lua function scripts and contributing to the community catalog
