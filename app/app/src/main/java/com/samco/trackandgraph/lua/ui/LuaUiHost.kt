@@ -36,11 +36,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -64,14 +66,20 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.ui.theming.TngColors
 import com.samco.trackandgraph.ui.theming.TngTypography
 import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.theming.tngTypography
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 private val LocalLuaUiErrorHandler = staticCompositionLocalOf<(Throwable) -> Unit> {
     { throw it }
+}
+
+private val LocalLuaUiActionHandler = staticCompositionLocalOf<(LuaValueReference) -> Unit> {
+    { error("No Lua UI action handler installed") }
 }
 
 private val canvasSpBreakpoints = listOf(8f, 10f, 12f, 14f, 18f, 20f, 24f, 30f, 100f)
@@ -100,9 +108,21 @@ internal fun LuaUiHost(
             theme = if (darkTheme) LuaUiContext.Theme.DARK else LuaUiContext.Theme.LIGHT,
         )
         var callbackError by remember(content, context) { mutableStateOf<Throwable?>(null) }
-        val renderResult by produceState<Result<LuaUiRenderResult>?>(null, content, context) {
-            value = captureLuaUiResult { content.render(context) }
-                .also { result -> result.getOrNull()?.let { onStateChanged(it.serializedState) } }
+        var renderResult by remember(content, context) {
+            mutableStateOf<Result<LuaUiRenderResult>?>(null)
+        }
+        fun publish(result: Result<LuaUiRenderResult>) {
+            renderResult = result
+            result.getOrNull()?.let { onStateChanged(it.serializedState) }
+        }
+        LaunchedEffect(content, context) {
+            publish(captureLuaUiResult { content.render(context) })
+        }
+        val coroutineScope = rememberCoroutineScope()
+        val actionHandler: (LuaValueReference) -> Unit = { function ->
+            coroutineScope.launch {
+                publish(captureLuaUiResult { content.interact(context, function) })
+            }
         }
         val error = callbackError ?: renderResult?.exceptionOrNull()
         if (error != null) {
@@ -111,6 +131,7 @@ internal fun LuaUiHost(
             renderResult?.getOrNull()?.ui?.let { tree ->
                 CompositionLocalProvider(
                     LocalLuaUiErrorHandler provides { callbackError = it },
+                    LocalLuaUiActionHandler provides actionHandler,
                 ) {
                     LuaNode(tree, content)
                 }
@@ -122,7 +143,11 @@ internal fun LuaUiHost(
 @Composable
 private fun LuaNode(node: LuaValueAccessor, content: LuaUiContent, parentModifier: Modifier = Modifier) {
     key(node["key"]?.asString() ?: node) {
-        val modifier = LuaUiModifierParser.parse(parentModifier, node["modifier"])
+        val modifier = LuaUiModifierParser.parse(
+            parentModifier,
+            node["modifier"],
+            LocalLuaUiActionHandler.current,
+        )
         when (node["type"]?.asString()) {
             "ROW" -> Row(
                 modifier = modifier,

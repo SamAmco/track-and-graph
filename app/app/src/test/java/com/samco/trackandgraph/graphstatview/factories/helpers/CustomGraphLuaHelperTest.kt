@@ -31,6 +31,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertSame
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -80,5 +81,34 @@ class CustomGraphLuaHelperTest {
         verify(luaEngine).acquireVM(vmLock.affinity)
         verify(luaEngine).callLuaFunction(vmLock, callback, argument)
         verify(luaEngine).releaseVM(vmLock)
+    }
+
+    @Test
+    fun `interaction calls callback and rerenders before releasing one VM lock`() = runTest {
+        val callback: LuaValueReference = mock()
+        whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
+        whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
+        whenever(luaEngine.renderLuaGraph(vmLock, renderFunction, renderState, renderData, context))
+            .thenReturn(renderResult)
+
+        val content = (CustomGraphLuaHelper(luaEngine)(
+            customData = LuaGraphResultData.CustomData(renderData, renderFunction, renderState),
+            graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
+        ).wrapped as ILuaCustomGraphViewData).content
+
+        assertSame(renderResult, content.interact(context, callback))
+
+        inOrder(luaEngine) {
+            verify(luaEngine).acquireVM(vmLock.affinity)
+            verify(luaEngine).callLuaFunction(vmLock, callback)
+            verify(luaEngine).renderLuaGraph(
+                vmLock,
+                renderFunction,
+                renderState,
+                renderData,
+                context,
+            )
+            verify(luaEngine).releaseVM(vmLock)
+        }
     }
 }

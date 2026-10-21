@@ -30,6 +30,7 @@ test("nested UI constants are available through the API level gate", function()
 end)
 
 test("modifier order and values are preserved", function()
+	local clicked = function() end
 	local modifiers = ui.modifier(
 		ui.fill_width(),
 		ui.height(ui.dp(200)),
@@ -39,10 +40,11 @@ test("modifier order and values are preserved", function()
 		ui.border({ width = ui.dp(1), color = theme.color.outline, shape = theme.shape.medium }),
 		ui.clip(theme.shape.medium),
 		ui.elevation(ui.dp(4)),
-		ui.align(ui.ALIGNMENT.CENTER)
+		ui.align(ui.ALIGNMENT.CENTER),
+		ui.on_click(clicked)
 	)
 
-	assert(#modifiers == 9)
+	assert(#modifiers == 10)
 	assert(modifiers[1].type == ui.MODIFIER_TYPE.FILL_WIDTH)
 	assert(modifiers[2].type == ui.MODIFIER_TYPE.HEIGHT)
 	assert(modifiers[3].fill == false)
@@ -52,6 +54,8 @@ test("modifier order and values are preserved", function()
 	assert(modifiers[7].shape == "SHAPE_MEDIUM")
 	assert(modifiers[8].value.value == 4)
 	assert(modifiers[9].value == ui.ALIGNMENT.CENTER)
+	assert(modifiers[10].type == ui.MODIFIER_TYPE.ON_CLICK)
+	assert(modifiers[10].callback == clicked)
 end)
 
 test("flow row preserves wrapping policy and child modifiers", function()

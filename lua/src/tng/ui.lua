@@ -38,6 +38,7 @@ M.MODIFIER_TYPE = {
 	CLIP = "CLIP",
 	ELEVATION = "ELEVATION",
 	ALIGN = "ALIGN",
+	ON_CLICK = "ON_CLICK",
 }
 
 --- @since (API level 2)
@@ -272,6 +273,12 @@ end
 
 M.align = function(alignment)
 	return value_modifier(M.MODIFIER_TYPE.ALIGN, alignment)
+end
+
+--- Invokes a function when the component is clicked, then rerenders the containing Lua UI session.
+M.on_click = function(callback)
+	assert(type(callback) == "function", "on_click callback must be a function")
+	return { type = M.MODIFIER_TYPE.ON_CLICK, callback = callback }
 end
 
 local component = function(component_type, params)

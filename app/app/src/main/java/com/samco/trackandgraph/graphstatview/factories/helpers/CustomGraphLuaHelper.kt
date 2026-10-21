@@ -45,6 +45,25 @@ class CustomGraphLuaHelper @Inject constructor(
                     render(customData.renderFunction, state, customData.renderData, context)
                         .also { state = it.state }
 
+                override suspend fun interact(
+                    context: LuaUiContext,
+                    function: LuaValueReference,
+                ): LuaUiRenderResult {
+                    val vmLock = luaEngine.acquireVM(customData.renderFunction.affinity)
+                    return try {
+                        luaEngine.callLuaFunction(vmLock, function)
+                        luaEngine.renderLuaGraph(
+                            vmLock,
+                            customData.renderFunction,
+                            state,
+                            customData.renderData,
+                            context,
+                        ).also { state = it.state }
+                    } finally {
+                        luaEngine.releaseVM(vmLock)
+                    }
+                }
+
                 override suspend fun call(function: LuaValueReference, argument: LuaValueData) =
                     callFunction(function, argument)
             }

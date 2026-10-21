@@ -18,6 +18,7 @@ package com.samco.trackandgraph.lua.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -46,10 +47,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 
 internal object LuaUiModifierParser {
     @Composable
-    fun parse(initial: Modifier, modifiers: LuaValueAccessor?): Modifier {
+    fun parse(
+        initial: Modifier,
+        modifiers: LuaValueAccessor?,
+        onClick: (LuaValueReference) -> Unit,
+    ): Modifier {
         var result = initial
         modifiers.toList().forEach { item ->
             result = when (item["type"]?.asString()) {
@@ -73,6 +79,9 @@ internal object LuaUiModifierParser {
                 } ?: result
                 "CLIP" -> result.clip(shape(item["shape"]?.asString()))
                 "ELEVATION" -> result.shadow(dimension(item["value"]) ?: 0.dp)
+                "ON_CLICK" -> item["callback"]?.asFunction()?.let { callback ->
+                    result.clickable { onClick(callback) }
+                } ?: result
                 else -> result
             }
         }

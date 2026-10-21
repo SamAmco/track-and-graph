@@ -33,6 +33,7 @@ return {
 	["MODIFIER_TYPE.CLIP"] = 2,
 	["MODIFIER_TYPE.ELEVATION"] = 2,
 	["MODIFIER_TYPE.ALIGN"] = 2,
+	["MODIFIER_TYPE.ON_CLICK"] = 2,
 
 	ALIGNMENT = 2,
 	["ALIGNMENT.START"] = 2,
@@ -104,6 +105,7 @@ return {
 	clip = 2,
 	elevation = 2,
 	align = 2,
+	on_click = 2,
 
 	row = 2,
 	flow_row = 2,

@@ -20,6 +20,13 @@ package com.samco.trackandgraph.data.lua.dto
 interface LuaUiContent {
     suspend fun render(context: LuaUiContext): LuaUiRenderResult
 
+    /** Calls an action and rerenders before releasing their shared VM execution lock. */
+    suspend fun interact(
+        context: LuaUiContext,
+        function: LuaValueReference,
+    ): LuaUiRenderResult
+
+    /** Calls an auxiliary function, such as a deferred Canvas draw callback, without rerendering. */
     suspend fun call(
         function: LuaValueReference,
         argument: LuaValueData = LuaValueData.Nil,
