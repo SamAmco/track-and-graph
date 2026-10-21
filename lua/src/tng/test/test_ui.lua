@@ -15,6 +15,12 @@ test("dimensions are serializable values", function()
 	assert(ui.sp(14).unit == ui.UNIT.SP)
 end)
 
+test("text accepts translated strings", function()
+	local translations = { en = "Calendar", fr = "Calendrier" }
+	local text = ui.text({ text = translations })
+	assert(text.text == translations)
+end)
+
 test("nested UI constants are available through the API level gate", function()
 	local api_gate = require("community.test-utils.api-gate")
 	local spec = dofile("src/tng/ui.apispec.lua")

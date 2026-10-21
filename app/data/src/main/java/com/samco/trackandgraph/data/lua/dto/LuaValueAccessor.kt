@@ -35,6 +35,8 @@ interface LuaValueAccessor {
     val arraySize: Int?
     fun asDouble(): Double?
     fun asString(): String?
+    /** Returns string-keyed string values when this value is a table. */
+    fun asStringMap(): Map<String, String>? = null
     fun asBoolean(): Boolean?
     fun asFunction(): LuaValueReference?
 }

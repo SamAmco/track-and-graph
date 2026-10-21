@@ -67,10 +67,12 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.ui.theming.TngColors
 import com.samco.trackandgraph.ui.theming.TngTypography
 import com.samco.trackandgraph.ui.theming.tngColors
 import com.samco.trackandgraph.ui.theming.tngTypography
+import com.samco.trackandgraph.ui.ui.resolve
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -220,7 +222,7 @@ private fun ColumnScope.LuaColumnChildren(
 @Composable
 private fun LuaText(node: LuaValueAccessor, modifier: Modifier) {
     Text(
-        text = node["text"]?.asString().orEmpty(),
+        text = luaText(node["text"]),
         modifier = modifier,
         color = luaColor(node["color"]) ?: Color.Unspecified,
         style = luaTextStyle(
@@ -246,6 +248,12 @@ private fun LuaText(node: LuaValueAccessor, modifier: Modifier) {
         } else TextOverflow.Clip,
     )
 }
+
+@Composable
+private fun luaText(value: LuaValueAccessor?): String =
+    value?.asString()
+        ?: value?.asStringMap()?.let { TranslatedString.Translations(it).resolve() }
+        .orEmpty()
 
 internal fun luaTextStyle(
     token: String?,

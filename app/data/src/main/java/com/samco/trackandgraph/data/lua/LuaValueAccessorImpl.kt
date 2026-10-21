@@ -29,6 +29,18 @@ internal class LuaValueAccessorImpl(
 
     override fun asDouble(): Double? = if (value.isnumber()) value.todouble() else null
     override fun asString(): String? = if (value.isstring()) value.tojstring() else null
+    override fun asStringMap(): Map<String, String>? {
+        if (!value.istable()) return null
+        val table = value.checktable()!!
+        return buildMap {
+            table.keys().forEach { key ->
+                val entry = table.rawget(key)
+                if (key.type() == LuaValue.TSTRING && entry.type() == LuaValue.TSTRING) {
+                    put(key.tojstring(), entry.tojstring())
+                }
+            }
+        }
+    }
     override fun asBoolean(): Boolean? = if (value.isboolean()) value.toboolean() else null
     override fun asFunction(): LuaValueReference? =
         if (value.isfunction()) LuaValueReferenceImpl(value, affinity) else null

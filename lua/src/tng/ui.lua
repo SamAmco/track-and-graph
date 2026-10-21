@@ -124,7 +124,7 @@ M.BoxParams = {}
 --- @class TextParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
---- @field text string: Text to display.
+--- @field text string|table<string,string>: Text to display, either directly or as translations keyed by BCP 47 language tag.
 --- @field style? string: Text style token from `tng.theme.text_style`.
 --- @field color? Color|string: Raw or theme color token.
 --- @field font_size? Dimension: Text size, normally expressed in sp.
@@ -348,7 +348,7 @@ end
 
 M.text = function(params)
 	assert(type(params) == "table", "text params must be a table")
-	assert(type(params.text) == "string", "text must be a string")
+	assert(type(params.text) == "string" or type(params.text) == "table", "text must be a string or translations table")
 	local result = component(M.COMPONENT_TYPE.TEXT, params)
 	result.text = params.text
 	result.style = params.style
