@@ -72,12 +72,18 @@ Kotlin deliberately parses the returned table in place through `LuaValueAccessor
 A canvas cannot know its exact bounds during root UI generation. `ui.canvas` therefore stores a Lua callback rather than immediate instructions. After Compose measures that canvas:
 
 1. Kotlin calls the retained callback with `context.bounds.width` and `height` in pixels.
-2. `tng.canvas` creates a Lua `CanvasDrawScope` containing the exact `size`.
-3. Calls such as `drawScope:drawLine(...)` and `drawScope:drawCircle(...)` append plain instruction tables.
+2. `tng.canvas` creates a Lua `CanvasDrawScope` containing the exact `size` and `center`. Bare numbers are physical pixels; its `dp` and `sp` helpers convert those units to numeric physical pixels for canvas arithmetic. The host supplies Compose density plus a font-scale conversion table so `sp` follows Android's non-linear accessibility scaling rather than assuming `density * fontScale`.
+3. Draw calls append plain instruction tables. The color-based API supports lines, rectangles, rounded rectangles, circles, ovals, arcs, paths, points, and measured text. Nested callbacks support translation, rotation, scaling, insets, and rectangle/path clipping.
 4. The callback returns the completed instruction list.
 5. Kotlin parses and replays that list into the Compose `DrawScope` in paint order.
 
 There is no Lua/Compose ping-pong for individual drawing operations. Lua records a complete instruction list, then Compose draws it. The draw callback is a closure in the same Lua environment as `render`, so it can retain state and values from the render context; canvas-specific data should remain limited to facts only known after measurement, such as exact bounds.
+
+Standard linear, horizontal, vertical, radial, and sweep gradients are represented as serializable brush descriptions. The same boundary models Compose blend modes, tint/color-matrix/lighting filters, common path effects, and scoped or batched transforms. Paths support ordinary segment construction plus non-returning additions and mutations; operations that synchronously return computed geometry are not exposed.
+
+Canvas text uses Compose's native horizontal `TextAlign`. Track & Graph additionally provides `vertical_align` for positioning measured text at the top, center, or bottom of an explicitly supplied `size` rectangle. It has no effect when `size` is absent because there is no vertical region to align within.
+
+The bridge intentionally does not yet expose image drawing, graphics layers, arbitrary shader brushes, or raw `drawIntoCanvas`. Images first need a package-asset contract, while stateful or live Compose objects cannot cross the retained-data boundary.
 
 ## Errors and Cancellation
 

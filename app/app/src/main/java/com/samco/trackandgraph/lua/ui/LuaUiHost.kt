@@ -46,6 +46,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
@@ -63,6 +64,8 @@ import kotlinx.coroutines.CancellationException
 private val LocalLuaUiErrorHandler = staticCompositionLocalOf<(Throwable) -> Unit> {
     { throw it }
 }
+
+private val canvasSpBreakpoints = listOf(8f, 10f, 12f, 14f, 18f, 20f, 24f, 30f, 100f)
 
 @Composable
 internal fun LuaUiHost(
@@ -208,9 +211,11 @@ private fun LuaSurface(node: LuaValueAccessor, content: LuaUiContent, modifier: 
 @Composable
 private fun LuaCanvas(node: LuaValueAccessor, content: LuaUiContent, modifier: Modifier) {
     val draw = node["draw"]?.asFunction() ?: return
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
     val onError = LocalLuaUiErrorHandler.current
     var size by remember(draw) { mutableStateOf(IntSize.Zero) }
-    val result by produceState<LuaValueAccessor?>(null, content, draw, size) {
+    val result by produceState<LuaValueAccessor?>(null, content, draw, size, density) {
         value = if (size == IntSize.Zero) null else {
             captureLuaUiResult {
                 content.call(
@@ -220,6 +225,16 @@ private fun LuaCanvas(node: LuaValueAccessor, content: LuaUiContent, modifier: M
                             "width" to LuaValueData.NumberValue(size.width.toDouble()),
                             "height" to LuaValueData.NumberValue(size.height.toDouble()),
                         )),
+                        "density" to LuaValueData.NumberValue(density.density.toDouble()),
+                        "font_scale" to LuaValueData.NumberValue(density.fontScale.toDouble()),
+                        "sp_to_px" to LuaValueData.ArrayValue(canvasSpBreakpoints.map { sp ->
+                            LuaValueData.TableValue(mapOf(
+                                "sp" to LuaValueData.NumberValue(sp.toDouble()),
+                                "px" to LuaValueData.NumberValue(
+                                    with(density) { sp.sp.toPx().toDouble() },
+                                ),
+                            ))
+                        }),
                     )),
                 )
             }.fold(
@@ -230,7 +245,9 @@ private fun LuaCanvas(node: LuaValueAccessor, content: LuaUiContent, modifier: M
     }
     val colors = luaThemeColors()
     Canvas(modifier.onSizeChanged { size = it }) {
-        result?.get("instructions")?.let { LuaCanvasInstructionParser.draw(this, it, colors) }
+        result?.get("instructions")?.let {
+            LuaCanvasInstructionParser.draw(this, it, colors, textMeasurer)
+        }
     }
 }
 
