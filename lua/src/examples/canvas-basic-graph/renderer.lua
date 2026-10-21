@@ -31,7 +31,8 @@ end
 
 return function(context, state, data)
 	local values = data.values
-	return ui.surface({
+	return {
+		ui = ui.surface({
 		key = "graph_surface",
 		color = theme.color.surface,
 		content_color = theme.color.on_surface,
@@ -116,5 +117,7 @@ return function(context, state, data)
 				}),
 			},
 		}),
-	})
+		}),
+		state = state,
+	}
 end

@@ -24,6 +24,7 @@ sealed interface LuaGraphResultData {
     data class CustomData(
         val renderData: LuaValueReference,
         val renderFunction: LuaValueReference,
+        val renderState: LuaValueReference,
     ) : LuaGraphResultData
 
     data class DataPointData(

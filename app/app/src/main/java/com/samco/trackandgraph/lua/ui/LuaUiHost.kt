@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.ui.theming.TngColors
@@ -80,6 +81,7 @@ internal fun LuaUiHost(
     modifier: Modifier,
     content: LuaUiContent,
     errorContent: @Composable (Throwable) -> Unit,
+    onStateChanged: (String?) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
@@ -98,14 +100,15 @@ internal fun LuaUiHost(
             theme = if (darkTheme) LuaUiContext.Theme.DARK else LuaUiContext.Theme.LIGHT,
         )
         var callbackError by remember(content, context) { mutableStateOf<Throwable?>(null) }
-        val renderResult by produceState<Result<LuaValueAccessor>?>(null, content, context) {
+        val renderResult by produceState<Result<LuaUiRenderResult>?>(null, content, context) {
             value = captureLuaUiResult { content.render(context) }
+                .also { result -> result.getOrNull()?.let { onStateChanged(it.serializedState) } }
         }
         val error = callbackError ?: renderResult?.exceptionOrNull()
         if (error != null) {
             errorContent(error)
         } else {
-            renderResult?.getOrNull()?.let { tree ->
+            renderResult?.getOrNull()?.ui?.let { tree ->
                 CompositionLocalProvider(
                     LocalLuaUiErrorHandler provides { callbackError = it },
                 ) {

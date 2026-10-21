@@ -98,11 +98,14 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             return {
                 type = "CUSTOM",
                 prepare_data = function() return {} end,
-                render_graph = function(context)
+                render_graph = function(context, state)
                     if context.theme == "DARK" then error("render failed") end
                     return {
-                        type = "CANVAS",
-                        draw = function() error("draw failed") end,
+                        ui = {
+                            type = "CANVAS",
+                            draw = function() error("draw failed") end,
+                        },
+                        state = state,
                     }
                 end,
             }
@@ -121,6 +124,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
                 engine.renderLuaGraph(
                     renderLock,
                     customData.renderFunction,
+                    customData.renderState,
                     customData.renderData,
                     context(LuaUiContext.Theme.DARK),
                 )
@@ -135,13 +139,14 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             engine.renderLuaGraph(
                 successfulRenderLock,
                 customData.renderFunction,
+                customData.renderState,
                 customData.renderData,
                 context(LuaUiContext.Theme.LIGHT),
             )
         } finally {
             engine.releaseVM(successfulRenderLock)
         }
-        val draw = requireNotNull(tree["draw"]?.asFunction())
+        val draw = requireNotNull(tree.ui["draw"]?.asFunction())
         val drawLock = engine.acquireVM(draw.affinity)
         val drawError = try {
             assertThrows(LuaScriptException::class.java) {
@@ -181,34 +186,42 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
 
             return {
                 type = graph.GRAPH_TYPE.CUSTOM,
-                prepare_data = function() return { value = 7 } end,
+                prepare_data = function(_, state) return { value = state.seed } end,
                 render_graph = function(context, state, data)
-                    return setmetatable({
-                        type = canvas.TYPE,
-                        value = data.value,
-                        theme = context.theme,
-                        max_width = context.constraints.max_width,
-                        draw = function(canvas_context)
-                            return {
-                                type = canvas.TYPE,
-                                instructions = {{
-                                    type = "CIRCLE",
-                                    color = theme.color.primary,
-                                    radius = canvas_context.bounds.width / 2,
-                                    center = { x = 5, y = 6 },
-                                }},
-                            }
-                        end,
-                    }, {
-                        __index = function(_, key) error("unexpected key: " .. key) end,
-                    })
+                    state.renders = state.renders + 1
+                    return {
+                        ui = setmetatable({
+                            type = canvas.TYPE,
+                            value = data.value,
+                            theme = context.theme,
+                            max_width = context.constraints.max_width,
+                            draw = function(canvas_context)
+                                return {
+                                    type = canvas.TYPE,
+                                    instructions = {{
+                                        type = "CIRCLE",
+                                        color = theme.color.primary,
+                                        radius = canvas_context.bounds.width / 2,
+                                        center = { x = 5, y = 6 },
+                                    }},
+                                }
+                            end,
+                        }, {
+                            __index = function(_, key) error("unexpected key: " .. key) end,
+                        }),
+                        state = state,
+                    }
                 end,
             }
         """.trimIndent()
 
         val initialLock = engine.acquireVM()
         val customData = try {
-            engine.runLuaGraph(initialLock, script, LuaGraphEngineParams(emptyMap())).data
+            engine.runLuaGraph(
+                initialLock,
+                script,
+                LuaGraphEngineParams(emptyMap(), "{\"seed\":7,\"renders\":0}"),
+            ).data
                 as LuaGraphResultData.CustomData
         } finally {
             engine.releaseVM(initialLock)
@@ -219,6 +232,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             engine.renderLuaGraph(
                 renderLock,
                 customData.renderFunction,
+                customData.renderState,
                 customData.renderData,
                 LuaUiContext(
                     LuaUiContext.Constraints(0, 1080, 0, 600),
@@ -232,13 +246,14 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             engine.releaseVM(renderLock)
         }
 
-        assertEquals("CANVAS", tree["type"]?.asString())
-        assertEquals(7.0, tree["value"]?.asDouble() ?: 0.0, 0.0)
-        assertEquals("DARK", tree["theme"]?.asString())
-        assertEquals(1080.0, tree["max_width"]?.asDouble() ?: 0.0, 0.0)
-        assertNull(tree["not_declared"])
+        assertEquals("CANVAS", tree.ui["type"]?.asString())
+        assertEquals(7.0, tree.ui["value"]?.asDouble() ?: 0.0, 0.0)
+        assertEquals("DARK", tree.ui["theme"]?.asString())
+        assertEquals(1080.0, tree.ui["max_width"]?.asDouble() ?: 0.0, 0.0)
+        assertNull(tree.ui["not_declared"])
+        assertEquals("{\"seed\":7.0,\"renders\":1.0}", tree.serializedState)
 
-        val draw = requireNotNull(tree["draw"]?.asFunction())
+        val draw = requireNotNull(tree.ui["draw"]?.asFunction())
         val drawLock = engine.acquireVM(draw.affinity)
         val instructions = try {
             engine.callLuaFunction(

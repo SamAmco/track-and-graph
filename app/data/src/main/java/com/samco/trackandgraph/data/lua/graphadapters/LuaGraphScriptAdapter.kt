@@ -20,12 +20,14 @@ import com.samco.trackandgraph.data.lua.LuaVMAffinity
 import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.lua.LuaValueAccessorImpl
 import com.samco.trackandgraph.data.lua.LuaValueReferenceImpl
+import com.samco.trackandgraph.data.lua.LuaStateJsonCodec
 import com.samco.trackandgraph.data.lua.valueFor
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import org.luaj.vm2.LuaTable
@@ -48,7 +50,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
     ): LuaGraphResult {
         val dataSources = luaDataSourceProviderImpl.createDataSourceTable(params.dataSources)
         val scriptResult = executeScript(resolvedScript, dataSources)
-        return processLuaGraphResult(scriptResult, dataSources, affinity)
+        return processLuaGraphResult(scriptResult, dataSources, params.configuration, affinity)
     }
 
     fun executeScript(resolvedScript: LuaValue, dataSources: LuaValue): LuaValue {
@@ -62,25 +64,38 @@ internal class LuaGraphScriptAdapter @Inject constructor(
     fun render(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
+        renderState: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaUiContext,
-    ): LuaValueAccessor {
+    ): LuaUiRenderResult {
         val luaRenderFunction = renderFunction.valueFor(vmLock)
+        val luaRenderState = renderState.valueFor(vmLock)
         val result = luaRenderFunction.invoke(
             LuaValue.varargsOf(
                 arrayOf(
                     context.toLuaValue(),
-                    LuaValue.NIL,
+                    luaRenderState,
                     renderData.valueFor(vmLock),
                 )
             )
         ).arg1()
-        return LuaValueAccessorImpl(result, vmLock.affinity)
+        require(result.istable()) { "A Lua UI renderer must return a table" }
+        val ui = result.rawget(UI)
+        require(!ui.isnil()) { "A Lua UI renderer must return a ui value" }
+        val returnedState = result.rawget(STATE)
+        val nextState = if (returnedState.isnil()) luaRenderState else returnedState
+        require(nextState.isnil() || nextState.istable()) { "Lua UI state must be a table or nil" }
+        return LuaUiRenderResult(
+            ui = LuaValueAccessorImpl(ui, vmLock.affinity),
+            state = LuaValueReferenceImpl(nextState, vmLock.affinity),
+            serializedState = if (nextState.istable()) LuaStateJsonCodec.encode(nextState) else null,
+        )
     }
 
     private fun processLuaGraphResult(
         resolvedResult: LuaValue,
         dataSources: LuaValue,
+        configuration: String?,
         affinity: LuaVMAffinity,
     ): LuaGraphResult {
         if (resolvedResult.isnil()) return LuaGraphResult(data = null)
@@ -94,7 +109,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
             PIE_CHART -> pieChartLuaGraphAdapter.process(resolvedResult)
             LINE_GRAPH -> lineGraphLuaGraphAdapter.process(resolvedResult)
             TIME_BARCHART -> timeBarChartLuaGraphAdapter.process(resolvedResult)
-            CUSTOM -> processCustomGraph(resolvedResult, dataSources, affinity)
+            CUSTOM -> processCustomGraph(resolvedResult, dataSources, configuration, affinity)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
@@ -104,13 +119,16 @@ internal class LuaGraphScriptAdapter @Inject constructor(
     private fun processCustomGraph(
         descriptor: LuaValue,
         dataSources: LuaValue,
+        configuration: String?,
         affinity: LuaVMAffinity,
     ): LuaGraphResultData.CustomData {
-        val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(dataSources, LuaValue.NIL)
+        val renderState = LuaStateJsonCodec.decode(configuration)
+        val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(dataSources, renderState)
         val renderFunction = descriptor[RENDER_GRAPH].checkfunction()!!
         return LuaGraphResultData.CustomData(
             renderData = LuaValueReferenceImpl(renderData, affinity),
             renderFunction = LuaValueReferenceImpl(renderFunction, affinity),
+            renderState = LuaValueReferenceImpl(renderState, affinity),
         )
     }
 
@@ -124,6 +142,8 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         const val CUSTOM = "CUSTOM"
         const val PREPARE_DATA = "prepare_data"
         const val RENDER_GRAPH = "render_graph"
+        const val UI = "ui"
+        const val STATE = "state"
     }
 }
 

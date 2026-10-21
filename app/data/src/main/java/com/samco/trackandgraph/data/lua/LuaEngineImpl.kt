@@ -29,6 +29,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
@@ -99,12 +100,13 @@ internal class LuaEngineImpl @Inject constructor(
     override fun renderLuaGraph(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
+        renderState: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaUiContext,
-    ): LuaValueAccessor {
+    ): LuaUiRenderResult {
         vmLock.requireActiveLease()
         return try {
-            luaGraphScriptAdapter.render(vmLock, renderFunction, renderData, context)
+            luaGraphScriptAdapter.render(vmLock, renderFunction, renderState, renderData, context)
         } catch (luaError: LuaError) {
             throw luaError.toLuaScriptException()
         }

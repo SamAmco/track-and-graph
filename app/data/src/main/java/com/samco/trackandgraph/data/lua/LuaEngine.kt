@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionMetadata
 import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import com.samco.trackandgraph.data.lua.dto.LuaValueData
@@ -62,9 +63,10 @@ interface LuaEngine {
     fun renderLuaGraph(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
+        renderState: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaUiContext,
-    ): LuaValueAccessor
+    ): LuaUiRenderResult
 
     /** Calls an affinity-bound Lua function with zero or more Kotlin-owned values. */
     fun callLuaFunction(

@@ -199,13 +199,16 @@ end
 return function(context, state, data)
 	local available_width_dp = context.constraints.max_width / context.density
 	local wide_layout = available_width_dp >= wide_layout_min_width_dp
-	return ui.column({
-		key = "calendar_heatmap",
-		spacing = theme.spacing.small,
-		modifier = ui.modifier(ui.fill_width()),
-		children = {
-			calendar(data, wide_layout),
-			legend(data),
-		},
-	})
+	return {
+		ui = ui.column({
+			key = "calendar_heatmap",
+			spacing = theme.spacing.small,
+			modifier = ui.modifier(ui.fill_width()),
+			children = {
+				calendar(data, wide_layout),
+				legend(data),
+			},
+		}),
+		state = state,
+	}
 end

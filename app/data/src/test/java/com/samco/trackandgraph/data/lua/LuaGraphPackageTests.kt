@@ -238,7 +238,10 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
             """.trimIndent(),
             "renderer.lua" to """
                 return function(context, state, data)
-                    return { type = "TEXT", text = tostring(data.value + 1) }
+                    return {
+                        ui = { type = "TEXT", text = tostring(data.value + 1) },
+                        state = state,
+                    }
                 end
             """.trimIndent(),
         ))
@@ -269,6 +272,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
             engine.renderLuaGraph(
                 renderLock,
                 data.renderFunction,
+                data.renderState,
                 data.renderData,
                 LuaUiContext(
                     constraints = LuaUiContext.Constraints(0, 100, 0, 100),
@@ -281,7 +285,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         } finally {
             engine.releaseVM(renderLock)
         }
-        assertEquals("42", rendered["text"]?.asString())
+        assertEquals("42", rendered.ui["text"]?.asString())
     }
 
     @Test
@@ -292,7 +296,9 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                 return {
                     type = "CUSTOM",
                     prepare_data = function() return {} end,
-                    render_graph = function() return require("renderer") end,
+                    render_graph = function(context, state)
+                        return { ui = require("renderer"), state = state }
+                    end,
                 }
             """.trimIndent(),
             "renderer.lua" to "return { type = 'TEXT', text = 'package renderer' }",
@@ -318,6 +324,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
             engine.renderLuaGraph(
                 retainedLock,
                 data.renderFunction,
+                data.renderState,
                 data.renderData,
                 LuaUiContext(
                     LuaUiContext.Constraints(0, 100, 0, 100),
@@ -330,7 +337,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         } finally {
             engine.releaseVM(retainedLock)
         }
-        assertEquals("package renderer", rendered["text"]?.asString())
+        assertEquals("package renderer", rendered.ui["text"]?.asString())
     }
 
     private fun zip(vararg entries: Pair<String, String>): ByteArray {

@@ -20,6 +20,7 @@ import com.samco.trackandgraph.data.database.dto.GraphOrStat
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
+import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
@@ -38,8 +39,11 @@ class CustomGraphLuaHelper @Inject constructor(
     ): ILuaGraphViewData = object : ILuaGraphViewData {
         override val wrapped = object : ILuaCustomGraphViewData {
             override val content = object : LuaUiContent {
-                override suspend fun render(context: LuaUiContext) =
-                    render(customData.renderFunction, customData.renderData, context)
+                private var state = customData.renderState
+
+                override suspend fun render(context: LuaUiContext): LuaUiRenderResult =
+                    render(customData.renderFunction, state, customData.renderData, context)
+                        .also { state = it.state }
 
                 override suspend fun call(function: LuaValueReference, argument: LuaValueData) =
                     callFunction(function, argument)
@@ -53,12 +57,13 @@ class CustomGraphLuaHelper @Inject constructor(
 
     private suspend fun render(
         renderFunction: LuaValueReference,
+        renderState: LuaValueReference,
         renderData: LuaValueReference,
         context: LuaUiContext,
-    ): LuaValueAccessor {
+    ): LuaUiRenderResult {
         val vmLock = luaEngine.acquireVM(renderFunction.affinity)
         return try {
-            luaEngine.renderLuaGraph(vmLock, renderFunction, renderData, context)
+            luaEngine.renderLuaGraph(vmLock, renderFunction, renderState, renderData, context)
         } finally {
             luaEngine.releaseVM(vmLock)
         }

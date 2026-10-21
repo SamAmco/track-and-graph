@@ -18,7 +18,7 @@ package com.samco.trackandgraph.data.lua.dto
 
 /** A session-bound source of a Lua UI tree and invoker for callbacks contained in that tree. */
 interface LuaUiContent {
-    suspend fun render(context: LuaUiContext): LuaValueAccessor
+    suspend fun render(context: LuaUiContext): LuaUiRenderResult
 
     suspend fun call(
         function: LuaValueReference,
