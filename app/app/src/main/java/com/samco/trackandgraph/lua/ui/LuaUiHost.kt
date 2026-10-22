@@ -91,7 +91,7 @@ internal fun LuaUiHost(
     modifier: Modifier,
     content: LuaUiContent,
     errorContent: @Composable (Throwable) -> Unit,
-    onStateChanged: (LuaValueData?) -> Unit = {},
+    onStateChanged: (LuaValueAccessor?) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current

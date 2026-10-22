@@ -40,7 +40,9 @@ internal class LuaUiScriptAdapter @Inject constructor() {
         require(nextState.isnil() || nextState.istable()) { "Lua UI state must be a table or nil" }
         return LuaUiRenderResult(
             ui = LuaValueAccessorImpl(ui, vmLock.affinity),
-            state = LuaStateJsonCodec.snapshot(nextState),
+            state = if (nextState.isnil()) null else {
+                LuaValueAccessorImpl(nextState, vmLock.affinity)
+            },
             retainedState = if (nextState.isnil()) null else {
                 LuaValueReferenceImpl(nextState, vmLock.affinity)
             },

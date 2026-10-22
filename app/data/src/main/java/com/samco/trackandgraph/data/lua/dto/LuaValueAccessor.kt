@@ -43,4 +43,12 @@ interface LuaValueAccessor {
     fun asStringMap(): Map<String, String>? = null
     fun asBoolean(): Boolean?
     fun asFunction(): LuaValueReference?
+
+    /**
+     * Copies the JSON-compatible portion of this live value into detached [LuaValueData].
+     * This traverses the value when called; callers that only need eventual persistence should
+     * defer it with [lazy]. Unsupported runtime values are omitted, so the result is null when
+     * the value itself cannot be represented.
+     */
+    fun snapshot(): LuaValueData?
 }

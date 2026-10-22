@@ -47,6 +47,11 @@ internal object LuaStateJsonCodec {
         return requireNotNull(snapshotTable(value.checktable()!!, visiting))
     }
 
+    fun snapshotValue(value: LuaValue): LuaValueData? {
+        val visiting = Collections.newSetFromMap(IdentityHashMap<LuaValue, Boolean>())
+        return snapshotValue(value, visiting)
+    }
+
     private fun encodeValue(value: LuaValueData): JsonElement? = when (value) {
         LuaValueData.Nil -> JsonNull
         is LuaValueData.BooleanValue -> JsonPrimitive(value.value)

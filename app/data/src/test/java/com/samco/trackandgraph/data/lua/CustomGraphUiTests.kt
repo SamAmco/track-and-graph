@@ -254,12 +254,12 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         assertEquals("DARK", tree.ui["theme"]?.asString())
         assertEquals(1080.0, tree.ui["max_width"]?.asDouble() ?: 0.0, 0.0)
         assertNull(tree.ui["not_declared"])
-        val state = requireNotNull(tree.state) as LuaValueData.TableValue
-        assertEquals(LuaValueData.NumberValue(7.0), state.values["seed"])
-        assertEquals(LuaValueData.NumberValue(1.0), state.values["renders"])
+        val state = requireNotNull(tree.state)
+        assertEquals(7.0, state["seed"]?.asDouble() ?: 0.0, 0.0)
+        assertEquals(1.0, state["renders"]?.asDouble() ?: 0.0, 0.0)
         assertEquals(
             "{\"seed\":7.0,\"renders\":1.0}",
-            LuaStateJsonCodec.encode(state),
+            LuaStateJsonCodec.encode(requireNotNull(state.snapshot())),
         )
 
         val draw = requireNotNull(tree.ui["draw"]?.asFunction())

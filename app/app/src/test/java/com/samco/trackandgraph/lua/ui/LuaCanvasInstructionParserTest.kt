@@ -496,5 +496,6 @@ class LuaCanvasInstructionParserTest {
         override fun asString() = value as? String
         override fun asBoolean() = value as? Boolean
         override fun asFunction(): LuaValueReference? = null
+        override fun snapshot() = error("Canvas parser test values are never snapshotted")
     }
 }

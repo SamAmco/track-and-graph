@@ -9,6 +9,7 @@
 package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 import org.luaj.vm2.LuaValue
 
@@ -44,6 +45,7 @@ internal class LuaValueAccessorImpl(
     override fun asBoolean(): Boolean? = if (value.isboolean()) value.toboolean() else null
     override fun asFunction(): LuaValueReference? =
         if (value.isfunction()) LuaValueReferenceImpl(value, affinity) else null
+    override fun snapshot(): LuaValueData? = LuaStateJsonCodec.snapshotValue(value)
 
     private fun LuaValue.accessorOrNull(): LuaValueAccessor? =
         if (isnil()) null else LuaValueAccessorImpl(this, affinity)
