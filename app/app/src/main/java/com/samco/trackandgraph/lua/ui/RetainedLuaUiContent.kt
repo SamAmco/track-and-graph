@@ -21,7 +21,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueReference
 internal class RetainedLuaUiContent(
     private val luaEngine: LuaEngine,
     private val renderFunction: LuaValueReference,
-    initialState: LuaValueReference,
+    initialState: LuaValueReference?,
     private val renderArguments: List<LuaValueReference> = emptyList(),
 ) : LuaUiContent {
     private var state = initialState
@@ -59,7 +59,7 @@ internal class RetainedLuaUiContent(
         state,
         context,
         *renderArguments.toTypedArray(),
-    ).also { state = it.state }
+    ).also { state = it.retainedState }
 
     private suspend fun <T> withRenderLock(
         block: (LuaVMLock) -> T,

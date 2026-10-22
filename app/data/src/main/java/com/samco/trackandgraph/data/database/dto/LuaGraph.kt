@@ -18,26 +18,37 @@
 package com.samco.trackandgraph.data.database.dto
 
 import com.samco.trackandgraph.data.database.entity.LuaGraph
+import com.samco.trackandgraph.data.lua.LuaStateJsonCodec
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 
-data class LuaGraph(
+/** A Lua graph DTO whose persisted configuration is decoded only if it is actually needed. */
+class LuaGraph(
     val id: Long,
     val graphStatId: Long,
     val source: LuaGraphSource,
-    val configuration: String? = null,
+    /** A detached immutable state snapshot; evaluating it may decode the stored JSON. */
+    val configuration: Lazy<LuaValueData>? = null,
 ) {
     internal fun toEntity() = source.toEntity(id, graphStatId, configuration)
+
+    fun copy(
+        id: Long = this.id,
+        graphStatId: Long = this.graphStatId,
+        source: LuaGraphSource = this.source,
+        configuration: Lazy<LuaValueData>? = this.configuration,
+    ) = LuaGraph(id, graphStatId, source, configuration)
 }
 
 internal fun LuaGraphSource.toEntity(
     id: Long,
     graphStatId: Long,
-    configuration: String? = null,
+    configuration: Lazy<LuaValueData>? = null,
 ) = when (this) {
     is LuaGraphSource.Inline -> LuaGraph(
         id = id,
         graphStatId = graphStatId,
         script = script,
-        configuration = configuration,
+        configuration = LuaStateJsonCodec.encode(configuration),
     )
     is LuaGraphSource.Package -> LuaGraph(
         id = id,
@@ -45,6 +56,6 @@ internal fun LuaGraphSource.toEntity(
         script = null,
         packageId = packageData.packageId,
         packageVersion = packageData.version,
-        configuration = configuration,
+        configuration = LuaStateJsonCodec.encode(configuration),
     )
 }

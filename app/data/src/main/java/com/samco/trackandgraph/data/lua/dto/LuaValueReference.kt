@@ -21,6 +21,10 @@ import com.samco.trackandgraph.data.lua.LuaVMAffinity
 /**
  * Opaque reference to a retained Lua value and the runtime that owns it.
  *
+ * Unlike [LuaValueData], this is not an immutable detached snapshot. Unlike [LuaValueAccessor],
+ * it does not allow Kotlin to inspect the value; it only preserves the value for a later engine
+ * operation on the runtime identified by [affinity].
+ *
  * It is passed unchanged through other layers and back to Lua. The data-layer implementation
  * wraps the original LuaJ value, so subsequent calls require no DTO conversion. [affinity] must
  * be used when acquiring the execution lock for any operation involving this value.

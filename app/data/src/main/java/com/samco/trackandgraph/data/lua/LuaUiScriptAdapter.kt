@@ -19,11 +19,11 @@ internal class LuaUiScriptAdapter @Inject constructor() {
     fun render(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
-        renderState: LuaValueReference,
+        renderState: LuaValueReference?,
         context: LuaUiContext,
         vararg arguments: LuaValueReference,
     ): LuaUiRenderResult {
-        val luaRenderState = renderState.valueFor(vmLock)
+        val luaRenderState = renderState?.valueFor(vmLock) ?: LuaValue.NIL
         val values = buildList {
             add(context.toLuaValue())
             add(luaRenderState)
@@ -40,8 +40,10 @@ internal class LuaUiScriptAdapter @Inject constructor() {
         require(nextState.isnil() || nextState.istable()) { "Lua UI state must be a table or nil" }
         return LuaUiRenderResult(
             ui = LuaValueAccessorImpl(ui, vmLock.affinity),
-            state = LuaValueReferenceImpl(nextState, vmLock.affinity),
-            serializedState = if (nextState.istable()) LuaStateJsonCodec.encode(nextState) else null,
+            state = LuaStateJsonCodec.snapshot(nextState),
+            retainedState = if (nextState.isnil()) null else {
+                LuaValueReferenceImpl(nextState, vmLock.affinity)
+            },
         )
     }
 

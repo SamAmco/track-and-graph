@@ -1,11 +1,15 @@
 package com.samco.trackandgraph.data.lua
 
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.luaj.vm2.LuaTable
@@ -15,30 +19,28 @@ import org.luaj.vm2.lib.ZeroArgFunction
 class LuaStateJsonCodecTest {
     @Test
     fun `round trips JSON-compatible nested state`() {
-        val state = LuaTable().apply {
-            set("name", "calendar")
-            set("enabled", LuaValue.valueOf(true))
-            set("threshold", 2.5)
-            set("values", LuaTable().apply {
-                set(1, "first")
-                set(2, LuaValue.valueOf(4))
-            })
-            set("nested", LuaTable().apply { set("value", 7) })
-        }
+        val state = LuaValueData.TableValue(
+            mapOf(
+                "name" to LuaValueData.StringValue("calendar"),
+                "enabled" to LuaValueData.BooleanValue(true),
+                "threshold" to LuaValueData.NumberValue(2.5),
+                "values" to LuaValueData.ArrayValue(
+                    listOf(
+                        LuaValueData.StringValue("first"),
+                        LuaValueData.NumberValue(4.0),
+                    )
+                ),
+                "nested" to LuaValueData.TableValue(
+                    mapOf("value" to LuaValueData.NumberValue(7.0))
+                ),
+            )
+        )
 
-        val encoded = LuaStateJsonCodec.encode(state)
-        val decoded = LuaStateJsonCodec.decode(encoded)
-
-        assertEquals("calendar", decoded["name"].tojstring())
-        assertTrue(decoded["enabled"].toboolean())
-        assertEquals(2.5, decoded["threshold"].todouble(), 0.0)
-        assertEquals("first", decoded["values"][1].tojstring())
-        assertEquals(4, decoded["values"][2].toint())
-        assertEquals(7, decoded["nested"]["value"].toint())
+        assertEquals(state, LuaStateJsonCodec.decode(LuaStateJsonCodec.encode(state)))
     }
 
     @Test
-    fun `omits functions unsupported keys non-finite numbers and cyclic branches`() {
+    fun `snapshot omits functions unsupported keys non-finite numbers and cyclic branches`() {
         val state = LuaTable()
         state.set("kept", "yes")
         state.set("function", object : ZeroArgFunction() {
@@ -48,7 +50,8 @@ class LuaStateJsonCodecTest {
         state.set(LuaTable(), LuaValue.valueOf("unsupported key"))
         state.set("cycle", state)
 
-        val encoded = Json.parseToJsonElement(LuaStateJsonCodec.encode(state)) as JsonObject
+        val snapshot = requireNotNull(LuaStateJsonCodec.snapshot(state))
+        val encoded = Json.parseToJsonElement(LuaStateJsonCodec.encode(snapshot)) as JsonObject
 
         assertEquals(JsonPrimitive("yes"), encoded["kept"])
         assertEquals(null, encoded["function"])
@@ -58,7 +61,7 @@ class LuaStateJsonCodecTest {
     }
 
     @Test
-    fun `dense numeric tables are arrays while empty and mixed tables are objects`() {
+    fun `dense numeric tables snapshot as arrays while empty and mixed tables snapshot as objects`() {
         val dense = LuaTable().apply {
             set(1, "a")
             set(2, object : ZeroArgFunction() {
@@ -74,18 +77,51 @@ class LuaStateJsonCodecTest {
 
         assertEquals(
             JsonArray(listOf(JsonPrimitive("a"), JsonNull, JsonPrimitive("c"))),
-            Json.parseToJsonElement(LuaStateJsonCodec.encode(dense)),
+            Json.parseToJsonElement(
+                LuaStateJsonCodec.encode(requireNotNull(LuaStateJsonCodec.snapshot(dense)))
+            ),
         )
-        assertEquals(JsonObject(emptyMap()), Json.parseToJsonElement(LuaStateJsonCodec.encode(empty)))
+        assertEquals(
+            JsonObject(emptyMap()),
+            Json.parseToJsonElement(
+                LuaStateJsonCodec.encode(requireNotNull(LuaStateJsonCodec.snapshot(empty)))
+            ),
+        )
         assertEquals(
             JsonObject(mapOf("name" to JsonPrimitive("kept"))),
-            Json.parseToJsonElement(LuaStateJsonCodec.encode(mixed)),
+            Json.parseToJsonElement(
+                LuaStateJsonCodec.encode(requireNotNull(LuaStateJsonCodec.snapshot(mixed)))
+            ),
         )
     }
 
     @Test
-    fun `JSON null decodes to Lua nil`() {
-        assertTrue(LuaStateJsonCodec.decode(null).isnil())
-        assertTrue(LuaStateJsonCodec.decode(JsonNull.toString()).isnil())
+    fun `JSON null decodes to immutable nil`() {
+        assertEquals(LuaValueData.Nil, LuaStateJsonCodec.decode(JsonNull.toString()))
+    }
+
+    @Test
+    fun `stored configuration is decoded only when accessed`() {
+        val configuration = LuaStateJsonCodec.decodeConfiguration("{not valid JSON")
+
+        assertNotNull(configuration)
+        assertFalse(configuration!!.isInitialized())
+        assertThrows(Exception::class.java) { configuration.value }
+    }
+
+    @Test
+    fun `valid stored configuration remains lazy until read`() {
+        val configuration = requireNotNull(
+            LuaStateJsonCodec.decodeConfiguration("{\"enabled\":true}")
+        )
+
+        assertFalse(configuration.isInitialized())
+        assertEquals(
+            LuaValueData.TableValue(
+                mapOf("enabled" to LuaValueData.BooleanValue(true))
+            ),
+            configuration.value,
+        )
+        assertTrue(configuration.isInitialized())
     }
 }

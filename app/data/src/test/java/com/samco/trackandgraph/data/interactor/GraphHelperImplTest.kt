@@ -41,6 +41,7 @@ import com.samco.trackandgraph.data.database.dto.LineGraphAveragingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.entity.GroupItem
 import com.samco.trackandgraph.data.database.entity.GroupItemType
+import com.samco.trackandgraph.data.lua.LuaStateJsonCodec
 import com.samco.trackandgraph.data.time.TimeProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -97,7 +98,8 @@ class GraphHelperImplTest {
     @Test
     fun `create Lua graph stores inline source`() = runTest(dispatcher) {
         val source = LuaGraphSource.Inline("return {}")
-        val configuration = "{\"show_labels\":true}"
+        val encodedConfiguration = "{\"show_labels\":true}"
+        val configuration = LuaStateJsonCodec.decodeConfiguration(encodedConfiguration)
 
         val graphStatId = uut.createLuaGraph(
             LuaGraphCreateRequest(
@@ -113,7 +115,7 @@ class GraphHelperImplTest {
 
         val stored = uut.getLuaGraphByGraphStatId(graphStatId)
         assertEquals(source, stored?.source)
-        assertEquals(configuration, stored?.configuration)
+        assertEquals(encodedConfiguration, LuaStateJsonCodec.encode(stored?.configuration))
     }
 
     @Test

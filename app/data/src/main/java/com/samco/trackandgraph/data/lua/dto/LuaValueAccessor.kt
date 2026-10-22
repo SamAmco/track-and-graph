@@ -19,6 +19,10 @@ package com.samco.trackandgraph.data.lua.dto
 /**
  * A read-only view of a Lua value retained by its originating VM.
  *
+ * Unlike the immutable, detached [LuaValueData], this reads the real runtime value and may expose
+ * a function as a [LuaValueReference]. Use [LuaValueReference] itself when a runtime value must be
+ * passed back to the engine later without copying it.
+ *
  * Plain values and tables that Lua treats as immutable may be traversed after the VM execution
  * lock has been released. Access uses raw table lookup and never invokes Lua metamethods. Callers
  * must not read a table while Lua code could be mutating that same table on another thread.

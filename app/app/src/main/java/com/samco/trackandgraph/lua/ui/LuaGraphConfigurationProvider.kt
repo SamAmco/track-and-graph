@@ -14,6 +14,7 @@ import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaGraphScriptAccessor
 import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaUiContent
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import javax.inject.Inject
 
 /** Resolves the optional configuration renderer without exposing how the script is stored. */
@@ -22,7 +23,7 @@ class LuaGraphConfigurationProvider @Inject constructor(
 ) {
     suspend operator fun invoke(
         source: LuaGraphSource,
-        configuration: String?,
+        configuration: Lazy<LuaValueData>?,
     ): LuaUiContent? {
         val vmLock = luaEngine.acquireVM()
         return try {
@@ -31,7 +32,9 @@ class LuaGraphConfigurationProvider @Inject constructor(
             RetainedLuaUiContent(
                 luaEngine = luaEngine,
                 renderFunction = renderer,
-                initialState = luaEngine.decodeLuaState(vmLock, configuration),
+                initialState = configuration?.value?.let {
+                    luaEngine.retainLuaValue(vmLock, it)
+                },
             )
         } finally {
             luaEngine.releaseVM(vmLock)

@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.data.database.dto
 
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import org.threeten.bp.temporal.TemporalAmount
 
 // =============================================================================
@@ -136,10 +137,10 @@ data class BarChartConfig(
  * Configuration for a Lua graph.
  * Does not include id or graphStatId as these are implementation details.
  */
-data class LuaGraphConfig(
+class LuaGraphConfig(
     val features: List<LuaGraphFeatureConfig>,
     val source: LuaGraphSource,
-    val configuration: String? = null,
+    val configuration: Lazy<LuaValueData>? = null,
 )
 
 // =============================================================================

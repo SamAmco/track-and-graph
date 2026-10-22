@@ -16,7 +16,14 @@
  */
 package com.samco.trackandgraph.data.lua.dto
 
-/** Values Kotlin may pass into a retained Lua function. */
+/**
+ * An immutable, VM-independent snapshot of JSON-compatible Lua-shaped data.
+ *
+ * Use this for values Kotlin owns and may later pass into Lua. It cannot contain functions,
+ * userdata, metatables, or other runtime state. Use [LuaValueAccessor] to inspect a value that
+ * still exists in a Lua runtime, and [LuaValueReference] to retain such a value for a later
+ * engine operation on its owning runtime.
+ */
 sealed interface LuaValueData {
     data object Nil : LuaValueData
     data class BooleanValue(val value: Boolean) : LuaValueData

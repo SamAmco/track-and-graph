@@ -8,6 +8,7 @@
  */
 package com.samco.trackandgraph.data.lua
 
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -21,40 +22,76 @@ import org.luaj.vm2.LuaValue
 import java.util.Collections
 import java.util.IdentityHashMap
 
-/** Converts the JSON-compatible subset of a Lua state table without invoking metamethods. */
+/** Converts immutable Lua-shaped data to and from its persisted JSON representation. */
 internal object LuaStateJsonCodec {
     private val json = Json
 
-    fun encode(value: LuaValue): String {
-        require(value.istable()) { "Lua UI state must be a table" }
-        val visiting = Collections.newSetFromMap(IdentityHashMap<LuaValue, Boolean>())
-        val encoded = requireNotNull(encodeTable(value.checktable()!!, visiting))
-        return json.encodeToString(JsonElement.serializer(), encoded)
+    fun decodeConfiguration(encoded: String?): Lazy<LuaValueData>? = encoded?.let {
+        lazy { decode(it) }
     }
 
-    fun decode(encoded: String?): LuaValue =
-        encoded?.let { decode(json.parseToJsonElement(it)) } ?: LuaValue.NIL
+    fun encode(configuration: Lazy<LuaValueData>?): String? =
+        configuration?.value?.let(::encode)
 
-    private fun encodeValue(
+    fun encode(value: LuaValueData): String = json.encodeToString(
+        JsonElement.serializer(),
+        encodeValue(value) ?: JsonNull,
+    )
+
+    fun decode(encoded: String): LuaValueData = decode(Json.parseToJsonElement(encoded))
+
+    fun snapshot(value: LuaValue): LuaValueData? {
+        if (value.isnil()) return null
+        require(value.istable()) { "Lua UI state must be a table or nil" }
+        val visiting = Collections.newSetFromMap(IdentityHashMap<LuaValue, Boolean>())
+        return requireNotNull(snapshotTable(value.checktable()!!, visiting))
+    }
+
+    private fun encodeValue(value: LuaValueData): JsonElement? = when (value) {
+        LuaValueData.Nil -> JsonNull
+        is LuaValueData.BooleanValue -> JsonPrimitive(value.value)
+        is LuaValueData.NumberValue -> value.value.takeIf(Double::isFinite)?.let(::JsonPrimitive)
+        is LuaValueData.StringValue -> JsonPrimitive(value.value)
+        is LuaValueData.ArrayValue -> JsonArray(value.values.map { encodeValue(it) ?: JsonNull })
+        is LuaValueData.TableValue -> JsonObject(
+            value.values.mapNotNull { (key, entry) -> encodeValue(entry)?.let { key to it } }
+                .toMap(linkedMapOf())
+        )
+    }
+
+    private fun decode(element: JsonElement): LuaValueData = when (element) {
+        JsonNull -> LuaValueData.Nil
+        is JsonArray -> LuaValueData.ArrayValue(element.map(::decode))
+        is JsonObject -> LuaValueData.TableValue(element.mapValues { decode(it.value) })
+        is JsonPrimitive -> when {
+            element.isString -> LuaValueData.StringValue(element.content)
+            element.booleanOrNull != null -> LuaValueData.BooleanValue(element.booleanOrNull!!)
+            element.doubleOrNull != null -> LuaValueData.NumberValue(element.doubleOrNull!!)
+            else -> LuaValueData.Nil
+        }
+    }
+
+    private fun snapshotValue(
         value: LuaValue,
         visiting: MutableSet<LuaValue>,
-    ): JsonElement? = when {
-        value.isnil() -> JsonNull
-        value.isboolean() -> JsonPrimitive(value.toboolean())
-        value.isnumber() -> value.todouble().takeIf(Double::isFinite)?.let(::JsonPrimitive)
-        value.isstring() -> JsonPrimitive(value.tojstring())
-        value.istable() -> value.checktable()?.let { encodeTable(it, visiting) }
+    ): LuaValueData? = when {
+        value.isnil() -> LuaValueData.Nil
+        value.isboolean() -> LuaValueData.BooleanValue(value.toboolean())
+        value.isnumber() -> value.todouble().takeIf(Double::isFinite)
+            ?.let(LuaValueData::NumberValue)
+        value.isstring() -> LuaValueData.StringValue(value.tojstring())
+        value.istable() -> snapshotTable(value.checktable()!!, visiting)
         else -> null
     }
 
-    private fun encodeTable(
+    private fun snapshotTable(
         table: LuaTable,
         visiting: MutableSet<LuaValue>,
-    ): JsonElement? {
+    ): LuaValueData? {
         if (!visiting.add(table)) return null
         return try {
-            val stringEntries = linkedMapOf<String, LuaValue>()
-            val integerEntries = sortedMapOf<Int, LuaValue>()
+            val strings = linkedMapOf<String, LuaValue>()
+            val integers = sortedMapOf<Int, LuaValue>()
             var key: LuaValue = LuaValue.NIL
             while (true) {
                 val next = table.next(key)
@@ -65,41 +102,27 @@ internal object LuaStateJsonCodec {
                     key.isnumber() && key.todouble().isFinite() -> {
                         val number = key.todouble()
                         val integer = number.toInt()
-                        if (integer > 0 && number == integer.toDouble()) {
-                            integerEntries[integer] = value
-                        }
+                        if (integer > 0 && number == integer.toDouble()) integers[integer] = value
                     }
-                    key.isstring() -> stringEntries[key.tojstring()] = value
+                    key.isstring() -> strings[key.tojstring()] = value
                 }
             }
 
-            if (stringEntries.isEmpty() && integerEntries.isNotEmpty() &&
-                integerEntries.keys.toList() == (1..integerEntries.size).toList()
+            if (strings.isEmpty() && integers.isNotEmpty() &&
+                integers.keys.toList() == (1..integers.size).toList()
             ) {
-                JsonArray(integerEntries.values.map { encodeValue(it, visiting) ?: JsonNull })
+                LuaValueData.ArrayValue(
+                    integers.values.map { snapshotValue(it, visiting) ?: LuaValueData.Nil }
+                )
             } else {
-                JsonObject(stringEntries.mapNotNull { (entryKey, entryValue) ->
-                    encodeValue(entryValue, visiting)?.let { entryKey to it }
-                }.toMap(linkedMapOf()))
+                LuaValueData.TableValue(
+                    strings.mapNotNull { (entryKey, entryValue) ->
+                        snapshotValue(entryValue, visiting)?.let { entryKey to it }
+                    }.toMap(linkedMapOf())
+                )
             }
         } finally {
             visiting.remove(table)
-        }
-    }
-
-    private fun decode(element: JsonElement): LuaValue = when (element) {
-        JsonNull -> LuaValue.NIL
-        is JsonArray -> LuaTable().also { table ->
-            element.forEachIndexed { index, value -> table.rawset(index + 1, decode(value)) }
-        }
-        is JsonObject -> LuaTable().also { table ->
-            element.forEach { (key, value) -> table.rawset(key, decode(value)) }
-        }
-        is JsonPrimitive -> when {
-            element.isString -> LuaValue.valueOf(element.content)
-            element.booleanOrNull != null -> LuaValue.valueOf(element.booleanOrNull!!)
-            element.doubleOrNull != null -> LuaValue.valueOf(element.doubleOrNull!!)
-            else -> LuaValue.NIL
         }
     }
 }

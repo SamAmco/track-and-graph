@@ -71,6 +71,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.lua.dto.LuaUiContent
+import com.samco.trackandgraph.data.lua.dto.LuaValueData
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel.NetworkError
@@ -161,7 +162,7 @@ fun LuaGraphConfigView(
 private fun LuaGraphConfigurationView(
     content: LuaUiContent,
     onBack: () -> Unit,
-    onStateChanged: (String?) -> Unit,
+    onStateChanged: (LuaValueData?) -> Unit,
 ) {
     BackHandler(onBack = onBack)
     Column(modifier = Modifier.fillMaxWidth()) {

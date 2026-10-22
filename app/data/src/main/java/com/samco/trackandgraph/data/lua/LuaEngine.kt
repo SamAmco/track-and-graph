@@ -65,16 +65,16 @@ interface LuaEngine {
         scriptAccessor: LuaGraphScriptAccessor,
     ): LuaValueAccessor
 
+    /** Retains Kotlin-owned immutable data as a value on the locked Lua runtime. */
+    fun retainLuaValue(vmLock: LuaVMLock, value: LuaValueData): LuaValueReference
+
     fun renderLuaUi(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
-        renderState: LuaValueReference,
+        renderState: LuaValueReference?,
         context: LuaUiContext,
         vararg arguments: LuaValueReference,
     ): LuaUiRenderResult
-
-    /** Decodes persisted JSON state into a retained value owned by [vmLock]'s runtime. */
-    fun decodeLuaState(vmLock: LuaVMLock, encoded: String?): LuaValueReference
 
     /** Calls an affinity-bound Lua function with zero or more Kotlin-owned values. */
     fun callLuaFunction(

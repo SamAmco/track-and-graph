@@ -220,7 +220,10 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             engine.runLuaGraph(
                 initialLock,
                 script,
-                LuaGraphEngineParams(emptyMap(), "{\"seed\":7,\"renders\":0}"),
+                LuaGraphEngineParams(
+                    emptyMap(),
+                    LuaStateJsonCodec.decode("{\"seed\":7,\"renders\":0}"),
+                ),
             ).data
                 as LuaGraphResultData.CustomData
         } finally {
@@ -251,7 +254,13 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         assertEquals("DARK", tree.ui["theme"]?.asString())
         assertEquals(1080.0, tree.ui["max_width"]?.asDouble() ?: 0.0, 0.0)
         assertNull(tree.ui["not_declared"])
-        assertEquals("{\"seed\":7.0,\"renders\":1.0}", tree.serializedState)
+        val state = requireNotNull(tree.state) as LuaValueData.TableValue
+        assertEquals(LuaValueData.NumberValue(7.0), state.values["seed"])
+        assertEquals(LuaValueData.NumberValue(1.0), state.values["renders"])
+        assertEquals(
+            "{\"seed\":7.0,\"renders\":1.0}",
+            LuaStateJsonCodec.encode(state),
+        )
 
         val draw = requireNotNull(tree.ui["draw"]?.asFunction())
         val drawLock = engine.acquireVM(draw.affinity)

@@ -104,10 +104,18 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 
+    override fun retainLuaValue(
+        vmLock: LuaVMLock,
+        value: LuaValueData,
+    ): LuaValueReference {
+        vmLock.requireActiveLease()
+        return LuaValueReferenceImpl(value.toLuaValue(), vmLock.affinity)
+    }
+
     override fun renderLuaUi(
         vmLock: LuaVMLock,
         renderFunction: LuaValueReference,
-        renderState: LuaValueReference,
+        renderState: LuaValueReference?,
         context: LuaUiContext,
         vararg arguments: LuaValueReference,
     ): LuaUiRenderResult {
@@ -117,11 +125,6 @@ internal class LuaEngineImpl @Inject constructor(
         } catch (luaError: LuaError) {
             throw luaError.toLuaScriptException()
         }
-    }
-
-    override fun decodeLuaState(vmLock: LuaVMLock, encoded: String?): LuaValueReference {
-        vmLock.requireActiveLease()
-        return LuaValueReferenceImpl(LuaStateJsonCodec.decode(encoded), vmLock.affinity)
     }
 
     override fun callLuaFunction(

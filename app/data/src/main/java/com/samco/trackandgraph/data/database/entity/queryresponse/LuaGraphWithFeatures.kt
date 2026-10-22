@@ -23,6 +23,7 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
+import com.samco.trackandgraph.data.lua.LuaStateJsonCodec
 
 internal class LuaGraphWithFeatures(
 
@@ -68,7 +69,7 @@ internal class LuaGraphWithFeatures(
             graphStatId = graphStatId,
             features = features.map { it.toDto() },
             source = source,
-            configuration = configuration,
+            configuration = LuaStateJsonCodec.decodeConfiguration(configuration),
         )
     }
 

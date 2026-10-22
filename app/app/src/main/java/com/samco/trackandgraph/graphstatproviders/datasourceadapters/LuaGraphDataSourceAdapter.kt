@@ -23,7 +23,7 @@ import com.samco.trackandgraph.data.interactor.DataInteractor
 import javax.inject.Inject
 
 class LuaGraphDataSourceAdapter @Inject constructor(
-    dataInteractor: DataInteractor
+    dataInteractor: DataInteractor,
 ) : GraphStatDataSourceAdapter<LuaGraphWithFeatures>(dataInteractor) {
 
     override suspend fun createInDatabase(
@@ -35,7 +35,7 @@ class LuaGraphDataSourceAdapter @Inject constructor(
             LuaGraphCreateRequest(
                 name = name,
                 groupId = groupId,
-                config = config.toConfig()
+                config = config.toConfig(),
             )
         )
     }
@@ -49,7 +49,7 @@ class LuaGraphDataSourceAdapter @Inject constructor(
             LuaGraphUpdateRequest(
                 graphStatId = graphStatId,
                 name = name,
-                config = config.toConfig()
+                config = config.toConfig(),
             )
         )
     }

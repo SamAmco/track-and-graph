@@ -115,7 +115,7 @@ class LuaGraphDataFactory @Inject constructor(
     ): ILuaGraphViewData {
         val luaEngineParams = LuaGraphEngineParams(
             dataSources = dataSamples,
-            configuration = config.configuration,
+            configuration = config.configuration?.value,
         )
 
         val luaGraphResult = when (val source = config.source) {

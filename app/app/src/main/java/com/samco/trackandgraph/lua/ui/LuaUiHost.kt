@@ -91,7 +91,7 @@ internal fun LuaUiHost(
     modifier: Modifier,
     content: LuaUiContent,
     errorContent: @Composable (Throwable) -> Unit,
-    onStateChanged: (String?) -> Unit = {},
+    onStateChanged: (LuaValueData?) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
@@ -115,7 +115,7 @@ internal fun LuaUiHost(
         }
         fun publish(result: Result<LuaUiRenderResult>) {
             renderResult = result
-            result.getOrNull()?.let { onStateChanged(it.serializedState) }
+            result.getOrNull()?.let { onStateChanged(it.state) }
         }
         LaunchedEffect(content, context) {
             publish(captureLuaUiResult { content.render(context) })

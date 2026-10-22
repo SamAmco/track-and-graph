@@ -43,7 +43,8 @@ class CustomGraphLuaHelperTest {
     private val renderState: LuaValueReference = mock()
     private val renderFunction: LuaValueReference = mock()
     private val result: LuaValueAccessor = mock()
-    private val renderResult = LuaUiRenderResult(result, renderState, "{}")
+    private val stateSnapshot = LuaValueData.TableValue(emptyMap())
+    private val renderResult = LuaUiRenderResult(result, stateSnapshot, renderState)
     private val context: LuaUiContext = mock()
 
     @Test
