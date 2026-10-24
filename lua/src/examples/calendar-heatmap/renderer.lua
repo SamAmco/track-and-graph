@@ -196,7 +196,10 @@ local function legend(data)
 	return graphui.legend({ key = "legend", items = items })
 end
 
-return function(context, state, data)
+return function(params)
+	local context = params.context
+	local state = params.state
+	local data = params.data
 	local available_width_dp = context.constraints.max_width / context.density
 	local layout = state and state.layout or "AUTO"
 	local wide_layout = layout == "WIDE"

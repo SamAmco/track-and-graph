@@ -237,7 +237,9 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                 }
             """.trimIndent(),
             "renderer.lua" to """
-                return function(context, state, data)
+                return function(params)
+                    local state = params.state
+                    local data = params.data
                     return {
                         ui = { type = "TEXT", text = tostring(data.value + 1) },
                         state = state,
@@ -280,7 +282,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                     layoutDirection = LuaUiContext.LayoutDirection.LTR,
                     theme = LuaUiContext.Theme.LIGHT,
                 ),
-                data.renderData,
+                mapOf("data" to data.renderData),
             )
         } finally {
             engine.releaseVM(renderLock)
@@ -296,7 +298,8 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                 return {
                     type = "CUSTOM",
                     prepare_data = function() return {} end,
-                    render_graph = function(context, state)
+                    render_graph = function(params)
+                        local state = params.state
                         return { ui = require("renderer"), state = state }
                     end,
                 }
@@ -332,7 +335,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
                     LuaUiContext.LayoutDirection.LTR,
                     LuaUiContext.Theme.LIGHT,
                 ),
-                data.renderData,
+                mapOf("data" to data.renderData),
             )
         } finally {
             engine.releaseVM(retainedLock)

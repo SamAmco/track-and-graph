@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.LuaTable
 import javax.inject.Inject
 
 internal class LuaGraphScriptAdapter @Inject constructor(
@@ -85,7 +86,11 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         affinity: LuaVMAffinity,
     ): LuaGraphResultData.CustomData {
         val renderState = configuration?.toLuaValue() ?: LuaValue.NIL
-        val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(dataSources, renderState)
+        val prepareParams = LuaTable().apply {
+            set(SOURCES, dataSources)
+            set(STATE, renderState)
+        }
+        val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(prepareParams)
         val renderFunction = descriptor[RENDER_GRAPH].checkfunction()!!
         return LuaGraphResultData.CustomData(
             renderData = LuaValueHandleImpl(renderData, affinity),
@@ -106,5 +111,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         const val CUSTOM = "CUSTOM"
         const val PREPARE_DATA = "prepare_data"
         const val RENDER_GRAPH = "render_graph"
+        const val SOURCES = "sources"
+        const val STATE = "state"
     }
 }

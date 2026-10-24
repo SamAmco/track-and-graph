@@ -69,7 +69,7 @@ interface LuaEngine {
         renderFunction: LuaValueHandle,
         renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueAccessor,
+        additionalParams: Map<String, LuaValueAccessor> = emptyMap(),
     ): LuaValueHandle
 
     /** Calls an affinity-bound Lua function with zero or more Kotlin-owned values. */

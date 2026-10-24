@@ -46,7 +46,8 @@ local function setting(label, options)
 	})
 end
 
-return function(context, state)
+return function(params)
+	local state = params.state
 	state = initial_state(state)
 	return {
 		ui = ui.column({

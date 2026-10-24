@@ -47,7 +47,7 @@ class CustomGraphLuaHelperTest {
     fun `renderer reacquires the VM that owns the retained render function`() = runTest {
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
-        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, mapOf("data" to renderData)))
             .thenReturn(result)
 
         val viewData = CustomGraphLuaHelper(luaEngine)(
@@ -57,7 +57,7 @@ class CustomGraphLuaHelperTest {
 
         assertSame(result, viewData.content.render(context))
         verify(luaEngine).acquireVM(vmLock.affinity)
-        verify(luaEngine).renderLuaUi(vmLock, renderFunction, renderState, context, renderData)
+        verify(luaEngine).renderLuaUi(vmLock, renderFunction, renderState, context, mapOf("data" to renderData))
         verify(luaEngine).releaseVM(vmLock)
     }
 
@@ -85,7 +85,7 @@ class CustomGraphLuaHelperTest {
         val callback: LuaValueHandle = mock()
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
-        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, mapOf("data" to renderData)))
             .thenReturn(result)
 
         val content = (CustomGraphLuaHelper(luaEngine)(
@@ -103,7 +103,7 @@ class CustomGraphLuaHelperTest {
                 renderFunction,
                 renderState,
                 context,
-                renderData,
+                mapOf("data" to renderData),
             )
             verify(luaEngine).releaseVM(vmLock)
         }
@@ -114,7 +114,7 @@ class CustomGraphLuaHelperTest {
         val nextState: LuaValueHandle = mock()
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
-        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, mapOf("data" to renderData)))
             .thenReturn(result)
         whenever(result["state"]).thenReturn(nextState)
 

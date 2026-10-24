@@ -112,7 +112,9 @@ local function read_source(source, source_index, index_by_date, start)
 	}
 end
 
-return function(sources, state)
+return function(params)
+	local sources = params.sources
+	local state = params.state
 	local weeks = state and state.weeks or 53
 	local today = core.date()
 	local days, index_by_date, weekday_labels, month_labels, start, today_index =

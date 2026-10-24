@@ -21,18 +21,22 @@ internal class LuaUiScriptAdapter @Inject constructor() {
         renderFunction: LuaValueHandle,
         renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueAccessor,
+        additionalParams: Map<String, LuaValueAccessor>,
     ): LuaValueHandle {
         val luaRenderState = renderState?.valueFor(vmLock) ?: LuaValue.NIL
-        val values = buildList {
-            add(context.toLuaValue())
-            add(luaRenderState)
-            arguments.forEach { add(it.valueFor(vmLock)) }
+        val params = LuaTable().apply {
+            set(CONTEXT, context.toLuaValue())
+            set(STATE, luaRenderState)
+            additionalParams.forEach { (key, value) -> set(key, value.valueFor(vmLock)) }
         }
         val result = renderFunction.valueFor(vmLock)
-            .invoke(LuaValue.varargsOf(values.toTypedArray()))
-            .arg1()
+            .call(params)
         return LuaValueHandleImpl(result, vmLock.affinity)
+    }
+
+    private companion object {
+        const val CONTEXT = "context"
+        const val STATE = "state"
     }
 
     private fun LuaUiContext.toLuaValue(): LuaValue = LuaTable().apply {

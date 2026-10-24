@@ -20,6 +20,7 @@ local function read_values(source)
 	return values
 end
 
-return function(sources)
+return function(params)
+	local sources = params.sources
 	return { values = read_values(first_source(sources)) }
 end

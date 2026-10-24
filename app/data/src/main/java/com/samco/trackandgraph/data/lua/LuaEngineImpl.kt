@@ -107,11 +107,17 @@ internal class LuaEngineImpl @Inject constructor(
         renderFunction: LuaValueHandle,
         renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueAccessor,
+        additionalParams: Map<String, LuaValueAccessor>,
     ): LuaValueHandle {
         vmLock.requireActiveLease()
         return try {
-            luaUiScriptAdapter.render(vmLock, renderFunction, renderState, context, *arguments)
+            luaUiScriptAdapter.render(
+                vmLock,
+                renderFunction,
+                renderState,
+                context,
+                additionalParams,
+            )
         } catch (luaError: LuaError) {
             throw luaError.toLuaScriptException()
         }

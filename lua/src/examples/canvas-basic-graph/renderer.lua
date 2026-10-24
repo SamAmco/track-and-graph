@@ -29,7 +29,10 @@ local function summary(values)
 	}
 end
 
-return function(context, state, data)
+return function(params)
+	local context = params.context
+	local state = params.state
+	local data = params.data
 	local values = data.values
 	return {
 		ui = ui.surface({

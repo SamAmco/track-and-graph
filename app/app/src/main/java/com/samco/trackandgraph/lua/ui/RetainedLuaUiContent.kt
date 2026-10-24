@@ -19,7 +19,7 @@ internal class RetainedLuaUiContent(
     private val luaEngine: LuaEngine,
     private val renderFunction: LuaValueHandle,
     initialState: LuaValueAccessor?,
-    private val renderArguments: List<LuaValueAccessor> = emptyList(),
+    private val additionalRenderParams: Map<String, LuaValueAccessor> = emptyMap(),
 ) : LuaUiContent {
     private var renderState = initialState
     override val state: LuaValueAccessor?
@@ -58,7 +58,7 @@ internal class RetainedLuaUiContent(
             renderFunction,
             renderState,
             context,
-            *renderArguments.toTypedArray(),
+            additionalRenderParams,
         )
         result[STATE]?.let { renderState = it }
         return result

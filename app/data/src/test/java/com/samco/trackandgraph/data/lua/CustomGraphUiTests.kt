@@ -98,7 +98,9 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             return {
                 type = "CUSTOM",
                 prepare_data = function() return {} end,
-                render_graph = function(context, state)
+                render_graph = function(params)
+                    local context = params.context
+                    local state = params.state
                     if context.theme == "DARK" then error("render failed") end
                     return {
                         ui = {
@@ -126,7 +128,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
                     customData.renderFunction,
                     customData.renderState,
                     context(LuaUiContext.Theme.DARK),
-                    customData.renderData,
+                    mapOf("data" to customData.renderData),
                 )
             }
         } finally {
@@ -141,7 +143,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
                 customData.renderFunction,
                 customData.renderState,
                 context(LuaUiContext.Theme.LIGHT),
-                customData.renderData,
+                mapOf("data" to customData.renderData),
             )
         } finally {
             engine.releaseVM(successfulRenderLock)
@@ -186,8 +188,11 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
 
             return {
                 type = graph.GRAPH_TYPE.CUSTOM,
-                prepare_data = function(_, state) return { value = state.seed } end,
-                render_graph = function(context, state, data)
+                prepare_data = function(params) return { value = params.state.seed } end,
+                render_graph = function(params)
+                    local context = params.context
+                    local state = params.state
+                    local data = params.data
                     state.renders = state.renders + 1
                     return {
                         ui = setmetatable({
@@ -243,7 +248,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
                     layoutDirection = LuaUiContext.LayoutDirection.LTR,
                     theme = LuaUiContext.Theme.DARK,
                 ),
-                customData.renderData,
+                mapOf("data" to customData.renderData),
             )
         } finally {
             engine.releaseVM(renderLock)

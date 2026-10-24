@@ -83,9 +83,9 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
         renderFunction: LuaValueHandle,
         renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueAccessor,
+        additionalParams: Map<String, LuaValueAccessor>,
     ): LuaValueHandle = if (luaEngineSwitch.enabled) {
-        luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, *arguments)
+        luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, additionalParams)
     } else throw LuaEngineDisabledException()
 
     override fun callLuaFunction(
