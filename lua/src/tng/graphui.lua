@@ -2,7 +2,6 @@ local ui = require("tng.ui")
 local theme = require("tng.theme")
 
 local M = {}
-local transient_dialogs = setmetatable({}, { __mode = "k" })
 
 --- @since (API level 5)
 --- @class LegendItem
@@ -21,7 +20,7 @@ M.LegendParams = {}
 
 --- @since (API level 5)
 --- @class FeatureSelectorParams
---- @field key string: Stable key used for this selector's transient visibility state.
+--- @field key string: Stable key used for this selector's visibility state.
 --- @field state table: Configuration state retained by the renderer.
 --- @field title string|table<string,string>: Select-item dialog title.
 --- @field placeholder string|table<string,string>: Text shown before a feature is selected.
@@ -92,11 +91,9 @@ M.feature_selector = function(params)
 	assert(type(params.key) == "string", "feature selector key is required")
 	assert(type(params.state) == "table", "feature selector state is required")
 	assert(type(params.on_selected) == "function", "feature selector on_selected is required")
-	local dialogs = transient_dialogs[params.state]
-	if dialogs == nil then
-		dialogs = {}
-		transient_dialogs[params.state] = dialogs
-	end
+	params.state.__graphui = params.state.__graphui or {}
+	params.state.__graphui.dialogs = params.state.__graphui.dialogs or {}
+	local dialogs = params.state.__graphui.dialogs
 	local close = function() dialogs[params.key] = false end
 	local selected = params.selected
 	return ui.box({

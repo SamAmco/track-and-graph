@@ -74,6 +74,7 @@ test("feature selector shares picker state and updates selection", function()
 
 	local button_modifiers = selector.children[1].modifier
 	button_modifiers[#button_modifiers].callback()
+	assert(state.__graphui.dialogs.source == true)
 	local dialog = selector.children[2]
 	local rerendered = graphui.feature_selector({
 		key = "source",
@@ -88,7 +89,7 @@ test("feature selector shares picker state and updates selection", function()
 	assert(dialog.picker_scope == "inputs")
 	dialog.on_feature_selected({ id = 42, path = "/Health/Steps" })
 	assert(selected.id == 42)
-	assert(state.__graphui_dialogs == nil)
+	assert(state.__graphui.dialogs.source == false)
 end)
 
 helpers.finish_tests()
