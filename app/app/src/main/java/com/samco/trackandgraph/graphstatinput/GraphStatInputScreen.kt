@@ -48,6 +48,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -184,6 +185,7 @@ internal fun GraphStatInputView(
     Column(modifier = Modifier.fillMaxHeight()) {
         var demoYOffset by remember { mutableFloatStateOf(0f) }
         var demoVisible by remember { mutableStateOf(false) }
+        var luaGraphResetRequest by remember { mutableIntStateOf(0) }
 
         val selectedGraphType = viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
 
@@ -191,7 +193,10 @@ internal fun GraphStatInputView(
             GraphStatInputViewForm(
                 graphName = viewModel.graphName,
                 selectedGraphType = selectedGraphType,
-                setGraphType = viewModel::setGraphType,
+                setGraphType = { graphType ->
+                    if (graphType == GraphStatType.LUA_SCRIPT) luaGraphResetRequest++
+                    viewModel.setGraphType(graphType)
+                },
                 setGraphStatName = viewModel::setGraphStatName,
                 updateMode = viewModel.updateMode.observeAsState(false),
                 configInputView = { scrollState ->
@@ -199,7 +204,8 @@ internal fun GraphStatInputView(
                         onConfigEvent = viewModel::onConfigEvent,
                         graphType = selectedGraphType,
                         graphStatId = graphStatId,
-                        scrollState = scrollState
+                        scrollState = scrollState,
+                        luaGraphResetRequest = luaGraphResetRequest,
                     )
                 },
             )
@@ -453,7 +459,8 @@ fun ConfigInputView(
     graphType: State<GraphStatType>,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit,
     graphStatId: Long?,
-    scrollState: ScrollState
+    scrollState: ScrollState,
+    luaGraphResetRequest: Int,
 ) {
     when (graphType.value) {
         GraphStatType.LINE_GRAPH -> LineGraphConfigView(
@@ -491,6 +498,7 @@ fun ConfigInputView(
             scrollState = scrollState,
             graphStatId = graphStatId,
             onConfigEvent = onConfigEvent,
+            resetRequest = luaGraphResetRequest,
         )
     }
 }

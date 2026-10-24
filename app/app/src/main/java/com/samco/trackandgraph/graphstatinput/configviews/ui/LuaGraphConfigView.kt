@@ -102,7 +102,8 @@ import kotlinx.coroutines.launch
 fun LuaGraphConfigView(
     scrollState: ScrollState,
     graphStatId: Long?,
-    onConfigEvent: (GraphStatConfigEvent?) -> Unit
+    onConfigEvent: (GraphStatConfigEvent?) -> Unit,
+    resetRequest: Int,
 ) {
     val viewModel = hiltViewModel<LuaGraphConfigViewModel>().apply {
         init(graphStatId)
@@ -110,6 +111,10 @@ fun LuaGraphConfigView(
 
     LaunchedEffect(viewModel) {
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
+    }
+
+    LaunchedEffect(viewModel, resetRequest) {
+        if (resetRequest > 0) viewModel.reset()
     }
 
     val context = LocalContext.current

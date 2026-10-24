@@ -360,6 +360,23 @@ class LuaGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
+    fun reset() {
+        luaGraph = LuaGraphWithFeatures(
+            id = 0,
+            graphStatId = 0,
+            source = LuaGraphSource.Inline(""),
+            features = emptyList(),
+        )
+        selectedFeatures = emptyList()
+        featureTextFields.clear()
+        configurationContent = null
+        configurationError = null
+        script = TextFieldValue("")
+        pendingScriptUriDownload.value = null
+        pendingScriptInstall.value = null
+        onUpdate()
+    }
+
     fun onScriptEditFinished() {
         viewModelScope.launch { refreshConfiguration() }
     }
