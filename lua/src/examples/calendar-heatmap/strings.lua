@@ -35,4 +35,13 @@ return {
 	no = {
 		en = "No",
 	},
+	select_feature = {
+		en = "Select a feature",
+	},
+	choose_feature = {
+		en = "Choose a feature",
+	},
+	feature_required = {
+		en = "Select a feature for the calendar heatmap",
+	},
 }

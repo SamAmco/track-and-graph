@@ -36,7 +36,7 @@ import com.samco.trackandgraph.ui.R
 
 @Composable
 fun AddCreateBar(
-    errorText: Int?,
+    errorText: String?,
     onCreateUpdateClicked: () -> Unit,
     isUpdateMode: Boolean
 ) = Surface(
@@ -53,7 +53,7 @@ fun AddCreateBar(
     ) {
 
         Text(
-            text = errorText?.let { stringResource(id = it) } ?: "",
+            text = errorText.orEmpty(),
             color = MaterialTheme.colorScheme.error,
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
             fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,

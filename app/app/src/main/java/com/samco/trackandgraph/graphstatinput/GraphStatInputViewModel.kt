@@ -44,6 +44,7 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -58,7 +59,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 sealed interface GraphStatConfigEvent {
-    data class ValidationException(val errorMessageId: Int) : Exception(), GraphStatConfigEvent
+    data class ValidationException(
+        val errorMessageId: Int? = null,
+        val translatedMessage: TranslatedString? = null,
+    ) : Exception(), GraphStatConfigEvent
     object Loading : GraphStatConfigEvent
 
     sealed interface ConfigData<T> : GraphStatConfigEvent {

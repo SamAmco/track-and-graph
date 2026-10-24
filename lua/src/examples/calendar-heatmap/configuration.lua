@@ -1,4 +1,5 @@
 local strings = require("strings")
+local graphui = require("tng.graphui")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
 
@@ -49,12 +50,30 @@ end
 return function(params)
 	local state = params.state
 	state = initial_state(state)
+	if state.feature_inputs_initialized ~= true then
+		state.source = params.feature_map and params.feature_map.source or nil
+		state.feature_inputs_initialized = true
+	end
+	local feature_inputs = {}
+	if state.source ~= nil then
+		feature_inputs[1] = { name = "source", feature_id = state.source.id }
+	end
 	return {
 		ui = ui.column({
 			key = "calendar_heatmap_configuration",
 			spacing = theme.spacing.large,
 			modifier = ui.modifier(ui.fill_width()),
 			children = {
+				graphui.feature_selector({
+					key = "source_feature",
+					state = state,
+					title = strings.select_feature,
+					placeholder = strings.choose_feature,
+					selected = state.source,
+					picker_scope = "feature_inputs",
+					on_selected = function(selection) state.source = selection end,
+					modifier = ui.modifier(ui.fill_width()),
+				}),
 				setting(strings.range, {
 					option(state, "weeks", 13, strings.weeks_13),
 					option(state, "weeks", 26, strings.weeks_26),
@@ -72,5 +91,7 @@ return function(params)
 			},
 		}),
 		state = state,
+		feature_inputs = feature_inputs,
+		configuration_error = state.source == nil and strings.feature_required or nil,
 	}
 end

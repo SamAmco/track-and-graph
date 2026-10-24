@@ -73,6 +73,7 @@ import com.samco.trackandgraph.graphstatinput.configviews.ui.AverageTimeBetweenC
 import com.samco.trackandgraph.graphstatinput.configviews.ui.BarChartConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.ui.LastValueConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.ui.LineGraphConfigView
+import com.samco.trackandgraph.ui.ui.resolve
 import com.samco.trackandgraph.graphstatinput.configviews.ui.LuaGraphConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.ui.PieChartConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.ui.TimeHistogramConfigView
@@ -215,8 +216,10 @@ internal fun GraphStatInputView(
                 onDragOffset = { demoYOffset -= it })
         }
 
+        val validationException = viewModel.validationException.observeAsState().value
         AddCreateBar(
-            errorText = viewModel.validationException.observeAsState().value?.errorMessageId,
+            errorText = validationException?.translatedMessage.resolve()
+                ?: validationException?.errorMessageId?.let { stringResource(it) },
             onCreateUpdateClicked = viewModel::createGraphOrStat,
             isUpdateMode = viewModel.updateMode.observeAsState().value == true
         )

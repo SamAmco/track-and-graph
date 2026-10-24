@@ -11,6 +11,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.util.FeaturePathProvider
 
 internal fun luaGraphFeatureMap(
@@ -47,3 +48,8 @@ internal fun luaGraphFeatureInputs(
         name = name,
     )
 }
+
+internal fun luaTranslatedString(value: LuaValueAccessor?): TranslatedString? =
+    value?.asString()?.let(TranslatedString::Simple)
+        ?: value?.asStringMap()?.takeIf { it.isNotEmpty() }
+            ?.let(TranslatedString::Translations)

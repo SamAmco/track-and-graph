@@ -44,6 +44,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.data.lua.isZipArchive
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
@@ -114,6 +115,8 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     var showingConfiguration by mutableStateOf(false)
         private set
+
+    private var configurationError: TranslatedString? = null
 
     val packageUiData: LuaGraphPackageUiData?
         get() = (luaGraph.source as? LuaGraphSource.Package)?.packageData?.let {
@@ -267,6 +270,9 @@ class LuaGraphConfigViewModel @Inject constructor(
         if (inputNames.size != inputNames.distinct().size) {
             return GraphStatConfigEvent.ValidationException(R.string.lua_feature_names_not_unique)
         }
+        configurationError?.let {
+            return GraphStatConfigEvent.ValidationException(translatedMessage = it)
+        }
         return null
     }
 
@@ -367,6 +373,7 @@ class LuaGraphConfigViewModel @Inject constructor(
             configuration = null,
         )
         configurationContent = null
+        configurationError = null
         showingConfiguration = false
         script = text
     }
@@ -502,6 +509,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     fun onConfigurationRendered(response: LuaValueAccessor) {
+        configurationError = luaTranslatedString(response[CONFIGURATION_ERROR])
         response[FEATURE_INPUTS]?.let(::updateFeatureInputs)
         val configuration = response[STATE]
         luaGraph = luaGraph.copy(
@@ -536,6 +544,7 @@ class LuaGraphConfigViewModel @Inject constructor(
             }
         } catch (t: Throwable) {
             Timber.e(t, "Failed to resolve Lua graph configuration UI")
+            configurationError = null
             null
         }
         withContext(ui) {
@@ -552,5 +561,6 @@ class LuaGraphConfigViewModel @Inject constructor(
     private companion object {
         const val STATE = "state"
         const val FEATURE_INPUTS = "feature_inputs"
+        const val CONFIGURATION_ERROR = "configuration_error"
     }
 }

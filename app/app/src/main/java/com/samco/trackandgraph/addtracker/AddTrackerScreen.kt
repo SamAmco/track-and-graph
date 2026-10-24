@@ -145,7 +145,7 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
             )
 
             AddCreateBar(
-                errorText = errorText,
+                errorText = errorText?.let { stringResource(it) },
                 onCreateUpdateClicked = viewModel::onCreateUpdateClicked,
                 isUpdateMode = isUpdateMode
             )
@@ -471,4 +471,3 @@ private fun NameInput(
     focusRequester = focusRequester,
     keyboardController = keyboardController
 )
-

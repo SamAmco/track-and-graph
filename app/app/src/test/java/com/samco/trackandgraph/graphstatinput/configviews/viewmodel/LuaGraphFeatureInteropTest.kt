@@ -2,6 +2,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
 import com.samco.trackandgraph.data.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
+import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.util.FeaturePathProvider
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -42,6 +43,20 @@ class LuaGraphFeatureInteropTest {
         assertEquals(
             listOf(LuaGraphFeature(1, 9, 42, "source")),
             luaGraphFeatureInputs(inputs, 9),
+        )
+    }
+
+    @Test
+    fun `validity messages accept translated tables and plain strings`() {
+        assertEquals(
+            TranslatedString.Simple("Choose a feature"),
+            luaTranslatedString(LuaValueSnapshot.StringValue("Choose a feature")),
+        )
+        assertEquals(
+            TranslatedString.Translations(mapOf("en" to "Choose a feature")),
+            luaTranslatedString(LuaValueSnapshot.TableValue(mapOf(
+                "en" to LuaValueSnapshot.StringValue("Choose a feature"),
+            ))),
         )
     }
 }

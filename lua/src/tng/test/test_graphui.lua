@@ -72,7 +72,8 @@ test("feature selector shares picker state and updates selection", function()
 		on_selected = function(value) selected = value end,
 	})
 
-	selector.children[1].modifier[2].callback()
+	local button_modifiers = selector.children[1].modifier
+	button_modifiers[#button_modifiers].callback()
 	local dialog = selector.children[2]
 	local rerendered = graphui.feature_selector({
 		key = "source",
