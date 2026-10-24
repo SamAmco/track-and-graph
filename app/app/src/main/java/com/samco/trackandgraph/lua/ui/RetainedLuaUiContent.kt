@@ -13,6 +13,7 @@ import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
+import java.util.concurrent.atomic.AtomicLong
 
 /** Retains one renderer and its current state on their originating Lua runtime. */
 internal class RetainedLuaUiContent(
@@ -21,6 +22,7 @@ internal class RetainedLuaUiContent(
     initialState: LuaValueAccessor?,
     private val additionalRenderParams: Map<String, LuaValueAccessor> = emptyMap(),
 ) : LuaUiContent {
+    override val nativeStateScopeKey = nextNativeStateScopeKey()
     private var renderState = initialState
     override val state: LuaValueAccessor?
         get() = renderState
@@ -31,9 +33,15 @@ internal class RetainedLuaUiContent(
 
     override suspend fun interact(
         context: LuaUiContext,
-        function: LuaValueHandle,
+        actions: List<LuaUiAction>,
     ): LuaValueHandle = withRenderLock { vmLock ->
-        luaEngine.callLuaFunction(vmLock, function)
+        actions.forEach { action ->
+            luaEngine.callLuaFunction(
+                vmLock,
+                action.function,
+                *action.arguments.toTypedArray(),
+            )
+        }
         renderLocked(vmLock, context)
     }
 
@@ -77,5 +85,8 @@ internal class RetainedLuaUiContent(
 
     private companion object {
         const val STATE = "state"
+        val nextScopeId = AtomicLong()
+
+        fun nextNativeStateScopeKey(): String = nextScopeId.incrementAndGet().toString()
     }
 }

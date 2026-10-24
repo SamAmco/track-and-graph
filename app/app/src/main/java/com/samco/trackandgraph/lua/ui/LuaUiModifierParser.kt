@@ -54,7 +54,7 @@ internal object LuaUiModifierParser {
     fun parse(
         initial: Modifier,
         modifiers: LuaValueHandle?,
-        onClick: (LuaValueHandle) -> Unit,
+        onClick: (List<LuaUiAction>) -> Unit,
     ): Modifier {
         var result = initial
         modifiers.toHandleList().forEach { item ->
@@ -81,7 +81,7 @@ internal object LuaUiModifierParser {
                 "CLIP" -> result.clip(shape(item["shape"]?.asString()))
                 "ELEVATION" -> result.shadow(dimension(item["value"]) ?: 0.dp)
                 "ON_CLICK" -> item["callback"]?.asFunction()?.let { callback ->
-                    result.clickable { onClick(callback) }
+                    result.clickable { onClick(listOf(LuaUiAction(callback))) }
                 } ?: result
                 else -> result
             }

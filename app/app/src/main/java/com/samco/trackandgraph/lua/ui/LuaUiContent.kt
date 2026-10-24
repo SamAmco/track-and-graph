@@ -14,6 +14,9 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 
 /** App-layer session that owns a Lua UI renderer and its effective state. */
 interface LuaUiContent {
+    /** Stable namespace for native state retained by components rendered by this content. */
+    val nativeStateScopeKey: String
+
     /** Effective state that will be passed to the next render. */
     val state: LuaValueAccessor?
 
@@ -23,7 +26,7 @@ interface LuaUiContent {
     /** Calls an action and rerenders before releasing their shared VM execution lock. */
     suspend fun interact(
         context: LuaUiContext,
-        function: LuaValueHandle,
+        actions: List<LuaUiAction>,
     ): LuaValueHandle
 
     /** Calls an auxiliary function, such as a deferred Canvas draw callback, without rerendering. */
@@ -32,3 +35,8 @@ interface LuaUiContent {
         vararg arguments: LuaValueAccessor,
     ): LuaValueHandle
 }
+
+data class LuaUiAction(
+    val function: LuaValueHandle,
+    val arguments: List<LuaValueAccessor> = emptyList(),
+)

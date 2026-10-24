@@ -25,6 +25,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCustomGraphViewData
+import com.samco.trackandgraph.lua.ui.LuaUiAction
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertSame
 import org.junit.Test
@@ -93,7 +94,7 @@ class CustomGraphLuaHelperTest {
             graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
         ).wrapped as ILuaCustomGraphViewData).content
 
-        assertSame(result, content.interact(context, callback))
+        assertSame(result, content.interact(context, listOf(LuaUiAction(callback))))
 
         inOrder(luaEngine) {
             verify(luaEngine).acquireVM(vmLock.affinity)

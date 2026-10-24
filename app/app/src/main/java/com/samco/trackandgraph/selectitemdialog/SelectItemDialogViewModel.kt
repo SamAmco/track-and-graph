@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.data.di.IODispatcher
+import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -91,6 +92,36 @@ sealed class GraphNode {
     ) : GraphNode()
 }
 
+/** Immutable description of a confirmed picker selection. */
+sealed interface SelectedItemInfo {
+    val name: String
+
+    data class Group(
+        val id: Long,
+        override val name: String,
+        val path: String,
+    ) : SelectedItemInfo
+
+    data class Tracker(
+        val trackerId: Long,
+        val featureId: Long,
+        override val name: String,
+        val featurePath: String,
+    ) : SelectedItemInfo
+
+    data class Graph(
+        val id: Long,
+        override val name: String,
+    ) : SelectedItemInfo
+
+    data class Function(
+        val functionId: Long,
+        val featureId: Long,
+        override val name: String,
+        val featurePath: String,
+    ) : SelectedItemInfo
+}
+
 interface SelectItemDialogViewModel {
     val state: StateFlow<SelectItemDialogState>
     val groupTree: StateFlow<GraphNode?>
@@ -104,6 +135,7 @@ interface SelectItemDialogViewModel {
         disabledItems: Set<HiddenItem> = emptySet(),
     )
     fun onItemClicked(item: GraphNode)
+    fun selectedItemInfo(): SelectedItemInfo?
     fun reset()
 }
 
@@ -113,6 +145,9 @@ class SelectItemDialogViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), SelectItemDialogViewModel {
+
+    @Volatile
+    private var featurePathProvider: FeaturePathProvider? = null
 
     private val _selectedItem = MutableStateFlow<GraphNode?>(null)
     override val selectedItem: StateFlow<GraphNode?> = _selectedItem.asStateFlow()
@@ -135,8 +170,10 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 .onStart { emit(config) }
         }
         .map {
+            val groupGraph = dataInteractor.getGroupGraphSync(rootGroupId = null)
+            featurePathProvider = FeaturePathProvider(groupGraph)
             buildGraphNodeTree(
-                groupGraph = dataInteractor.getGroupGraphSync(rootGroupId = null),
+                groupGraph = groupGraph,
                 selectableTypes = it.selectableTypes,
                 hiddenItems = it.hiddenItems,
                 disabledItems = it.disabledItems,
@@ -200,6 +237,31 @@ class SelectItemDialogViewModelImpl @Inject constructor(
                 ) return
                 _selectedItem.value = item
             }
+        }
+    }
+
+    override fun selectedItemInfo(): SelectedItemInfo? {
+        val item = selectedItem.value ?: return null
+        val paths = featurePathProvider ?: return null
+        return when (item) {
+            is GraphNode.Group -> SelectedItemInfo.Group(
+                id = item.id,
+                name = item.name,
+                path = paths.getPathForGroup(item.id),
+            )
+            is GraphNode.Tracker -> SelectedItemInfo.Tracker(
+                trackerId = item.trackerId,
+                featureId = item.featureId,
+                name = item.name,
+                featurePath = paths.getPathForFeature(item.featureId),
+            )
+            is GraphNode.Graph -> SelectedItemInfo.Graph(item.id, item.name)
+            is GraphNode.Function -> SelectedItemInfo.Function(
+                functionId = item.functionId,
+                featureId = item.featureId,
+                name = item.name,
+                featurePath = paths.getPathForFeature(item.featureId),
+            )
         }
     }
 

@@ -12,6 +12,14 @@ return {
 	["COMPONENT_TYPE.SPACER"] = 5,
 	["COMPONENT_TYPE.TEXT"] = 5,
 	["COMPONENT_TYPE.SURFACE"] = 5,
+	["COMPONENT_TYPE.SELECT_ITEM_DIALOG"] = 5,
+
+	SELECTABLE_ITEM_TYPE = 5,
+	["SELECTABLE_ITEM_TYPE.GROUP"] = 5,
+	["SELECTABLE_ITEM_TYPE.TRACKER"] = 5,
+	["SELECTABLE_ITEM_TYPE.FEATURE"] = 5,
+	["SELECTABLE_ITEM_TYPE.GRAPH"] = 5,
+	["SELECTABLE_ITEM_TYPE.FUNCTION"] = 5,
 
 	MODIFIER_TYPE = 5,
 	["MODIFIER_TYPE.WIDTH"] = 5,
@@ -81,6 +89,7 @@ return {
 	TextParams = 5,
 	SurfaceParams = 5,
 	CanvasParams = 5,
+	SelectItemDialogParams = 5,
 
 	px = 5,
 	dp = 5,
@@ -115,4 +124,5 @@ return {
 	text = 5,
 	surface = 5,
 	canvas = 5,
+	select_item_dialog = 5,
 }

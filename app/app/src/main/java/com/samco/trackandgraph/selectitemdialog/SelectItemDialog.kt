@@ -87,10 +87,12 @@ fun SelectItemDialog(
     onFeatureSelected: ((Long) -> Unit)? = null,
     onGraphSelected: ((Long) -> Unit)? = null,
     onFunctionSelected: ((Long) -> Unit)? = null,
+    onItemSelected: ((SelectedItemInfo) -> Unit)? = null,
     onDismissRequest: () -> Unit,
     resetOnClose: Boolean = false,
+    dismissAfterSelection: Boolean = true,
+    viewModel: SelectItemDialogViewModel = hiltViewModel<SelectItemDialogViewModelImpl>(),
 ) {
-    val viewModel: SelectItemDialogViewModel = hiltViewModel<SelectItemDialogViewModelImpl>()
     val dismiss = {
         onDismissRequest()
         if (resetOnClose) viewModel.reset()
@@ -116,7 +118,9 @@ fun SelectItemDialog(
             onFeatureSelected = onFeatureSelected,
             onGraphSelected = onGraphSelected,
             onFunctionSelected = onFunctionSelected,
+            onItemSelected = onItemSelected,
             onDismissRequest = dismiss,
+            dismissAfterSelection = dismissAfterSelection,
             viewModel = viewModel,
         )
     }
@@ -133,6 +137,7 @@ fun SelectItemDialogContent(
     onFeatureSelected: ((Long) -> Unit)? = null,
     onGraphSelected: ((Long) -> Unit)? = null,
     onFunctionSelected: ((Long) -> Unit)? = null,
+    onItemSelected: ((SelectedItemInfo) -> Unit)? = null,
     onDismissRequest: () -> Unit,
     dismissAfterSelection: Boolean = true,
     selectionEnabled: Boolean = true,
@@ -152,6 +157,7 @@ fun SelectItemDialogContent(
         onDismissRequest = onDismissRequest,
         onConfirm = {
             selectedItem?.let { item ->
+                viewModel.selectedItemInfo()?.let { onItemSelected?.invoke(it) }
                 when (item) {
                     is GraphNode.Group -> onGroupSelected?.invoke(item.id)
                     is GraphNode.Tracker -> {

@@ -14,6 +14,17 @@ M.COMPONENT_TYPE = {
 	SPACER = "SPACER",
 	TEXT = "TEXT",
 	SURFACE = "SURFACE",
+	SELECT_ITEM_DIALOG = "SELECT_ITEM_DIALOG",
+}
+
+--- @since (API level 5)
+--- @enum SELECTABLE_ITEM_TYPE
+M.SELECTABLE_ITEM_TYPE = {
+	GROUP = "GROUP",
+	TRACKER = "TRACKER",
+	FEATURE = "FEATURE",
+	GRAPH = "GRAPH",
+	FUNCTION = "FUNCTION",
 }
 
 --- @since (API level 5)
@@ -152,6 +163,24 @@ M.SurfaceParams = {}
 --- @field modifier? table[]: Ordered modifiers.
 --- @field draw fun(draw_scope): Callback invoked after the canvas has been measured.
 M.CanvasParams = {}
+
+--- @since (API level 5)
+--- @class SelectItemDialogParams
+--- @field key? string: Stable identity of this UI node across renders.
+--- @field visible boolean
+--- @field title string|table<string,string>
+--- @field picker_scope? string: Dialogs with the same scope share retained picker navigation state.
+--- @field selectable_types SELECTABLE_ITEM_TYPE[]
+--- @field hidden_items? table[]: Items expressed as `{ type = ..., id = ... }`.
+--- @field disabled_items? table[]: Items expressed as `{ type = ..., id = ... }`.
+--- @field on_group_selected? fun(params)
+--- @field on_tracker_selected? fun(params)
+--- @field on_feature_selected? fun(params)
+--- @field on_graph_selected? fun(params)
+--- @field on_function_selected? fun(params)
+--- @field on_dismiss_request? fun()
+--- @field reset_on_close? boolean
+M.SelectItemDialogParams = {}
 
 local dimension = function(unit, value)
 	assert(type(value) == "number", "dimension value must be a number")
@@ -378,6 +407,31 @@ M.canvas = function(params)
 	local canvas = require("tng.canvas")
 	local result = component(canvas.TYPE, params)
 	result.draw = canvas.create(params.draw)
+	return result
+end
+
+--- Displays the app's general-purpose component picker.
+--- Dialogs share picker navigation state within the same picker_scope.
+--- @param params SelectItemDialogParams
+M.select_item_dialog = function(params)
+	assert(type(params) == "table", "select_item_dialog params must be a table")
+	assert(type(params.visible) == "boolean", "visible must be a boolean")
+	assert(type(params.title) == "string" or type(params.title) == "table", "title must be a string or translations table")
+	assert(type(params.selectable_types) == "table", "selectable_types must be a table")
+	local result = component(M.COMPONENT_TYPE.SELECT_ITEM_DIALOG, params)
+	result.visible = params.visible
+	result.title = params.title
+	result.picker_scope = params.picker_scope
+	result.selectable_types = params.selectable_types
+	result.hidden_items = params.hidden_items or {}
+	result.disabled_items = params.disabled_items or {}
+	result.on_group_selected = params.on_group_selected
+	result.on_tracker_selected = params.on_tracker_selected
+	result.on_feature_selected = params.on_feature_selected
+	result.on_graph_selected = params.on_graph_selected
+	result.on_function_selected = params.on_function_selected
+	result.on_dismiss_request = params.on_dismiss_request
+	result.reset_on_close = params.reset_on_close or false
 	return result
 end
 

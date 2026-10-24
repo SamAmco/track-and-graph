@@ -21,6 +21,32 @@ test("text accepts translated strings", function()
 	assert(text.text == translations)
 end)
 
+test("select item dialog preserves picker options and callbacks", function()
+	local selected = function() end
+	local dismissed = function() end
+	local dialog = ui.select_item_dialog({
+		key = "source_dialog",
+		visible = true,
+		title = { en = "Select a feature" },
+		picker_scope = "feature_inputs",
+		selectable_types = { ui.SELECTABLE_ITEM_TYPE.FEATURE },
+		hidden_items = { { type = ui.SELECTABLE_ITEM_TYPE.FEATURE, id = 1 } },
+		disabled_items = { { type = ui.SELECTABLE_ITEM_TYPE.FEATURE, id = 2 } },
+		on_feature_selected = selected,
+		on_dismiss_request = dismissed,
+		reset_on_close = true,
+	})
+
+	assert(dialog.type == ui.COMPONENT_TYPE.SELECT_ITEM_DIALOG)
+	assert(dialog.picker_scope == "feature_inputs")
+	assert(dialog.selectable_types[1] == ui.SELECTABLE_ITEM_TYPE.FEATURE)
+	assert(dialog.hidden_items[1].id == 1)
+	assert(dialog.disabled_items[1].id == 2)
+	assert(dialog.on_feature_selected == selected)
+	assert(dialog.on_dismiss_request == dismissed)
+	assert(dialog.reset_on_close == true)
+end)
+
 test("nested UI constants are available through the API level gate", function()
 	local api_gate = require("community.test-utils.api-gate")
 	local spec = dofile("src/tng/ui.apispec.lua")
@@ -29,6 +55,7 @@ test("nested UI constants are available through the API level gate", function()
 
 	assert(gated.BOX_ALIGNMENT.BOTTOM_END == "BOTTOM_END")
 	assert(gated.COMPONENT_TYPE.FLOW_ROW == "FLOW_ROW")
+	assert(gated.SELECTABLE_ITEM_TYPE.FEATURE == "FEATURE")
 	assert(gated.MODIFIER_TYPE.FILL_MAX_ROW_HEIGHT == "FILL_MAX_ROW_HEIGHT")
 	assert(gated.fill_max_row_height(0.5).fraction == 0.5)
 	assert(gated.flow_row({}).type == "FLOW_ROW")
