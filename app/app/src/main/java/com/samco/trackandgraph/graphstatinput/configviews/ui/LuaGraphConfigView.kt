@@ -126,13 +126,13 @@ fun LuaGraphConfigView(
 
     val configurationContent = viewModel.configurationContent
     if (viewModel.showingConfiguration && configurationContent != null) {
-        LuaGraphConfigurationView(
+        LuaGraphRenderedConfigurationView(
             content = configurationContent,
             onBack = viewModel::showSourceControls,
             onStateChanged = viewModel::onConfigurationChanged,
         )
     } else {
-        LuaGraphConfigView(
+        LuaGraphSourceEditorView(
             scrollState = scrollState,
             script = viewModel.script,
             scriptPreview = viewModel.scriptPreview
@@ -159,7 +159,7 @@ fun LuaGraphConfigView(
 }
 
 @Composable
-private fun LuaGraphConfigurationView(
+private fun LuaGraphRenderedConfigurationView(
     content: LuaUiContent,
     onBack: () -> Unit,
     onStateChanged: (LuaValueAccessor?) -> Unit,
@@ -193,7 +193,7 @@ private fun showErrorToast(context: Context, networkError: NetworkError) {
 }
 
 @Composable
-private fun LuaGraphConfigView(
+private fun LuaGraphSourceEditorView(
     scrollState: ScrollState,
     script: TextFieldValue,
     scriptPreview: TextFieldValue,
@@ -530,9 +530,9 @@ private fun Buttons(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewLuaGraphConfigView() = TnGComposeTheme {
+fun PreviewLuaGraphSourceEditorView() = TnGComposeTheme {
     Column {
-        LuaGraphConfigView(
+        LuaGraphSourceEditorView(
             scrollState = rememberScrollState(),
             script = TextFieldValue(),
             scriptPreview = TextFieldValue(
