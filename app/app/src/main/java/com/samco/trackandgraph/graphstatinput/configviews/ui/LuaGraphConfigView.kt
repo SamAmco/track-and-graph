@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -71,6 +72,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel.NetworkError
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigurationUiState
 import com.samco.trackandgraph.lua.ui.LuaUiContent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphFeatureUiData
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphPackageUiData
@@ -86,6 +88,7 @@ import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.ui.IconTextButton
 import com.samco.trackandgraph.ui.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.ui.LuaScriptEditDialog
 import com.samco.trackandgraph.ui.ui.SelectorButton
 import com.samco.trackandgraph.ui.ui.TextSubtitle2
@@ -126,14 +129,11 @@ fun LuaGraphConfigView(
 
     val showEditScriptDialog = rememberSaveable { mutableStateOf(false) }
 
-    val configurationContent = viewModel.configurationContent
-    if (configurationContent != null) {
-        LuaGraphRenderedConfigurationView(
-            content = configurationContent,
-            onRendered = viewModel::onConfigurationRendered,
+    when (val state = viewModel.configurationUiState) {
+        LuaGraphConfigurationUiState.Loading -> LoadingOverlay(
+            modifier = Modifier.height(200.dp),
         )
-    } else {
-        LuaGraphSourceEditorView(
+        LuaGraphConfigurationUiState.SourceEditor -> LuaGraphSourceEditorView(
             scrollState = scrollState,
             script = viewModel.script,
             scriptPreview = viewModel.scriptPreview
@@ -155,6 +155,10 @@ fun LuaGraphConfigView(
             onClickInPreview = viewModel::onClickInPreview,
             showUserConfirmDeepLinkDialog = viewModel.showUserConfirmDeepLink
                 .collectAsStateWithLifecycle(),
+        )
+        is LuaGraphConfigurationUiState.Rendered -> LuaGraphRenderedConfigurationView(
+            content = state.content,
+            onRendered = viewModel::onConfigurationRendered,
         )
     }
 }

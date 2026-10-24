@@ -82,6 +82,12 @@ data class LuaGraphPackageUiData(
     val version: String,
 )
 
+sealed interface LuaGraphConfigurationUiState {
+    data object Loading : LuaGraphConfigurationUiState
+    data object SourceEditor : LuaGraphConfigurationUiState
+    data class Rendered(val content: LuaUiContent) : LuaGraphConfigurationUiState
+}
+
 @HiltViewModel
 class LuaGraphConfigViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -110,7 +116,8 @@ class LuaGraphConfigViewModel @Inject constructor(
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
 
-    var configurationContent: LuaUiContent? by mutableStateOf(null)
+    var configurationUiState: LuaGraphConfigurationUiState by
+        mutableStateOf(LuaGraphConfigurationUiState.Loading)
         private set
 
     private var configurationError: TranslatedString? = null
@@ -369,7 +376,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         )
         selectedFeatures = emptyList()
         featureTextFields.clear()
-        configurationContent = null
+        configurationUiState = LuaGraphConfigurationUiState.SourceEditor
         configurationError = null
         script = TextFieldValue("")
         pendingScriptUriDownload.value = null
@@ -386,7 +393,7 @@ class LuaGraphConfigViewModel @Inject constructor(
             source = LuaGraphSource.Inline(text.text),
             configuration = null,
         )
-        configurationContent = null
+        configurationUiState = LuaGraphConfigurationUiState.SourceEditor
         configurationError = null
         script = text
     }
@@ -493,27 +500,28 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     override fun onDataLoaded(config: Any?) {
         val lgConfig = config as? LuaGraphWithFeatures
-        lgConfig?.let { luaGraph = it }
-        lgConfig?.source?.let { source ->
-            when (source) {
-                is LuaGraphSource.Inline -> {
-                    script = TextFieldValue(source.script)
-                }
-                is LuaGraphSource.Package -> {
-                    val accessor = ZipLuaScriptAccessor(source.packageData.archive)
-                    script = TextFieldValue(accessor.mainScript())
-                }
+        if (lgConfig == null) {
+            configurationUiState = LuaGraphConfigurationUiState.SourceEditor
+            return
+        }
+        luaGraph = lgConfig
+        when (val source = lgConfig.source) {
+            is LuaGraphSource.Inline -> {
+                script = TextFieldValue(source.script)
+            }
+
+            is LuaGraphSource.Package -> {
+                val accessor = ZipLuaScriptAccessor(source.packageData.archive)
+                script = TextFieldValue(accessor.mainScript())
             }
         }
-        lgConfig?.features?.let { features ->
-            selectedFeatures = features
-            featureTextFields.clear()
-            featureTextFields.addAll(features.map {
-                mutableStateOf(
-                    TextFieldValue(it.name, TextRange(it.name.length))
-                )
-            })
-        }
+        selectedFeatures = lgConfig.features
+        featureTextFields.clear()
+        featureTextFields.addAll(lgConfig.features.map {
+            mutableStateOf(
+                TextFieldValue(it.name, TextRange(it.name.length))
+            )
+        })
         viewModelScope.launch { refreshConfiguration() }
     }
 
@@ -547,6 +555,11 @@ class LuaGraphConfigViewModel @Inject constructor(
         val source = luaGraph.source
         val configuration = luaGraph.configuration
         val featureMap = featureMap()
+        withContext(ui) {
+            if (luaGraph.source == source) {
+                configurationUiState = LuaGraphConfigurationUiState.Loading
+            }
+        }
         val content = try {
             withContext(default) {
                 luaGraphConfigurationProvider(source, configuration, featureMap)
@@ -558,7 +571,8 @@ class LuaGraphConfigViewModel @Inject constructor(
         }
         withContext(ui) {
             if (luaGraph.source != source) return@withContext
-            configurationContent = content
+            configurationUiState = content?.let(LuaGraphConfigurationUiState::Rendered)
+                ?: LuaGraphConfigurationUiState.SourceEditor
         }
     }
 
