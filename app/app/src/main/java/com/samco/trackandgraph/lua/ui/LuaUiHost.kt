@@ -16,7 +16,6 @@
  */
 package com.samco.trackandgraph.lua.ui
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -31,16 +30,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -48,35 +44,15 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
-import com.samco.trackandgraph.data.localisation.TranslatedString
-import com.samco.trackandgraph.selectitemdialog.HiddenItem
-import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
-import com.samco.trackandgraph.selectitemdialog.SelectItemDialogViewModelImpl
-import com.samco.trackandgraph.selectitemdialog.SelectableItemType
-import com.samco.trackandgraph.selectitemdialog.SelectedItemInfo
 import com.samco.trackandgraph.ui.theming.TngColors
-import com.samco.trackandgraph.ui.theming.TngTypography
 import com.samco.trackandgraph.ui.theming.tngColors
-import com.samco.trackandgraph.ui.theming.tngTypography
-import com.samco.trackandgraph.ui.ui.resolve
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -87,8 +63,6 @@ private val LocalLuaUiErrorHandler = staticCompositionLocalOf<(Throwable) -> Uni
 private val LocalLuaUiActionHandler = staticCompositionLocalOf<(List<LuaUiAction>) -> Unit> {
     { error("No Lua UI action handler installed") }
 }
-
-private val canvasSpBreakpoints = listOf(8f, 10f, 12f, 14f, 18f, 20f, 24f, 30f, 100f)
 
 @Composable
 internal fun LuaUiHost(
@@ -185,8 +159,8 @@ private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier:
             "SPACER" -> Spacer(modifier)
             "TEXT" -> LuaText(node, modifier)
             "SURFACE" -> LuaSurface(node, content, modifier)
-            "CANVAS" -> LuaCanvas(node, content, modifier)
-            "SELECT_ITEM_DIALOG" -> LuaSelectItemDialog(node, content)
+            "CANVAS" -> LuaCanvas(node, content, modifier, LocalLuaUiErrorHandler.current)
+            "SELECT_ITEM_DIALOG" -> LuaSelectItemDialog(node, LocalLuaUiActionHandler.current)
         }
     }
 }
@@ -229,85 +203,6 @@ private fun ColumnScope.LuaColumnChildren(
 }
 
 @Composable
-private fun LuaText(node: LuaValueHandle, modifier: Modifier) {
-    Text(
-        text = luaText(node["text"]),
-        modifier = modifier,
-        color = luaColor(node["color"]) ?: Color.Unspecified,
-        style = luaTextStyle(
-            node["style"]?.asString(),
-            MaterialTheme.tngTypography,
-            LocalTextStyle.current,
-        ),
-        fontSize = textDimension(node["font_size"]),
-        fontWeight = when (node["font_weight"]?.asString()) {
-            "NORMAL" -> FontWeight.Normal
-            "MEDIUM" -> FontWeight.Medium
-            "BOLD" -> FontWeight.Bold
-            else -> null
-        },
-        textAlign = when (node["text_align"]?.asString()) {
-            "CENTER" -> TextAlign.Center
-            "END" -> TextAlign.End
-            else -> TextAlign.Start
-        },
-        maxLines = node.positiveInt("max_lines"),
-        overflow = if (node["overflow"]?.asString() == "ELLIPSIS") {
-            TextOverflow.Ellipsis
-        } else TextOverflow.Clip,
-    )
-}
-
-@Composable
-private fun luaText(value: LuaValueAccessor?): String =
-    value?.asString()
-        ?: value?.asStringMap()?.let { TranslatedString.Translations(it).resolve() }
-        .orEmpty()
-
-internal fun luaTextStyle(
-    token: String?,
-    typography: TngTypography,
-    fallback: TextStyle,
-): TextStyle = when (token) {
-    "TEXT_STYLE_DISPLAY_LARGE" -> typography.materialTypography.displayLarge
-    "TEXT_STYLE_DISPLAY_MEDIUM" -> typography.materialTypography.displayMedium
-    "TEXT_STYLE_DISPLAY_SMALL" -> typography.materialTypography.displaySmall
-    "TEXT_STYLE_HEADLINE_LARGE" -> typography.materialTypography.headlineLarge
-    "TEXT_STYLE_HEADLINE_MEDIUM" -> typography.materialTypography.headlineMedium
-    "TEXT_STYLE_HEADLINE_SMALL" -> typography.materialTypography.headlineSmall
-    "TEXT_STYLE_TITLE_LARGE" -> typography.materialTypography.titleLarge
-    "TEXT_STYLE_TITLE_MEDIUM" -> typography.materialTypography.titleMedium
-    "TEXT_STYLE_TITLE_SMALL" -> typography.materialTypography.titleSmall
-    "TEXT_STYLE_BODY_LARGE" -> typography.materialTypography.bodyLarge
-    "TEXT_STYLE_BODY_MEDIUM" -> typography.materialTypography.bodyMedium
-    "TEXT_STYLE_BODY_SMALL" -> typography.materialTypography.bodySmall
-    "TEXT_STYLE_LABEL_LARGE" -> typography.materialTypography.labelLarge
-    "TEXT_STYLE_LABEL_MEDIUM" -> typography.materialTypography.labelMedium
-    "TEXT_STYLE_LABEL_SMALL" -> typography.materialTypography.labelSmall
-    "TEXT_STYLE_CODE" -> typography.code
-    else -> fallback
-}
-
-@Composable
-private fun textDimension(value: LuaValueAccessor?): TextUnit {
-    val number = value?.get("value")?.asDouble()?.toFloat()
-        ?.takeIf { it.isFinite() && it >= 0f }
-        ?: return TextUnit.Unspecified
-    return when (value["unit"]?.asString()) {
-        "PX" -> with(LocalDensity.current) { number.toDp().toSp() }
-        "DP" -> with(LocalDensity.current) { number.dp.toSp() }
-        else -> number.sp
-    }
-}
-
-private fun LuaValueAccessor.positiveInt(key: String): Int =
-    this[key]?.asDouble()
-        ?.takeIf { it.isFinite() && it >= 1.0 }
-        ?.coerceAtMost(Int.MAX_VALUE.toDouble())
-        ?.toInt()
-        ?: Int.MAX_VALUE
-
-@Composable
 private fun LuaSurface(node: LuaValueHandle, content: LuaUiContent, modifier: Modifier) {
     Surface(
         modifier = modifier,
@@ -319,191 +214,7 @@ private fun LuaSurface(node: LuaValueHandle, content: LuaUiContent, modifier: Mo
     ) { node["child"]?.let { LuaNode(it, content) } }
 }
 
-@Composable
-private fun LuaSelectItemDialog(node: LuaValueHandle, content: LuaUiContent) {
-    if (node["visible"]?.asBoolean() != true) return
-
-    val selectableTypes = node["selectable_types"].toSelectableItemTypes()
-    if (selectableTypes.isEmpty()) return
-
-    val pickerScope = node["picker_scope"]?.asString().orEmpty().ifBlank { "default" }
-    val viewModel = hiltViewModel<SelectItemDialogViewModelImpl>(
-        key = "lua-select-item:$pickerScope",
-    )
-    val actionHandler = LocalLuaUiActionHandler.current
-    val resetOnClose = node["reset_on_close"]?.asBoolean() == true
-    val dismiss = {
-        node.action("on_dismiss_request")?.let { actionHandler(listOf(it)) }
-        if (resetOnClose) viewModel.reset()
-    }
-
-    SelectItemDialog(
-        title = luaText(node["title"]),
-        selectableTypes = selectableTypes,
-        hiddenItems = node["hidden_items"].toHiddenItems(),
-        disabledItems = node["disabled_items"].toHiddenItems(),
-        onItemSelected = { selection ->
-            val actions = node.selectionActions(selection).toMutableList()
-            node.action("on_dismiss_request")?.let(actions::add)
-            if (actions.isNotEmpty()) actionHandler(actions)
-            if (resetOnClose) viewModel.reset()
-        },
-        onDismissRequest = dismiss,
-        resetOnClose = false,
-        dismissAfterSelection = false,
-        viewModel = viewModel,
-    )
-}
-
-private fun LuaValueAccessor?.toSelectableItemTypes(): Set<SelectableItemType> =
-    toAccessorList().mapNotNull { value ->
-        value.asString()?.let { runCatching { SelectableItemType.valueOf(it) }.getOrNull() }
-    }.toSet()
-
-private fun LuaValueAccessor?.toHiddenItems(): Set<HiddenItem> =
-    toAccessorList().mapNotNull { value ->
-        val type = value["type"]?.asString()
-            ?.let { runCatching { SelectableItemType.valueOf(it) }.getOrNull() }
-            ?: return@mapNotNull null
-        val id = value["id"]?.asDouble()?.takeIf { it.isFinite() }?.toLong()
-            ?: return@mapNotNull null
-        HiddenItem(type, id)
-    }.toSet()
-
-private fun LuaValueAccessor?.toAccessorList(): List<LuaValueAccessor> =
-    (1..(this?.arraySize ?: 0)).mapNotNull { this?.get(it) }
-
-private fun LuaValueHandle.action(
-    callbackName: String,
-    argument: LuaValueAccessor? = null,
-): LuaUiAction? = this[callbackName]?.asFunction()?.let { callback ->
-    LuaUiAction(callback, listOfNotNull(argument))
-}
-
-private fun LuaValueHandle.selectionActions(selection: SelectedItemInfo): List<LuaUiAction> = when (selection) {
-    is SelectedItemInfo.Group -> listOfNotNull(action(
-        "on_group_selected",
-        selectionParams(
-            id = selection.id,
-            type = "GROUP",
-            name = selection.name,
-            path = selection.path,
-        ),
-    ))
-    is SelectedItemInfo.Tracker -> listOfNotNull(
-        action(
-            "on_tracker_selected",
-            selectionParams(
-                id = selection.trackerId,
-                type = "TRACKER",
-                name = selection.name,
-                featureId = selection.featureId,
-                path = selection.featurePath,
-            ),
-        ),
-        action(
-            "on_feature_selected",
-            selectionParams(
-                id = selection.featureId,
-                type = "FEATURE",
-                name = selection.name,
-                sourceId = selection.trackerId,
-                sourceType = "TRACKER",
-                path = selection.featurePath,
-            ),
-        ),
-    )
-    is SelectedItemInfo.Graph -> listOfNotNull(action(
-        "on_graph_selected",
-        selectionParams(selection.id, "GRAPH", selection.name),
-    ))
-    is SelectedItemInfo.Function -> listOfNotNull(
-        action(
-            "on_function_selected",
-            selectionParams(
-                id = selection.functionId,
-                type = "FUNCTION",
-                name = selection.name,
-                featureId = selection.featureId,
-                path = selection.featurePath,
-            ),
-        ),
-        action(
-            "on_feature_selected",
-            selectionParams(
-                id = selection.featureId,
-                type = "FEATURE",
-                name = selection.name,
-                sourceId = selection.functionId,
-                sourceType = "FUNCTION",
-                path = selection.featurePath,
-            ),
-        ),
-    )
-}
-
-private fun selectionParams(
-    id: Long,
-    type: String,
-    name: String,
-    featureId: Long? = null,
-    sourceId: Long? = null,
-    sourceType: String? = null,
-    path: String? = null,
-): LuaValueSnapshot = LuaValueSnapshot.TableValue(buildMap {
-    put("id", LuaValueSnapshot.NumberValue(id.toDouble()))
-    put("type", LuaValueSnapshot.StringValue(type))
-    put("name", LuaValueSnapshot.StringValue(name))
-    featureId?.let { put("feature_id", LuaValueSnapshot.NumberValue(it.toDouble())) }
-    sourceId?.let { put("source_id", LuaValueSnapshot.NumberValue(it.toDouble())) }
-    sourceType?.let { put("source_type", LuaValueSnapshot.StringValue(it)) }
-    path?.let { put("path", LuaValueSnapshot.StringValue(it)) }
-})
-
-@Composable
-private fun LuaCanvas(node: LuaValueHandle, content: LuaUiContent, modifier: Modifier) {
-    val draw = node["draw"]?.asFunction() ?: return
-    val textMeasurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-    val onError = LocalLuaUiErrorHandler.current
-    var size by remember(draw) { mutableStateOf(IntSize.Zero) }
-    val result by produceState<LuaValueHandle?>(null, content, draw, size, density) {
-        value = if (size == IntSize.Zero) null else {
-            captureLuaUiResult {
-                content.call(
-                    draw,
-                    LuaValueSnapshot.TableValue(mapOf(
-                        "bounds" to LuaValueSnapshot.TableValue(mapOf(
-                            "width" to LuaValueSnapshot.NumberValue(size.width.toDouble()),
-                            "height" to LuaValueSnapshot.NumberValue(size.height.toDouble()),
-                        )),
-                        "density" to LuaValueSnapshot.NumberValue(density.density.toDouble()),
-                        "font_scale" to LuaValueSnapshot.NumberValue(density.fontScale.toDouble()),
-                        "sp_to_px" to LuaValueSnapshot.ArrayValue(canvasSpBreakpoints.map { sp ->
-                            LuaValueSnapshot.TableValue(mapOf(
-                                "sp" to LuaValueSnapshot.NumberValue(sp.toDouble()),
-                                "px" to LuaValueSnapshot.NumberValue(
-                                    with(density) { sp.sp.toPx().toDouble() },
-                                ),
-                            ))
-                        }),
-                    )),
-                )
-            }.fold(
-                onSuccess = { it },
-                onFailure = { onError(it); null },
-            )
-        }
-    }
-    val colors = luaThemeColors(MaterialTheme.tngColors)
-    Canvas(modifier.onSizeChanged { size = it }) {
-        result?.get("instructions")?.let {
-            LuaCanvasInstructionParser.draw(this, it, colors, textMeasurer)
-        }
-    }
-}
-
-private suspend fun <T> captureLuaUiResult(block: suspend () -> T): Result<T> = try {
+internal suspend fun <T> captureLuaUiResult(block: suspend () -> T): Result<T> = try {
     Result.success(block())
 } catch (cancellation: CancellationException) {
     throw cancellation
