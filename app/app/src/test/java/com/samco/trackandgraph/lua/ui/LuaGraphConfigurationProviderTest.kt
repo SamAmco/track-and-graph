@@ -25,6 +25,7 @@ class LuaGraphConfigurationProviderTest {
     private val luaEngine: LuaEngine = mock()
     private val vmLock = TestLuaVMFixtures.createTestLuaVMLock()
     private val descriptor: LuaValueHandle = mock()
+    private val featureMap = LuaValueSnapshot.TableValue(emptyMap())
 
     @Test
     fun `creates the same retained configuration content for an inline script`() = runTest {
@@ -39,6 +40,7 @@ class LuaGraphConfigurationProviderTest {
         val content = LuaGraphConfigurationProvider(luaEngine)(
             LuaGraphSource.Inline("return {}"),
             lazyOf(state),
+            featureMap,
         )
 
         assertNotNull(content)
@@ -65,6 +67,7 @@ class LuaGraphConfigurationProviderTest {
         val content = LuaGraphConfigurationProvider(luaEngine)(
             LuaGraphSource.Package(LuaGraphPackage("example", "1.0.0", archive)),
             null,
+            featureMap,
         )
 
         assertNull(content)

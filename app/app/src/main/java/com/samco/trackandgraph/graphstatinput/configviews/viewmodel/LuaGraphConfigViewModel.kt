@@ -501,7 +501,9 @@ class LuaGraphConfigViewModel @Inject constructor(
         showingConfiguration = false
     }
 
-    fun onConfigurationChanged(configuration: LuaValueAccessor?) {
+    fun onConfigurationRendered(response: LuaValueAccessor) {
+        response[FEATURE_INPUTS]?.let(::updateFeatureInputs)
+        val configuration = response[STATE]
         luaGraph = luaGraph.copy(
             configuration = when (configuration) {
                 null -> null
@@ -512,12 +514,25 @@ class LuaGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
+    private fun updateFeatureInputs(inputs: LuaValueAccessor) {
+        val features = luaGraphFeatureInputs(inputs, luaGraph.id)
+        selectedFeatures = features
+        featureTextFields.clear()
+        featureTextFields.addAll(features.map { feature ->
+            mutableStateOf(TextFieldValue(feature.name, TextRange(feature.name.length)))
+        })
+    }
+
+    private fun featureMap(): LuaValueSnapshot =
+        luaGraphFeatureMap(selectedFeatures, featurePathProvider)
+
     private suspend fun refreshConfiguration(autoShow: Boolean) {
         val source = luaGraph.source
         val configuration = luaGraph.configuration
+        val featureMap = featureMap()
         val content = try {
             withContext(default) {
-                luaGraphConfigurationProvider(source, configuration)
+                luaGraphConfigurationProvider(source, configuration, featureMap)
             }
         } catch (t: Throwable) {
             Timber.e(t, "Failed to resolve Lua graph configuration UI")
@@ -532,5 +547,10 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     fun openCommunityScripts() {
         viewModelScope.launch { urlNavigator.navigateTo(context, UrlNavigator.Location.LUA_COMMUNITY_SCRIPTS_ROOT) }
+    }
+
+    private companion object {
+        const val STATE = "state"
+        const val FEATURE_INPUTS = "feature_inputs"
     }
 }

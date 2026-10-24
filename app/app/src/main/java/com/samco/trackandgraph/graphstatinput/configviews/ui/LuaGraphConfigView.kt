@@ -129,7 +129,7 @@ fun LuaGraphConfigView(
         LuaGraphRenderedConfigurationView(
             content = configurationContent,
             onBack = viewModel::showSourceControls,
-            onStateChanged = viewModel::onConfigurationChanged,
+            onRendered = viewModel::onConfigurationRendered,
         )
     } else {
         LuaGraphSourceEditorView(
@@ -162,7 +162,7 @@ fun LuaGraphConfigView(
 private fun LuaGraphRenderedConfigurationView(
     content: LuaUiContent,
     onBack: () -> Unit,
-    onStateChanged: (LuaValueAccessor?) -> Unit,
+    onRendered: (LuaValueAccessor) -> Unit,
 ) {
     BackHandler(onBack = onBack)
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -178,7 +178,7 @@ private fun LuaGraphRenderedConfigurationView(
             errorContent = { error ->
                 GraphErrorView(error = error.message ?: stringResource(R.string.unknown_error_occurred))
             },
-            onStateChanged = onStateChanged,
+            onRendered = onRendered,
         )
     }
 }

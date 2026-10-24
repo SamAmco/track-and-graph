@@ -23,6 +23,7 @@ class LuaGraphConfigurationProvider @Inject constructor(
     suspend operator fun invoke(
         source: LuaGraphSource,
         configuration: Lazy<LuaValueSnapshot>?,
+        featureMap: LuaValueSnapshot,
     ): LuaUiContent? {
         val vmLock = luaEngine.acquireVM()
         return try {
@@ -32,6 +33,7 @@ class LuaGraphConfigurationProvider @Inject constructor(
                 luaEngine = luaEngine,
                 renderFunction = renderer,
                 initialState = configuration?.value,
+                additionalRenderParams = mapOf(FEATURE_MAP to featureMap),
             )
         } finally {
             luaEngine.releaseVM(vmLock)
@@ -45,5 +47,6 @@ class LuaGraphConfigurationProvider @Inject constructor(
 
     private companion object {
         const val RENDER_CONFIGURATION = "render_configuration"
+        const val FEATURE_MAP = "feature_map"
     }
 }

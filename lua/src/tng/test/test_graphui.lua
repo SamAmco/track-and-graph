@@ -60,4 +60,34 @@ test("graph UI wrappers are available through the API level gate", function()
 	api_gate.validate(5)
 end)
 
+test("feature selector shares picker state and updates selection", function()
+	local state = {}
+	local selected = nil
+	local selector = graphui.feature_selector({
+		key = "source",
+		state = state,
+		title = "Select a feature",
+		placeholder = "Choose feature",
+		picker_scope = "inputs",
+		on_selected = function(value) selected = value end,
+	})
+
+	selector.children[1].modifier[2].callback()
+	local dialog = selector.children[2]
+	local rerendered = graphui.feature_selector({
+		key = "source",
+		state = state,
+		title = "Select a feature",
+		placeholder = "Choose feature",
+		picker_scope = "inputs",
+		on_selected = function(value) selected = value end,
+	})
+	dialog = rerendered.children[2]
+	assert(dialog.visible == true)
+	assert(dialog.picker_scope == "inputs")
+	dialog.on_feature_selected({ id = 42, path = "/Health/Steps" })
+	assert(selected.id == 42)
+	assert(state.__graphui_dialogs == nil)
+end)
+
 helpers.finish_tests()

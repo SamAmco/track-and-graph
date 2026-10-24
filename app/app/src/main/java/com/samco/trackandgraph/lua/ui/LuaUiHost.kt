@@ -95,7 +95,7 @@ internal fun LuaUiHost(
     modifier: Modifier,
     content: LuaUiContent,
     errorContent: @Composable (Throwable) -> Unit,
-    onStateChanged: (LuaValueAccessor?) -> Unit = {},
+    onRendered: (LuaValueAccessor) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
@@ -121,7 +121,7 @@ internal fun LuaUiHost(
             renderResult = result.mapCatching { response ->
                 response[UI] ?: error("A Lua UI renderer must return a ui value")
             }
-            if (renderResult?.isSuccess == true) onStateChanged(content.state)
+            if (renderResult?.isSuccess == true) result.getOrNull()?.let(onRendered)
         }
         LaunchedEffect(content, context) {
             publish(captureLuaUiResult { content.render(context) })
