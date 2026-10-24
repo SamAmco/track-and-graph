@@ -29,7 +29,7 @@ class LuaGraph(
     /** A detached immutable state snapshot; evaluating it may decode the stored JSON. */
     val configuration: Lazy<LuaValueSnapshot>? = null,
 ) {
-    internal fun toEntity() = source.toEntity(id, graphStatId, configuration)
+    internal fun toEntity() = source.toEntity(id, graphStatId, configuration?.value)
 
     fun copy(
         id: Long = this.id,
@@ -42,13 +42,13 @@ class LuaGraph(
 internal fun LuaGraphSource.toEntity(
     id: Long,
     graphStatId: Long,
-    configuration: Lazy<LuaValueSnapshot>? = null,
+    configuration: LuaValueSnapshot? = null,
 ) = when (this) {
     is LuaGraphSource.Inline -> LuaGraph(
         id = id,
         graphStatId = graphStatId,
         script = script,
-        configuration = LuaStateJsonCodec.encode(configuration),
+        configuration = configuration?.let(LuaStateJsonCodec::encode),
     )
     is LuaGraphSource.Package -> LuaGraph(
         id = id,
@@ -56,6 +56,6 @@ internal fun LuaGraphSource.toEntity(
         script = null,
         packageId = packageData.packageId,
         packageVersion = packageData.version,
-        configuration = LuaStateJsonCodec.encode(configuration),
+        configuration = configuration?.let(LuaStateJsonCodec::encode),
     )
 }

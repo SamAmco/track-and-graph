@@ -108,14 +108,14 @@ class GraphHelperImplTest {
                 config = LuaGraphConfig(
                     features = emptyList(),
                     source = source,
-                    configuration = configuration,
+                    configuration = configuration?.value,
                 ),
             )
         ).componentId
 
         val stored = uut.getLuaGraphByGraphStatId(graphStatId)
         assertEquals(source, stored?.source)
-        assertEquals(encodedConfiguration, LuaStateJsonCodec.encode(stored?.configuration))
+        assertEquals(encodedConfiguration, stored?.configuration?.value?.let(LuaStateJsonCodec::encode))
     }
 
     @Test

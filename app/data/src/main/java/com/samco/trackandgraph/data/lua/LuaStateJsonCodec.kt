@@ -30,9 +30,6 @@ internal object LuaStateJsonCodec {
         lazy { decode(it) }
     }
 
-    fun encode(configuration: Lazy<LuaValueSnapshot>?): String? =
-        configuration?.value?.let(::encode)
-
     fun encode(value: LuaValueSnapshot): String = json.encodeToString(
         JsonElement.serializer(),
         encodeValue(value) ?: JsonNull,

@@ -29,7 +29,7 @@ class LuaGraphWithFeatures(
     fun toConfig() = LuaGraphConfig(
         features = features.map { it.toFeatureConfig() },
         source = source,
-        configuration = configuration,
+        configuration = configuration?.value,
     )
 
     fun copy(

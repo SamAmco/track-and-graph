@@ -140,7 +140,8 @@ data class BarChartConfig(
 class LuaGraphConfig(
     val features: List<LuaGraphFeatureConfig>,
     val source: LuaGraphSource,
-    val configuration: Lazy<LuaValueSnapshot>? = null,
+    /** Detached immutable state to encode as part of this write request. */
+    val configuration: LuaValueSnapshot? = null,
 )
 
 // =============================================================================
