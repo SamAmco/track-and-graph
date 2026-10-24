@@ -25,14 +25,17 @@ internal fun resolveLuaColor(
     value: LuaValueAccessor?,
     namedColors: Map<String, Color>,
 ): Color? {
-    value?.asDouble()?.let { number ->
+    if (value == null) return null
+    value.asDouble()?.let { number ->
         val index = number.toInt()
-        if (number == index.toDouble()) return dataVisColorList.getOrNull(index)
+        return if (number == index.toDouble()) {
+            dataVisColorList.getOrNull(index) ?: Color.Magenta
+        } else Color.Magenta
     }
-    return value?.asString()?.let { string ->
-        namedColors[string] ?: runCatching {
-            val hex = string.removePrefix("#")
-            Color((if (hex.length == 6) "FF$hex" else hex).toLong(16))
-        }.getOrNull()
-    }
+    val string = value.asString() ?: return Color.Magenta
+    namedColors[string]?.let { return it }
+    val hex = string.removePrefix("#")
+    if (hex.length != 6 && hex.length != 8) return Color.Magenta
+    val encoded = (if (hex.length == 6) "FF$hex" else hex).toLongOrNull(16)
+    return encoded?.let(::Color) ?: Color.Magenta
 }

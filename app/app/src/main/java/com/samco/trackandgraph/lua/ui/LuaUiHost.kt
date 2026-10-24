@@ -163,8 +163,8 @@ private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier:
                 horizontalArrangement = flowHorizontalArrangement(node),
                 verticalArrangement = flowVerticalArrangement(node),
                 itemVerticalAlignment = verticalAlignment(node["item_vertical_alignment"]?.asString()),
-                maxItemsInEachRow = node["max_items_in_each_row"]?.asDouble()?.toInt() ?: Int.MAX_VALUE,
-                maxLines = node["max_lines"]?.asDouble()?.toInt() ?: Int.MAX_VALUE,
+                maxItemsInEachRow = node.positiveInt("max_items_in_each_row"),
+                maxLines = node.positiveInt("max_lines"),
             ) { LuaFlowRowChildren(node["children"], content) }
             "COLUMN" -> Column(
                 modifier = modifier,
@@ -244,7 +244,7 @@ private fun LuaText(node: LuaValueHandle, modifier: Modifier) {
             "END" -> TextAlign.End
             else -> TextAlign.Start
         },
-        maxLines = node["max_lines"]?.asDouble()?.toInt() ?: Int.MAX_VALUE,
+        maxLines = node.positiveInt("max_lines"),
         overflow = if (node["overflow"]?.asString() == "ELLIPSIS") {
             TextOverflow.Ellipsis
         } else TextOverflow.Clip,
@@ -283,13 +283,22 @@ internal fun luaTextStyle(
 
 @Composable
 private fun textDimension(value: LuaValueAccessor?): TextUnit {
-    val number = value?.get("value")?.asDouble()?.toFloat() ?: return TextUnit.Unspecified
+    val number = value?.get("value")?.asDouble()?.toFloat()
+        ?.takeIf { it.isFinite() && it >= 0f }
+        ?: return TextUnit.Unspecified
     return when (value["unit"]?.asString()) {
         "PX" -> with(LocalDensity.current) { number.toDp().toSp() }
         "DP" -> with(LocalDensity.current) { number.dp.toSp() }
         else -> number.sp
     }
 }
+
+private fun LuaValueAccessor.positiveInt(key: String): Int =
+    this[key]?.asDouble()
+        ?.takeIf { it.isFinite() && it >= 1.0 }
+        ?.coerceAtMost(Int.MAX_VALUE.toDouble())
+        ?.toInt()
+        ?: Int.MAX_VALUE
 
 @Composable
 private fun LuaSurface(node: LuaValueHandle, content: LuaUiContent, modifier: Modifier) {

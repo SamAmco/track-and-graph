@@ -61,15 +61,16 @@ internal object LuaUiModifierParser {
             result = when (item["type"]?.asString()) {
                 "WIDTH" -> dimension(item["value"])?.let(result::width) ?: result
                 "HEIGHT" -> dimension(item["value"])?.let(result::height) ?: result
-                "FILL_WIDTH" -> result.fillMaxWidth(item["fraction"]?.asDouble()?.toFloat() ?: 1f)
-                "FILL_HEIGHT" -> result.fillMaxHeight(item["fraction"]?.asDouble()?.toFloat() ?: 1f)
+                "FILL_WIDTH" -> result.fillMaxWidth(item.fraction("fraction"))
+                "FILL_HEIGHT" -> result.fillMaxHeight(item.fraction("fraction"))
                 "WRAP_WIDTH" -> result.wrapContentWidth()
                 "WRAP_HEIGHT" -> result.wrapContentHeight()
                 "MIN_WIDTH" -> result.widthIn(min = dimension(item["value"]) ?: Dp.Unspecified)
                 "MAX_WIDTH" -> result.widthIn(max = dimension(item["value"]) ?: Dp.Unspecified)
                 "MIN_HEIGHT" -> result.heightIn(min = dimension(item["value"]) ?: Dp.Unspecified)
                 "MAX_HEIGHT" -> result.heightIn(max = dimension(item["value"]) ?: Dp.Unspecified)
-                "ASPECT_RATIO" -> result.aspectRatio(item["value"]?.asDouble()?.toFloat() ?: 1f)
+                "ASPECT_RATIO" -> item.positiveFloat("value")
+                    ?.let(result::aspectRatio) ?: result
                 "PADDING" -> padding(result, item)
                 "BACKGROUND" -> luaColor(item["color"])?.let {
                     result.background(it, shape(item["shape"]?.asString()))
@@ -91,7 +92,7 @@ internal object LuaUiModifierParser {
     fun rowChild(scope: RowScope, node: LuaValueAccessor): Modifier = with(scope) {
         var result: Modifier = Modifier
         entry(node, "WEIGHT")?.let {
-            result = result.weight(it["value"]?.asDouble()?.toFloat() ?: 1f, it["fill"]?.asBoolean() ?: true)
+            result = result.weight(it.positiveFloat("value") ?: 1f, it["fill"]?.asBoolean() ?: true)
         }
         when (entry(node, "ALIGN")?.get("value")?.asString()) {
             "START" -> result.align(Alignment.Top)
@@ -106,7 +107,7 @@ internal object LuaUiModifierParser {
     fun flowRowChild(scope: FlowRowScope, node: LuaValueAccessor): Modifier = with(scope) {
         var result: Modifier = Modifier
         entry(node, "WEIGHT")?.let {
-            result = result.weight(it["value"]?.asDouble()?.toFloat() ?: 1f, it["fill"]?.asBoolean() ?: true)
+            result = result.weight(it.positiveFloat("value") ?: 1f, it["fill"]?.asBoolean() ?: true)
         }
         when (entry(node, "ALIGN")?.get("value")?.asString()) {
             "START" -> result = result.align(Alignment.Top)
@@ -115,7 +116,7 @@ internal object LuaUiModifierParser {
             "STRETCH" -> result = result.fillMaxRowHeight()
         }
         entry(node, "FILL_MAX_ROW_HEIGHT")?.let {
-            result = result.fillMaxRowHeight(it["fraction"]?.asDouble()?.toFloat() ?: 1f)
+            result = result.fillMaxRowHeight(it.fraction("fraction"))
         }
         result
     }
@@ -123,7 +124,7 @@ internal object LuaUiModifierParser {
     fun columnChild(scope: ColumnScope, node: LuaValueAccessor): Modifier = with(scope) {
         var result: Modifier = Modifier
         entry(node, "WEIGHT")?.let {
-            result = result.weight(it["value"]?.asDouble()?.toFloat() ?: 1f, it["fill"]?.asBoolean() ?: true)
+            result = result.weight(it.positiveFloat("value") ?: 1f, it["fill"]?.asBoolean() ?: true)
         }
         when (entry(node, "ALIGN")?.get("value")?.asString()) {
             "START" -> result.align(Alignment.Start)
@@ -141,7 +142,10 @@ internal object LuaUiModifierParser {
     @Composable
     fun dimension(value: LuaValueAccessor?): Dp? {
         value?.asString()?.let { return spacing(it) }
-        val number = value?.get("value")?.asDouble() ?: return null
+        val number = value?.get("value")?.asDouble()
+            ?.takeIf { it.isFinite() }
+            ?.coerceAtLeast(0.0)
+            ?: return null
         return when (value["unit"]?.asString()) {
             "PX" -> with(LocalDensity.current) { number.toFloat().toDp() }
             "SP" -> with(LocalDensity.current) { number.sp.toDp() }
@@ -181,4 +185,13 @@ internal object LuaUiModifierParser {
         "SPACING_X_LARGE" -> 50.dp
         else -> null
     }
+
+    private fun LuaValueAccessor.positiveFloat(key: String): Float? =
+        this[key]?.asDouble()?.toFloat()?.takeIf { it.isFinite() && it > 0f }
+
+    private fun LuaValueAccessor.fraction(key: String): Float =
+        this[key]?.asDouble()?.toFloat()
+            ?.takeIf(Float::isFinite)
+            ?.coerceIn(0f, 1f)
+            ?: 1f
 }

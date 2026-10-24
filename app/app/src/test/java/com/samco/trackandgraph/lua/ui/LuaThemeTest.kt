@@ -67,9 +67,13 @@ class LuaThemeTest {
         assertEquals(dataVisColorList[7], resolveLuaColor(number(7.0), emptyMap()))
         assertEquals(namedColor, resolveLuaColor(string("THEME_PRIMARY"), mapOf("THEME_PRIMARY" to namedColor)))
         assertEquals(Color(0xFF112233), resolveLuaColor(string("#112233"), emptyMap()))
-        assertNull(resolveLuaColor(number(7.5), emptyMap()))
-        assertNull(resolveLuaColor(number(-1.0), emptyMap()))
-        assertNull(resolveLuaColor(number(dataVisColorList.size.toDouble()), emptyMap()))
+        assertEquals(Color.Magenta, resolveLuaColor(number(7.5), emptyMap()))
+        assertEquals(Color.Magenta, resolveLuaColor(number(-1.0), emptyMap()))
+        assertEquals(Color.Magenta, resolveLuaColor(number(dataVisColorList.size.toDouble()), emptyMap()))
+        assertEquals(Color.Magenta, resolveLuaColor(string("not-a-color"), emptyMap()))
+        assertEquals(Color.Magenta, resolveLuaColor(string("#12345"), emptyMap()))
+        assertEquals(Color.Magenta, resolveLuaColor(string("#GG1122"), emptyMap()))
+        assertNull(resolveLuaColor(null, emptyMap()))
     }
 
     private fun number(value: Double) = LuaValueSnapshot.NumberValue(value)

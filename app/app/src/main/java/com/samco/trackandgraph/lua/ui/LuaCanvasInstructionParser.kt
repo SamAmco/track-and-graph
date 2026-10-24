@@ -372,7 +372,9 @@ internal object LuaCanvasInstructionParser {
         val requestedSize = instruction["size"]?.let(::size)
         val constraints = textConstraints(requestedSize)
         val baseStyle = TextStyle(
-            fontSize = instruction["font_size"]?.asDouble()?.toFloat()?.toSp()
+            fontSize = instruction["font_size"]?.asDouble()?.toFloat()
+                ?.takeIf { it.isFinite() && it >= 0f }
+                ?.toSp()
                 ?: TextStyle.Default.fontSize,
             fontWeight = when (instruction["font_weight"]?.asString()) {
                 "medium" -> FontWeight.Medium
@@ -398,7 +400,7 @@ internal object LuaCanvasInstructionParser {
                 else -> TextOverflow.Clip
             },
             softWrap = instruction["soft_wrap"]?.asBoolean() ?: true,
-            maxLines = instruction["max_lines"]?.asDouble()?.toInt() ?: Int.MAX_VALUE,
+            maxLines = instruction.positiveInt("max_lines"),
             constraints = constraints,
         )
         drawText(
@@ -554,6 +556,8 @@ internal object LuaCanvasInstructionParser {
     private fun DrawScope.brush(value: LuaValueAccessor, colors: Map<String, Color>): Brush? {
         val colorStops = gradientStops(value["color_stops"] ?: value["stops"], colors)
         val gradientColors = colors(value["colors"], colors)
+        if (colorStops != null && colorStops.size < 2) return null
+        if (colorStops == null && gradientColors.size < 2) return null
         val tileMode = tileMode(value["tile_mode"]?.asString())
         return when (value["type"]?.asString()) {
             "LINEAR_GRADIENT" -> if (colorStops != null) {
@@ -715,6 +719,13 @@ internal object LuaCanvasInstructionParser {
 
     private fun LuaValueAccessor.float(key: String, default: Float = 0f) =
         this[key]?.asDouble()?.toFloat() ?: default
+
+    private fun LuaValueAccessor.positiveInt(key: String): Int =
+        this[key]?.asDouble()
+            ?.takeIf { it.isFinite() && it >= 1.0 }
+            ?.coerceAtMost(Int.MAX_VALUE.toDouble())
+            ?.toInt()
+            ?: Int.MAX_VALUE
 
 }
 
