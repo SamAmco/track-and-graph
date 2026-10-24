@@ -8,12 +8,8 @@
  */
 package com.samco.trackandgraph.data.lua.dto
 
-/**
- * A rendered Lua UI tree, a readable view of its live [state], and the opaque [retainedState]
- * that feeds that same real Lua value into the next interaction.
- */
+/** A rendered Lua UI tree and the live state handle to feed into its next render. */
 data class LuaUiRenderResult(
-    val ui: LuaValueAccessor,
-    val state: LuaValueAccessor?,
-    val retainedState: LuaValueReference?,
+    val ui: LuaValueHandle,
+    val state: LuaValueHandle?,
 )

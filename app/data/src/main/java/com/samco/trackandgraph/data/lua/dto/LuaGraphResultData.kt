@@ -22,9 +22,9 @@ import org.threeten.bp.temporal.TemporalAmount
 
 sealed interface LuaGraphResultData {
     data class CustomData(
-        val renderData: LuaValueReference,
-        val renderFunction: LuaValueReference,
-        val renderState: LuaValueReference?,
+        val renderData: LuaValueHandle,
+        val renderFunction: LuaValueHandle,
+        val renderState: LuaValueHandle?,
     ) : LuaGraphResultData
 
     data class DataPointData(

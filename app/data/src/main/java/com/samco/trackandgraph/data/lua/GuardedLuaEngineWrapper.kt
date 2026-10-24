@@ -27,8 +27,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.sampling.RawDataSample
 import javax.inject.Inject
 
@@ -69,39 +68,32 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
     override fun runLuaScript(
         vmLock: LuaVMLock,
         script: String,
-    ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
+    ): LuaValueHandle = if (luaEngineSwitch.enabled) {
         luaEngine.runLuaScript(vmLock, script)
     } else throw LuaEngineDisabledException()
 
     override fun runLuaScript(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
-    ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
+    ): LuaValueHandle = if (luaEngineSwitch.enabled) {
         luaEngine.runLuaScript(vmLock, scriptAccessor)
-    } else throw LuaEngineDisabledException()
-
-    override fun retainLuaValue(
-        vmLock: LuaVMLock,
-        value: LuaValueData,
-    ): LuaValueReference = if (luaEngineSwitch.enabled) {
-        luaEngine.retainLuaValue(vmLock, value)
     } else throw LuaEngineDisabledException()
 
     override fun renderLuaUi(
         vmLock: LuaVMLock,
-        renderFunction: LuaValueReference,
-        renderState: LuaValueReference?,
+        renderFunction: LuaValueHandle,
+        renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueReference,
+        vararg arguments: LuaValueAccessor,
     ): LuaUiRenderResult = if (luaEngineSwitch.enabled) {
         luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, *arguments)
     } else throw LuaEngineDisabledException()
 
     override fun callLuaFunction(
         vmLock: LuaVMLock,
-        function: LuaValueReference,
-        vararg arguments: LuaValueData,
-    ): LuaValueAccessor = if (luaEngineSwitch.enabled) {
+        function: LuaValueHandle,
+        vararg arguments: LuaValueAccessor,
+    ): LuaValueHandle = if (luaEngineSwitch.enabled) {
         luaEngine.callLuaFunction(vmLock, function, *arguments)
     } else throw LuaEngineDisabledException()
 

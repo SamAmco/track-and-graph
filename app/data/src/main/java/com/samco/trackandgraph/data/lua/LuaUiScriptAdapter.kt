@@ -10,7 +10,8 @@ package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -18,10 +19,10 @@ import javax.inject.Inject
 internal class LuaUiScriptAdapter @Inject constructor() {
     fun render(
         vmLock: LuaVMLock,
-        renderFunction: LuaValueReference,
-        renderState: LuaValueReference?,
+        renderFunction: LuaValueHandle,
+        renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueReference,
+        vararg arguments: LuaValueAccessor,
     ): LuaUiRenderResult {
         val luaRenderState = renderState?.valueFor(vmLock) ?: LuaValue.NIL
         val values = buildList {
@@ -39,13 +40,8 @@ internal class LuaUiScriptAdapter @Inject constructor() {
         val nextState = if (returnedState.isnil()) luaRenderState else returnedState
         require(nextState.isnil() || nextState.istable()) { "Lua UI state must be a table or nil" }
         return LuaUiRenderResult(
-            ui = LuaValueAccessorImpl(ui, vmLock.affinity),
-            state = if (nextState.isnil()) null else {
-                LuaValueAccessorImpl(nextState, vmLock.affinity)
-            },
-            retainedState = if (nextState.isnil()) null else {
-                LuaValueReferenceImpl(nextState, vmLock.affinity)
-            },
+            ui = LuaValueHandleImpl(ui, vmLock.affinity),
+            state = if (nextState.isnil()) null else LuaValueHandleImpl(nextState, vmLock.affinity),
         )
     }
 

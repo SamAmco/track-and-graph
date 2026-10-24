@@ -17,14 +17,14 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 
 class LuaGraphWithFeatures(
     val id: Long,
     val graphStatId: Long,
     val features: List<LuaGraphFeature>,
     val source: LuaGraphSource,
-    val configuration: Lazy<LuaValueData>? = null,
+    val configuration: Lazy<LuaValueSnapshot>? = null,
 ) {
     fun toConfig() = LuaGraphConfig(
         features = features.map { it.toFeatureConfig() },
@@ -37,6 +37,6 @@ class LuaGraphWithFeatures(
         graphStatId: Long = this.graphStatId,
         features: List<LuaGraphFeature> = this.features,
         source: LuaGraphSource = this.source,
-        configuration: Lazy<LuaValueData>? = this.configuration,
+        configuration: Lazy<LuaValueSnapshot>? = this.configuration,
     ) = LuaGraphWithFeatures(id, graphStatId, features, source, configuration)
 }

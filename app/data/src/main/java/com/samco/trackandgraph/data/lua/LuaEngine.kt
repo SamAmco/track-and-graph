@@ -27,8 +27,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 
 interface LuaEngine {
 
@@ -58,30 +57,27 @@ interface LuaEngine {
     fun runLuaScript(
         vmLock: LuaVMLock,
         script: String,
-    ): LuaValueAccessor
+    ): LuaValueHandle
 
     fun runLuaScript(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
-    ): LuaValueAccessor
-
-    /** Retains Kotlin-owned immutable data as a value on the locked Lua runtime. */
-    fun retainLuaValue(vmLock: LuaVMLock, value: LuaValueData): LuaValueReference
+    ): LuaValueHandle
 
     fun renderLuaUi(
         vmLock: LuaVMLock,
-        renderFunction: LuaValueReference,
-        renderState: LuaValueReference?,
+        renderFunction: LuaValueHandle,
+        renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueReference,
+        vararg arguments: LuaValueAccessor,
     ): LuaUiRenderResult
 
     /** Calls an affinity-bound Lua function with zero or more Kotlin-owned values. */
     fun callLuaFunction(
         vmLock: LuaVMLock,
-        function: LuaValueReference,
-        vararg arguments: LuaValueData,
-    ): LuaValueAccessor
+        function: LuaValueHandle,
+        vararg arguments: LuaValueAccessor,
+    ): LuaValueHandle
 
     fun runLuaFunction(
         vmLock: LuaVMLock,

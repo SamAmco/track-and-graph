@@ -20,14 +20,12 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
-import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.ui.theming.TngTypography
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class LuaThemeTest {
     @Test
@@ -74,12 +72,7 @@ class LuaThemeTest {
         assertNull(resolveLuaColor(number(dataVisColorList.size.toDouble()), emptyMap()))
     }
 
-    private fun number(value: Double): LuaValueAccessor = mock<LuaValueAccessor>().also {
-        whenever(it.asDouble()).thenReturn(value)
-    }
+    private fun number(value: Double) = LuaValueSnapshot.NumberValue(value)
 
-    private fun string(value: String): LuaValueAccessor = mock<LuaValueAccessor>().also {
-        whenever(it.asDouble()).thenReturn(null)
-        whenever(it.asString()).thenReturn(value)
-    }
+    private fun string(value: String) = LuaValueSnapshot.StringValue(value)
 }

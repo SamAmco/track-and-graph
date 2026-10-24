@@ -8,7 +8,7 @@
  */
 package com.samco.trackandgraph.data.lua
 
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import kotlinx.coroutines.sync.Mutex
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -17,7 +17,7 @@ import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 
-class LuaValueAccessorImplTest {
+class LuaValueHandleImplTest {
     private val affinity = LuaVMRuntime(Globals(), Mutex(), "test")
 
     @Test
@@ -31,26 +31,26 @@ class LuaValueAccessorImplTest {
 
         assertEquals(
             mapOf("en" to "Calendar", "fr" to "Calendrier"),
-            LuaValueAccessorImpl(table, affinity).asStringMap(),
+            LuaValueHandleImpl(table, affinity).asStringMap(),
         )
     }
 
     @Test
     fun `non table has no string map`() {
-        assertNull(LuaValueAccessorImpl(LuaValue.valueOf("Calendar"), affinity).asStringMap())
+        assertNull(LuaValueHandleImpl(LuaValue.valueOf("Calendar"), affinity).asStringMap())
     }
 
     @Test
     fun `snapshot explicitly detaches live table data`() {
         val table = LuaTable().apply { rawset("value", 1) }
-        val accessor = LuaValueAccessorImpl(table, affinity)
+        val accessor = LuaValueHandleImpl(table, affinity)
 
         val snapshot = accessor.snapshot()
         table.rawset("value", 2)
 
         assertEquals(
-            LuaValueData.TableValue(
-                mapOf("value" to LuaValueData.NumberValue(1.0))
+            LuaValueSnapshot.TableValue(
+                mapOf("value" to LuaValueSnapshot.NumberValue(1.0))
             ),
             snapshot,
         )

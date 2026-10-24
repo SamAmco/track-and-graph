@@ -1,6 +1,6 @@
 package com.samco.trackandgraph.data.lua
 
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
@@ -19,19 +19,19 @@ import org.luaj.vm2.lib.ZeroArgFunction
 class LuaStateJsonCodecTest {
     @Test
     fun `round trips JSON-compatible nested state`() {
-        val state = LuaValueData.TableValue(
+        val state = LuaValueSnapshot.TableValue(
             mapOf(
-                "name" to LuaValueData.StringValue("calendar"),
-                "enabled" to LuaValueData.BooleanValue(true),
-                "threshold" to LuaValueData.NumberValue(2.5),
-                "values" to LuaValueData.ArrayValue(
+                "name" to LuaValueSnapshot.StringValue("calendar"),
+                "enabled" to LuaValueSnapshot.BooleanValue(true),
+                "threshold" to LuaValueSnapshot.NumberValue(2.5),
+                "values" to LuaValueSnapshot.ArrayValue(
                     listOf(
-                        LuaValueData.StringValue("first"),
-                        LuaValueData.NumberValue(4.0),
+                        LuaValueSnapshot.StringValue("first"),
+                        LuaValueSnapshot.NumberValue(4.0),
                     )
                 ),
-                "nested" to LuaValueData.TableValue(
-                    mapOf("value" to LuaValueData.NumberValue(7.0))
+                "nested" to LuaValueSnapshot.TableValue(
+                    mapOf("value" to LuaValueSnapshot.NumberValue(7.0))
                 ),
             )
         )
@@ -97,7 +97,7 @@ class LuaStateJsonCodecTest {
 
     @Test
     fun `JSON null decodes to immutable nil`() {
-        assertEquals(LuaValueData.Nil, LuaStateJsonCodec.decode(JsonNull.toString()))
+        assertEquals(LuaValueSnapshot.Nil, LuaStateJsonCodec.decode(JsonNull.toString()))
     }
 
     @Test
@@ -117,8 +117,8 @@ class LuaStateJsonCodecTest {
 
         assertFalse(configuration.isInitialized())
         assertEquals(
-            LuaValueData.TableValue(
-                mapOf("enabled" to LuaValueData.BooleanValue(true))
+            LuaValueSnapshot.TableValue(
+                mapOf("enabled" to LuaValueSnapshot.BooleanValue(true))
             ),
             configuration.value,
         )

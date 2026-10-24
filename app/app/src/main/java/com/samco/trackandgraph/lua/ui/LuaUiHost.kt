@@ -65,8 +65,8 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.localisation.TranslatedString
 import com.samco.trackandgraph.ui.theming.TngColors
 import com.samco.trackandgraph.ui.theming.TngTypography
@@ -80,7 +80,7 @@ private val LocalLuaUiErrorHandler = staticCompositionLocalOf<(Throwable) -> Uni
     { throw it }
 }
 
-private val LocalLuaUiActionHandler = staticCompositionLocalOf<(LuaValueReference) -> Unit> {
+private val LocalLuaUiActionHandler = staticCompositionLocalOf<(LuaValueHandle) -> Unit> {
     { error("No Lua UI action handler installed") }
 }
 
@@ -91,7 +91,7 @@ internal fun LuaUiHost(
     modifier: Modifier,
     content: LuaUiContent,
     errorContent: @Composable (Throwable) -> Unit,
-    onStateChanged: (LuaValueAccessor?) -> Unit = {},
+    onStateChanged: (LuaValueHandle?) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
@@ -121,7 +121,7 @@ internal fun LuaUiHost(
             publish(captureLuaUiResult { content.render(context) })
         }
         val coroutineScope = rememberCoroutineScope()
-        val actionHandler: (LuaValueReference) -> Unit = { function ->
+        val actionHandler: (LuaValueHandle) -> Unit = { function ->
             coroutineScope.launch {
                 publish(captureLuaUiResult { content.interact(context, function) })
             }
@@ -143,7 +143,7 @@ internal fun LuaUiHost(
 }
 
 @Composable
-private fun LuaNode(node: LuaValueAccessor, content: LuaUiContent, parentModifier: Modifier = Modifier) {
+private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier: Modifier = Modifier) {
     key(node["key"]?.asString() ?: node) {
         val modifier = LuaUiModifierParser.parse(
             parentModifier,
@@ -170,7 +170,7 @@ private fun LuaNode(node: LuaValueAccessor, content: LuaUiContent, parentModifie
                 horizontalAlignment = horizontalAlignment(node["alignment"]?.asString()),
             ) { LuaColumnChildren(node["children"], node["alignment"]?.asString(), content) }
             "BOX" -> Box(modifier, contentAlignment = boxAlignment(node["alignment"]?.asString())) {
-                node["children"].toList().forEach { child ->
+                node["children"].toHandleList().forEach { child ->
                     LuaNode(child, content, LuaUiModifierParser.boxChild(this, child))
                 }
             }
@@ -185,21 +185,21 @@ private fun LuaNode(node: LuaValueAccessor, content: LuaUiContent, parentModifie
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FlowRowScope.LuaFlowRowChildren(
-    children: LuaValueAccessor?,
+    children: LuaValueHandle?,
     content: LuaUiContent,
 ) {
-    children.toList().forEach {
+    children.toHandleList().forEach {
         LuaNode(it, content, LuaUiModifierParser.flowRowChild(this, it))
     }
 }
 
 @Composable
 private fun RowScope.LuaRowChildren(
-    children: LuaValueAccessor?,
+    children: LuaValueHandle?,
     alignment: String?,
     content: LuaUiContent,
 ) {
-    children.toList().forEach {
+    children.toHandleList().forEach {
         var parentModifier = LuaUiModifierParser.rowChild(this, it)
         if (alignment == "STRETCH") parentModifier = parentModifier.fillMaxHeight()
         LuaNode(it, content, parentModifier)
@@ -208,11 +208,11 @@ private fun RowScope.LuaRowChildren(
 
 @Composable
 private fun ColumnScope.LuaColumnChildren(
-    children: LuaValueAccessor?,
+    children: LuaValueHandle?,
     alignment: String?,
     content: LuaUiContent,
 ) {
-    children.toList().forEach {
+    children.toHandleList().forEach {
         var parentModifier = LuaUiModifierParser.columnChild(this, it)
         if (alignment == "STRETCH") parentModifier = parentModifier.fillMaxWidth()
         LuaNode(it, content, parentModifier)
@@ -220,7 +220,7 @@ private fun ColumnScope.LuaColumnChildren(
 }
 
 @Composable
-private fun LuaText(node: LuaValueAccessor, modifier: Modifier) {
+private fun LuaText(node: LuaValueHandle, modifier: Modifier) {
     Text(
         text = luaText(node["text"]),
         modifier = modifier,
@@ -290,7 +290,7 @@ private fun textDimension(value: LuaValueAccessor?): TextUnit {
 }
 
 @Composable
-private fun LuaSurface(node: LuaValueAccessor, content: LuaUiContent, modifier: Modifier) {
+private fun LuaSurface(node: LuaValueHandle, content: LuaUiContent, modifier: Modifier) {
     Surface(
         modifier = modifier,
         color = luaColor(node["color"]) ?: MaterialTheme.colorScheme.surface,
@@ -302,28 +302,28 @@ private fun LuaSurface(node: LuaValueAccessor, content: LuaUiContent, modifier: 
 }
 
 @Composable
-private fun LuaCanvas(node: LuaValueAccessor, content: LuaUiContent, modifier: Modifier) {
+private fun LuaCanvas(node: LuaValueHandle, content: LuaUiContent, modifier: Modifier) {
     val draw = node["draw"]?.asFunction() ?: return
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
     val onError = LocalLuaUiErrorHandler.current
     var size by remember(draw) { mutableStateOf(IntSize.Zero) }
-    val result by produceState<LuaValueAccessor?>(null, content, draw, size, density) {
+    val result by produceState<LuaValueHandle?>(null, content, draw, size, density) {
         value = if (size == IntSize.Zero) null else {
             captureLuaUiResult {
                 content.call(
                     draw,
-                    LuaValueData.TableValue(mapOf(
-                        "bounds" to LuaValueData.TableValue(mapOf(
-                            "width" to LuaValueData.NumberValue(size.width.toDouble()),
-                            "height" to LuaValueData.NumberValue(size.height.toDouble()),
+                    LuaValueSnapshot.TableValue(mapOf(
+                        "bounds" to LuaValueSnapshot.TableValue(mapOf(
+                            "width" to LuaValueSnapshot.NumberValue(size.width.toDouble()),
+                            "height" to LuaValueSnapshot.NumberValue(size.height.toDouble()),
                         )),
-                        "density" to LuaValueData.NumberValue(density.density.toDouble()),
-                        "font_scale" to LuaValueData.NumberValue(density.fontScale.toDouble()),
-                        "sp_to_px" to LuaValueData.ArrayValue(canvasSpBreakpoints.map { sp ->
-                            LuaValueData.TableValue(mapOf(
-                                "sp" to LuaValueData.NumberValue(sp.toDouble()),
-                                "px" to LuaValueData.NumberValue(
+                        "density" to LuaValueSnapshot.NumberValue(density.density.toDouble()),
+                        "font_scale" to LuaValueSnapshot.NumberValue(density.fontScale.toDouble()),
+                        "sp_to_px" to LuaValueSnapshot.ArrayValue(canvasSpBreakpoints.map { sp ->
+                            LuaValueSnapshot.TableValue(mapOf(
+                                "sp" to LuaValueSnapshot.NumberValue(sp.toDouble()),
+                                "px" to LuaValueSnapshot.NumberValue(
                                     with(density) { sp.sp.toPx().toDouble() },
                                 ),
                             ))

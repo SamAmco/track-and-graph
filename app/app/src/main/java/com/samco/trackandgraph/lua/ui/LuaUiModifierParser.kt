@@ -47,17 +47,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 
 internal object LuaUiModifierParser {
     @Composable
     fun parse(
         initial: Modifier,
-        modifiers: LuaValueAccessor?,
-        onClick: (LuaValueReference) -> Unit,
+        modifiers: LuaValueHandle?,
+        onClick: (LuaValueHandle) -> Unit,
     ): Modifier {
         var result = initial
-        modifiers.toList().forEach { item ->
+        modifiers.toHandleList().forEach { item ->
             result = when (item["type"]?.asString()) {
                 "WIDTH" -> dimension(item["value"])?.let(result::width) ?: result
                 "HEIGHT" -> dimension(item["value"])?.let(result::height) ?: result

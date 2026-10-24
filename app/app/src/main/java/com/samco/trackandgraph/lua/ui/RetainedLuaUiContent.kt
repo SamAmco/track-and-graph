@@ -14,15 +14,14 @@ import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 
 /** Retains one renderer and its current state on their originating Lua runtime. */
 internal class RetainedLuaUiContent(
     private val luaEngine: LuaEngine,
-    private val renderFunction: LuaValueReference,
-    initialState: LuaValueReference?,
-    private val renderArguments: List<LuaValueReference> = emptyList(),
+    private val renderFunction: LuaValueHandle,
+    initialState: LuaValueAccessor?,
+    private val renderArguments: List<LuaValueAccessor> = emptyList(),
 ) : LuaUiContent {
     private var state = initialState
 
@@ -32,19 +31,19 @@ internal class RetainedLuaUiContent(
 
     override suspend fun interact(
         context: LuaUiContext,
-        function: LuaValueReference,
+        function: LuaValueHandle,
     ): LuaUiRenderResult = withRenderLock { vmLock ->
         luaEngine.callLuaFunction(vmLock, function)
         renderLocked(vmLock, context)
     }
 
     override suspend fun call(
-        function: LuaValueReference,
-        argument: LuaValueData,
-    ): LuaValueAccessor {
+        function: LuaValueHandle,
+        vararg arguments: LuaValueAccessor,
+    ): LuaValueHandle {
         val vmLock = luaEngine.acquireVM(function.affinity)
         return try {
-            luaEngine.callLuaFunction(vmLock, function, argument)
+            luaEngine.callLuaFunction(vmLock, function, *arguments)
         } finally {
             luaEngine.releaseVM(vmLock)
         }
@@ -59,7 +58,7 @@ internal class RetainedLuaUiContent(
         state,
         context,
         *renderArguments.toTypedArray(),
-    ).also { state = it.retainedState }
+    ).also { state = it.state }
 
     private suspend fun <T> withRenderLock(
         block: (LuaVMLock) -> T,

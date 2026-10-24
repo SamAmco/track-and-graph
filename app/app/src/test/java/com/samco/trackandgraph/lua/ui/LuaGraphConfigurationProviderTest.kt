@@ -5,9 +5,8 @@ import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaGraphScriptAccessor
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
-import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -25,21 +24,18 @@ import java.util.zip.ZipOutputStream
 class LuaGraphConfigurationProviderTest {
     private val luaEngine: LuaEngine = mock()
     private val vmLock = TestLuaVMFixtures.createTestLuaVMLock()
-    private val descriptor: LuaValueAccessor = mock()
+    private val descriptor: LuaValueHandle = mock()
 
     @Test
     fun `creates the same retained configuration content for an inline script`() = runTest {
-        val rendererAccessor: LuaValueAccessor = mock()
-        val renderer: LuaValueReference = mock()
-        val state = LuaValueData.TableValue(
-            mapOf("value" to LuaValueData.NumberValue(1.0))
+        val renderer: LuaValueHandle = mock()
+        val state = LuaValueSnapshot.TableValue(
+            mapOf("value" to LuaValueSnapshot.NumberValue(1.0))
         )
-        val retainedState: LuaValueReference = mock()
         whenever(luaEngine.acquireVM()).thenReturn(vmLock)
         whenever(luaEngine.runLuaScript(any(), any<LuaGraphScriptAccessor>())).thenReturn(descriptor)
-        whenever(descriptor["render_configuration"]).thenReturn(rendererAccessor)
-        whenever(rendererAccessor.asFunction()).thenReturn(renderer)
-        whenever(luaEngine.retainLuaValue(vmLock, state)).thenReturn(retainedState)
+        whenever(descriptor["render_configuration"]).thenReturn(renderer)
+        whenever(renderer.asFunction()).thenReturn(renderer)
         val content = LuaGraphConfigurationProvider(luaEngine)(
             LuaGraphSource.Inline("return {}"),
             lazyOf(state),
@@ -50,7 +46,6 @@ class LuaGraphConfigurationProviderTest {
             eq(vmLock),
             argThat<LuaGraphScriptAccessor> { mainScript() == "return {}" },
         )
-        verify(luaEngine).retainLuaValue(vmLock, state)
         verify(luaEngine).releaseVM(vmLock)
     }
 

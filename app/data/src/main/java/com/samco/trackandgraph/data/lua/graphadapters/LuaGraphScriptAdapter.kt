@@ -17,13 +17,13 @@
 package com.samco.trackandgraph.data.lua.graphadapters
 
 import com.samco.trackandgraph.data.lua.LuaVMAffinity
-import com.samco.trackandgraph.data.lua.LuaValueReferenceImpl
+import com.samco.trackandgraph.data.lua.LuaValueHandleImpl
 import com.samco.trackandgraph.data.lua.toLuaValue
 import com.samco.trackandgraph.data.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
@@ -57,7 +57,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
     private fun processLuaGraphResult(
         resolvedResult: LuaValue,
         dataSources: LuaValue,
-        configuration: LuaValueData?,
+        configuration: LuaValueSnapshot?,
         affinity: LuaVMAffinity,
     ): LuaGraphResult {
         if (resolvedResult.isnil()) return LuaGraphResult(data = null)
@@ -81,17 +81,17 @@ internal class LuaGraphScriptAdapter @Inject constructor(
     private fun processCustomGraph(
         descriptor: LuaValue,
         dataSources: LuaValue,
-        configuration: LuaValueData?,
+        configuration: LuaValueSnapshot?,
         affinity: LuaVMAffinity,
     ): LuaGraphResultData.CustomData {
         val renderState = configuration?.toLuaValue() ?: LuaValue.NIL
         val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(dataSources, renderState)
         val renderFunction = descriptor[RENDER_GRAPH].checkfunction()!!
         return LuaGraphResultData.CustomData(
-            renderData = LuaValueReferenceImpl(renderData, affinity),
-            renderFunction = LuaValueReferenceImpl(renderFunction, affinity),
+            renderData = LuaValueHandleImpl(renderData, affinity),
+            renderFunction = LuaValueHandleImpl(renderFunction, affinity),
             renderState = if (renderState.isnil()) null else {
-                LuaValueReferenceImpl(renderState, affinity)
+                LuaValueHandleImpl(renderState, affinity)
             },
         )
     }

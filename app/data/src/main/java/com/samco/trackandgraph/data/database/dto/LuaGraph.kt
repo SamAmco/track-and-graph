@@ -19,7 +19,7 @@ package com.samco.trackandgraph.data.database.dto
 
 import com.samco.trackandgraph.data.database.entity.LuaGraph
 import com.samco.trackandgraph.data.lua.LuaStateJsonCodec
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 
 /** A Lua graph DTO whose persisted configuration is decoded only if it is actually needed. */
 class LuaGraph(
@@ -27,7 +27,7 @@ class LuaGraph(
     val graphStatId: Long,
     val source: LuaGraphSource,
     /** A detached immutable state snapshot; evaluating it may decode the stored JSON. */
-    val configuration: Lazy<LuaValueData>? = null,
+    val configuration: Lazy<LuaValueSnapshot>? = null,
 ) {
     internal fun toEntity() = source.toEntity(id, graphStatId, configuration)
 
@@ -35,14 +35,14 @@ class LuaGraph(
         id: Long = this.id,
         graphStatId: Long = this.graphStatId,
         source: LuaGraphSource = this.source,
-        configuration: Lazy<LuaValueData>? = this.configuration,
+        configuration: Lazy<LuaValueSnapshot>? = this.configuration,
     ) = LuaGraph(id, graphStatId, source, configuration)
 }
 
 internal fun LuaGraphSource.toEntity(
     id: Long,
     graphStatId: Long,
-    configuration: Lazy<LuaValueData>? = null,
+    configuration: Lazy<LuaValueSnapshot>? = null,
 ) = when (this) {
     is LuaGraphSource.Inline -> LuaGraph(
         id = id,

@@ -20,7 +20,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaScriptException
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -78,9 +78,9 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             val threeArguments = engine.callLuaFunction(
                 lock,
                 function,
-                LuaValueData.StringValue("first"),
-                LuaValueData.NumberValue(2.0),
-                LuaValueData.BooleanValue(true),
+                LuaValueSnapshot.StringValue("first"),
+                LuaValueSnapshot.NumberValue(2.0),
+                LuaValueSnapshot.BooleanValue(true),
             )
             assertEquals(3.0, threeArguments["count"]?.asDouble() ?: -1.0, 0.0)
             assertEquals("first", threeArguments["values"]?.get(1)?.asString())
@@ -150,7 +150,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         val drawLock = engine.acquireVM(draw.affinity)
         val drawError = try {
             assertThrows(LuaScriptException::class.java) {
-                engine.callLuaFunction(drawLock, draw, LuaValueData.Nil)
+                engine.callLuaFunction(drawLock, draw, LuaValueSnapshot.Nil)
             }
         } finally {
             engine.releaseVM(drawLock)
@@ -268,10 +268,10 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             engine.callLuaFunction(
                 drawLock,
                 draw,
-                LuaValueData.TableValue(mapOf(
-                    "bounds" to LuaValueData.TableValue(mapOf(
-                        "width" to LuaValueData.NumberValue(200.0),
-                        "height" to LuaValueData.NumberValue(100.0),
+                LuaValueSnapshot.TableValue(mapOf(
+                    "bounds" to LuaValueSnapshot.TableValue(mapOf(
+                        "width" to LuaValueSnapshot.NumberValue(200.0),
+                        "height" to LuaValueSnapshot.NumberValue(100.0),
                     )),
                 )),
             )

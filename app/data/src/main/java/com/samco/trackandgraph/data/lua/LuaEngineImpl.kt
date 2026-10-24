@@ -32,8 +32,7 @@ import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.lua.functionadapters.LuaFunctionCatalogueAdapter
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
@@ -87,15 +86,15 @@ internal class LuaEngineImpl @Inject constructor(
     override fun runLuaScript(
         vmLock: LuaVMLock,
         script: String,
-    ): LuaValueAccessor = runLuaScript(vmLock, InlineLuaGraphScriptAccessor(script))
+    ): LuaValueHandle = runLuaScript(vmLock, InlineLuaGraphScriptAccessor(script))
 
     override fun runLuaScript(
         vmLock: LuaVMLock,
         scriptAccessor: LuaGraphScriptAccessor,
-    ): LuaValueAccessor {
+    ): LuaValueHandle {
         val vmLease = vmLock.requireActiveLease()
         return try {
-            LuaValueAccessorImpl(
+            LuaValueHandleImpl(
                 luaScriptResolver.resolveLuaScript(scriptAccessor, vmLease),
                 vmLock.affinity,
             )
@@ -104,20 +103,12 @@ internal class LuaEngineImpl @Inject constructor(
         }
     }
 
-    override fun retainLuaValue(
-        vmLock: LuaVMLock,
-        value: LuaValueData,
-    ): LuaValueReference {
-        vmLock.requireActiveLease()
-        return LuaValueReferenceImpl(value.toLuaValue(), vmLock.affinity)
-    }
-
     override fun renderLuaUi(
         vmLock: LuaVMLock,
-        renderFunction: LuaValueReference,
-        renderState: LuaValueReference?,
+        renderFunction: LuaValueHandle,
+        renderState: LuaValueAccessor?,
         context: LuaUiContext,
-        vararg arguments: LuaValueReference,
+        vararg arguments: LuaValueAccessor,
     ): LuaUiRenderResult {
         vmLock.requireActiveLease()
         return try {
@@ -129,14 +120,14 @@ internal class LuaEngineImpl @Inject constructor(
 
     override fun callLuaFunction(
         vmLock: LuaVMLock,
-        function: LuaValueReference,
-        vararg arguments: LuaValueData,
-    ): LuaValueAccessor {
+        function: LuaValueHandle,
+        vararg arguments: LuaValueAccessor,
+    ): LuaValueHandle {
         vmLock.requireActiveLease()
         return try {
-            LuaValueAccessorImpl(
+            LuaValueHandleImpl(
                 function.valueFor(vmLock)
-                    .invoke(LuaValue.varargsOf(arguments.map { it.toLuaValue() }.toTypedArray()))
+                    .invoke(LuaValue.varargsOf(arguments.map { it.valueFor(vmLock) }.toTypedArray()))
                     .arg1(),
                 vmLock.affinity,
             )

@@ -17,6 +17,10 @@
 package com.samco.trackandgraph.lua.ui
 
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 
 internal fun LuaValueAccessor?.toList(): List<LuaValueAccessor> =
+    (1..(this?.arraySize ?: 0)).mapNotNull { this?.get(it) }
+
+internal fun LuaValueHandle?.toHandleList(): List<LuaValueHandle> =
     (1..(this?.arraySize ?: 0)).mapNotNull { this?.get(it) }

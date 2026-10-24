@@ -8,7 +8,7 @@
  */
 package com.samco.trackandgraph.data.lua
 
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -26,65 +26,65 @@ import java.util.IdentityHashMap
 internal object LuaStateJsonCodec {
     private val json = Json
 
-    fun decodeConfiguration(encoded: String?): Lazy<LuaValueData>? = encoded?.let {
+    fun decodeConfiguration(encoded: String?): Lazy<LuaValueSnapshot>? = encoded?.let {
         lazy { decode(it) }
     }
 
-    fun encode(configuration: Lazy<LuaValueData>?): String? =
+    fun encode(configuration: Lazy<LuaValueSnapshot>?): String? =
         configuration?.value?.let(::encode)
 
-    fun encode(value: LuaValueData): String = json.encodeToString(
+    fun encode(value: LuaValueSnapshot): String = json.encodeToString(
         JsonElement.serializer(),
         encodeValue(value) ?: JsonNull,
     )
 
-    fun decode(encoded: String): LuaValueData = decode(Json.parseToJsonElement(encoded))
+    fun decode(encoded: String): LuaValueSnapshot = decode(Json.parseToJsonElement(encoded))
 
-    fun snapshot(value: LuaValue): LuaValueData? {
+    fun snapshot(value: LuaValue): LuaValueSnapshot? {
         if (value.isnil()) return null
         require(value.istable()) { "Lua UI state must be a table or nil" }
         val visiting = Collections.newSetFromMap(IdentityHashMap<LuaValue, Boolean>())
         return requireNotNull(snapshotTable(value.checktable()!!, visiting))
     }
 
-    fun snapshotValue(value: LuaValue): LuaValueData? {
+    fun snapshotValue(value: LuaValue): LuaValueSnapshot? {
         val visiting = Collections.newSetFromMap(IdentityHashMap<LuaValue, Boolean>())
         return snapshotValue(value, visiting)
     }
 
-    private fun encodeValue(value: LuaValueData): JsonElement? = when (value) {
-        LuaValueData.Nil -> JsonNull
-        is LuaValueData.BooleanValue -> JsonPrimitive(value.value)
-        is LuaValueData.NumberValue -> value.value.takeIf(Double::isFinite)?.let(::JsonPrimitive)
-        is LuaValueData.StringValue -> JsonPrimitive(value.value)
-        is LuaValueData.ArrayValue -> JsonArray(value.values.map { encodeValue(it) ?: JsonNull })
-        is LuaValueData.TableValue -> JsonObject(
+    private fun encodeValue(value: LuaValueSnapshot): JsonElement? = when (value) {
+        LuaValueSnapshot.Nil -> JsonNull
+        is LuaValueSnapshot.BooleanValue -> JsonPrimitive(value.value)
+        is LuaValueSnapshot.NumberValue -> value.value.takeIf(Double::isFinite)?.let(::JsonPrimitive)
+        is LuaValueSnapshot.StringValue -> JsonPrimitive(value.value)
+        is LuaValueSnapshot.ArrayValue -> JsonArray(value.values.map { encodeValue(it) ?: JsonNull })
+        is LuaValueSnapshot.TableValue -> JsonObject(
             value.values.mapNotNull { (key, entry) -> encodeValue(entry)?.let { key to it } }
                 .toMap(linkedMapOf())
         )
     }
 
-    private fun decode(element: JsonElement): LuaValueData = when (element) {
-        JsonNull -> LuaValueData.Nil
-        is JsonArray -> LuaValueData.ArrayValue(element.map(::decode))
-        is JsonObject -> LuaValueData.TableValue(element.mapValues { decode(it.value) })
+    private fun decode(element: JsonElement): LuaValueSnapshot = when (element) {
+        JsonNull -> LuaValueSnapshot.Nil
+        is JsonArray -> LuaValueSnapshot.ArrayValue(element.map(::decode))
+        is JsonObject -> LuaValueSnapshot.TableValue(element.mapValues { decode(it.value) })
         is JsonPrimitive -> when {
-            element.isString -> LuaValueData.StringValue(element.content)
-            element.booleanOrNull != null -> LuaValueData.BooleanValue(element.booleanOrNull!!)
-            element.doubleOrNull != null -> LuaValueData.NumberValue(element.doubleOrNull!!)
-            else -> LuaValueData.Nil
+            element.isString -> LuaValueSnapshot.StringValue(element.content)
+            element.booleanOrNull != null -> LuaValueSnapshot.BooleanValue(element.booleanOrNull!!)
+            element.doubleOrNull != null -> LuaValueSnapshot.NumberValue(element.doubleOrNull!!)
+            else -> LuaValueSnapshot.Nil
         }
     }
 
     private fun snapshotValue(
         value: LuaValue,
         visiting: MutableSet<LuaValue>,
-    ): LuaValueData? = when {
-        value.isnil() -> LuaValueData.Nil
-        value.isboolean() -> LuaValueData.BooleanValue(value.toboolean())
+    ): LuaValueSnapshot? = when {
+        value.isnil() -> LuaValueSnapshot.Nil
+        value.isboolean() -> LuaValueSnapshot.BooleanValue(value.toboolean())
         value.isnumber() -> value.todouble().takeIf(Double::isFinite)
-            ?.let(LuaValueData::NumberValue)
-        value.isstring() -> LuaValueData.StringValue(value.tojstring())
+            ?.let(LuaValueSnapshot::NumberValue)
+        value.isstring() -> LuaValueSnapshot.StringValue(value.tojstring())
         value.istable() -> snapshotTable(value.checktable()!!, visiting)
         else -> null
     }
@@ -92,7 +92,7 @@ internal object LuaStateJsonCodec {
     private fun snapshotTable(
         table: LuaTable,
         visiting: MutableSet<LuaValue>,
-    ): LuaValueData? {
+    ): LuaValueSnapshot? {
         if (!visiting.add(table)) return null
         return try {
             val strings = linkedMapOf<String, LuaValue>()
@@ -116,11 +116,11 @@ internal object LuaStateJsonCodec {
             if (strings.isEmpty() && integers.isNotEmpty() &&
                 integers.keys.toList() == (1..integers.size).toList()
             ) {
-                LuaValueData.ArrayValue(
-                    integers.values.map { snapshotValue(it, visiting) ?: LuaValueData.Nil }
+                LuaValueSnapshot.ArrayValue(
+                    integers.values.map { snapshotValue(it, visiting) ?: LuaValueSnapshot.Nil }
                 )
             } else {
-                LuaValueData.TableValue(
+                LuaValueSnapshot.TableValue(
                     strings.mapNotNull { (entryKey, entryValue) ->
                         snapshotValue(entryValue, visiting)?.let { entryKey to it }
                     }.toMap(linkedMapOf())

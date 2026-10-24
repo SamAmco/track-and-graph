@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Constraints
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.ui.dataVisColorList
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
@@ -486,16 +486,17 @@ class LuaCanvasInstructionParserTest {
         }
     }
 
-    private fun accessor(value: Any): LuaValueAccessor = TestAccessor(value)
+    private fun accessor(value: Any?): LuaValueAccessor = snapshot(value)
 
-    private class TestAccessor(private val value: Any) : LuaValueAccessor {
-        override fun get(key: String) = (value as? Map<*, *>)?.get(key)?.let(::TestAccessor)
-        override fun get(index: Int) = (value as? List<*>)?.getOrNull(index - 1)?.let(::TestAccessor)
-        override val arraySize get() = (value as? List<*>)?.size
-        override fun asDouble() = (value as? Number)?.toDouble()
-        override fun asString() = value as? String
-        override fun asBoolean() = value as? Boolean
-        override fun asFunction(): LuaValueReference? = null
-        override fun snapshot() = error("Canvas parser test values are never snapshotted")
+    private fun snapshot(value: Any?): LuaValueSnapshot = when (value) {
+        null -> LuaValueSnapshot.Nil
+        is Boolean -> LuaValueSnapshot.BooleanValue(value)
+        is Number -> LuaValueSnapshot.NumberValue(value.toDouble())
+        is String -> LuaValueSnapshot.StringValue(value)
+        is List<*> -> LuaValueSnapshot.ArrayValue(value.map(::snapshot))
+        is Map<*, *> -> LuaValueSnapshot.TableValue(
+            value.entries.associate { (key, item) -> key.toString() to snapshot(item) }
+        )
+        else -> error("Unsupported canvas test value: ${value::class}")
     }
 }

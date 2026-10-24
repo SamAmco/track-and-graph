@@ -20,5 +20,5 @@ import com.samco.trackandgraph.data.sampling.RawDataSample
 
 data class LuaGraphEngineParams(
     val dataSources: Map<String, RawDataSample>,
-    val configuration: LuaValueData? = null,
+    val configuration: LuaValueSnapshot? = null,
 )

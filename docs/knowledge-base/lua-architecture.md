@@ -9,7 +9,7 @@ topics:
   - LuaEngine execution APIs, including generic package entry-point evaluation through runLuaScript
   - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
   - Lua VM affinity, validated execution-lock ownership, and cancellation cleanup
-keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, runLuaGraph, runLuaScript, callLuaFunction, LuaValueAccessor, LuaValueReference, overload, Mockito, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, runLuaGraph, runLuaScript, callLuaFunction, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, overload, Mockito, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
 ---
 
 # Lua Functions Architecture
@@ -180,10 +180,9 @@ Primary modes:
 2. `runLuaFunctionGenerator()` - Execute with data → `Sequence<DataPoint>`
 3. `runLuaGraph()` - Execute either an inline graph script or an accessor-backed package entry point → render result
 4. `runLuaCatalogue()` - Parse function library
-5. `runLuaScript()` - Execute an inline or accessor-backed entry point → read-only `LuaValueAccessor`
+5. `runLuaScript()` - Execute an inline or accessor-backed entry point → live `LuaValueHandle`
 6. `renderLuaUi()` - Invoke a retained UI renderer with context, state, and optional affinity-bound arguments → UI/state result
-7. `retainLuaValue()` - Convert detached `LuaValueData` into an opaque value retained on the locked runtime
-8. `callLuaFunction()` - Invoke an affinity-bound `LuaValueReference` with zero or more `LuaValueData` arguments → read-only `LuaValueAccessor`
+7. `callLuaFunction()` - Invoke an affinity-bound `LuaValueHandle` with zero or more accessor-shaped arguments → live `LuaValueHandle`
 
 `runLuaGraph` is overloaded on its second argument (`String` versus `LuaGraphScriptAccessor`). In Mockito-Kotlin tests, three untyped `any()` matchers make calls and stubs ambiguous. Use named arguments such as `runLuaGraph(vmLock = any(), script = any(), params = any())` or name `scriptAccessor` to select the intended overload explicitly.
 
@@ -213,7 +212,9 @@ Each acquired lock is a one-use lease with its own mutex owner token. Engine ent
 
 Function and graph execution can be recursive: a Lua function can read a function-backed data source, which may execute more Lua. To avoid deadlocks and excess VM consumption, a recursive operation should pass the same execution lock down through `DataSampler.getRawDataSampleForFeatureId(..., vmLock)` / `getDataSampleForFeatureId(..., vmLock)`. Stateful UI sessions may retain the affinity between calls, but must release the execution lock after each call and reacquire against that affinity for the next call.
 
-`LuaValueReference` pairs every retained Lua table or function with the affinity of the runtime that owns it. A custom graph retains both the result of `prepare_data` and the original `render_graph` closure; it does not reload the script before rendering. `RetainedLuaUiContent` binds renderer, live state, and optional arguments into a generic session, reacquires an execution lock using the renderer's affinity, and invokes retained values. Configuration UI uses the same session with `render_configuration` and no graph-data argument. Canvas and click callbacks follow the same affinity rule. `LuaValueData` is instead an immutable, detached snapshot of the JSON-compatible subset of a Lua value, with no runtime identity or functions. Database DTOs expose stored configuration as `Lazy<LuaValueData>` so unrelated reads do not decode it. A UI render returns both a live-state accessor for the ViewModel and a retained reference to the same value for the next interaction; the ViewModel only snapshots through a lazy conversion, and JSON encoding occurs when the graph DTO is converted for persistence. Never use a retained Lua value with an arbitrary execution lock; the data-layer adapter rejects mismatched affinities.
+Lua-shaped values use one traversal contract and two representations. `LuaValueAccessor` defines only read/traversal operations and makes no promise about origin or mutability. `LuaValueSnapshot` is an immutable, detached, JSON-compatible accessor suitable for DTOs and persistence. `LuaValueHandle` is a live accessor tied to a `LuaVMAffinity`; it can additionally identify functions and be passed back to that VM. A custom graph retains both the result of `prepare_data` and the original `render_graph` closure as handles; it does not reload the script before rendering. `RetainedLuaUiContent` binds renderer, live state, and optional arguments into a generic session, reacquires an execution lock using the renderer's affinity, and invokes those handles. Configuration UI uses the same session with `render_configuration` and no graph-data argument. Canvas and click callbacks follow the same affinity rule.
+
+Database DTOs expose stored configuration as `Lazy<LuaValueSnapshot>` so unrelated reads do not decode it. The first UI render can pass that snapshot directly to Lua; later renders reuse the live state handle returned by the prior render. There is no separate retained-state copy or `retainLuaValue` conversion. The configuration ViewModel wraps handle-to-snapshot conversion in `Lazy`, and JSON encoding occurs only when the graph DTO is converted for persistence. Never pass a handle to an arbitrary execution lock; the data-layer adapter rejects mismatched affinities.
 
 See [Lua custom UI](lua-custom-ui.md) for the graph contract and view-layer callback lifecycle built on this affinity model.
 

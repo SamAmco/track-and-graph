@@ -41,7 +41,7 @@ import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaUiContent
-import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.lua.isZipArchive
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
@@ -499,7 +499,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         showingConfiguration = false
     }
 
-    fun onConfigurationChanged(configuration: LuaValueAccessor?) {
+    fun onConfigurationChanged(configuration: LuaValueHandle?) {
         luaGraph = luaGraph.copy(
             configuration = configuration?.let { lazy { requireNotNull(it.snapshot()) } }
         )

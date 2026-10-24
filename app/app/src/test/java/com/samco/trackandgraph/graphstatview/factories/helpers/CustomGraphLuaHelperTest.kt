@@ -23,9 +23,8 @@ import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaValueReference
-import com.samco.trackandgraph.data.lua.dto.LuaValueData
+import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaCustomGraphViewData
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertSame
@@ -39,12 +38,11 @@ class CustomGraphLuaHelperTest {
 
     private val luaEngine: LuaEngine = mock()
     private val vmLock = TestLuaVMFixtures.createTestLuaVMLock()
-    private val renderData: LuaValueReference = mock()
-    private val renderState: LuaValueReference = mock()
-    private val renderFunction: LuaValueReference = mock()
-    private val result: LuaValueAccessor = mock()
-    private val stateAccessor: LuaValueAccessor = mock()
-    private val renderResult = LuaUiRenderResult(result, stateAccessor, renderState)
+    private val renderData: LuaValueHandle = mock()
+    private val renderState: LuaValueHandle = mock()
+    private val renderFunction: LuaValueHandle = mock()
+    private val result: LuaValueHandle = mock()
+    private val renderResult = LuaUiRenderResult(result, renderState)
     private val context: LuaUiContext = mock()
 
     @Test
@@ -67,8 +65,8 @@ class CustomGraphLuaHelperTest {
 
     @Test
     fun `callback reacquires the VM that owns the retained function`() = runTest {
-        val callback: LuaValueReference = mock()
-        val argument = LuaValueData.NumberValue(4.0)
+        val callback: LuaValueHandle = mock()
+        val argument = LuaValueSnapshot.NumberValue(4.0)
         whenever(callback.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
         whenever(luaEngine.callLuaFunction(vmLock, callback, argument)).thenReturn(result)
@@ -86,7 +84,7 @@ class CustomGraphLuaHelperTest {
 
     @Test
     fun `interaction calls callback and rerenders before releasing one VM lock`() = runTest {
-        val callback: LuaValueReference = mock()
+        val callback: LuaValueHandle = mock()
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
         whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
