@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatinput.configviews.ui
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ScrollState
@@ -34,8 +33,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -125,10 +122,9 @@ fun LuaGraphConfigView(
     val showEditScriptDialog = rememberSaveable { mutableStateOf(false) }
 
     val configurationContent = viewModel.configurationContent
-    if (viewModel.showingConfiguration && configurationContent != null) {
+    if (configurationContent != null) {
         LuaGraphRenderedConfigurationView(
             content = configurationContent,
-            onBack = viewModel::showSourceControls,
             onRendered = viewModel::onConfigurationRendered,
         )
     } else {
@@ -161,26 +157,16 @@ fun LuaGraphConfigView(
 @Composable
 private fun LuaGraphRenderedConfigurationView(
     content: LuaUiContent,
-    onBack: () -> Unit,
     onRendered: (LuaValueAccessor) -> Unit,
 ) {
-    BackHandler(onBack = onBack)
-    Column(modifier = Modifier.fillMaxWidth()) {
-        IconButton(onClick = onBack) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = null,
-            )
-        }
-        LuaUiHost(
-            modifier = Modifier.fillMaxWidth(),
-            content = content,
-            errorContent = { error ->
-                GraphErrorView(error = error.message ?: stringResource(R.string.unknown_error_occurred))
-            },
-            onRendered = onRendered,
-        )
-    }
+    LuaUiHost(
+        modifier = Modifier.fillMaxWidth(),
+        content = content,
+        errorContent = { error ->
+            GraphErrorView(error = error.message ?: stringResource(R.string.unknown_error_occurred))
+        },
+        onRendered = onRendered,
+    )
 }
 
 private fun showErrorToast(context: Context, networkError: NetworkError) {

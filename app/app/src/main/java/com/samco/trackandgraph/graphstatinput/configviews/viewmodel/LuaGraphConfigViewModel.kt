@@ -113,9 +113,6 @@ class LuaGraphConfigViewModel @Inject constructor(
     var configurationContent: LuaUiContent? by mutableStateOf(null)
         private set
 
-    var showingConfiguration by mutableStateOf(false)
-        private set
-
     private var configurationError: TranslatedString? = null
 
     val packageUiData: LuaGraphPackageUiData?
@@ -314,7 +311,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         } else {
             setInlineScript(TextFieldValue(bytes.toString(Charsets.UTF_8)))
         }
-        refreshConfiguration(autoShow = true)
+        refreshConfiguration()
     }
 
     private suspend fun installPackage(archive: ByteArray) {
@@ -364,7 +361,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     fun onScriptEditFinished() {
-        viewModelScope.launch { refreshConfiguration(autoShow = true) }
+        viewModelScope.launch { refreshConfiguration() }
     }
 
     private fun setInlineScript(text: TextFieldValue) {
@@ -374,7 +371,6 @@ class LuaGraphConfigViewModel @Inject constructor(
         )
         configurationContent = null
         configurationError = null
-        showingConfiguration = false
         script = text
     }
 
@@ -447,7 +443,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     fun updateScriptFromClipboard(text: String) {
         setInlineScript(TextFieldValue(text))
         onUpdate()
-        viewModelScope.launch { refreshConfiguration(autoShow = true) }
+        viewModelScope.launch { refreshConfiguration() }
     }
 
     fun onUserConfirmDeepLink() {
@@ -462,7 +458,7 @@ class LuaGraphConfigViewModel @Inject constructor(
                 pendingScriptInstall.emit(null)
                 setInlineScript(TextFieldValue(it))
                 onUpdate()
-                refreshConfiguration(autoShow = true)
+                refreshConfiguration()
                 return@launch
             }
         }
@@ -501,11 +497,7 @@ class LuaGraphConfigViewModel @Inject constructor(
                 )
             })
         }
-        viewModelScope.launch { refreshConfiguration(autoShow = true) }
-    }
-
-    fun showSourceControls() {
-        showingConfiguration = false
+        viewModelScope.launch { refreshConfiguration() }
     }
 
     fun onConfigurationRendered(response: LuaValueAccessor) {
@@ -534,7 +526,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     private fun featureMap(): LuaValueSnapshot =
         luaGraphFeatureMap(selectedFeatures, featurePathProvider)
 
-    private suspend fun refreshConfiguration(autoShow: Boolean) {
+    private suspend fun refreshConfiguration() {
         val source = luaGraph.source
         val configuration = luaGraph.configuration
         val featureMap = featureMap()
@@ -550,7 +542,6 @@ class LuaGraphConfigViewModel @Inject constructor(
         withContext(ui) {
             if (luaGraph.source != source) return@withContext
             configurationContent = content
-            if (autoShow) showingConfiguration = content != null
         }
     }
 
