@@ -25,7 +25,6 @@ import com.samco.trackandgraph.data.lua.dto.LuaFunctionCatalogue
 import com.samco.trackandgraph.data.lua.dto.LuaGraphEngineParams
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.sampling.RawDataSample
@@ -85,7 +84,7 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
         renderState: LuaValueAccessor?,
         context: LuaUiContext,
         vararg arguments: LuaValueAccessor,
-    ): LuaUiRenderResult = if (luaEngineSwitch.enabled) {
+    ): LuaValueHandle = if (luaEngineSwitch.enabled) {
         luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, *arguments)
     } else throw LuaEngineDisabledException()
 

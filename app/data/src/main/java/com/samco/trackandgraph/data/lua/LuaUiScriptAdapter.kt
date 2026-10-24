@@ -9,7 +9,6 @@
 package com.samco.trackandgraph.data.lua
 
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import org.luaj.vm2.LuaTable
@@ -23,7 +22,7 @@ internal class LuaUiScriptAdapter @Inject constructor() {
         renderState: LuaValueAccessor?,
         context: LuaUiContext,
         vararg arguments: LuaValueAccessor,
-    ): LuaUiRenderResult {
+    ): LuaValueHandle {
         val luaRenderState = renderState?.valueFor(vmLock) ?: LuaValue.NIL
         val values = buildList {
             add(context.toLuaValue())
@@ -33,16 +32,7 @@ internal class LuaUiScriptAdapter @Inject constructor() {
         val result = renderFunction.valueFor(vmLock)
             .invoke(LuaValue.varargsOf(values.toTypedArray()))
             .arg1()
-        require(result.istable()) { "A Lua UI renderer must return a table" }
-        val ui = result.rawget(UI)
-        require(!ui.isnil()) { "A Lua UI renderer must return a ui value" }
-        val returnedState = result.rawget(STATE)
-        val nextState = if (returnedState.isnil()) luaRenderState else returnedState
-        require(nextState.isnil() || nextState.istable()) { "Lua UI state must be a table or nil" }
-        return LuaUiRenderResult(
-            ui = LuaValueHandleImpl(ui, vmLock.affinity),
-            state = if (nextState.isnil()) null else LuaValueHandleImpl(nextState, vmLock.affinity),
-        )
+        return LuaValueHandleImpl(result, vmLock.affinity)
     }
 
     private fun LuaUiContext.toLuaValue(): LuaValue = LuaTable().apply {
@@ -56,10 +46,5 @@ internal class LuaUiScriptAdapter @Inject constructor() {
         set("font_scale", fontScale.toDouble())
         set("layout_direction", layoutDirection.name)
         set("theme", theme.name)
-    }
-
-    private companion object {
-        const val UI = "ui"
-        const val STATE = "state"
     }
 }

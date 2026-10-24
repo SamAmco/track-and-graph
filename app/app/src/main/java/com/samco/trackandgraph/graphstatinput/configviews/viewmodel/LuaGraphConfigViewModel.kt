@@ -40,14 +40,16 @@ import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaUiContent
+import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.data.lua.isZipArchive
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.lua.ui.LuaGraphConfigurationProvider
+import com.samco.trackandgraph.lua.ui.LuaUiContent
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -499,9 +501,13 @@ class LuaGraphConfigViewModel @Inject constructor(
         showingConfiguration = false
     }
 
-    fun onConfigurationChanged(configuration: LuaValueHandle?) {
+    fun onConfigurationChanged(configuration: LuaValueAccessor?) {
         luaGraph = luaGraph.copy(
-            configuration = configuration?.let { lazy { requireNotNull(it.snapshot()) } }
+            configuration = when (configuration) {
+                null -> null
+                is LuaValueSnapshot -> lazyOf(configuration)
+                is LuaValueHandle -> lazy { requireNotNull(configuration.snapshot()) }
+            }
         )
         onUpdate()
     }

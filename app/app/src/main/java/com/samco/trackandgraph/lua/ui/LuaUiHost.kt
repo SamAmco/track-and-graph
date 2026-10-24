@@ -61,9 +61,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
@@ -91,7 +89,7 @@ internal fun LuaUiHost(
     modifier: Modifier,
     content: LuaUiContent,
     errorContent: @Composable (Throwable) -> Unit,
-    onStateChanged: (LuaValueHandle?) -> Unit = {},
+    onStateChanged: (LuaValueAccessor?) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
@@ -111,11 +109,13 @@ internal fun LuaUiHost(
         )
         var callbackError by remember(content, context) { mutableStateOf<Throwable?>(null) }
         var renderResult by remember(content, context) {
-            mutableStateOf<Result<LuaUiRenderResult>?>(null)
+            mutableStateOf<Result<LuaValueHandle>?>(null)
         }
-        fun publish(result: Result<LuaUiRenderResult>) {
-            renderResult = result
-            result.getOrNull()?.let { onStateChanged(it.state) }
+        fun publish(result: Result<LuaValueHandle>) {
+            renderResult = result.mapCatching { response ->
+                response[UI] ?: error("A Lua UI renderer must return a ui value")
+            }
+            if (renderResult?.isSuccess == true) onStateChanged(content.state)
         }
         LaunchedEffect(content, context) {
             publish(captureLuaUiResult { content.render(context) })
@@ -130,7 +130,7 @@ internal fun LuaUiHost(
         if (error != null) {
             errorContent(error)
         } else {
-            renderResult?.getOrNull()?.ui?.let { tree ->
+            renderResult?.getOrNull()?.let { tree ->
                 CompositionLocalProvider(
                     LocalLuaUiErrorHandler provides { callbackError = it },
                     LocalLuaUiActionHandler provides actionHandler,
@@ -141,6 +141,8 @@ internal fun LuaUiHost(
         }
     }
 }
+
+private const val UI = "ui"
 
 @Composable
 private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier: Modifier = Modifier) {

@@ -13,7 +13,6 @@ import com.samco.trackandgraph.data.lua.InlineLuaGraphScriptAccessor
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaGraphScriptAccessor
 import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
-import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import javax.inject.Inject
 

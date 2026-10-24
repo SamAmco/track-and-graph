@@ -285,7 +285,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         } finally {
             engine.releaseVM(renderLock)
         }
-        assertEquals("42", rendered.ui["text"]?.asString())
+        assertEquals("42", rendered["ui"]?.get("text")?.asString())
     }
 
     @Test
@@ -337,7 +337,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         } finally {
             engine.releaseVM(retainedLock)
         }
-        assertEquals("package renderer", rendered.ui["text"]?.asString())
+        assertEquals("package renderer", rendered["ui"]?.get("text")?.asString())
     }
 
     private fun zip(vararg entries: Pair<String, String>): ByteArray {

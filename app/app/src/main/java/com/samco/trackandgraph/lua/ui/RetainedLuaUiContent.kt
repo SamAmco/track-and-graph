@@ -10,9 +10,7 @@ package com.samco.trackandgraph.lua.ui
 
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.LuaVMLock
-import com.samco.trackandgraph.data.lua.dto.LuaUiContent
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 
@@ -23,16 +21,18 @@ internal class RetainedLuaUiContent(
     initialState: LuaValueAccessor?,
     private val renderArguments: List<LuaValueAccessor> = emptyList(),
 ) : LuaUiContent {
-    private var state = initialState
+    private var renderState = initialState
+    override val state: LuaValueAccessor?
+        get() = renderState
 
-    override suspend fun render(context: LuaUiContext): LuaUiRenderResult = withRenderLock { vmLock ->
+    override suspend fun render(context: LuaUiContext): LuaValueHandle = withRenderLock { vmLock ->
         renderLocked(vmLock, context)
     }
 
     override suspend fun interact(
         context: LuaUiContext,
         function: LuaValueHandle,
-    ): LuaUiRenderResult = withRenderLock { vmLock ->
+    ): LuaValueHandle = withRenderLock { vmLock ->
         luaEngine.callLuaFunction(vmLock, function)
         renderLocked(vmLock, context)
     }
@@ -52,13 +52,17 @@ internal class RetainedLuaUiContent(
     private fun renderLocked(
         vmLock: LuaVMLock,
         context: LuaUiContext,
-    ): LuaUiRenderResult = luaEngine.renderLuaUi(
-        vmLock,
-        renderFunction,
-        state,
-        context,
-        *renderArguments.toTypedArray(),
-    ).also { state = it.state }
+    ): LuaValueHandle {
+        val result = luaEngine.renderLuaUi(
+            vmLock,
+            renderFunction,
+            renderState,
+            context,
+            *renderArguments.toTypedArray(),
+        )
+        result[STATE]?.let { renderState = it }
+        return result
+    }
 
     private suspend fun <T> withRenderLock(
         block: (LuaVMLock) -> T,
@@ -69,5 +73,9 @@ internal class RetainedLuaUiContent(
         } finally {
             luaEngine.releaseVM(vmLock)
         }
+    }
+
+    private companion object {
+        const val STATE = "state"
     }
 }

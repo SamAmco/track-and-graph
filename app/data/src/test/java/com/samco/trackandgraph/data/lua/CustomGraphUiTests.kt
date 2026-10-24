@@ -146,7 +146,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         } finally {
             engine.releaseVM(successfulRenderLock)
         }
-        val draw = requireNotNull(tree.ui["draw"]?.asFunction())
+        val draw = requireNotNull(tree["ui"]?.get("draw")?.asFunction())
         val drawLock = engine.acquireVM(draw.affinity)
         val drawError = try {
             assertThrows(LuaScriptException::class.java) {
@@ -249,12 +249,13 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             engine.releaseVM(renderLock)
         }
 
-        assertEquals("CANVAS", tree.ui["type"]?.asString())
-        assertEquals(7.0, tree.ui["value"]?.asDouble() ?: 0.0, 0.0)
-        assertEquals("DARK", tree.ui["theme"]?.asString())
-        assertEquals(1080.0, tree.ui["max_width"]?.asDouble() ?: 0.0, 0.0)
-        assertNull(tree.ui["not_declared"])
-        val state = requireNotNull(tree.state)
+        val ui = requireNotNull(tree["ui"])
+        assertEquals("CANVAS", ui["type"]?.asString())
+        assertEquals(7.0, ui["value"]?.asDouble() ?: 0.0, 0.0)
+        assertEquals("DARK", ui["theme"]?.asString())
+        assertEquals(1080.0, ui["max_width"]?.asDouble() ?: 0.0, 0.0)
+        assertNull(ui["not_declared"])
+        val state = requireNotNull(tree["state"])
         assertEquals(7.0, state["seed"]?.asDouble() ?: 0.0, 0.0)
         assertEquals(1.0, state["renders"]?.asDouble() ?: 0.0, 0.0)
         assertEquals(
@@ -262,7 +263,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             LuaStateJsonCodec.encode(requireNotNull(state.snapshot())),
         )
 
-        val draw = requireNotNull(tree.ui["draw"]?.asFunction())
+        val draw = requireNotNull(ui["draw"]?.asFunction())
         val drawLock = engine.acquireVM(draw.affinity)
         val instructions = try {
             engine.callLuaFunction(

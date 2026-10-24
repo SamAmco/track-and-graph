@@ -16,7 +16,7 @@
  */
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.data.lua.dto.LuaUiContent
+import com.samco.trackandgraph.lua.ui.LuaUiContent
 
 interface ILuaCustomGraphViewData : IGraphStatViewData {
     val content: LuaUiContent

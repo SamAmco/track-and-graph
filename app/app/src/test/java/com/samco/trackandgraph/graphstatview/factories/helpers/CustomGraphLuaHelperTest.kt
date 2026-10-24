@@ -21,7 +21,6 @@ import com.samco.trackandgraph.data.database.dto.GraphStatType
 import com.samco.trackandgraph.data.lua.LuaEngine
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
-import com.samco.trackandgraph.data.lua.dto.LuaUiRenderResult
 import com.samco.trackandgraph.data.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
@@ -42,7 +41,6 @@ class CustomGraphLuaHelperTest {
     private val renderState: LuaValueHandle = mock()
     private val renderFunction: LuaValueHandle = mock()
     private val result: LuaValueHandle = mock()
-    private val renderResult = LuaUiRenderResult(result, renderState)
     private val context: LuaUiContext = mock()
 
     @Test
@@ -50,14 +48,14 @@ class CustomGraphLuaHelperTest {
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
         whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
-            .thenReturn(renderResult)
+            .thenReturn(result)
 
         val viewData = CustomGraphLuaHelper(luaEngine)(
             customData = LuaGraphResultData.CustomData(renderData, renderFunction, renderState),
             graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
         ).wrapped as ILuaCustomGraphViewData
 
-        assertSame(renderResult, viewData.content.render(context))
+        assertSame(result, viewData.content.render(context))
         verify(luaEngine).acquireVM(vmLock.affinity)
         verify(luaEngine).renderLuaUi(vmLock, renderFunction, renderState, context, renderData)
         verify(luaEngine).releaseVM(vmLock)
@@ -88,14 +86,14 @@ class CustomGraphLuaHelperTest {
         whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
         whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
         whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
-            .thenReturn(renderResult)
+            .thenReturn(result)
 
         val content = (CustomGraphLuaHelper(luaEngine)(
             customData = LuaGraphResultData.CustomData(renderData, renderFunction, renderState),
             graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
         ).wrapped as ILuaCustomGraphViewData).content
 
-        assertSame(renderResult, content.interact(context, callback))
+        assertSame(result, content.interact(context, callback))
 
         inOrder(luaEngine) {
             verify(luaEngine).acquireVM(vmLock.affinity)
@@ -109,5 +107,23 @@ class CustomGraphLuaHelperTest {
             )
             verify(luaEngine).releaseVM(vmLock)
         }
+    }
+
+    @Test
+    fun `content retains state from the complete renderer response`() = runTest {
+        val nextState: LuaValueHandle = mock()
+        whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
+        whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, renderData))
+            .thenReturn(result)
+        whenever(result["state"]).thenReturn(nextState)
+
+        val content = (CustomGraphLuaHelper(luaEngine)(
+            customData = LuaGraphResultData.CustomData(renderData, renderFunction, renderState),
+            graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
+        ).wrapped as ILuaCustomGraphViewData).content
+
+        assertSame(result, content.render(context))
+        assertSame(nextState, content.state)
     }
 }
