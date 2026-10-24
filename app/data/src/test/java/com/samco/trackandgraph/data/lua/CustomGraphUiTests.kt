@@ -59,6 +59,30 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
     }
 
     @Test
+    fun `common UI components are available as an installed pure Lua module`() = runBlocking {
+        val engine = uut()
+        val lock = engine.acquireVM()
+        try {
+            val chip = engine.runLuaScript(
+                lock,
+                InlineLuaScriptAccessor(
+                    """
+                    local commonui = require("tng.commonui")
+                    return commonui.text_chip({ text = "Selected", selected = true })
+                    """.trimIndent(),
+                ),
+            )
+
+            assertEquals("SURFACE", chip["type"]?.asString())
+            assertEquals("THEME_PRIMARY", chip["color"]?.asString())
+            assertEquals("Selected", chip["child"]?.get("children")?.get(1)
+                ?.get("text")?.asString())
+        } finally {
+            engine.releaseVM(lock)
+        }
+    }
+
+    @Test
     fun `retained Lua functions accept arbitrary argument counts`() = runBlocking {
         val engine = uut()
         val lock = engine.acquireVM()

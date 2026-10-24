@@ -53,9 +53,11 @@ internal fun LuaText(node: LuaValueHandle, modifier: Modifier) {
             else -> TextAlign.Start
         },
         maxLines = node.positiveInt("max_lines"),
-        overflow = if (node["overflow"]?.asString() == "ELLIPSIS") {
-            TextOverflow.Ellipsis
-        } else TextOverflow.Clip,
+        overflow = when (node["overflow"]?.asString()) {
+            "ELLIPSIS" -> TextOverflow.Ellipsis
+            "START_ELLIPSIS" -> TextOverflow.StartEllipsis
+            else -> TextOverflow.Clip
+        },
     )
 }
 

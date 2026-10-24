@@ -87,7 +87,11 @@ M.TEXT_ALIGN = { START = "START", CENTER = "CENTER", END = "END" }
 
 --- @since (API level 5)
 --- @enum TEXT_OVERFLOW
-M.TEXT_OVERFLOW = { CLIP = "CLIP", ELLIPSIS = "ELLIPSIS" }
+M.TEXT_OVERFLOW = {
+	CLIP = "CLIP",
+	ELLIPSIS = "ELLIPSIS",
+	START_ELLIPSIS = "START_ELLIPSIS",
+}
 
 --- @since (API level 5)
 --- @enum FONT_WEIGHT

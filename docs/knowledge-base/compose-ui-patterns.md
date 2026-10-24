@@ -1,6 +1,6 @@
 ---
 title: Compose UI patterns — ViewModel binding, pure UI, previews, spacing, and chip state
-description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, new screens and UI components include @Preview by default; reusable controls, hero cards, and spacing tokens live in app/ui; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
+description: The standard three-layer composable pattern used throughout the app — ViewModel-binding composable collects state and builds callbacks, pure-UI composable takes only state/callbacks, new screens and UI components include @Preview by default; reusable controls, hero cards, and spacing tokens live in app/ui; selected common controls are mirrored in Lua; selectable TextChip styling is driven only by selected state, with press feedback left to ripple indication.
 topics:
   - ViewModel-binding layer collects state and calls the pure-UI composable
   - Pure-UI composable takes only state values and callbacks — no ViewModels
@@ -12,7 +12,8 @@ topics:
   - Use shared spacing tokens/helpers before introducing hard-coded dimensions
   - Naming conventions for each layer
   - TextChip/TngChip selected styling versus pressed-state feedback
-keywords: [compose, composable, preview, ThreeTenABP, ZoneRulesException, No time-zone data files registered, OffsetDateTime.now, ZoneId.systemDefault, ZoneOffset.UTC, deterministic-time, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, HeroCardButton, IconHeroCardButton, Painter, TextButton, SmallTextButton, RowCheckbox, RowRadioButton, OutlinedTextMapSpinner, Divider, spacing, dimensions, hard-coded, dialogInputSpacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState]
+  - Native/Lua common-component parity is maintained in both directions
+keywords: [compose, composable, preview, ThreeTenABP, ZoneRulesException, No time-zone data files registered, OffsetDateTime.now, ZoneId.systemDefault, ZoneOffset.UTC, deterministic-time, ViewModel, pure UI, state, callbacks, pattern, split, shared-ui, app-ui, buttons, HeroCardButton, IconHeroCardButton, Painter, TextButton, SmallTextButton, SelectorButton, RowCheckbox, RowRadioButton, OutlinedTextMapSpinner, Divider, spacing, dimensions, hard-coded, dialogInputSpacing, PasswordTextField, GroupDeleteDialog, GroupScreen, TextChip, TngChip, chip, selected, pressed, ripple, interactionSource, collectIsPressedAsState, Lua, commonui, parity]
 ---
 
 # Compose UI Patterns
@@ -28,6 +29,8 @@ When adding or migrating shared UI, add preview functions in the same file unles
 Previews are the default for new screens, dialogs, and UI components. Skip them only when there is a concrete blocker such as an AndroidView/runtime dependency that cannot reasonably be faked; otherwise split the UI so a pure composable can be previewed with hardcoded state.
 
 Before defining local wrappers around Material components, check `app/ui` for existing app-styled controls. Common examples include buttons (`TextButton`, `SmallTextButton`, `FullWidthIconTextButton`), hero cards (`HeroCardButton`, `IconHeroCardButton`), text fields (`FullWidthTextField`, `PasswordTextField`), selectors (`TextMapSpinner`, `OutlinedTextMapSpinner`), dividers (`Divider`, `GradientDivider`), spacing (`DialogInputSpacing`, `InputSpacingLarge`, `cardPadding`, etc.), and row controls (`RowCheckbox`, `RowRadioButton`). `IconHeroCardButton` accepts a `Painter` rather than an app drawable resource ID so it remains reusable from the dependency-lower UI module; the feature caller resolves its own drawable and localized title. If a reusable control is missing and the need is generic, add it to `app/ui` with a preview rather than keeping a one-off feature-local version.
+
+Some shared native controls are deliberately duplicated as pure-Lua component wrappers in `lua/src/tng/commonui.lua` so packaged Lua screens retain the app's visual language. `SelectorButton` and `TextChip`/`TngChip` currently have `commonui.selector_button` and `commonui.text_chip` counterparts. Treat each native/Lua pair as one visual contract: changes to shape, dimensions, padding, typography, colors, selected or enabled behavior, and interaction semantics on either side must be reviewed and reflected in the other side where the Lua primitives can express them. Add parity assertions to `lua/src/tng/test/test_commonui.lua` when a mirrored constant or structure changes.
 
 Do not introduce ad-hoc hard-coded dimensions in Compose UI. In particular, do not add literal fixed or minimum heights just to make content look balanced; let content determine its intrinsic size and use the shared spacing tokens in `app/ui` for padding and gaps. For dialog/content gaps, prefer `dialogInputSpacing` or its helper composable over repeating the equivalent `.dp` value inline. If a genuinely new reusable dimension is required and no existing token describes it, add a named token rather than embedding the value in a feature composable.
 

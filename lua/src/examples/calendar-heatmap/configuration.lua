@@ -1,5 +1,5 @@
 local strings = require("strings")
-local graphui = require("tng.graphui")
+local commonui = require("tng.commonui")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
 
@@ -13,23 +13,11 @@ end
 
 local function option(state, field, value, label)
 	local selected = state[field] == value
-	return ui.surface({
+	return commonui.text_chip({
 		key = field .. "_" .. tostring(value),
-		modifier = ui.modifier(
-			ui.clip(theme.shape.medium),
-			ui.on_click(function() state[field] = value end)
-		),
-		color = selected and theme.color.primary or theme.color.surface_variant,
-		content_color = selected and theme.color.on_primary or theme.color.on_surface_variant,
-		shape = theme.shape.medium,
-		child = ui.text({
-			text = label,
-			style = theme.text_style.label_large,
-			modifier = ui.modifier(ui.padding({
-				horizontal = theme.spacing.medium,
-				vertical = theme.spacing.small,
-			})),
-		}),
+		text = label,
+		selected = selected,
+		on_click = function() state[field] = value end,
 	})
 end
 
@@ -64,7 +52,7 @@ return function(params)
 			spacing = theme.spacing.large,
 			modifier = ui.modifier(ui.fill_width()),
 			children = {
-				graphui.feature_selector({
+				commonui.feature_selector({
 					key = "source_feature",
 					state = state,
 					title = strings.select_feature,

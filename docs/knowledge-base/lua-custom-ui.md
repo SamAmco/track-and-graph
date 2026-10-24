@@ -1,16 +1,17 @@
 ---
 title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
-description: Custom graph preparation/rendering, stateful configuration UI sessions, affinity-bound Lua values, responsive declarative layout, deferred Canvas drawing, theme and translation tokens, testing boundaries, and runtime errors.
+description: Custom graph preparation/rendering, stateful configuration UI sessions, affinity-bound Lua values, responsive declarative layout, shared common-UI wrappers, deferred Canvas drawing, theme and translation tokens, testing boundaries, and runtime errors.
 topics:
   - CUSTOM graph descriptor separates data preparation from view-dependent rendering
   - Lua values and callbacks remain opaque and bound to their originating VM affinity
   - LuaUiContext supplies root constraints, density, font scale, layout direction, and light/dark mode
   - tng.ui describes responsive layout; tng.graphui composes host-free graph conventions from it
+  - tng.commonui mirrors selected reusable native controls for consistent Lua screens
   - tng.canvas records instructions for later Compose DrawScope replay
   - Theme values and data-visualization colors resolve consistently across declarative UI and Canvas
   - Render and callback failures use the existing graph error presentation
   - Configuration renderers retain JSON-serializable Lua table state across interactions and graph execution
-keywords: [lua, custom-ui, CUSTOM, prepare_data, render_graph, render_configuration, configuration, JSON, state, on_click, RetainedLuaUiContent, tng.ui, tng.graphui, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, translation, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, error]
+keywords: [lua, custom-ui, CUSTOM, prepare_data, render_graph, render_configuration, configuration, JSON, state, on_click, RetainedLuaUiContent, tng.ui, tng.commonui, tng.graphui, SelectorButton, TextChip, native-parity, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, translation, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, error]
 ---
 
 # Lua Custom UI
@@ -72,6 +73,8 @@ For coarse responsive decisions such as changing a graph's orientation, compare 
 
 `tng.graphui` is a pure-Lua convenience layer built only from `tng.ui` and `tng.theme`; it introduces no Android bridge types. Its legend helpers reproduce the native graph convention—a centered, wrapping full-width FlowRow containing 20dp circular swatches, a 2dp label gap, body-medium text, and 10dp item spacing. Put reusable graph presentation conventions here so native and packaged graphs do not drift visually.
 
+`tng.commonui` is the corresponding pure-Lua layer for app-wide controls that are not graph-specific. It mirrors selected components from `app/ui`, including the standard `SelectorButton` and selectable `TextChip`, and composes the selector button with `ui.select_item_dialog` for feature selection. These wrappers intentionally duplicate native layout constants and styling. Whenever a mirrored native or Lua component changes, inspect and update its counterpart and the structural parity tests in `lua/src/tng/test/test_commonui.lua`; visual consistency is a bidirectional maintenance requirement.
+
 Stable component keys preserve identity across renders and are especially important for interactive trees. `ui.on_click(callback)` is valid on every node through its modifier list. The host calls the callback and rerenders the root UI before releasing the one VM execution lock acquired for that interaction. This makes the callback mutation and resulting tree/state snapshot one serialized Lua operation; do not add a separate UI mutex around it.
 
 `ui.text` accepts either a direct string or the same `{ language_tag = text }` translation table used by package metadata. Kotlin resolves translation tables against the current Android locale preferences, including English fallback. Keep package translations in `strings.lua` and pass the table through unchanged; renderers should not choose a locale themselves.
@@ -120,4 +123,4 @@ Test the Lua instruction recorder in `lua/src/tng/test/test_canvas.lua`, and tes
 
 Initial graph execution errors already flow through `LuaGraphResult` and the normal graph error view. Failures thrown later by `render` or a retained canvas callback are converted to `LuaScriptException` and routed to the same presentation rather than silently producing an empty component. Coroutine cancellation is rethrown: constraint/content changes may cancel and restart `produceState`, and that control flow must not appear as a script failure.
 
-The worked stateful example is the multi-file calendar heatmap package under `lua/src/examples/`; it configures its data range, layout, and legend. Examples are disposable demonstrations, not runtime dependencies. The graph result type belongs to `tng.graph`; `tng.ui` only describes the returned layout. API compatibility is declared in the `tng.graph`, `tng.ui`, `tng.graphui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.
+The worked stateful example is the multi-file calendar heatmap package under `lua/src/examples/`; it configures its data range, layout, and legend. Examples are disposable demonstrations, not runtime dependencies. The graph result type belongs to `tng.graph`; `tng.ui` only describes the returned layout. API compatibility is declared in the `tng.graph`, `tng.ui`, `tng.commonui`, `tng.graphui`, `tng.canvas`, and `tng.theme` API spec files; update those specs whenever public Lua symbols change.

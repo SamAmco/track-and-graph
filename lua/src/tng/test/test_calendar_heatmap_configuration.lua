@@ -22,7 +22,9 @@ test("calendar configuration restores and updates its normalized feature input",
 
 	local selector = result.ui.children[1]
 	local button_modifiers = selector.children[1].modifier
-	button_modifiers[#button_modifiers].callback()
+	for _, modifier in ipairs(button_modifiers) do
+		if modifier.callback ~= nil then modifier.callback() end
+	end
 	local opened = render({ state = result.state, feature_map = { source = existing } })
 	local replacement = { id = 99, type = "FEATURE", name = "Sleep", path = "/Health/Sleep" }
 	opened.ui.children[1].children[2].on_feature_selected(replacement)
