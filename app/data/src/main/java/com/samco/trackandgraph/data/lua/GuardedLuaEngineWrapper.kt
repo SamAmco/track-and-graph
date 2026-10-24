@@ -56,7 +56,7 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
 
     override fun runLuaGraph(
         vmLock: LuaVMLock,
-        scriptAccessor: LuaGraphScriptAccessor,
+        scriptAccessor: LuaScriptAccessor,
         params: LuaGraphEngineParams
     ): LuaGraphResult {
         return if (luaEngineSwitch.enabled) {
@@ -73,7 +73,7 @@ class GuardedLuaEngineWrapper @Inject internal constructor(
 
     override fun runLuaScript(
         vmLock: LuaVMLock,
-        scriptAccessor: LuaGraphScriptAccessor,
+        scriptAccessor: LuaScriptAccessor,
     ): LuaValueHandle = if (luaEngineSwitch.enabled) {
         luaEngine.runLuaScript(vmLock, scriptAccessor)
     } else throw LuaEngineDisabledException()

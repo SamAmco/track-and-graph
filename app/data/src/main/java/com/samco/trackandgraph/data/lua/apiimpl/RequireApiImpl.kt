@@ -17,7 +17,7 @@
 package com.samco.trackandgraph.data.lua.apiimpl
 
 import com.samco.trackandgraph.data.assetreader.AssetReader
-import com.samco.trackandgraph.data.lua.LuaGraphScriptAccessor
+import com.samco.trackandgraph.data.lua.LuaScriptAccessor
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -51,7 +51,7 @@ internal class RequireApiImpl @Inject constructor(
     fun createRequireFunction(
         globals: Globals,
         environment: LuaTable,
-        scriptAccessor: LuaGraphScriptAccessor,
+        scriptAccessor: LuaScriptAccessor,
     ): LuaValue {
         val loadedModules = mutableMapOf<String, LuaValue>()
         val loadingModules = mutableSetOf<String>()

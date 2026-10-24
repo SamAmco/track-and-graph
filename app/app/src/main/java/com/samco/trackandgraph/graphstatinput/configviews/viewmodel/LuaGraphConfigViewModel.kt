@@ -39,7 +39,7 @@ import com.samco.trackandgraph.data.di.DefaultDispatcher
 import com.samco.trackandgraph.data.di.IODispatcher
 import com.samco.trackandgraph.data.di.MainDispatcher
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
+import com.samco.trackandgraph.data.lua.ZipLuaScriptAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
@@ -282,7 +282,7 @@ class LuaGraphConfigViewModel @Inject constructor(
                         val read = input.read(buffer)
                         if (read < 0) break
                         total += read
-                        require(total <= ZipLuaGraphScriptAccessor.MAX_ARCHIVE_BYTES) {
+                        require(total <= ZipLuaScriptAccessor.MAX_ARCHIVE_BYTES) {
                             "Imported Lua graph file is too large"
                         }
                         output.write(buffer, 0, read)
@@ -300,7 +300,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     private suspend fun installImportedFile(bytes: ByteArray) {
-        require(bytes.size <= ZipLuaGraphScriptAccessor.MAX_ARCHIVE_BYTES) {
+        require(bytes.size <= ZipLuaScriptAccessor.MAX_ARCHIVE_BYTES) {
             "Imported Lua graph file is too large"
         }
         if (bytes.isZipArchive()) {
@@ -312,7 +312,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     private suspend fun installPackage(archive: ByteArray) {
-        val accessor = ZipLuaGraphScriptAccessor(archive)
+        val accessor = ZipLuaScriptAccessor(archive)
         val (packageId, version) = readPackageIdentity(accessor)
         luaGraph = luaGraph.copy(
             source = LuaGraphSource.Package(
@@ -328,7 +328,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     private suspend fun readPackageIdentity(
-        accessor: ZipLuaGraphScriptAccessor,
+        accessor: ZipLuaScriptAccessor,
     ): Pair<String, String> {
         val vmLock = luaEngine.acquireVM()
         return try {
@@ -480,7 +480,7 @@ class LuaGraphConfigViewModel @Inject constructor(
                     script = TextFieldValue(source.script)
                 }
                 is LuaGraphSource.Package -> {
-                    val accessor = ZipLuaGraphScriptAccessor(source.packageData.archive)
+                    val accessor = ZipLuaScriptAccessor(source.packageData.archive)
                     script = TextFieldValue(accessor.mainScript())
                 }
             }

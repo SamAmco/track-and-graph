@@ -36,7 +36,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
         try {
             val legend = engine.runLuaScript(
                 lock,
-                InlineLuaGraphScriptAccessor(
+                InlineLuaScriptAccessor(
                     """
                     local core = require("tng.core")
                     local graphui = require("tng.graphui")
@@ -66,7 +66,7 @@ internal class CustomGraphUiTests : LuaEngineImplTest() {
             val function = requireNotNull(
                 engine.runLuaScript(
                     lock,
-                    InlineLuaGraphScriptAccessor(
+                    InlineLuaScriptAccessor(
                         "return function(...) return { count = select('#', ...), values = {...} } end"
                     ),
                 ).asFunction()

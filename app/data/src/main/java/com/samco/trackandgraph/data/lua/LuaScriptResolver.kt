@@ -31,7 +31,7 @@ internal class LuaScriptResolver @Inject constructor(
             .call()
     }
 
-    fun resolveLuaScript(accessor: LuaGraphScriptAccessor, vmLease: VMLease): LuaValue {
+    fun resolveLuaScript(accessor: LuaScriptAccessor, vmLease: VMLease): LuaValue {
         val environment = createEnvironment(vmLease)
         environment[RequireApiImpl.REQUIRE] = requireApi.createRequireFunction(
             globals = vmLease.globals,

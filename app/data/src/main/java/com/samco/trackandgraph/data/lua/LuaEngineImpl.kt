@@ -58,13 +58,13 @@ internal class LuaEngineImpl @Inject constructor(
         params: LuaGraphEngineParams,
     ): LuaGraphResult = runLuaGraph(
         vmLock = vmLock,
-        scriptAccessor = InlineLuaGraphScriptAccessor(script),
+        scriptAccessor = InlineLuaScriptAccessor(script),
         params = params,
     )
 
     override fun runLuaGraph(
         vmLock: LuaVMLock,
-        scriptAccessor: LuaGraphScriptAccessor,
+        scriptAccessor: LuaScriptAccessor,
         params: LuaGraphEngineParams
     ): LuaGraphResult {
         val vmLease = vmLock.requireActiveLease()
@@ -85,11 +85,11 @@ internal class LuaEngineImpl @Inject constructor(
     override fun runLuaScript(
         vmLock: LuaVMLock,
         script: String,
-    ): LuaValueHandle = runLuaScript(vmLock, InlineLuaGraphScriptAccessor(script))
+    ): LuaValueHandle = runLuaScript(vmLock, InlineLuaScriptAccessor(script))
 
     override fun runLuaScript(
         vmLock: LuaVMLock,
-        scriptAccessor: LuaGraphScriptAccessor,
+        scriptAccessor: LuaScriptAccessor,
     ): LuaValueHandle {
         val vmLease = vmLock.requireActiveLease()
         return try {

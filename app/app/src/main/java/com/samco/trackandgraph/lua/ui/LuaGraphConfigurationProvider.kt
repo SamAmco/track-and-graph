@@ -9,10 +9,10 @@
 package com.samco.trackandgraph.lua.ui
 
 import com.samco.trackandgraph.data.database.dto.LuaGraphSource
-import com.samco.trackandgraph.data.lua.InlineLuaGraphScriptAccessor
+import com.samco.trackandgraph.data.lua.InlineLuaScriptAccessor
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.LuaGraphScriptAccessor
-import com.samco.trackandgraph.data.lua.ZipLuaGraphScriptAccessor
+import com.samco.trackandgraph.data.lua.LuaScriptAccessor
+import com.samco.trackandgraph.data.lua.ZipLuaScriptAccessor
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import javax.inject.Inject
 
@@ -38,9 +38,9 @@ class LuaGraphConfigurationProvider @Inject constructor(
         }
     }
 
-    private fun LuaGraphSource.scriptAccessor(): LuaGraphScriptAccessor = when (this) {
-        is LuaGraphSource.Inline -> InlineLuaGraphScriptAccessor(script)
-        is LuaGraphSource.Package -> ZipLuaGraphScriptAccessor(packageData.archive)
+    private fun LuaGraphSource.scriptAccessor(): LuaScriptAccessor = when (this) {
+        is LuaGraphSource.Inline -> InlineLuaScriptAccessor(script)
+        is LuaGraphSource.Package -> ZipLuaScriptAccessor(packageData.archive)
     }
 
     private companion object {

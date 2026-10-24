@@ -32,7 +32,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
     @Test
     fun `zip accessor resolves dotted modules and init modules`() {
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to "return {}",
             "chart/renderer.lua" to "return 1",
             "helpers/init.lua" to "return 2",
@@ -47,7 +47,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
     @Test
     fun `zip accessor permits entries larger than one MiB`() {
         val largeModule = "-".repeat(2 * 1024 * 1024)
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to "return {}",
             "large.lua" to largeModule,
         ))
@@ -58,7 +58,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
     @Test
     fun `zip accessor rejects traversal entries`() {
         assertThrows(IllegalArgumentException::class.java) {
-            ZipLuaGraphScriptAccessor(zip(
+            ZipLuaScriptAccessor(zip(
                 "main.lua" to "return {}",
                 "../escape.lua" to "return {}",
             ))
@@ -68,7 +68,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
     @Test
     fun `circular require is detected before looking up the module again`() = runBlocking {
         var moduleLookups = 0
-        val accessor = object : LuaGraphScriptAccessor {
+        val accessor = object : LuaScriptAccessor {
             override fun mainScript() = "return require('loop')"
 
             override fun moduleScript(moduleName: String): String {
@@ -93,7 +93,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
     @Test
     fun `failed module lookup does not remain marked as loading`() = runBlocking {
-        val accessor = object : LuaGraphScriptAccessor {
+        val accessor = object : LuaScriptAccessor {
             override fun mainScript() = """
                 pcall(require, "missing")
                 local _, second_error = pcall(require, "missing")
@@ -123,7 +123,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
     @Test
     fun `require executes a module once and returns the same table`() = runBlocking {
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to """
                 _G.module_loads = 0
                 local first = require("stateful")
@@ -147,7 +147,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
     @Test
     fun `require caches true when a module returns nil`() = runBlocking {
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to """
                 _G.module_loads = 0
                 local first = require("no_result")
@@ -170,7 +170,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
     @Test
     fun `require reloads a module that returns false`() = runBlocking {
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to """
                 _G.module_loads = 0
                 local first = require("false_result")
@@ -196,7 +196,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
 
     @Test
     fun `module results are isolated between script executions on the same VM`() = runBlocking {
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to """
                 _G.module_loads = 0
                 require("stateful")
@@ -220,7 +220,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
     @Test
     fun `package entry point and graph can use required modules`() = runBlocking {
         val engine = uut()
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to """
                 local renderer = require("renderer")
                 return {
@@ -291,7 +291,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
     @Test
     fun `retained render uses its own package after another graph runs on the VM`() = runBlocking {
         val engine = uut()
-        val accessor = ZipLuaGraphScriptAccessor(zip(
+        val accessor = ZipLuaScriptAccessor(zip(
             "main.lua" to """
                 return {
                     type = "CUSTOM",
@@ -352,7 +352,7 @@ internal class LuaGraphPackageTests : LuaEngineImplTest() {
         return output.toByteArray()
     }
 
-    private suspend fun runScript(accessor: LuaGraphScriptAccessor) = uut().let { engine ->
+    private suspend fun runScript(accessor: LuaScriptAccessor) = uut().let { engine ->
         val lock = engine.acquireVM()
         try {
             engine.runLuaScript(lock, accessor)

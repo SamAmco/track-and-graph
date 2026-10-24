@@ -184,7 +184,7 @@ Primary modes:
 6. `renderLuaUi()` - Invoke a retained UI renderer with context, state, and optional affinity-bound arguments → the complete returned `LuaValueHandle`
 7. `callLuaFunction()` - Invoke an affinity-bound `LuaValueHandle` with zero or more accessor-shaped arguments → live `LuaValueHandle`
 
-`runLuaGraph` is overloaded on its second argument (`String` versus `LuaGraphScriptAccessor`). In Mockito-Kotlin tests, three untyped `any()` matchers make calls and stubs ambiguous. Use named arguments such as `runLuaGraph(vmLock = any(), script = any(), params = any())` or name `scriptAccessor` to select the intended overload explicitly.
+`runLuaGraph` is overloaded on its second argument (`String` versus `LuaScriptAccessor`). In Mockito-Kotlin tests, three untyped `any()` matchers make calls and stubs ambiguous. Use named arguments such as `runLuaGraph(vmLock = any(), script = any(), params = any())` or name `scriptAccessor` to select the intended overload explicitly.
 
 ### Execution Flow
 

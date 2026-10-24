@@ -48,7 +48,7 @@ interface LuaEngine {
 
     fun runLuaGraph(
         vmLock: LuaVMLock,
-        scriptAccessor: LuaGraphScriptAccessor,
+        scriptAccessor: LuaScriptAccessor,
         params: LuaGraphEngineParams,
     ): LuaGraphResult
 
@@ -60,7 +60,7 @@ interface LuaEngine {
 
     fun runLuaScript(
         vmLock: LuaVMLock,
-        scriptAccessor: LuaGraphScriptAccessor,
+        scriptAccessor: LuaScriptAccessor,
     ): LuaValueHandle
 
     /** Invokes a UI renderer without interpreting the structure of its returned value. */

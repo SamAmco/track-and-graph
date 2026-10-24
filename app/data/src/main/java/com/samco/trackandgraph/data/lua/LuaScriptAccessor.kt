@@ -16,12 +16,12 @@ import java.nio.charset.StandardCharsets
 import java.util.zip.ZipInputStream
 
 /** Supplies a main chunk and lazily loaded modules without exposing storage to the Lua engine. */
-interface LuaGraphScriptAccessor {
+interface LuaScriptAccessor {
     fun mainScript(): String
     fun moduleScript(moduleName: String): String?
 }
 
-class InlineLuaGraphScriptAccessor(private val script: String) : LuaGraphScriptAccessor {
+class InlineLuaScriptAccessor(private val script: String) : LuaScriptAccessor {
     override fun mainScript(): String = script
     override fun moduleScript(moduleName: String): String? = null
 }
@@ -30,7 +30,7 @@ class InlineLuaGraphScriptAccessor(private val script: String) : LuaGraphScriptA
  * Reads an ordinary ZIP file whose entry point is `main.lua`. `require("chart.renderer")`
  * resolves `chart/renderer.lua`, then `chart/renderer/init.lua`. Entries are inflated on demand.
  */
-class ZipLuaGraphScriptAccessor(private val archive: ByteArray) : LuaGraphScriptAccessor {
+class ZipLuaScriptAccessor(private val archive: ByteArray) : LuaScriptAccessor {
     init {
         require(archive.size <= MAX_ARCHIVE_BYTES) { "Lua graph package is too large" }
         require(MAIN_SCRIPT in entryNames()) { "Lua graph package must contain $MAIN_SCRIPT" }

@@ -3,7 +3,7 @@ package com.samco.trackandgraph.lua.ui
 import com.samco.trackandgraph.data.database.dto.LuaGraphPackage
 import com.samco.trackandgraph.data.database.dto.LuaGraphSource
 import com.samco.trackandgraph.data.lua.LuaEngine
-import com.samco.trackandgraph.data.lua.LuaGraphScriptAccessor
+import com.samco.trackandgraph.data.lua.LuaScriptAccessor
 import com.samco.trackandgraph.data.lua.TestLuaVMFixtures
 import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
@@ -33,7 +33,7 @@ class LuaGraphConfigurationProviderTest {
             mapOf("value" to LuaValueSnapshot.NumberValue(1.0))
         )
         whenever(luaEngine.acquireVM()).thenReturn(vmLock)
-        whenever(luaEngine.runLuaScript(any(), any<LuaGraphScriptAccessor>())).thenReturn(descriptor)
+        whenever(luaEngine.runLuaScript(any(), any<LuaScriptAccessor>())).thenReturn(descriptor)
         whenever(descriptor["render_configuration"]).thenReturn(renderer)
         whenever(renderer.asFunction()).thenReturn(renderer)
         val content = LuaGraphConfigurationProvider(luaEngine)(
@@ -44,7 +44,7 @@ class LuaGraphConfigurationProviderTest {
         assertNotNull(content)
         verify(luaEngine).runLuaScript(
             eq(vmLock),
-            argThat<LuaGraphScriptAccessor> { mainScript() == "return {}" },
+            argThat<LuaScriptAccessor> { mainScript() == "return {}" },
         )
         verify(luaEngine).releaseVM(vmLock)
     }
@@ -52,7 +52,7 @@ class LuaGraphConfigurationProviderTest {
     @Test
     fun `package and inline sources share descriptor capability detection`() = runTest {
         whenever(luaEngine.acquireVM()).thenReturn(vmLock)
-        whenever(luaEngine.runLuaScript(any(), any<LuaGraphScriptAccessor>())).thenReturn(descriptor)
+        whenever(luaEngine.runLuaScript(any(), any<LuaScriptAccessor>())).thenReturn(descriptor)
         whenever(descriptor["render_configuration"]).thenReturn(null)
         val archive = ByteArrayOutputStream().also { output ->
             ZipOutputStream(output).use { zip ->
@@ -70,7 +70,7 @@ class LuaGraphConfigurationProviderTest {
         assertNull(content)
         verify(luaEngine).runLuaScript(
             eq(vmLock),
-            argThat<LuaGraphScriptAccessor> { mainScript() == "return function() end" },
+            argThat<LuaScriptAccessor> { mainScript() == "return function() end" },
         )
         verify(luaEngine).releaseVM(vmLock)
     }
