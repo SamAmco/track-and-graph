@@ -32,7 +32,7 @@ test("nested UI constants are available through the API level gate", function()
 	assert(gated.MODIFIER_TYPE.FILL_MAX_ROW_HEIGHT == "FILL_MAX_ROW_HEIGHT")
 	assert(gated.fill_max_row_height(0.5).fraction == 0.5)
 	assert(gated.flow_row({}).type == "FLOW_ROW")
-	api_gate.validate(2)
+	api_gate.validate(5)
 end)
 
 test("modifier order and values are preserved", function()

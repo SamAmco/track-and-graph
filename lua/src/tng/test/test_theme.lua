@@ -30,7 +30,7 @@ test("nested theme tokens are available through the API level gate", function()
 	assert(gated.text_style.code == "TEXT_STYLE_CODE")
 	assert(gated.spacing.medium == "SPACING_MEDIUM")
 	assert(gated.shape.medium == "SHAPE_MEDIUM")
-	api_gate.validate(2)
+	api_gate.validate(5)
 end)
 
 helpers.finish_tests()

@@ -1,10 +1,10 @@
 local M = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum UNIT
 M.UNIT = { PX = "PX", DP = "DP", SP = "SP" }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum COMPONENT_TYPE
 M.COMPONENT_TYPE = {
 	ROW = "ROW",
@@ -16,7 +16,7 @@ M.COMPONENT_TYPE = {
 	SURFACE = "SURFACE",
 }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum MODIFIER_TYPE
 M.MODIFIER_TYPE = {
 	WIDTH = "WIDTH",
@@ -41,11 +41,11 @@ M.MODIFIER_TYPE = {
 	ON_CLICK = "ON_CLICK",
 }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum ALIGNMENT
 M.ALIGNMENT = { START = "START", CENTER = "CENTER", END = "END", STRETCH = "STRETCH" }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum BOX_ALIGNMENT
 M.BOX_ALIGNMENT = {
 	TOP_START = "TOP_START",
@@ -59,7 +59,7 @@ M.BOX_ALIGNMENT = {
 	BOTTOM_END = "BOTTOM_END",
 }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum ARRANGEMENT
 M.ARRANGEMENT = {
 	START = "START",
@@ -70,25 +70,25 @@ M.ARRANGEMENT = {
 	SPACE_EVENLY = "SPACE_EVENLY",
 }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum TEXT_ALIGN
 M.TEXT_ALIGN = { START = "START", CENTER = "CENTER", END = "END" }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum TEXT_OVERFLOW
 M.TEXT_OVERFLOW = { CLIP = "CLIP", ELLIPSIS = "ELLIPSIS" }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum FONT_WEIGHT
 M.FONT_WEIGHT = { NORMAL = "NORMAL", MEDIUM = "MEDIUM", BOLD = "BOLD" }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class Dimension
 --- @field unit UNIT
 --- @field value number
 M.Dimension = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class LayoutParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
@@ -98,7 +98,7 @@ M.Dimension = {}
 --- @field alignment? ALIGNMENT: Cross-axis alignment.
 M.LayoutParams = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class FlowRowParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
@@ -112,7 +112,7 @@ M.LayoutParams = {}
 --- @field max_lines? integer
 M.FlowRowParams = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class BoxParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
@@ -120,7 +120,7 @@ M.FlowRowParams = {}
 --- @field alignment? BOX_ALIGNMENT: Default alignment for children.
 M.BoxParams = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class TextParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
@@ -134,7 +134,7 @@ M.BoxParams = {}
 --- @field overflow? TEXT_OVERFLOW
 M.TextParams = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class SurfaceParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.
@@ -146,7 +146,7 @@ M.TextParams = {}
 --- @field shadow_elevation? Dimension
 M.SurfaceParams = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class CanvasParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers.

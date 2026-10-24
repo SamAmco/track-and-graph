@@ -1,7 +1,7 @@
 local M = {}
 
 --- Custom UI graph type.
---- @since (API level 2)
+--- @since (API level 5)
 M.TYPE = "GRAPH"
 
 --- Graph types enum

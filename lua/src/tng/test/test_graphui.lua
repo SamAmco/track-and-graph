@@ -57,7 +57,7 @@ test("graph UI wrappers are available through the API level gate", function()
 	local gated = api_gate.gate(graphui, spec)
 
 	assert(gated.legend({ items = {} }).type == ui.COMPONENT_TYPE.FLOW_ROW)
-	api_gate.validate(2)
+	api_gate.validate(5)
 end)
 
 helpers.finish_tests()

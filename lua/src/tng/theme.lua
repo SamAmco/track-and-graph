@@ -5,7 +5,7 @@ local theme_color = function(name)
 end
 
 --- Theme-aware colors, resolved by the app at render time.
---- @since (API level 2)
+--- @since (API level 5)
 M.color = {
 	primary = theme_color("PRIMARY"),
 	on_primary = theme_color("ON_PRIMARY"),
@@ -27,7 +27,7 @@ M.color = {
 
 --- Track & Graph text styles, resolved by the app at render time.
 --- Individual text properties supplied to `ui.text` override the selected style.
---- @since (API level 2)
+--- @since (API level 5)
 M.text_style = {
 	display_large = "TEXT_STYLE_DISPLAY_LARGE",
 	display_medium = "TEXT_STYLE_DISPLAY_MEDIUM",
@@ -48,7 +48,7 @@ M.text_style = {
 }
 
 --- Track & Graph spacing tokens: 4dp, 5dp, 10dp, 20dp, and 50dp.
---- @since (API level 2)
+--- @since (API level 5)
 M.spacing = {
 	x_small = "SPACING_X_SMALL",
 	small = "SPACING_SMALL",
@@ -58,7 +58,7 @@ M.spacing = {
 }
 
 --- Track & Graph shapes. Small, medium, and large currently use 4dp, 8dp, and 16dp rounded corners.
---- @since (API level 2)
+--- @since (API level 5)
 M.shape = {
 	small = "SHAPE_SMALL",
 	medium = "SHAPE_MEDIUM",

@@ -2,7 +2,7 @@
 -- Maps each exported symbol to the API level where it was introduced
 -- All existing APIs are level 1
 return {
-	TYPE = 2,
+	TYPE = 5,
 
 	-- Enums
 	GRAPH_TYPE = 1,
@@ -11,7 +11,7 @@ return {
 	["GRAPH_TYPE.PIE_CHART"] = 1,
 	["GRAPH_TYPE.TIME_BARCHART"] = 1,
 	["GRAPH_TYPE.LINE_GRAPH"] = 1,
-	["GRAPH_TYPE.CUSTOM"] = 2,
+	["GRAPH_TYPE.CUSTOM"] = 5,
 
 	LINE_POINT_STYLE = 1,
 	["LINE_POINT_STYLE.NONE"] = 1,

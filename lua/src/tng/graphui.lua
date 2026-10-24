@@ -3,7 +3,7 @@ local theme = require("tng.theme")
 
 local M = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class LegendItem
 --- @field key? string: Stable identity across renders.
 --- @field color Color|string: Data-vis index, hex color, or theme color token.
@@ -11,7 +11,7 @@ local M = {}
 --- @field modifier? table[]: Ordered modifiers for the item row.
 M.LegendItem = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class LegendParams
 --- @field key? string: Stable identity across renders.
 --- @field modifier? table[]: Ordered modifiers applied after the default fill-width modifier.

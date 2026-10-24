@@ -1,14 +1,15 @@
 ---
 title: Lua tooling, build process, publishing, and adding new config types
-description: Directory structure for lua/, building the function catalog (pack-functions.lua), validation and API test tooling, debug/prod catalog publishing, and the complete list of 8 implementation + 5 test files to update when adding a new configuration type.
+description: Directory structure for lua/, building the function catalog, release-aware Lua API-level selection, validation and API test tooling, catalog publishing, and adding new configuration types.
 topics:
   - Directory: lua/src/community/functions/, lua/catalog/, lua/tools/, lua/src/tng/
   - Build catalog: lua tools/pack-functions.lua → catalog/community-functions.lua
   - Validation tools: verify-api-specs, validate-functions, pack-functions, detect-changes
+  - API levels are release batches: reuse an unreleased maximum, otherwise increment the released maximum once
   - Lua API tests: caught assertions require finish_tests; the suite runner provides a finalization fallback
   - Catalog publish: make lua-publish-debug / make lua-publish-prod rebuild before signing; direct Lua publish scripts only sign existing catalog
   - Adding config types: 8 implementation files + 5 test files must ALL be updated
-keywords: [lua, tooling, build, pack-functions, catalog, luarocks, serpent, validation, tests, test runner, finish_tests, config-types, debug-publish, prod-publish, publish-functions-prod, api-specs, make]
+keywords: [lua, tooling, build, pack-functions, catalog, luarocks, serpent, validation, tests, test runner, finish_tests, config-types, debug-publish, prod-publish, publish-functions-prod, api-specs, api-level, release, make]
 ---
 
 # Lua Tooling and Project Structure
@@ -91,6 +92,51 @@ Run from `lua/` directory:
 `make validate-all` is the release gate. Keep new validation and its tests
 reachable from this target; a check that only runs from an ad-hoc command can
 otherwise be missed before publishing.
+
+### Choosing an API level for new Lua APIs
+
+Lua API levels describe the app release batch in which an interface first
+becomes available. They do **not** increment independently for each module,
+revision, or feature. All new Lua APIs destined for the same upcoming app
+release use the same API level.
+
+Before assigning a level:
+
+1. Identify the most recent shipped app release tag.
+2. Run `make lua-get-max-api-level` to find the maximum in the current working
+   tree.
+3. Compare every changed `lua/src/tng/*.apispec.lua` file against that release,
+   for example:
+
+   ```bash
+   jj diff --from <last-release-tag> --to @ --summary -- 'glob:lua/src/tng/*.apispec.lua'
+   ```
+
+4. Determine whether the current maximum was already present in the shipped
+   release:
+   - If the maximum was introduced after the release, reuse it for every other
+     API being prepared for the same next release.
+   - If the shipped release already contained that maximum, assign
+     `current maximum + 1` to all newly introduced APIs.
+
+Never infer the next level from an individual spec's existing values. A newly
+created module starting at level 2 is wrong when the released API surface has
+already reached a higher level. Conversely, do not keep incrementing merely
+because another unreleased module has already claimed the next level.
+
+Audit the complete release diff rather than only the file currently being
+edited. Update both the `.apispec.lua` declarations and matching `@since`
+annotations in the Lua source. Then run:
+
+```bash
+make lua-get-max-api-level
+make lua-verify-api-specs
+make lua-test-api
+```
+
+For the work following app release `v10.5.1`, API level 4 was already shipped,
+so the new canvas, custom UI, graph UI, theme, and custom graph interfaces all
+belong to API level 5.
 
 ### Lua API test finalization
 

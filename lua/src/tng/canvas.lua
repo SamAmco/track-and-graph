@@ -1,10 +1,10 @@
 local M = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 M.TYPE = "CANVAS"
 
 --- Canvas draw instruction types.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum INSTRUCTION_TYPE
 M.INSTRUCTION_TYPE = {
 	ARC = "ARC",
@@ -20,7 +20,7 @@ M.INSTRUCTION_TYPE = {
 }
 
 --- Canvas drawing styles. These map to Compose DrawStyle variants.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum DRAW_STYLE
 M.DRAW_STYLE = {
 	FILL = "fill",
@@ -28,7 +28,7 @@ M.DRAW_STYLE = {
 }
 
 --- Stroke cap styles.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum STROKE_CAP
 M.STROKE_CAP = {
 	BUTT = "butt",
@@ -37,7 +37,7 @@ M.STROKE_CAP = {
 }
 
 --- Stroke join styles.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum STROKE_JOIN
 M.STROKE_JOIN = {
 	MITER = "miter",
@@ -46,7 +46,7 @@ M.STROKE_JOIN = {
 }
 
 --- How a list of points is interpreted.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum POINT_MODE
 M.POINT_MODE = {
 	POINTS = "points",
@@ -55,7 +55,7 @@ M.POINT_MODE = {
 }
 
 --- Clipping operations.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum CLIP_OP
 M.CLIP_OP = {
 	INTERSECT = "intersect",
@@ -63,7 +63,7 @@ M.CLIP_OP = {
 }
 
 --- Canvas text alignment within the optional text bounds.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum TEXT_ALIGN
 M.TEXT_ALIGN = {
 	START = "start",
@@ -73,7 +73,7 @@ M.TEXT_ALIGN = {
 
 --- Canvas text alignment on the vertical axis of the optional text bounds.
 --- This is a Track & Graph abstraction; Compose has no equivalent vertical TextAlign.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum TEXT_VERTICAL_ALIGN
 M.TEXT_VERTICAL_ALIGN = {
 	TOP = "top",
@@ -82,7 +82,7 @@ M.TEXT_VERTICAL_ALIGN = {
 }
 
 --- Canvas text overflow behavior.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum TEXT_OVERFLOW
 M.TEXT_OVERFLOW = {
 	CLIP = "clip",
@@ -91,7 +91,7 @@ M.TEXT_OVERFLOW = {
 }
 
 --- Canvas font weights.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum FONT_WEIGHT
 M.FONT_WEIGHT = {
 	NORMAL = "normal",
@@ -100,7 +100,7 @@ M.FONT_WEIGHT = {
 }
 
 --- Blend modes supported by Compose DrawScope.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum BLEND_MODE
 M.BLEND_MODE = {
 	CLEAR = "clear", SRC = "src", DST = "dst", SRC_OVER = "src_over", DST_OVER = "dst_over",
@@ -114,50 +114,50 @@ M.BLEND_MODE = {
 }
 
 --- Gradient tiling behavior.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum TILE_MODE
 M.TILE_MODE = { CLAMP = "clamp", REPEATED = "repeated", MIRROR = "mirror", DECAL = "decal" }
 
 --- Direction used when adding closed geometry to a path.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum PATH_DIRECTION
 M.PATH_DIRECTION = { CLOCKWISE = "clockwise", COUNTER_CLOCKWISE = "counter_clockwise" }
 
 --- How a stamped path effect transforms its shape along the path.
---- @since (API level 2)
+--- @since (API level 5)
 --- @enum STAMPED_PATH_EFFECT_STYLE
 M.STAMPED_PATH_EFFECT_STYLE = { TRANSLATE = "translate", ROTATE = "rotate", MORPH = "morph" }
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class CanvasPoint
 --- @field x number Horizontal coordinate, increasing from left to right.
 --- @field y number Vertical coordinate, increasing from top to bottom.
 M.CanvasPoint = {}
 
---- @since (API level 2)
+--- @since (API level 5)
 --- @class CanvasSize
 --- @field width number
 --- @field height number
 M.CanvasSize = {}
 
 --- Parameter tables accepted by CanvasDrawScope drawing methods.
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawLineParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawCircleParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawRectParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawRoundRectParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawOvalParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawArcParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawPathParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawPointsParams = {}
---- @since (API level 2)
+--- @since (API level 5)
 M.DrawTextParams = {}
 
 local function copy_point(point)
@@ -184,7 +184,7 @@ local function deep_copy(value)
 end
 
 --- Standard Compose gradient brush descriptions.
---- @since (API level 2)
+--- @since (API level 5)
 M.Brush = {}
 
 M.Brush.linearGradient = function(params)
@@ -218,7 +218,7 @@ M.Brush.sweepGradient = function(params)
 end
 
 --- Compose color filter descriptions.
---- @since (API level 2)
+--- @since (API level 5)
 M.ColorFilter = {}
 
 M.ColorFilter.tint = function(params)
@@ -238,7 +238,7 @@ M.ColorFilter.lighting = function(params)
 end
 
 --- Compose path effect descriptions.
---- @since (API level 2)
+--- @since (API level 5)
 M.PathEffect = {}
 
 M.PathEffect.corner = function(radius)
@@ -264,7 +264,7 @@ M.PathEffect.stamped = function(params)
 end
 
 --- Operations accepted by CanvasDrawScope.withTransform.
---- @since (API level 2)
+--- @since (API level 5)
 M.Transform = {}
 
 M.Transform.translate = function(params)
@@ -538,7 +538,7 @@ end
 CanvasPath.rewind = CanvasPath.reset
 
 --- Creates a mutable path description for drawPath and clipPath.
---- @since (API level 2)
+--- @since (API level 5)
 --- @return CanvasPath
 M.path = function()
 	return setmetatable({ commands = {} }, CanvasPath)
@@ -795,7 +795,7 @@ CanvasDrawScope.clipPath = function(self, params, draw)
 end
 
 --- Creates a deferred canvas renderer. The returned function records draw calls once bounds are known.
---- @since (API level 2)
+--- @since (API level 5)
 --- @param draw fun(draw_scope): A callback that issues draw calls on the supplied scope.
 --- @return fun(context: table): table A function returning recorded draw instructions for a canvas context.
 M.create = function(draw)
