@@ -14,9 +14,6 @@ import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
 
 /** App-layer session that owns a Lua UI renderer and its effective state. */
 interface LuaUiContent {
-    /** Stable namespace for native state retained by components rendered by this content. */
-    val nativeStateScopeKey: String
-
     /** Effective state that will be passed to the next render. */
     val state: LuaValueAccessor?
 

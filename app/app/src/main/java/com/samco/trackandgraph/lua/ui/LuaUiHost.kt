@@ -328,7 +328,7 @@ private fun LuaSelectItemDialog(node: LuaValueHandle, content: LuaUiContent) {
 
     val pickerScope = node["picker_scope"]?.asString().orEmpty().ifBlank { "default" }
     val viewModel = hiltViewModel<SelectItemDialogViewModelImpl>(
-        key = "lua-select-item:${content.nativeStateScopeKey}:$pickerScope",
+        key = "lua-select-item:$pickerScope",
     )
     val actionHandler = LocalLuaUiActionHandler.current
     val resetOnClose = node["reset_on_close"]?.asBoolean() == true
