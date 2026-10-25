@@ -1,3 +1,4 @@
+local core = require("tng.core")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
 
@@ -25,6 +26,17 @@ M.SelectorButtonParams = {}
 M.TextChipParams = {}
 
 --- @since (API level 5)
+--- @class ColorSpinnerParams
+--- @field key string: Stable key used for this spinner and its expanded state.
+--- @field state table: State retained by the renderer.
+--- @field selected_color integer: Zero-based index into `colors`.
+--- @field on_color_selected fun(index): Called with the selected zero-based colour index.
+--- @field colors? Color[]: Defaults to the complete Track & Graph data-visualisation palette.
+--- @field enabled? boolean: Defaults to true.
+--- @field modifier? table[]
+M.ColorSpinnerParams = {}
+
+--- @since (API level 5)
 --- @class FeatureSelectorParams
 --- @field key string: Stable key used for this selector and its visibility state.
 --- @field state table: Configuration state retained by the renderer.
@@ -35,6 +47,21 @@ M.TextChipParams = {}
 --- @field on_selected fun(selection): Updates the caller's state with the selected feature.
 --- @field modifier? table[]
 M.FeatureSelectorParams = {}
+
+local data_vis_colors = {
+	core.COLOR.RED_DARK,
+	core.COLOR.RED,
+	core.COLOR.ORANGE_DARK,
+	core.COLOR.ORANGE,
+	core.COLOR.YELLOW,
+	core.COLOR.BLUE_LIGHT,
+	core.COLOR.BLUE_SKY,
+	core.COLOR.BLUE,
+	core.COLOR.BLUE_DARK,
+	core.COLOR.BLUE_NAVY,
+	core.COLOR.GREEN_LIGHT,
+	core.COLOR.GREEN_DARK,
+}
 
 local function append_modifiers(first, second)
 	local result = {}
@@ -138,6 +165,68 @@ M.text_chip = function(params)
 	})
 end
 
+local function color_circle(color, modifiers)
+	return ui.surface({
+		modifier = append_modifiers(modifiers, ui.modifier(ui.width(ui.dp(54)), ui.height(ui.dp(54)))),
+		color = color,
+		shape = theme.shape.circle,
+	})
+end
+
+--- Creates the Lua equivalent of the app's ColorSpinner.
+--- @param params ColorSpinnerParams
+M.color_spinner = function(params)
+	assert(type(params) == "table", "color spinner params must be a table")
+	assert(type(params.key) == "string", "color spinner key is required")
+	assert(type(params.state) == "table", "color spinner state is required")
+	assert(type(params.selected_color) == "number", "selected_color must be a number")
+	assert(type(params.on_color_selected) == "function", "on_color_selected is required")
+	local colors = params.colors or data_vis_colors
+	local selected = params.selected_color
+	assert(selected % 1 == 0 and selected >= 0 and selected < #colors, "selected_color is out of range")
+	params.state.__commonui = params.state.__commonui or {}
+	params.state.__commonui.dropdowns = params.state.__commonui.dropdowns or {}
+	local dropdowns = params.state.__commonui.dropdowns
+	local close = function() dropdowns[params.key] = false end
+	local enabled = params.enabled ~= false
+	local selected_modifiers = {}
+	if enabled then
+		table.insert(selected_modifiers, ui.on_click(function()
+			dropdowns[params.key] = dropdowns[params.key] ~= true
+		end))
+	end
+	local items = {}
+	for index, color in ipairs(colors) do
+		local color_index = index - 1
+		items[index] = ui.dropdown_menu_item({
+			key = params.key .. "_color_" .. color_index,
+			enabled = enabled,
+			on_click = function()
+				params.on_color_selected(color_index)
+				close()
+			end,
+			child = ui.column({
+				modifier = ui.modifier(ui.fill_width(), ui.padding({ vertical = theme.spacing.small })),
+				alignment = ui.ALIGNMENT.CENTER,
+				children = { color_circle(color) },
+			}),
+		})
+	end
+	return ui.box({
+		key = params.key,
+		modifier = params.modifier,
+		children = {
+			color_circle(colors[selected + 1], selected_modifiers),
+			ui.dropdown_menu({
+				key = params.key .. "_dropdown",
+				expanded = dropdowns[params.key] == true,
+				on_dismiss_request = close,
+				children = items,
+			}),
+		},
+	})
+end
+
 --- Creates a SelectorButton backed by the app's standard feature-selection dialog.
 --- @param params FeatureSelectorParams
 M.feature_selector = function(params)
@@ -150,12 +239,19 @@ M.feature_selector = function(params)
 	local dialogs = params.state.__commonui.dialogs
 	local close = function() dialogs[params.key] = false end
 	local selected = params.selected
+	local button_modifiers = nil
+	if has_modifier(params.modifier, ui.MODIFIER_TYPE.FILL_WIDTH)
+		or has_modifier(params.modifier, ui.MODIFIER_TYPE.WEIGHT)
+	then
+		button_modifiers = ui.modifier(ui.fill_width())
+	end
 	return ui.box({
 		key = params.key,
+		modifier = params.modifier,
 		children = {
 			M.selector_button({
 				key = params.key .. "_button",
-				modifier = params.modifier,
+				modifier = button_modifiers,
 				text = selected and selected.path or params.placeholder,
 				on_click = function() dialogs[params.key] = true end,
 			}),

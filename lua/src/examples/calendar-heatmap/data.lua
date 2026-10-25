@@ -77,7 +77,7 @@ local function calendar_days(today, weeks)
 	return days, index_by_date, weekday_labels, month_labels, start, today_index
 end
 
-local function read_source(source, source_index, index_by_date, start)
+local function read_source(source, color, index_by_date, start)
 	local values = {}
 	local point_counts = {}
 	local maximum = 0
@@ -107,7 +107,7 @@ local function read_source(source, source_index, index_by_date, start)
 
 	return {
 		name = source.name,
-		color = ((source_index - 1) * data_vis_color_generator) % data_vis_color_count,
+		color = color,
 		values = values,
 	}
 end
@@ -122,7 +122,10 @@ return function(params)
 	local source_data = {}
 
 	for index, source in ipairs(ordered_sources(sources)) do
-		source_data[index] = read_source(source, index, index_by_date, start)
+		local configured_source = state and state.sources and state.sources[index]
+		local color = configured_source and configured_source.color
+			or ((index - 1) * data_vis_color_generator) % data_vis_color_count
+		source_data[index] = read_source(source, color, index_by_date, start)
 	end
 
 	return {

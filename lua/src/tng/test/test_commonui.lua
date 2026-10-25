@@ -66,18 +66,58 @@ test("text chip matches native selected and unselected styling", function()
 	assert(selected.child.children[1].color == theme.color.on_primary)
 end)
 
+test("color spinner matches the native palette control and retains expanded state", function()
+	local state = {}
+	local selected = nil
+	local spinner = commonui.color_spinner({
+		key = "source_color",
+		state = state,
+		selected_color = 7,
+		on_color_selected = function(index) selected = index end,
+	})
+
+	assert(spinner.type == ui.COMPONENT_TYPE.BOX)
+	local selected_circle = spinner.children[1]
+	assert(selected_circle.type == ui.COMPONENT_TYPE.SURFACE)
+	assert(selected_circle.color == 7)
+	assert(selected_circle.shape == theme.shape.circle)
+	assert(modifier_of_type(selected_circle.modifier, ui.MODIFIER_TYPE.WIDTH).value.value == 54)
+	assert(modifier_of_type(selected_circle.modifier, ui.MODIFIER_TYPE.HEIGHT).value.value == 54)
+	modifier_of_type(selected_circle.modifier, ui.MODIFIER_TYPE.ON_CLICK).callback()
+	assert(state.__commonui.dropdowns.source_color == true)
+
+	local opened = commonui.color_spinner({
+		key = "source_color",
+		state = state,
+		selected_color = 7,
+		on_color_selected = function(index) selected = index end,
+	})
+	local menu = opened.children[2]
+	assert(menu.expanded == true)
+	assert(#menu.children == 12)
+	menu.children[5].on_click()
+	assert(selected == 4)
+	assert(state.__commonui.dropdowns.source_color == false)
+end)
+
 test("feature selector stores visibility in configuration state and updates selection", function()
 	local state = {}
 	local selected = nil
+	local root_modifiers = ui.modifier(ui.fill_width(), ui.weight(1), ui.padding(ui.dp(4)))
 	local selector = commonui.feature_selector({
 		key = "source",
 		state = state,
 		title = "Select a feature",
 		placeholder = "Choose feature",
 		picker_scope = "inputs",
+		modifier = root_modifiers,
 		on_selected = function(value) selected = value end,
 	})
 
+	assert(selector.modifier == root_modifiers)
+	assert(modifier_of_type(selector.modifier, ui.MODIFIER_TYPE.PADDING).all.value == 4)
+	assert(modifier_of_type(selector.children[1].modifier, ui.MODIFIER_TYPE.FILL_WIDTH) ~= nil)
+	assert(modifier_of_type(selector.children[1].modifier, ui.MODIFIER_TYPE.WEIGHT) == nil)
 	modifier_of_type(selector.children[1].modifier, ui.MODIFIER_TYPE.ON_CLICK).callback()
 	assert(state.__commonui.dialogs.source == true)
 	local rerendered = commonui.feature_selector({
@@ -104,6 +144,12 @@ test("common UI wrappers are available through the API level gate", function()
 
 	assert(gated.selector_button({ text = "Select" }).type == ui.COMPONENT_TYPE.SURFACE)
 	assert(gated.text_chip({ text = "Chip" }).type == ui.COMPONENT_TYPE.SURFACE)
+	assert(gated.color_spinner({
+		key = "color",
+		state = {},
+		selected_color = 0,
+		on_color_selected = function() end,
+	}).type == ui.COMPONENT_TYPE.BOX)
 	api_gate.validate(5)
 end)
 
