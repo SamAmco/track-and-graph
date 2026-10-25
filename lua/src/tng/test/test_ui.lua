@@ -21,6 +21,31 @@ test("text accepts translated strings", function()
 	assert(text.text == translations)
 end)
 
+test("icons and icon buttons retain semantic tokens and interaction", function()
+	local icons = require("tng.icons")
+	local clicked = false
+	local icon = ui.icon({
+		icon = icons.ICON.DELETE,
+		content_description = { en = "Remove feature" },
+		tint = theme.color.error,
+	})
+	local button = ui.icon_button({
+		child = icon,
+		on_click = function() clicked = true end,
+		enabled = false,
+	})
+
+	assert(icon.type == ui.COMPONENT_TYPE.ICON)
+	assert(icon.icon == "ICON_DELETE")
+	assert(icon.content_description.en == "Remove feature")
+	assert(icon.tint == theme.color.error)
+	assert(button.type == ui.COMPONENT_TYPE.ICON_BUTTON)
+	assert(button.child == icon)
+	assert(button.enabled == false)
+	button.on_click()
+	assert(clicked)
+end)
+
 test("select item dialog preserves picker options and callbacks", function()
 	local selected = function() end
 	local dismissed = function() end

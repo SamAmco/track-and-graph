@@ -13,6 +13,8 @@ M.COMPONENT_TYPE = {
 	BOX = "BOX",
 	SPACER = "SPACER",
 	TEXT = "TEXT",
+	ICON = "ICON",
+	ICON_BUTTON = "ICON_BUTTON",
 	SURFACE = "SURFACE",
 	DROPDOWN_MENU = "DROPDOWN_MENU",
 	DROPDOWN_MENU_ITEM = "DROPDOWN_MENU_ITEM",
@@ -150,6 +152,24 @@ M.BoxParams = {}
 --- @field max_lines? integer
 --- @field overflow? TEXT_OVERFLOW
 M.TextParams = {}
+
+--- @since (API level 5)
+--- @class IconParams
+--- @field key? string: Stable identity across renders.
+--- @field modifier? table[]: Ordered modifiers.
+--- @field icon string: Semantic token from `tng.icons.ICON`.
+--- @field content_description? string|table<string,string>: Localized accessibility description, or nil for a decorative icon.
+--- @field tint? Color|string: Raw or theme color token. Defaults to the current content color.
+M.IconParams = {}
+
+--- @since (API level 5)
+--- @class IconButtonParams
+--- @field key? string: Stable identity across renders.
+--- @field modifier? table[]: Ordered modifiers.
+--- @field child table: Content drawn inside the standard icon button touch target.
+--- @field on_click fun(): Called when the enabled button is selected.
+--- @field enabled? boolean: Defaults to true.
+M.IconButtonParams = {}
 
 --- @since (API level 5)
 --- @class SurfaceParams
@@ -411,6 +431,37 @@ M.text = function(params)
 	result.text_align = params.text_align
 	result.max_lines = params.max_lines
 	result.overflow = params.overflow
+	return result
+end
+
+--- Draws one of the app's stable semantic icon tokens.
+--- @param params IconParams
+M.icon = function(params)
+	assert(type(params) == "table", "icon params must be a table")
+	assert(type(params.icon) == "string", "icon token must be a string")
+	assert(
+		params.content_description == nil
+			or type(params.content_description) == "string"
+			or type(params.content_description) == "table",
+		"content_description must be a string or translations table"
+	)
+	local result = component(M.COMPONENT_TYPE.ICON, params)
+	result.icon = params.icon
+	result.content_description = params.content_description
+	result.tint = params.tint
+	return result
+end
+
+--- Creates a Material icon button with arbitrary UI content.
+--- @param params IconButtonParams
+M.icon_button = function(params)
+	assert(type(params) == "table", "icon_button params must be a table")
+	assert(type(params.child) == "table", "icon_button child is required")
+	assert(type(params.on_click) == "function", "icon_button on_click must be a function")
+	local result = component(M.COMPONENT_TYPE.ICON_BUTTON, params)
+	result.child = params.child
+	result.on_click = params.on_click
+	result.enabled = params.enabled ~= false
 	return result
 end
 

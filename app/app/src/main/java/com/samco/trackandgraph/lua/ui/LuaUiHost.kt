@@ -158,6 +158,12 @@ private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier:
             }
             "SPACER" -> Spacer(modifier)
             "TEXT" -> LuaText(node, modifier)
+            "ICON" -> LuaIcon(node, modifier)
+            "ICON_BUTTON" -> LuaIconButton(
+                node = node,
+                modifier = modifier,
+                actionHandler = LocalLuaUiActionHandler.current,
+            ) { LuaNode(it, content) }
             "SURFACE" -> LuaSurface(node, content, modifier)
             "CANVAS" -> LuaCanvas(node, content, modifier, LocalLuaUiErrorHandler.current)
             "DROPDOWN_MENU" -> LuaDropdownMenu(
