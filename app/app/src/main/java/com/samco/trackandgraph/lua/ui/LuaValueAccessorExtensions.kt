@@ -24,3 +24,10 @@ internal fun LuaValueAccessor?.toList(): List<LuaValueAccessor> =
 
 internal fun LuaValueHandle?.toHandleList(): List<LuaValueHandle> =
     (1..(this?.arraySize ?: 0)).mapNotNull { this?.get(it) }
+
+internal fun LuaValueHandle.action(
+    callbackName: String,
+    argument: LuaValueAccessor? = null,
+): LuaUiAction? = this[callbackName]?.asFunction()?.let { callback ->
+    LuaUiAction(callback, listOfNotNull(argument))
+}

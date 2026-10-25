@@ -75,13 +75,6 @@ private fun LuaValueAccessor?.toHiddenItems(): Set<HiddenItem> =
 private fun LuaValueAccessor?.toAccessorList(): List<LuaValueAccessor> =
     (1..(this?.arraySize ?: 0)).mapNotNull { this?.get(it) }
 
-private fun LuaValueHandle.action(
-    callbackName: String,
-    argument: LuaValueAccessor? = null,
-): LuaUiAction? = this[callbackName]?.asFunction()?.let { callback ->
-    LuaUiAction(callback, listOfNotNull(argument))
-}
-
 private fun LuaValueHandle.selectionActions(selection: SelectedItemInfo): List<LuaUiAction> = when (selection) {
     is SelectedItemInfo.Group -> listOfNotNull(action(
         "on_group_selected",

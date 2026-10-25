@@ -47,6 +47,33 @@ test("select item dialog preserves picker options and callbacks", function()
 	assert(dialog.reset_on_close == true)
 end)
 
+test("dropdown menu preserves controlled visibility and arbitrary item content", function()
+	local dismissed = function() end
+	local selected = function() end
+	local item_content = ui.row({ children = { ui.text({ text = "Choice" }) } })
+	local menu = ui.dropdown_menu({
+		key = "choices",
+		expanded = true,
+		on_dismiss_request = dismissed,
+		children = {
+			ui.dropdown_menu_item({
+				key = "choice",
+				child = item_content,
+				on_click = selected,
+				enabled = false,
+			}),
+		},
+	})
+
+	assert(menu.type == ui.COMPONENT_TYPE.DROPDOWN_MENU)
+	assert(menu.expanded == true)
+	assert(menu.on_dismiss_request == dismissed)
+	assert(menu.children[1].type == ui.COMPONENT_TYPE.DROPDOWN_MENU_ITEM)
+	assert(menu.children[1].child == item_content)
+	assert(menu.children[1].on_click == selected)
+	assert(menu.children[1].enabled == false)
+end)
+
 test("nested UI constants are available through the API level gate", function()
 	local api_gate = require("community.test-utils.api-gate")
 	local spec = dofile("src/tng/ui.apispec.lua")
@@ -55,11 +82,16 @@ test("nested UI constants are available through the API level gate", function()
 
 	assert(gated.BOX_ALIGNMENT.BOTTOM_END == "BOTTOM_END")
 	assert(gated.COMPONENT_TYPE.FLOW_ROW == "FLOW_ROW")
+	assert(gated.COMPONENT_TYPE.DROPDOWN_MENU_ITEM == "DROPDOWN_MENU_ITEM")
 	assert(gated.SELECTABLE_ITEM_TYPE.FEATURE == "FEATURE")
 	assert(gated.TEXT_OVERFLOW.START_ELLIPSIS == "START_ELLIPSIS")
 	assert(gated.MODIFIER_TYPE.FILL_MAX_ROW_HEIGHT == "FILL_MAX_ROW_HEIGHT")
 	assert(gated.fill_max_row_height(0.5).fraction == 0.5)
 	assert(gated.flow_row({}).type == "FLOW_ROW")
+	assert(gated.dropdown_menu({
+		expanded = false,
+		on_dismiss_request = function() end,
+	}).type == "DROPDOWN_MENU")
 	api_gate.validate(5)
 end)
 

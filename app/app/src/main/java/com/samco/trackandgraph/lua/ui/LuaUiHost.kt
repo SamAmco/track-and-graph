@@ -160,6 +160,16 @@ private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier:
             "TEXT" -> LuaText(node, modifier)
             "SURFACE" -> LuaSurface(node, content, modifier)
             "CANVAS" -> LuaCanvas(node, content, modifier, LocalLuaUiErrorHandler.current)
+            "DROPDOWN_MENU" -> LuaDropdownMenu(
+                node = node,
+                modifier = modifier,
+                actionHandler = LocalLuaUiActionHandler.current,
+            ) { LuaNode(it, content) }
+            "DROPDOWN_MENU_ITEM" -> LuaDropdownMenuItem(
+                node = node,
+                modifier = modifier,
+                actionHandler = LocalLuaUiActionHandler.current,
+            ) { LuaNode(it, content) }
             "SELECT_ITEM_DIALOG" -> LuaSelectItemDialog(node, LocalLuaUiActionHandler.current)
         }
     }

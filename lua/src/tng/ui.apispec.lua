@@ -12,6 +12,8 @@ return {
 	["COMPONENT_TYPE.SPACER"] = 5,
 	["COMPONENT_TYPE.TEXT"] = 5,
 	["COMPONENT_TYPE.SURFACE"] = 5,
+	["COMPONENT_TYPE.DROPDOWN_MENU"] = 5,
+	["COMPONENT_TYPE.DROPDOWN_MENU_ITEM"] = 5,
 	["COMPONENT_TYPE.SELECT_ITEM_DIALOG"] = 5,
 
 	SELECTABLE_ITEM_TYPE = 5,
@@ -90,6 +92,8 @@ return {
 	TextParams = 5,
 	SurfaceParams = 5,
 	CanvasParams = 5,
+	DropdownMenuParams = 5,
+	DropdownMenuItemParams = 5,
 	SelectItemDialogParams = 5,
 
 	px = 5,
@@ -125,5 +129,7 @@ return {
 	text = 5,
 	surface = 5,
 	canvas = 5,
+	dropdown_menu = 5,
+	dropdown_menu_item = 5,
 	select_item_dialog = 5,
 }

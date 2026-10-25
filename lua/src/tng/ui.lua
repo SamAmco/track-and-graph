@@ -14,6 +14,8 @@ M.COMPONENT_TYPE = {
 	SPACER = "SPACER",
 	TEXT = "TEXT",
 	SURFACE = "SURFACE",
+	DROPDOWN_MENU = "DROPDOWN_MENU",
+	DROPDOWN_MENU_ITEM = "DROPDOWN_MENU_ITEM",
 	SELECT_ITEM_DIALOG = "SELECT_ITEM_DIALOG",
 }
 
@@ -167,6 +169,24 @@ M.SurfaceParams = {}
 --- @field modifier? table[]: Ordered modifiers.
 --- @field draw fun(draw_scope): Callback invoked after the canvas has been measured.
 M.CanvasParams = {}
+
+--- @since (API level 5)
+--- @class DropdownMenuParams
+--- @field key? string: Stable identity across renders.
+--- @field modifier? table[]: Ordered modifiers applied to the popup menu.
+--- @field expanded boolean: Whether the popup is visible.
+--- @field on_dismiss_request fun(): Called when the user requests that the popup close.
+--- @field children? table[]: Menu content, normally `dropdown_menu_item` components.
+M.DropdownMenuParams = {}
+
+--- @since (API level 5)
+--- @class DropdownMenuItemParams
+--- @field key? string: Stable identity across renders.
+--- @field modifier? table[]: Ordered modifiers applied to the menu item.
+--- @field child table: Arbitrary UI content drawn inside the item.
+--- @field on_click fun(): Called when the enabled item is selected.
+--- @field enabled? boolean: Defaults to true.
+M.DropdownMenuItemParams = {}
 
 --- @since (API level 5)
 --- @class SelectItemDialogParams
@@ -411,6 +431,32 @@ M.canvas = function(params)
 	local canvas = require("tng.canvas")
 	local result = component(canvas.TYPE, params)
 	result.draw = canvas.create(params.draw)
+	return result
+end
+
+--- Creates a controlled popup menu anchored by its parent layout.
+--- @param params DropdownMenuParams
+M.dropdown_menu = function(params)
+	assert(type(params) == "table", "dropdown_menu params must be a table")
+	assert(type(params.expanded) == "boolean", "expanded must be a boolean")
+	assert(type(params.on_dismiss_request) == "function", "on_dismiss_request must be a function")
+	local result = component(M.COMPONENT_TYPE.DROPDOWN_MENU, params)
+	result.expanded = params.expanded
+	result.on_dismiss_request = params.on_dismiss_request
+	result.children = params.children or {}
+	return result
+end
+
+--- Creates a selectable menu item whose child supplies its content.
+--- @param params DropdownMenuItemParams
+M.dropdown_menu_item = function(params)
+	assert(type(params) == "table", "dropdown_menu_item params must be a table")
+	assert(type(params.child) == "table", "dropdown_menu_item child is required")
+	assert(type(params.on_click) == "function", "dropdown_menu_item on_click must be a function")
+	local result = component(M.COMPONENT_TYPE.DROPDOWN_MENU_ITEM, params)
+	result.child = params.child
+	result.on_click = params.on_click
+	result.enabled = params.enabled ~= false
 	return result
 end
 
