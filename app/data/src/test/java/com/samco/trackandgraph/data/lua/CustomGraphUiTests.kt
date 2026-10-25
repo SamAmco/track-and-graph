@@ -30,6 +30,27 @@ import org.junit.Test
 
 internal class CustomGraphUiTests : LuaEngineImplTest() {
     @Test
+    fun `common icon tokens are available as an installed pure Lua module`() = runBlocking {
+        val engine = uut()
+        val lock = engine.acquireVM()
+        try {
+            val icon = engine.runLuaScript(
+                lock,
+                InlineLuaScriptAccessor(
+                    """
+                    local icons = require("tng.icons")
+                    return icons.ICON.DELETE
+                    """.trimIndent(),
+                ),
+            )
+
+            assertEquals("ICON_DELETE", icon.asString())
+        } finally {
+            engine.releaseVM(lock)
+        }
+    }
+
+    @Test
     fun `graph UI legend is available as an installed pure Lua module`() = runBlocking {
         val engine = uut()
         val lock = engine.acquireVM()

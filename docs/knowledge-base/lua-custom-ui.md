@@ -8,10 +8,10 @@ topics:
   - tng.ui describes responsive layout; tng.graphui composes host-free graph conventions from it
   - tng.commonui mirrors selected reusable native controls for consistent Lua screens
   - tng.canvas records instructions for later Compose DrawScope replay
-  - Theme values and data-visualization colors resolve consistently across declarative UI and Canvas
+  - Theme values, data-visualization colors, and common semantic icon tokens resolve consistently
   - Render and callback failures use the existing graph error presentation
   - Configuration renderers retain JSON-serializable Lua table state across interactions and graph execution
-keywords: [lua, custom-ui, CUSTOM, prepare_data, render_graph, render_configuration, configuration, JSON, state, on_click, RetainedLuaUiContent, tng.ui, tng.commonui, tng.graphui, SelectorButton, TextChip, native-parity, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, translation, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, error]
+keywords: [lua, custom-ui, CUSTOM, prepare_data, render_graph, render_configuration, configuration, JSON, state, on_click, RetainedLuaUiContent, tng.ui, tng.commonui, tng.graphui, tng.icons, icons, SelectorButton, TextChip, native-parity, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, translation, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, error]
 ---
 
 # Lua Custom UI
@@ -70,6 +70,8 @@ For coarse responsive decisions such as changing a graph's orientation, compare 
 `tng.ui` API level 2 currently describes rows, wrapping flow rows, columns, boxes, spacers, text, surfaces, and canvases. Dimensions carry a `PX`, `DP`, or `SP` unit. Ordered modifier tables cover sizing, weight, constraints, aspect ratio, padding, background, border, clipping, elevation, and child alignment. `flow_row` maps Compose's horizontal and vertical arrangements, independent inter-item and inter-row spacing, item vertical alignment, maximum items per row, maximum lines, and `fill_max_row_height` child behavior. Explicit spacing combines with start/center/end alignment; space-between/around/evenly arrangements define their own gaps, so explicit spacing is ignored for those modes. Keep FlowRow-specific child modifiers in the same ordered modifier list as ordinary modifiers.
 
 `tng.theme` supplies stable color, spacing, shape, and text-style tokens rather than exposing Compose objects to Lua. Its text styles cover the complete Material display/headline/title/body/label set plus Track & Graph's code style. A color accepted by Lua UI or Canvas may be a theme token, a hex string, or a zero-based `tng.core.COLOR` data-visualization palette index; both rendering paths deliberately share the same resolver.
+
+`tng.icons` is the corresponding semantic catalogue for icons used repeatedly across the app. Tokens describe intent (`DELETE`, `SEARCH`, `MORE`, `TRACKER`, and so on), not Android resource names or Material implementations. The host remains free to change the actual vector asset without changing packaged Lua. The catalogue covers reusable actions, navigation, status, and Track & Graph item types; branding, screenshots, graph point-style previews, and other one-off illustrations are deliberately excluded.
 
 `tng.graphui` is a pure-Lua convenience layer built only from `tng.ui` and `tng.theme`; it introduces no Android bridge types. Its legend helpers reproduce the native graph convention—a centered, wrapping full-width FlowRow containing 20dp circular swatches, a 2dp label gap, body-medium text, and 10dp item spacing. Put reusable graph presentation conventions here so native and packaged graphs do not drift visually.
 

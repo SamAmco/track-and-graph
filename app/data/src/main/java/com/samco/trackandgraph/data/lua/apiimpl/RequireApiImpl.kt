@@ -89,6 +89,7 @@ internal class RequireApiImpl @Inject constructor(
         "tng.aggregation" to lazyPureLuaModule(globals, "aggregation"),
         "tng.canvas" to lazyPureLuaModule(globals, "canvas"),
         "tng.theme" to lazyPureLuaModule(globals, "theme"),
+        "tng.icons" to lazyPureLuaModule(globals, "icons"),
         "tng.ui" to lazyPureLuaModule(globals, "ui"),
         "tng.commonui" to lazyPureLuaModule(globals, "commonui"),
         "tng.graphui" to lazyPureLuaModule(globals, "graphui"),
