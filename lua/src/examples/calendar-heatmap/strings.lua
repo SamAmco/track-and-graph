@@ -38,6 +38,9 @@ return {
 	select_feature = {
 		en = "Select a feature",
 	},
+	data_sources = {
+		en = "Data sources",
+	},
 	choose_feature = {
 		en = "Choose a feature",
 	},

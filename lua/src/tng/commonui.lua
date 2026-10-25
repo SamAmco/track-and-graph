@@ -1,4 +1,5 @@
 local core = require("tng.core")
+local icons = require("tng.icons")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
 
@@ -47,6 +48,14 @@ M.ColorSpinnerParams = {}
 --- @field on_selected fun(selection): Updates the caller's state with the selected feature.
 --- @field modifier? table[]
 M.FeatureSelectorParams = {}
+
+--- @since (API level 5)
+--- @class AddBarButtonParams
+--- @field key? string: Stable identity across renders.
+--- @field on_click fun(): Called when the add button is selected.
+--- @field content_description string|table<string,string>: Localized accessibility description.
+--- @field modifier? table[]
+M.AddBarButtonParams = {}
 
 local data_vis_colors = {
 	core.COLOR.RED_DARK,
@@ -159,6 +168,39 @@ M.text_chip = function(params)
 					style = theme.text_style.title_small,
 					color = content_color,
 					modifier = ui.modifier(ui.padding({ horizontal = ui.dp(4) })),
+				}),
+			},
+		}),
+	})
+end
+
+--- Creates the Lua equivalent of the app's centered AddBarButton.
+--- @param params AddBarButtonParams
+M.add_bar_button = function(params)
+	assert(type(params) == "table", "add bar button params must be a table")
+	assert(type(params.on_click) == "function", "add bar button on_click is required")
+	assert(
+		type(params.content_description) == "string" or type(params.content_description) == "table",
+		"add bar button content_description is required"
+	)
+	return ui.surface({
+		key = params.key,
+		modifier = clickable_modifiers(params, 160, 40),
+		color = theme.color.primary,
+		content_color = theme.color.on_primary,
+		shape = theme.shape.medium,
+		child = ui.row({
+			modifier = ui.modifier(
+				ui.min_width(ui.dp(160)),
+				ui.min_height(ui.dp(40)),
+				ui.padding({ horizontal = ui.dp(24), vertical = ui.dp(8) })
+			),
+			arrangement = ui.ARRANGEMENT.CENTER,
+			alignment = ui.ALIGNMENT.CENTER,
+			children = {
+				ui.icon({
+					icon = icons.ICON.ADD,
+					content_description = params.content_description,
 				}),
 			},
 		}),

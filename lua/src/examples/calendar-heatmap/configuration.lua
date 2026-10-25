@@ -71,6 +71,35 @@ local function source_row(state, index, source)
 	})
 end
 
+local function add_source_control(state)
+	local close = function() state.add_source_dialog_visible = false end
+	return ui.box({
+		key = "add_source_control",
+		modifier = ui.modifier(ui.fill_width()),
+		alignment = ui.BOX_ALIGNMENT.TOP_CENTER,
+		children = {
+			commonui.add_bar_button({
+				key = "add_source_button",
+				content_description = strings.add_feature,
+				on_click = function() state.add_source_dialog_visible = true end,
+			}),
+			ui.select_item_dialog({
+				key = "add_source_dialog",
+				visible = state.add_source_dialog_visible == true,
+				title = strings.select_feature,
+				picker_scope = "feature_inputs",
+				selectable_types = { ui.SELECTABLE_ITEM_TYPE.FEATURE },
+				on_feature_selected = function(selection)
+					local index = #state.sources + 1
+					state.sources[index] = { selection = selection, color = ((index - 1) * 7) % 12 }
+					close()
+				end,
+				on_dismiss_request = close,
+			}),
+		},
+	})
+end
+
 return function(params)
 	local state = params.state
 	state = initial_state(state)
@@ -84,25 +113,20 @@ return function(params)
 		feature_inputs[index] = { name = "source_" .. index, feature_id = source.selection.id }
 		source_controls[index] = source_row(state, index, source)
 	end
-	table.insert(source_controls, commonui.feature_selector({
-		key = "add_source",
-		state = state,
-		title = strings.select_feature,
-		placeholder = strings.add_feature,
-		picker_scope = "feature_inputs",
-		on_selected = function(selection)
-			local index = #state.sources + 1
-			state.sources[index] = { selection = selection, color = ((index - 1) * 7) % 12 }
-		end,
-		modifier = ui.modifier(ui.fill_width()),
-	}))
+	table.insert(source_controls, add_source_control(state))
 	return {
 		ui = ui.column({
 			key = "calendar_heatmap_configuration",
 			spacing = theme.spacing.large,
 			modifier = ui.modifier(ui.fill_width()),
 			children = {
-				ui.column({ spacing = theme.spacing.small, children = source_controls }),
+				ui.column({
+					spacing = theme.spacing.small,
+					children = {
+						ui.text({ text = strings.data_sources, style = theme.text_style.title_small }),
+						ui.column({ spacing = theme.spacing.medium, children = source_controls }),
+					},
+				}),
 				setting(strings.range, {
 					option(state, "weeks", 13, strings.weeks_13),
 					option(state, "weeks", 26, strings.weeks_26),

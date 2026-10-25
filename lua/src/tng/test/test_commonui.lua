@@ -66,6 +66,32 @@ test("text chip matches native selected and unselected styling", function()
 	assert(selected.child.children[1].color == theme.color.on_primary)
 end)
 
+test("add bar button matches the native shared component", function()
+	local clicked = false
+	local button = commonui.add_bar_button({
+		key = "add_source",
+		on_click = function() clicked = true end,
+		content_description = { en = "Add feature" },
+	})
+
+	assert(button.type == ui.COMPONENT_TYPE.SURFACE)
+	assert(button.color == theme.color.primary)
+	assert(button.content_color == theme.color.on_primary)
+	assert(button.shape == theme.shape.medium)
+	assert(modifier_of_type(button.modifier, ui.MODIFIER_TYPE.MIN_WIDTH).value.value == 160)
+	assert(modifier_of_type(button.modifier, ui.MODIFIER_TYPE.MIN_HEIGHT).value.value == 40)
+	local click = modifier_of_type(button.modifier, ui.MODIFIER_TYPE.ON_CLICK).callback
+	click()
+	assert(clicked)
+	assert(button.child.arrangement == ui.ARRANGEMENT.CENTER)
+	assert(button.child.alignment == ui.ALIGNMENT.CENTER)
+	local padding = modifier_of_type(button.child.modifier, ui.MODIFIER_TYPE.PADDING)
+	assert(padding.horizontal.value == 24)
+	assert(padding.vertical.value == 8)
+	assert(button.child.children[1].icon == "ICON_ADD")
+	assert(button.child.children[1].content_description.en == "Add feature")
+end)
+
 test("color spinner matches the native palette control and retains expanded state", function()
 	local state = {}
 	local selected = nil
@@ -144,6 +170,10 @@ test("common UI wrappers are available through the API level gate", function()
 
 	assert(gated.selector_button({ text = "Select" }).type == ui.COMPONENT_TYPE.SURFACE)
 	assert(gated.text_chip({ text = "Chip" }).type == ui.COMPONENT_TYPE.SURFACE)
+	assert(gated.add_bar_button({
+		on_click = function() end,
+		content_description = "Add",
+	}).type == ui.COMPONENT_TYPE.SURFACE)
 	assert(gated.color_spinner({
 		key = "color",
 		state = {},
