@@ -1,5 +1,6 @@
 local strings = require("strings")
 local commonui = require("tng.commonui")
+local graphui = require("tng.graphui")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
 
@@ -55,33 +56,18 @@ local function initial_sources(feature_map)
 end
 
 local function source_row(state, index, source)
-	return ui.row({
+	return graphui.colored_feature_input_card({
 		key = "source_" .. index,
-		spacing = theme.spacing.small,
-		alignment = ui.ALIGNMENT.CENTER,
-		children = {
-			commonui.feature_selector({
-				key = "source_feature_" .. index,
-				state = state,
-				title = strings.select_feature,
-				placeholder = strings.choose_feature,
-				selected = source.selection,
-				picker_scope = "feature_inputs",
-				on_selected = function(selection) source.selection = selection end,
-				modifier = ui.modifier(ui.fill_width(), ui.weight(1)),
-			}),
-			commonui.color_spinner({
-				key = "source_color_" .. index,
-				state = state,
-				selected_color = source.color,
-				on_color_selected = function(color) source.color = color end,
-			}),
-			commonui.text_chip({
-				key = "remove_source_" .. index,
-				text = strings.remove,
-				on_click = function() table.remove(state.sources, index) end,
-			}),
-		},
+		state = state,
+		title = strings.select_feature,
+		placeholder = strings.choose_feature,
+		selected = source.selection,
+		selected_color = source.color,
+		picker_scope = "feature_inputs",
+		on_selected = function(selection) source.selection = selection end,
+		on_color_selected = function(color) source.color = color end,
+		on_delete = function() table.remove(state.sources, index) end,
+		delete_content_description = strings.remove_feature,
 	})
 end
 

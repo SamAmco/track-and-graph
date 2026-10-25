@@ -22,19 +22,19 @@ test("calendar configuration restores, adds, recolors, and removes feature input
 	assert(result.feature_inputs[1].feature_id == 42)
 
 	local source_controls = result.ui.children[1]
-	local selector = source_controls.children[1].children[1]
+	local selector = source_controls.children[1].child.children[2]
 	local button_modifiers = selector.children[1].modifier
 	for _, modifier in ipairs(button_modifiers) do
 		if modifier.callback ~= nil then modifier.callback() end
 	end
 	local opened = render({ state = result.state, feature_map = { source = existing } })
 	local replacement = { id = 99, type = "FEATURE", name = "Sleep", path = "/Health/Sleep" }
-	opened.ui.children[1].children[1].children[1].children[2].on_feature_selected(replacement)
+	opened.ui.children[1].children[1].child.children[2].children[2].on_feature_selected(replacement)
 	local updated = render({ state = opened.state, feature_map = { source = existing } })
 	assert(updated.state.sources[1].selection == replacement)
 	assert(updated.feature_inputs[1].feature_id == 99)
 
-	local color_spinner = updated.ui.children[1].children[1].children[2]
+	local color_spinner = updated.ui.children[1].children[1].child.children[1]
 	color_spinner.children[2].children[8].on_click()
 	assert(updated.state.sources[1].color == 7)
 
@@ -47,10 +47,8 @@ test("calendar configuration restores, adds, recolors, and removes feature input
 	assert(with_added.feature_inputs[2].feature_id == 123)
 	assert(with_added.state.sources[2].color == 7)
 
-	local remove_chip = with_added.ui.children[1].children[1].children[3]
-	for _, modifier in ipairs(remove_chip.modifier) do
-		if modifier.callback ~= nil then modifier.callback() end
-	end
+	local remove_button = with_added.ui.children[1].children[1].child.children[3]
+	remove_button.on_click()
 	local removed = render({ state = with_added.state, feature_map = {} })
 	assert(#removed.feature_inputs == 1)
 	assert(removed.feature_inputs[1].feature_id == 123)

@@ -44,8 +44,8 @@ return {
 	add_feature = {
 		en = "Add feature",
 	},
-	remove = {
-		en = "Remove",
+	remove_feature = {
+		en = "Remove feature",
 	},
 	feature_required = {
 		en = "Select a feature for the calendar heatmap",
