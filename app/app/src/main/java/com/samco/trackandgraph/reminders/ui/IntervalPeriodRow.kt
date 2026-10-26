@@ -49,12 +49,12 @@ fun IntervalPeriodRow(
         // Interval number input
         OutlinedTextField(
             value = interval,
-            onValueChange = onIntervalChanged,
+            onValueChange = { onIntervalChanged(it.filter(Char::isDigit)) },
             modifier = Modifier
                 .weight(0.4f)
                 .onFocusChanged { focusState ->
                     if (!focusState.isFocused) {
-                        // If the user enters a decimal floor it to the nearest int
+                        // Reset an empty or zero interval to 1
                         val numericValue = interval.toDoubleOrNull()?.toInt() ?: 1
                         val coercedValue = numericValue.coerceAtLeast(1)
                         if (coercedValue.toString() != interval) {
