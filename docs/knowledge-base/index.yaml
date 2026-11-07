@@ -75,7 +75,7 @@ docs:
   - file: database-migrations.md
     title: Writing Room database migrations
     description: How to write Room migrations safely — schema JSON, table rebuilds, cascade pitfalls, normalized Lua packages, and graph configuration state.
-    keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 59-60, 60-61, 61-62, lua_graph_packages, configuration, unique-constraint]
+    keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 59-60, 60-61, 61-62, 62-63, multi-output, parent_function_id, lua_graph_packages, configuration, unique-constraint]
 
   - file: database-backup-restore.md
     title: Database backup and restore lifecycle
@@ -105,7 +105,7 @@ docs:
   - file: lua-architecture.md
     title: Lua functions — app architecture and data model
     description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types, 8 configuration value types, serialization pipeline, LuaEngine execution and retained-value APIs, Lua VM affinity and validated lease ownership, cancellation cleanup, and catalog translation keys.
-    keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, runLuaGraph, runLuaScript, callLuaFunction, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, overload, Mockito, architecture, FunctionGraphSerializer, translations, LocalizationsTable, usedTranslations, catalog-mode, showEditTools, LuaFunctionMetadataAdapter, TranslatedStringParser, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+    keywords: [lua, function, multiple-outputs, additionalOutputNodes, parent_function_id, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, runLuaGraph, runLuaScript, callLuaFunction, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, overload, Mockito, architecture, FunctionGraphSerializer, translations, LocalizationsTable, usedTranslations, catalog-mode, showEditTools, LuaFunctionMetadataAdapter, TranslatedStringParser, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
 
   - file: lua-custom-ui.md
     title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping

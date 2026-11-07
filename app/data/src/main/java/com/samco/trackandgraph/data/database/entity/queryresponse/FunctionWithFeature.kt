@@ -34,11 +34,18 @@ internal data class FunctionWithFeature(
 
     @ColumnInfo(name = "feature_description")
     val description: String,
+
+    @ColumnInfo(name = "parent_function_id")
+    val parentFunctionId: Long? = null,
+
+    @ColumnInfo(name = "output_node_id")
+    val outputNodeId: Int? = null,
 ) {
     fun toDto(
         functionGraphDto: com.samco.trackandgraph.data.database.dto.FunctionGraph,
         inputFeatures: List<Long>,
         unique: Boolean,
+        additionalOutputs: List<com.samco.trackandgraph.data.database.dto.FunctionOutput> = emptyList(),
     ) = com.samco.trackandgraph.data.database.dto.Function(
         id = id,
         featureId = featureId,
@@ -47,5 +54,8 @@ internal data class FunctionWithFeature(
         functionGraph = functionGraphDto,
         inputFeatureIds = inputFeatures,
         unique = unique,
+        parentFunctionId = parentFunctionId,
+        outputNodeId = outputNodeId,
+        additionalOutputs = additionalOutputs,
     )
 }

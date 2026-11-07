@@ -60,13 +60,15 @@ internal class FakeGroupDao : GroupDao {
         )
     }
 
-    fun addFunction(functionId: Long, featureId: Long) {
+    fun addFunction(functionId: Long, featureId: Long, parentFunctionId: Long? = null) {
         functions[functionId] = FunctionWithFeature(
             id = functionId,
             featureId = featureId,
             functionGraph = "{}",
             name = "Function $functionId",
-            description = ""
+            description = "",
+            parentFunctionId = parentFunctionId,
+            outputNodeId = parentFunctionId?.let { functionId.toInt() },
         )
     }
 
@@ -113,11 +115,17 @@ internal class FakeGroupDao : GroupDao {
 
     override fun getFunctionById(functionId: Long): FunctionWithFeature? = functions[functionId]
 
+    override fun getAdditionalOutputFunctionsSync(parentFunctionId: Long): List<FunctionWithFeature> =
+        functions.values.filter { it.parentFunctionId == parentFunctionId }
+
     override fun deleteFeature(id: Long) {
         deletedFeatureIds.add(id)
         // Remove trackers/functions with this feature
         trackers.entries.removeIf { it.value.featureId == id }
+        val removed = functions.values.filter { it.featureId == id }.map { it.id }.toSet()
         functions.entries.removeIf { it.value.featureId == id }
+        // Mirrors ON DELETE CASCADE on parent_function_id
+        functions.entries.removeIf { it.value.parentFunctionId in removed }
     }
 
     override fun deleteGraphOrStat(id: Long) {

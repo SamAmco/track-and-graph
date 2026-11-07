@@ -18,6 +18,7 @@ package com.samco.trackandgraph.functions
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -287,7 +288,6 @@ internal fun FunctionsScreenContent(
                                 onDeleteNode(node)
                                 autoFitCameraToContent.value = false
                             },
-                            onCreateOrUpdateFunction = onCreateOrUpdateFunction,
                             onUpdateScriptForNodeId = onUpdateScriptForNodeId,
                             onUpdateScriptFromFileForNodeId = onUpdateScriptFromFileForNodeId,
                             onOpenCustomFunctionsDocs = onOpenCustomFunctionsDocs,
@@ -309,22 +309,44 @@ internal fun FunctionsScreenContent(
                 }
             }
 
-            AnimatedVisibility(
-                modifier = Modifier.align(Alignment.BottomEnd),
-                visible = selectedEdgeState != null,
-                enter = fabEnterTransition,
-                exit = fabExitTransition
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(resolvedOverlayPadding)
+                    .padding(inputSpacingLarge),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(inputSpacingLarge),
             ) {
+                AnimatedVisibility(
+                    visible = selectedEdgeState != null,
+                    enter = fabEnterTransition,
+                    exit = fabExitTransition
+                ) {
+                    FloatingActionButton(
+                        onClick = onDeleteSelectedEdge,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.delete_icon),
+                            contentDescription = stringResource(id = R.string.delete)
+                        )
+                    }
+                }
+
+                // One action for the whole canvas, however many outputs it has
+                val isUpdateMode = nodesState.filterIsInstance<Node.Output>()
+                    .firstOrNull()?.isUpdateMode == true
                 FloatingActionButton(
-                    modifier = Modifier
-                        .padding(resolvedOverlayPadding)
-                        .then(Modifier.padding(inputSpacingLarge)),
-                    onClick = onDeleteSelectedEdge,
+                    onClick = onCreateOrUpdateFunction,
                     containerColor = MaterialTheme.colorScheme.primary,
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.delete_icon),
-                        contentDescription = stringResource(id = R.string.delete)
+                        painter = painterResource(id = R.drawable.save_icon),
+                        // Still announced as Create or Update for screen readers
+                        contentDescription = stringResource(
+                            if (isUpdateMode) R.string.update else R.string.create
+                        ),
                     )
                 }
             }

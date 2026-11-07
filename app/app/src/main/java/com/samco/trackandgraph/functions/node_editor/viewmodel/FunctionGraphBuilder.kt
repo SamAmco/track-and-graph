@@ -53,6 +53,7 @@ internal class FunctionGraphBuilder @Inject constructor(
         return try {
             // Process all nodes in a single iteration using when for type safety
             var outputNodeViewModel: Node.Output? = null
+            val additionalOutputViewModels = mutableListOf<Node.Output>()
             val graphNodes = mutableListOf<FunctionGraphNode>()
             // The source of truth for valid node IDs is the nodes list, not positions
             val validNodeIds: Set<Int> = nodes.map { it.id }.toSet()
@@ -60,10 +61,14 @@ internal class FunctionGraphBuilder @Inject constructor(
             nodes.forEach { node ->
                 when (node) {
                     is Node.Output -> {
-                        if (outputNodeViewModel != null) {
-                            throw IllegalStateException("Function graph can only have one output node")
+                        if (!node.isPrimary) {
+                            additionalOutputViewModels.add(node)
+                        } else {
+                            if (outputNodeViewModel != null) {
+                                throw IllegalStateException("Function graph can only have one primary output node")
+                            }
+                            outputNodeViewModel = node
                         }
-                        outputNodeViewModel = node
                     }
 
                     is Node.DataSource -> {
@@ -88,7 +93,12 @@ internal class FunctionGraphBuilder @Inject constructor(
             FunctionGraph(
                 nodes = graphNodes,
                 outputNode = outputNodeDto,
-                isDuration = isDuration
+                isDuration = isDuration,
+                additionalOutputNodes = additionalOutputViewModels.map {
+                    // The primary output uses the graph level flag, the others carry their own
+                    buildOutputNode(it, edges, nodePositions, validNodeIds)
+                        .copy(isDuration = it.isDuration.value)
+                },
             )
         } catch (t: Throwable) {
             Timber.e(t, "Failed to build function graph: ${t.message}")

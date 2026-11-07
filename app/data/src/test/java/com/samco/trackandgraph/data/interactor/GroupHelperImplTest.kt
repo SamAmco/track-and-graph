@@ -323,6 +323,76 @@ class GroupHelperImplTest {
             assertTrue(fakeGroupDao.deletedFeatureIds.contains(featureId))
         }
 
+    @Test
+    fun `deleteGroup deletes the additional outputs of a function even when they are in another group`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val (groupId, groupItemId) = uut.insertGroup(
+                GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
+            )
+            val (otherGroupId, _) = uut.insertGroup(
+                GroupCreateRequest(name = "Other", colorIndex = 0, parentGroupId = 0L)
+            )
+            val ownerId = 100L
+            val sameGroupOutputId = 101L
+            val movedOutputId = 102L
+            fakeGroupDao.addFunction(ownerId, featureId = 200L)
+            fakeGroupDao.addFunction(sameGroupOutputId, featureId = 201L, parentFunctionId = ownerId)
+            fakeGroupDao.addFunction(movedOutputId, featureId = 202L, parentFunctionId = ownerId)
+            fun placeIn(group: Long, functionId: Long) = fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = group, displayIndex = 0, childId = functionId,
+                    type = GroupItemType.FUNCTION, createdAt = 1000L
+                )
+            )
+            placeIn(groupId, ownerId)
+            placeIn(groupId, sameGroupOutputId)
+            placeIn(otherGroupId, movedOutputId)
+
+            // EXECUTE
+            val result =
+                uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
+
+            // VERIFY
+            assertEquals(setOf(200L, 201L, 202L), result.deletedFeatureIds)
+            assertTrue(fakeGroupItemDao.getGroupItemsForChild(movedOutputId, GroupItemType.FUNCTION).isEmpty())
+            assertTrue(fakeGroupItemDao.getGroupItemsForChild(ownerId, GroupItemType.FUNCTION).isEmpty())
+        }
+
+    @Test
+    fun `deleteGroup keeps the owner of a function when only an additional output is deleted`() =
+        runTest(dispatcher) {
+            // PREPARE
+            val (groupId, groupItemId) = uut.insertGroup(
+                GroupCreateRequest(name = "Group", colorIndex = 0, parentGroupId = 0L)
+            )
+            val (otherGroupId, _) = uut.insertGroup(
+                GroupCreateRequest(name = "Other", colorIndex = 0, parentGroupId = 0L)
+            )
+            fakeGroupDao.addFunction(100L, featureId = 200L)
+            fakeGroupDao.addFunction(101L, featureId = 201L, parentFunctionId = 100L)
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = otherGroupId, displayIndex = 0, childId = 100L,
+                    type = GroupItemType.FUNCTION, createdAt = 1000L
+                )
+            )
+            fakeGroupItemDao.insertGroupItem(
+                GroupItem(
+                    groupId = groupId, displayIndex = 0, childId = 101L,
+                    type = GroupItemType.FUNCTION, createdAt = 1000L
+                )
+            )
+
+            // EXECUTE
+            val result =
+                uut.deleteGroup(ComponentDeleteRequest(groupItemId = groupItemId, deleteEverywhere = true))
+
+            // VERIFY
+            assertEquals(setOf(201L), result.deletedFeatureIds)
+            assertEquals(1, fakeGroupItemDao.getGroupItemsForChild(100L, GroupItemType.FUNCTION).size)
+        }
+
     // =========================================================================
     // Delete tests - With graphs
     // =========================================================================

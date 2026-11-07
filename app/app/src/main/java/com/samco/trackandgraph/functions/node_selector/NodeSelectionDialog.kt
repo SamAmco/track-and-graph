@@ -304,6 +304,16 @@ private fun CategoryList(
 
         Divider()
 
+        // An extra output lets one canvas expose several results
+        SelectionRow(
+            text = stringResource(R.string.output),
+            onClick = {
+                onSelect(AddNodeData.OutputNode)
+            },
+        )
+
+        Divider()
+
         val localeList = LocalConfiguration.current.locales
 
         val sortedCategories = remember(state.allCategories, localeList) {

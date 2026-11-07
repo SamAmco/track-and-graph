@@ -54,6 +54,8 @@ internal interface GroupDao {
 
     fun getFunctionById(functionId: Long): FunctionWithFeature?
 
+    fun getAdditionalOutputFunctionsSync(parentFunctionId: Long): List<FunctionWithFeature>
+
     fun deleteFeature(id: Long)
 
     fun deleteGraphOrStat(id: Long)

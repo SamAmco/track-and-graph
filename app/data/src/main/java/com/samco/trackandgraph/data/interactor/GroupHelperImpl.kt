@@ -173,6 +173,17 @@ internal class GroupHelperImpl @Inject constructor(
                                 collected.featureIds.add(function.featureId)
                             }
                             collectAllGroupItemsForChild(item.childId, item.type, hierarchy, collected.groupItemIds)
+                            // The other outputs of a canvas cannot outlive its owner, even when
+                            // they were moved to a group that is not being deleted
+                            groupDao.getAdditionalOutputFunctionsSync(item.childId).forEach { output ->
+                                collected.featureIds.add(output.featureId)
+                                collectAllGroupItemsForChild(
+                                    output.id,
+                                    GroupItemType.FUNCTION,
+                                    hierarchy,
+                                    collected.groupItemIds
+                                )
+                            }
                         }
                     }
 

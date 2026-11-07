@@ -68,7 +68,7 @@ internal class FunctionGraphDataSample(
     }
 
     override fun iterator(): Iterator<DataPoint> {
-        return mergeNode(functionGraph.outputNode.dependencies.map { it.nodeId })
+        return mergeNode(functionGraph.outputNodeFor(function.outputNodeId).dependencies.map { it.nodeId })
             .onEach { visited.add(it) }
             .iterator()
     }

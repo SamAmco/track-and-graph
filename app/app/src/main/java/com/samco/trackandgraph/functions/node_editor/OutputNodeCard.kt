@@ -29,9 +29,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -41,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -52,7 +56,6 @@ import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import com.samco.trackandgraph.functions.node_editor.viewmodel.ValidationError
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.ui.WideButton
 import com.samco.trackandgraph.ui.ui.buttonSize
 import com.samco.trackandgraph.ui.ui.cardPadding
 import com.samco.trackandgraph.ui.ui.dialogInputSpacing
@@ -60,7 +63,7 @@ import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 @Composable
 internal fun OutputNode(
     node: Node.Output,
-    onCreateOrUpdate: () -> Unit = {}
+    onDeleteNode: () -> Unit = {},
 ) {
     val hasNameError =
         remember(node.validationErrors) { ValidationError.MISSING_NAME in node.validationErrors }
@@ -83,8 +86,22 @@ internal fun OutputNode(
         ) {
             Text(
                 text = stringResource(R.string.output),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
             )
+
+            // Only additional outputs can be removed from the canvas
+            if (!node.isPrimary) {
+                IconButton(
+                    modifier = Modifier.size(buttonSize),
+                    onClick = onDeleteNode
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.delete_icon),
+                        contentDescription = stringResource(R.string.delete)
+                    )
+                }
+            }
         }
 
         OutlinedTextField(
@@ -148,12 +165,7 @@ internal fun OutputNode(
             message = stringResource(R.string.unknown_error_occurred)
         )
 
-        WideButton(
-            text = stringResource(
-                if (node.isUpdateMode) R.string.update else R.string.create
-            ),
-            onClick = onCreateOrUpdate,
-        )
+
     }
 }
 
@@ -193,10 +205,7 @@ private fun OutputNodePreview() {
                 validationErrors = emptyList()
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -220,10 +229,7 @@ private fun OutputNodeUpdateModePreview() {
                 validationErrors = emptyList()
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -247,10 +253,7 @@ private fun OutputNodeWithNameErrorPreview() {
                 validationErrors = listOf(ValidationError.MISSING_NAME)
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -274,10 +277,7 @@ private fun OutputNodeWithNoInputsErrorPreview() {
                 validationErrors = listOf(ValidationError.NO_INPUTS)
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -305,10 +305,30 @@ private fun OutputNodeWithAllErrorsPreview() {
                 )
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
+            OutputNode(node = sampleNode)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AdditionalOutputNodePreview() {
+    TnGComposeTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
+            val sampleNode = Node.Output(
+                id = 3,
+                name = remember { mutableStateOf(TextFieldValue("Second output")) },
+                description = remember { mutableStateOf(TextFieldValue("")) },
+                isPrimary = false,
+                isUpdateMode = true,
             )
+
+            OutputNode(node = sampleNode)
         }
     }
 }

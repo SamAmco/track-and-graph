@@ -57,7 +57,6 @@ internal fun NodeCard(
     connectorLayerState: ConnectorLayerState,
     onDragBy: (Offset) -> Unit = {},
     onDeleteNode: (Node) -> Unit = {},
-    onCreateOrUpdateFunction: () -> Unit = {},
     onUpdateScriptForNodeId: (Int, String) -> Unit = { _, _ -> },
     onUpdateScriptFromFileForNodeId: (Int, Uri?) -> Unit = { _, _ -> },
     onOpenCustomFunctionsDocs: () -> Unit = {},
@@ -95,7 +94,6 @@ internal fun NodeCard(
             ) {
                 NodeCardContent(
                     node,
-                    onCreateOrUpdateFunction,
                     onDeleteNode,
                     onUpdateScriptForNodeId,
                     onUpdateScriptFromFileForNodeId,
@@ -125,7 +123,6 @@ internal fun NodeCard(
 @Composable
 private fun NodeCardContent(
     node: Node,
-    onCreateOrUpdateFunction: () -> Unit,
     onDeleteNode: (Node) -> Unit,
     onUpdateScriptForNodeId: (Int, String) -> Unit,
     onUpdateScriptFromFileForNodeId: (Int, Uri?) -> Unit,
@@ -133,7 +130,7 @@ private fun NodeCardContent(
 ) = when (node) {
     is Node.Output -> OutputNode(
         node = node,
-        onCreateOrUpdate = onCreateOrUpdateFunction
+        onDeleteNode = { onDeleteNode(node) },
     )
 
     is Node.DataSource -> DataSourceNode(

@@ -55,6 +55,8 @@ internal interface FunctionDao {
 
     fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
 
+    fun getAdditionalOutputFunctionsSync(parentFunctionId: Long): List<FunctionWithFeature>
+
     fun hasAnyFunctions(): Boolean
 
     // =========================================================================

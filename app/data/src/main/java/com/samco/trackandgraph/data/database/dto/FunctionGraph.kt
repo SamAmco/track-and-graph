@@ -198,6 +198,8 @@ sealed class FunctionGraphNode {
      * Represents the output node in the function graph.
      * @param id Unique identifier for this node
      * @param dependencies List of nodes this node depends on
+     * @param isDuration Whether this output is a duration. Null (the only value the primary
+     * output uses, and what older graphs contain) means "use [FunctionGraph.isDuration]".
      */
     @Serializable
     @SerialName("OutputNode")
@@ -205,7 +207,8 @@ sealed class FunctionGraphNode {
         override val x: Float,
         override val y: Float,
         override val id: Int,
-        override val dependencies: List<NodeDependency>
+        override val dependencies: List<NodeDependency>,
+        val isDuration: Boolean? = null,
     ) : FunctionGraphNode()
 }
 
@@ -219,6 +222,26 @@ sealed class FunctionGraphNode {
 data class FunctionGraph(
     val nodes: List<FunctionGraphNode>,
     val outputNode: FunctionGraphNode.OutputNode,
-    val isDuration: Boolean
-)
+    val isDuration: Boolean,
+    /**
+     * Extra outputs on the same canvas. Each one is exposed as its own feature, see
+     * [com.samco.trackandgraph.data.database.dto.Function.additionalOutputs]. Defaults to empty so
+     * graphs serialized before multiple outputs existed still deserialize.
+     */
+    val additionalOutputNodes: List<FunctionGraphNode.OutputNode> = emptyList(),
+) {
+    val allOutputNodes: List<FunctionGraphNode.OutputNode>
+        get() = listOf(outputNode) + additionalOutputNodes
+
+    /**
+     * The output node a function evaluates. A null [outputNodeId] means the primary output.
+     */
+    fun isDurationFor(outputNodeId: Int?): Boolean =
+        outputNodeFor(outputNodeId).isDuration ?: isDuration
+
+    fun outputNodeFor(outputNodeId: Int?): FunctionGraphNode.OutputNode =
+        if (outputNodeId == null) outputNode
+        else allOutputNodes.firstOrNull { it.id == outputNodeId }
+            ?: throw IllegalArgumentException("Output node $outputNodeId not found")
+}
 
