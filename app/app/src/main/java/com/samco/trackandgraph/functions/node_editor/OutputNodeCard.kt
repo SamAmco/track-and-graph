@@ -56,7 +56,6 @@ import com.samco.trackandgraph.functions.node_editor.viewmodel.Node
 import com.samco.trackandgraph.functions.node_editor.viewmodel.ValidationError
 import com.samco.trackandgraph.ui.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.ui.DialogInputSpacing
-import com.samco.trackandgraph.ui.ui.WideButton
 import com.samco.trackandgraph.ui.ui.buttonSize
 import com.samco.trackandgraph.ui.ui.cardPadding
 import com.samco.trackandgraph.ui.ui.dialogInputSpacing
@@ -64,7 +63,6 @@ import com.samco.trackandgraph.ui.ui.dialogInputSpacing
 @Composable
 internal fun OutputNode(
     node: Node.Output,
-    onCreateOrUpdate: () -> Unit = {},
     onDeleteNode: () -> Unit = {},
 ) {
     val hasNameError =
@@ -142,22 +140,19 @@ internal fun OutputNode(
             maxLines = Int.MAX_VALUE
         )
 
-        // The duration setting belongs to the whole canvas, so only the primary output shows it
-        if (node.isPrimary) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clickable { node.isDuration.value = !node.isDuration.value }
-                    .heightIn(min = buttonSize)
-                    .fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = node.isDuration.value,
-                    onCheckedChange = null
-                )
-                DialogInputSpacing()
-                Text(stringResource(R.string.this_is_a_time_or_duration))
-            }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clickable { node.isDuration.value = !node.isDuration.value }
+                .heightIn(min = buttonSize)
+                .fillMaxWidth()
+        ) {
+            Checkbox(
+                checked = node.isDuration.value,
+                onCheckedChange = null
+            )
+            DialogInputSpacing()
+            Text(stringResource(R.string.this_is_a_time_or_duration))
         }
 
         ErrorMessage(
@@ -170,14 +165,7 @@ internal fun OutputNode(
             message = stringResource(R.string.unknown_error_occurred)
         )
 
-        if (node.isPrimary) {
-            WideButton(
-                text = stringResource(
-                    if (node.isUpdateMode) R.string.update else R.string.create
-                ),
-                onClick = onCreateOrUpdate,
-            )
-        }
+
     }
 }
 
@@ -217,10 +205,7 @@ private fun OutputNodePreview() {
                 validationErrors = emptyList()
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -244,10 +229,7 @@ private fun OutputNodeUpdateModePreview() {
                 validationErrors = emptyList()
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -271,10 +253,7 @@ private fun OutputNodeWithNameErrorPreview() {
                 validationErrors = listOf(ValidationError.MISSING_NAME)
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -298,10 +277,7 @@ private fun OutputNodeWithNoInputsErrorPreview() {
                 validationErrors = listOf(ValidationError.NO_INPUTS)
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }
@@ -329,10 +305,7 @@ private fun OutputNodeWithAllErrorsPreview() {
                 )
             )
 
-            OutputNode(
-                node = sampleNode,
-                onCreateOrUpdate = { }
-            )
+            OutputNode(node = sampleNode)
         }
     }
 }

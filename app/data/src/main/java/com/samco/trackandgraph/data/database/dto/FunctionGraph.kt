@@ -198,6 +198,8 @@ sealed class FunctionGraphNode {
      * Represents the output node in the function graph.
      * @param id Unique identifier for this node
      * @param dependencies List of nodes this node depends on
+     * @param isDuration Whether this output is a duration. Null (the only value the primary
+     * output uses, and what older graphs contain) means "use [FunctionGraph.isDuration]".
      */
     @Serializable
     @SerialName("OutputNode")
@@ -205,7 +207,8 @@ sealed class FunctionGraphNode {
         override val x: Float,
         override val y: Float,
         override val id: Int,
-        override val dependencies: List<NodeDependency>
+        override val dependencies: List<NodeDependency>,
+        val isDuration: Boolean? = null,
     ) : FunctionGraphNode()
 }
 
@@ -233,6 +236,9 @@ data class FunctionGraph(
     /**
      * The output node a function evaluates. A null [outputNodeId] means the primary output.
      */
+    fun isDurationFor(outputNodeId: Int?): Boolean =
+        outputNodeFor(outputNodeId).isDuration ?: isDuration
+
     fun outputNodeFor(outputNodeId: Int?): FunctionGraphNode.OutputNode =
         if (outputNodeId == null) outputNode
         else allOutputNodes.firstOrNull { it.id == outputNodeId }

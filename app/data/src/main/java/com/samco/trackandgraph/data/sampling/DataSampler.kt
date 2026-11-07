@@ -150,7 +150,9 @@ internal class DataSamplerImpl @Inject constructor(
         }
         val function = dataInteractor.tryGetFunctionByFeatureId(featureId)
         if (function != null) {
-            return DataSampleProperties(isDuration = function.functionGraph.isDuration)
+            return DataSampleProperties(
+                isDuration = function.functionGraph.isDurationFor(function.outputNodeId)
+            )
         }
         return null
     }

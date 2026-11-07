@@ -78,7 +78,8 @@ output_node_id: Int?       — which OutputNode this row evaluates; null = graph
 - Every output has its own feature (name, description), its own group item (placed directly after the owner) and its own copy of `function_input_features_table` rows (the dependency analyser looks inputs up per function).
 - `Function.parentFunctionId` / `outputNodeId` identify an additional output; `Function.additionalOutputs` (`FunctionOutput`) is only populated on the owner and is what the editor uses to name the extra output nodes. `FunctionGraph.outputNodeFor(id)` is what the sampler uses to pick the dependencies to evaluate.
 - `FunctionHelperImpl` owns the family: `updateFunction` always works on the owner (an additional output's id is redirected), and reconciles extra outputs by `outputNodeId` (rename / insert / delete). Deleting the owner deletes all outputs; deleting an additional output strips its node from the owner's graph. Duplicating any output makes a standalone single-output function.
-- The editor opens the owner when an additional output is tapped. `isDuration` stays a canvas-wide setting shown only on the primary output.
+- The editor opens the owner when an additional output is tapped. Output cards are peers (own name, description and duration checkbox); the only difference is that the owner's output has no delete button. One floating Create/Update button saves the whole canvas.
+- `isDuration` is per output: `OutputNode.isDuration` (nullable, so older graphs still load) overrides `FunctionGraph.isDuration`, which the primary output keeps using. Always read it through `FunctionGraph.isDurationFor(outputNodeId)`.
 
 ## Data Model
 

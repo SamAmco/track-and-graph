@@ -87,6 +87,24 @@ internal class FunctionGraphMultiOutputTest {
     }
 
     @Test
+    fun `builder gives each additional output its own duration flag`() {
+        val nodes = listOf(
+            Node.Output(id = 1, isDuration = mutableStateOf(true)),
+            Node.Output(id = 2, isPrimary = false, isDuration = mutableStateOf(false)),
+            Node.Output(id = 3, isPrimary = false, isDuration = mutableStateOf(true)),
+        )
+
+        val graph = builder.buildFunctionGraph(nodes, emptyList(), emptyMap(), isDuration = true)
+
+        // The primary output keeps using the graph level flag
+        assertEquals(null, graph.outputNode.isDuration)
+        assertEquals(listOf(false, true), graph.additionalOutputNodes.map { it.isDuration })
+        assertEquals(true, graph.isDurationFor(null))
+        assertEquals(false, graph.isDurationFor(2))
+        assertEquals(true, graph.isDurationFor(3))
+    }
+
+    @Test
     fun `builder without additional outputs leaves the list empty`() {
         val graph = builder.buildFunctionGraph(
             nodes = listOf(output(1, "Main", isPrimary = true)),
@@ -160,6 +178,27 @@ internal class FunctionGraphMultiOutputTest {
     }
 
     @Test
+    fun `decoder uses the graph duration flag unless an output has its own`() = runTest {
+        val function = multiOutputFunction().let { base ->
+            base.copy(
+                functionGraph = base.functionGraph.copy(
+                    additionalOutputNodes = base.functionGraph.additionalOutputNodes.mapIndexed { index, node ->
+                        if (index == 0) node.copy(isDuration = false) else node
+                    }
+                )
+            )
+        }
+
+        val result = decoder.decodeFunctionGraph(function, mapOf(100L to "Feature"))
+
+        // Graph flag is true: the primary and the output without a flag follow it
+        assertEquals(
+            listOf(true, false, true),
+            result.nodes.filterIsInstance<Node.Output>().map { it.isDuration.value }
+        )
+    }
+
+    @Test
     fun `decoder fills names and descriptions from the matching outputs`() = runTest {
         val result = decoder.decodeFunctionGraph(multiOutputFunction(), mapOf(100L to "Feature"))
 
@@ -194,6 +233,13 @@ internal class FunctionGraphMultiOutputTest {
             isDuration = decoded.isDuration,
         )
 
-        assertEquals(function.functionGraph, rebuilt)
+        // Saving writes the canvas duration flag into outputs that had none, which means the same
+        val graph = function.functionGraph
+        assertEquals(
+            graph.copy(
+                additionalOutputNodes = graph.additionalOutputNodes.map { it.copy(isDuration = graph.isDuration) }
+            ),
+            rebuilt
+        )
     }
 }

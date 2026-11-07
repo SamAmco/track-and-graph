@@ -108,6 +108,7 @@ internal class FunctionGraphDecoder @Inject constructor(
                     description = output?.description ?: "",
                     function = function,
                     isPrimary = false,
+                    isDuration = additionalNode.isDuration ?: functionGraph.isDuration,
                 )
             )
             nodePositions[additionalNode.id] = Offset(additionalNode.x, additionalNode.y)
@@ -169,12 +170,13 @@ internal class FunctionGraphDecoder @Inject constructor(
         description: String,
         function: Function,
         isPrimary: Boolean = true,
+        isDuration: Boolean = function.functionGraph.isDuration,
     ): Node.Output {
         return Node.Output(
             id = graphNode.id,
             name = mutableStateOf(TextFieldValue(name)),
             description = mutableStateOf(TextFieldValue(description)),
-            isDuration = mutableStateOf(function.functionGraph.isDuration),
+            isDuration = mutableStateOf(isDuration),
             isPrimary = isPrimary,
             isUpdateMode = true, // Since we're loading an existing function
             validationErrors = emptyList()

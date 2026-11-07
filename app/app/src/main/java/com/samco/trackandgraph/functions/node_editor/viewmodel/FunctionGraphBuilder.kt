@@ -95,7 +95,9 @@ internal class FunctionGraphBuilder @Inject constructor(
                 outputNode = outputNodeDto,
                 isDuration = isDuration,
                 additionalOutputNodes = additionalOutputViewModels.map {
+                    // The primary output uses the graph level flag, the others carry their own
                     buildOutputNode(it, edges, nodePositions, validNodeIds)
+                        .copy(isDuration = it.isDuration.value)
                 },
             )
         } catch (t: Throwable) {

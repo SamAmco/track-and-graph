@@ -75,6 +75,41 @@ class FunctionGraphMultiOutputSerializationTest {
     }
 
     @Test
+    fun `an output without its own duration flag uses the graph one`() {
+        val graph = FunctionGraph(
+            nodes = emptyList(), outputNode = primary, isDuration = true,
+            additionalOutputNodes = listOf(secondary),
+        )
+
+        assertEquals(true, graph.isDurationFor(null))
+        assertEquals(true, graph.isDurationFor(11))
+    }
+
+    @Test
+    fun `an additional output can override the graph duration flag`() {
+        val graph = FunctionGraph(
+            nodes = emptyList(), outputNode = primary, isDuration = true,
+            additionalOutputNodes = listOf(secondary.copy(isDuration = false)),
+        )
+
+        assertEquals(true, graph.isDurationFor(null))
+        assertEquals(false, graph.isDurationFor(11))
+    }
+
+    @Test
+    fun `an output duration flag survives a serialization round trip`() {
+        val graph = FunctionGraph(
+            nodes = emptyList(), outputNode = primary, isDuration = false,
+            additionalOutputNodes = listOf(secondary.copy(isDuration = true)),
+        )
+
+        val result = serializer.deserialize(serializer.serialize(graph, throwOnFailure = true)!!, throwOnFailure = true)
+
+        assertEquals(true, result!!.additionalOutputNodes.single().isDuration)
+        assertEquals(null, result.outputNode.isDuration)
+    }
+
+    @Test
     fun `allOutputNodes lists the primary output first`() {
         val graph = FunctionGraph(
             nodes = emptyList(), outputNode = primary, isDuration = false,
