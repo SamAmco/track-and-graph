@@ -101,11 +101,16 @@ internal class FunctionGraphDecoder @Inject constructor(
         // Add any additional outputs sharing this canvas
         functionGraph.additionalOutputNodes.forEach { additionalNode ->
             val output = function.additionalOutputs.firstOrNull { it.outputNodeId == additionalNode.id }
+            if (output == null) {
+                // Its function was deleted elsewhere (e.g. with a group), so the node is stale
+                filteredNodeIds.add(additionalNode.id)
+                return@forEach
+            }
             decodedNodes.add(
                 decodeOutputNode(
                     graphNode = additionalNode,
-                    name = output?.name ?: "",
-                    description = output?.description ?: "",
+                    name = output.name,
+                    description = output.description,
                     function = function,
                     isPrimary = false,
                     isDuration = additionalNode.isDuration ?: functionGraph.isDuration,

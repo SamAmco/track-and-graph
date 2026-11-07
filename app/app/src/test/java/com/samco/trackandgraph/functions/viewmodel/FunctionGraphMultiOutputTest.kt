@@ -154,8 +154,8 @@ internal class FunctionGraphMultiOutputTest {
             isDuration = true,
             additionalOutputNodes = listOf(
                 FunctionGraphNode.OutputNode(20f, 30f, 3, listOf(NodeDependency(0, 1))),
-                // Deliberately has no matching FunctionOutput
-                FunctionGraphNode.OutputNode(40f, 50f, 4, emptyList()),
+                // Deliberately has no matching FunctionOutput: its function was deleted
+                FunctionGraphNode.OutputNode(40f, 50f, 4, listOf(NodeDependency(0, 1))),
             ),
         ),
     ).copy(
@@ -172,8 +172,8 @@ internal class FunctionGraphMultiOutputTest {
         val result = decoder.decodeFunctionGraph(multiOutputFunction(), mapOf(100L to "Feature"))
 
         val outputs = result.nodes.filterIsInstance<Node.Output>()
-        assertEquals(listOf(2, 3, 4), outputs.map { it.id })
-        assertEquals(listOf(true, false, false), outputs.map { it.isPrimary })
+        assertEquals(listOf(2, 3), outputs.map { it.id })
+        assertEquals(listOf(true, false), outputs.map { it.isPrimary })
         assertTrue(outputs.all { it.isUpdateMode })
     }
 
@@ -191,9 +191,9 @@ internal class FunctionGraphMultiOutputTest {
 
         val result = decoder.decodeFunctionGraph(function, mapOf(100L to "Feature"))
 
-        // Graph flag is true: the primary and the output without a flag follow it
+        // Graph flag is true: the primary follows it, the second output overrides it
         assertEquals(
-            listOf(true, false, true),
+            listOf(true, false),
             result.nodes.filterIsInstance<Node.Output>().map { it.isDuration.value }
         )
     }
@@ -207,7 +207,6 @@ internal class FunctionGraphMultiOutputTest {
         assertEquals("main description", outputs[0].description.value.text)
         assertEquals("Second", outputs[1].name.value.text)
         assertEquals("second description", outputs[1].description.value.text)
-        assertEquals("", outputs[2].name.value.text)
     }
 
     @Test
@@ -215,9 +214,16 @@ internal class FunctionGraphMultiOutputTest {
         val result = decoder.decodeFunctionGraph(multiOutputFunction(), mapOf(100L to "Feature"))
 
         assertEquals(Offset(20f, 30f), result.nodePositions[3])
-        assertEquals(Offset(40f, 50f), result.nodePositions[4])
         assertTrue(edge(1, 2) in result.edges)
         assertTrue(edge(1, 3) in result.edges)
+    }
+
+    @Test
+    fun `decoder drops output nodes whose function no longer exists`() = runTest {
+        val result = decoder.decodeFunctionGraph(multiOutputFunction(), mapOf(100L to "Feature"))
+
+        assertFalse(result.nodes.any { it.id == 4 })
+        assertFalse(result.nodePositions.containsKey(4))
         assertFalse(result.edges.any { it.to.nodeId == 4 })
     }
 
@@ -233,11 +239,14 @@ internal class FunctionGraphMultiOutputTest {
             isDuration = decoded.isDuration,
         )
 
-        // Saving writes the canvas duration flag into outputs that had none, which means the same
+        // Saving writes the canvas duration flag into outputs that had none, which means the same,
+        // and leaves out the stale output node 4 whose function no longer exists
         val graph = function.functionGraph
         assertEquals(
             graph.copy(
-                additionalOutputNodes = graph.additionalOutputNodes.map { it.copy(isDuration = graph.isDuration) }
+                additionalOutputNodes = graph.additionalOutputNodes
+                    .filter { it.id != 4 }
+                    .map { it.copy(isDuration = graph.isDuration) }
             ),
             rebuilt
         )
