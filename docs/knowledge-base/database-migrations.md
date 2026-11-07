@@ -7,7 +7,8 @@ topics:
   - DROP TABLE does NOT trigger ON DELETE CASCADE on child tables
   - child_id must be tracker/function primary key, NOT features_table.id (use JOIN)
   - Migration 58→59: introduced group_items_table, migrated group_id/display_index columns
-keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 58-59, 59-60, 60-61, 61-62, lua_graph_packages, configuration, unique-constraint]
+  - Migration 62→63: multi-output functions — nullable parent_function_id (self FK) and output_node_id on functions_table
+keywords: [migration, Room, SQLite, schema, ALTER, DROP, cascade, rebuild, jq, child_id, group_items, 58-59, 59-60, 60-61, 61-62, 62-63, multi-output, parent_function_id, lua_graph_packages, configuration, unique-constraint]
 ---
 
 # Database Migrations
@@ -94,3 +95,9 @@ Because `lua_graph_features_table` has a cascading foreign key to `lua_graphs_ta
 ## Migration 61 → 62 (Lua graph instance configuration)
 
 This migration adds nullable `configuration TEXT` to `lua_graphs_table`. It stores JSON state per graph instance rather than on `lua_graph_packages_table`, because several graphs may share the same package while using different configuration. As with every Room migration, the migration SQL and committed schema snapshot must match Room's generated schema exactly, and the instrumentation migration test should verify both inline and package-backed rows retain their source fields while configuration begins null.
+
+## Migration 62 → 63 (functions with multiple outputs)
+
+This migration adds two nullable columns to `functions_table`: `parent_function_id` (self-referencing foreign key, `ON DELETE CASCADE`) and `output_node_id`, plus the `index_functions_table_parent_function_id` index Room expects for the foreign key. Existing rows keep both null, which means "the primary output of my own graph", so no data is rewritten and the graph JSON needs no migration (`FunctionGraph.additionalOutputNodes` defaults to empty).
+
+Unlike the rebuild migrations above, a plain `ALTER TABLE ... ADD COLUMN ... REFERENCES` is enough here: SQLite allows adding a foreign-key column when its default is NULL, and Room's schema validation compares the foreign key list rather than the original `CREATE TABLE` text. The instrumentation test (`Migration62to63Test`) checks existing rows and their input features survive, new rows can use the columns, deleting an owner cascades to its additional outputs, and the index exists. Run it on a device with `./gradlew :data:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.samco.trackandgraph.data.database.Migration62to63Test`.

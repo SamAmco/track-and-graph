@@ -51,7 +51,7 @@ Base table for data-producing entities (trackers and functions share this).
 Tracker-specific configuration. References features_table.
 
 ### functions_table
-Function-specific configuration (Lua graph definitions). References features_table.
+Function-specific configuration (Lua graph definitions). References features_table. Since version 63 it also has a nullable self-referencing `parent_function_id` (CASCADE) and `output_node_id` for additional outputs of a multi-output canvas; see `lua-architecture.md`.
 
 ### graphs_and_stats_table
 Graph/statistic configurations.

@@ -133,7 +133,8 @@ private fun NodeCardContent(
 ) = when (node) {
     is Node.Output -> OutputNode(
         node = node,
-        onCreateOrUpdate = onCreateOrUpdateFunction
+        onCreateOrUpdate = onCreateOrUpdateFunction,
+        onDeleteNode = { onDeleteNode(node) },
     )
 
     is Node.DataSource -> DataSourceNode(

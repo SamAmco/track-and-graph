@@ -3,13 +3,14 @@ title: Lua functions — app architecture and data model
 description: Functions are derived data sources built in a visual node editor; covers FunctionGraph DTO, node types (FeatureNode, LuaScriptNode, OutputNode), configuration value types (8 types), serialization pipeline, LuaEngine execution and retained-value APIs, and Lua VM lease ownership/cancellation rules.
 topics:
   - Functions: derived data sources using Lua; stored as Features in features_table
+  - Multiple outputs: extra OutputNodes on one canvas, each stored as its own function (parent_function_id + output_node_id) that shares the owner's graph
   - Visual node editor: FeatureNode → LuaScriptNode → OutputNode; data flows left to right
   - FunctionGraph DTO and JSON serialization via FunctionGraphSerializer (kotlinx.serialization)
   - Config value types: text, number, checkbox, enum, uint, duration (→ms), localtime (→ms), instant
   - LuaEngine execution APIs, including generic package entry-point evaluation through runLuaScript
   - Serialization pipeline: Node/Edge (VM) ↔ FunctionGraph (DTO) ↔ JSON (DB)
   - Lua VM affinity, validated execution-lock ownership, and cancellation cleanup
-keywords: [lua, function, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, runLuaGraph, runLuaScript, callLuaFunction, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, overload, Mockito, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
+keywords: [lua, function, multiple-outputs, additionalOutputNodes, parent_function_id, node-editor, FunctionGraph, LuaScriptNode, FeatureNode, OutputNode, configuration, serialization, LuaEngine, runLuaGraph, runLuaScript, callLuaFunction, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, overload, Mockito, architecture, FunctionGraphSerializer, FunctionGraphBuilder, FunctionGraphDecoder, LuaVMProvider, LuaVMAffinity, LuaVMLock, owner-token, FunctionGraphDataSample, DataSampler, cancellation, dispose, lease, LuaEngineSwitch, GuardedLuaEngineWrapper]
 ---
 
 # Lua Functions Architecture
@@ -62,6 +63,22 @@ function_graph: String (JSON-serialized FunctionGraph)
 ```
 
 Functions are stored as Features (enabling composition). The `function_graph` column contains the entire node graph as JSON.
+
+### Multiple outputs on one canvas
+
+A canvas can have several Output nodes (added from the node catalog's "Output" row). Every output has to be a feature so it can be graphed and used as another function's input, so each one is stored as a `functions_table` row of its own:
+
+```
+functions_table (added in DB version 63)
+parent_function_id: Long?  (self FK, CASCADE) — null for a normal function and for the owner
+output_node_id: Int?       — which OutputNode this row evaluates; null = graph.outputNode
+```
+
+- The **owner** is the first function created for the canvas. It is the only row whose `function_graph` is real: `FunctionGraph.additionalOutputNodes` lists the other output nodes (default empty, so older JSON still deserializes). Additional rows store `""` and the DAO queries use `COALESCE(parent.function_graph, f.function_graph)`, so there is never a second copy of the graph to keep in sync.
+- Every output has its own feature (name, description), its own group item (placed directly after the owner) and its own copy of `function_input_features_table` rows (the dependency analyser looks inputs up per function).
+- `Function.parentFunctionId` / `outputNodeId` identify an additional output; `Function.additionalOutputs` (`FunctionOutput`) is only populated on the owner and is what the editor uses to name the extra output nodes. `FunctionGraph.outputNodeFor(id)` is what the sampler uses to pick the dependencies to evaluate.
+- `FunctionHelperImpl` owns the family: `updateFunction` always works on the owner (an additional output's id is redirected), and reconciles extra outputs by `outputNodeId` (rename / insert / delete). Deleting the owner deletes all outputs; deleting an additional output strips its node from the owner's graph. Duplicating any output makes a standalone single-output function.
+- The editor opens the owner when an additional output is tapped. `isDuration` stays a canvas-wide setting shown only on the primary output.
 
 ## Data Model
 

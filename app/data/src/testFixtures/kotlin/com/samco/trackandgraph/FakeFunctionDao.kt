@@ -64,7 +64,10 @@ internal class FakeFunctionDao : FunctionDao {
 
     override fun deleteFeature(id: Long) {
         features.remove(id)
+        val removedIds = functions.values.filter { it.featureId == id }.map { it.id }.toSet()
         functions.entries.removeIf { it.value.featureId == id }
+        // Mirrors ON DELETE CASCADE on parent_function_id
+        functions.entries.removeIf { it.value.parentFunctionId in removedIds }
     }
 
     override fun getFeatureById(featureId: Long): Feature? = features[featureId]
@@ -86,12 +89,17 @@ internal class FakeFunctionDao : FunctionDao {
     override fun getFunctionById(functionId: Long): FunctionWithFeature? {
         val function = functions[functionId] ?: return null
         val feature = features[function.featureId] ?: return null
+        // Mirrors COALESCE(parent.function_graph, f.function_graph) in the real query
+        val graph = function.parentFunctionId?.let { functions[it]?.functionGraph }
+            ?: function.functionGraph
         return FunctionWithFeature(
             id = function.id,
             featureId = function.featureId,
-            functionGraph = function.functionGraph,
+            functionGraph = graph,
             name = feature.name,
             description = feature.description,
+            parentFunctionId = function.parentFunctionId,
+            outputNodeId = function.outputNodeId,
         )
     }
 
@@ -103,6 +111,12 @@ internal class FakeFunctionDao : FunctionDao {
     override fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature> {
         return functions.values.mapNotNull { getFunctionById(it.id) }
     }
+
+    override fun getAdditionalOutputFunctionsSync(parentFunctionId: Long): List<FunctionWithFeature> =
+        functions.values
+            .filter { it.parentFunctionId == parentFunctionId }
+            .sortedBy { it.id }
+            .mapNotNull { getFunctionById(it.id) }
 
     override fun hasAnyFunctions(): Boolean = functions.isNotEmpty()
 

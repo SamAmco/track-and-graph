@@ -506,11 +506,14 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
         SELECT
             f.id as id,
             f.feature_id as feature_id,
-            f.function_graph as function_graph,
+            COALESCE(parent.function_graph, f.function_graph) as function_graph,
             ft.name as name,
-            ft.feature_description as feature_description
+            ft.feature_description as feature_description,
+            f.parent_function_id as parent_function_id,
+            f.output_node_id as output_node_id
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
+        LEFT JOIN functions_table parent ON f.parent_function_id = parent.id
         WHERE f.id = :functionId
         LIMIT 1
     """)
@@ -520,11 +523,14 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
         SELECT
             f.id as id,
             f.feature_id as feature_id,
-            f.function_graph as function_graph,
+            COALESCE(parent.function_graph, f.function_graph) as function_graph,
             ft.name as name,
-            ft.feature_description as feature_description
+            ft.feature_description as feature_description,
+            f.parent_function_id as parent_function_id,
+            f.output_node_id as output_node_id
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
+        LEFT JOIN functions_table parent ON f.parent_function_id = parent.id
         WHERE f.feature_id = :featureId
         LIMIT 1
     """)
@@ -534,15 +540,35 @@ internal interface TrackAndGraphDatabaseDao : GraphDao, ReminderDao, GroupDao, T
         SELECT
             f.id as id,
             f.feature_id as feature_id,
-            f.function_graph as function_graph,
+            COALESCE(parent.function_graph, f.function_graph) as function_graph,
             ft.name as name,
-            ft.feature_description as feature_description
+            ft.feature_description as feature_description,
+            f.parent_function_id as parent_function_id,
+            f.output_node_id as output_node_id
         FROM functions_table f
         INNER JOIN features_table ft ON f.feature_id = ft.id
+        LEFT JOIN functions_table parent ON f.parent_function_id = parent.id
         LEFT JOIN group_items_table gi ON f.id = gi.child_id AND gi.type = 'FUNCTION'
         WHERE gi.group_id = :groupId
     """)
     override fun getFunctionsForGroupSync(groupId: Long): List<FunctionWithFeature>
+
+    @Query("""
+        SELECT
+            f.id as id,
+            f.feature_id as feature_id,
+            COALESCE(parent.function_graph, f.function_graph) as function_graph,
+            ft.name as name,
+            ft.feature_description as feature_description,
+            f.parent_function_id as parent_function_id,
+            f.output_node_id as output_node_id
+        FROM functions_table f
+        INNER JOIN features_table ft ON f.feature_id = ft.id
+        LEFT JOIN functions_table parent ON f.parent_function_id = parent.id
+        WHERE f.parent_function_id = :parentFunctionId
+        ORDER BY f.id ASC
+    """)
+    override fun getAdditionalOutputFunctionsSync(parentFunctionId: Long): List<FunctionWithFeature>
 
     @Query("SELECT EXISTS (SELECT 1 FROM functions_table LIMIT 1)")
     override fun hasAnyFunctions(): Boolean

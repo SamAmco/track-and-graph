@@ -29,6 +29,11 @@ import androidx.room.PrimaryKey
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("feature_id"),
         onDelete = ForeignKey.CASCADE
+    ), ForeignKey(
+        entity = Function::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("parent_function_id"),
+        onDelete = ForeignKey.CASCADE
     )]
 )
 internal data class Function(
@@ -40,5 +45,17 @@ internal data class Function(
     val featureId: Long,
 
     @ColumnInfo(name = "function_graph")
-    val functionGraph: String
+    val functionGraph: String,
+
+    /**
+     * Null for a normal function (and for the primary output of a multi-output function).
+     * For an additional output this is the id of the function that owns the canvas, whose
+     * function_graph is the only stored copy of the graph.
+     */
+    @ColumnInfo(name = "parent_function_id", index = true)
+    val parentFunctionId: Long? = null,
+
+    /** The output node this function evaluates, or null for the graph's primary output. */
+    @ColumnInfo(name = "output_node_id")
+    val outputNodeId: Int? = null,
 )

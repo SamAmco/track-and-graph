@@ -25,14 +25,41 @@ data class Function(
     val functionGraph: FunctionGraph,
     val inputFeatureIds: List<Long>,
     val unique: Boolean,
+    /** Non-null when this function is an additional output of another function's canvas. */
+    val parentFunctionId: Long? = null,
+    /** The output node of [functionGraph] this function evaluates; null means the primary one. */
+    val outputNodeId: Int? = null,
+    /** The other outputs on this function's canvas. Only populated on the owning function. */
+    val additionalOutputs: List<FunctionOutput> = emptyList(),
 ) : Feature {
     internal fun toEntity(serializedFunctionGraph: String) =
         com.samco.trackandgraph.data.database.entity.Function(
             id = id,
             featureId = featureId,
-            functionGraph = serializedFunctionGraph
+            functionGraph = serializedFunctionGraph,
+            parentFunctionId = parentFunctionId,
+            outputNodeId = outputNodeId,
         )
 }
+
+/**
+ * An additional output of a multi-output function. Each output is a feature in its own right so
+ * that it can be graphed, searched and used as the input of other functions.
+ */
+data class FunctionOutput(
+    val functionId: Long,
+    val featureId: Long,
+    val outputNodeId: Int,
+    val name: String,
+    val description: String,
+)
+
+/** Name and description for an additional output node when creating or updating a function. */
+data class FunctionOutputRequest(
+    val outputNodeId: Int,
+    val name: String,
+    val description: String = "",
+)
 
 /**
  * Request object for creating a new Function.
@@ -45,6 +72,7 @@ data class FunctionCreateRequest(
     val description: String = "",
     val functionGraph: FunctionGraph,
     val inputFeatureIds: List<Long> = emptyList(),
+    val additionalOutputs: List<FunctionOutputRequest> = emptyList(),
 )
 
 /**
@@ -60,5 +88,7 @@ data class FunctionUpdateRequest(
     val description: String? = null,
     val functionGraph: FunctionGraph? = null,
     val inputFeatureIds: List<Long>? = null,
+    /** Null leaves the existing additional outputs unchanged (apart from removing deleted nodes). */
+    val additionalOutputs: List<FunctionOutputRequest>? = null,
 )
 

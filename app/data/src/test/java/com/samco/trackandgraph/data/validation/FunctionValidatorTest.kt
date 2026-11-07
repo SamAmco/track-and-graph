@@ -690,6 +690,60 @@ class FunctionValidatorTest {
         }
     }
 
+    @Test
+    fun `validateFunction fails when an additional output node ID conflicts with a regular node ID`() = runTest {
+        val function = createTestFunction(
+            nodes = listOf(FunctionGraphNode.FeatureNode(x = 0f, y = 0f, id = 1, featureId = 100L)),
+            inputFeatureIds = listOf(100L),
+        ).let { base ->
+            base.copy(
+                functionGraph = base.functionGraph.copy(
+                    additionalOutputNodes = listOf(
+                        FunctionGraphNode.OutputNode(0f, 0f, 1, emptyList())
+                    )
+                )
+            )
+        }
+
+        try {
+            validator.validateFunction(function)
+            fail("Should have thrown an exception due to output node ID conflicting with regular node")
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message?.contains("Node IDs should be unique") == true)
+        }
+    }
+
+    @Test
+    fun `validateFunction fails when two output nodes share an ID`() = runTest {
+        val function = createTestFunction(outputNode = FunctionGraphNode.OutputNode(0f, 0f, 1, emptyList()))
+            .let { base ->
+                base.copy(
+                    functionGraph = base.functionGraph.copy(
+                        additionalOutputNodes = listOf(FunctionGraphNode.OutputNode(0f, 0f, 1, emptyList()))
+                    )
+                )
+            }
+
+        try {
+            validator.validateFunction(function)
+            fail("Should have thrown an exception due to duplicate output node IDs")
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message?.contains("Node IDs should be unique") == true)
+        }
+    }
+
+    @Test
+    fun `validateFunction fails when the function output node is not in the graph`() = runTest {
+        val function = createTestFunction().copy(parentFunctionId = 7L, outputNodeId = 42)
+
+        try {
+            validator.validateFunction(function)
+            fail("Should have thrown an exception due to a missing output node")
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message?.contains("42") == true)
+        }
+    }
+
     // ========== Helper functions ==========
 
     private fun createMockFeature(id: Long): Feature {

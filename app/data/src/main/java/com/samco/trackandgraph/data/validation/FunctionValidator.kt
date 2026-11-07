@@ -69,8 +69,18 @@ internal class FunctionValidatorImpl @Inject constructor(
 
         val nodeIdsSet = nodeIds.toSet()
 
-        if (nodeIds.size != nodeIdsSet.size || function.functionGraph.outputNode.id in nodeIdsSet) {
+        val outputIds = function.functionGraph.allOutputNodes.map { it.id }
+
+        if (nodeIds.size != nodeIdsSet.size
+            || outputIds.size != outputIds.toSet().size
+            || outputIds.any { it in nodeIdsSet }
+        ) {
             error("Node IDs should be unique in a function graph")
+        }
+
+        val outputNodeId = function.outputNodeId
+        if (outputNodeId != null && outputNodeId !in outputIds) {
+            error("Function output node $outputNodeId is not in the function graph")
         }
     }
 

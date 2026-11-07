@@ -219,6 +219,23 @@ sealed class FunctionGraphNode {
 data class FunctionGraph(
     val nodes: List<FunctionGraphNode>,
     val outputNode: FunctionGraphNode.OutputNode,
-    val isDuration: Boolean
-)
+    val isDuration: Boolean,
+    /**
+     * Extra outputs on the same canvas. Each one is exposed as its own feature, see
+     * [com.samco.trackandgraph.data.database.dto.Function.additionalOutputs]. Defaults to empty so
+     * graphs serialized before multiple outputs existed still deserialize.
+     */
+    val additionalOutputNodes: List<FunctionGraphNode.OutputNode> = emptyList(),
+) {
+    val allOutputNodes: List<FunctionGraphNode.OutputNode>
+        get() = listOf(outputNode) + additionalOutputNodes
+
+    /**
+     * The output node a function evaluates. A null [outputNodeId] means the primary output.
+     */
+    fun outputNodeFor(outputNodeId: Int?): FunctionGraphNode.OutputNode =
+        if (outputNodeId == null) outputNode
+        else allOutputNodes.firstOrNull { it.id == outputNodeId }
+            ?: throw IllegalArgumentException("Output node $outputNodeId not found")
+}
 

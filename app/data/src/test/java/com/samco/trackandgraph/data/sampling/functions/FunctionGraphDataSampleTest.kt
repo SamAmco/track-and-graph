@@ -608,4 +608,68 @@ class FunctionGraphDataSampleTest {
         }
         locks.forEach { luaEngine.releaseVM(it) }
     }
+
+    @Test
+    fun `each output of a multi output function samples its own dependencies`() = runTest {
+        // Arrange
+        fun points(featureId: Long, base: Double) = listOf(
+            DataPoint(OffsetDateTime.parse("2023-01-02T10:00:00Z"), featureId, base + 1, "", ""),
+            DataPoint(OffsetDateTime.parse("2023-01-01T10:00:00Z"), featureId, base, "", ""),
+        )
+        val firstPoints = points(featureId = 1L, base = 10.0)
+        val secondPoints = points(featureId = 2L, base = 20.0)
+
+        val firstSource = FunctionGraphNode.FeatureNode(x = 0f, y = 0f, id = 1, featureId = 1L)
+        val secondSource = FunctionGraphNode.FeatureNode(x = 0f, y = 0f, id = 2, featureId = 2L)
+        val primaryOutput = FunctionGraphNode.OutputNode(
+            x = 0f, y = 0f, id = 3,
+            dependencies = listOf(NodeDependency(connectorIndex = 0, nodeId = 1))
+        )
+        val additionalOutput = FunctionGraphNode.OutputNode(
+            x = 0f, y = 0f, id = 4,
+            dependencies = listOf(NodeDependency(connectorIndex = 0, nodeId = 2))
+        )
+        val functionGraph = FunctionGraph(
+            nodes = listOf(firstSource, secondSource),
+            outputNode = primaryOutput,
+            isDuration = false,
+            additionalOutputNodes = listOf(additionalOutput),
+        )
+
+        fun function(outputNodeId: Int?, parentId: Long?) = Function(
+            id = 1L,
+            featureId = 5L,
+            name = "Test Function",
+            description = "",
+            functionGraph = functionGraph,
+            inputFeatureIds = listOf(1L, 2L),
+            unique = true,
+            parentFunctionId = parentId,
+            outputNodeId = outputNodeId,
+        )
+
+        suspend fun sampler(): DataSampler {
+            val dataSampler = mock<DataSampler>()
+            whenever(dataSampler.getRawDataSampleForFeatureId(eq(1L), any())).thenReturn(
+                RawDataSample.fromSequence(firstPoints.asSequence(), { firstPoints }, {})
+            )
+            whenever(dataSampler.getRawDataSampleForFeatureId(eq(2L), any())).thenReturn(
+                RawDataSample.fromSequence(secondPoints.asSequence(), { secondPoints }, {})
+            )
+            return dataSampler
+        }
+
+        // Act
+        val primarySample = FunctionGraphDataSample.create(null, function(null, null), sampler(), luaEngine)
+        val primaryResult = primarySample.toList()
+        val additionalSample = FunctionGraphDataSample.create(null, function(4, 1L), sampler(), luaEngine)
+        val additionalResult = additionalSample.toList()
+
+        // Assert
+        assertEquals(firstPoints, primaryResult)
+        assertEquals(secondPoints, additionalResult)
+
+        primarySample.dispose()
+        additionalSample.dispose()
+    }
 }

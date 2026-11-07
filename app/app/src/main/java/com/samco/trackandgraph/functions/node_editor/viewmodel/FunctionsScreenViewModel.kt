@@ -34,6 +34,7 @@ import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.Function
 import com.samco.trackandgraph.data.database.dto.FunctionCreateRequest
+import com.samco.trackandgraph.data.database.dto.FunctionOutputRequest
 import com.samco.trackandgraph.data.database.dto.FunctionUpdateRequest
 import com.samco.trackandgraph.data.interactor.DataInteractor
 import com.samco.trackandgraph.util.FeaturePathProvider
@@ -103,6 +104,7 @@ internal data class Hint(
 sealed class AddNodeData {
     data object DataSourceNode : AddNodeData()
     data object LuaScriptNode : AddNodeData()
+    data object OutputNode : AddNodeData()
     data class LibraryFunction(val metadata: LuaFunctionMetadata) : AddNodeData()
 }
 
@@ -117,6 +119,8 @@ internal sealed class Node(
         val name: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
         val description: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue("")),
         val isDuration: MutableState<Boolean> = mutableStateOf(false),
+        /** The primary output owns the canvas and the create/update action; others can be deleted. */
+        val isPrimary: Boolean = true,
         val isUpdateMode: Boolean = false,
         val validationErrors: List<ValidationError> = emptyList(),
     ) : Node(
@@ -250,7 +254,14 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         this.groupId = groupId
 
         viewModelScope.launch {
-            existingFunction = functionId?.let { dataInteractor.getFunctionById(it) }
+            existingFunction = functionId
+                ?.let { dataInteractor.getFunctionById(it) }
+                // An additional output is edited on the canvas of the function that owns it
+                ?.let { function ->
+                    function.parentFunctionId
+                        ?.let { dataInteractor.getFunctionById(it) }
+                        ?: function
+                }
 
             // Check if user has any functions at all (for first-time user dialog)
             if (functionId == null) {
@@ -286,7 +297,11 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
 
     private suspend fun initializeExistingFunction(existing: Function) {
         // Get dependent feature IDs for cycle detection when editing existing function
-        dependentFeatureIds = dataInteractor.getFeatureIdsDependingOn(existing.featureId)
+        // Every output of the canvas counts, since a data source reading one of them would
+        // make the function depend on itself
+        val ownFeatureIds = listOf(existing.featureId) + existing.additionalOutputs.map { it.featureId }
+        dependentFeatureIds = ownFeatureIds.toSet() +
+                ownFeatureIds.flatMap { dataInteractor.getFeatureIdsDependingOn(it) }
 
         // Decode existing function graph
         val decodedGraph = functionGraphDecoder.decodeFunctionGraph(
@@ -390,6 +405,7 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         val success = when (data) {
             is AddNodeData.DataSourceNode -> addDataSourceNode(newId)
             is AddNodeData.LuaScriptNode -> addLuaScriptNode(newId)
+            is AddNodeData.OutputNode -> addOutputNode(newId)
             is AddNodeData.LibraryFunction -> addLibraryFunctionNode(newId, data.metadata)
         }
         if (success) nodePositions[newId] = offset
@@ -417,6 +433,17 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
         return true
     }
 
+    private fun addOutputNode(id: Int): Boolean {
+        val newNode = Node.Output(
+            id = id,
+            isPrimary = false,
+            isUpdateMode = existingFunction != null,
+        )
+        _nodes.value = _nodes.value.adding(newNode)
+
+        return true
+    }
+
     private fun addLuaScriptNode(id: Int): Boolean {
         val newNode = Node.LuaScript(
             id = id,
@@ -435,6 +462,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     }
 
     override fun onDeleteNode(node: Node) {
+        // The primary output carries the create/update action and cannot be removed
+        if (node is Node.Output && node.isPrimary) return
         _nodes.value = _nodes.value.removingAll { it.id == node.id }
         val removedConnectors = mutableSetOf<Connector>()
         _connectors.value = _connectors.value.removingAll { connector ->
@@ -506,20 +535,14 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
     override fun onCreateOrUpdateFunction() {
         viewModelScope.launch {
             val outputNode = outputNode()
+            val outputNodes = _nodes.value.filterIsInstance<Node.Output>()
 
-            // Validate the output node
-            val validationErrors = validateOutputNode(outputNode)
+            // Validate every output node, not just the primary one
+            val validationErrors = outputNodes.associate { it.id to validateOutputNode(it) }
 
             // Return early if there are validation errors
-            if (validationErrors.isNotEmpty()) {
-                // Update the node with validation errors
-                val updatedOutputNode = outputNode.copy(validationErrors = validationErrors)
-                _nodes.value = _nodes.value.mutate { nodeList ->
-                    val index = nodeList.indexOfFirst { it == outputNode }
-                    if (index >= 0) {
-                        nodeList[index] = updatedOutputNode
-                    }
-                }
+            if (validationErrors.values.any { it.isNotEmpty() }) {
+                setOutputNodeErrors(validationErrors)
                 return@launch
             }
 
@@ -535,6 +558,16 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                 // Extract input feature IDs from data source nodes
                 val inputFeatureIds = functionGraphBuilder.extractInputFeatureIds(_nodes.value)
 
+                val additionalOutputs = outputNodes
+                    .filter { !it.isPrimary }
+                    .map {
+                        FunctionOutputRequest(
+                            outputNodeId = it.id,
+                            name = it.name.value.text,
+                            description = it.description.value.text,
+                        )
+                    }
+
                 val existing = existingFunction
                 if (existing != null) {
                     // Update existing function
@@ -543,7 +576,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                         name = outputNode.name.value.text,
                         description = outputNode.description.value.text,
                         functionGraph = functionGraph,
-                        inputFeatureIds = inputFeatureIds
+                        inputFeatureIds = inputFeatureIds,
+                        additionalOutputs = additionalOutputs,
                     )
                     dataInteractor.updateFunction(updateRequest)
                 } else {
@@ -553,7 +587,8 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
                         groupId = groupId,
                         description = outputNode.description.value.text,
                         functionGraph = functionGraph,
-                        inputFeatureIds = inputFeatureIds
+                        inputFeatureIds = inputFeatureIds,
+                        additionalOutputs = additionalOutputs,
                     )
                     dataInteractor.insertFunction(createRequest)
                 }
@@ -561,21 +596,26 @@ internal class FunctionsScreenViewModelImpl @Inject constructor(
             } catch (e: IllegalStateException) {
                 Timber.e(e, "Function could not be created or updated")
 
-                // Show a generic error on the output node
-                val updatedOutputNode = outputNode.copy(
-                    validationErrors = listOf(ValidationError.GENERIC_ERROR)
-                )
-                _nodes.value = _nodes.value.mutate { nodeList ->
-                    val index = nodeList.indexOfFirst { it.id == outputNode.id }
-                    if (index >= 0) {
-                        nodeList[index] = updatedOutputNode
-                    }
+                // Show a generic error on the primary output node, which owns the action
+                setOutputNodeErrors(mapOf(outputNode.id to listOf(ValidationError.GENERIC_ERROR)))
+            }
+        }
+    }
+
+    private fun setOutputNodeErrors(errors: Map<Int, List<ValidationError>>) {
+        _nodes.value = _nodes.value.mutate { nodeList ->
+            // Index based so the builder is never modified while it is being iterated
+            for (index in nodeList.indices) {
+                val node = nodeList[index]
+                val nodeErrors = errors[node.id]
+                if (node is Node.Output && nodeErrors != null) {
+                    nodeList[index] = node.copy(validationErrors = nodeErrors)
                 }
             }
         }
     }
 
-    private fun outputNode() = _nodes.value.filterIsInstance<Node.Output>().first()
+    private fun outputNode() = _nodes.value.filterIsInstance<Node.Output>().first { it.isPrimary }
 
     private fun validateOutputNode(outputNode: Node.Output): List<ValidationError> {
         val errors = mutableListOf<ValidationError>()

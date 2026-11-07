@@ -95,8 +95,23 @@ internal class FunctionGraphDecoder @Inject constructor(
         
         // Add output node (always valid)
         val outputNode = functionGraph.outputNode
-        decodedNodes.add(decodeOutputNode(outputNode, function))
+        decodedNodes.add(decodeOutputNode(outputNode, function.name, function.description, function))
         nodePositions[outputNode.id] = Offset(outputNode.x, outputNode.y)
+
+        // Add any additional outputs sharing this canvas
+        functionGraph.additionalOutputNodes.forEach { additionalNode ->
+            val output = function.additionalOutputs.firstOrNull { it.outputNodeId == additionalNode.id }
+            decodedNodes.add(
+                decodeOutputNode(
+                    graphNode = additionalNode,
+                    name = output?.name ?: "",
+                    description = output?.description ?: "",
+                    function = function,
+                    isPrimary = false,
+                )
+            )
+            nodePositions[additionalNode.id] = Offset(additionalNode.x, additionalNode.y)
+        }
         
         // Build edges, filtering out connections to invalid nodes
         val edges = buildEdgesFromDependencies(functionGraph, filteredNodeIds)
@@ -150,13 +165,17 @@ internal class FunctionGraphDecoder @Inject constructor(
      */
     private fun decodeOutputNode(
         graphNode: FunctionGraphNode.OutputNode,
-        function: Function
+        name: String,
+        description: String,
+        function: Function,
+        isPrimary: Boolean = true,
     ): Node.Output {
         return Node.Output(
             id = graphNode.id,
-            name = mutableStateOf(TextFieldValue(function.name)),
-            description = mutableStateOf(TextFieldValue(function.description)),
+            name = mutableStateOf(TextFieldValue(name)),
+            description = mutableStateOf(TextFieldValue(description)),
             isDuration = mutableStateOf(function.functionGraph.isDuration),
+            isPrimary = isPrimary,
             isUpdateMode = true, // Since we're loading an existing function
             validationErrors = emptyList()
         )
@@ -175,7 +194,7 @@ internal class FunctionGraphDecoder @Inject constructor(
     ): PersistentList<Edge> {
         return persistentListOf<Edge>().mutate { edgeList ->
             // Get all nodes including the output node
-            val allNodes = functionGraph.nodes + functionGraph.outputNode
+            val allNodes = functionGraph.nodes + functionGraph.allOutputNodes
 
             // Process dependencies for each node
             allNodes.forEach { node ->
