@@ -16,6 +16,7 @@ return {
 	["color.toolbar_background"] = 5,
 	["color.hyperlink"] = 5,
 	["color.good"] = 5,
+	["color.data_vis_blank"] = 5,
 
 	text_style = 5,
 	["text_style.display_large"] = 5,

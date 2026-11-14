@@ -23,6 +23,8 @@ M.color = {
 	toolbar_background = theme_color("TOOLBAR_BACKGROUND"),
 	hyperlink = theme_color("HYPERLINK"),
 	good = theme_color("GOOD"),
+	-- Neutral empty cells in data visualisations, visible against the graph surface in both themes.
+	data_vis_blank = theme_color("DATA_VIS_BLANK"),
 }
 
 --- Track & Graph text styles, resolved by the app at render time.

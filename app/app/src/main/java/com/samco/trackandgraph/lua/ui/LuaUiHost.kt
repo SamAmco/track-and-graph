@@ -126,7 +126,9 @@ private const val UI = "ui"
 
 @Composable
 private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier: Modifier = Modifier) {
-    key(node["key"]?.asString() ?: node) {
+    // Unkeyed nodes retain positional identity, as ordinary Compose children do.
+    // A fresh Lua table on every render must not recreate focused text fields.
+    key(node["key"]?.asString()) {
         val modifier = LuaUiModifierParser.parse(
             parentModifier,
             node["modifier"],
@@ -158,6 +160,7 @@ private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier:
             }
             "SPACER" -> Spacer(modifier)
             "TEXT" -> LuaText(node, modifier)
+            "TEXT_FIELD" -> LuaTextField(node, modifier, LocalLuaUiActionHandler.current)
             "ICON" -> LuaIcon(node, modifier)
             "ICON_BUTTON" -> LuaIconButton(
                 node = node,
@@ -332,5 +335,6 @@ internal fun luaThemeColors(colors: TngColors): Map<String, Color> = colors.let 
         "THEME_SELECTOR_BUTTON" to it.selectorButtonColor, "THEME_SECONDARY_TEXT" to it.textColorSecondary,
         "THEME_TOOLBAR_BACKGROUND" to it.toolbarBackgroundColor, "THEME_HYPERLINK" to it.hyperlinkColor,
         "THEME_GOOD" to it.goodColor,
+        "THEME_DATA_VIS_BLANK" to it.selectorButtonColor,
     )
 }

@@ -13,6 +13,7 @@ M.COMPONENT_TYPE = {
 	BOX = "BOX",
 	SPACER = "SPACER",
 	TEXT = "TEXT",
+	TEXT_FIELD = "TEXT_FIELD",
 	ICON = "ICON",
 	ICON_BUTTON = "ICON_BUTTON",
 	SURFACE = "SURFACE",
@@ -152,6 +153,20 @@ M.BoxParams = {}
 --- @field max_lines? integer
 --- @field overflow? TEXT_OVERFLOW
 M.TextParams = {}
+
+--- A controlled, single-line outlined text input. Keep the string in renderer state,
+--- including incomplete numeric edits such as "-" or "1.".
+--- @since (API level 5)
+--- @class TextFieldParams
+--- @field key? string
+--- @field modifier? table[]
+--- @field value string
+--- @field on_value_change fun(value: string)
+--- @field label? string|table<string,string>
+--- @field keyboard_type? string: TEXT, NUMBER, or DECIMAL. This is a keyboard hint, not validation.
+--- @field is_error? boolean
+--- @field enabled? boolean
+M.TextFieldParams = {}
 
 --- @since (API level 5)
 --- @class IconParams
@@ -474,6 +489,21 @@ M.surface = function(params)
 	result.shape = params.shape
 	result.tonal_elevation = params.tonal_elevation
 	result.shadow_elevation = params.shadow_elevation
+	return result
+end
+
+--- @param params TextFieldParams
+M.text_field = function(params)
+	assert(type(params) == "table", "text_field params must be a table")
+	assert(type(params.value) == "string", "text_field value must be a string")
+	assert(type(params.on_value_change) == "function", "text_field on_value_change is required")
+	local result = component(M.COMPONENT_TYPE.TEXT_FIELD, params)
+	result.value = params.value
+	result.on_value_change = params.on_value_change
+	result.label = params.label
+	result.keyboard_type = params.keyboard_type or "TEXT"
+	result.is_error = params.is_error == true
+	result.enabled = params.enabled ~= false
 	return result
 end
 

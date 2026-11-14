@@ -10,6 +10,7 @@ test("colors, text styles, spacing, and shapes are serializable tokens", functio
 	assert(theme.color.selector_button == "THEME_SELECTOR_BUTTON")
 	assert(theme.color.hyperlink == "THEME_HYPERLINK")
 	assert(theme.color.good == "THEME_GOOD")
+	assert(theme.color.data_vis_blank == "THEME_DATA_VIS_BLANK")
 	assert(theme.text_style.display_large == "TEXT_STYLE_DISPLAY_LARGE")
 	assert(theme.text_style.body_medium == "TEXT_STYLE_BODY_MEDIUM")
 	assert(theme.text_style.label_small == "TEXT_STYLE_LABEL_SMALL")

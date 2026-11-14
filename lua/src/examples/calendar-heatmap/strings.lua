@@ -5,27 +5,11 @@ return {
 	range = {
 		en = "Range",
 	},
-	weeks_13 = {
-		en = "13 weeks",
-	},
-	weeks_26 = {
-		en = "26 weeks",
-	},
-	weeks_53 = {
-		en = "53 weeks",
-	},
-	layout = {
-		en = "Layout",
-	},
-	automatic = {
-		en = "Automatic",
-	},
-	wide = {
-		en = "Wide",
-	},
-	narrow = {
-		en = "Narrow",
-	},
+	intensity = { en = "Colour intensity" },
+	binary = { en = "Binary" },
+	minimum = { en = "Minimum" },
+	maximum = { en = "Maximum" },
+	invalid_range = { en = "Enter a valid minimum and maximum, with maximum greater than minimum" },
 	show_legend = {
 		en = "Show legend",
 	},

@@ -21,6 +21,20 @@ test("text accepts translated strings", function()
 	assert(text.text == translations)
 end)
 
+test("text fields preserve incomplete numeric edits for Lua validation", function()
+	local state = { minimum = "0" }
+	local field = ui.text_field({
+		key = "minimum",
+		value = state.minimum,
+		label = { en = "Minimum" },
+		on_value_change = function(value) state.minimum = value end,
+	})
+	field.on_value_change("-")
+	assert(state.minimum == "-")
+	field.on_value_change("-3.1253")
+	assert(tonumber(state.minimum) == -3.1253)
+end)
+
 test("icons and icon buttons retain semantic tokens and interaction", function()
 	local icons = require("tng.icons")
 	local clicked = false

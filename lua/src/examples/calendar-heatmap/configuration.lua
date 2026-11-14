@@ -1,13 +1,11 @@
 local strings = require("strings")
 local commonui = require("tng.commonui")
-local graphui = require("tng.graphui")
+local icons = require("tng.icons")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
 
 local function initial_state(state)
 	state = state or {}
-	if state.weeks == nil then state.weeks = 53 end
-	if state.layout == nil then state.layout = "AUTO" end
 	if state.show_legend == nil then state.show_legend = true end
 	if state.sources == nil then state.sources = {} end
 	return state
@@ -55,19 +53,107 @@ local function initial_sources(feature_map)
 	return sources
 end
 
+local function valid_range(source)
+	local minimum, maximum = tonumber(source.minimum), tonumber(source.maximum)
+	return minimum ~= nil and maximum ~= nil
+		and minimum > -math.huge and maximum < math.huge and maximum > minimum
+end
+
+local function range_field(source, field, label)
+	return ui.text_field({
+		key = field,
+		value = source[field],
+		label = label,
+		-- Some decimal keyboards omit minus; the text keyboard permits signed ranges.
+		keyboard_type = "TEXT",
+		is_error = not valid_range(source),
+		on_value_change = function(value) source[field] = value end,
+		modifier = ui.modifier(ui.weight(1)),
+	})
+end
+
 local function source_row(state, index, source)
-	return graphui.colored_feature_input_card({
+	source.mode = source.mode or "BINARY"
+	source.minimum = source.minimum or "0"
+	source.maximum = source.maximum or "100"
+	local mode_menu = {}
+	for _, mode in ipairs({ "BINARY", "RANGE" }) do
+		mode_menu[#mode_menu + 1] = ui.dropdown_menu_item({
+			on_click = function()
+				source.mode = mode
+				source.mode_menu_visible = false
+			end,
+			child = ui.text({ text = mode == "BINARY" and strings.binary or strings.range }),
+		})
+	end
+	local children = {
+		ui.row({
+			alignment = ui.ALIGNMENT.CENTER,
+			spacing = theme.spacing.small,
+			children = {
+				commonui.color_spinner({
+					key = "source_color_" .. index,
+					state = state,
+					selected_color = source.color,
+					on_color_selected = function(color) source.color = color end,
+				}),
+				commonui.feature_selector({
+					key = "source_feature_" .. index,
+					state = state,
+					title = strings.select_feature,
+					placeholder = strings.choose_feature,
+					selected = source.selection,
+					picker_scope = "feature_inputs",
+					on_selected = function(selection) source.selection = selection end,
+					modifier = ui.modifier(ui.weight(1)),
+				}),
+				ui.icon_button({
+					on_click = function() table.remove(state.sources, index) end,
+					child = ui.icon({ icon = icons.ICON.DELETE, content_description = strings.remove_feature }),
+				}),
+			},
+		}),
+		ui.row({
+			alignment = ui.ALIGNMENT.CENTER,
+			spacing = theme.spacing.medium,
+			children = {
+				ui.text({ text = strings.intensity, style = theme.text_style.body_medium }),
+				ui.box({
+					children = {
+						commonui.selector_button({
+							text = source.mode == "RANGE" and strings.range or strings.binary,
+							on_click = function() source.mode_menu_visible = true end,
+						}),
+						ui.dropdown_menu({
+							expanded = source.mode_menu_visible == true,
+							on_dismiss_request = function() source.mode_menu_visible = false end,
+							children = mode_menu,
+						}),
+					},
+				}),
+			},
+		}),
+	}
+	if source.mode == "RANGE" then
+		children[#children + 1] = ui.row({
+			spacing = theme.spacing.medium,
+			children = {
+				range_field(source, "minimum", strings.minimum),
+				range_field(source, "maximum", strings.maximum),
+			},
+		})
+	end
+	return ui.surface({
 		key = "source_" .. index,
-		state = state,
-		title = strings.select_feature,
-		placeholder = strings.choose_feature,
-		selected = source.selection,
-		selected_color = source.color,
-		picker_scope = "feature_inputs",
-		on_selected = function(selection) source.selection = selection end,
-		on_color_selected = function(color) source.color = color end,
-		on_delete = function() table.remove(state.sources, index) end,
-		delete_content_description = strings.remove_feature,
+		modifier = ui.modifier(ui.fill_width()),
+		color = theme.color.surface,
+		shape = theme.shape.medium,
+		shadow_elevation = ui.dp(4),
+		child = ui.column({
+			modifier = ui.modifier(ui.padding(theme.spacing.medium)),
+			spacing = theme.spacing.medium,
+			children = children,
+		}),
 	})
 end
 
@@ -107,11 +193,13 @@ return function(params)
 		state.sources = initial_sources(params.feature_map)
 		state.feature_inputs_initialized = true
 	end
+	local configuration_error = #state.sources == 0 and strings.feature_required or nil
 	local feature_inputs = {}
 	local source_controls = {}
 	for index, source in ipairs(state.sources) do
 		feature_inputs[index] = { name = "source_" .. index, feature_id = source.selection.id }
 		source_controls[index] = source_row(state, index, source)
+		if source.mode == "RANGE" and not valid_range(source) then configuration_error = strings.invalid_range end
 	end
 	table.insert(source_controls, add_source_control(state))
 	return {
@@ -127,16 +215,6 @@ return function(params)
 						ui.column({ spacing = theme.spacing.medium, children = source_controls }),
 					},
 				}),
-				setting(strings.range, {
-					option(state, "weeks", 13, strings.weeks_13),
-					option(state, "weeks", 26, strings.weeks_26),
-					option(state, "weeks", 53, strings.weeks_53),
-				}),
-				setting(strings.layout, {
-					option(state, "layout", "AUTO", strings.automatic),
-					option(state, "layout", "WIDE", strings.wide),
-					option(state, "layout", "NARROW", strings.narrow),
-				}),
 				setting(strings.show_legend, {
 					option(state, "show_legend", true, strings.yes),
 					option(state, "show_legend", false, strings.no),
@@ -145,6 +223,6 @@ return function(params)
 		}),
 		state = state,
 		feature_inputs = feature_inputs,
-		configuration_error = #state.sources == 0 and strings.feature_required or nil,
+		configuration_error = configuration_error,
 	}
 end
