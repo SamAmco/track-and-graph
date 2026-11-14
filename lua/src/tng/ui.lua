@@ -154,19 +154,87 @@ M.BoxParams = {}
 --- @field overflow? TEXT_OVERFLOW
 M.TextParams = {}
 
---- A controlled, single-line outlined text input. Keep the string in renderer state,
---- including incomplete numeric edits such as "-" or "1.".
+--- A single-line outlined text input. Compose owns live editing state; ordinary Lua
+--- renders do not overwrite it. Use `value:mutate(...)` to request a replacement.
 --- @since (API level 5)
 --- @class TextFieldParams
---- @field key? string
+--- @field key string: Stable field identity; never use a changing list position.
 --- @field modifier? table[]
---- @field value string
---- @field on_value_change fun(value: string)
+--- @field value TextFieldValue
+--- @field on_value_change fun(value: TextFieldValue): Store the supplied value, including acknowledgements of Lua replacements.
 --- @field label? string|table<string,string>
 --- @field keyboard_type? string: TEXT, NUMBER, or DECIMAL. This is a keyboard hint, not validation.
 --- @field is_error? boolean
 --- @field enabled? boolean
 M.TextFieldParams = {}
+
+--- Plain serializable editing data. Selection offsets are zero-based UTF-16 code
+--- units, matching Compose (not Lua byte offsets). Methods live on the metatable.
+--- @since (API level 5)
+--- @class TextFieldValue
+--- @field text string
+--- @field selection table: `{ start = integer, ["end"] = integer }`; reversed selections are supported.
+--- @field revision integer: Managed by the bridge and mutation helper; do not edit directly.
+--- @field base_revision? integer: Base of an explicit replacement request; do not edit directly.
+M.TextFieldValue = {}
+
+local text_field_value_metatable = { __index = M.TextFieldValue }
+local max_text_revision = 9007199254740991
+
+local function text_revision(value)
+	assert(type(value) == "number" and value >= 0 and value <= max_text_revision and value % 1 == 0,
+		"text field revision must be a non-negative safe integer")
+	return value
+end
+
+local function copy_text_field_value(value)
+	assert(type(value) == "table" and type(value.text) == "string", "expected a text field value")
+	local selection = value.selection or { start = 0, ["end"] = 0 }
+	assert(type(selection.start) == "number" and type(selection["end"]) == "number",
+		"text field selection requires start and end offsets")
+	return setmetatable({
+		text = value.text,
+		selection = { start = selection.start, ["end"] = selection["end"] },
+		revision = text_revision(value.revision or 0),
+		base_revision = value.base_revision ~= nil and text_revision(value.base_revision) or nil,
+	}, text_field_value_metatable)
+end
+
+--- Creates editing state from a string, or reattaches methods to restored editing data.
+--- All selection and revision fields survive ordinary JSON persistence unchanged.
+--- A new string starts with its cursor at the end, measured in UTF-16 code units.
+--- @since (API level 5)
+--- @param value string|TextFieldValue
+--- @return TextFieldValue
+M.text_field_value = function(value)
+	if type(value) == "string" then
+		local length = 0
+		for index = 1, #value do
+			local byte = value:byte(index)
+			if byte < 128 or byte >= 192 then length = length + (byte >= 240 and 2 or 1) end
+		end
+		value = { text = value, selection = { start = length, ["end"] = length }, revision = 0 }
+	elseif getmetatable(value) == text_field_value_metatable then
+		return value
+	end
+	return copy_text_field_value(value)
+end
+
+--- Returns a replacement request without modifying this value or its selection table.
+--- Multiple mutations before a render retain the original base revision.
+--- Native code clamps selection offsets to the resulting text length.
+--- @since (API level 5)
+--- @param change fun(value: TextFieldValue)
+--- @return TextFieldValue
+M.TextFieldValue.mutate = function(self, change)
+	assert(type(change) == "function", "text field mutation requires a function")
+	local result = copy_text_field_value(self)
+	change(result)
+	assert(type(result.text) == "string", "text field value text must be a string")
+	result.base_revision = self.base_revision or self.revision
+	result.revision = text_revision(self.revision + 1)
+	return copy_text_field_value(result)
+end
 
 --- @since (API level 5)
 --- @class IconParams
@@ -495,11 +563,14 @@ end
 --- @param params TextFieldParams
 M.text_field = function(params)
 	assert(type(params) == "table", "text_field params must be a table")
-	assert(type(params.value) == "string", "text_field value must be a string")
+	assert(type(params.key) == "string", "text_field requires a stable key")
+	assert(type(params.value) == "table", "text_field value must be a TextFieldValue")
 	assert(type(params.on_value_change) == "function", "text_field on_value_change is required")
 	local result = component(M.COMPONENT_TYPE.TEXT_FIELD, params)
-	result.value = params.value
-	result.on_value_change = params.on_value_change
+	result.value = M.text_field_value(params.value)
+	result.on_value_change = function(value)
+		params.on_value_change(M.text_field_value(value))
+	end
 	result.label = params.label
 	result.keyboard_type = params.keyboard_type or "TEXT"
 	result.is_error = params.is_error == true

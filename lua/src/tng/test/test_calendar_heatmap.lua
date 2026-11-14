@@ -38,9 +38,10 @@ test("binary tests individual nonzero points and range scales signed daily sums"
 	end
 	assert(intensity({ 0, 0 }, { mode = "BINARY" }) == 0)
 	assert(intensity({ -5, 5 }, { mode = "BINARY" }) == 1)
-	assert(intensity({ -2, 3 }, { mode = "RANGE", minimum = "-3", maximum = "5" }) == 0.5)
-	assert(intensity({ -20 }, { mode = "RANGE", minimum = "-3", maximum = "5" }) == 0)
-	assert(intensity({ 20 }, { mode = "RANGE", minimum = "-3", maximum = "5" }) == 1)
+	local range = { mode = "RANGE", minimum = { text = "-3" }, maximum = { text = "5" } }
+	assert(intensity({ -2, 3 }, range) == 0.5)
+	assert(intensity({ -20 }, range) == 0)
+	assert(intensity({ 20 }, range) == 1)
 end)
 
 test("month labels belong to the week containing the first, not its first Monday", function()

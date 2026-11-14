@@ -12,10 +12,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import com.samco.trackandgraph.data.lua.dto.LuaValueHandle
-import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 
 @Composable
 internal fun LuaTextField(
@@ -24,11 +28,26 @@ internal fun LuaTextField(
     actionHandler: (List<LuaUiAction>) -> Unit,
 ) {
     val callback = node["on_value_change"]?.takeIf { it.asFunction() != null }
+    val incoming = LuaTextFieldValue.fromLua(node["value"])
+    var nativeValue by rememberSaveable(stateSaver = LuaTextFieldValue.Saver) {
+        mutableStateOf(incoming.copy(baseRevision = null))
+    }
+    fun notifyLua() {
+        node.action("on_value_change", nativeValue.snapshot())?.let { actionHandler(listOf(it)) }
+    }
+    LaunchedEffect(incoming) {
+        nativeValue.replaceWith(incoming)?.let { nativeValue = it }
+        // Acknowledge applied requests and resynchronise stale Lua state after queued edits or
+        // rotation. Comparing public fields ignores the native IME composition range.
+        if (nativeValue.needsAcknowledgement(incoming)) notifyLua()
+    }
     OutlinedTextField(
-        value = node["value"]?.asString().orEmpty(),
+        value = nativeValue.value,
         onValueChange = { value ->
-            node.action("on_value_change", LuaValueSnapshot.StringValue(value))
-                ?.let { actionHandler(listOf(it)) }
+            if (value != nativeValue.value) {
+                nativeValue = nativeValue.edit(value)
+                notifyLua()
+            }
         },
         modifier = modifier,
         label = node["label"]?.let { label -> { Text(luaText(label)) } },

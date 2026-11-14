@@ -22,17 +22,49 @@ test("text accepts translated strings", function()
 end)
 
 test("text fields preserve incomplete numeric edits for Lua validation", function()
-	local state = { minimum = "0" }
+	local state = { minimum = ui.text_field_value("0") }
 	local field = ui.text_field({
 		key = "minimum",
 		value = state.minimum,
 		label = { en = "Minimum" },
 		on_value_change = function(value) state.minimum = value end,
 	})
-	field.on_value_change("-")
-	assert(state.minimum == "-")
-	field.on_value_change("-3.1253")
-	assert(tonumber(state.minimum) == -3.1253)
+	field.on_value_change({ text = "-", selection = { start = 1, ["end"] = 1 }, revision = 1 })
+	assert(state.minimum.text == "-")
+	assert(state.minimum.revision == 1)
+	assert(type(state.minimum.mutate) == "function")
+	field.on_value_change({ text = "-3.1253", selection = { start = 7, ["end"] = 7 }, revision = 2 })
+	assert(tonumber(state.minimum.text) == -3.1253)
+end)
+
+test("text field values restore selection and revisions and mutate without aliasing", function()
+	local original = ui.text_field_value({
+		text = "Hello", selection = { start = 4, ["end"] = 1 }, revision = 37,
+	})
+	assert(ui.text_field_value(original) == original)
+	local changed = original:mutate(function(value)
+		value.text = "Reset"
+		value.selection.start = 0
+	end)
+	assert(original.text == "Hello" and original.selection.start == 4)
+	assert(changed.text == "Reset" and changed.selection.start == 0)
+	assert(changed.selection["end"] == 1)
+	assert(changed.base_revision == 37 and changed.revision == 38)
+	local twice = changed:mutate(function(value) value.text = "Again" end)
+	assert(twice.base_revision == 37 and twice.revision == 39)
+	local restored = ui.text_field_value({
+		text = twice.text, selection = twice.selection, revision = twice.revision,
+		base_revision = twice.base_revision,
+	})
+	assert(restored.selection.start == 0 and restored.selection["end"] == 1)
+	assert(restored.revision == 39 and restored.base_revision == 37)
+	assert(restored:mutate(function(value) value.text = "Restored" end).revision == 40)
+end)
+
+test("new text field cursor offsets count UTF-16 rather than UTF-8 bytes", function()
+	local value = ui.text_field_value("Aé😀")
+	assert(value.selection.start == 4 and value.selection["end"] == 4)
+	assert(value.revision == 0 and value.base_revision == nil)
 end)
 
 test("icons and icon buttons retain semantic tokens and interaction", function()
@@ -118,6 +150,7 @@ test("nested UI constants are available through the API level gate", function()
 	local spec = dofile("src/tng/ui.apispec.lua")
 	api_gate.reset()
 	local gated = api_gate.gate(ui, spec)
+	assert(gated.text_field_value("text").text == "text")
 
 	assert(gated.BOX_ALIGNMENT.BOTTOM_END == "BOTTOM_END")
 	assert(gated.COMPONENT_TYPE.FLOW_ROW == "FLOW_ROW")

@@ -8,6 +8,7 @@ local function initial_state(state)
 	state = state or {}
 	if state.show_legend == nil then state.show_legend = true end
 	if state.sources == nil then state.sources = {} end
+	if state.next_source_key == nil then state.next_source_key = 0 end
 	return state
 end
 
@@ -54,7 +55,7 @@ local function initial_sources(feature_map)
 end
 
 local function valid_range(source)
-	local minimum, maximum = tonumber(source.minimum), tonumber(source.maximum)
+	local minimum, maximum = tonumber(source.minimum.text), tonumber(source.maximum.text)
 	return minimum ~= nil and maximum ~= nil
 		and minimum > -math.huge and maximum < math.huge and maximum > minimum
 end
@@ -73,9 +74,14 @@ local function range_field(source, field, label)
 end
 
 local function source_row(state, index, source)
+	if source.key == nil then
+		state.next_source_key = state.next_source_key + 1
+		source.key = state.next_source_key
+	end
+	local source_key = source.key
 	source.mode = source.mode or "BINARY"
-	source.minimum = source.minimum or "0"
-	source.maximum = source.maximum or "100"
+	source.minimum = ui.text_field_value(source.minimum or "0")
+	source.maximum = ui.text_field_value(source.maximum or "100")
 	local mode_menu = {}
 	for _, mode in ipairs({ "BINARY", "RANGE" }) do
 		mode_menu[#mode_menu + 1] = ui.dropdown_menu_item({
@@ -92,13 +98,13 @@ local function source_row(state, index, source)
 			spacing = theme.spacing.small,
 			children = {
 				commonui.color_spinner({
-					key = "source_color_" .. index,
+					key = "source_color_" .. source_key,
 					state = state,
 					selected_color = source.color,
 					on_color_selected = function(color) source.color = color end,
 				}),
 				commonui.feature_selector({
-					key = "source_feature_" .. index,
+					key = "source_feature_" .. source_key,
 					state = state,
 					title = strings.select_feature,
 					placeholder = strings.choose_feature,
@@ -144,7 +150,7 @@ local function source_row(state, index, source)
 		})
 	end
 	return ui.surface({
-		key = "source_" .. index,
+		key = "source_" .. source_key,
 		modifier = ui.modifier(ui.fill_width()),
 		color = theme.color.surface,
 		shape = theme.shape.medium,

@@ -87,8 +87,8 @@ local function read_source(source, configuration, color)
 	end
 
 	local mode = configuration and configuration.mode or "BINARY"
-	local minimum = tonumber(configuration and configuration.minimum) or 0
-	local maximum = tonumber(configuration and configuration.maximum) or 100
+	local minimum = tonumber(configuration and configuration.minimum and configuration.minimum.text) or 0
+	local maximum = tonumber(configuration and configuration.maximum and configuration.maximum.text) or 100
 	for index, value in pairs(values) do
 		if mode == "RANGE" and maximum > minimum then
 			values[index] = math.max(0, math.min(1, (value - minimum) / (maximum - minimum)))

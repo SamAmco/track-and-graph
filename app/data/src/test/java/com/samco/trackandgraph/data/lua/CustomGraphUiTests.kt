@@ -30,6 +30,53 @@ import org.junit.Test
 
 internal class CustomGraphUiTests : LuaEngineImplTest() {
     @Test
+    fun `text field values restore methods selection and revision after configuration persistence`() = runBlocking {
+        val engine = uut()
+        val lock = engine.acquireVM()
+        try {
+            val original = engine.runLuaScript(
+                lock,
+                InlineLuaScriptAccessor(
+                    """
+                    local ui = require("tng.ui")
+                    return ui.text_field_value({
+                        text = "100", selection = { start = 2, ["end"] = 0 }, revision = 37,
+                    })
+                    """.trimIndent(),
+                ),
+            )
+            val restored = LuaStateJsonCodec.decode(
+                LuaStateJsonCodec.encode(requireNotNull(original.snapshot())),
+            )
+            assertEquals("100", restored["text"]?.asString())
+            assertEquals(2.0, restored["selection"]?.get("start")?.asDouble() ?: -1.0, 0.0)
+            assertEquals(0.0, restored["selection"]?.get("end")?.asDouble() ?: -1.0, 0.0)
+            val mutate = requireNotNull(engine.runLuaScript(
+                lock,
+                InlineLuaScriptAccessor(
+                    """
+                    local ui = require("tng.ui")
+                    return function(saved)
+                        return ui.text_field_value(saved):mutate(function(next)
+                            next.text = "0"
+                            next.selection = { start = 1, ["end"] = 1 }
+                        end)
+                    end
+                    """.trimIndent(),
+                ),
+            ).asFunction())
+            val changed = engine.callLuaFunction(lock, mutate, restored)
+            assertEquals("0", changed["text"]?.asString())
+            assertEquals(37.0, changed["base_revision"]?.asDouble() ?: -1.0, 0.0)
+            assertEquals(38.0, changed["revision"]?.asDouble() ?: -1.0, 0.0)
+            assertEquals(1.0, changed["selection"]?.get("start")?.asDouble() ?: -1.0, 0.0)
+            assertEquals("100", original["text"]?.asString())
+        } finally {
+            engine.releaseVM(lock)
+        }
+    }
+
+    @Test
     fun `common icon tokens are available as an installed pure Lua module`() = runBlocking {
         val engine = uut()
         val lock = engine.acquireVM()
