@@ -18,6 +18,47 @@ import org.luaj.vm2.lib.ZeroArgFunction
 
 class LuaStateJsonCodecTest {
     @Test
+    fun `snapshot and JSON round trip preserve numeric strings as strings`() {
+        val strings = listOf("0", "100", "-3.1253", "001", "1e3", "-")
+        val state = LuaTable().apply {
+            set("fields", LuaTable().apply {
+                strings.forEachIndexed { index, text -> set(index + 1, text) }
+            })
+            set("number", 100.0)
+            set("enabled", LuaValue.valueOf(true))
+        }
+
+        val snapshot = requireNotNull(LuaStateJsonCodec.snapshot(state))
+        val restored = LuaStateJsonCodec.decode(LuaStateJsonCodec.encode(snapshot)).toLuaValue()
+
+        strings.forEachIndexed { index, text ->
+            val field = restored.get("fields").get(index + 1)
+            assertEquals(text, LuaValue.TSTRING, field.type())
+            assertEquals(text, field.tojstring())
+        }
+        assertEquals(LuaValue.TNUMBER, restored.get("number").type())
+        assertEquals(100.0, restored.get("number").todouble(), 0.0)
+        assertEquals(LuaValue.TBOOLEAN, restored.get("enabled").type())
+        assertTrue(restored.get("enabled").toboolean())
+    }
+
+    @Test
+    fun `numeric string keys remain distinct object keys`() {
+        val keys = listOf("1", "01", "0", "-1", "1.5", "1e3")
+        val state = LuaTable().apply {
+            keys.forEach { key -> set(key, "value for $key") }
+        }
+
+        val snapshot = requireNotNull(LuaStateJsonCodec.snapshot(state))
+        val encoded = Json.parseToJsonElement(LuaStateJsonCodec.encode(snapshot))
+
+        assertEquals(JsonObject(keys.associateWith { JsonPrimitive("value for $it") }), encoded)
+        val restored = LuaStateJsonCodec.decode(encoded.toString()).toLuaValue()
+        keys.forEach { key -> assertEquals("value for $key", restored.get(key).tojstring()) }
+        assertTrue(restored.get(1).isnil())
+    }
+
+    @Test
     fun `round trips JSON-compatible nested state`() {
         val state = LuaValueSnapshot.TableValue(
             mapOf(

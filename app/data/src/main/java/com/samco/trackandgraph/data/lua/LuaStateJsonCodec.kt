@@ -73,16 +73,17 @@ internal object LuaStateJsonCodec {
         }
     }
 
+    // isnumber()/isstring() accept coercible values; persistence must preserve the actual type.
     private fun snapshotValue(
         value: LuaValue,
         visiting: MutableSet<LuaValue>,
-    ): LuaValueSnapshot? = when {
-        value.isnil() -> LuaValueSnapshot.Nil
-        value.isboolean() -> LuaValueSnapshot.BooleanValue(value.toboolean())
-        value.isnumber() -> value.todouble().takeIf(Double::isFinite)
+    ): LuaValueSnapshot? = when (value.type()) {
+        LuaValue.TNIL -> LuaValueSnapshot.Nil
+        LuaValue.TBOOLEAN -> LuaValueSnapshot.BooleanValue(value.toboolean())
+        LuaValue.TNUMBER -> value.todouble().takeIf(Double::isFinite)
             ?.let(LuaValueSnapshot::NumberValue)
-        value.isstring() -> LuaValueSnapshot.StringValue(value.tojstring())
-        value.istable() -> snapshotTable(value.checktable()!!, visiting)
+        LuaValue.TSTRING -> LuaValueSnapshot.StringValue(value.tojstring())
+        LuaValue.TTABLE -> snapshotTable(value.checktable()!!, visiting)
         else -> null
     }
 
@@ -100,13 +101,15 @@ internal object LuaStateJsonCodec {
                 key = next.arg1()
                 if (key.isnil()) break
                 val value = next.arg(2)
-                when {
-                    key.isnumber() && key.todouble().isFinite() -> {
+                when (key.type()) {
+                    LuaValue.TNUMBER -> {
                         val number = key.todouble()
                         val integer = number.toInt()
-                        if (integer > 0 && number == integer.toDouble()) integers[integer] = value
+                        if (number.isFinite() && integer > 0 && number == integer.toDouble()) {
+                            integers[integer] = value
+                        }
                     }
-                    key.isstring() -> strings[key.tojstring()] = value
+                    LuaValue.TSTRING -> strings[key.tojstring()] = value
                 }
             }
 
