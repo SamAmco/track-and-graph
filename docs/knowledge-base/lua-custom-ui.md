@@ -21,7 +21,9 @@ The custom UI path is a general declarative Lua-to-Compose boundary shared by gr
 
 ## Graph Contract and Lifecycle
 
-A custom graph returns a descriptor with `type = "CUSTOM"`, `prepare_data`, and `render_graph`. It may additionally expose `render_configuration`:
+A custom graph returns a descriptor with `type = "CUSTOM"`, `prepare_data`, and `render_graph`. It may additionally expose `render_configuration`.
+
+Built-in graph descriptors also support `prepare_data`, but return their completed native graph result and need no Lua `render_graph`. See [built-in graph descriptors](lua-graph-scripts.md#descriptors-for-built-in-graphs); the example and lifecycle below describe the custom UI path.
 
 ```lua
 local graph = require("tng.graph")

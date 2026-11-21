@@ -66,13 +66,27 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         val type = resolvedResult[TYPE].checkjstring()
             ?: throw IllegalArgumentException("No valid type found for lua graph script result")
 
+        if (type == CUSTOM) {
+            return LuaGraphResult(data = processCustomGraph(resolvedResult, dataSources, configuration, affinity))
+        }
+
+        // Without a preparation hook this is an existing, already-computed graph result.
+        // Native descriptors prepare that same result shape; they do not render Lua UI.
+        val prepareData = resolvedResult[PREPARE_DATA]
+        val graphResult = if (prepareData.isnil()) resolvedResult else {
+            prepareData.checkfunction()!!.call(prepareParams(dataSources, configuration?.toLuaValue() ?: LuaValue.NIL))
+        }
+        if (graphResult.isnil()) return LuaGraphResult(data = null)
+        require(graphResult[TYPE].checkjstring() == type) {
+            "prepare_data must return a graph result of type $type"
+        }
+
         val data = when (type) {
-            DATA_POINT -> dataPointLuaGraphAdapter.process(resolvedResult)
-            TEXT -> textLuaGraphAdapter.process(resolvedResult)
-            PIE_CHART -> pieChartLuaGraphAdapter.process(resolvedResult)
-            LINE_GRAPH -> lineGraphLuaGraphAdapter.process(resolvedResult)
-            TIME_BARCHART -> timeBarChartLuaGraphAdapter.process(resolvedResult)
-            CUSTOM -> processCustomGraph(resolvedResult, dataSources, configuration, affinity)
+            DATA_POINT -> dataPointLuaGraphAdapter.process(graphResult)
+            TEXT -> textLuaGraphAdapter.process(graphResult)
+            PIE_CHART -> pieChartLuaGraphAdapter.process(graphResult)
+            LINE_GRAPH -> lineGraphLuaGraphAdapter.process(graphResult)
+            TIME_BARCHART -> timeBarChartLuaGraphAdapter.process(graphResult)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
@@ -86,11 +100,7 @@ internal class LuaGraphScriptAdapter @Inject constructor(
         affinity: LuaVMAffinity,
     ): LuaGraphResultData.CustomData {
         val renderState = configuration?.toLuaValue() ?: LuaValue.NIL
-        val prepareParams = LuaTable().apply {
-            set(SOURCES, dataSources)
-            set(STATE, renderState)
-        }
-        val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(prepareParams)
+        val renderData = descriptor[PREPARE_DATA].checkfunction()!!.call(prepareParams(dataSources, renderState))
         val renderFunction = descriptor[RENDER_GRAPH].checkfunction()!!
         return LuaGraphResultData.CustomData(
             renderData = LuaValueHandleImpl(renderData, affinity),
@@ -99,6 +109,11 @@ internal class LuaGraphScriptAdapter @Inject constructor(
                 LuaValueHandleImpl(renderState, affinity)
             },
         )
+    }
+
+    private fun prepareParams(dataSources: LuaValue, state: LuaValue) = LuaTable().apply {
+        set(SOURCES, dataSources)
+        set(STATE, state)
     }
 
     companion object {

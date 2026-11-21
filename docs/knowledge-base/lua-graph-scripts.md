@@ -42,6 +42,27 @@ See `tng/graph.lua` for full parameter definitions.
 
 Custom UI is an additional graph result type with separate data preparation and deferred rendering phases. It can describe layouts and Compose Canvas drawing rather than selecting a built-in chart. See [Lua custom UI](lua-custom-ui.md) for that contract and its runtime constraints.
 
+### Descriptors for built-in graphs
+
+Built-in graph types can also return a descriptor with `prepare_data(params)` and an optional `render_configuration(params)`. Preparation receives `params.sources` (the named input sources) and `params.state` (saved per-instance configuration, or nil). There is no UI context or view mode during preparation. Return the ordinary result table for the descriptor's declared type, or nil to show no graph:
+
+```lua
+local graph = require("tng.graph")
+return {
+    type = graph.GRAPH_TYPE.TEXT,
+    prepare_data = function(params)
+        local point = params.sources.input.dp()
+        if point == nil then return nil end
+        local multiplier = params.state and params.state.multiplier or 1
+        return graph.text(point.value * multiplier)
+    end,
+}
+```
+
+This works for text, data-point, line, pie and time-bar results, in either inline scripts or packages. Package identity fields are independent of this execution contract. Built-in descriptors do not need `render_graph`: Android renders the prepared result. `CUSTOM` retains its existing two-phase contract, where preparation returns intermediate data for `render_graph` instead. Preparation runs once and its result is parsed directly, not recursively treated as another descriptor. A mismatched result type or a failing preparation hook becomes a normal graph error.
+
+Compatibility is selected by shape, not storage: a returned function still receives the original `sources` table directly, and a returned native result table without `prepare_data` is still parsed immediately. Do not wrap legacy function arguments in `params`. `NativeGraphDescriptorTests` pins both legacy shapes, all five native descriptor types, saved/nil state, errors and inline/package parity against the real engine; the community graph runner separately exercises the catalog scripts.
+
 ## Multi-file graph packages
 
 The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"` plus stable `id` and semantic `version` strings. Package IDs use concise descriptive kebab-case names, matching community Lua function IDs; reverse-domain names are not the convention. Package identity is the `(id, version)` pair. Storage format does not determine capability: inline text and package `main.lua` are evaluated identically. A legacy returned function keeps the old graph behavior. A returned descriptor table may expose package metadata, custom graph hooks, and `render_configuration`. When that hook exists, its Lua UI replaces the source preview and feature inputs. See [configuration lifecycle](lua-custom-ui.md#stateful-configuration-ui) for navigation and reset behaviour.
