@@ -109,7 +109,7 @@ docs:
 
   - file: lua-custom-ui.md
     title: Lua custom UI — deferred rendering, retained VM state, and Compose mapping
-    description: Custom graph preparation/rendering, retained stateful configuration UI, affinity locking, responsive layout, translated text, common UI wrappers, FlowRow, Canvas, and theme tokens.
+    description: Custom graph preparation/rendering, retained stateful configuration UI, affinity locking, responsive calendar heatmap layout lessons, translated text, common UI wrappers, FlowRow, Canvas, and theme tokens.
     keywords: [lua, custom-ui, CUSTOM, prepare_data, render_graph, render_configuration, configuration, JSON, state, on_click, RetainedLuaUiContent, tng.ui, tng.commonui, tng.graphui, SelectorButton, TextChip, native-parity, tng.canvas, tng.theme, LuaUiContent, LuaUiContext, LuaValueAccessor, LuaValueSnapshot, LuaValueHandle, affinity, render, data, canvas, DrawScope, Compose, constraints, responsive, density, font-scale, dp, sp, FlowRow, legend, data-vis, translation, TextAlign, vertical-align, Path, pathFactory, testing, theme, modifier, callback, error]
 
   - file: lua-community-functions.md
@@ -119,8 +119,8 @@ docs:
 
   - file: lua-graph-scripts.md
     title: Writing Lua graph scripts and contributing graph scripts
-    description: Graph scripts, ZIP-compatible .tng packages, source-neutral descriptors, custom graph/configuration renderers, per-instance state, DataSource API, and tests.
-    keywords: [lua, graph, script, package, archive, ZIP, tng, require, configuration, render_configuration, prepare_data, render_graph, JSON, state, translation, visualization, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, community]
+    description: Graph scripts, ZIP-compatible .tng packages, source-neutral descriptors, custom graph/configuration renderers, per-instance state, local device package iteration, DataSource API, and tests.
+    keywords: [lua, graph, script, package, archive, ZIP, tng, require, configuration, render_configuration, prepare_data, render_graph, JSON, state, translation, visualization, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, community, tng-lua-dev, emulator, hot-reload]
 
   - file: lua-tooling.md
     title: Lua tooling, build process, publishing, and adding new config types

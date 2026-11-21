@@ -9,6 +9,7 @@ topics:
   - core.DURATION (ms, arithmetic ok) vs core.PERIOD (variable length — NO arithmetic)
   - Graph tests DIFFER from function tests: config values are Lua code strings (regex replacement); sources are named table
   - File structure: lua/src/community/graphs/<category>/<script-name>/
+  - Local package iteration uses external tng-lua-dev tooling and staged database replacement
 keywords: [lua, graph, script, package, tng, ZIP, configuration, render_configuration, prepare_data, render_graph, JSON, state, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, sync-lua-to-docs]
 ---
 
@@ -43,7 +44,7 @@ Custom UI is an additional graph result type with separate data preparation and 
 
 ## Multi-file graph packages
 
-The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"` plus stable `id` and semantic `version` strings. Package IDs use concise descriptive kebab-case names, matching community Lua function IDs; reverse-domain names are not the convention. Package identity is the `(id, version)` pair. Storage format does not determine capability: inline text and package `main.lua` are evaluated identically. A legacy returned function keeps the old graph behavior. A returned descriptor table may expose package metadata, custom graph hooks, and `render_configuration`. When that hook exists, its Lua UI replaces the source preview and feature inputs until the user navigates back to the source controls.
+The app imports multi-file Track & Graph packages as ZIP-compatible files with a `.tng` extension. A package has `main.lua` at its root. When imported as a graph, its returned descriptor must declare `purpose = "GRAPH"` plus stable `id` and semantic `version` strings. Package IDs use concise descriptive kebab-case names, matching community Lua function IDs; reverse-domain names are not the convention. Package identity is the `(id, version)` pair. Storage format does not determine capability: inline text and package `main.lua` are evaluated identically. A legacy returned function keeps the old graph behavior. A returned descriptor table may expose package metadata, custom graph hooks, and `render_configuration`. When that hook exists, its Lua UI replaces the source preview and feature inputs. See [configuration lifecycle](lua-custom-ui.md#stateful-configuration-ui) for navigation and reset behaviour.
 
 Lua modules use the conventional mapping: `require("renderer")` loads `renderer.lua`, while `require("chart.renderer")` loads `chart/renderer.lua`. `<module>/init.lua` is also supported. Modules are decoded on demand through a package accessor, and each graph execution has an isolated module cache so retained custom-render closures continue to resolve the correct package.
 
@@ -58,6 +59,20 @@ To build one with common ZIP tooling, run the command from inside the package di
 ```bash
 zip -r my-graph.tng main.lua data.lua renderer.lua strings.lua
 ```
+
+### Local package iteration on a debuggable device
+
+On this development machine, the external helper `~/.local/bin/tng-lua-dev` zips a package directory and replaces an already-imported package on the emulator. Use `--list` to discover graph IDs, then:
+
+```bash
+tng-lua-dev /absolute/path/to/package --graph-id <lua_graphs_table.id>
+```
+
+The ID is the Lua graph row ID, not `graph_stat_id`. Configuration and feature inputs are preserved by default; `--config-file /tmp/config.json` optionally changes configuration in the same transaction, but does not change feature mappings. The helper includes every regular package file, so new required modules are not accidentally omitted. It accepts `--serial` and `--app` for a different device or debuggable app.
+
+This deliberately bypasses production first-write-wins package storage: replacing a shared `(id, version)` affects every graph referencing it. Keep identity/version unchanged during this local loop rather than bumping the version for each visual tweak. Native API changes still require rebuilding/installing the app. For ordinary imports without the helper, delete all graphs referencing that package so cleanup removes the stored archive before reimporting changed bytes at the same version.
+
+The helper stops the app, preserves committed WAL data, makes an offline backup under `~/.local/state/tng-lua-dev/backups/`, edits a private copy, and stages it for restart using the [database restore lifecycle](database-backup-restore.md#restore-lifecycle). Never replace an open Room database directly. The helper is machine-local tooling, not a repository dependency. After reload, open the graph card to inspect full-screen mode and verify both portrait and landscape; installing successfully is not visual verification.
 
 ## Using Data Sources
 
@@ -101,7 +116,7 @@ return function(sources)
 end
 ```
 
-Users modify these variables directly in the script editor. Descriptor-based scripts can instead provide `render_configuration(context, state)` and return interactive Lua UI plus persistent state; packages are not required for that capability.
+Users modify these variables directly in the script editor. Descriptor-based scripts can instead provide `render_configuration(params)` and return interactive Lua UI plus persistent state; packages are not required for that capability.
 
 ### Script Previews
 
