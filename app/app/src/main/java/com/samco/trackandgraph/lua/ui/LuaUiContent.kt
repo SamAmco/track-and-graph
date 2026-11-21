@@ -17,13 +17,17 @@ interface LuaUiContent {
     /** Effective state that will be passed to the next render. */
     val state: LuaValueAccessor?
 
-    /** Returns the complete top-level table produced by the Lua renderer. */
-    suspend fun render(context: LuaUiContext): LuaValueHandle
+    /** Returns the complete render response, with caller-supplied params alongside context/state. */
+    suspend fun render(
+        context: LuaUiContext,
+        additionalParams: Map<String, LuaValueAccessor> = emptyMap(),
+    ): LuaValueHandle
 
     /** Calls an action and rerenders before releasing their shared VM execution lock. */
     suspend fun interact(
         context: LuaUiContext,
         actions: List<LuaUiAction>,
+        additionalParams: Map<String, LuaValueAccessor> = emptyMap(),
     ): LuaValueHandle
 
     /** Calls an auxiliary function, such as a deferred Canvas draw callback, without rerendering. */

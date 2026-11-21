@@ -70,6 +70,7 @@ internal fun LuaUiHost(
     content: LuaUiContent,
     errorContent: @Composable (Throwable) -> Unit,
     onRendered: (LuaValueAccessor) -> Unit = {},
+    additionalParams: Map<String, LuaValueAccessor> = emptyMap(),
 ) {
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
@@ -87,8 +88,8 @@ internal fun LuaUiHost(
             } else LuaUiContext.LayoutDirection.RTL,
             theme = if (darkTheme) LuaUiContext.Theme.DARK else LuaUiContext.Theme.LIGHT,
         )
-        var callbackError by remember(content, context) { mutableStateOf<Throwable?>(null) }
-        var renderResult by remember(content, context) {
+        var callbackError by remember(content, context, additionalParams) { mutableStateOf<Throwable?>(null) }
+        var renderResult by remember(content, context, additionalParams) {
             mutableStateOf<Result<LuaValueHandle>?>(null)
         }
         fun publish(result: Result<LuaValueHandle>) {
@@ -97,13 +98,13 @@ internal fun LuaUiHost(
             }
             if (renderResult?.isSuccess == true) result.getOrNull()?.let(onRendered)
         }
-        LaunchedEffect(content, context) {
-            publish(captureLuaUiResult { content.render(context) })
+        LaunchedEffect(content, context, additionalParams) {
+            publish(captureLuaUiResult { content.render(context, additionalParams) })
         }
         val coroutineScope = rememberCoroutineScope()
         val actionHandler: (List<LuaUiAction>) -> Unit = { actions ->
             coroutineScope.launch {
-                publish(captureLuaUiResult { content.interact(context, actions) })
+                publish(captureLuaUiResult { content.interact(context, actions, additionalParams) })
             }
         }
         val error = callbackError ?: renderResult?.exceptionOrNull()

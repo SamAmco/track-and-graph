@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,6 +68,7 @@ import com.samco.trackandgraph.ui.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.ui.smallIconSize
 import com.samco.trackandgraph.data.lua.dto.LuaScriptException
+import com.samco.trackandgraph.data.lua.dto.LuaValueSnapshot
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -77,24 +79,40 @@ fun FullScreenGraphStatView(
 ) = BoxWithConstraints(modifier = modifier) {
     val maxHeight = constraints.maxHeight
     val graphBackgroundColor = MaterialTheme.colorScheme.background
-    FadingScrollColumn(
-        modifier = Modifier
-            .padding(WindowInsets.safeDrawing.asPaddingValues())
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        content = {
-            DialogInputSpacing()
-            GraphStatViewContent(
-                modifier = Modifier.fillMaxWidth(),
-                graphStatViewData = graphStatViewData,
-                graphViewMode = GraphViewMode.FullScreenMode(maxHeight),
-                graphBackgroundColor = graphBackgroundColor,
-                timeMarker = timeMarker,
-            )
-            DialogInputSpacing()
-        }
-    )
+    val customLuaGraph = (graphStatViewData as? ILuaGraphViewData)?.wrapped is ILuaCustomGraphViewData
+    val content: @Composable ColumnScope.() -> Unit = {
+        DialogInputSpacing()
+        GraphStatViewContent(
+            modifier = if (customLuaGraph) {
+                Modifier.fillMaxWidth().weight(1f, fill = false)
+            } else Modifier.fillMaxWidth(),
+            graphStatViewData = graphStatViewData,
+            graphViewMode = GraphViewMode.FullScreenMode(maxHeight),
+            graphBackgroundColor = graphBackgroundColor,
+            timeMarker = timeMarker,
+        )
+        DialogInputSpacing()
+    }
+    val containerModifier = Modifier
+        .padding(WindowInsets.safeDrawing.asPaddingValues())
+        .fillMaxSize()
+    if (customLuaGraph) {
+        // Custom UI decides how to use the remaining viewport. A scroll container would give
+        // it unbounded height, preventing fill-height canvases and measured row wrapping.
+        Column(
+            modifier = containerModifier,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            content = content,
+        )
+    } else {
+        FadingScrollColumn(
+            modifier = containerModifier,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            content = content,
+        )
+    }
 }
 
 @Composable
@@ -299,6 +317,12 @@ private fun UnwrappedLuaGraphView(
             modifier = modifier,
             content = unwrapped.content,
             errorContent = { GraphThrowableError(error = it) },
+            additionalParams = mapOf(
+                "view_mode" to LuaValueSnapshot.StringValue(when (graphViewMode) {
+                    GraphViewMode.ListMode -> "LIST"
+                    is GraphViewMode.FullScreenMode -> "FULL_SCREEN"
+                }),
+            ),
         )
         else -> GraphStatInnerView(
             graphStatViewData = unwrapped,

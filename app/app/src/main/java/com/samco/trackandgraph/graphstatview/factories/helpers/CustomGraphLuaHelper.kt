@@ -37,7 +37,7 @@ class CustomGraphLuaHelper @Inject constructor(
                 luaEngine = luaEngine,
                 renderFunction = customData.renderFunction,
                 initialState = customData.renderState,
-                additionalRenderParams = mapOf("data" to customData.renderData),
+                defaultAdditionalParams = mapOf("data" to customData.renderData),
             )
             override val state = IGraphStatViewData.State.READY
             override val graphOrStat = graphOrStat

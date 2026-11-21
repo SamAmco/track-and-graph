@@ -81,6 +81,68 @@ test("calendar squares retain size and one-pixel gaps while revealing older week
 	assert(wide[#wide].top_left.x + 28 == 1000)
 end)
 
+test("full screen wraps complete rows chronologically with weekday labels only on the first", function()
+	local data = prepare({ sources = {}, state = {} })
+	local calendar = data.calendar
+	local requested_weeks, days
+	data.calendar = function(weeks)
+		requested_weeks = weeks
+		local result = calendar(weeks)
+		days = result.days
+		return result
+	end
+	local result = render({
+		context = { density = 2, font_scale = 1 }, view_mode = "FULL_SCREEN",
+		state = { show_legend = false }, data = data,
+	})
+	assert(result.ui.modifier[2].type == "FILL_HEIGHT")
+	assert(result.ui.children[1].modifier[2].type == "WEIGHT")
+	local recording = result.ui.children[1].draw({ bounds = { width = 400, height = 802 }, density = 2 })
+	local rects, weekday_count, headings = {}, 0, {}
+	for _, instruction in ipairs(recording.instructions) do
+		if instruction.type == "RECT" then
+			rects[#rects + 1] = instruction
+			assert(instruction.top_left.y + instruction.size.height <= 802)
+		elseif instruction.type == "TEXT" then
+			if instruction.top_left.x == 0 then weekday_count = weekday_count + 1
+			else headings[instruction.top_left.y] = true end
+		end
+	end
+	assert(requested_weeks == 33 and #rects == 33 * 7)
+	assert(weekday_count == 7)
+	assert(headings[0] and headings[278] and headings[556])
+	for row = 0, 2 do
+		local first, last = rects[row * 77 + 1], rects[(row + 1) * 77]
+		assert(first.top_left.x == 82 and first.top_left.y == row * 278 + 44)
+		assert(last.top_left.x + 28 == 400)
+	end
+	assert(days[1].key < days[78].key and days[78].key < days[155].key)
+	assert(days[#days - 1].key == "2026-11-14") -- newest Saturday in the bottom-right week
+	result.ui.children[1].draw({ bounds = { width = 400, height = 801 }, density = 2 })
+	assert(requested_weeks == 22) -- one pixel too short for three complete rows
+end)
+
+test("list mode ignores surplus height and tiny full screen bounds draw nothing", function()
+	local data = prepare({ sources = {}, state = {} })
+	for _, case in ipairs({
+		{ full = false, width = 400, height = 1000, expected = 77 },
+		{ full = true, width = 400, height = 245, expected = 0 },
+		{ full = true, width = 60, height = 1000, expected = 0 },
+	}) do
+		local result = render({
+			context = { density = 2 }, view_mode = case.full and "FULL_SCREEN" or "LIST", data = data,
+		})
+		local recording = result.ui.children[1].draw({
+			bounds = { width = case.width, height = case.height }, density = 2,
+		})
+		local count = 0
+		for _, item in ipairs(recording.instructions) do
+			if item.type == "RECT" then count = count + 1 end
+		end
+		assert(count == case.expected)
+	end
+end)
+
 test("overlapping colours average scaled results independently of source order", function()
 	local data = prepare({ sources = {}, state = {} })
 	local function composite(sources)

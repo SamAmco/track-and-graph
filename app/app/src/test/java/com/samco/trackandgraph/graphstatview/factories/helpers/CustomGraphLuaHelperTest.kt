@@ -65,10 +65,12 @@ class CustomGraphLuaHelperTest {
     @Test
     fun `callback reacquires the VM that owns the retained function`() = runTest {
         val callback: LuaValueHandle = mock()
+        val callbackLock = TestLuaVMFixtures.createTestLuaVMLock()
         val argument = LuaValueSnapshot.NumberValue(4.0)
-        whenever(callback.affinity).thenReturn(vmLock.affinity)
-        whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
-        whenever(luaEngine.callLuaFunction(vmLock, callback, argument)).thenReturn(result)
+        whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
+        whenever(callback.affinity).thenReturn(callbackLock.affinity)
+        whenever(luaEngine.acquireVM(callbackLock.affinity)).thenReturn(callbackLock)
+        whenever(luaEngine.callLuaFunction(callbackLock, callback, argument)).thenReturn(result)
 
         val viewData = CustomGraphLuaHelper(luaEngine)(
             customData = LuaGraphResultData.CustomData(renderData, renderFunction, renderState),
@@ -76,8 +78,25 @@ class CustomGraphLuaHelperTest {
         ).wrapped as ILuaCustomGraphViewData
 
         assertSame(result, viewData.content.call(callback, argument))
-        verify(luaEngine).acquireVM(vmLock.affinity)
-        verify(luaEngine).callLuaFunction(vmLock, callback, argument)
+        verify(luaEngine).acquireVM(callbackLock.affinity)
+        verify(luaEngine).callLuaFunction(callbackLock, callback, argument)
+        verify(luaEngine).releaseVM(callbackLock)
+    }
+
+    @Test
+    fun `callback releases its VM lock when invocation fails`() = runTest {
+        val callback: LuaValueHandle = mock()
+        val failure = IllegalStateException("callback failed")
+        whenever(callback.affinity).thenReturn(vmLock.affinity)
+        whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
+        whenever(luaEngine.callLuaFunction(vmLock, callback)).thenThrow(failure)
+
+        val content = (CustomGraphLuaHelper(luaEngine)(
+            customData = LuaGraphResultData.CustomData(renderData, renderFunction, renderState),
+            graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
+        ).wrapped as ILuaCustomGraphViewData).content
+
+        assertSame(failure, runCatching { content.call(callback) }.exceptionOrNull())
         verify(luaEngine).releaseVM(vmLock)
     }
 
@@ -108,6 +127,34 @@ class CustomGraphLuaHelperTest {
             )
             verify(luaEngine).releaseVM(vmLock)
         }
+    }
+
+    @Test
+    fun `caller additional params merge with data on render and interaction without resetting state`() = runTest {
+        val callback: LuaValueHandle = mock()
+        val nextState: LuaValueHandle = mock()
+        val listParams = mapOf("view_mode" to LuaValueSnapshot.StringValue("LIST"))
+        val fullParams = mapOf("view_mode" to LuaValueSnapshot.StringValue("FULL_SCREEN"))
+        val dataParams = mapOf("data" to renderData)
+        whenever(renderFunction.affinity).thenReturn(vmLock.affinity)
+        whenever(luaEngine.acquireVM(vmLock.affinity)).thenReturn(vmLock)
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, renderState, context, dataParams + listParams))
+            .thenReturn(result)
+        whenever(luaEngine.renderLuaUi(vmLock, renderFunction, nextState, context, dataParams + fullParams))
+            .thenReturn(result)
+        whenever(result["state"]).thenReturn(nextState)
+
+        val content = (CustomGraphLuaHelper(luaEngine)(
+            customData = LuaGraphResultData.CustomData(renderData, renderFunction, renderState),
+            graphOrStat = GraphOrStat(1, "custom", GraphStatType.LUA_SCRIPT, true),
+        ).wrapped as ILuaCustomGraphViewData).content
+
+        assertSame(result, content.render(context, listParams))
+        assertSame(nextState, content.state)
+        assertSame(result, content.interact(context, listOf(LuaUiAction(callback)), fullParams))
+        verify(luaEngine).callLuaFunction(vmLock, callback)
+        verify(luaEngine).renderLuaUi(vmLock, renderFunction, nextState, context, dataParams + fullParams)
+        assertSame(nextState, content.state)
     }
 
     @Test

@@ -30,6 +30,30 @@ import org.junit.Test
 
 internal class CustomGraphUiTests : LuaEngineImplTest() {
     @Test
+    fun `graph view mode is an optional render parameter not part of the generic context`() = runBlocking {
+        val engine = uut()
+        val lock = engine.acquireVM()
+        try {
+            val render = requireNotNull(engine.runLuaScript(
+                lock,
+                InlineLuaScriptAccessor("return function(params) return { ui = params } end"),
+            ).asFunction())
+            for (mode in listOf(null, "LIST", "FULL_SCREEN")) {
+                val result = engine.renderLuaUi(
+                    lock, render, null,
+                    context(LuaUiContext.Theme.LIGHT),
+                    mode?.let { mapOf("view_mode" to LuaValueSnapshot.StringValue(it)) }.orEmpty(),
+                )
+                assertEquals(mode, result["ui"]?.get("view_mode")?.asString())
+                assertNull(result["ui"]?.get("context")?.get("is_full_screen"))
+                assertNull(result["ui"]?.get("context")?.get("view_mode"))
+            }
+        } finally {
+            engine.releaseVM(lock)
+        }
+    }
+
+    @Test
     fun `text field values restore methods selection and revision after configuration persistence`() = runBlocking {
         val engine = uut()
         val lock = engine.acquireVM()

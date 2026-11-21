@@ -9,6 +9,7 @@
 package com.samco.trackandgraph.lua.ui
 
 import com.samco.trackandgraph.data.lua.LuaEngine
+import com.samco.trackandgraph.data.lua.LuaVMAffinity
 import com.samco.trackandgraph.data.lua.LuaVMLock
 import com.samco.trackandgraph.data.lua.dto.LuaUiContext
 import com.samco.trackandgraph.data.lua.dto.LuaValueAccessor
@@ -19,20 +20,24 @@ internal class RetainedLuaUiContent(
     private val luaEngine: LuaEngine,
     private val renderFunction: LuaValueHandle,
     initialState: LuaValueAccessor?,
-    private val additionalRenderParams: Map<String, LuaValueAccessor> = emptyMap(),
+    private val defaultAdditionalParams: Map<String, LuaValueAccessor> = emptyMap(),
 ) : LuaUiContent {
     private var renderState = initialState
     override val state: LuaValueAccessor?
         get() = renderState
 
-    override suspend fun render(context: LuaUiContext): LuaValueHandle = withRenderLock { vmLock ->
-        renderLocked(vmLock, context)
+    override suspend fun render(
+        context: LuaUiContext,
+        additionalParams: Map<String, LuaValueAccessor>,
+    ): LuaValueHandle = withVMLock { vmLock ->
+        renderLocked(vmLock, context, additionalParams)
     }
 
     override suspend fun interact(
         context: LuaUiContext,
         actions: List<LuaUiAction>,
-    ): LuaValueHandle = withRenderLock { vmLock ->
+        additionalParams: Map<String, LuaValueAccessor>,
+    ): LuaValueHandle = withVMLock { vmLock ->
         actions.forEach { action ->
             luaEngine.callLuaFunction(
                 vmLock,
@@ -40,40 +45,37 @@ internal class RetainedLuaUiContent(
                 *action.arguments.toTypedArray(),
             )
         }
-        renderLocked(vmLock, context)
+        renderLocked(vmLock, context, additionalParams)
     }
 
     override suspend fun call(
         function: LuaValueHandle,
         vararg arguments: LuaValueAccessor,
-    ): LuaValueHandle {
-        val vmLock = luaEngine.acquireVM(function.affinity)
-        return try {
-            luaEngine.callLuaFunction(vmLock, function, *arguments)
-        } finally {
-            luaEngine.releaseVM(vmLock)
-        }
+    ): LuaValueHandle = withVMLock(function.affinity) { vmLock ->
+        luaEngine.callLuaFunction(vmLock, function, *arguments)
     }
 
     private fun renderLocked(
         vmLock: LuaVMLock,
         context: LuaUiContext,
+        additionalParams: Map<String, LuaValueAccessor>,
     ): LuaValueHandle {
         val result = luaEngine.renderLuaUi(
             vmLock,
             renderFunction,
             renderState,
             context,
-            additionalRenderParams,
+            defaultAdditionalParams + additionalParams,
         )
         result[STATE]?.let { renderState = it }
         return result
     }
 
-    private suspend fun <T> withRenderLock(
+    private suspend fun <T> withVMLock(
+        affinity: LuaVMAffinity = renderFunction.affinity,
         block: (LuaVMLock) -> T,
     ): T {
-        val vmLock = luaEngine.acquireVM(renderFunction.affinity)
+        val vmLock = luaEngine.acquireVM(affinity)
         return try {
             block(vmLock)
         } finally {

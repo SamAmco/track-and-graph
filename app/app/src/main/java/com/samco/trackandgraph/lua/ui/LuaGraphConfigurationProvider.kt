@@ -33,7 +33,7 @@ class LuaGraphConfigurationProvider @Inject constructor(
                 luaEngine = luaEngine,
                 renderFunction = renderer,
                 initialState = configuration?.value,
-                additionalRenderParams = mapOf(FEATURE_MAP to featureMap),
+                defaultAdditionalParams = mapOf(FEATURE_MAP to featureMap),
             )
         } finally {
             luaEngine.releaseVM(vmLock)
