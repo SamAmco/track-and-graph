@@ -1,5 +1,6 @@
 local strings = require("strings")
 local commonui = require("tng.commonui")
+local core = require("tng.core")
 local icons = require("tng.icons")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
@@ -9,6 +10,7 @@ local function initial_state(state)
 	if state.show_legend == nil then state.show_legend = true end
 	if state.sources == nil then state.sources = {} end
 	if state.next_source_key == nil then state.next_source_key = 0 end
+	if state.sample_ending_at == nil then state.sample_ending_at = "LATEST" end
 	return state
 end
 
@@ -192,6 +194,55 @@ local function add_source_control(state)
 	})
 end
 
+local function ending_at_control(state)
+	local choices = { { "LATEST", strings.ending_at_latest }, { "NOW", strings.ending_at_now },
+		{ "CUSTOM", strings.ending_at_custom } }
+	local items, selected = {}, strings.ending_at_latest
+	for _, choice in ipairs(choices) do
+		local mode, text = choice[1], choice[2]
+		if state.sample_ending_at == mode then selected = text end
+		items[#items + 1] = ui.dropdown_menu_item({
+			key = "ending_at_" .. mode,
+			child = ui.text({ text = text }),
+			on_click = function()
+				state.ending_at_menu_visible = false
+				if mode == "CUSTOM" then state.ending_at_date_visible = true
+				else state.sample_ending_at = mode end
+			end,
+		})
+	end
+	if state.sample_ending_at == "CUSTOM" and state.sample_end_date then
+		selected = core.format(state.sample_end_date, "d MMM yyyy")
+	end
+	return ui.row({
+		key = "sample_ending_at", alignment = ui.ALIGNMENT.CENTER,
+		modifier = ui.modifier(ui.fill_width()), spacing = theme.spacing.medium,
+		children = {
+			ui.text({ text = strings.ending_at, style = theme.text_style.body_medium,
+				modifier = ui.modifier(ui.weight(1)) }),
+			ui.box({ children = {
+				commonui.selector_button({
+					key = "ending_at_button", text = selected,
+					on_click = function() state.ending_at_menu_visible = true end,
+				}),
+				ui.dropdown_menu({
+					expanded = state.ending_at_menu_visible == true, children = items,
+					on_dismiss_request = function() state.ending_at_menu_visible = false end,
+				}),
+				ui.date_picker_dialog({
+					key = "ending_at_date", visible = state.ending_at_date_visible == true,
+					initial_date = state.sample_end_date,
+					on_date_selected = function(date)
+						state.sample_end_date = date
+						state.sample_ending_at = "CUSTOM"
+					end,
+					on_dismiss_request = function() state.ending_at_date_visible = false end,
+				}),
+			} }),
+		},
+	})
+end
+
 return function(params)
 	local state = params.state
 	state = initial_state(state)
@@ -214,6 +265,7 @@ return function(params)
 			spacing = theme.spacing.large,
 			modifier = ui.modifier(ui.fill_width()),
 			children = {
+				ending_at_control(state),
 				ui.column({
 					spacing = theme.spacing.small,
 					children = {

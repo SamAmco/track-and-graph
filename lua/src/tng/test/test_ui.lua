@@ -15,6 +15,22 @@ test("dimensions are serializable values", function()
 	assert(ui.sp(14).unit == ui.UNIT.SP)
 end)
 
+test("scrolling and native date-picker descriptions retain their options and callbacks", function()
+	assert(ui.vertical_scroll().type == "VERTICAL_SCROLL")
+	local selected, dismissed
+	local date = { year = 2026, month = 1, day = 1 }
+	local dialog = ui.date_picker_dialog({
+		key = "date", visible = true, initial_date = date, allow_past_dates = false,
+		on_date_selected = function(value) selected = value end,
+		on_dismiss_request = function() dismissed = true end,
+	})
+	assert(dialog.type == "DATE_PICKER_DIALOG" and dialog.initial_date == date)
+	assert(dialog.visible and not dialog.allow_past_dates)
+	dialog.on_date_selected(date)
+	dialog.on_dismiss_request()
+	assert(selected == date and dismissed)
+end)
+
 test("text accepts translated strings", function()
 	local translations = { en = "Calendar", fr = "Calendrier" }
 	local text = ui.text({ text = translations })

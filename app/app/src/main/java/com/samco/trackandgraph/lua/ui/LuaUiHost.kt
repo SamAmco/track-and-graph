@@ -181,6 +181,7 @@ private fun LuaNode(node: LuaValueHandle, content: LuaUiContent, parentModifier:
                 actionHandler = LocalLuaUiActionHandler.current,
             ) { LuaNode(it, content) }
             "SELECT_ITEM_DIALOG" -> LuaSelectItemDialog(node, LocalLuaUiActionHandler.current)
+            "DATE_PICKER_DIALOG" -> LuaDatePickerDialog(node, LocalLuaUiActionHandler.current)
         }
     }
 }

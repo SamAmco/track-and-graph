@@ -20,6 +20,7 @@ M.COMPONENT_TYPE = {
 	DROPDOWN_MENU = "DROPDOWN_MENU",
 	DROPDOWN_MENU_ITEM = "DROPDOWN_MENU_ITEM",
 	SELECT_ITEM_DIALOG = "SELECT_ITEM_DIALOG",
+	DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG",
 }
 
 --- @since (API level 5)
@@ -55,6 +56,7 @@ M.MODIFIER_TYPE = {
 	ELEVATION = "ELEVATION",
 	ALIGN = "ALIGN",
 	ON_CLICK = "ON_CLICK",
+	VERTICAL_SCROLL = "VERTICAL_SCROLL",
 }
 
 --- @since (API level 5)
@@ -366,6 +368,12 @@ M.wrap_height = function()
 	return { type = M.MODIFIER_TYPE.WRAP_HEIGHT }
 end
 
+--- Gives this component a remembered vertical scroll position when its content exceeds its viewport.
+--- @since (API level 5)
+M.vertical_scroll = function()
+	return { type = M.MODIFIER_TYPE.VERTICAL_SCROLL }
+end
+
 M.weight = function(value, fill)
 	assert(type(value) == "number" and value > 0, "weight must be positive")
 	return { type = M.MODIFIER_TYPE.WEIGHT, value = value, fill = fill ~= false }
@@ -634,6 +642,32 @@ M.select_item_dialog = function(params)
 	result.on_function_selected = params.on_function_selected
 	result.on_dismiss_request = params.on_dismiss_request
 	result.reset_on_close = params.reset_on_close or false
+	return result
+end
+
+--- A controlled calendar date picker using the app's native dialog.
+--- @since (API level 5)
+--- @class DatePickerDialogParams
+--- @field key? string
+--- @field visible boolean
+--- @field initial_date? table: Civil date `{ year = integer, month = integer, day = integer }`; defaults to today.
+--- @field allow_past_dates? boolean: Defaults to true.
+--- @field on_date_selected fun(date: table): Receives a civil date with year, month, and day.
+--- @field on_dismiss_request fun()
+M.DatePickerDialogParams = {}
+
+--- @since (API level 5)
+--- @param params DatePickerDialogParams
+M.date_picker_dialog = function(params)
+	assert(type(params) == "table" and type(params.visible) == "boolean", "date picker requires visible")
+	assert(type(params.on_date_selected) == "function", "date picker requires on_date_selected")
+	assert(type(params.on_dismiss_request) == "function", "date picker requires on_dismiss_request")
+	local result = component(M.COMPONENT_TYPE.DATE_PICKER_DIALOG, params)
+	result.visible = params.visible
+	result.initial_date = params.initial_date
+	result.allow_past_dates = params.allow_past_dates ~= false
+	result.on_date_selected = params.on_date_selected
+	result.on_dismiss_request = params.on_dismiss_request
 	return result
 end
 

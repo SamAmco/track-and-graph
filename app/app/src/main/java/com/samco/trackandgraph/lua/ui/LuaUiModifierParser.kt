@@ -19,6 +19,8 @@ package com.samco.trackandgraph.lua.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -65,6 +67,7 @@ internal object LuaUiModifierParser {
                 "FILL_HEIGHT" -> result.fillMaxHeight(item.fraction("fraction"))
                 "WRAP_WIDTH" -> result.wrapContentWidth()
                 "WRAP_HEIGHT" -> result.wrapContentHeight()
+                "VERTICAL_SCROLL" -> result.verticalScroll(rememberScrollState())
                 "MIN_WIDTH" -> result.widthIn(min = dimension(item["value"]) ?: Dp.Unspecified)
                 "MAX_WIDTH" -> result.widthIn(max = dimension(item["value"]) ?: Dp.Unspecified)
                 "MIN_HEIGHT" -> result.heightIn(min = dimension(item["value"]) ?: Dp.Unspecified)

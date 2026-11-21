@@ -18,6 +18,7 @@ return {
 	["COMPONENT_TYPE.DROPDOWN_MENU"] = 5,
 	["COMPONENT_TYPE.DROPDOWN_MENU_ITEM"] = 5,
 	["COMPONENT_TYPE.SELECT_ITEM_DIALOG"] = 5,
+	["COMPONENT_TYPE.DATE_PICKER_DIALOG"] = 5,
 
 	SELECTABLE_ITEM_TYPE = 5,
 	["SELECTABLE_ITEM_TYPE.GROUP"] = 5,
@@ -47,6 +48,7 @@ return {
 	["MODIFIER_TYPE.ELEVATION"] = 5,
 	["MODIFIER_TYPE.ALIGN"] = 5,
 	["MODIFIER_TYPE.ON_CLICK"] = 5,
+	["MODIFIER_TYPE.VERTICAL_SCROLL"] = 5,
 
 	ALIGNMENT = 5,
 	["ALIGNMENT.START"] = 5,
@@ -104,6 +106,7 @@ return {
 	DropdownMenuParams = 5,
 	DropdownMenuItemParams = 5,
 	SelectItemDialogParams = 5,
+	DatePickerDialogParams = 5,
 
 	px = 5,
 	dp = 5,
@@ -116,6 +119,7 @@ return {
 	fill_max_row_height = 5,
 	wrap_width = 5,
 	wrap_height = 5,
+	vertical_scroll = 5,
 	weight = 5,
 	min_width = 5,
 	max_width = 5,
@@ -144,4 +148,5 @@ return {
 	dropdown_menu = 5,
 	dropdown_menu_item = 5,
 	select_item_dialog = 5,
+	date_picker_dialog = 5,
 }

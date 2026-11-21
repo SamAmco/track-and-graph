@@ -1,4 +1,8 @@
 return {
+	ending_at = { en = "Sample ending at:" },
+	ending_at_latest = { en = "Last Data Point" },
+	ending_at_now = { en = "Now" },
+	ending_at_custom = { en = "Custom date…" },
 	title = {
 		en = "Calendar heatmap",
 	},

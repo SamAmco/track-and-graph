@@ -4,6 +4,7 @@ local helpers = require("src.tng.test.test_helpers")
 local test = helpers.test
 local render = dofile("src/examples/calendar-heatmap/configuration.lua")
 local ui = require("tng.ui")
+local core = require("tng.core")
 
 local function find(node, predicate)
 	if predicate(node) then return node end
@@ -31,6 +32,32 @@ test("calendar configuration requires a feature", function()
 	local result = render({ feature_map = {} })
 	assert(result.configuration_error.en == "Select a feature for the calendar heatmap")
 	assert(#result.feature_inputs == 0)
+end)
+
+test("sampling endpoint selection supports last point now and a cancellable native date picker", function()
+	local result = render({ feature_map = {} })
+	local state = result.state
+	assert(state.sample_ending_at == "LATEST")
+	keyed(result.ui, "ending_at_NOW").on_click()
+	assert(state.sample_ending_at == "NOW")
+	keyed(result.ui, "ending_at_CUSTOM").on_click()
+	result = render({ state = state })
+	assert(keyed(result.ui, "ending_at_date").visible)
+	keyed(result.ui, "ending_at_date").on_dismiss_request()
+	assert(state.sample_ending_at == "NOW" and not state.ending_at_date_visible)
+	keyed(result.ui, "ending_at_CUSTOM").on_click()
+	local date = { year = 2024, month = 1, day = 3 }
+	keyed(result.ui, "ending_at_date").on_date_selected(date)
+	keyed(result.ui, "ending_at_date").on_dismiss_request()
+	assert(state.sample_end_date == date and state.sample_ending_at == "CUSTOM")
+	core.format = function(value, pattern)
+		assert(value == date and pattern == "d MMM yyyy")
+		return "3 Jan 2024"
+	end
+	result = render({ state = state })
+	assert(keyed(result.ui, "ending_at_button").child.children[1].text == "3 Jan 2024")
+	keyed(result.ui, "ending_at_LATEST").on_click()
+	assert(state.sample_ending_at == "LATEST")
 end)
 
 test("calendar source controls retain colours, validate ranges, add and remove inputs", function()

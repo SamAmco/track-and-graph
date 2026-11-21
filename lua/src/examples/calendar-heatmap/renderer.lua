@@ -2,22 +2,20 @@ local canvas = require("tng.canvas")
 local graphui = require("tng.graphui")
 local theme = require("tng.theme")
 local ui = require("tng.ui")
+local layout = require("calendar_layout")
+local month_layout = require("month_layout")
 
 local function label(scope, text, x, y, width, height, align)
 	scope:drawText({
-		text = text,
-		color = theme.color.secondary_text,
-		top_left = { x = x, y = y },
-		size = { width = width, height = height },
-		font_size = scope:sp(12),
-		text_align = align or canvas.TEXT_ALIGN.START,
-		vertical_align = canvas.TEXT_VERTICAL_ALIGN.CENTER,
-		max_lines = 1,
-		soft_wrap = false,
+		text = text, color = theme.color.secondary_text,
+		top_left = { x = x, y = y }, size = { width = width, height = height },
+		font_size = scope:sp(12), text_align = align or canvas.TEXT_ALIGN.START,
+		vertical_align = canvas.TEXT_VERTICAL_ALIGN.CENTER, max_lines = 1, soft_wrap = false,
 	})
 end
 
 local function draw_day(scope, data, index, x, y, tile)
+	if data.days[index].outside_year then return end
 	local blank = theme.color.data_vis_blank
 	local position = { x = x, y = y }
 	local size = { width = tile, height = tile }
@@ -31,88 +29,132 @@ local function draw_day(scope, data, index, x, y, tile)
 		local alpha = source.values[data.days[index].key] or 0
 		if alpha > 0 then
 			count = count + 1
-			-- Running arithmetic mean of the source's final colour:
-			-- C' = (1 - 1/n) C + ((1-a) blank + a source) / n.
-			-- Two ordinary source-over fills implement it without resolving theme
-			-- or palette tokens in Lua, and give every active source equal weight.
+			-- Running arithmetic mean of each active source's final colour.
 			if alpha < 1 then fill(blank, (1 - alpha) / (count - alpha)) end
 			fill(source.color, alpha / count)
 		end
 	end
 end
 
+-- The list card remains a compact strip of the most recent weeks.
+local function draw_calendar(scope, data, font_scale)
+	local geometry = layout(scope.size.width, scope.density, font_scale)
+	if geometry == nil then return end
+	local calendar = data.calendar(geometry.weeks)
+	calendar.sources = data.sources
+	local top = math.floor(math.max(0, scope.size.height - geometry.height) / 2)
+	local grid_width = geometry.weeks * geometry.step - 1
+	local group_left = math.floor((scope.size.width - grid_width - geometry.label_gap - geometry.label_width) / 2)
+	local left = group_left + geometry.label_gap + geometry.label_width
+	local right = left + grid_width
+	local headings = {}
+	for week = 1, geometry.weeks do
+		local day = calendar.days[(week - 1) * 7 + 1]
+		local month, year = calendar.month_labels[week], calendar.year_labels[week]
+		if week == 1 and month == nil then
+			month = day.month
+			if day.month_number == 1 then year = tostring(day.year) end
+		end
+		local x = left + (week - 1) * geometry.step
+		if month then
+			local minimum = scope:dp((year and 32 or 26) * font_scale)
+			headings[#headings + 1] = { month = month, year = year,
+				x = math.max(left, math.min(x, right - minimum)), minimum = minimum }
+		end
+		for weekday = 1, 7 do
+			draw_day(scope, calendar, (week - 1) * 7 + weekday, x,
+				top + geometry.header + (weekday - 1) * geometry.step, geometry.tile)
+		end
+	end
+	-- Give month boundaries priority over an initial partial-month heading.
+	local label_right = math.min(scope.size.width, math.max(right, left + scope:dp(40 * font_scale)))
+	for index = #headings, 1, -1 do
+		local heading = headings[index]
+		if heading.x + heading.minimum <= label_right then
+			local width = math.min(scope:dp(40 * font_scale), label_right - heading.x)
+			if heading.year then label(scope, heading.year, heading.x, top, width, geometry.header / 2) end
+			label(scope, heading.month, heading.x, top + geometry.header / 2, width, geometry.header / 2)
+			label_right = heading.x
+		end
+	end
+	for weekday = 1, 7 do
+		label(scope, calendar.weekday_labels[weekday], group_left,
+			top + geometry.header + (weekday - 1) * geometry.step, geometry.label_width, geometry.tile)
+	end
+end
+
+local function draw_month_row(scope, row, geometry, sources)
+	local left = math.floor(math.max(0, scope.size.width - row.width) / 2)
+	for _, entry in ipairs(row.months) do
+		local month = entry.month
+		local x = left + entry.x
+		label(scope, month.title, x, 0, scope:dp(52), geometry.header)
+		local calendar = { days = month.days, sources = sources }
+		for index, day in ipairs(month.days) do
+			draw_day(scope, calendar, index, x + (day.week - 1) * geometry.step,
+				geometry.header + (day.weekday - 1) * geometry.step, geometry.tile)
+		end
+	end
+	if row.gutter > 0 then
+		for weekday = 1, 7 do
+			label(scope, row.months[1].month.weekday_labels[weekday], left,
+				geometry.header + (weekday - 1) * geometry.step,
+				row.gutter - scope:dp(6), geometry.tile)
+		end
+	end
+end
+
 return function(params)
-	local data = params.data
-	local context = params.context
-	local state = params.state
-	local density = context.density or 1
-	local font_scale = context.font_scale or 1
-	local tile_dp = 14
-	-- Labels grow with accessibility text scaling; squares retain their size.
-	local header_dp = 22 * font_scale
+	local data, context, state = params.data, params.context, params.state
+	local density, font_scale = context.density or 1, context.font_scale or 1
 	local full_screen = params.view_mode == "FULL_SCREEN"
-	local canvas_modifier = full_screen
-		and ui.modifier(ui.fill_width(), ui.weight(1))
-		or ui.modifier(ui.fill_width(), ui.height(ui.dp(header_dp + 7 * tile_dp + 6 / density)))
 	local column_modifier = ui.modifier(ui.fill_width())
-	if full_screen then table.insert(column_modifier, ui.fill_height()) end
-	local children = {
-		ui.canvas({
+	local children = {}
+	if full_screen then
+		table.insert(column_modifier, ui.fill_height())
+		table.insert(column_modifier, ui.padding({ horizontal = ui.dp(16) }))
+		local width = math.max(0, (context.constraints and context.constraints.max_width or 320 * density)
+			- 2 * math.floor(16 * density + 0.5))
+		local sections = {}
+		for year_index, section in ipairs(data.years) do
+			local section_children = {}
+			if #data.years > 1 then
+				section_children[#section_children + 1] = ui.text({
+					key = "year_heading_" .. section.year, text = tostring(section.year),
+					style = theme.text_style.title_medium, font_weight = ui.FONT_WEIGHT.BOLD,
+				})
+			end
+			local geometry = month_layout(section.months, width, density, font_scale, year_index == 1)
+			local rows = {}
+			for index, row in ipairs(geometry.rows) do
+				rows[#rows + 1] = ui.canvas({
+					key = "month_row_" .. section.year .. "_" .. index,
+					modifier = ui.modifier(ui.fill_width(), ui.height(ui.px(geometry.height))),
+					draw = function(scope) draw_month_row(scope, row, geometry, data.sources) end,
+				})
+			end
+			section_children[#section_children + 1] = ui.column({
+				key = "months_" .. section.year, modifier = ui.modifier(ui.fill_width()),
+				spacing = theme.spacing.medium, children = rows,
+			})
+			sections[#sections + 1] = ui.column({
+				key = "year_" .. section.year, spacing = theme.spacing.small,
+				modifier = ui.modifier(ui.fill_width()), children = section_children,
+			})
+		end
+		-- Independent month blocks avoid split weeks and per-row scroll positions.
+		children[1] = ui.column({
+			key = "calendar_years", arrangement = ui.ARRANGEMENT.CENTER,
+			modifier = ui.modifier(ui.fill_width(), ui.weight(1), ui.vertical_scroll()),
+			children = { ui.column({ spacing = theme.spacing.large, children = sections }) },
+		})
+	else
+		children[1] = ui.canvas({
 			key = "calendar",
-			modifier = canvas_modifier,
-			draw = function(scope)
-				local tile = math.max(1, math.floor(scope:dp(tile_dp)))
-				local step = tile + 1 -- one physical pixel between adjacent squares
-				local label_width = scope:dp(34 * font_scale)
-				local header = math.floor(scope:dp(header_dp))
-				local weeks_per_row = math.max(0, math.floor((scope.size.width - label_width + 1) / step))
-				local row_height = header + 7 * step - 1
-				local row_gap = scope:dp(16)
-				local rows = full_screen
-					and math.max(0, math.floor((scope.size.height + row_gap) / (row_height + row_gap))) or 1
-				if weeks_per_row == 0 or rows == 0 then return end
-				local weeks = weeks_per_row * rows
-				local calendar_data = data.calendar(weeks)
-				calendar_data.sources = data.sources
-				local left = math.floor(scope.size.width) - (weeks_per_row * step - 1)
-				for row = 1, rows do
-					local top = (row - 1) * (row_height + row_gap)
-					local first_week = (row - 1) * weeks_per_row + 1
-					local last_week = row * weeks_per_row
-					for week = first_week, last_week do
-						local x = left + (week - first_week) * step
-						local month = calendar_data.month_labels[week]
-						-- Each wrapped row identifies its initial (possibly partial) month.
-						if week == first_week and month == nil then
-							month = calendar_data.days[(week - 1) * 7 + 1].month
-						end
-						if month ~= nil and month ~= "" then
-							-- Skip a trailing partial label rather than clipping it at the right edge.
-							local label_right = scope.size.width
-							for next_week = week + 1, last_week do
-								if (calendar_data.month_labels[next_week] or "") ~= "" then
-									label_right = left + (next_week - first_week) * step
-									break
-								end
-							end
-							if x + scope:dp(26 * font_scale) <= label_right then
-								label(scope, month, x, top, math.min(scope:dp(40 * font_scale), label_right - x), header)
-							end
-						end
-						for weekday = 1, 7 do
-							local y = top + header + (weekday - 1) * step
-							draw_day(scope, calendar_data, (week - 1) * 7 + weekday, x, y, tile)
-						end
-					end
-				end
-				for weekday = 1, 7 do
-					-- Keep labels anchored independently of the spare width before the first whole week.
-					label(scope, calendar_data.weekday_labels[weekday], 0, header + (weekday - 1) * step,
-						label_width - scope:dp(4), tile, canvas.TEXT_ALIGN.START)
-				end
-			end,
-		}),
-	}
+			modifier = ui.modifier(ui.fill_width(), ui.height(ui.dp(36 * font_scale + 7 * 14 + 6 / density))),
+			draw = function(scope) draw_calendar(scope, data, font_scale) end,
+		})
+	end
 	if state == nil or state.show_legend ~= false then
 		local items = {}
 		for index, source in ipairs(data.sources) do
@@ -122,10 +164,8 @@ return function(params)
 	end
 	return {
 		ui = ui.column({
-			key = "calendar_heatmap",
-			spacing = theme.spacing.small,
-			modifier = column_modifier,
-			children = children,
+			key = "calendar_heatmap", spacing = theme.spacing.small,
+			modifier = column_modifier, children = children,
 		}),
 		state = state,
 	}
