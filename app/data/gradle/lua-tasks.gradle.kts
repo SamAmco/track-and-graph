@@ -47,6 +47,13 @@ tasks.register("copyLuaScriptsForTests") {
 
         copyLuaApiToDestination(file("src/test/resources/generated/lua-api/"))
 
+        // Frozen published scripts exercise installed-script compatibility, not a live catalog.
+        copy {
+            from("${rootProject.projectDir}/../docs/docs/lua/community")
+            into("${projectDir}/src/test/resources/generated/legacy-lua-graphs")
+            include("**/script.lua")
+        }
+
         val destinationDir = file("src/test/resources/generated/lua-test/")
         destinationDir.mkdirs()
         rootProject.file("../lua/src/test").listFiles()?.forEach { file ->
