@@ -43,6 +43,12 @@ tasks.register("copyLuaScriptsForTests") {
             from("${rootProject.projectDir}/../lua/src/community")
             into("${projectDir}/src/test/resources/generated/lua-community")
             include("**/*.lua")
+            exclude("graphs/**")
+        }
+
+        copy {
+            from("${rootProject.projectDir}/../lua/src/community/graphs")
+            into("${projectDir}/src/test/resources/generated/lua-graphs")
         }
 
         copyLuaApiToDestination(file("src/test/resources/generated/lua-api/"))

@@ -22,7 +22,7 @@ lua/
 │   └── function-name/
 │       ├── function-name.lua
 │       └── test_function-name.lua
-├── src/community/graphs/       # Reserved for future graph packages, not the retired catalog
+├── src/community/graphs/       # Graph directories: package/ plus test/test_*.lua files
 ├── catalog/                    # Generated catalog output
 ├── tools/                      # Build and validation scripts
 └── src/tng/                    # TNG API and .apispec.lua files
@@ -31,9 +31,10 @@ lua/
 The former graph catalog and its source-to-website sync tooling are retired. See
 [legacy graph deprecation](lua-graph-scripts.md#legacy-catalog-deprecation-and-release)
 for permanent website downloads, runtime compatibility tests, and the coordinated
-release requirement. `run-community-tests` now runs functions and installed legacy
-graph compatibility checks; the new package catalog and graph harness are not yet
-implemented.
+release requirement. `run-community-tests` runs functions, API-gated graph package
+tests, and installed legacy graph compatibility checks. See the
+[graph harness](lua-graph-scripts.md#real-engine-graph-harness) for discovery and
+execution semantics. The published graph package catalog is not yet implemented.
 
 ## Building the Function Catalog
 

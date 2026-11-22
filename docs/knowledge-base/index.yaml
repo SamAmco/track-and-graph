@@ -119,8 +119,8 @@ docs:
 
   - file: lua-graph-scripts.md
     title: Writing Lua graph scripts and contributing graph scripts
-    description: Graph packages and descriptors, local device iteration, installed legacy script compatibility, deprecated website downloads, and coordinated documentation release.
-    keywords: [lua, graph, script, package, ZIP, tng, require, configuration, render_configuration, prepare_data, render_graph, JSON, state, translation, visualization, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, community, tng-lua-dev, emulator, hot-reload, deprecated, LegacyGraphCompatibilityTests, release-coordination]
+    description: Graph packages and descriptors, real-engine lifecycle harness and API gating, local device iteration, installed legacy script compatibility, deprecated downloads, and coordinated documentation release.
+    keywords: [lua, graph, script, package, ZIP, tng, require, configuration, render_configuration, prepare_data, render_graph, JSON, state, translation, visualization, custom-ui, DataSource, DURATION, PERIOD, tests, GraphPackageTestRunner, ApiUsageTracker, harness, api-gating, tng.graph, community, tng-lua-dev, emulator, hot-reload, deprecated, LegacyGraphCompatibilityTests, release-coordination]
 
   - file: lua-tooling.md
     title: Lua tooling, build process, publishing, and adding new config types

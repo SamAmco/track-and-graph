@@ -93,8 +93,8 @@ lua-translations-apply:
 	@python3 -B scripts/translations/apply_lua_catalog_draft.py "$(DRAFT)"
 
 .PHONY: run-community-tests
-## run-community-tests: Run community functions and installed legacy graph compatibility tests.
-run-community-tests: run-community-functions-tests run-legacy-graph-tests
+## run-community-tests: Run functions, graph packages, and installed legacy graph compatibility tests.
+run-community-tests: run-community-functions-tests run-community-graph-tests run-legacy-graph-tests
 
 .PHONY: run-community-functions-tests
 ## run-community-functions-tests: Run the community Lua function catalog integration tests.
@@ -105,6 +105,11 @@ run-community-functions-tests:
 ## run-legacy-graph-tests: Verify installed legacy scripts with the real Lua engine.
 run-legacy-graph-tests:
 	cd app && ./gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.LegacyGraphCompatibilityTests" --tests "com.samco.trackandgraph.data.lua.GraphApiLuaGraphTests" --tests "com.samco.trackandgraph.data.lua.NativeGraphDescriptorTests"
+
+.PHONY: run-community-graph-tests
+## run-community-graph-tests: Run API-gated graph package lifecycle tests with the real Lua engine.
+run-community-graph-tests:
+	cd app && ./gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.community_test_runner.GraphPackageTestRunner" --tests "com.samco.trackandgraph.data.lua.community_test_runner.GraphTestHarnessTest"
 
 .PHONY: lua-verify-api-specs
 ## lua-verify-api-specs: Verify the Lua API specifications and generated documentation agree.

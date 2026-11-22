@@ -8,6 +8,7 @@ topics:
   - Script config: local variables modified directly by users; PREVIEW_START/END for collapsed view
   - core.DURATION (ms, arithmetic ok) vs core.PERIOD (variable length — NO arithmetic)
   - Installed-script compatibility tests use unchanged published scripts through the real engine
+  - Package lifecycle tests exercise real engine operations and gate API export lookups against version major
   - The old source catalog is deleted; permanent legacy downloads live only in the deprecated website
   - Local package iteration uses external tng-lua-dev tooling and staged database replacement
 keywords: [lua, graph, script, package, tng, ZIP, configuration, render_configuration, prepare_data, render_graph, JSON, state, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, deprecated, LegacyGraphCompatibilityTests, release-coordination]
@@ -197,7 +198,7 @@ Older releases keep using `tutorial-lua` and `lua-community-scripts-root`, now r
 
 Retiring downloads does not retire runtime compatibility. Preserve inline storage, migrations and feature mappings; the original `function(sources)` argument shape; direct result tables and native adapters; and the published `tng.core`, `tng.graph` and `tng.graphext` APIs. Installed scripts contain their own source and do not fetch the website to render.
 
-### Compatibility tests and future packages
+### Compatibility tests and package tests
 
 `LegacyGraphCompatibilityTests` loads unchanged published scripts from the deprecated website via generated test resources, uses fixed time and inputs, and checks parsed results for all five native graph types. This is an installed-user contract test, not a maintained catalog harness. `GraphApiLuaGraphTests` retains data-source/helper API checks, and `NativeGraphDescriptorTests` pins legacy return shapes alongside new descriptor support. Migration tests remain necessary to preserve persisted inline scripts and their input mappings.
 
@@ -207,6 +208,18 @@ Run these focused checks with:
 make run-legacy-graph-tests
 ```
 
-`make run-community-tests` runs the function catalog suite plus these compatibility checks, and remains part of `make validate-all`. There is no `run-community-graph-tests` or `sync-lua-to-docs` command anymore.
+`make run-community-tests` runs functions, new graph packages, and these compatibility checks, and remains part of `make validate-all`. The source-to-website `sync-lua-to-docs` command remains deleted.
 
-Calendar heatmap is the first package under `lua/src/community/graphs/calendar-heatmap/package/`; tests live outside `package/` so they cannot accidentally become shipped modules. Its version major is the required API level (currently `5.0.0`). The obsolete `lua/src/examples/` directory is removed. Do not recreate the old single-script discovery or regex configuration harness. The generic traversal utilities and graph root are retained, but future discovery must identify package roots rather than treating every nested module as a standalone graph. Graph catalog packaging/signing/publishing and the new graph lifecycle/API-gated harness are still future work.
+Calendar heatmap is the first package under `lua/src/community/graphs/calendar-heatmap/package/`; tests live outside `package/` so they cannot accidentally become shipped modules. Its version major is the required API level (currently `5.0.0`). The obsolete `lua/src/examples/` directory is removed. Do not recreate the old single-script discovery or regex configuration harness. Graph catalog packaging/signing/publishing remains future work.
+
+### Real-engine graph harness
+
+`make run-community-graph-tests` discovers `package/main.lua` roots and `test/test_*.lua` files under each graph directory. Each test file returns a table of named functions taking a harness. Only `package/` is zipped; tests and fixtures stay in the sibling `test/` directory outside the archive. Other files in `test/` are not discovered as suites. The JVM runner uses the actual ZIP accessor, module loader, graph preparation, UI/function invocation, and state JSON codec—not mocked Lua APIs. Time is fixed at 2026-11-14 noon UTC and locale at UK English. Each case gets a fresh script environment while its live handles remain on one leased VM.
+
+The test-only Lua helper exposes `configure`, `prepare`, and `call`; returned sessions support `render`, `find`, `invoke`, `draw`, and `save` (JSON round-trip). Tests can supply named data-point sources, initial state, feature mappings, measured draw bounds and UI contexts. Native graph results are opaque DTOs here; native field parsing and installed-script compatibility remain covered by Kotlin tests. This harness checks emitted UI/draw instructions, not Compose pixels or native widget behavior.
+
+`ApiUsageTracker` shares the function harness's API-spec proxy mechanism, with independent per-VM sessions. Tracking covers entry-point loading, preparation, rendering, interactions, and explicitly exercised deferred draw callbacks. Fixture construction and assertions are excluded. It records API export lookups (including constants and nested tables), not every Lua function invocation; production has no wrapper overhead. Validation compares the highest observed API requirement against the graph version major. There is no mutable global current-graph version.
+
+This is coverage-based, not a static proof: unexecuted branches cannot be checked. Returned object methods are not separately proxied/spec'd (for example canvas scope methods); the current canvas surface is all API 5, but future method additions need explicit gating support. Include tests of deferred callbacks and configuration paths rather than only the initial render. Synthetic JVM regressions pin gating at each execution phase and ensure graph errors fail tests rather than silently becoming empty output.
+
+Known discrepancy found by these tests: LuaK 3.4.0 evaluates `tonumber("-")` as zero, while standard Lua returns nil. The heatmap's range validation consequently accepts an unfinished minus. This is not fixed by the harness; its nonnumeric validation case uses `"invalid"`. Do not assume the plain-Lua unit suites fully reproduce the embedded engine's parsing behavior.
