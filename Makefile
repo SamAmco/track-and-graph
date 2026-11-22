@@ -106,11 +106,6 @@ run-community-functions-tests:
 run-legacy-graph-tests:
 	cd app && ./gradlew :data:cleanTestDebugUnitTest :data:testDebugUnitTest --tests "com.samco.trackandgraph.data.lua.LegacyGraphCompatibilityTests" --tests "com.samco.trackandgraph.data.lua.GraphApiLuaGraphTests" --tests "com.samco.trackandgraph.data.lua.NativeGraphDescriptorTests"
 
-.PHONY: sync-lua-to-docs
-## sync-lua-to-docs: Copy the public Lua API sources into the generated documentation tree.
-sync-lua-to-docs:
-	./scripts/sync-lua-to-docs.sh
-
 .PHONY: lua-verify-api-specs
 ## lua-verify-api-specs: Verify the Lua API specifications and generated documentation agree.
 lua-verify-api-specs:
