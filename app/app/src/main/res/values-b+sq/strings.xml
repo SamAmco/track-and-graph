@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Mirë se vini te Funksionet</string>
     <string name="functions_first_time_user_message">Funksionet janë një veçori e avancuar që ju lejon të kombinoni, grumbulloni dhe transformoni të dhënat tuaja në burime të reja të dhënash të derivuara.</string>
     <string name="learn_more">Mësoni më shumë këtu</string>
-    <string name="github">GitHub</string>
     <string name="paste">Ngjit</string>
     <string name="failed_to_download_file">Shkarkimi i skedarit dështoi: %s</string>
     <string name="confirm_deep_link">Keni marrë një lidhje skripti nga një burim i panjohur. Instaloni vetëm skripte nga burime që u besoni. Dëshironi ta instaloni këtë skript?</string>

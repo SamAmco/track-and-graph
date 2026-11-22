@@ -504,7 +504,6 @@
     <string name="functions_first_time_user_title">Functions-д тавтай морил</string>
     <string name="functions_first_time_user_message">Functions нь өгөгдлийг нэгтгэх, нийлбэрлэх болон хувиргаж шинэ үүсмэл өгөгдлийн эх үүсвэр болгох дэвшилтэт функц юм.</string>
     <string name="learn_more">Эндээс дэлгэрэнгүй үзэх</string>
-    <string name="github">GitHub</string>
     <string name="paste">Буулгах</string>
     <string name="failed_to_download_file">Файлыг татаж чадсангүй: %s</string>
     <string name="confirm_deep_link">Та үл мэдэгдэх эх сурвалжаас скриптийн холбоос хүлээн авлаа. Зөвхөн итгэдэг эх сурвалжаасаа скрипт суулгана уу. Энэ скриптийг суулгах уу?</string>

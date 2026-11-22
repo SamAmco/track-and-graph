@@ -6,7 +6,7 @@ search:
 # Cumulative Line Graph Script
 
 !!! warning "Deprecated documentation"
-    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../community/index.md).
+    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../developer-guide/writing-graph-scripts.md).
 
 
 This script generates a cumulative line graph for each of the provided data sources.

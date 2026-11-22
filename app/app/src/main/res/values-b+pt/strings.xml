@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Boas-vindas às funções</string>
     <string name="functions_first_time_user_message">As funções são um recurso avançado que permite combinar, agregar e transformar seus dados em novas fontes de dados derivadas.</string>
     <string name="learn_more">Saiba mais aqui</string>
-    <string name="github">GitHub</string>
     <string name="paste">Colar</string>
     <string name="failed_to_download_file">Falha ao baixar o arquivo: %s</string>
     <string name="confirm_deep_link">Você recebeu um link de script de uma fonte desconhecida. Instale scripts apenas de fontes confiáveis. Deseja instalar este script?</string>

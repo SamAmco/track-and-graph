@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Tervetuloa funktioihin</string>
     <string name="functions_first_time_user_message">Funktiot ovat edistyksellinen ominaisuus, jolla voit yhdistää, koostaa ja muuntaa tietojasi uusiksi johdetuiksi tietolähteiksi.</string>
     <string name="learn_more">Lue lisää täältä</string>
-    <string name="github">GitHub</string>
     <string name="paste">Liitä</string>
     <string name="failed_to_download_file">Tiedoston lataaminen epäonnistui: %s</string>
     <string name="confirm_deep_link">Olet saanut skriptilinkin tuntemattomasta lähteestä. Asenna skriptejä vain luotettavista lähteistä. Haluatko asentaa tämän skriptin?</string>

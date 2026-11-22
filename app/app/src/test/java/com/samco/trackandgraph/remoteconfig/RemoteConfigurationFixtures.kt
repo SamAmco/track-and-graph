@@ -23,6 +23,7 @@ val testEndpoints = Endpoints(
     tutorialLua = "https://tutorial.com/lua",
     tutorialGraphs = "https://tutorial.com/graphs",
     luaCommunityScriptsRoot = "https://scripts.com",
+    luaGraphsDocs = "https://tutorial.com/lua-packages",
     playStorePage = "https://play.google.com",
     functionCatalogueLocation = "https://functions.com/catalog",
     functionCatalogueSignature = "https://functions.com/signature",

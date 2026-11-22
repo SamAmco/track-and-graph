@@ -6,7 +6,7 @@ search:
 # Total this period
 
 !!! warning "Deprecated documentation"
-    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../community/index.md).
+    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../developer-guide/writing-graph-scripts.md).
 
 
 Shows the total of a given input over a specified period of time **from the beginning of that period**. For example:

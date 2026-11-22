@@ -463,7 +463,6 @@
     <string name="functions_first_time_user_title">Bienvenue dans les fonctions</string>
     <string name="functions_first_time_user_message">Les fonctions sont une fonctionnalité avancée qui vous permet de combiner, agréger et transformer vos données en nouvelles sources de données dérivées.</string>
     <string name="learn_more">En savoir plus ici</string>
-    <string name="github">GitHub</string>
     <string name="paste">Coller</string>
     <string name="failed_to_download_file">Échec du téléchargement du fichier : %s</string>
     <string name="confirm_deep_link">Vous avez reçu un lien vers un script d\'une source inconnue. Installez uniquement des scripts provenant de sources de confiance. Voulez-vous installer ce script ?</string>

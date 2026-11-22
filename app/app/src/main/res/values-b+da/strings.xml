@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Velkommen til funktioner</string>
     <string name="functions_first_time_user_message">Funktioner er en avanceret funktion, der lader dig kombinere, aggregere og transformere dine data til nye afledte datakilder.</string>
     <string name="learn_more">Få mere at vide her</string>
-    <string name="github">GitHub</string>
     <string name="paste">Indsæt</string>
     <string name="failed_to_download_file">Kunne ikke downloade filen: %s</string>
     <string name="confirm_deep_link">Du har modtaget et script-link fra en ukendt kilde. Installér kun scripts fra kilder, du har tillid til. Vil du installere dette script?</string>

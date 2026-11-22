@@ -530,7 +530,6 @@
     <string name="functions_first_time_user_title">Bun venit la Funcții</string>
     <string name="functions_first_time_user_message">Funcțiile sunt o funcție avansată care îți permite să combini, să agregi și să transformi datele în surse de date derivate noi.</string>
     <string name="learn_more">Află mai multe aici</string>
-    <string name="github">GitHub</string>
     <string name="paste">Lipește</string>
     <string name="failed_to_download_file">Descărcarea fișierului a eșuat: %s</string>
     <string name="confirm_deep_link">Ai primit un link către un script dintr-o sursă necunoscută. Instalează scripturi doar din surse de încredere. Vrei să instalezi acest script?</string>

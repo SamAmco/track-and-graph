@@ -530,7 +530,6 @@
     <string name="functions_first_time_user_title">Dobro došli u funkcije</string>
     <string name="functions_first_time_user_message">Funkcije su napredna funkcija koja vam omogućava da kombinujete, objedinite i transformišete podatke u nove izvedene izvore podataka.</string>
     <string name="learn_more">Saznajte više ovde</string>
-    <string name="github">GitHub</string>
     <string name="paste">Nalepi</string>
     <string name="failed_to_download_file">Preuzimanje datoteke nije uspelo: %s</string>
     <string name="confirm_deep_link">Primili ste vezu ka skripti iz nepoznatog izvora. Instalirajte skripte samo iz izvora kojima verujete. Da li želite da instalirate ovu skriptu?</string>

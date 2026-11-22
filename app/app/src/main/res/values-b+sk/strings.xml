@@ -530,7 +530,6 @@
     <string name="functions_first_time_user_title">Vitajte vo funkciách</string>
     <string name="functions_first_time_user_message">Funkcie sú pokročilá funkcia, ktorá vám umožňuje kombinovať, agregovať a transformovať údaje na nové odvodené zdroje údajov.</string>
     <string name="learn_more">Zistite viac</string>
-    <string name="github">GitHub</string>
     <string name="paste">Prilepiť</string>
     <string name="failed_to_download_file">Stiahnutie súboru zlyhalo: %s</string>
     <string name="confirm_deep_link">Dostali ste odkaz na skript z neznámeho zdroja. Inštalujte skripty iba zo zdrojov, ktorým dôverujete. Chcete tento skript nainštalovať?</string>

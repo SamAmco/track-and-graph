@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Welkom by Funksies</string>
     <string name="functions_first_time_user_message">Funksies is ’n gevorderde funksie waarmee jy jou data kan kombineer, saamvoeg en transformeer tot nuwe afgeleide databronne.</string>
     <string name="learn_more">Leer hier meer</string>
-    <string name="github">GitHub</string>
     <string name="paste">Plak</string>
     <string name="failed_to_download_file">Kon nie lêer aflaai nie: %s</string>
     <string name="confirm_deep_link">Jy het ’n skripskakel van ’n onbekende bron ontvang. Installeer slegs skripte van bronne wat jy vertrou. Wil jy hierdie skrip installeer?</string>

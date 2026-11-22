@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">Functions မှ ကြိုဆိုပါသည်</string>
     <string name="functions_first_time_user_message">Functions များသည် သင့်ဒေတာများကို ပေါင်းစပ်၊ စုစည်းကာ ပြောင်းလဲပြီး ဆင်းသက်ဒေတာရင်းမြစ်အသစ်များ ဖန်တီးနိုင်သည့် အဆင့်မြင့်လုပ်ဆောင်ချက်များဖြစ်သည်။</string>
     <string name="learn_more">ဤနေရာတွင် ထပ်မံလေ့လာရန်</string>
-    <string name="github">GitHub</string>
     <string name="paste">ကူးထည့်ရန်</string>
     <string name="failed_to_download_file">ဖိုင်ဒေါင်းလုဒ် မအောင်မြင်ပါ: %s</string>
     <string name="confirm_deep_link">မသိသောရင်းမြစ်မှ script လင့်ခ်တစ်ခုကို လက်ခံရရှိထားသည်။ ယုံကြည်ရသောရင်းမြစ်များမှသာ script များကို ထည့်သွင်းပါ။ ဤ script ကို ထည့်သွင်းမလား။</string>

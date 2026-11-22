@@ -359,7 +359,6 @@
     <string name="functions_first_time_user_title">Functions වෙත සාදරයෙන් පිළිගනිමු</string>
     <string name="functions_first_time_user_message">Functions යනු ඔබේ දත්ත ඒකාබද්ධ කිරීමට, එකතු කිරීමට සහ පරිවර්තනය කිරීමට ඉඩ දෙන උසස් විශේෂාංගයකි.</string>
     <string name="learn_more">වැඩිදුර මෙතැනින් දැනගන්න</string>
-    <string name="github">GitHub</string>
     <string name="paste">අලවන්න</string>
     <string name="failed_to_download_file">ගොනුව බාගැනීම අසාර්ථකයි: %s</string>
     <string name="confirm_deep_link">ඔබට නොදන්නා මූලාශ්‍රයකින් ස්ක්‍රිප්ට් සබැඳියක් ලැබී ඇත. ඔබ විශ්වාස කරන මූලාශ්‍රවලින් පමණක් ස්ක්‍රිප්ට් ස්ථාපනය කරන්න. මෙම ස්ක්‍රිප්ටය ස්ථාපනය කිරීමට අවශ්‍යද?</string>

@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Üdvözlünk a függvényeknél</string>
     <string name="functions_first_time_user_message">A függvények haladó funkciók, amelyekkel az adataidat kombinálhatod, összesítheted és átalakíthatod új származtatott adatforrásokká.</string>
     <string name="learn_more">További információ</string>
-    <string name="github">GitHub</string>
     <string name="paste">Beillesztés</string>
     <string name="failed_to_download_file">Nem sikerült letölteni a fájlt: %s</string>
     <string name="confirm_deep_link">Ismeretlen forrásból származó szkriptlinket kaptál. Csak megbízható forrásból telepíts szkripteket. Szeretnéd telepíteni ezt a szkriptet?</string>

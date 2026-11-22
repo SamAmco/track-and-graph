@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">ยินดีต้อนรับสู่ฟังก์ชัน</string>
     <string name="functions_first_time_user_message">ฟังก์ชันเป็นฟีเจอร์ขั้นสูงที่ช่วยให้คุณรวม รวบรวม และแปลงข้อมูลเป็นแหล่งข้อมูลอนุพันธ์ใหม่</string>
     <string name="learn_more">ดูข้อมูลเพิ่มเติมที่นี่</string>
-    <string name="github">GitHub</string>
     <string name="paste">วาง</string>
     <string name="failed_to_download_file">ดาวน์โหลดไฟล์ไม่สำเร็จ: %s</string>
     <string name="confirm_deep_link">คุณได้รับลิงก์สคริปต์จากแหล่งที่ไม่รู้จัก ควรติดตั้งสคริปต์จากแหล่งที่คุณเชื่อถือเท่านั้น ต้องการติดตั้งสคริปต์นี้หรือไม่?</string>

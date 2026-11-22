@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Functions-க்கு வரவேற்கிறோம்</string>
     <string name="functions_first_time_user_message">Functions என்பது உங்கள் தரவை இணைத்து, தொகுத்து, மாற்றி புதிய பெறப்பட்ட தரவு மூலங்களாக உருவாக்க உதவும் மேம்பட்ட அம்சமாகும்.</string>
     <string name="learn_more">மேலும் அறிக</string>
-    <string name="github">GitHub</string>
     <string name="paste">ஒட்டு</string>
     <string name="failed_to_download_file">கோப்பைப் பதிவிறக்க முடியவில்லை: %s</string>
     <string name="confirm_deep_link">அறியப்படாத மூலத்திலிருந்து ஸ்கிரிப்ட் இணைப்பைப் பெற்றுள்ளீர்கள். நம்பகமான மூலங்களிலிருந்து மட்டுமே ஸ்கிரிப்ட்களை நிறுவவும். இந்த ஸ்கிரிப்டை நிறுவ விரும்புகிறீர்களா?</string>

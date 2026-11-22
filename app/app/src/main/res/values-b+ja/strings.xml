@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">関数へようこそ</string>
     <string name="functions_first_time_user_message">関数は、データを結合、集計、変換して新しい派生データソースを作成できる高度な機能です。</string>
     <string name="learn_more">詳しくはこちら</string>
-    <string name="github">GitHub</string>
     <string name="paste">貼り付け</string>
     <string name="failed_to_download_file">ファイルのダウンロードに失敗しました: %s</string>
     <string name="confirm_deep_link">信頼できないソースからスクリプトリンクを受け取りました。信頼できるソースのスクリプトのみインストールしてください。このスクリプトをインストールしますか？</string>

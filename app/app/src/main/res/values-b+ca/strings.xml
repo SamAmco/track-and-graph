@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Et donem la benvinguda a les funcions</string>
     <string name="functions_first_time_user_message">Les funcions són una eina avançada que et permet combinar, agregar i transformar les dades en noves fonts de dades derivades.</string>
     <string name="learn_more">Més informació aquí</string>
-    <string name="github">GitHub</string>
     <string name="paste">Enganxa</string>
     <string name="failed_to_download_file">No s\'ha pogut baixar el fitxer: %s</string>
     <string name="confirm_deep_link">Has rebut un enllaç a un script d\'una font desconeguda. Instal·la scripts només de fonts de confiança. Vols instal·lar aquest script?</string>

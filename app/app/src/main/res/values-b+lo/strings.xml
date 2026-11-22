@@ -337,7 +337,6 @@
     <string name="functions_first_time_user_title">ຍິນດີຕ້ອນຮັບສູ່ຟັງຊັນ</string>
     <string name="functions_first_time_user_message">ຟັງຊັນແມ່ນຟີເຈີຂັ້ນສູງທີ່ໃຫ້ທ່ານລວມ, ຮວບຮວມ ແລະແປງຂໍ້ມູນເປັນແຫຼ່ງຂໍ້ມູນທີ່ຄຳນວນໃໝ່.</string>
     <string name="learn_more">ຮຽນຮູ້ເພີ່ມທີ່ນີ້</string>
-    <string name="github">GitHub</string>
     <string name="paste">ວາງ</string>
     <string name="failed_to_download_file">ດາວໂຫຼດໄຟລ໌ລົ້ມເຫຼວ: %s</string>
     <string name="confirm_deep_link">ທ່ານໄດ້ຮັບລິ້ງສະຄຣິບຈາກແຫຼ່ງທີ່ບໍ່ຮູ້ຈັກ. ຕິດຕັ້ງສະຄຣິບຈາກແຫຼ່ງທີ່ທ່ານໄວ້ໃຈເທົ່ານັ້ນ. ຕ້ອງການຕິດຕັ້ງສະຄຣິບນີ້ບໍ?</string>

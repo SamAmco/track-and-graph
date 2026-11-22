@@ -530,7 +530,6 @@
     <string name="functions_first_time_user_title">Добре дошли във функциите</string>
     <string name="functions_first_time_user_message">Функциите са разширена възможност, която ви позволява да комбинирате, обобщавате и преобразувате данните си в нови производни източници на данни.</string>
     <string name="learn_more">Научете повече тук</string>
-    <string name="github">GitHub</string>
     <string name="paste">Поставяне</string>
     <string name="failed_to_download_file">Неуспешно изтегляне на файла: %s</string>
     <string name="confirm_deep_link">Получихте връзка към скрипт от неизвестен източник. Инсталирайте скриптове само от източници, на които имате доверие. Искате ли да инсталирате този скрипт?</string>

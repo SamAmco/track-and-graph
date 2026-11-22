@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Functions-এ স্বাগতম</string>
     <string name="functions_first_time_user_message">Functions একটি উন্নত সুবিধা, যা আপনার ডেটা একত্র, সমষ্টিবদ্ধ ও রূপান্তর করে নতুন ডেরাইভড ডেটা সোর্স তৈরি করতে দেয়।</string>
     <string name="learn_more">এখানে আরও জানুন</string>
-    <string name="github">GitHub</string>
     <string name="paste">পেস্ট করুন</string>
     <string name="failed_to_download_file">ফাইল ডাউনলোড ব্যর্থ: %s</string>
     <string name="confirm_deep_link">আপনি একটি অজানা উৎস থেকে স্ক্রিপ্টের লিংক পেয়েছেন। শুধু বিশ্বস্ত উৎস থেকে স্ক্রিপ্ট ইনস্টল করুন। আপনি কি এই স্ক্রিপ্টটি ইনস্টল করতে চান?</string>

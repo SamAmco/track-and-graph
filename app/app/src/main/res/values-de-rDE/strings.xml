@@ -441,7 +441,6 @@
     <string name="functions_first_time_user_title">Willkommen bei den Funktionen</string>
     <string name="functions_first_time_user_message">Mit Funktionen können Sie Daten kombinieren, aggregieren und in neue abgeleitete Datenquellen umwandeln.</string>
     <string name="learn_more">Erfahren Sie hier mehr</string>
-    <string name="github">GitHub</string>
     <string name="paste">Einfügen</string>
     <string name="failed_to_download_file">Fehler beim Herunterladen der Datei: %s</string>
     <string name="confirm_deep_link">Sie haben einen Skriptlink von einer unbekannten Quelle erhalten. Installieren Sie nur Skripte aus vertrauenswürdigen Quellen. Möchten Sie dieses Skript installieren?</string>

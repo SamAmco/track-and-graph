@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Добредојдовте во Функции</string>
     <string name="functions_first_time_user_message">Функциите се напредна функција што ви овозможува да ги комбинирате, собирате и трансформирате податоците во нови изведени извори на податоци.</string>
     <string name="learn_more">Дознајте повеќе тука</string>
-    <string name="github">GitHub</string>
     <string name="paste">Залепи</string>
     <string name="failed_to_download_file">Преземањето на датотеката не успеа: %s</string>
     <string name="confirm_deep_link">Добивте врска до скрипта од непознат извор. Инсталирајте скрипти само од извори на кои им верувате. Дали сакате да ја инсталирате оваа скрипта?</string>

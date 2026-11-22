@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">欢迎使用函数</string>
     <string name="functions_first_time_user_message">函数是一项高级功能，可将您的数据组合、汇总并转换为新的派生数据源。</string>
     <string name="learn_more">在此了解更多</string>
-    <string name="github">GitHub</string>
     <string name="paste">粘贴</string>
     <string name="failed_to_download_file">文件下载失败：%s</string>
     <string name="confirm_deep_link">您收到一个来自未知来源的脚本链接。请只安装来自可信来源的脚本。要安装此脚本吗？</string>

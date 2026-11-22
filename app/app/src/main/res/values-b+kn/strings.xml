@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Functions ಗೆ ಸ್ವಾಗತ</string>
     <string name="functions_first_time_user_message">ಫಂಕ್ಷನ್‌ಗಳು ನಿಮ್ಮ ಡೇಟಾವನ್ನು ಸಂಯೋಜಿಸಲು, ಒಟ್ಟುಗೂಡಿಸಲು ಮತ್ತು ಪರಿವರ್ತಿಸಿ ಹೊಸ ವ್ಯುತ್ಪನ್ನ ಡೇಟಾ ಮೂಲಗಳಾಗಿ ರೂಪಿಸಲು ಅನುಮತಿಸುವ ಸುಧಾರಿತ ವೈಶಿಷ್ಟ್ಯಗಳಾಗಿವೆ.</string>
     <string name="learn_more">ಇಲ್ಲಿ ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ</string>
-    <string name="github">GitHub</string>
     <string name="paste">ಅಂಟಿಸಿ</string>
     <string name="failed_to_download_file">ಫೈಲ್ ಡೌನ್‌ಲೋಡ್ ವಿಫಲವಾಗಿದೆ: %s</string>
     <string name="confirm_deep_link">ನೀವು ಅಪರಿಚಿತ ಮೂಲದಿಂದ ಸ್ಕ್ರಿಪ್ಟ್ ಲಿಂಕ್ ಸ್ವೀಕರಿಸಿದ್ದೀರಿ. ನೀವು ನಂಬುವ ಮೂಲಗಳಿಂದ ಮಾತ್ರ ಸ್ಕ್ರಿಪ್ಟ್‌ಗಳನ್ನು ಸ್ಥಾಪಿಸಿ. ಈ ಸ್ಕ್ರಿಪ್ಟ್ ಸ್ಥಾಪಿಸಲು ಬಯಸುವಿರಾ?</string>

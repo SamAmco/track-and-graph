@@ -337,7 +337,6 @@
     <string name="functions_first_time_user_title">Velkomin í föll</string>
     <string name="functions_first_time_user_message">Föll eru háþróaður eiginleiki sem gerir þér kleift að sameina, leggja saman og umbreyta gögnunum þínum í nýja afleidda gagnagjafa.</string>
     <string name="learn_more">Lærðu meira hér</string>
-    <string name="github">GitHub</string>
     <string name="paste">Líma</string>
     <string name="failed_to_download_file">Ekki tókst að hlaða niður skrá: %s</string>
     <string name="confirm_deep_link">Þú hefur fengið skriftutengil frá óþekktum uppruna. Settu aðeins upp skriftur frá aðilum sem þú treystir. Viltu setja þessa skriftu upp?</string>

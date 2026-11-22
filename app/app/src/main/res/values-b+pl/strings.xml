@@ -549,7 +549,6 @@
     <string name="functions_first_time_user_title">Witamy w funkcjach</string>
     <string name="functions_first_time_user_message">Funkcje to zaawansowana funkcja umożliwiająca łączenie, agregowanie i przekształcanie danych w nowe pochodne źródła danych.</string>
     <string name="learn_more">Dowiedz się więcej</string>
-    <string name="github">GitHub</string>
     <string name="paste">Wklej</string>
     <string name="failed_to_download_file">Nie udało się pobrać pliku: %s</string>
     <string name="confirm_deep_link">Otrzymano link do skryptu z nieznanego źródła. Instaluj skrypty tylko z zaufanych źródeł. Czy chcesz zainstalować ten skrypt?</string>

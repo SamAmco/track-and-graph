@@ -52,7 +52,6 @@ import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.lua.ui.LuaGraphConfigurationProvider
 import com.samco.trackandgraph.lua.ui.LuaUiContent
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
-import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.z4kn4fein.semver.toVersion
@@ -96,7 +95,6 @@ class LuaGraphConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     private val deepLinkHandler: DeepLinkHandler,
     private val fileDownloader: FileDownloader,
-    private val urlNavigator: UrlNavigator,
     private val remoteConfigProvider: RemoteConfigProvider,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
@@ -574,10 +572,6 @@ class LuaGraphConfigViewModel @Inject constructor(
             configurationUiState = content?.let(LuaGraphConfigurationUiState::Rendered)
                 ?: LuaGraphConfigurationUiState.SourceEditor
         }
-    }
-
-    fun openCommunityScripts() {
-        viewModelScope.launch { urlNavigator.navigateTo(context, UrlNavigator.Location.LUA_COMMUNITY_SCRIPTS_ROOT) }
     }
 
     private companion object {

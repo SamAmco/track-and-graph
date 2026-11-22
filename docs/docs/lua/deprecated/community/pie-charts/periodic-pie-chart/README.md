@@ -6,7 +6,7 @@ search:
 # Periodic Pie Chart
 
 !!! warning "Deprecated documentation"
-    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../community/index.md).
+    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../developer-guide/writing-graph-scripts.md).
 
 
 A pie chart that displays data for a specific time period such as the current day, week, month, etc. The pie chart resets at the beginning of each new period and accumulates data throughout that period. This script can accept multiple data sources and merges them all into one pie chart.

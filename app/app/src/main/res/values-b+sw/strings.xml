@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Karibu kwenye Functions</string>
     <string name="functions_first_time_user_message">Functions ni kipengele cha kina kinachokuruhusu kuchanganya, kukusanya na kubadilisha data yako kuwa vyanzo vipya vya data vilivyotokana.</string>
     <string name="learn_more">Jifunze zaidi hapa</string>
-    <string name="github">GitHub</string>
     <string name="paste">Bandika</string>
     <string name="failed_to_download_file">Imeshindikana kupakua faili: %s</string>
     <string name="confirm_deep_link">Umepokea kiungo cha script kutoka chanzo kisichojulikana. Sakinisha script kutoka vyanzo unavyoviamini pekee. Je, ungependa kusakinisha script hii?</string>

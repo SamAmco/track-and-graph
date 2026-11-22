@@ -340,7 +340,6 @@
     <string name="functions_first_time_user_title">Selamat datang di Fungsi</string>
     <string name="functions_first_time_user_message">Fungsi adalah fitur lanjutan yang memungkinkan Anda menggabungkan, mengagregasikan, dan mengubah data menjadi sumber data turunan baru.</string>
     <string name="learn_more">Pelajari selengkapnya di sini</string>
-    <string name="github">GitHub</string>
     <string name="paste">Tempel</string>
     <string name="failed_to_download_file">Gagal mengunduh file: %s</string>
     <string name="confirm_deep_link">Anda menerima tautan skrip dari sumber yang tidak dikenal. Instal skrip hanya dari sumber yang Anda percaya. Apakah Anda ingin memasang skrip ini?</string>

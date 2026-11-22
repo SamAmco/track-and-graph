@@ -148,7 +148,6 @@ fun LuaGraphConfigView(
             onScriptEditFinished = viewModel::onScriptEditFinished,
             onReadFile = viewModel::readFile,
             onUpdateScriptFromClipboard = viewModel::updateScriptFromClipboard,
-            onOpenCommunityScripts = viewModel::openCommunityScripts,
             onUserConfirmDeepLink = viewModel::onUserConfirmDeepLink,
             onUserCancelDeepLink = viewModel::onUserCancelDeepLink,
             showEditScriptDialog = showEditScriptDialog,
@@ -202,7 +201,6 @@ private fun LuaGraphSourceEditorView(
     onScriptEditFinished: () -> Unit,
     onReadFile: (Uri?) -> Unit,
     onUpdateScriptFromClipboard: (String) -> Unit,
-    onOpenCommunityScripts: () -> Unit,
     onUserConfirmDeepLink: () -> Unit,
     onUserCancelDeepLink: () -> Unit,
     showEditScriptDialog: MutableState<Boolean>,
@@ -224,7 +222,6 @@ private fun LuaGraphSourceEditorView(
     Buttons(
         onReadFile = onReadFile,
         onUpdateScriptFromClipboard = onUpdateScriptFromClipboard,
-        onOpenCommunityScripts = onOpenCommunityScripts,
     )
 
     InputSpacingLarge()
@@ -478,7 +475,6 @@ private fun ScriptTextInputPreview(
 private fun Buttons(
     onReadFile: (Uri?) -> Unit,
     onUpdateScriptFromClipboard: (String) -> Unit,
-    onOpenCommunityScripts: () -> Unit,
 ) = FlowRow(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -512,14 +508,6 @@ private fun Buttons(
         onClick = { launcher.launch(arrayOf("text/*", "application/zip", "application/octet-stream")) },
         icon = R.drawable.folder_open,
         text = stringResource(R.string.file)
-    )
-
-    DialogInputSpacing()
-
-    IconTextButton(
-        onClick = { onOpenCommunityScripts() },
-        icon = R.drawable.github_mark,
-        text = stringResource(R.string.github)
     )
 }
 
@@ -556,7 +544,6 @@ fun PreviewLuaGraphSourceEditorView() = TnGComposeTheme {
             onScriptEditFinished = {},
             onReadFile = {},
             onUpdateScriptFromClipboard = {},
-            onOpenCommunityScripts = {},
             onUserConfirmDeepLink = {},
             onUserCancelDeepLink = {},
             onClickInPreview = {},

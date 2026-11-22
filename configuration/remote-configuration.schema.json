@@ -16,6 +16,7 @@
         "tutorial-graphs",
         "tutorial-functions-reminders",
         "lua-community-scripts-root",
+        "lua-graphs-docs",
         "play-store-page",
         "function-catalogue-location",
         "function-catalogue-signature",
@@ -39,7 +40,9 @@
         },
         "tutorial-lua": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "$comment": "Deprecated 2026-11-27: retained for app releases using the single-file Lua graph workflow, before package-based configuration UI. Do not remove: older clients require this key.",
+          "description": "Archived single-file Lua graph user tutorial for older app versions"
         },
         "tutorial-graphs": {
           "type": "string",
@@ -52,7 +55,14 @@
         },
         "lua-community-scripts-root": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "$comment": "Deprecated 2026-11-27: retained for the GitHub/download button in app releases using the single-file Lua graph workflow. Package-aware clients no longer use a website catalog. Do not remove: older clients require this key.",
+          "description": "Archived single-file Lua graph catalog for older app versions"
+        },
+        "lua-graphs-docs": {
+          "type": "string",
+          "format": "uri",
+          "description": "Developer guide for writing Lua graph scripts and packages"
         },
         "play-store-page": {
           "type": "string",

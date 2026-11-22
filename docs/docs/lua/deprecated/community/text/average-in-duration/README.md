@@ -6,7 +6,7 @@ search:
 # Average in Duration
 
 !!! warning "Deprecated documentation"
-    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../community/index.md).
+    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../developer-guide/writing-graph-scripts.md).
 
 
 Shows the average of all data points from all data sources combined over a specified duration prior to now. This is a moving average that calculates the mean of all values within the duration window, not bounded by calendar periods. For example, the average over the last 7 days, or the average over the last 30 days from the current moment.

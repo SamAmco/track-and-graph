@@ -337,7 +337,6 @@
     <string name="functions_first_time_user_title">Dobrodošli v funkcijah</string>
     <string name="functions_first_time_user_message">Funkcije so napredna možnost, ki vam omogoča združevanje, združevanje po skupinah in pretvarjanje podatkov v nove izpeljane vire podatkov.</string>
     <string name="learn_more">Več informacij</string>
-    <string name="github">GitHub</string>
     <string name="paste">Prilepi</string>
     <string name="failed_to_download_file">Prenos datoteke ni uspel: %s</string>
     <string name="confirm_deep_link">Prejeli ste povezavo do skripta iz neznanega vira. Nameščajte skripte samo iz virov, ki jim zaupate. Ali želite namestiti ta skript?</string>

@@ -530,7 +530,6 @@
     <string name="functions_first_time_user_title">Sveiki atvykę į funkcijas</string>
     <string name="functions_first_time_user_message">Funkcijos yra išplėstinė funkcija, leidžianti sujungti, agreguoti ir transformuoti duomenis į naujus išvestinius duomenų šaltinius.</string>
     <string name="learn_more">Sužinokite daugiau čia</string>
-    <string name="github">GitHub</string>
     <string name="paste">Įklijuoti</string>
     <string name="failed_to_download_file">Nepavyko atsisiųsti failo: %s</string>
     <string name="confirm_deep_link">Gavote scenarijaus nuorodą iš nežinomo šaltinio. Diekite scenarijus tik iš patikimų šaltinių. Ar norite įdiegti šį scenarijų?</string>

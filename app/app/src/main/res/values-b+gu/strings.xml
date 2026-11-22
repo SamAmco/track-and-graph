@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Functions માં આપનું સ્વાગત છે</string>
     <string name="functions_first_time_user_message">Functions એક અદ્યતન સુવિધા છે, જે તમને તમારા ડેટાને જોડીને, એકત્રિત કરીને અને રૂપાંતરિત કરીને નવા ઉત્પન્ન ડેટા સ્રોતોમાં બદલવાની મંજૂરી આપે છે.</string>
     <string name="learn_more">અહીં વધુ જાણો</string>
-    <string name="github">GitHub</string>
     <string name="paste">પેસ્ટ કરો</string>
     <string name="failed_to_download_file">ફાઇલ ડાઉનલોડ નિષ્ફળ થયું: %s</string>
     <string name="confirm_deep_link">તમને અજ્ઞાત સ્રોતમાંથી સ્ક્રિપ્ટની લિંક મળી છે. તમે વિશ્વાસ કરતા સ્રોતોમાંથી જ સ્ક્રિપ્ટ ઇન્સ્ટોલ કરો. શું તમે આ સ્ક્રિપ્ટ ઇન્સ્ટોલ કરવા માંગો છો?</string>

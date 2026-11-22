@@ -359,7 +359,6 @@
     <string name="functions_first_time_user_title">Բարի գալուստ Functions</string>
     <string name="functions_first_time_user_message">Functions-ը առաջադեմ հնարավորություն է, որը թույլ է տալիս համադրել, համախմբել և փոխակերպել ձեր տվյալները նոր ածանցյալ տվյալների աղբյուրների։</string>
     <string name="learn_more">Իմանալ ավելին այստեղ</string>
-    <string name="github">GitHub</string>
     <string name="paste">Տեղադրել</string>
     <string name="failed_to_download_file">Չհաջողվեց ներբեռնել ֆայլը՝ %s</string>
     <string name="confirm_deep_link">Դուք ստացել եք սկրիպտի հղում անհայտ աղբյուրից։ Տեղադրեք սկրիպտներ միայն վստահելի աղբյուրներից։ Տեղադրե՞լ այս սկրիպտը։</string>

@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Καλώς ήρθατε στις συναρτήσεις</string>
     <string name="functions_first_time_user_message">Οι συναρτήσεις είναι μια προηγμένη δυνατότητα που σας επιτρέπει να συνδυάζετε, να συγκεντρώνετε και να μετασχηματίζετε τα δεδομένα σας σε νέες παράγωγες πηγές δεδομένων.</string>
     <string name="learn_more">Μάθετε περισσότερα εδώ</string>
-    <string name="github">GitHub</string>
     <string name="paste">Επικόλληση</string>
     <string name="failed_to_download_file">Η λήψη του αρχείου απέτυχε: %s</string>
     <string name="confirm_deep_link">Λάβατε έναν σύνδεσμο script από άγνωστη πηγή. Εγκαθιστάτε script μόνο από πηγές που εμπιστεύεστε. Θέλετε να εγκαταστήσετε αυτό το script;</string>

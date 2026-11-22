@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">ወደ ፋንክሽኖች እንኳን በደህና መጡ</string>
     <string name="functions_first_time_user_message">ፋንክሽኖች ውሂብዎን ወደ አዲስ የተዋጡ የውሂብ ምንጮች እንዲያጣምሩ፣ እንዲያጠቃልሉ እና እንዲቀይሩ የሚያስችሉ የላቁ ባህሪያት ናቸው።</string>
     <string name="learn_more">እዚህ ተጨማሪ ይወቁ</string>
-    <string name="github">GitHub</string>
     <string name="paste">ለጥፍ</string>
     <string name="failed_to_download_file">ፋይሉን ማውረድ አልተሳካም፦ %s</string>
     <string name="confirm_deep_link">ከማይታወቅ ምንጭ የስክሪፕት አገናኝ ደርሶዎታል። ስክሪፕቶችን የሚያምኗቸው ምንጮች ብቻ ይጫኑ። ይህን ስክሪፕት መጫን ይፈልጋሉ?</string>

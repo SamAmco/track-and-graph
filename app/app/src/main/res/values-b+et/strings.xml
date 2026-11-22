@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Tere tulemast funktsioonide juurde</string>
     <string name="functions_first_time_user_message">Funktsioonid on täiustatud funktsioon, mis võimaldab andmeid kombineerida, koondada ja teisendada uuteks tuletatud andmeallikateks.</string>
     <string name="learn_more">Loe lähemalt siin</string>
-    <string name="github">GitHub</string>
     <string name="paste">Kleebi</string>
     <string name="failed_to_download_file">Faili allalaadimine nurjus: %s</string>
     <string name="confirm_deep_link">Sa said skripti lingi tundmatust allikast. Installi skripte ainult usaldusväärsetest allikatest. Kas soovid selle skripti installida?</string>

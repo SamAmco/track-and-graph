@@ -359,7 +359,6 @@
     <string name="functions_first_time_user_title">Maligayang pagdating sa Functions</string>
     <string name="functions_first_time_user_message">Ang Functions ay advanced na feature na nagbibigay-daan sa pagsasama, pag-aaggregate, at pagbabago ng iyong data upang maging mga bagong derived data source.</string>
     <string name="learn_more">Matuto pa rito</string>
-    <string name="github">GitHub</string>
     <string name="paste">I-paste</string>
     <string name="failed_to_download_file">Hindi na-download ang file: %s</string>
     <string name="confirm_deep_link">Nakatanggap ka ng link ng script mula sa hindi kilalang pinagmulan. Mag-install lamang ng script mula sa mga pinagkakatiwalaang source. Gusto mo bang i-install ang script na ito?</string>

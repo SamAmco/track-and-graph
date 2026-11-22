@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Ongi etorri Functions-era</string>
     <string name="functions_first_time_user_message">Functions funtzio aurreratua da, zure datuak konbinatu, agregatu eta eraldatuz datu-iturri deribatu berriak sortzeko aukera ematen duena.</string>
     <string name="learn_more">Informazio gehiago hemen</string>
-    <string name="github">GitHub</string>
     <string name="paste">Itsatsi</string>
     <string name="failed_to_download_file">Ezin izan da fitxategia deskargatu: %s</string>
     <string name="confirm_deep_link">Iturri ezezagun bateko script-esteka jaso duzu. Instalatu script-ak soilik konfiantzazko iturrietatik. Script hau instalatu nahi duzu?</string>

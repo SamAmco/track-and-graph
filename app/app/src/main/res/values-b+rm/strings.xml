@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Bainvegni tar las funcziuns</string>
     <string name="functions_first_time_user_message">Las funcziuns èn ina funcziun avanzada che permetta da cumbinar, aggregrar e transfurmar tias datas en novas funtaunas da datas derivadas.</string>
     <string name="learn_more">Dapli infurmaziuns qua</string>
-    <string name="github">GitHub</string>
     <string name="paste">Collar</string>
     <string name="failed_to_download_file">Betg reussì da telechargiar il file: %s</string>
     <string name="confirm_deep_link">Ti has survegnì in link da script d\'ina funtauna nunenconuschenta. Installa mo scripts da funtaunas en las qualas ti fidas. Vuls ti installar quest script?</string>

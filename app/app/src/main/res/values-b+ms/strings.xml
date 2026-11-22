@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">Selamat datang ke Fungsi</string>
     <string name="functions_first_time_user_message">Fungsi ialah ciri lanjutan yang membolehkan anda menggabungkan, mengagregatkan dan mengubah data anda menjadi sumber data terbitan baharu.</string>
     <string name="learn_more">Ketahui lebih lanjut di sini</string>
-    <string name="github">GitHub</string>
     <string name="paste">Tampal</string>
     <string name="failed_to_download_file">Gagal memuat turun fail: %s</string>
     <string name="confirm_deep_link">Anda menerima pautan skrip daripada sumber yang tidak dikenali. Pasang skrip hanya daripada sumber yang anda percayai. Mahu memasang skrip ini?</string>

@@ -549,7 +549,6 @@
     <string name="functions_first_time_user_title">Ласкаво просимо до функцій</string>
     <string name="functions_first_time_user_message">Функції — це розширена можливість об’єднувати, агрегувати та перетворювати дані на нові похідні джерела даних.</string>
     <string name="learn_more">Дізнатися більше</string>
-    <string name="github">GitHub</string>
     <string name="paste">Вставити</string>
     <string name="failed_to_download_file">Не вдалося завантажити файл: %s</string>
     <string name="confirm_deep_link">Ви отримали посилання на скрипт із невідомого джерела. Встановлюйте скрипти лише з надійних джерел. Встановити цей скрипт?</string>

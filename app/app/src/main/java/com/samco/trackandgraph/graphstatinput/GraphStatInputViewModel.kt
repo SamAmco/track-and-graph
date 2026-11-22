@@ -116,7 +116,7 @@ interface GraphStatInputViewModel {
     fun onConfigEvent(configData: GraphStatConfigEvent?)
     fun createGraphOrStat()
     fun onLuaFirstTimeUserDialogDismiss()
-    fun onOpenLuaTutorialPath()
+    fun onOpenLuaDeveloperGuide()
 }
 
 @HiltViewModel
@@ -245,9 +245,9 @@ class GraphStatInputViewModelImpl @Inject constructor(
         _showLuaFirstTimeUserDialog.value = false
     }
 
-    override fun onOpenLuaTutorialPath() {
+    override fun onOpenLuaDeveloperGuide() {
         viewModelScope.launch {
-            urlNavigator.navigateTo(context, UrlNavigator.Location.TUTORIAL_LUA)
+            urlNavigator.navigateTo(context, UrlNavigator.Location.LUA_GRAPHS_DOCS)
         }
     }
 

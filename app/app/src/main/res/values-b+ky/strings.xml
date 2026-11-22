@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Функцияларга кош келиңиз</string>
     <string name="functions_first_time_user_message">Функциялар — дайындарыңызды бириктирип, жыйынтыктап жана өзгөртүп, жаңы туунду маалымат булактарын түзүүгө мүмкүндүк берген өркүндөтүлгөн мүмкүнчүлүк.</string>
     <string name="learn_more">Бул жерден көбүрөөк билиңиз</string>
-    <string name="github">GitHub</string>
     <string name="paste">Коюу</string>
     <string name="failed_to_download_file">Файл жүктөлгөн жок: %s</string>
     <string name="confirm_deep_link">Сиз белгисиз булактан скрипт шилтемесин алдыңыз. Скрипттерди ишенген булактардан гана орнотуңуз. Бул скриптти орноткуңуз келеби?</string>

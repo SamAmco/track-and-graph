@@ -6,7 +6,7 @@ search:
 # Merge Inputs
 
 !!! warning "Deprecated documentation"
-    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../community/index.md).
+    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../developer-guide/writing-graph-scripts.md).
 
 
 Plots all provided data sources in a single line where all datapoints are sorted by their timestamp.

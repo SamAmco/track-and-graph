@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">歡迎使用函數</string>
     <string name="functions_first_time_user_message">函數是進階功能，可讓您結合、彙總及轉換資料，建立新的衍生資料來源。</string>
     <string name="learn_more">在此深入瞭解</string>
-    <string name="github">GitHub</string>
     <string name="paste">貼上</string>
     <string name="failed_to_download_file">下載檔案失敗：%s</string>
     <string name="confirm_deep_link">您收到來自未知來源的指令碼連結。請只從您信任的來源安裝指令碼。要安裝此指令碼嗎？</string>

@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Funksiyalara xoş gəlmisiniz</string>
     <string name="functions_first_time_user_message">Funksiyalar məlumatlarınızı birləşdirməyə, ümumiləşdirməyə və yeni törəmə məlumat mənbələrinə çevirməyə imkan verən inkişaf etmiş funksiyadır.</string>
     <string name="learn_more">Ətraflı öyrənin</string>
-    <string name="github">GitHub</string>
     <string name="paste">Yapışdır</string>
     <string name="failed_to_download_file">Faylı yükləmək alınmadı: %s</string>
     <string name="confirm_deep_link">Naməlum mənbədən skript linki almısınız. Skriptləri yalnız etibar etdiyiniz mənbələrdən quraşdırın. Bu skripti quraşdırmaq istəyirsiniz?</string>

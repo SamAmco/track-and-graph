@@ -44,6 +44,8 @@ data class Endpoints(
     val tutorialFunctionsReminders: String,
     @SerialName("lua-community-scripts-root")
     val luaCommunityScriptsRoot: String,
+    @SerialName("lua-graphs-docs")
+    val luaGraphsDocs: String,
     @SerialName("play-store-page")
     val playStorePage: String,
     @SerialName("function-catalogue-location")

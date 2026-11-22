@@ -49,7 +49,6 @@ nav:
     - tutorial/timestamps.md
     - tutorial/functions.md
   - Lua:
-    - lua/community/index.md
     - 'Developer Guide':
       - lua/developer-guide/intro.md
       - lua/developer-guide/writing-graph-scripts.md

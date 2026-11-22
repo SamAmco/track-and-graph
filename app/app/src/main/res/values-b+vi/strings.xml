@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">Chào mừng đến với Hàm</string>
     <string name="functions_first_time_user_message">Hàm là tính năng nâng cao cho phép bạn kết hợp, tổng hợp và chuyển đổi dữ liệu thành các nguồn dữ liệu dẫn xuất mới.</string>
     <string name="learn_more">Tìm hiểu thêm tại đây</string>
-    <string name="github">GitHub</string>
     <string name="paste">Dán</string>
     <string name="failed_to_download_file">Không thể tải tệp xuống: %s</string>
     <string name="confirm_deep_link">Bạn đã nhận được liên kết tập lệnh từ một nguồn không xác định. Chỉ cài đặt tập lệnh từ các nguồn bạn tin cậy. Bạn có muốn cài đặt tập lệnh này không?</string>

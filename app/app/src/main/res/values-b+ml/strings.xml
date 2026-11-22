@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Functions-ലേക്ക് സ്വാഗതം</string>
     <string name="functions_first_time_user_message">ഡാറ്റ സംയോജിപ്പിക്കാനും സമാഹരിക്കാനും പരിവർത്തനം ചെയ്ത് പുതിയ ഡെറൈവ് ചെയ്ത ഡാറ്റാ ഉറവിടങ്ങളാക്കാനും അനുവദിക്കുന്ന വിപുലമായ സവിശേഷതയാണ് Functions.</string>
     <string name="learn_more">കൂടുതൽ അറിയുക</string>
-    <string name="github">GitHub</string>
     <string name="paste">ഒട്ടിക്കുക</string>
     <string name="failed_to_download_file">ഫയൽ ഡൗൺലോഡ് ചെയ്യാനായില്ല: %s</string>
     <string name="confirm_deep_link">അജ്ഞാത ഉറവിടത്തിൽ നിന്ന് നിങ്ങൾക്ക് ഒരു സ്ക്രിപ്റ്റ് ലിങ്ക് ലഭിച്ചു. വിശ്വസിക്കുന്ന ഉറവിടങ്ങളിൽ നിന്ന് മാത്രം സ്ക്രിപ്റ്റുകൾ ഇൻസ്റ്റാൾ ചെയ്യുക. ഈ സ്ക്രിപ്റ്റ് ഇൻസ്റ്റാൾ ചെയ്യണോ?</string>

@@ -504,7 +504,6 @@
     <string name="functions_first_time_user_title">Функцияларға қош келдіңіз</string>
     <string name="functions_first_time_user_message">Функциялар — деректерді біріктіріп, жинақтап және түрлендіріп, жаңа туынды дереккөздер жасауға мүмкіндік беретін кеңейтілген мүмкіндік.</string>
     <string name="learn_more">Толығырақ ақпарат</string>
-    <string name="github">GitHub</string>
     <string name="paste">Қою</string>
     <string name="failed_to_download_file">Файлды жүктеп алу сәтсіз аяқталды: %s</string>
     <string name="confirm_deep_link">Сізге белгісіз дереккөзден скрипт сілтемесі келді. Скрипттерді тек сенімді дереккөздерден орнатыңыз. Бұл скриптті орнатқыңыз келе ме?</string>

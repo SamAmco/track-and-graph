@@ -359,7 +359,6 @@
     <string name="functions_first_time_user_title">კეთილი იყოს თქვენი მობრძანება ფუნქციებში</string>
     <string name="functions_first_time_user_message">ფუნქციები მოწინავე შესაძლებლობაა, რომელიც საშუალებას გაძლევთ დააკავშიროთ, დააჯგუფოთ და გარდაქმნათ თქვენი მონაცემები ახალ წარმოებულ მონაცემთა წყაროებად.</string>
     <string name="learn_more">შეიტყვეთ მეტი აქ</string>
-    <string name="github">GitHub</string>
     <string name="paste">ჩასმა</string>
     <string name="failed_to_download_file">ფაილის ჩამოტვირთვა ვერ მოხერხდა: %s</string>
     <string name="confirm_deep_link">თქვენ მიიღეთ სკრიპტის ბმული უცნობი წყაროდან. დააყენეთ სკრიპტები მხოლოდ სანდო წყაროებიდან. გსურთ ამ სკრიპტის დაყენება?</string>

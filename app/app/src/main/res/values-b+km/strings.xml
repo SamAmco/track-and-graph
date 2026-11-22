@@ -337,7 +337,6 @@
     <string name="functions_first_time_user_title">សូមស្វាគមន៍មកកាន់អនុគមន៍</string>
     <string name="functions_first_time_user_message">អនុគមន៍ជាមុខងារកម្រិតខ្ពស់ ដែលអនុញ្ញាតឱ្យអ្នកបញ្ចូល សរុប និងបម្លែងទិន្នន័យរបស់អ្នកទៅជាប្រភពទិន្នន័យដែលបានដេរីវេថ្មី។</string>
     <string name="learn_more">ស្វែងយល់បន្ថែមនៅទីនេះ</string>
-    <string name="github">GitHub</string>
     <string name="paste">បិទភ្ជាប់</string>
     <string name="failed_to_download_file">ទាញយកឯកសារបរាជ័យ៖ %s</string>
     <string name="confirm_deep_link">អ្នកបានទទួលតំណស្គ្រីបពីប្រភពមិនស្គាល់។ សូមដំឡើងស្គ្រីបតែពីប្រភពដែលអ្នកទុកចិត្តប៉ុណ្ណោះ។ តើអ្នកចង់ដំឡើងស្គ្រីបនេះឬទេ?</string>

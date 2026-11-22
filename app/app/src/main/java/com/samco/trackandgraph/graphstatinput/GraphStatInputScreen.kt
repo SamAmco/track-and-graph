@@ -237,7 +237,7 @@ internal fun GraphStatInputView(
     if (showLuaFirstTimeUserDialog.value) {
         LuaFirstTimeUserDialog(
             onDismiss = viewModel::onLuaFirstTimeUserDialogDismiss,
-            onOpenLuaTutorialPath = viewModel::onOpenLuaTutorialPath
+            onOpenLuaDeveloperGuide = viewModel::onOpenLuaDeveloperGuide
         )
     }
 }
@@ -387,7 +387,7 @@ private fun DemoButton(
 @Composable
 private fun LuaFirstTimeUserDialog(
     onDismiss: () -> Unit,
-    onOpenLuaTutorialPath: () -> Unit,
+    onOpenLuaDeveloperGuide: () -> Unit,
 ) {
     CustomContinueCancelDialog(
         onDismissRequest = onDismiss,
@@ -408,7 +408,7 @@ private fun LuaFirstTimeUserDialog(
                 TextLink(
                     stringResource(id = R.string.learn_more),
                 ) {
-                    onOpenLuaTutorialPath()
+                    onOpenLuaDeveloperGuide()
                     onDismiss()
                 }
             }
@@ -420,7 +420,7 @@ private fun LuaFirstTimeUserDialog(
 @Preview(showBackground = true)
 @Composable
 private fun LuaFirstTimeUserDialogPreview() {
-    LuaFirstTimeUserDialog(onDismiss = {}, onOpenLuaTutorialPath = {})
+    LuaFirstTimeUserDialog(onDismiss = {}, onOpenLuaDeveloperGuide = {})
 }
 
 @Composable

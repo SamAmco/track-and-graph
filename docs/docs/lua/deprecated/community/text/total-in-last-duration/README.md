@@ -6,7 +6,7 @@ search:
 # Total in Last Duration
 
 !!! warning "Deprecated documentation"
-    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../community/index.md).
+    This page describes the older single-file Lua graph workflow. It is retained for existing users and is no longer maintained. [Current documentation](../../../../developer-guide/writing-graph-scripts.md).
 
 
 Shows the total of a given input over a **rolling time window** extending backwards from the current moment. For example:

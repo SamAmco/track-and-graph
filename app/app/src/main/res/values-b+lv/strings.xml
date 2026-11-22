@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Laipni lūdzam funkciju sadaļā</string>
     <string name="functions_first_time_user_message">Funkcijas ir uzlabota iespēja, kas ļauj apvienot, apkopot un pārveidot datus jaunos atvasinātos datu avotos.</string>
     <string name="learn_more">Uzziniet vairāk šeit</string>
-    <string name="github">GitHub</string>
     <string name="paste">Ielīmēt</string>
     <string name="failed_to_download_file">Neizdevās lejupielādēt failu: %s</string>
     <string name="confirm_deep_link">Jūs saņēmāt skripta saiti no nezināma avota. Instalējiet skriptus tikai no avotiem, kuriem uzticaties. Vai vēlaties instalēt šo skriptu?</string>

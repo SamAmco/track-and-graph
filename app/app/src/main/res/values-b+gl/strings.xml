@@ -511,7 +511,6 @@
     <string name="functions_first_time_user_title">Benvido ás funcións</string>
     <string name="functions_first_time_user_message">As funcións son unha función avanzada que che permite combinar, agregar e transformar os teus datos en novas fontes de datos derivadas.</string>
     <string name="learn_more">Máis información aquí</string>
-    <string name="github">GitHub</string>
     <string name="paste">Pegar</string>
     <string name="failed_to_download_file">Non se puido descargar o ficheiro: %s</string>
     <string name="confirm_deep_link">Recibiches unha ligazón a un script desde unha fonte descoñecida. Instala scripts só de fontes nas que confíes. Queres instalar este script?</string>

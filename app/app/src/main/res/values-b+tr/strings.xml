@@ -492,7 +492,6 @@
     <string name="functions_first_time_user_title">Fonksiyonlara Hoş Geldiniz</string>
     <string name="functions_first_time_user_message">Fonksiyonlar, verilerinizi birleştirmenizi, toplamanızı ve dönüştürerek yeni türetilmiş veri kaynakları oluşturmanızı sağlayan gelişmiş bir özelliktir.</string>
     <string name="learn_more">Buradan daha fazla bilgi edinin</string>
-    <string name="github">GitHub</string>
     <string name="paste">Yapıştır</string>
     <string name="failed_to_download_file">Dosya indirilemedi: %s</string>
     <string name="confirm_deep_link">Bilinmeyen bir kaynaktan betik bağlantısı aldınız. Yalnızca güvendiğiniz kaynaklardan betik yükleyin. Bu betiği yüklemek istiyor musunuz?</string>

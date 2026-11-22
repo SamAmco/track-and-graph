@@ -365,7 +365,6 @@
     <string name="functions_first_time_user_title">Welkom bij Functies</string>
     <string name="functions_first_time_user_message">Functies zijn een geavanceerde functie waarmee je gegevens kunt combineren, samenvoegen en omzetten in nieuwe afgeleide gegevensbronnen.</string>
     <string name="learn_more">Lees hier meer</string>
-    <string name="github">GitHub</string>
     <string name="paste">Plakken</string>
     <string name="failed_to_download_file">Downloaden van bestand mislukt: %s</string>
     <string name="confirm_deep_link">Je hebt een scriptlink ontvangen van een onbekende bron. Installeer alleen scripts van bronnen die je vertrouwt. Wil je dit script installeren?</string>
