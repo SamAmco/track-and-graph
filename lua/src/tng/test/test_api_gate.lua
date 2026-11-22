@@ -1,0 +1,52 @@
+package.path = package.path .. ";src/?.lua;src/?/init.lua"
+local helpers = require("src.tng.test.test_helpers")
+local gate = require("community.test-utils.api-gate")
+
+helpers.test("empty API usage is valid", function()
+    local session = gate.new()
+    session.reset()
+    session.validate(1)
+end)
+
+helpers.test("gates track functions constants and nested tables with qualified diagnostics", function()
+    local session = gate.new()
+    local f = function() return 7 end
+    local api = session.gate({ f = f, values = { NEXT = 6 } },
+        { f = 1, values = 1, ["values.NEXT"] = 6 }, "tng.fixture")
+    assert(api.f == f and api.f() == 7)
+    session.validate(1)
+    assert(api.values.NEXT == 6)
+    local ok, message = pcall(session.validate, 5)
+    assert(not ok and message:find("tng.fixture.values.NEXT", 1, true))
+    session.validate(6)
+end)
+
+helpers.test("independent sessions can interleave without sharing usage or levels", function()
+    local first, second = gate.new(), gate.new()
+    local a = first.gate({ x = 1 }, { x = 6 })
+    local b = second.gate({ x = 1 }, { x = 1 })
+    assert(a.x == b.x)
+    second.validate(1)
+    assert(not pcall(first.validate, 5))
+    first.validate(6)
+end)
+
+helpers.test("fixture accesses can be excluded without losing deferred callback usage", function()
+    local session = gate.new()
+    local api = session.gate({ future = function() end }, { future = 6 })
+    session.set_tracking(false)
+    api.future()
+    session.validate(1)
+    local callback = function() api.future() end
+    session.set_tracking(true)
+    callback()
+    assert(not pcall(session.validate, 5))
+end)
+
+helpers.test("undeclared exports fail and gated tables remain read only", function()
+    local session = gate.new()
+    local api = session.gate({ x = 1 }, {})
+    assert(not pcall(function() return api.x end))
+    assert(not pcall(function() api.x = 2 end))
+end)
+helpers.finish_tests()

@@ -16,7 +16,6 @@
  */
 package com.samco.trackandgraph.data.lua.community_test_runner
 
-import com.samco.trackandgraph.data.lua.apiimpl.ModuleLoadInterceptor
 import io.github.z4kn4fein.semver.toVersion
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,7 +23,6 @@ import org.junit.runners.Parameterized
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import java.io.File
 
 @RunWith(Parameterized::class)
 internal class FunctionTestRunner : CommunityTestRunner() {
@@ -45,39 +43,13 @@ internal class FunctionTestRunner : CommunityTestRunner() {
             return crawlTestDirectory("generated/lua-community/functions")
         }
 
-        private fun loadLuaFile(globals: Globals, path: String): LuaValue {
-            val classLoader = FunctionTestRunner::class.java.classLoader!!
-            val scriptText = File(classLoader.getResource(path).toURI()).readText()
-            return globals.load(scriptText).call()
-        }
     }
 
-    override fun getModuleLoadInterceptor(): ModuleLoadInterceptor {
-        return object : ModuleLoadInterceptor {
-            override fun onModuleLoad(
-                globals: Globals,
-                moduleName: String,
-                module: LuaTable
-            ): LuaTable {
-                if (!moduleName.startsWith("tng.")) return module
-
-                val gateModule = loadLuaFile(
-                    globals = globals,
-                    path = "generated/lua-community/test-utils/api-gate.lua"
-                )
-
-                val moduleFileName = moduleName.removePrefix("tng.")
-                val apiSpecModule = loadLuaFile(
-                    globals = globals,
-                    path = "generated/lua-api/$moduleFileName.apispec.lua"
-                )
-
-                return gateModule["gate"].checkfunction()!!
-                    .call(module, apiSpecModule)
-                    .checktable()!!
-            }
-        }
+    private val apiUsage by lazy {
+        ApiUsageTracker { path -> requireNotNull(readAssetToString(path)) { "Missing resource: $path" } }
     }
+
+    override fun getModuleLoadInterceptor() = apiUsage
 
     @Test
     fun `run community function test`() {
@@ -85,13 +57,14 @@ internal class FunctionTestRunner : CommunityTestRunner() {
         val vmLease = acquireTestVMLease(vmProvider)
         try {
             // Reset API usage tracking
-            val gateModule = loadLuaFile(vmLease.globals, "generated/lua-community/test-utils/api-gate.lua")
-            gateModule["reset"].checkfunction()!!.call()
+            apiUsage.reset(vmLease.globals)
 
             // Read the script to get the version
-            val resolvedScript = daggerComponent.provideLuaScriptResolver()
-                .resolveLuaScript(scriptLuaText, vmLease)
-                .checktable()!!
+            val resolvedScript = apiUsage.track(vmLease.globals) {
+                daggerComponent.provideLuaScriptResolver()
+                    .resolveLuaScript(scriptLuaText, vmLease)
+                    .checktable()!!
+            }
 
             val version = resolvedScript["version"].checkjstring()!!.toVersion().major
 
@@ -101,17 +74,17 @@ internal class FunctionTestRunner : CommunityTestRunner() {
             for (key in testSet.keys()) {
                 runFunctionTest(
                     resolvedScript = resolvedScript,
+                    globals = vmLease.globals,
                     key = key,
                     testStructure = testSet[key].checktable()!!,
                 )
             }
 
             // Validate API usage at the end
-            gateModule["validate"].checkfunction()!!
-                .call(LuaValue.valueOf(version))
+            apiUsage.validate(vmLease.globals, version)
 
             // Clear usage table
-            gateModule["reset"].checkfunction()!!.call()
+            apiUsage.reset(vmLease.globals)
         } catch (t: Throwable) {
             println("Failed to run $testName : ${t.message}")
             t.printStackTrace()
@@ -123,6 +96,7 @@ internal class FunctionTestRunner : CommunityTestRunner() {
 
     private fun runFunctionTest(
         resolvedScript: LuaTable,
+        globals: Globals,
         key: LuaValue,
         testStructure: LuaTable,
     ) {
@@ -131,11 +105,13 @@ internal class FunctionTestRunner : CommunityTestRunner() {
             val testDataSources = testStructure["sources"].checkfunction()!!.call().checktable()!!
 
             // For functions, we execute the script directly and call the generator
-            val functionResult = executeFunctionScript(
-                resolvedScript = resolvedScript,
-                dataSources = testDataSources,
-                config = testConfig,
-            )
+            val functionResult = apiUsage.track(globals) {
+                executeFunctionScript(
+                    resolvedScript = resolvedScript,
+                    dataSources = testDataSources,
+                    config = testConfig,
+                )
+            }
             testStructure["assertions"].checkfunction()!!.call(functionResult)
             println("Test passed: $testName.$key")
         } catch (t: Throwable) {

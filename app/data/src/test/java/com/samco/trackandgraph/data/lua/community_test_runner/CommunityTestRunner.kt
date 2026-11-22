@@ -38,7 +38,7 @@ import java.io.File
 @OptIn(ExperimentalCoroutinesApi::class)
 internal abstract class CommunityTestRunner {
 
-    private fun readAssetToString(path: String): String? {
+    protected fun readAssetToString(path: String): String? {
         return javaClass.getClassLoader()
             ?.getResourceAsStream(path)
             .use { it?.bufferedReader()?.readText() }
