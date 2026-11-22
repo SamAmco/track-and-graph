@@ -49,7 +49,7 @@ tasks.register("copyLuaScriptsForTests") {
 
         // Frozen published scripts exercise installed-script compatibility, not a live catalog.
         copy {
-            from("${rootProject.projectDir}/../docs/docs/lua/community")
+            from("${rootProject.projectDir}/../docs/docs/lua/deprecated/community")
             into("${projectDir}/src/test/resources/generated/legacy-lua-graphs")
             include("**/script.lua")
         }
