@@ -1,8 +1,8 @@
 #!/usr/bin/env lua
-package.path = "src/examples/calendar-heatmap/?.lua;" .. package.path .. ";src/?.lua;src/?/init.lua"
+package.path = "src/community/graphs/calendar-heatmap/package/?.lua;" .. package.path .. ";src/?.lua;src/?/init.lua"
 local helpers = require("src.tng.test.test_helpers")
 local test = helpers.test
-local render = dofile("src/examples/calendar-heatmap/configuration.lua")
+local render = dofile("src/community/graphs/calendar-heatmap/package/configuration.lua")
 local ui = require("tng.ui")
 local core = require("tng.core")
 

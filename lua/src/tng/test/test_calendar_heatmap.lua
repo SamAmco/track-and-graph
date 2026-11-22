@@ -1,10 +1,10 @@
 #!/usr/bin/env lua
-package.path = "src/examples/calendar-heatmap/?.lua;" .. package.path .. ";src/?.lua;src/?/init.lua"
+package.path = "src/community/graphs/calendar-heatmap/package/?.lua;" .. package.path .. ";src/?.lua;src/?/init.lua"
 local helpers = require("src.tng.test.test_helpers")
 local test = helpers.test
 local core = require("tng.core")
-local prepare = dofile("src/examples/calendar-heatmap/data.lua")
-local render = dofile("src/examples/calendar-heatmap/renderer.lua")
+local prepare = dofile("src/community/graphs/calendar-heatmap/package/data.lua")
+local render = dofile("src/community/graphs/calendar-heatmap/package/renderer.lua")
 local month_layout = require("month_layout")
 
 -- Deterministic civil-date fixture for exercising the package under ordinary Lua.
