@@ -41,3 +41,10 @@ Two access patterns exist:
 ## Design Decisions
 
 - **No `InfoDisplay` for external links**: When an info button should open an external URL rather than show an in-app dialog, use a separate lambda (e.g. `onLuaScriptInfoClick`) threaded through the composable chain rather than routing through the `InfoDisplay` sealed class. `InfoDisplay` is only for in-app description dialogs.
+
+## Legacy graph documentation routing
+
+Older app releases and current package-aware builds use separate documentation
+endpoint keys. Keep the legacy keys in the shared configuration rather than
+renaming them. The paths, fallback decoding, and merge/site-publication constraint
+are documented in [Lua graph deprecation](lua-graph-scripts.md#legacy-catalog-deprecation-and-release).

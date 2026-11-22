@@ -226,7 +226,7 @@ From the repository root:
 # Run all function tests
 make run-community-functions-tests
 
-# Run all tests (functions + graphs)
+# Run function catalog and installed legacy graph compatibility tests
 make run-community-tests
 ```
 

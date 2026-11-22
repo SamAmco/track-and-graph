@@ -32,10 +32,12 @@ database-extract/               # Extracted DB snapshots (dev tooling)
 docs/
 ├── knowledge-base/             # Technical docs (see knowledge-base/index.yaml)
 └── docs/                       # User-facing docs (tutorials, Lua, policies)
+    └── lua/deprecated/         # Permanent legacy graph pages/downloads; not generated from Lua src
 fastlane/                       # Release automation (metadata, frameit)
 image-assets/                   # App store / marketing images
 lua/
 ├── src/community/functions/    # Community Lua function scripts
+├── src/community/graphs/       # Reserved for the new graph package catalog
 ├── src/tng/                    # TNG API and .apispec.lua files
 ├── catalog/                    # Generated catalog output (bundled for distribution)
 └── tools/                      # Build and validation scripts (pack-functions.lua, etc.)

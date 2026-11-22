@@ -7,10 +7,10 @@ topics:
   - DataSource API: sources["name"].dp() iterates data points in reverse chronological order
   - Script config: local variables modified directly by users; PREVIEW_START/END for collapsed view
   - core.DURATION (ms, arithmetic ok) vs core.PERIOD (variable length — NO arithmetic)
-  - Graph tests DIFFER from function tests: config values are Lua code strings (regex replacement); sources are named table
-  - File structure: lua/src/community/graphs/<category>/<script-name>/
+  - Installed-script compatibility tests use unchanged published scripts through the real engine
+  - The old source catalog is deleted; permanent legacy downloads live only in the deprecated website
   - Local package iteration uses external tng-lua-dev tooling and staged database replacement
-keywords: [lua, graph, script, package, tng, ZIP, configuration, render_configuration, prepare_data, render_graph, JSON, state, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, sync-lua-to-docs]
+keywords: [lua, graph, script, package, tng, ZIP, configuration, render_configuration, prepare_data, render_graph, JSON, state, visualization, line, pie, bar, text, data_point, custom-ui, DataSource, DURATION, PERIOD, tests, tng.graph, PREVIEW, community, deprecated, LegacyGraphCompatibilityTests, release-coordination]
 ---
 
 # Lua Graph Scripts
@@ -33,10 +33,10 @@ Returns a table that Track & Graph renders:
 | Type | Function | Description |
 |------|----------|-------------|
 | Text | `graph.text(params)` | Text display |
-| Data Point | `graph.data_point(dp)` | Single data point |
-| Line Graph | `graph.line(params)` | Line chart |
-| Time Bar Chart | `graph.time_bar(params)` | Bar chart (not histograms) |
-| Pie Chart | `graph.pie(params)` | Pie chart |
+| Data Point | `graph.data_point({ datapoint = dp })` | Single data point |
+| Line Graph | `graph.line_graph(params)` | Line chart |
+| Time Bar Chart | `graph.time_barchart(params)` | Bar chart (not histograms) |
+| Pie Chart | `graph.pie_chart(params)` | Pie chart |
 
 See `tng/graph.lua` for full parameter definitions.
 
@@ -61,7 +61,7 @@ return {
 
 This works for text, data-point, line, pie and time-bar results, in either inline scripts or packages. Package identity fields are independent of this execution contract. Built-in descriptors do not need `render_graph`: Android renders the prepared result. `CUSTOM` retains its existing two-phase contract, where preparation returns intermediate data for `render_graph` instead. Preparation runs once and its result is parsed directly, not recursively treated as another descriptor. A mismatched result type or a failing preparation hook becomes a normal graph error.
 
-Compatibility is selected by shape, not storage: a returned function still receives the original `sources` table directly, and a returned native result table without `prepare_data` is still parsed immediately. Do not wrap legacy function arguments in `params`. `NativeGraphDescriptorTests` pins both legacy shapes, all five native descriptor types, saved/nil state, errors and inline/package parity against the real engine; the community graph runner separately exercises the catalog scripts.
+Compatibility is selected by shape, not storage: a returned function still receives the original `sources` table directly, and a returned native result table without `prepare_data` is still parsed immediately. Do not wrap legacy function arguments in `params`. `NativeGraphDescriptorTests` pins both legacy shapes, all five native descriptor types, saved/nil state, errors and inline/package parity against the real engine; `LegacyGraphCompatibilityTests` exercises representative unchanged published scripts and their native parsed results.
 
 ## Multi-file graph packages
 
@@ -103,7 +103,7 @@ Return a function to receive configured data sources:
 return function(sources)
     local graph = require("tng.graph")
     local dp = sources["my_data_source"].dp()
-    return graph.data_point(dp)
+    return graph.data_point({ datapoint = dp })
 end
 ```
 
@@ -185,98 +185,28 @@ local color = core.COLOR.BLUE  -- Named constant
 
 Named colors: `RED_DARK`, `RED`, `ORANGE_DARK`, `ORANGE`, `YELLOW`, `BLUE_LIGHT`, `BLUE_SKY`, `BLUE`, `BLUE_DARK`, `BLUE_NAVY`, `GREEN_LIGHT`, `GREEN_DARK`
 
----
+## Legacy catalog deprecation and release
 
-# Contributing Graph Scripts
+The old single-file source catalog, regex-based `GraphScriptTestRunner`, and website-sync command have been removed. The scripts, pages and media survive only under `docs/docs/lua/deprecated/` as permanent website content. Do not regenerate or overwrite those downloads from `lua/src`, and do not create a separate source archive. Revision history preserves the deleted authoring code.
 
-## File Structure
+Current documentation retains the former entry-point URLs, with coming-soon pages linking explicitly to the deprecated material. Deprecated pages are published but excluded from main navigation and search. Their install links point directly at raw files in the new deprecated directory; preserving previously copied raw links or bookmarks to moved subpages is not a requirement.
 
-**Code and tests** in `lua/src/community/graphs/`:
-```
-lua/src/community/graphs/<category>/<script-name>/
-├── <script-name>.lua
-└── test_<script-name>.lua
-```
+Older releases keep using `tutorial-lua` and `lua-community-scripts-root`, now routed to the deprecated tutorial and catalog. Current builds use the separate `lua-graphs-docs` and `lua-graphs-root` keys for the normal documentation URLs. Defaults let current builds decode the already-published configuration until those new keys are deployed. See [remote URL navigation](remote-config-and-urls.md) for endpoint wiring.
 
-**Documentation** in `docs/docs/lua/community/`:
-```
-docs/docs/lua/community/<category>/<script-name>/
-├── script.lua    # Auto-generated via make sync-lua-to-docs
-├── README.md     # Manual
-└── image.png     # Screenshot
-```
+**Release coordination:** the move is prepared on a development branch, not published. Finish the coming-soon documentation before release. Coordinate merging the changed raw-file paths/configuration into master with publishing the built website around the new app release; doing only one leaves live pages, downloads or configuration routes out of sync. A local MkDocs build is validation, not publication. Do not run a website deploy or push as part of ordinary implementation.
 
-## Writing Tests
+Retiring downloads does not retire runtime compatibility. Preserve inline storage, migrations and feature mappings; the original `function(sources)` argument shape; direct result tables and native adapters; and the published `tng.core`, `tng.graph` and `tng.graphext` APIs. Installed scripts contain their own source and do not fetch the website to render.
 
-Graph script tests use **text-based config overrides** (different from function tests):
+### Compatibility tests and future packages
 
-```lua
-local M = {}
-local core = require("tng.core")
-local graph = require("tng.graph")
-local test = require("test.core")
+`LegacyGraphCompatibilityTests` loads unchanged published scripts from the deprecated website via generated test resources, uses fixed time and inputs, and checks parsed results for all five native graph types. This is an installed-user contract test, not a maintained catalog harness. `GraphApiLuaGraphTests` retains data-source/helper API checks, and `NativeGraphDescriptorTests` pins legacy return shapes alongside new descriptor support. Migration tests remain necessary to preserve persisted inline scripts and their input mappings.
 
-M.test_basic = {
-    config = {
-        -- Config values are STRINGS of Lua code (regex replacement)
-        period = "core.PERIOD.WEEK",
-        count_by_label = "true",
-        numerator_labels = "{'A', 'B'}",
-    },
-    sources = function()
-        local now = core.time().timestamp
-        return {
-            source1 = {  -- Named sources matching script
-                { timestamp = now - core.DURATION.DAY, value = 10.0, label = "A" },
-                { timestamp = now - core.DURATION.DAY * 2, value = 5.0, label = "B" },
-            },
-        }
-    end,
-    assertions = function(result)
-        test.assert("result was nil", result)
-        test.assertEquals(graph.GRAPH_TYPE.TEXT, result.type)
-        test.assertEquals("15/30", result.text)
-    end,
-}
-
-return M
-```
-
-### Key Differences from Function Tests
-
-| Aspect | Function Tests | Graph Tests |
-|--------|---------------|-------------|
-| Config values | Actual Lua types | Strings of Lua code |
-| Sources format | Array of arrays | Named table |
-| Why | Direct injection | Regex replacement |
-
-### Config Override Mechanism
-
-Test harness uses regex to replace variable declarations:
-```lua
--- Script has: local period = nil
--- Test config: { period = "core.PERIOD.WEEK" }
--- Result: local period = core.PERIOD.WEEK
-```
-
-### Running Tests
+Run these focused checks with:
 
 ```bash
-make run-community-graph-tests
+make run-legacy-graph-tests
 ```
 
-## Debugging
+`make run-community-tests` runs the function catalog suite plus these compatibility checks, and remains part of `make validate-all`. There is no `run-community-graph-tests` or `sync-lua-to-docs` command anymore.
 
-- Use `print()` for debugging (remove before PR)
-- Tables print as memory addresses - access fields directly
-- Check config keys match script variable names exactly
-- Verify config values are valid Lua code strings
-
-## Syncing to Docs
-
-After editing scripts:
-```bash
-make sync-lua-to-docs
-```
-
-This copies `*.lua` from `lua/src/community/graphs/` to `docs/docs/lua/community/`.
+Keep `lua/src/community/graphs/` for future packages; its README currently reserves the location. The calendar heatmap remains a disposable example until explicitly promoted. Do not recreate the old single-script discovery or regex configuration harness. The generic traversal utilities and graph root are retained, but future discovery must identify package roots rather than treating every nested module as a standalone graph. Graph catalog packaging/signing/publishing and the new graph lifecycle/API-gated harness are still future work.
