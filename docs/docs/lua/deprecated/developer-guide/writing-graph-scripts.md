@@ -11,6 +11,17 @@ search:
 
 This guide covers writing Lua graph scripts for custom visualizations. If you just want a reference for how to use the Lua graph feature in the app, check out [the tutorial here](../tutorial/lua-graphs.md).
 
+## Legacy scripting environment
+
+The [getting-started guide](../../developer-guide/intro.md) covers shared editor setup and Lua API discovery. It will evolve with current scripting support; these notes preserve the older graph workflow:
+
+- A graph script was a single Lua file, pasted into the app or imported as a file. It could not load your own modules with `require`; only the app-provided Track & Graph API modules were available.
+- The embedded engine was LuaK, a Kotlin port of LuaJ based on Lua 5.2.x. Scripts needed to target that language version rather than assume support for newer Lua features.
+- The scripting environment did not expose `dofile`, `loadfile`, or the standard `package` library. Scripts could not rely on OS commands, network access, or filesystem access.
+- The older examples now live in the [deprecated graph catalog](../community/index.md), including their downloadable single-file source. The current source tree is no longer the catalog for these scripts.
+
+The single-file restriction above describes older app versions, not the capabilities of current graph packages.
+
 ## Writing Your First Script
 
 To get started let's write and save a super simple script: 
