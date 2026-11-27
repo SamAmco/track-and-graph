@@ -119,7 +119,7 @@ docs:
 
   - file: lua-graph-scripts.md
     title: Writing Lua graph scripts and contributing graph scripts
-    description: Graph packages and descriptors, real-engine lifecycle harness and API gating, local device iteration, installed legacy script compatibility, deprecated downloads, and coordinated documentation release.
+    description: Graph packages and descriptors, real-engine lifecycle harness and API gating, sparse developer-guide scope, legacy documentation routing, local device iteration, and coordinated documentation release.
     keywords: [lua, graph, script, package, ZIP, tng, require, configuration, render_configuration, prepare_data, render_graph, JSON, state, translation, visualization, custom-ui, DataSource, DURATION, PERIOD, tests, GraphPackageTestRunner, ApiUsageTracker, harness, api-gating, tng.graph, community, tng-lua-dev, emulator, hot-reload, deprecated, LegacyGraphCompatibilityTests, release-coordination]
 
   - file: lua-tooling.md
@@ -129,8 +129,8 @@ docs:
 
   - file: remote-config-and-urls.md
     title: Remote configuration and URL navigation
-    description: How external URLs are managed via remote config and opened from the app — UrlNavigator pattern, adding new URLs, and the multi-file update checklist.
-    keywords: [RemoteConfiguration, UrlNavigator, Endpoints, remote-config, URL, navigate, triggerNavigation, browser, InfoDisplay]
+    description: Remote URL navigation, adding and retiring endpoints without breaking released clients, schema deprecation notes, and rollout validation.
+    keywords: [RemoteConfiguration, UrlNavigator, Endpoints, remote-config, URL, navigate, triggerNavigation, browser, InfoDisplay, deprecation, schema, rollout]
 
   - file: release-changelogs.md
     title: Release notes and in-app changelogs

@@ -1,8 +1,8 @@
 ---
 title: Remote configuration and URL navigation
 description: How external URLs are managed via remote config and opened from the app — UrlNavigator pattern, adding new URLs, and the multi-file update checklist.
-topics: [remote-config, url-navigation, endpoints]
-keywords: [RemoteConfiguration, UrlNavigator, Endpoints, remote-config, URL, navigate, triggerNavigation, browser]
+topics: [remote-config, url-navigation, endpoints, endpoint-deprecation]
+keywords: [RemoteConfiguration, UrlNavigator, Endpoints, remote-config, URL, navigate, triggerNavigation, browser, deprecation, schema, rollout]
 ---
 
 # Remote Configuration and URL Navigation
@@ -30,6 +30,21 @@ Update these files (all required):
 5. **`UrlNavigatorImpl.kt`** — add mapping in `getUrlForLocation()`
 6. **`RemoteConfigurationFixtures.kt`** (test) — add field to `testEndpoints`
 
+## Retiring an endpoint
+
+Removing a current UI button does not authorize deleting its shared configuration
+key: released clients may still require it. Keep the legacy JSON/schema fields,
+record the deprecation date and affected client era in the schema's `$comment`,
+and remove only unused current navigation/UI plumbing and resources. Retained
+serialized fields do not require retained navigation enum entries.
+
+Change schema, checked-in configuration, fixtures, and call sites together.
+Do not silently default a new endpoint to a legacy destination unless explicitly
+required; retaining old keys for released clients is a separate concern.
+Use intended post-merge URLs; for unpublished documentation,
+validate the schema and locally built destinations rather than treating the live
+site as authoritative. Keep deployment separate from implementation.
+
 ## Using UrlNavigator from UI
 
 Two access patterns exist:
@@ -46,5 +61,5 @@ Two access patterns exist:
 
 Older app releases and current package-aware builds use separate documentation
 endpoint keys. Keep the legacy keys in the shared configuration rather than
-renaming them. The paths, fallback decoding, and merge/site-publication constraint
+renaming them. The paths, required fields, and merge/site-publication constraint
 are documented in [Lua graph deprecation](lua-graph-scripts.md#legacy-catalog-deprecation-and-release).
